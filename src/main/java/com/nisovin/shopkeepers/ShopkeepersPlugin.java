@@ -118,6 +118,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// saving:
 	// flag to (temporary) turn off saving
 	private boolean skipSaving = false;
+	private volatile boolean savingFailed = false;
+	private long lastSavingErrorMsgTimeStamp = 0L;
+
 	private boolean dirty = false;
 	private int chunkLoadSaveTask = -1;
 	// keeps track about certain stats and information during a save, gets reused
@@ -134,7 +137,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public void onEnable() {
 		plugin = this;
+
+		// reset error state variables:
 		skipSaving = false;
+		savingFailed = false;
 
 		// try to load suitable NMS code:
 		NMSManager.load(this);
@@ -1169,12 +1175,26 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return new File(this.getDataFolder(), "save.yml");
 	}
 
+	private File getTempSaveFile() {
+		File saveFile = this.getSaveFile();
+		return new File(saveFile.getParentFile(), saveFile.getName() + ".temp");
+	}
+
 	// returns false if there was some issue during loading
 	private boolean load() {
-		File file = this.getSaveFile();
-		if (!file.exists()) {
-			// file does not exist yet -> no shopkeeper data available
-			return true;
+		File saveFile = this.getSaveFile();
+		if (!saveFile.exists()) {
+			File tempSaveFile = this.getTempSaveFile();
+			if (tempSaveFile.exists()) {
+				// load from temporary save file instead:
+				Log.warning("Found no save file, but an existing temporary save file! (" + tempSaveFile.getName() + ") \n"
+						+ "This might indicate an issue during a previous saving attempt! \n"
+						+ "Trying to load the shopkeepers data from this temporary save file instead!");
+				saveFile = tempSaveFile;
+			} else {
+				// save file does not exist yet -> no shopkeeper data available
+				return true;
+			}
 		}
 
 		YamlConfiguration shopkeepersConfig = new YamlConfiguration();
@@ -1182,7 +1202,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		FileInputStream stream = null;
 		try {
 			if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-				stream = new FileInputStream(file);
+				stream = new FileInputStream(saveFile);
 				scanner = new Scanner(stream, Settings.fileEncoding);
 				scanner.useDelimiter("\\A");
 				if (!scanner.hasNext()) {
@@ -1191,7 +1211,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				String data = scanner.next();
 				shopkeepersConfig.loadFromString(data);
 			} else {
-				shopkeepersConfig.load(file);
+				shopkeepersConfig.load(saveFile);
 			}
 		} catch (Exception e) {
 			// issue detected:
@@ -1295,9 +1315,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	// should only get called sync on disable:
-	private void saveReal(boolean async) {
+	private void saveReal(final boolean async) {
 		if (skipSaving) {
-			Log.debug("Skipped saving due to flag.");
+			Log.warning("Skipped saving due to previous issue.");
 			return;
 		}
 
@@ -1330,41 +1350,63 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		dirty = false;
 
+		// called sync:
+		final Runnable syncSavingCallback = new Runnable() {
+
+			@Override
+			public void run() {
+				// print debug info:
+				saveInfo.printDebugInfo();
+
+				// inform admins about saving issue:
+				// 4 min error message throttle, less than the saving interval in case of non-instant saving
+				if (savingFailed && Math.abs(System.currentTimeMillis() - lastSavingErrorMsgTimeStamp) > (4 * 60 * 1000L)) {
+					lastSavingErrorMsgTimeStamp = System.currentTimeMillis();
+					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Saving shop data failed! Please check out the server log(s) and look into the issue!";
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						if (player.hasPermission(ShopkeepersAPI.ADMIN_PERMISSION)) {
+							player.sendMessage(errorMsg);
+						}
+					}
+				}
+
+				if (async) {
+					saveIOTask = -1;
+
+					// did we get another request to saveReal() in the meantime?
+					if (saveRealAgain) {
+						// trigger another full save with latest data:
+						saveRealAgain = false;
+						saveReal();
+					}
+				}
+			}
+		};
+		// called possibly async:
+		final Runnable savingCallback = new Runnable() {
+
+			@Override
+			public void run() {
+				if (async) {
+					// continue in main thread:
+					Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, syncSavingCallback);
+				} else {
+					// already in main thread:
+					syncSavingCallback.run();
+				}
+			}
+		};
+
 		if (!async) {
 			// sync file io:
-			this.saveDataToFile(config, null);
-			// print debug info:
-			saveInfo.printDebugInfo();
+			this.saveDataToFile(config, savingCallback);
 		} else {
 			// async file io:
 			saveIOTask = Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
 
 				@Override
 				public void run() {
-					saveDataToFile(config, new Runnable() {
-
-						@Override
-						public void run() {
-							// continue sync:
-							Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, new Runnable() {
-
-								@Override
-								public void run() {
-									saveIOTask = -1;
-
-									// print debug info:
-									saveInfo.printDebugInfo();
-
-									// did we get another request to saveReal() in the meantime?
-									if (saveRealAgain) {
-										// trigger another full save with latest data:
-										saveRealAgain = false;
-										saveReal();
-									}
-								}
-							});
-						}
-					});
+					saveDataToFile(config, savingCallback);
 				}
 			}).getTaskId();
 		}
@@ -1381,107 +1423,148 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		saveInfo.ioStartTime = System.currentTimeMillis();
 
 		File saveFile = this.getSaveFile();
-		File tempSaveFile = new File(saveFile.getParentFile(), saveFile.getName() + ".temp");
+		File tempSaveFile = this.getTempSaveFile();
 
-		// first trying to save to a temporary save file
-		// if all goes well, the save file gets replaced with the temporary file
+		// saving procedure:
+		// inside a retry-loop:
+		// * if there is a temporary save file:
+		// * * if there is no save file: rename temporary save file to save file
+		// * * else: remove temporary save file
+		// * create parent directories
+		// * create new temporary save file
+		// * save data to temporary save file
+		// * remove old save file
+		// * rename temporary save file to save file
 
 		int savingAttempt = 0;
-		boolean printStacktrace = true;
-		String error;
+		boolean problem = false;
+		String error = null;
 		Exception exception;
+		boolean printStacktrace = true;
 
 		while (++savingAttempt <= SAVING_MAX_ATTEMPTS) {
-			boolean problem = false;
+			// reset problem variables:
+			problem = false;
 			error = null;
 			exception = null;
 
-			// remove old temporary file, if there is one:
-			if (!problem) {
-				if (tempSaveFile.exists()) {
-					if (!tempSaveFile.canWrite()) {
-						error = "Cannot write to temporary save file! (" + tempSaveFile.getName() + ")";
-						problem = true;
-					} else {
-						// remove old temporary save file:
-						if (!tempSaveFile.delete()) {
-							error = "Couldn't delete existing temporary save file! (" + tempSaveFile.getName() + ")";
+			try {
+				// handle already existing temporary save file:
+				if (!problem) {
+					if (tempSaveFile.exists()) {
+						// check write permission:
+						if (!tempSaveFile.canWrite()) {
+							error = "Cannot write to temporary save file! (" + tempSaveFile.getName() + ")";
+							problem = true;
+						}
+
+						if (!problem) {
+							if (!saveFile.exists()) {
+								// if only the temporary file exists, but the actual save file does not, this might
+								// indicate, that a previous saving attempt saved to the temporary file and removed the
+								// actual save file, but wasn't able to then rename the temporary file to the actual
+								// save file
+								// -> the temporary file might contain the only backup of saved data, don't remove it!
+								// -> instead we try to rename it to make it the new 'actual save file' and then
+								// continue the saving procedure
+
+								Log.warning("Found an already existing temporary save file, but no old save file! (" + tempSaveFile.getName() + ") \n"
+										+ "This might indicate an issue during a previous saving attempt! \n"
+										+ "Trying to rename the temporary save file to use it as 'existing old save data', and then continue the saving!");
+
+								// rename temporary save file:
+								if (!tempSaveFile.renameTo(saveFile)) {
+									error = "Couldn't rename temporary save file! (" + tempSaveFile.getName() + " to " + saveFile.getName() + ")";
+									problem = true;
+								}
+							} else {
+								// remove old temporary save file:
+								if (!tempSaveFile.delete()) {
+									error = "Couldn't delete existing temporary save file! (" + tempSaveFile.getName() + ")";
+									problem = true;
+								}
+							}
+						}
+					}
+				}
+
+				// make sure that the parent directories exist:
+				if (!problem) {
+					File parentDir = tempSaveFile.getParentFile();
+					if (parentDir != null && !parentDir.exists()) {
+						if (!parentDir.mkdirs()) {
+							error = "Couldn't create parent directories for temporary save file! (" + parentDir.getAbsolutePath() + ")";
 							problem = true;
 						}
 					}
 				}
-			}
 
-			// make sure that the parent directories exist:
-			if (!problem) {
-				File parentDir = tempSaveFile.getParentFile();
-				if (parentDir != null && !parentDir.exists()) {
-					if (!parentDir.mkdirs()) {
-						error = "Couldn't create parent directories for temporary save file! (" + parentDir.getAbsolutePath() + ")";
+				// create new temporary save file:
+				if (!problem) {
+					try {
+						tempSaveFile.createNewFile();
+					} catch (Exception e) {
+						error = "Couldn't create temporary save file! (" + tempSaveFile.getName() + ") : " + e.getMessage();
+						exception = e;
 						problem = true;
 					}
 				}
-			}
 
-			// create new temporary save file:
-			if (!problem) {
-				try {
-					tempSaveFile.createNewFile();
-				} catch (IOException e) {
-					error = "Couldn't create temporary save file! (" + tempSaveFile.getName() + ")";
-					exception = e;
-					problem = true;
-				}
-			}
-
-			// write shopkeeper data to temporary save file:
-			if (!problem) {
-				PrintWriter writer = null;
-				try {
-					if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-						writer = new PrintWriter(tempSaveFile, Settings.fileEncoding);
-						writer.write(config.saveToString());
-					} else {
-						config.save(tempSaveFile);
-					}
-				} catch (Exception e) {
-					error = "Couldn't save data to temporary save file!(" + tempSaveFile.getName() + ")";
-					exception = e;
-					problem = true;
-				} finally {
-					if (writer != null) {
-						writer.close();
-					}
-				}
-			}
-
-			// delete old save file:
-			if (!problem) {
-				if (saveFile.exists()) {
-					if (!saveFile.canWrite()) {
-						error = "Cannot write to save file! (" + saveFile.getName() + ")";
+				// write shopkeeper data to temporary save file:
+				if (!problem) {
+					PrintWriter writer = null;
+					try {
+						if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
+							writer = new PrintWriter(tempSaveFile, Settings.fileEncoding);
+							writer.write(config.saveToString());
+						} else {
+							config.save(tempSaveFile);
+						}
+					} catch (Exception e) {
+						error = "Couldn't save data to temporary save file! (" + tempSaveFile.getName() + ") : " + e.getMessage();
+						exception = e;
 						problem = true;
-					} else {
-						// remove old save file:
-						if (!saveFile.delete()) {
-							error = "Couldn't delete existing old save file! (" + saveFile.getName() + ")";
-							problem = true;
+					} finally {
+						if (writer != null) {
+							writer.close();
 						}
 					}
 				}
-			}
 
-			// rename temporary save file:
-			if (!problem) {
-				if (!tempSaveFile.renameTo(saveFile)) {
-					error = "Couldn't rename temporary save file! (" + tempSaveFile.getName() + " to " + saveFile.getName() + ")";
-					problem = true;
+				// delete old save file:
+				if (!problem) {
+					if (saveFile.exists()) {
+						// check write permission:
+						if (!saveFile.canWrite()) {
+							error = "Cannot write to save file! (" + saveFile.getName() + ")";
+							problem = true;
+						} else {
+							// delete old save file:
+							if (!saveFile.delete()) {
+								error = "Couldn't delete existing old save file! (" + saveFile.getName() + ")";
+								problem = true;
+							}
+						}
+					}
 				}
+
+				// rename temporary save file:
+				if (!problem) {
+					if (!tempSaveFile.renameTo(saveFile)) {
+						error = "Couldn't rename temporary save file! (" + tempSaveFile.getName() + " to " + saveFile.getName() + ")";
+						problem = true;
+					}
+				}
+			} catch (Exception e) {
+				// catching any exceptions not explicitly caught above already:
+				error = e.getMessage();
+				exception = e;
+				problem = true;
 			}
 
 			// handle problem situation:
 			if (problem) {
-				// don't spam with errors and stacktraces, only print them once for the first try:
+				// don't spam with errors and stacktraces, only print them once for the first saving attempt:
 				if (exception != null && printStacktrace) {
 					printStacktrace = false;
 					exception.printStackTrace();
@@ -1496,6 +1579,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					}
 				} else {
 					// saving failed even after a bunch of retries:
+					savingFailed = true;
 					Log.severe("Saving failed! Save data might be lost! :(");
 					break;
 				}
