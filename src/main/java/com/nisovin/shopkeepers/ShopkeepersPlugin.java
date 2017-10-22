@@ -118,7 +118,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// saving:
 	// flag to (temporary) turn off saving
 	private boolean skipSaving = false;
-	private volatile boolean savingFailed = false;
+	private volatile boolean savingFailed = false; // indicates that the last saving attempt failed
 	private long lastSavingErrorMsgTimeStamp = 0L;
 
 	private boolean dirty = false;
@@ -141,6 +141,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// reset error state variables:
 		skipSaving = false;
 		savingFailed = false;
+		lastSavingErrorMsgTimeStamp = 0L;
 
 		// try to load suitable NMS code:
 		NMSManager.load(this);
@@ -1422,6 +1423,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		assert config != null;
 
 		saveInfo.ioStartTime = System.currentTimeMillis();
+		savingFailed = false; // reset saving-failed flag
 
 		File saveFile = this.getSaveFile();
 		File tempSaveFile = this.getTempSaveFile();
