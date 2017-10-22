@@ -1187,9 +1187,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			File tempSaveFile = this.getTempSaveFile();
 			if (tempSaveFile.exists()) {
 				// load from temporary save file instead:
-				Log.warning("Found no save file, but an existing temporary save file! (" + tempSaveFile.getName() + ") \n"
-						+ "This might indicate an issue during a previous saving attempt! \n"
-						+ "Trying to load the shopkeepers data from this temporary save file instead!");
+				Log.warning("Found no save file, but an existing temporary save file! (" + tempSaveFile.getName() + ")");
+				Log.warning("This might indicate an issue during a previous saving attempt!");
+				Log.warning("Trying to load the shopkeepers data from this temporary save file instead!");
+
 				saveFile = tempSaveFile;
 			} else {
 				// save file does not exist yet -> no shopkeeper data available
@@ -1468,9 +1469,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 								// -> instead we try to rename it to make it the new 'actual save file' and then
 								// continue the saving procedure
 
-								Log.warning("Found an already existing temporary save file, but no old save file! (" + tempSaveFile.getName() + ") \n"
-										+ "This might indicate an issue during a previous saving attempt! \n"
-										+ "Trying to rename the temporary save file to use it as 'existing old save data', and then continue the saving!");
+								Log.warning("Found an already existing temporary save file, but no old save file! (" + tempSaveFile.getName() + ")");
+								Log.warning("This might indicate an issue during a previous saving attempt!");
+								Log.warning("Trying to rename the temporary save file to use it as 'existing old save data', and then continue the saving!");
 
 								// rename temporary save file:
 								if (!tempSaveFile.renameTo(saveFile)) {
