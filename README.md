@@ -16,14 +16,10 @@ You can set up admin shops, which have infinite supply, and you can also set up 
 Maven repository for releases: http://nexus3.cube-nation.de/repository/releases/  
 Maven repository for dev builds (snapshots): http://nexus3.cube-nation.de/repository/snapshots/  
 
-Guidelines
+Pull Requests & Contributing
 ----------
 
-All "volatile" code (any code that relies on CraftBukkit, NMS or specific Bukkit versions) should be in the `compat` package.
-Please keep this code to a minimum wherever possible, as adding more volatile code makes the updating process more difficult.
-If it is possible to create a non-volatile fallback method, please do so and put it in the FailedHandler class.
-
-For any major feature changes, please make a forum thread about it and/or create an extra branch so it can be discussed before you commit the code to the main repository.
+See [Contributing](CONTRIBUTING.md)
 
 Build with Maven
 ----------------
