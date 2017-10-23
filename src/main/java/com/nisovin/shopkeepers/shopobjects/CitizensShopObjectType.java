@@ -7,8 +7,8 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class CitizensShopObjectType extends ShopObjectType {
 

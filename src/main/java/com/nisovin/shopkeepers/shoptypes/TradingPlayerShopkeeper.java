@@ -16,16 +16,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.ItemCount;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
+import com.nisovin.shopkeepers.util.ItemCount;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 

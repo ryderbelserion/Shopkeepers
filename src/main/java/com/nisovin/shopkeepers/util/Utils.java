@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.util;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -28,6 +28,8 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.util.Vector;
 
+import com.nisovin.shopkeepers.Log;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class Utils {

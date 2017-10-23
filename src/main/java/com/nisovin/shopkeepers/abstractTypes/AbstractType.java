@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.abstractTypes;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Utils;
+import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class AbstractType {
 

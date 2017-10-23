@@ -8,6 +8,8 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.util.ChunkData;
+
 public interface ShopkeepersAPI {
 
 	public static final String HELP_PERMISSION = "shopkeeper.help";

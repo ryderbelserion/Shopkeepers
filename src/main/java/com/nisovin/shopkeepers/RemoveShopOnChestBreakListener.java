@@ -10,6 +10,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.util.Utils;
 
 class RemoveShopOnChestBreakListener implements Listener {
 

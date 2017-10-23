@@ -21,10 +21,10 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.shoptypes.offers.BookOffer;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
+import com.nisovin.shopkeepers.util.Utils;
 
 /**
  * Sells written books.

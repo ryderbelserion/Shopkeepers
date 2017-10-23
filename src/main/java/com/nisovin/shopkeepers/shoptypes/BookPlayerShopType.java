@@ -8,7 +8,7 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
-import com.nisovin.shopkeepers.Utils;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class BookPlayerShopType extends ShopType<BookPlayerShopkeeper> {
 

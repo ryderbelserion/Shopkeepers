@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.Utils;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class LivingEntityObjectTypes {
 

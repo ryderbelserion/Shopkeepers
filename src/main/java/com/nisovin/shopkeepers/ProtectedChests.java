@@ -12,6 +12,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class ProtectedChests {
 

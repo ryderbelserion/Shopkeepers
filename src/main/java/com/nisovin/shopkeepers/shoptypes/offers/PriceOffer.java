@@ -10,8 +10,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.util.Utils;
 
 /**
  * Stores information about an item stack being sold or bought for a certain price.

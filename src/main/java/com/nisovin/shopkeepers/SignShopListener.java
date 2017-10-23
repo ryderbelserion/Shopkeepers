@@ -16,6 +16,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.util.Utils;
 
 class SignShopListener implements Listener {
 

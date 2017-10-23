@@ -15,8 +15,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.nisovin.shopkeepers.Filter;
-import com.nisovin.shopkeepers.ItemCount;
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
@@ -24,7 +22,6 @@ import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.events.PlayerShopkeeperHiredEvent;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
@@ -34,6 +31,9 @@ import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.HiringHandler;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
+import com.nisovin.shopkeepers.util.Filter;
+import com.nisovin.shopkeepers.util.ItemCount;
+import com.nisovin.shopkeepers.util.Utils;
 
 /**
  * A shopkeeper that is managed by a player. This shopkeeper draws its supplies from a chest and will deposit earnings

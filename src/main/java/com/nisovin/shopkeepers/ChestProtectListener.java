@@ -16,6 +16,8 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.InventoryHolder;
 
+import com.nisovin.shopkeepers.util.Utils;
+
 class ChestProtectListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;

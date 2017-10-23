@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.util;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;

@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.google.common.base.Objects;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class Settings {
 

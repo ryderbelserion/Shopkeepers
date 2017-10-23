@@ -17,6 +17,8 @@ import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
+import com.nisovin.shopkeepers.util.ChunkData;
+import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class Shopkeeper {
 

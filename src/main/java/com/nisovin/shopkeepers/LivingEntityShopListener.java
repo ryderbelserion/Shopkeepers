@@ -30,6 +30,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.util.Utils;
 
 class LivingEntityShopListener implements Listener {
 

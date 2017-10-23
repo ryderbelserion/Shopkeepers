@@ -21,7 +21,6 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.OpenTradeEvent;
 import com.nisovin.shopkeepers.events.ShopkeeperTradeCompletedEvent;
@@ -29,6 +28,7 @@ import com.nisovin.shopkeepers.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIType;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class TradingHandler extends UIHandler {
 
