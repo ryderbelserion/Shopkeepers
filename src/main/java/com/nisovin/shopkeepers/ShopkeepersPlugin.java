@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -59,6 +60,8 @@ import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 
 public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
+
+	private static final long ASYNC_TASKS_TIMEOUT_SECONDS = 10L;
 
 	private static ShopkeepersPlugin plugin;
 
@@ -118,16 +121,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// saving:
 	// flag to (temporary) turn off saving
 	private boolean skipSaving = false;
-	private volatile boolean savingFailed = false; // indicates that the last saving attempt failed
 	private long lastSavingErrorMsgTimeStamp = 0L;
-
 	private boolean dirty = false;
-	private int chunkLoadSaveTask = -1;
-	// keeps track about certain stats and information during a save, gets reused
-	private final SaveInfo saveInfo = new SaveInfo();
-	// the task which performs file io during a save
+	private int delayedSaveTaskId = -1;
+	// the task which performs async file io during a save
 	private int saveIOTask = -1;
-	// determines if there was another saveReal()-request while another saveIOTask was still in progress
+	// determines if there was another saveReal()-request while the saveIOTask was still in progress
 	private boolean saveRealAgain = false;
 
 	// listeners:
@@ -138,10 +137,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	public void onEnable() {
 		plugin = this;
 
-		// reset error state variables:
+		// reset a bunch of variables:
 		skipSaving = false;
-		savingFailed = false;
 		lastSavingErrorMsgTimeStamp = 0L;
+		dirty = false;
+		delayedSaveTaskId = -1;
+		saveIOTask = -1;
+		saveRealAgain = false;
 
 		// try to load suitable NMS code:
 		NMSManager.load(this);
@@ -350,6 +352,35 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	@Override
 	public void onDisable() {
+		// wait for async tasks to complete:
+		final long asyncTasksTimeoutMillis = ASYNC_TASKS_TIMEOUT_SECONDS * 1000L;
+		final long asyncTasksStart = System.nanoTime();
+		int activeAsyncTasks = SchedulerUtils.getActiveAsyncTasks(this);
+		if (activeAsyncTasks > 0) {
+			Log.info("Waiting up to " + ASYNC_TASKS_TIMEOUT_SECONDS + " seconds for "
+					+ activeAsyncTasks + " remaining async tasks to finish ..");
+		}
+		while (SchedulerUtils.getActiveAsyncTasks(this) > 0) {
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			final long asyncTasksWaitedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - asyncTasksStart);
+			if (asyncTasksWaitedMillis > asyncTasksTimeoutMillis) {
+				// timeout reached, disable anyways..
+				break;
+			}
+		}
+		final long asyncTasksWaitedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - asyncTasksStart);
+		if (asyncTasksWaitedMillis > 1) {
+			Log.info("Waited " + asyncTasksWaitedMillis + " ms for async tasks to finish.");
+		}
+		activeAsyncTasks = SchedulerUtils.getActiveAsyncTasks(this);
+		if (activeAsyncTasks > 0) {
+			Log.severe("There are still " + activeAsyncTasks + " async tasks remaining! Disabling anyways now ..");
+		}
+
 		// close all open windows:
 		uiManager.closeAll();
 		// inform ui manager about disable:
@@ -831,20 +862,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				this.activateShopkeeper(shopkeeper);
 			}
 
-			// save:
-			dirty = true;
-			if (Settings.saveInstantly) {
-				if (chunkLoadSaveTask == -1) {
-					chunkLoadSaveTask = Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-						public void run() {
-							if (dirty) {
-								saveReal();
-							}
-							chunkLoadSaveTask = -1;
-						}
-					}, 600).getTaskId();
-				}
-			}
+			// save delayed:
+			this.saveDelayed();
 		}
 		return affectedShops;
 	}
@@ -1089,7 +1108,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				}
 
 				// continue in main thread:
-				Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, new Runnable() {
+				SchedulerUtils.runTaskOrOmit(ShopkeepersPlugin.this, new Runnable() {
 
 					@Override
 					public void run() {
@@ -1160,15 +1179,28 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// SHOPS LOADING AND SAVING
 
-	private static class SaveInfo {
-		long startTime;
-		long packingDuration;
-		long ioStartTime;
-		long ioDuration;
-		long fullDuration;
+	private static class SaveResult {
+
+		// note: synchronization for those values is not needed, because they don't get modified by the main and async
+		// task at the same time, and because the bukkit scheduler already includes memory-barriers when starting the
+		// async IO task and when going back to the main thread by starting a sync task, so changes become visible to
+		// each thread involved
+
+		private boolean async;
+		private long startTime;
+		private long packingDuration;
+		private long asyncTaskDelay;
+		private long ioLockAcquireDuration;
+		private long ioDuration;
+		private long totalDuration;
+		private boolean success;
 
 		public void printDebugInfo() {
-			Log.debug("Saved shopkeeper data (" + fullDuration + "ms (Data packing: " + packingDuration + "ms, Async IO: " + ioDuration + "ms))");
+			Log.debug("Saved shopkeeper data (" + totalDuration + "ms (Data packing: " + packingDuration + "ms, "
+					+ (async ? "AsyncTask delay: " + asyncTaskDelay + "ms, " : "")
+					+ ((ioLockAcquireDuration > 1) ? "IO lock delay: " + ioLockAcquireDuration + "ms, " : "")
+					+ (async ? "Async " : "Sync ") + "IO: " + ioDuration + "ms))"
+					+ (success ? "" : ": Saving failed!"));
 		}
 	}
 
@@ -1312,11 +1344,28 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
+	public void saveDelayed() {
+		dirty = true;
+		if (Settings.saveInstantly) {
+			if (delayedSaveTaskId == -1) {
+				delayedSaveTaskId = Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
+					public void run() {
+						if (dirty) {
+							saveReal();
+						}
+						delayedSaveTaskId = -1;
+					}
+				}, 600).getTaskId(); // 30 seconds delay
+			}
+		}
+	}
+
+	@Override
 	public void saveReal() {
 		this.saveReal(true);
 	}
 
-	// should only get called sync on disable:
+	// should only get called with parameter async=false on disable:
 	private void saveReal(final boolean async) {
 		if (skipSaving) {
 			Log.warning("Skipped saving due to previous issue.");
@@ -1330,8 +1379,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			return;
 		}
 
+		// keeps track of statistics and information about this saving attempt:
+		final SaveResult saveResult = new SaveResult();
+		saveResult.async = async;
+		saveResult.startTime = System.currentTimeMillis();
+
 		// store shopkeeper data into memory configuration:
-		saveInfo.startTime = System.currentTimeMillis();
 		final YamlConfiguration config = new YamlConfiguration();
 		int counter = 1;
 		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
@@ -1348,8 +1401,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 		}
 		// time to store shopkeeper data in memory configuration:
-		saveInfo.packingDuration = System.currentTimeMillis() - saveInfo.startTime;
+		saveResult.packingDuration = System.currentTimeMillis() - saveResult.startTime;
 
+		// note: the dirty flag might get reverted again after saving, if saving failed
+		// however, the flag gets reset here (and not just after successful saving), so that any saving requests that
+		// arrive in the meantime get noticed and can cause another save later:
 		dirty = false;
 
 		// called sync:
@@ -1358,16 +1414,23 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			@Override
 			public void run() {
 				// print debug info:
-				saveInfo.printDebugInfo();
+				saveResult.printDebugInfo();
 
-				// inform admins about saving issue:
-				// 4 min error message throttle, less than the saving interval in case of non-instant saving
-				if (savingFailed && Math.abs(System.currentTimeMillis() - lastSavingErrorMsgTimeStamp) > (4 * 60 * 1000L)) {
-					lastSavingErrorMsgTimeStamp = System.currentTimeMillis();
-					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Saving shop data failed! Please check out the server log(s) and look into the issue!";
-					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.hasPermission(ShopkeepersAPI.ADMIN_PERMISSION)) {
-							player.sendMessage(errorMsg);
+				// saving failed?
+				if (!saveResult.success) {
+					// mark as dirty, as there is potentially unsaved data, and request another delayed save:
+					dirty = true;
+					saveDelayed();
+
+					// inform admins about saving issue:
+					// 4 min error message throttle (slightly less than the saving interval)
+					if (Math.abs(System.currentTimeMillis() - lastSavingErrorMsgTimeStamp) > (4 * 60 * 1000L)) {
+						lastSavingErrorMsgTimeStamp = System.currentTimeMillis();
+						String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Saving shop data failed! Please check out the server log(s) and look into the issue!";
+						for (Player player : Bukkit.getOnlinePlayers()) {
+							if (player.hasPermission(ShopkeepersAPI.ADMIN_PERMISSION)) {
+								player.sendMessage(errorMsg);
+							}
 						}
 					}
 				}
@@ -1389,26 +1452,23 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 			@Override
 			public void run() {
-				if (async) {
-					// continue in main thread:
-					Bukkit.getScheduler().runTask(ShopkeepersPlugin.this, syncSavingCallback);
-				} else {
-					// already in main thread:
-					syncSavingCallback.run();
-				}
+				// ensure that we continue on main thread:
+				SchedulerUtils.runOnMainThreadOrOmit(ShopkeepersPlugin.this, syncSavingCallback);
 			}
 		};
 
 		if (!async) {
 			// sync file io:
-			this.saveDataToFile(config, savingCallback);
+			this.saveDataToFile(config, saveResult, savingCallback);
 		} else {
 			// async file io:
+			final long asyncTaskSubmittedTime = System.currentTimeMillis();
 			saveIOTask = Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
 
 				@Override
 				public void run() {
-					saveDataToFile(config, savingCallback);
+					saveResult.asyncTaskDelay = System.currentTimeMillis() - asyncTaskSubmittedTime;
+					saveDataToFile(config, saveResult, savingCallback);
 				}
 			}).getTaskId();
 		}
@@ -1417,185 +1477,197 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// max total delay: 500ms
 	private static final int SAVING_MAX_ATTEMPTS = 20;
 	private static final long SAVING_ATTEMPTS_DELAY_MILLIS = 25;
+	private static final Object SAVING_IO_LOCK = new Object();
 
-	// can be run async and sync:
-	private void saveDataToFile(FileConfiguration config, Runnable callback) {
-		assert config != null;
+	// can be run async and sync
+	private void saveDataToFile(FileConfiguration config, SaveResult saveResult, Runnable callback) {
+		assert config != null && saveResult != null;
 
-		saveInfo.ioStartTime = System.currentTimeMillis();
-		savingFailed = false; // reset saving-failed flag
+		// synchronization, so that only one thread at a time attempts to mess with the save files
+		final long ioLockStartTime = System.currentTimeMillis();
+		synchronized (SAVING_IO_LOCK) {
+			saveResult.ioLockAcquireDuration = System.currentTimeMillis() - ioLockStartTime;
 
-		File saveFile = this.getSaveFile();
-		File tempSaveFile = this.getTempSaveFile();
+			// actual IO:
+			final long ioStartTime = System.currentTimeMillis();
 
-		// saving procedure:
-		// inside a retry-loop:
-		// * if there is a temporary save file:
-		// * * if there is no save file: rename temporary save file to save file
-		// * * else: remove temporary save file
-		// * create parent directories
-		// * create new temporary save file
-		// * save data to temporary save file
-		// * remove old save file
-		// * rename temporary save file to save file
+			File saveFile = this.getSaveFile();
+			File tempSaveFile = this.getTempSaveFile();
 
-		int savingAttempt = 0;
-		boolean problem = false;
-		String error = null;
-		Exception exception;
-		boolean printStacktrace = true;
+			// saving procedure:
+			// inside a retry-loop:
+			// * if there is a temporary save file:
+			// * * if there is no save file: rename temporary save file to save file
+			// * * else: remove temporary save file
+			// * create parent directories
+			// * create new temporary save file
+			// * save data to temporary save file
+			// * remove old save file
+			// * rename temporary save file to save file
 
-		while (++savingAttempt <= SAVING_MAX_ATTEMPTS) {
-			// reset problem variables:
-			problem = false;
-			error = null;
-			exception = null;
+			int savingAttempt = 0;
+			boolean problem = false;
+			String error = null;
+			Exception exception;
+			boolean printStacktrace = true;
 
-			try {
-				// handle already existing temporary save file:
-				if (!problem) {
-					if (tempSaveFile.exists()) {
-						// check write permission:
-						if (!tempSaveFile.canWrite()) {
-							error = "Cannot write to temporary save file! (" + tempSaveFile.getName() + ")";
-							problem = true;
-						}
+			while (++savingAttempt <= SAVING_MAX_ATTEMPTS) {
+				// reset problem variables:
+				problem = false;
+				error = null;
+				exception = null;
 
-						if (!problem) {
-							if (!saveFile.exists()) {
-								// if only the temporary file exists, but the actual save file does not, this might
-								// indicate, that a previous saving attempt saved to the temporary file and removed the
-								// actual save file, but wasn't able to then rename the temporary file to the actual
-								// save file
-								// -> the temporary file might contain the only backup of saved data, don't remove it!
-								// -> instead we try to rename it to make it the new 'actual save file' and then
-								// continue the saving procedure
+				try {
+					// handle already existing temporary save file:
+					if (!problem) {
+						if (tempSaveFile.exists()) {
+							// check write permission:
+							if (!tempSaveFile.canWrite()) {
+								error = "Cannot write to temporary save file! (" + tempSaveFile.getName() + ")";
+								problem = true;
+							}
 
-								Log.warning("Found an already existing temporary save file, but no old save file! (" + tempSaveFile.getName() + ")");
-								Log.warning("This might indicate an issue during a previous saving attempt!");
-								Log.warning("Trying to rename the temporary save file to use it as 'existing old save data', and then continue the saving!");
+							if (!problem) {
+								if (!saveFile.exists()) {
+									// if only the temporary file exists, but the actual save file does not, this might
+									// indicate, that a previous saving attempt saved to the temporary file and removed
+									// the
+									// actual save file, but wasn't able to then rename the temporary file to the actual
+									// save file
+									// -> the temporary file might contain the only backup of saved data, don't remove
+									// it!
+									// -> instead we try to rename it to make it the new 'actual save file' and then
+									// continue the saving procedure
 
-								// rename temporary save file:
-								if (!tempSaveFile.renameTo(saveFile)) {
-									error = "Couldn't rename temporary save file! (" + tempSaveFile.getName() + " to " + saveFile.getName() + ")";
-									problem = true;
-								}
-							} else {
-								// remove old temporary save file:
-								if (!tempSaveFile.delete()) {
-									error = "Couldn't delete existing temporary save file! (" + tempSaveFile.getName() + ")";
-									problem = true;
+									Log.warning("Found an already existing temporary save file, but no old save file! (" + tempSaveFile.getName() + ")");
+									Log.warning("This might indicate an issue during a previous saving attempt!");
+									Log.warning("Trying to rename the temporary save file to use it as 'existing old save data', and then continue the saving!");
+
+									// rename temporary save file:
+									if (!tempSaveFile.renameTo(saveFile)) {
+										error = "Couldn't rename temporary save file! (" + tempSaveFile.getName() + " to " + saveFile.getName() + ")";
+										problem = true;
+									}
+								} else {
+									// remove old temporary save file:
+									if (!tempSaveFile.delete()) {
+										error = "Couldn't delete existing temporary save file! (" + tempSaveFile.getName() + ")";
+										problem = true;
+									}
 								}
 							}
 						}
 					}
-				}
 
-				// make sure that the parent directories exist:
-				if (!problem) {
-					File parentDir = tempSaveFile.getParentFile();
-					if (parentDir != null && !parentDir.exists()) {
-						if (!parentDir.mkdirs()) {
-							error = "Couldn't create parent directories for temporary save file! (" + parentDir.getAbsolutePath() + ")";
-							problem = true;
-						}
-					}
-				}
-
-				// create new temporary save file:
-				if (!problem) {
-					try {
-						tempSaveFile.createNewFile();
-					} catch (Exception e) {
-						error = "Couldn't create temporary save file! (" + tempSaveFile.getName() + ") : " + e.getMessage();
-						exception = e;
-						problem = true;
-					}
-				}
-
-				// write shopkeeper data to temporary save file:
-				if (!problem) {
-					PrintWriter writer = null;
-					try {
-						if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-							writer = new PrintWriter(tempSaveFile, Settings.fileEncoding);
-							writer.write(config.saveToString());
-						} else {
-							config.save(tempSaveFile);
-						}
-					} catch (Exception e) {
-						error = "Couldn't save data to temporary save file! (" + tempSaveFile.getName() + ") : " + e.getMessage();
-						exception = e;
-						problem = true;
-					} finally {
-						if (writer != null) {
-							writer.close();
-						}
-					}
-				}
-
-				// delete old save file:
-				if (!problem) {
-					if (saveFile.exists()) {
-						// check write permission:
-						if (!saveFile.canWrite()) {
-							error = "Cannot write to save file! (" + saveFile.getName() + ")";
-							problem = true;
-						} else {
-							// delete old save file:
-							if (!saveFile.delete()) {
-								error = "Couldn't delete existing old save file! (" + saveFile.getName() + ")";
+					// make sure that the parent directories exist:
+					if (!problem) {
+						File parentDir = tempSaveFile.getParentFile();
+						if (parentDir != null && !parentDir.exists()) {
+							if (!parentDir.mkdirs()) {
+								error = "Couldn't create parent directories for temporary save file! (" + parentDir.getAbsolutePath() + ")";
 								problem = true;
 							}
 						}
 					}
-				}
 
-				// rename temporary save file:
-				if (!problem) {
-					if (!tempSaveFile.renameTo(saveFile)) {
-						error = "Couldn't rename temporary save file! (" + tempSaveFile.getName() + " to " + saveFile.getName() + ")";
-						problem = true;
+					// create new temporary save file:
+					if (!problem) {
+						try {
+							tempSaveFile.createNewFile();
+						} catch (Exception e) {
+							error = "Couldn't create temporary save file! (" + tempSaveFile.getName() + ") : " + e.getMessage();
+							exception = e;
+							problem = true;
+						}
 					}
-				}
-			} catch (Exception e) {
-				// catching any exceptions not explicitly caught above already:
-				error = e.getMessage();
-				exception = e;
-				problem = true;
-			}
 
-			// handle problem situation:
-			if (problem) {
-				// don't spam with errors and stacktraces, only print them once for the first saving attempt:
-				if (exception != null && printStacktrace) {
-					printStacktrace = false;
-					exception.printStackTrace();
-				}
-				Log.severe("Saving attempt " + savingAttempt + " failed: " + (error != null ? error : "Unknown error"));
+					// write shopkeeper data to temporary save file:
+					if (!problem) {
+						PrintWriter writer = null;
+						try {
+							if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
+								writer = new PrintWriter(tempSaveFile, Settings.fileEncoding);
+								writer.write(config.saveToString());
+							} else {
+								config.save(tempSaveFile);
+							}
+						} catch (Exception e) {
+							error = "Couldn't save data to temporary save file! (" + tempSaveFile.getName() + ") : " + e.getMessage();
+							exception = e;
+							problem = true;
+						} finally {
+							if (writer != null) {
+								writer.close();
+							}
+						}
+					}
 
-				if (savingAttempt < SAVING_MAX_ATTEMPTS) {
-					// try again after a small delay:
-					try {
-						Thread.sleep(SAVING_ATTEMPTS_DELAY_MILLIS);
-					} catch (InterruptedException e) {
+					// delete old save file:
+					if (!problem) {
+						if (saveFile.exists()) {
+							// check write permission:
+							if (!saveFile.canWrite()) {
+								error = "Cannot write to save file! (" + saveFile.getName() + ")";
+								problem = true;
+							} else {
+								// delete old save file:
+								if (!saveFile.delete()) {
+									error = "Couldn't delete existing old save file! (" + saveFile.getName() + ")";
+									problem = true;
+								}
+							}
+						}
+					}
+
+					// rename temporary save file:
+					if (!problem) {
+						if (!tempSaveFile.renameTo(saveFile)) {
+							error = "Couldn't rename temporary save file! (" + tempSaveFile.getName() + " to " + saveFile.getName() + ")";
+							problem = true;
+						}
+					}
+				} catch (Exception e) {
+					// catching any exceptions not explicitly caught above already:
+					error = e.getMessage();
+					exception = e;
+					problem = true;
+				}
+
+				// handle problem situation:
+				if (problem) {
+					// don't spam with errors and stacktraces, only print them once for the first saving attempt:
+					if (exception != null && printStacktrace) {
+						printStacktrace = false;
+						exception.printStackTrace();
+					}
+					Log.severe("Saving attempt " + savingAttempt + " failed: " + (error != null ? error : "Unknown error"));
+
+					if (savingAttempt < SAVING_MAX_ATTEMPTS) {
+						// try again after a small delay:
+						try {
+							Thread.sleep(SAVING_ATTEMPTS_DELAY_MILLIS);
+						} catch (InterruptedException e) {
+						}
+					} else {
+						// saving failed even after a bunch of retries:
+						saveResult.success = false;
+						Log.severe("Saving failed! Save data might be lost! :(");
+						break;
 					}
 				} else {
-					// saving failed even after a bunch of retries:
-					savingFailed = true;
-					Log.severe("Saving failed! Save data might be lost! :(");
+					// saving was successful:
+					saveResult.success = true;
 					break;
 				}
-			} else {
-				// saving was successful:
-				break;
 			}
+
+			final long now = System.currentTimeMillis();
+			saveResult.ioDuration = now - ioStartTime; // time for pure io
+			saveResult.totalDuration = now - saveResult.startTime; // time from saveReal() call to finished save
 		}
+		// file IO over
 
-		long now = System.currentTimeMillis();
-		saveInfo.ioDuration = now - saveInfo.ioStartTime; // time for pure io
-		saveInfo.fullDuration = now - saveInfo.startTime; // time from saveReal() call to finished save
-
+		// run callback:
 		if (callback != null) {
 			callback.run();
 		}
