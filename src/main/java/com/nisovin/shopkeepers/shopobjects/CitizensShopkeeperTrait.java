@@ -1,9 +1,5 @@
 package com.nisovin.shopkeepers.shopobjects;
 
-import net.citizensnpcs.api.npc.NPC;
-import net.citizensnpcs.api.trait.Trait;
-import net.citizensnpcs.api.util.DataKey;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -13,6 +9,10 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
+
+import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.trait.Trait;
+import net.citizensnpcs.api.util.DataKey;
 
 public class CitizensShopkeeperTrait extends Trait {
 
