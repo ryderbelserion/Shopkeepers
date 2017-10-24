@@ -275,7 +275,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			int slot = event.getRawSlot();
 			if (slot == 2 || slot == 6) {
 				// handle hiring:
-				// check the the player can hire (create) this type of shopkeeper:
+				// check if the player can hire (create) this type of shopkeeper:
 				if (Settings.hireRequireCreationPermission
 						&& (!this.getShopkeeper().getType().hasPermission(player)
 						|| !this.getShopkeeper().getShopObject().getObjectType().hasPermission(player))) {
