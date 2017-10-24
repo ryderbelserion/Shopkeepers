@@ -23,7 +23,7 @@ import org.bukkit.inventory.meta.SpawnEggMeta;
 
 import net.minecraft.server.v1_12_R1.*;
 
-import com.nisovin.shopkeepers.Utils;
+import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
 public final class NMSHandler implements NMSCallProvider {
