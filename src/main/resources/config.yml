@@ -103,6 +103,7 @@ hire-item: EMERALD
 hire-item-data: 0
 hire-item-name: ""
 hire-item-lore: []
+hire-require-creation-permission: true
 hire-other-villagers-costs: 1
 for-hire-title: "For Hire"
 
@@ -193,7 +194,9 @@ msg-trade-perm-view: "&aThe shop's current trading permission is '&e{perm}&a'."
 msg-must-hold-hire-item: "&7You have to hold the required hire item in your hand."
 msg-set-for-hire: "&aThe Shopkeeper was set for hire."
 msg-hired: "&aYou have hired this shopkeeper!"
-msg-cant-hire: "&aYou cannot afford to hire this shopkeeper."
+msg-missing-hire-perm: "&7You do not have the permission to hire shopkeepers."
+msg-cant-hire: "&7You cannot afford to hire this shopkeeper."
+msg-cant-hire-shop-type: "&7You do not have the permission to hire this type of shopkeeper."
 msg-villager-for-hire: "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a."
 
 msg-missing-trade-perm: "&7You do not have the permission to trade with this shop."

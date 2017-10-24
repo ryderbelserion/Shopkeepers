@@ -124,6 +124,7 @@ public class Settings {
 	public static int hireItemData = 0;
 	public static String hireItemName = "";
 	public static List<String> hireItemLore = new ArrayList<String>(0);
+	public static boolean hireRequireCreationPermission = true;
 	public static int hireOtherVillagersCosts = 1;
 	public static String forHireTitle = "For Hire";
 
@@ -206,7 +207,9 @@ public class Settings {
 	public static String msgMustHoldHireItem = "&7You have to hold the required hire item in your hand.";
 	public static String msgSetForHire = "&aThe Shopkeeper was set for hire.";
 	public static String msgHired = "&aYou have hired this shopkeeper!";
+	public static String msgMissingHirePerm = "&7You do not have the permission to hire shopkeepers.";
 	public static String msgCantHire = "&aYou cannot afford to hire this shopkeeper.";
+	public static String msgCantHireShopType = "&7You do not have the permission to hire this type of shopkeeper.";
 	// placeholders: {costs}, {hire-item}
 	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a.";
 

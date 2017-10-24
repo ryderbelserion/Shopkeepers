@@ -5,6 +5,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
+import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
@@ -21,8 +22,13 @@ public abstract class HiringHandler extends UIHandler {
 	@Override
 	protected boolean canOpen(Player player) {
 		assert player != null;
-		// only allowed to hire, if the player also has the permission to create shopkeepers of that type
-		return this.getShopkeeper().getType().hasPermission(player) && Utils.hasPermission(player, ShopkeepersAPI.HIRE_PERMISSION);
+		// check for hire permission:
+		if (!Utils.hasPermission(player, ShopkeepersAPI.HIRE_PERMISSION)) {
+			Log.debug("Blocked hire window opening from " + player.getName() + ": missing hire permission");
+			Utils.sendMessage(player, Settings.msgMissingHirePerm);
+			return false;
+		}
+		return true;
 	}
 
 	@Override

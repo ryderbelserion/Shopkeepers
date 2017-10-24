@@ -252,11 +252,6 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		@Override
-		protected boolean canOpen(Player player) {
-			return this.getShopkeeper().isForHire() && super.canOpen(player);
-		}
-
-		@Override
 		protected boolean openWindow(Player player) {
 			final PlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 9, Settings.forHireTitle);
@@ -279,6 +274,18 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			final PlayerShopkeeper shopkeeper = this.getShopkeeper();
 			int slot = event.getRawSlot();
 			if (slot == 2 || slot == 6) {
+				// handle hiring:
+				// check the the player can hire (create) this type of shopkeeper:
+				if (Settings.hireRequireCreationPermission
+						&& (!this.getShopkeeper().getType().hasPermission(player)
+						|| !this.getShopkeeper().getShopObject().getObjectType().hasPermission(player))) {
+					// missing permission to hire this type of shopkeeper:
+					Utils.sendMessage(player, Settings.msgCantHireShopType);
+					this.closeDelayed(player);
+					return;
+				}
+
+				// check if the player can afford it:
 				ItemStack[] inventory = player.getInventory().getContents();
 				ItemStack hireCost = shopkeeper.getHireCost().clone();
 				for (int i = 0; i < inventory.length; i++) {
@@ -299,45 +306,44 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					}
 				}
 
-				if (hireCost.getAmount() == 0) {
-					int maxShops = ShopkeepersPlugin.getInstance().getMaxShops(player);
-
-					// call event:
-					PlayerShopkeeperHiredEvent hireEvent = new PlayerShopkeeperHiredEvent(player, shopkeeper, maxShops);
-					Bukkit.getPluginManager().callEvent(hireEvent);
-					if (hireEvent.isCancelled()) {
-						// close window for this player:
-						this.closeDelayed(player);
-						return;
-					}
-
-					// check max shops limit:
-					maxShops = hireEvent.getMaxShopsForPlayer();
-					if (maxShops > 0) {
-						int count = ShopkeepersPlugin.getInstance().countShopsOfPlayer(player);
-						if (count >= maxShops) {
-							Utils.sendMessage(player, Settings.msgTooManyShops);
-							this.closeDelayed(player);
-							return;
-						}
-					}
-
-					// hire it:
-					player.getInventory().setContents(inventory); // apply inventory changes
-					shopkeeper.setForHire(false, null);
-					shopkeeper.setOwner(player);
-					ShopkeepersPlugin.getInstance().save();
-					Utils.sendMessage(player, Settings.msgHired);
-
-					// close all open windows for this shopkeeper:
-					shopkeeper.closeAllOpenWindows();
-					return;
-				} else {
+				if (hireCost.getAmount() != 0) {
 					// not enough money:
 					Utils.sendMessage(player, Settings.msgCantHire);
 					// close window for this player:
 					this.closeDelayed(player);
+					return;
 				}
+
+				// call event:
+				int maxShops = ShopkeepersPlugin.getInstance().getMaxShops(player);
+				PlayerShopkeeperHiredEvent hireEvent = new PlayerShopkeeperHiredEvent(player, shopkeeper, maxShops);
+				Bukkit.getPluginManager().callEvent(hireEvent);
+				if (hireEvent.isCancelled()) {
+					// close window for this player:
+					this.closeDelayed(player);
+					return;
+				}
+
+				// check max shops limit:
+				maxShops = hireEvent.getMaxShopsForPlayer();
+				if (maxShops > 0) {
+					int count = ShopkeepersPlugin.getInstance().countShopsOfPlayer(player);
+					if (count >= maxShops) {
+						Utils.sendMessage(player, Settings.msgTooManyShops);
+						this.closeDelayed(player);
+						return;
+					}
+				}
+
+				// hire the shopkeeper:
+				player.getInventory().setContents(inventory); // apply inventory changes
+				shopkeeper.setForHire(false, null);
+				shopkeeper.setOwner(player);
+				ShopkeepersPlugin.getInstance().save();
+				Utils.sendMessage(player, Settings.msgHired);
+
+				// close all open windows for this shopkeeper:
+				shopkeeper.closeAllOpenWindows();
 			}
 		}
 	}
@@ -443,12 +449,11 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			}
 		}
 
-		// TODO what if something is replacing the default PlayerShopHiringHandler with some other kind of handler?
-		PlayerShopHiringHandler hiringHandler = (PlayerShopHiringHandler) this.getUIHandler(DefaultUIs.HIRING_WINDOW.getIdentifier());
-		if (!player.isSneaking() && hiringHandler.canOpen(player)) {
-			// show hiring interface:
+		if (!player.isSneaking() && this.isForHire()) {
+			// open hiring window:
 			this.openHireWindow(player);
 		} else {
+			// open editor or trading window:
 			super.onPlayerInteraction(player);
 		}
 	}
