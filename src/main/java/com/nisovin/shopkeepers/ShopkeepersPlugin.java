@@ -1093,7 +1093,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 			@Override
 			public void run() {
-				final List<OfflinePlayer> inactivePlayers = new ArrayList<OfflinePlayer>(playerUUIDs.size());
+				final List<OfflinePlayer> inactivePlayers = new ArrayList<OfflinePlayer>();
 				long now = System.currentTimeMillis();
 				for (UUID uuid : playerUUIDs) {
 					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
