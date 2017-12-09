@@ -55,8 +55,8 @@ public class Settings {
 	public static int shopCreationItemData = 0;
 	public static String shopCreationItemName = "";
 	public static List<String> shopCreationItemLore = new ArrayList<String>(0);
-	public static String shopCreationItemSpawnEggEntityType = "VILLAGER"; // only works above bukkit 1.11.1, ignored if
-																			 // empty
+	// only works above bukkit 1.11.1, ignored if  empty:
+	public static String shopCreationItemSpawnEggEntityType = "VILLAGER";
 	public static boolean preventShopCreationItemRegularUsage = false;
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
