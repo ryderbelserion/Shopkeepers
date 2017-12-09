@@ -56,7 +56,7 @@ public class Settings {
 	public static String shopCreationItemName = "";
 	public static List<String> shopCreationItemLore = new ArrayList<String>(0);
 	public static String shopCreationItemSpawnEggEntityType = "VILLAGER"; // only works above bukkit 1.11.1, ignored if
-																			// empty
+																			 // empty
 	public static boolean preventShopCreationItemRegularUsage = false;
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
@@ -281,6 +281,7 @@ public class Settings {
 
 				// initialize the setting with the default value, if it is missing in the config
 				if (!config.isSet(configKey)) {
+					Log.warning("Config: Inserting default value for missing config entry: " + configKey);
 					if (typeClass == Material.class) {
 						config.set(configKey, ((Material) field.get(null)).name());
 					} else if (typeClass == String.class) {
@@ -303,17 +304,17 @@ public class Settings {
 					field.set(null, config.getBoolean(configKey, field.getBoolean(null)));
 				} else if (typeClass == Material.class) {
 					if (config.contains(configKey)) {
+						Material material = null;
 						if (config.isInt(configKey)) {
-							@SuppressWarnings("deprecation")
-							Material mat = Material.getMaterial(config.getInt(configKey));
-							if (mat != null) {
-								field.set(null, mat);
-							}
+							material = Material.getMaterial(config.getInt(configKey));
 						} else if (config.isString(configKey)) {
-							Material mat = Material.matchMaterial(config.getString(configKey));
-							if (mat != null) {
-								field.set(null, mat);
-							}
+							material = Material.matchMaterial(config.getString(configKey));
+						}
+						if (material != null) {
+							field.set(null, material);
+						} else {
+							Log.warning("Config: Unknown material for config entry '" + configKey + "': " + config.get(configKey));
+							Log.warning("Config: All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
 						}
 					}
 				} else if (typeClass == List.class) {
@@ -329,12 +330,27 @@ public class Settings {
 
 		// validation:
 
-		if (maxChestDistance > 50) maxChestDistance = 50;
-		if (highCurrencyValue <= 0) highCurrencyItem = Material.AIR;
+		if (maxChestDistance > 50) {
+			Log.warning("Config: 'max-chest-distance' can be at most 50.");
+			maxChestDistance = 50;
+		}
+		if (highCurrencyValue <= 0 && highCurrencyItem != Material.AIR) {
+			Log.debug("Config: 'high-currency-item' disabled because of 'high-currency-value' being less than 1.");
+			highCurrencyItem = Material.AIR;
+		}
 		// certain items cannot be of type AIR:
-		if (shopCreationItem == Material.AIR) shopCreationItem = Material.MONSTER_EGG;
-		if (hireItem == Material.AIR) hireItem = Material.EMERALD;
-		if (currencyItem == Material.AIR) currencyItem = Material.EMERALD;
+		if (shopCreationItem == Material.AIR) {
+			Log.warning("Config: 'shop-creation-item' can not be AIR.");
+			shopCreationItem = Material.MONSTER_EGG;
+		}
+		if (hireItem == Material.AIR) {
+			Log.warning("Config: 'hire-item' can not be AIR.");
+			hireItem = Material.EMERALD;
+		}
+		if (currencyItem == Material.AIR) {
+			Log.warning("Config: 'currency-item' can not be AIR.");
+			currencyItem = Material.EMERALD;
+		}
 
 		return misses;
 	}
