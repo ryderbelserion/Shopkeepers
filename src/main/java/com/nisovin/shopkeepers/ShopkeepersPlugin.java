@@ -660,14 +660,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// activate shopkeeper:
 		if (!shopkeeper.needsSpawning()) {
+			// activate shopkeeper once at registration:
 			this._activateShopkeeper(shopkeeper);
-		} else if (!shopkeeper.isActive() && chunkData.isChunkLoaded()) {
-			boolean spawned = shopkeeper.spawn();
-			if (spawned) {
-				this._activateShopkeeper(shopkeeper);
-			} else {
-				Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
-			}
+		} else if (chunkData.isChunkLoaded()) {
+			// activate shopkeeper due to loaded chunk:
+			this.activateShopkeeper(shopkeeper);
 		}
 	}
 
