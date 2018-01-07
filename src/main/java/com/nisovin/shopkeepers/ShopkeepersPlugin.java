@@ -1277,7 +1277,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					shopType = DefaultShopTypes.PLAYER_NORMAL();
 				} else {
 					// no valid shop type given..
-					Log.warning("Failed to load shopkeeper '" + id + "': unknown type");
+					Log.severe("Failed to load shopkeeper '" + id + "': unknown type");
 					return false; // disable without save
 				}
 			}
@@ -1326,9 +1326,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				if (shopkeeper == null) {
 					throw new ShopkeeperCreateException("ShopType returned null shopkeeper!");
 				}
-			} catch (ShopkeeperCreateException e) {
-				Log.warning("Failed to load shopkeeper '" + id + "': " + e.getMessage());
-				return false;
+			} catch (Exception e) {
+				Log.severe("Failed to load shopkeeper '" + id + "': " + e.getMessage());
+				return false; // disable without save
 			}
 		}
 		return true;
