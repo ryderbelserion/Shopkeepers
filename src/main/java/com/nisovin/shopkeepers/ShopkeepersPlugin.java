@@ -163,8 +163,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 		this.reloadConfig();
 		Configuration config = this.getConfig();
-		if (Settings.loadConfiguration(config)) {
-			// if values were missing -> add those to the file and save it
+		boolean settingsMissing = Settings.loadConfiguration(config);
+		if (settingsMissing) {
+			// if settings were missing -> add those to the config and save it
+			// TODO persist comments somehow
 			this.saveConfig();
 		}
 

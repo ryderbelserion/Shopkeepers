@@ -17,40 +17,32 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class Settings {
 
-	public static String fileEncoding = "UTF-8";
+	/*
+	 * General Settings
+	 */
 	public static boolean debug = false;
 
-	public static boolean disableOtherVillagers = false;
-	public static boolean hireOtherVillagers = false;
-	public static boolean blockVillagerSpawns = false;
+	/*
+	 * Shopkeeper Data
+	 */
+	public static String fileEncoding = "UTF-8";
+	public static boolean saveInstantly = true;
+	public static boolean skipCustomHeadSaving = true;
+
+	/*
+	 * Plugin Compatibility
+	 */
 	public static boolean enableSpawnVerifier = false;
 	public static boolean bypassSpawnBlocking = true;
 	public static boolean bypassShopInteractionBlocking = false;
-	public static boolean enablePurchaseLogging = false;
-	public static boolean saveInstantly = true;
-	public static boolean skipCustomHeadSaving = true;
 
 	public static boolean enableWorldGuardRestrictions = false;
 	public static boolean requireWorldGuardAllowShopFlag = false;
 	public static boolean enableTownyRestrictions = false;
 
-	public static boolean createPlayerShopWithCommand = false;
-	public static boolean simulateRightClickOnCommand = true;
-	public static boolean requireChestRecentlyPlaced = true;
-	public static boolean protectChests = true; // TODO does it make sense to not protected shop chests?
-	public static boolean deleteShopkeeperOnBreakChest = false;
-	public static int maxShopsPerPlayer = 0;
-	public static String maxShopsPermOptions = "10,15,25";
-	public static int maxChestDistance = 15;
-	public static int playerShopkeeperInactiveDays = 0;
-	public static boolean preventTradingWithOwnShop = true;
-	public static boolean preventTradingWhileOwnerIsOnline = false;
-	public static boolean useStrictItemComparison = false;
-	public static boolean enableChestOptionOnPlayerShop = false;
-
-	public static int taxRate = 0;
-	public static boolean taxRoundUp = false;
-
+	/*
+	 * Shop Creation (and removal)
+	 */
 	public static Material shopCreationItem = Material.MONSTER_EGG;
 	public static int shopCreationItemData = 0;
 	public static String shopCreationItemName = "";
@@ -60,6 +52,22 @@ public class Settings {
 	public static boolean preventShopCreationItemRegularUsage = false;
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
+	public static boolean createPlayerShopWithCommand = false;
+	public static boolean simulateRightClickOnCommand = true;
+
+	public static boolean requireChestRecentlyPlaced = true;
+	public static int maxChestDistance = 15;
+	public static boolean protectChests = true;
+	public static boolean deleteShopkeeperOnBreakChest = false;
+
+	public static int maxShopsPerPlayer = 0;
+	public static String maxShopsPermOptions = "10,15,25";
+
+	public static int playerShopkeeperInactiveDays = 0;
+
+	/*
+	 * Shop (Object) Types
+	 */
 	public static List<String> enabledLivingShops = Arrays.asList(
 			EntityType.VILLAGER.name(),
 			EntityType.COW.name(),
@@ -99,38 +107,75 @@ public class Settings {
 
 	public static boolean silenceLivingShopEntities = true;
 
-	public static boolean enableSignShops = true;
-	public static boolean enableCitizenShops = false;
-
-	public static String signShopFirstLine = "[SHOP]";
 	public static boolean showNameplates = true;
 	public static boolean alwaysShowNameplates = false;
 	public static String nameplatePrefix = "&a";
+
+	public static boolean enableCitizenShops = false;
+
+	public static boolean enableSignShops = true;
+	public static String signShopFirstLine = "[SHOP]";
+
+	/*
+	 * Naming
+	 */
 	public static String nameRegex = "[A-Za-z0-9 ]{3,32}";
 	public static boolean namingOfPlayerShopsViaItem = false;
 	public static boolean allowRenamingOfPlayerNpcShops = false;
 
+	/*
+	 * Editor Menu
+	 */
 	public static String editorTitle = "Shopkeeper Editor";
+
 	public static Material nameItem = Material.NAME_TAG;
 	public static int nameItemData = 0;
 	public static List<String> nameItemLore = new ArrayList<String>(0);
+
+	public static boolean enableChestOptionOnPlayerShop = false;
 	public static Material chestItem = Material.CHEST;
 	public static int chestItemData = 0;
+
 	public static Material deleteItem = Material.BONE;
 	public static int deleteItemData = 0;
 
+	/*
+	 * Non-shopkeeper villagers
+	 */
+	public static boolean disableOtherVillagers = false;
+	public static boolean blockVillagerSpawns = false;
+	public static boolean hireOtherVillagers = false;
+
+	/*
+	 * Hiring
+	 */
 	public static Material hireItem = Material.EMERALD;
 	public static int hireItemData = 0;
 	public static String hireItemName = "";
 	public static List<String> hireItemLore = new ArrayList<String>(0);
-	public static boolean hireRequireCreationPermission = true;
 	public static int hireOtherVillagersCosts = 1;
 	public static String forHireTitle = "For Hire";
+	public static boolean hireRequireCreationPermission = true;
 
+	/*
+	 * Trading
+	 */
+	public static boolean preventTradingWithOwnShop = true;
+	public static boolean preventTradingWhileOwnerIsOnline = false;
+	public static boolean useStrictItemComparison = false;
+	public static boolean enablePurchaseLogging = false;
+
+	public static int taxRate = 0;
+	public static boolean taxRoundUp = false;
+
+	/*
+	 * Currencies
+	 */
 	public static Material currencyItem = Material.EMERALD;
 	public static short currencyItemData = 0;
 	public static String currencyItemName = "";
 	public static List<String> currencyItemLore = new ArrayList<String>(0);
+
 	public static Material zeroCurrencyItem = Material.BARRIER;
 	public static short zeroCurrencyItemData = 0;
 	public static String zeroCurrencyItemName = "";
@@ -140,13 +185,18 @@ public class Settings {
 	public static short highCurrencyItemData = 0;
 	public static String highCurrencyItemName = "";
 	public static List<String> highCurrencyItemLore = new ArrayList<String>(0);
+
 	public static int highCurrencyValue = 9;
 	public static int highCurrencyMinCost = 20;
+
 	public static Material highZeroCurrencyItem = Material.BARRIER;
 	public static short highZeroCurrencyItemData = 0;
 	public static String highZeroCurrencyItemName = "";
 	public static List<String> highZeroCurrencyItemLore = new ArrayList<String>(0);
 
+	/*
+	 * Messages
+	 */
 	public static String language = "en";
 
 	public static String msgCreationItemSelected = "&aRight-click to select the shop type.\n"
@@ -265,13 +315,15 @@ public class Settings {
 	public static String msgCommandSetforhire = "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale.";
 	public static String msgCommandShopkeeper = "&a/shopkeepers [shop type] [object type] &8- &7Creates a shop.";
 
+	// /////
+
 	private static String toConfigKey(String fieldName) {
 		return fieldName.replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase();
 	}
 
 	// returns true, if the config misses values which need to be saved
 	public static boolean loadConfiguration(Configuration config) {
-		boolean misses = false;
+		boolean settingsMissing = false;
 		try {
 			Field[] fields = Settings.class.getDeclaredFields();
 			for (Field field : fields) {
@@ -290,7 +342,7 @@ public class Settings {
 					} else {
 						config.set(configKey, field.get(null));
 					}
-					misses = true;
+					settingsMissing = true;
 				}
 
 				if (typeClass == String.class) {
@@ -357,7 +409,7 @@ public class Settings {
 			}
 		}
 
-		return misses;
+		return settingsMissing;
 	}
 
 	public static void loadLanguageConfiguration(Configuration config) {
