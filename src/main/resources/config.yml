@@ -92,7 +92,6 @@ allow-renaming-of-player-npc-shops: false
 editor-title: "Shopkeeper Editor"
 name-item: NAME_TAG
 name-item-data: 0
-name-item-name: ""
 name-item-lore: []
 chest-item: CHEST
 chest-item-data: 0

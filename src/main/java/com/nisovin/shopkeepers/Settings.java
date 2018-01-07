@@ -113,7 +113,6 @@ public class Settings {
 	public static String editorTitle = "Shopkeeper Editor";
 	public static Material nameItem = Material.NAME_TAG;
 	public static int nameItemData = 0;
-	public static String nameItemName = "";
 	public static List<String> nameItemLore = new ArrayList<String>(0);
 	public static Material chestItem = Material.CHEST;
 	public static int chestItemData = 0;
@@ -351,6 +350,12 @@ public class Settings {
 			Log.warning("Config: 'currency-item' can not be AIR.");
 			currencyItem = Material.EMERALD;
 		}
+		if (namingOfPlayerShopsViaItem) {
+			if (nameItem == Material.AIR) {
+				Log.warning("Config: 'name-item' can not be AIR if naming-of-player-shops-via-item is enabled!");
+				nameItem = Material.NAME_TAG;
+			}
+		}
 
 		return misses;
 	}
@@ -415,7 +420,7 @@ public class Settings {
 	}
 
 	public static boolean isNamingItem(ItemStack item) {
-		return Utils.isSimilar(item, nameItem, (short) nameItemData, Settings.nameItemName, Settings.nameItemLore);
+		return Utils.isSimilar(item, nameItem, (short) nameItemData, null, Settings.nameItemLore);
 	}
 
 	// chest button:
