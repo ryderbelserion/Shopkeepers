@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
-import com.nisovin.shopkeepers.util.ChunkData;
+import com.nisovin.shopkeepers.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class Shopkeeper {
@@ -29,7 +29,7 @@ public abstract class Shopkeeper {
 	protected int x;
 	protected int y;
 	protected int z;
-	protected ChunkData chunkData;
+	protected ChunkCoords chunkCoords;
 	protected String name = "";
 
 	private boolean valid = false;
@@ -82,7 +82,7 @@ public abstract class Shopkeeper {
 		this.x = location.getBlockX();
 		this.y = location.getBlockY();
 		this.z = location.getBlockZ();
-		this.updateChunkData();
+		this.updateChunkCoords();
 
 		this.shopObject = creationData.objectType.createObject(this, creationData);
 	}
@@ -120,7 +120,7 @@ public abstract class Shopkeeper {
 		this.x = config.getInt("x");
 		this.y = config.getInt("y");
 		this.z = config.getInt("z");
-		this.updateChunkData();
+		this.updateChunkCoords();
 
 		ShopObjectType objectType = ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(config.getString("object"));
 		if (objectType == null) {
@@ -266,12 +266,12 @@ public abstract class Shopkeeper {
 	}
 
 	/**
-	 * Gets the ChunkData identifying the chunk this shopkeeper spawns in.
+	 * Gets the ChunkCoords identifying the chunk this shopkeeper spawns in.
 	 * 
-	 * @return the chunk information
+	 * @return the chunk coordinates
 	 */
-	public ChunkData getChunkData() {
-		return chunkData;
+	public ChunkCoords getChunkCoords() {
+		return chunkCoords;
 	}
 
 	public String getPositionString() {
@@ -322,19 +322,19 @@ public abstract class Shopkeeper {
 	 *            The new stored location of this shopkeeper.
 	 */
 	public void setLocation(Location location) {
-		ChunkData oldChunk = this.getChunkData();
+		ChunkCoords oldChunk = this.getChunkCoords();
 		x = location.getBlockX();
 		y = location.getBlockY();
 		z = location.getBlockZ();
 		worldName = location.getWorld().getName();
-		this.updateChunkData();
+		this.updateChunkCoords();
 
 		// update shopkeeper in chunk map:
 		ShopkeepersPlugin.getInstance().onShopkeeperMove(this, oldChunk);
 	}
 
-	private void updateChunkData() {
-		this.chunkData = new ChunkData(worldName, (x >> 4), (z >> 4));
+	private void updateChunkCoords() {
+		this.chunkCoords = ChunkCoords.fromBlockPos(worldName, x, z);
 	}
 
 	/**

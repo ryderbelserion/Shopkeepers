@@ -8,7 +8,7 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.util.ChunkData;
+import com.nisovin.shopkeepers.util.ChunkCoords;
 
 public interface ShopkeepersAPI {
 
@@ -125,25 +125,11 @@ public interface ShopkeepersAPI {
 	/**
 	 * Gets all shopkeepers for a given chunk. Returns <code>null</code> if there are no shopkeepers in that chunk.
 	 * 
-	 * @param worldName
-	 *            the world name
-	 * @param x
-	 *            chunk x-coordinate
-	 * @param z
-	 *            chunk z-coordinate
-	 * @return an unmodifiable list of shopkeepers, or <code>null</code> if there are none
-	 */
-	public List<Shopkeeper> getShopkeepersInChunk(String worldName, int x, int z);
-
-	/**
-	 * Gets all shopkeepers for a given chunk. Returns <code>null</code> if there are no shopkeepers in that chunk.
-	 * Similar to {@link #getShopkeepersInChunk(String, int, int)}.
-	 * 
-	 * @param chunkData
+	 * @param chunkCoords
 	 *            specifies the chunk
 	 * @return an unmodifiable list of the shopkeepers in the specified chunk, or <code>null</code> if there are none
 	 */
-	public List<Shopkeeper> getShopkeepersInChunk(ChunkData chunkData);
+	public List<Shopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords);
 
 	/**
 	 * Checks if a given entity is a Shopkeeper.

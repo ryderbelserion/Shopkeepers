@@ -58,7 +58,7 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
-import com.nisovin.shopkeepers.util.ChunkData;
+import com.nisovin.shopkeepers.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -109,7 +109,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private final Collection<Shopkeeper> allShopkeepersView = Collections.unmodifiableCollection(shopkeepersById.values());
 	private int nextShopSessionId = 1;
 	private final Map<Integer, Shopkeeper> shopkeepersBySessionId = new LinkedHashMap<Integer, Shopkeeper>();
-	private final Map<ChunkData, List<Shopkeeper>> shopkeepersByChunk = new HashMap<ChunkData, List<Shopkeeper>>();
+	private final Map<ChunkCoords, List<Shopkeeper>> shopkeepersByChunk = new HashMap<ChunkCoords, List<Shopkeeper>>();
 	private final Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>(); // TODO remove this (?)
 	private final Collection<Shopkeeper> activeShopkeepersView = Collections.unmodifiableCollection(activeShopkeepers.values());
 
@@ -308,8 +308,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
 				public void run() {
 					int count = 0;
-					for (Entry<ChunkData, List<Shopkeeper>> chunkEntry : shopkeepersByChunk.entrySet()) {
-						ChunkData chunk = chunkEntry.getKey();
+					for (Entry<ChunkCoords, List<Shopkeeper>> chunkEntry : shopkeepersByChunk.entrySet()) {
+						ChunkCoords chunk = chunkEntry.getKey();
 						if (chunk.isChunkLoaded()) {
 							List<Shopkeeper> shopkeepers = chunkEntry.getValue();
 							for (Shopkeeper shopkeeper : shopkeepers) {
@@ -618,20 +618,20 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// SHOPKEEPER MEMORY STORAGE
 
-	private void addShopkeeperToChunk(Shopkeeper shopkeeper, ChunkData chunkData) {
-		List<Shopkeeper> list = shopkeepersByChunk.get(chunkData);
+	private void addShopkeeperToChunk(Shopkeeper shopkeeper, ChunkCoords chunkCoords) {
+		List<Shopkeeper> list = shopkeepersByChunk.get(chunkCoords);
 		if (list == null) {
 			list = new ArrayList<Shopkeeper>();
-			shopkeepersByChunk.put(chunkData, list);
+			shopkeepersByChunk.put(chunkCoords, list);
 		}
 		list.add(shopkeeper);
 	}
 
-	private void removeShopkeeperFromChunk(Shopkeeper shopkeeper, ChunkData chunkData) {
-		List<Shopkeeper> byChunk = shopkeepersByChunk.get(chunkData);
+	private void removeShopkeeperFromChunk(Shopkeeper shopkeeper, ChunkCoords chunkCoords) {
+		List<Shopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
 		if (byChunk == null) return;
 		if (byChunk.remove(shopkeeper) && byChunk.isEmpty()) {
-			shopkeepersByChunk.remove(chunkData);
+			shopkeepersByChunk.remove(chunkCoords);
 		}
 	}
 
@@ -657,14 +657,14 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		shopkeeper.onRegistration(shopSessionId);
 
 		// add shopkeeper to chunk:
-		ChunkData chunkData = shopkeeper.getChunkData();
-		this.addShopkeeperToChunk(shopkeeper, chunkData);
+		ChunkCoords chunkCoords = shopkeeper.getChunkCoords();
+		this.addShopkeeperToChunk(shopkeeper, chunkCoords);
 
 		// activate shopkeeper:
 		if (!shopkeeper.needsSpawning()) {
 			// activate shopkeeper once at registration:
 			this._activateShopkeeper(shopkeeper);
-		} else if (chunkData.isChunkLoaded()) {
+		} else if (chunkCoords.isChunkLoaded()) {
 			// activate shopkeeper due to loaded chunk:
 			this.activateShopkeeper(shopkeeper);
 		}
@@ -735,13 +735,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
-	public List<Shopkeeper> getShopkeepersInChunk(String worldName, int x, int z) {
-		return this.getShopkeepersInChunk(new ChunkData(worldName, x, z));
-	}
-
-	@Override
-	public List<Shopkeeper> getShopkeepersInChunk(ChunkData chunkData) {
-		List<Shopkeeper> byChunk = shopkeepersByChunk.get(chunkData);
+	public List<Shopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords) {
+		List<Shopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
 		if (byChunk == null) return null;
 		return Collections.unmodifiableList(byChunk);
 	}
@@ -826,13 +821,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		shopkeepersBySessionId.remove(shopkeeper.getSessionId());
 
 		// remove shopkeeper from chunk:
-		ChunkData chunkData = shopkeeper.getChunkData();
-		this.removeShopkeeperFromChunk(shopkeeper, chunkData);
+		ChunkCoords chunkCoords = shopkeeper.getChunkCoords();
+		this.removeShopkeeperFromChunk(shopkeeper, chunkCoords);
 	}
 
-	public void onShopkeeperMove(Shopkeeper shopkeeper, ChunkData oldChunk) {
+	public void onShopkeeperMove(Shopkeeper shopkeeper, ChunkCoords oldChunk) {
 		assert oldChunk != null;
-		ChunkData newChunk = shopkeeper.getChunkData();
+		ChunkCoords newChunk = shopkeeper.getChunkCoords();
 		if (!oldChunk.equals(newChunk)) {
 			// remove from old chunk:
 			this.removeShopkeeperFromChunk(shopkeeper, oldChunk);
@@ -852,7 +847,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	int loadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
 		int affectedShops = 0;
-		List<Shopkeeper> shopkeepers = shopkeepersByChunk.get(new ChunkData(chunk));
+		List<Shopkeeper> shopkeepers = shopkeepersByChunk.get(new ChunkCoords(chunk));
 		if (shopkeepers != null) {
 			affectedShops = shopkeepers.size();
 			Log.debug("Loading " + affectedShops + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
@@ -880,7 +875,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	int unloadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
 		int affectedShops = 0;
-		List<Shopkeeper> shopkeepers = this.getShopkeepersInChunk(new ChunkData(chunk));
+		List<Shopkeeper> shopkeepers = this.getShopkeepersInChunk(new ChunkCoords(chunk));
 		if (shopkeepers != null) {
 			affectedShops = shopkeepers.size();
 			Log.debug("Unloading " + affectedShops + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());

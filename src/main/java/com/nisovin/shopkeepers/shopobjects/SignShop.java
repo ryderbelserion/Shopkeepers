@@ -218,7 +218,7 @@ public class SignShop extends ShopObject {
 
 	@Override
 	public boolean check() {
-		if (!shopkeeper.getChunkData().isChunkLoaded()) {
+		if (!shopkeeper.getChunkCoords().isChunkLoaded()) {
 			// only verify sign, if the chunk is currently loaded:
 			return false;
 		}
