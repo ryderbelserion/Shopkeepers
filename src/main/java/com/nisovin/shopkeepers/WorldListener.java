@@ -5,6 +5,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -36,7 +37,18 @@ class WorldListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onChunkUnload(ChunkUnloadEvent event) {
-		plugin.unloadShopkeepersInChunk(event.getChunk());
+		// living entity shopkeeper entities can wander into different chunks, so we remove all living entity shopkeeper
+		// entities which wandered ways from their chunk during chunk unloads:
+		Chunk chunk = event.getChunk();
+		for (Entity entity : chunk.getEntities()) {
+			Shopkeeper shopkeeper = plugin.getLivingEntityShopkeeper(entity);
+			if (shopkeeper != null && !shopkeeper.getChunkCoords().isSameChunk(chunk)) {
+				Log.debug("Removing shop entity which was pushed away from shop's chunk at (" + shopkeeper.getPositionString() + ")");
+				entity.remove();
+			}
+		}
+
+		plugin.unloadShopkeepersInChunk(chunk);
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)

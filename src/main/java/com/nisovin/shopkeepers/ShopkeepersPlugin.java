@@ -283,7 +283,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					Shopkeeper shopkeeper = iter.next().getValue();
 					boolean update = shopkeeper.check();
 					if (update) {
-						// if the shopkeeper had to be respawned it's shop id changed:
+						// if the shopkeeper had to be respawned its shop id changed:
 						// this removes the entry which was stored with the old shop id and later adds back the
 						// shopkeeper with it's new id
 						readd.add(shopkeeper);
@@ -696,9 +696,20 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public Shopkeeper getShopkeeperByEntity(Entity entity) {
 		if (entity == null) return null;
-		Shopkeeper shopkeeper = this.getActiveShopkeeper(LivingEntityShop.getId(entity));
+		// check if the entity is a living entity shopkeeper:
+		Shopkeeper shopkeeper = this.getLivingEntityShopkeeper(entity);
 		if (shopkeeper != null) return shopkeeper;
-		// check if this is a citizens npc shopkeeper:
+		// check if the entity is a citizens npc shopkeeper:
+		return this.getCitizensShopkeeper(entity);
+	}
+
+	public Shopkeeper getLivingEntityShopkeeper(Entity entity) {
+		if (entity == null) return null;
+		return this.getActiveShopkeeper(LivingEntityShop.getId(entity));
+	}
+
+	public Shopkeeper getCitizensShopkeeper(Entity entity) {
+		if (entity == null) return null;
 		Integer npcId = CitizensHandler.getNPCId(entity);
 		if (npcId == null) return null;
 		return this.getActiveShopkeeper(CitizensShop.getId(npcId));

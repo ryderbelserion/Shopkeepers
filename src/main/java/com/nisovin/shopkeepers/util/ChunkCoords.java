@@ -56,6 +56,11 @@ public final class ChunkCoords {
 		return false;
 	}
 
+	public boolean isSameChunk(Chunk chunk) {
+		if (chunk == null) return false;
+		return chunk.getX() == chunkX && chunk.getZ() == chunkZ && chunk.getWorld().getName().equals(worldName);
+	}
+
 	@Override
 	public String toString() {
 		return getClass().getName()
@@ -92,5 +97,29 @@ public final class ChunkCoords {
 
 	public static ChunkCoords fromBlockPos(String worldName, int blockX, int blockZ) {
 		return new ChunkCoords(worldName, convertBlockCoord(blockX), convertBlockCoord(blockZ));
+	}
+
+	public static boolean isSameChunk(Location loc1, Location loc2) {
+		if (loc1 == null || loc2 == null) return false;
+		World world1 = loc1.getWorld();
+		World world2 = loc2.getWorld();
+		if (world1 == null || world2 == null) return false;
+		if (!world1.getName().equals(world2.getName())) return false;
+
+		int chunkX1 = convertBlockCoord(loc1.getBlockX());
+		int chunkX2 = convertBlockCoord(loc2.getBlockX());
+		if (chunkX1 != chunkX2) return false;
+
+		int chunkZ1 = convertBlockCoord(loc1.getBlockZ());
+		int chunkZ2 = convertBlockCoord(loc2.getBlockZ());
+		if (chunkZ1 != chunkZ2) return false;
+		return true;
+	}
+
+	public static boolean isChunkLoaded(Location location) {
+		if (location == null) return false;
+		World world = location.getWorld();
+		if (world == null) return false;
+		return world.isChunkLoaded(convertBlockCoord(location.getBlockX()), convertBlockCoord(location.getBlockZ()));
 	}
 }

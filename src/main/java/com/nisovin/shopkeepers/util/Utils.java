@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.util;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -65,7 +67,7 @@ public class Utils {
 	public static ItemStack normalizedIfEmpty(ItemStack item) {
 		return isEmpty(item) ? EMPTY_ITEM : item;
 	}
-
+	
 	public static ItemStack getEmptyItem() {
 		return EMPTY_ITEM.clone();
 	}*/
@@ -429,6 +431,7 @@ public class Utils {
 		if (location == null) return entities;
 		if (radius <= 0.0D) return entities;
 
+		List<EntityType> typesList = (types == null) ? Collections.<EntityType>emptyList() : Arrays.asList(types);
 		double radius2 = radius * radius;
 		int chunkRadius = ((int) (radius / 16)) + 1;
 		Chunk center = location.getChunk();
@@ -453,17 +456,44 @@ public class Utils {
 					}
 
 					if (entityLoc.distanceSquared(location) <= radius2) {
-						if (types == null) {
+						if (typesList.isEmpty() || typesList.contains(entity.getType())) {
 							entities.add(entity);
-						} else {
-							EntityType type = entity.getType();
-							for (EntityType t : types) {
-								if (type.equals(t)) {
-									entities.add(entity);
-									break;
-								}
-							}
 						}
+					}
+				}
+			}
+		}
+		return entities;
+	}
+
+	public static List<Entity> getNearbyChunkEntities(Chunk chunk, int chunkRadius, boolean loadChunks, EntityType... types) {
+		List<Entity> entities = new ArrayList<Entity>();
+		if (chunk == null) return entities;
+		if (chunkRadius < 0) return entities;
+
+		List<EntityType> typesList = (types == null) ? Collections.<EntityType>emptyList() : Arrays.asList(types);
+		int startX = chunk.getX() - chunkRadius;
+		int endX = chunk.getX() + chunkRadius;
+		int startZ = chunk.getZ() - chunkRadius;
+		int endZ = chunk.getZ() + chunkRadius;
+		World world = chunk.getWorld();
+		for (int chunkX = startX; chunkX <= endX; chunkX++) {
+			for (int chunkZ = startZ; chunkZ <= endZ; chunkZ++) {
+				if (!loadChunks && !world.isChunkLoaded(chunkX, chunkZ)) continue;
+				Chunk currentChunk = world.getChunkAt(chunkX, chunkZ);
+				for (Entity entity : currentChunk.getEntities()) {
+					Location entityLoc = entity.getLocation();
+					// TODO: this is a workaround: for some yet unknown reason entities sometimes report to be in a
+					// different world..
+					if (!entityLoc.getWorld().equals(world)) {
+						Log.debug("Found an entity which reports to be in a different world than the chunk we got it from:");
+						Log.debug("Chunk=" + currentChunk + ", ChunkWorld=" + currentChunk.getWorld() + ", entityType=" + entity.getType()
+								+ ", entityLocation=" + entityLoc);
+						continue; // skip this entity
+					}
+
+					if (typesList.isEmpty() || typesList.contains(entity.getType())) {
+						entities.add(entity);
 					}
 				}
 			}
