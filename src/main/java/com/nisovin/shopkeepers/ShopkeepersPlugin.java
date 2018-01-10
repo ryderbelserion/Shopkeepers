@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Scanner;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -1240,39 +1239,25 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 
 		YamlConfiguration shopkeepersConfig = new YamlConfiguration();
-		Scanner scanner = null;
-		FileInputStream stream = null;
 		try {
-			if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-				stream = new FileInputStream(saveFile);
-				scanner = new Scanner(stream, Settings.fileEncoding);
-				scanner.useDelimiter("\\A");
-				if (!scanner.hasNext()) {
-					return true; // file is completely empty -> no shopkeeper data is available
+			if (!Utils.isEmpty(Settings.fileEncoding)) {
+				// load with specified charset:
+				try (	FileInputStream stream = new FileInputStream(saveFile);
+						InputStreamReader reader = new InputStreamReader(stream, Settings.fileEncoding)) {
+					shopkeepersConfig.load(reader);
 				}
-				String data = scanner.next();
-				shopkeepersConfig.loadFromString(data);
 			} else {
+				// load with default charset handling:
 				shopkeepersConfig.load(saveFile);
 			}
 		} catch (Exception e) {
-			// issue detected:
+			Log.severe("Failed to load save file!");
 			e.printStackTrace();
 			return false; // disable without save
-		} finally {
-			if (scanner != null) {
-				scanner.close();
-			}
-			if (stream != null) {
-				try {
-					stream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 
 		Set<String> ids = shopkeepersConfig.getKeys(false);
+		Log.debug("Loading data of " + ids.size() + " shopkeepers..");
 		for (String id : ids) {
 			ConfigurationSection shopkeeperSection = shopkeepersConfig.getConfigurationSection(id);
 			ShopType<?> shopType = shopTypesManager.get(shopkeeperSection.getString("type"));
