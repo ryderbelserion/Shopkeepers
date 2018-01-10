@@ -40,6 +40,10 @@ public class DefaultShopObjectTypes {
 
 	// STATICS (for convenience):
 
+	public static LivingEntityObjectTypes MOBS() {
+		return ShopkeepersPlugin.getInstance().getDefaultShopObjectTypes().getLivingEntityObjectTypes();
+	}
+
 	public static ShopObjectType SIGN() {
 		return ShopkeepersPlugin.getInstance().getDefaultShopObjectTypes().getSignShopObjectType();
 	}

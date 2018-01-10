@@ -14,6 +14,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
@@ -151,6 +152,32 @@ class CommandManager implements CommandExecutor {
 				player.sendMessage("-Is low zero currency: " + (Settings.isZeroCurrencyItem(nextItem)));
 				player.sendMessage("-Is high zero currency: " + (Settings.isHighZeroCurrencyItem(nextItem)));
 
+				return true;
+			}
+
+			// debug command: create shops
+			if (args.length >= 1 && args[0].equalsIgnoreCase("debugCreateShops")) {
+				if (!Utils.hasPermission(sender, ShopkeepersAPI.DEBUG_PERMISSION)) {
+					Utils.sendMessage(sender, Settings.msgNoPermission);
+					return true;
+				}
+
+				int shopCount = 10;
+				if (args.length >= 2) {
+					Integer shopCountArg = Utils.parseInt(args[1]);
+					if (shopCountArg == null) {
+						sender.sendMessage(ChatColor.RED + "Invalid shopkeeper count: " + args[1]);
+						return true;
+					}
+					shopCount = shopCountArg.intValue();
+				}
+				sender.sendMessage(ChatColor.GREEN + "Creating " + shopCount + " shopkeepers, starting here!");
+				Location curSpawnLocation = player.getLocation();
+				for (int i = 0; i < shopCount; i++) {
+					plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.MOBS().getObjectType(EntityType.VILLAGER), curSpawnLocation.clone(), null));
+					curSpawnLocation.add(2, 0, 0);
+				}
+				sender.sendMessage(ChatColor.GREEN + "Done!");
 				return true;
 			}
 
