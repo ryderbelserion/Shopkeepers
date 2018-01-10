@@ -251,7 +251,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// load shopkeeper saved data:
 		boolean loadError = false;
 		try {
-			loadError = this.load();
+			loadError = !this.load();
 		} catch (Exception e) {
 			Log.severe("Something completely unexpected went wrong during loading of the save data!");
 			e.printStackTrace();
