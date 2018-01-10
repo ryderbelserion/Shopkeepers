@@ -1222,109 +1222,116 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// returns false if there was some issue during loading
 	private boolean load() {
-		File saveFile = this.getSaveFile();
-		if (!saveFile.exists()) {
-			File tempSaveFile = this.getTempSaveFile();
-			if (tempSaveFile.exists()) {
-				// load from temporary save file instead:
-				Log.warning("Found no save file, but an existing temporary save file! (" + tempSaveFile.getName() + ")");
-				Log.warning("This might indicate an issue during a previous saving attempt!");
-				Log.warning("Trying to load the shopkeepers data from this temporary save file instead!");
-
-				saveFile = tempSaveFile;
-			} else {
-				// save file does not exist yet -> no shopkeeper data available
-				return true;
-			}
-		}
-
-		YamlConfiguration shopkeepersConfig = new YamlConfiguration();
 		try {
-			if (!Utils.isEmpty(Settings.fileEncoding)) {
-				// load with specified charset:
-				try (	FileInputStream stream = new FileInputStream(saveFile);
-						InputStreamReader reader = new InputStreamReader(stream, Settings.fileEncoding)) {
-					shopkeepersConfig.load(reader);
-				}
-			} else {
-				// load with default charset handling:
-				shopkeepersConfig.load(saveFile);
-			}
-		} catch (Exception e) {
-			Log.severe("Failed to load save file!");
-			e.printStackTrace();
-			return false; // disable without save
-		}
+			File saveFile = this.getSaveFile();
+			if (!saveFile.exists()) {
+				File tempSaveFile = this.getTempSaveFile();
+				if (tempSaveFile.exists()) {
+					// load from temporary save file instead:
+					Log.warning("Found no save file, but an existing temporary save file! (" + tempSaveFile.getName() + ")");
+					Log.warning("This might indicate an issue during a previous saving attempt!");
+					Log.warning("Trying to load the shopkeepers data from this temporary save file instead!");
 
-		Set<String> ids = shopkeepersConfig.getKeys(false);
-		Log.debug("Loading data of " + ids.size() + " shopkeepers..");
-		for (String id : ids) {
-			ConfigurationSection shopkeeperSection = shopkeepersConfig.getConfigurationSection(id);
-			ShopType<?> shopType = shopTypesManager.get(shopkeeperSection.getString("type"));
-			// unknown shop type
-			if (shopType == null) {
-				// got an owner entry? -> default to normal player shop type
-				if (shopkeeperSection.contains("owner")) {
-					Log.warning("No valid shop type specified for shopkeeper '" + id + "': defaulting to "
-							+ DefaultShopTypes.PLAYER_NORMAL().getIdentifier());
-					shopType = DefaultShopTypes.PLAYER_NORMAL();
+					saveFile = tempSaveFile;
 				} else {
-					// no valid shop type given..
-					Log.severe("Failed to load shopkeeper '" + id + "': unknown type");
+					// save file does not exist yet -> no shopkeeper data available
+					return true;
+				}
+			}
+
+			YamlConfiguration shopkeepersConfig = new YamlConfiguration();
+			try {
+				if (!Utils.isEmpty(Settings.fileEncoding)) {
+					// load with specified charset:
+					try (	FileInputStream stream = new FileInputStream(saveFile);
+							InputStreamReader reader = new InputStreamReader(stream, Settings.fileEncoding)) {
+						shopkeepersConfig.load(reader);
+					}
+				} else {
+					// load with default charset handling:
+					shopkeepersConfig.load(saveFile);
+				}
+			} catch (Exception e) {
+				Log.severe("Failed to load save file!");
+				e.printStackTrace();
+				return false; // disable without save
+			}
+
+			Set<String> ids = shopkeepersConfig.getKeys(false);
+			Log.debug("Loading data of " + ids.size() + " shopkeepers..");
+			for (String id : ids) {
+				ConfigurationSection shopkeeperSection = shopkeepersConfig.getConfigurationSection(id);
+				ShopType<?> shopType = shopTypesManager.get(shopkeeperSection.getString("type"));
+				// unknown shop type
+				if (shopType == null) {
+					// got an owner entry? -> default to normal player shop type
+					if (shopkeeperSection.contains("owner")) {
+						Log.warning("No valid shop type specified for shopkeeper '" + id + "': defaulting to "
+								+ DefaultShopTypes.PLAYER_NORMAL().getIdentifier());
+						shopType = DefaultShopTypes.PLAYER_NORMAL();
+					} else {
+						// no valid shop type given..
+						Log.severe("Failed to load shopkeeper '" + id + "': unknown type");
+						return false; // disable without save
+					}
+				}
+
+				// MC 1.11: convert old skeleton and zombie variants to new mob types
+				// TODO remove again in future updates
+				boolean hasStrayType = false;
+				boolean hasWitherSkeletonType = false;
+				boolean hasZombieVillagerType = false;
+				try {
+					hasStrayType = (EntityType.valueOf("STRAY") != null);
+				} catch (Exception e) {
+				}
+				try {
+					hasWitherSkeletonType = (EntityType.valueOf("WITHER_SKELETON") != null);
+				} catch (Exception e) {
+				}
+				try {
+					hasZombieVillagerType = (EntityType.valueOf("ZOMBIE_VILLAGER") != null);
+				} catch (Exception e) {
+				}
+
+				if (hasStrayType || hasWitherSkeletonType || hasZombieVillagerType) {
+					String objectType = shopkeeperSection.getString("object");
+					if ("skeleton".equalsIgnoreCase(objectType)) {
+						String skeletonType = shopkeeperSection.getString("skeletonType");
+						if (hasStrayType && "STRAY".equalsIgnoreCase(skeletonType)) {
+							Log.warning("Converting skeleton shopkeeper '" + id + "' with stray variant to new stray shopkeeper.");
+							shopkeeperSection.set("object", "stray");
+						} else if (hasWitherSkeletonType && "WITHER".equalsIgnoreCase(skeletonType)) {
+							Log.warning("Converting skeleton shopkeeper '" + id + "' with wither variant to new wither-skeleton shopkeeper.");
+							shopkeeperSection.set("object", "wither_skeleton");
+						}
+					}
+					if ("zombie".equalsIgnoreCase(objectType)) {
+						if (hasZombieVillagerType && shopkeeperSection.getBoolean("villagerZombie")) {
+							Log.warning("Converting zombie shopkeeper '" + id + "' with zombie-villager variant to new zombie-villager shopkeeper.");
+							shopkeeperSection.set("object", "zombie_villager");
+						}
+					}
+				}
+
+				// load shopkeeper:
+				try {
+					Shopkeeper shopkeeper = shopType.loadShopkeeper(shopkeeperSection);
+					if (shopkeeper == null) {
+						throw new ShopkeeperCreateException("ShopType returned null shopkeeper!");
+					}
+				} catch (Exception e) {
+					Log.severe("Failed to load shopkeeper '" + id + "': " + e.getMessage());
+					e.printStackTrace();
 					return false; // disable without save
 				}
 			}
-
-			// MC 1.11: convert old skeleton and zombie variants to new mob types
-			// TODO remove again in future updates
-			boolean hasStrayType = false;
-			boolean hasWitherSkeletonType = false;
-			boolean hasZombieVillagerType = false;
-			try {
-				hasStrayType = (EntityType.valueOf("STRAY") != null);
-			} catch (Exception e) {
-			}
-			try {
-				hasWitherSkeletonType = (EntityType.valueOf("WITHER_SKELETON") != null);
-			} catch (Exception e) {
-			}
-			try {
-				hasZombieVillagerType = (EntityType.valueOf("ZOMBIE_VILLAGER") != null);
-			} catch (Exception e) {
-			}
-
-			if (hasStrayType || hasWitherSkeletonType || hasZombieVillagerType) {
-				String objectType = shopkeeperSection.getString("object");
-				if ("skeleton".equalsIgnoreCase(objectType)) {
-					String skeletonType = shopkeeperSection.getString("skeletonType");
-					if (hasStrayType && "STRAY".equalsIgnoreCase(skeletonType)) {
-						Log.warning("Converting skeleton shopkeeper '" + id + "' with stray variant to new stray shopkeeper.");
-						shopkeeperSection.set("object", "stray");
-					} else if (hasWitherSkeletonType && "WITHER".equalsIgnoreCase(skeletonType)) {
-						Log.warning("Converting skeleton shopkeeper '" + id + "' with wither variant to new wither-skeleton shopkeeper.");
-						shopkeeperSection.set("object", "wither_skeleton");
-					}
-				}
-				if ("zombie".equalsIgnoreCase(objectType)) {
-					if (hasZombieVillagerType && shopkeeperSection.getBoolean("villagerZombie")) {
-						Log.warning("Converting zombie shopkeeper '" + id + "' with zombie-villager variant to new zombie-villager shopkeeper.");
-						shopkeeperSection.set("object", "zombie_villager");
-					}
-				}
-			}
-
-			// load shopkeeper:
-			try {
-				Shopkeeper shopkeeper = shopType.loadShopkeeper(shopkeeperSection);
-				if (shopkeeper == null) {
-					throw new ShopkeeperCreateException("ShopType returned null shopkeeper!");
-				}
-			} catch (Exception e) {
-				Log.severe("Failed to load shopkeeper '" + id + "': " + e.getMessage());
-				return false; // disable without save
-			}
+			return true;
+		} catch (Exception e) {
+			Log.severe("Something went wrong during loading of the save data!");
+			e.printStackTrace();
+			return false; // disable without save
 		}
-		return true;
 	}
 
 	@Override
