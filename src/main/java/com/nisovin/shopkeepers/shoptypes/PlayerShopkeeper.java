@@ -278,7 +278,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				// check if the player can hire (create) this type of shopkeeper:
 				if (Settings.hireRequireCreationPermission
 						&& (!this.getShopkeeper().getType().hasPermission(player)
-						|| !this.getShopkeeper().getShopObject().getObjectType().hasPermission(player))) {
+								|| !this.getShopkeeper().getShopObject().getObjectType().hasPermission(player))) {
 					// missing permission to hire this type of shopkeeper:
 					Utils.sendMessage(player, Settings.msgCantHireShopType);
 					this.closeDelayed(player);
@@ -287,7 +287,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 				// check if the player can afford it:
 				ItemStack[] inventory = player.getInventory().getContents();
-				ItemStack hireCost = shopkeeper.getHireCost().clone();
+				ItemStack hireCost = shopkeeper.getHireCost();
 				for (int i = 0; i < inventory.length; i++) {
 					ItemStack item = inventory[i];
 					if (item != null && item.isSimilar(hireCost)) {
@@ -337,7 +337,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 				// hire the shopkeeper:
 				player.getInventory().setContents(inventory); // apply inventory changes
-				shopkeeper.setForHire(false, null);
+				shopkeeper.setForHire(null);
 				shopkeeper.setOwner(player);
 				ShopkeepersPlugin.getInstance().save();
 				Utils.sendMessage(player, Settings.msgHired);
@@ -353,8 +353,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	protected int chestX;
 	protected int chestY;
 	protected int chestZ;
-	protected boolean forHire = false;
-	protected ItemStack hireCost = null;
+	protected ItemStack hireCost = null; // null if not for hire
 
 	/**
 	 * For use in extending classes.
@@ -476,11 +475,11 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		// update chest:
 		this.setChest(config.getInt("chestx"), config.getInt("chesty"), config.getInt("chestz"));
 
-		forHire = config.getBoolean("forhire");
 		hireCost = config.getItemStack("hirecost");
-		if (forHire && hireCost == null) {
-			Log.warning("Couldn't load hire cost! Disabling 'for hire' for shopkeeper at " + this.getPositionString());
-			forHire = false;
+		// hire cost itemstack is not null, but empty -> normalize to null:
+		if (hireCost != null && Utils.isEmpty(hireCost)) {
+			Log.warning("Invalid (empty) hire cost! Disabling 'for hire' for shopkeeper at " + this.getPositionString());
+			hireCost = null;
 		}
 	}
 
@@ -492,8 +491,9 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		config.set("chestx", chestX);
 		config.set("chesty", chestY);
 		config.set("chestz", chestZ);
-		config.set("forhire", forHire);
-		config.set("hirecost", hireCost);
+		if (hireCost != null) {
+			config.set("hirecost", hireCost);
+		}
 	}
 
 	/**
@@ -561,28 +561,42 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		return Bukkit.getPlayer(ownerUUID);
 	}
 
+	/**
+	 * Checks whether this shopkeeper is for hire.
+	 * <p>
+	 * The shopkeeper is for hire if a hire cost has been specified.
+	 * 
+	 * @return <code>true</code> if this shopkeeper is for hire
+	 */
 	public boolean isForHire() {
-		return forHire;
+		return (hireCost != null);
 	}
 
-	public void setForHire(boolean forHire, ItemStack hireCost) {
-		if (forHire) {
-			Validate.notNull(hireCost);
-		} else {
-			Validate.isTrue(hireCost == null);
-		}
-
-		this.forHire = forHire;
-		this.hireCost = hireCost;
-		if (forHire) {
-			this.setName(Settings.forHireTitle);
-		} else {
+	/**
+	 * Sets this shopkeeper for hire using the given hire cost.
+	 * 
+	 * @param hireCost
+	 *            the hire cost, or <code>null</code> or empty to disable hiring for this shopkeeper
+	 */
+	public void setForHire(ItemStack hireCost) {
+		if (Utils.isEmpty(hireCost)) {
+			// disable hiring:
+			this.hireCost = null;
 			this.setName("");
+		} else {
+			// set for hire:
+			this.hireCost = hireCost.clone();
+			this.setName(Settings.forHireTitle);
 		}
 	}
 
+	/**
+	 * Gets the hiring cost of this shopkeeper.
+	 * 
+	 * @return the hiring cost (cloned), or <code>null</code> if this shop is not for hire
+	 */
 	public ItemStack getHireCost() {
-		return hireCost;
+		return (this.isForHire() ? hireCost.clone() : null);
 	}
 
 	private void setChest(int chestX, int chestY, int chestZ) {

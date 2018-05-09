@@ -601,7 +601,7 @@ class CommandManager implements CommandExecutor {
 				}
 
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {
-					shopkeeper.setForHire(true, hireCost.clone());
+					shopkeeper.setForHire(hireCost);
 				}
 				plugin.save();
 				Utils.sendMessage(player, Settings.msgSetForHire);
