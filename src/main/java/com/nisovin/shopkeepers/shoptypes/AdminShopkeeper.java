@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.shoptypes;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
@@ -17,7 +18,9 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
@@ -53,12 +56,12 @@ public class AdminShopkeeper extends Shopkeeper {
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
 			// add the shopkeeper's trade offers:
-			List<ItemStack[]> recipes = shopkeeper.getRecipes();
-			for (int column = 0; column < recipes.size() && column < 8; column++) {
-				ItemStack[] recipe = recipes.get(column);
-				inventory.setItem(column, recipe[0]);
-				inventory.setItem(column + 9, recipe[1]);
-				inventory.setItem(column + 18, recipe[2]);
+			List<TradingOffer> offers = shopkeeper.getOffers();
+			for (int column = 0; column < offers.size() && column < 8; column++) {
+				TradingOffer offer = offers.get(column);
+				inventory.setItem(column, offer.getItem1());
+				inventory.setItem(column + 9, offer.getItem2());
+				inventory.setItem(column + 18, offer.getResultItem());
 			}
 			// add the special buttons:
 			this.setActionButtons(inventory);
@@ -70,12 +73,11 @@ public class AdminShopkeeper extends Shopkeeper {
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
 			final AdminShopkeeper shopkeeper = this.getShopkeeper();
-			List<ItemStack[]> recipes = shopkeeper.recipes;
-			recipes.clear();
+			shopkeeper.clearOffers();
 			for (int column = 0; column < 8; column++) {
 				ItemStack cost1 = Utils.getNullIfEmpty(inventory.getItem(column));
 				ItemStack cost2 = Utils.getNullIfEmpty(inventory.getItem(column + 9));
-				ItemStack result = Utils.getNullIfEmpty(inventory.getItem(column + 18));
+				ItemStack resultItem = Utils.getNullIfEmpty(inventory.getItem(column + 18));
 
 				// handle cost2 item as cost1 item if there is no cost1 item:
 				if (cost1 == null) {
@@ -83,13 +85,9 @@ public class AdminShopkeeper extends Shopkeeper {
 					cost2 = null;
 				}
 
-				if (cost1 != null && result != null) {
+				if (cost1 != null && resultItem != null) {
 					// add trading recipe:
-					ItemStack[] recipe = new ItemStack[3];
-					recipe[0] = cost1;
-					recipe[1] = cost2;
-					recipe[2] = result;
-					recipes.add(recipe);
+					shopkeeper.addOffer(resultItem, cost1, cost2);
 				} else if (player != null) {
 					// return unused items to inventory:
 					if (cost1 != null) {
@@ -98,8 +96,8 @@ public class AdminShopkeeper extends Shopkeeper {
 					if (cost2 != null) {
 						player.getInventory().addItem(cost2);
 					}
-					if (result != null) {
-						player.getInventory().addItem(result);
+					if (resultItem != null) {
+						player.getInventory().addItem(resultItem);
 					}
 				}
 			}
@@ -137,7 +135,14 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 	}
 
-	protected final List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+	// can contain multiple offers for a specific type of item:
+	private final List<TradingOffer> offers = new ArrayList<TradingOffer>();
+	private final List<TradingOffer> offersView = Collections.unmodifiableList(offers);
+
+	// kept in sync with offers:
+	private final List<TradingRecipe> recipes = new ArrayList<TradingRecipe>();
+	private final List<TradingRecipe> recipesView = Collections.unmodifiableList(recipes);
+
 	// null indicates that no additional permission is required:
 	protected String tradePermission = null;
 
@@ -170,10 +175,10 @@ public class AdminShopkeeper extends Shopkeeper {
 		// load trade permission:
 		tradePermission = config.getString("tradePerm", null);
 		// load offers:
-		recipes.clear();
-		// legacy: load offers from old format
-		recipes.addAll(this.loadRecipesOld(config, "recipes"));
-		recipes.addAll(this.loadRecipes(config, "recipes"));
+		this.clearOffers();
+		// TODO remove legacy: load offers from old format
+		this.addOffers(this.loadFromConfigOld(config, "recipes"));
+		this.addOffers(TradingOffer.loadFromConfig(config, "recipes"));
 	}
 
 	@Override
@@ -182,7 +187,7 @@ public class AdminShopkeeper extends Shopkeeper {
 		// save trade permission:
 		config.set("tradePerm", tradePermission);
 		// save offers:
-		this.saveRecipes(config, "recipes", recipes);
+		TradingOffer.saveToConfig(config, "recipes", this.getOffers());
 	}
 
 	@Override
@@ -202,44 +207,43 @@ public class AdminShopkeeper extends Shopkeeper {
 	}
 
 	@Override
-	public List<ItemStack[]> getRecipes() {
-		return recipes;
+	public List<TradingRecipe> getTradingRecipes(Player player) {
+		return recipesView;
 	}
 
-	private void saveRecipes(ConfigurationSection config, String node, Collection<ItemStack[]> recipes) {
-		ConfigurationSection recipesSection = config.createSection(node);
-		int id = 0;
-		for (ItemStack[] recipe : recipes) {
-			// TODO temporary, due to a bukkit bug custom head item can currently not be saved
-			if (Settings.skipCustomHeadSaving && (Utils.isCustomHeadItem(recipe[0])
-					|| Utils.isCustomHeadItem(recipe[1])
-					|| Utils.isCustomHeadItem(recipe[2]))) {
-				Log.warning("Skipping saving of trade involving a head item with custom texture, which cannot be saved currently due to a bukkit bug.");
-				continue;
-			}
-			ConfigurationSection recipeSection = recipesSection.createSection(String.valueOf(id));
-			Utils.saveItem(recipeSection, "item1", recipe[0]);
-			Utils.saveItem(recipeSection, "item2", recipe[1]);
-			Utils.saveItem(recipeSection, "resultItem", recipe[2]);
-			id++;
+	// OFFERS:
+
+	public List<TradingOffer> getOffers() {
+		return offersView;
+	}
+
+	public TradingOffer addOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+		// create offer (also handles validation):
+		TradingOffer newOffer = new TradingOffer(resultItem, item1, item2);
+
+		// add new offer:
+		this.addOffer(newOffer);
+		return newOffer;
+	}
+
+	private void addOffer(TradingOffer offer) {
+		assert offer != null;
+		offers.add(offer);
+		recipes.add(offer); // TradingOffer extends TradingRecipe
+	}
+
+	private void addOffers(Collection<TradingOffer> offers) {
+		assert offers != null;
+		for (TradingOffer offer : offers) {
+			if (offer == null) continue; // skip invalid entries
+			// add new offer:
+			this.addOffer(offer);
 		}
 	}
 
-	private List<ItemStack[]> loadRecipes(ConfigurationSection config, String node) {
-		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
-		ConfigurationSection recipesSection = config.getConfigurationSection(node);
-		if (recipesSection != null) {
-			for (String key : recipesSection.getKeys(false)) {
-				ConfigurationSection recipeSection = recipesSection.getConfigurationSection(key);
-				ItemStack[] recipe = new ItemStack[3];
-				recipe[0] = Utils.getNullIfEmpty(Utils.loadItem(recipeSection, "item1"));
-				recipe[1] = Utils.getNullIfEmpty(Utils.loadItem(recipeSection, "item2"));
-				recipe[2] = Utils.getNullIfEmpty(Utils.loadItem(recipeSection, "resultItem"));
-				if (recipe[0] == null || recipe[2] == null) continue; // invalid recipe
-				recipes.add(recipe);
-			}
-		}
-		return recipes;
+	public void clearOffers() {
+		offers.clear();
+		recipes.clear();
 	}
 
 	// legacy code:
@@ -258,7 +262,26 @@ public class AdminShopkeeper extends Shopkeeper {
 		}
 	}*/
 
-	private List<ItemStack[]> loadRecipesOld(ConfigurationSection config, String node) {
+	private List<TradingOffer> loadFromConfigOld(ConfigurationSection config, String node) {
+		List<TradingOffer> offers = new ArrayList<TradingOffer>();
+		ConfigurationSection offersSection = config.getConfigurationSection(node);
+		if (offersSection != null) {
+			for (String key : offersSection.getKeys(false)) {
+				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
+				if (offerSection == null) continue; // invalid offer: not a section
+
+				ItemStack resultItem = this.loadItemStackOld(offerSection.getConfigurationSection("2"));
+				if (Utils.isEmpty(resultItem)) continue; // invalid offer
+				ItemStack item1 = this.loadItemStackOld(offerSection.getConfigurationSection("0"));
+				if (Utils.isEmpty(item1)) continue; // invalid offer
+				ItemStack item2 = this.loadItemStackOld(offerSection.getConfigurationSection("1"));
+				offers.add(new TradingOffer(resultItem, item1, item2));
+			}
+		}
+		return offers;
+	}
+
+	/*private List<ItemStack[]> loadRecipesOld(ConfigurationSection config, String node) {
 		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
 		ConfigurationSection recipesSection = config.getConfigurationSection(node);
 		if (recipesSection != null) {
@@ -275,7 +298,7 @@ public class AdminShopkeeper extends Shopkeeper {
 			}
 		}
 		return recipes;
-	}
+	}*/
 
 	/**
 	 * Loads an ItemStack from a config section.
@@ -284,6 +307,7 @@ public class AdminShopkeeper extends Shopkeeper {
 	 * @return
 	 */
 	private ItemStack loadItemStackOld(ConfigurationSection section) {
+		if (section == null) return null;
 		ItemStack item = section.getItemStack("item");
 		if (item != null) {
 			if (section.contains("attributes")) {

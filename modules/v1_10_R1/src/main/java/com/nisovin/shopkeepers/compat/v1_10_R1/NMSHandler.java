@@ -19,6 +19,7 @@ import org.bukkit.inventory.MerchantInventory;
 
 import net.minecraft.server.v1_10_R1.*;
 
+import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
 public final class NMSHandler implements NMSCallProvider {
@@ -29,7 +30,7 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public boolean openTradeWindow(String title, List<org.bukkit.inventory.ItemStack[]> recipes, Player player) {
+	public boolean openTradeWindow(String title, List<TradingRecipe> recipes, Player player) {
 		try {
 			EntityVillager villager = new EntityVillager(((CraftPlayer) player).getHandle().getWorld(), 0);
 			// custom name:
@@ -50,8 +51,8 @@ public final class NMSHandler implements NMSCallProvider {
 				recipeListField.set(villager, recipeList);
 			}
 			recipeList.clear();
-			for (org.bukkit.inventory.ItemStack[] recipe : recipes) {
-				recipeList.add(createMerchantRecipe(recipe[0], recipe[1], recipe[2]));
+			for (TradingRecipe recipe : recipes) {
+				recipeList.add(createMerchantRecipe(recipe.getItem1(), recipe.getItem2(), recipe.getResultItem()));
 			}
 
 			// set trading player:
@@ -69,15 +70,14 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public ItemStack[] getUsedTradingRecipe(MerchantInventory merchantInventory) {
+	public TradingRecipe getUsedTradingRecipe(MerchantInventory merchantInventory) {
 		try {
 			InventoryMerchant handle = (InventoryMerchant) ((CraftInventoryMerchant) merchantInventory).getInventory();
 			MerchantRecipe merchantRecipe = handle.getRecipe();
-			ItemStack[] recipe = new ItemStack[3];
-			recipe[0] = merchantRecipe.getBuyItem1() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem1()) : null;
-			recipe[1] = merchantRecipe.getBuyItem2() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem2()) : null;
-			recipe[2] = merchantRecipe.getBuyItem3() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem3()) : null;
-			return recipe;
+			ItemStack item1 = merchantRecipe.getBuyItem1() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem1()) : null;
+			ItemStack item2 = merchantRecipe.getBuyItem2() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem2()) : null;
+			ItemStack resultItem = merchantRecipe.getBuyItem3() != null ? CraftItemStack.asBukkitCopy(merchantRecipe.getBuyItem3()) : null;
+			return new TradingRecipe(resultItem, item1, item2);
 		} catch (Exception e) {
 			return null;
 		}

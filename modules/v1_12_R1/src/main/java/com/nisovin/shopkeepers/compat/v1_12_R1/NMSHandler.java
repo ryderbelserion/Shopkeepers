@@ -24,6 +24,7 @@ import org.bukkit.inventory.meta.SpawnEggMeta;
 import net.minecraft.server.v1_12_R1.*;
 
 import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
 public final class NMSHandler implements NMSCallProvider {
@@ -35,20 +36,15 @@ public final class NMSHandler implements NMSCallProvider {
 
 	// TODO this can be moved out of nms handler once we only support 1.11 upwards
 	@Override
-	public boolean openTradeWindow(String title, List<ItemStack[]> recipes, Player player) {
+	public boolean openTradeWindow(String title, List<TradingRecipe> recipes, Player player) {
 		// create empty merchant:
 		Merchant merchant = Bukkit.createMerchant(title);
 
 		// create list of merchant recipes:
 		List<MerchantRecipe> merchantRecipes = new ArrayList<MerchantRecipe>();
-		for (ItemStack[] recipe : recipes) {
-			// skip invalid recipes:
-			if (recipe == null || recipe.length != 3 || Utils.isEmpty(recipe[0]) || Utils.isEmpty(recipe[2])) {
-				continue;
-			}
-
+		for (TradingRecipe recipe : recipes) {
 			// create and add merchant recipe:
-			merchantRecipes.add(this.createMerchantRecipe(recipe[0], recipe[1], recipe[2]));
+			merchantRecipes.add(this.createMerchantRecipe(recipe.getItem1(), recipe.getItem2(), recipe.getResultItem()));
 		}
 
 		// set merchant's recipes:
@@ -74,20 +70,19 @@ public final class NMSHandler implements NMSCallProvider {
 
 	// TODO this can be moved out of nms handler once we only support 1.11 upwards
 	@Override
-	public ItemStack[] getUsedTradingRecipe(MerchantInventory merchantInventory) {
+	public TradingRecipe getUsedTradingRecipe(MerchantInventory merchantInventory) {
 		MerchantRecipe merchantRecipe = merchantInventory.getSelectedRecipe();
 		List<ItemStack> ingredients = merchantRecipe.getIngredients();
-		ItemStack[] recipe = new ItemStack[3];
-		recipe[0] = ingredients.get(0);
-		recipe[1] = null;
+		ItemStack item1 = ingredients.get(0);
+		ItemStack item2 = null;
 		if (ingredients.size() > 1) {
 			ItemStack buyItem2 = ingredients.get(1);
 			if (!Utils.isEmpty(buyItem2)) {
-				recipe[1] = buyItem2;
+				item2 = buyItem2;
 			}
 		}
-		recipe[2] = merchantRecipe.getResult();
-		return recipe;
+		ItemStack resultItem = merchantRecipe.getResult();
+		return new TradingRecipe(resultItem, item1, item2);
 	}
 
 	@Override

@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.BookOffer;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -105,13 +106,13 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
-			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, TradingRecipe tradingRecipe, ItemStack offered1, ItemStack offered2) {
+			super.onPurchaseClick(event, player, tradingRecipe, offered1, offered2);
 			if (event.isCancelled()) return;
 			final BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 
-			ItemStack book = usedRecipe[2];
-			String bookTitle = getTitleOfBook(book);
+			ItemStack bookItem = tradingRecipe.getResultItem();
+			String bookTitle = getTitleOfBook(bookItem);
 			if (bookTitle == null) {
 				// this should not happen.. because the recipes were created based on the shopkeeper's offers
 				event.setCancelled(true);
@@ -226,24 +227,23 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public List<ItemStack[]> getRecipes() {
-		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+	public List<TradingRecipe> getTradingRecipes(Player player) {
+		List<TradingRecipe> recipes = new ArrayList<TradingRecipe>();
 		if (this.hasChestBlankBooks()) {
-			List<ItemStack> books = this.getBooksFromChest();
-			for (ItemStack book : books) {
-				assert !Utils.isEmpty(book);
-				String bookTitle = getTitleOfBook(book); // can be null
+			List<ItemStack> bookItems = this.getBooksFromChest();
+			for (ItemStack bookItem : bookItems) {
+				assert !Utils.isEmpty(bookItem);
+				String bookTitle = getTitleOfBook(bookItem); // can be null
 				BookOffer offer = this.getOffer(bookTitle);
 				if (offer != null) {
-					int price = offer.getPrice();
-					ItemStack[] recipe = new ItemStack[3];
-					this.setRecipeCost(recipe, price);
-					recipe[2] = book.clone();
-					recipes.add(recipe);
+					TradingRecipe recipe = this.createSellingRecipe(bookItem.clone(), offer.getPrice());
+					if (recipe != null) {
+						recipes.add(recipe);
+					}
 				}
 			}
 		}
-		return recipes;
+		return Collections.unmodifiableList(recipes);
 	}
 
 	private List<ItemStack> getBooksFromChest() {

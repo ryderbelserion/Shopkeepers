@@ -19,12 +19,13 @@ import com.nisovin.shopkeepers.util.Utils;
 public class PriceOffer {
 
 	private final ItemStack item; // not null/empty
-	private int price; // >= 0
+	private final int price; // > 0
 
 	public PriceOffer(ItemStack item, int price) {
 		Validate.isTrue(!Utils.isEmpty(item), "Item cannot be empty!");
+		Validate.isTrue(price > 0, "Price has to be positive!");
 		this.item = item.clone();
-		this.setPrice(price);
+		this.price = price;
 	}
 
 	public ItemStack getItem() {
@@ -33,12 +34,6 @@ public class PriceOffer {
 
 	public int getPrice() {
 		return price;
-	}
-
-	public void setPrice(int price) {
-		// TODO what about price of 0? maybe filter that?
-		Validate.isTrue(price >= 0, "Price cannot be negative!");
-		this.price = price;
 	}
 
 	// //////////
@@ -68,9 +63,10 @@ public class PriceOffer {
 		if (offersSection != null) {
 			for (String id : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(id);
+				if (offerSection == null) continue; // invalid offer: not a section
 				ItemStack item = Utils.loadItem(offerSection, "item");
 				int price = offerSection.getInt("price");
-				if (Utils.isEmpty(item) || price < 0) continue; // invalid offer
+				if (Utils.isEmpty(item) || price <= 0) continue; // invalid offer
 				offers.add(new PriceOffer(item, price));
 			}
 		}
@@ -103,6 +99,7 @@ public class PriceOffer {
 		if (offersSection != null) {
 			for (String key : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
+				if (offerSection == null) continue; // invalid offer: not a section
 				ItemStack item = offerSection.getItemStack("item");
 				if (item != null) {
 					// legacy: the amount was stored separately from the item
@@ -115,7 +112,7 @@ public class PriceOffer {
 					}
 				}
 				int price = offerSection.getInt("cost");
-				if (Utils.isEmpty(item) || price < 0) continue; // invalid offer
+				if (Utils.isEmpty(item) || price <= 0) continue; // invalid offer
 				offers.add(new PriceOffer(item, price));
 			}
 		}

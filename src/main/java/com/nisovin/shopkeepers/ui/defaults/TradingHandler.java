@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.OpenTradeEvent;
 import com.nisovin.shopkeepers.events.ShopkeeperTradeCompletedEvent;
@@ -59,7 +60,7 @@ public class TradingHandler extends UIHandler {
 
 		// create and open trading window:
 		String title = this.getInventoryTitle();
-		return NMSManager.getProvider().openTradeWindow(title, shopkeeper.getRecipes(), player);
+		return NMSManager.getProvider().openTradeWindow(title, shopkeeper.getTradingRecipes(player), player);
 	}
 
 	protected String getInventoryTitle() {
@@ -139,24 +140,37 @@ public class TradingHandler extends UIHandler {
 		}
 
 		// find the recipe minecraft is using for the trade:
-		ItemStack[] usedRecipe = NMSManager.getProvider().getUsedTradingRecipe(inventory);
+		TradingRecipe usedRecipe = NMSManager.getProvider().getUsedTradingRecipe(inventory);
 
+		// validate the used recipe:
+		boolean invalidRecipe = false;
 		if (usedRecipe == null) {
 			// this shouldn't happen..
 			Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": "
 					+ "Minecraft offered a trade, but we didn't find the used recipe!");
+			invalidRecipe = true;
+		} else if (!usedRecipe.getResultItem().equals(resultItem)) {
+			// this shouldn't happen..
+			Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": "
+					+ "The trade result item doesn't match the expected item of the used trading recipe!");
+			invalidRecipe = true;
+		}
+		if (invalidRecipe) {
 			event.setCancelled(true);
 			Utils.updateInventoryLater(player);
 			return;
 		}
 
+		ItemStack requiredItem1 = usedRecipe.getItem1();
+		ItemStack requiredItem2 = usedRecipe.getItem2();
+
 		// detecting and preventing issue due to minecraft bug MC-81687 (traded items not being properly removed):
 		// TODO should be fixed in newer versions (1.9+), remove when no longer needed
 		if (NMSManager.getProvider().getVersionId().startsWith("1_8_")) {
-			assert usedRecipe[0] != null && item1 != null;
+			assert requiredItem1 != null && item1 != null;
 			if (Utils.isSimilar(item1, item2)) {
-				assert usedRecipe[1] != null && item2 != null;
-				if (item1.getAmount() < usedRecipe[0].getAmount() || item2.getAmount() < usedRecipe[1].getAmount()) {
+				assert requiredItem2 != null && item2 != null;
+				if (item1.getAmount() < requiredItem1.getAmount() || item2.getAmount() < requiredItem2.getAmount()) {
 					Log.debug("Preventing trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + ": "
 							+ "Due to a minecraft bug (MC-81687), which players can use to exploit, this trade might not get properly handled.");
 					event.setCancelled(true);
@@ -168,12 +182,12 @@ public class TradingHandler extends UIHandler {
 
 		if (Settings.useStrictItemComparison) {
 			// verify the recipe items are perfectly matching:
-			if (!this.isStrictMatchingRecipe(usedRecipe, item1, item2)) {
+			if (!this.isStrictMatchingRecipeItems(requiredItem1, requiredItem2, item1, item2)) {
 				if (Settings.debug) { // additional check so we don't do the item comparisons if not really needed
 					Log.debug("Invalid trade by " + playerName + " with shopkeeper at " + shopkeeper.getPositionString() + " using strict item comparison:");
 					Log.debug("Used recipe: " + Utils.getSimpleRecipeInfo(usedRecipe));
-					Log.debug("Recipe item 1: " + (Utils.isSimilar(usedRecipe[0], item1) ? "similar" : "not similar"));
-					Log.debug("Recipe item 2: " + (Utils.isSimilar(usedRecipe[1], item2) ? "similar" : "not similar"));
+					Log.debug("Recipe item 1: " + (Utils.isSimilar(requiredItem1, item1) ? "similar" : "not similar"));
+					Log.debug("Recipe item 2: " + (Utils.isSimilar(requiredItem2, item2) ? "similar" : "not similar"));
 				}
 				event.setCancelled(true);
 				Utils.updateInventoryLater(player);
@@ -217,9 +231,9 @@ public class TradingHandler extends UIHandler {
 						+ "\",\"" + shopkeeper.getType().getIdentifier() + "\",\"" + shopkeeper.getPositionString() + "\",\"" + owner
 						+ "\",\"" + resultItem.getType().name() + "\",\"" + resultItem.getDurability() + "\",\"" + resultItem.getAmount()
 						+ "\",\"" + (item1 != null ? item1.getType().name() + ":" + item1.getDurability() : "")
-						+ "\",\"" + (usedRecipe[0] != null ? usedRecipe[0].getAmount() : "")
+						+ "\",\"" + (requiredItem1 != null ? requiredItem1.getAmount() : "")
 						+ "\",\"" + (item2 != null ? item2.getType().name() + ":" + item2.getDurability() : "")
-						+ "\",\"" + (usedRecipe[1] != null ? usedRecipe[1].getAmount() : "")
+						+ "\",\"" + (requiredItem2 != null ? requiredItem2.getAmount() : "")
 						+ "\"\n");
 				writer.close();
 			} catch (IOException e) {
@@ -246,15 +260,17 @@ public class TradingHandler extends UIHandler {
 	 * </p>
 	 * 
 	 * @param event
+	 *            the inventory click event
 	 * @param player
-	 * @param usedRecipe
-	 *            The recipe minecraft is using for the trade.
+	 *            the player
+	 * @param tradingRecipe
+	 *            The trading recipe minecraft is using for the trade.
 	 * @param offered1
 	 *            The first offered item. If the first slot was empty, this is the item from the second slot.
 	 * @param offered2
 	 *            The second offered item. If the first slot was empty, this is null.
 	 */
-	protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
+	protected void onPurchaseClick(InventoryClickEvent event, Player player, TradingRecipe tradingRecipe, ItemStack offered1, ItemStack offered2) {
 		// nothing to do by default
 	}
 
@@ -269,10 +285,7 @@ public class TradingHandler extends UIHandler {
 		return amount - taxes;
 	}
 
-	private boolean isStrictMatchingRecipe(ItemStack[] recipe, ItemStack offered1, ItemStack offered2) {
-		assert recipe != null;
-		if (!Utils.isSimilar(recipe[0], offered1)) return false;
-		if (!Utils.isSimilar(recipe[1], offered2)) return false;
-		return true;
+	private boolean isStrictMatchingRecipeItems(ItemStack required1, ItemStack required2, ItemStack offered1, ItemStack offered2) {
+		return Utils.isSimilar(required1, offered1) && Utils.isSimilar(required2, offered2);
 	}
 }

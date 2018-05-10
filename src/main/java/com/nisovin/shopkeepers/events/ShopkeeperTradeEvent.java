@@ -5,20 +5,20 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.TradingRecipe;
 
 /**
  * This event is called whenever a player is about to trade with a shopkeeper.
  * <p>
- * It shares it's cancelled state with the original InventoryClickEvent:<br>
+ * It shares its cancelled state with the original {@link InventoryClickEvent}:<br>
  * Canceling the click event will cancel the trade and canceling the trade is implemented by canceling the original
  * click event.<br>
  * It is recommended to not modify the original click event (besides the cancel state).<br>
  * Also note that the shopkeeper has the final say on whether the trade will be cancelled: It is quite possible that
  * this event is not cancelled but the shopkeeper cancels the trade afterwards nevertheless for some reason. So if you
- * are interested in the actual outcome of the trade take a look at the ShopkeeperTradeCompletedEvent.
+ * are interested in the actual outcome of the trade take a look at the {@link ShopkeeperTradeCompletedEvent}.
  * </p>
  */
 public class ShopkeeperTradeEvent extends Event implements Cancellable {
@@ -26,13 +26,13 @@ public class ShopkeeperTradeEvent extends Event implements Cancellable {
 	private final Shopkeeper shopkeeper;
 	private final Player player;
 	private final InventoryClickEvent clickEvent;
-	private final ItemStack[] tradeRecipe;
+	private final TradingRecipe tradingRecipe;
 
-	public ShopkeeperTradeEvent(Shopkeeper shopkeeper, Player player, InventoryClickEvent clickEvent, ItemStack[] tradeRecipe) {
+	public ShopkeeperTradeEvent(Shopkeeper shopkeeper, Player player, InventoryClickEvent clickEvent, TradingRecipe tradingRecipe) {
 		this.shopkeeper = shopkeeper;
 		this.player = player;
 		this.clickEvent = clickEvent;
-		this.tradeRecipe = tradeRecipe;
+		this.tradingRecipe = tradingRecipe;
 	}
 
 	/**
@@ -67,19 +67,12 @@ public class ShopkeeperTradeEvent extends Event implements Cancellable {
 	}
 
 	/**
-	 * Gets the recipe containing the required (index 0 and 1) and the resulting (index 2) {@link ItemStack}s of this
-	 * trade.
+	 * Gets the trading recipe used by this trade.
 	 * 
-	 * <p>
-	 * Do not modify this array, nor the items it contains!<br>
-	 * In case you want to use the items of this trade for something else, create copies of the provided
-	 * {@link ItemStack}s and use those copies instead.
-	 * </p>
-	 * 
-	 * @return the first item of the trading recipe
+	 * @return the used trading recipe
 	 */
-	public ItemStack[] getTradeRecipe() {
-		return tradeRecipe;
+	public TradingRecipe getTradingRecipe() {
+		return tradingRecipe;
 	}
 
 	/**

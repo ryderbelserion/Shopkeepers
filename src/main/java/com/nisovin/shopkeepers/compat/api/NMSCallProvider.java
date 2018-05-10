@@ -11,13 +11,15 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 
+import com.nisovin.shopkeepers.TradingRecipe;
+
 public interface NMSCallProvider {
 
 	public String getVersionId();
 
-	public boolean openTradeWindow(String title, List<ItemStack[]> recipes, Player player);
+	public boolean openTradeWindow(String title, List<TradingRecipe> recipes, Player player);
 
-	public ItemStack[] getUsedTradingRecipe(MerchantInventory merchantInventory);
+	public TradingRecipe getUsedTradingRecipe(MerchantInventory merchantInventory);
 
 	public void overwriteLivingEntityAI(LivingEntity entity);
 

@@ -13,13 +13,14 @@ import org.bukkit.configuration.ConfigurationSection;
 public class BookOffer {
 
 	private final String bookTitle; // not null, can be empty
-	private int price; // >= 0
+	private final int price; // > 0
 
 	public BookOffer(String bookTitle, int price) {
-		// TODO what about empty book titles, and price of 0?
+		// TODO what about empty book titles?
 		Validate.notNull(bookTitle, "Book title cannot be null!");
+		Validate.isTrue(price > 0, "Price has to be positive!");
 		this.bookTitle = bookTitle;
-		this.setPrice(price);
+		this.price = price;
 	}
 
 	public String getBookTitle() {
@@ -28,12 +29,6 @@ public class BookOffer {
 
 	public int getPrice() {
 		return price;
-	}
-
-	public void setPrice(int price) {
-		// TODO what about price of 0? maybe filter that?
-		Validate.isTrue(price >= 0, "Price cannot be negative!");
-		this.price = price;
 	}
 
 	// //////////
@@ -53,6 +48,7 @@ public class BookOffer {
 		if (offersSection != null) {
 			for (String bookTitle : offersSection.getKeys(false)) {
 				int price = offersSection.getInt(bookTitle);
+				if (bookTitle == null || price <= 0) continue; // invalid offer
 				offers.add(new BookOffer(bookTitle, price));
 			}
 		}

@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
@@ -21,6 +20,7 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -160,8 +160,8 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
-			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, TradingRecipe tradingRecipe, ItemStack offered1, ItemStack offered2) {
+			super.onPurchaseClick(event, player, tradingRecipe, offered1, offered2);
 			if (event.isCancelled()) return;
 			final TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 
@@ -173,35 +173,43 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			}
 
 			// remove result item from chest:
-			ItemStack resultItem = usedRecipe[2];
+			ItemStack resultItem = tradingRecipe.getResultItem();
 			assert resultItem != null;
-			Inventory inventory = ((Chest) chest.getState()).getInventory();
-			ItemStack[] contents = inventory.getContents();
-			if (Utils.removeItems(contents, resultItem) != 0) {
+			Inventory chestInventory = ((Chest) chest.getState()).getInventory();
+			ItemStack[] newChestContents = chestInventory.getContents();
+			if (Utils.removeItems(newChestContents, resultItem) != 0) {
 				event.setCancelled(true);
 				return;
 			}
 
 			// add traded items to chest:
-			for (int i = 0; i < 2; i++) {
-				ItemStack requiredItem = usedRecipe[i];
-				if (Utils.isEmpty(requiredItem)) continue;
-				int amountAfterTaxes = this.getAmountAfterTaxes(requiredItem.getAmount());
-				if (amountAfterTaxes > 0) {
-					// the items the trading player gave might slightly differ from the required items,
-					// but are still accepted, depending on item comparison and settings:
-					ItemStack receivedItem = (i == 0 ? offered1 : offered2);
-					receivedItem = receivedItem.clone(); // create a copy, just in case
-					receivedItem.setAmount(amountAfterTaxes);
-					if (Utils.addItems(contents, receivedItem) != 0) {
-						event.setCancelled(true);
-						return;
-					}
-				}
+			if (!this.addItemsToChest(newChestContents, tradingRecipe.getItem1(), offered1)
+					|| !this.addItemsToChest(newChestContents, tradingRecipe.getItem2(), offered2)) {
+				// items couldn't be added to the chest, abort the trade:
+				event.setCancelled(true);
+				return;
 			}
 
-			// save chest contents:
-			inventory.setContents(contents);
+			// apply new chest contents:
+			chestInventory.setContents(newChestContents);
+		}
+
+		// The items the trading player gave might slightly differ from the required items,
+		// but are still accepted for the trade, depending on minecraft's item comparison and settings.
+		// Therefore we differ between require and offered items here.
+		// Returns false, if not all items could be added to the chest contents:
+		private boolean addItemsToChest(ItemStack[] newChestContents, ItemStack requiredItem, ItemStack offeredItem) {
+			if (Utils.isEmpty(requiredItem)) return true;
+			int amountAfterTaxes = this.getAmountAfterTaxes(requiredItem.getAmount());
+			if (amountAfterTaxes > 0) {
+				ItemStack receivedItem = offeredItem.clone(); // create a copy, just in case
+				receivedItem.setAmount(amountAfterTaxes);
+				if (Utils.addItems(newChestContents, receivedItem) != 0) {
+					// couldn't add all items to the chest contents:
+					return false;
+				}
+			}
+			return true;
 		}
 	}
 
@@ -259,32 +267,21 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public List<ItemStack[]> getRecipes() {
-		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+	public List<TradingRecipe> getTradingRecipes(Player player) {
+		List<TradingRecipe> recipes = new ArrayList<TradingRecipe>();
 		List<ItemCount> chestItems = this.getItemsFromChest();
 		for (TradingOffer offer : this.getOffers()) {
 			ItemStack resultItem = offer.getResultItem();
+			assert !Utils.isEmpty(resultItem);
 			ItemCount itemCount = ItemCount.findSimilar(chestItems, resultItem);
 			if (itemCount != null) {
 				int chestAmt = itemCount.getAmount();
 				if (chestAmt >= resultItem.getAmount()) {
-					ItemStack item1 = offer.getItem1();
-					ItemStack item2 = offer.getItem2();
-
-					ItemStack[] recipe = new ItemStack[3];
-					int slot = 0;
-					if (item1 != null && item1.getType() != Material.AIR && item1.getAmount() > 0) {
-						recipe[slot++] = item1.clone();
-					}
-					if (item2 != null && item2.getType() != Material.AIR && item2.getAmount() > 0) {
-						recipe[slot] = item2.clone();
-					}
-					recipe[2] = resultItem.clone();
-					recipes.add(recipe);
+					recipes.add(offer); // TradingOffer extends TradingRecipe
 				}
 			}
 		}
-		return recipes;
+		return Collections.unmodifiableList(recipes);
 	}
 
 	private List<ItemCount> getItemsFromChest() {

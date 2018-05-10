@@ -20,6 +20,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 
 @SuppressWarnings("rawtypes")
@@ -133,7 +134,7 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public boolean openTradeWindow(String title, List<ItemStack[]> recipes, Player player) {
+	public boolean openTradeWindow(String title, List<TradingRecipe> recipes, Player player) {
 		// TODO replace this with new custom merchant api once only MC 1.11 upwards is supported
 		ShopkeepersPlugin.getInstance().getLogger().warning(ChatColor.AQUA + "Shopkeepers needs an update.");
 		try {
@@ -149,8 +150,8 @@ public final class FailedHandler implements NMSCallProvider {
 				recipeListField.set(villager, recipeList);
 			}
 			((ArrayList) recipeList).clear();
-			for (ItemStack[] recipe : recipes) {
-				Object mcRecipe = createMerchantRecipe(recipe[0], recipe[1], recipe[2]);
+			for (TradingRecipe recipe : recipes) {
+				Object mcRecipe = createMerchantRecipe(recipe.getItem1(), recipe.getItem2(), recipe.getResultItem());
 				if (mcRecipe != null) {
 					((ArrayList) recipeList).add(mcRecipe);
 				}
@@ -169,15 +170,14 @@ public final class FailedHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public ItemStack[] getUsedTradingRecipe(MerchantInventory merchantInventory) {
+	public TradingRecipe getUsedTradingRecipe(MerchantInventory merchantInventory) {
 		try {
 			Object inventoryMerchant = craftInventoryGetInventory.invoke(merchantInventory);
 			Object merchantRecipe = getRecipeMethod.invoke(inventoryMerchant);
-			ItemStack[] recipe = new ItemStack[3];
-			recipe[0] = asBukkitCopy(getBuyItem1Method.invoke(merchantRecipe));
-			recipe[1] = asBukkitCopy(getBuyItem2Method.invoke(merchantRecipe));
-			recipe[2] = asBukkitCopy(getBuyItem3Method.invoke(merchantRecipe));
-			return recipe;
+			ItemStack item1 = asBukkitCopy(getBuyItem1Method.invoke(merchantRecipe));
+			ItemStack item2 = asBukkitCopy(getBuyItem2Method.invoke(merchantRecipe));
+			ItemStack resultItem = asBukkitCopy(getBuyItem3Method.invoke(merchantRecipe));
+			return new TradingRecipe(resultItem, item1, item2);
 		} catch (Exception e) {
 			return null;
 		}

@@ -11,7 +11,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.ui.UIHandler;
@@ -347,13 +346,22 @@ public abstract class Shopkeeper {
 	}
 
 	/**
-	 * Gets the shopkeeper's trade recipes. This will be a list of ItemStack[3],
-	 * where the first two elemets of the ItemStack[] array are the cost, and the third
-	 * element is the trade result (the item sold by the shopkeeper).
+	 * Gets the shopkeeper's currently available trading recipes for the given player.
+	 * <p>
+	 * Depending on the type of shopkeeper this might access the world data to determine available stock (chest
+	 * contents).<br>
+	 * Managing (adding, removing, editing, validating) the overall available trading recipes of this shopkeeper might
+	 * differ between different shopkeeper types and is therefore in their responsibility.
+	 * <p>
+	 * The <code>player</code> parameter can be used to request player-specific trading recipes, if the shopkeeper types
+	 * supports that.
 	 * 
-	 * @return the trade recipes of this shopkeeper
+	 * @param player
+	 *            the player (can be <code>null</code>), allows for returning player-specific trading recipes if the
+	 *            shopkeeper supports that
+	 * @return an unmodifiable view on the currently available trading recipes of this shopkeeper for the given player
 	 */
-	public abstract List<ItemStack[]> getRecipes();
+	public abstract List<TradingRecipe> getTradingRecipes(Player player);
 
 	// SHOPKEEPER UIs:
 

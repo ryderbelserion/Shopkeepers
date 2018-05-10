@@ -20,6 +20,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.PriceOffer;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -54,11 +55,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				PriceOffer offer = shopkeeper.getOffer(type);
 
 				if (offer != null) {
-					if (offer.getPrice() == 0) {
-						currencyItem = Settings.createZeroCurrencyItem();
-					} else {
-						currencyItem = Settings.createCurrencyItem(offer.getPrice());
-					}
+					currencyItem = Settings.createCurrencyItem(offer.getPrice());
 					int tradedItemAmount = offer.getItem().getAmount();
 					type.setAmount(tradedItemAmount);
 				} else {
@@ -126,13 +123,13 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
-			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, TradingRecipe tradingRecipe, ItemStack offered1, ItemStack offered2) {
+			super.onPurchaseClick(event, player, tradingRecipe, offered1, offered2);
 			if (event.isCancelled()) return;
 			final BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 
 			// get offer for this bought item:
-			ItemStack requestedItem = usedRecipe[0];
+			ItemStack requestedItem = tradingRecipe.getItem1();
 			PriceOffer offer = shopkeeper.getOffer(requestedItem);
 			if (offer == null) {
 				// this should not happen.. because the recipes were created based on the shopkeeper's offers
@@ -303,8 +300,8 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public List<ItemStack[]> getRecipes() {
-		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+	public List<TradingRecipe> getTradingRecipes(Player player) {
+		List<TradingRecipe> recipes = new ArrayList<TradingRecipe>();
 		List<ItemCount> chestItems = this.getItemsFromChest();
 		int chestTotal = this.getCurrencyInChest();
 		for (PriceOffer offer : this.getOffers()) {
@@ -312,14 +309,12 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			ItemCount itemCount = ItemCount.findSimilar(chestItems, tradedItem);
 			if (itemCount != null) {
 				if (chestTotal >= offer.getPrice()) {
-					ItemStack[] recipe = new ItemStack[3];
-					recipe[0] = tradedItem;
-					recipe[2] = Settings.createCurrencyItem(offer.getPrice());
+					TradingRecipe recipe = this.createBuyingRecipe(tradedItem, offer.getPrice());
 					recipes.add(recipe);
 				}
 			}
 		}
-		return recipes;
+		return Collections.unmodifiableList(recipes);
 	}
 
 	private List<ItemCount> getItemsFromChest() {

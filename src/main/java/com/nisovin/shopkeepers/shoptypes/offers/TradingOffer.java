@@ -4,42 +4,22 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.Utils;
 
 /**
  * Stores information about up to two items being traded for another item.
  */
-public class TradingOffer {
-
-	private final ItemStack resultItem; // not null/empty
-	private ItemStack item1; // not null/empty
-	private ItemStack item2; // can be null
+public class TradingOffer extends TradingRecipe { // shares its implementation with TradingRecipe
 
 	public TradingOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		Validate.isTrue(!Utils.isEmpty(resultItem), "Result item cannot be empty!");
-		Validate.isTrue(!Utils.isEmpty(item1), "Item1 cannot be empty!");
-		this.resultItem = resultItem.clone();
-		this.item1 = item1.clone();
-		this.item2 = Utils.isEmpty(item2) ? null : item2.clone();
-	}
-
-	public ItemStack getResultItem() {
-		return resultItem.clone();
-	}
-
-	public ItemStack getItem1() {
-		return item1.clone();
-	}
-
-	public ItemStack getItem2() {
-		return item2 == null ? null : item2.clone();
+		super(resultItem, item1, item2);
 	}
 
 	// //////////
@@ -72,6 +52,7 @@ public class TradingOffer {
 		if (offersSection != null) {
 			for (String key : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
+				if (offerSection == null) continue; // invalid offer: not a section
 				ItemStack resultItem = Utils.loadItem(offerSection, "resultItem");
 				ItemStack item1 = Utils.loadItem(offerSection, "item1");
 				ItemStack item2 = Utils.loadItem(offerSection, "item2");
@@ -110,6 +91,7 @@ public class TradingOffer {
 		if (offersSection != null) {
 			for (String key : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
+				if (offerSection == null) continue; // invalid offer: not a section
 				ItemStack resultItem = offerSection.getItemStack("item");
 				if (resultItem != null) {
 					// legacy: the amount was stored separately from the item

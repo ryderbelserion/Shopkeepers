@@ -32,6 +32,7 @@ import org.bukkit.util.Vector;
 
 import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
 public class Utils {
@@ -527,12 +528,12 @@ public class Utils {
 		return sb.toString();
 	}
 
-	public static String getSimpleRecipeInfo(ItemStack[] recipe) {
+	public static String getSimpleRecipeInfo(TradingRecipe recipe) {
 		if (recipe == null) return "none";
 		StringBuilder sb = new StringBuilder();
-		sb.append("[0=").append(getSimpleItemInfo(recipe[0]))
-				.append(",1=").append(getSimpleItemInfo(recipe[1]))
-				.append(",2=").append(getSimpleItemInfo(recipe[2])).append("]");
+		sb.append("[item1=").append(getSimpleItemInfo(recipe.getItem1()))
+				.append(",item2=").append(getSimpleItemInfo(recipe.getItem2()))
+				.append(",resultItem=").append(getSimpleItemInfo(recipe.getResultItem())).append("]");
 		return sb.toString();
 	}
 

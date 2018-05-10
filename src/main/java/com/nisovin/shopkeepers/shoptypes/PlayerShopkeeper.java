@@ -22,6 +22,7 @@ import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.events.PlayerShopkeeperHiredEvent;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
@@ -217,8 +218,8 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, ItemStack[] usedRecipe, ItemStack offered1, ItemStack offered2) {
-			super.onPurchaseClick(event, player, usedRecipe, offered1, offered2);
+		protected void onPurchaseClick(InventoryClickEvent event, Player player, TradingRecipe tradingRecipe, ItemStack offered1, ItemStack offered2) {
+			super.onPurchaseClick(event, player, tradingRecipe, offered1, offered2);
 			if (event.isCancelled()) return;
 			final PlayerShopkeeper shopkeeper = this.getShopkeeper();
 
@@ -642,33 +643,49 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		return Bukkit.getWorld(worldName).getBlockAt(chestX, chestY, chestZ);
 	}
 
-	protected void setRecipeCost(ItemStack[] recipe, int cost) {
-		int lowCostSlot = 0;
-		int lowCost = cost;
+	// returns null (and logs a warning) if the price cannot be represented correctly by currency items
+	protected TradingRecipe createSellingRecipe(ItemStack itemBeingSold, int price) {
+		int remainingPrice = price;
 
-		if (Settings.highCurrencyItem != Material.AIR && cost > Settings.highCurrencyMinCost) {
-			int highCost = cost / Settings.highCurrencyValue;
-			lowCost = cost % Settings.highCurrencyValue;
-			if (highCost > 0) {
-				lowCostSlot = 1; // we put the high cost in the first slot instead
-				ItemStack item = Settings.createHighCurrencyItem(highCost);
-				recipe[0] = item;
-				int maxStackSize = item.getMaxStackSize();
-				if (highCost > maxStackSize) {
-					item.setAmount(maxStackSize);
-					lowCost += (highCost - maxStackSize) * Settings.highCurrencyValue;
-				}
+		ItemStack item1 = null;
+		ItemStack item2 = null;
+
+		if (Settings.highCurrencyItem != Material.AIR && price > Settings.highCurrencyMinCost) {
+			int highCurrencyAmount = Math.min(price / Settings.highCurrencyValue, Settings.highCurrencyItem.getMaxStackSize());
+			if (highCurrencyAmount > 0) {
+				remainingPrice -= (highCurrencyAmount * Settings.highCurrencyValue);
+				ItemStack highCurrencyItem = Settings.createHighCurrencyItem(highCurrencyAmount);
+				item1 = highCurrencyItem; // using the first slot
 			}
 		}
 
-		if (lowCost > 0) {
-			ItemStack item = Settings.createCurrencyItem(lowCost);
-			recipe[lowCostSlot] = item;
-			int maxStackSize = item.getMaxStackSize();
-			if (lowCost > maxStackSize) {
+		if (remainingPrice > 0) {
+			if (remainingPrice > Settings.currencyItem.getMaxStackSize()) {
+				// cannot represent this price with the used currency items:
 				Log.warning("Shopkeeper at " + worldName + "," + x + "," + y + "," + z + " owned by " + ownerName + " has an invalid cost!");
+				return null;
+			}
+
+			ItemStack currencyItem = Settings.createCurrencyItem(remainingPrice);
+			if (item1 == null) {
+				item1 = currencyItem;
+			} else {
+				// the first item of the trading recipe is already used by the high currency item:
+				item2 = currencyItem;
 			}
 		}
+		return new TradingRecipe(itemBeingSold, item1, item2);
+	}
+
+	// returns null (and logs a warning) if the price cannot be represented correctly by currency items
+	protected TradingRecipe createBuyingRecipe(ItemStack itemBeingBought, int price) {
+		if (price > Settings.currencyItem.getMaxStackSize()) {
+			// cannot represent this price with the used currency items:
+			Log.warning("Shopkeeper at " + worldName + "," + x + "," + y + "," + z + " owned by " + ownerName + " has an invalid cost!");
+			return null;
+		}
+		ItemStack currencyItem = Settings.createCurrencyItem(price);
+		return new TradingRecipe(currencyItem, itemBeingBought, null);
 	}
 
 	protected int getCurrencyInChest() {
