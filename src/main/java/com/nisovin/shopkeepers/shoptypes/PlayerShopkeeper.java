@@ -285,23 +285,25 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 					return;
 				}
 
-				// check if the player can afford it:
-				ItemStack[] inventory = player.getInventory().getContents();
+				// check if the player can afford it and calculate the resulting player inventory:
+				ItemStack[] newPlayerInventoryContents = player.getInventory().getContents();
 				ItemStack hireCost = shopkeeper.getHireCost();
-				for (int i = 0; i < inventory.length; i++) {
-					ItemStack item = inventory[i];
+				for (int i = 0; i < newPlayerInventoryContents.length; i++) {
+					ItemStack item = newPlayerInventoryContents[i];
 					if (item != null && item.isSimilar(hireCost)) {
 						if (item.getAmount() > hireCost.getAmount()) {
-							item.setAmount(item.getAmount() - hireCost.getAmount());
+							ItemStack clonedItem = item.clone();
+							newPlayerInventoryContents[i] = clonedItem;
+							clonedItem.setAmount(item.getAmount() - hireCost.getAmount());
 							hireCost.setAmount(0);
 							break;
 						} else if (item.getAmount() == hireCost.getAmount()) {
-							inventory[i] = null;
+							newPlayerInventoryContents[i] = null;
 							hireCost.setAmount(0);
 							break;
 						} else {
 							hireCost.setAmount(hireCost.getAmount() - item.getAmount());
-							inventory[i] = null;
+							newPlayerInventoryContents[i] = null;
 						}
 					}
 				}
@@ -316,7 +318,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 				// call event:
 				int maxShops = ShopkeepersPlugin.getInstance().getMaxShops(player);
-				PlayerShopkeeperHiredEvent hireEvent = new PlayerShopkeeperHiredEvent(player, shopkeeper, maxShops);
+				PlayerShopkeeperHiredEvent hireEvent = new PlayerShopkeeperHiredEvent(player, shopkeeper, newPlayerInventoryContents, maxShops);
 				Bukkit.getPluginManager().callEvent(hireEvent);
 				if (hireEvent.isCancelled()) {
 					// close window for this player:
@@ -336,7 +338,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				}
 
 				// hire the shopkeeper:
-				player.getInventory().setContents(inventory); // apply inventory changes
+				player.getInventory().setContents(newPlayerInventoryContents); // apply inventory changes
 				shopkeeper.setForHire(null);
 				shopkeeper.setOwner(player);
 				ShopkeepersPlugin.getInstance().save();
