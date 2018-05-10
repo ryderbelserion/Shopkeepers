@@ -541,7 +541,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	public String getOwnerAsString() {
-		return ownerName + "(" + ownerUUID.toString() + ")";
+		return Utils.getPlayerAsString(ownerName, ownerUUID);
 	}
 
 	/**

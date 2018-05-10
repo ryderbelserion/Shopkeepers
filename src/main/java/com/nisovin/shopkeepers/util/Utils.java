@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.UUID;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -325,6 +326,14 @@ public class Utils {
 
 	public static String getLocationString(String worldName, double x, double y, double z) {
 		return worldName + "," + DECIMAL_FORMAT.format(x) + "," + DECIMAL_FORMAT.format(y) + "," + DECIMAL_FORMAT.format(z);
+	}
+
+	public static String getPlayerAsString(Player player) {
+		return getPlayerAsString(player.getName(), player.getUniqueId());
+	}
+
+	public static String getPlayerAsString(String playerName, UUID uniqueId) {
+		return playerName + (uniqueId == null ? "" : "(" + uniqueId.toString() + ")");
 	}
 
 	public static String translateColorCodesToAlternative(char altColorChar, String textToTranslate) {

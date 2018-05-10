@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Log {
@@ -25,5 +26,9 @@ public class Log {
 
 	public static void severe(String message) {
 		getLogger().severe(message);
+	}
+
+	public static void severe(String message, Throwable throwable) {
+		getLogger().log(Level.SEVERE, message, throwable);
 	}
 }

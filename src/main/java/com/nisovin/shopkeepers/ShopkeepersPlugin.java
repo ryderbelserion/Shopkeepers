@@ -54,6 +54,7 @@ import com.nisovin.shopkeepers.shopobjects.SignShop;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
 import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
@@ -218,6 +219,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		pm.registerEvents(new CreateListener(this), this);
 		pm.registerEvents(new VillagerInteractionListener(this), this);
 		pm.registerEvents(new LivingEntityShopListener(this), this);
+		pm.registerEvents(new TradeFileLogger(this.getDataFolder()), this);
 
 		if (Settings.enableSignShops) {
 			this.signShopListener = new SignShopListener(this);

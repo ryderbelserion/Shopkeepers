@@ -1,12 +1,5 @@
 package com.nisovin.shopkeepers.ui.defaults;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
@@ -20,13 +13,11 @@ import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.OpenTradeEvent;
 import com.nisovin.shopkeepers.events.ShopkeeperTradeCompletedEvent;
 import com.nisovin.shopkeepers.events.ShopkeeperTradeEvent;
-import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.util.Utils;
@@ -126,11 +117,9 @@ public class TradingHandler extends UIHandler {
 		}
 
 		ItemStack item1 = inventory.getItem(0);
-		ItemStack item2 = inventory.getItem(1);
-		if (Utils.isEmpty(item2)) {
-			// use null here instead of air, consistent behavior with previous versions:
-			item2 = null;
-		}
+		// use null here instead of air, consistent behavior with previous versions:
+		ItemStack item2 = Utils.getNullIfEmpty(inventory.getItem(1));
+
 		// minecraft is also allowing the trade, if the second offered item matches the first required one and the first
 		// slot is empty:
 		// so let's as well assume the item in slot 2 would be in the currently empty slot 1
@@ -217,29 +206,6 @@ public class TradingHandler extends UIHandler {
 
 		// let shopkeeper handle the purchase:
 		this.onPurchaseClick(event, player, usedRecipe, item1, item2);
-
-		// log purchase:
-		if (Settings.enablePurchaseLogging && !event.isCancelled()) {
-			// TODO maybe move this somewhere else:
-			try {
-				String owner = (shopkeeper instanceof PlayerShopkeeper) ? ((PlayerShopkeeper) shopkeeper).getOwnerAsString() : "[Admin]";
-				File file = new File(ShopkeepersPlugin.getInstance().getDataFolder(), "purchases-" + new SimpleDateFormat("yyyy-MM-dd").format(new Date()) + ".csv");
-				boolean isNew = !file.exists();
-				BufferedWriter writer = new BufferedWriter(new FileWriter(file, true));
-				if (isNew) writer.append("TIME,PLAYER,SHOP ID,SHOP TYPE,SHOP POS,OWNER,ITEM TYPE,DATA,QUANTITY,CURRENCY 1,CURRENCY 1 AMOUNT,CURRENCY 2,CURRENCY 2 AMOUNT\n");
-				writer.append("\"" + new SimpleDateFormat("HH:mm:ss").format(new Date()) + "\",\"" + playerName + "\",\"" + shopkeeper.getUniqueId()
-						+ "\",\"" + shopkeeper.getType().getIdentifier() + "\",\"" + shopkeeper.getPositionString() + "\",\"" + owner
-						+ "\",\"" + resultItem.getType().name() + "\",\"" + resultItem.getDurability() + "\",\"" + resultItem.getAmount()
-						+ "\",\"" + (item1 != null ? item1.getType().name() + ":" + item1.getDurability() : "")
-						+ "\",\"" + (requiredItem1 != null ? requiredItem1.getAmount() : "")
-						+ "\",\"" + (item2 != null ? item2.getType().name() + ":" + item2.getDurability() : "")
-						+ "\",\"" + (requiredItem2 != null ? requiredItem2.getAmount() : "")
-						+ "\"\n");
-				writer.close();
-			} catch (IOException e) {
-				Log.severe("IO exception while trying to log purchase");
-			}
-		}
 
 		// call trade-completed event:
 		ShopkeeperTradeCompletedEvent tradeCompletedEvent = new ShopkeeperTradeCompletedEvent(tradeEvent);
