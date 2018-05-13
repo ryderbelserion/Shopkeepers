@@ -531,9 +531,12 @@ public class Utils {
 	}
 
 	public static String getSimpleItemInfo(ItemStack item) {
-		if (item == null) return "none";
+		if (item == null) return "empty";
 		StringBuilder sb = new StringBuilder();
-		sb.append(item.getType()).append('~').append(item.getDurability());
+		sb.append(item.getAmount()).append('x').append(item.getType());
+		if (item.getDurability() != 0) {
+			sb.append('~').append(item.getDurability());
+		}
 		return sb.toString();
 	}
 
@@ -541,8 +544,8 @@ public class Utils {
 		if (recipe == null) return "none";
 		StringBuilder sb = new StringBuilder();
 		sb.append("[item1=").append(getSimpleItemInfo(recipe.getItem1()))
-				.append(",item2=").append(getSimpleItemInfo(recipe.getItem2()))
-				.append(",resultItem=").append(getSimpleItemInfo(recipe.getResultItem())).append("]");
+				.append(", item2=").append(getSimpleItemInfo(recipe.getItem2()))
+				.append(", result=").append(getSimpleItemInfo(recipe.getResultItem())).append("]");
 		return sb.toString();
 	}
 
