@@ -325,6 +325,12 @@ public class Settings {
 	// returns true, if the config misses values which need to be saved
 	public static boolean loadConfiguration(Configuration config) {
 		boolean settingsMissing = false;
+
+		// exempt a few string / string list settings from color conversion:
+		List<String> noColorConversionKeys = Arrays.asList(
+				toConfigKey("fileEncoding"), toConfigKey("shopCreationItemSpawnEggEntityType"),
+				toConfigKey("maxShopsPermOptions"), toConfigKey("enabledLivingShops"),
+				toConfigKey("nameRegex"), toConfigKey("language"));
 		try {
 			Field[] fields = Settings.class.getDeclaredFields();
 			for (Field field : fields) {
@@ -347,7 +353,12 @@ public class Settings {
 				}
 
 				if (typeClass == String.class) {
-					field.set(null, Utils.colorize(config.getString(configKey, (String) field.get(null))));
+					String string = config.getString(configKey, (String) field.get(null));
+					// colorize, if not exempted:
+					if (!noColorConversionKeys.contains(configKey)) {
+						string = Utils.colorize(string);
+					}
+					field.set(null, string);
 				} else if (typeClass == int.class) {
 					field.set(null, config.getInt(configKey, field.getInt(null)));
 				} else if (typeClass == short.class) {
@@ -372,7 +383,12 @@ public class Settings {
 				} else if (typeClass == List.class) {
 					Class<?> genericType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
 					if (genericType == String.class) {
-						field.set(null, Utils.colorize(config.getStringList(configKey)));
+						List<String> stringList = config.getStringList(configKey);
+						// colorize, if not exempted:
+						if (!noColorConversionKeys.contains(configKey)) {
+							stringList = Utils.colorize(stringList);
+						}
+						field.set(null, stringList);
 					}
 				}
 			}
