@@ -321,6 +321,7 @@ public class Settings {
 		return fieldName.replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase();
 	}
 
+	// TODO on reloads this will probably use the previous values as defaults, instead of the actual default values
 	// returns true, if the config misses values which need to be saved
 	public static boolean loadConfiguration(Configuration config) {
 		boolean settingsMissing = false;
