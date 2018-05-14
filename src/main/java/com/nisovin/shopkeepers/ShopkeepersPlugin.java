@@ -219,6 +219,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		pm.registerEvents(new CreateListener(this), this);
 		pm.registerEvents(new VillagerInteractionListener(this), this);
 		pm.registerEvents(new LivingEntityShopListener(this), this);
+		pm.registerEvents(new TradingCountListener(this), this);
 		pm.registerEvents(new TradeFileLogger(this.getDataFolder()), this);
 
 		if (Settings.enableSignShops) {
@@ -243,7 +244,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// register force-creature-spawn event handler:
 		if (Settings.bypassSpawnBlocking) {
 			creatureForceSpawnListener = new CreatureForceSpawnListener();
-			Bukkit.getPluginManager().registerEvents(creatureForceSpawnListener, this);
+			pm.registerEvents(creatureForceSpawnListener, this);
 		}
 
 		// register command handler:
@@ -417,6 +418,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		protectedChests.onDisable(this);
 
 		// cleanup:
+		creatureForceSpawnListener = null;
+
 		activeShopkeepers.clear();
 		shopkeepersByChunk.clear();
 		shopkeepersById.clear();
