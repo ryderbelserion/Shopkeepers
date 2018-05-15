@@ -425,6 +425,13 @@ public class Settings {
 				nameItem = Material.NAME_TAG;
 			}
 		}
+		if (taxRate < 0) {
+			Log.warning("Config: 'tax-rate' can not be less than 0!");
+			taxRate = 0;
+		} else if (taxRate > 100) {
+			Log.warning("Config: 'tax-rate' can not be larger than 100!");
+			taxRate = 100;
+		}
 
 		return settingsMissing;
 	}
