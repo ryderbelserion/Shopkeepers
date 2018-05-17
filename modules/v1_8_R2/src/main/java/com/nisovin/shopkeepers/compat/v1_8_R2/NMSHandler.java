@@ -18,7 +18,7 @@ import org.bukkit.inventory.MerchantInventory;
 
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 
 import net.minecraft.server.v1_8_R2.Entity;
 import net.minecraft.server.v1_8_R2.EntityHuman;
@@ -258,8 +258,8 @@ public final class NMSHandler implements NMSCallProvider {
 	public boolean matches(ItemStack provided, ItemStack required) {
 		if (provided == required) return true;
 		// if the required item is empty, then the provided item has to be empty as well:
-		if (Utils.isEmpty(required)) return Utils.isEmpty(provided);
-		else if (Utils.isEmpty(provided)) return false;
+		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
+		else if (ItemUtils.isEmpty(provided)) return false;
 		if (provided.getType() != required.getType()) return false;
 		if (provided.getDurability() != required.getDurability()) return false;
 		net.minecraft.server.v1_8_R2.ItemStack nmsProvided = CraftItemStack.asNMSCopy(provided);

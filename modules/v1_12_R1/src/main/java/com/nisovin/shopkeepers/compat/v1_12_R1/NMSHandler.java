@@ -23,7 +23,7 @@ import org.bukkit.inventory.meta.SpawnEggMeta;
 
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 
 import net.minecraft.server.v1_12_R1.EntityHuman;
 import net.minecraft.server.v1_12_R1.EntityInsentient;
@@ -66,11 +66,11 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	private MerchantRecipe createMerchantRecipe(ItemStack buyItem1, ItemStack buyItem2, ItemStack sellingItem) {
-		assert !Utils.isEmpty(sellingItem) && !Utils.isEmpty(buyItem1);
+		assert !ItemUtils.isEmpty(sellingItem) && !ItemUtils.isEmpty(buyItem1);
 		MerchantRecipe recipe = new MerchantRecipe(sellingItem, 10000); // no max-uses limit
 		recipe.setExperienceReward(false); // no experience rewards
 		recipe.addIngredient(buyItem1);
-		if (!Utils.isEmpty(buyItem2)) {
+		if (!ItemUtils.isEmpty(buyItem2)) {
 			recipe.addIngredient(buyItem2);
 		}
 		return recipe;
@@ -85,7 +85,7 @@ public final class NMSHandler implements NMSCallProvider {
 		ItemStack item2 = null;
 		if (ingredients.size() > 1) {
 			ItemStack buyItem2 = ingredients.get(1);
-			if (!Utils.isEmpty(buyItem2)) {
+			if (!ItemUtils.isEmpty(buyItem2)) {
 				item2 = buyItem2;
 			}
 		}
@@ -223,8 +223,8 @@ public final class NMSHandler implements NMSCallProvider {
 	public boolean matches(ItemStack provided, ItemStack required) {
 		if (provided == required) return true;
 		// if the required item is empty, then the provided item has to be empty as well:
-		if (Utils.isEmpty(required)) return Utils.isEmpty(provided);
-		else if (Utils.isEmpty(provided)) return false;
+		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
+		else if (ItemUtils.isEmpty(provided)) return false;
 		if (provided.getType() != required.getType()) return false;
 		if (provided.getDurability() != required.getDurability()) return false;
 		net.minecraft.server.v1_12_R1.ItemStack nmsProvided = CraftItemStack.asNMSCopy(provided);
