@@ -8,11 +8,9 @@ import org.bukkit.event.HandlerList;
 import com.nisovin.shopkeepers.Shopkeeper;
 
 /**
- * This event is called when a player attempts to open trade with a shopkeeper villager.
- * 
+ * This event is called whenever a player attempts to open the trading window of a shopkeeper.
  * <p>
- * If the event is cancelled, the trade window will not open.
- * </p>
+ * If the event is cancelled, the trading window will not open.
  */
 public class OpenTradeEvent extends Event implements Cancellable {
 

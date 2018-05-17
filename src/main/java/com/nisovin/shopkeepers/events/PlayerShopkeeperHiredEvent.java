@@ -68,7 +68,7 @@ public class PlayerShopkeeperHiredEvent extends Event implements Cancellable {
 	}
 
 	/**
-	 * Gets the maximum number of shops this player can have.
+	 * Gets the maximum number of shops the player can have.
 	 * 
 	 * @return player max shops
 	 */
@@ -78,6 +78,7 @@ public class PlayerShopkeeperHiredEvent extends Event implements Cancellable {
 
 	/**
 	 * Sets the maximum number of shops the creating player can have.
+	 * <p>
 	 * If the player has more than this number, the shop will not be hired.
 	 * 
 	 * @param maxShops
