@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
@@ -44,6 +43,10 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	protected static abstract class PlayerShopEditorHandler extends EditorHandler {
 
+		// slot = column + offset:
+		protected static final int HIGH_COST_OFFSET = 9;
+		protected static final int LOW_COST_OFFSET = 18;
+
 		protected PlayerShopEditorHandler(UIType uiType, PlayerShopkeeper shopkeeper) {
 			super(uiType, shopkeeper);
 		}
@@ -60,31 +63,32 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		@Override
 		protected void onInventoryClick(InventoryClickEvent event, Player player) {
-			int slot = event.getRawSlot();
-			// prevent shift clicks on player inventory items:
-			if (slot >= 27 && event.isShiftClick()) {
-				event.setCancelled(true);
-			}
-			if (slot >= 18 && slot <= 25) {
+			// cancel all inventory clicks and handle everything on our own:
+			// TODO maybe allow certain inventory actions which only affect the player's inventory?
+			// (like moving items around)
+			event.setCancelled(true);
+
+			int rawSlot = event.getRawSlot();
+			if (rawSlot >= LOW_COST_OFFSET && rawSlot < (LOW_COST_OFFSET + TRADE_COLUMNS)) {
 				// change low cost:
-				int column = slot - 18;
+				int column = rawSlot - LOW_COST_OFFSET;
 				ItemStack soldItem = event.getInventory().getItem(column);
 				if (Utils.isEmpty(soldItem)) return;
 				this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
-			} else if (slot >= 9 && slot <= 16) {
+			} else if (rawSlot >= HIGH_COST_OFFSET && rawSlot < ((HIGH_COST_OFFSET + TRADE_COLUMNS))) {
 				// change high cost:
-				int column = slot - 9;
+				int column = rawSlot - HIGH_COST_OFFSET;
 				ItemStack soldItem = event.getInventory().getItem(column);
 				if (Utils.isEmpty(soldItem)) return;
 				this.handleUpdateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), Settings.createHighZeroCurrencyItem());
 			} else {
+				// handle common editor buttons:
 				super.onInventoryClick(event, player);
 			}
 		}
 
 		protected void handleUpdateItemAmountOnClick(InventoryClickEvent event, int minAmount) {
-			// cancel event:
-			event.setCancelled(true);
+			assert event.isCancelled();
 			// ignore in certain situations:
 			ItemStack clickedItem = event.getCurrentItem();
 			if (Utils.isEmpty(clickedItem)) return;
@@ -106,8 +110,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		protected void handleUpdateTradeCostItemOnClick(InventoryClickEvent event, ItemStack currencyItem, ItemStack zeroCurrencyItem) {
-			// cancel event:
-			event.setCancelled(true);
+			assert event.isCancelled();
 			// ignore in certain situations:
 			if (Utils.isEmpty(currencyItem)) return;
 
@@ -139,40 +142,44 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			}
 		}
 
+		// note: in case the cost is too large to represent, it sets the cost to zero and prints a warning
+		// (so opening and closing the editor window will remove the offer, instead of setting the costs to a lower
+		// value than what was previously somehow specified)
 		protected void setEditColumnCost(Inventory inventory, int column, int cost) {
-			if (cost > 0) {
-				if (Settings.highCurrencyItem != Material.AIR && cost > Settings.highCurrencyMinCost) {
-					int highCost = cost / Settings.highCurrencyValue;
-					int lowCost = cost % Settings.highCurrencyValue;
-					if (highCost > 0) {
-						ItemStack item = Settings.createHighCurrencyItem(highCost);
-						if (highCost > item.getMaxStackSize()) {
-							lowCost += (highCost - item.getMaxStackSize()) * Settings.highCurrencyValue;
-							item.setAmount(item.getMaxStackSize());
-						}
-						inventory.setItem(column + 9, item);
-					} else {
-						inventory.setItem(column + 9, Settings.createHighZeroCurrencyItem());
-					}
-					if (lowCost > 0) {
-						ItemStack item = Settings.createCurrencyItem(lowCost);
-						inventory.setItem(column + 18, item);
-					} else {
-						inventory.setItem(column + 18, Settings.createZeroCurrencyItem());
-					}
+			assert inventory != null && column >= 0 && column <= TRADE_COLUMNS;
+			ItemStack highCostItem = null;
+			ItemStack lowCostItem = null;
+
+			int remainingCost = cost;
+			if (Settings.isHighCurrencyEnabled()) {
+				int highCost = 0;
+				if (remainingCost > Settings.highCurrencyMinCost) {
+					highCost = Math.min((remainingCost / Settings.highCurrencyValue), Settings.highCurrencyItem.getMaxStackSize());
+				}
+				if (highCost > 0) {
+					remainingCost -= (highCost * Settings.highCurrencyValue);
+					highCostItem = Settings.createHighCurrencyItem(highCost);
 				} else {
-					ItemStack item = Settings.createCurrencyItem(cost);
-					inventory.setItem(column + 18, item);
-					if (Settings.highCurrencyItem != Material.AIR) {
-						inventory.setItem(column + 9, Settings.createHighZeroCurrencyItem());
+					highCostItem = Settings.createHighZeroCurrencyItem();
+				}
+			}
+			if (remainingCost > 0) {
+				if (remainingCost <= Settings.currencyItem.getMaxStackSize()) {
+					lowCostItem = Settings.createCurrencyItem(remainingCost);
+				} else {
+					// cost is to large to represent: reset cost to zero:
+					lowCostItem = Settings.createZeroCurrencyItem();
+					if (Settings.isHighCurrencyEnabled()) {
+						highCostItem = Settings.createHighZeroCurrencyItem();
 					}
 				}
 			} else {
-				inventory.setItem(column + 18, Settings.createZeroCurrencyItem());
-				if (Settings.highCurrencyItem != Material.AIR) {
-					inventory.setItem(column + 9, Settings.createHighZeroCurrencyItem());
-				}
+				lowCostItem = Settings.createZeroCurrencyItem();
 			}
+
+			// apply to inventory:
+			inventory.setItem(column + HIGH_COST_OFFSET, highCostItem);
+			inventory.setItem(column + LOW_COST_OFFSET, lowCostItem);
 		}
 
 		protected int getPriceFromColumn(Inventory inventory, int column) {
@@ -182,14 +189,18 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			if (lowCostItem != null && lowCostItem.getType() == Settings.currencyItem && lowCostItem.getAmount() > 0) {
 				cost += lowCostItem.getAmount();
 			}
-			if (Settings.highCurrencyItem != Material.AIR && highCostItem != null && highCostItem.getType() == Settings.highCurrencyItem && highCostItem.getAmount() > 0) {
-				cost += highCostItem.getAmount() * Settings.highCurrencyValue;
+			if (Settings.isHighCurrencyEnabled() && highCostItem != null && highCostItem.getType() == Settings.highCurrencyItem && highCostItem.getAmount() > 0) {
+				cost += (highCostItem.getAmount() * Settings.highCurrencyValue);
 			}
 			return cost;
 		}
 	}
 
 	protected static abstract class PlayerShopTradingHandler extends TradingHandler {
+
+		// state related to the currently handled trade:
+		protected Inventory chestInventory = null;
+		protected ItemStack[] newChestContents = null;
 
 		protected PlayerShopTradingHandler(UIType uiType, PlayerShopkeeper shopkeeper) {
 			super(uiType, shopkeeper);
@@ -203,7 +214,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		@Override
 		protected boolean canOpen(Player player) {
 			if (!super.canOpen(player)) return false;
-			final PlayerShopkeeper shopkeeper = this.getShopkeeper();
+			PlayerShopkeeper shopkeeper = this.getShopkeeper();
 
 			// stop opening if trading shall be prevented while the owner is offline:
 			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
@@ -218,26 +229,63 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, TradingRecipe tradingRecipe, ItemStack offered1, ItemStack offered2) {
-			super.onPurchaseClick(event, player, tradingRecipe, offered1, offered2);
-			if (event.isCancelled()) return;
-			final PlayerShopkeeper shopkeeper = this.getShopkeeper();
+		protected boolean prepareTrade(TradeData tradeData) {
+			if (!super.prepareTrade(tradeData)) return false;
+			PlayerShopkeeper shopkeeper = this.getShopkeeper();
+			Player tradingPlayer = tradeData.tradingPlayer;
 
-			if (Settings.preventTradingWithOwnShop && shopkeeper.isOwner(player) && !player.isOp()) {
-				event.setCancelled(true);
-				Log.debug("Cancelled trade from " + player.getName() + " because he can't trade with his own shop");
-				return;
+			// no trading with own shop:
+			if (Settings.preventTradingWithOwnShop && shopkeeper.isOwner(tradingPlayer) && !tradingPlayer.isOp()) {
+				this.debugPreventedTrade(tradingPlayer, "Trading with the own shop is not allowed.");
+				return false;
 			}
 
-			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
+			// no trading while shop owner is online:
+			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(tradingPlayer, ShopkeepersAPI.BYPASS_PERMISSION)) {
 				Player ownerPlayer = shopkeeper.getOwner();
-				if (ownerPlayer != null && !shopkeeper.isOwner(player)) {
-					Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
-					event.setCancelled(true);
-					Log.debug("Cancelled trade from " + event.getWhoClicked().getName() + " because the owner is online");
-					return;
+				if (ownerPlayer != null && !shopkeeper.isOwner(tradingPlayer)) {
+					Utils.sendMessage(tradingPlayer, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
+					this.debugPreventedTrade(tradingPlayer, "Trading is not allowed while the shop owner is online.");
+					return false;
 				}
 			}
+
+			// check for the shop's chest:
+			Block chest = shopkeeper.getChest();
+			if (!Utils.isChest(chest.getType())) {
+				this.debugPreventedTrade(tradingPlayer, "Couldn't find the shop's chest.");
+				return false;
+			}
+
+			// setup common state information for handling this trade:
+			this.chestInventory = ((Chest) chest.getState()).getInventory();
+			this.newChestContents = chestInventory.getContents();
+
+			return true;
+		}
+
+		@Override
+		protected void onTradeApplied(TradeData tradeData) {
+			super.onTradeApplied(tradeData);
+
+			// apply chest content changes:
+			if (chestInventory != null && newChestContents != null) {
+				chestInventory.setContents(newChestContents);
+			}
+
+			// reset trade related state information:
+			this.resetTradeState();
+		}
+
+		@Override
+		protected void onTradeAborted(TradeData tradeData) {
+			super.onTradeAborted(tradeData);
+			this.resetTradeState();
+		}
+
+		protected void resetTradeState() {
+			chestInventory = null;
+			newChestContents = null;
 		}
 	}
 
@@ -254,7 +302,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		@Override
 		protected boolean openWindow(Player player) {
-			final PlayerShopkeeper shopkeeper = this.getShopkeeper();
+			PlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 9, Settings.forHireTitle);
 
 			ItemStack hireItem = Settings.createHireButtonItem();
@@ -270,16 +318,15 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		}
 
 		@Override
-		protected void onInventoryClick(InventoryClickEvent event, final Player player) {
+		protected void onInventoryClick(InventoryClickEvent event, Player player) {
 			super.onInventoryClick(event, player);
-			final PlayerShopkeeper shopkeeper = this.getShopkeeper();
+			PlayerShopkeeper shopkeeper = this.getShopkeeper();
 			int slot = event.getRawSlot();
 			if (slot == 2 || slot == 6) {
 				// handle hiring:
 				// check if the player can hire (create) this type of shopkeeper:
-				if (Settings.hireRequireCreationPermission
-						&& (!this.getShopkeeper().getType().hasPermission(player)
-								|| !this.getShopkeeper().getShopObject().getObjectType().hasPermission(player))) {
+				if (Settings.hireRequireCreationPermission && (!this.getShopkeeper().getType().hasPermission(player)
+						|| !this.getShopkeeper().getShopObject().getObjectType().hasPermission(player))) {
 					// missing permission to hire this type of shopkeeper:
 					Utils.sendMessage(player, Settings.msgCantHireShopType);
 					this.closeDelayed(player);
@@ -415,7 +462,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	@Override
-	protected void onPlayerInteraction(final Player player) {
+	protected void onPlayerInteraction(Player player) {
 		// naming via item:
 		ItemStack itemInHand = player.getItemInHand();
 		if (Settings.namingOfPlayerShopsViaItem && Settings.isNamingItem(itemInHand)) {
@@ -650,7 +697,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		ItemStack item1 = null;
 		ItemStack item2 = null;
 
-		if (Settings.highCurrencyItem != Material.AIR && price > Settings.highCurrencyMinCost) {
+		if (Settings.isHighCurrencyEnabled() && price > Settings.highCurrencyMinCost) {
 			int highCurrencyAmount = Math.min(price / Settings.highCurrencyValue, Settings.highCurrencyItem.getMaxStackSize());
 			if (highCurrencyAmount > 0) {
 				remainingPrice -= (highCurrencyAmount * Settings.highCurrencyValue);
@@ -662,7 +709,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		if (remainingPrice > 0) {
 			if (remainingPrice > Settings.currencyItem.getMaxStackSize()) {
 				// cannot represent this price with the used currency items:
-				Log.warning("Shopkeeper at " + worldName + "," + x + "," + y + "," + z + " owned by " + ownerName + " has an invalid cost!");
+				Log.warning("Shopkeeper at " + this.getPositionString() + " owned by " + ownerName + " has an invalid cost!");
 				return null;
 			}
 
@@ -681,7 +728,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	protected TradingRecipe createBuyingRecipe(ItemStack itemBeingBought, int price) {
 		if (price > Settings.currencyItem.getMaxStackSize()) {
 			// cannot represent this price with the used currency items:
-			Log.warning("Shopkeeper at " + worldName + "," + x + "," + y + "," + z + " owned by " + ownerName + " has an invalid cost!");
+			Log.warning("Shopkeeper at " + this.getPositionString() + " owned by " + ownerName + " has an invalid cost!");
 			return null;
 		}
 		ItemStack currencyItem = Settings.createCurrencyItem(price);
@@ -689,28 +736,30 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	protected int getCurrencyInChest() {
-		int total = 0;
 		Block chest = this.getChest();
-		if (Utils.isChest(chest.getType())) {
-			Inventory inv = ((Chest) chest.getState()).getInventory();
-			ItemStack[] contents = inv.getContents();
-			for (ItemStack item : contents) {
-				if (Settings.isCurrencyItem(item)) {
-					total += item.getAmount();
-				} else if (Settings.isHighCurrencyItem(item)) {
-					total += item.getAmount() * Settings.highCurrencyValue;
-				}
+		if (!Utils.isChest(chest.getType())) return 0;
+
+		int totalCurrency = 0;
+		Inventory chestInventory = ((Chest) chest.getState()).getInventory();
+		ItemStack[] chestContents = chestInventory.getContents();
+		for (ItemStack itemStack : chestContents) {
+			if (Settings.isCurrencyItem(itemStack)) {
+				totalCurrency += itemStack.getAmount();
+			} else if (Settings.isHighCurrencyItem(itemStack)) {
+				totalCurrency += (itemStack.getAmount() * Settings.highCurrencyValue);
 			}
 		}
-		return total;
+		return totalCurrency;
 	}
 
 	protected List<ItemCount> getItemsFromChest(Filter<ItemStack> filter) {
-		Inventory chestInventory = null;
+		ItemStack[] chestContents = null;
 		Block chest = this.getChest();
 		if (Utils.isChest(chest.getType())) {
-			chestInventory = ((Chest) chest.getState()).getInventory();
+			Inventory chestInventory = ((Chest) chest.getState()).getInventory();
+			chestContents = chestInventory.getContents();
 		}
-		return Utils.getItemCountsFromInventory(chestInventory, filter);
+		// returns an empty list if the chest couldn't be found:
+		return Utils.countItems(chestContents, filter);
 	}
 }

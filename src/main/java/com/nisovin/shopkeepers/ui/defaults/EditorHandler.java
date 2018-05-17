@@ -22,6 +22,9 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class EditorHandler extends UIHandler {
 
+	// column = [0,7] (last column of the inventory is used for editor buttons)
+	protected static final int TRADE_COLUMNS = 8;
+
 	protected EditorHandler(UIType uiType, Shopkeeper shopkeeper) {
 		super(uiType, shopkeeper);
 	}
@@ -47,13 +50,13 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryClick(InventoryClickEvent event, final Player player) {
+	protected void onInventoryClick(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
-		final Shopkeeper shopkeeper = this.getShopkeeper();
+		Shopkeeper shopkeeper = this.getShopkeeper();
 
 		// check for special action buttons:
-		int slot = event.getRawSlot();
-		if (slot == 26) {
+		int rawSlot = event.getRawSlot();
+		if (rawSlot == 26) {
 			// delete button - delete shopkeeper:
 			event.setCancelled(true);
 
@@ -75,7 +78,7 @@ public abstract class EditorHandler extends UIHandler {
 
 			// save:
 			ShopkeepersPlugin.getInstance().save();
-		} else if (slot == 17) {
+		} else if (rawSlot == 17) {
 			// cycle button - cycle to next object type variation:
 			event.setCancelled(true);
 
@@ -103,7 +106,7 @@ public abstract class EditorHandler extends UIHandler {
 
 			// save:
 			ShopkeepersPlugin.getInstance().save();
-		} else if (slot == 8) {
+		} else if (rawSlot == 8) {
 			// naming or chest inventory button:
 			event.setCancelled(true);
 
@@ -130,7 +133,7 @@ public abstract class EditorHandler extends UIHandler {
 			shopkeeper.deactivateUI();
 
 			// close editor window delayed, and optionally open chest inventory afterwards:
-			final boolean openChest = (event.getCurrentItem().getType() == Settings.chestItem);
+			boolean openChest = (event.getCurrentItem().getType() == Settings.chestItem);
 			Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
 
 				@Override

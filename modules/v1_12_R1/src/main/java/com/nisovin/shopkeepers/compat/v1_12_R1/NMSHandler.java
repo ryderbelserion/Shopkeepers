@@ -1,14 +1,14 @@
 package com.nisovin.shopkeepers.compat.v1_12_R1;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.ArrayList;
 
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -21,11 +21,19 @@ import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 
-import net.minecraft.server.v1_12_R1.*;
-
-import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
+import com.nisovin.shopkeepers.util.Utils;
+
+import net.minecraft.server.v1_12_R1.EntityHuman;
+import net.minecraft.server.v1_12_R1.EntityInsentient;
+import net.minecraft.server.v1_12_R1.EntityLiving;
+import net.minecraft.server.v1_12_R1.GameProfileSerializer;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
+import net.minecraft.server.v1_12_R1.NBTTagList;
+import net.minecraft.server.v1_12_R1.PathfinderGoalFloat;
+import net.minecraft.server.v1_12_R1.PathfinderGoalLookAtPlayer;
+import net.minecraft.server.v1_12_R1.PathfinderGoalSelector;
 
 public final class NMSHandler implements NMSCallProvider {
 
@@ -138,32 +146,6 @@ public final class NMSHandler implements NMSCallProvider {
 		bukkitEntity.setAI(false);
 	}
 
-	// TODO no longer needed once attribute saving and loading has been removed
-	private NBTTagCompound getItemTag(net.minecraft.server.v1_12_R1.ItemStack itemStack) {
-		if (itemStack == null) return null;
-		try {
-			Field tag = itemStack.getClass().getDeclaredField("tag");
-			tag.setAccessible(true);
-			return (NBTTagCompound) tag.get(itemStack);
-		} catch (NoSuchFieldException e) {
-			return null;
-		} catch (IllegalAccessException e2) {
-			return null;
-		}
-	}
-
-	// TODO no longer needed once attribute saving and loading has been removed
-	private void setItemTag(net.minecraft.server.v1_12_R1.ItemStack itemStack, NBTTagCompound newTag) {
-		if (itemStack == null) return;
-		try {
-			Field tag = itemStack.getClass().getDeclaredField("tag");
-			tag.setAccessible(true);
-			tag.set(itemStack, newTag);
-		} catch (NoSuchFieldException e) {
-		} catch (IllegalAccessException e2) {
-		}
-	}
-
 	@Override
 	public ItemStack loadItemAttributesFromString(ItemStack item, String data) {
 		// since somewhere in late bukkit 1.8, bukkit saves item attributes on its own (inside the internal data)
@@ -189,14 +171,14 @@ public final class NMSHandler implements NMSCallProvider {
 				list.add(attr);
 			}
 		}
-		net.minecraft.server.v1_12_R1.ItemStack i = CraftItemStack.asNMSCopy(item);
-		NBTTagCompound tag = this.getItemTag(i);
+		net.minecraft.server.v1_12_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+		NBTTagCompound tag = nmsItem.getTag();
 		if (tag == null) {
 			tag = new NBTTagCompound();
-			this.setItemTag(i, tag);
+			nmsItem.setTag(tag);
 		}
 		tag.set("AttributeModifiers", list);
-		return CraftItemStack.asBukkitCopy(i);
+		return CraftItemStack.asBukkitCopy(nmsItem);
 	}
 
 	@Override
@@ -235,5 +217,20 @@ public final class NMSHandler implements NMSCallProvider {
 		if (!spawnEggItem.hasItemMeta()) return null;
 		SpawnEggMeta itemMeta = (SpawnEggMeta) spawnEggItem.getItemMeta();
 		return itemMeta.getSpawnedType();
+	}
+
+	@Override
+	public boolean matches(ItemStack provided, ItemStack required) {
+		if (provided == required) return true;
+		// if the required item is empty, then the provided item has to be empty as well:
+		if (Utils.isEmpty(required)) return Utils.isEmpty(provided);
+		else if (Utils.isEmpty(provided)) return false;
+		if (provided.getType() != required.getType()) return false;
+		if (provided.getDurability() != required.getDurability()) return false;
+		net.minecraft.server.v1_12_R1.ItemStack nmsProvided = CraftItemStack.asNMSCopy(provided);
+		net.minecraft.server.v1_12_R1.ItemStack nmsRequired = CraftItemStack.asNMSCopy(required);
+		NBTTagCompound providedTag = nmsProvided.getTag();
+		NBTTagCompound requiredTag = nmsRequired.getTag();
+		return GameProfileSerializer.a(requiredTag, providedTag, false);
 	}
 }

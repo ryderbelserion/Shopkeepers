@@ -186,6 +186,7 @@ public class Settings {
 	public static String highCurrencyItemName = "";
 	public static List<String> highCurrencyItemLore = new ArrayList<String>(0);
 
+	// note: this can in general be larger than 64!
 	public static int highCurrencyValue = 9;
 	public static int highCurrencyMinCost = 20;
 
@@ -530,16 +531,18 @@ public class Settings {
 	}
 
 	// high currency item:
+	public static boolean isHighCurrencyEnabled() {
+		return (Settings.highCurrencyItem != Material.AIR);
+	}
+
 	public static ItemStack createHighCurrencyItem(int amount) {
-		if (Settings.highCurrencyItem == Material.AIR) return null;
+		if (!isHighCurrencyEnabled()) return null;
 		return Utils.createItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemData,
 				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}
 
 	public static boolean isHighCurrencyItem(ItemStack item) {
-		if (Settings.highCurrencyItem == Material.AIR) {
-			return Utils.isEmpty(item);
-		}
+		if (!isHighCurrencyEnabled()) return false;
 		return Utils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData,
 				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}

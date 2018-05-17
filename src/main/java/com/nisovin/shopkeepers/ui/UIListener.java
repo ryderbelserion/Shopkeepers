@@ -40,7 +40,7 @@ class UIListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST)
 	void onInventoryClick(InventoryClickEvent event) {
 		if (event.getWhoClicked().getType() != EntityType.PLAYER) return;
-		final Player player = (Player) event.getWhoClicked();
+		Player player = (Player) event.getWhoClicked();
 		UISession session = uiManager.getSession(player);
 		if (session != null) {
 			// inform uiHandler so that it can react to it:
@@ -48,8 +48,8 @@ class UIListener implements Listener {
 			if (session.getUIHandler().isWindow(inventory)) {
 				if (!session.getShopkeeper().isUIActive() || !session.getShopkeeper().isValid()) {
 					// shopkeeper deleted, or the UIs got deactivated: ignore this click
-					Log.debug("Inventory click by " + player.getName() + " ignored, because window is about to get close,"
-							+ " or shopkeeper got deleted.");
+					Log.debug("Inventory click by " + player.getName() + " ignored, because the window is about to get closed,"
+							+ " or the shopkeeper got deleted.");
 					event.setCancelled(true);
 					return;
 				}

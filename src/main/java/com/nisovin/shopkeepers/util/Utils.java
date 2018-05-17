@@ -26,6 +26,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.permissions.Permissible;
@@ -52,8 +53,6 @@ public class Utils {
 		return normalizedClone;
 	}
 
-	// private static final ItemStack EMPTY_ITEM = new ItemStack(Material.AIR, 0);
-
 	public static boolean isEmpty(ItemStack item) {
 		return item == null || item.getType() == Material.AIR || item.getAmount() <= 0;
 	}
@@ -61,18 +60,6 @@ public class Utils {
 	public static ItemStack getNullIfEmpty(ItemStack item) {
 		return isEmpty(item) ? null : item;
 	}
-
-	/*public static ItemStack getEmptyIfNull(ItemStack item) {
-		return item == null ? getEmptyItem() : item;
-	}
-	
-	public static ItemStack normalizedIfEmpty(ItemStack item) {
-		return isEmpty(item) ? EMPTY_ITEM : item;
-	}
-	
-	public static ItemStack getEmptyItem() {
-		return EMPTY_ITEM.clone();
-	}*/
 
 	public static boolean isChest(Material material) {
 		return material == Material.CHEST || material == Material.TRAPPED_CHEST;
@@ -197,7 +184,7 @@ public class Utils {
 	 *            the player
 	 * @param targetBlock
 	 *            the block the player is looking at
-	 * @return the block face, or null if none was found
+	 * @return the block face, or <code<null</code> if none was found
 	 */
 	public static BlockFace getTargetBlockFace(Player player, Block targetBlock) {
 		Location intersection = getBlockIntersection(player, targetBlock);
@@ -570,13 +557,13 @@ public class Utils {
 	 * @param item
 	 *            the item
 	 * @param type
-	 *            The item type.
+	 *            the item type
 	 * @param data
-	 *            The data value/durability. If -1 is is ignored.
+	 *            the data value/durability, or <code>-1</code> to ignore it
 	 * @param displayName
-	 *            The displayName. If null or empty it is ignored.
+	 *            the displayName, or <code>null</code> or empty to ignore it
 	 * @param lore
-	 *            The item lore. If null or empty it is ignored.
+	 *            the item lore, or <code>null</code> or empty to ignore it
 	 * @return <code>true</code> if the item has similar attributes
 	 */
 	public static boolean isSimilar(ItemStack item, Material type, short data, String displayName, List<String> lore) {
@@ -623,7 +610,7 @@ public class Utils {
 	 * @param node
 	 *            where to save the item stack inside the section
 	 * @param item
-	 *            the item stack to save, can be null
+	 *            the item stack to save, can be <code>null</code>
 	 */
 	public static void saveItem(ConfigurationSection section, String node, ItemStack item) {
 		assert section != null && node != null;
@@ -644,7 +631,7 @@ public class Utils {
 	 *            a configuration section
 	 * @param node
 	 *            where to load the item stack from inside the section
-	 * @return the loaded item stack, possibly null
+	 * @return the loaded item stack, possibly <code>null</code>
 	 */
 	public static ItemStack loadItem(ConfigurationSection section, String node) {
 		assert section != null && node != null;
@@ -662,55 +649,130 @@ public class Utils {
 
 	// inventory utilities:
 
-	public static List<ItemCount> getItemCountsFromInventory(Inventory inventory, Filter<ItemStack> filter) {
-		List<ItemCount> itemCounts = new ArrayList<ItemCount>();
-		if (inventory != null) {
-			ItemStack[] contents = inventory.getContents();
-			for (ItemStack item : contents) {
-				if (isEmpty(item)) continue;
-				if (filter != null && !filter.accept(item)) continue;
+	// somewhere in early 1.9 getStorageContents was introduced and the previous behavior of getContents was changed for
+	// player inventories to now return the combined inventory contents
+	// TODO remove this once we support 1.9+
 
-				// check if we already have a counter for this type of item:
-				ItemCount itemCount = ItemCount.findSimilar(itemCounts, item);
-				if (itemCount != null) {
-					// increase item count:
-					itemCount.addAmount(item.getAmount());
-				} else {
-					// add new item entry:
-					itemCounts.add(new ItemCount(item, item.getAmount()));
-				}
+	private static final int PLAYER_INVENTORY_STORAGE_SIZE = 36;
+
+	/**
+	 * Gets the storage contents from the specified inventory.
+	 * 
+	 * @param inventory
+	 *            the inventory
+	 * @return the storage contents
+	 */
+	public static ItemStack[] getStorageContents(Inventory inventory) {
+		assert inventory != null;
+		ItemStack[] storageContents = inventory.getContents();
+		if (inventory instanceof PlayerInventory) {
+			storageContents = Arrays.copyOf(storageContents, PLAYER_INVENTORY_STORAGE_SIZE);
+		}
+		return storageContents;
+	}
+
+	/**
+	 * Sets the storage contents of the specified inventory.
+	 * 
+	 * @param inventory
+	 *            the inventory
+	 * @param storageContents
+	 *            the new storage contents
+	 */
+	public static void setStorageContents(Inventory inventory, ItemStack[] storageContents) {
+		assert inventory != null;
+		// storage contents are always stored at the beginning of the inventory
+		for (int slotId = 0; slotId < storageContents.length; slotId++) {
+			inventory.setItem(slotId, storageContents[slotId]);
+		}
+	}
+
+	public static List<ItemCount> countItems(ItemStack[] contents, Filter<ItemStack> filter) {
+		List<ItemCount> itemCounts = new ArrayList<ItemCount>();
+		if (contents == null) return itemCounts;
+		for (ItemStack item : contents) {
+			if (isEmpty(item)) continue;
+			if (filter != null && !filter.accept(item)) continue;
+
+			// check if we already have a counter for this type of item:
+			ItemCount itemCount = ItemCount.findSimilar(itemCounts, item);
+			if (itemCount != null) {
+				// increase item count:
+				itemCount.addAmount(item.getAmount());
+			} else {
+				// add new item entry:
+				itemCounts.add(new ItemCount(item, item.getAmount()));
 			}
 		}
 		return itemCounts;
 	}
 
 	/**
-	 * Checks if the given inventory contains at least a certain amount of items which match the specified attributes.
+	 * Checks if the given contents contains at least the specified amount of items matching the specified attributes.
 	 * 
-	 * @param inv
+	 * @param contents
+	 *            the contents to search through
 	 * @param type
-	 *            The item type.
+	 *            the item type
 	 * @param data
-	 *            The data value/durability. If -1 is is ignored.
+	 *            the data value/durability, or <code>-1</code> to ignore it
 	 * @param displayName
-	 *            The displayName. If null it is ignored.
+	 *            the displayName, or <code>null</code> to ignore it
 	 * @param lore
-	 *            The item lore. If null or empty it is ignored.
-	 * @param ignoreNameAndLore
+	 *            the item lore, or <code>null</code> or empty to ignore it
 	 * @param amount
-	 * @return
+	 *            the amount of items to look for
+	 * @return <code>true</code> if the at least specified amount of matching items was found
 	 */
-	public static boolean hasInventoryItemsAtLeast(Inventory inv, Material type, short data, String displayName, List<String> lore, int amount) {
-		for (ItemStack is : inv.getContents()) {
-			if (!Utils.isSimilar(is, type, data, displayName, lore)) continue;
-			int currentAmount = is.getAmount() - amount;
+	public static boolean containsAtLeast(ItemStack[] contents, Material type, short data, String displayName, List<String> lore, int amount) {
+		if (contents == null) return false;
+		int remainingAmount = amount;
+		for (ItemStack itemStack : contents) {
+			if (!Utils.isSimilar(itemStack, type, data, displayName, lore)) continue;
+			int currentAmount = itemStack.getAmount() - remainingAmount;
 			if (currentAmount >= 0) {
 				return true;
 			} else {
-				amount = -currentAmount;
+				remainingAmount = -currentAmount;
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Removes the specified amount of items which match the specified attributes from the given contents.
+	 * 
+	 * @param contents
+	 *            the contents
+	 * @param type
+	 *            the item type
+	 * @param data
+	 *            the data value/durability, or <code>-1</code> to ignore it
+	 * @param displayName
+	 *            the display name, or <code>null</code> to ignore it
+	 * @param lore
+	 *            the item lore, or <code>null</code> or empty to ignore it
+	 * @param amount
+	 *            the amount of matching items to remove
+	 * @return the amount of items that couldn't be removed (<code>0</code> on full success)
+	 */
+	public static int removeItems(ItemStack[] contents, Material type, short data, String displayName, List<String> lore, int amount) {
+		if (contents == null) return amount;
+		int remainingAmount = amount;
+		for (int slotId = 0; slotId < contents.length; slotId++) {
+			ItemStack itemStack = contents[slotId];
+			if (!Utils.isSimilar(itemStack, type, data, displayName, lore)) continue;
+			int newAmount = itemStack.getAmount() - remainingAmount;
+			if (newAmount > 0) {
+				itemStack.setAmount(newAmount);
+				break;
+			} else {
+				contents[slotId] = null;
+				remainingAmount = -newAmount;
+				if (remainingAmount == 0) break;
+			}
+		}
+		return remainingAmount;
 	}
 
 	/**
@@ -718,17 +780,18 @@ public class Utils {
 	 * 
 	 * <p>
 	 * This will first try to fill similar partial {@link ItemStack}s in the contents up to the item's max stack size.
-	 * Afterwards it will insert the remaining amount into empty slots, splitting at the item's max stack size.<br>
-	 * This does not modify the original item stacks. If it has to modify the amount of an item stack, it first replaces
-	 * it with a copy. So in case those item stacks are mirroring changes to their minecraft counterpart, those don't
-	 * get affected directly.
-	 * </p>
+	 * Afterwards it will insert the remaining amount into empty slots, splitting at the item's max stack size.
+	 * <p>
+	 * This does not modify the original item stacks in the given array. If it has to modify the amount of an item
+	 * stack, it first replaces it with a copy. So in case those item stacks are mirroring changes to their minecraft
+	 * counterpart, those don't get affected directly.<br>
+	 * The item being added gets copied as well before it gets inserted in an empty slot.
 	 * 
 	 * @param contents
-	 *            The contents to add the given {@link ItemStack} to.
+	 *            the contents to add the given {@link ItemStack} to
 	 * @param item
-	 *            The {@link ItemStack} to add to the given contents.
-	 * @return The amount of items which couldn't be added (0 on full success).
+	 *            the {@link ItemStack} to add
+	 * @return the amount of items which couldn't be added (<code>0</code> on full success)
 	 */
 	public static int addItems(ItemStack[] contents, ItemStack item) {
 		Validate.notNull(contents);
@@ -772,11 +835,11 @@ public class Utils {
 		// we have items remaining:
 		assert amount > 0;
 
-		// search for free slots:
+		// search for empty slots:
 		for (int slot = 0; slot < size; slot++) {
 			ItemStack slotItem = contents[slot];
 			if (isEmpty(slotItem)) {
-				// found free slot:
+				// found empty slot:
 				if (amount > maxStackSize) {
 					// add full stack:
 					ItemStack stack = item.clone();
@@ -809,10 +872,10 @@ public class Utils {
 	 * </p>
 	 * 
 	 * @param contents
-	 *            The contents to remove the given {@link ItemStack} from.
+	 *            the contents to remove the given {@link ItemStack} from
 	 * @param item
-	 *            The {@link ItemStack} to remove from the given contents.
-	 * @return The amount of items which couldn't be removed (0 on full success).
+	 *            the {@link ItemStack} to remove from the given contents
+	 * @return the amount of items which couldn't be removed (<code>0</code> on full success)
 	 */
 	public static int removeItems(ItemStack[] contents, ItemStack item) {
 		Validate.notNull(contents);
@@ -822,8 +885,7 @@ public class Utils {
 		if (amount == 0) return 0;
 
 		boolean removeAll = (amount == Integer.MAX_VALUE);
-		int size = contents.length;
-		for (int slot = 0; slot < size; slot++) {
+		for (int slot = 0; slot < contents.length; slot++) {
 			ItemStack slotItem = contents[slot];
 			if (slotItem == null) continue;
 			if (item.isSimilar(slotItem)) {
@@ -855,45 +917,64 @@ public class Utils {
 	}
 
 	/**
-	 * Removes the specified amount of items which match the specified attributes from the given inventory.
+	 * Increases the amount of the given {@link ItemStack}.
+	 * <p>
+	 * This makes sure that the itemstack's amount ends up to be at most {@link ItemStack#getMaxStackSize()}, and that
+	 * empty itemstacks are represented by <code>null</code>.
 	 * 
-	 * @param inv
-	 * @param type
-	 *            The item type.
-	 * @param data
-	 *            The data value/durability. If -1 is is ignored.
-	 * @param displayName
-	 *            The displayName. If null it is ignored.
-	 * @param lore
-	 *            The item lore. If null or empty it is ignored.
-	 * @param ignoreNameAndLore
-	 * @param amount
+	 * @param itemStack
+	 *            the itemstack, can be empty
+	 * @param amountToIncrease
+	 *            the amount to increase, can be negative to decrease
+	 * @return the resulting item, or <code>null</code> if the item ends up being empty
 	 */
-	public static void removeItemsFromInventory(Inventory inv, Material type, short data, String displayName, List<String> lore, int amount) {
-		for (ItemStack is : inv.getContents()) {
-			if (!Utils.isSimilar(is, type, data, displayName, lore)) continue;
-			int newamount = is.getAmount() - amount;
-			if (newamount > 0) {
-				is.setAmount(newamount);
-				break;
-			} else {
-				inv.remove(is);
-				amount = -newamount;
-				if (amount == 0) break;
-			}
-		}
+	public static ItemStack increaseItemAmount(ItemStack itemStack, int amountToIncrease) {
+		if (Utils.isEmpty(itemStack)) return null;
+		int newAmount = Math.min(itemStack.getAmount() + amountToIncrease, itemStack.getMaxStackSize());
+		if (newAmount <= 0) return null;
+		itemStack.setAmount(newAmount);
+		return itemStack;
+	}
+
+	/**
+	 * Decreases the amount of the given {@link ItemStack}.
+	 * <p>
+	 * This makes sure that the itemstack's amount ends up to be at most {@link ItemStack#getMaxStackSize()}, and that
+	 * empty itemstacks are represented by <code>null</code>.
+	 * 
+	 * @param itemStack
+	 *            the itemstack, can be empty
+	 * @param amountToDescrease
+	 *            the amount to decrease, can be negative to increase
+	 * @return the resulting item, or <code>null</code> if the item ends up being empty
+	 */
+	public static ItemStack descreaseItemAmount(ItemStack itemStack, int amountToDescrease) {
+		return increaseItemAmount(itemStack, -amountToDescrease);
+	}
+
+	/**
+	 * Gets an itemstack's amount and returns <code>0</code> for empty itemstacks.
+	 * 
+	 * @param itemStack
+	 *            the itemstack, can be empty
+	 * @return the itemstack's amount, or <code>0</code> if the itemstack is empty
+	 */
+	public static int getItemStackAmount(ItemStack itemStack) {
+		return (Utils.isEmpty(itemStack) ? 0 : itemStack.getAmount());
 	}
 
 	@SuppressWarnings("deprecation")
-	public static void updateInventoryLater(final Player player) {
+	public static void updateInventoryLater(Player player) {
 		Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
 
 			@Override
 			public void run() {
 				player.updateInventory();
 			}
-		}, 3L);
+		}, 3L); // TODO why exactly 3 ticks?
 	}
+
+	// value conversion utilities:
 
 	public static Integer parseInt(String intString) {
 		try {

@@ -19,7 +19,7 @@ import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.TradingRecipe;
-import com.nisovin.shopkeepers.events.ShopkeeperTradeCompletedEvent;
+import com.nisovin.shopkeepers.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -39,15 +39,15 @@ public class TradeFileLogger implements Listener {
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	void onTradeCompleted(ShopkeeperTradeCompletedEvent event) {
-		if (!Settings.enablePurchaseLogging || event.getCompletedTrade().isCancelled()) {
+	void onTradeCompleted(ShopkeeperTradeEvent event) {
+		if (!Settings.enablePurchaseLogging || event.isCancelled()) {
 			return;
 		}
 		Player player = event.getPlayer();
 		Shopkeeper shopkeeper = event.getShopkeeper();
 		String ownerString = (shopkeeper instanceof PlayerShopkeeper) ? ((PlayerShopkeeper) shopkeeper).getOwnerAsString() : "[Admin]";
 
-		TradingRecipe tradingRecipe = event.getCompletedTrade().getTradingRecipe();
+		TradingRecipe tradingRecipe = event.getTradingRecipe();
 		ItemStack resultItem = tradingRecipe.getResultItem();
 		ItemStack requiredItem1 = tradingRecipe.getItem1();
 		ItemStack requiredItem2 = tradingRecipe.getItem2();
@@ -60,10 +60,12 @@ public class TradeFileLogger implements Listener {
 			usedItem2 = null;
 		}
 
+		// TODO fully serialize the traded items? (metadata)
+		// TODO do the file writing async
 		Date now = new Date();
 		File file = new File(dataFolder, FILE_NAME_PREFIX + DATE_FORMAT.format(now) + ".csv");
+		boolean isNew = !file.exists();
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
-			boolean isNew = !file.exists();
 			if (isNew) writer.append("TIME,PLAYER,SHOP ID,SHOP TYPE,SHOP POS,OWNER,ITEM TYPE,DATA,QUANTITY,CURRENCY 1,CURRENCY 1 AMOUNT,CURRENCY 2,CURRENCY 2 AMOUNT\n");
 			writer.append("\"" + TIME_FORMAT.format(now) + "\",\"" + Utils.getPlayerAsString(player) + "\",\"" + shopkeeper.getUniqueId()
 					+ "\",\"" + shopkeeper.getType().getIdentifier() + "\",\"" + shopkeeper.getPositionString() + "\",\"" + ownerString

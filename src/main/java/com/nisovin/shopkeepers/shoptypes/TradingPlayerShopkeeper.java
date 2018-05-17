@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -42,13 +40,13 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected boolean openWindow(Player player) {
-			final TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
 			// add the shopkeeper's offers:
 			List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
-			int column = 0;
-			for (ItemCount itemCount : chestItems) {
+			for (int column = 0; column < chestItems.size() && column < TRADE_COLUMNS; column++) {
+				ItemCount itemCount = chestItems.get(column);
 				ItemStack tradedItem = itemCount.getItem(); // this item is already a copy with amount 1
 				TradingOffer offer = shopkeeper.getOffer(tradedItem);
 				if (offer != null) {
@@ -57,20 +55,16 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 					// fill in costs:
 					ItemStack item1 = offer.getItem1();
+					assert !Utils.isEmpty(item1);
+					inventory.setItem(column + 9, item1);
+
 					ItemStack item2 = offer.getItem2();
-					if (!Utils.isEmpty(item1)) {
-						inventory.setItem(column + 9, item1);
-					}
 					if (!Utils.isEmpty(item2)) {
 						inventory.setItem(column + 18, item2);
 					}
 				}
-
 				// fill in traded item:
 				inventory.setItem(column, tradedItem);
-
-				column++;
-				if (column > 8) break;
 			}
 
 			// add the special buttons:
@@ -82,16 +76,16 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected void onInventoryClick(InventoryClickEvent event, Player player) {
-			final TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			event.setCancelled(true);
-			final int slot = event.getRawSlot();
-			if (slot >= 0 && slot <= 7) {
+			int slot = event.getRawSlot();
+			if (slot >= 0 && slot < TRADE_COLUMNS) {
 				// handle changing sell stack size:
 				this.handleUpdateItemAmountOnClick(event, 1);
 			} else if ((slot >= 9 && slot <= 16) || (slot >= 18 && slot <= 25)) {
 				if (shopkeeper.clickedItem != null) {
 					// placing item:
-					final Inventory inventory = event.getInventory();
+					Inventory inventory = event.getInventory();
 					Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
 						public void run() {
 							inventory.setItem(slot, shopkeeper.clickedItem);
@@ -123,8 +117,8 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
-			final TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-			for (int column = 0; column < 8; column++) {
+			TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			for (int column = 0; column < TRADE_COLUMNS; column++) {
 				ItemStack resultItem = inventory.getItem(column);
 				if (Utils.isEmpty(resultItem)) continue; // not valid recipe column
 
@@ -160,52 +154,42 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, TradingRecipe tradingRecipe, ItemStack offered1, ItemStack offered2) {
-			super.onPurchaseClick(event, player, tradingRecipe, offered1, offered2);
-			if (event.isCancelled()) return;
-			final TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		protected boolean prepareTrade(TradeData tradeData) {
+			if (!super.prepareTrade(tradeData)) return false;
+			Player tradingPlayer = tradeData.tradingPlayer;
+			TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
-			// get chest:
-			Block chest = shopkeeper.getChest();
-			if (!Utils.isChest(chest.getType())) {
-				event.setCancelled(true);
-				return;
-			}
+			assert chestInventory != null & newChestContents != null;
 
-			// remove result item from chest:
+			// remove result items from chest contents:
 			ItemStack resultItem = tradingRecipe.getResultItem();
 			assert resultItem != null;
-			Inventory chestInventory = ((Chest) chest.getState()).getInventory();
-			ItemStack[] newChestContents = chestInventory.getContents();
 			if (Utils.removeItems(newChestContents, resultItem) != 0) {
-				event.setCancelled(true);
-				return;
+				this.debugPreventedTrade(tradingPlayer, "The shop's chest doesn't contain the required items.");
+				return false;
 			}
 
-			// add traded items to chest:
-			if (!this.addItemsToChest(newChestContents, tradingRecipe.getItem1(), offered1)
-					|| !this.addItemsToChest(newChestContents, tradingRecipe.getItem2(), offered2)) {
-				// items couldn't be added to the chest, abort the trade:
-				event.setCancelled(true);
-				return;
+			// add traded items to chest contents:
+			if (!this.addItems(newChestContents, tradingRecipe.getItem1(), tradeData.offeredItem1)
+					|| !this.addItems(newChestContents, tradingRecipe.getItem2(), tradeData.offeredItem2)) {
+				this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
+				return false;
 			}
-
-			// apply new chest contents:
-			chestInventory.setContents(newChestContents);
+			return true;
 		}
 
 		// The items the trading player gave might slightly differ from the required items,
 		// but are still accepted for the trade, depending on minecraft's item comparison and settings.
 		// Therefore we differ between require and offered items here.
-		// Returns false, if not all items could be added to the chest contents:
-		private boolean addItemsToChest(ItemStack[] newChestContents, ItemStack requiredItem, ItemStack offeredItem) {
+		// Returns false, if not all items could be added to the contents:
+		private boolean addItems(ItemStack[] contents, ItemStack requiredItem, ItemStack offeredItem) {
 			if (Utils.isEmpty(requiredItem)) return true;
 			int amountAfterTaxes = this.getAmountAfterTaxes(requiredItem.getAmount());
 			if (amountAfterTaxes > 0) {
 				ItemStack receivedItem = offeredItem.clone(); // create a copy, just in case
 				receivedItem.setAmount(amountAfterTaxes);
-				if (Utils.addItems(newChestContents, receivedItem) != 0) {
-					// couldn't add all items to the chest contents:
+				if (Utils.addItems(contents, receivedItem) != 0) {
+					// couldn't add all items to the contents:
 					return false;
 				}
 			}
@@ -274,11 +258,11 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			ItemStack resultItem = offer.getResultItem();
 			assert !Utils.isEmpty(resultItem);
 			ItemCount itemCount = ItemCount.findSimilar(chestItems, resultItem);
-			if (itemCount != null) {
-				int chestAmt = itemCount.getAmount();
-				if (chestAmt >= resultItem.getAmount()) {
-					recipes.add(offer); // TradingOffer extends TradingRecipe
-				}
+			if (itemCount == null) continue;
+
+			int itemAmountInChest = itemCount.getAmount();
+			if (itemAmountInChest >= resultItem.getAmount()) {
+				recipes.add(offer); // TradingOffer extends TradingRecipe
 			}
 		}
 		return Collections.unmodifiableList(recipes);

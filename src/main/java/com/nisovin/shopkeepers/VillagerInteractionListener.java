@@ -78,11 +78,12 @@ class VillagerInteractionListener implements Listener {
 					"{hire-item}", Settings.hireItem.name()); // TODO also print required hire item name and lore?
 			return false;
 		} else {
-			Inventory inventory = player.getInventory();
+			Inventory playerInventory = player.getInventory();
 			// check if the player has enough of those hiring items
 			int costs = Settings.hireOtherVillagersCosts;
 			if (costs > 0) {
-				if (Utils.hasInventoryItemsAtLeast(inventory, Settings.hireItem, (short) Settings.hireItemData,
+				ItemStack[] storageContents = Utils.getStorageContents(playerInventory);
+				if (Utils.containsAtLeast(storageContents, Settings.hireItem, (short) Settings.hireItemData,
 						Settings.hireItemName, Settings.hireItemLore, costs)) {
 					Log.debug("  Villager hiring: the player has the needed amount of hiring items");
 					int inHandAmount = inHand.getAmount();
@@ -93,9 +94,11 @@ class VillagerInteractionListener implements Listener {
 					} else { // remaining <= 0
 						player.setItemInHand(null); // remove item in hand
 						if (remaining < 0) {
-							// remove remaining costs from inventory
-							Utils.removeItemsFromInventory(inventory, Settings.hireItem, (short) Settings.hireItemData,
+							// remove remaining costs from inventory:
+							Utils.removeItems(storageContents, Settings.hireItem, (short) Settings.hireItemData,
 									Settings.hireItemName, Settings.hireItemLore, -remaining);
+							// apply the change to the player's inventory:
+							Utils.setStorageContents(playerInventory, storageContents);
 						}
 					}
 				} else {
@@ -106,7 +109,7 @@ class VillagerInteractionListener implements Listener {
 
 			// give player the shop creation item
 			ItemStack shopCreationItem = Settings.createShopCreationItem();
-			Map<Integer, ItemStack> remaining = inventory.addItem(shopCreationItem);
+			Map<Integer, ItemStack> remaining = playerInventory.addItem(shopCreationItem);
 			if (!remaining.isEmpty()) {
 				villager.getWorld().dropItem(villager.getLocation(), shopCreationItem);
 			}

@@ -6,10 +6,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -43,12 +42,12 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected boolean openWindow(Player player) {
-			final BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
 			// add the shopkeeper's offers:
 			List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
-			for (int column = 0; column < chestItems.size() && column < 8; column++) {
+			for (int column = 0; column < chestItems.size() && column < TRADE_COLUMNS; column++) {
 				ItemCount itemCount = chestItems.get(column);
 				ItemStack type = itemCount.getItem(); // this item is already a copy with amount 1
 				ItemStack currencyItem = null;
@@ -78,17 +77,16 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		@Override
 		protected void onInventoryClick(InventoryClickEvent event, Player player) {
 			event.setCancelled(true);
-
-			int slot = event.getRawSlot();
-			if (slot >= 0 && slot <= 7) {
+			int rawSlot = event.getRawSlot();
+			if (rawSlot >= 0 && rawSlot < TRADE_COLUMNS) {
 				// modifying cost:
-				ItemStack tradedItem = event.getInventory().getItem(slot + 18);
+				ItemStack tradedItem = event.getInventory().getItem(rawSlot + 18);
 				if (Utils.isEmpty(tradedItem)) return;
 				this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
-			} else if (slot >= 18 && slot <= 25) {
+			} else if (rawSlot >= 18 && rawSlot <= 25) {
 				// modifying bought item quantity:
 				this.handleUpdateItemAmountOnClick(event, 1);
-			} else if (slot >= 9 && slot <= 16) {
+			} else if (rawSlot >= 9 && rawSlot <= 16) {
 			} else {
 				super.onInventoryClick(event, player);
 			}
@@ -96,16 +94,16 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
-			final BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-			for (int column = 0; column < 8; column++) {
+			BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			for (int column = 0; column < TRADE_COLUMNS; column++) {
 				ItemStack tradedItem = inventory.getItem(column + 18);
-				if (!Utils.isEmpty(tradedItem)) {
-					ItemStack priceItem = inventory.getItem(column);
-					if (priceItem != null && priceItem.getType() == Settings.currencyItem && priceItem.getAmount() > 0) {
-						shopkeeper.addOffer(tradedItem, priceItem.getAmount());
-					} else {
-						shopkeeper.removeOffer(tradedItem);
-					}
+				if (Utils.isEmpty(tradedItem)) continue;
+
+				ItemStack priceItem = inventory.getItem(column);
+				if (priceItem != null && priceItem.getType() == Settings.currencyItem && priceItem.getAmount() > 0) {
+					shopkeeper.addOffer(tradedItem, priceItem.getAmount());
+				} else {
+					shopkeeper.removeOffer(tradedItem);
 				}
 			}
 		}
@@ -123,119 +121,159 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, TradingRecipe tradingRecipe, ItemStack offered1, ItemStack offered2) {
-			super.onPurchaseClick(event, player, tradingRecipe, offered1, offered2);
-			if (event.isCancelled()) return;
-			final BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		protected boolean prepareTrade(TradeData tradeData) {
+			if (!super.prepareTrade(tradeData)) return false;
+			BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			Player tradingPlayer = tradeData.tradingPlayer;
+			TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
-			// get offer for this bought item:
-			ItemStack requestedItem = tradingRecipe.getItem1();
-			PriceOffer offer = shopkeeper.getOffer(requestedItem);
+			// get offer for the bought item:
+			ItemStack boughtItem = tradingRecipe.getItem1();
+			PriceOffer offer = shopkeeper.getOffer(boughtItem);
 			if (offer == null) {
 				// this should not happen.. because the recipes were created based on the shopkeeper's offers
-				event.setCancelled(true);
-				return;
+				this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
+				return false;
 			}
 
-			int tradedItemAmount = offer.getItem().getAmount();
-			if (tradedItemAmount > requestedItem.getAmount()) {
+			// validate the found offer:
+			int expectedBoughtItemAmount = offer.getItem().getAmount();
+			if (expectedBoughtItemAmount > boughtItem.getAmount()) {
 				// this shouldn't happen .. because the recipe was created based on this offer
-				event.setCancelled(true);
-				return;
+				this.debugPreventedTrade(tradingPlayer, "The offer doesn't match the trading recipe!");
+				return false;
 			}
 
-			// get chest:
-			Block chest = shopkeeper.getChest();
-			if (!Utils.isChest(chest.getType())) {
-				event.setCancelled(true);
-				return;
+			assert chestInventory != null & newChestContents != null;
+
+			// remove currency items from chest contents:
+			int remaining = this.removeCurrency(newChestContents, offer.getPrice());
+			if (remaining > 0) {
+				this.debugPreventedTrade(tradingPlayer, "The shop's chest doesn't contain enough currency.");
+				return false;
+			} else if (remaining < 0) {
+				this.debugPreventedTrade(tradingPlayer, "The shop's chest does not have enough space to split large currency items.");
+				return false;
 			}
 
-			// remove currency from chest:
-			Inventory inventory = ((Chest) chest.getState()).getInventory();
-			ItemStack[] contents = inventory.getContents();
-			boolean removed = this.removeCurrencyFromChest(offer.getPrice(), contents);
-			if (!removed) {
-				event.setCancelled(true);
-				return;
-			}
-
-			// add items to chest:
-			int amount = this.getAmountAfterTaxes(tradedItemAmount);
-			if (amount > 0) {
+			// add bought items to chest contents:
+			int amountAfterTaxes = this.getAmountAfterTaxes(expectedBoughtItemAmount);
+			if (amountAfterTaxes > 0) {
 				// the item the trading player gave might slightly differ from the required item,
-				// but is still accepted, depending on item comparison and settings:
-				ItemStack receivedItem = offered1.clone(); // create a copy, just in case
-				receivedItem.setAmount(amount);
-				if (Utils.addItems(contents, receivedItem) != 0) {
-					event.setCancelled(true);
-					return;
+				// but is still accepted, depending on the used item comparison logic and settings:
+				ItemStack receivedItem = tradeData.offeredItem1.clone(); // create a copy, just in case
+				receivedItem.setAmount(amountAfterTaxes);
+				if (Utils.addItems(newChestContents, receivedItem) != 0) {
+					this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
+					return false;
 				}
 			}
-
-			// save chest contents:
-			inventory.setContents(contents);
+			return true;
 		}
 
-		protected boolean removeCurrencyFromChest(int amount, ItemStack[] contents) {
+		// TODO simplify this? Maybe by separating into different, general utility functions
+		// TODO support iterating in reverse order, for nicer looking chest contents?
+		// returns the amount of currency that couldn't be removed, 0 on full success, negative if too much was removed
+		protected int removeCurrency(ItemStack[] contents, int amount) {
+			Validate.notNull(contents);
+			Validate.isTrue(amount >= 0, "Amount cannot be negative!");
+			if (amount == 0) return 0;
 			int remaining = amount;
 
-			// first pass - remove currency:
-			int emptySlot = -1;
-			for (int i = 0; i < contents.length; i++) {
-				ItemStack item = contents[i];
-				if (item != null) {
-					if (Settings.isHighCurrencyItem(item) && remaining >= Settings.highCurrencyValue) {
-						int needed = remaining / Settings.highCurrencyValue;
-						int amt = item.getAmount();
-						if (amt > needed) {
-							item.setAmount(amt - needed);
-							remaining = remaining - (needed * Settings.highCurrencyValue);
+			// first pass: remove as much low currency as available from partial stacks
+			// second pass: remove as much low currency as available from full stacks
+			for (int k = 0; k < 2; k++) {
+				for (int slot = 0; slot < contents.length; slot++) {
+					ItemStack itemStack = contents[slot];
+					if (!Settings.isCurrencyItem(itemStack)) continue;
+
+					// second pass, or the itemstack is a partial one:
+					int itemAmount = itemStack.getAmount();
+					if (k == 1 || itemAmount < itemStack.getMaxStackSize()) {
+						int newAmount = (itemAmount - remaining);
+						if (newAmount > 0) {
+							// copy the item before modifying it:
+							itemStack = itemStack.clone();
+							contents[slot] = itemStack;
+							itemStack.setAmount(newAmount);
+							remaining = 0;
+							break;
 						} else {
-							contents[i] = null;
-							remaining = remaining - (amt * Settings.highCurrencyValue);
-						}
-					} else if (Settings.isCurrencyItem(item)) {
-						int amt = item.getAmount();
-						if (amt > remaining) {
-							item.setAmount(amt - remaining);
-							return true;
-						} else if (amt == remaining) {
-							contents[i] = null;
-							return true;
-						} else {
-							contents[i] = null;
-							remaining -= amt;
+							contents[slot] = null;
+							remaining = -newAmount;
+							if (newAmount == 0) {
+								break;
+							}
 						}
 					}
-				} else if (emptySlot < 0) {
-					emptySlot = i;
 				}
-				if (remaining <= 0) {
-					return true;
-				}
+				if (remaining == 0) break;
+			}
+			if (remaining == 0) return 0;
+
+			if (!Settings.isHighCurrencyEnabled()) {
+				// we couldn't remove all currency:
+				return remaining;
 			}
 
-			// second pass - try to make change:
-			if (remaining > 0 && remaining <= Settings.highCurrencyValue && Settings.highCurrencyItem != Material.AIR && emptySlot >= 0) {
-				for (int i = 0; i < contents.length; i++) {
-					ItemStack item = contents[i];
-					if (Settings.isHighCurrencyItem(item)) {
-						if (item.getAmount() == 1) {
-							contents[i] = null;
+			int remainingHigh = (int) Math.ceil((double) remaining / Settings.highCurrencyValue);
+			// we rounded the high currency up, so if this is negative now, it represents the remaining change which
+			// needs to be added back:
+			remaining -= (remainingHigh * Settings.highCurrencyValue);
+			assert remaining <= 0;
+
+			// first pass: remove high currency from partial stacks
+			// second pass: remove high currency from full stacks
+			for (int k = 0; k < 2; k++) {
+				for (int slot = 0; slot < contents.length; slot++) {
+					ItemStack itemStack = contents[slot];
+					if (!Settings.isHighCurrencyItem(itemStack)) continue;
+
+					// second pass, or the itemstack is a partial one:
+					int itemAmount = itemStack.getAmount();
+					if (k == 1 || itemAmount < itemStack.getMaxStackSize()) {
+						int newAmount = (itemAmount - remainingHigh);
+						if (newAmount > 0) {
+							// copy the item before modifying it:
+							itemStack = itemStack.clone();
+							contents[slot] = itemStack;
+							itemStack.setAmount(newAmount);
+							remainingHigh = 0;
+							break;
 						} else {
-							item.setAmount(item.getAmount() - 1);
+							contents[slot] = null;
+							remainingHigh = -newAmount;
+							if (newAmount == 0) {
+								break;
+							}
 						}
-						int stackSize = Settings.highCurrencyValue - remaining;
-						if (stackSize > 0) {
-							contents[emptySlot] = Settings.createCurrencyItem(stackSize);
-						}
-						return true;
 					}
 				}
+				if (remainingHigh == 0) break;
 			}
 
-			return false;
+			remaining += (remainingHigh * Settings.highCurrencyValue);
+			if (remaining >= 0) {
+				return remaining;
+			}
+			assert remaining < 0; // we have some change left
+			remaining = -remaining; // the change is now represented as positive value
+
+			// add the remaining change into empty slots (all partial slots have already been cleared above):
+			// TODO this could probably be replaced with Utils.addItems
+			int maxStackSize = Settings.currencyItem.getMaxStackSize();
+			for (int slot = 0; slot < contents.length; slot++) {
+				ItemStack itemStack = contents[slot];
+				if (!Utils.isEmpty(itemStack)) continue;
+
+				int stackSize = Math.min(remaining, maxStackSize);
+				contents[slot] = Settings.createCurrencyItem(stackSize);
+				remaining -= stackSize;
+				if (remaining == 0) break;
+			}
+			// we removed too much, represent as negative value:
+			remaining = -remaining;
+			return remaining;
 		}
 	}
 
@@ -303,13 +341,15 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	public List<TradingRecipe> getTradingRecipes(Player player) {
 		List<TradingRecipe> recipes = new ArrayList<TradingRecipe>();
 		List<ItemCount> chestItems = this.getItemsFromChest();
-		int chestTotal = this.getCurrencyInChest();
+		int currencyInChest = this.getCurrencyInChest();
 		for (PriceOffer offer : this.getOffers()) {
 			ItemStack tradedItem = offer.getItem();
 			ItemCount itemCount = ItemCount.findSimilar(chestItems, tradedItem);
-			if (itemCount != null) {
-				if (chestTotal >= offer.getPrice()) {
-					TradingRecipe recipe = this.createBuyingRecipe(tradedItem, offer.getPrice());
+			if (itemCount == null) continue;
+
+			if (currencyInChest >= offer.getPrice()) {
+				TradingRecipe recipe = this.createBuyingRecipe(tradedItem, offer.getPrice());
+				if (recipe != null) {
 					recipes.add(recipe);
 				}
 			}

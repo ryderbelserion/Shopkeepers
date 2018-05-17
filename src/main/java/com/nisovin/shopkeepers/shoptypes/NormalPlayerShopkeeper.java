@@ -1,23 +1,18 @@
 package com.nisovin.shopkeepers.shoptypes;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
@@ -45,13 +40,13 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected boolean openWindow(Player player) {
-			final NormalPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			NormalPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
 			// add offers:
 			List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
-			int column = 0;
-			for (ItemCount itemCount : chestItems) {
+			for (int column = 0; column < chestItems.size() && column < TRADE_COLUMNS; column++) {
+				ItemCount itemCount = chestItems.get(column);
 				ItemStack item = itemCount.getItem(); // this item is already a copy with amount 1
 				int price = 0;
 				PriceOffer offer = shopkeeper.getOffer(item);
@@ -60,12 +55,9 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 					item.setAmount(offer.getItem().getAmount());
 				}
 
-				// add offer to inventory:
+				// add offer to editor inventory:
 				inventory.setItem(column, item);
 				this.setEditColumnCost(inventory, column, price);
-
-				column++;
-				if (column > 8) break;
 			}
 
 			// add the special buttons:
@@ -78,7 +70,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		@Override
 		protected void onInventoryClick(InventoryClickEvent event, Player player) {
 			event.setCancelled(true);
-			if (event.getRawSlot() >= 0 && event.getRawSlot() <= 7) {
+			if (event.getRawSlot() >= 0 && event.getRawSlot() < TRADE_COLUMNS) {
 				// handle changing sell stack size:
 				this.handleUpdateItemAmountOnClick(event, 1);
 			} else {
@@ -88,8 +80,8 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
-			final NormalPlayerShopkeeper shopkeeper = this.getShopkeeper();
-			for (int column = 0; column < 8; column++) {
+			NormalPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			for (int column = 0; column < TRADE_COLUMNS; column++) {
 				ItemStack tradedItem = inventory.getItem(column);
 				if (!Utils.isEmpty(tradedItem)) {
 					int price = this.getPriceFromColumn(inventory, column);
@@ -116,76 +108,59 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, TradingRecipe tradingRecipe, ItemStack offered1, ItemStack offered2) {
-			super.onPurchaseClick(event, player, tradingRecipe, offered1, offered2);
-			if (event.isCancelled()) return;
-			final NormalPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		protected boolean prepareTrade(TradeData tradeData) {
+			if (!super.prepareTrade(tradeData)) return false;
+			NormalPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			Player tradingPlayer = tradeData.tradingPlayer;
+			TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
 			// get offer for this type of item:
-			ItemStack resultItem = tradingRecipe.getResultItem();
-			PriceOffer offer = shopkeeper.getOffer(resultItem);
+			ItemStack soldItem = tradingRecipe.getResultItem();
+			PriceOffer offer = shopkeeper.getOffer(soldItem);
 			if (offer == null) {
 				// this should not happen.. because the recipes were created based on the shopkeeper's offers
-				event.setCancelled(true);
-				return;
+				this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
+				return false;
 			}
 
-			int tradedItemAmount = offer.getItem().getAmount();
-			if (tradedItemAmount != resultItem.getAmount()) {
+			// validate the found offer:
+			int expectedSoldItemAmount = offer.getItem().getAmount();
+			if (expectedSoldItemAmount != soldItem.getAmount()) {
 				// this shouldn't happen .. because the recipe was created based on this offer
-				event.setCancelled(true);
-				return;
+				this.debugPreventedTrade(tradingPlayer, "The offer doesn't match the trading recipe!");
+				return false;
 			}
 
-			// get chest:
-			Block chest = shopkeeper.getChest();
-			if (!Utils.isChest(chest.getType())) {
-				event.setCancelled(true);
-				return;
+			assert chestInventory != null & newChestContents != null;
+
+			// remove result items from chest contents:
+			if (Utils.removeItems(newChestContents, soldItem) != 0) {
+				this.debugPreventedTrade(tradingPlayer, "The shop's chest doesn't contain the required items.");
+				return false;
 			}
 
-			// remove result items from chest:
-			Inventory inventory = ((Chest) chest.getState()).getInventory();
-			ItemStack[] contents = inventory.getContents();
-			contents = Arrays.copyOf(contents, contents.length);
-			if (Utils.removeItems(contents, resultItem) != 0) {
-				Log.debug("Chest does not contain the required items.");
-				event.setCancelled(true);
-				return;
-			}
-
-			// add earnings to chest:
+			// add earnings to chest contents:
 			// TODO maybe add the actual items the trading player gave, instead of creating new currency items?
-			int amount = this.getAmountAfterTaxes(offer.getPrice());
-			if (amount > 0) {
-				if (Settings.highCurrencyItem == Material.AIR || offer.getPrice() <= Settings.highCurrencyMinCost) {
-					if (Utils.addItems(contents, Settings.createCurrencyItem(amount)) != 0) {
-						Log.debug("Chest cannot hold the given items.");
-						event.setCancelled(true);
-						return;
+			int amountAfterTaxes = this.getAmountAfterTaxes(offer.getPrice());
+			if (amountAfterTaxes > 0) {
+				// TODO always store the currency in the most compressed form possible, regardless of
+				// 'highCurrencyMinCost'?
+				int remaining = amountAfterTaxes;
+				if (Settings.isHighCurrencyEnabled() || remaining > Settings.highCurrencyMinCost) {
+					int highCurrencyAmount = (remaining / Settings.highCurrencyValue);
+					if (highCurrencyAmount > 0) {
+						int remainingHighCurrency = Utils.addItems(newChestContents, Settings.createHighCurrencyItem(highCurrencyAmount));
+						remaining -= ((highCurrencyAmount - remainingHighCurrency) * Settings.highCurrencyValue);
 					}
-				} else {
-					int highCost = amount / Settings.highCurrencyValue;
-					int lowCost = amount % Settings.highCurrencyValue;
-					if (highCost > 0) {
-						if (Utils.addItems(contents, Settings.createHighCurrencyItem(highCost)) != 0) {
-							Log.debug("Chest cannot hold the given items.");
-							event.setCancelled(true);
-							return;
-						}
-					}
-					if (lowCost > 0) {
-						if (Utils.addItems(contents, Settings.createCurrencyItem(lowCost)) != 0) {
-							Log.debug("Chest cannot hold the given items.");
-							event.setCancelled(true);
-							return;
-						}
+				}
+				if (remaining > 0) {
+					if (Utils.addItems(newChestContents, Settings.createCurrencyItem(remaining)) != 0) {
+						this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
+						return false;
 					}
 				}
 			}
-
-			// save chest contents:
-			inventory.setContents(contents);
+			return true;
 		}
 	}
 
@@ -254,13 +229,13 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		for (PriceOffer offer : this.getOffers()) {
 			ItemStack tradedItem = offer.getItem();
 			ItemCount itemCount = ItemCount.findSimilar(chestItems, tradedItem);
-			if (itemCount != null) {
-				int chestAmt = itemCount.getAmount();
-				if (chestAmt >= offer.getItem().getAmount()) {
-					TradingRecipe recipe = this.createSellingRecipe(tradedItem, offer.getPrice());
-					if (recipe != null) {
-						recipes.add(recipe);
-					}
+			if (itemCount == null) continue;
+
+			int itemAmountInChest = itemCount.getAmount();
+			if (itemAmountInChest >= offer.getItem().getAmount()) {
+				TradingRecipe recipe = this.createSellingRecipe(tradedItem, offer.getPrice());
+				if (recipe != null) {
+					recipes.add(recipe);
 				}
 			}
 		}

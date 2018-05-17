@@ -22,6 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
+import com.nisovin.shopkeepers.util.Utils;
 
 @SuppressWarnings("rawtypes")
 public final class FailedHandler implements NMSCallProvider {
@@ -45,7 +46,7 @@ public final class FailedHandler implements NMSCallProvider {
 	Class craftInventory;
 	Method craftInventoryGetInventory;
 	Class classNMSItemStack;
-	Field tagField;
+	Method getTagMethod;
 
 	Class classCraftItemStack;
 	Method asNMSCopyMethod;
@@ -66,6 +67,10 @@ public final class FailedHandler implements NMSCallProvider {
 
 	Class classEntity;
 	Field worldField;
+
+	Class classGameProfileSerializer;
+	Class classNBTBase;
+	Method areNBTMatchingMethod;
 
 	@SuppressWarnings("unchecked")
 	public FailedHandler() throws Exception {
@@ -97,7 +102,7 @@ public final class FailedHandler implements NMSCallProvider {
 		setCustomNameMethod = classEntityInsentient.getMethod("setCustomName", String.class);
 
 		classNMSItemStack = Class.forName(nmsPackageString + "ItemStack");
-		tagField = classNMSItemStack.getDeclaredField("tag");
+		getTagMethod = classNMSItemStack.getDeclaredMethod("getTag");
 
 		classCraftItemStack = Class.forName(obcPackageString + "inventory.CraftItemStack");
 		asNMSCopyMethod = classCraftItemStack.getDeclaredMethod("asNMSCopy", ItemStack.class);
@@ -125,6 +130,10 @@ public final class FailedHandler implements NMSCallProvider {
 
 		classEntity = Class.forName(nmsPackageString + "Entity");
 		worldField = classEntity.getDeclaredField("world");
+
+		classGameProfileSerializer = Class.forName(nmsPackageString + "GameProfileSerializer");
+		classNBTBase = Class.forName(nmsPackageString + "NBTBase");
+		areNBTMatchingMethod = classGameProfileSerializer.getDeclaredMethod("a", classNBTBase, classNBTBase, boolean.class);
 	}
 
 	@Override
@@ -262,5 +271,27 @@ public final class FailedHandler implements NMSCallProvider {
 	public EntityType getSpawnEggEntityType(ItemStack spawnEggItem) {
 		// not supported
 		return null;
+	}
+
+	@Override
+	public boolean matches(ItemStack provided, ItemStack required) {
+		if (provided == required) return true;
+		// if the required item is empty, then the provided item has to be empty as well:
+		if (Utils.isEmpty(required)) return Utils.isEmpty(provided);
+		else if (Utils.isEmpty(provided)) return false;
+		if (provided.getType() != required.getType()) return false;
+		if (provided.getDurability() != required.getDurability()) return false;
+		try {
+			Object nmsProvided = asNMSCopyMethod.invoke(null, provided);
+			Object nmsRequired = asNMSCopyMethod.invoke(null, required);
+			Object providedTag = getTagMethod.invoke(nmsProvided);
+			Object requiredTag = getTagMethod.invoke(nmsRequired);
+			return (Boolean) areNBTMatchingMethod.invoke(null, requiredTag, providedTag, false);
+		} catch (Exception e) {
+			// fallback: checking for metadata equality
+			// note: in this case the behavior of this method is no longer equivalent to minecraft's item comparison
+			// behavior!
+			return provided.isSimilar(required);
+		}
 	}
 }

@@ -8,7 +8,6 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -52,12 +51,12 @@ public class AdminShopkeeper extends Shopkeeper {
 
 		@Override
 		protected boolean openWindow(Player player) {
-			final AdminShopkeeper shopkeeper = this.getShopkeeper();
+			AdminShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
 			// add the shopkeeper's trade offers:
 			List<TradingOffer> offers = shopkeeper.getOffers();
-			for (int column = 0; column < offers.size() && column < 8; column++) {
+			for (int column = 0; column < offers.size() && column < TRADE_COLUMNS; column++) {
 				TradingOffer offer = offers.get(column);
 				inventory.setItem(column, offer.getItem1());
 				inventory.setItem(column + 9, offer.getItem2());
@@ -72,9 +71,9 @@ public class AdminShopkeeper extends Shopkeeper {
 
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
-			final AdminShopkeeper shopkeeper = this.getShopkeeper();
+			AdminShopkeeper shopkeeper = this.getShopkeeper();
 			shopkeeper.clearOffers();
-			for (int column = 0; column < 8; column++) {
+			for (int column = 0; column < TRADE_COLUMNS; column++) {
 				ItemStack cost1 = Utils.getNullIfEmpty(inventory.getItem(column));
 				ItemStack cost2 = Utils.getNullIfEmpty(inventory.getItem(column + 9));
 				ItemStack resultItem = Utils.getNullIfEmpty(inventory.getItem(column + 18));
@@ -120,17 +119,10 @@ public class AdminShopkeeper extends Shopkeeper {
 			if (!super.canOpen(player)) return false;
 			String tradePermission = this.getShopkeeper().getTradePremission();
 			if (tradePermission != null && !Utils.hasPermission(player, tradePermission)) {
-				Log.debug("Blocked trade window opening from " + player.getName() + ": missing custom trade permission");
+				Log.debug("Blocked trade window opening from " + player.getName() + ": Missing custom trade permission.");
 				Utils.sendMessage(player, Settings.msgMissingCustomTradePerm);
 				return false;
 			}
-			return true;
-		}
-
-		@Override
-		protected boolean isShiftTradeAllowed(InventoryClickEvent event) {
-			// admin shop has unlimited stock and we don't need to move items around, so we can safely allow shift
-			// trading:
 			return true;
 		}
 	}

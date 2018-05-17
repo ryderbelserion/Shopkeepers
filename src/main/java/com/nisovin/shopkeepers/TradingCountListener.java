@@ -20,12 +20,15 @@ import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.util.Utils;
 
 /**
- * Tries to accurately detect individual trades by listening to corresponding changes of the TRADED_WITH_VILLAGER
- * statistic for a short period of time right after a player has clicked inside the inventories with open merchant
+ * Tries to accurately detect individual trades handled by minecraft by listening to corresponding changes of the
+ * TRADED_WITH_VILLAGER statistic for a short period of time right after a player has clicked inside the merchant
  * inventory view.
  * <p>
- * This cannot be used for handling the trades, because at that point the trading and player inventories were already
- * (at least partly) modified. It can however be useful for debugging purposes.
+ * This cannot be used for handling or canceling the trades, because at that point the trading and player inventory was
+ * already (at least partly) modified. It can however be useful for debugging purposes.
+ * <p>
+ * Since shopkeepers handles its trades on its own, only trades with vanilla villagers get detected here. This can
+ * currently be used to debug and compare vanilla trading behavior with Shopkeeper's trading behavior.
  */
 class TradingCountListener implements Listener {
 
@@ -40,7 +43,7 @@ class TradingCountListener implements Listener {
 	};
 
 	private Player tradingPlayer = null;
-	private int tradeCount = 0;
+	private int tradeCounter = 0;
 	private BukkitTask stopListeningTask = null;
 
 	TradingCountListener(ShopkeepersPlugin plugin) {
@@ -49,16 +52,16 @@ class TradingCountListener implements Listener {
 
 	private void startListeningForTrades(Player tradingPlayer) {
 		this.stopListeningForTrades();
-		Log.debug("Listening for trades of player " + tradingPlayer.getName() + " ..");
+		Log.debug("Listening for non-shopkeeper trades of player " + tradingPlayer.getName() + " ..");
 		this.tradingPlayer = tradingPlayer;
 		stopListeningTask = Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), stopListeningAction);
 	}
 
 	private void stopListeningForTrades() {
 		if (tradingPlayer == null) return;
-		Log.debug(".. Stopped listening for trades.");
+		Log.debug(".. Stopped listening for non-shopkeeper trades.");
 		tradingPlayer = null;
-		tradeCount = 0;
+		tradeCounter = 0;
 		if (stopListeningTask != null) {
 			stopListeningTask.cancel();
 			stopListeningTask = null;
@@ -72,10 +75,9 @@ class TradingCountListener implements Listener {
 		if (!(event.getInventory() instanceof MerchantInventory)) return;
 		Player player = (Player) event.getWhoClicked();
 		UIType uiType = plugin.getUIManager().getOpenInterface(player);
-		if (uiType != DefaultUIs.TRADING_WINDOW) return; // trading with a non-shopkeeper merchant
+		if (uiType == DefaultUIs.TRADING_WINDOW) return; // trading with a shopkeeper, which handles trades on its own
 
 		MerchantInventory inventory = (MerchantInventory) event.getInventory();
-
 		ItemStack resultItem = inventory.getItem(2);
 		if (Utils.isEmpty(resultItem)) {
 			return; // no trade available, ignoring
@@ -99,24 +101,24 @@ class TradingCountListener implements Listener {
 		// sanity checks:
 		int delta = (event.getNewValue() - event.getPreviousValue());
 		if (delta != 1) {
-			Log.debug("Trading-statistic-change: Expected statistic change of 1, but got " + delta);
+			Log.debug("Non-shopkeeper trade detection: Expected trading statistic change of 1, but got " + delta);
 			return;
 		}
 		Inventory inventory = player.getOpenInventory().getTopInventory();
 		if (!(inventory instanceof MerchantInventory)) {
-			Log.debug("Trading-statistic-change: Expected open merchant inventory, but got " + inventory.getType());
+			Log.debug("Non-shopkeeper trade detection: Expected open merchant inventory, but got " + inventory.getType());
 			return;
 		}
 
 		MerchantInventory merchantInventory = (MerchantInventory) inventory;
-		// find the recipe minecraft is using for the trade (active recipe gets changed after the statistic change):
+		// find the recipe minecraft is using for the trade (the active recipe gets updated after the statistic change):
 		TradingRecipe usedRecipe = NMSManager.getProvider().getUsedTradingRecipe(merchantInventory);
 		if (usedRecipe == null) {
-			Log.debug("Trading-statistic-change: Couldn't find used recipe.");
+			Log.debug("Non-shopkeeper trade detection: Couldn't find the used trading recipe.");
 			return;
 		}
 
-		tradeCount++;
-		Log.debug("Detected trade (#" + tradeCount + "): " + Utils.getSimpleRecipeInfo(usedRecipe));
+		tradeCounter++;
+		Log.debug("Detected non-shopkeeper trade (#" + tradeCounter + "): " + Utils.getSimpleRecipeInfo(usedRecipe));
 	}
 }

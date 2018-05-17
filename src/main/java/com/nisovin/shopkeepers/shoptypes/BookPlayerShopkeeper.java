@@ -45,50 +45,57 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 
 		@Override
 		protected boolean openWindow(Player player) {
-			final BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
-			Inventory inv = Bukkit.createInventory(player, 27, Settings.editorTitle);
+			BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
+
+			// add offers:
 			List<ItemStack> books = shopkeeper.getBooksFromChest();
-			for (int column = 0; column < books.size() && column < 8; column++) {
+			for (int column = 0; column < books.size() && column < TRADE_COLUMNS; column++) {
 				String bookTitle = getTitleOfBook(books.get(column));
-				if (bookTitle != null) {
-					int price = 0;
-					BookOffer offer = shopkeeper.getOffer(bookTitle);
-					if (offer != null) {
-						price = offer.getPrice();
-					}
-					inv.setItem(column, books.get(column));
-					this.setEditColumnCost(inv, column, price);
+				if (bookTitle == null) {
+					// allow another book to take its place:
+					column--;
+					continue;
 				}
+
+				// add offer to editor inventory:
+				int price = 0;
+				BookOffer offer = shopkeeper.getOffer(bookTitle);
+				if (offer != null) {
+					price = offer.getPrice();
+				}
+				inventory.setItem(column, books.get(column));
+				this.setEditColumnCost(inventory, column, price);
 			}
 
 			// add the special buttons:
-			this.setActionButtons(inv);
+			this.setActionButtons(inventory);
 			// show editing inventory:
-			player.openInventory(inv);
+			player.openInventory(inventory);
 			return true;
 		}
 
 		@Override
 		protected void onInventoryClick(InventoryClickEvent event, Player player) {
-			event.setCancelled(true);
 			super.onInventoryClick(event, player);
 		}
 
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
-			final BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
-			for (int column = 0; column < 8; column++) {
+			BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			for (int column = 0; column < TRADE_COLUMNS; column++) {
 				ItemStack item = inventory.getItem(column);
-				if (!Utils.isEmpty(item) && item.getType() == Material.WRITTEN_BOOK) {
-					String bookTitle = getTitleOfBook(item);
-					if (bookTitle != null) {
-						int price = this.getPriceFromColumn(inventory, column);
-						if (price > 0) {
-							shopkeeper.addOffer(bookTitle, price);
-						} else {
-							shopkeeper.removeOffer(bookTitle);
-						}
-					}
+				if (Utils.isEmpty(item) || item.getType() != Material.WRITTEN_BOOK) {
+					continue;
+				}
+				String bookTitle = getTitleOfBook(item);
+				if (bookTitle == null) continue;
+
+				int price = this.getPriceFromColumn(inventory, column);
+				if (price > 0) {
+					shopkeeper.addOffer(bookTitle, price);
+				} else {
+					shopkeeper.removeOffer(bookTitle);
 				}
 			}
 		}
@@ -106,74 +113,74 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 		}
 
 		@Override
-		protected void onPurchaseClick(InventoryClickEvent event, Player player, TradingRecipe tradingRecipe, ItemStack offered1, ItemStack offered2) {
-			super.onPurchaseClick(event, player, tradingRecipe, offered1, offered2);
-			if (event.isCancelled()) return;
-			final BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		protected boolean prepareTrade(TradeData tradeData) {
+			if (!super.prepareTrade(tradeData)) return false;
+			BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			Player tradingPlayer = tradeData.tradingPlayer;
+			TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
 			ItemStack bookItem = tradingRecipe.getResultItem();
 			String bookTitle = getTitleOfBook(bookItem);
 			if (bookTitle == null) {
 				// this should not happen.. because the recipes were created based on the shopkeeper's offers
-				event.setCancelled(true);
-				return;
+				this.debugPreventedTrade(tradingPlayer, "Couldn't determine the book title of the traded item!");
+				return false;
 			}
 
-			// get chest:
-			Block chest = shopkeeper.getChest();
-			if (!Utils.isChest(chest.getType())) {
-				event.setCancelled(true);
-				return;
-			}
-
-			// remove blank book from chest:
-			boolean removed = false;
-			Inventory inv = ((Chest) chest.getState()).getInventory();
-			ItemStack[] contents = inv.getContents();
-			for (int i = 0; i < contents.length; i++) {
-				if (contents[i] != null && contents[i].getType() == Material.BOOK_AND_QUILL) {
-					if (contents[i].getAmount() == 1) {
-						contents[i] = null;
-					} else {
-						contents[i].setAmount(contents[i].getAmount() - 1);
-					}
-					removed = true;
-					break;
-				}
-			}
-			if (!removed) {
-				event.setCancelled(true);
-				return;
-			}
-
-			// get price:
+			// get offer for this type of item:
 			BookOffer offer = shopkeeper.getOffer(bookTitle);
 			if (offer == null) {
-				event.setCancelled(true);
-				return;
-			}
-			int price = this.getAmountAfterTaxes(offer.getPrice());
-
-			// add earnings to chest:
-			if (price > 0) {
-				int highCost = price / Settings.highCurrencyValue;
-				int lowCost = price % Settings.highCurrencyValue;
-				if (highCost > 0) {
-					if (Utils.addItems(contents, Settings.createHighCurrencyItem(highCost)) != 0) {
-						event.setCancelled(true);
-						return;
-					}
-				}
-				if (lowCost > 0) {
-					if (Utils.addItems(contents, Settings.createCurrencyItem(lowCost)) != 0) {
-						event.setCancelled(true);
-						return;
-					}
-				}
+				// this should not happen.. because the recipes were created based on the shopkeeper's offers
+				this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
+				return false;
 			}
 
-			// set chest contents:
-			inv.setContents(contents);
+			assert chestInventory != null & newChestContents != null;
+
+			// remove blank book from chest contents:
+			boolean removed = false;
+			for (int slot = 0; slot < newChestContents.length; slot++) {
+				ItemStack itemStack = newChestContents[slot];
+				if (Utils.isEmpty(itemStack)) continue;
+				if (itemStack.getType() != Material.BOOK_AND_QUILL) continue;
+
+				int newAmount = itemStack.getAmount() - 1;
+				assert newAmount >= 0;
+				if (newAmount == 0) {
+					newChestContents[slot] = null;
+				} else {
+					// copy the item before modifying it:
+					itemStack = itemStack.clone();
+					newChestContents[slot] = itemStack;
+					itemStack.setAmount(newAmount);
+				}
+				removed = true;
+				break;
+			}
+			if (!removed) {
+				this.debugPreventedTrade(tradingPlayer, "The shop's chest doesn't contain any book-and-quill items.");
+				return false;
+			}
+
+			// add earnings to chest contents:
+			int amountAfterTaxes = this.getAmountAfterTaxes(offer.getPrice());
+			if (amountAfterTaxes > 0) {
+				int remaining = amountAfterTaxes;
+				if (Settings.isHighCurrencyEnabled() || remaining > Settings.highCurrencyMinCost) {
+					int highCurrencyAmount = (remaining / Settings.highCurrencyValue);
+					if (highCurrencyAmount > 0) {
+						int remainingHighCurrency = Utils.addItems(newChestContents, Settings.createHighCurrencyItem(highCurrencyAmount));
+						remaining -= ((highCurrencyAmount - remainingHighCurrency) * Settings.highCurrencyValue);
+					}
+				}
+				if (remaining > 0) {
+					if (Utils.addItems(newChestContents, Settings.createCurrencyItem(remaining)) != 0) {
+						this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
+						return false;
+					}
+				}
+			}
+			return true;
 		}
 	}
 
@@ -235,11 +242,11 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 				assert !Utils.isEmpty(bookItem);
 				String bookTitle = getTitleOfBook(bookItem); // can be null
 				BookOffer offer = this.getOffer(bookTitle);
-				if (offer != null) {
-					TradingRecipe recipe = this.createSellingRecipe(bookItem.clone(), offer.getPrice());
-					if (recipe != null) {
-						recipes.add(recipe);
-					}
+				if (offer == null) continue;
+
+				TradingRecipe recipe = this.createSellingRecipe(bookItem.clone(), offer.getPrice());
+				if (recipe != null) {
+					recipes.add(recipe);
 				}
 			}
 		}
@@ -249,12 +256,12 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 	private List<ItemStack> getBooksFromChest() {
 		List<ItemStack> list = new ArrayList<ItemStack>();
 		Block chest = this.getChest();
-		if (Utils.isChest(chest.getType())) {
-			Inventory inv = ((Chest) chest.getState()).getInventory();
-			for (ItemStack item : inv.getContents()) {
-				if (!Utils.isEmpty(item) && item.getType() == Material.WRITTEN_BOOK && this.isBookAuthoredByShopOwner(item)) {
-					list.add(item);
-				}
+		if (!Utils.isChest(chest.getType())) return list;
+		Inventory chestInventory = ((Chest) chest.getState()).getInventory();
+		for (ItemStack item : chestInventory.getContents()) {
+			if (Utils.isEmpty(item)) continue;
+			if (item.getType() == Material.WRITTEN_BOOK && this.isBookAuthoredByShopOwner(item)) {
+				list.add(item);
 			}
 		}
 		return list;
