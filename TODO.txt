@@ -14,6 +14,7 @@ Low priority:
 * Change amount-per-click from 10 to 8 when clicking items in the player shopkeeper editor? (feels more intuitive due to minecraft's stack sizes)
 * Compress currency items in the chest (low currency to high currency)? To maximize available storage capacity. This would also mean that the usage of the high-currency-min-cost setting would be limited to creating the trading recipes, and not be used when adding currency items to the shop chests.
 * Maybe prevent any unrecognised types of clicks if running in compatibility mode? To reduce the risk of minecraft updates with new clicking actions causing issues.
+* Refactor command handling.
 
 Ideas:
 * Per-Trade/Shopkeeper settings, maybe via written books:<br>
