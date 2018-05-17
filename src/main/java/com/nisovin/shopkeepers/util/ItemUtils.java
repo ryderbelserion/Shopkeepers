@@ -550,6 +550,6 @@ public class ItemUtils {
 			public void run() {
 				player.updateInventory();
 			}
-		}, 3L); // TODO why exactly 3 ticks?
+		}, 1L);
 	}
 }
