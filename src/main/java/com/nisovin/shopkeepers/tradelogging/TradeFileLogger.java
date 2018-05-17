@@ -20,6 +20,7 @@ import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -54,8 +55,8 @@ public class TradeFileLogger implements Listener {
 
 		Inventory inventory = event.getClickEvent().getInventory();
 		ItemStack usedItem1 = inventory.getItem(0);
-		ItemStack usedItem2 = Utils.getNullIfEmpty(inventory.getItem(1));
-		if (Utils.isEmpty(usedItem1)) {
+		ItemStack usedItem2 = ItemUtils.getNullIfEmpty(inventory.getItem(1));
+		if (ItemUtils.isEmpty(usedItem1)) {
 			usedItem1 = usedItem2;
 			usedItem2 = null;
 		}

@@ -9,6 +9,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -23,7 +24,7 @@ class ChestListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
-		if (Utils.isChest(block.getType())) {
+		if (ItemUtils.isChest(block.getType())) {
 			plugin.onChestPlacement(event.getPlayer(), block);
 		}
 	}
@@ -33,7 +34,7 @@ class ChestListener implements Listener {
 		// prevent opening shop chests
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 		Block block = event.getClickedBlock();
-		if (event.hasBlock() && Utils.isChest(block.getType())) {
+		if (event.hasBlock() && ItemUtils.isChest(block.getType())) {
 			Player player = event.getPlayer();
 
 			// check for protected chest

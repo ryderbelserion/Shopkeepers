@@ -17,8 +17,8 @@ import org.bukkit.scheduler.BukkitTask;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
 
 /**
  * Tries to accurately detect individual trades handled by minecraft by listening to corresponding changes of the
@@ -80,7 +80,7 @@ class TradingCountListener implements Listener {
 
 		MerchantInventory inventory = (MerchantInventory) event.getInventory();
 		ItemStack resultItem = inventory.getItem(2);
-		if (Utils.isEmpty(resultItem)) {
+		if (ItemUtils.isEmpty(resultItem)) {
 			return; // no trade available, ignoring
 		}
 		TradingRecipe usedRecipe = NMSManager.getProvider().getUsedTradingRecipe(inventory);
@@ -120,6 +120,6 @@ class TradingCountListener implements Listener {
 		}
 
 		tradeCounter++;
-		Log.debug("Detected non-shopkeeper trade (#" + tradeCounter + "): " + Utils.getSimpleRecipeInfo(usedRecipe));
+		Log.debug("Detected non-shopkeeper trade (#" + tradeCounter + "): " + ItemUtils.getSimpleRecipeInfo(usedRecipe));
 	}
 }

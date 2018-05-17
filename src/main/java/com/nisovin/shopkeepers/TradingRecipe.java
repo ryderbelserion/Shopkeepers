@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers;
 import org.apache.commons.lang.Validate;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 
 /**
  * An unmodifiable trading recipe.
@@ -15,11 +15,11 @@ public class TradingRecipe {
 	private final ItemStack item2; // can be null
 
 	public TradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		Validate.isTrue(!Utils.isEmpty(resultItem), "Result item cannot be empty!");
-		Validate.isTrue(!Utils.isEmpty(item1), "Item1 cannot be empty!");
+		Validate.isTrue(!ItemUtils.isEmpty(resultItem), "Result item cannot be empty!");
+		Validate.isTrue(!ItemUtils.isEmpty(item1), "Item1 cannot be empty!");
 		this.resultItem = resultItem.clone();
 		this.item1 = item1.clone();
-		this.item2 = Utils.isEmpty(item2) ? null : item2.clone();
+		this.item2 = ItemUtils.isEmpty(item2) ? null : item2.clone();
 	}
 
 	/**

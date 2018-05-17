@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -74,9 +75,9 @@ public class AdminShopkeeper extends Shopkeeper {
 			AdminShopkeeper shopkeeper = this.getShopkeeper();
 			shopkeeper.clearOffers();
 			for (int column = 0; column < TRADE_COLUMNS; column++) {
-				ItemStack cost1 = Utils.getNullIfEmpty(inventory.getItem(column));
-				ItemStack cost2 = Utils.getNullIfEmpty(inventory.getItem(column + 9));
-				ItemStack resultItem = Utils.getNullIfEmpty(inventory.getItem(column + 18));
+				ItemStack cost1 = ItemUtils.getNullIfEmpty(inventory.getItem(column));
+				ItemStack cost2 = ItemUtils.getNullIfEmpty(inventory.getItem(column + 9));
+				ItemStack resultItem = ItemUtils.getNullIfEmpty(inventory.getItem(column + 18));
 
 				// handle cost2 item as cost1 item if there is no cost1 item:
 				if (cost1 == null) {
@@ -263,9 +264,9 @@ public class AdminShopkeeper extends Shopkeeper {
 				if (offerSection == null) continue; // invalid offer: not a section
 
 				ItemStack resultItem = this.loadItemStackOld(offerSection.getConfigurationSection("2"));
-				if (Utils.isEmpty(resultItem)) continue; // invalid offer
+				if (ItemUtils.isEmpty(resultItem)) continue; // invalid offer
 				ItemStack item1 = this.loadItemStackOld(offerSection.getConfigurationSection("0"));
-				if (Utils.isEmpty(item1)) continue; // invalid offer
+				if (ItemUtils.isEmpty(item1)) continue; // invalid offer
 				ItemStack item2 = this.loadItemStackOld(offerSection.getConfigurationSection("1"));
 				offers.add(new TradingOffer(resultItem, item1, item2));
 			}

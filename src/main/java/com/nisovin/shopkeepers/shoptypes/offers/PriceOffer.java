@@ -10,8 +10,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
 
 /**
  * Stores information about an item stack being sold or bought for a certain price.
@@ -22,7 +22,7 @@ public class PriceOffer {
 	private final int price; // > 0
 
 	public PriceOffer(ItemStack item, int price) {
-		Validate.isTrue(!Utils.isEmpty(item), "Item cannot be empty!");
+		Validate.isTrue(!ItemUtils.isEmpty(item), "Item cannot be empty!");
 		Validate.isTrue(price > 0, "Price has to be positive!");
 		this.item = item.clone();
 		this.price = price;
@@ -46,12 +46,12 @@ public class PriceOffer {
 		for (PriceOffer offer : offers) {
 			ItemStack item = offer.getItem();
 			// TODO temporary, due to a bukkit bug custom head item can currently not be saved
-			if (Settings.skipCustomHeadSaving && Utils.isCustomHeadItem(item)) {
+			if (Settings.skipCustomHeadSaving && ItemUtils.isCustomHeadItem(item)) {
 				Log.warning("Skipping saving of trade involving a head item with custom texture, which cannot be saved currently due to a bukkit bug.");
 				continue;
 			}
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
-			Utils.saveItem(offerSection, "item", item);
+			ItemUtils.saveItem(offerSection, "item", item);
 			offerSection.set("price", offer.getPrice());
 			id++;
 		}
@@ -64,9 +64,9 @@ public class PriceOffer {
 			for (String id : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(id);
 				if (offerSection == null) continue; // invalid offer: not a section
-				ItemStack item = Utils.loadItem(offerSection, "item");
+				ItemStack item = ItemUtils.loadItem(offerSection, "item");
 				int price = offerSection.getInt("price");
-				if (Utils.isEmpty(item) || price <= 0) continue; // invalid offer
+				if (ItemUtils.isEmpty(item) || price <= 0) continue; // invalid offer
 				offers.add(new PriceOffer(item, price));
 			}
 		}
@@ -112,7 +112,7 @@ public class PriceOffer {
 					}
 				}
 				int price = offerSection.getInt("cost");
-				if (Utils.isEmpty(item) || price <= 0) continue; // invalid offer
+				if (ItemUtils.isEmpty(item) || price <= 0) continue; // invalid offer
 				offers.add(new PriceOffer(item, price));
 			}
 		}

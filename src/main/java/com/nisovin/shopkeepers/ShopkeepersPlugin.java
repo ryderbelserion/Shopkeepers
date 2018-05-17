@@ -59,6 +59,7 @@ import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.ChunkCoords;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.Utils;
@@ -528,7 +529,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// RECENTLY PLACED CHESTS
 
 	void onChestPlacement(Player player, Block chest) {
-		assert player != null && chest != null && Utils.isChest(chest.getType());
+		assert player != null && chest != null && ItemUtils.isChest(chest.getType());
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
 		if (recentlyPlaced == null) {
@@ -542,7 +543,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	public boolean wasRecentlyPlaced(Player player, Block chest) {
-		assert player != null && chest != null && Utils.isChest(chest.getType());
+		assert player != null && chest != null && ItemUtils.isChest(chest.getType());
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
 		return recentlyPlaced != null && recentlyPlaced.contains(chest.getWorld().getName() + "," + chest.getX() + "," + chest.getY() + "," + chest.getZ());
@@ -555,7 +556,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		String playerName = player.getName();
 		if (chest == null) selectedChest.remove(playerName);
 		else {
-			assert Utils.isChest(chest.getType());
+			assert ItemUtils.isChest(chest.getType());
 			selectedChest.put(playerName, chest);
 		}
 	}

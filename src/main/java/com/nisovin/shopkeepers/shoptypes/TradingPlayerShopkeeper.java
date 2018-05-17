@@ -23,7 +23,7 @@ import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.util.ItemCount;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
@@ -55,11 +55,11 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 					// fill in costs:
 					ItemStack item1 = offer.getItem1();
-					assert !Utils.isEmpty(item1);
+					assert !ItemUtils.isEmpty(item1);
 					inventory.setItem(column + 9, item1);
 
 					ItemStack item2 = offer.getItem2();
-					if (!Utils.isEmpty(item2)) {
+					if (!ItemUtils.isEmpty(item2)) {
 						inventory.setItem(column + 18, item2);
 					}
 				}
@@ -102,11 +102,11 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 					return;
 				}
 				ItemStack cursor = event.getCursor();
-				if (!Utils.isEmpty(cursor)) {
+				if (!ItemUtils.isEmpty(cursor)) {
 					return;
 				}
 				ItemStack current = event.getCurrentItem();
-				if (!Utils.isEmpty(current)) {
+				if (!ItemUtils.isEmpty(current)) {
 					shopkeeper.clickedItem = current.clone();
 					shopkeeper.clickedItem.setAmount(1);
 				}
@@ -120,10 +120,10 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			for (int column = 0; column < TRADE_COLUMNS; column++) {
 				ItemStack resultItem = inventory.getItem(column);
-				if (Utils.isEmpty(resultItem)) continue; // not valid recipe column
+				if (ItemUtils.isEmpty(resultItem)) continue; // not valid recipe column
 
-				ItemStack cost1 = Utils.getNullIfEmpty(inventory.getItem(column + 9));
-				ItemStack cost2 = Utils.getNullIfEmpty(inventory.getItem(column + 18));
+				ItemStack cost1 = ItemUtils.getNullIfEmpty(inventory.getItem(column + 9));
+				ItemStack cost2 = ItemUtils.getNullIfEmpty(inventory.getItem(column + 18));
 
 				// handle cost2 item as cost1 item if there is no cost1 item:
 				if (cost1 == null) {
@@ -164,7 +164,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			// remove result items from chest contents:
 			ItemStack resultItem = tradingRecipe.getResultItem();
 			assert resultItem != null;
-			if (Utils.removeItems(newChestContents, resultItem) != 0) {
+			if (ItemUtils.removeItems(newChestContents, resultItem) != 0) {
 				this.debugPreventedTrade(tradingPlayer, "The shop's chest doesn't contain the required items.");
 				return false;
 			}
@@ -183,12 +183,12 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		// Therefore we differ between require and offered items here.
 		// Returns false, if not all items could be added to the contents:
 		private boolean addItems(ItemStack[] contents, ItemStack requiredItem, ItemStack offeredItem) {
-			if (Utils.isEmpty(requiredItem)) return true;
+			if (ItemUtils.isEmpty(requiredItem)) return true;
 			int amountAfterTaxes = this.getAmountAfterTaxes(requiredItem.getAmount());
 			if (amountAfterTaxes > 0) {
 				ItemStack receivedItem = offeredItem.clone(); // create a copy, just in case
 				receivedItem.setAmount(amountAfterTaxes);
-				if (Utils.addItems(contents, receivedItem) != 0) {
+				if (ItemUtils.addItems(contents, receivedItem) != 0) {
 					// couldn't add all items to the contents:
 					return false;
 				}
@@ -256,7 +256,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 		List<ItemCount> chestItems = this.getItemsFromChest();
 		for (TradingOffer offer : this.getOffers()) {
 			ItemStack resultItem = offer.getResultItem();
-			assert !Utils.isEmpty(resultItem);
+			assert !ItemUtils.isEmpty(resultItem);
 			ItemCount itemCount = ItemCount.findSimilar(chestItems, resultItem);
 			if (itemCount == null) continue;
 
@@ -280,7 +280,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 	public TradingOffer getOffer(ItemStack tradedItem) {
 		for (TradingOffer offer : this.getOffers()) {
-			if (Utils.isSimilar(offer.getResultItem(), tradedItem)) {
+			if (ItemUtils.isSimilar(offer.getResultItem(), tradedItem)) {
 				return offer;
 			}
 		}
@@ -319,7 +319,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	public void removeOffer(ItemStack tradedItem) {
 		Iterator<TradingOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
-			if (Utils.isSimilar(iterator.next().getResultItem(), tradedItem)) {
+			if (ItemUtils.isSimilar(iterator.next().getResultItem(), tradedItem)) {
 				iterator.remove();
 				break;
 			}

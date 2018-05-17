@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -110,13 +111,13 @@ class CreateListener implements Listener {
 
 			Block selectedChest = plugin.getSelectedChest(player);
 			// validate old selected chest:
-			if (selectedChest != null && !Utils.isChest(selectedChest.getType())) {
+			if (selectedChest != null && !ItemUtils.isChest(selectedChest.getType())) {
 				plugin.selectChest(player, null);
 				selectedChest = null;
 			}
 
 			// chest for chest selection:
-			if (Utils.isChest(clickedBlock.getType()) && !clickedBlock.equals(selectedChest)) {
+			if (ItemUtils.isChest(clickedBlock.getType()) && !clickedBlock.equals(selectedChest)) {
 				// check if the clicked chest was recently placed:
 				if (Settings.requireChestRecentlyPlaced && !plugin.wasRecentlyPlaced(player, clickedBlock)) {
 					// chest was not recently placed:
@@ -183,7 +184,7 @@ class CreateListener implements Listener {
 			Utils.sendMessage(player, Settings.msgMustSelectChest);
 			return false;
 		}
-		assert Utils.isChest(selectedChest.getType()); // we have checked that above
+		assert ItemUtils.isChest(selectedChest.getType()); // we have checked that above
 
 		// check for selected chest being too far away:
 		if (!selectedChest.getWorld().equals(clickedBlock.getWorld())

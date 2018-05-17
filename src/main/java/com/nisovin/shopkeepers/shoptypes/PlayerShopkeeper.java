@@ -32,6 +32,7 @@ import com.nisovin.shopkeepers.ui.defaults.HiringHandler;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -73,13 +74,13 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				// change low cost:
 				int column = rawSlot - LOW_COST_OFFSET;
 				ItemStack soldItem = event.getInventory().getItem(column);
-				if (Utils.isEmpty(soldItem)) return;
+				if (ItemUtils.isEmpty(soldItem)) return;
 				this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
 			} else if (rawSlot >= HIGH_COST_OFFSET && rawSlot < ((HIGH_COST_OFFSET + TRADE_COLUMNS))) {
 				// change high cost:
 				int column = rawSlot - HIGH_COST_OFFSET;
 				ItemStack soldItem = event.getInventory().getItem(column);
-				if (Utils.isEmpty(soldItem)) return;
+				if (ItemUtils.isEmpty(soldItem)) return;
 				this.handleUpdateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), Settings.createHighZeroCurrencyItem());
 			} else {
 				// handle common editor buttons:
@@ -91,7 +92,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 			assert event.isCancelled();
 			// ignore in certain situations:
 			ItemStack clickedItem = event.getCurrentItem();
-			if (Utils.isEmpty(clickedItem)) return;
+			if (ItemUtils.isEmpty(clickedItem)) return;
 
 			// get new item amount:
 			int currentItemAmount = clickedItem.getAmount();
@@ -112,12 +113,12 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		protected void handleUpdateTradeCostItemOnClick(InventoryClickEvent event, ItemStack currencyItem, ItemStack zeroCurrencyItem) {
 			assert event.isCancelled();
 			// ignore in certain situations:
-			if (Utils.isEmpty(currencyItem)) return;
+			if (ItemUtils.isEmpty(currencyItem)) return;
 
 			// get new item amount:
 			ItemStack clickedItem = event.getCurrentItem(); // can be null
 			int currentItemAmount = 0;
-			boolean isCurrencyItem = Utils.isSimilar(clickedItem, currencyItem);
+			boolean isCurrencyItem = ItemUtils.isSimilar(clickedItem, currencyItem);
 			if (isCurrencyItem) {
 				assert clickedItem != null;
 				currentItemAmount = clickedItem.getAmount();
@@ -252,7 +253,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 			// check for the shop's chest:
 			Block chest = shopkeeper.getChest();
-			if (!Utils.isChest(chest.getType())) {
+			if (!ItemUtils.isChest(chest.getType())) {
 				this.debugPreventedTrade(tradingPlayer, "Couldn't find the shop's chest.");
 				return false;
 			}
@@ -451,7 +452,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		Log.debug("checking open chest window ..");
 		// make sure the chest still exists
 		Block chest = this.getChest();
-		if (Utils.isChest(chest.getType())) {
+		if (ItemUtils.isChest(chest.getType())) {
 			// open the chest directly as the player (no need for a custom UI)
 			Log.debug("opening chest inventory window");
 			Inventory inv = ((Chest) chest.getState()).getInventory();
@@ -527,7 +528,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 		hireCost = config.getItemStack("hirecost");
 		// hire cost itemstack is not null, but empty -> normalize to null:
-		if (hireCost != null && Utils.isEmpty(hireCost)) {
+		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
 			Log.warning("Invalid (empty) hire cost! Disabling 'for hire' for shopkeeper at " + this.getPositionString());
 			hireCost = null;
 		}
@@ -629,7 +630,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	 *            the hire cost, or <code>null</code> or empty to disable hiring for this shopkeeper
 	 */
 	public void setForHire(ItemStack hireCost) {
-		if (Utils.isEmpty(hireCost)) {
+		if (ItemUtils.isEmpty(hireCost)) {
 			// disable hiring:
 			this.hireCost = null;
 			this.setName("");
@@ -737,7 +738,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 
 	protected int getCurrencyInChest() {
 		Block chest = this.getChest();
-		if (!Utils.isChest(chest.getType())) return 0;
+		if (!ItemUtils.isChest(chest.getType())) return 0;
 
 		int totalCurrency = 0;
 		Inventory chestInventory = ((Chest) chest.getState()).getInventory();
@@ -755,11 +756,11 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	protected List<ItemCount> getItemsFromChest(Filter<ItemStack> filter) {
 		ItemStack[] chestContents = null;
 		Block chest = this.getChest();
-		if (Utils.isChest(chest.getType())) {
+		if (ItemUtils.isChest(chest.getType())) {
 			Inventory chestInventory = ((Chest) chest.getState()).getInventory();
 			chestContents = chestInventory.getContents();
 		}
 		// returns an empty list if the chest couldn't be found:
-		return Utils.countItems(chestContents, filter);
+		return ItemUtils.countItems(chestContents, filter);
 	}
 }

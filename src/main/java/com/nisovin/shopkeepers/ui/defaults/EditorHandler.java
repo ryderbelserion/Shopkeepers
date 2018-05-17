@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIType;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class EditorHandler extends UIHandler {
@@ -83,7 +84,7 @@ public abstract class EditorHandler extends UIHandler {
 			event.setCancelled(true);
 
 			ItemStack cursor = event.getCursor();
-			if (!Utils.isEmpty(cursor)) {
+			if (!ItemUtils.isEmpty(cursor)) {
 				// equip item:
 				shopkeeper.getShopObject().setItem(cursor.clone());
 				// TODO how to remove equipped item again?
@@ -95,8 +96,8 @@ public abstract class EditorHandler extends UIHandler {
 				if (event.getClick() != ClickType.DOUBLE_CLICK) { // ignore double clicks
 					shopkeeper.getShopObject().cycleSubType();
 					ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
-					if (!Utils.isEmpty(typeItem)) {
-						event.getInventory().setItem(17, Utils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
+					if (!ItemUtils.isEmpty(typeItem)) {
+						event.getInventory().setItem(17, ItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 					}
 				}
 			}
@@ -236,7 +237,7 @@ public abstract class EditorHandler extends UIHandler {
 		// sub-type cycle button:
 		ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
 		if (typeItem != null) {
-			inventory.setItem(17, Utils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
+			inventory.setItem(17, ItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 		}
 
 		// delete button:

@@ -24,6 +24,7 @@ import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shoptypes.AdminShopkeeper;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 class CommandManager implements CommandExecutor {
@@ -144,7 +145,7 @@ class CommandManager implements CommandExecutor {
 				player.sendMessage("-Is high currency: " + (Settings.isHighCurrencyItem(inHand)));
 				player.sendMessage("-Is low zero currency: " + (Settings.isZeroCurrencyItem(inHand)));
 				player.sendMessage("-Is high zero currency: " + (Settings.isHighZeroCurrencyItem(inHand)));
-				player.sendMessage("-Similar to next item: " + (Utils.isSimilar(nextItem, inHand) ? "yes" : "nope"));
+				player.sendMessage("-Similar to next item: " + (ItemUtils.isSimilar(nextItem, inHand) ? "yes" : "nope"));
 
 				player.sendMessage("Next item:");
 				player.sendMessage("-Is low currency: " + (Settings.isCurrencyItem(nextItem)));
@@ -488,7 +489,7 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				if (block == null || !Utils.isChest(block.getType())) {
+				if (block == null || !ItemUtils.isChest(block.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
@@ -574,7 +575,7 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				if (block == null || !Utils.isChest(block.getType())) {
+				if (block == null || !ItemUtils.isChest(block.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
@@ -595,7 +596,7 @@ class CommandManager implements CommandExecutor {
 				}
 
 				ItemStack hireCost = player.getItemInHand();
-				if (Utils.isEmpty(hireCost)) {
+				if (ItemUtils.isEmpty(hireCost)) {
 					Utils.sendMessage(player, Settings.msgMustHoldHireItem);
 					return true;
 				}
@@ -616,7 +617,7 @@ class CommandManager implements CommandExecutor {
 				return true;
 			}
 
-			if (Settings.createPlayerShopWithCommand && Utils.isChest(block.getType())) {
+			if (Settings.createPlayerShopWithCommand && ItemUtils.isChest(block.getType())) {
 				// create player shopkeeper:
 
 				// check if this chest is already used by some other shopkeeper:

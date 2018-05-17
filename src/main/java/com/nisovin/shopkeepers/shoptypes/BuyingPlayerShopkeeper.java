@@ -25,7 +25,7 @@ import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
@@ -81,7 +81,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			if (rawSlot >= 0 && rawSlot < TRADE_COLUMNS) {
 				// modifying cost:
 				ItemStack tradedItem = event.getInventory().getItem(rawSlot + 18);
-				if (Utils.isEmpty(tradedItem)) return;
+				if (ItemUtils.isEmpty(tradedItem)) return;
 				this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
 			} else if (rawSlot >= 18 && rawSlot <= 25) {
 				// modifying bought item quantity:
@@ -97,7 +97,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			for (int column = 0; column < TRADE_COLUMNS; column++) {
 				ItemStack tradedItem = inventory.getItem(column + 18);
-				if (Utils.isEmpty(tradedItem)) continue;
+				if (ItemUtils.isEmpty(tradedItem)) continue;
 
 				ItemStack priceItem = inventory.getItem(column);
 				if (priceItem != null && priceItem.getType() == Settings.currencyItem && priceItem.getAmount() > 0) {
@@ -163,7 +163,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				// but is still accepted, depending on the used item comparison logic and settings:
 				ItemStack receivedItem = tradeData.offeredItem1.clone(); // create a copy, just in case
 				receivedItem.setAmount(amountAfterTaxes);
-				if (Utils.addItems(newChestContents, receivedItem) != 0) {
+				if (ItemUtils.addItems(newChestContents, receivedItem) != 0) {
 					this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
 					return false;
 				}
@@ -264,7 +264,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 			int maxStackSize = Settings.currencyItem.getMaxStackSize();
 			for (int slot = 0; slot < contents.length; slot++) {
 				ItemStack itemStack = contents[slot];
-				if (!Utils.isEmpty(itemStack)) continue;
+				if (!ItemUtils.isEmpty(itemStack)) continue;
 
 				int stackSize = Math.min(remaining, maxStackSize);
 				contents[slot] = Settings.createCurrencyItem(stackSize);
@@ -369,7 +369,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 	public PriceOffer getOffer(ItemStack tradedItem) {
 		for (PriceOffer offer : this.getOffers()) {
-			if (Utils.isSimilar(offer.getItem(), tradedItem)) {
+			if (ItemUtils.isSimilar(offer.getItem(), tradedItem)) {
 				return offer;
 			}
 		}
@@ -408,7 +408,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	public void removeOffer(ItemStack tradedItem) {
 		Iterator<PriceOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
-			if (Utils.isSimilar(iterator.next().getItem(), tradedItem)) {
+			if (ItemUtils.isSimilar(iterator.next().getItem(), tradedItem)) {
 				iterator.remove();
 				break;
 			}
