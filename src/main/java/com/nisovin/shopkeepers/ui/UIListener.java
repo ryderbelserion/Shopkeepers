@@ -10,8 +10,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
-import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.util.Log;
 
 class UIListener implements Listener {
 

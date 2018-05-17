@@ -2,8 +2,8 @@ package com.nisovin.shopkeepers.compat;
 
 import org.bukkit.plugin.Plugin;
 
-import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
+import com.nisovin.shopkeepers.util.Log;
 
 public final class NMSManager {
 

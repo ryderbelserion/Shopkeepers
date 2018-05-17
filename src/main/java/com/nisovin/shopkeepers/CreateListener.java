@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
 /**

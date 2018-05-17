@@ -32,7 +32,6 @@ import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.util.Vector;
 
-import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;

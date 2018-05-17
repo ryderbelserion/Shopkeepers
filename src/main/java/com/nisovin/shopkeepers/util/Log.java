@@ -1,7 +1,10 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
 
 public class Log {
 

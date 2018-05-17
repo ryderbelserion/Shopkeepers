@@ -9,10 +9,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
-import com.nisovin.shopkeepers.Log;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.abstractTypes.TypeRegistry;
+import com.nisovin.shopkeepers.util.Log;
 
 /**
  * Acts as registry for ui types and keeps track of which player has which ui currently opened.

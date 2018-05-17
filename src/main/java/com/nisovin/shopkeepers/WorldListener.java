@@ -15,6 +15,8 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
+import com.nisovin.shopkeepers.util.Log;
+
 class WorldListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;

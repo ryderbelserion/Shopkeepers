@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 
-import com.nisovin.shopkeepers.Log;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class TypeRegistry<T extends AbstractType> {
