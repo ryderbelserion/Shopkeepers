@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -66,7 +65,7 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
-	private static final long ASYNC_TASKS_TIMEOUT_SECONDS = 10L;
+	private static final int ASYNC_TASKS_TIMEOUT_SECONDS = 10;
 
 	private static ShopkeepersPlugin plugin;
 
@@ -370,33 +369,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public void onDisable() {
 		// wait for async tasks to complete:
-		final long asyncTasksTimeoutMillis = ASYNC_TASKS_TIMEOUT_SECONDS * 1000L;
-		final long asyncTasksStart = System.nanoTime();
-		int activeAsyncTasks = SchedulerUtils.getActiveAsyncTasks(this);
-		if (activeAsyncTasks > 0) {
-			Log.info("Waiting up to " + ASYNC_TASKS_TIMEOUT_SECONDS + " seconds for "
-					+ activeAsyncTasks + " remaining async tasks to finish ..");
-		}
-		while (SchedulerUtils.getActiveAsyncTasks(this) > 0) {
-			try {
-				Thread.sleep(5);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			final long asyncTasksWaitedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - asyncTasksStart);
-			if (asyncTasksWaitedMillis > asyncTasksTimeoutMillis) {
-				// timeout reached, disable anyways..
-				break;
-			}
-		}
-		final long asyncTasksWaitedMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - asyncTasksStart);
-		if (asyncTasksWaitedMillis > 1) {
-			Log.info("Waited " + asyncTasksWaitedMillis + " ms for async tasks to finish.");
-		}
-		activeAsyncTasks = SchedulerUtils.getActiveAsyncTasks(this);
-		if (activeAsyncTasks > 0) {
-			Log.severe("There are still " + activeAsyncTasks + " async tasks remaining! Disabling anyways now ..");
-		}
+		SchedulerUtils.awaitAsyncTasksCompletion(this, ASYNC_TASKS_TIMEOUT_SECONDS, this.getLogger());
 
 		// close all open windows:
 		uiManager.closeAll();
