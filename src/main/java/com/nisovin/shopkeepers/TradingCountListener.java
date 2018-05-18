@@ -34,13 +34,9 @@ import com.nisovin.shopkeepers.util.Log;
 class TradingCountListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;
-	private final Runnable stopListeningAction = new Runnable() {
-
-		@Override
-		public void run() {
-			stopListeningTask = null;
-			stopListeningForTrades();
-		}
+	private final Runnable stopListeningAction = () -> {
+		stopListeningTask = null;
+		stopListeningForTrades();
 	};
 
 	private Player tradingPlayer = null;

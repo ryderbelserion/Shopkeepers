@@ -56,17 +56,13 @@ public abstract class UIHandler {
 	protected void closeDelayed(final Player player) {
 		// temporary deactivate ui and close open window delayed for this player:
 		shopkeeper.deactivateUI();
-		Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
+		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+			informOnClose(player);
+			player.closeInventory();
 
-			@Override
-			public void run() {
-				informOnClose(player);
-				player.closeInventory();
-
-				// reactivate ui:
-				shopkeeper.activateUI();
-			}
-		}, 1L);
+			// reactivate ui:
+			shopkeeper.activateUI();
+		});
 	}
 
 	/**

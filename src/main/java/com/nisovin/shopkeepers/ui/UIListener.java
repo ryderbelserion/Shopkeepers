@@ -69,14 +69,10 @@ class UIListener implements Listener {
 				Log.debug("Closing inventory for " + player.getName() + ", because different open inventory was expected."
 						+ " Open inventory: " + inventory.getType() + " with name '" + inventory.getTitle() + "'");
 				event.setCancelled(true);
-				Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
-
-					@Override
-					public void run() {
-						uiManager.onInventoryClose(player); // cleanup
-						player.closeInventory();
-					}
-				}, 1L);
+				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+					uiManager.onInventoryClose(player); // cleanup
+					player.closeInventory();
+				});
 			}
 		}
 	}

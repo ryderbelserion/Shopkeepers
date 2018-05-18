@@ -60,11 +60,11 @@ class CreateListener implements Listener {
 		if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
 
 		// ignore creative mode players:
-		final Player player = event.getPlayer();
+		Player player = event.getPlayer();
 		if (player.getGameMode() == GameMode.CREATIVE) return;
 
 		// make sure the item used is the shop creation item:
-		final ItemStack itemInHand = event.getItem();
+		ItemStack itemInHand = event.getItem();
 		if (!Settings.isShopCreationItem(itemInHand)) {
 			return;
 		}
@@ -153,16 +153,9 @@ class CreateListener implements Listener {
 				if (shopkeeperCreated) {
 					// manually remove creation item from player's hand after this event is processed:
 					event.setCancelled(true);
-					Bukkit.getScheduler().runTask(plugin, new Runnable() {
-						public void run() {
-							// TODO can the player (very) quickly change the item in hand?
-							if (itemInHand.getAmount() <= 1) {
-								player.setItemInHand(null);
-							} else {
-								itemInHand.setAmount(itemInHand.getAmount() - 1);
-								player.setItemInHand(itemInHand);
-							}
-						}
+					Bukkit.getScheduler().runTask(plugin, () -> {
+						ItemStack newItemInHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
+						player.setItemInHand(newItemInHand);
 					});
 				}
 

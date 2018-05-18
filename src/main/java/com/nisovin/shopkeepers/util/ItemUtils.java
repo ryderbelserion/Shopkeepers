@@ -544,12 +544,6 @@ public class ItemUtils {
 
 	@SuppressWarnings("deprecation")
 	public static void updateInventoryLater(Player player) {
-		Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
-
-			@Override
-			public void run() {
-				player.updateInventory();
-			}
-		}, 1L);
+		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> player.updateInventory());
 	}
 }

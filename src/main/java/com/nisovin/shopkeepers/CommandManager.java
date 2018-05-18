@@ -29,6 +29,7 @@ import com.nisovin.shopkeepers.util.Utils;
 
 class CommandManager implements CommandExecutor {
 
+	private static final int COMMAND_CONFIRMATION_TICKS = 25 * 20; // 25 seconds time for confirmations
 	private static final int LIST_PAGE_SIZE = 6;
 
 	private final ShopkeepersPlugin plugin;
@@ -345,76 +346,72 @@ class CommandManager implements CommandExecutor {
 				}
 
 				// this is dangerous: let the player first confirm this action
-				plugin.waitForConfirm(player, new Runnable() {
+				plugin.waitForConfirm(player, () -> {
+					List<Shopkeeper> shops = new ArrayList<Shopkeeper>();
 
-					@Override
-					public void run() {
-						List<Shopkeeper> shops = new ArrayList<Shopkeeper>();
-
-						if (playerName.equals("admin")) {
-							// searching admin shops:
-							for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
-								if (!(shopkeeper instanceof PlayerShopkeeper)) {
-									shops.add(shopkeeper);
-								}
+					if (playerName.equals("admin")) {
+						// searching admin shops:
+						for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+							if (!(shopkeeper instanceof PlayerShopkeeper)) {
+								shops.add(shopkeeper);
 							}
-						} else if (playerName.equals("all")) {
-							// searching all player shops:
-							for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
-								if (shopkeeper instanceof PlayerShopkeeper) {
-									shops.add(shopkeeper);
-								}
+						}
+					} else if (playerName.equals("all")) {
+						// searching all player shops:
+						for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+							if (shopkeeper instanceof PlayerShopkeeper) {
+								shops.add(shopkeeper);
 							}
-						} else {
-							// searching shops of specific player:
-							Player listPlayer = Bukkit.getPlayerExact(playerName);
-							UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
+						}
+					} else {
+						// searching shops of specific player:
+						Player listPlayer = Bukkit.getPlayerExact(playerName);
+						UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
 
-							for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
-								if (shopkeeper instanceof PlayerShopkeeper) {
-									PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-									if (playerShop.getOwnerName().equals(playerName)) {
-										UUID shopOwnerUUID = playerShop.getOwnerUUID();
-										// TODO really ignore owner uuid if the player is currently offline? - consider:
-										// TODO * player A 'peter' creating shops
-										// TODO * player A leaves, changes name, player B changes name to 'peter'
-										// TODO * player B joins before player A has joined again yet, and creates shops
-										// TODO * situation: shops with the same owner name, but different uuid.
-										// Problem?
-										if (shopOwnerUUID == null || listPlayerUUID == null || shopOwnerUUID.equals(listPlayerUUID)) {
-											shops.add(playerShop);
-										}
+						for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+							if (shopkeeper instanceof PlayerShopkeeper) {
+								PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+								if (playerShop.getOwnerName().equals(playerName)) {
+									UUID shopOwnerUUID = playerShop.getOwnerUUID();
+									// TODO really ignore owner uuid if the player is currently offline? - consider:
+									// TODO * player A 'peter' creating shops
+									// TODO * player A leaves, changes name, player B changes name to 'peter'
+									// TODO * player B joins before player A has joined again yet, and creates shops
+									// TODO * situation: shops with the same owner name, but different uuid.
+									// Problem?
+									if (shopOwnerUUID == null || listPlayerUUID == null || shopOwnerUUID.equals(listPlayerUUID)) {
+										shops.add(playerShop);
 									}
 								}
 							}
 						}
-
-						// removing shops:
-						for (Shopkeeper shopkeeper : shops) {
-							shopkeeper.delete();
-						}
-
-						// trigger save:
-						plugin.save();
-
-						// printing result message:
-						int shopsCount = shops.size();
-						if (playerName.equals("admin")) {
-							// removed admin shops:
-							Utils.sendMessage(player, Settings.msgRemovedAdminShops,
-									"{shopsCount}", String.valueOf(shopsCount));
-						} else if (playerName.equals("all")) {
-							// removed all player shops:
-							Utils.sendMessage(player, Settings.msgRemovedAllPlayerShops,
-									"{shopsCount}", String.valueOf(shopsCount));
-						} else {
-							// removed shops of specific player:
-							Utils.sendMessage(player, Settings.msgRemovedPlayerShops,
-									"{player}", playerName,
-									"{shopsCount}", String.valueOf(shopsCount));
-						}
 					}
-				}, 25 * 20); // 25 seconds time for confirmation
+
+					// removing shops:
+					for (Shopkeeper shopkeeper : shops) {
+						shopkeeper.delete();
+					}
+
+					// trigger save:
+					plugin.save();
+
+					// printing result message:
+					int shopsCount = shops.size();
+					if (playerName.equals("admin")) {
+						// removed admin shops:
+						Utils.sendMessage(player, Settings.msgRemovedAdminShops,
+								"{shopsCount}", String.valueOf(shopsCount));
+					} else if (playerName.equals("all")) {
+						// removed all player shops:
+						Utils.sendMessage(player, Settings.msgRemovedAllPlayerShops,
+								"{shopsCount}", String.valueOf(shopsCount));
+					} else {
+						// removed shops of specific player:
+						Utils.sendMessage(player, Settings.msgRemovedPlayerShops,
+								"{player}", playerName,
+								"{shopsCount}", String.valueOf(shopsCount));
+					}
+				}, COMMAND_CONFIRMATION_TICKS);
 
 				// inform player about required confirmation:
 				if (playerName.equals("admin")) {

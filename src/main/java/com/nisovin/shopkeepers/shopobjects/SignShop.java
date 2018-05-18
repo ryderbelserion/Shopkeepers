@@ -20,12 +20,13 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class SignShop extends ShopObject {
 
 	public static String getId(Block block) {
 		if (block == null) return null;
-		return "block" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ();
+		return "block" + Utils.getLocationString(block);
 	}
 
 	private BlockFace signFacing;
@@ -225,24 +226,13 @@ public class SignShop extends ShopObject {
 
 		Sign sign = this.getSign();
 		if (sign == null) {
-			String worldName = shopkeeper.getWorldName();
-			int x = shopkeeper.getX();
-			int y = shopkeeper.getY();
-			int z = shopkeeper.getZ();
-
 			// removing the shopkeeper, because re-spawning might fail (ex. attached block missing) or could be abused
 			// (sign drop farming):
-			Log.debug("Shopkeeper sign at (" + worldName + "," + x + "," + y + "," + z + ") is no longer existing! Attempting respawn now.");
+			Log.debug("Shopkeeper sign at " + shopkeeper.getPositionString() + " is no longer existing! Attempting respawn now.");
 			if (!this.spawn()) {
-				Log.warning("Shopkeeper sign at (" + worldName + "," + x + "," + y + "," + z + ") could not be replaced! Removing shopkeeper now!");
+				Log.warning("Shopkeeper sign at " + shopkeeper.getPositionString() + " could not be replaced! Removing shopkeeper now!");
 				// delayed removal:
-				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), new Runnable() {
-
-					@Override
-					public void run() {
-						shopkeeper.delete();
-					}
-				});
+				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> shopkeeper.delete());
 			}
 			return true;
 		}

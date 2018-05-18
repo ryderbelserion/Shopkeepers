@@ -38,7 +38,6 @@ import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import com.nisovin.shopkeepers.abstractTypes.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -274,87 +273,77 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			this.loadShopkeepersInWorld(world);
 		}
 
-		Bukkit.getScheduler().runTaskLater(this, new Runnable() {
-
-			@Override
-			public void run() {
-				// remove invalid citizens shopkeepers:
-				CitizensHandler.removeInvalidCitizensShopkeepers();
-				// remove inactive player shopkeepers:
-				removeInactivePlayerShops();
-			}
+		Bukkit.getScheduler().runTaskLater(this, () -> {
+			// remove invalid citizens shopkeepers:
+			CitizensHandler.removeInvalidCitizensShopkeepers();
+			// remove inactive player shopkeepers:
+			removeInactivePlayerShops();
 		}, 5L);
 
 		// start teleporter task:
-		Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
-			public void run() {
-				List<Shopkeeper> readd = new ArrayList<Shopkeeper>();
-				Iterator<Map.Entry<String, Shopkeeper>> iter = activeShopkeepers.entrySet().iterator();
-				while (iter.hasNext()) {
-					Shopkeeper shopkeeper = iter.next().getValue();
-					boolean update = shopkeeper.check();
-					if (update) {
-						// if the shopkeeper had to be respawned its shop id changed:
-						// this removes the entry which was stored with the old shop id and later adds back the
-						// shopkeeper with it's new id
-						readd.add(shopkeeper);
-						iter.remove();
+		Bukkit.getScheduler().runTaskTimer(this, () -> {
+			List<Shopkeeper> readd = new ArrayList<Shopkeeper>();
+			Iterator<Map.Entry<String, Shopkeeper>> iter = activeShopkeepers.entrySet().iterator();
+			while (iter.hasNext()) {
+				Shopkeeper shopkeeper = iter.next().getValue();
+				boolean update = shopkeeper.check();
+				if (update) {
+					// if the shopkeeper had to be respawned its shop id changed:
+					// this removes the entry which was stored with the old shop id and later adds back the
+					// shopkeeper with it's new id
+					readd.add(shopkeeper);
+					iter.remove();
+				}
+			}
+			if (!readd.isEmpty()) {
+				for (Shopkeeper shopkeeper : readd) {
+					if (shopkeeper.isActive()) {
+						_activateShopkeeper(shopkeeper);
 					}
 				}
-				if (!readd.isEmpty()) {
-					for (Shopkeeper shopkeeper : readd) {
-						if (shopkeeper.isActive()) {
-							_activateShopkeeper(shopkeeper);
-						}
-					}
 
-					// shopkeepers might have been respawned, request save:
-					save();
-				}
+				// shopkeepers might have been respawned, request save:
+				save();
 			}
 		}, 200, 200); // 10 seconds
 
 		// start verifier task:
 		if (Settings.enableSpawnVerifier) {
-			Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
-				public void run() {
-					int count = 0;
-					for (Entry<ChunkCoords, List<Shopkeeper>> chunkEntry : shopkeepersByChunk.entrySet()) {
-						ChunkCoords chunk = chunkEntry.getKey();
-						if (chunk.isChunkLoaded()) {
-							List<Shopkeeper> shopkeepers = chunkEntry.getValue();
-							for (Shopkeeper shopkeeper : shopkeepers) {
-								if (shopkeeper.needsSpawning() && !shopkeeper.isActive()) {
-									// deactivate by old object id:
-									_deactivateShopkeeper(shopkeeper);
+			Bukkit.getScheduler().runTaskTimer(this, () -> {
+				int count = 0;
+				for (Entry<ChunkCoords, List<Shopkeeper>> chunkEntry : shopkeepersByChunk.entrySet()) {
+					ChunkCoords chunk = chunkEntry.getKey();
+					if (chunk.isChunkLoaded()) {
+						List<Shopkeeper> shopkeepers = chunkEntry.getValue();
+						for (Shopkeeper shopkeeper : shopkeepers) {
+							if (shopkeeper.needsSpawning() && !shopkeeper.isActive()) {
+								// deactivate by old object id:
+								_deactivateShopkeeper(shopkeeper);
 
-									boolean spawned = shopkeeper.spawn();
-									if (spawned) {
-										// activate with new object id:
-										_activateShopkeeper(shopkeeper);
-										count++;
-									} else {
-										Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
-									}
+								boolean spawned = shopkeeper.spawn();
+								if (spawned) {
+									// activate with new object id:
+									_activateShopkeeper(shopkeeper);
+									count++;
+								} else {
+									Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 								}
 							}
 						}
 					}
-					if (count > 0) {
-						Log.debug("Spawn verifier: " + count + " shopkeepers respawned");
-						save();
-					}
+				}
+				if (count > 0) {
+					Log.debug("Spawn verifier: " + count + " shopkeepers respawned");
+					save();
 				}
 			}, 600, 1200); // 30,60 seconds
 		}
 
 		// start save task:
 		if (!Settings.saveInstantly) {
-			Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
-				public void run() {
-					if (dirty) {
-						saveReal();
-					}
+			Bukkit.getScheduler().runTaskTimer(this, () -> {
+				if (dirty) {
+					saveReal();
 				}
 			}, 6000, 6000); // 5 minutes
 		}
@@ -541,16 +530,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// COMMAND CONFIRMING
 
-	void waitForConfirm(final Player player, Runnable action, int delay) {
-		assert player != null && delay > 0;
-		int taskId = new BukkitRunnable() {
+	void waitForConfirm(final Player player, Runnable action, int timeoutTicks) {
+		assert player != null && timeoutTicks > 0;
+		int taskId = Bukkit.getScheduler().runTaskLater(this, () -> {
+			endConfirmation(player);
+			Utils.sendMessage(player, Settings.msgConfirmationExpired);
+		}, timeoutTicks).getTaskId();
 
-			@Override
-			public void run() {
-				endConfirmation(player);
-				Utils.sendMessage(player, Settings.msgConfirmationExpired);
-			}
-		}.runTaskLater(this, delay).getTaskId();
 		ConfirmEntry oldEntry = confirming.put(player.getName(), new ConfirmEntry(action, taskId));
 		if (oldEntry != null) {
 			// end old confirmation task:
@@ -1067,7 +1053,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private void removeInactivePlayerShops() {
 		if (Settings.playerShopkeeperInactiveDays <= 0) return;
 
-		final Set<UUID> playerUUIDs = new HashSet<UUID>();
+		Set<UUID> playerUUIDs = new HashSet<UUID>();
 		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
 				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
@@ -1080,63 +1066,55 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 
 		// fetch OfflinePlayers async:
-		final int playerShopkeeperInactiveDays = Settings.playerShopkeeperInactiveDays;
-		Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
+		int playerShopkeeperInactiveDays = Settings.playerShopkeeperInactiveDays;
+		Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+			List<OfflinePlayer> inactivePlayers = new ArrayList<OfflinePlayer>();
+			long now = System.currentTimeMillis();
+			for (UUID uuid : playerUUIDs) {
+				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+				if (!offlinePlayer.hasPlayedBefore()) continue;
 
-			@Override
-			public void run() {
-				final List<OfflinePlayer> inactivePlayers = new ArrayList<OfflinePlayer>();
-				long now = System.currentTimeMillis();
-				for (UUID uuid : playerUUIDs) {
-					OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-					if (!offlinePlayer.hasPlayedBefore()) continue;
-
-					long lastPlayed = offlinePlayer.getLastPlayed();
-					if ((lastPlayed > 0) && ((now - lastPlayed) / 86400000 > playerShopkeeperInactiveDays)) {
-						inactivePlayers.add(offlinePlayer);
-					}
+				long lastPlayed = offlinePlayer.getLastPlayed();
+				if ((lastPlayed > 0) && ((now - lastPlayed) / 86400000 > playerShopkeeperInactiveDays)) {
+					inactivePlayers.add(offlinePlayer);
 				}
-
-				if (inactivePlayers.isEmpty()) {
-					// no inactive players found:
-					return;
-				}
-
-				// continue in main thread:
-				SchedulerUtils.runTaskOrOmit(ShopkeepersPlugin.this, new Runnable() {
-
-					@Override
-					public void run() {
-						List<PlayerShopkeeper> forRemoval = new ArrayList<PlayerShopkeeper>();
-						for (OfflinePlayer inactivePlayer : inactivePlayers) {
-							// remove all shops of this inactive player:
-							UUID playerUUID = inactivePlayer.getUniqueId();
-
-							for (Shopkeeper shopkeeper : shopkeepersById.values()) {
-								if (shopkeeper instanceof PlayerShopkeeper) {
-									PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-									UUID ownerUUID = playerShop.getOwnerUUID();
-									if (ownerUUID.equals(playerUUID)) {
-										forRemoval.add(playerShop);
-									}
-								}
-							}
-						}
-
-						// remove those shopkeepers:
-						if (!forRemoval.isEmpty()) {
-							for (PlayerShopkeeper shopkeeper : forRemoval) {
-								shopkeeper.delete();
-								Log.info("Shopkeeper owned by " + shopkeeper.getOwnerAsString() + " at "
-										+ shopkeeper.getPositionString() + " has been removed for owner inactivity.");
-							}
-
-							// save:
-							save();
-						}
-					}
-				});
 			}
+
+			if (inactivePlayers.isEmpty()) {
+				// no inactive players found:
+				return;
+			}
+
+			// continue in main thread:
+			SchedulerUtils.runTaskOrOmit(ShopkeepersPlugin.this, () -> {
+				List<PlayerShopkeeper> forRemoval = new ArrayList<PlayerShopkeeper>();
+				for (OfflinePlayer inactivePlayer : inactivePlayers) {
+					// remove all shops of this inactive player:
+					UUID playerUUID = inactivePlayer.getUniqueId();
+
+					for (Shopkeeper shopkeeper : shopkeepersById.values()) {
+						if (shopkeeper instanceof PlayerShopkeeper) {
+							PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+							UUID ownerUUID = playerShop.getOwnerUUID();
+							if (ownerUUID.equals(playerUUID)) {
+								forRemoval.add(playerShop);
+							}
+						}
+					}
+				}
+
+				// remove those shopkeepers:
+				if (!forRemoval.isEmpty()) {
+					for (PlayerShopkeeper shopkeeper : forRemoval) {
+						shopkeeper.delete();
+						Log.info("Shopkeeper owned by " + shopkeeper.getOwnerAsString() + " at "
+								+ shopkeeper.getPositionString() + " has been removed for owner inactivity.");
+					}
+
+					// save:
+					save();
+				}
+			});
 		});
 	}
 
@@ -1328,17 +1306,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	@Override
 	public void saveDelayed() {
 		dirty = true;
-		if (Settings.saveInstantly) {
-			if (delayedSaveTaskId == -1) {
-				delayedSaveTaskId = Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
-					public void run() {
-						if (dirty) {
-							saveReal();
-						}
-						delayedSaveTaskId = -1;
-					}
-				}, 600).getTaskId(); // 30 seconds delay
-			}
+		if (Settings.saveInstantly && delayedSaveTaskId == -1) {
+			delayedSaveTaskId = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+				if (dirty) {
+					saveReal();
+				}
+				delayedSaveTaskId = -1;
+			}, 600).getTaskId(); // 30 seconds delay
 		}
 	}
 
@@ -1348,7 +1322,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	// should only get called with parameter async=false on disable:
-	private void saveReal(final boolean async) {
+	private void saveReal(boolean async) {
 		if (skipSaving) {
 			Log.warning("Skipped saving due to previous issue.");
 			return;
@@ -1362,12 +1336,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 
 		// keeps track of statistics and information about this saving attempt:
-		final SaveResult saveResult = new SaveResult();
+		SaveResult saveResult = new SaveResult();
 		saveResult.async = async;
 		saveResult.startTime = System.currentTimeMillis();
 
 		// store shopkeeper data into memory configuration:
-		final YamlConfiguration config = new YamlConfiguration();
+		YamlConfiguration config = new YamlConfiguration();
 		int counter = 1;
 		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
 			String sectionKey = String.valueOf(counter++);
@@ -1391,52 +1365,44 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		dirty = false;
 
 		// called sync:
-		final Runnable syncSavingCallback = new Runnable() {
+		Runnable syncSavingCallback = () -> {
+			// print debug info:
+			saveResult.printDebugInfo();
 
-			@Override
-			public void run() {
-				// print debug info:
-				saveResult.printDebugInfo();
+			// saving failed?
+			if (!saveResult.success) {
+				// mark as dirty, as there is potentially unsaved data, and request another delayed save:
+				dirty = true;
+				saveDelayed();
 
-				// saving failed?
-				if (!saveResult.success) {
-					// mark as dirty, as there is potentially unsaved data, and request another delayed save:
-					dirty = true;
-					saveDelayed();
-
-					// inform admins about saving issue:
-					// 4 min error message throttle (slightly less than the saving interval)
-					if (Math.abs(System.currentTimeMillis() - lastSavingErrorMsgTimeStamp) > (4 * 60 * 1000L)) {
-						lastSavingErrorMsgTimeStamp = System.currentTimeMillis();
-						String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Saving shop data failed! Please check out the server log(s) and look into the issue!";
-						for (Player player : Bukkit.getOnlinePlayers()) {
-							if (player.hasPermission(ShopkeepersAPI.ADMIN_PERMISSION)) {
-								player.sendMessage(errorMsg);
-							}
+				// inform admins about saving issue:
+				// 4 min error message throttle (slightly less than the saving interval)
+				if (Math.abs(System.currentTimeMillis() - lastSavingErrorMsgTimeStamp) > (4 * 60 * 1000L)) {
+					lastSavingErrorMsgTimeStamp = System.currentTimeMillis();
+					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Saving shop data failed! Please check out the server log(s) and look into the issue!";
+					for (Player player : Bukkit.getOnlinePlayers()) {
+						if (player.hasPermission(ShopkeepersAPI.ADMIN_PERMISSION)) {
+							player.sendMessage(errorMsg);
 						}
 					}
 				}
+			}
 
-				if (async) {
-					saveIOTask = -1;
+			if (async) {
+				saveIOTask = -1;
 
-					// did we get another request to saveReal() in the meantime?
-					if (saveRealAgain) {
-						// trigger another full save with latest data:
-						saveRealAgain = false;
-						saveReal();
-					}
+				// did we get another request to saveReal() in the meantime?
+				if (saveRealAgain) {
+					// trigger another full save with latest data:
+					saveRealAgain = false;
+					saveReal();
 				}
 			}
 		};
 		// called possibly async:
-		final Runnable savingCallback = new Runnable() {
-
-			@Override
-			public void run() {
-				// ensure that we continue on main thread:
-				SchedulerUtils.runOnMainThreadOrOmit(ShopkeepersPlugin.this, syncSavingCallback);
-			}
+		Runnable savingCallback = () -> {
+			// ensure that we continue on main thread:
+			SchedulerUtils.runOnMainThreadOrOmit(ShopkeepersPlugin.this, syncSavingCallback);
 		};
 
 		if (!async) {
@@ -1445,13 +1411,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		} else {
 			// async file io:
 			final long asyncTaskSubmittedTime = System.currentTimeMillis();
-			saveIOTask = Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
-
-				@Override
-				public void run() {
-					saveResult.asyncTaskDelay = System.currentTimeMillis() - asyncTaskSubmittedTime;
-					saveDataToFile(config, saveResult, savingCallback);
-				}
+			saveIOTask = Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+				saveResult.asyncTaskDelay = System.currentTimeMillis() - asyncTaskSubmittedTime;
+				saveDataToFile(config, saveResult, savingCallback);
 			}).getTaskId();
 		}
 	}

@@ -19,17 +19,12 @@ class ShopNamingListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onChat(AsyncPlayerChatEvent event) {
-		final Player player = event.getPlayer();
-		final Shopkeeper shopkeeper = plugin.endNaming(player);
+		Player player = event.getPlayer();
+		Shopkeeper shopkeeper = plugin.endNaming(player);
 		if (shopkeeper == null) return;
 
 		event.setCancelled(true);
-		final String newName = event.getMessage().trim();
-
-		Bukkit.getScheduler().runTask(plugin, new Runnable() {
-			public void run() {
-				shopkeeper.requestNameChange(player, newName);
-			}
-		});
+		String newName = event.getMessage().trim();
+		Bukkit.getScheduler().runTask(plugin, () -> shopkeeper.requestNameChange(player, newName));
 	}
 }

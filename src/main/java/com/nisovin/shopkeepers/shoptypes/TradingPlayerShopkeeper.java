@@ -86,12 +86,10 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 				if (shopkeeper.clickedItem != null) {
 					// placing item:
 					Inventory inventory = event.getInventory();
-					Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
-						public void run() {
-							inventory.setItem(slot, shopkeeper.clickedItem);
-							shopkeeper.clickedItem = null;
-						}
-					}, 1);
+					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+						inventory.setItem(slot, shopkeeper.clickedItem);
+						shopkeeper.clickedItem = null;
+					});
 				} else {
 					// changing stack size of clicked item:
 					this.handleUpdateItemAmountOnClick(event, 0);

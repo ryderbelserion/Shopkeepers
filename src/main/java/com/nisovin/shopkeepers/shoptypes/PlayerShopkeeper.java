@@ -482,19 +482,11 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				// handled name changing:
 				if (this.requestNameChange(player, newName)) {
 					// manually remove rename item from player's hand after this event is processed:
-					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), new Runnable() {
-						public void run() {
-							ItemStack itemInHand = player.getItemInHand();
-							if (itemInHand.getAmount() <= 1) {
-								player.setItemInHand(null);
-							} else {
-								itemInHand.setAmount(itemInHand.getAmount() - 1);
-								player.setItemInHand(itemInHand);
-							}
-						}
+					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+						ItemStack newItemInHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
+						player.setItemInHand(newItemInHand);
 					});
 				}
-
 				return;
 			}
 		}

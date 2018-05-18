@@ -133,26 +133,26 @@ public abstract class EditorHandler extends UIHandler {
 			// ignore other click events for this shopkeeper in the same tick:
 			shopkeeper.deactivateUI();
 
+			// determine resulting action depending on the clicked item type:
+			ItemStack clickedItem = event.getCurrentItem();
+			boolean renaming = (!ItemUtils.isEmpty(clickedItem) && clickedItem.getType() == Settings.nameItem);
+			boolean openChest = (!renaming && !ItemUtils.isEmpty(clickedItem) && clickedItem.getType() == Settings.chestItem);
+
 			// close editor window delayed, and optionally open chest inventory afterwards:
-			boolean openChest = (event.getCurrentItem().getType() == Settings.chestItem);
-			Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
+			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+				informOnClose(player);
+				player.closeInventory();
 
-				@Override
-				public void run() {
-					informOnClose(player);
-					player.closeInventory();
+				// reactivate ui for this shopkeeper:
+				shopkeeper.activateUI();
 
-					// reactivate ui for this shopkeeper:
-					shopkeeper.activateUI();
-
-					// open chest inventory:
-					if (openChest) {
-						shopkeeper.openChestWindow(player);
-					}
+				// open chest inventory:
+				if (openChest) {
+					shopkeeper.openChestWindow(player);
 				}
-			}, 1L);
+			});
 
-			if (event.getCurrentItem().getType() == Settings.nameItem) {
+			if (renaming) {
 				// start naming:
 				shopkeeper.startNaming(player);
 				Utils.sendMessage(player, Settings.msgTypeNewName);

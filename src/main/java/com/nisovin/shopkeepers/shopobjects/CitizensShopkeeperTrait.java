@@ -97,47 +97,37 @@ public class CitizensShopkeeperTrait extends Trait {
 		}
 
 		// giving citizens some time to properly initialize the trait and npc:
-		Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), new Runnable() {
+		Bukkit.getScheduler().runTaskLater(ShopkeepersPlugin.getInstance(), () -> {
+			// create a new shopkeeper if there isn't one already for this npc:
+			if (!isMissingShopkeeper()) {
+				return;
+			}
 
-			@Override
-			public void run() {
-				// create a new shopkeeper if there isn't one already for this npc:
-				if (!isMissingShopkeeper()) {
-					return;
-				}
+			Log.debug("Creating shopkeeper for NPC " + npc.getId());
 
-				Log.debug("Creating shopkeeper for NPC " + npc.getId());
+			NPC npc = getNPC();
+			Location location = null;
+			Entity entity = npc.getEntity();
+			if (entity != null) {
+				location = entity.getLocation();
+			} else {
+				location = npc.getStoredLocation();
+			}
 
-				NPC npc = getNPC();
-				Location location = null;
-				Entity entity = npc.getEntity();
-				if (entity != null) {
-					location = entity.getLocation();
+			if (location != null) {
+				ShopCreationData creationData = new ShopCreationData(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
+				creationData.npcId = npc.getId();
+				Shopkeeper shopkeeper = ShopkeepersPlugin.getInstance().createNewAdminShopkeeper(creationData);
+				if (shopkeeper != null) {
+					shopkeeperId = shopkeeper.getObjectId();
 				} else {
-					location = npc.getStoredLocation();
+					Log.warning("Shopkeeper creation via trait failed. Removing trait again.");
+					shopkeeperId = null;
+					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> getNPC().removeTrait(CitizensShopkeeperTrait.class));
 				}
-
-				if (location != null) {
-					ShopCreationData creationData = new ShopCreationData(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
-					creationData.npcId = npc.getId();
-					Shopkeeper shopkeeper = ShopkeepersPlugin.getInstance().createNewAdminShopkeeper(creationData);
-					if (shopkeeper != null) {
-						shopkeeperId = shopkeeper.getObjectId();
-					} else {
-						Log.warning("Shopkeeper creation via trait failed. Removing trait again.");
-						shopkeeperId = null;
-						Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), new Runnable() {
-
-							@Override
-							public void run() {
-								getNPC().removeTrait(CitizensShopkeeperTrait.class);
-							}
-						});
-					}
-				} else {
-					// well.. no idea what to do in that case.. we cannot create a shopkeeper without a location, right?
-					Log.debug("Shopkeeper NPC Trait: Failed to create shopkeeper due to missing npc location.");
-				}
+			} else {
+				// well.. no idea what to do in that case.. we cannot create a shopkeeper without a location, right?
+				Log.debug("Shopkeeper NPC Trait: Failed to create shopkeeper due to missing npc location.");
 			}
 		}, 5L);
 	}
