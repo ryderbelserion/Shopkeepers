@@ -119,7 +119,7 @@ class CreateListener implements Listener {
 			// chest for chest selection:
 			if (ItemUtils.isChest(clickedBlock.getType()) && !clickedBlock.equals(selectedChest)) {
 				// check if the clicked chest was recently placed:
-				if (Settings.requireChestRecentlyPlaced && !plugin.wasRecentlyPlaced(player, clickedBlock)) {
+				if (Settings.requireChestRecentlyPlaced && !plugin.isRecentlyPlaced(player, clickedBlock)) {
 					// chest was not recently placed:
 					Utils.sendMessage(player, Settings.msgChestNotPlaced);
 				} else {

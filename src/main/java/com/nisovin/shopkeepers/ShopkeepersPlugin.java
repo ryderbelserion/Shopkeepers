@@ -509,17 +509,17 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			recentlyPlaced = new LinkedList<String>();
 			recentlyPlacedChests.put(playerName, recentlyPlaced);
 		}
-		recentlyPlaced.add(chest.getWorld().getName() + "," + chest.getX() + "," + chest.getY() + "," + chest.getZ());
+		recentlyPlaced.add(Utils.getLocationString(chest));
 		if (recentlyPlaced.size() > 5) {
 			recentlyPlaced.remove(0);
 		}
 	}
 
-	public boolean wasRecentlyPlaced(Player player, Block chest) {
+	public boolean isRecentlyPlaced(Player player, Block chest) {
 		assert player != null && chest != null && ItemUtils.isChest(chest.getType());
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
-		return recentlyPlaced != null && recentlyPlaced.contains(chest.getWorld().getName() + "," + chest.getX() + "," + chest.getY() + "," + chest.getZ());
+		return recentlyPlaced != null && recentlyPlaced.contains(Utils.getLocationString(chest));
 	}
 
 	// SELECTED CHEST

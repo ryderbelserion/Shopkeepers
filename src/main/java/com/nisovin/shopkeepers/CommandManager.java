@@ -628,7 +628,7 @@ class CommandManager implements CommandExecutor {
 
 				// check for recently placed:
 				if (Settings.requireChestRecentlyPlaced) {
-					if (!plugin.wasRecentlyPlaced(player, block)) {
+					if (!plugin.isRecentlyPlaced(player, block)) {
 						Utils.sendMessage(player, Settings.msgChestNotPlaced);
 						return true;
 					}
