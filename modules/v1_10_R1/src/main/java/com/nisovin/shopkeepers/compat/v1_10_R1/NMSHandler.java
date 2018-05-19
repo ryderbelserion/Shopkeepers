@@ -100,6 +100,10 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public void overwriteLivingEntityAI(LivingEntity entity) {
 		try {
+			// setting the entity non-collidable:
+			// TODO this can be moved out of the nms handler once we support 1.9 upwards
+			entity.setCollidable(false);
+
 			EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
 			// example: armor stands are living, but not insentient
 			if (!(mcLivingEntity instanceof EntityInsentient)) return;

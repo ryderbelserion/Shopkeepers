@@ -72,6 +72,8 @@ public final class FailedHandler implements NMSCallProvider {
 	Class classNBTBase;
 	Method areNBTMatchingMethod;
 
+	Method setCollidableMethod;
+
 	@SuppressWarnings("unchecked")
 	public FailedHandler() throws Exception {
 		String versionString = Bukkit.getServer().getClass().getName().replace("org.bukkit.craftbukkit.", "").replace("CraftServer", "");
@@ -134,6 +136,8 @@ public final class FailedHandler implements NMSCallProvider {
 		classGameProfileSerializer = Class.forName(nmsPackageString + "GameProfileSerializer");
 		classNBTBase = Class.forName(nmsPackageString + "NBTBase");
 		areNBTMatchingMethod = classGameProfileSerializer.getDeclaredMethod("a", classNBTBase, classNBTBase, boolean.class);
+
+		setCollidableMethod = LivingEntity.class.getDeclaredMethod("setCollidable", boolean.class);
 	}
 
 	@Override
@@ -194,7 +198,15 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public void overwriteLivingEntityAI(LivingEntity entity) {
+		// workaround to make mobs stationary:
 		entity.addPotionEffect(new PotionEffect(PotionEffectType.SLOW, Short.MAX_VALUE - 1, 15, true));
+
+		// setting the entity non-collidable:
+		// TODO this can be moved out of the nms handler once we support 1.9 upwards
+		try {
+			setCollidableMethod = LivingEntity.class.getDeclaredMethod("setCollidable", boolean.class);
+		} catch (Exception e) {
+		}
 	}
 
 	@Override
