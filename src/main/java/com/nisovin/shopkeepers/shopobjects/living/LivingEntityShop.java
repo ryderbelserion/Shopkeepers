@@ -157,11 +157,11 @@ public class LivingEntityShop extends ShopObject {
 				entity.removePotionEffect(potionEffect.getType());
 			}
 
-			// overwrite AI:
-			this.overwriteAI();
-
 			// apply sub type:
 			this.applySubType();
+
+			// overwrite AI:
+			this.overwriteAI();
 
 			// success:
 			return true;
@@ -244,13 +244,8 @@ public class LivingEntityShop extends ShopObject {
 
 	@Override
 	public boolean check() {
-		String worldName = shopkeeper.getWorldName();
-		int x = shopkeeper.getX();
-		int y = shopkeeper.getY();
-		int z = shopkeeper.getZ();
-
 		if (!this.isActive()) {
-			Log.debug("Shopkeeper (" + worldName + "," + x + "," + y + "," + z + ") missing, triggering respawn now");
+			Log.debug("Shopkeeper (" + shopkeeper.getPositionString() + ") missing, triggering respawn now");
 			boolean silentlyUnloaded = (entity != null && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation()));
 			if (silentlyUnloaded) {
 				// the chunk was silently unloaded before:
@@ -260,6 +255,7 @@ public class LivingEntityShop extends ShopObject {
 			if (spawned) {
 				respawnAttempts = 0;
 				if (silentlyUnloaded) {
+					String worldName = shopkeeper.getWorldName();
 					World world = Bukkit.getWorld(worldName);
 					Location location = this.getSpawnLocation();
 					Chunk chunk = location.getChunk();
