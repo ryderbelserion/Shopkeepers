@@ -5,6 +5,10 @@
 
 # The initial debugging state of the plugin.
 debug: false
+# Whether to report anonymous usage statistics to https://bStats.org
+# All reported information can be found here:
+# https://bstats.org/plugin/bukkit/Shopkeepers
+enable-metrics: true
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Shopkeeper Data

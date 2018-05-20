@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -43,6 +44,13 @@ import com.nisovin.shopkeepers.abstractTypes.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.CreatePlayerShopkeeperEvent;
 import com.nisovin.shopkeepers.events.ShopkeeperCreatedEvent;
+import com.nisovin.shopkeepers.metrics.CitizensChart;
+import com.nisovin.shopkeepers.metrics.VaultEconomyChart;
+import com.nisovin.shopkeepers.metrics.FeaturesChart;
+import com.nisovin.shopkeepers.metrics.PlayerShopsChart;
+import com.nisovin.shopkeepers.metrics.ShopkeepersCountChart;
+import com.nisovin.shopkeepers.metrics.TownyChart;
+import com.nisovin.shopkeepers.metrics.WorldGuardChart;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
@@ -353,6 +361,11 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			if (Utils.isNPC(player)) continue;
 			this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
 		}
+
+		// setup metrics:
+		if (Settings.enableMetrics) {
+			this.setupMetrics();
+		}
 	}
 
 	@Override
@@ -416,6 +429,21 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		this.onEnable();
 	}
 
+	// METRICS
+
+	private void setupMetrics() {
+		Metrics metrics = new Metrics(this);
+		metrics.addCustomChart(new CitizensChart());
+		metrics.addCustomChart(new WorldGuardChart());
+		metrics.addCustomChart(new TownyChart());
+		metrics.addCustomChart(new VaultEconomyChart());
+		metrics.addCustomChart(new ShopkeepersCountChart(this));
+		metrics.addCustomChart(new PlayerShopsChart(this));
+		metrics.addCustomChart(new FeaturesChart());
+	}
+
+	// PLAYER CLEANUP
+
 	void onPlayerQuit(Player player) {
 		String playerName = player.getName();
 		shopTypesManager.clearSelection(player);
@@ -427,6 +455,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		naming.remove(playerName);
 		this.endConfirmation(player);
 	}
+
+	// CREATURE FORCE SPAWN
 
 	// bypassing creature blocking plugins ('region protection' plugins):
 	public void forceCreatureSpawn(Location location, EntityType entityType) {

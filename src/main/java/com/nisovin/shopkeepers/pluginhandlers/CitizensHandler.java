@@ -39,6 +39,10 @@ public class CitizensHandler {
 		return Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
 	}
 
+	public static boolean isPluginEnabled() {
+		return Bukkit.getPluginManager().isPluginEnabled(PLUGIN_NAME);
+	}
+
 	public static boolean isEnabled() {
 		return enabled;
 	}
@@ -49,33 +53,32 @@ public class CitizensHandler {
 			disable();
 		}
 
-		if (Settings.enableCitizenShops) {
-			Plugin citizensPlugin = getPlugin();
-			if (citizensPlugin != null && citizensPlugin.isEnabled()) {
-				Log.info("Citizens found, enabling NPC shopkeepers.");
-				// register shopkeeper trait:
-				assert shopkeeperTrait == null;
-				shopkeeperTrait = TraitInfo.create(CitizensShopkeeperTrait.class).withName(CitizensShopkeeperTrait.TRAIT_NAME);
-				try {
-					CitizensAPI.getTraitFactory().registerTrait(shopkeeperTrait);
-				} catch (Throwable ex) {
-					Log.debug("Shopkeeper trait registration error: " + ex.getMessage());
-					if (Settings.debug) {
-						ex.printStackTrace();
-					}
-				}
+		if (!Settings.enableCitizenShops) return; // feature disabled
+		if (!isPluginEnabled()) {
+			Log.warning("Citizens Shops enabled, but Citizens plugin not found or disabled.");
+			return;
+		}
 
-				// register citizens listener:
-				assert citizensListener == null;
-				citizensListener = new CitizensListener();
-				Bukkit.getPluginManager().registerEvents(citizensListener, ShopkeepersPlugin.getInstance());
-
-				// enabled:
-				enabled = true;
-			} else {
-				Log.warning("Citizens Shops enabled, but Citizens plugin not found or disabled.");
+		Log.info("Citizens found, enabling NPC shopkeepers.");
+		// register shopkeeper trait:
+		assert shopkeeperTrait == null;
+		shopkeeperTrait = TraitInfo.create(CitizensShopkeeperTrait.class).withName(CitizensShopkeeperTrait.TRAIT_NAME);
+		try {
+			CitizensAPI.getTraitFactory().registerTrait(shopkeeperTrait);
+		} catch (Throwable ex) {
+			Log.debug("Shopkeeper trait registration error: " + ex.getMessage());
+			if (Settings.debug) {
+				ex.printStackTrace();
 			}
 		}
+
+		// register citizens listener:
+		assert citizensListener == null;
+		citizensListener = new CitizensListener();
+		Bukkit.getPluginManager().registerEvents(citizensListener, ShopkeepersPlugin.getInstance());
+
+		// enabled:
+		enabled = true;
 	}
 
 	public static void disable() {

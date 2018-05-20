@@ -23,6 +23,7 @@ public class Settings {
 	 * General Settings
 	 */
 	public static boolean debug = false;
+	public static boolean enableMetrics = true;
 
 	/*
 	 * Shopkeeper Data

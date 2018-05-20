@@ -10,13 +10,19 @@ import com.palmergames.bukkit.towny.object.TownyUniverse;
 
 public class TownyHandler {
 
-	public static boolean isCommercialArea(Location loc) {
-		Plugin plugin = Bukkit.getPluginManager().getPlugin("Towny");
-		if (plugin != null) {
-			TownBlock townBlock = TownyUniverse.getTownBlock(loc);
-			return townBlock.getType() == TownBlockType.COMMERCIAL;
-		} else {
-			return false;
-		}
+	public static final String PLUGIN_NAME = "Towny";
+
+	public static Plugin getPlugin() {
+		return Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
+	}
+
+	public static boolean isPluginEnabled() {
+		return Bukkit.getPluginManager().isPluginEnabled(PLUGIN_NAME);
+	}
+
+	public static boolean isCommercialArea(Location location) {
+		if (!isPluginEnabled()) return false;
+		TownBlock townBlock = TownyUniverse.getTownBlock(location);
+		return (townBlock.getType() == TownBlockType.COMMERCIAL);
 	}
 }

@@ -17,20 +17,23 @@ public class WorldGuardHandler {
 		return Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);
 	}
 
+	public static boolean isPluginEnabled() {
+		return Bukkit.getPluginManager().isPluginEnabled(PLUGIN_NAME);
+	}
+
 	public static boolean isShopAllowed(Player player, Location loc) {
-		Plugin plugin = getPlugin();
-		if (plugin != null) {
-			WorldGuardPlugin wgPlugin = (WorldGuardPlugin) plugin;
-			boolean allowShopFlag = wgPlugin.getRegionManager(loc.getWorld()).getApplicableRegions(loc).testState(null, DefaultFlag.ENABLE_SHOP);
-			if (Settings.requireWorldGuardAllowShopFlag) {
-				// allow shops ONLY in regions with the ENABLE_SHOP flag set:
-				return allowShopFlag;
-			} else {
-				// allow shops in regions where the ENABLE_SHOP flag is set OR the player can build:
-				return allowShopFlag || wgPlugin.canBuild(player, loc);
-			}
+		// note: This works even if WorldGuard is not present.
+		// The class is only going to get resolved, when it is required (ex. when accessed).
+		WorldGuardPlugin wgPlugin = (WorldGuardPlugin) getPlugin();
+		if (wgPlugin == null || !wgPlugin.isEnabled()) return true;
+
+		boolean allowShopFlag = wgPlugin.getRegionManager(loc.getWorld()).getApplicableRegions(loc).testState(null, DefaultFlag.ENABLE_SHOP);
+		if (Settings.requireWorldGuardAllowShopFlag) {
+			// allow shops ONLY in regions with the ENABLE_SHOP flag set:
+			return allowShopFlag;
 		} else {
-			return true;
+			// allow shops in regions where the ENABLE_SHOP flag is set OR the player can build:
+			return allowShopFlag || wgPlugin.canBuild(player, loc);
 		}
 	}
 }
