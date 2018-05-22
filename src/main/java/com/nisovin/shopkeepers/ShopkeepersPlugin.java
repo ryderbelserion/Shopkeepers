@@ -863,7 +863,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	int loadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
 		int affectedShops = 0;
-		List<Shopkeeper> shopkeepers = shopkeepersByChunk.get(new ChunkCoords(chunk));
+		List<Shopkeeper> shopkeepers = this.getShopkeepersInChunk(new ChunkCoords(chunk));
 		if (shopkeepers != null) {
 			affectedShops = shopkeepers.size();
 			Log.debug("Loading " + affectedShops + " shopkeepers in chunk " + chunk.getWorld().getName()
@@ -1063,7 +1063,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	public int countShopsOfPlayer(Player player) {
 		int count = 0;
-		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
+		for (Shopkeeper shopkeeper : this.getAllShopkeepers()) {
 			if (shopkeeper instanceof PlayerShopkeeper && ((PlayerShopkeeper) shopkeeper).isOwner(player)) {
 				count++;
 			}
@@ -1126,7 +1126,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 					// remove all shops of this inactive player:
 					UUID playerUUID = inactivePlayer.getUniqueId();
 
-					for (Shopkeeper shopkeeper : shopkeepersById.values()) {
+					for (Shopkeeper shopkeeper : this.getAllShopkeepers()) {
 						if (shopkeeper instanceof PlayerShopkeeper) {
 							PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
 							UUID ownerUUID = playerShop.getOwnerUUID();
@@ -1157,7 +1157,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// updates owner names for the shopkeepers of the specified player:
 	void updateShopkeepersForPlayer(UUID playerUUID, String playerName) {
 		boolean dirty = false;
-		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
+		for (Shopkeeper shopkeeper : this.getAllShopkeepers()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
 				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
 				UUID ownerUUID = playerShop.getOwnerUUID();
@@ -1377,7 +1377,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		// store shopkeeper data into memory configuration:
 		YamlConfiguration config = new YamlConfiguration();
 		int counter = 1;
-		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
+		for (Shopkeeper shopkeeper : this.getAllShopkeepers()) {
 			String sectionKey = String.valueOf(counter++);
 			ConfigurationSection section = config.createSection(sectionKey);
 			try {
