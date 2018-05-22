@@ -2,8 +2,11 @@ package com.nisovin.shopkeepers;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
+import org.bukkit.Chunk;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -123,13 +126,33 @@ public interface ShopkeepersAPI {
 	public Shopkeeper getShopkeeperByBlock(Block block);
 
 	/**
-	 * Gets all shopkeepers for a given chunk. Returns <code>null</code> if there are no shopkeepers in that chunk.
+	 * Gets all shopkeepers for a given chunk.
+	 * 
+	 * @param chunk
+	 *            the chunk
+	 * @return an unmodifiable list of the shopkeepers in the specified chunk, empty if there are none
+	 */
+	public List<Shopkeeper> getShopkeepersInChunk(Chunk chunk);
+
+	/**
+	 * Gets all shopkeepers for a given chunk.
 	 * 
 	 * @param chunkCoords
 	 *            specifies the chunk
-	 * @return an unmodifiable list of the shopkeepers in the specified chunk, or <code>null</code> if there are none
+	 * @return an unmodifiable list of the shopkeepers in the specified chunk, empty if there are none
 	 */
 	public List<Shopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords);
+
+	/**
+	 * Gets all shopkeepers in the specified world.
+	 * 
+	 * @param world
+	 *            the world
+	 * @param onlyLoadedChunks
+	 *            <code>true</code> to only include shopkeepers from loaded chunks
+	 * @return an unmodifiable view on the shopkeepers
+	 */
+	public List<Shopkeeper> getShopkeepersInWorld(World world, boolean onlyLoadedChunks);
 
 	/**
 	 * Checks if a given entity is a Shopkeeper.
@@ -148,13 +171,11 @@ public interface ShopkeepersAPI {
 	public Collection<Shopkeeper> getAllShopkeepers();
 
 	/**
-	 * Gets all loaded shopkeepers grouped by the chunks they are in.
+	 * Gets all shopkeepers grouped by the chunks they are in.
 	 * 
-	 * @return all loaded shopkeepers
-	 * @deprecated Use {@link #getAllShopkeepers()} instead.
+	 * @return an unmodifiable view on all shopkeepers grouped by the chunks they are in
 	 */
-	@Deprecated
-	public Collection<List<Shopkeeper>> getAllShopkeepersByChunks();
+	public Map<ChunkCoords, List<Shopkeeper>> getAllShopkeepersByChunks();
 
 	/**
 	 * Gets all active shopkeepers. Some shopkeeper types might be always active (like sign shops),

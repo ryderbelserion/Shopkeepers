@@ -18,6 +18,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang.Validate;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -119,6 +120,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private int nextShopSessionId = 1;
 	private final Map<Integer, Shopkeeper> shopkeepersBySessionId = new LinkedHashMap<Integer, Shopkeeper>();
 	private final Map<ChunkCoords, List<Shopkeeper>> shopkeepersByChunk = new HashMap<ChunkCoords, List<Shopkeeper>>();
+	// entries are themselves unmodifiable views as well:
+	private final Map<ChunkCoords, List<Shopkeeper>> shopkeepersByChunkView = new HashMap<ChunkCoords, List<Shopkeeper>>();
 	private final Map<String, Shopkeeper> activeShopkeepers = new HashMap<String, Shopkeeper>(); // TODO remove this (?)
 	private final Collection<Shopkeeper> activeShopkeepersView = Collections.unmodifiableCollection(activeShopkeepers.values());
 
@@ -320,7 +323,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		if (Settings.enableSpawnVerifier) {
 			Bukkit.getScheduler().runTaskTimer(this, () -> {
 				int count = 0;
-				for (Entry<ChunkCoords, List<Shopkeeper>> chunkEntry : shopkeepersByChunk.entrySet()) {
+				for (Entry<ChunkCoords, List<Shopkeeper>> chunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
 					ChunkCoords chunk = chunkEntry.getKey();
 					if (chunk.isChunkLoaded()) {
 						List<Shopkeeper> shopkeepers = chunkEntry.getValue();
@@ -400,6 +403,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		activeShopkeepers.clear();
 		shopkeepersByChunk.clear();
+		shopkeepersByChunkView.clear();
 		shopkeepersById.clear();
 		shopkeepersBySessionId.clear();
 		nextShopSessionId = 1;
@@ -624,12 +628,13 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	// SHOPKEEPER MEMORY STORAGE
 
 	private void addShopkeeperToChunk(Shopkeeper shopkeeper, ChunkCoords chunkCoords) {
-		List<Shopkeeper> list = shopkeepersByChunk.get(chunkCoords);
-		if (list == null) {
-			list = new ArrayList<Shopkeeper>();
-			shopkeepersByChunk.put(chunkCoords, list);
+		List<Shopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
+		if (byChunk == null) {
+			byChunk = new ArrayList<Shopkeeper>();
+			shopkeepersByChunk.put(chunkCoords, byChunk);
+			shopkeepersByChunkView.put(chunkCoords, Collections.unmodifiableList(byChunk));
 		}
-		list.add(shopkeeper);
+		byChunk.add(shopkeeper);
 	}
 
 	private void removeShopkeeperFromChunk(Shopkeeper shopkeeper, ChunkCoords chunkCoords) {
@@ -637,6 +642,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		if (byChunk == null) return;
 		if (byChunk.remove(shopkeeper) && byChunk.isEmpty()) {
 			shopkeepersByChunk.remove(chunkCoords);
+			shopkeepersByChunkView.remove(chunkCoords);
 		}
 	}
 
@@ -741,8 +747,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
-	public Collection<List<Shopkeeper>> getAllShopkeepersByChunks() {
-		return Collections.unmodifiableCollection(shopkeepersByChunk.values());
+	public Map<ChunkCoords, List<Shopkeeper>> getAllShopkeepersByChunks() {
+		return shopkeepersByChunkView;
 	}
 
 	@Override
@@ -751,10 +757,34 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
+	public List<Shopkeeper> getShopkeepersInChunk(Chunk chunk) {
+		return this.getShopkeepersInChunk(new ChunkCoords(chunk));
+	}
+
+	@Override
 	public List<Shopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords) {
-		List<Shopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
-		if (byChunk == null) return null;
-		return Collections.unmodifiableList(byChunk);
+		List<Shopkeeper> byChunk = shopkeepersByChunkView.get(chunkCoords);
+		if (byChunk == null) return Collections.emptyList();
+		return byChunk; // unmodifiable already
+	}
+
+	@Override
+	public List<Shopkeeper> getShopkeepersInWorld(World world, boolean onlyLoadedChunks) {
+		Validate.notNull(world, "World is null!");
+		List<Shopkeeper> shopkeepersInWorld = new ArrayList<>();
+		if (onlyLoadedChunks) {
+			for (Chunk chunk : world.getLoadedChunks()) {
+				shopkeepersInWorld.addAll(this.getShopkeepersInChunk(chunk));
+			}
+		} else {
+			String worldName = world.getName();
+			for (Entry<ChunkCoords, List<Shopkeeper>> byChunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
+				if (byChunkEntry.getKey().getWorldName().equals(worldName)) {
+					shopkeepersInWorld.addAll(byChunkEntry.getValue());
+				}
+			}
+		}
+		return Collections.unmodifiableList(shopkeepersInWorld);
 	}
 
 	// LOADING/UNLOADING/REMOVAL
@@ -863,8 +893,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	int loadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
 		int affectedShops = 0;
-		List<Shopkeeper> shopkeepers = this.getShopkeepersInChunk(new ChunkCoords(chunk));
-		if (shopkeepers != null) {
+		List<Shopkeeper> shopkeepers = this.getShopkeepersInChunk(chunk);
+		if (!shopkeepers.isEmpty()) {
 			affectedShops = shopkeepers.size();
 			Log.debug("Loading " + affectedShops + " shopkeepers in chunk " + chunk.getWorld().getName()
 					+ "," + chunk.getX() + "," + chunk.getZ());
@@ -892,8 +922,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	int unloadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
 		int affectedShops = 0;
-		List<Shopkeeper> shopkeepers = this.getShopkeepersInChunk(new ChunkCoords(chunk));
-		if (shopkeepers != null) {
+		List<Shopkeeper> shopkeepers = this.getShopkeepersInChunk(chunk);
+		if (!shopkeepers.isEmpty()) {
 			affectedShops = shopkeepers.size();
 			Log.debug("Unloading " + affectedShops + " shopkeepers in chunk " + chunk.getWorld().getName()
 					+ "," + chunk.getX() + "," + chunk.getZ());
@@ -916,14 +946,16 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	 * 
 	 * @param world
 	 *            the world
+	 * @return the number of loaded shopkeepers
 	 */
-	void loadShopkeepersInWorld(World world) {
+	int loadShopkeepersInWorld(World world) {
 		assert world != null;
 		int affectedShops = 0;
 		for (Chunk chunk : world.getLoadedChunks()) {
 			affectedShops += this.loadShopkeepersInChunk(chunk);
 		}
 		Log.debug("Loaded " + affectedShops + " shopkeepers in world " + world.getName());
+		return affectedShops;
 	}
 
 	/**
@@ -931,14 +963,16 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	 * 
 	 * @param world
 	 *            the world
+	 * @return the number of unloaded shopkeepers
 	 */
-	void unloadShopkeepersInWorld(World world) {
+	int unloadShopkeepersInWorld(World world) {
 		assert world != null;
 		int affectedShops = 0;
 		for (Chunk chunk : world.getLoadedChunks()) {
 			affectedShops += this.unloadShopkeepersInChunk(chunk);
 		}
 		Log.debug("Unloaded " + affectedShops + " shopkeepers in world " + world.getName());
+		return affectedShops;
 	}
 
 	// SHOPKEEPER CREATION:
