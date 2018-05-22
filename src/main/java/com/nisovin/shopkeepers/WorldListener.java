@@ -25,7 +25,7 @@ class WorldListener implements Listener {
 		this.plugin = plugin;
 	}
 
-	@EventHandler
+	@EventHandler(priority = EventPriority.MONITOR)
 	void onChunkLoad(ChunkLoadEvent event) {
 		Chunk chunk = event.getChunk();
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -72,7 +72,7 @@ class WorldListener implements Listener {
 		plugin.loadShopkeepersInWorld(event.getWorld());
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.HIGH)
 	void onWorldUnload(WorldUnloadEvent event) {
 		plugin.unloadShopkeepersInWorld(event.getWorld());
 	}
