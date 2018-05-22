@@ -12,26 +12,26 @@ import org.bukkit.block.Block;
  */
 public final class ChunkCoords {
 
-	public final String worldName;
-	public final int chunkX;
-	public final int chunkZ;
+	private final String worldName;
+	private final int chunkX;
+	private final int chunkZ;
 
 	public ChunkCoords(String worldName, int chunkX, int chunkZ) {
-		Validate.notNull(worldName);
+		Validate.notNull(worldName, "World name is null!");
 		this.worldName = worldName;
 		this.chunkX = chunkX;
 		this.chunkZ = chunkZ;
 	}
 
 	public ChunkCoords(Chunk chunk) {
-		Validate.notNull(chunk);
+		Validate.notNull(chunk, "Chunk is null!");
 		this.worldName = chunk.getWorld().getName();
 		this.chunkX = chunk.getX();
 		this.chunkZ = chunk.getZ();
 	}
 
 	public ChunkCoords(Location location) {
-		Validate.notNull(location);
+		Validate.notNull(location, "Location is null!");
 		World world = location.getWorld();
 		Validate.notNull(world);
 		this.worldName = world.getName();
@@ -40,12 +40,39 @@ public final class ChunkCoords {
 	}
 
 	public ChunkCoords(Block block) {
-		Validate.notNull(block);
+		Validate.notNull(block, "Block is null!");
 		World world = block.getWorld();
 		Validate.notNull(world);
 		this.worldName = world.getName();
 		this.chunkX = convertBlockCoord(block.getX());
 		this.chunkZ = convertBlockCoord(block.getZ());
+	}
+
+	/**
+	 * Gets the chunk's world name.
+	 * 
+	 * @return the chunk's world name
+	 */
+	public String getWorldName() {
+		return worldName;
+	}
+
+	/**
+	 * Gets the chunk's x-coordinate
+	 * 
+	 * @return the chunk's x-coordinate
+	 */
+	public int getChunkX() {
+		return chunkX;
+	}
+
+	/**
+	 * Gets the chunk's z-coordinate
+	 * 
+	 * @return the chunk's z-coordinate
+	 */
+	public int getChunkZ() {
+		return chunkZ;
 	}
 
 	public boolean isChunkLoaded() {
