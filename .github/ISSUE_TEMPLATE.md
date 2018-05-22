@@ -7,11 +7,11 @@
 
 ## Before reporting an issue:
 * Try to reproduce your issue when using:
-  * The latest versions of Spigot and Shopkeeper.
+  * The latest versions of Spigot and Shopkeepers.
   * No other plugins.
   * No kinds of other server or client mods.
 
 ## When reporting an issue:
-* Provide the versions you are using of Minecraft, Spigot and Shopkeeper.
+* Provide the versions you are using of Minecraft, Spigot and Shopkeepers.
 * Provide a detailed description of your problem and add as much information as possible which could help reproducing the issue.
 * If possible, include **step-by-step instructions** on how to reproduce the issue on a fresh Spigot server.
