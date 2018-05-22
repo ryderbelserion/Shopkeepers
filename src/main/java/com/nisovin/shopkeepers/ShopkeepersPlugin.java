@@ -866,7 +866,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		List<Shopkeeper> shopkeepers = shopkeepersByChunk.get(new ChunkCoords(chunk));
 		if (shopkeepers != null) {
 			affectedShops = shopkeepers.size();
-			Log.debug("Loading " + affectedShops + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
+			Log.debug("Loading " + affectedShops + " shopkeepers in chunk " + chunk.getWorld().getName()
+					+ "," + chunk.getX() + "," + chunk.getZ());
 			for (Shopkeeper shopkeeper : shopkeepers) {
 				// inform shopkeeper about chunk load:
 				shopkeeper.onChunkLoad();
@@ -894,7 +895,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		List<Shopkeeper> shopkeepers = this.getShopkeepersInChunk(new ChunkCoords(chunk));
 		if (shopkeepers != null) {
 			affectedShops = shopkeepers.size();
-			Log.debug("Unloading " + affectedShops + " shopkeepers in chunk " + chunk.getX() + "," + chunk.getZ());
+			Log.debug("Unloading " + affectedShops + " shopkeepers in chunk " + chunk.getWorld().getName()
+					+ "," + chunk.getX() + "," + chunk.getZ());
 			for (Shopkeeper shopkeeper : shopkeepers) {
 				// inform shopkeeper about chunk unload:
 				shopkeeper.onChunkUnload();
