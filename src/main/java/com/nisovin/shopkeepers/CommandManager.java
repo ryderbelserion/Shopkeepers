@@ -2,18 +2,23 @@ package com.nisovin.shopkeepers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
@@ -24,6 +29,7 @@ import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shoptypes.AdminShopkeeper;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -114,13 +120,81 @@ class CommandManager implements CommandExecutor {
 				return true;
 			}
 
-			for (Shopkeeper shopkeeper : plugin.getActiveShopkeepers()) {
-				if (shopkeeper.isActive()) {
-					Location loc = shopkeeper.getActualLocation();
-					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": active (" + (loc != null ? loc.toString() : "maybe not?!?") + ")");
-				} else {
-					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": INACTIVE!");
+			boolean isConsole = (sender instanceof ConsoleCommandSender);
+			boolean listChunks = false;
+			boolean listActive = false;
+			if (args.length >= 2) {
+				listChunks = args[1].equals("chunks");
+				listActive = args[1].equals("active");
+			}
+
+			Map<ChunkCoords, List<Shopkeeper>> shopsByChunk = plugin.getAllShopkeepersByChunks();
+
+			sender.sendMessage(ChatColor.YELLOW + "All shopkeepers:");
+			sender.sendMessage("  Total: " + plugin.getAllShopkeepers().size());
+			sender.sendMessage("  Total chunks with shopkeepers: " + shopsByChunk.size());
+			sender.sendMessage("  Active: " + plugin.getActiveShopkeepers().size());
+
+			for (World world : Bukkit.getWorlds()) {
+				String worldName = world.getName();
+				Chunk[] loadedChunks = world.getLoadedChunks();
+				int totalShopkeepers = 0;
+				int chunksWithShopkeepers = 0;
+				int loadedChunksWithShopkeepers = 0;
+				int shopkeepersInLoadedChunks = 0;
+
+				for (Entry<ChunkCoords, List<Shopkeeper>> chunkEntry : shopsByChunk.entrySet()) {
+					ChunkCoords chunkCoords = chunkEntry.getKey();
+					if (!chunkCoords.getWorldName().equals(worldName)) continue;
+					List<Shopkeeper> inChunk = chunkEntry.getValue();
+					chunksWithShopkeepers++;
+					totalShopkeepers += inChunk.size();
+					if (chunkCoords.isChunkLoaded()) {
+						loadedChunksWithShopkeepers++;
+						shopkeepersInLoadedChunks += inChunk.size();
+					}
 				}
+
+				sender.sendMessage(ChatColor.YELLOW + "Shopkeepers in world '" + world.getName() + "':");
+				sender.sendMessage("  Total: " + totalShopkeepers);
+
+				sender.sendMessage("  Chunks with shopkeepers: " + chunksWithShopkeepers);
+				sender.sendMessage("  Loaded chunks: " + loadedChunks.length);
+				sender.sendMessage("  Loaded chunks with shopkeepers: " + loadedChunksWithShopkeepers);
+				sender.sendMessage("  Shopkeepers in loaded chunks: " + shopkeepersInLoadedChunks);
+
+				// list all chunks containing shopkeepers:
+				if (isConsole && listChunks) {
+					sender.sendMessage("  Listing of all chunks with shopkeepers:");
+					int line = 0;
+					for (Entry<ChunkCoords, List<Shopkeeper>> chunkEntry : shopsByChunk.entrySet()) {
+						ChunkCoords chunkCoords = chunkEntry.getKey();
+						if (!chunkCoords.getWorldName().equals(worldName)) continue;
+						List<Shopkeeper> inChunk = chunkEntry.getValue();
+						line++;
+						ChatColor lineColor = (line % 2 == 0 ? ChatColor.WHITE : ChatColor.GRAY);
+						sender.sendMessage("    (" + lineColor + chunkCoords.getChunkX() + "," + chunkCoords.getChunkZ() + ChatColor.RESET + ") ["
+								+ (chunkCoords.isChunkLoaded() ? ChatColor.GREEN + "loaded" : ChatColor.DARK_GRAY + "unloaded") + ChatColor.RESET
+								+ "]: " + inChunk.size());
+					}
+				}
+			}
+
+			// list all active shopkeepers:
+			if (isConsole && listActive) {
+				sender.sendMessage("All active shopkeepers:");
+				for (Shopkeeper shopkeeper : plugin.getActiveShopkeepers()) {
+					if (shopkeeper.isActive()) {
+						Location loc = shopkeeper.getActualLocation();
+						sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": active (" + (loc != null ? loc.toString() : "maybe not?!?") + ")");
+					} else {
+						sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": INACTIVE!");
+					}
+				}
+			}
+
+			if (!isConsole && (listChunks || listActive)) {
+				sender.sendMessage("There might be more information getting printed if the command is run from the console.");
 			}
 			return true;
 		} else if (!(sender instanceof Player)) {
