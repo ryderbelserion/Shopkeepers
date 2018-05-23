@@ -53,6 +53,7 @@ import com.nisovin.shopkeepers.metrics.ShopkeepersCountChart;
 import com.nisovin.shopkeepers.metrics.TownyChart;
 import com.nisovin.shopkeepers.metrics.VaultEconomyChart;
 import com.nisovin.shopkeepers.metrics.WorldGuardChart;
+import com.nisovin.shopkeepers.metrics.WorldsChart;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
@@ -446,6 +447,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		metrics.addCustomChart(new ShopkeepersCountChart(this));
 		metrics.addCustomChart(new PlayerShopsChart(this));
 		metrics.addCustomChart(new FeaturesChart());
+		metrics.addCustomChart(new WorldsChart(this));
 	}
 
 	// PLAYER CLEANUP
