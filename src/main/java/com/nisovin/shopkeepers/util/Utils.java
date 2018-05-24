@@ -11,6 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -25,6 +26,18 @@ import org.bukkit.permissions.Permissible;
 import org.bukkit.util.Vector;
 
 public class Utils {
+
+	/**
+	 * Gets the block's center location.
+	 * 
+	 * @param block
+	 *            the block
+	 * @return the block's center location
+	 */
+	public static Location getBlockCenterLocation(Block block) {
+		Validate.notNull(block, "Block is null!");
+		return block.getLocation().add(0.5D, 0.5D, 0.5D);
+	}
 
 	/**
 	 * Checks if the given {@link BlockFace} is valid to be used for a wall sign.
