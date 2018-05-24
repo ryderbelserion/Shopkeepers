@@ -95,7 +95,8 @@ public class CreatePlayerShopkeeperEvent extends Event implements Cancellable {
 	 *            the spawn location
 	 */
 	public void setSpawnLocation(Location location) {
-		Validate.notNull(location);
+		Validate.notNull(location, "The location is null!");
+		Validate.notNull(location.getWorld() != null, "The location's world is null!");
 		creationData.spawnLocation = location;
 	}
 
