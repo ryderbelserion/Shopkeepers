@@ -48,7 +48,7 @@ Date format: (YYYY-MM-DD)
   * All collected information can be publicly viewed here: https://bstats.org/plugin/bukkit/Shopkeepers/
   * You can disable this globally for all plugins on your server by editing 'plugins/bStats/config.yml'. Or you can alternatively also disable this for Shopkeepers only via the setting 'enable-metrics'.
   * Consider keeping this enabled: Having this information available allows me to determine when it is safe to drop support for older minecraft versions, and on which features I should focus development and optimization efforts.
-* Added a few plugins as soft dependencies (Vault, WorldGuard, Towny, Gringotts). They will now get reliably loaded before Shopkeepers.
+* Added blaze and silverfish to the by default enabled mob types. They seem to work fine with NoAI.
 * Documentation: The full changelog of the plugin can now also be found in the repository: https://github.com/Shopkeepers/Shopkeepers/blob/master/CHANGELOG.md
 * Debugging: Improved the output of debugging command '/shopkeepers check': It prints information about loaded chunks, and it lists various AI and gravity related timing statistics now. With the arguments 'chunks' and 'active' you can let it print additional information. Some information, that may not fit into the player's chat, may only get printed if the command is run from the console. 
 * Debugging: Added world name to chunk load and unload debug messages.
@@ -61,6 +61,7 @@ Date format: (YYYY-MM-DD)
 * API/Internal: Refactored shop creation and shop types.
 * API/Internal: ChunkCoords fields have to be accessed via getters now.
 * API/Internal: The shop creation data is now guarded against unintended modification.
+* Internal: Added a few plugins as soft dependencies (Vault, WorldGuard, Towny, Gringotts). They will now get reliably loaded before Shopkeepers.
 * Internal: Various other refactoring across the project.
 
 ## v1.87 Beta (2018-05-17)
