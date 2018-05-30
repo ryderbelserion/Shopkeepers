@@ -390,7 +390,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 				player.getInventory().setContents(newPlayerInventoryContents); // apply inventory changes
 				shopkeeper.setForHire(null);
 				shopkeeper.setOwner(player);
-				ShopkeepersPlugin.getInstance().save();
+				ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 				Utils.sendMessage(player, Settings.msgHired);
 
 				// close all open windows for this shopkeeper:
@@ -531,7 +531,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	}
 
 	@Override
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		super.save(config);
 		config.set("owner uuid", ownerUUID.toString());
 		config.set("owner", ownerName);

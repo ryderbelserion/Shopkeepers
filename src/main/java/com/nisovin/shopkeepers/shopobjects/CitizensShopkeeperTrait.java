@@ -59,7 +59,7 @@ public class CitizensShopkeeperTrait extends Trait {
 			// this should keep the citizens npc and only remove the shopkeeper data:
 			shopkeeper.delete();
 			// save:
-			ShopkeepersPlugin.getInstance().save();
+			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 		} else {
 			// TODO what if the trait gets removed and Shopkeepers is disabled?
 			// -> does a new npc get created when Shopkeepers enables again?

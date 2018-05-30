@@ -211,7 +211,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		super.save(config);
 		// save offers:
 		PriceOffer.saveToConfig(config, "offers", this.getOffers());

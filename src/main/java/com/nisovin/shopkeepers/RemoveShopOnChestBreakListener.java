@@ -34,7 +34,7 @@ class RemoveShopOnChestBreakListener implements Listener {
 					}
 					plugin.deleteShopkeeper(shopkeeper);
 				}
-				plugin.save();
+				plugin.getShopkeeperStorage().save();
 			}
 		}
 	}

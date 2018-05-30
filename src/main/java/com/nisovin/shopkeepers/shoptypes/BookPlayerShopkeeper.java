@@ -222,7 +222,7 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		super.save(config);
 		// save offers:
 		BookOffer.saveToConfig(config, "offers", this.getOffers());

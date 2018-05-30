@@ -175,7 +175,7 @@ public class CitizensHandler {
 			}
 
 			// save:
-			ShopkeepersPlugin.getInstance().save();
+			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 		}
 	}
 

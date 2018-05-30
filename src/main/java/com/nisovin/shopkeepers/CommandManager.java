@@ -495,7 +495,7 @@ class CommandManager implements CommandExecutor {
 					}
 
 					// trigger save:
-					plugin.save();
+					plugin.getShopkeeperStorage().save();
 
 					// printing result message:
 					int shopsCount = shops.size();
@@ -611,7 +611,7 @@ class CommandManager implements CommandExecutor {
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {
 					shopkeeper.setOwner(newOwner);
 				}
-				plugin.save();
+				plugin.getShopkeeperStorage().save();
 				Utils.sendMessage(player, Settings.msgOwnerSet.replace("{owner}", newOwner.getName()));
 				return true;
 			}
@@ -662,7 +662,7 @@ class CommandManager implements CommandExecutor {
 				((AdminShopkeeper) shopkeeper).setTradePermission(newTradePerm);
 
 				// save:
-				plugin.save();
+				plugin.getShopkeeperStorage().save();
 
 				return true;
 			}
@@ -703,7 +703,7 @@ class CommandManager implements CommandExecutor {
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {
 					shopkeeper.setForHire(hireCost);
 				}
-				plugin.save();
+				plugin.getShopkeeperStorage().save();
 				Utils.sendMessage(player, Settings.msgSetForHire);
 				return true;
 			}

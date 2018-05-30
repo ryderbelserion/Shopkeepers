@@ -138,8 +138,9 @@ public abstract class Shopkeeper {
 	 * 
 	 * @param config
 	 *            the config section
+	 * @deprecated this is currently meant for internal use only
 	 */
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		config.set("uniqueId", uniqueId.toString());
 		config.set("name", Utils.decolorize(name));
 		config.set("world", worldName);
@@ -525,7 +526,7 @@ public abstract class Shopkeeper {
 		Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, this));
 
 		// save:
-		ShopkeepersPlugin.getInstance().save();
+		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 
 		return true;
 	}

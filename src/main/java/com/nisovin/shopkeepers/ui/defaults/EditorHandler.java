@@ -48,7 +48,7 @@ public abstract class EditorHandler extends UIHandler {
 	protected void onInventoryClose(InventoryCloseEvent event, Player player) {
 		this.saveEditor(event.getInventory(), player);
 		this.getShopkeeper().closeAllOpenWindows();
-		ShopkeepersPlugin.getInstance().save();
+		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public abstract class EditorHandler extends UIHandler {
 			Bukkit.getPluginManager().callEvent(new ShopkeeperDeletedEvent(player, shopkeeper));
 
 			// save:
-			ShopkeepersPlugin.getInstance().save();
+			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 		} else if (rawSlot == 17) {
 			// cycle button - cycle to next object type variation:
 			event.setCancelled(true);
@@ -107,7 +107,7 @@ public abstract class EditorHandler extends UIHandler {
 			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
 
 			// save:
-			ShopkeepersPlugin.getInstance().save();
+			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 		} else if (rawSlot == 8) {
 			// naming or chest inventory button:
 			event.setCancelled(true);
@@ -129,7 +129,7 @@ public abstract class EditorHandler extends UIHandler {
 			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
 
 			// save:
-			ShopkeepersPlugin.getInstance().save();
+			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 
 			// ignore other click events for this shopkeeper in the same tick:
 			shopkeeper.deactivateUI();

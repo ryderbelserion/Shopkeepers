@@ -175,7 +175,7 @@ public class AdminShopkeeper extends Shopkeeper {
 	}
 
 	@Override
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		super.save(config);
 		// save trade permission:
 		config.set("tradePerm", tradePermission);

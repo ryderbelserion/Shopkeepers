@@ -41,8 +41,9 @@ public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
 	 * @return the created shopkeeper
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper could not be loaded
+	 * @deprecated this is currently meant for internal use only
 	 */
-	protected abstract T loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException;
+	public abstract T loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException;
 
 	/**
 	 * This needs to be called right after the creation or loading of a shopkeeper.
