@@ -5,12 +5,12 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
-import com.nisovin.shopkeepers.ShopType;
+import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class BuyingPlayerShopType extends ShopType<BuyingPlayerShopkeeper> {
+public class BuyingPlayerShopType extends PlayerShopType<BuyingPlayerShopkeeper> {
 
 	BuyingPlayerShopType() {
 		super("buy", ShopkeepersAPI.PLAYER_BUY_PERMISSION);
@@ -18,7 +18,7 @@ public class BuyingPlayerShopType extends ShopType<BuyingPlayerShopkeeper> {
 
 	@Override
 	public BuyingPlayerShopkeeper loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
-		this.commonPreChecks(config);
+		this.validateConfigSection(config);
 		BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(config);
 		this.registerShopkeeper(shopkeeper);
 		return shopkeeper;
@@ -26,15 +26,10 @@ public class BuyingPlayerShopType extends ShopType<BuyingPlayerShopkeeper> {
 
 	@Override
 	public BuyingPlayerShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
-		this.commonPlayerPreChecks(creationData);
-		BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(creationData);
+		this.validateCreationData(creationData);
+		BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper((PlayerShopCreationData) creationData);
 		this.registerShopkeeper(shopkeeper);
 		return shopkeeper;
-	}
-
-	@Override
-	public boolean isPlayerShopType() {
-		return true;
 	}
 
 	@Override

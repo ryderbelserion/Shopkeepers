@@ -47,24 +47,14 @@ public interface ShopkeepersAPI {
 	public boolean hasCreatePermission(Player player);
 
 	/**
-	 * Creates a new admin shopkeeper and spawns it into the world.
+	 * Creates a new shopkeeper and spawns it into the world.
 	 * 
 	 * @param shopCreationData
-	 *            a container holding the necessary arguments (spawn location, object type, etc.) for creating this
-	 *            shopkeeper
-	 * @return the shopkeeper created, or <code>null</code> if creation wasn't successful for some reason
+	 *            the shop creation data containing the necessary arguments (spawn location, object type, etc.) for
+	 *            creating this shopkeeper
+	 * @return the new shopkeeper, or <code>null</code> if the creation wasn't successful for some reason
 	 */
-	public Shopkeeper createNewAdminShopkeeper(ShopCreationData shopCreationData);
-
-	/**
-	 * Creates a new player-based shopkeeper and spawns it into the world.
-	 * 
-	 * @param shopCreationData
-	 *            a container holding the necessary arguments (spawn location, object type, owner, etc.) for creating
-	 *            this shopkeeper
-	 * @return the shopkeeper created, or <code>null</code> if creation wasn't successful for some reason
-	 */
-	public Shopkeeper createNewPlayerShopkeeper(ShopCreationData shopCreationData);
+	public Shopkeeper createShopkeeper(ShopCreationData shopCreationData);
 
 	/**
 	 * Gets the shopkeeper by its unique id.

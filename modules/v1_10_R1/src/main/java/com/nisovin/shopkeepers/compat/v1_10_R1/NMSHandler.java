@@ -4,6 +4,9 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
 
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_10_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_10_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_10_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_10_R1.inventory.CraftInventoryMerchant;
@@ -16,11 +19,13 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
+import org.bukkit.util.Vector;
 
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
+import net.minecraft.server.v1_10_R1.Entity;
 import net.minecraft.server.v1_10_R1.EntityHuman;
 import net.minecraft.server.v1_10_R1.EntityInsentient;
 import net.minecraft.server.v1_10_R1.EntityLiving;
@@ -29,12 +34,14 @@ import net.minecraft.server.v1_10_R1.GameProfileSerializer;
 import net.minecraft.server.v1_10_R1.InventoryMerchant;
 import net.minecraft.server.v1_10_R1.MerchantRecipe;
 import net.minecraft.server.v1_10_R1.MerchantRecipeList;
+import net.minecraft.server.v1_10_R1.MovingObjectPosition;
 import net.minecraft.server.v1_10_R1.NBTTagCompound;
 import net.minecraft.server.v1_10_R1.NBTTagList;
 import net.minecraft.server.v1_10_R1.PathfinderGoalFloat;
 import net.minecraft.server.v1_10_R1.PathfinderGoalLookAtPlayer;
 import net.minecraft.server.v1_10_R1.PathfinderGoalSelector;
 import net.minecraft.server.v1_10_R1.StatisticList;
+import net.minecraft.server.v1_10_R1.Vec3D;
 
 public final class NMSHandler implements NMSCallProvider {
 
@@ -145,13 +152,62 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
+	public void tickAI(LivingEntity entity) {
+		EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
+		// example: armor stands are living, but not insentient
+		if (!(mcLivingEntity instanceof EntityInsentient)) return;
+		EntityInsentient mcInsentientEntity = ((EntityInsentient) mcLivingEntity);
+		mcInsentientEntity.goalSelector.a();
+		mcInsentientEntity.getControllerLook().a();
+	}
+
+	@Override
+	public double getCollisionDistance(Location start, Vector direction) {
+		// rayTrace parameters: (Vec3d start, Vec3d end, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox,
+		// boolean returnLastUncollidableBlock)
+		Vec3D startPos = new Vec3D(start.getX(), start.getY(), start.getZ());
+		Vec3D endPos = startPos.add(direction.getX(), direction.getY(), direction.getZ()); // creates a new vector
+		MovingObjectPosition hitResult = ((CraftWorld) start.getWorld()).getHandle().rayTrace(startPos, endPos, true, true, false);
+		if (hitResult == null) return direction.length(); // no collisions within the checked range
+		return distance(start, hitResult.pos);
+	}
+
+	private double distance(Location from, Vec3D to) {
+		double dx = to.x - from.getX();
+		double dy = to.y - from.getY();
+		double dz = to.z - from.getZ();
+		return Math.sqrt(dx * dx + dy * dy + dz * dz);
+	}
+
+	@Override
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 		entity.setSilent(silent);
 	}
 
 	@Override
-	public void setNoAI(LivingEntity bukkitEntity) {
-		bukkitEntity.setAI(false);
+	public void setNoAI(LivingEntity entity) {
+		entity.setAI(false);
+		// note: on MC 1.10 this does not disable gravity and collisions
+	}
+
+	@Override
+	public void setGravity(org.bukkit.entity.Entity entity, boolean gravity) {
+		entity.setGravity(gravity);
+
+		if (!gravity) {
+			// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes
+			// that it is currently falling:
+			EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
+			mcLivingEntity.onGround = true;
+		}
+	}
+
+	@Override
+	public void setNoclip(org.bukkit.entity.Entity entity) {
+		// when gravity gets disabled, we are able to also disable collisions/pushing of mobs via the noclip flag:
+		// this might not properly work for Vec, since those disable noclip again after their movement:
+		Entity mcEntity = ((CraftEntity) entity).getHandle();
+		mcEntity.noclip = true;
 	}
 
 	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2, org.bukkit.inventory.ItemStack item3) {

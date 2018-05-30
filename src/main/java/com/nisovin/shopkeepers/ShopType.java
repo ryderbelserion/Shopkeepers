@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
@@ -11,13 +12,6 @@ public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
 		super(identifier, permission);
 	}
 
-	/**
-	 * Whether or not this shop type is a player shop type.
-	 * 
-	 * @return false if it is an admin shop type
-	 */
-	public abstract boolean isPlayerShopType(); // TODO is this needed or could be hidden behind some abstraction?
-
 	public abstract String getCreatedMessage();
 
 	public final ShopType<?> selectNext(Player player) {
@@ -26,10 +20,9 @@ public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
 
 	/**
 	 * Creates a shopkeeper of this type.
-	 * This has to check that all data needed for the shop creation are given and valid.
-	 * For example: the owner and chest argument might be null for creating admin shopkeepers
-	 * while they are needed for player shops.
-	 * Returning null indicates that something is preventing the shopkeeper creation.
+	 * <p>
+	 * This has to check that all data needed for the shop creation are given and valid. For example that for player
+	 * shops an owner and a shop chest has been specified.
 	 * 
 	 * @param data
 	 *            a container holding the necessary arguments (spawn location, object type, owner, etc.) for creating
@@ -62,26 +55,13 @@ public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
 		ShopkeepersPlugin.getInstance().registerShopkeeper(shopkeeper);
 	}
 
-	// common checks, which might be useful for extending classes:
+	// common functions that might be useful for sub-classes:
 
-	protected void commonPreChecks(ShopCreationData creationData) throws ShopkeeperCreateException {
-		// common null checks:
-		if (creationData == null || creationData.spawnLocation == null || creationData.objectType == null) {
-			throw new ShopkeeperCreateException("null");
-		}
+	protected void validateCreationData(ShopCreationData creationData) throws ShopkeeperCreateException {
+		Validate.notNull(creationData, "CreationData is null!");
 	}
 
-	protected void commonPlayerPreChecks(ShopCreationData creationData) throws ShopkeeperCreateException {
-		this.commonPreChecks(creationData);
-		if (creationData.creator == null || creationData.chest == null) {
-			throw new ShopkeeperCreateException("null");
-		}
-	}
-
-	protected void commonPreChecks(ConfigurationSection section) throws ShopkeeperCreateException {
-		// common null checks:
-		if (section == null) {
-			throw new ShopkeeperCreateException("null");
-		}
+	protected void validateConfigSection(ConfigurationSection section) throws ShopkeeperCreateException {
+		Validate.notNull(section, "Config section is null!");
 	}
 }

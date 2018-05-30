@@ -108,6 +108,9 @@ public class Settings {
 			"PARROT" // MC 1.12
 	);
 
+	public static boolean useLegacyMobBehavior = false;
+	public static boolean disableGravity = false;
+	public static int gravityChunkRange = 4;
 	public static boolean silenceLivingShopEntities = true;
 
 	public static boolean showNameplates = true;
@@ -405,6 +408,10 @@ public class Settings {
 		if (maxChestDistance > 50) {
 			Log.warning("Config: 'max-chest-distance' can be at most 50.");
 			maxChestDistance = 50;
+		}
+		if (gravityChunkRange < 0) {
+			Log.warning("Config: 'gravity-chunk-range' cannot be negative.");
+			gravityChunkRange = 0;
 		}
 		if (highCurrencyValue <= 0 && highCurrencyItem != Material.AIR) {
 			Log.debug("Config: 'high-currency-item' disabled because of 'high-currency-value' being less than 1.");

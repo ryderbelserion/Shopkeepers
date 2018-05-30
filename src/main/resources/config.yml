@@ -155,6 +155,21 @@ enabled-living-shops:
 - ILLUSIONER
 - PARROT
 
+# With the old behavior the mobs can be pushed around and their AI and gravity
+# is handled by minecraft itself. With the new behavior all their vanilla AI is
+# disabled and their gravity and behavior is handled by the plugin instead.
+use-legacy-mob-behavior: false
+# Whether shopkeeper mobs shall not be affected by gravity.
+disable-gravity: false
+# The range in chunks around players in which shopkeeper mobs will be affected
+# by gravity. Setting this too high may have a negative impact on performance.
+# And setting it below the server's entity tracking range will result in
+# players being able to see mobs floating in mid air until they get close
+# enough. A value of 0 will limit the gravity to mobs within chunks that
+# contain a player. This has no effect if gravity is disabled, or when using
+# the legacy mob behavior.
+gravity-chunk-range: 4
+
 # Whether mob shopkeepers make sounds.
 silence-living-shop-entities: true
 

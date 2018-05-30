@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shoptypes;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -16,6 +15,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
+import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
@@ -407,18 +407,22 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 	protected ItemStack hireCost = null; // null if not for hire
 
 	/**
-	 * For use in extending classes.
+	 * For use in sub-classes.
 	 */
 	protected PlayerShopkeeper() {
 	}
 
+	/**
+	 * Expects a {@link PlayerShopCreationData}.
+	 */
 	@Override
 	protected void initOnCreation(ShopCreationData creationData) throws ShopkeeperCreateException {
 		super.initOnCreation(creationData);
-		Player owner = creationData.creator;
-		Block chest = creationData.chest;
-		Validate.notNull(owner);
-		Validate.notNull(chest);
+		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) creationData;
+		Player owner = playerShopCreationData.getOwner();
+		Block chest = playerShopCreationData.getShopChest();
+		assert owner != null;
+		assert chest != null;
 
 		this.ownerUUID = owner.getUniqueId();
 		this.ownerName = owner.getName();
@@ -468,7 +472,7 @@ public abstract class PlayerShopkeeper extends Shopkeeper {
 		ItemStack itemInHand = player.getItemInHand();
 		if (Settings.namingOfPlayerShopsViaItem && Settings.isNamingItem(itemInHand)) {
 			// check if player can edit this shopkeeper:
-			PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUIs.EDITOR_WINDOW.getIdentifier());
+			PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUIs.EDITOR_WINDOW);
 			if (editorHandler.canOpen(player)) {
 				// rename with the player's item in hand:
 				String newName;

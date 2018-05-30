@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects;
 
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
@@ -40,5 +42,12 @@ public class SignShopObjectType extends ShopObjectType {
 	@Override
 	public boolean needsSpawning() {
 		return false; // TODO maybe cleanup the shop signs on chunk unload in the future?
+	}
+
+	@Override
+	public boolean isValidSpawnBlockFace(Block targetBlock, BlockFace targetBlockFace) {
+		assert targetBlock != null && Utils.isBlockSide(targetBlockFace);
+		// limit to wall sign faces:
+		return (targetBlockFace != BlockFace.DOWN && targetBlockFace != BlockFace.UP);
 	}
 }

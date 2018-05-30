@@ -14,7 +14,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopCreationData;
+import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.TradingRecipe;
@@ -188,7 +188,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 		this.onInitDone();
 	}
 
-	public NormalPlayerShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
+	public NormalPlayerShopkeeper(PlayerShopCreationData creationData) throws ShopkeeperCreateException {
 		this.initOnCreation(creationData);
 		this.onInitDone();
 	}

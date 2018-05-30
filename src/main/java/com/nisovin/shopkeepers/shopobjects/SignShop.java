@@ -29,7 +29,7 @@ public class SignShop extends ShopObject {
 		return "block" + Utils.getLocationString(block);
 	}
 
-	private BlockFace signFacing;
+	private BlockFace signFacing; // can be null, if not yet loaded or unknown
 
 	// update the sign content at least once after plugin start, in case some settings have changed which affect the
 	// sign content:
@@ -37,7 +37,9 @@ public class SignShop extends ShopObject {
 
 	protected SignShop(Shopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
-		this.signFacing = creationData.blockFace;
+		if (creationData != null) {
+			this.signFacing = creationData.getTargetedBlockFace();
+		}
 	}
 
 	@Override
@@ -54,8 +56,8 @@ public class SignShop extends ShopObject {
 		}
 
 		// in case no sign facing is stored: try getting the current sign facing from sign in the world
-		// if it is not possible (for ex. because the world isn't loaded yet), we will reattempt this
-		// during the periodically checks
+		// if it is not possible (for ex. because the world isn't loaded yet), we will re-attempt this
+		// during the periodic checks
 		if (signFacing == null) {
 			signFacing = this.getSignFacingFromWorld();
 		}

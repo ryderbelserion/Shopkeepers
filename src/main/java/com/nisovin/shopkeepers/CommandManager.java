@@ -25,9 +25,11 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shoptypes.AdminShopkeeper;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
+import com.nisovin.shopkeepers.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -134,6 +136,31 @@ class CommandManager implements CommandExecutor {
 			sender.sendMessage("  Total: " + plugin.getAllShopkeepers().size());
 			sender.sendMessage("  Total chunks with shopkeepers: " + shopsByChunk.size());
 			sender.sendMessage("  Active: " + plugin.getActiveShopkeepers().size());
+			sender.sendMessage("  Active with AI: " + plugin.getLivingEntityAI().getEntityCount());
+			sender.sendMessage("  Active AI chunks: " + plugin.getLivingEntityAI().getActiveAIChunksCount());
+			sender.sendMessage("  Active with active AI: " + plugin.getLivingEntityAI().getActiveAIEntityCount());
+			sender.sendMessage("  Active gravity chunks: " + plugin.getLivingEntityAI().getActiveGravityChunksCount());
+			sender.sendMessage("  Active with active gravity: " + plugin.getLivingEntityAI().getActiveGravityEntityCount());
+
+			double avgTotalAITimings = plugin.getLivingEntityAI().getTotalTimings().getAverageTimeMillis();
+			double maxTotalAITiming = plugin.getLivingEntityAI().getTotalTimings().getMaxTimeMillis();
+			sender.sendMessage("  Avg. total AI timings: " + Utils.DECIMAL_FORMAT.format(avgTotalAITimings) + " ms");
+			sender.sendMessage("  Max. total AI timing: " + Utils.DECIMAL_FORMAT.format(maxTotalAITiming) + " ms");
+
+			double avgAIActivationTimings = plugin.getLivingEntityAI().getActivationTimings().getAverageTimeMillis();
+			double maxAIActivationTiming = plugin.getLivingEntityAI().getActivationTimings().getMaxTimeMillis();
+			sender.sendMessage("    Avg. AI activation timings: " + Utils.DECIMAL_FORMAT.format(avgAIActivationTimings) + " ms");
+			sender.sendMessage("    Max. AI activation timing: " + Utils.DECIMAL_FORMAT.format(maxAIActivationTiming) + " ms");
+
+			double avgGravityTimings = plugin.getLivingEntityAI().getGravityTimings().getAverageTimeMillis();
+			double maxGravityTiming = plugin.getLivingEntityAI().getGravityTimings().getMaxTimeMillis();
+			sender.sendMessage("    Avg. gravity timings: " + Utils.DECIMAL_FORMAT.format(avgGravityTimings) + " ms");
+			sender.sendMessage("    Max. gravity timing: " + Utils.DECIMAL_FORMAT.format(maxGravityTiming) + " ms");
+
+			double avgAITimings = plugin.getLivingEntityAI().getAITimings().getAverageTimeMillis();
+			double maxAITiming = plugin.getLivingEntityAI().getAITimings().getMaxTimeMillis();
+			sender.sendMessage("    Avg. AI timings: " + Utils.DECIMAL_FORMAT.format(avgAITimings) + " ms");
+			sender.sendMessage("    Max. AI timing: " + Utils.DECIMAL_FORMAT.format(maxAITiming) + " ms");
 
 			for (World world : Bukkit.getWorlds()) {
 				String worldName = world.getName();
@@ -157,14 +184,15 @@ class CommandManager implements CommandExecutor {
 
 				sender.sendMessage(ChatColor.YELLOW + "Shopkeepers in world '" + world.getName() + "':");
 				sender.sendMessage("  Total: " + totalShopkeepers);
-
-				sender.sendMessage("  Chunks with shopkeepers: " + chunksWithShopkeepers);
 				sender.sendMessage("  Loaded chunks: " + loadedChunks.length);
-				sender.sendMessage("  Loaded chunks with shopkeepers: " + loadedChunksWithShopkeepers);
-				sender.sendMessage("  Shopkeepers in loaded chunks: " + shopkeepersInLoadedChunks);
+				if (totalShopkeepers > 0) {
+					sender.sendMessage("  Chunks with shopkeepers: " + chunksWithShopkeepers);
+					sender.sendMessage("  Loaded chunks with shopkeepers: " + loadedChunksWithShopkeepers);
+					sender.sendMessage("  Shopkeepers in loaded chunks: " + shopkeepersInLoadedChunks);
+				}
 
 				// list all chunks containing shopkeepers:
-				if (isConsole && listChunks) {
+				if (isConsole && listChunks && totalShopkeepers > 0) {
 					sender.sendMessage("  Listing of all chunks with shopkeepers:");
 					int line = 0;
 					for (Entry<ChunkCoords, List<Shopkeeper>> chunkEntry : shopsByChunk.entrySet()) {
@@ -250,7 +278,7 @@ class CommandManager implements CommandExecutor {
 				sender.sendMessage(ChatColor.GREEN + "Creating " + shopCount + " shopkeepers, starting here!");
 				Location curSpawnLocation = player.getLocation();
 				for (int i = 0; i < shopCount; i++) {
-					plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.MOBS().getObjectType(EntityType.VILLAGER), curSpawnLocation.clone(), null));
+					plugin.createShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.MOBS().getObjectType(EntityType.VILLAGER), curSpawnLocation.clone(), null));
 					curSpawnLocation.add(2, 0, 0);
 				}
 				sender.sendMessage(ChatColor.GREEN + "Done!");
@@ -523,7 +551,7 @@ class CommandManager implements CommandExecutor {
 
 				// find (player) shopkeeper by name or id:
 				Shopkeeper shopkeeper = this.getShopkeeper(shopName);
-				if (shopkeeper == null || shopkeeper.getType().isPlayerShopType()) {
+				if (shopkeeper == null || shopkeeper.getType() instanceof PlayerShopType) {
 					// only admin shops can be remotely opened:
 					Utils.sendMessage(player, Settings.msgUnknownShopkeeper);
 					return true;
@@ -536,11 +564,11 @@ class CommandManager implements CommandExecutor {
 			}
 
 			// get targeted block:
-			Block block = null;
+			Block targetBlock = null;
 			try {
-				block = player.getTargetBlock((Set<Material>) null, 10);
+				targetBlock = player.getTargetBlock((Set<Material>) null, 10);
 			} catch (Exception e) {
-				// getTargetBlock might sometimes cause an exception
+				// getTargetBlock might sometimes throw an exception
 			}
 
 			// transfer ownership:
@@ -560,12 +588,12 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				if (block == null || !ItemUtils.isChest(block.getType())) {
+				if (targetBlock == null || !ItemUtils.isChest(targetBlock.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
 
-				List<PlayerShopkeeper> shopkeepers = plugin.getProtectedChests().getShopkeeperOwnersOfChest(block);
+				List<PlayerShopkeeper> shopkeepers = plugin.getProtectedChests().getShopkeeperOwnersOfChest(targetBlock);
 				if (shopkeepers.size() == 0) {
 					Utils.sendMessage(player, Settings.msgUnusedChest);
 					return true;
@@ -646,12 +674,12 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				if (block == null || !ItemUtils.isChest(block.getType())) {
+				if (targetBlock == null || !ItemUtils.isChest(targetBlock.getType())) {
 					Utils.sendMessage(player, Settings.msgMustTargetChest);
 					return true;
 				}
 
-				List<PlayerShopkeeper> shopkeepers = plugin.getProtectedChests().getShopkeeperOwnersOfChest(block);
+				List<PlayerShopkeeper> shopkeepers = plugin.getProtectedChests().getShopkeeperOwnersOfChest(targetBlock);
 				if (shopkeepers.size() == 0) {
 					Utils.sendMessage(player, Settings.msgUnusedChest);
 					return true;
@@ -682,24 +710,24 @@ class CommandManager implements CommandExecutor {
 
 			// creating new shopkeeper:
 
-			// check for valid spawn location:
-			if (block == null || block.getType() == Material.AIR) {
+			// check for valid targeted block:
+			if (targetBlock == null || targetBlock.getType() == Material.AIR) {
 				Utils.sendMessage(player, Settings.msgShopCreateFail);
 				return true;
 			}
 
-			if (Settings.createPlayerShopWithCommand && ItemUtils.isChest(block.getType())) {
+			if (Settings.createPlayerShopWithCommand && ItemUtils.isChest(targetBlock.getType())) {
 				// create player shopkeeper:
 
 				// check if this chest is already used by some other shopkeeper:
-				if (plugin.getProtectedChests().isChestProtected(block, null)) {
+				if (plugin.getProtectedChests().isChestProtected(targetBlock, null)) {
 					Utils.sendMessage(player, Settings.msgShopCreateFail);
 					return true;
 				}
 
 				// check for recently placed:
 				if (Settings.requireChestRecentlyPlaced) {
-					if (!plugin.isRecentlyPlaced(player, block)) {
+					if (!plugin.isRecentlyPlaced(player, targetBlock)) {
 						Utils.sendMessage(player, Settings.msgChestNotPlaced);
 						return true;
 					}
@@ -709,7 +737,7 @@ class CommandManager implements CommandExecutor {
 				if (Settings.simulateRightClickOnCommand) {
 					ItemStack itemInHand = player.getItemInHand();
 					player.setItemInHand(null);
-					TestPlayerInteractEvent fakeInteractEvent = new TestPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, null, block, BlockFace.UP);
+					TestPlayerInteractEvent fakeInteractEvent = new TestPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, null, targetBlock, BlockFace.UP);
 					Bukkit.getPluginManager().callEvent(fakeInteractEvent);
 					boolean chestAccessDenied = (fakeInteractEvent.useInteractedBlock() == Result.DENY);
 
@@ -781,34 +809,29 @@ class CommandManager implements CommandExecutor {
 					}
 				}
 
-				Block spawnBlock;
-				Location spawnLocation;
-				BlockFace signFacing = null;
-
-				// TODO move somewhere else
-				if (shopObjType == DefaultShopObjectTypes.SIGN()) {
-					// determine wall sign facing: // TODO maybe also allow non-wall signs
-					signFacing = Utils.getTargetBlockFace(player, block);
-					if (signFacing == null || !Utils.isWallSignFace(signFacing)) {
+				// default: spawn on top of targeted block:
+				BlockFace targetBlockFace = BlockFace.UP;
+				if (!shopObjType.isValidSpawnBlockFace(targetBlock, targetBlockFace)) {
+					// some object types (signs) may allow placement on the targeted side:
+					targetBlockFace = Utils.getTargetBlockFace(player, targetBlock);
+					if (targetBlockFace == null || !shopObjType.isValidSpawnBlockFace(targetBlock, targetBlockFace)) {
+						// invalid targeted block face:
 						Utils.sendMessage(player, Settings.msgShopCreateFail);
 						return true;
 					}
-					spawnBlock = block.getRelative(signFacing);
-					spawnLocation = spawnBlock.getLocation();
-				} else {
-					// spawn on top of chest:
-					spawnBlock = block.getRelative(BlockFace.UP);
-					spawnLocation = spawnBlock.getLocation();
 				}
-
-				// check if there is enough space:
-				if (spawnBlock.getType() != Material.AIR) {
+				Block spawnBlock = targetBlock.getRelative(targetBlockFace);
+				// check if the shop can be placed there (enough space, etc.):
+				if (!shopObjType.isValidSpawnBlock(spawnBlock)) {
+					// invalid spawn location:
 					Utils.sendMessage(player, Settings.msgShopCreateFail);
 					return true;
 				}
+				Location spawnLocation = spawnBlock.getLocation();
 
 				// create player shopkeeper:
-				plugin.createNewPlayerShopkeeper(new ShopCreationData(player, shopType, shopObjType, spawnLocation, signFacing, block));
+				plugin.createShopkeeper(new PlayerShopCreationData(player, shopType, shopObjType, spawnLocation, targetBlockFace,
+						player, targetBlock));
 				return true;
 			} else {
 				// create admin shopkeeper:
@@ -833,33 +856,28 @@ class CommandManager implements CommandExecutor {
 					shopObjType = matchedObjectType;
 				}
 
-				Block spawnBlock;
-				Location spawnLocation;
-				BlockFace signFacing = null;
-
-				// TODO move somewhere else
-				if (shopObjType == DefaultShopObjectTypes.SIGN()) {
-					// determine wall sign facing: // TODO maybe also allow non-wall signs
-					signFacing = Utils.getTargetBlockFace(player, block);
-					if (signFacing == null || !Utils.isWallSignFace(signFacing)) {
+				// default: spawn on top of targeted block:
+				BlockFace targetBlockFace = BlockFace.UP;
+				if (!shopObjType.isValidSpawnBlockFace(targetBlock, targetBlockFace)) {
+					// some object types (signs) may allow placement on the targeted side:
+					targetBlockFace = Utils.getTargetBlockFace(player, targetBlock);
+					if (targetBlockFace == null || !shopObjType.isValidSpawnBlockFace(targetBlock, targetBlockFace)) {
+						// invalid targeted block face:
 						Utils.sendMessage(player, Settings.msgShopCreateFail);
 						return true;
 					}
-					spawnBlock = block.getRelative(signFacing);
-					spawnLocation = spawnBlock.getLocation();
-				} else {
-					spawnBlock = block.getRelative(BlockFace.UP);
-					spawnLocation = spawnBlock.getLocation();
 				}
-
-				// check if there is enough space:
-				if (spawnBlock.getType() != Material.AIR) {
+				Block spawnBlock = targetBlock.getRelative(targetBlockFace);
+				// check if the shop can be placed there (enough space, etc.):
+				if (!shopObjType.isValidSpawnBlock(spawnBlock)) {
+					// invalid spawn location:
 					Utils.sendMessage(player, Settings.msgShopCreateFail);
 					return true;
 				}
+				Location spawnLocation = spawnBlock.getLocation();
 
 				// create admin shopkeeper:
-				plugin.createNewAdminShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN(), shopObjType, spawnLocation, signFacing));
+				plugin.createShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN(), shopObjType, spawnLocation, targetBlockFace));
 				return true;
 			}
 		}

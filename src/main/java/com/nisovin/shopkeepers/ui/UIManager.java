@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -19,8 +20,9 @@ import com.nisovin.shopkeepers.util.Log;
  */
 public class UIManager extends TypeRegistry<UIType> {
 
+	// player name -> ui session
 	private final Map<String, UISession> playerSessions = new HashMap<String, UISession>();
-	private UIListener uiListener;
+	private UIListener uiListener = null;
 
 	public UIManager() {
 	}
@@ -42,21 +44,15 @@ public class UIManager extends TypeRegistry<UIType> {
 		return "UIManager";
 	}
 
-	public boolean requestUI(String uiIdentifier, Shopkeeper shopkeeper, Player player) {
-		UIType uiManager = this.get(uiIdentifier);
-		if (uiManager == null) {
-			Log.debug("Unknown interface type: " + uiIdentifier);
-			return false;
-		}
+	public boolean requestUI(UIType uiType, Shopkeeper shopkeeper, Player player) {
+		Validate.notNull(uiType, "UI type is null!");
+		Validate.notNull(shopkeeper, "Shopkeeper is null!");
+		Validate.notNull(player, "Player is null!");
 
-		if (player == null || shopkeeper == null) {
-			Log.debug("Cannot open " + uiIdentifier + ": invalid argument(s): null");
-			return false;
-		}
-
-		UIHandler uiHandler = shopkeeper.getUIHandler(uiIdentifier);
+		String uiIdentifier = uiType.getIdentifier();
+		UIHandler uiHandler = shopkeeper.getUIHandler(uiType);
 		if (uiHandler == null) {
-			Log.debug("Cannot open " + uiIdentifier + ": this shopkeeper is not handling/supporting this type of interface window.");
+			Log.debug("Cannot open " + uiIdentifier + ": This shopkeeper is not handling/supporting this type of user interface.");
 			return false;
 		}
 
@@ -73,7 +69,7 @@ public class UIManager extends TypeRegistry<UIType> {
 			return false;
 		}
 
-		Log.debug("Opening " + uiIdentifier + "...");
+		Log.debug("Opening " + uiIdentifier + " ...");
 		boolean isOpen = uiHandler.openWindow(player);
 		if (isOpen) {
 			Log.debug(uiIdentifier + " opened");
@@ -104,7 +100,6 @@ public class UIManager extends TypeRegistry<UIType> {
 		playerSessions.remove(player.getName());
 	}
 
-	// TODO make sure that this is delayed where needed
 	public void closeAll(Shopkeeper shopkeeper) {
 		if (shopkeeper == null) return;
 		assert shopkeeper != null;
@@ -122,7 +117,7 @@ public class UIManager extends TypeRegistry<UIType> {
 		}
 	}
 
-	public void closeAllDelayed(final Shopkeeper shopkeeper) {
+	public void closeAllDelayed(Shopkeeper shopkeeper) {
 		if (shopkeeper == null) return;
 
 		// deactivate currently active UIs:

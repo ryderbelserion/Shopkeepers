@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.events.ShopkeeperDeletedEvent;
 import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -62,7 +63,7 @@ public abstract class EditorHandler extends UIHandler {
 			event.setCancelled(true);
 
 			// return shop creation item for player shopkeepers:
-			if (Settings.deletingPlayerShopReturnsCreationItem && shopkeeper.getType().isPlayerShopType()) {
+			if (Settings.deletingPlayerShopReturnsCreationItem && shopkeeper.getType() instanceof PlayerShopType) {
 				ItemStack shopCreationItem = Settings.createShopCreationItem();
 				Map<Integer, ItemStack> remaining = player.getInventory().addItem(shopCreationItem);
 				if (!remaining.isEmpty()) {
@@ -114,7 +115,7 @@ public abstract class EditorHandler extends UIHandler {
 			// renaming is disabled for citizens player shops:
 			if (!Settings.enableChestOptionOnPlayerShop
 					&& !Settings.allowRenamingOfPlayerNpcShops
-					&& shopkeeper.getType().isPlayerShopType()
+					&& shopkeeper.getType() instanceof PlayerShopType
 					&& shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN()) {
 				return;
 				// TODO restructure this all, to allow for dynamic editor buttons depending on shop (object) types and
@@ -211,13 +212,13 @@ public abstract class EditorHandler extends UIHandler {
 		// TODO restructure this to allow button types to be registered and unregistered (instead of this condition
 		// check here)
 
-		if (Settings.enableChestOptionOnPlayerShop && shopkeeper.getType().isPlayerShopType()) {
+		if (Settings.enableChestOptionOnPlayerShop && shopkeeper.getType() instanceof PlayerShopType) {
 			// chest button:
 			inventory.setItem(8, Settings.createChestButtonItem());
 		} else {
 			// naming button:
 			boolean useNamingButton = false;
-			if (!shopkeeper.getType().isPlayerShopType()) {
+			if (!(shopkeeper.getType() instanceof PlayerShopType)) {
 				useNamingButton = true;
 			} else {
 				// naming via button enabled?

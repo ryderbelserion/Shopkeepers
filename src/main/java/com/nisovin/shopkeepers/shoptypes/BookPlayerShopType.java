@@ -5,20 +5,20 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
-import com.nisovin.shopkeepers.ShopType;
+import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class BookPlayerShopType extends ShopType<BookPlayerShopkeeper> {
+public class BookPlayerShopType extends PlayerShopType<BookPlayerShopkeeper> {
 
-	BookPlayerShopType() {
+	protected BookPlayerShopType() {
 		super("book", ShopkeepersAPI.PLAYER_BOOK_PERMISSION);
 	}
 
 	@Override
 	public BookPlayerShopkeeper loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
-		this.commonPreChecks(config);
+		this.validateConfigSection(config);
 		BookPlayerShopkeeper shopkeeper = new BookPlayerShopkeeper(config);
 		this.registerShopkeeper(shopkeeper);
 		return shopkeeper;
@@ -26,15 +26,10 @@ public class BookPlayerShopType extends ShopType<BookPlayerShopkeeper> {
 
 	@Override
 	public BookPlayerShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
-		this.commonPlayerPreChecks(creationData);
-		BookPlayerShopkeeper shopkeeper = new BookPlayerShopkeeper(creationData);
+		this.validateCreationData(creationData);
+		BookPlayerShopkeeper shopkeeper = new BookPlayerShopkeeper((PlayerShopCreationData) creationData);
 		this.registerShopkeeper(shopkeeper);
 		return shopkeeper;
-	}
-
-	@Override
-	public boolean isPlayerShopType() {
-		return true;
 	}
 
 	@Override

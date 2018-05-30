@@ -25,7 +25,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
 import org.bukkit.util.Vector;
 
+import com.nisovin.shopkeepers.compat.NMSManager;
+
 public class Utils {
+
+	/**
+	 * Calculates the average of the given values.
+	 * <p>
+	 * Note: This can overflow if the sum of the values doesn't fit into a single <code>long</code>.
+	 * 
+	 * @param values
+	 *            the values
+	 * @return the average
+	 */
+	public static double average(long[] values) {
+		long total = 0L;
+		for (long value : values) {
+			total += value;
+		}
+		return ((double) total / values.length);
+	}
 
 	/**
 	 * Gets the block's center location.
@@ -39,14 +58,27 @@ public class Utils {
 		return block.getLocation().add(0.5D, 0.5D, 0.5D);
 	}
 
+	private static final List<BlockFace> BLOCK_SIDES = Arrays.asList(BlockFace.UP, BlockFace.DOWN,
+			BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
+
+	public static List<BlockFace> getBlockSides() {
+		return BLOCK_SIDES;
+	}
+
+	public static boolean isBlockSide(BlockFace blockFace) {
+		return BLOCK_SIDES.contains(blockFace);
+	}
+
 	/**
 	 * Checks if the given {@link BlockFace} is valid to be used for a wall sign.
 	 * 
 	 * @param blockFace
-	 * @return
+	 *            the block face
+	 * @return <code>true</code> if the given block face is a valid wall sign face
 	 */
 	public static boolean isWallSignFace(BlockFace blockFace) {
-		return blockFace == BlockFace.NORTH || blockFace == BlockFace.SOUTH || blockFace == BlockFace.EAST || blockFace == BlockFace.WEST;
+		return blockFace == BlockFace.NORTH || blockFace == BlockFace.SOUTH
+				|| blockFace == BlockFace.EAST || blockFace == BlockFace.WEST;
 	}
 
 	/**
@@ -126,6 +158,7 @@ public class Utils {
 		return getAxisBlockFace(direction.getX(), 0.0D, direction.getZ());
 	}
 
+	// TODO this doesn't work properly for partial blocks (doesn't take the block collision box into account)
 	/**
 	 * Gets the block face a player is looking at.
 	 * 
@@ -133,7 +166,7 @@ public class Utils {
 	 *            the player
 	 * @param targetBlock
 	 *            the block the player is looking at
-	 * @return the block face, or <code<null</code> if none was found
+	 * @return the block face, or <code>null</code> if none was found
 	 */
 	public static BlockFace getTargetBlockFace(Player player, Block targetBlock) {
 		Location intersection = getBlockIntersection(player, targetBlock);
@@ -153,8 +186,8 @@ public class Utils {
 	 *            the player
 	 * @param targetBlock
 	 *            the block the player is looking at
-	 * @return the intersection point of the players view and the target block,
-	 *         or null if no intersection was found
+	 * @return the intersection point of the players view and the target block, or <code>null</code> if no intersection
+	 *         was found
 	 */
 	public static Location getBlockIntersection(Player player, Block targetBlock) {
 		if (player == null || targetBlock == null) return null;
@@ -243,6 +276,48 @@ public class Utils {
 		// intersection:
 		Location intersection = origin.add(dir.multiply(tmin));
 		return intersection;
+	}
+
+	// temporary objects getting re-used during ray tracing:
+	private static final Location TEMP_LOCATION = new Location(null, 0, 0, 0);
+	private static final Vector TEMP_VECTOR = new Vector(0.0D, 0.0D, 0.0D);
+	private static final double RAY_TRACE_OFFSET = 0.01D;
+
+	/**
+	 * Get the distance to the nearest block collision in the range of the given <code>maxDistance</code>.
+	 * <p>
+	 * This uses a NMS function to ray tray through the blocks' collision bounding boxes (so this goes through passable
+	 * blocks, like liquids, etc.). If the NMS function is not supported by this server version, then <code>0.0</code>
+	 * is returned.
+	 * <p>
+	 * The ray tracing gets slightly offset (by <code>0.01</code>) in order to make sure that we don't miss any block
+	 * directly at the start location. If this results in a hit above the start location, we ignore it and return
+	 * <code>0.0</code>.
+	 * 
+	 * @param startLocation
+	 *            the start location, has to use a valid world, does not get modified
+	 * @param maxDistance
+	 *            the max distance to check for block collisions, has to be positive
+	 * @return the distance to the ground, or <code>maxDistance</code> if there are no block collisions within the
+	 *         specified range
+	 */
+	public static double getCollisionDistanceToGround(Location startLocation, double maxDistance) {
+		// setup our re-used temporary location and vector objects:
+		TEMP_LOCATION.setWorld(startLocation.getWorld());
+		TEMP_LOCATION.setX(startLocation.getX());
+		TEMP_LOCATION.setY(startLocation.getY() + RAY_TRACE_OFFSET);
+		TEMP_LOCATION.setZ(startLocation.getZ());
+
+		TEMP_VECTOR.setX(0.0D);
+		TEMP_VECTOR.setY(-(maxDistance + RAY_TRACE_OFFSET));
+		TEMP_VECTOR.setZ(0.0D);
+
+		// nms function, that considers block collision boxes:
+		double distanceToGround = NMSManager.getProvider().getCollisionDistance(TEMP_LOCATION, TEMP_VECTOR) - RAY_TRACE_OFFSET;
+		TEMP_LOCATION.setWorld(null); // cleanup temporarily used location object
+		// might be negative if the hit is between the start location and the offset start location, we ignore it then:
+		if (distanceToGround < 0.0D) distanceToGround = 0.0D;
+		return distanceToGround;
 	}
 
 	// messages:

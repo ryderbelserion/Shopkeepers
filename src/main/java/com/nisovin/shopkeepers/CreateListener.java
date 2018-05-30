@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
-import org.bukkit.Material;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -15,8 +15,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
@@ -186,21 +186,24 @@ class CreateListener implements Listener {
 			return false;
 		}
 
-		// TODO move object type specific stuff into the object type instead
-		if (shopObjType == DefaultShopObjectTypes.SIGN() && !Utils.isWallSignFace(clickedBlockFace)) {
+		if (!shopObjType.isValidSpawnBlockFace(clickedBlock, clickedBlockFace)) {
+			// invalid targeted block face:
 			Utils.sendMessage(player, Settings.msgShopCreateFail);
 			return false;
 		}
 
 		Block spawnBlock = clickedBlock.getRelative(clickedBlockFace);
-		if (spawnBlock.getType() != Material.AIR) {
+		// check if the shop can be placed there (enough space, etc.):
+		if (!shopObjType.isValidSpawnBlock(spawnBlock)) {
+			// invalid spawn location:
 			Utils.sendMessage(player, Settings.msgShopCreateFail);
-			return false;
+			return true;
 		}
+		Location spawnLocation = spawnBlock.getLocation();
 
 		// create player shopkeeper:
-		ShopCreationData creationData = new ShopCreationData(player, shopType, shopObjType, spawnBlock.getLocation(), clickedBlockFace, selectedChest);
-		Shopkeeper shopkeeper = plugin.createNewPlayerShopkeeper(creationData);
+		ShopCreationData creationData = new PlayerShopCreationData(player, shopType, shopObjType, spawnLocation, clickedBlockFace, player, selectedChest);
+		Shopkeeper shopkeeper = plugin.createShopkeeper(creationData);
 		if (shopkeeper == null) {
 			// something else prevented this shopkeeper from being created
 			return false;

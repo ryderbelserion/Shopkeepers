@@ -116,8 +116,8 @@ public class CitizensShopkeeperTrait extends Trait {
 
 			if (location != null) {
 				ShopCreationData creationData = new ShopCreationData(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
-				creationData.npcId = npc.getId();
-				Shopkeeper shopkeeper = ShopkeepersPlugin.getInstance().createNewAdminShopkeeper(creationData);
+				creationData.setValue(CitizensShop.CREATION_DATA_NPC_ID_KEY, npc.getId());
+				Shopkeeper shopkeeper = ShopkeepersPlugin.getInstance().createShopkeeper(creationData);
 				if (shopkeeper != null) {
 					shopkeeperId = shopkeeper.getObjectId();
 				} else {

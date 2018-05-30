@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.Log;
 
@@ -22,6 +23,8 @@ import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 
 public class CitizensShop extends ShopObject {
+
+	public static String CREATION_DATA_NPC_ID_KEY = "CitizensNpcId";
 
 	public static String getId(int npcId) {
 		return "NPC-" + npcId;
@@ -33,9 +36,11 @@ public class CitizensShop extends ShopObject {
 
 	protected CitizensShop(Shopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
-		// can be null here, as currently only NPC shopkeepers created by the shopkeeper trait provide the npc id via
-		// the creation data:
-		this.npcId = creationData.npcId;
+		if (creationData != null) {
+			// can be null here, as currently only NPC shopkeepers created by the shopkeeper trait provide the npc id
+			// via the creation data:
+			this.npcId = creationData.getValue(CREATION_DATA_NPC_ID_KEY);
+		}
 	}
 
 	@Override
@@ -63,7 +68,7 @@ public class CitizensShop extends ShopObject {
 		// create npc:
 		EntityType entityType;
 		String name;
-		if (shopkeeper.getType().isPlayerShopType()) {
+		if (shopkeeper.getType() instanceof PlayerShopType) {
 			// player shops will use a player npc:
 			entityType = EntityType.PLAYER;
 			name = ((PlayerShopkeeper) shopkeeper).getOwnerName();
@@ -72,12 +77,14 @@ public class CitizensShop extends ShopObject {
 			name = "Shopkeeper";
 		}
 
-		// prepare location:
-		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		Location location = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
-
 		// create npc:
-		npcId = CitizensHandler.createNPC(location, entityType, name);
+		Location spawnLocation = this.getSpawnLocation();
+		npcId = CitizensHandler.createNPC(spawnLocation, entityType, name);
+	}
+
+	private Location getSpawnLocation() {
+		World world = Bukkit.getWorld(shopkeeper.getWorldName());
+		return new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
 	}
 
 	@Override
@@ -156,20 +163,14 @@ public class CitizensShop extends ShopObject {
 	public boolean check() {
 		NPC npc = this.getNPC();
 		if (npc != null) {
-			String worldName = shopkeeper.getWorldName();
-			World world = Bukkit.getWorld(worldName);
-			int x = shopkeeper.getX();
-			int y = shopkeeper.getY();
-			int z = shopkeeper.getZ();
-
 			Location currentLocation = npc.getStoredLocation();
-			Location expectedLocation = new Location(world, x + 0.5D, y + 0.5D, z + 0.5D);
+			Location expectedLocation = this.getSpawnLocation();
 			if (currentLocation == null) {
 				npc.teleport(expectedLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
-				Log.debug("Shopkeeper NPC (" + worldName + "," + x + "," + y + "," + z + ") had no location, teleported");
+				Log.debug("Shopkeeper NPC (" + shopkeeper.getPositionString() + ") had no location, teleported");
 			} else if (!currentLocation.getWorld().equals(expectedLocation.getWorld()) || currentLocation.distanceSquared(expectedLocation) > 1.0D) {
 				shopkeeper.setLocation(currentLocation);
-				Log.debug("Shopkeeper NPC (" + worldName + "," + x + "," + y + "," + z + ") out of place, re-indexing");
+				Log.debug("Shopkeeper NPC (" + shopkeeper.getPositionString() + ") out of place, re-indexing");
 			}
 		} else {
 			// Not going to force Citizens creation, this seems like it could go really wrong.

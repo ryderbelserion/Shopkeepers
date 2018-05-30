@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.compat.api;
 
 import java.util.List;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -10,6 +11,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
+import org.bukkit.util.Vector;
 
 import com.nisovin.shopkeepers.TradingRecipe;
 
@@ -23,9 +25,30 @@ public interface NMSCallProvider {
 
 	public void overwriteLivingEntityAI(LivingEntity entity);
 
+	// whether tickAI and getCollisionDistance are supported
+	public default boolean supportsCustomMobAI() {
+		return true;
+	}
+
+	public void tickAI(LivingEntity entity);
+
+	// returns the distance to the nearest block collision in the range of the given direction vector
+	// note: this uses the blocks collision bounding boxes (so this goes through passable blocks, like liquids, etc.)
+	// note: does not modify the start location and direction vector
+	public double getCollisionDistance(Location start, Vector direction);
+
 	public void setEntitySilent(Entity entity, boolean silent);
 
-	public void setNoAI(LivingEntity bukkitEntity);
+	public void setNoAI(LivingEntity entity);
+
+	// on some MC versions (ex. MC 1.9, 1.10) NoAI only disables AI
+	public default boolean isNoAIDisablingGravity() {
+		return true;
+	}
+
+	public void setGravity(Entity entity, boolean gravity);
+
+	public void setNoclip(Entity entity);
 
 	public ItemStack loadItemAttributesFromString(ItemStack item, String data);
 

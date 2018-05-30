@@ -17,7 +17,7 @@ public class AdminShopType extends ShopType<AdminShopkeeper> {
 
 	@Override
 	public AdminShopkeeper loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
-		this.commonPreChecks(config);
+		this.validateConfigSection(config);
 		AdminShopkeeper shopkeeper = new AdminShopkeeper(config);
 		this.registerShopkeeper(shopkeeper);
 		return shopkeeper;
@@ -25,15 +25,10 @@ public class AdminShopType extends ShopType<AdminShopkeeper> {
 
 	@Override
 	public AdminShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
-		this.commonPreChecks(creationData);
+		this.validateCreationData(creationData);
 		AdminShopkeeper shopkeeper = new AdminShopkeeper(creationData);
 		this.registerShopkeeper(shopkeeper);
 		return shopkeeper;
-	}
-
-	@Override
-	public boolean isPlayerShopType() {
-		return false;
 	}
 
 	@Override

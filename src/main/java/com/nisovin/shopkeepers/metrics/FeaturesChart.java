@@ -38,6 +38,10 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 			addFeatureEntry(allFeatures, "disable-other-villagers", Settings.disableOtherVillagers);
 			addFeatureEntry(allFeatures, "block-villager-spawns", Settings.blockVillagerSpawns);
 			addFeatureEntry(allFeatures, "hire-other-villagers", Settings.hireOtherVillagers);
+			addFeatureEntry(allFeatures, "use-legacy-mob-behavior", Settings.useLegacyMobBehavior);
+			addFeatureEntry(allFeatures, "disable-gravity", Settings.disableGravity);
+			addFeatureEntry(allFeatures, "increased gravity chunk range", Settings.gravityChunkRange > 4);
+			addFeatureEntry(allFeatures, "decreased gravity chunk range", Settings.gravityChunkRange < 4);
 			return allFeatures;
 		});
 	}

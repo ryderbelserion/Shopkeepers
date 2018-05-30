@@ -14,16 +14,16 @@ public final class NMSManager {
 	}
 
 	public static void load(Plugin plugin) {
-		final String packageName = plugin.getServer().getClass().getPackage().getName();
+		String packageName = plugin.getServer().getClass().getPackage().getName();
 		String cbversion = packageName.substring(packageName.lastIndexOf('.') + 1);
 		try {
-			final Class<?> clazz = Class.forName("com.nisovin.shopkeepers.compat." + cbversion + ".NMSHandler");
+			Class<?> clazz = Class.forName("com.nisovin.shopkeepers.compat." + cbversion + ".NMSHandler");
 			if (NMSCallProvider.class.isAssignableFrom(clazz)) {
 				NMSManager.provider = (NMSCallProvider) clazz.getConstructor().newInstance();
 			} else {
 				throw new Exception("Nope");
 			}
-		} catch (final Exception e) {
+		} catch (Exception e) {
 			Log.severe("Potentially incompatible server version: " + cbversion);
 			Log.severe("Shopkeepers is trying to run in 'compatibility mode'.");
 			Log.info("Check for updates at: " + plugin.getDescription().getWebsite());

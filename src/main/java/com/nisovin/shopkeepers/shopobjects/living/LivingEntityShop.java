@@ -110,7 +110,12 @@ public class LivingEntityShop extends ShopObject {
 
 	private Location getSpawnLocation() {
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		return new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
+		double offset = 0.0D;
+		// is gravity active? -> spawn slightly above the ground:
+		if (!Settings.disableGravity && !(Settings.useLegacyMobBehavior && this.isNoAIMobType() && NMSManager.getProvider().isNoAIDisablingGravity())) {
+			offset = 0.5D;
+		}
+		return new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + offset, shopkeeper.getZ() + 0.5D);
 	}
 
 	@Override
@@ -306,6 +311,9 @@ public class LivingEntityShop extends ShopObject {
 				}
 			}
 
+			// disable AI:
+			this.cleanupAI();
+
 			// cleanup metadata:
 			this.removeShopkeeperMetadata(entity);
 
@@ -324,11 +332,32 @@ public class LivingEntityShop extends ShopObject {
 
 	protected void overwriteAI() {
 		NMSManager.getProvider().overwriteLivingEntityAI(entity);
+
+		if (!Settings.useLegacyMobBehavior) {
+			// disable AI (also disables gravity) and replace it with our own handling:
+			NMSManager.getProvider().setNoAI(entity);
+			if (NMSManager.getProvider().supportsCustomMobAI()) {
+				ShopkeepersPlugin.getInstance().getLivingEntityAI().addEntity(entity);
+			}
+		}
+
 		if (Settings.silenceLivingShopEntities) {
 			NMSManager.getProvider().setEntitySilent(entity, true);
 		}
+		if (Settings.disableGravity) {
+			NMSManager.getProvider().setGravity(entity, false);
+			// when gravity gets disabled, we might be able to also disable collisions/pushing of mobs via noclip:
+			NMSManager.getProvider().setNoclip(entity);
+		}
 
-		// set the NoAI tag for certain entity types:
+		// set the NoAI tag always for certain entity types:
+		if (this.isNoAIMobType()) {
+			NMSManager.getProvider().setNoAI(entity);
+		}
+	}
+
+	// some mobs will always get their AI disabled in order to properly work:
+	protected boolean isNoAIMobType() {
 		switch (livingObjectType.getEntityType()) {
 		case BAT:
 		case ENDER_DRAGON:
@@ -336,10 +365,14 @@ public class LivingEntityShop extends ShopObject {
 		case WITHER:
 		case SILVERFISH:
 		case BLAZE:
-			NMSManager.getProvider().setNoAI(entity);
-			break;
+			return true;
 		default:
-			break;
+			return false;
 		}
+	}
+
+	protected void cleanupAI() {
+		// disable AI:
+		ShopkeepersPlugin.getInstance().getLivingEntityAI().removeEntity(entity);
 	}
 }

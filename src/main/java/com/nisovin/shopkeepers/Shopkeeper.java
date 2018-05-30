@@ -72,25 +72,25 @@ public abstract class Shopkeeper {
 	 *             if the shopkeeper cannot be properly initialized
 	 */
 	protected void initOnCreation(ShopCreationData creationData) throws ShopkeeperCreateException {
-		Validate.notNull(creationData.spawnLocation);
-		Validate.notNull(creationData.objectType);
+		assert creationData != null;
 
 		this.uniqueId = UUID.randomUUID();
-
-		Location location = creationData.spawnLocation;
-		this.worldName = location.getWorld().getName();
-		this.x = location.getBlockX();
-		this.y = location.getBlockY();
-		this.z = location.getBlockZ();
+		Location spawnLocation = creationData.getSpawnLocation();
+		assert spawnLocation != null;
+		this.worldName = spawnLocation.getWorld().getName();
+		this.x = spawnLocation.getBlockX();
+		this.y = spawnLocation.getBlockY();
+		this.z = spawnLocation.getBlockZ();
 		this.updateChunkCoords();
 
-		this.shopObject = creationData.objectType.createObject(this, creationData);
+		ShopObjectType shopObjectType = creationData.getShopObjectType();
+		assert shopObjectType != null;
+		this.shopObject = shopObjectType.createObject(this, creationData);
 	}
 
 	/**
-	 * Call this at the beginning of the constructor of an extending class,
-	 * after either {@link #initOnLoad(ConfigurationSection)} or {@link #initOnCreation(ShopCreationData)} have been
-	 * called.
+	 * Call this at the beginning of the constructor of an extending class, after either
+	 * {@link #initOnLoad(ConfigurationSection)} or {@link #initOnCreation(ShopCreationData)} have been called.
 	 */
 	protected void onInitDone() {
 		// nothing by default
@@ -129,7 +129,7 @@ public abstract class Shopkeeper {
 			Log.warning("Invalid object type '" + config.getString("object") + "' for shopkeeper '" + uniqueId
 					+ "'. Did you edit the save file? Switching to default type '" + objectType.getIdentifier() + "'.");
 		}
-		this.shopObject = objectType.createObject(this, new ShopCreationData()); // dummy ShopCreationData
+		this.shopObject = objectType.createObject(this, null);
 		this.shopObject.load(config);
 	}
 
@@ -386,51 +386,42 @@ public abstract class Shopkeeper {
 	}
 
 	/**
-	 * Gets the handler this specific shopkeeper is using for the specified interface type.
-	 * 
-	 * @param uiIdentifier
-	 *            Specifies the user interface type.
-	 * @return The handler, or null if this shopkeeper is not supporting the specified interface type
-	 */
-	public UIHandler getUIHandler(String uiIdentifier) {
-		return uiHandlers.get(uiIdentifier);
-	}
-
-	/**
-	 * 
-	 * @param uiManager
-	 *            Specifies the type of user interface.
-	 * @return
-	 */
-	public UIHandler getUIHandler(UIType uiManager) {
-		return uiManager != null ? uiHandlers.get(uiManager.getIdentifier()) : null;
-	}
-
-	/**
-	 * Registers an ui handler for a specific type of user interface for this specific shopkeeper.
+	 * Registers an {@link UIHandler} which handles a specific type of user interface for this shopkeeper.
 	 * 
 	 * @param uiHandler
-	 *            The handler
+	 *            the ui handler
 	 */
 	public void registerUIHandler(UIHandler uiHandler) {
-		Validate.notNull(uiHandler);
+		Validate.notNull(uiHandler, "UI handler is null!");
 		uiHandlers.put(uiHandler.getUIType().getIdentifier(), uiHandler);
 	}
 
 	/**
-	 * Attempts to open the interface specified by the given identifier for the specified player.
-	 * Fails if this shopkeeper doesn't support the specified interface type, if the player
-	 * cannot open this interface type for this shopkeeper (for example because of missing permissions),
-	 * or if something else goes wrong.
+	 * Gets the {@link UIHandler} this shopkeeper is using for the specified {@link UIType}.
 	 * 
-	 * @param uiIdentifier
-	 *            Specifies the user interface type.
-	 * @param player
-	 *            the player requesting the specified interface
-	 * @return true the player's request was successful and the interface was opened, false otherwise
+	 * @param uiType
+	 *            the ui type
+	 * @return the ui handler, or <code>null</code> if none is available
 	 */
-	public boolean openWindow(String uiIdentifier, Player player) {
-		return ShopkeepersPlugin.getInstance().getUIManager().requestUI(uiIdentifier, this, player);
+	public UIHandler getUIHandler(UIType uiType) {
+		Validate.notNull(uiType, "UI type is null!");
+		return uiHandlers.get(uiType.getIdentifier());
+	}
+
+	/**
+	 * Attempts to open the interface for the given {@link UIType} for the specified player.
+	 * <p>
+	 * This fails if this shopkeeper doesn't support the specified interface type, if the player cannot open this
+	 * interface type for this shopkeeper (for example because of missing permissions), or if something else goes wrong.
+	 * 
+	 * @param uiType
+	 *            the requested ui type
+	 * @param player
+	 *            the player requesting the interface
+	 * @return <code>true</code> the player's request was successful and the interface was opened, false otherwise
+	 */
+	public boolean openWindow(UIType uiType, Player player) {
+		return ShopkeepersPlugin.getInstance().getUIManager().requestUI(uiType, this, player);
 	}
 
 	// shortcuts for the default window types:
@@ -440,10 +431,10 @@ public abstract class Shopkeeper {
 	 * 
 	 * @param player
 	 *            the player requesting the editor interface
-	 * @return whether or not the player's request was successful and the player is now editing
+	 * @return <code>true</code> if the interface was successfully opened for the player
 	 */
 	public boolean openEditorWindow(Player player) {
-		return this.openWindow(DefaultUIs.EDITOR_WINDOW.getIdentifier(), player);
+		return this.openWindow(DefaultUIs.EDITOR_WINDOW, player);
 	}
 
 	/**
@@ -451,31 +442,34 @@ public abstract class Shopkeeper {
 	 * 
 	 * @param player
 	 *            the player requesting the trading interface
-	 * @return whether or not the player's request was successful and the player is now trading
+	 * @return <code>true</code> if the interface was successfully opened for the player
 	 */
 	public boolean openTradingWindow(Player player) {
-		return this.openWindow(DefaultUIs.TRADING_WINDOW.getIdentifier(), player);
+		return this.openWindow(DefaultUIs.TRADING_WINDOW, player);
 	}
 
+	// TODO move these into PlayerShopkeeper
 	/**
 	 * Attempts to open the hiring interface of this shopkeeper for the specified player.
+	 * <p>
 	 * Fails if this shopkeeper type doesn't support hiring (ex. admin shops).
 	 * 
 	 * @param player
 	 *            the player requesting the hiring interface
-	 * @return whether or not the player's request was successful and the player is now hiring
+	 * @return <code>true</code> if the interface was successfully opened for the player
 	 */
 	public boolean openHireWindow(Player player) {
-		return this.openWindow(DefaultUIs.HIRING_WINDOW.getIdentifier(), player);
+		return this.openWindow(DefaultUIs.HIRING_WINDOW, player);
 	}
 
 	/**
 	 * Attempts to open the chest inventory of this shopkeeper for the specified player.
+	 * <p>
 	 * Fails if this shopkeeper type doesn't have a chest (ex. admin shops).
 	 * 
 	 * @param player
 	 *            the player requesting the chest inventory window
-	 * @return whether or not the player's request was successful and the inventory window was opened
+	 * @return <code>true</code> if the interface was successfully opened for the player
 	 */
 	public boolean openChestWindow(Player player) {
 		return false;

@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.compat.v1_8_R2;
 import java.lang.reflect.Field;
 import java.util.List;
 
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_8_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
@@ -15,6 +17,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
+import org.bukkit.util.Vector;
 
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
@@ -29,12 +32,14 @@ import net.minecraft.server.v1_8_R2.GameProfileSerializer;
 import net.minecraft.server.v1_8_R2.InventoryMerchant;
 import net.minecraft.server.v1_8_R2.MerchantRecipe;
 import net.minecraft.server.v1_8_R2.MerchantRecipeList;
+import net.minecraft.server.v1_8_R2.MovingObjectPosition;
 import net.minecraft.server.v1_8_R2.NBTTagCompound;
 import net.minecraft.server.v1_8_R2.NBTTagList;
 import net.minecraft.server.v1_8_R2.PathfinderGoalFloat;
 import net.minecraft.server.v1_8_R2.PathfinderGoalLookAtPlayer;
 import net.minecraft.server.v1_8_R2.PathfinderGoalSelector;
 import net.minecraft.server.v1_8_R2.StatisticList;
+import net.minecraft.server.v1_8_R2.Vec3D;
 
 public final class NMSHandler implements NMSCallProvider {
 
@@ -139,21 +144,63 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
+	public void tickAI(LivingEntity entity) {
+		EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
+		// example: armor stands are living, but not insentient
+		if (!(mcLivingEntity instanceof EntityInsentient)) return;
+		EntityInsentient mcInsentientEntity = ((EntityInsentient) mcLivingEntity);
+		mcInsentientEntity.goalSelector.a();
+		mcInsentientEntity.getControllerLook().a();
+	}
+
+	@Override
+	public double getCollisionDistance(Location start, Vector direction) {
+		// rayTrace parameters: (Vec3d start, Vec3d end, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox,
+		// boolean returnLastUncollidableBlock)
+		Vec3D startPos = new Vec3D(start.getX(), start.getY(), start.getZ());
+		Vec3D endPos = startPos.add(direction.getX(), direction.getY(), direction.getZ()); // creates a new vector
+		MovingObjectPosition hitResult = ((CraftWorld) start.getWorld()).getHandle().rayTrace(startPos, endPos, true, true, false);
+		if (hitResult == null) return direction.length(); // no collisions within the checked range
+		return distance(start, hitResult.pos);
+	}
+
+	private double distance(Location from, Vec3D to) {
+		double dx = to.a - from.getX();
+		double dy = to.b - from.getY();
+		double dz = to.c - from.getZ();
+		return Math.sqrt(dx * dx + dy * dy + dz * dz);
+	}
+
+	@Override
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 		Entity mcEntity = ((CraftEntity) entity).getHandle();
 		mcEntity.b(silent);
 	}
 
 	@Override
-	public void setNoAI(LivingEntity bukkitEntity) {
-		net.minecraft.server.v1_8_R2.Entity nmsEntity = ((CraftEntity) bukkitEntity).getHandle();
-		NBTTagCompound tag = nmsEntity.getNBTTag();
+	public void setNoAI(LivingEntity entity) {
+		EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
+		NBTTagCompound tag = mcLivingEntity.getNBTTag();
 		if (tag == null) {
 			tag = new NBTTagCompound();
 		}
-		nmsEntity.c(tag);
+		mcLivingEntity.c(tag);
 		tag.setInt("NoAI", 1);
-		nmsEntity.f(tag);
+		mcLivingEntity.f(tag);
+
+		// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes that
+		// it is currently falling:
+		mcLivingEntity.onGround = true;
+	}
+
+	@Override
+	public void setGravity(org.bukkit.entity.Entity entity, boolean gravity) {
+		// not supported
+	}
+
+	@Override
+	public void setNoclip(org.bukkit.entity.Entity entity) {
+		// not supported
 	}
 
 	private MerchantRecipe createMerchantRecipe(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2, org.bukkit.inventory.ItemStack item3) {

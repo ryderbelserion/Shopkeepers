@@ -41,6 +41,7 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.abstractTypes.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.CreatePlayerShopkeeperEvent;
@@ -60,8 +61,10 @@ import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SignShop;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
+import com.nisovin.shopkeepers.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
 import com.nisovin.shopkeepers.ui.UIManager;
@@ -95,7 +98,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		public boolean canBeSelected(Player player, ShopType<?> type) {
 			// TODO This currently skips the admin shop type. Maybe included the admin shop types here for players
 			// which are admins, because there /could/ be different types of admin shops in the future (?)
-			return super.canBeSelected(player, type) && type.isPlayerShopType();
+			return super.canBeSelected(player, type) && (type instanceof PlayerShopType);
 		}
 	};
 
@@ -133,6 +136,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// protected chests:
 	private final ProtectedChests protectedChests = new ProtectedChests();
+	private final LivingEntityAI livingEntityAI = new LivingEntityAI();
 
 	// saving:
 	// flag to (temporary) turn off saving
@@ -396,7 +400,9 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			this.saveReal(false); // not async here
 		}
 
-		// inform ProtectedChests:
+		// inform other components:
+		livingEntityAI.stop();
+		livingEntityAI.reset(); // cleanup, reset timings, etc.
 		protectedChests.onDisable(this);
 
 		// cleanup:
@@ -489,6 +495,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	public ProtectedChests getProtectedChests() {
 		return protectedChests;
+	}
+
+	// LIVING ENTITY AI
+
+	public LivingEntityAI getLivingEntityAI() {
+		return livingEntityAI;
 	}
 
 	// SHOP TYPES
@@ -986,113 +998,85 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
-	public Shopkeeper createNewAdminShopkeeper(ShopCreationData creationData) {
+	public Shopkeeper createShopkeeper(ShopCreationData creationData) {
+		Validate.notNull(creationData, "CreationData is null!");
 		try {
-			if (creationData == null || creationData.spawnLocation == null || creationData.objectType == null) {
-				throw new ShopkeeperCreateException("null");
-			}
-			if (creationData.shopType == null) {
-				creationData.shopType = DefaultShopTypes.ADMIN();
-			} else if (creationData.shopType.isPlayerShopType()) {
-				// we are expecting an admin shop type here..
-				throw new ShopkeeperCreateException("Expecting admin shop type, got player shop type!");
-			}
+			// receives messages, can be null:
+			Player creator = creationData.getCreator();
+			ShopType<?> shopType = creationData.getShopType();
 
-			// create the shopkeeper (and spawn it):
-			Shopkeeper shopkeeper = creationData.shopType.createShopkeeper(creationData);
-			if (shopkeeper == null) {
-				throw new ShopkeeperCreateException("ShopType returned null shopkeeper!");
-			}
-			assert shopkeeper != null;
+			// additional checks for player shops:
+			// TODO move this into PlayerShopType
+			if (shopType instanceof PlayerShopType) {
+				if (!(creationData instanceof PlayerShopCreationData)) {
+					throw new ShopkeeperCreateException("Expecting player shop creation data!");
+				}
+				ShopCreationData.PlayerShopCreationData playerShopData = (ShopCreationData.PlayerShopCreationData) creationData;
 
-			// save:
-			this.save();
-
-			// send creation message to creator:
-			Utils.sendMessage(creationData.creator, creationData.shopType.getCreatedMessage());
-
-			// run shopkeeper-created-event:
-			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(creationData.creator, shopkeeper));
-
-			return shopkeeper;
-		} catch (ShopkeeperCreateException e) {
-			Log.warning("Couldn't create admin shopkeeper: " + e.getMessage());
-			return null;
-		}
-	}
-
-	@Override
-	public Shopkeeper createNewPlayerShopkeeper(ShopCreationData creationData) {
-		try {
-			if (creationData == null || creationData.shopType == null || creationData.objectType == null
-					|| creationData.creator == null || creationData.chest == null || creationData.spawnLocation == null) {
-				throw new ShopkeeperCreateException("null");
-			}
-
-			// check if this chest is already used by some other shopkeeper:
-			if (this.getProtectedChests().isChestProtected(creationData.chest, null)) {
-				Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
-				return null;
-			}
-
-			// check worldguard:
-			if (Settings.enableWorldGuardRestrictions) {
-				if (!WorldGuardHandler.isShopAllowed(creationData.creator, creationData.spawnLocation)) {
-					Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
+				// check if this chest is already used by some other shopkeeper:
+				if (this.getProtectedChests().isChestProtected(playerShopData.getShopChest(), null)) {
+					Utils.sendMessage(creator, Settings.msgShopCreateFail);
 					return null;
 				}
-			}
+				Player owner = playerShopData.getOwner();
+				Location spawnLocation = creationData.getSpawnLocation();
 
-			// check towny:
-			if (Settings.enableTownyRestrictions) {
-				if (!TownyHandler.isCommercialArea(creationData.spawnLocation)) {
-					Utils.sendMessage(creationData.creator, Settings.msgShopCreateFail);
-					return null;
+				// check worldguard:
+				if (Settings.enableWorldGuardRestrictions) {
+					if (!WorldGuardHandler.isShopAllowed(owner, spawnLocation)) {
+						Utils.sendMessage(creator, Settings.msgShopCreateFail);
+						return null;
+					}
 				}
-			}
 
-			int maxShops = this.getMaxShops(creationData.creator);
+				// check towny:
+				if (Settings.enableTownyRestrictions) {
+					if (!TownyHandler.isCommercialArea(spawnLocation)) {
+						Utils.sendMessage(creator, Settings.msgShopCreateFail);
+						return null;
+					}
+				}
 
-			// call event:
-			CreatePlayerShopkeeperEvent event = new CreatePlayerShopkeeperEvent(creationData, maxShops);
-			Bukkit.getPluginManager().callEvent(event);
-			if (event.isCancelled()) {
-				Log.debug("CreatePlayerShopkeeperEvent was cancelled!");
-				return null;
-			} else {
-				creationData.spawnLocation = event.getSpawnLocation();
-				creationData.shopType = event.getType();
-				maxShops = event.getMaxShopsForPlayer();
-			}
-
-			// count owned shops:
-			if (maxShops > 0) {
-				int count = this.countShopsOfPlayer(creationData.creator);
-				if (count >= maxShops) {
-					Utils.sendMessage(creationData.creator, Settings.msgTooManyShops);
+				int maxShops = this.getMaxShops(owner);
+				// call event:
+				CreatePlayerShopkeeperEvent event = new CreatePlayerShopkeeperEvent(creationData, maxShops);
+				Bukkit.getPluginManager().callEvent(event);
+				if (event.isCancelled()) {
+					Log.debug("CreatePlayerShopkeeperEvent was cancelled!");
 					return null;
+				} else {
+					maxShops = event.getMaxShopsForPlayer();
+				}
+
+				// count owned shops:
+				if (maxShops > 0) {
+					int count = this.countShopsOfPlayer(owner);
+					if (count >= maxShops) {
+						Utils.sendMessage(creator, Settings.msgTooManyShops);
+						return null;
+					}
 				}
 			}
 
 			// create and spawn the shopkeeper:
-			Shopkeeper shopkeeper = creationData.shopType.createShopkeeper(creationData);
+			Shopkeeper shopkeeper = shopType.createShopkeeper(creationData);
 			if (shopkeeper == null) {
 				throw new ShopkeeperCreateException("ShopType returned null shopkeeper!");
 			}
 			assert shopkeeper != null;
 
+			// run shopkeeper-created-event:
+			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(creator, shopkeeper));
+
+			// send creation message to creator:
+			Utils.sendMessage(creator, shopType.getCreatedMessage());
+
 			// save:
 			this.save();
 
-			// send creation message to creator:
-			Utils.sendMessage(creationData.creator, creationData.shopType.getCreatedMessage());
-
-			// run shopkeeper-created-event
-			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(creationData.creator, shopkeeper));
-
 			return shopkeeper;
 		} catch (ShopkeeperCreateException e) {
-			Log.warning("Couldn't create player shopkeeper: " + e.getMessage());
+			Log.warning("Couldn't create shopkeeper: " + e.getMessage());
 			return null;
 		}
 	}
@@ -1296,6 +1280,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		Log.info("Loading data of " + ids.size() + " shopkeepers..");
 		for (String id : ids) {
 			ConfigurationSection shopkeeperSection = shopkeepersConfig.getConfigurationSection(id);
+			if (shopkeeperSection == null) {
+				Log.warning("Failed to load shopkeeper '" + id + "': Invalid config section!");
+				continue;
+			}
 			ShopType<?> shopType = shopTypesManager.get(shopkeeperSection.getString("type"));
 			// unknown shop type
 			if (shopType == null) {
