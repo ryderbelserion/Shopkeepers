@@ -3,7 +3,65 @@ Date format: (YYYY-MM-DD)
 
 ## Next release
 ### Supported MC versions: xxx
-* 
+**Major change to Shopkeepers' mob behavior:**
+* Shopkeeper mobs by default use minecraft's NoAI flag now:
+  * This disables various internal AI behavior that would otherwise still be active in the background (villagers for example would periodically search for nearby villages and even cause chunk loads by that).
+  * This makes shop entities unpushable (at least on certain MC versions, see below).
+* However:
+  * In order to keep the look-at-nearby-players behavior, the plugin now manually triggers the minecraft logic responsible for that.
+  * In order for the entities to still be affected by gravity, the plugin now manually periodically checks for block collisions below mobs and then teleports them downwards. This doesn't look as smooth as minecraft's gravity motion, but it should suffice (especially since the shopkeeper mobs are usually not falling far from their initial spawn position anyways).
+  
+**Impact on performance:**
+* Shopkeepers only runs the AI and the gravity for mobs that are in range of players (AI: 1 chunk around players, gravity: 4 chunks around players by default).
+* You can experiment with the gravity chunk range by tuning the config setting 'gravity-chunk-range'. Setting it lower than your server's entity tracking range might however result in players being able to see mobs floating above the ground until they get closer. And if setting it higher than your server's entity tracking range, mobs that are falling for a larger distance might end up visually appearing inside the ground for players near the entity tracking range (see https://hub.spigotmc.org/jira/browse/SPIGOT-3948).
+  * This should not be that big of an issue though, since this only affects players at the edge of the tracking range and mobs that are falling for a large distance. And the mobs get teleported back to their spawn position every 10 seconds anyways.
+* Internal: The active AI and gravity chunks are currently determined only once every 20 ticks, and falling conditions of mobs are checked only once every 10 ticks.
+* Internal: The shopkeeper mobs get their internal isOnGround flag set, so that the mobs are properly recognized by Spigot's entity activation range and not getting ticked when far away.
+* Please note: Since at least some AI stuff is now run or triggered by the Shopkeepers plugin, your timings reports will show that Shopkeepers is using quite a bit more of your server's ticking time now. Don't be irritated by that though: I tried to optimize this quite a bit, so hopefully if you compare the performance of your server overall before and after the update, it should in summary even be a small improvement, since lots of unneeded AI and movement logic is no longer getting run.
+
+**Other related changes:**
+* Shopkeeper mobs get the 'collidable' flag set on MC 1.9 and above now. Unfortunately this alone will not prevent them from getting pushed around, however it might be beneficial regardless, due them being fully ignored by minecarts, boats and projectiles now.
+* You can disable the new mob behavior with the setting 'use-legacy-mob-behavior' (default: false). AI and gravity will then be handled by minecraft directly again. By the way, please use this setting and compare the overall performance of your server with and without the new mob behavior and let me know of your findings!
+  * Side note: Spigot added a new setting 'tick-inactive-villagers' (default: true). If you have areas with lots of villagers, and you are using the old (legacy) mob behavior, consider disabling this setting. Otherwise those villagers might cause lots of unneeded additional chunk loads due to their search for nearby villages.
+* You are now able to fully disable gravity of shopkeeper mobs via the setting 'disable-gravity' (default: false).
+  * This only works on MC 1.10 and later.
+  * If you are using the legacy-mob-behavior: Some mob types will always get their AI disabled, and will therefore not be affected by gravity regardless of that setting.
+  * With gravity enabled, mobs spawn 0.5 blocks above their spawning position (like before).
+  * With gravity disabled, mobs will be spawned exactly at the position they are meant to be. Note however, that if your shopkeeper's spawn location is already above the ground (for example if they were placed on top of grass or other collision-less blocks), those shopkeepers will end up floating above the ground.
+
+**Note on MC version differences:**
+* On MC 1.9 and MC 1.10 the NoAI tag does not disable minecraft's gravity and collision handling. Mobs will therefore by default be pushable on those versions, even with the new mob behavior.
+* However, if gravity gets disabled on MC 1.10 and above, we are also able to disable collisions/pushing of mobs (by using minecraft's internal noclip flag of entities).
+
+**Various improvements when running on a not yet supported version of minecraft:**
+* Fixed: Freezing of mobs via a slowness potion effect didn't properly work. Instead mobs get their movement speed set to zero now via a custom attribute modifier.
+* Fixed: The fallback handler supports silencing of entities now.
+* Fixed: The fallback handler wasn't able to handle trading recipes with empty second item.
+* Fixed: The fallback handler was updated to now support setting the NoAI flag of mobs.
+* Note on the new mob behavior: The new AI and gravity handling is not supported when running on unsupported minecraft versions: All entity AI will be prevented (due to the NoAI flag), but no AI replacement will be active, causing the mobs to not be affected by gravity and not look at nearby players.
+  * As workaround you may enable the legacy mob behavior in this case then: Minecraft will handle AI and gravity again then. However, this might be unperformant due to lots of unneeded internal AI logic being active then.
+  * When using the legacy mob behavior and also disabling gravity, the mobs will additionally not be affected by gravity and they can no longer be pushed around by players.
+
+**Other changes:**
+* Added bStats metrics: This reports anonymous usage statistics to bstats.org.
+  * Besides the general server and plugin information, this also collects Shopkeepers-specific information about: Usage of supported third-party plugins, used Vault economy, usage of various features, total shopkeeper count and the number of worlds containing shopkeepers.
+  * All collected information can be publicly viewed here: https://bstats.org/plugin/bukkit/Shopkeepers/
+  * You can disable this globally for all plugins on your server by editing 'plugins/bStats/config.yml'. Or you can alternatively also disable this for Shopkeepers only via the setting 'enable-metrics'.
+  * Consider keeping this enabled: Having this information available allows me to determine when it is safe to drop support for older minecraft versions, and on which features I should focus development and optimization efforts.
+* Added a few plugins as soft dependencies (Vault, WorldGuard, Towny, Gringotts). They will now get reliably loaded before Shopkeepers.
+* Documentation: The full changelog of the plugin can now also be found in the repository: https://github.com/Shopkeepers/Shopkeepers/blob/master/CHANGELOG.md
+* Debugging: Improved the output of debugging command '/shopkeepers check': It prints information about loaded chunks, and it lists various AI and gravity related timing statistics now. With the arguments 'chunks' and 'active' you can let it print additional information. Some information, that may not fit into the player's chat, may only get printed if the command is run from the console. 
+* Debugging: Added world name to chunk load and unload debug messages.
+* API: CreatePlayerShopkeeperEvent has changed a bit. It also no longer supports changing the shop type.
+* API: Removed createNewAdminShopkeeper and createNewPlayerShopkeeper and added a general createShopkeeper method instead.
+* API: The getShopkeepersFromChunk method now returns an empty list instead of null, in case a chunk doesn't contain any shopkeepers.
+* API: Added method to get all shopkeepers in a specific world (optionally only from loaded chunks).
+* API: Various javadoc improvements.
+* API/Internal: User interfaces now get requested via the UIType instead of a plain UI identifier.
+* API/Internal: Refactored shop creation and shop types.
+* API/Internal: ChunkCoords fields have to be accessed via getters now.
+* API/Internal: The shop creation data is now guarded against unintended modification.
+* Internal: Various other refactoring across the project.
 
 ## v1.87 Beta (2018-05-17)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
