@@ -83,6 +83,8 @@ public class Settings {
 			EntityType.WOLF.name(),
 			EntityType.SNOWMAN.name(),
 			EntityType.IRON_GOLEM.name(),
+			EntityType.BLAZE.name(),
+			EntityType.SILVERFISH.name(),
 			"POLAR_BEAR", // MC 1.10
 			EntityType.SKELETON.name(),
 			"STRAY", // MC 1.11
