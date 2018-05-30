@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -54,15 +55,17 @@ public class LivingEntityAI {
 	// in the next tick
 	private static final double GRAVITY_COLLISION_CHECK_RANGE = MAX_FALLING_DISTANCE_PER_TICK + 0.1D;
 
+	private static final Random RANDOM = new Random();
+
 	private static class EntityData {
 		private final ChunkData chunkData;
-		public boolean falling;
+		// random initial delay to distribute falling checks of entities among ticks:
+		public int skipFallingCheckTicks = RANDOM.nextInt(10);
+		public boolean falling = false;
 		public double distanceToGround = 0.0D;
 
-		public EntityData(ChunkData chunkData, boolean activeGravity) {
+		public EntityData(ChunkData chunkData) {
 			this.chunkData = chunkData;
-			// active by default to quickly check for falling conditions initially:
-			this.falling = activeGravity;
 		}
 	}
 
@@ -226,7 +229,6 @@ public class LivingEntityAI {
 				activeGravityChunksCount = 0;
 
 				// activate chunks with nearby players:
-				// active gravity handling?
 				boolean gravityActive = this.isGravityActive();
 				int gravityChunkRange = Math.max(Settings.gravityChunkRange, 0);
 				for (Player player : Bukkit.getOnlinePlayers()) {
@@ -239,9 +241,6 @@ public class LivingEntityAI {
 				activationTimings.stop();
 			}
 
-			// check for changed falling conditions every 10 ticks (offset from activation checking by 5 ticks):
-			// TODO split this over multiple ticks, for example by using a random per-entity offset
-			boolean checkFallingConditions = ((tickCounter + 5) % 10 == 0);
 			activeAIEntityCount = 0;
 			activeGravityEntityCount = 0;
 			Iterator<Entry<LivingEntity, EntityData>> iterator = entities.entrySet().iterator();
@@ -262,17 +261,21 @@ public class LivingEntityAI {
 				if (chunkData.activeGravity) {
 					activeGravityEntityCount++;
 
-					// checking periodically if the entity is meant to fall, or if already falling:
-					if (checkFallingConditions || entityData.falling) {
+					// check periodically, or if already falling, if the entity is meant to (continue to) fall:
+					entityData.skipFallingCheckTicks--;
+					if ((entityData.skipFallingCheckTicks <= 0) || entityData.falling) {
+						// falling, if the distance-to-ground is above the threshold:
 						Location entityLocation = entity.getLocation(tempLocation);
 						entityData.distanceToGround = Utils.getCollisionDistanceToGround(entityLocation, GRAVITY_COLLISION_CHECK_RANGE);
-						// not falling if the distance-to-ground is below the threshold:
 						entityData.falling = (entityData.distanceToGround >= DISTANCE_TO_GROUND_THRESHOLD);
-					}
 
-					// handle falling:
-					if (entityData.falling) {
-						this.handleFalling(entity, entityData);
+						// handle falling:
+						if (entityData.falling) {
+							this.handleFalling(entity, entityData);
+						}
+
+						// wait 10 ticks before checking again:
+						entityData.skipFallingCheckTicks = 10;
 					}
 				}
 				gravityTimings.pause();
@@ -307,14 +310,10 @@ public class LivingEntityAI {
 	}
 
 	public void stop() {
-		if (aiTask != null) {
-			aiTask.cancel();
-			aiTask = null;
-			this.resetStatistics();
-		}
-		// cleanup here as well, just in case:
-		// activeAIChunks.clear();
-		// activeGravityChunks.clear();
+		if (aiTask == null) return;
+		aiTask.cancel();
+		aiTask = null;
+		this.resetStatistics();
 	}
 
 	public boolean isActive() {
@@ -332,7 +331,7 @@ public class LivingEntityAI {
 		// determine entity chunk (asserts that the entity won't move!):
 		Chunk entityChunk = entity.getLocation(tempLocation).getChunk();
 		tempLocation.setWorld(null); // cleanup temporarily used location object
-		
+
 		// active gravity handling?
 		boolean gravityActive = this.isGravityActive();
 
@@ -345,7 +344,7 @@ public class LivingEntityAI {
 		chunkData.entityCount++;
 
 		// add entity entry:
-		entities.put(entity, new EntityData(chunkData, gravityActive));// new EntityData(entityChunk, tickCounter + 20));
+		entities.put(entity, new EntityData(chunkData));
 
 		// start the ai task, if it isn't already running:
 		this.start();
