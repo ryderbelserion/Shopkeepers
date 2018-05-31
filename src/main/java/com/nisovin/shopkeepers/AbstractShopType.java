@@ -47,7 +47,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Sel
 	 */
 	protected void registerShopkeeper(T shopkeeper) {
 		shopkeeper.shopObject.onInit();
-		ShopkeepersPlugin.getInstance().registerShopkeeper(shopkeeper);
+		SKShopkeepersPlugin.getInstance().registerShopkeeper(shopkeeper);
 	}
 
 	// common functions that might be useful for sub-classes:

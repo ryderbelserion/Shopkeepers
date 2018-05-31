@@ -7,13 +7,13 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.ShopkeepersAPI;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class TradingPlayerShopType extends AbstractPlayerShopType<TradingPlayerShopkeeper> {
 
 	TradingPlayerShopType() {
-		super("trade", ShopkeepersAPI.PLAYER_TRADE_PERMISSION);
+		super("trade", ShopkeepersPlugin.PLAYER_TRADE_PERMISSION);
 	}
 
 	@Override

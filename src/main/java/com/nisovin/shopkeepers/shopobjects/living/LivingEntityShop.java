@@ -18,7 +18,7 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.Log;
@@ -75,11 +75,11 @@ public class LivingEntityShop extends ShopObject {
 	}
 
 	protected void assignShopkeeperMetadata(LivingEntity entity) {
-		entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
+		entity.setMetadata("shopkeeper", new FixedMetadataValue(SKShopkeepersPlugin.getInstance(), true));
 	}
 
 	protected void removeShopkeeperMetadata(LivingEntity entity) {
-		entity.removeMetadata("shopkeeper", ShopkeepersPlugin.getInstance());
+		entity.removeMetadata("shopkeeper", SKShopkeepersPlugin.getInstance());
 	}
 
 	// returns true if we find a valid entity:
@@ -135,7 +135,7 @@ public class LivingEntityShop extends ShopObject {
 			// TODO check if the block is passable before spawning there?
 			// try to bypass entity-spawn blocking plugins:
 			EntityType entityType = this.getEntityType();
-			ShopkeepersPlugin.getInstance().forceCreatureSpawn(spawnLocation, entityType);
+			SKShopkeepersPlugin.getInstance().forceCreatureSpawn(spawnLocation, entityType);
 			entity = (LivingEntity) world.spawnEntity(spawnLocation, entityType);
 			uuid = entity.getUniqueId().toString();
 		}
@@ -337,7 +337,7 @@ public class LivingEntityShop extends ShopObject {
 			// disable AI (also disables gravity) and replace it with our own handling:
 			NMSManager.getProvider().setNoAI(entity);
 			if (NMSManager.getProvider().supportsCustomMobAI()) {
-				ShopkeepersPlugin.getInstance().getLivingEntityAI().addEntity(entity);
+				SKShopkeepersPlugin.getInstance().getLivingEntityAI().addEntity(entity);
 			}
 		}
 
@@ -373,6 +373,6 @@ public class LivingEntityShop extends ShopObject {
 
 	protected void cleanupAI() {
 		// disable AI:
-		ShopkeepersPlugin.getInstance().getLivingEntityAI().removeEntity(entity);
+		SKShopkeepersPlugin.getInstance().getLivingEntityAI().removeEntity(entity);
 	}
 }

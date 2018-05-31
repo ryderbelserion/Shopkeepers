@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.events.ShopkeeperDeletedEvent;
 import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
@@ -49,7 +49,7 @@ public abstract class EditorHandler extends UIHandler {
 	protected void onInventoryClose(InventoryCloseEvent event, Player player) {
 		this.saveEditor(event.getInventory(), player);
 		this.getShopkeeper().closeAllOpenWindows();
-		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+		SKShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 	}
 
 	@Override
@@ -80,7 +80,7 @@ public abstract class EditorHandler extends UIHandler {
 			Bukkit.getPluginManager().callEvent(new ShopkeeperDeletedEvent(player, shopkeeper));
 
 			// save:
-			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+			SKShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 		} else if (rawSlot == 17) {
 			// cycle button - cycle to next object type variation:
 			event.setCancelled(true);
@@ -108,7 +108,7 @@ public abstract class EditorHandler extends UIHandler {
 			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
 
 			// save:
-			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+			SKShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 		} else if (rawSlot == 8) {
 			// naming or chest inventory button:
 			event.setCancelled(true);
@@ -130,7 +130,7 @@ public abstract class EditorHandler extends UIHandler {
 			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
 
 			// save:
-			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+			SKShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 
 			// ignore other click events for this shopkeeper in the same tick:
 			shopkeeper.deactivateUI();
@@ -141,7 +141,7 @@ public abstract class EditorHandler extends UIHandler {
 			boolean openChest = (!renaming && !ItemUtils.isEmpty(clickedItem) && clickedItem.getType() == Settings.chestItem);
 
 			// close editor window delayed, and optionally open chest inventory afterwards:
-			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+			Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> {
 				informOnClose(player);
 				player.closeInventory();
 

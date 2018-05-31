@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.shopobjects;
 import java.util.List;
 
 import com.nisovin.shopkeepers.ShopObjectType;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectTypes;
 
 public interface DefaultShopObjectTypes {
@@ -19,7 +19,7 @@ public interface DefaultShopObjectTypes {
 	// STATICS (for convenience):
 
 	public static DefaultShopObjectTypes getInstance() {
-		return ShopkeepersPlugin.getInstance().getDefaultShopObjectTypes();
+		return SKShopkeepersPlugin.getInstance().getDefaultShopObjectTypes();
 	}
 
 	public static LivingEntityObjectTypes MOBS() {

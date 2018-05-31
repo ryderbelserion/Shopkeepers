@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nisovin.shopkeepers.AbstractShopType;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 
 public class SKDefaultShopTypes implements DefaultShopTypes {
 
@@ -18,7 +18,7 @@ public class SKDefaultShopTypes implements DefaultShopTypes {
 	}
 
 	public void register() {
-		ShopkeepersPlugin.getInstance().getShopTypeRegistry().registerAll(this.getAllShopTypes());
+		SKShopkeepersPlugin.getInstance().getShopTypeRegistry().registerAll(this.getAllShopTypes());
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class SKDefaultShopTypes implements DefaultShopTypes {
 	// STATICS (for convenience):
 
 	public static SKDefaultShopTypes getInstance() {
-		return ShopkeepersPlugin.getInstance().getDefaultShopTypes();
+		return SKShopkeepersPlugin.getInstance().getDefaultShopTypes();
 	}
 
 	public static AbstractShopType<?> ADMIN() {

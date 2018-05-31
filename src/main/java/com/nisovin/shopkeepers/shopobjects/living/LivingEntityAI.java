@@ -17,7 +17,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.Utils;
@@ -206,7 +206,7 @@ public class LivingEntityAI {
 		else if (aiTask != null) this.stop(); // not active, but already setup: perform cleanup
 
 		// start ai task:
-		aiTask = Bukkit.getScheduler().runTaskTimer(ShopkeepersPlugin.getInstance(), () -> {
+		aiTask = Bukkit.getScheduler().runTaskTimer(SKShopkeepersPlugin.getInstance(), () -> {
 			currentlyRunning = true;
 			tickCounter++;
 

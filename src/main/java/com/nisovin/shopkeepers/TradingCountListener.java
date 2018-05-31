@@ -51,7 +51,7 @@ class TradingCountListener implements Listener {
 		this.stopListeningForTrades();
 		Log.debug("Listening for non-shopkeeper trades of player " + tradingPlayer.getName() + " ..");
 		this.tradingPlayer = tradingPlayer;
-		stopListeningTask = Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), stopListeningAction);
+		stopListeningTask = Bukkit.getScheduler().runTask(plugin, stopListeningAction);
 	}
 
 	private void stopListeningForTrades() {
@@ -71,7 +71,7 @@ class TradingCountListener implements Listener {
 		if (event.getWhoClicked().getType() != EntityType.PLAYER) return;
 		if (!(event.getInventory() instanceof MerchantInventory)) return;
 		Player player = (Player) event.getWhoClicked();
-		UIType uiType = plugin.getUIManager().getOpenInterface(player);
+		UIType uiType = plugin.getUIRegistry().getOpenInterface(player);
 		if (uiType == DefaultUIs.TRADING_WINDOW) return; // trading with a shopkeeper, which handles trades on its own
 
 		MerchantInventory inventory = (MerchantInventory) event.getInventory();

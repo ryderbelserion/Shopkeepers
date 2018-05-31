@@ -7,12 +7,12 @@ import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.ShopkeepersAPI;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
 
 public class AdminShopType extends AbstractShopType<AdminShopkeeper> {
 
 	AdminShopType() {
-		super("admin", ShopkeepersAPI.ADMIN_PERMISSION);
+		super("admin", ShopkeepersPlugin.ADMIN_PERMISSION);
 	}
 
 	@Override

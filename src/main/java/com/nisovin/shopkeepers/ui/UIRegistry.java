@@ -18,22 +18,24 @@ import com.nisovin.shopkeepers.util.Log;
 /**
  * Acts as registry for ui types and keeps track of which player has which ui currently opened.
  */
-public class UIManager extends TypeRegistry<UIType> {
+public class UIRegistry extends TypeRegistry<UIType> {
 
+	private final ShopkeepersPlugin plugin;
 	// player name -> ui session
 	private final Map<String, UISession> playerSessions = new HashMap<String, UISession>();
 	private UIListener uiListener = null;
 
-	public UIManager() {
+	public UIRegistry(ShopkeepersPlugin plugin) {
+		this.plugin = plugin;
 	}
 
-	public void onEnable(ShopkeepersPlugin plugin) {
+	public void onEnable() {
 		assert uiListener == null;
 		uiListener = new UIListener(this);
 		Bukkit.getPluginManager().registerEvents(uiListener, plugin);
 	}
 
-	public void onDisable(ShopkeepersPlugin plugin) {
+	public void onDisable() {
 		assert uiListener != null;
 		HandlerList.unregisterAll(uiListener);
 		uiListener = null;
@@ -124,7 +126,7 @@ public class UIManager extends TypeRegistry<UIType> {
 		shopkeeper.deactivateUI();
 
 		// delayed because this is/was originally called from inside the PlayerCloseInventoryEvent
-		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+		Bukkit.getScheduler().runTask(plugin, () -> {
 			closeAll(shopkeeper);
 
 			// reactivate UIs:

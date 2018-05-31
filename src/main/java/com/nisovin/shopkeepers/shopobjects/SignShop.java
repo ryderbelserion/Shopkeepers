@@ -16,7 +16,7 @@ import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -126,10 +126,10 @@ public class SignShop extends ShopObject {
 
 		// place sign: // TODO maybe also allow non-wall signs?
 		// cancel block physics for this placed sign if needed:
-		ShopkeepersPlugin.getInstance().cancelNextBlockPhysics(signLocation);
+		SKShopkeepersPlugin.getInstance().cancelNextBlockPhysics(signLocation);
 		signBlock.setType(Material.WALL_SIGN);
 		// cleanup state if no block physics were triggered:
-		ShopkeepersPlugin.getInstance().cancelNextBlockPhysics(null);
+		SKShopkeepersPlugin.getInstance().cancelNextBlockPhysics(null);
 
 		// in case sign placement has failed for some reason:
 		if (!ItemUtils.isSign(signBlock.getType())) {
@@ -234,7 +234,7 @@ public class SignShop extends ShopObject {
 			if (!this.spawn()) {
 				Log.warning("Shopkeeper sign at " + shopkeeper.getPositionString() + " could not be replaced! Removing shopkeeper now!");
 				// delayed removal:
-				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> shopkeeper.delete());
+				Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> shopkeeper.delete());
 			}
 			return true;
 		}

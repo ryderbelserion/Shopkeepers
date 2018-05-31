@@ -17,7 +17,7 @@ import org.bukkit.inventory.PlayerInventory;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.ShopkeepersAPI;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.OpenTradeEvent;
@@ -118,7 +118,7 @@ public class TradingHandler extends UIHandler {
 	@Override
 	protected boolean canOpen(Player player) {
 		assert player != null;
-		if (!Utils.hasPermission(player, ShopkeepersAPI.TRADE_PERMISSION)) {
+		if (!Utils.hasPermission(player, ShopkeepersPlugin.TRADE_PERMISSION)) {
 			Log.debug("Blocked trade window opening from " + player.getName() + ": Missing trade permission.");
 			Utils.sendMessage(player, Settings.msgMissingTradePerm);
 			return false;

@@ -24,10 +24,10 @@ public class ProtectedChests {
 	public ProtectedChests() {
 	}
 
-	void onEnable(ShopkeepersPlugin plugin) {
+	void onEnable(SKShopkeepersPlugin plugin) {
 	}
 
-	void onDisable(ShopkeepersPlugin plugin) {
+	void onDisable(SKShopkeepersPlugin plugin) {
 		// cleanup:
 		protectedChests.clear();
 	}
@@ -121,7 +121,7 @@ public class ProtectedChests {
 	//
 
 	public boolean isProtectedChestAroundHopper(Block hopper, Player player) {
-		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
+		SKShopkeepersPlugin plugin = SKShopkeepersPlugin.getInstance();
 		if (plugin == null) return false;
 		for (BlockFace face : HOPPER_PROTECTED_FACES) {
 			Block adjacentBlock = hopper.getRelative(face);

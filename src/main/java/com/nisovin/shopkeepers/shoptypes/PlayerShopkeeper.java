@@ -18,8 +18,8 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.events.PlayerShopkeeperHiredEvent;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
@@ -59,7 +59,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 
 		@Override
 		protected boolean canOpen(Player player) {
-			return super.canOpen(player) && (this.getShopkeeper().isOwner(player) || Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION));
+			return super.canOpen(player) && (this.getShopkeeper().isOwner(player) || Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION));
 		}
 
 		@Override
@@ -218,7 +218,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 			PlayerShopkeeper shopkeeper = this.getShopkeeper();
 
 			// stop opening if trading shall be prevented while the owner is offline:
-			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
+			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 				Player ownerPlayer = shopkeeper.getOwner();
 				if (ownerPlayer != null) {
 					Log.debug("Blocked trade window opening from " + player.getName() + " because the owner is online");
@@ -242,7 +242,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 			}
 
 			// no trading while shop owner is online:
-			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(tradingPlayer, ShopkeepersAPI.BYPASS_PERMISSION)) {
+			if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 				Player ownerPlayer = shopkeeper.getOwner();
 				if (ownerPlayer != null && !shopkeeper.isOwner(tradingPlayer)) {
 					Utils.sendMessage(tradingPlayer, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
@@ -366,7 +366,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 				}
 
 				// call event:
-				int maxShops = ShopkeepersPlugin.getInstance().getMaxShops(player);
+				int maxShops = SKShopkeepersPlugin.getInstance().getMaxShops(player);
 				PlayerShopkeeperHiredEvent hireEvent = new PlayerShopkeeperHiredEvent(player, shopkeeper, newPlayerInventoryContents, maxShops);
 				Bukkit.getPluginManager().callEvent(hireEvent);
 				if (hireEvent.isCancelled()) {
@@ -378,7 +378,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 				// check max shops limit:
 				maxShops = hireEvent.getMaxShopsForPlayer();
 				if (maxShops > 0) {
-					int count = ShopkeepersPlugin.getInstance().countShopsOfPlayer(player);
+					int count = SKShopkeepersPlugin.getInstance().countShopsOfPlayer(player);
 					if (count >= maxShops) {
 						Utils.sendMessage(player, Settings.msgTooManyShops);
 						this.closeDelayed(player);
@@ -390,7 +390,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 				player.getInventory().setContents(newPlayerInventoryContents); // apply inventory changes
 				shopkeeper.setForHire(null);
 				shopkeeper.setOwner(player);
-				ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+				SKShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 				Utils.sendMessage(player, Settings.msgHired);
 
 				// close all open windows for this shopkeeper:
@@ -440,7 +440,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		super.onRegistration(sessionId);
 
 		// register protected chest:
-		ShopkeepersPlugin.getInstance().getProtectedChests().addChest(worldName, chestX, chestY, chestZ, this);
+		SKShopkeepersPlugin.getInstance().getProtectedChests().addChest(worldName, chestX, chestY, chestZ, this);
 	}
 
 	@Override
@@ -448,7 +448,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		super.onDeletion();
 
 		// unregister previously protected chest:
-		ShopkeepersPlugin.getInstance().getProtectedChests().removeChest(worldName, chestX, chestY, chestZ, this);
+		SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(worldName, chestX, chestY, chestZ, this);
 	}
 
 	@Override
@@ -486,7 +486,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 				// handled name changing:
 				if (this.requestNameChange(player, newName)) {
 					// manually remove rename item from player's hand after this event is processed:
-					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+					Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> {
 						ItemStack newItemInHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
 						player.setItemInHand(newItemInHand);
 					});
@@ -649,7 +649,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 	private void setChest(int chestX, int chestY, int chestZ) {
 		if (this.isValid()) {
 			// unregister previously protected chest:
-			ShopkeepersPlugin.getInstance().getProtectedChests().removeChest(worldName, chestX, chestY, chestZ, this);
+			SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(worldName, chestX, chestY, chestZ, this);
 		}
 
 		// update chest:
@@ -659,7 +659,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 
 		if (this.isValid()) {
 			// register new protected chest:
-			ShopkeepersPlugin.getInstance().getProtectedChests().addChest(worldName, chestX, chestY, chestZ, this);
+			SKShopkeepersPlugin.getInstance().getProtectedChests().addChest(worldName, chestX, chestY, chestZ, this);
 		}
 	}
 

@@ -38,9 +38,9 @@ class LivingEntityShopListener implements Listener {
 	// the radius around lightning strikes in which villagers turn into witches
 	private static final int VILLAGER_ZAP_RADIUS = 7; // minecraft wiki says 3-4, we use 7 to be safe
 
-	private final ShopkeepersPlugin plugin;
+	private final SKShopkeepersPlugin plugin;
 
-	LivingEntityShopListener(ShopkeepersPlugin plugin) {
+	LivingEntityShopListener(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 

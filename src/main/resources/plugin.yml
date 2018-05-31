@@ -1,4 +1,4 @@
-name: Shopkeepers
+name: SKShopkeepersPlugin
 version: '${project.version}'
 description: Custom villager shopkeepers
 authors: [nisovin, blablubbabc]

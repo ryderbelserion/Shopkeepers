@@ -26,9 +26,9 @@ import com.nisovin.shopkeepers.util.Utils;
  */
 class CreateListener implements Listener {
 
-	private final ShopkeepersPlugin plugin;
+	private final SKShopkeepersPlugin plugin;
 
-	CreateListener(ShopkeepersPlugin plugin) {
+	CreateListener(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
@@ -41,7 +41,7 @@ class CreateListener implements Listener {
 			return;
 		}
 
-		if (!ShopkeepersPlugin.getInstance().hasCreatePermission(player)) {
+		if (!SKShopkeepersPlugin.getInstance().hasCreatePermission(player)) {
 			// player cannot create any shopkeeper at all
 			return;
 		}
@@ -74,7 +74,7 @@ class CreateListener implements Listener {
 
 		// prevent regular usage:
 		// TODO are there items which would require canceling the event for left clicks or physical interaction as well?
-		if (Settings.preventShopCreationItemRegularUsage && !Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
+		if (Settings.preventShopCreationItemRegularUsage && !Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Log.debug("Preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}

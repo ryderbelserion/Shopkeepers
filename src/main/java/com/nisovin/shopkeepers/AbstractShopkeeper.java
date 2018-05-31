@@ -123,10 +123,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.z = config.getInt("z");
 		this.updateChunkCoords();
 
-		AbstractShopObjectType objectType = ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(config.getString("object"));
+		AbstractShopObjectType objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(config.getString("object"));
 		if (objectType == null) {
 			// use default shop object type:
-			objectType = ShopkeepersPlugin.getInstance().getDefaultShopObjectType();
+			objectType = SKShopkeepersPlugin.getInstance().getDefaultShopObjectType();
 			Log.warning("Invalid object type '" + config.getString("object") + "' for shopkeeper '" + uniqueId
 					+ "'. Did you edit the save file? Switching to default type '" + objectType.getIdentifier() + "'.");
 		}
@@ -208,7 +208,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public void delete() {
-		ShopkeepersPlugin.getInstance().deleteShopkeeper(this);
+		SKShopkeepersPlugin.getInstance().deleteShopkeeper(this);
 	}
 
 	protected void onDeletion() {
@@ -280,7 +280,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.updateChunkCoords();
 
 		// update shopkeeper in chunk map:
-		ShopkeepersPlugin.getInstance().onShopkeeperMove(this, oldChunk);
+		SKShopkeepersPlugin.getInstance().onShopkeeperMove(this, oldChunk);
 	}
 
 	private void updateChunkCoords() {
@@ -314,7 +314,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public void closeAllOpenWindows() {
-		ShopkeepersPlugin.getInstance().getUIManager().closeAllDelayed(this);
+		SKShopkeepersPlugin.getInstance().getUIRegistry().closeAllDelayed(this);
 	}
 
 	@Override
@@ -331,7 +331,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public boolean openWindow(UIType uiType, Player player) {
-		return ShopkeepersPlugin.getInstance().getUIManager().requestUI(uiType, this, player);
+		return SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(uiType, this, player);
 	}
 
 	// shortcuts for the default window types:
@@ -375,7 +375,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// TODO move these somewhere else
 
 	public void startNaming(Player player) {
-		ShopkeepersPlugin.getInstance().onNaming(player, this);
+		SKShopkeepersPlugin.getInstance().onNaming(player, this);
 	}
 
 	public boolean isValidName(String name) {
@@ -411,7 +411,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, this));
 
 		// save:
-		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+		SKShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 
 		return true;
 	}

@@ -9,9 +9,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 class PlayerJoinQuitListener implements Listener {
 
-	private final ShopkeepersPlugin plugin;
+	private final SKShopkeepersPlugin plugin;
 
-	PlayerJoinQuitListener(ShopkeepersPlugin plugin) {
+	PlayerJoinQuitListener(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 

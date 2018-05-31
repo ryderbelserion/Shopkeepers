@@ -14,9 +14,9 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 class RemoveShopOnChestBreakListener implements Listener {
 
-	private final ShopkeepersPlugin plugin;
+	private final SKShopkeepersPlugin plugin;
 
-	RemoveShopOnChestBreakListener(ShopkeepersPlugin plugin) {
+	RemoveShopOnChestBreakListener(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 

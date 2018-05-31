@@ -9,9 +9,9 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 class ShopNamingListener implements Listener {
 
-	private final ShopkeepersPlugin plugin;
+	private final SKShopkeepersPlugin plugin;
 
-	ShopNamingListener(ShopkeepersPlugin plugin) {
+	ShopNamingListener(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 

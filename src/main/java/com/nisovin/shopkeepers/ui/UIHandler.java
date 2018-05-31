@@ -7,7 +7,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 
 /**
  * The component which handles one specific type of user interface window for one specific shopkeeper.
@@ -35,7 +35,7 @@ public abstract class UIHandler {
 	 */
 	protected void informOnClose(Player player) {
 		assert player != null;
-		ShopkeepersPlugin.getInstance().getUIManager().onInventoryClose(player);
+		SKShopkeepersPlugin.getInstance().getUIRegistry().onInventoryClose(player);
 	}
 
 	/**
@@ -56,7 +56,7 @@ public abstract class UIHandler {
 	protected void closeDelayed(final Player player) {
 		// temporary deactivate ui and close open window delayed for this player:
 		shopkeeper.deactivateUI();
-		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+		Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> {
 			informOnClose(player);
 			player.closeInventory();
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.nisovin.shopkeepers.AbstractShopObjectType;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectTypes;
 
 public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
@@ -19,7 +19,7 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 	}
 
 	public void register() {
-		ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().registerAll(this.getAllObjectTypes());
+		SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().registerAll(this.getAllObjectTypes());
 	}
 
 	@Override
@@ -49,7 +49,7 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 	// STATICS (for convenience):
 
 	public static SKDefaultShopObjectTypes getInstance() {
-		return ShopkeepersPlugin.getInstance().getDefaultShopObjectTypes();
+		return SKShopkeepersPlugin.getInstance().getDefaultShopObjectTypes();
 	}
 
 	public static LivingEntityObjectTypes MOBS() {

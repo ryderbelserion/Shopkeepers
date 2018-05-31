@@ -15,9 +15,9 @@ import com.nisovin.shopkeepers.util.Utils;
 
 class ChestListener implements Listener {
 
-	private final ShopkeepersPlugin plugin;
+	private final SKShopkeepersPlugin plugin;
 
-	ChestListener(ShopkeepersPlugin plugin) {
+	ChestListener(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
@@ -38,7 +38,7 @@ class ChestListener implements Listener {
 			Player player = event.getPlayer();
 
 			// check for protected chest
-			if (!Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) {
+			if (!Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 				if (plugin.getProtectedChests().isChestProtected(block, player)) {
 					// TODO always allow access to own shop chests, even if cancelled by other plugins?
 					Log.debug("Cancelled chest opening by '" + player.getName() + "' at '"

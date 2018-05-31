@@ -20,8 +20,8 @@ import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.shoptypes.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
@@ -29,7 +29,7 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class SKShopkeeperStorage implements ShopkeeperStorage {
 
-	private final ShopkeepersPlugin plugin;
+	private final SKShopkeepersPlugin plugin;
 	// flag to (temporary) turn off saving
 	private boolean savingDisabled = false;
 	private long lastSavingErrorMsgTimeStamp = 0L;
@@ -40,7 +40,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// determines if there was another saveReal()-request while the saveIOTask was still in progress
 	private boolean saveRealAgain = false;
 
-	public SKShopkeeperStorage(ShopkeepersPlugin plugin) {
+	public SKShopkeeperStorage(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
@@ -312,7 +312,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 					lastSavingErrorMsgTimeStamp = System.currentTimeMillis();
 					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Saving shop data failed! Please check out the server log(s) and look into the issue!";
 					for (Player player : Bukkit.getOnlinePlayers()) {
-						if (player.hasPermission(ShopkeepersAPI.ADMIN_PERMISSION)) {
+						if (player.hasPermission(ShopkeepersPlugin.ADMIN_PERMISSION)) {
 							player.sendMessage(errorMsg);
 						}
 					}

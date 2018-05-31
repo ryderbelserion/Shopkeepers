@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.shoptypes;
 import java.util.List;
 
 import com.nisovin.shopkeepers.ShopType;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 
 public interface DefaultShopTypes {
 
@@ -22,7 +22,7 @@ public interface DefaultShopTypes {
 	// STATICS (for convenience):
 
 	public static DefaultShopTypes getInstance() {
-		return ShopkeepersPlugin.getInstance().getDefaultShopTypes();
+		return SKShopkeepersPlugin.getInstance().getDefaultShopTypes();
 	}
 
 	public static ShopType<?> ADMIN() {

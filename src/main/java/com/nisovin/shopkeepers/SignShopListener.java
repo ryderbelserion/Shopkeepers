@@ -21,11 +21,11 @@ import com.nisovin.shopkeepers.util.Log;
 
 class SignShopListener implements Listener {
 
-	private final ShopkeepersPlugin plugin;
+	private final SKShopkeepersPlugin plugin;
 
 	private Location cancelNextBlockPhysicsLoc = null;
 
-	SignShopListener(ShopkeepersPlugin plugin) {
+	SignShopListener(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 

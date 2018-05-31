@@ -2,14 +2,14 @@ package com.nisovin.shopkeepers.metrics;
 
 import org.bstats.bukkit.Metrics;
 
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 
 /**
  * Reports the (rough) number of shopkeepers.
  */
 public class ShopkeepersCountChart extends Metrics.SimplePie {
 
-	public ShopkeepersCountChart(ShopkeepersPlugin plugin) {
+	public ShopkeepersCountChart(SKShopkeepersPlugin plugin) {
 		super("shopkeepers_count", () -> {
 			int numberOfShopkeepers = plugin.getAllShopkeepers().size();
 			if (numberOfShopkeepers >= 1000) return (numberOfShopkeepers / 1000) + "000+";

@@ -19,9 +19,9 @@ import com.nisovin.shopkeepers.util.Log;
 
 class WorldListener implements Listener {
 
-	private final ShopkeepersPlugin plugin;
+	private final SKShopkeepersPlugin plugin;
 
-	WorldListener(ShopkeepersPlugin plugin) {
+	WorldListener(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 

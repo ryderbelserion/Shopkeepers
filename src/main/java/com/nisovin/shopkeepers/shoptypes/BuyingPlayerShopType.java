@@ -7,13 +7,13 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.ShopkeepersAPI;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class BuyingPlayerShopType extends AbstractPlayerShopType<BuyingPlayerShopkeeper> {
 
 	BuyingPlayerShopType() {
-		super("buy", ShopkeepersAPI.PLAYER_BUY_PERMISSION);
+		super("buy", ShopkeepersPlugin.PLAYER_BUY_PERMISSION);
 	}
 
 	@Override

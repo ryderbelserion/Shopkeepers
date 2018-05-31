@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
 import com.nisovin.shopkeepers.ui.UIType;
@@ -86,7 +86,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 				if (shopkeeper.clickedItem != null) {
 					// placing item:
 					Inventory inventory = event.getInventory();
-					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+					Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> {
 						inventory.setItem(slot, shopkeeper.clickedItem);
 						shopkeeper.clickedItem = null;
 					});

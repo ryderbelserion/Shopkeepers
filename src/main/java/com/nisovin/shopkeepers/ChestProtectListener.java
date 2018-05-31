@@ -22,9 +22,9 @@ import com.nisovin.shopkeepers.util.Utils;
 
 class ChestProtectListener implements Listener {
 
-	private final ShopkeepersPlugin plugin;
+	private final SKShopkeepersPlugin plugin;
 
-	ChestProtectListener(ShopkeepersPlugin plugin) {
+	ChestProtectListener(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
@@ -33,7 +33,7 @@ class ChestProtectListener implements Listener {
 		Block block = event.getBlock();
 		if (!ItemUtils.isChest(block.getType())) return;
 		Player player = event.getPlayer();
-		if (Utils.hasPermission(player, ShopkeepersAPI.BYPASS_PERMISSION)) return;
+		if (Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) return;
 
 		if (plugin.getProtectedChests().isChestProtected(block, player)) {
 			Log.debug("Cancelled breaking of chest block by '" + player.getName() + "' at '"

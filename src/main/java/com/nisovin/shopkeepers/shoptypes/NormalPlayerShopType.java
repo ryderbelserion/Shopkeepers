@@ -7,13 +7,13 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.ShopkeepersAPI;
+import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class NormalPlayerShopType extends AbstractPlayerShopType<NormalPlayerShopkeeper> {
 
 	NormalPlayerShopType() {
-		super("player", ShopkeepersAPI.PLAYER_NORMAL_PERMISSION);
+		super("player", ShopkeepersPlugin.PLAYER_NORMAL_PERMISSION);
 	}
 
 	@Override

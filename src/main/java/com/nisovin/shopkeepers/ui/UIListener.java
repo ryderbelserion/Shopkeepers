@@ -10,26 +10,26 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.Log;
 
 class UIListener implements Listener {
 
-	private final UIManager uiManager;
+	private final UIRegistry uiRegistry;
 
-	UIListener(UIManager uiManager) {
-		this.uiManager = uiManager;
+	UIListener(UIRegistry uiRegistry) {
+		this.uiRegistry = uiRegistry;
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	void onInventoryClose(InventoryCloseEvent event) {
 		if (event.getPlayer().getType() != EntityType.PLAYER) return;
 		Player player = (Player) event.getPlayer();
-		UISession session = uiManager.getSession(player);
+		UISession session = uiRegistry.getSession(player);
 		if (session != null) {
 			Log.debug("Player " + player.getName() + " closed " + session.getUIType().getIdentifier());
 			// inform uiManager so that it can cleanup player data:
-			uiManager.onInventoryClose(player);
+			uiRegistry.onInventoryClose(player);
 			// inform uiHandler so that it can react to it:
 			if (session.getUIHandler().isWindow(event.getInventory())) {
 				session.getUIHandler().onInventoryClose(event, player);
@@ -41,7 +41,7 @@ class UIListener implements Listener {
 	void onInventoryClick(InventoryClickEvent event) {
 		if (event.getWhoClicked().getType() != EntityType.PLAYER) return;
 		Player player = (Player) event.getWhoClicked();
-		UISession session = uiManager.getSession(player);
+		UISession session = uiRegistry.getSession(player);
 		if (session != null) {
 			// inform uiHandler so that it can react to it:
 			Inventory inventory = event.getInventory();
@@ -69,8 +69,8 @@ class UIListener implements Listener {
 				Log.debug("Closing inventory for " + player.getName() + ", because different open inventory was expected."
 						+ " Open inventory: " + inventory.getType() + " with name '" + inventory.getTitle() + "'");
 				event.setCancelled(true);
-				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-					uiManager.onInventoryClose(player); // cleanup
+				Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> {
+					uiRegistry.onInventoryClose(player); // cleanup
 					player.closeInventory();
 				});
 			}

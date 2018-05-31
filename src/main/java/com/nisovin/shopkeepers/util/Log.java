@@ -4,12 +4,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 
 public class Log {
 
 	public static Logger getLogger() {
-		return ShopkeepersPlugin.getInstance().getLogger();
+		return SKShopkeepersPlugin.getInstance().getLogger();
 	}
 
 	public static void info(String message) {
