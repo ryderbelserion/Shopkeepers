@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.abstractTypes;
+package com.nisovin.shopkeepers.types;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;

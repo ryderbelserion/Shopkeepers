@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.abstractTypes;
+package com.nisovin.shopkeepers.types;
 
 import java.util.HashMap;
 import java.util.Map;

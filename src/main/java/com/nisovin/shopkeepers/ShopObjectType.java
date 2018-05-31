@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-import com.nisovin.shopkeepers.abstractTypes.SelectableType;
+import com.nisovin.shopkeepers.types.SelectableType;
 import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class ShopObjectType extends SelectableType {

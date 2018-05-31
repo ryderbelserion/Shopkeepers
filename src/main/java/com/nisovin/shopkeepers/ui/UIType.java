@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.ui;
 
-import com.nisovin.shopkeepers.abstractTypes.AbstractType;
+import com.nisovin.shopkeepers.types.AbstractType;
 
 public class UIType extends AbstractType {
 

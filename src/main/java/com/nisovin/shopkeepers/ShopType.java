@@ -4,7 +4,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.abstractTypes.SelectableType;
+import com.nisovin.shopkeepers.types.SelectableType;
 
 public abstract class ShopType<T extends SKShopkeeper> extends SelectableType {
 

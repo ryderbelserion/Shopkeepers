@@ -12,7 +12,7 @@ import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.abstractTypes.TypeRegistry;
+import com.nisovin.shopkeepers.types.TypeRegistry;
 import com.nisovin.shopkeepers.util.Log;
 
 /**

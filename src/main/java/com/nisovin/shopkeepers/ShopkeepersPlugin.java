@@ -37,7 +37,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.abstractTypes.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.events.CreatePlayerShopkeeperEvent;
 import com.nisovin.shopkeepers.events.ShopkeeperCreatedEvent;
@@ -64,6 +63,7 @@ import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
+import com.nisovin.shopkeepers.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.ui.UIManager;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
