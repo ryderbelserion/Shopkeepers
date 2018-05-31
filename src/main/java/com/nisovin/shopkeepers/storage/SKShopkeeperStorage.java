@@ -163,7 +163,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			if (shopType == null) {
 				// got an owner entry? -> default to normal player shop type
 				if (shopkeeperSection.contains("owner")) {
-					Log.warning("No valid shop type specified for shopkeeper '" + id + "': defaulting to "
+					Log.warning("No valid shop type specified for shopkeeper '" + id + "': Defaulting to "
 							+ SKDefaultShopTypes.PLAYER_NORMAL().getIdentifier());
 					shopType = SKDefaultShopTypes.PLAYER_NORMAL();
 				} else {

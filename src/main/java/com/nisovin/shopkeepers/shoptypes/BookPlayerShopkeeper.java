@@ -17,7 +17,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
@@ -228,7 +227,7 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public AbstractShopType<?> getType() {
+	public BookPlayerShopType getType() {
 		return SKDefaultShopTypes.PLAYER_BOOK();
 	}
 

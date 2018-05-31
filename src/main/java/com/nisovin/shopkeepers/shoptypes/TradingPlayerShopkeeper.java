@@ -13,7 +13,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
@@ -243,7 +242,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public AbstractShopType<?> getType() {
+	public TradingPlayerShopType getType() {
 		return SKDefaultShopTypes.PLAYER_TRADING();
 	}
 

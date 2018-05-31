@@ -11,8 +11,8 @@ import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectTypes;
 public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 
 	private final LivingEntityObjectTypes livingEntityObjectTypes = new LivingEntityObjectTypes();
-	private final AbstractShopObjectType signShopObjectType = new SignShopObjectType();
-	private final AbstractShopObjectType citizensShopObjectType = new CitizensShopObjectType();
+	private final SignShopObjectType signShopObjectType = new SignShopObjectType();
+	private final CitizensShopObjectType citizensShopObjectType = new CitizensShopObjectType();
 
 	// TODO maybe change object type permissions to 'shopkeeper.object.<type>'?
 
@@ -34,12 +34,12 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 	}
 
 	@Override
-	public AbstractShopObjectType getSignShopObjectType() {
+	public SignShopObjectType getSignShopObjectType() {
 		return signShopObjectType;
 	}
 
 	@Override
-	public AbstractShopObjectType getCitizensShopObjectType() {
+	public CitizensShopObjectType getCitizensShopObjectType() {
 		return citizensShopObjectType;
 	}
 
@@ -53,11 +53,11 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 		return getInstance().getLivingEntityObjectTypes();
 	}
 
-	public static AbstractShopObjectType SIGN() {
+	public static SignShopObjectType SIGN() {
 		return getInstance().getSignShopObjectType();
 	}
 
-	public static AbstractShopObjectType CITIZEN() {
+	public static CitizensShopObjectType CITIZEN() {
 		return getInstance().getCitizensShopObjectType();
 	}
 }

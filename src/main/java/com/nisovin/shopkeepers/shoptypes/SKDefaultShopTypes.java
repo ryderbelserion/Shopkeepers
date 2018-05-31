@@ -9,11 +9,11 @@ import com.nisovin.shopkeepers.api.shoptypes.DefaultShopTypes;
 
 public class SKDefaultShopTypes implements DefaultShopTypes {
 
-	private final AbstractShopType<?> adminShopType = new AdminShopType();
-	private final AbstractPlayerShopType<?> normalPlayerShopType = new NormalPlayerShopType();
-	private final AbstractPlayerShopType<?> tradingPlayerShopType = new TradingPlayerShopType();
-	private final AbstractPlayerShopType<?> buyingPlayerShopType = new BuyingPlayerShopType();
-	private final AbstractPlayerShopType<?> bookPlayerShopType = new BookPlayerShopType();
+	private final AdminShopType adminShopType = new AdminShopType();
+	private final NormalPlayerShopType normalPlayerShopType = new NormalPlayerShopType();
+	private final BuyingPlayerShopType buyingPlayerShopType = new BuyingPlayerShopType();
+	private final TradingPlayerShopType tradingPlayerShopType = new TradingPlayerShopType();
+	private final BookPlayerShopType bookPlayerShopType = new BookPlayerShopType();
 
 	public SKDefaultShopTypes() {
 	}
@@ -23,34 +23,34 @@ public class SKDefaultShopTypes implements DefaultShopTypes {
 		List<AbstractShopType<?>> shopTypes = new ArrayList<>();
 		shopTypes.add(adminShopType);
 		shopTypes.add(normalPlayerShopType);
-		shopTypes.add(tradingPlayerShopType);
 		shopTypes.add(buyingPlayerShopType);
+		shopTypes.add(tradingPlayerShopType);
 		shopTypes.add(bookPlayerShopType);
 		return shopTypes;
 	}
 
 	@Override
-	public AbstractShopType<?> getAdminShopType() {
+	public AdminShopType getAdminShopType() {
 		return adminShopType;
 	}
 
 	@Override
-	public AbstractPlayerShopType<?> getNormalPlayerShopType() {
+	public NormalPlayerShopType getNormalPlayerShopType() {
 		return normalPlayerShopType;
 	}
 
 	@Override
-	public AbstractPlayerShopType<?> getTradingPlayerShopType() {
-		return tradingPlayerShopType;
-	}
-
-	@Override
-	public AbstractPlayerShopType<?> getBuyingPlayerShopType() {
+	public BuyingPlayerShopType getBuyingPlayerShopType() {
 		return buyingPlayerShopType;
 	}
 
 	@Override
-	public AbstractPlayerShopType<?> getBookPlayerShopType() {
+	public TradingPlayerShopType getTradingPlayerShopType() {
+		return tradingPlayerShopType;
+	}
+
+	@Override
+	public BookPlayerShopType getBookPlayerShopType() {
 		return bookPlayerShopType;
 	}
 
@@ -60,23 +60,23 @@ public class SKDefaultShopTypes implements DefaultShopTypes {
 		return SKShopkeepersPlugin.getInstance().getDefaultShopTypes();
 	}
 
-	public static AbstractShopType<?> ADMIN() {
+	public static AdminShopType ADMIN() {
 		return getInstance().getAdminShopType();
 	}
 
-	public static AbstractPlayerShopType<?> PLAYER_NORMAL() {
+	public static NormalPlayerShopType PLAYER_NORMAL() {
 		return getInstance().getNormalPlayerShopType();
 	}
 
-	public static AbstractPlayerShopType<?> PLAYER_TRADING() {
-		return getInstance().getTradingPlayerShopType();
-	}
-
-	public static AbstractPlayerShopType<?> PLAYER_BUYING() {
+	public static BuyingPlayerShopType PLAYER_BUYING() {
 		return getInstance().getBuyingPlayerShopType();
 	}
 
-	public static AbstractPlayerShopType<?> PLAYER_BOOK() {
+	public static TradingPlayerShopType PLAYER_TRADING() {
+		return getInstance().getTradingPlayerShopType();
+	}
+
+	public static BookPlayerShopType PLAYER_BOOK() {
 		return getInstance().getBookPlayerShopType();
 	}
 }

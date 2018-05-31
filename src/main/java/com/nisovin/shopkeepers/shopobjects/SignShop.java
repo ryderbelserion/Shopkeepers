@@ -11,16 +11,14 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Attachable;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.ShopObjectType;
 import com.nisovin.shopkeepers.api.Shopkeeper;
-import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
-import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class SignShop extends ShopObject {
@@ -79,8 +77,8 @@ public class SignShop extends ShopObject {
 	}
 
 	@Override
-	public ShopObjectType getObjectType() {
-		return DefaultShopObjectTypes.SIGN();
+	public SignShopObjectType getObjectType() {
+		return SKDefaultShopObjectTypes.SIGN();
 	}
 
 	public Sign getSign() {

@@ -12,9 +12,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.ShopObjectType;
 import com.nisovin.shopkeepers.api.Shopkeeper;
-import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
@@ -89,8 +87,8 @@ public class CitizensShop extends ShopObject {
 	}
 
 	@Override
-	public ShopObjectType getObjectType() {
-		return DefaultShopObjectTypes.CITIZEN();
+	public CitizensShopObjectType getObjectType() {
+		return SKDefaultShopObjectTypes.CITIZEN();
 	}
 
 	@Override

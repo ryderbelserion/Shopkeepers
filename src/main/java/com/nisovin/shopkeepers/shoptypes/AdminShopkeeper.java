@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
@@ -183,7 +182,7 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 	}
 
 	@Override
-	public AbstractShopType<?> getType() {
+	public AdminShopType getType() {
 		return SKDefaultShopTypes.ADMIN();
 	}
 
