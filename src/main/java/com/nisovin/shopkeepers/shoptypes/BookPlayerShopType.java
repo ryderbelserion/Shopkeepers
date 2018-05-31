@@ -10,7 +10,7 @@ import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class BookPlayerShopType extends PlayerShopType<BookPlayerShopkeeper> {
+public class BookPlayerShopType extends AbstractPlayerShopType<BookPlayerShopkeeper> {
 
 	protected BookPlayerShopType() {
 		super("book", ShopkeepersAPI.PLAYER_BOOK_PERMISSION);

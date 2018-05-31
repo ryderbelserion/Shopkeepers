@@ -3,13 +3,13 @@ package com.nisovin.shopkeepers.shoptypes;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
-import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 
-public class AdminShopType extends ShopType<AdminShopkeeper> {
+public class AdminShopType extends AbstractShopType<AdminShopkeeper> {
 
 	AdminShopType() {
 		super("admin", ShopkeepersAPI.ADMIN_PERMISSION);

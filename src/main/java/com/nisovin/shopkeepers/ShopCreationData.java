@@ -169,8 +169,7 @@ public class ShopCreationData {
 		private Block chest; // not null
 
 		public PlayerShopCreationData(	Player creator, ShopType<?> shopType, ShopObjectType objectType,
-							Location spawnLocation, BlockFace targetedBlockFace,
-							Player owner, Block chest) {
+										Location spawnLocation, BlockFace targetedBlockFace, Player owner, Block chest) {
 			super(creator, shopType, objectType, spawnLocation, targetedBlockFace);
 			Validate.notNull(owner, "Owner is null!");
 			Validate.notNull(chest, "Chest is null!");

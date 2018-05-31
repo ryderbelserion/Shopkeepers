@@ -57,6 +57,7 @@ import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SignShop;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
+import com.nisovin.shopkeepers.shoptypes.AbstractPlayerShopType;
 import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
@@ -84,7 +85,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	// shop types manager:
-	private final SelectableTypeRegistry<ShopType<?>> shopTypesManager = new SelectableTypeRegistry<ShopType<?>>() {
+	private final SelectableTypeRegistry<AbstractShopType<?>> shopTypesManager = new SelectableTypeRegistry<AbstractShopType<?>>() {
 
 		@Override
 		protected String getTypeName() {
@@ -92,7 +93,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 
 		@Override
-		public boolean canBeSelected(Player player, ShopType<?> type) {
+		public boolean canBeSelected(Player player, AbstractShopType<?> type) {
 			// TODO This currently skips the admin shop type. Maybe included the admin shop types here for players
 			// which are admins, because there /could/ be different types of admin shops in the future (?)
 			return super.canBeSelected(player, type) && (type instanceof PlayerShopType);
@@ -490,7 +491,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// SHOP TYPES
 
-	public SelectableTypeRegistry<ShopType<?>> getShopTypeRegistry() {
+	public SelectableTypeRegistry<AbstractShopType<?>> getShopTypeRegistry() {
 		return shopTypesManager;
 	}
 
@@ -988,22 +989,26 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		try {
 			// receives messages, can be null:
 			Player creator = creationData.getCreator();
-			ShopType<?> shopType = creationData.getShopType();
+			ShopType<?> rawShopType = creationData.getShopType();
+			Validate.isTrue(rawShopType instanceof AbstractShopType,
+					"Expecting an AbstractShopType, got " + rawShopType.getClass().getName());
+			AbstractShopType<?> shopType = (AbstractShopType<?>) rawShopType;
 
 			// additional checks for player shops:
 			// TODO move this into PlayerShopType
 			if (shopType instanceof PlayerShopType) {
-				if (!(creationData instanceof PlayerShopCreationData)) {
-					throw new ShopkeeperCreateException("Expecting player shop creation data!");
-				}
-				PlayerShopCreationData playerShopData = (PlayerShopCreationData) creationData;
+				Validate.isTrue(shopType instanceof AbstractPlayerShopType,
+						"Expecting an AbstractPlayerShopType, got " + shopType.getClass().getName());
+				Validate.isTrue(creationData instanceof PlayerShopCreationData,
+						"Expecting PlayerShopCreationData, got " + creationData.getClass().getName());
+				PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) creationData;
 
 				// check if this chest is already used by some other shopkeeper:
-				if (this.getProtectedChests().isChestProtected(playerShopData.getShopChest(), null)) {
+				if (this.getProtectedChests().isChestProtected(playerShopCreationData.getShopChest(), null)) {
 					Utils.sendMessage(creator, Settings.msgShopCreateFail);
 					return null;
 				}
-				Player owner = playerShopData.getOwner();
+				Player owner = playerShopCreationData.getOwner();
 				Location spawnLocation = creationData.getSpawnLocation();
 
 				// check worldguard:

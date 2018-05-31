@@ -15,9 +15,9 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
@@ -157,7 +157,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				Log.warning("Failed to load shopkeeper '" + id + "': Invalid config section!");
 				continue;
 			}
-			ShopType<?> shopType = plugin.getShopTypeRegistry().get(shopkeeperSection.getString("type"));
+			AbstractShopType<?> shopType = plugin.getShopTypeRegistry().get(shopkeeperSection.getString("type"));
 			// unknown shop type
 			if (shopType == null) {
 				// got an owner entry? -> default to normal player shop type
