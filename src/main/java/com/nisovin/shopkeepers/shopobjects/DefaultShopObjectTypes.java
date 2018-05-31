@@ -1,55 +1,36 @@
 package com.nisovin.shopkeepers.shopobjects;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.nisovin.shopkeepers.AbstractShopObjectType;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectTypes;
 
-public class DefaultShopObjectTypes {
+public interface DefaultShopObjectTypes {
 
-	private final LivingEntityObjectTypes livingEntityObjectTypes = new LivingEntityObjectTypes();
-	private final AbstractShopObjectType signShopObjectType = new SignShopObjectType();
-	private final AbstractShopObjectType citizensShopObjectType = new CitizensShopObjectType();
+	public List<? extends ShopObjectType> getAllObjectTypes();
 
-	// TODO maybe change object type permissions to 'shopkeeper.object.<type>'?
+	public LivingEntityObjectTypes getLivingEntityObjectTypes();
 
-	public DefaultShopObjectTypes() {
-	}
+	public ShopObjectType getSignShopObjectType();
 
-	public List<AbstractShopObjectType> getAllObjectTypes() {
-		List<AbstractShopObjectType> shopObjectTypes = new ArrayList<>();
-		shopObjectTypes.addAll(livingEntityObjectTypes.getAllObjectTypes());
-		shopObjectTypes.add(signShopObjectType);
-		shopObjectTypes.add(citizensShopObjectType);
-		return shopObjectTypes;
-	}
-
-	public LivingEntityObjectTypes getLivingEntityObjectTypes() {
-		return livingEntityObjectTypes;
-	}
-
-	public ShopObjectType getSignShopObjectType() {
-		return signShopObjectType;
-	}
-
-	public ShopObjectType getCitizensShopObjectType() {
-		return citizensShopObjectType;
-	}
+	public ShopObjectType getCitizensShopObjectType();
 
 	// STATICS (for convenience):
 
+	public static DefaultShopObjectTypes getInstance() {
+		return ShopkeepersPlugin.getInstance().getDefaultShopObjectTypes();
+	}
+
 	public static LivingEntityObjectTypes MOBS() {
-		return ShopkeepersPlugin.getInstance().getDefaultShopObjectTypes().getLivingEntityObjectTypes();
+		return getInstance().getLivingEntityObjectTypes();
 	}
 
 	public static ShopObjectType SIGN() {
-		return ShopkeepersPlugin.getInstance().getDefaultShopObjectTypes().getSignShopObjectType();
+		return getInstance().getSignShopObjectType();
 	}
 
 	public static ShopObjectType CITIZEN() {
-		return ShopkeepersPlugin.getInstance().getDefaultShopObjectTypes().getCitizensShopObjectType();
+		return getInstance().getCitizensShopObjectType();
 	}
 }

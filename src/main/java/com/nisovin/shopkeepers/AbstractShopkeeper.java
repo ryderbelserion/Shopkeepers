@@ -162,7 +162,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public abstract ShopType<?> getType();
+	public abstract AbstractShopType<?> getType();
 
 	@Override
 	public ShopObject getShopObject() {

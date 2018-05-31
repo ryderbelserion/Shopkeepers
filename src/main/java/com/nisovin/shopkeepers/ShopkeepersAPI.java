@@ -11,7 +11,10 @@ import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.storage.ShopkeeperStorage;
+import com.nisovin.shopkeepers.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.util.ChunkCoords;
 
 public interface ShopkeepersAPI {
@@ -38,6 +41,18 @@ public interface ShopkeepersAPI {
 	public static final String PLAYER_BUY_PERMISSION = "shopkeeper.player.buy";
 	public static final String PLAYER_TRADE_PERMISSION = "shopkeeper.player.trade";
 	public static final String PLAYER_BOOK_PERMISSION = "shopkeeper.player.book";
+
+	// SHOP TYPES
+
+	public SelectableTypeRegistry<? extends ShopType<?>> getShopTypeRegistry();
+
+	public DefaultShopTypes getDefaultShopTypes();
+
+	// SHOP OBJECT TYPES
+
+	public SelectableTypeRegistry<? extends ShopObjectType> getShopObjectTypeRegistry();
+
+	public DefaultShopObjectTypes getDefaultShopObjectTypes();
 
 	/**
 	 * Gets the {@link ShopkeeperStorage}.

@@ -22,7 +22,7 @@ import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
+import com.nisovin.shopkeepers.shoptypes.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.Utils;
@@ -163,8 +163,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				// got an owner entry? -> default to normal player shop type
 				if (shopkeeperSection.contains("owner")) {
 					Log.warning("No valid shop type specified for shopkeeper '" + id + "': defaulting to "
-							+ DefaultShopTypes.PLAYER_NORMAL().getIdentifier());
-					shopType = DefaultShopTypes.PLAYER_NORMAL();
+							+ SKDefaultShopTypes.PLAYER_NORMAL().getIdentifier());
+					shopType = SKDefaultShopTypes.PLAYER_NORMAL();
 				} else {
 					// no valid shop type given..
 					Log.severe("Failed to load shopkeeper '" + id + "': unknown type");

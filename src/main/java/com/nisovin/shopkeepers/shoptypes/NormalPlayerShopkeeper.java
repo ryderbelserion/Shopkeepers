@@ -13,9 +13,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.PriceOffer;
@@ -218,8 +218,8 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public ShopType<?> getType() {
-		return DefaultShopTypes.PLAYER_NORMAL();
+	public AbstractShopType<?> getType() {
+		return SKDefaultShopTypes.PLAYER_NORMAL();
 	}
 
 	@Override

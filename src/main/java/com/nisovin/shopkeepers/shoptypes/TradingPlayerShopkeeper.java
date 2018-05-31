@@ -13,9 +13,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.TradingRecipe;
@@ -244,8 +244,8 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	}
 
 	@Override
-	public ShopType<?> getType() {
-		return DefaultShopTypes.PLAYER_TRADING();
+	public AbstractShopType<?> getType() {
+		return SKDefaultShopTypes.PLAYER_TRADING();
 	}
 
 	@Override

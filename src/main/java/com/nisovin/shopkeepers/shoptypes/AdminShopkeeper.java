@@ -11,10 +11,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
-import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -184,8 +184,8 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 	}
 
 	@Override
-	public ShopType<?> getType() {
-		return DefaultShopTypes.ADMIN();
+	public AbstractShopType<?> getType() {
+		return SKDefaultShopTypes.ADMIN();
 	}
 
 	public String getTradePremission() {

@@ -53,14 +53,14 @@ import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
-import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SignShop;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.shoptypes.AbstractPlayerShopType;
-import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.shoptypes.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
@@ -110,8 +110,8 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	};
 
 	// default shop and shop object types:
-	private DefaultShopTypes defaultShopTypes;
-	private DefaultShopObjectTypes defaultShopObjectTypes;
+	private SKDefaultShopTypes defaultShopTypes;
+	private SKDefaultShopObjectTypes defaultShopObjectTypes;
 
 	// ui manager:
 	private final UIManager uiManager = new UIManager();
@@ -197,12 +197,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 
 		// initialize default shop and shop object types (after config has been loaded):
-		defaultShopTypes = new DefaultShopTypes();
-		defaultShopObjectTypes = new DefaultShopObjectTypes();
+		defaultShopTypes = new SKDefaultShopTypes();
+		defaultShopObjectTypes = new SKDefaultShopObjectTypes();
 
 		// register default stuff:
-		shopTypesManager.registerAll(defaultShopTypes.getAllShopTypes());
-		shopObjectTypesManager.registerAll(defaultShopObjectTypes.getAllObjectTypes());
+		defaultShopTypes.register();
+		defaultShopObjectTypes.register();
 		uiManager.registerAll(DefaultUIs.getAllUITypes());
 
 		// inform ui manager (registers ui event handlers):
@@ -491,21 +491,25 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// SHOP TYPES
 
+	@Override
 	public SelectableTypeRegistry<AbstractShopType<?>> getShopTypeRegistry() {
 		return shopTypesManager;
 	}
 
-	public DefaultShopTypes getDefaultShopTypes() {
+	@Override
+	public SKDefaultShopTypes getDefaultShopTypes() {
 		return defaultShopTypes;
 	}
 
 	// SHOP OBJECT TYPES
 
+	@Override
 	public SelectableTypeRegistry<AbstractShopObjectType> getShopObjectTypeRegistry() {
 		return shopObjectTypesManager;
 	}
 
-	public DefaultShopObjectTypes getDefaultShopObjectTypes() {
+	@Override
+	public SKDefaultShopObjectTypes getDefaultShopObjectTypes() {
 		return defaultShopObjectTypes;
 	}
 
