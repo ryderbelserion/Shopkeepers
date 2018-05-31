@@ -3,9 +3,9 @@ package com.nisovin.shopkeepers;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-import com.nisovin.shopkeepers.types.Type;
+import com.nisovin.shopkeepers.types.SelectableType;
 
-public interface ShopObjectType extends Type {
+public interface ShopObjectType extends SelectableType {
 
 	/**
 	 * Whether shop objects of this type get spawned with chunk loads and despawned with chunk unloads.

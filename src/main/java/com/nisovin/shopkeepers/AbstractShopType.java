@@ -3,9 +3,9 @@ package com.nisovin.shopkeepers;
 import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.nisovin.shopkeepers.types.SelectableType;
+import com.nisovin.shopkeepers.types.AbstractSelectableType;
 
-public abstract class AbstractShopType<T extends AbstractShopkeeper> extends SelectableType implements ShopType<T> {
+public abstract class AbstractShopType<T extends AbstractShopkeeper> extends AbstractSelectableType implements ShopType<T> {
 
 	protected AbstractShopType(String identifier, String permission) {
 		super(identifier, permission);

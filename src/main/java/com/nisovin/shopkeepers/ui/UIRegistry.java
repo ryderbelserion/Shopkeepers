@@ -12,13 +12,13 @@ import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.types.TypeRegistry;
+import com.nisovin.shopkeepers.types.AbstractTypeRegistry;
 import com.nisovin.shopkeepers.util.Log;
 
 /**
  * Acts as registry for ui types and keeps track of which player has which ui currently opened.
  */
-public class UIRegistry extends TypeRegistry<UIType> {
+public class UIRegistry extends AbstractTypeRegistry<UIType> {
 
 	private final ShopkeepersPlugin plugin;
 	// player name -> ui session

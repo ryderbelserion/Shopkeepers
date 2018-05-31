@@ -1,136 +1,34 @@
 package com.nisovin.shopkeepers.types;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
-public abstract class SelectableTypeRegistry<T extends SelectableType> extends TypeRegistry<T> {
-
-	private class Link {
-		private T next = null;
-	}
-
-	private final Map<String, Link> links = new HashMap<>();
-	private T first = null;
-	private T last = null;
-
-	@Override
-	public boolean register(T type) {
-		if (super.register(type)) {
-			if (first == null) {
-				first = type;
-			}
-			Link link = new Link();
-			links.put(type.getIdentifier(), link);
-			if (last != null) {
-				links.get(last.getIdentifier()).next = type;
-			}
-			last = type;
-			return true;
-		}
-		return false;
-	}
-
-	protected T getFirst() {
-		return first;
-	}
-
-	protected T getNext(T current) {
-		Link link = (current != null) ? links.get(current.getIdentifier()) : null;
-		return (link == null || link.next == null) ? first : link.next;
-	}
-
-	protected boolean canBeSelected(Player player, T type) {
-		assert player != null && type != null;
-		return type.isEnabled() && type.hasPermission(player);
-	}
-
-	protected T getNext(Player player, T current) {
-		assert player != null;
-		T next = current;
-
-		int count = this.numberOfRegisteredTypes();
-		while (count > 0) {
-			// automatically selects the first type, if next is null or if next is the last type
-			next = this.getNext(next);
-			if (this.canBeSelected(player, next)) {
-				break;
-			}
-			count--;
-		}
-
-		// use the currently selected type (can be null) after it went through all types and didn't find one the player
-		// can use:
-		if (count == 0) {
-			// check if the currently selected type can still be used by this player:
-			if (current != null && !this.canBeSelected(player, current)) current = null;
-			next = current;
-		}
-		return next;
-	}
+public interface SelectableTypeRegistry<T extends SelectableType> extends TypeRegistry<T> {
 
 	// SELECTION MANAGEMENT
-
-	// player name -> selected type
-	protected final Map<String, T> selections = new HashMap<String, T>();
 
 	/**
 	 * Gets the first select-able type for this player, starting at the default one.
 	 * 
 	 * @param player
 	 *            a player
-	 * @return the first select-able type for this player, or null if this player can't select/use any type at all
+	 * @return the first select-able type for this player, or <code>null</code> if this player can't select or use any
+	 *         type at all
 	 */
-	public T getDefaultSelection(Player player) {
-		return this.getNext(player, null);
-	}
-
-	// public
+	public T getDefaultSelection(Player player);
 
 	/**
 	 * Gets the first select-able type for this player, starting at the currently selected one.
 	 * 
 	 * @param player
-	 * @return the first select-able type for this player, or null if this player can't select/use any type at all
+	 *            the player
+	 * @return the first select-able type for this player, or <code>null</code> if this player can't select or use any
+	 *         type at all
 	 */
-	public T getSelection(Player player) {
-		Validate.notNull(player);
-		String playerName = player.getName();
-		T current = selections.get(playerName);
-		// if none is currently selected, let's search for the first type this player can use:
-		if (current == null || !this.canBeSelected(player, current)) current = this.getNext(player, current);
-		return current; // returns null if the player can use no type at all
-	}
+	public T getSelection(Player player);
 
-	public T selectNext(Player player) {
-		Validate.notNull(player);
-		String playerName = player.getName();
-		T current = selections.get(playerName);
-		T next = this.getNext(player, current);
-		if (next != null) {
-			selections.put(playerName, next);
-			this.onSelect(next, player);
-		} else {
-			// for now remember the current selection
-			// selections.remove(playerName);
-		}
-		return next;
-	}
+	public T selectNext(Player player);
 
-	protected void onSelect(T type, Player selectedBy) {
-		// inform type:
-		type.onSelect(selectedBy);
-	}
+	public void clearSelection(Player player);
 
-	public void clearSelection(Player player) {
-		assert player != null;
-		String playerName = player.getName();
-		selections.remove(playerName);
-	}
-
-	public void clearAllSelections() {
-		selections.clear();
-	}
+	public void clearAllSelections();
 }

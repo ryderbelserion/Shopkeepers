@@ -64,6 +64,7 @@ import com.nisovin.shopkeepers.shoptypes.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
+import com.nisovin.shopkeepers.types.AbstractSelectableTypeRegistry;
 import com.nisovin.shopkeepers.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.ui.UIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
@@ -85,7 +86,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	}
 
 	// shop types manager:
-	private final SelectableTypeRegistry<AbstractShopType<?>> shopTypesManager = new SelectableTypeRegistry<AbstractShopType<?>>() {
+	private final SelectableTypeRegistry<AbstractShopType<?>> shopTypesManager = new AbstractSelectableTypeRegistry<AbstractShopType<?>>() {
 
 		@Override
 		protected String getTypeName() {
@@ -101,7 +102,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	};
 
 	// shop object types manager:
-	private final SelectableTypeRegistry<AbstractShopObjectType> shopObjectTypesManager = new SelectableTypeRegistry<AbstractShopObjectType>() {
+	private final SelectableTypeRegistry<AbstractShopObjectType> shopObjectTypesManager = new AbstractSelectableTypeRegistry<AbstractShopObjectType>() {
 
 		@Override
 		protected String getTypeName() {

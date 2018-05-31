@@ -4,10 +4,10 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
-import com.nisovin.shopkeepers.types.SelectableType;
+import com.nisovin.shopkeepers.types.AbstractSelectableType;
 import com.nisovin.shopkeepers.util.Utils;
 
-public abstract class AbstractShopObjectType extends SelectableType implements ShopObjectType {
+public abstract class AbstractShopObjectType extends AbstractSelectableType implements ShopObjectType {
 
 	protected AbstractShopObjectType(String identifier, String permission) {
 		super(identifier, permission);
