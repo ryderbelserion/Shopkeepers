@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopobjects;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.nisovin.shopkeepers.AbstractShopObjectType;
 import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectTypes;
@@ -10,16 +11,16 @@ import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectTypes;
 public class DefaultShopObjectTypes {
 
 	private final LivingEntityObjectTypes livingEntityObjectTypes = new LivingEntityObjectTypes();
-	private final ShopObjectType signShopObjectType = new SignShopObjectType();
-	private final ShopObjectType citizensShopObjectType = new CitizensShopObjectType();
+	private final AbstractShopObjectType signShopObjectType = new SignShopObjectType();
+	private final AbstractShopObjectType citizensShopObjectType = new CitizensShopObjectType();
 
 	// TODO maybe change object type permissions to 'shopkeeper.object.<type>'?
 
 	public DefaultShopObjectTypes() {
 	}
 
-	public List<ShopObjectType> getAllObjectTypes() {
-		List<ShopObjectType> shopObjectTypes = new ArrayList<ShopObjectType>();
+	public List<AbstractShopObjectType> getAllObjectTypes() {
+		List<AbstractShopObjectType> shopObjectTypes = new ArrayList<>();
 		shopObjectTypes.addAll(livingEntityObjectTypes.getAllObjectTypes());
 		shopObjectTypes.add(signShopObjectType);
 		shopObjectTypes.add(citizensShopObjectType);

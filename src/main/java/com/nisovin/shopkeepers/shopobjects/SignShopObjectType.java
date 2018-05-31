@@ -4,14 +4,14 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.AbstractShopObjectType;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
-import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class SignShopObjectType extends ShopObjectType {
+public class SignShopObjectType extends AbstractShopObjectType {
 
 	SignShopObjectType() {
 		super("block", "shopkeeper.sign");
@@ -46,8 +46,7 @@ public class SignShopObjectType extends ShopObjectType {
 
 	@Override
 	public boolean isValidSpawnBlockFace(Block targetBlock, BlockFace targetBlockFace) {
-		assert targetBlock != null && Utils.isBlockSide(targetBlockFace);
 		// limit to wall sign faces:
-		return (targetBlockFace != BlockFace.DOWN && targetBlockFace != BlockFace.UP);
+		return (targetBlockFace != BlockFace.UP) && super.isValidSpawnBlockFace(targetBlock, targetBlockFace);
 	}
 }

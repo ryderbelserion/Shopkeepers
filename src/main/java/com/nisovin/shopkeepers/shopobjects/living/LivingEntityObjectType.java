@@ -6,14 +6,14 @@ import java.util.List;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.AbstractShopObjectType;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
-import com.nisovin.shopkeepers.ShopObjectType;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class LivingEntityObjectType extends ShopObjectType {
+public class LivingEntityObjectType extends AbstractShopObjectType {
 
 	protected final EntityType entityType;
 	protected final List<String> aliases;

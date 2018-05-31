@@ -84,8 +84,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.updateChunkCoords();
 
 		ShopObjectType shopObjectType = creationData.getShopObjectType();
-		assert shopObjectType != null;
-		this.shopObject = shopObjectType.createObject(this, creationData);
+		Validate.isTrue(shopObjectType instanceof AbstractShopObjectType,
+				"Expecting an AbstractShopObjectType, got " + shopObjectType.getClass().getName());
+		this.shopObject = ((AbstractShopObjectType) shopObjectType).createObject(this, creationData);
 	}
 
 	/**
@@ -122,7 +123,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.z = config.getInt("z");
 		this.updateChunkCoords();
 
-		ShopObjectType objectType = ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(config.getString("object"));
+		AbstractShopObjectType objectType = ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(config.getString("object"));
 		if (objectType == null) {
 			// use default shop object type:
 			objectType = ShopkeepersPlugin.getInstance().getDefaultShopObjectType();

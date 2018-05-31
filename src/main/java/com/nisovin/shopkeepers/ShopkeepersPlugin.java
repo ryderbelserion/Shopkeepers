@@ -101,7 +101,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	};
 
 	// shop object types manager:
-	private final SelectableTypeRegistry<ShopObjectType> shopObjectTypesManager = new SelectableTypeRegistry<ShopObjectType>() {
+	private final SelectableTypeRegistry<AbstractShopObjectType> shopObjectTypesManager = new SelectableTypeRegistry<AbstractShopObjectType>() {
 
 		@Override
 		protected String getTypeName() {
@@ -501,7 +501,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// SHOP OBJECT TYPES
 
-	public SelectableTypeRegistry<ShopObjectType> getShopObjectTypeRegistry() {
+	public SelectableTypeRegistry<AbstractShopObjectType> getShopObjectTypeRegistry() {
 		return shopObjectTypesManager;
 	}
 
@@ -519,7 +519,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	 * 
 	 * @return the default shop object type
 	 */
-	public ShopObjectType getDefaultShopObjectType() {
+	public AbstractShopObjectType getDefaultShopObjectType() {
 		// default: villager entity shop object type:
 		return this.getDefaultShopObjectTypes().getLivingEntityObjectTypes().getObjectType(EntityType.VILLAGER);
 	}
