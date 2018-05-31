@@ -1,11 +1,12 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.shopobjects;
 
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.ShopObject;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 
 public abstract class AbstractShopObject implements ShopObject {
 
@@ -20,11 +21,11 @@ public abstract class AbstractShopObject implements ShopObject {
 	@Override
 	public abstract AbstractShopObjectType<?> getObjectType();
 
-	protected void load(ConfigurationSection config) {
+	public void load(ConfigurationSection config) {
 		// nothing to load by default
 	}
 
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		config.set("object", this.getObjectType().getIdentifier());
 	}
 
@@ -34,15 +35,15 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * Ideal to initialize any remaining things, like creating the citizens npc
 	 * for citizens shopkeepers, if none was loaded before / is existent.
 	 */
-	protected void onInit() {
+	public void onInit() {
 		// nothing to do by default
 	}
 
-	protected void onChunkLoad() {
+	public void onChunkLoad() {
 		// nothing by default
 	}
 
-	protected void onChunkUnload() {
+	public void onChunkUnload() {
 		// nothing by default
 	}
 
@@ -64,7 +65,8 @@ public abstract class AbstractShopObject implements ShopObject {
 	@Override
 	public abstract int getNameLengthLimit();
 
-	protected String trimToNameLength(String name) {
+	@Override
+	public String trimToNameLength(String name) {
 		if (name == null) return null;
 		int lengthLimit = this.getNameLengthLimit();
 		if (name.length() > lengthLimit) name = name.substring(0, lengthLimit);

@@ -1,10 +1,13 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.shoptypes;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 
+import com.nisovin.shopkeepers.AbstractShopkeeper;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.ShopType;
+import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
 
 public abstract class AbstractShopType<T extends AbstractShopkeeper> extends AbstractSelectableType implements ShopType<T> {
@@ -48,7 +51,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 *            the freshly created shopkeeper
 	 */
 	protected void registerShopkeeper(T shopkeeper) {
-		shopkeeper.shopObject.onInit();
+		shopkeeper.getShopObject().onInit();
 		SKShopkeepersPlugin.getInstance().registerShopkeeper(shopkeeper);
 	}
 

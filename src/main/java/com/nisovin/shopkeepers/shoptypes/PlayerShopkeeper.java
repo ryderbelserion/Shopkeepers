@@ -441,7 +441,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		super.onRegistration(sessionId);
 
 		// register protected chest:
-		SKShopkeepersPlugin.getInstance().getProtectedChests().addChest(worldName, chestX, chestY, chestZ, this);
+		SKShopkeepersPlugin.getInstance().getProtectedChests().addChest(this.getWorldName(), chestX, chestY, chestZ, this);
 	}
 
 	@Override
@@ -449,7 +449,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		super.onDeletion();
 
 		// unregister previously protected chest:
-		SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(worldName, chestX, chestY, chestZ, this);
+		SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(this.getWorldName(), chestX, chestY, chestZ, this);
 	}
 
 	@Override
@@ -650,7 +650,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 	private void setChest(int chestX, int chestY, int chestZ) {
 		if (this.isValid()) {
 			// unregister previously protected chest:
-			SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(worldName, chestX, chestY, chestZ, this);
+			SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(this.getWorldName(), chestX, chestY, chestZ, this);
 		}
 
 		// update chest:
@@ -660,7 +660,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 
 		if (this.isValid()) {
 			// register new protected chest:
-			SKShopkeepersPlugin.getInstance().getProtectedChests().addChest(worldName, chestX, chestY, chestZ, this);
+			SKShopkeepersPlugin.getInstance().getProtectedChests().addChest(this.getWorldName(), chestX, chestY, chestZ, this);
 		}
 	}
 
@@ -672,7 +672,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 	 * @return
 	 */
 	public boolean usesChest(Block chest) {
-		if (!chest.getWorld().getName().equals(worldName)) return false;
+		if (!chest.getWorld().getName().equals(this.getWorldName())) return false;
 		int x = chest.getX();
 		int y = chest.getY();
 		int z = chest.getZ();
@@ -685,7 +685,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 	}
 
 	public Block getChest() {
-		return Bukkit.getWorld(worldName).getBlockAt(chestX, chestY, chestZ);
+		return Bukkit.getWorld(this.getWorldName()).getBlockAt(chestX, chestY, chestZ);
 	}
 
 	// returns null (and logs a warning) if the price cannot be represented correctly by currency items

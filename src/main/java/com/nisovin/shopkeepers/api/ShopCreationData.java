@@ -9,6 +9,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
+import com.nisovin.shopkeepers.api.shoptypes.ShopType;
+
 /**
  * Holds the different possible arguments needed for the creation of a shopkeeper of a certain type.
  * <p>

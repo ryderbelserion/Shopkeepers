@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.shopobjects;
 
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.AbstractShopObjectType;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopCreationData;
@@ -17,7 +16,7 @@ public class CitizensShopObjectType extends AbstractShopObjectType<CitizensShop>
 	}
 
 	@Override
-	protected CitizensShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public CitizensShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		return new CitizensShop(shopkeeper, creationData);
 	}
 

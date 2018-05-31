@@ -21,7 +21,7 @@ public class VillagerShop extends LivingEntityShop {
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) {
+	public void load(ConfigurationSection config) {
 		super.load(config);
 
 		// load profession:
@@ -45,7 +45,7 @@ public class VillagerShop extends LivingEntityShop {
 	}
 
 	@Override
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		super.save(config);
 		config.set("prof", profession.name());
 	}

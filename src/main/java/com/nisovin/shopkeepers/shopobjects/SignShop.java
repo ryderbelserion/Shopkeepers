@@ -11,7 +11,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Attachable;
 
-import com.nisovin.shopkeepers.AbstractShopObject;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
@@ -42,7 +41,7 @@ public class SignShop extends AbstractShopObject {
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) {
+	public void load(ConfigurationSection config) {
 		super.load(config);
 		if (config.isString("signFacing")) {
 			String signFacingName = config.getString("signFacing");
@@ -63,7 +62,7 @@ public class SignShop extends AbstractShopObject {
 	}
 
 	@Override
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		super.save(config);
 		if (signFacing != null) {
 			config.set("signFacing", signFacing.name());
@@ -71,7 +70,7 @@ public class SignShop extends AbstractShopObject {
 	}
 
 	@Override
-	protected void onInit() {
+	public void onInit() {
 		super.onInit();
 		this.spawn();
 	}
@@ -99,7 +98,7 @@ public class SignShop extends AbstractShopObject {
 	}
 
 	@Override
-	protected void onChunkLoad() {
+	public void onChunkLoad() {
 		super.onChunkLoad();
 		// get the sign facing, in case we weren't able yet, for example because the world wasn't loaded earlier:
 		if (signFacing == null) {

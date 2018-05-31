@@ -17,8 +17,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.api.ShopObjectType;
-import com.nisovin.shopkeepers.api.ShopType;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
+import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.NMSManager;

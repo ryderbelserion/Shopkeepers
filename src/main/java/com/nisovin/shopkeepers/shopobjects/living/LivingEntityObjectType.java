@@ -5,10 +5,10 @@ import java.util.List;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.AbstractShopObjectType;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -36,7 +36,7 @@ public abstract class LivingEntityObjectType<T extends LivingEntityShop> extends
 	}
 
 	@Override
-	protected abstract T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData);
+	public abstract T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData);
 
 	@Override
 	public boolean isEnabled() {

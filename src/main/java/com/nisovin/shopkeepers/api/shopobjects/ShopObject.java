@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.api;
+package com.nisovin.shopkeepers.api.shopobjects;
 
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
@@ -27,6 +27,8 @@ public interface ShopObject {
 	public void setName(String name);
 
 	public int getNameLengthLimit();
+
+	public String trimToNameLength(String name);
 
 	/**
 	 * Equips the given item.

@@ -13,14 +13,17 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.ShopObject;
-import com.nisovin.shopkeepers.api.ShopObjectType;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
+import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
+import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
+import com.nisovin.shopkeepers.shoptypes.AbstractShopType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
@@ -29,18 +32,18 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	private int sessionId;
 	private UUID uniqueId;
-	protected AbstractShopObject shopObject;
-	protected String worldName;
-	protected int x;
-	protected int y;
-	protected int z;
-	protected ChunkCoords chunkCoords;
-	protected String name = "";
+	private AbstractShopObject shopObject;
+	private String worldName;
+	private int x;
+	private int y;
+	private int z;
+	private ChunkCoords chunkCoords;
+	private String name = "";
 
 	private boolean valid = false;
 
 	// ui type identifier -> ui handler
-	protected final Map<String, UIHandler> uiHandlers = new HashMap<>();
+	private final Map<String, UIHandler> uiHandlers = new HashMap<>();
 	private boolean uiActive = true; // can be used to deactivate UIs for this shopkeeper
 
 	/**
@@ -235,21 +238,6 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public ChunkCoords getChunkCoords() {
-		return chunkCoords;
-	}
-
-	@Override
-	public String getPositionString() {
-		return Utils.getLocationString(worldName, x, y, z);
-	}
-
-	@Override
-	public Location getActualLocation() {
-		return shopObject.getActualLocation();
-	}
-
-	@Override
 	public String getWorldName() {
 		return worldName;
 	}
@@ -289,8 +277,23 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		SKShopkeepersPlugin.getInstance().onShopkeeperMove(this, oldChunk);
 	}
 
+	@Override
+	public String getPositionString() {
+		return Utils.getLocationString(worldName, x, y, z);
+	}
+
+	@Override
+	public ChunkCoords getChunkCoords() {
+		return chunkCoords;
+	}
+
 	private void updateChunkCoords() {
 		this.chunkCoords = ChunkCoords.fromBlockPos(worldName, x, z);
+	}
+
+	@Override
+	public Location getActualLocation() {
+		return shopObject.getActualLocation();
 	}
 
 	@Override

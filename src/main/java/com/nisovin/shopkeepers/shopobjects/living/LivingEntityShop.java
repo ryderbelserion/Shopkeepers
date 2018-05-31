@@ -13,13 +13,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 
-import com.nisovin.shopkeepers.AbstractShopObject;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -48,7 +48,7 @@ public class LivingEntityShop extends AbstractShopObject {
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) {
+	public void load(ConfigurationSection config) {
 		super.load(config);
 		if (config.contains("uuid")) {
 			this.uuid = config.getString("uuid");
@@ -56,7 +56,7 @@ public class LivingEntityShop extends AbstractShopObject {
 	}
 
 	@Override
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		super.save(config);
 		// let's save last known uuid nevertheless, for the case that the entity somehow wasn't properly removed before
 		// (which seems to still happen sometimes during server shutdowns)

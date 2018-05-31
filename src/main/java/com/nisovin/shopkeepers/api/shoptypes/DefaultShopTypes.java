@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.api.shoptypes;
 
 import java.util.List;
 
-import com.nisovin.shopkeepers.api.ShopType;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 
 public interface DefaultShopTypes {

@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.shoptypes;
 
 import org.apache.commons.lang.Validate;
 
-import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;

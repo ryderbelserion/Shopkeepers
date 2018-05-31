@@ -18,13 +18,13 @@ public class ZombieShop extends LivingEntityShop {
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) {
+	public void load(ConfigurationSection config) {
 		super.load(config);
 		baby = config.getBoolean("baby");
 	}
 
 	@Override
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		super.save(config);
 		config.set("baby", baby);
 	}

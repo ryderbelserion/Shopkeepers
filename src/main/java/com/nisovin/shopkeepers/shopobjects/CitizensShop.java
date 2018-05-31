@@ -9,7 +9,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.AbstractShopObject;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopCreationData;
@@ -43,7 +42,7 @@ public class CitizensShop extends AbstractShopObject {
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) {
+	public void load(ConfigurationSection config) {
 		super.load(config);
 		if (config.contains("npcId")) {
 			npcId = config.getInt("npcId");
@@ -51,7 +50,7 @@ public class CitizensShop extends AbstractShopObject {
 	}
 
 	@Override
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		super.save(config);
 		if (npcId != null) {
 			config.set("npcId", npcId);
@@ -59,7 +58,7 @@ public class CitizensShop extends AbstractShopObject {
 	}
 
 	@Override
-	protected void onInit() {
+	public void onInit() {
 		super.onInit();
 		if (this.isActive()) return;
 		if (!CitizensHandler.isEnabled()) return;

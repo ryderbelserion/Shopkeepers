@@ -38,13 +38,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.api.ShopType;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.CreatePlayerShopkeeperEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperCreatedEvent;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
+import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
@@ -62,12 +62,14 @@ import com.nisovin.shopkeepers.metrics.WorldsChart;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
+import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SignShop;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.shoptypes.AbstractPlayerShopType;
+import com.nisovin.shopkeepers.shoptypes.AbstractShopType;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.shoptypes.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
@@ -667,7 +669,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	}
 
 	// this needs to be called right after a new shopkeeper was created..
-	void registerShopkeeper(AbstractShopkeeper shopkeeper) {
+	public void registerShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		// assert !this.isRegistered(shopkeeper);
 

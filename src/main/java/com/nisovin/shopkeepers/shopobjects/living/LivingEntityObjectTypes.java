@@ -141,7 +141,7 @@ public class LivingEntityObjectTypes {
 		case VILLAGER:
 			objectType = new LivingEntityObjectType<VillagerShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected VillagerShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+				public VillagerShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new VillagerShop(this, shopkeeper, creationData);
 				}
 			};
@@ -149,7 +149,7 @@ public class LivingEntityObjectTypes {
 		case CREEPER:
 			objectType = new LivingEntityObjectType<CreeperShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected CreeperShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+				public CreeperShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new CreeperShop(this, shopkeeper, creationData);
 				}
 			};
@@ -157,7 +157,7 @@ public class LivingEntityObjectTypes {
 		case OCELOT:
 			objectType = new LivingEntityObjectType<CatShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected CatShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+				public CatShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new CatShop(this, shopkeeper, creationData);
 				}
 			};
@@ -165,7 +165,7 @@ public class LivingEntityObjectTypes {
 		case SHEEP:
 			objectType = new LivingEntityObjectType<SheepShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected SheepShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+				public SheepShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new SheepShop(this, shopkeeper, creationData);
 				}
 			};
@@ -173,7 +173,7 @@ public class LivingEntityObjectTypes {
 		case ZOMBIE:
 			objectType = new LivingEntityObjectType<ZombieShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected ZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+				public ZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new ZombieShop(this, shopkeeper, creationData);
 				}
 			};
@@ -181,7 +181,7 @@ public class LivingEntityObjectTypes {
 		case PIG_ZOMBIE:
 			objectType = new LivingEntityObjectType<PigZombieShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected PigZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+				public PigZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new PigZombieShop(this, shopkeeper, creationData);
 				}
 			};
@@ -189,7 +189,7 @@ public class LivingEntityObjectTypes {
 		default:
 			objectType = new LivingEntityObjectType<LivingEntityShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected LivingEntityShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+				public LivingEntityShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new LivingEntityShop(this, shopkeeper, creationData);
 				}
 			};

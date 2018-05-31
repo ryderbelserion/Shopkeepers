@@ -19,13 +19,13 @@ public class SheepShop extends LivingEntityShop {
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) {
+	public void load(ConfigurationSection config) {
 		super.load(config);
 		this.color = DyeColor.getByWoolData((byte) config.getInt("color"));
 	}
 
 	@Override
-	protected void save(ConfigurationSection config) {
+	public void save(ConfigurationSection config) {
 		super.save(config);
 		config.set("color", color.getWoolData());
 	}

@@ -13,7 +13,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.shoptypes.DefaultShopTypes;
+import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;

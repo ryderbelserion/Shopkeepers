@@ -27,13 +27,13 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.api.ShopObjectType;
-import com.nisovin.shopkeepers.api.ShopType;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
+import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.shoptypes.AdminShopkeeper;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
