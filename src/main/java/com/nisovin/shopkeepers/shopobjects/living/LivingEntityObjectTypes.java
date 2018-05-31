@@ -78,7 +78,7 @@ public class LivingEntityObjectTypes {
 	 * </ul>
 	 */
 
-	public static final Map<EntityType, List<String>> ALIASES;
+	private static final Map<EntityType, List<String>> ALIASES;
 
 	private static List<String> prepareAliases(List<String> aliases) {
 		return Collections.unmodifiableList(Utils.normalize(aliases));

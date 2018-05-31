@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.entity.EntityType;
@@ -23,7 +23,7 @@ public class LivingEntityObjectType extends AbstractShopObjectType {
 		this.entityType = entityType;
 		assert entityType.isAlive();
 		// assert: aliases are normalized
-		this.aliases = aliases == null ? new ArrayList<String>(0) : aliases;
+		this.aliases = (aliases != null ? aliases : Collections.emptyList());
 	}
 
 	public EntityType getEntityType() {
