@@ -3,9 +3,10 @@ package com.nisovin.shopkeepers.shoptypes;
 import org.apache.commons.lang.Validate;
 
 import com.nisovin.shopkeepers.AbstractShopType;
-import com.nisovin.shopkeepers.ShopCreationData;
-import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
 
 public abstract class AbstractPlayerShopType<T extends PlayerShopkeeper> extends AbstractShopType<T> implements PlayerShopType<T> {
 

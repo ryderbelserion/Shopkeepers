@@ -9,9 +9,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 
 /**
  * Stores information about an item stack being sold or bought for a certain price.
@@ -46,12 +47,12 @@ public class PriceOffer {
 		for (PriceOffer offer : offers) {
 			ItemStack item = offer.getItem();
 			// TODO temporary, due to a bukkit bug custom head item can currently not be saved
-			if (Settings.skipCustomHeadSaving && ItemUtils.isCustomHeadItem(item)) {
+			if (Settings.skipCustomHeadSaving && SKItemUtils.isCustomHeadItem(item)) {
 				Log.warning("Skipping saving of trade involving a head item with custom texture, which cannot be saved currently due to a bukkit bug.");
 				continue;
 			}
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
-			ItemUtils.saveItem(offerSection, "item", item);
+			SKItemUtils.saveItem(offerSection, "item", item);
 			offerSection.set("price", offer.getPrice());
 			id++;
 		}
@@ -64,7 +65,7 @@ public class PriceOffer {
 			for (String id : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(id);
 				if (offerSection == null) continue; // invalid offer: not a section
-				ItemStack item = ItemUtils.loadItem(offerSection, "item");
+				ItemStack item = SKItemUtils.loadItem(offerSection, "item");
 				int price = offerSection.getInt("price");
 				if (ItemUtils.isEmpty(item) || price <= 0) continue; // invalid offer
 				offers.add(new PriceOffer(item, price));

@@ -27,7 +27,10 @@ import org.bukkit.util.Vector;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
 
-public class Utils {
+public final class Utils {
+
+	private Utils() {
+	}
 
 	/**
 	 * Calculates the average of the given values.

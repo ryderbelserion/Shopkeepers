@@ -7,9 +7,9 @@ import org.bukkit.inventory.Inventory;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 

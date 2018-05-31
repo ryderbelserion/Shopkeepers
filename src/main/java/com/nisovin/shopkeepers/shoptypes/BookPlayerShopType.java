@@ -4,10 +4,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopCreationData;
-import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class BookPlayerShopType extends AbstractPlayerShopType<BookPlayerShopkeeper> {

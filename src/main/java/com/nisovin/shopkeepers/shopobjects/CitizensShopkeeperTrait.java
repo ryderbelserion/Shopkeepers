@@ -4,10 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
-import com.nisovin.shopkeepers.ShopCreationData;
-import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.api.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.util.Log;
 
 import net.citizensnpcs.api.npc.NPC;

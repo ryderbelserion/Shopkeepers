@@ -11,16 +11,17 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
-import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.events.ShopkeeperDeletedEvent;
-import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
-import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
-import com.nisovin.shopkeepers.shoptypes.PlayerShopType;
+import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.events.ShopkeeperDeletedEvent;
+import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
+import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
+import com.nisovin.shopkeepers.api.ui.UIType;
+import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.ui.UIType;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class EditorHandler extends UIHandler {
@@ -99,7 +100,7 @@ public abstract class EditorHandler extends UIHandler {
 					shopkeeper.getShopObject().cycleSubType();
 					ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
 					if (!ItemUtils.isEmpty(typeItem)) {
-						event.getInventory().setItem(17, ItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
+						event.getInventory().setItem(17, SKItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 					}
 				}
 			}
@@ -239,7 +240,7 @@ public abstract class EditorHandler extends UIHandler {
 		// sub-type cycle button:
 		ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
 		if (typeItem != null) {
-			inventory.setItem(17, ItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
+			inventory.setItem(17, SKItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 		}
 
 		// delete button:

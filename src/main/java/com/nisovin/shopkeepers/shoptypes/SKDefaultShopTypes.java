@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.shoptypes.DefaultShopTypes;
 
 public class SKDefaultShopTypes implements DefaultShopTypes {
 

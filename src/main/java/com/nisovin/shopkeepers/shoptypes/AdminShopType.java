@@ -5,9 +5,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 
 public class AdminShopType extends AbstractShopType<AdminShopkeeper> {
 

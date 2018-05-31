@@ -16,16 +16,17 @@ import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.Shopkeeper;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.TradingRecipe;
+import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.events.OpenTradeEvent;
+import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
+import com.nisovin.shopkeepers.api.ui.UIType;
+import com.nisovin.shopkeepers.api.util.ItemUtils;
+import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.events.OpenTradeEvent;
-import com.nisovin.shopkeepers.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.ui.UIType;
-import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class TradingHandler extends UIHandler {
@@ -184,7 +185,7 @@ public class TradingHandler extends UIHandler {
 		ItemStack cursor = clickEvent.getCursor();
 
 		// prevent unsupported types of special clicks:
-		if (action == InventoryAction.COLLECT_TO_CURSOR && ItemUtils.isSimilar(resultItem, cursor)) {
+		if (action == InventoryAction.COLLECT_TO_CURSOR && SKItemUtils.isSimilar(resultItem, cursor)) {
 			// weird behavior and buggy, see MC-129515
 			// for now: only allowed if the item on the cursor and inside the result slot are different
 			// TODO maybe replicate the behavior of this inventory action, but limit its effect to the player's
@@ -192,7 +193,7 @@ public class TradingHandler extends UIHandler {
 			Log.debug("Prevented unsupported special click in trading window by " + playerName
 					+ " at " + shopkeeper.getPositionString() + ": " + action);
 			clickEvent.setCancelled(true);
-			ItemUtils.updateInventoryLater(player);
+			SKItemUtils.updateInventoryLater(player);
 			return;
 		}
 
@@ -209,7 +210,7 @@ public class TradingHandler extends UIHandler {
 
 		// we are handling all types of clicks which might trigger a trade ourselves:
 		clickEvent.setCancelled(true);
-		ItemUtils.updateInventoryLater(player);
+		SKItemUtils.updateInventoryLater(player);
 
 		// check for a trade and prepare trade data:
 		TradeData tradeData = this.checkForTrade(clickEvent, false);
@@ -234,7 +235,7 @@ public class TradingHandler extends UIHandler {
 					if (isCursorEmpty) {
 						resultCursor = resultItem; // no item copy required here
 					} else {
-						resultCursor = ItemUtils.increaseItemAmount(cursor, resultItem.getAmount());
+						resultCursor = SKItemUtils.increaseItemAmount(cursor, resultItem.getAmount());
 					}
 					player.setItemOnCursor(resultCursor);
 
@@ -276,7 +277,7 @@ public class TradingHandler extends UIHandler {
 			// equal to the previous result item
 			while (true) {
 				// check if there is enough space in the player's inventory:
-				ItemStack[] newPlayerContents = ItemUtils.getStorageContents(playerInventory);
+				ItemStack[] newPlayerContents = SKItemUtils.getStorageContents(playerInventory);
 
 				// minecraft is adding items in reverse container order (starting with hotbar slot 9),
 				// so we reverse the player contents accordingly before adding items:
@@ -288,7 +289,7 @@ public class TradingHandler extends UIHandler {
 				Collections.reverse(contentsView);
 
 				// no item copy required here
-				if (ItemUtils.addItems(newPlayerContents, resultItem) != 0) {
+				if (SKItemUtils.addItems(newPlayerContents, resultItem) != 0) {
 					// not enough inventory space, abort trading:
 					break;
 				}
@@ -303,7 +304,7 @@ public class TradingHandler extends UIHandler {
 				Collections.reverse(contentsView);
 
 				// apply player inventory changes:
-				ItemUtils.setStorageContents(playerInventory, newPlayerContents);
+				SKItemUtils.setStorageContents(playerInventory, newPlayerContents);
 
 				// common apply trade:
 				this.commonApplyTrade(tradeData);
@@ -392,13 +393,13 @@ public class TradingHandler extends UIHandler {
 
 		if (Settings.useStrictItemComparison) {
 			// verify the recipe items are perfectly matching (they can still be swapped though):
-			if (!ItemUtils.isSimilar(requiredItem1, offeredItem1) || !ItemUtils.isSimilar(requiredItem2, offeredItem2)) {
+			if (!SKItemUtils.isSimilar(requiredItem1, offeredItem1) || !SKItemUtils.isSimilar(requiredItem2, offeredItem2)) {
 				// additional check for the debug flag, so we don't do the item comparisons if not really needed
 				if (!silent && Settings.debug) {
 					this.debugPreventedTrade(player, "The offered items do not strictly match the required items.");
-					Log.debug("Used trading recipe: " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
-					Log.debug("Recipe item 1: " + (ItemUtils.isSimilar(requiredItem1, offeredItem1) ? "similar" : "not similar"));
-					Log.debug("Recipe item 2: " + (ItemUtils.isSimilar(requiredItem2, offeredItem2) ? "similar" : "not similar"));
+					Log.debug("Used trading recipe: " + SKItemUtils.getSimpleRecipeInfo(tradingRecipe));
+					Log.debug("Recipe item 1: " + (SKItemUtils.isSimilar(requiredItem1, offeredItem1) ? "similar" : "not similar"));
+					Log.debug("Recipe item 2: " + (SKItemUtils.isSimilar(requiredItem2, offeredItem2) ? "similar" : "not similar"));
 				}
 				return null;
 			}
@@ -407,7 +408,7 @@ public class TradingHandler extends UIHandler {
 		// detecting and preventing issue due to minecraft bug MC-81687 (traded items not being properly removed):
 		// TODO should be fixed in newer versions (1.9+), remove when no longer needed
 		if (NMSManager.getProvider().getVersionId().startsWith("1_8_")) {
-			if (ItemUtils.isSimilar(offeredItem1, offeredItem2)) {
+			if (SKItemUtils.isSimilar(offeredItem1, offeredItem2)) {
 				assert requiredItem2 != null && offeredItem2 != null;
 				if (offeredItem1.getAmount() < requiredItem1.getAmount() || offeredItem2.getAmount() < requiredItem2.getAmount()) {
 					if (!silent) {
@@ -499,8 +500,8 @@ public class TradingHandler extends UIHandler {
 		merchantInventory.setItem(RESULT_ITEM_SLOT_ID, null); // clear result slot, just in case
 
 		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
-		ItemStack newOfferedItem1 = ItemUtils.descreaseItemAmount(tradeData.offeredItem1, ItemUtils.getItemStackAmount(tradingRecipe.getItem1()));
-		ItemStack newOfferedItem2 = ItemUtils.descreaseItemAmount(tradeData.offeredItem2, ItemUtils.getItemStackAmount(tradingRecipe.getItem2()));
+		ItemStack newOfferedItem1 = SKItemUtils.descreaseItemAmount(tradeData.offeredItem1, SKItemUtils.getItemStackAmount(tradingRecipe.getItem1()));
+		ItemStack newOfferedItem2 = SKItemUtils.descreaseItemAmount(tradeData.offeredItem2, SKItemUtils.getItemStackAmount(tradingRecipe.getItem2()));
 		// inform the merchant inventory about the change (updates the active trading recipe and result item):
 		merchantInventory.setItem(tradeData.swappedItemOrder ? BUY_ITEM_2_SLOT_ID : BUY_ITEM_1_SLOT_ID, newOfferedItem1);
 		merchantInventory.setItem(tradeData.swappedItemOrder ? BUY_ITEM_1_SLOT_ID : BUY_ITEM_2_SLOT_ID, newOfferedItem2);
@@ -517,7 +518,7 @@ public class TradingHandler extends UIHandler {
 
 		// log trade:
 		Log.debug("Trade (#" + tradeCounter + ") by " + tradeData.tradingPlayer.getName() + " with shopkeeper at "
-				+ this.getShopkeeper().getPositionString() + ": " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
+				+ this.getShopkeeper().getPositionString() + ": " + SKItemUtils.getSimpleRecipeInfo(tradingRecipe));
 	}
 
 	/**

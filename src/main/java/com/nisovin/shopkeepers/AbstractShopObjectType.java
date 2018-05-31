@@ -4,6 +4,9 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopObjectType;
+import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
 import com.nisovin.shopkeepers.util.Utils;
 

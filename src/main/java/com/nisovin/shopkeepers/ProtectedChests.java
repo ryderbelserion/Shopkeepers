@@ -12,7 +12,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 
 public class ProtectedChests {
 
@@ -110,7 +110,7 @@ public class ProtectedChests {
 		// further adjacent blocks are only protected if an adjacent block to that is a directly protected chest:
 		for (BlockFace face : CHEST_PROTECTED_FACES) {
 			Block adjacentBlock = chest.getRelative(face);
-			if (ItemUtils.isChest(adjacentBlock.getType()) && this.isChestDirectlyProtected(adjacentBlock, player)) {
+			if (SKItemUtils.isChest(adjacentBlock.getType()) && this.isChestDirectlyProtected(adjacentBlock, player)) {
 				return true;
 			}
 		}
@@ -125,7 +125,7 @@ public class ProtectedChests {
 		if (plugin == null) return false;
 		for (BlockFace face : HOPPER_PROTECTED_FACES) {
 			Block adjacentBlock = hopper.getRelative(face);
-			if (ItemUtils.isChest(adjacentBlock.getType()) && this.isChestProtected(adjacentBlock, player)) {
+			if (SKItemUtils.isChest(adjacentBlock.getType()) && this.isChestProtected(adjacentBlock, player)) {
 				return true;
 			}
 		}

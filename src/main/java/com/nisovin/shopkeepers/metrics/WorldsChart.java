@@ -6,8 +6,8 @@ import java.util.Set;
 
 import org.bstats.bukkit.Metrics;
 
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.util.ChunkCoords;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.util.ChunkCoords;
 
 /**
  * Reports the number of worlds containing shopkeepers.

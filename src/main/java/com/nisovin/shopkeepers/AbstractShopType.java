@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers;
 import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopType;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
 
 public abstract class AbstractShopType<T extends AbstractShopkeeper> extends AbstractSelectableType implements ShopType<T> {

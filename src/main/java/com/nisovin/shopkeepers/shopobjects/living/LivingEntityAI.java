@@ -17,9 +17,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.Utils;
 
 /**

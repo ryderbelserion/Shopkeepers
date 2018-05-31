@@ -15,7 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.CitizensShopkeeperTrait;

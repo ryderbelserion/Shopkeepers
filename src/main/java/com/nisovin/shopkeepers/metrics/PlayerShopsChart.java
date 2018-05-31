@@ -2,8 +2,8 @@ package com.nisovin.shopkeepers.metrics;
 
 import org.bstats.bukkit.Metrics;
 
-import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 
 /**

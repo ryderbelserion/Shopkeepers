@@ -15,9 +15,14 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopObjectType;
+import com.nisovin.shopkeepers.api.ShopType;
+import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -111,13 +116,13 @@ class CreateListener implements Listener {
 
 			Block selectedChest = plugin.getSelectedChest(player);
 			// validate old selected chest:
-			if (selectedChest != null && !ItemUtils.isChest(selectedChest.getType())) {
+			if (selectedChest != null && !SKItemUtils.isChest(selectedChest.getType())) {
 				plugin.selectChest(player, null);
 				selectedChest = null;
 			}
 
 			// chest for chest selection:
-			if (ItemUtils.isChest(clickedBlock.getType()) && !clickedBlock.equals(selectedChest)) {
+			if (SKItemUtils.isChest(clickedBlock.getType()) && !clickedBlock.equals(selectedChest)) {
 				// check if the clicked chest was recently placed:
 				if (Settings.requireChestRecentlyPlaced && !plugin.isRecentlyPlaced(player, clickedBlock)) {
 					// chest was not recently placed:
@@ -154,7 +159,7 @@ class CreateListener implements Listener {
 					// manually remove creation item from player's hand after this event is processed:
 					event.setCancelled(true);
 					Bukkit.getScheduler().runTask(plugin, () -> {
-						ItemStack newItemInHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
+						ItemStack newItemInHand = SKItemUtils.descreaseItemAmount(itemInHand, 1);
 						player.setItemInHand(newItemInHand);
 					});
 				}
@@ -177,7 +182,7 @@ class CreateListener implements Listener {
 			Utils.sendMessage(player, Settings.msgMustSelectChest);
 			return false;
 		}
-		assert ItemUtils.isChest(selectedChest.getType()); // we have checked that above
+		assert SKItemUtils.isChest(selectedChest.getType()); // we have checked that above
 
 		// check for selected chest being too far away:
 		if (!selectedChest.getWorld().equals(clickedBlock.getWorld())

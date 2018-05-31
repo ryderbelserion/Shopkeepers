@@ -12,9 +12,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.common.base.Objects;
+import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class Settings {
@@ -467,7 +468,7 @@ public class Settings {
 
 	// creation item:
 	public static ItemStack createShopCreationItem() {
-		ItemStack creationItem = ItemUtils.createItemStack(shopCreationItem, 1, (short) shopCreationItemData, shopCreationItemName, shopCreationItemLore);
+		ItemStack creationItem = SKItemUtils.createItemStack(shopCreationItem, 1, (short) shopCreationItemData, shopCreationItemName, shopCreationItemLore);
 
 		// apply spawn egg entity type:
 		if (shopCreationItem == Material.MONSTER_EGG && !Utils.isEmpty(shopCreationItemSpawnEggEntityType) && NMSManager.getProvider().supportsSpawnEggEntityType()) {
@@ -484,7 +485,7 @@ public class Settings {
 	}
 
 	public static boolean isShopCreationItem(ItemStack item) {
-		if (!ItemUtils.isSimilar(item, Settings.shopCreationItem, (short) Settings.shopCreationItemData, Settings.shopCreationItemName, Settings.shopCreationItemLore)) {
+		if (!SKItemUtils.isSimilar(item, Settings.shopCreationItem, (short) Settings.shopCreationItemData, Settings.shopCreationItemName, Settings.shopCreationItemLore)) {
 			return false;
 		}
 
@@ -505,40 +506,40 @@ public class Settings {
 
 	// naming item:
 	public static ItemStack createNameButtonItem() {
-		return ItemUtils.createItemStack(nameItem, 1, (short) nameItemData, msgButtonName, msgButtonNameLore);
+		return SKItemUtils.createItemStack(nameItem, 1, (short) nameItemData, msgButtonName, msgButtonNameLore);
 	}
 
 	public static boolean isNamingItem(ItemStack item) {
-		return ItemUtils.isSimilar(item, nameItem, (short) nameItemData, null, Settings.nameItemLore);
+		return SKItemUtils.isSimilar(item, nameItem, (short) nameItemData, null, Settings.nameItemLore);
 	}
 
 	// chest button:
 	public static ItemStack createChestButtonItem() {
-		return ItemUtils.createItemStack(chestItem, 1, (short) chestItemData, msgButtonChest, msgButtonChestLore);
+		return SKItemUtils.createItemStack(chestItem, 1, (short) chestItemData, msgButtonChest, msgButtonChestLore);
 	}
 
 	// delete button:
 	public static ItemStack createDeleteButtonItem() {
-		return ItemUtils.createItemStack(deleteItem, 1, (short) deleteItemData, msgButtonDelete, msgButtonDeleteLore);
+		return SKItemUtils.createItemStack(deleteItem, 1, (short) deleteItemData, msgButtonDelete, msgButtonDeleteLore);
 	}
 
 	// hire item:
 	public static ItemStack createHireButtonItem() {
-		return ItemUtils.createItemStack(hireItem, 1, (short) hireItemData, msgButtonHire, msgButtonHireLore);
+		return SKItemUtils.createItemStack(hireItem, 1, (short) hireItemData, msgButtonHire, msgButtonHireLore);
 	}
 
 	public static boolean isHireItem(ItemStack item) {
-		return ItemUtils.isSimilar(item, hireItem, (short) hireItemData, hireItemName, hireItemLore);
+		return SKItemUtils.isSimilar(item, hireItem, (short) hireItemData, hireItemName, hireItemLore);
 	}
 
 	// currency item:
 	public static ItemStack createCurrencyItem(int amount) {
-		return ItemUtils.createItemStack(Settings.currencyItem, amount, Settings.currencyItemData,
+		return SKItemUtils.createItemStack(Settings.currencyItem, amount, Settings.currencyItemData,
 				Settings.currencyItemName, Settings.currencyItemLore);
 	}
 
 	public static boolean isCurrencyItem(ItemStack item) {
-		return ItemUtils.isSimilar(item, Settings.currencyItem, Settings.currencyItemData,
+		return SKItemUtils.isSimilar(item, Settings.currencyItem, Settings.currencyItemData,
 				Settings.currencyItemName, Settings.currencyItemLore);
 	}
 
@@ -549,20 +550,20 @@ public class Settings {
 
 	public static ItemStack createHighCurrencyItem(int amount) {
 		if (!isHighCurrencyEnabled()) return null;
-		return ItemUtils.createItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemData,
+		return SKItemUtils.createItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemData,
 				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}
 
 	public static boolean isHighCurrencyItem(ItemStack item) {
 		if (!isHighCurrencyEnabled()) return false;
-		return ItemUtils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData,
+		return SKItemUtils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData,
 				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}
 
 	// zero currency item:
 	public static ItemStack createZeroCurrencyItem() {
 		if (Settings.zeroCurrencyItem == Material.AIR) return null;
-		return ItemUtils.createItemStack(Settings.zeroCurrencyItem, 1, Settings.zeroCurrencyItemData,
+		return SKItemUtils.createItemStack(Settings.zeroCurrencyItem, 1, Settings.zeroCurrencyItemData,
 				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
 	}
 
@@ -570,14 +571,14 @@ public class Settings {
 		if (Settings.zeroCurrencyItem == Material.AIR) {
 			return ItemUtils.isEmpty(item);
 		}
-		return ItemUtils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData,
+		return SKItemUtils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData,
 				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
 	}
 
 	// high zero currency item:
 	public static ItemStack createHighZeroCurrencyItem() {
 		if (Settings.highZeroCurrencyItem == Material.AIR) return null;
-		return ItemUtils.createItemStack(Settings.highZeroCurrencyItem, 1, Settings.highZeroCurrencyItemData,
+		return SKItemUtils.createItemStack(Settings.highZeroCurrencyItem, 1, Settings.highZeroCurrencyItemData,
 				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 
@@ -585,7 +586,7 @@ public class Settings {
 		if (Settings.highZeroCurrencyItem == Material.AIR) {
 			return ItemUtils.isEmpty(item);
 		}
-		return ItemUtils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemData,
+		return SKItemUtils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemData,
 				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 }

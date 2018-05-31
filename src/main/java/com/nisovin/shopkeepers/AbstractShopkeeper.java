@@ -12,11 +12,15 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.events.ShopkeeperEditedEvent;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopObjectType;
+import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
+import com.nisovin.shopkeepers.api.ui.UIType;
+import com.nisovin.shopkeepers.api.util.ChunkCoords;
+import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
-import com.nisovin.shopkeepers.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 

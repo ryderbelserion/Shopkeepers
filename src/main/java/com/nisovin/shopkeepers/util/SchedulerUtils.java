@@ -12,7 +12,7 @@ import org.bukkit.scheduler.BukkitWorker;
 /**
  * Scheduler-related utilities.
  */
-public class SchedulerUtils {
+public final class SchedulerUtils {
 
 	private SchedulerUtils() {
 	}

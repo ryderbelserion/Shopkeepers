@@ -16,7 +16,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 
 class SignShopListener implements Listener {
@@ -39,7 +39,7 @@ class SignShopListener implements Listener {
 		Block block = event.getClickedBlock();
 
 		// check for sign shop
-		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && ItemUtils.isSign(block.getType())) {
+		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && SKItemUtils.isSign(block.getType())) {
 			AbstractShopkeeper shopkeeper = plugin.getShopkeeperByBlock(block);
 			if (shopkeeper != null) {
 				// only trigger shopkeeper interaction for main-hand events:
@@ -63,7 +63,7 @@ class SignShopListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
-		if (ItemUtils.isSign(block.getType())) {
+		if (SKItemUtils.isSign(block.getType())) {
 			if (plugin.getShopkeeperByBlock(block) != null) {
 				event.setCancelled(true);
 			}
@@ -76,7 +76,7 @@ class SignShopListener implements Listener {
 		if (cancelNextBlockPhysicsLoc != null && cancelNextBlockPhysicsLoc.equals(block.getLocation())) {
 			event.setCancelled(true);
 		} else {
-			if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperByBlock(block) != null) {
+			if (SKItemUtils.isSign(block.getType()) && plugin.getShopkeeperByBlock(block) != null) {
 				event.setCancelled(true);
 			}
 		}
@@ -88,7 +88,7 @@ class SignShopListener implements Listener {
 		Iterator<Block> iter = event.blockList().iterator();
 		while (iter.hasNext()) {
 			Block block = iter.next();
-			if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperByBlock(block) != null) {
+			if (SKItemUtils.isSign(block.getType()) && plugin.getShopkeeperByBlock(block) != null) {
 				iter.remove();
 			}
 		}

@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.util.Vector;
 
-import com.nisovin.shopkeepers.TradingRecipe;
+import com.nisovin.shopkeepers.api.util.TradingRecipe;
 
 public interface NMSCallProvider {
 

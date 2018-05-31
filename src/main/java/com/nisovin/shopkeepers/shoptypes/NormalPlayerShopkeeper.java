@@ -15,15 +15,16 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.TradingRecipe;
+import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.ui.UIType;
+import com.nisovin.shopkeepers.api.util.ItemUtils;
+import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.PriceOffer;
-import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 
 public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
@@ -134,7 +135,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 			assert chestInventory != null & newChestContents != null;
 
 			// remove result items from chest contents:
-			if (ItemUtils.removeItems(newChestContents, soldItem) != 0) {
+			if (SKItemUtils.removeItems(newChestContents, soldItem) != 0) {
 				this.debugPreventedTrade(tradingPlayer, "The shop's chest doesn't contain the required items.");
 				return false;
 			}
@@ -149,12 +150,12 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 				if (Settings.isHighCurrencyEnabled() || remaining > Settings.highCurrencyMinCost) {
 					int highCurrencyAmount = (remaining / Settings.highCurrencyValue);
 					if (highCurrencyAmount > 0) {
-						int remainingHighCurrency = ItemUtils.addItems(newChestContents, Settings.createHighCurrencyItem(highCurrencyAmount));
+						int remainingHighCurrency = SKItemUtils.addItems(newChestContents, Settings.createHighCurrencyItem(highCurrencyAmount));
 						remaining -= ((highCurrencyAmount - remainingHighCurrency) * Settings.highCurrencyValue);
 					}
 				}
 				if (remaining > 0) {
-					if (ItemUtils.addItems(newChestContents, Settings.createCurrencyItem(remaining)) != 0) {
+					if (SKItemUtils.addItems(newChestContents, Settings.createCurrencyItem(remaining)) != 0) {
 						this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
 						return false;
 					}
@@ -254,7 +255,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 	public PriceOffer getOffer(ItemStack tradedItem) {
 		for (PriceOffer offer : this.getOffers()) {
-			if (ItemUtils.isSimilar(offer.getItem(), tradedItem)) {
+			if (SKItemUtils.isSimilar(offer.getItem(), tradedItem)) {
 				return offer;
 			}
 		}
@@ -293,7 +294,7 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	public void removeOffer(ItemStack tradedItem) {
 		Iterator<PriceOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
-			if (ItemUtils.isSimilar(iterator.next().getItem(), tradedItem)) {
+			if (SKItemUtils.isSimilar(iterator.next().getItem(), tradedItem)) {
 				iterator.remove();
 				break;
 			}

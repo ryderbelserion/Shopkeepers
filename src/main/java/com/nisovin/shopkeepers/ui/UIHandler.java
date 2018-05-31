@@ -8,6 +8,7 @@ import org.bukkit.inventory.Inventory;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ui.UIType;
 
 /**
  * The component which handles one specific type of user interface window for one specific shopkeeper.

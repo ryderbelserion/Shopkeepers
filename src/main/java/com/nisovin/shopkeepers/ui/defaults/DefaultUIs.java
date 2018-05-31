@@ -3,8 +3,8 @@ package com.nisovin.shopkeepers.ui.defaults;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.ui.UIType;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ui.UIType;
 
 public class DefaultUIs {
 

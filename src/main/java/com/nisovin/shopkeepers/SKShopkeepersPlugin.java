@@ -36,10 +36,19 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopType;
+import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.events.CreatePlayerShopkeeperEvent;
+import com.nisovin.shopkeepers.api.events.ShopkeeperCreatedEvent;
+import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
+import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
+import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
+import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.events.CreatePlayerShopkeeperEvent;
-import com.nisovin.shopkeepers.events.ShopkeeperCreatedEvent;
 import com.nisovin.shopkeepers.metrics.CitizensChart;
 import com.nisovin.shopkeepers.metrics.FeaturesChart;
 import com.nisovin.shopkeepers.metrics.GringottsChart;
@@ -58,19 +67,15 @@ import com.nisovin.shopkeepers.shopobjects.SignShop;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.shoptypes.AbstractPlayerShopType;
-import com.nisovin.shopkeepers.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.shoptypes.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
-import com.nisovin.shopkeepers.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
 import com.nisovin.shopkeepers.types.AbstractSelectableTypeRegistry;
-import com.nisovin.shopkeepers.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
-import com.nisovin.shopkeepers.util.ChunkCoords;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.Utils;
@@ -534,7 +539,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	// RECENTLY PLACED CHESTS
 
 	void onChestPlacement(Player player, Block chest) {
-		assert player != null && chest != null && ItemUtils.isChest(chest.getType());
+		assert player != null && chest != null && SKItemUtils.isChest(chest.getType());
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
 		if (recentlyPlaced == null) {
@@ -548,7 +553,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	}
 
 	public boolean isRecentlyPlaced(Player player, Block chest) {
-		assert player != null && chest != null && ItemUtils.isChest(chest.getType());
+		assert player != null && chest != null && SKItemUtils.isChest(chest.getType());
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
 		return recentlyPlaced != null && recentlyPlaced.contains(Utils.getLocationString(chest));
@@ -561,7 +566,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		String playerName = player.getName();
 		if (chest == null) selectedChest.remove(playerName);
 		else {
-			assert ItemUtils.isChest(chest.getType());
+			assert SKItemUtils.isChest(chest.getType());
 			selectedChest.put(playerName, chest);
 		}
 	}

@@ -4,6 +4,10 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopObjectType;
+import com.nisovin.shopkeepers.api.Shopkeeper;
+
 public abstract class ShopObject {
 
 	protected final Shopkeeper shopkeeper;

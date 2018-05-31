@@ -8,10 +8,11 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.TradingRecipe;
+import com.nisovin.shopkeepers.api.util.ItemUtils;
+import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 
 /**
  * Stores information about up to two items being traded for another item.
@@ -32,16 +33,16 @@ public class TradingOffer extends TradingRecipe { // shares its implementation w
 		for (TradingOffer offer : offers) {
 			// TODO temporary, due to a bukkit bug custom head item can currently not be saved
 			if (Settings.skipCustomHeadSaving
-					&& (ItemUtils.isCustomHeadItem(offer.getItem1())
-							|| ItemUtils.isCustomHeadItem(offer.getItem2())
-							|| ItemUtils.isCustomHeadItem(offer.getResultItem()))) {
+					&& (SKItemUtils.isCustomHeadItem(offer.getItem1())
+							|| SKItemUtils.isCustomHeadItem(offer.getItem2())
+							|| SKItemUtils.isCustomHeadItem(offer.getResultItem()))) {
 				Log.warning("Skipping saving of trade involving a head item with custom texture, which cannot be saved currently due to a bukkit bug.");
 				continue;
 			}
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
-			ItemUtils.saveItem(offerSection, "resultItem", offer.getResultItem());
-			ItemUtils.saveItem(offerSection, "item1", offer.getItem1());
-			ItemUtils.saveItem(offerSection, "item2", offer.getItem2());
+			SKItemUtils.saveItem(offerSection, "resultItem", offer.getResultItem());
+			SKItemUtils.saveItem(offerSection, "item1", offer.getItem1());
+			SKItemUtils.saveItem(offerSection, "item2", offer.getItem2());
 			id++;
 		}
 	}
@@ -53,9 +54,9 @@ public class TradingOffer extends TradingRecipe { // shares its implementation w
 			for (String key : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
 				if (offerSection == null) continue; // invalid offer: not a section
-				ItemStack resultItem = ItemUtils.loadItem(offerSection, "resultItem");
-				ItemStack item1 = ItemUtils.loadItem(offerSection, "item1");
-				ItemStack item2 = ItemUtils.loadItem(offerSection, "item2");
+				ItemStack resultItem = SKItemUtils.loadItem(offerSection, "resultItem");
+				ItemStack item1 = SKItemUtils.loadItem(offerSection, "item1");
+				ItemStack item2 = SKItemUtils.loadItem(offerSection, "item2");
 				if (ItemUtils.isEmpty(resultItem) || ItemUtils.isEmpty(item1)) continue; // invalid offer
 				offers.add(new TradingOffer(resultItem, item1, item2));
 			}

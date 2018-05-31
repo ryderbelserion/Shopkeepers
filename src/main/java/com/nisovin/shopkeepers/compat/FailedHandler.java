@@ -17,9 +17,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.util.Vector;
 
-import com.nisovin.shopkeepers.TradingRecipe;
+import com.nisovin.shopkeepers.api.util.ItemUtils;
+import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
-import com.nisovin.shopkeepers.util.ItemUtils;
 
 public final class FailedHandler implements NMSCallProvider {
 

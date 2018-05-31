@@ -12,13 +12,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Attachable;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
-import com.nisovin.shopkeepers.ShopObjectType;
-import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopObjectType;
+import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -86,7 +87,7 @@ public class SignShop extends ShopObject {
 		Location signLocation = this.getActualLocation();
 		if (signLocation == null) return null;
 		Block signBlock = signLocation.getBlock();
-		if (!ItemUtils.isSign(signBlock.getType())) return null;
+		if (!SKItemUtils.isSign(signBlock.getType())) return null;
 		return (Sign) signBlock.getState();
 	}
 
@@ -132,7 +133,7 @@ public class SignShop extends ShopObject {
 		SKShopkeepersPlugin.getInstance().cancelNextBlockPhysics(null);
 
 		// in case sign placement has failed for some reason:
-		if (!ItemUtils.isSign(signBlock.getType())) {
+		if (!SKItemUtils.isSign(signBlock.getType())) {
 			return false;
 		}
 
@@ -156,7 +157,7 @@ public class SignShop extends ShopObject {
 		Location signLocation = this.getActualLocation();
 		if (signLocation == null) return false;
 		Block signBlock = signLocation.getBlock();
-		return ItemUtils.isSign(signBlock.getType());
+		return SKItemUtils.isSign(signBlock.getType());
 	}
 
 	@Override
@@ -259,7 +260,7 @@ public class SignShop extends ShopObject {
 			// this should load the chunk if necessary, making sure that the block gets removed (though, might not work
 			// on server stops..):
 			Block signBlock = world.getBlockAt(shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
-			if (ItemUtils.isSign(signBlock.getType())) {
+			if (SKItemUtils.isSign(signBlock.getType())) {
 				// remove sign:
 				signBlock.setType(Material.AIR);
 			}

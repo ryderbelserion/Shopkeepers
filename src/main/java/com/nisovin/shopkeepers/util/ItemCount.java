@@ -47,7 +47,7 @@ public class ItemCount {
 	public static ItemCount findSimilar(Collection<ItemCount> itemCounts, ItemStack item) {
 		if (itemCounts != null && item != null) {
 			for (ItemCount entry : itemCounts) {
-				if (ItemUtils.isSimilar(entry.getItem(), item)) {
+				if (SKItemUtils.isSimilar(entry.getItem(), item)) {
 					return entry;
 				}
 			}

@@ -14,26 +14,27 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
-import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopCreationData;
-import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.TradingRecipe;
-import com.nisovin.shopkeepers.events.PlayerShopkeeperHiredEvent;
+import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHiredEvent;
+import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.api.ui.UIType;
+import com.nisovin.shopkeepers.api.util.ItemUtils;
+import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
-import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SignShop;
-import com.nisovin.shopkeepers.ui.UIType;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.HiringHandler;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
-import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 /**
@@ -118,7 +119,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 			// get new item amount:
 			ItemStack clickedItem = event.getCurrentItem(); // can be null
 			int currentItemAmount = 0;
-			boolean isCurrencyItem = ItemUtils.isSimilar(clickedItem, currencyItem);
+			boolean isCurrencyItem = SKItemUtils.isSimilar(clickedItem, currencyItem);
 			if (isCurrencyItem) {
 				assert clickedItem != null;
 				currentItemAmount = clickedItem.getAmount();
@@ -253,7 +254,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 
 			// check for the shop's chest:
 			Block chest = shopkeeper.getChest();
-			if (!ItemUtils.isChest(chest.getType())) {
+			if (!SKItemUtils.isChest(chest.getType())) {
 				this.debugPreventedTrade(tradingPlayer, "Couldn't find the shop's chest.");
 				return false;
 			}
@@ -456,7 +457,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		Log.debug("checking open chest window ..");
 		// make sure the chest still exists
 		Block chest = this.getChest();
-		if (ItemUtils.isChest(chest.getType())) {
+		if (SKItemUtils.isChest(chest.getType())) {
 			// open the chest directly as the player (no need for a custom UI)
 			Log.debug("opening chest inventory window");
 			Inventory inv = ((Chest) chest.getState()).getInventory();
@@ -487,7 +488,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 				if (this.requestNameChange(player, newName)) {
 					// manually remove rename item from player's hand after this event is processed:
 					Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> {
-						ItemStack newItemInHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
+						ItemStack newItemInHand = SKItemUtils.descreaseItemAmount(itemInHand, 1);
 						player.setItemInHand(newItemInHand);
 					});
 				}
@@ -734,7 +735,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 
 	protected int getCurrencyInChest() {
 		Block chest = this.getChest();
-		if (!ItemUtils.isChest(chest.getType())) return 0;
+		if (!SKItemUtils.isChest(chest.getType())) return 0;
 
 		int totalCurrency = 0;
 		Inventory chestInventory = ((Chest) chest.getState()).getInventory();
@@ -752,11 +753,11 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 	protected List<ItemCount> getItemsFromChest(Filter<ItemStack> filter) {
 		ItemStack[] chestContents = null;
 		Block chest = this.getChest();
-		if (ItemUtils.isChest(chest.getType())) {
+		if (SKItemUtils.isChest(chest.getType())) {
 			Inventory chestInventory = ((Chest) chest.getState()).getInventory();
 			chestContents = chestInventory.getContents();
 		}
 		// returns an empty list if the chest couldn't be found:
-		return ItemUtils.countItems(chestContents, filter);
+		return SKItemUtils.countItems(chestContents, filter);
 	}
 }

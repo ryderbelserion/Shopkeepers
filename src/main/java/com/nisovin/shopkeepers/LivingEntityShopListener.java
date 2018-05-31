@@ -28,8 +28,8 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
+import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 

@@ -6,7 +6,10 @@ import java.util.logging.Logger;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 
-public class Log {
+public final class Log {
+
+	private Log() {
+	}
 
 	public static Logger getLogger() {
 		return SKShopkeepersPlugin.getInstance().getLogger();

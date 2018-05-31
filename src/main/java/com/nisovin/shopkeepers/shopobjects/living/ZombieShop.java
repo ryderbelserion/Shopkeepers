@@ -6,8 +6,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.ShopCreationData;
-import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.Shopkeeper;
 
 public class ZombieShop extends LivingEntityShop {
 

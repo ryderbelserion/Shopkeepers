@@ -12,9 +12,9 @@ import java.util.Map;
 import org.bukkit.entity.EntityType;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
-import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class LivingEntityObjectTypes {

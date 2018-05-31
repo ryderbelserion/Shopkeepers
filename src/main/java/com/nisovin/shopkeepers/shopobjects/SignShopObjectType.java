@@ -6,9 +6,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.AbstractShopObjectType;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
-import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class SignShopObjectType extends AbstractShopObjectType {

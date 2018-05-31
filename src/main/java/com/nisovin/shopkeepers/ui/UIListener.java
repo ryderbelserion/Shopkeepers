@@ -11,6 +11,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ui.UIRegistry;
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.util.Log;
 
 class UIListener implements Listener {

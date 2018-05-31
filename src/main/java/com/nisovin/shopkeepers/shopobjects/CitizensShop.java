@@ -10,12 +10,13 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopObject;
-import com.nisovin.shopkeepers.ShopObjectType;
-import com.nisovin.shopkeepers.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopObjectType;
+import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
-import com.nisovin.shopkeepers.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.Log;
 

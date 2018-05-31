@@ -6,6 +6,8 @@ import java.util.Map;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
+
 public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectableType> extends AbstractTypeRegistry<T> implements SelectableTypeRegistry<T> {
 
 	private static class Link<T> {
