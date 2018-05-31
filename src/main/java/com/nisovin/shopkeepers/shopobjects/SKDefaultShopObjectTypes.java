@@ -5,11 +5,11 @@ import java.util.List;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingEntityObjectTypes;
 
 public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 
-	private final LivingEntityObjectTypes livingEntityObjectTypes = new LivingEntityObjectTypes();
+	private final SKLivingEntityObjectTypes livingEntityObjectTypes = new SKLivingEntityObjectTypes();
 	private final SignShopObjectType signShopObjectType = new SignShopObjectType();
 	private final CitizensShopObjectType citizensShopObjectType = new CitizensShopObjectType();
 
@@ -28,7 +28,7 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 	}
 
 	@Override
-	public LivingEntityObjectTypes getLivingEntityObjectTypes() {
+	public SKLivingEntityObjectTypes getLivingEntityObjectTypes() {
 		return livingEntityObjectTypes;
 	}
 
@@ -48,7 +48,7 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 		return SKShopkeepersPlugin.getInstance().getDefaultShopObjectTypes();
 	}
 
-	public static LivingEntityObjectTypes MOBS() {
+	public static SKLivingEntityObjectTypes MOBS() {
 		return getInstance().getLivingEntityObjectTypes();
 	}
 

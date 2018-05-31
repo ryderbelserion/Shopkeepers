@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.api.shopobjects;
 import java.util.List;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectTypes;
+import com.nisovin.shopkeepers.api.shopobjects.living.LivingEntityObjectTypes;
 
 public interface DefaultShopObjectTypes {
 

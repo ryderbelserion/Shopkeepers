@@ -14,10 +14,10 @@ import org.bukkit.entity.EntityType;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopobjects.living.LivingEntityObjectTypes;
 import com.nisovin.shopkeepers.util.StringUtils;
 
-public class LivingEntityObjectTypes {
-
+public class SKLivingEntityObjectTypes implements LivingEntityObjectTypes {
 	/*
 	 * Notes about individual differences and issues for specific entity types:
 	 * All non-listed entity types are completely untested and therefore 'experimental' as well.
@@ -89,15 +89,11 @@ public class LivingEntityObjectTypes {
 		ALIASES = Collections.unmodifiableMap(aliases);
 	}
 
-	public static List<String> getAliases(EntityType entityType) {
-		List<String> aliases = ALIASES.get(entityType);
-		return aliases != null ? aliases : Collections.emptyList();
-	}
-
 	// order is specified by the 'enabled-living-shops' config setting:
 	private final Map<EntityType, LivingEntityObjectType<?>> objectTypes = new LinkedHashMap<>();
+	private final Collection<LivingEntityObjectType<?>> objectTypesView = Collections.unmodifiableCollection(objectTypes.values());
 
-	public LivingEntityObjectTypes() {
+	public SKLivingEntityObjectTypes() {
 		// first, create the enabled living object types, in the same order as specified in the config:
 		for (String enabledEntityType : Settings.enabledLivingShops) {
 			if (enabledEntityType == null) continue; // just in case
@@ -123,10 +119,18 @@ public class LivingEntityObjectTypes {
 		}
 	}
 
-	public Collection<LivingEntityObjectType<?>> getAllObjectTypes() {
-		return Collections.unmodifiableCollection(objectTypes.values());
+	@Override
+	public List<String> getAliases(EntityType entityType) {
+		List<String> aliases = ALIASES.get(entityType);
+		return aliases != null ? aliases : Collections.emptyList();
 	}
 
+	@Override
+	public Collection<LivingEntityObjectType<?>> getAllObjectTypes() {
+		return objectTypesView;
+	}
+
+	@Override
 	public LivingEntityObjectType<?> getObjectType(EntityType entityType) {
 		return objectTypes.get(entityType);
 	}
