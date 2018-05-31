@@ -47,7 +47,7 @@ public class TradingOffer extends SKTradingRecipe { // shares its implementation
 	}
 
 	public static List<TradingOffer> loadFromConfig(ConfigurationSection config, String node) {
-		List<TradingOffer> offers = new ArrayList<TradingOffer>();
+		List<TradingOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String key : offersSection.getKeys(false)) {
@@ -86,7 +86,7 @@ public class TradingOffer extends SKTradingRecipe { // shares its implementation
 	}*/
 
 	public static List<TradingOffer> loadFromConfigOld(ConfigurationSection config, String node) {
-		List<TradingOffer> offers = new ArrayList<TradingOffer>();
+		List<TradingOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String key : offersSection.getKeys(false)) {

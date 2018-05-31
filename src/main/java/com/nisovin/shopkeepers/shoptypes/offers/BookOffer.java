@@ -43,7 +43,7 @@ public class BookOffer {
 	}
 
 	public static List<BookOffer> loadFromConfig(ConfigurationSection config, String node) {
-		List<BookOffer> offers = new ArrayList<BookOffer>();
+		List<BookOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String bookTitle : offersSection.getKeys(false)) {

@@ -286,7 +286,7 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	};
 
 	// contains only one offer for a specific type of item:
-	private final List<PriceOffer> offers = new ArrayList<PriceOffer>();
+	private final List<PriceOffer> offers = new ArrayList<>();
 	private final List<PriceOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
@@ -336,7 +336,7 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	@Override
 	public List<TradingRecipe> getTradingRecipes(Player player) {
-		List<TradingRecipe> recipes = new ArrayList<TradingRecipe>();
+		List<TradingRecipe> recipes = new ArrayList<>();
 		List<ItemCount> chestItems = this.getItemsFromChest();
 		int currencyInChest = this.getCurrencyInChest();
 		for (PriceOffer offer : this.getOffers()) {

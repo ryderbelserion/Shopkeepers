@@ -41,7 +41,7 @@ public class ProtectedChests {
 		String key = this.getKey(worldName, x, y, z);
 		List<PlayerShopkeeper> shopkeepers = protectedChests.get(key);
 		if (shopkeepers == null) {
-			shopkeepers = new ArrayList<PlayerShopkeeper>(1);
+			shopkeepers = new ArrayList<>(1);
 			protectedChests.put(key, shopkeepers);
 		}
 		shopkeepers.add(shopkeeper);
@@ -136,7 +136,7 @@ public class ProtectedChests {
 
 	// getting the shopkeepers which can use the chest at the given location:
 	public List<PlayerShopkeeper> getShopkeeperOwnersOfChest(String worldName, int x, int y, int z) {
-		List<PlayerShopkeeper> result = new ArrayList<PlayerShopkeeper>();
+		List<PlayerShopkeeper> result = new ArrayList<>();
 		// checking this exact block:
 		List<PlayerShopkeeper> shopkeepers = this.getShopkeepers(worldName, x, y, z);
 		if (shopkeepers != null) {

@@ -317,7 +317,7 @@ public final class ItemUtils {
 	}
 
 	public static List<ItemCount> countItems(ItemStack[] contents, Filter<ItemStack> filter) {
-		List<ItemCount> itemCounts = new ArrayList<ItemCount>();
+		List<ItemCount> itemCounts = new ArrayList<>();
 		if (contents == null) return itemCounts;
 		for (ItemStack item : contents) {
 			if (isEmpty(item)) continue;

@@ -143,7 +143,7 @@ public class CitizensHandler {
 			// cannot determine which shopkeepers have a backing npc if citizens isn't running:
 			return;
 		}
-		List<Shopkeeper> forRemoval = new ArrayList<Shopkeeper>();
+		List<Shopkeeper> forRemoval = new ArrayList<>();
 		for (Shopkeeper shopkeeper : SKShopkeepersPlugin.getInstance().getAllShopkeepers()) {
 			if (shopkeeper.getShopObject() instanceof CitizensShop) {
 				CitizensShop citizensShop = (CitizensShop) shopkeeper.getShopObject();

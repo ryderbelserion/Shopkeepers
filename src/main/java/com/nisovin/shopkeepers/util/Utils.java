@@ -368,7 +368,7 @@ public final class Utils {
 
 	public static List<String> decolorize(List<String> colored) {
 		if (colored == null) return null;
-		List<String> decolored = new ArrayList<String>(colored.size());
+		List<String> decolored = new ArrayList<>(colored.size());
 		for (String string : colored) {
 			decolored.add(Utils.translateColorCodesToAlternative('&', string));
 		}
@@ -382,7 +382,7 @@ public final class Utils {
 
 	public static List<String> colorize(List<String> messages) {
 		if (messages == null) return messages;
-		List<String> colored = new ArrayList<String>(messages.size());
+		List<String> colored = new ArrayList<>(messages.size());
 		for (String message : messages) {
 			colored.add(Utils.colorize(message));
 		}
@@ -433,7 +433,7 @@ public final class Utils {
 	}
 
 	public static List<Entity> getNearbyEntities(Location location, double radius, EntityType... types) {
-		List<Entity> entities = new ArrayList<Entity>();
+		List<Entity> entities = new ArrayList<>();
 		if (location == null) return entities;
 		if (radius <= 0.0D) return entities;
 
@@ -473,7 +473,7 @@ public final class Utils {
 	}
 
 	public static List<Entity> getNearbyChunkEntities(Chunk chunk, int chunkRadius, boolean loadChunks, EntityType... types) {
-		List<Entity> entities = new ArrayList<Entity>();
+		List<Entity> entities = new ArrayList<>();
 		if (chunk == null) return entities;
 		if (chunkRadius < 0) return entities;
 

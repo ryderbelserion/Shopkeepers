@@ -76,7 +76,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 	// SELECTION MANAGEMENT
 
 	// player name -> selected type
-	protected final Map<String, T> selections = new HashMap<String, T>();
+	protected final Map<String, T> selections = new HashMap<>();
 
 	@Override
 	public T getDefaultSelection(Player player) {

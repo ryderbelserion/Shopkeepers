@@ -93,6 +93,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return plugin;
 	}
 
+	// TODO create non-anonymous classes for these
+
 	// shop types registry:
 	private final SelectableTypeRegistry<AbstractShopType<?>> shopTypesRegistry = new AbstractSelectableTypeRegistry<AbstractShopType<?>>() {
 

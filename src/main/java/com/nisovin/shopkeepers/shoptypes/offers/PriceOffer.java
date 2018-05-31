@@ -58,7 +58,7 @@ public class PriceOffer {
 	}
 
 	public static List<PriceOffer> loadFromConfig(ConfigurationSection config, String node) {
-		List<PriceOffer> offers = new ArrayList<PriceOffer>();
+		List<PriceOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String id : offersSection.getKeys(false)) {
@@ -94,7 +94,7 @@ public class PriceOffer {
 	}*/
 
 	public static List<PriceOffer> loadFromConfigOld(ConfigurationSection config, String node) {
-		List<PriceOffer> offers = new ArrayList<PriceOffer>();
+		List<PriceOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String key : offersSection.getKeys(false)) {

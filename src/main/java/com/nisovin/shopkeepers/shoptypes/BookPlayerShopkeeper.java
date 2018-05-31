@@ -182,7 +182,7 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	}
 
 	// contains only one offer for a specific book (book title):
-	private final List<BookOffer> offers = new ArrayList<BookOffer>();
+	private final List<BookOffer> offers = new ArrayList<>();
 	private final List<BookOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
@@ -232,7 +232,7 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	@Override
 	public List<TradingRecipe> getTradingRecipes(Player player) {
-		List<TradingRecipe> recipes = new ArrayList<TradingRecipe>();
+		List<TradingRecipe> recipes = new ArrayList<>();
 		if (this.hasChestBlankBooks()) {
 			List<ItemStack> bookItems = this.getBooksFromChest();
 			for (ItemStack bookItem : bookItems) {
@@ -251,7 +251,7 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	}
 
 	private List<ItemStack> getBooksFromChest() {
-		List<ItemStack> list = new ArrayList<ItemStack>();
+		List<ItemStack> list = new ArrayList<>();
 		Block chest = this.getChest();
 		if (!ItemUtils.isChest(chest.getType())) return list;
 		Inventory chestInventory = ((Chest) chest.getState()).getInventory();

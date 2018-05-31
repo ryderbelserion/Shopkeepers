@@ -50,7 +50,7 @@ public class Settings {
 	public static Material shopCreationItem = Material.MONSTER_EGG;
 	public static int shopCreationItemData = 0;
 	public static String shopCreationItemName = "";
-	public static List<String> shopCreationItemLore = new ArrayList<String>(0);
+	public static List<String> shopCreationItemLore = new ArrayList<>(0);
 	// only works above bukkit 1.11.1, ignored if empty:
 	public static String shopCreationItemSpawnEggEntityType = "VILLAGER";
 	public static boolean preventShopCreationItemRegularUsage = false;
@@ -139,7 +139,7 @@ public class Settings {
 
 	public static Material nameItem = Material.NAME_TAG;
 	public static int nameItemData = 0;
-	public static List<String> nameItemLore = new ArrayList<String>(0);
+	public static List<String> nameItemLore = new ArrayList<>(0);
 
 	public static boolean enableChestOptionOnPlayerShop = false;
 	public static Material chestItem = Material.CHEST;
@@ -161,7 +161,7 @@ public class Settings {
 	public static Material hireItem = Material.EMERALD;
 	public static int hireItemData = 0;
 	public static String hireItemName = "";
-	public static List<String> hireItemLore = new ArrayList<String>(0);
+	public static List<String> hireItemLore = new ArrayList<>(0);
 	public static int hireOtherVillagersCosts = 1;
 	public static String forHireTitle = "For Hire";
 	public static boolean hireRequireCreationPermission = true;
@@ -183,17 +183,17 @@ public class Settings {
 	public static Material currencyItem = Material.EMERALD;
 	public static short currencyItemData = 0;
 	public static String currencyItemName = "";
-	public static List<String> currencyItemLore = new ArrayList<String>(0);
+	public static List<String> currencyItemLore = new ArrayList<>(0);
 
 	public static Material zeroCurrencyItem = Material.BARRIER;
 	public static short zeroCurrencyItemData = 0;
 	public static String zeroCurrencyItemName = "";
-	public static List<String> zeroCurrencyItemLore = new ArrayList<String>(0);
+	public static List<String> zeroCurrencyItemLore = new ArrayList<>(0);
 
 	public static Material highCurrencyItem = Material.EMERALD_BLOCK;
 	public static short highCurrencyItemData = 0;
 	public static String highCurrencyItemName = "";
-	public static List<String> highCurrencyItemLore = new ArrayList<String>(0);
+	public static List<String> highCurrencyItemLore = new ArrayList<>(0);
 
 	// note: this can in general be larger than 64!
 	public static int highCurrencyValue = 9;
@@ -202,7 +202,7 @@ public class Settings {
 	public static Material highZeroCurrencyItem = Material.BARRIER;
 	public static short highZeroCurrencyItemData = 0;
 	public static String highZeroCurrencyItemName = "";
-	public static List<String> highZeroCurrencyItemLore = new ArrayList<String>(0);
+	public static List<String> highZeroCurrencyItemLore = new ArrayList<>(0);
 
 	/*
 	 * Messages

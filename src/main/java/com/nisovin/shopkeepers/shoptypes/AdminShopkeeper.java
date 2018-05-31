@@ -127,11 +127,11 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 	}
 
 	// can contain multiple offers for a specific type of item:
-	private final List<TradingOffer> offers = new ArrayList<TradingOffer>();
+	private final List<TradingOffer> offers = new ArrayList<>();
 	private final List<TradingOffer> offersView = Collections.unmodifiableList(offers);
 
 	// kept in sync with offers:
-	private final List<TradingRecipe> recipes = new ArrayList<TradingRecipe>();
+	private final List<TradingRecipe> recipes = new ArrayList<>();
 	private final List<TradingRecipe> recipesView = Collections.unmodifiableList(recipes);
 
 	// null indicates that no additional permission is required:
@@ -254,7 +254,7 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 	}*/
 
 	private List<TradingOffer> loadFromConfigOld(ConfigurationSection config, String node) {
-		List<TradingOffer> offers = new ArrayList<TradingOffer>();
+		List<TradingOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String key : offersSection.getKeys(false)) {
@@ -273,7 +273,7 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 	}
 
 	/*private List<ItemStack[]> loadRecipesOld(ConfigurationSection config, String node) {
-		List<ItemStack[]> recipes = new ArrayList<ItemStack[]>();
+		List<ItemStack[]> recipes = new ArrayList<>();
 		ConfigurationSection recipesSection = config.getConfigurationSection(node);
 		if (recipesSection != null) {
 			for (String key : recipesSection.getKeys(false)) {

@@ -333,7 +333,7 @@ class CommandManager implements CommandExecutor {
 					}
 				}
 
-				List<Shopkeeper> shops = new ArrayList<Shopkeeper>();
+				List<Shopkeeper> shops = new ArrayList<>();
 
 				if (playerName == null) {
 					// permission check:
@@ -455,7 +455,7 @@ class CommandManager implements CommandExecutor {
 
 				// this is dangerous: let the player first confirm this action
 				plugin.waitForConfirm(player, () -> {
-					List<Shopkeeper> shops = new ArrayList<Shopkeeper>();
+					List<Shopkeeper> shops = new ArrayList<>();
 
 					if (playerName.equals("admin")) {
 						// searching admin shops:
