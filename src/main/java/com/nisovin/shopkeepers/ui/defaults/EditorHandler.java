@@ -18,10 +18,9 @@ import com.nisovin.shopkeepers.api.events.ShopkeeperDeletedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
-import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.util.SKItemUtils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class EditorHandler extends UIHandler {
@@ -100,7 +99,7 @@ public abstract class EditorHandler extends UIHandler {
 					shopkeeper.getShopObject().cycleSubType();
 					ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
 					if (!ItemUtils.isEmpty(typeItem)) {
-						event.getInventory().setItem(17, SKItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
+						event.getInventory().setItem(17, ItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 					}
 				}
 			}
@@ -240,7 +239,7 @@ public abstract class EditorHandler extends UIHandler {
 		// sub-type cycle button:
 		ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
 		if (typeItem != null) {
-			inventory.setItem(17, SKItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
+			inventory.setItem(17, ItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore));
 		}
 
 		// delete button:

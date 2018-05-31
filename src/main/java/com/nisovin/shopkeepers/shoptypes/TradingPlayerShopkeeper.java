@@ -17,11 +17,10 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
 import com.nisovin.shopkeepers.util.ItemCount;
-import com.nisovin.shopkeepers.util.SKItemUtils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
@@ -160,7 +159,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			// remove result items from chest contents:
 			ItemStack resultItem = tradingRecipe.getResultItem();
 			assert resultItem != null;
-			if (SKItemUtils.removeItems(newChestContents, resultItem) != 0) {
+			if (ItemUtils.removeItems(newChestContents, resultItem) != 0) {
 				this.debugPreventedTrade(tradingPlayer, "The shop's chest doesn't contain the required items.");
 				return false;
 			}
@@ -184,7 +183,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 			if (amountAfterTaxes > 0) {
 				ItemStack receivedItem = offeredItem.clone(); // create a copy, just in case
 				receivedItem.setAmount(amountAfterTaxes);
-				if (SKItemUtils.addItems(contents, receivedItem) != 0) {
+				if (ItemUtils.addItems(contents, receivedItem) != 0) {
 					// couldn't add all items to the contents:
 					return false;
 				}
@@ -276,7 +275,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 	public TradingOffer getOffer(ItemStack tradedItem) {
 		for (TradingOffer offer : this.getOffers()) {
-			if (SKItemUtils.isSimilar(offer.getResultItem(), tradedItem)) {
+			if (ItemUtils.isSimilar(offer.getResultItem(), tradedItem)) {
 				return offer;
 			}
 		}
@@ -315,7 +314,7 @@ public class TradingPlayerShopkeeper extends PlayerShopkeeper {
 	public void removeOffer(ItemStack tradedItem) {
 		Iterator<TradingOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
-			if (SKItemUtils.isSimilar(iterator.next().getResultItem(), tradedItem)) {
+			if (ItemUtils.isSimilar(iterator.next().getResultItem(), tradedItem)) {
 				iterator.remove();
 				break;
 			}

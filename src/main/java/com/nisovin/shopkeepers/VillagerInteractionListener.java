@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.util.SKItemUtils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -85,8 +85,8 @@ class VillagerInteractionListener implements Listener {
 			// check if the player has enough of those hiring items
 			int costs = Settings.hireOtherVillagersCosts;
 			if (costs > 0) {
-				ItemStack[] storageContents = SKItemUtils.getStorageContents(playerInventory);
-				if (SKItemUtils.containsAtLeast(storageContents, Settings.hireItem, (short) Settings.hireItemData,
+				ItemStack[] storageContents = ItemUtils.getStorageContents(playerInventory);
+				if (ItemUtils.containsAtLeast(storageContents, Settings.hireItem, (short) Settings.hireItemData,
 						Settings.hireItemName, Settings.hireItemLore, costs)) {
 					Log.debug("  Villager hiring: the player has the needed amount of hiring items");
 					int inHandAmount = inHand.getAmount();
@@ -98,10 +98,10 @@ class VillagerInteractionListener implements Listener {
 						player.setItemInHand(null); // remove item in hand
 						if (remaining < 0) {
 							// remove remaining costs from inventory:
-							SKItemUtils.removeItems(storageContents, Settings.hireItem, (short) Settings.hireItemData,
+							ItemUtils.removeItems(storageContents, Settings.hireItem, (short) Settings.hireItemData,
 									Settings.hireItemName, Settings.hireItemLore, -remaining);
 							// apply the change to the player's inventory:
-							SKItemUtils.setStorageContents(playerInventory, storageContents);
+							ItemUtils.setStorageContents(playerInventory, storageContents);
 						}
 					}
 				} else {

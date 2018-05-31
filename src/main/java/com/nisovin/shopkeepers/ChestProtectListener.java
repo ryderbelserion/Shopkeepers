@@ -17,7 +17,7 @@ import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.InventoryHolder;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.util.SKItemUtils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -32,7 +32,7 @@ class ChestProtectListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
-		if (!SKItemUtils.isChest(block.getType())) return;
+		if (!ItemUtils.isChest(block.getType())) return;
 		Player player = event.getPlayer();
 		if (Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) return;
 
@@ -48,7 +48,7 @@ class ChestProtectListener implements Listener {
 		Block block = event.getBlock();
 		Material type = block.getType();
 		Player player = event.getPlayer();
-		if (SKItemUtils.isChest(type)) {
+		if (ItemUtils.isChest(type)) {
 			if (plugin.getProtectedChests().isChestProtected(block, player)) {
 				Log.debug("Cancelled placing of chest block by '" + player.getName() + "' at '"
 						+ Utils.getLocationString(block) + "': Protected chest nearby");
@@ -62,7 +62,7 @@ class ChestProtectListener implements Listener {
 			}
 		} else if (type == Material.RAILS || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL || type == Material.ACTIVATOR_RAIL) {
 			Block upperBlock = block.getRelative(BlockFace.UP);
-			if (SKItemUtils.isChest(upperBlock.getType()) && plugin.getProtectedChests().isChestProtected(upperBlock, player)) {
+			if (ItemUtils.isChest(upperBlock.getType()) && plugin.getProtectedChests().isChestProtected(upperBlock, player)) {
 				Log.debug("Cancelled placing of rail block by '" + player.getName() + "' at '"
 						+ Utils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
@@ -90,7 +90,7 @@ class ChestProtectListener implements Listener {
 		Iterator<Block> iter = event.blockList().iterator();
 		while (iter.hasNext()) {
 			Block block = iter.next();
-			if (SKItemUtils.isChest(block.getType()) && plugin.getProtectedChests().isChestProtected(block, null)) {
+			if (ItemUtils.isChest(block.getType()) && plugin.getProtectedChests().isChestProtected(block, null)) {
 				iter.remove();
 			}
 		}

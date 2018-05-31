@@ -20,10 +20,9 @@ import org.bukkit.inventory.meta.BookMeta;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.BookOffer;
-import com.nisovin.shopkeepers.util.SKItemUtils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 
 /**
  * Sells written books.
@@ -167,12 +166,12 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 				if (Settings.isHighCurrencyEnabled() || remaining > Settings.highCurrencyMinCost) {
 					int highCurrencyAmount = (remaining / Settings.highCurrencyValue);
 					if (highCurrencyAmount > 0) {
-						int remainingHighCurrency = SKItemUtils.addItems(newChestContents, Settings.createHighCurrencyItem(highCurrencyAmount));
+						int remainingHighCurrency = ItemUtils.addItems(newChestContents, Settings.createHighCurrencyItem(highCurrencyAmount));
 						remaining -= ((highCurrencyAmount - remainingHighCurrency) * Settings.highCurrencyValue);
 					}
 				}
 				if (remaining > 0) {
-					if (SKItemUtils.addItems(newChestContents, Settings.createCurrencyItem(remaining)) != 0) {
+					if (ItemUtils.addItems(newChestContents, Settings.createCurrencyItem(remaining)) != 0) {
 						this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
 						return false;
 					}
@@ -254,7 +253,7 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 	private List<ItemStack> getBooksFromChest() {
 		List<ItemStack> list = new ArrayList<ItemStack>();
 		Block chest = this.getChest();
-		if (!SKItemUtils.isChest(chest.getType())) return list;
+		if (!ItemUtils.isChest(chest.getType())) return list;
 		Inventory chestInventory = ((Chest) chest.getState()).getInventory();
 		for (ItemStack item : chestInventory.getContents()) {
 			if (ItemUtils.isEmpty(item)) continue;
@@ -267,7 +266,7 @@ public class BookPlayerShopkeeper extends PlayerShopkeeper {
 
 	private boolean hasChestBlankBooks() {
 		Block chest = this.getChest();
-		if (SKItemUtils.isChest(chest.getType())) {
+		if (ItemUtils.isChest(chest.getType())) {
 			Inventory chestInventory = ((Chest) chest.getState()).getInventory();
 			return chestInventory.contains(Material.BOOK_AND_QUILL);
 		}

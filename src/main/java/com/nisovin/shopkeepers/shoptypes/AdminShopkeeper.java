@@ -15,13 +15,13 @@ import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 

@@ -77,7 +77,7 @@ import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.SKItemUtils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -548,7 +548,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	// RECENTLY PLACED CHESTS
 
 	void onChestPlacement(Player player, Block chest) {
-		assert player != null && chest != null && SKItemUtils.isChest(chest.getType());
+		assert player != null && chest != null && ItemUtils.isChest(chest.getType());
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
 		if (recentlyPlaced == null) {
@@ -562,7 +562,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	}
 
 	public boolean isRecentlyPlaced(Player player, Block chest) {
-		assert player != null && chest != null && SKItemUtils.isChest(chest.getType());
+		assert player != null && chest != null && ItemUtils.isChest(chest.getType());
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
 		return recentlyPlaced != null && recentlyPlaced.contains(Utils.getLocationString(chest));
@@ -575,7 +575,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		String playerName = player.getName();
 		if (chest == null) selectedChest.remove(playerName);
 		else {
-			assert SKItemUtils.isChest(chest.getType());
+			assert ItemUtils.isChest(chest.getType());
 			selectedChest.put(playerName, chest);
 		}
 	}

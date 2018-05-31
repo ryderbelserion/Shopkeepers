@@ -17,16 +17,15 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
 /**
  * Utility functions related to materials, items and inventories.
  */
-public final class SKItemUtils {
+public final class ItemUtils {
 
-	private SKItemUtils() {
+	private ItemUtils() {
 	}
 
 	// material utilities:
@@ -40,6 +39,14 @@ public final class SKItemUtils {
 	}
 
 	// itemstack utilities:
+
+	public static boolean isEmpty(ItemStack item) {
+		return item == null || item.getType() == Material.AIR || item.getAmount() <= 0;
+	}
+
+	public static ItemStack getNullIfEmpty(ItemStack item) {
+		return isEmpty(item) ? null : item;
+	}
 
 	// TODO temporary, due to a bukkit bug custom head item can currently not be saved
 	public static boolean isCustomHeadItem(ItemStack item) {
@@ -79,7 +86,7 @@ public final class SKItemUtils {
 	public static ItemStack createItemStack(Material type, int amount, short data, String displayName, List<String> lore) {
 		// TODO return null in case of type AIR?
 		ItemStack item = new ItemStack(type, amount, data);
-		return SKItemUtils.setItemStackNameAndLore(item, displayName, lore);
+		return ItemUtils.setItemStackNameAndLore(item, displayName, lore);
 	}
 
 	public static ItemStack setItemStackNameAndLore(ItemStack item, String displayName, List<String> lore) {
@@ -188,7 +195,7 @@ public final class SKItemUtils {
 	 * @return the resulting item, or <code>null</code> if the item ends up being empty
 	 */
 	public static ItemStack increaseItemAmount(ItemStack itemStack, int amountToIncrease) {
-		if (ItemUtils.isEmpty(itemStack)) return null;
+		if (isEmpty(itemStack)) return null;
 		int newAmount = Math.min(itemStack.getAmount() + amountToIncrease, itemStack.getMaxStackSize());
 		if (newAmount <= 0) return null;
 		itemStack.setAmount(newAmount);
@@ -219,7 +226,7 @@ public final class SKItemUtils {
 	 * @return the itemstack's amount, or <code>0</code> if the itemstack is empty
 	 */
 	public static int getItemStackAmount(ItemStack itemStack) {
-		return (ItemUtils.isEmpty(itemStack) ? 0 : itemStack.getAmount());
+		return (isEmpty(itemStack) ? 0 : itemStack.getAmount());
 	}
 
 	// save and load itemstacks from config, including attributes:
@@ -313,7 +320,7 @@ public final class SKItemUtils {
 		List<ItemCount> itemCounts = new ArrayList<ItemCount>();
 		if (contents == null) return itemCounts;
 		for (ItemStack item : contents) {
-			if (ItemUtils.isEmpty(item)) continue;
+			if (isEmpty(item)) continue;
 			if (filter != null && !filter.accept(item)) continue;
 
 			// check if we already have a counter for this type of item:
@@ -429,7 +436,7 @@ public final class SKItemUtils {
 			ItemStack slotItem = contents[slot];
 
 			// slot empty? - skip, because we are currently filling existing item stacks up
-			if (ItemUtils.isEmpty(slotItem)) continue;
+			if (isEmpty(slotItem)) continue;
 
 			// slot already full?
 			int slotAmount = slotItem.getAmount();
@@ -460,7 +467,7 @@ public final class SKItemUtils {
 		// search for empty slots:
 		for (int slot = 0; slot < size; slot++) {
 			ItemStack slotItem = contents[slot];
-			if (ItemUtils.isEmpty(slotItem)) {
+			if (isEmpty(slotItem)) {
 				// found empty slot:
 				if (amount > maxStackSize) {
 					// add full stack:

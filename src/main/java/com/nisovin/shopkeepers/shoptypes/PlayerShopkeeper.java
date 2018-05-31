@@ -23,7 +23,6 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHiredEvent;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
-import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.SignShop;
@@ -33,8 +32,9 @@ import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.SKItemUtils;
+import com.nisovin.shopkeepers.util.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.Utils;
 
 /**
@@ -119,7 +119,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 			// get new item amount:
 			ItemStack clickedItem = event.getCurrentItem(); // can be null
 			int currentItemAmount = 0;
-			boolean isCurrencyItem = SKItemUtils.isSimilar(clickedItem, currencyItem);
+			boolean isCurrencyItem = ItemUtils.isSimilar(clickedItem, currencyItem);
 			if (isCurrencyItem) {
 				assert clickedItem != null;
 				currentItemAmount = clickedItem.getAmount();
@@ -254,7 +254,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 
 			// check for the shop's chest:
 			Block chest = shopkeeper.getChest();
-			if (!SKItemUtils.isChest(chest.getType())) {
+			if (!ItemUtils.isChest(chest.getType())) {
 				this.debugPreventedTrade(tradingPlayer, "Couldn't find the shop's chest.");
 				return false;
 			}
@@ -457,7 +457,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		Log.debug("checking open chest window ..");
 		// make sure the chest still exists
 		Block chest = this.getChest();
-		if (SKItemUtils.isChest(chest.getType())) {
+		if (ItemUtils.isChest(chest.getType())) {
 			// open the chest directly as the player (no need for a custom UI)
 			Log.debug("opening chest inventory window");
 			Inventory inv = ((Chest) chest.getState()).getInventory();
@@ -488,7 +488,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 				if (this.requestNameChange(player, newName)) {
 					// manually remove rename item from player's hand after this event is processed:
 					Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> {
-						ItemStack newItemInHand = SKItemUtils.descreaseItemAmount(itemInHand, 1);
+						ItemStack newItemInHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
 						player.setItemInHand(newItemInHand);
 					});
 				}
@@ -719,7 +719,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 				item2 = currencyItem;
 			}
 		}
-		return new TradingRecipe(itemBeingSold, item1, item2);
+		return new SKTradingRecipe(itemBeingSold, item1, item2);
 	}
 
 	// returns null (and logs a warning) if the price cannot be represented correctly by currency items
@@ -730,12 +730,12 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 			return null;
 		}
 		ItemStack currencyItem = Settings.createCurrencyItem(price);
-		return new TradingRecipe(currencyItem, itemBeingBought, null);
+		return new SKTradingRecipe(currencyItem, itemBeingBought, null);
 	}
 
 	protected int getCurrencyInChest() {
 		Block chest = this.getChest();
-		if (!SKItemUtils.isChest(chest.getType())) return 0;
+		if (!ItemUtils.isChest(chest.getType())) return 0;
 
 		int totalCurrency = 0;
 		Inventory chestInventory = ((Chest) chest.getState()).getInventory();
@@ -753,11 +753,11 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 	protected List<ItemCount> getItemsFromChest(Filter<ItemStack> filter) {
 		ItemStack[] chestContents = null;
 		Block chest = this.getChest();
-		if (SKItemUtils.isChest(chest.getType())) {
+		if (ItemUtils.isChest(chest.getType())) {
 			Inventory chestInventory = ((Chest) chest.getState()).getInventory();
 			chestContents = chestInventory.getContents();
 		}
 		// returns an empty list if the chest couldn't be found:
-		return SKItemUtils.countItems(chestContents, filter);
+		return ItemUtils.countItems(chestContents, filter);
 	}
 }

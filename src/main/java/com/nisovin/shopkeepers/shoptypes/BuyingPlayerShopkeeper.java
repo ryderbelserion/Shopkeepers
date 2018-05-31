@@ -18,12 +18,11 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.PriceOffer;
 import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
-import com.nisovin.shopkeepers.util.SKItemUtils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
@@ -161,7 +160,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 				// but is still accepted, depending on the used item comparison logic and settings:
 				ItemStack receivedItem = tradeData.offeredItem1.clone(); // create a copy, just in case
 				receivedItem.setAmount(amountAfterTaxes);
-				if (SKItemUtils.addItems(newChestContents, receivedItem) != 0) {
+				if (ItemUtils.addItems(newChestContents, receivedItem) != 0) {
 					this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
 					return false;
 				}
@@ -367,7 +366,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 
 	public PriceOffer getOffer(ItemStack tradedItem) {
 		for (PriceOffer offer : this.getOffers()) {
-			if (SKItemUtils.isSimilar(offer.getItem(), tradedItem)) {
+			if (ItemUtils.isSimilar(offer.getItem(), tradedItem)) {
 				return offer;
 			}
 		}
@@ -406,7 +405,7 @@ public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	public void removeOffer(ItemStack tradedItem) {
 		Iterator<PriceOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
-			if (SKItemUtils.isSimilar(iterator.next().getItem(), tradedItem)) {
+			if (ItemUtils.isSimilar(iterator.next().getItem(), tradedItem)) {
 				iterator.remove();
 				break;
 			}

@@ -18,7 +18,7 @@ import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.SKItemUtils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class SignShop extends ShopObject {
@@ -85,7 +85,7 @@ public class SignShop extends ShopObject {
 		Location signLocation = this.getActualLocation();
 		if (signLocation == null) return null;
 		Block signBlock = signLocation.getBlock();
-		if (!SKItemUtils.isSign(signBlock.getType())) return null;
+		if (!ItemUtils.isSign(signBlock.getType())) return null;
 		return (Sign) signBlock.getState();
 	}
 
@@ -131,7 +131,7 @@ public class SignShop extends ShopObject {
 		SKShopkeepersPlugin.getInstance().cancelNextBlockPhysics(null);
 
 		// in case sign placement has failed for some reason:
-		if (!SKItemUtils.isSign(signBlock.getType())) {
+		if (!ItemUtils.isSign(signBlock.getType())) {
 			return false;
 		}
 
@@ -155,7 +155,7 @@ public class SignShop extends ShopObject {
 		Location signLocation = this.getActualLocation();
 		if (signLocation == null) return false;
 		Block signBlock = signLocation.getBlock();
-		return SKItemUtils.isSign(signBlock.getType());
+		return ItemUtils.isSign(signBlock.getType());
 	}
 
 	@Override
@@ -258,7 +258,7 @@ public class SignShop extends ShopObject {
 			// this should load the chunk if necessary, making sure that the block gets removed (though, might not work
 			// on server stops..):
 			Block signBlock = world.getBlockAt(shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
-			if (SKItemUtils.isSign(signBlock.getType())) {
+			if (ItemUtils.isSign(signBlock.getType())) {
 				// remove sign:
 				signBlock.setType(Material.AIR);
 			}

@@ -10,7 +10,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
-import com.nisovin.shopkeepers.util.SKItemUtils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 
 class RemoveShopOnChestBreakListener implements Listener {
 
@@ -23,7 +23,7 @@ class RemoveShopOnChestBreakListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
-		if (SKItemUtils.isChest(block.getType())) {
+		if (ItemUtils.isChest(block.getType())) {
 			List<PlayerShopkeeper> shopkeepers = plugin.getProtectedChests().getShopkeeperOwnersOfChest(block);
 			if (shopkeepers.size() > 0) {
 				for (PlayerShopkeeper shopkeeper : shopkeepers) {

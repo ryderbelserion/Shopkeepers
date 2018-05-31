@@ -17,9 +17,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.util.Vector;
 
-import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
+import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.SKTradingRecipe;
 
 public final class FailedHandler implements NMSCallProvider {
 
@@ -231,7 +232,7 @@ public final class FailedHandler implements NMSCallProvider {
 			ItemStack item1 = asBukkitCopy(nmsGetBuyItem1Method.invoke(merchantRecipe));
 			ItemStack item2 = asBukkitCopy(nmsGetBuyItem2Method.invoke(merchantRecipe));
 			ItemStack resultItem = asBukkitCopy(nmsGetBuyItem3Method.invoke(merchantRecipe));
-			return new TradingRecipe(resultItem, item1, item2);
+			return new SKTradingRecipe(resultItem, item1, item2);
 		} catch (Exception e) {
 			return null;
 		}
