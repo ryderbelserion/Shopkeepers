@@ -37,7 +37,7 @@ public class AdminShopType extends ShopType<AdminShopkeeper> {
 	}
 
 	@Override
-	public void onSelect(Player player) {
+	protected void onSelect(Player player) {
 		// currently can't be 'selected'
 	}
 }

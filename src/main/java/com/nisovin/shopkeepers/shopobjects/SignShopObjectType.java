@@ -35,7 +35,7 @@ public class SignShopObjectType extends ShopObjectType {
 	}
 
 	@Override
-	public void onSelect(Player player) {
+	protected void onSelect(Player player) {
 		Utils.sendMessage(player, Settings.msgSelectedSignShop);
 	}
 

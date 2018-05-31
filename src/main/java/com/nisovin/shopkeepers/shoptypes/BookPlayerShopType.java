@@ -45,7 +45,7 @@ public class BookPlayerShopType extends PlayerShopType<BookPlayerShopkeeper> {
 	}
 
 	@Override
-	public void onSelect(Player player) {
+	protected void onSelect(Player player) {
 		Utils.sendMessage(player, Settings.msgSelectedBookShop);
 	}
 }

@@ -56,7 +56,7 @@ public class LivingEntityObjectType extends ShopObjectType {
 	}
 
 	@Override
-	public void onSelect(Player player) {
+	protected void onSelect(Player player) {
 		// TODO translation support for the entity type name?
 		Utils.sendMessage(player, Settings.msgSelectedLivingShop, "{type}", entityType.name());
 	}

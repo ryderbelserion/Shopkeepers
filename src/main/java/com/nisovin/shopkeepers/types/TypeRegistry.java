@@ -7,38 +7,36 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 
-import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class TypeRegistry<T extends AbstractType> {
 
-	protected final Map<String, T> registeredTypes = new HashMap<String, T>();
+	protected final Map<String, T> registeredTypes = new HashMap<>();
 
 	// true on success:
 	public boolean register(T type) {
 		Validate.notNull(type);
 		String identifier = type.getIdentifier();
 		assert identifier != null && !identifier.isEmpty();
-		if (registeredTypes.containsKey(identifier)) {
-			// this shouldn't happen, as currently we are the only one registering types, and the registry gets cleared
-			// on reloads
-			Log.warning("Cannot replace previously registered " + this.getTypeName() + " '" + identifier + "' with new one!");
-			return false;
-		}
+		Validate.isTrue(!registeredTypes.containsKey(identifier),
+				"Another " + this.getTypeName() + " with identifier '" + identifier + "' is already registered!");
 		registeredTypes.put(identifier, type);
 		return true;
 	}
 
-	public void registerAll(Collection<T> all) {
-		if (all == null) return;
-		for (T type : all) {
-			if (type != null) this.register(type);
+	public void registerAll(Collection<T> types) {
+		if (types == null) return;
+		for (T type : types) {
+			if (type != null) {
+				this.register(type);
+			}
 		}
 	}
 
 	/**
 	 * A name for the type this TypeRegistry is managing.
-	 * Used to print slightly more informative debug messages.
+	 * <p>
+	 * Used to print slightly more informative debug messages.<br>
 	 * Examples: 'shop type', 'shop object type', 'trading window', 'hiring window', etc.
 	 * 
 	 * @return a name for the type this class is handling

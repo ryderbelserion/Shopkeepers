@@ -45,7 +45,7 @@ public class NormalPlayerShopType extends PlayerShopType<NormalPlayerShopkeeper>
 	}
 
 	@Override
-	public void onSelect(Player player) {
+	protected void onSelect(Player player) {
 		Utils.sendMessage(player, Settings.msgSelectedNormalShop);
 	}
 }

@@ -8,21 +8,23 @@ import com.nisovin.shopkeepers.util.Utils;
 public abstract class AbstractType {
 
 	/**
-	 * An identifier for this type object.
-	 * This could for example be used inside save/configuration files.
-	 * So it should not contain any characters which could cause problems with that.
+	 * An unique identifier for this type object.
+	 * <p>
+	 * This could for example be used inside save/configuration files, so it should not contain any characters which
+	 * could cause problems with that.
 	 */
-	protected final String identifier;
+	protected final String identifier; // not null or empty
 	/**
 	 * The permission a player needs in order to use/access this type in some way.
-	 * Can be null or empty to indicate that no permission is needed.
+	 * <p>
+	 * Can be <code>null</code> to indicate that no permission is needed.
 	 */
-	protected final String permission;
+	protected final String permission; // can be null
 
 	protected AbstractType(String identifier, String permission) {
-		Validate.notEmpty(identifier);
+		Validate.notEmpty(identifier, "Empty identifier!");
 		this.identifier = identifier;
-		this.permission = permission;
+		this.permission = Utils.isEmpty(permission) ? null : permission;
 	}
 
 	public final String getIdentifier() {
@@ -30,7 +32,7 @@ public abstract class AbstractType {
 	}
 
 	public boolean hasPermission(Player player) {
-		return permission == null || permission.isEmpty() || Utils.hasPermission(player, permission);
+		return (permission == null || Utils.hasPermission(player, permission));
 	}
 
 	public boolean isEnabled() {

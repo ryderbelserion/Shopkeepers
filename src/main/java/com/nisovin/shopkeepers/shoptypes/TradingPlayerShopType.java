@@ -45,7 +45,7 @@ public class TradingPlayerShopType extends PlayerShopType<TradingPlayerShopkeepe
 	}
 
 	@Override
-	public void onSelect(Player player) {
+	protected void onSelect(Player player) {
 		Utils.sendMessage(player, Settings.msgSelectedTradeShop);
 	}
 }

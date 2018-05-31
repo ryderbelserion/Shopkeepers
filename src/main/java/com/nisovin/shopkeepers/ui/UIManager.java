@@ -41,7 +41,7 @@ public class UIManager extends TypeRegistry<UIType> {
 
 	@Override
 	protected String getTypeName() {
-		return "UIManager";
+		return "UI type";
 	}
 
 	public boolean requestUI(UIType uiType, Shopkeeper shopkeeper, Player player) {

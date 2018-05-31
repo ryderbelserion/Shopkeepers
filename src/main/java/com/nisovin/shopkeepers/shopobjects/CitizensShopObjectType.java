@@ -34,7 +34,7 @@ public class CitizensShopObjectType extends ShopObjectType {
 	}
 
 	@Override
-	public void onSelect(Player player) {
+	protected void onSelect(Player player) {
 		Utils.sendMessage(player, Settings.msgSelectedCitizenShop);
 	}
 

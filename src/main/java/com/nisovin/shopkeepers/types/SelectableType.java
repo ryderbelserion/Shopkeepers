@@ -8,5 +8,5 @@ public abstract class SelectableType extends AbstractType {
 		super(identifier, permission);
 	}
 
-	public abstract void onSelect(Player player);
+	protected abstract void onSelect(Player player);
 }

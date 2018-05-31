@@ -8,11 +8,11 @@ import org.bukkit.entity.Player;
 
 public abstract class SelectableTypeRegistry<T extends SelectableType> extends TypeRegistry<T> {
 
-	private class LinkData {
+	private class Link {
 		private T next = null;
 	}
 
-	private final Map<String, LinkData> links = new HashMap<String, LinkData>();
+	private final Map<String, Link> links = new HashMap<>();
 	private T first = null;
 	private T last = null;
 
@@ -22,8 +22,8 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 			if (first == null) {
 				first = type;
 			}
-			LinkData data = new LinkData();
-			links.put(type.getIdentifier(), data);
+			Link link = new Link();
+			links.put(type.getIdentifier(), link);
 			if (last != null) {
 				links.get(last.getIdentifier()).next = type;
 			}
@@ -38,8 +38,8 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 	}
 
 	protected T getNext(T current) {
-		LinkData data = current != null ? links.get(current.getIdentifier()) : null;
-		return (data == null || data.next == null) ? first : data.next;
+		Link link = (current != null) ? links.get(current.getIdentifier()) : null;
+		return (link == null || link.next == null) ? first : link.next;
 	}
 
 	protected boolean canBeSelected(Player player, T type) {
@@ -53,8 +53,8 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 
 		int count = this.numberOfRegisteredTypes();
 		while (count > 0) {
-			next = this.getNext(next); // automatically selects the first type, if next is null or if next is the last
-										// type
+			// automatically selects the first type, if next is null or if next is the last type
+			next = this.getNext(next);
 			if (this.canBeSelected(player, next)) {
 				break;
 			}
@@ -73,6 +73,7 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 
 	// SELECTION MANAGEMENT
 
+	// player name -> selected type
 	protected final Map<String, T> selections = new HashMap<String, T>();
 
 	/**
@@ -110,12 +111,17 @@ public abstract class SelectableTypeRegistry<T extends SelectableType> extends T
 		T next = this.getNext(player, current);
 		if (next != null) {
 			selections.put(playerName, next);
-			next.onSelect(player);
+			this.onSelect(next, player);
 		} else {
 			// for now remember the current selection
 			// selections.remove(playerName);
 		}
 		return next;
+	}
+
+	protected void onSelect(T type, Player selectedBy) {
+		// inform type:
+		type.onSelect(selectedBy);
 	}
 
 	public void clearSelection(Player player) {
