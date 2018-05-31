@@ -10,14 +10,16 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.Log;
 
 class UIListener implements Listener {
 
+	private final ShopkeepersPlugin plugin;
 	private final SKUIRegistry uiRegistry;
 
-	UIListener(SKUIRegistry uiRegistry) {
+	UIListener(ShopkeepersPlugin plugin, SKUIRegistry uiRegistry) {
+		this.plugin = plugin;
 		this.uiRegistry = uiRegistry;
 	}
 
@@ -50,7 +52,7 @@ class UIListener implements Listener {
 			Log.debug("Closing inventory for " + player.getName() + ", because a different open inventory was expected."
 					+ " Open inventory: " + inventory.getType() + " with name '" + inventory.getTitle() + "'");
 			event.setCancelled(true);
-			Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> {
+			Bukkit.getScheduler().runTask(plugin, () -> {
 				uiRegistry.onInventoryClose(player); // cleanup
 				player.closeInventory();
 			});

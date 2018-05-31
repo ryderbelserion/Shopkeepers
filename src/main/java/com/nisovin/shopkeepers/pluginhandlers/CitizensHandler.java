@@ -16,7 +16,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.Shopkeeper;
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.CitizensShopkeeperTrait;
 import com.nisovin.shopkeepers.util.Log;
@@ -75,7 +75,7 @@ public class CitizensHandler {
 		// register citizens listener:
 		assert citizensListener == null;
 		citizensListener = new CitizensListener();
-		Bukkit.getPluginManager().registerEvents(citizensListener, SKShopkeepersPlugin.getInstance());
+		Bukkit.getPluginManager().registerEvents(citizensListener, ShopkeepersPlugin.getInstance());
 
 		// enabled:
 		enabled = true;
@@ -144,7 +144,7 @@ public class CitizensHandler {
 			return;
 		}
 		List<Shopkeeper> forRemoval = new ArrayList<>();
-		for (Shopkeeper shopkeeper : SKShopkeepersPlugin.getInstance().getAllShopkeepers()) {
+		for (Shopkeeper shopkeeper : ShopkeepersPlugin.getInstance().getAllShopkeepers()) {
 			if (shopkeeper.getShopObject() instanceof CitizensShop) {
 				CitizensShop citizensShop = (CitizensShop) shopkeeper.getShopObject();
 				Integer npcId = citizensShop.getNpcId();
@@ -159,7 +159,7 @@ public class CitizensHandler {
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
 							+ ": No NPC existing with id '" + npcId + "'.");
-				} else if (SKShopkeepersPlugin.getInstance().getActiveShopkeeper(shopkeeper.getObjectId()) != shopkeeper) {
+				} else if (ShopkeepersPlugin.getInstance().getActiveShopkeeper(shopkeeper.getObjectId()) != shopkeeper) {
 					// there is already another citizens shopkeeper using this npc id:
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
@@ -175,7 +175,7 @@ public class CitizensHandler {
 			}
 
 			// save:
-			SKShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 		}
 	}
 

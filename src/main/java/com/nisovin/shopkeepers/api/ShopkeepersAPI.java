@@ -156,6 +156,10 @@ public final class ShopkeepersAPI {
 		return getPlugin().getShopkeeperByName(shopName);
 	}
 
+	public static Shopkeeper getActiveShopkeeper(String objectId) {
+		return getPlugin().getActiveShopkeeper(objectId);
+	}
+
 	/**
 	 * Gets the shopkeeper for a given entity.
 	 * 

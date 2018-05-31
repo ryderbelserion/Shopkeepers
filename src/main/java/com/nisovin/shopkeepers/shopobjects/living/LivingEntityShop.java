@@ -17,6 +17,7 @@ import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
@@ -74,11 +75,11 @@ public class LivingEntityShop extends AbstractShopObject {
 	}
 
 	protected void assignShopkeeperMetadata(LivingEntity entity) {
-		entity.setMetadata("shopkeeper", new FixedMetadataValue(SKShopkeepersPlugin.getInstance(), true));
+		entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
 	}
 
 	protected void removeShopkeeperMetadata(LivingEntity entity) {
-		entity.removeMetadata("shopkeeper", SKShopkeepersPlugin.getInstance());
+		entity.removeMetadata("shopkeeper", ShopkeepersPlugin.getInstance());
 	}
 
 	// returns true if we find a valid entity:

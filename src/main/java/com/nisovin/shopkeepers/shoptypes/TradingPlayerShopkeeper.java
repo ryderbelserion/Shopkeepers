@@ -13,10 +13,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
 import com.nisovin.shopkeepers.util.ItemCount;
@@ -83,7 +83,7 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 				if (shopkeeper.clickedItem != null) {
 					// placing item:
 					Inventory inventory = event.getInventory();
-					Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> {
+					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
 						inventory.setItem(slot, shopkeeper.clickedItem);
 						shopkeeper.clickedItem = null;
 					});

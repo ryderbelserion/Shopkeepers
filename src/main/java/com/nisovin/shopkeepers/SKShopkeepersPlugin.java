@@ -146,7 +146,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// protected chests:
 	private final ProtectedChests protectedChests = new ProtectedChests();
-	private final LivingEntityAI livingEntityAI = new LivingEntityAI();
+	private final LivingEntityAI livingEntityAI = new LivingEntityAI(this);
 
 	// storage
 	private final SKShopkeeperStorage shopkeeperStorage = new SKShopkeeperStorage(this);
@@ -223,7 +223,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		uiRegistry.onEnable();
 
 		// inform ProtectedChests:
-		protectedChests.onEnable(this);
+		protectedChests.onEnable();
 
 		// register events
 		PluginManager pm = Bukkit.getPluginManager();
@@ -396,7 +396,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// inform other components:
 		livingEntityAI.stop();
 		livingEntityAI.reset(); // cleanup, reset timings, etc.
-		protectedChests.onDisable(this);
+		protectedChests.onDisable();
 
 		// cleanup:
 		creatureForceSpawnListener = null;
@@ -729,6 +729,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	}
 
 	@Override
+	public AbstractShopkeeper getActiveShopkeeper(String objectId) {
+		return activeShopkeepers.get(objectId);
+	}
+
+	@Override
 	public AbstractShopkeeper getShopkeeperByEntity(Entity entity) {
 		if (entity == null) return null;
 		// check if the entity is a living entity shopkeeper:
@@ -754,10 +759,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	public AbstractShopkeeper getShopkeeperByBlock(Block block) {
 		if (block == null) return null;
 		return this.getActiveShopkeeper(SignShop.getId(block));
-	}
-
-	public AbstractShopkeeper getActiveShopkeeper(String objectId) {
-		return activeShopkeepers.get(objectId);
 	}
 
 	@Override

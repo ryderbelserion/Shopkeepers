@@ -32,7 +32,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 
 	public void onEnable() {
 		assert uiListener == null;
-		uiListener = new UIListener(this);
+		uiListener = new UIListener(plugin, this);
 		Bukkit.getPluginManager().registerEvents(uiListener, plugin);
 	}
 

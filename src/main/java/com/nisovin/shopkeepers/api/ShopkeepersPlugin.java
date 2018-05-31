@@ -134,13 +134,14 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * <p>
 	 * This search ignores colors in the shop names.<br>
 	 * Note: Shop names are not unique!
-	 * </p>
 	 * 
 	 * @param shopName
 	 *            the shop name
 	 * @return the shopkeeper, or <code>null</code>
 	 */
 	public Shopkeeper getShopkeeperByName(String shopName);
+
+	public Shopkeeper getActiveShopkeeper(String objectId);
 
 	/**
 	 * Gets the shopkeeper for a given entity.

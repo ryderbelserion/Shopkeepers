@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -232,7 +233,7 @@ public class SignShop extends AbstractShopObject {
 			if (!this.spawn()) {
 				Log.warning("Shopkeeper sign at " + shopkeeper.getPositionString() + " could not be replaced! Removing shopkeeper now!");
 				// delayed removal:
-				Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> shopkeeper.delete());
+				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> shopkeeper.delete());
 			}
 			return true;
 		}

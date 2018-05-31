@@ -4,7 +4,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 
 public final class Log {
 
@@ -12,7 +12,7 @@ public final class Log {
 	}
 
 	public static Logger getLogger() {
-		return SKShopkeepersPlugin.getInstance().getLogger();
+		return ShopkeepersPlugin.getInstance().getLogger();
 	}
 
 	public static void info(String message) {

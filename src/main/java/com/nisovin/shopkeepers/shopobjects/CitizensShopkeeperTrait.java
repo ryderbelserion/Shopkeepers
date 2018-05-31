@@ -4,9 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shoptypes.DefaultShopTypes;
 import com.nisovin.shopkeepers.util.Log;
@@ -34,10 +34,10 @@ public class CitizensShopkeeperTrait extends Trait {
 	}
 
 	public Shopkeeper getShopkeeper() {
-		if (shopkeeperId == null || SKShopkeepersPlugin.getInstance() == null) {
-			return null;
-		}
-		return SKShopkeepersPlugin.getInstance().getActiveShopkeeper(shopkeeperId);
+		if (shopkeeperId == null) return null;
+		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
+		if (plugin == null) return null;
+		return plugin.getActiveShopkeeper(shopkeeperId);
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class CitizensShopkeeperTrait extends Trait {
 			// this should keep the citizens npc and only remove the shopkeeper data:
 			shopkeeper.delete();
 			// save:
-			SKShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 		} else {
 			// TODO what if the trait gets removed and Shopkeepers is disabled?
 			// -> does a new npc get created when Shopkeepers enables again?
@@ -73,12 +73,13 @@ public class CitizensShopkeeperTrait extends Trait {
 			// citizens not running or trait got already removed again?
 			return false;
 		}
-		if (SKShopkeepersPlugin.getInstance() == null) {
+		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
+		if (plugin == null) {
 			// shopkeepers not running:
 			return false;
 		}
 
-		if (SKShopkeepersPlugin.getInstance().getActiveShopkeeper(CitizensShop.getId(npc.getId())) != null) {
+		if (plugin.getActiveShopkeeper(CitizensShop.getId(npc.getId())) != null) {
 			// there is already a shopkeeper for this npc:
 			// the trait was probably re-attached after a reload of citizens:
 			return false;
@@ -92,13 +93,14 @@ public class CitizensShopkeeperTrait extends Trait {
 		// note: this is also called whenever citizens gets reloaded
 		// Log.debug("Shopkeeper trait attached to NPC " + npc.getId());
 
-		if (SKShopkeepersPlugin.getInstance() == null) {
+		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
+		if (plugin == null) {
 			// shopkeepers is not running:
 			return;
 		}
 
 		// giving citizens some time to properly initialize the trait and npc:
-		Bukkit.getScheduler().runTaskLater(SKShopkeepersPlugin.getInstance(), () -> {
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			// create a new shopkeeper if there isn't one already for this npc:
 			if (!isMissingShopkeeper()) {
 				return;
@@ -118,13 +120,13 @@ public class CitizensShopkeeperTrait extends Trait {
 			if (location != null) {
 				ShopCreationData creationData = ShopCreationData.create(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
 				creationData.setValue(CitizensShop.CREATION_DATA_NPC_ID_KEY, npc.getId());
-				Shopkeeper shopkeeper = SKShopkeepersPlugin.getInstance().createShopkeeper(creationData);
+				Shopkeeper shopkeeper = plugin.createShopkeeper(creationData);
 				if (shopkeeper != null) {
 					shopkeeperId = shopkeeper.getObjectId();
 				} else {
 					Log.warning("Shopkeeper creation via trait failed. Removing trait again.");
 					shopkeeperId = null;
-					Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> getNPC().removeTrait(CitizensShopkeeperTrait.class));
+					Bukkit.getScheduler().runTask(plugin, () -> getNPC().removeTrait(CitizensShopkeeperTrait.class));
 				}
 			} else {
 				// well.. no idea what to do in that case.. we cannot create a shopkeeper without a location, right?

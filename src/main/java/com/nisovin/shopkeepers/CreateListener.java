@@ -46,7 +46,7 @@ class CreateListener implements Listener {
 			return;
 		}
 
-		if (!SKShopkeepersPlugin.getInstance().hasCreatePermission(player)) {
+		if (!plugin.hasCreatePermission(player)) {
 			// player cannot create any shopkeeper at all
 			return;
 		}

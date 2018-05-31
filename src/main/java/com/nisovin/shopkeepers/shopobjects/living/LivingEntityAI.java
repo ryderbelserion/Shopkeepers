@@ -17,8 +17,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -56,6 +56,8 @@ public class LivingEntityAI {
 	private static final double GRAVITY_COLLISION_CHECK_RANGE = MAX_FALLING_DISTANCE_PER_TICK + 0.1D;
 
 	private static final Random RANDOM = new Random();
+
+	private final ShopkeepersPlugin plugin;
 
 	private static class EntityData {
 		private final ChunkData chunkData;
@@ -192,7 +194,8 @@ public class LivingEntityAI {
 	private final Timings gravityTimings = new Timings();
 	private final Timings aiTimings = new Timings();
 
-	public LivingEntityAI() {
+	public LivingEntityAI(ShopkeepersPlugin plugin) {
+		this.plugin = plugin;
 	}
 
 	// whether our custom gravity handling shall be active
@@ -206,7 +209,7 @@ public class LivingEntityAI {
 		else if (aiTask != null) this.stop(); // not active, but already setup: perform cleanup
 
 		// start ai task:
-		aiTask = Bukkit.getScheduler().runTaskTimer(SKShopkeepersPlugin.getInstance(), () -> {
+		aiTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
 			currentlyRunning = true;
 			tickCounter++;
 

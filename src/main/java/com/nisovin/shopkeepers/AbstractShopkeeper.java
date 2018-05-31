@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
@@ -323,7 +324,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public void closeAllOpenWindows() {
-		SKShopkeepersPlugin.getInstance().getUIRegistry().closeAllDelayed(this);
+		ShopkeepersPlugin.getInstance().getUIRegistry().closeAllDelayed(this);
 	}
 
 	/**
@@ -431,7 +432,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, this));
 
 		// save:
-		SKShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 
 		return true;
 	}

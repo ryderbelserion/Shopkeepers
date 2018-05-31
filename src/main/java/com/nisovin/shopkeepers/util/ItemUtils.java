@@ -16,7 +16,7 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 
@@ -547,6 +547,6 @@ public final class ItemUtils {
 
 	@SuppressWarnings("deprecation")
 	public static void updateInventoryLater(Player player) {
-		Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> player.updateInventory());
+		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> player.updateInventory());
 	}
 }

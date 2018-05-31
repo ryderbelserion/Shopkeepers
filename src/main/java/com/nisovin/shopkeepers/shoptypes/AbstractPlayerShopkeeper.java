@@ -388,7 +388,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				player.getInventory().setContents(newPlayerInventoryContents); // apply inventory changes
 				shopkeeper.setForHire(null);
 				shopkeeper.setOwner(player);
-				SKShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+				ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 				Utils.sendMessage(player, Settings.msgHired);
 
 				// close all open windows for this shopkeeper:
@@ -484,7 +484,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				// handled name changing:
 				if (this.requestNameChange(player, newName)) {
 					// manually remove rename item from player's hand after this event is processed:
-					Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> {
+					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
 						ItemStack newItemInHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
 						player.setItemInHand(newItemInHand);
 					});
