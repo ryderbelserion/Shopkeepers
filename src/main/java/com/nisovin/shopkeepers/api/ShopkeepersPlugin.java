@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
+import com.nisovin.shopkeepers.ui.defaults.DefaultUITypes;
 
 public interface ShopkeepersPlugin extends Plugin {
 
@@ -73,7 +74,9 @@ public interface ShopkeepersPlugin extends Plugin {
 
 	// UI
 
-	public UIRegistry getUIRegistry();
+	public UIRegistry<?> getUIRegistry();
+
+	public DefaultUITypes getDefaultUITypes();
 
 	// STORAGE
 

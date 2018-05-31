@@ -19,7 +19,7 @@ import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
+import com.nisovin.shopkeepers.ui.defaults.DefaultUITypes;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SKItemUtils;
 
@@ -75,7 +75,7 @@ class TradingCountListener implements Listener {
 		if (!(event.getInventory() instanceof MerchantInventory)) return;
 		Player player = (Player) event.getWhoClicked();
 		UIType uiType = plugin.getUIRegistry().getOpenUIType(player);
-		if (uiType == DefaultUIs.TRADING_WINDOW) return; // trading with a shopkeeper, which handles trades on its own
+		if (uiType == DefaultUITypes.TRADING()) return; // trading with a shopkeeper, which handles trades on its own
 
 		MerchantInventory inventory = (MerchantInventory) event.getInventory();
 		ItemStack resultItem = inventory.getItem(2);

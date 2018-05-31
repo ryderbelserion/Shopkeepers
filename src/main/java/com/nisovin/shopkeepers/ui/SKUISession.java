@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.ui;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.ui.UISession;
-import com.nisovin.shopkeepers.api.ui.UIType;
 
 public class SKUISession implements UISession {
 
@@ -26,7 +25,7 @@ public class SKUISession implements UISession {
 	}
 
 	@Override
-	public UIType getUIType() {
+	public AbstractUIType getUIType() {
 		return uiHandler.getUIType();
 	}
 }

@@ -18,8 +18,8 @@ import com.nisovin.shopkeepers.api.events.ShopkeeperDeletedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
-import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ItemUtils;
+import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
@@ -29,7 +29,7 @@ public abstract class EditorHandler extends UIHandler {
 	// column = [0,7] (last column of the inventory is used for editor buttons)
 	protected static final int TRADE_COLUMNS = 8;
 
-	protected EditorHandler(UIType uiType, AbstractShopkeeper shopkeeper) {
+	protected EditorHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
 		super(uiType, shopkeeper);
 	}
 

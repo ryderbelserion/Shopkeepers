@@ -19,10 +19,6 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 	public SKDefaultShopObjectTypes() {
 	}
 
-	public void register() {
-		SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().registerAll(this.getAllObjectTypes());
-	}
-
 	@Override
 	public List<AbstractShopObjectType> getAllObjectTypes() {
 		List<AbstractShopObjectType> shopObjectTypes = new ArrayList<>();

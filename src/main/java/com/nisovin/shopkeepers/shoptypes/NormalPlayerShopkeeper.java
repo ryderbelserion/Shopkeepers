@@ -17,11 +17,9 @@ import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.PriceOffer;
-import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.SKItemUtils;
@@ -30,8 +28,8 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 	protected static class NormalPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-		protected NormalPlayerShopEditorHandler(UIType uiType, NormalPlayerShopkeeper shopkeeper) {
-			super(uiType, shopkeeper);
+		protected NormalPlayerShopEditorHandler(NormalPlayerShopkeeper shopkeeper) {
+			super(shopkeeper);
 		}
 
 		@Override
@@ -99,8 +97,8 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 
 	protected static class NormalPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
-		protected NormalPlayerShopTradingHandler(UIType uiManager, NormalPlayerShopkeeper shopkeeper) {
-			super(uiManager, shopkeeper);
+		protected NormalPlayerShopTradingHandler(NormalPlayerShopkeeper shopkeeper) {
+			super(shopkeeper);
 		}
 
 		@Override
@@ -197,8 +195,8 @@ public class NormalPlayerShopkeeper extends PlayerShopkeeper {
 	@Override
 	protected void onInitDone() {
 		super.onInitDone();
-		this.registerUIHandler(new NormalPlayerShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
-		this.registerUIHandler(new NormalPlayerShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
+		this.registerUIHandler(new NormalPlayerShopEditorHandler(this));
+		this.registerUIHandler(new NormalPlayerShopTradingHandler(this));
 	}
 
 	@Override

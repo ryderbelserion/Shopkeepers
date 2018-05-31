@@ -22,14 +22,14 @@ import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHiredEvent;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
-import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.SignShop;
-import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
+import com.nisovin.shopkeepers.ui.defaults.DefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.HiringHandler;
+import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
@@ -49,8 +49,8 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		protected static final int HIGH_COST_OFFSET = 9;
 		protected static final int LOW_COST_OFFSET = 18;
 
-		protected PlayerShopEditorHandler(UIType uiType, PlayerShopkeeper shopkeeper) {
-			super(uiType, shopkeeper);
+		protected PlayerShopEditorHandler(PlayerShopkeeper shopkeeper) {
+			super(SKDefaultUITypes.EDITOR(), shopkeeper);
 		}
 
 		@Override
@@ -204,8 +204,8 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		protected Inventory chestInventory = null;
 		protected ItemStack[] newChestContents = null;
 
-		protected PlayerShopTradingHandler(UIType uiType, PlayerShopkeeper shopkeeper) {
-			super(uiType, shopkeeper);
+		protected PlayerShopTradingHandler(PlayerShopkeeper shopkeeper) {
+			super(SKDefaultUITypes.TRADING(), shopkeeper);
 		}
 
 		@Override
@@ -293,8 +293,8 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 
 	protected static class PlayerShopHiringHandler extends HiringHandler {
 
-		protected PlayerShopHiringHandler(UIType uiType, PlayerShopkeeper shopkeeper) {
-			super(uiType, shopkeeper);
+		protected PlayerShopHiringHandler(PlayerShopkeeper shopkeeper) {
+			super(SKDefaultUITypes.HIRING(), shopkeeper);
 		}
 
 		@Override
@@ -433,7 +433,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 	@Override
 	protected void onInitDone() {
 		super.onInitDone();
-		this.registerUIHandler(new PlayerShopHiringHandler(DefaultUIs.HIRING_WINDOW, this));
+		this.registerUIHandler(new PlayerShopHiringHandler(this));
 	}
 
 	@Override
@@ -473,7 +473,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		ItemStack itemInHand = player.getItemInHand();
 		if (Settings.namingOfPlayerShopsViaItem && Settings.isNamingItem(itemInHand)) {
 			// check if player can edit this shopkeeper:
-			PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUIs.EDITOR_WINDOW);
+			PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUITypes.EDITOR());
 			if (editorHandler.canOpen(player)) {
 				// rename with the player's item in hand:
 				String newName;

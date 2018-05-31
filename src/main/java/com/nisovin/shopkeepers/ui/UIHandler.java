@@ -8,22 +8,21 @@ import org.bukkit.inventory.Inventory;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.ui.UIType;
 
 /**
  * The component which handles one specific type of user interface window for one specific shopkeeper.
  */
 public abstract class UIHandler {
 
-	private final UIType uiType;
+	private final AbstractUIType uiType;
 	private final AbstractShopkeeper shopkeeper;
 
-	protected UIHandler(UIType uiType, AbstractShopkeeper shopkeeper) {
+	protected UIHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
 		this.uiType = uiType;
 		this.shopkeeper = shopkeeper;
 	}
 
-	public UIType getUIType() {
+	public AbstractUIType getUIType() {
 		return uiType;
 	}
 

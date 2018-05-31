@@ -16,13 +16,12 @@ import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
-import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
@@ -35,8 +34,8 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 
 	protected static class AdminShopEditorHandler extends EditorHandler {
 
-		protected AdminShopEditorHandler(UIType uiType, AdminShopkeeper shopkeeper) {
-			super(uiType, shopkeeper);
+		protected AdminShopEditorHandler(AdminShopkeeper shopkeeper) {
+			super(SKDefaultUITypes.EDITOR(), shopkeeper);
 		}
 
 		@Override
@@ -106,8 +105,8 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 
 	protected static class AdminShopTradingHandler extends TradingHandler {
 
-		protected AdminShopTradingHandler(UIType uiType, AdminShopkeeper shopkeeper) {
-			super(uiType, shopkeeper);
+		protected AdminShopTradingHandler(AdminShopkeeper shopkeeper) {
+			super(SKDefaultUITypes.TRADING(), shopkeeper);
 		}
 
 		@Override
@@ -158,8 +157,8 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 	@Override
 	protected void onInitDone() {
 		super.onInitDone();
-		this.registerUIHandler(new AdminShopEditorHandler(DefaultUIs.EDITOR_WINDOW, this));
-		this.registerUIHandler(new AdminShopTradingHandler(DefaultUIs.TRADING_WINDOW, this));
+		this.registerUIHandler(new AdminShopEditorHandler(this));
+		this.registerUIHandler(new AdminShopTradingHandler(this));
 	}
 
 	@Override

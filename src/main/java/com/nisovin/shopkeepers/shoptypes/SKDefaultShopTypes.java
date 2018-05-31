@@ -18,10 +18,6 @@ public class SKDefaultShopTypes implements DefaultShopTypes {
 	public SKDefaultShopTypes() {
 	}
 
-	public void register() {
-		SKShopkeepersPlugin.getInstance().getShopTypeRegistry().registerAll(this.getAllShopTypes());
-	}
-
 	@Override
 	public List<AbstractShopType<?>> getAllShopTypes() {
 		List<AbstractShopType<?>> shopTypes = new ArrayList<>();

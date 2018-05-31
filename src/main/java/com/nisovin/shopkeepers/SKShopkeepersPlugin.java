@@ -37,11 +37,11 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.ShopType;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.events.CreatePlayerShopkeeperEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperCreatedEvent;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
@@ -73,10 +73,11 @@ import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
 import com.nisovin.shopkeepers.types.AbstractSelectableTypeRegistry;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
-import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
+import com.nisovin.shopkeepers.ui.defaults.DefaultUITypes;
+import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
-import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.SKItemUtils;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -121,6 +122,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// ui registry:
 	private final SKUIRegistry uiRegistry = new SKUIRegistry(this);
+	private final SKDefaultUITypes defaultUITypes = new SKDefaultUITypes();
 
 	// all shopkeepers:
 	private final Map<UUID, AbstractShopkeeper> shopkeepersById = new LinkedHashMap<>();
@@ -208,9 +210,10 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		defaultShopObjectTypes = new SKDefaultShopObjectTypes();
 
 		// register default stuff:
-		defaultShopTypes.register();
-		defaultShopObjectTypes.register();
-		uiRegistry.registerAll(DefaultUIs.getAllUITypes());
+
+		shopTypesRegistry.registerAll(defaultShopTypes.getAllShopTypes());
+		shopObjectTypesRegistry.registerAll(defaultShopObjectTypes.getAllObjectTypes());
+		uiRegistry.registerAll(defaultUITypes.getAllUITypes());
 
 		// inform ui registry (registers ui event handlers):
 		uiRegistry.onEnable();
@@ -481,8 +484,14 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// UI
 
+	@Override
 	public SKUIRegistry getUIRegistry() {
 		return uiRegistry;
+	}
+
+	@Override
+	public SKDefaultUITypes getDefaultUITypes() {
+		return defaultUITypes;
 	}
 
 	// PROTECTED CHESTS:
@@ -664,8 +673,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// assert !this.isRegistered(shopkeeper);
 
 		// add default trading handler, if none is provided:
-		if (shopkeeper.getUIHandler(DefaultUIs.TRADING_WINDOW) == null) {
-			shopkeeper.registerUIHandler(new TradingHandler(DefaultUIs.TRADING_WINDOW, shopkeeper));
+		if (shopkeeper.getUIHandler(DefaultUITypes.TRADING()) == null) {
+			shopkeeper.registerUIHandler(new TradingHandler(SKDefaultUITypes.TRADING(), shopkeeper));
 		}
 
 		// store by unique id:

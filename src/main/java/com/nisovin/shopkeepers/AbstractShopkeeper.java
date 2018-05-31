@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
+import com.nisovin.shopkeepers.ui.defaults.DefaultUITypes;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -38,7 +38,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	private boolean valid = false;
 
-	protected final Map<String, UIHandler> uiHandlers = new HashMap<String, UIHandler>();
+	// ui type identifier -> ui handler
+	protected final Map<String, UIHandler> uiHandlers = new HashMap<>();
 	private boolean uiActive = true; // can be used to deactivate UIs for this shopkeeper
 
 	/**
@@ -353,18 +354,18 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public boolean openEditorWindow(Player player) {
-		return this.openWindow(DefaultUIs.EDITOR_WINDOW, player);
+		return this.openWindow(DefaultUITypes.EDITOR(), player);
 	}
 
 	@Override
 	public boolean openTradingWindow(Player player) {
-		return this.openWindow(DefaultUIs.TRADING_WINDOW, player);
+		return this.openWindow(DefaultUITypes.TRADING(), player);
 	}
 
 	// TODO move these into PlayerShopkeeper
 	@Override
 	public boolean openHireWindow(Player player) {
-		return this.openWindow(DefaultUIs.HIRING_WINDOW, player);
+		return this.openWindow(DefaultUITypes.HIRING(), player);
 	}
 
 	@Override

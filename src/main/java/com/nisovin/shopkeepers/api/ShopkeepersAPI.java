@@ -78,7 +78,7 @@ public final class ShopkeepersAPI {
 	}
 	// UI
 
-	public static UIRegistry getUIRegistry() {
+	public static UIRegistry<?> getUIRegistry() {
 		return getPlugin().getUIRegistry();
 	}
 

@@ -8,7 +8,7 @@ import com.nisovin.shopkeepers.api.types.TypeRegistry;
 /**
  * Acts as registry for UI types and keeps track of which player has which UI currently opened.
  */
-public interface UIRegistry extends TypeRegistry<UIType> {
+public interface UIRegistry<T extends UIType> extends TypeRegistry<T> {
 
 	public UISession getSession(Player player);
 

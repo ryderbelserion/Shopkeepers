@@ -19,7 +19,7 @@ import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.types.AbstractTypeRegistry;
 import com.nisovin.shopkeepers.util.Log;
 
-public class SKUIRegistry extends AbstractTypeRegistry<UIType> implements UIRegistry {
+public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implements UIRegistry<AbstractUIType> {
 
 	private final ShopkeepersPlugin plugin;
 	// player name -> ui session
@@ -55,24 +55,24 @@ public class SKUIRegistry extends AbstractTypeRegistry<UIType> implements UIRegi
 		String uiIdentifier = uiType.getIdentifier();
 		UIHandler uiHandler = shopkeeper.getUIHandler(uiType);
 		if (uiHandler == null) {
-			Log.debug("Cannot open " + uiIdentifier + ": This shopkeeper is not handling/supporting this type of user interface.");
+			Log.debug("Cannot open UI '" + uiIdentifier + "': This shopkeeper is not handling/supporting this type of user interface.");
 			return false;
 		}
 
 		String playerName = player.getName();
 		if (!uiHandler.canOpen(player)) {
-			Log.debug("Cannot open " + uiIdentifier + " for '" + playerName + "'.");
+			Log.debug("Cannot open UI '" + uiIdentifier + "' for '" + playerName + "'.");
 			return false;
 		}
 
 		SKUISession oldSession = this.getSession(player);
 		// filtering out duplicate open requests:
 		if (oldSession != null && oldSession.getShopkeeper().equals(shopkeeper) && oldSession.getUIHandler().equals(uiHandler)) {
-			Log.debug(uiIdentifier + " is already opened for '" + playerName + "'.");
+			Log.debug("UI '" + uiIdentifier + "'" + " is already opened for '" + playerName + "'.");
 			return false;
 		}
 
-		Log.debug("Opening " + uiIdentifier + " ...");
+		Log.debug("Opening UI '" + uiIdentifier + "' ...");
 		boolean isOpen = uiHandler.openWindow(player);
 		if (isOpen) {
 			Log.debug(uiIdentifier + " opened");
@@ -93,8 +93,8 @@ public class SKUIRegistry extends AbstractTypeRegistry<UIType> implements UIRegi
 	}
 
 	@Override
-	public UIType getOpenUIType(Player player) {
-		UISession session = this.getSession(player);
+	public AbstractUIType getOpenUIType(Player player) {
+		SKUISession session = this.getSession(player);
 		return (session != null ? session.getUIType() : null);
 	}
 

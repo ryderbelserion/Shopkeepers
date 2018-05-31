@@ -8,14 +8,14 @@ import org.bukkit.inventory.Inventory;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.ui.UIType;
+import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class HiringHandler extends UIHandler {
 
-	protected HiringHandler(UIType uiType, AbstractShopkeeper shopkeeper) {
+	protected HiringHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
 		super(uiType, shopkeeper);
 	}
 

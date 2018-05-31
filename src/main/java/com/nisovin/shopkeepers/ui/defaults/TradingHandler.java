@@ -20,10 +20,10 @@ import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.OpenTradeEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
-import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SKItemUtils;
@@ -112,7 +112,7 @@ public class TradingHandler extends UIHandler {
 	// counts the trades triggered by the last click-event:
 	protected int tradeCounter = 0;
 
-	public TradingHandler(UIType uiType, AbstractShopkeeper shopkeeper) {
+	public TradingHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
 		super(uiType, shopkeeper);
 	}
 
