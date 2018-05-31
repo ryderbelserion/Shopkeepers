@@ -8,6 +8,7 @@ import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class CitizensShopObjectType extends AbstractShopObjectType {
@@ -28,7 +29,7 @@ public class CitizensShopObjectType extends AbstractShopObjectType {
 
 	@Override
 	public boolean matches(String identifier) {
-		identifier = Utils.normalize(identifier);
+		identifier = StringUtils.normalize(identifier);
 		if (super.matches(identifier)) return true;
 		return identifier.startsWith("citizen") || identifier.startsWith("npc");
 	}

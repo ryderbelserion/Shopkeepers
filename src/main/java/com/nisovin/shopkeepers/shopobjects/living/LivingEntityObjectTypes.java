@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.StringUtils;
 
 public class LivingEntityObjectTypes {
 
@@ -81,7 +81,7 @@ public class LivingEntityObjectTypes {
 	private static final Map<EntityType, List<String>> ALIASES;
 
 	private static List<String> prepareAliases(List<String> aliases) {
-		return Collections.unmodifiableList(Utils.normalize(aliases));
+		return Collections.unmodifiableList(StringUtils.normalize(aliases));
 	}
 
 	static {

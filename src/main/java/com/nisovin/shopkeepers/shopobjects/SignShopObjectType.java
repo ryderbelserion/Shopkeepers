@@ -9,6 +9,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class SignShopObjectType extends AbstractShopObjectType {
@@ -29,7 +30,7 @@ public class SignShopObjectType extends AbstractShopObjectType {
 
 	@Override
 	public boolean matches(String identifier) {
-		identifier = Utils.normalize(identifier);
+		identifier = StringUtils.normalize(identifier);
 		if (super.matches(identifier)) return true;
 		return identifier.startsWith("sign");
 	}

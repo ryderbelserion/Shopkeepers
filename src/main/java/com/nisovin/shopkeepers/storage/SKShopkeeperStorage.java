@@ -17,16 +17,16 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.AbstractShopType;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.shoptypes.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.StringUtils;
 
 public class SKShopkeeperStorage implements ShopkeeperStorage {
 
@@ -134,7 +134,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		YamlConfiguration shopkeepersConfig = new YamlConfiguration();
 		try {
-			if (!Utils.isEmpty(Settings.fileEncoding)) {
+			if (!StringUtils.isEmpty(Settings.fileEncoding)) {
 				// load with specified charset:
 				try (	FileInputStream stream = new FileInputStream(saveFile);
 						InputStreamReader reader = new InputStreamReader(stream, Settings.fileEncoding)) {

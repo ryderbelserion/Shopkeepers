@@ -11,6 +11,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class LivingEntityObjectType extends AbstractShopObjectType {
@@ -47,7 +48,7 @@ public class LivingEntityObjectType extends AbstractShopObjectType {
 
 	@Override
 	public boolean matches(String identifier) {
-		identifier = Utils.normalize(identifier);
+		identifier = StringUtils.normalize(identifier);
 		if (super.matches(identifier)) return true;
 		for (String alias : aliases) {
 			if (identifier.startsWith(alias)) return true;

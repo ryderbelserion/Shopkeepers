@@ -4,10 +4,11 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class BuyingPlayerShopType extends AbstractPlayerShopType<BuyingPlayerShopkeeper> {
@@ -39,7 +40,7 @@ public class BuyingPlayerShopType extends AbstractPlayerShopType<BuyingPlayerSho
 
 	@Override
 	public boolean matches(String identifier) {
-		identifier = Utils.normalize(identifier);
+		identifier = StringUtils.normalize(identifier);
 		if (super.matches(identifier)) return true;
 		return identifier.startsWith("buy");
 	}

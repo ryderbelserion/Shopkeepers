@@ -410,24 +410,6 @@ public final class Utils {
 		}
 	}
 
-	public static boolean isEmpty(String string) {
-		return string == null || string.isEmpty();
-	}
-
-	public static String normalize(String identifier) {
-		if (identifier == null) return null;
-		return identifier.trim().replace('_', '-').replace(' ', '-').toLowerCase(Locale.ROOT);
-	}
-
-	public static List<String> normalize(List<String> identifiers) {
-		if (identifiers == null) return null;
-		List<String> normalized = new ArrayList<String>(identifiers.size());
-		for (String identifier : identifiers) {
-			normalized.add(normalize(identifier));
-		}
-		return normalized;
-	}
-
 	/**
 	 * Performs a permissions check and logs debug information about it.
 	 * 

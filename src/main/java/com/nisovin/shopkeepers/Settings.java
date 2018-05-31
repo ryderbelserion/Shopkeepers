@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SKItemUtils;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class Settings {
@@ -471,7 +472,7 @@ public class Settings {
 		ItemStack creationItem = SKItemUtils.createItemStack(shopCreationItem, 1, (short) shopCreationItemData, shopCreationItemName, shopCreationItemLore);
 
 		// apply spawn egg entity type:
-		if (shopCreationItem == Material.MONSTER_EGG && !Utils.isEmpty(shopCreationItemSpawnEggEntityType) && NMSManager.getProvider().supportsSpawnEggEntityType()) {
+		if (shopCreationItem == Material.MONSTER_EGG && !StringUtils.isEmpty(shopCreationItemSpawnEggEntityType) && NMSManager.getProvider().supportsSpawnEggEntityType()) {
 			EntityType spawnEggEntityType = null;
 			try {
 				spawnEggEntityType = EntityType.valueOf(shopCreationItemSpawnEggEntityType);
@@ -490,7 +491,7 @@ public class Settings {
 		}
 
 		// check spawn egg entity type:
-		if (shopCreationItem == Material.MONSTER_EGG && !Utils.isEmpty(shopCreationItemSpawnEggEntityType) && NMSManager.getProvider().supportsSpawnEggEntityType()) {
+		if (shopCreationItem == Material.MONSTER_EGG && !StringUtils.isEmpty(shopCreationItemSpawnEggEntityType) && NMSManager.getProvider().supportsSpawnEggEntityType()) {
 			EntityType spawnEggEntityType = NMSManager.getProvider().getSpawnEggEntityType(item); // can be null
 			EntityType requiredEntityType = null;
 			try {

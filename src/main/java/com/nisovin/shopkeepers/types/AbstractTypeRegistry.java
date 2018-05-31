@@ -8,7 +8,7 @@ import java.util.Map;
 import org.apache.commons.lang.Validate;
 
 import com.nisovin.shopkeepers.api.types.TypeRegistry;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.StringUtils;
 
 public abstract class AbstractTypeRegistry<T extends AbstractType> implements TypeRegistry<T> {
 
@@ -64,7 +64,7 @@ public abstract class AbstractTypeRegistry<T extends AbstractType> implements Ty
 		if (identifier == null || identifier.isEmpty()) return null;
 		// might slightly improve performance of this loop: java /might/ skip 'toLowerCase' calls if the string already
 		// is in lower case:
-		identifier = Utils.normalize(identifier);
+		identifier = StringUtils.normalize(identifier);
 		for (T type : registeredTypesView) {
 			if (type.matches(identifier)) {
 				return type;

@@ -4,7 +4,7 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.StringUtils;
 
 import net.milkbowl.vault.economy.Economy;
 
@@ -32,7 +32,7 @@ public class VaultEconomyChart extends Metrics.SimplePie {
 					economyName = economy.getName();
 				}
 			}
-			return (Utils.isEmpty(economyName) ? "None" : economyName);
+			return (StringUtils.isEmpty(economyName) ? "None" : economyName);
 		});
 	}
 }

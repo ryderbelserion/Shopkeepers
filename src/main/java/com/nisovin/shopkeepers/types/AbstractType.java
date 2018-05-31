@@ -4,6 +4,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.types.Type;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class AbstractType implements Type {
@@ -18,7 +19,7 @@ public abstract class AbstractType implements Type {
 	protected AbstractType(String identifier, String permission) {
 		Validate.notEmpty(identifier, "Empty identifier!");
 		this.identifier = identifier;
-		this.permission = Utils.isEmpty(permission) ? null : permission;
+		this.permission = StringUtils.isEmpty(permission) ? null : permission;
 	}
 
 	@Override
@@ -43,7 +44,7 @@ public abstract class AbstractType implements Type {
 
 	@Override
 	public boolean matches(String identifier) {
-		identifier = Utils.normalize(identifier);
-		return Utils.normalize(this.identifier).equals(identifier);
+		identifier = StringUtils.normalize(identifier);
+		return StringUtils.normalize(this.identifier).equals(identifier);
 	}
 }
