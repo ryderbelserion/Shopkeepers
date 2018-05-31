@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.SKShopkeeper;
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopType;
@@ -31,7 +31,7 @@ import com.nisovin.shopkeepers.util.Utils;
  * Represents a shopkeeper that is managed by an admin. This shopkeeper will have unlimited supply
  * and will not store earnings anywhere.
  */
-public class AdminShopkeeper extends SKShopkeeper {
+public class AdminShopkeeper extends AbstractShopkeeper {
 
 	protected static class AdminShopEditorHandler extends EditorHandler {
 

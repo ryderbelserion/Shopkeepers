@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
-public abstract class SKShopkeeper implements Shopkeeper {
+public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	private int sessionId;
 	private UUID uniqueId;
@@ -45,7 +45,7 @@ public abstract class SKShopkeeper implements Shopkeeper {
 	 * {@link #initOnLoad(ConfigurationSection)} or {@link #initOnCreation(ShopCreationData)}.
 	 * Afterwards it is also required to call {@link #onInitDone()}.
 	 */
-	public SKShopkeeper() {
+	public AbstractShopkeeper() {
 	}
 
 	/**

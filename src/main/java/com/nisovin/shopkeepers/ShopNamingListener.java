@@ -20,7 +20,7 @@ class ShopNamingListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		SKShopkeeper shopkeeper = plugin.endNaming(player);
+		AbstractShopkeeper shopkeeper = plugin.endNaming(player);
 		if (shopkeeper == null) return;
 
 		event.setCancelled(true);

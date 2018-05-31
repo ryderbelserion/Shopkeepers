@@ -6,7 +6,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
-import com.nisovin.shopkeepers.SKShopkeeper;
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
 
 /**
@@ -15,9 +15,9 @@ import com.nisovin.shopkeepers.ShopkeepersPlugin;
 public abstract class UIHandler {
 
 	private final UIType uiType;
-	private final SKShopkeeper shopkeeper;
+	private final AbstractShopkeeper shopkeeper;
 
-	protected UIHandler(UIType uiType, SKShopkeeper shopkeeper) {
+	protected UIHandler(UIType uiType, AbstractShopkeeper shopkeeper) {
 		this.uiType = uiType;
 		this.shopkeeper = shopkeeper;
 	}
@@ -43,7 +43,7 @@ public abstract class UIHandler {
 	 * 
 	 * @return the shopkeeper
 	 */
-	public SKShopkeeper getShopkeeper() {
+	public AbstractShopkeeper getShopkeeper() {
 		return shopkeeper;
 	}
 

@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.nisovin.shopkeepers.SKShopkeeper;
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
@@ -111,7 +111,7 @@ public class TradingHandler extends UIHandler {
 	// counts the trades triggered by the last click-event:
 	protected int tradeCounter = 0;
 
-	public TradingHandler(UIType uiType, SKShopkeeper shopkeeper) {
+	public TradingHandler(UIType uiType, AbstractShopkeeper shopkeeper) {
 		super(uiType, shopkeeper);
 	}
 

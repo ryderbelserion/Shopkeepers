@@ -130,7 +130,7 @@ class CommandManager implements CommandExecutor {
 				listActive = args[1].equals("active");
 			}
 
-			Map<ChunkCoords, List<SKShopkeeper>> shopsByChunk = plugin.getAllShopkeepersByChunks();
+			Map<ChunkCoords, List<AbstractShopkeeper>> shopsByChunk = plugin.getAllShopkeepersByChunks();
 
 			sender.sendMessage(ChatColor.YELLOW + "All shopkeepers:");
 			sender.sendMessage("  Total: " + plugin.getAllShopkeepers().size());
@@ -170,10 +170,10 @@ class CommandManager implements CommandExecutor {
 				int loadedChunksWithShopkeepers = 0;
 				int shopkeepersInLoadedChunks = 0;
 
-				for (Entry<ChunkCoords, List<SKShopkeeper>> chunkEntry : shopsByChunk.entrySet()) {
+				for (Entry<ChunkCoords, List<AbstractShopkeeper>> chunkEntry : shopsByChunk.entrySet()) {
 					ChunkCoords chunkCoords = chunkEntry.getKey();
 					if (!chunkCoords.getWorldName().equals(worldName)) continue;
-					List<SKShopkeeper> inChunk = chunkEntry.getValue();
+					List<AbstractShopkeeper> inChunk = chunkEntry.getValue();
 					chunksWithShopkeepers++;
 					totalShopkeepers += inChunk.size();
 					if (chunkCoords.isChunkLoaded()) {
@@ -195,10 +195,10 @@ class CommandManager implements CommandExecutor {
 				if (isConsole && listChunks && totalShopkeepers > 0) {
 					sender.sendMessage("  Listing of all chunks with shopkeepers:");
 					int line = 0;
-					for (Entry<ChunkCoords, List<SKShopkeeper>> chunkEntry : shopsByChunk.entrySet()) {
+					for (Entry<ChunkCoords, List<AbstractShopkeeper>> chunkEntry : shopsByChunk.entrySet()) {
 						ChunkCoords chunkCoords = chunkEntry.getKey();
 						if (!chunkCoords.getWorldName().equals(worldName)) continue;
-						List<SKShopkeeper> inChunk = chunkEntry.getValue();
+						List<AbstractShopkeeper> inChunk = chunkEntry.getValue();
 						line++;
 						ChatColor lineColor = (line % 2 == 0 ? ChatColor.WHITE : ChatColor.GRAY);
 						sender.sendMessage("    (" + lineColor + chunkCoords.getChunkX() + "," + chunkCoords.getChunkZ() + ChatColor.RESET + ") ["

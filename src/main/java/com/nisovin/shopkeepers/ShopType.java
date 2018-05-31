@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.types.SelectableType;
 
-public abstract class ShopType<T extends SKShopkeeper> extends SelectableType {
+public abstract class ShopType<T extends AbstractShopkeeper> extends SelectableType {
 
 	protected ShopType(String identifier, String permission) {
 		super(identifier, permission);

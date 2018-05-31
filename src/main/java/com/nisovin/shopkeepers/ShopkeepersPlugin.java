@@ -116,18 +116,18 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	private final UIManager uiManager = new UIManager();
 
 	// all shopkeepers:
-	private final Map<UUID, SKShopkeeper> shopkeepersById = new LinkedHashMap<>();
-	private final Collection<SKShopkeeper> allShopkeepersView = Collections.unmodifiableCollection(shopkeepersById.values());
+	private final Map<UUID, AbstractShopkeeper> shopkeepersById = new LinkedHashMap<>();
+	private final Collection<AbstractShopkeeper> allShopkeepersView = Collections.unmodifiableCollection(shopkeepersById.values());
 	private int nextShopSessionId = 1;
-	private final Map<Integer, SKShopkeeper> shopkeepersBySessionId = new LinkedHashMap<>();
-	private final Map<ChunkCoords, List<SKShopkeeper>> shopkeepersByChunk = new HashMap<>();
+	private final Map<Integer, AbstractShopkeeper> shopkeepersBySessionId = new LinkedHashMap<>();
+	private final Map<ChunkCoords, List<AbstractShopkeeper>> shopkeepersByChunk = new HashMap<>();
 	// entries are themselves unmodifiable views as well:
-	private final Map<ChunkCoords, List<SKShopkeeper>> shopkeepersByChunkView = new HashMap<>();
-	private final Map<String, SKShopkeeper> activeShopkeepers = new HashMap<>(); // TODO remove this (?)
-	private final Collection<SKShopkeeper> activeShopkeepersView = Collections.unmodifiableCollection(activeShopkeepers.values());
+	private final Map<ChunkCoords, List<AbstractShopkeeper>> shopkeepersByChunkView = new HashMap<>();
+	private final Map<String, AbstractShopkeeper> activeShopkeepers = new HashMap<>(); // TODO remove this (?)
+	private final Collection<AbstractShopkeeper> activeShopkeepersView = Collections.unmodifiableCollection(activeShopkeepers.values());
 
 	private final Map<String, ConfirmEntry> confirming = new HashMap<>();
-	private final Map<String, SKShopkeeper> naming = Collections.synchronizedMap(new HashMap<>());
+	private final Map<String, AbstractShopkeeper> naming = Collections.synchronizedMap(new HashMap<>());
 	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<>();
 	private final Map<String, Block> selectedChest = new HashMap<>();
 
@@ -277,10 +277,10 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 		// start teleporter task:
 		Bukkit.getScheduler().runTaskTimer(this, () -> {
-			List<SKShopkeeper> readd = new ArrayList<>();
-			Iterator<Map.Entry<String, SKShopkeeper>> iter = activeShopkeepers.entrySet().iterator();
+			List<AbstractShopkeeper> readd = new ArrayList<>();
+			Iterator<Map.Entry<String, AbstractShopkeeper>> iter = activeShopkeepers.entrySet().iterator();
 			while (iter.hasNext()) {
-				SKShopkeeper shopkeeper = iter.next().getValue();
+				AbstractShopkeeper shopkeeper = iter.next().getValue();
 				boolean update = shopkeeper.check();
 				if (update) {
 					// if the shopkeeper had to be respawned its shop id changed:
@@ -291,7 +291,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 				}
 			}
 			if (!readd.isEmpty()) {
-				for (SKShopkeeper shopkeeper : readd) {
+				for (AbstractShopkeeper shopkeeper : readd) {
 					if (shopkeeper.isActive()) {
 						this._activateShopkeeper(shopkeeper);
 					}
@@ -306,12 +306,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		if (Settings.enableSpawnVerifier) {
 			Bukkit.getScheduler().runTaskTimer(this, () -> {
 				int count = 0;
-				for (Entry<ChunkCoords, List<SKShopkeeper>> chunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
+				for (Entry<ChunkCoords, List<AbstractShopkeeper>> chunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
 					ChunkCoords chunk = chunkEntry.getKey();
 					if (!chunk.isChunkLoaded()) continue;
 
-					List<SKShopkeeper> shopkeepers = chunkEntry.getValue();
-					for (SKShopkeeper shopkeeper : shopkeepers) {
+					List<AbstractShopkeeper> shopkeepers = chunkEntry.getValue();
+					for (AbstractShopkeeper shopkeeper : shopkeepers) {
 						if (!shopkeeper.needsSpawning() || shopkeeper.isActive()) continue;
 
 						// deactivate by old object id:
@@ -604,12 +604,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// SHOPKEEPER NAMING
 
-	void onNaming(Player player, SKShopkeeper shopkeeper) {
+	void onNaming(Player player, AbstractShopkeeper shopkeeper) {
 		assert player != null && shopkeeper != null;
 		naming.put(player.getName(), shopkeeper);
 	}
 
-	SKShopkeeper getCurrentlyNamedShopkeeper(Player player) {
+	AbstractShopkeeper getCurrentlyNamedShopkeeper(Player player) {
 		assert player != null;
 		return naming.get(player.getName());
 	}
@@ -619,25 +619,25 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return this.getCurrentlyNamedShopkeeper(player) != null;
 	}
 
-	SKShopkeeper endNaming(Player player) {
+	AbstractShopkeeper endNaming(Player player) {
 		assert player != null;
 		return naming.remove(player.getName());
 	}
 
 	// SHOPKEEPER MEMORY STORAGE
 
-	private void addShopkeeperToChunk(SKShopkeeper shopkeeper, ChunkCoords chunkCoords) {
-		List<SKShopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
+	private void addShopkeeperToChunk(AbstractShopkeeper shopkeeper, ChunkCoords chunkCoords) {
+		List<AbstractShopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
 		if (byChunk == null) {
-			byChunk = new ArrayList<SKShopkeeper>();
+			byChunk = new ArrayList<AbstractShopkeeper>();
 			shopkeepersByChunk.put(chunkCoords, byChunk);
 			shopkeepersByChunkView.put(chunkCoords, Collections.unmodifiableList(byChunk));
 		}
 		byChunk.add(shopkeeper);
 	}
 
-	private void removeShopkeeperFromChunk(SKShopkeeper shopkeeper, ChunkCoords chunkCoords) {
-		List<SKShopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
+	private void removeShopkeeperFromChunk(AbstractShopkeeper shopkeeper, ChunkCoords chunkCoords) {
+		List<AbstractShopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
 		if (byChunk == null) return;
 		if (byChunk.remove(shopkeeper) && byChunk.isEmpty()) {
 			shopkeepersByChunk.remove(chunkCoords);
@@ -646,7 +646,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	// this needs to be called right after a new shopkeeper was created..
-	void registerShopkeeper(SKShopkeeper shopkeeper) {
+	void registerShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		// assert !this.isRegistered(shopkeeper);
 
@@ -681,20 +681,20 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
-	public SKShopkeeper getShopkeeper(UUID shopkeeperUUID) {
+	public AbstractShopkeeper getShopkeeper(UUID shopkeeperUUID) {
 		return shopkeepersById.get(shopkeeperUUID);
 	}
 
 	@Override
-	public SKShopkeeper getShopkeeper(int shopkeeperSessionId) {
+	public AbstractShopkeeper getShopkeeper(int shopkeeperSessionId) {
 		return shopkeepersBySessionId.get(shopkeeperSessionId);
 	}
 
 	@Override
-	public SKShopkeeper getShopkeeperByName(String shopName) {
+	public AbstractShopkeeper getShopkeeperByName(String shopName) {
 		if (shopName == null) return null;
 		shopName = ChatColor.stripColor(shopName);
-		for (SKShopkeeper shopkeeper : this.getAllShopkeepers()) {
+		for (AbstractShopkeeper shopkeeper : this.getAllShopkeepers()) {
 			String shopkeeperName = shopkeeper.getName();
 			if (shopkeeperName != null && ChatColor.stripColor(shopkeeperName).equalsIgnoreCase(shopName)) {
 				return shopkeeper;
@@ -704,21 +704,21 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
-	public SKShopkeeper getShopkeeperByEntity(Entity entity) {
+	public AbstractShopkeeper getShopkeeperByEntity(Entity entity) {
 		if (entity == null) return null;
 		// check if the entity is a living entity shopkeeper:
-		SKShopkeeper shopkeeper = this.getLivingEntityShopkeeper(entity);
+		AbstractShopkeeper shopkeeper = this.getLivingEntityShopkeeper(entity);
 		if (shopkeeper != null) return shopkeeper;
 		// check if the entity is a citizens npc shopkeeper:
 		return this.getCitizensShopkeeper(entity);
 	}
 
-	public SKShopkeeper getLivingEntityShopkeeper(Entity entity) {
+	public AbstractShopkeeper getLivingEntityShopkeeper(Entity entity) {
 		if (entity == null) return null;
 		return this.getActiveShopkeeper(LivingEntityShop.getId(entity));
 	}
 
-	public SKShopkeeper getCitizensShopkeeper(Entity entity) {
+	public AbstractShopkeeper getCitizensShopkeeper(Entity entity) {
 		if (entity == null) return null;
 		Integer npcId = CitizensHandler.getNPCId(entity);
 		if (npcId == null) return null;
@@ -726,12 +726,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
-	public SKShopkeeper getShopkeeperByBlock(Block block) {
+	public AbstractShopkeeper getShopkeeperByBlock(Block block) {
 		if (block == null) return null;
 		return this.getActiveShopkeeper(SignShop.getId(block));
 	}
 
-	public SKShopkeeper getActiveShopkeeper(String objectId) {
+	public AbstractShopkeeper getActiveShopkeeper(String objectId) {
 		return activeShopkeepers.get(objectId);
 	}
 
@@ -741,43 +741,43 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
-	public Collection<SKShopkeeper> getAllShopkeepers() {
+	public Collection<AbstractShopkeeper> getAllShopkeepers() {
 		return allShopkeepersView;
 	}
 
 	@Override
-	public Map<ChunkCoords, List<SKShopkeeper>> getAllShopkeepersByChunks() {
+	public Map<ChunkCoords, List<AbstractShopkeeper>> getAllShopkeepersByChunks() {
 		return shopkeepersByChunkView;
 	}
 
 	@Override
-	public Collection<SKShopkeeper> getActiveShopkeepers() {
+	public Collection<AbstractShopkeeper> getActiveShopkeepers() {
 		return activeShopkeepersView;
 	}
 
 	@Override
-	public List<SKShopkeeper> getShopkeepersInChunk(Chunk chunk) {
+	public List<AbstractShopkeeper> getShopkeepersInChunk(Chunk chunk) {
 		return this.getShopkeepersInChunk(new ChunkCoords(chunk));
 	}
 
 	@Override
-	public List<SKShopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords) {
-		List<SKShopkeeper> byChunk = shopkeepersByChunkView.get(chunkCoords);
+	public List<AbstractShopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords) {
+		List<AbstractShopkeeper> byChunk = shopkeepersByChunkView.get(chunkCoords);
 		if (byChunk == null) return Collections.emptyList();
 		return byChunk; // unmodifiable already
 	}
 
 	@Override
-	public List<SKShopkeeper> getShopkeepersInWorld(World world, boolean onlyLoadedChunks) {
+	public List<AbstractShopkeeper> getShopkeepersInWorld(World world, boolean onlyLoadedChunks) {
 		Validate.notNull(world, "World is null!");
-		List<SKShopkeeper> shopkeepersInWorld = new ArrayList<>();
+		List<AbstractShopkeeper> shopkeepersInWorld = new ArrayList<>();
 		if (onlyLoadedChunks) {
 			for (Chunk chunk : world.getLoadedChunks()) {
 				shopkeepersInWorld.addAll(this.getShopkeepersInChunk(chunk));
 			}
 		} else {
 			String worldName = world.getName();
-			for (Entry<ChunkCoords, List<SKShopkeeper>> byChunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
+			for (Entry<ChunkCoords, List<AbstractShopkeeper>> byChunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
 				if (byChunkEntry.getKey().getWorldName().equals(worldName)) {
 					shopkeepersInWorld.addAll(byChunkEntry.getValue());
 				}
@@ -790,7 +790,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 
 	// performs some validation before actually activating a shopkeeper:
 	// returns false if some validation failed
-	private boolean _activateShopkeeper(SKShopkeeper shopkeeper) {
+	private boolean _activateShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		String objectId = shopkeeper.getObjectId();
 		if (objectId == null) {
@@ -808,7 +808,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 	}
 
-	private boolean _deactivateShopkeeper(SKShopkeeper shopkeeper) {
+	private boolean _deactivateShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		String objectId = shopkeeper.getObjectId();
 		if (activeShopkeepers.get(objectId) == shopkeeper) {
@@ -818,7 +818,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		return false;
 	}
 
-	private void activateShopkeeper(SKShopkeeper shopkeeper) {
+	private void activateShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		if (shopkeeper.needsSpawning() && !shopkeeper.isActive()) {
 			// deactivate shopkeeper by old shop object id, in case there is one:
@@ -843,7 +843,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		}
 	}
 
-	private void deactivateShopkeeper(SKShopkeeper shopkeeper, boolean closeWindows) {
+	private void deactivateShopkeeper(AbstractShopkeeper shopkeeper, boolean closeWindows) {
 		assert shopkeeper != null;
 		if (closeWindows) {
 			// delayed closing of all open windows:
@@ -853,7 +853,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		shopkeeper.despawn();
 	}
 
-	public void deleteShopkeeper(SKShopkeeper shopkeeper) {
+	public void deleteShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		// deactivate shopkeeper:
 		this.deactivateShopkeeper(shopkeeper, true);
@@ -870,7 +870,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 		this.removeShopkeeperFromChunk(shopkeeper, chunkCoords);
 	}
 
-	public void onShopkeeperMove(SKShopkeeper shopkeeper, ChunkCoords oldChunk) {
+	public void onShopkeeperMove(AbstractShopkeeper shopkeeper, ChunkCoords oldChunk) {
 		assert oldChunk != null;
 		ChunkCoords newChunk = shopkeeper.getChunkCoords();
 		if (!oldChunk.equals(newChunk)) {
@@ -892,12 +892,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	int loadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
 		int affectedShops = 0;
-		List<SKShopkeeper> shopkeepers = this.getShopkeepersInChunk(chunk);
+		List<AbstractShopkeeper> shopkeepers = this.getShopkeepersInChunk(chunk);
 		if (!shopkeepers.isEmpty()) {
 			affectedShops = shopkeepers.size();
 			Log.debug("Loading " + affectedShops + " shopkeepers in chunk " + chunk.getWorld().getName()
 					+ "," + chunk.getX() + "," + chunk.getZ());
-			for (SKShopkeeper shopkeeper : shopkeepers) {
+			for (AbstractShopkeeper shopkeeper : shopkeepers) {
 				// inform shopkeeper about chunk load:
 				shopkeeper.onChunkLoad();
 
@@ -921,12 +921,12 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	int unloadShopkeepersInChunk(Chunk chunk) {
 		assert chunk != null;
 		int affectedShops = 0;
-		List<SKShopkeeper> shopkeepers = this.getShopkeepersInChunk(chunk);
+		List<AbstractShopkeeper> shopkeepers = this.getShopkeepersInChunk(chunk);
 		if (!shopkeepers.isEmpty()) {
 			affectedShops = shopkeepers.size();
 			Log.debug("Unloading " + affectedShops + " shopkeepers in chunk " + chunk.getWorld().getName()
 					+ "," + chunk.getX() + "," + chunk.getZ());
-			for (SKShopkeeper shopkeeper : shopkeepers) {
+			for (AbstractShopkeeper shopkeeper : shopkeepers) {
 				// inform shopkeeper about chunk unload:
 				shopkeeper.onChunkUnload();
 
@@ -983,7 +983,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 	}
 
 	@Override
-	public SKShopkeeper createShopkeeper(ShopCreationData creationData) {
+	public AbstractShopkeeper createShopkeeper(ShopCreationData creationData) {
 		Validate.notNull(creationData, "CreationData is null!");
 		try {
 			// receives messages, can be null:
@@ -1044,7 +1044,7 @@ public class ShopkeepersPlugin extends JavaPlugin implements ShopkeepersAPI {
 			}
 
 			// create and spawn the shopkeeper:
-			SKShopkeeper shopkeeper = shopType.createShopkeeper(creationData);
+			AbstractShopkeeper shopkeeper = shopType.createShopkeeper(creationData);
 			if (shopkeeper == null) {
 				throw new ShopkeeperCreateException("ShopType returned null shopkeeper!");
 			}
