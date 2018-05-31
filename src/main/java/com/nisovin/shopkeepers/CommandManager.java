@@ -283,7 +283,8 @@ class CommandManager implements CommandExecutor {
 				sender.sendMessage(ChatColor.GREEN + "Creating " + shopCount + " shopkeepers, starting here!");
 				Location curSpawnLocation = player.getLocation();
 				for (int i = 0; i < shopCount; i++) {
-					plugin.createShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.MOBS().getObjectType(EntityType.VILLAGER), curSpawnLocation.clone(), null));
+					plugin.createShopkeeper(ShopCreationData.create(player, DefaultShopTypes.ADMIN(),
+							DefaultShopObjectTypes.MOBS().getObjectType(EntityType.VILLAGER), curSpawnLocation.clone(), null));
 					curSpawnLocation.add(2, 0, 0);
 				}
 				sender.sendMessage(ChatColor.GREEN + "Done!");
@@ -835,8 +836,7 @@ class CommandManager implements CommandExecutor {
 				Location spawnLocation = spawnBlock.getLocation();
 
 				// create player shopkeeper:
-				plugin.createShopkeeper(new PlayerShopCreationData(player, shopType, shopObjType, spawnLocation, targetBlockFace,
-						player, targetBlock));
+				plugin.createShopkeeper(PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace, player, targetBlock));
 				return true;
 			} else {
 				// create admin shopkeeper:
@@ -882,7 +882,7 @@ class CommandManager implements CommandExecutor {
 				Location spawnLocation = spawnBlock.getLocation();
 
 				// create admin shopkeeper:
-				plugin.createShopkeeper(new ShopCreationData(player, DefaultShopTypes.ADMIN(), shopObjType, spawnLocation, targetBlockFace));
+				plugin.createShopkeeper(ShopCreationData.create(player, DefaultShopTypes.ADMIN(), shopObjType, spawnLocation, targetBlockFace));
 				return true;
 			}
 		}

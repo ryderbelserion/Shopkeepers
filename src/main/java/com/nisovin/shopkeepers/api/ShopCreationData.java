@@ -12,9 +12,16 @@ import org.bukkit.entity.Player;
 /**
  * Holds the different possible arguments needed for the creation of a shopkeeper of a certain type.
  * <p>
- * Additional data may be added via sub-classing, or dynamically via {@link #setValue(String, Object)}.
+ * Additional data might be available through sub-classes, or when dynamically added via
+ * {@link #setValue(String, Object)}.
+ * TODO: turn into an interface?
  */
 public class ShopCreationData {
+
+	public static ShopCreationData create(	Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
+											Location spawnLocation, BlockFace targetedBlockFace) {
+		return new ShopCreationData(creator, shopType, shopObjectType, spawnLocation, targetedBlockFace);
+	}
 
 	private final Player creator; // can be null
 	private final ShopType<?> shopType; // not null
@@ -38,8 +45,8 @@ public class ShopCreationData {
 	 * @param targetedBlockFace
 	 *            the targeted block face, can be <code>null</code>
 	 */
-	public ShopCreationData(Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
-							Location spawnLocation, BlockFace targetedBlockFace) {
+	protected ShopCreationData(	Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
+								Location spawnLocation, BlockFace targetedBlockFace) {
 		Validate.notNull(shopType, "Shop type is null!");
 		Validate.notNull(shopObjectType, "Shop object type is null!");
 		Validate.notNull(spawnLocation, "Spawn location is null!");
@@ -165,11 +172,16 @@ public class ShopCreationData {
 	 */
 	public static class PlayerShopCreationData extends ShopCreationData {
 
+		public static PlayerShopCreationData create(Player creator, ShopType<?> shopType, ShopObjectType<?> objectType,
+													Location spawnLocation, BlockFace targetedBlockFace, Player owner, Block chest) {
+			return new PlayerShopCreationData(creator, shopType, objectType, spawnLocation, targetedBlockFace, owner, chest);
+		}
+
 		private Player owner; // not null, modifiable
 		private Block chest; // not null
 
-		public PlayerShopCreationData(	Player creator, ShopType<?> shopType, ShopObjectType<?> objectType,
-										Location spawnLocation, BlockFace targetedBlockFace, Player owner, Block chest) {
+		protected PlayerShopCreationData(	Player creator, ShopType<?> shopType, ShopObjectType<?> objectType,
+											Location spawnLocation, BlockFace targetedBlockFace, Player owner, Block chest) {
 			super(creator, shopType, objectType, spawnLocation, targetedBlockFace);
 			Validate.notNull(owner, "Owner is null!");
 			Validate.notNull(chest, "Chest is null!");

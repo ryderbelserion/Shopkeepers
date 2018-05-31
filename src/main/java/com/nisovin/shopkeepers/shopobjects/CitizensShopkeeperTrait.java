@@ -4,11 +4,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shoptypes.DefaultShopTypes;
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.Log;
 
 import net.citizensnpcs.api.npc.NPC;
@@ -116,7 +116,7 @@ public class CitizensShopkeeperTrait extends Trait {
 			}
 
 			if (location != null) {
-				ShopCreationData creationData = new ShopCreationData(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
+				ShopCreationData creationData = ShopCreationData.create(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
 				creationData.setValue(CitizensShop.CREATION_DATA_NPC_ID_KEY, npc.getId());
 				Shopkeeper shopkeeper = SKShopkeepersPlugin.getInstance().createShopkeeper(creationData);
 				if (shopkeeper != null) {

@@ -207,7 +207,7 @@ class CreateListener implements Listener {
 		Location spawnLocation = spawnBlock.getLocation();
 
 		// create player shopkeeper:
-		ShopCreationData creationData = new PlayerShopCreationData(player, shopType, shopObjType, spawnLocation, clickedBlockFace, player, selectedChest);
+		ShopCreationData creationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, clickedBlockFace, player, selectedChest);
 		Shopkeeper shopkeeper = plugin.createShopkeeper(creationData);
 		if (shopkeeper == null) {
 			// something else prevented this shopkeeper from being created
