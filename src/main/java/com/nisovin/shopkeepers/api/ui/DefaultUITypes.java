@@ -1,9 +1,8 @@
-package com.nisovin.shopkeepers.ui.defaults;
+package com.nisovin.shopkeepers.api.ui;
 
 import java.util.List;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.ui.UIType;
 
 public interface DefaultUITypes {
 

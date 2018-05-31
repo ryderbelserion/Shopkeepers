@@ -15,11 +15,11 @@ import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ItemUtils;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.ui.defaults.DefaultUITypes;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SKItemUtils;
 
