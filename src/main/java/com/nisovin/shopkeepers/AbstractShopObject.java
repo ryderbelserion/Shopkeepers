@@ -5,20 +5,20 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.ShopObjectType;
-import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.ShopObject;
 
-public abstract class ShopObject {
+public abstract class AbstractShopObject implements ShopObject {
 
-	protected final Shopkeeper shopkeeper;
+	protected final AbstractShopkeeper shopkeeper;
 
 	// fresh creation
-	protected ShopObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+	protected AbstractShopObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		assert shopkeeper != null;
 		this.shopkeeper = shopkeeper;
 	}
 
-	public abstract ShopObjectType getObjectType();
+	@Override
+	public abstract AbstractShopObjectType<?> getObjectType();
 
 	protected void load(ConfigurationSection config) {
 		// nothing to load by default
@@ -46,22 +46,22 @@ public abstract class ShopObject {
 		// nothing by default
 	}
 
+	@Override
 	public abstract boolean spawn();
 
+	@Override
 	public abstract boolean isActive();
 
-	/**
-	 * Gets an unique id for this shop object. This id can change when the shop object (ex. shop entity) gets respawned.
-	 * 
-	 * @return the shop object id, or null if the shopkeeper is currently not active
-	 */
+	@Override
 	public abstract String getId();
 
+	@Override
 	public abstract Location getActualLocation();
 
-	// naming is done through the Shopkeeper instance
+	@Override
 	public abstract void setName(String name);
 
+	@Override
 	public abstract int getNameLengthLimit();
 
 	protected String trimToNameLength(String name) {
@@ -71,16 +71,7 @@ public abstract class ShopObject {
 		return name;
 	}
 
-	/**
-	 * Equips the given item.
-	 * 
-	 * <p>
-	 * Might not be supported by all types of shop objects.
-	 * </p>
-	 * 
-	 * @param item
-	 *            the item
-	 */
+	@Override
 	public abstract void setItem(ItemStack item);
 
 	/**
@@ -92,11 +83,15 @@ public abstract class ShopObject {
 	 */
 	public abstract boolean check();
 
+	@Override
 	public abstract void despawn();
 
+	@Override
 	public abstract void delete();
 
+	@Override
 	public abstract ItemStack getSubTypeItem();
 
+	@Override
 	public abstract void cycleSubType();
 }

@@ -3,22 +3,21 @@ package com.nisovin.shopkeepers.shopobjects;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.AbstractShopObjectType;
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class CitizensShopObjectType extends AbstractShopObjectType {
+public class CitizensShopObjectType extends AbstractShopObjectType<CitizensShop> {
 
 	CitizensShopObjectType() {
 		super("citizen", "shopkeeper.citizen");
 	}
 
 	@Override
-	protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+	protected CitizensShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		return new CitizensShop(shopkeeper, creationData);
 	}
 

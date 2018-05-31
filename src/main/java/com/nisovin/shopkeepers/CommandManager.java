@@ -756,7 +756,7 @@ class CommandManager implements CommandExecutor {
 
 				// create the player shopkeeper (with the default/first use-able player shop and shop object type)
 				ShopType<?> shopType = plugin.getShopTypeRegistry().getDefaultSelection(player);
-				ShopObjectType shopObjType = plugin.getShopObjectTypeRegistry().getDefaultSelection(player);
+				ShopObjectType<?> shopObjType = plugin.getShopObjectTypeRegistry().getDefaultSelection(player);
 
 				if (shopType == null || shopObjType == null) {
 					// TODO maybe print different kind of no-permission message,
@@ -772,7 +772,7 @@ class CommandManager implements CommandExecutor {
 							shopType = matchedShopType;
 						} else {
 							// check if an object type might be matching:
-							ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
+							ShopObjectType<?> matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
 							if (matchedObjectType != null) {
 								shopObjType = matchedObjectType;
 							} else {
@@ -782,7 +782,7 @@ class CommandManager implements CommandExecutor {
 						}
 					}
 					if (args.length >= 2) {
-						ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[1]);
+						ShopObjectType<?> matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[1]);
 						if (matchedObjectType != null) {
 							shopObjType = matchedObjectType;
 						} else {
@@ -845,10 +845,10 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 
-				ShopObjectType shopObjType = plugin.getDefaultShopObjectType();
+				ShopObjectType<?> shopObjType = plugin.getDefaultShopObjectType();
 
 				if (args.length > 0) {
-					ShopObjectType matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
+					ShopObjectType<?> matchedObjectType = plugin.getShopObjectTypeRegistry().match(args[0]);
 					if (matchedObjectType == null) {
 						Utils.sendMessage(player, Settings.msgUnknowShopObjectType, "{type}", args[0]);
 						return true;

@@ -11,10 +11,9 @@ import java.util.Map;
 
 import org.bukkit.entity.EntityType;
 
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.util.StringUtils;
 
 public class LivingEntityObjectTypes {
@@ -78,20 +77,25 @@ public class LivingEntityObjectTypes {
 	 * </ul>
 	 */
 
-	private static final Map<EntityType, List<String>> ALIASES;
+	private static final Map<EntityType, List<String>> ALIASES; // deeply unmodifiable
 
 	private static List<String> prepareAliases(List<String> aliases) {
 		return Collections.unmodifiableList(StringUtils.normalize(aliases));
 	}
 
 	static {
-		Map<EntityType, List<String>> aliases = new HashMap<EntityType, List<String>>();
+		Map<EntityType, List<String>> aliases = new HashMap<>();
 		aliases.put(EntityType.MUSHROOM_COW, prepareAliases(Arrays.asList("mooshroom")));
 		ALIASES = Collections.unmodifiableMap(aliases);
 	}
 
+	public static List<String> getAliases(EntityType entityType) {
+		List<String> aliases = ALIASES.get(entityType);
+		return aliases != null ? aliases : Collections.emptyList();
+	}
+
 	// order is specified by the 'enabled-living-shops' config setting:
-	private final Map<EntityType, LivingEntityObjectType> objectTypes = new LinkedHashMap<EntityType, LivingEntityObjectType>();
+	private final Map<EntityType, LivingEntityObjectType<?>> objectTypes = new LinkedHashMap<>();
 
 	public LivingEntityObjectTypes() {
 		// first, create the enabled living object types, in the same order as specified in the config:
@@ -106,7 +110,7 @@ public class LivingEntityObjectTypes {
 			}
 			if (entityType != null && entityType.isAlive() && entityType.isSpawnable()) {
 				// not using aliases (yet?)
-				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, ALIASES.get(entityType)));
+				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, getAliases(entityType)));
 			}
 		}
 
@@ -114,76 +118,81 @@ public class LivingEntityObjectTypes {
 		for (EntityType entityType : EntityType.values()) {
 			if (entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType)) {
 				// not using aliases (yet?)
-				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, ALIASES.get(entityType)));
+				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, getAliases(entityType)));
 			}
 		}
 	}
 
-	public Collection<LivingEntityObjectType> getAllObjectTypes() {
+	public Collection<LivingEntityObjectType<?>> getAllObjectTypes() {
 		return Collections.unmodifiableCollection(objectTypes.values());
 	}
 
-	public LivingEntityObjectType getObjectType(EntityType entityType) {
+	public LivingEntityObjectType<?> getObjectType(EntityType entityType) {
 		return objectTypes.get(entityType);
 	}
 
-	private LivingEntityObjectType createLivingEntityObjectType(EntityType entityType, List<String> aliases) {
+	private LivingEntityObjectType<?> createLivingEntityObjectType(EntityType entityType, List<String> aliases) {
 		String typeName = entityType.name().toLowerCase(Locale.ROOT);
 		String permission = "shopkeeper.entity." + typeName;
 
-		LivingEntityObjectType objectType;
+		LivingEntityObjectType<?> objectType;
 
 		switch (entityType) {
 		case VILLAGER:
-			objectType = new LivingEntityObjectType(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<VillagerShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-					return new VillagerShop(shopkeeper, creationData, this);
+				protected VillagerShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new VillagerShop(this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case CREEPER:
-			objectType = new LivingEntityObjectType(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<CreeperShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-					return new CreeperShop(shopkeeper, creationData, this);
+				protected CreeperShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new CreeperShop(this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case OCELOT:
-			objectType = new LivingEntityObjectType(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<CatShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-					return new CatShop(shopkeeper, creationData, this);
+				protected CatShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new CatShop(this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case SHEEP:
-			objectType = new LivingEntityObjectType(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<SheepShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-					return new SheepShop(shopkeeper, creationData, this);
+				protected SheepShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new SheepShop(this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case ZOMBIE:
-			objectType = new LivingEntityObjectType(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<ZombieShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-					return new ZombieShop(shopkeeper, creationData, this);
+				protected ZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new ZombieShop(this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case PIG_ZOMBIE:
-			objectType = new LivingEntityObjectType(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<PigZombieShop>(entityType, aliases, typeName, permission) {
 				@Override
-				protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-					return new PigZombieShop(shopkeeper, creationData, this);
+				protected PigZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new PigZombieShop(this, shopkeeper, creationData);
 				}
 			};
 			break;
 		default:
-			objectType = new LivingEntityObjectType(entityType, aliases, typeName, permission);
+			objectType = new LivingEntityObjectType<LivingEntityShop>(entityType, aliases, typeName, permission) {
+				@Override
+				protected LivingEntityShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new LivingEntityShop(this, shopkeeper, creationData);
+				}
+			};
 			break;
 		}
 

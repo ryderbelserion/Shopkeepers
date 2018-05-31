@@ -1,30 +1,29 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.AbstractShopObjectType;
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class LivingEntityObjectType extends AbstractShopObjectType {
+public abstract class LivingEntityObjectType<T extends LivingEntityShop> extends AbstractShopObjectType<T> {
 
 	protected final EntityType entityType;
-	protected final List<String> aliases;
+	protected final List<String> aliases; // unmodifiable, not null, might be empty
 
 	protected LivingEntityObjectType(EntityType entityType, List<String> aliases, String identifier, String permission) {
 		super(identifier, permission);
 		this.entityType = entityType;
 		assert entityType.isAlive();
+		assert aliases != null;
 		// assert: aliases are normalized
-		this.aliases = (aliases != null ? aliases : Collections.emptyList());
+		this.aliases = aliases;
 	}
 
 	public EntityType getEntityType() {
@@ -37,9 +36,7 @@ public class LivingEntityObjectType extends AbstractShopObjectType {
 	}
 
 	@Override
-	protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
-		return new LivingEntityShop(shopkeeper, creationData, this);
-	}
+	protected abstract T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData);
 
 	@Override
 	public boolean isEnabled() {

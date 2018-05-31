@@ -16,11 +16,11 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.ShopObjectType;
 import com.nisovin.shopkeepers.api.ShopType;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -94,7 +94,7 @@ class CreateListener implements Listener {
 		// get shop type:
 		ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);
 		// get shop object type:
-		ShopObjectType shopObjType = plugin.getShopObjectTypeRegistry().getSelection(player);
+		ShopObjectType<?> shopObjType = plugin.getShopObjectTypeRegistry().getSelection(player);
 
 		if (shopType == null || shopObjType == null) {
 			// TODO maybe print different kind of no-permission message, because the player cannot create shops at all:
@@ -174,7 +174,7 @@ class CreateListener implements Listener {
 	}
 
 	// returns true on success
-	private boolean handleShopkeeperCreation(Player player, ShopType<?> shopType, ShopObjectType shopObjType, Block selectedChest, Block clickedBlock, BlockFace clickedBlockFace) {
+	private boolean handleShopkeeperCreation(Player player, ShopType<?> shopType, ShopObjectType<?> shopObjType, Block selectedChest, Block clickedBlock, BlockFace clickedBlockFace) {
 		assert shopType != null && shopObjType != null; // has been check already
 
 		if (selectedChest == null) {

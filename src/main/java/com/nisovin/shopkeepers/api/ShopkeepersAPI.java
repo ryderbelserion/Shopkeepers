@@ -69,7 +69,7 @@ public final class ShopkeepersAPI {
 
 	// SHOP OBJECT TYPES
 
-	public static SelectableTypeRegistry<? extends ShopObjectType> getShopObjectTypeRegistry() {
+	public static SelectableTypeRegistry<? extends ShopObjectType<?>> getShopObjectTypeRegistry() {
 		return getPlugin().getShopObjectTypeRegistry();
 	}
 

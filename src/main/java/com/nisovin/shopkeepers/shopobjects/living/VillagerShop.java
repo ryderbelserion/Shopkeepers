@@ -8,16 +8,16 @@ import org.bukkit.entity.Villager.Profession;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.util.Log;
 
 public class VillagerShop extends LivingEntityShop {
 
 	private Profession profession = Profession.FARMER;
 
-	protected VillagerShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
-		super(shopkeeper, creationData, livingObjectType);
+	protected VillagerShop(LivingEntityObjectType<VillagerShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		super(livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override

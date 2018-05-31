@@ -11,17 +11,17 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Attachable;
 
+import com.nisovin.shopkeepers.AbstractShopObject;
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
-import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class SignShop extends ShopObject {
+public class SignShop extends AbstractShopObject {
 
 	public static String getId(Block block) {
 		if (block == null) return null;
@@ -34,7 +34,7 @@ public class SignShop extends ShopObject {
 	// sign content:
 	private boolean updateSign = true;
 
-	protected SignShop(Shopkeeper shopkeeper, ShopCreationData creationData) {
+	protected SignShop(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
 		if (creationData != null) {
 			this.signFacing = creationData.getTargetedBlockFace();

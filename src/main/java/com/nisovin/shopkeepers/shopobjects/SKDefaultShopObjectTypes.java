@@ -20,8 +20,8 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 	}
 
 	@Override
-	public List<AbstractShopObjectType> getAllObjectTypes() {
-		List<AbstractShopObjectType> shopObjectTypes = new ArrayList<>();
+	public List<AbstractShopObjectType<?>> getAllObjectTypes() {
+		List<AbstractShopObjectType<?>> shopObjectTypes = new ArrayList<>();
 		shopObjectTypes.addAll(livingEntityObjectTypes.getAllObjectTypes());
 		shopObjectTypes.add(signShopObjectType);
 		shopObjectTypes.add(citizensShopObjectType);

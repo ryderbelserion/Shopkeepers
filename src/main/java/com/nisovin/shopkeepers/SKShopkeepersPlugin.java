@@ -76,8 +76,8 @@ import com.nisovin.shopkeepers.types.AbstractSelectableTypeRegistry;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
-import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -108,7 +108,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	};
 
 	// shop object types registry:
-	private final SelectableTypeRegistry<AbstractShopObjectType> shopObjectTypesRegistry = new AbstractSelectableTypeRegistry<AbstractShopObjectType>() {
+	private final SelectableTypeRegistry<AbstractShopObjectType<?>> shopObjectTypesRegistry = new AbstractSelectableTypeRegistry<AbstractShopObjectType<?>>() {
 
 		@Override
 		protected String getTypeName() {
@@ -521,7 +521,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	// SHOP OBJECT TYPES
 
 	@Override
-	public SelectableTypeRegistry<AbstractShopObjectType> getShopObjectTypeRegistry() {
+	public SelectableTypeRegistry<AbstractShopObjectType<?>> getShopObjectTypeRegistry() {
 		return shopObjectTypesRegistry;
 	}
 
@@ -534,13 +534,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	 * Gets the default shop object type.
 	 * 
 	 * <p>
-	 * Usually this will be the villager entity shop object type.<br>
-	 * However, there are no guarantees that this might not get changed or be configurable in the future.
-	 * </p>
+	 * Usually this will be the villager entity shop object type. However, there are no guarantees that this might not
+	 * get changed or be configurable in the future.
 	 * 
 	 * @return the default shop object type
 	 */
-	public AbstractShopObjectType getDefaultShopObjectType() {
+	public AbstractShopObjectType<?> getDefaultShopObjectType() {
 		// default: villager entity shop object type:
 		return this.getDefaultShopObjectTypes().getLivingEntityObjectTypes().getObjectType(EntityType.VILLAGER);
 	}

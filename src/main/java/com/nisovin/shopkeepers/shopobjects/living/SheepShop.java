@@ -7,15 +7,15 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Sheep;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 
 public class SheepShop extends LivingEntityShop {
 
 	private DyeColor color = DyeColor.WHITE; // default white
 
-	protected SheepShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
-		super(shopkeeper, creationData, livingObjectType);
+	protected SheepShop(LivingEntityObjectType<SheepShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		super(livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override

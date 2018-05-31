@@ -6,15 +6,15 @@ import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 
 public class CreeperShop extends LivingEntityShop {
 
 	private boolean powered = false;
 
-	protected CreeperShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
-		super(shopkeeper, creationData, livingObjectType);
+	protected CreeperShop(LivingEntityObjectType<CreeperShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		super(livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override

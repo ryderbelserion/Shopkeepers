@@ -6,11 +6,10 @@ import org.bukkit.block.BlockFace;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.ShopObjectType;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
 import com.nisovin.shopkeepers.util.Utils;
 
-public abstract class AbstractShopObjectType extends AbstractSelectableType implements ShopObjectType {
+public abstract class AbstractShopObjectType<T extends AbstractShopObject> extends AbstractSelectableType implements ShopObjectType<T> {
 
 	protected AbstractShopObjectType(String identifier, String permission) {
 		super(identifier, permission);
@@ -25,7 +24,7 @@ public abstract class AbstractShopObjectType extends AbstractSelectableType impl
 	 *            the used shop creation data, can be <code>null</code> (for ex. if the shopkeeper gets loaded)
 	 * @return the shop object
 	 */
-	protected abstract ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData);
+	protected abstract T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData);
 
 	@Override
 	public abstract boolean needsSpawning();

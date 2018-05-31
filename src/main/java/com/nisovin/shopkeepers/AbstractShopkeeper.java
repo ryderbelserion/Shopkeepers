@@ -13,6 +13,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ShopObject;
 import com.nisovin.shopkeepers.api.ShopObjectType;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
@@ -28,7 +29,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	private int sessionId;
 	private UUID uniqueId;
-	protected ShopObject shopObject;
+	protected AbstractShopObject shopObject;
 	protected String worldName;
 	protected int x;
 	protected int y;
@@ -88,10 +89,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.z = spawnLocation.getBlockZ();
 		this.updateChunkCoords();
 
-		ShopObjectType shopObjectType = creationData.getShopObjectType();
+		ShopObjectType<?> shopObjectType = creationData.getShopObjectType();
 		Validate.isTrue(shopObjectType instanceof AbstractShopObjectType,
 				"Expecting an AbstractShopObjectType, got " + shopObjectType.getClass().getName());
-		this.shopObject = ((AbstractShopObjectType) shopObjectType).createObject(this, creationData);
+		this.shopObject = ((AbstractShopObjectType<?>) shopObjectType).createObject(this, creationData);
 	}
 
 	/**
@@ -128,7 +129,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.z = config.getInt("z");
 		this.updateChunkCoords();
 
-		AbstractShopObjectType objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(config.getString("object"));
+		AbstractShopObjectType<?> objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(config.getString("object"));
 		if (objectType == null) {
 			// use default shop object type:
 			objectType = SKShopkeepersPlugin.getInstance().getDefaultShopObjectType();
@@ -170,7 +171,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public abstract AbstractShopType<?> getType();
 
 	@Override
-	public ShopObject getShopObject() {
+	public AbstractShopObject getShopObject() {
 		return shopObject;
 	}
 

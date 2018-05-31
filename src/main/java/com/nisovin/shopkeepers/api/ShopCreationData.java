@@ -18,7 +18,7 @@ public class ShopCreationData {
 
 	private final Player creator; // can be null
 	private final ShopType<?> shopType; // not null
-	private final ShopObjectType shopObjectType; // not null
+	private final ShopObjectType<?> shopObjectType; // not null
 	private final Location spawnLocation; // not null, modifiable
 	private BlockFace targetedBlockFace; // can be null, modifiable
 
@@ -38,7 +38,7 @@ public class ShopCreationData {
 	 * @param targetedBlockFace
 	 *            the targeted block face, can be <code>null</code>
 	 */
-	public ShopCreationData(Player creator, ShopType<?> shopType, ShopObjectType shopObjectType,
+	public ShopCreationData(Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
 							Location spawnLocation, BlockFace targetedBlockFace) {
 		Validate.notNull(shopType, "Shop type is null!");
 		Validate.notNull(shopObjectType, "Shop object type is null!");
@@ -74,7 +74,7 @@ public class ShopCreationData {
 	 * 
 	 * @return the shop object type, not <code>null</code>
 	 */
-	public ShopObjectType getShopObjectType() {
+	public ShopObjectType<?> getShopObjectType() {
 		return shopObjectType;
 	}
 
@@ -168,7 +168,7 @@ public class ShopCreationData {
 		private Player owner; // not null, modifiable
 		private Block chest; // not null
 
-		public PlayerShopCreationData(	Player creator, ShopType<?> shopType, ShopObjectType objectType,
+		public PlayerShopCreationData(	Player creator, ShopType<?> shopType, ShopObjectType<?> objectType,
 										Location spawnLocation, BlockFace targetedBlockFace, Player owner, Block chest) {
 			super(creator, shopType, objectType, spawnLocation, targetedBlockFace);
 			Validate.notNull(owner, "Owner is null!");

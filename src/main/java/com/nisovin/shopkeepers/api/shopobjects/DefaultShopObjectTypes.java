@@ -8,13 +8,13 @@ import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectTypes;
 
 public interface DefaultShopObjectTypes {
 
-	public List<? extends ShopObjectType> getAllObjectTypes();
+	public List<? extends ShopObjectType<?>> getAllObjectTypes();
 
 	public LivingEntityObjectTypes getLivingEntityObjectTypes();
 
-	public ShopObjectType getSignShopObjectType();
+	public ShopObjectType<?> getSignShopObjectType();
 
-	public ShopObjectType getCitizensShopObjectType();
+	public ShopObjectType<?> getCitizensShopObjectType();
 
 	// STATICS (for convenience):
 
@@ -26,11 +26,11 @@ public interface DefaultShopObjectTypes {
 		return getInstance().getLivingEntityObjectTypes();
 	}
 
-	public static ShopObjectType SIGN() {
+	public static ShopObjectType<?> SIGN() {
 		return getInstance().getSignShopObjectType();
 	}
 
-	public static ShopObjectType CITIZEN() {
+	public static ShopObjectType<?> CITIZEN() {
 		return getInstance().getCitizensShopObjectType();
 	}
 }

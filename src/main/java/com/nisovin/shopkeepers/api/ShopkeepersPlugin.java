@@ -68,7 +68,7 @@ public interface ShopkeepersPlugin extends Plugin {
 
 	// SHOP OBJECT TYPES
 
-	public SelectableTypeRegistry<? extends ShopObjectType> getShopObjectTypeRegistry();
+	public SelectableTypeRegistry<? extends ShopObjectType<?>> getShopObjectTypeRegistry();
 
 	public DefaultShopObjectTypes getDefaultShopObjectTypes();
 

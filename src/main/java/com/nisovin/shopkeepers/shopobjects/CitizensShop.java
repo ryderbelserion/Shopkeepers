@@ -9,10 +9,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.AbstractShopObject;
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
@@ -21,7 +21,7 @@ import com.nisovin.shopkeepers.util.Log;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 
-public class CitizensShop extends ShopObject {
+public class CitizensShop extends AbstractShopObject {
 
 	public static String CREATION_DATA_NPC_ID_KEY = "CitizensNpcId";
 
@@ -33,7 +33,7 @@ public class CitizensShop extends ShopObject {
 	// used by citizen shopkeeper traits: if false, this will not remove the npc on deletion:
 	private boolean destroyNPC = true;
 
-	protected CitizensShop(Shopkeeper shopkeeper, ShopCreationData creationData) {
+	protected CitizensShop(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
 		if (creationData != null) {
 			// can be null here, as currently only NPC shopkeepers created by the shopkeeper trait provide the npc id

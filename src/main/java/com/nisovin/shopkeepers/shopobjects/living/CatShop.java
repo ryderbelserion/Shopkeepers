@@ -7,15 +7,15 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ocelot;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 
 public class CatShop extends LivingEntityShop {
 
 	private Ocelot.Type catType = Ocelot.Type.WILD_OCELOT;
 
-	protected CatShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
-		super(shopkeeper, creationData, livingObjectType);
+	protected CatShop(LivingEntityObjectType<CatShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		super(livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override

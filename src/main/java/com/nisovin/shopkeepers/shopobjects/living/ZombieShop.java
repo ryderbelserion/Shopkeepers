@@ -6,15 +6,15 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 
 public class ZombieShop extends LivingEntityShop {
 
 	private boolean baby = false;
 
-	protected ZombieShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
-		super(shopkeeper, creationData, livingObjectType);
+	protected ZombieShop(LivingEntityObjectType<ZombieShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		super(livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override

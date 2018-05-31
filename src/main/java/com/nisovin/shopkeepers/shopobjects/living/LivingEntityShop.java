@@ -13,17 +13,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 
+import com.nisovin.shopkeepers.AbstractShopObject;
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class LivingEntityShop extends ShopObject {
+public class LivingEntityShop extends AbstractShopObject {
 
 	public static String getId(Entity entity) {
 		if (entity != null) {
@@ -32,18 +32,18 @@ public class LivingEntityShop extends ShopObject {
 		return null;
 	}
 
-	protected final LivingEntityObjectType livingObjectType;
+	protected final LivingEntityObjectType<?> livingObjectType;
 	protected LivingEntity entity;
 	private String uuid;
 	private int respawnAttempts = 0;
 
-	protected LivingEntityShop(Shopkeeper shopkeeper, ShopCreationData creationData, LivingEntityObjectType livingObjectType) {
+	protected LivingEntityShop(LivingEntityObjectType<?> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
 		this.livingObjectType = livingObjectType;
 	}
 
 	@Override
-	public LivingEntityObjectType getObjectType() {
+	public LivingEntityObjectType<?> getObjectType() {
 		return livingObjectType;
 	}
 

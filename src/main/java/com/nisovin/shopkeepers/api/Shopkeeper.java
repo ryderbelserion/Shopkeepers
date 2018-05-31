@@ -6,7 +6,6 @@ import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;

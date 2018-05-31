@@ -5,21 +5,20 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.AbstractShopObjectType;
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class SignShopObjectType extends AbstractShopObjectType {
+public class SignShopObjectType extends AbstractShopObjectType<SignShop> {
 
 	SignShopObjectType() {
 		super("block", "shopkeeper.sign");
 	}
 
 	@Override
-	protected ShopObject createObject(Shopkeeper shopkeeper, ShopCreationData creationData) {
+	protected SignShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		return new SignShop(shopkeeper, creationData);
 	}
 
