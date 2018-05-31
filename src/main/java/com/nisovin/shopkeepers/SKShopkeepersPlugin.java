@@ -66,7 +66,7 @@ import com.nisovin.shopkeepers.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
 import com.nisovin.shopkeepers.types.AbstractSelectableTypeRegistry;
 import com.nisovin.shopkeepers.types.SelectableTypeRegistry;
-import com.nisovin.shopkeepers.ui.UIRegistry;
+import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.DefaultUIs;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.ChunkCoords;
@@ -85,8 +85,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return plugin;
 	}
 
-	// shop types manager:
-	private final SelectableTypeRegistry<AbstractShopType<?>> shopTypesManager = new AbstractSelectableTypeRegistry<AbstractShopType<?>>() {
+	// shop types registry:
+	private final SelectableTypeRegistry<AbstractShopType<?>> shopTypesRegistry = new AbstractSelectableTypeRegistry<AbstractShopType<?>>() {
 
 		@Override
 		protected String getTypeName() {
@@ -101,8 +101,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 	};
 
-	// shop object types manager:
-	private final SelectableTypeRegistry<AbstractShopObjectType> shopObjectTypesManager = new AbstractSelectableTypeRegistry<AbstractShopObjectType>() {
+	// shop object types registry:
+	private final SelectableTypeRegistry<AbstractShopObjectType> shopObjectTypesRegistry = new AbstractSelectableTypeRegistry<AbstractShopObjectType>() {
 
 		@Override
 		protected String getTypeName() {
@@ -114,8 +114,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private SKDefaultShopTypes defaultShopTypes;
 	private SKDefaultShopObjectTypes defaultShopObjectTypes;
 
-	// ui manager:
-	private final UIRegistry uiRegistry = new UIRegistry(this);
+	// ui registry:
+	private final SKUIRegistry uiRegistry = new SKUIRegistry(this);
 
 	// all shopkeepers:
 	private final Map<UUID, AbstractShopkeeper> shopkeepersById = new LinkedHashMap<>();
@@ -207,7 +207,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		defaultShopObjectTypes.register();
 		uiRegistry.registerAll(DefaultUIs.getAllUITypes());
 
-		// inform ui manager (registers ui event handlers):
+		// inform ui registry (registers ui event handlers):
 		uiRegistry.onEnable();
 
 		// inform ProtectedChests:
@@ -365,7 +365,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// close all open windows:
 		uiRegistry.closeAll();
-		// inform ui manager about disable:
+		// inform ui registry about disable:
 		uiRegistry.onDisable();
 
 		// despawn shopkeepers:
@@ -396,16 +396,16 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopkeepersBySessionId.clear();
 		nextShopSessionId = 1;
 
-		shopTypesManager.clearAllSelections();
-		shopObjectTypesManager.clearAllSelections();
+		shopTypesRegistry.clearAllSelections();
+		shopObjectTypesRegistry.clearAllSelections();
 
 		confirming.clear();
 		naming.clear();
 		selectedChest.clear();
 
 		// clear all types of registers:
-		shopTypesManager.clearAll();
-		shopObjectTypesManager.clearAll();
+		shopTypesRegistry.clearAll();
+		shopObjectTypesRegistry.clearAll();
 		uiRegistry.clearAll();
 
 		HandlerList.unregisterAll(this);
@@ -442,8 +442,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	void onPlayerQuit(Player player) {
 		String playerName = player.getName();
-		shopTypesManager.clearSelection(player);
-		shopObjectTypesManager.clearSelection(player);
+		shopTypesRegistry.clearSelection(player);
+		shopObjectTypesRegistry.clearSelection(player);
 		uiRegistry.onInventoryClose(player);
 
 		selectedChest.remove(playerName);
@@ -476,7 +476,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// UI
 
-	public UIRegistry getUIRegistry() {
+	public SKUIRegistry getUIRegistry() {
 		return uiRegistry;
 	}
 
@@ -496,7 +496,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	@Override
 	public SelectableTypeRegistry<AbstractShopType<?>> getShopTypeRegistry() {
-		return shopTypesManager;
+		return shopTypesRegistry;
 	}
 
 	@Override
@@ -508,7 +508,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	@Override
 	public SelectableTypeRegistry<AbstractShopObjectType> getShopObjectTypeRegistry() {
-		return shopObjectTypesManager;
+		return shopObjectTypesRegistry;
 	}
 
 	@Override
@@ -987,7 +987,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	@Override
 	public boolean hasCreatePermission(Player player) {
 		if (player == null) return false;
-		return (shopTypesManager.getSelection(player) != null) && (shopObjectTypesManager.getSelection(player) != null);
+		return (shopTypesRegistry.getSelection(player) != null) && (shopObjectTypesRegistry.getSelection(player) != null);
 	}
 
 	@Override

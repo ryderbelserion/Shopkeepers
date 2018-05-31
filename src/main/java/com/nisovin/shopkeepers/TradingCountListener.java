@@ -71,7 +71,7 @@ class TradingCountListener implements Listener {
 		if (event.getWhoClicked().getType() != EntityType.PLAYER) return;
 		if (!(event.getInventory() instanceof MerchantInventory)) return;
 		Player player = (Player) event.getWhoClicked();
-		UIType uiType = plugin.getUIRegistry().getOpenInterface(player);
+		UIType uiType = plugin.getUIRegistry().getOpenUIType(player);
 		if (uiType == DefaultUIs.TRADING_WINDOW) return; // trading with a shopkeeper, which handles trades on its own
 
 		MerchantInventory inventory = (MerchantInventory) event.getInventory();

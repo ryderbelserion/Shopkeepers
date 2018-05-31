@@ -27,7 +27,8 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Informs the uiManager that the window is/gets closed for this player.
+	 * Informs the UI registry that the window is/gets closed for this player.
+	 * <p>
 	 * This is only needed if the inventory gets manually closed by a plugin.
 	 * 
 	 * @param player
@@ -48,10 +49,11 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Temporary deactivates ui's for the affected shopkeeper and closes the window (inventory)
-	 * for the given player after a tiny delay.
+	 * Temporary deactivates UIs for the affected shopkeeper and closes the window (inventory) for the given player
+	 * after a tiny delay.
 	 * 
 	 * @param player
+	 *            the player
 	 */
 	protected void closeDelayed(final Player player) {
 		// temporary deactivate ui and close open window delayed for this player:
@@ -67,23 +69,25 @@ public abstract class UIHandler {
 
 	/**
 	 * Checks whether or not the given player can open the handled interface for this shopkeeper.
-	 * This for example gets called when a player requests the interface for this shopkeeper.
-	 * It should perform the necessary permission checks.
+	 * <p>
+	 * This for example gets called when a player requests the interface for this shopkeeper. It should perform the
+	 * necessary permission checks.
 	 * 
 	 * @param player
 	 *            a player
-	 * @return true, if the given player is allowed to open the interface window type this class is handling
+	 * @return <code>true</code> if the given player is allowed to open the interface window type this class is handling
 	 */
 	protected abstract boolean canOpen(Player player);
 
 	/**
 	 * This method should open the interface window for the given player.
-	 * Generally {@link #canOpen(Player) canOpen} should be checked before this method gets called,
-	 * however this method should not rely on that.
+	 * <p>
+	 * Generally {@link #canOpen(Player) canOpen} should be checked before this method gets called, however this method
+	 * should not rely on that.
 	 * 
 	 * @param player
 	 *            a player
-	 * @return true, if the interface window was successfully opened
+	 * @return <code>true</code> if the interface window was successfully opened
 	 */
 	protected abstract boolean openWindow(Player player);
 
@@ -94,15 +98,16 @@ public abstract class UIHandler {
 	 * 
 	 * @param inventory
 	 *            an inventory
-	 * @return true, if the given inventory is representing a custom interface window created and handled by this
-	 *         handler
+	 * @return <code>true</code> if the given inventory is representing a custom interface window created and handled by
+	 *         this handler
 	 */
 	public abstract boolean isWindow(Inventory inventory);
 
 	// handling of interface window interaction
 
 	/**
-	 * Called when a player closes an inventory for which (@link #isInterface(Inventory) isInterface) returned true.
+	 * Called when a player closes an inventory for which (@link #isInterface(Inventory)) returned <code>true</code>.
+	 * <p>
 	 * It is not guaranteed that this method gets called for all user interface windows which were opened by this
 	 * handler (for example plugin triggered closing of a players inventory might not trigger a call to this method). So
 	 * don't rely on it for cleanup.

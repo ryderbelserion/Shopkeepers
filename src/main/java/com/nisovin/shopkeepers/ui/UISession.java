@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.ui;
 
 import com.nisovin.shopkeepers.Shopkeeper;
 
-class UISession {
+public class UISession {
 
 	// reference shopkeeper directly and not by id, because the id might change or currently be invalid
 	// (for inactive shopkeepers).. especially important for remotely opened windows
