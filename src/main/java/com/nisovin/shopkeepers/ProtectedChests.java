@@ -11,7 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class ProtectedChests {
@@ -19,7 +19,7 @@ public class ProtectedChests {
 	public static final BlockFace[] CHEST_PROTECTED_FACES = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
 	public static final BlockFace[] HOPPER_PROTECTED_FACES = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
 
-	private final Map<String, List<PlayerShopkeeper>> protectedChests = new HashMap<String, List<PlayerShopkeeper>>();
+	private final Map<String, List<PlayerShopkeeper>> protectedChests = new HashMap<>();
 
 	public ProtectedChests() {
 	}

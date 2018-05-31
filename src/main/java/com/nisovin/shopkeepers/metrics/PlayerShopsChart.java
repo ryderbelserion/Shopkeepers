@@ -4,7 +4,7 @@ import org.bstats.bukkit.Metrics;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.Shopkeeper;
-import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
 
 /**
  * Reports whether the server uses player shopkeepers.

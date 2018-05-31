@@ -7,7 +7,7 @@ import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
 
-public abstract class AbstractPlayerShopType<T extends PlayerShopkeeper> extends AbstractShopType<T> implements PlayerShopType<T> {
+public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper> extends AbstractShopType<T> implements PlayerShopType<T> {
 
 	protected AbstractPlayerShopType(String identifier, String permission) {
 		super(identifier, permission);

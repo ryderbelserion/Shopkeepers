@@ -22,7 +22,7 @@ import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
-public class NormalPlayerShopkeeper extends PlayerShopkeeper {
+public class NormalPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	protected static class NormalPlayerShopEditorHandler extends PlayerShopEditorHandler {
 

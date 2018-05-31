@@ -13,8 +13,8 @@ import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
+import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
-import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.Log;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -66,7 +66,7 @@ public class CitizensShop extends AbstractShopObject {
 		// create npc:
 		EntityType entityType;
 		String name;
-		if (shopkeeper.getType() instanceof PlayerShopType) {
+		if (shopkeeper instanceof PlayerShopkeeper) {
 			// player shops will use a player npc:
 			entityType = EntityType.PLAYER;
 			name = ((PlayerShopkeeper) shopkeeper).getOwnerName();

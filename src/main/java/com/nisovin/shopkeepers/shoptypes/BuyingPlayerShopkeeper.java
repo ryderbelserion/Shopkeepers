@@ -24,7 +24,7 @@ import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
-public class BuyingPlayerShopkeeper extends PlayerShopkeeper {
+public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	protected static class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 

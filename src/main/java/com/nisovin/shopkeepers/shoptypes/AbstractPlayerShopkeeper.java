@@ -22,6 +22,7 @@ import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHiredEvent;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
@@ -37,11 +38,7 @@ import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.Utils;
 
-/**
- * A shopkeeper that is managed by a player. This shopkeeper draws its supplies from a chest and will deposit earnings
- * back into that chest.
- */
-public abstract class PlayerShopkeeper extends AbstractShopkeeper {
+public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
 
 	protected static abstract class PlayerShopEditorHandler extends EditorHandler {
 
@@ -49,13 +46,13 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		protected static final int HIGH_COST_OFFSET = 9;
 		protected static final int LOW_COST_OFFSET = 18;
 
-		protected PlayerShopEditorHandler(PlayerShopkeeper shopkeeper) {
+		protected PlayerShopEditorHandler(AbstractPlayerShopkeeper shopkeeper) {
 			super(SKDefaultUITypes.EDITOR(), shopkeeper);
 		}
 
 		@Override
-		public PlayerShopkeeper getShopkeeper() {
-			return (PlayerShopkeeper) super.getShopkeeper();
+		public AbstractPlayerShopkeeper getShopkeeper() {
+			return (AbstractPlayerShopkeeper) super.getShopkeeper();
 		}
 
 		@Override
@@ -204,13 +201,13 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		protected Inventory chestInventory = null;
 		protected ItemStack[] newChestContents = null;
 
-		protected PlayerShopTradingHandler(PlayerShopkeeper shopkeeper) {
+		protected PlayerShopTradingHandler(AbstractPlayerShopkeeper shopkeeper) {
 			super(SKDefaultUITypes.TRADING(), shopkeeper);
 		}
 
 		@Override
-		public PlayerShopkeeper getShopkeeper() {
-			return (PlayerShopkeeper) super.getShopkeeper();
+		public AbstractPlayerShopkeeper getShopkeeper() {
+			return (AbstractPlayerShopkeeper) super.getShopkeeper();
 		}
 
 		@Override
@@ -293,13 +290,13 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 
 	protected static class PlayerShopHiringHandler extends HiringHandler {
 
-		protected PlayerShopHiringHandler(PlayerShopkeeper shopkeeper) {
+		protected PlayerShopHiringHandler(AbstractPlayerShopkeeper shopkeeper) {
 			super(SKDefaultUITypes.HIRING(), shopkeeper);
 		}
 
 		@Override
-		public PlayerShopkeeper getShopkeeper() {
-			return (PlayerShopkeeper) super.getShopkeeper();
+		public AbstractPlayerShopkeeper getShopkeeper() {
+			return (AbstractPlayerShopkeeper) super.getShopkeeper();
 		}
 
 		@Override
@@ -410,7 +407,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 	/**
 	 * For use in sub-classes.
 	 */
-	protected PlayerShopkeeper() {
+	protected AbstractPlayerShopkeeper() {
 	}
 
 	/**
@@ -544,16 +541,12 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		}
 	}
 
-	/**
-	 * Sets the owner of this shop (sets name and uuid).
-	 * 
-	 * @param player
-	 *            the owner of this shop
-	 */
+	@Override
 	public void setOwner(Player player) {
 		this.setOwner(player.getUniqueId(), player.getName());
 	}
 
+	@Override
 	public void setOwner(UUID ownerUUID, String ownerName) {
 		this.ownerUUID = ownerUUID;
 		this.ownerName = ownerName;
@@ -567,65 +560,37 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		}
 	}
 
-	/**
-	 * Gets the uuid of the player who owns this shop.
-	 * 
-	 * @return the owners player uuid
-	 */
+	@Override
 	public UUID getOwnerUUID() {
 		return ownerUUID;
 	}
 
-	/**
-	 * Gets the last known name of the player who owns this shop.
-	 * 
-	 * @return the owners last known player name
-	 */
+	@Override
 	public String getOwnerName() {
 		return ownerName;
 	}
 
+	@Override
 	public String getOwnerAsString() {
 		return Utils.getPlayerAsString(ownerName, ownerUUID);
 	}
 
-	/**
-	 * Checks if the given owner is owning this shop.
-	 * 
-	 * @param player
-	 *            the player to check
-	 * @return <code>true</code> if the given player owns this shop
-	 */
+	@Override
 	public boolean isOwner(Player player) {
 		return player.getUniqueId().equals(ownerUUID);
 	}
 
-	/**
-	 * Gets the owner of this shop IF he is online.
-	 * 
-	 * @return the owner of this shop, or <code>null</code> if the owner is offline
-	 */
+	@Override
 	public Player getOwner() {
 		return Bukkit.getPlayer(ownerUUID);
 	}
 
-	/**
-	 * Checks whether this shopkeeper is for hire.
-	 * <p>
-	 * The shopkeeper is for hire if a hire cost has been specified.
-	 * 
-	 * @return <code>true</code> if this shopkeeper is for hire
-	 */
+	@Override
 	public boolean isForHire() {
 		return (hireCost != null);
 	}
 
-	/**
-	 * Sets this shopkeeper for hire using the given hire cost.
-	 * 
-	 * @param hireCost
-	 *            the hire cost, or <code>null</code> or empty to disable hiring for this shopkeeper
-	 */
+	@Override
 	public void setForHire(ItemStack hireCost) {
 		if (ItemUtils.isEmpty(hireCost)) {
 			// disable hiring:
@@ -638,16 +603,13 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		}
 	}
 
-	/**
-	 * Gets the hiring cost of this shopkeeper.
-	 * 
-	 * @return the hiring cost (cloned), or <code>null</code> if this shop is not for hire
-	 */
+	@Override
 	public ItemStack getHireCost() {
 		return (this.isForHire() ? hireCost.clone() : null);
 	}
 
-	private void setChest(int chestX, int chestY, int chestZ) {
+	@Override
+	public void setChest(int chestX, int chestY, int chestZ) {
 		if (this.isValid()) {
 			// unregister previously protected chest:
 			SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(this.getWorldName(), chestX, chestY, chestZ, this);
@@ -670,6 +632,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 	 * @param chest
 	 *            the chest to check
 	 * @return
+	 * 		TODO unused?
 	 */
 	public boolean usesChest(Block chest) {
 		if (!chest.getWorld().getName().equals(this.getWorldName())) return false;
@@ -684,6 +647,7 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		return false;
 	}
 
+	@Override
 	public Block getChest() {
 		return Bukkit.getWorld(this.getWorldName()).getBlockAt(chestX, chestY, chestZ);
 	}
@@ -733,7 +697,8 @@ public abstract class PlayerShopkeeper extends AbstractShopkeeper {
 		return new SKTradingRecipe(currencyItem, itemBeingBought, null);
 	}
 
-	protected int getCurrencyInChest() {
+	@Override
+	public int getCurrencyInChest() {
 		Block chest = this.getChest();
 		if (!ItemUtils.isChest(chest.getType())) return 0;
 

@@ -27,7 +27,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 /**
  * Sells written books.
  */
-public class BookPlayerShopkeeper extends PlayerShopkeeper {
+public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	protected static class WrittenBookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 

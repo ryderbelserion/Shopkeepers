@@ -6,7 +6,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
 
 /**
  * This event is called whenever a player is about to hire a player shopkeeper.

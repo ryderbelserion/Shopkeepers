@@ -44,6 +44,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.CreatePlayerShopkeeperEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperCreatedEvent;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
+import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
@@ -70,7 +71,6 @@ import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.shoptypes.AbstractPlayerShopType;
 import com.nisovin.shopkeepers.shoptypes.AbstractShopType;
-import com.nisovin.shopkeepers.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.shoptypes.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
@@ -553,7 +553,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
 		if (recentlyPlaced == null) {
-			recentlyPlaced = new LinkedList<String>();
+			recentlyPlaced = new LinkedList<>();
 			recentlyPlacedChests.put(playerName, recentlyPlaced);
 		}
 		recentlyPlaced.add(Utils.getLocationString(chest));
@@ -652,7 +652,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private void addShopkeeperToChunk(AbstractShopkeeper shopkeeper, ChunkCoords chunkCoords) {
 		List<AbstractShopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
 		if (byChunk == null) {
-			byChunk = new ArrayList<AbstractShopkeeper>();
+			byChunk = new ArrayList<>();
 			shopkeepersByChunk.put(chunkCoords, byChunk);
 			shopkeepersByChunkView.put(chunkCoords, Collections.unmodifiableList(byChunk));
 		}
@@ -1119,7 +1119,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private void removeInactivePlayerShops() {
 		if (Settings.playerShopkeeperInactiveDays <= 0) return;
 
-		Set<UUID> playerUUIDs = new HashSet<UUID>();
+		Set<UUID> playerUUIDs = new HashSet<>();
 		for (Shopkeeper shopkeeper : shopkeepersById.values()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
 				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
@@ -1134,7 +1134,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// fetch OfflinePlayers async:
 		int playerShopkeeperInactiveDays = Settings.playerShopkeeperInactiveDays;
 		Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
-			List<OfflinePlayer> inactivePlayers = new ArrayList<OfflinePlayer>();
+			List<OfflinePlayer> inactivePlayers = new ArrayList<>();
 			long now = System.currentTimeMillis();
 			for (UUID uuid : playerUUIDs) {
 				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
@@ -1153,7 +1153,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 			// continue in main thread:
 			SchedulerUtils.runTaskOrOmit(SKShopkeepersPlugin.this, () -> {
-				List<PlayerShopkeeper> forRemoval = new ArrayList<PlayerShopkeeper>();
+				List<PlayerShopkeeper> forRemoval = new ArrayList<>();
 				for (OfflinePlayer inactivePlayer : inactivePlayers) {
 					// remove all shops of this inactive player:
 					UUID playerUUID = inactivePlayer.getUniqueId();
