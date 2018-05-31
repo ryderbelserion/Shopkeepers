@@ -321,13 +321,24 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		SKShopkeepersPlugin.getInstance().getUIRegistry().closeAllDelayed(this);
 	}
 
-	@Override
+	/**
+	 * Registers an {@link UIHandler} which handles a specific type of user interface for this shopkeeper.
+	 * 
+	 * @param uiHandler
+	 *            the ui handler
+	 */
 	public void registerUIHandler(UIHandler uiHandler) {
 		Validate.notNull(uiHandler, "UI handler is null!");
 		uiHandlers.put(uiHandler.getUIType().getIdentifier(), uiHandler);
 	}
 
-	@Override
+	/**
+	 * Gets the {@link UIHandler} this shopkeeper is using for the specified {@link UIType}.
+	 * 
+	 * @param uiType
+	 *            the ui type
+	 * @return the ui handler, or <code>null</code> if none is available
+	 */
 	public UIHandler getUIHandler(UIType uiType) {
 		Validate.notNull(uiType, "UI type is null!");
 		return uiHandlers.get(uiType.getIdentifier());

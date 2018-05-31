@@ -10,7 +10,6 @@ import com.nisovin.shopkeepers.ShopObject;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
-import com.nisovin.shopkeepers.ui.UIHandler;
 
 public interface Shopkeeper {
 
@@ -167,23 +166,6 @@ public interface Shopkeeper {
 	 * Deactivates all currently open UIs (purchasing, editing, hiring, etc.) and closes them 1 tick later.
 	 */
 	public void closeAllOpenWindows();
-
-	/**
-	 * Registers an {@link UIHandler} which handles a specific type of user interface for this shopkeeper.
-	 * 
-	 * @param uiHandler
-	 *            the ui handler
-	 */
-	public void registerUIHandler(UIHandler uiHandler);
-
-	/**
-	 * Gets the {@link UIHandler} this shopkeeper is using for the specified {@link UIType}.
-	 * 
-	 * @param uiType
-	 *            the ui type
-	 * @return the ui handler, or <code>null</code> if none is available
-	 */
-	public UIHandler getUIHandler(UIType uiType);
 
 	/**
 	 * Attempts to open the interface for the given {@link UIType} for the specified player.

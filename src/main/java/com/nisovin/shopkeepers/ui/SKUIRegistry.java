@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
@@ -22,7 +23,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<UIType> implements UIRegi
 
 	private final ShopkeepersPlugin plugin;
 	// player name -> ui session
-	private final Map<String, UISession> playerSessions = new HashMap<String, UISession>();
+	private final Map<String, SKUISession> playerSessions = new HashMap<>();
 	private UIListener uiListener = null;
 
 	public SKUIRegistry(ShopkeepersPlugin plugin) {
@@ -46,7 +47,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<UIType> implements UIRegi
 		return "UI type";
 	}
 
-	public boolean requestUI(UIType uiType, Shopkeeper shopkeeper, Player player) {
+	public boolean requestUI(UIType uiType, AbstractShopkeeper shopkeeper, Player player) {
 		Validate.notNull(uiType, "UI type is null!");
 		Validate.notNull(shopkeeper, "Shopkeeper is null!");
 		Validate.notNull(player, "Player is null!");
@@ -64,7 +65,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<UIType> implements UIRegi
 			return false;
 		}
 
-		UISession oldSession = this.getSession(player);
+		SKUISession oldSession = this.getSession(player);
 		// filtering out duplicate open requests:
 		if (oldSession != null && oldSession.getShopkeeper().equals(shopkeeper) && oldSession.getUIHandler().equals(uiHandler)) {
 			Log.debug(uiIdentifier + " is already opened for '" + playerName + "'.");
@@ -77,7 +78,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<UIType> implements UIRegi
 			Log.debug(uiIdentifier + " opened");
 			// old window already should automatically have been closed by the new window.. no need currently, to do
 			// that here
-			playerSessions.put(playerName, new UISession(shopkeeper, uiHandler));
+			playerSessions.put(playerName, new SKUISession(shopkeeper, uiHandler));
 			return true;
 		} else {
 			Log.debug(uiIdentifier + " NOT opened");
@@ -86,7 +87,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<UIType> implements UIRegi
 	}
 
 	@Override
-	public UISession getSession(Player player) {
+	public SKUISession getSession(Player player) {
 		Validate.notNull(player, "Player is null!");
 		return playerSessions.get(player.getName());
 	}
@@ -107,9 +108,9 @@ public class SKUIRegistry extends AbstractTypeRegistry<UIType> implements UIRegi
 	public void closeAll(Shopkeeper shopkeeper) {
 		if (shopkeeper == null) return;
 		assert shopkeeper != null;
-		Iterator<Entry<String, UISession>> iter = playerSessions.entrySet().iterator();
+		Iterator<Entry<String, SKUISession>> iter = playerSessions.entrySet().iterator();
 		while (iter.hasNext()) {
-			Entry<String, UISession> entry = iter.next();
+			Entry<String, SKUISession> entry = iter.next();
 			UISession session = entry.getValue();
 			if (session.getShopkeeper().equals(shopkeeper)) {
 				iter.remove();

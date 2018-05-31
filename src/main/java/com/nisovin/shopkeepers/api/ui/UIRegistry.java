@@ -10,8 +10,6 @@ import com.nisovin.shopkeepers.api.types.TypeRegistry;
  */
 public interface UIRegistry extends TypeRegistry<UIType> {
 
-	public boolean requestUI(UIType uiType, Shopkeeper shopkeeper, Player player);
-
 	public UISession getSession(Player player);
 
 	public UIType getOpenUIType(Player player);

@@ -21,6 +21,10 @@ import com.nisovin.shopkeepers.api.util.ChunkCoords;
 
 public interface ShopkeepersPlugin extends Plugin {
 
+	public static ShopkeepersPlugin getInstance() {
+		return ShopkeepersAPI.getPlugin();
+	}
+
 	// PERMISSIONS
 
 	public static final String HELP_PERMISSION = "shopkeeper.help";

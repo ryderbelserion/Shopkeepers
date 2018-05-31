@@ -11,15 +11,13 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.ui.UIRegistry;
-import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.util.Log;
 
 class UIListener implements Listener {
 
-	private final UIRegistry uiRegistry;
+	private final SKUIRegistry uiRegistry;
 
-	UIListener(UIRegistry uiRegistry) {
+	UIListener(SKUIRegistry uiRegistry) {
 		this.uiRegistry = uiRegistry;
 	}
 
@@ -27,7 +25,7 @@ class UIListener implements Listener {
 	void onInventoryClose(InventoryCloseEvent event) {
 		if (event.getPlayer().getType() != EntityType.PLAYER) return;
 		Player player = (Player) event.getPlayer();
-		UISession session = uiRegistry.getSession(player);
+		SKUISession session = uiRegistry.getSession(player);
 		if (session == null) return;
 
 		Log.debug("Player " + player.getName() + " closed " + session.getUIType().getIdentifier());
@@ -43,7 +41,7 @@ class UIListener implements Listener {
 	void onInventoryClick(InventoryClickEvent event) {
 		if (event.getWhoClicked().getType() != EntityType.PLAYER) return;
 		Player player = (Player) event.getWhoClicked();
-		UISession session = uiRegistry.getSession(player);
+		SKUISession session = uiRegistry.getSession(player);
 		if (session == null) return;
 
 		// inform uiHandler so that it can react to it:
