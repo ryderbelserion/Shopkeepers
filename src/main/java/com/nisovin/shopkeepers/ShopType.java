@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.abstractTypes.SelectableType;
 
-public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
+public abstract class ShopType<T extends SKShopkeeper> extends SelectableType {
 
 	protected ShopType(String identifier, String permission) {
 		super(identifier, permission);
@@ -41,7 +41,6 @@ public abstract class ShopType<T extends Shopkeeper> extends SelectableType {
 	 * @return the created shopkeeper
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper could not be loaded
-	 * @deprecated this is currently meant for internal use only
 	 */
 	public abstract T loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException;
 

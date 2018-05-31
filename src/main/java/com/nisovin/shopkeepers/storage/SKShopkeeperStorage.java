@@ -15,6 +15,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.SKShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopType;
 import com.nisovin.shopkeepers.Shopkeeper;
@@ -273,7 +274,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		// store shopkeeper data into memory configuration:
 		YamlConfiguration config = new YamlConfiguration();
 		int counter = 1;
-		for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+		for (SKShopkeeper shopkeeper : plugin.getAllShopkeepers()) {
 			String sectionKey = String.valueOf(counter++);
 			ConfigurationSection section = config.createSection(sectionKey);
 			try {

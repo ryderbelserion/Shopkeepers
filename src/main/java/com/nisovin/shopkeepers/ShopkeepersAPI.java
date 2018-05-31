@@ -130,7 +130,7 @@ public interface ShopkeepersAPI {
 	 *            the chunk
 	 * @return an unmodifiable list of the shopkeepers in the specified chunk, empty if there are none
 	 */
-	public List<Shopkeeper> getShopkeepersInChunk(Chunk chunk);
+	public List<? extends Shopkeeper> getShopkeepersInChunk(Chunk chunk);
 
 	/**
 	 * Gets all shopkeepers for a given chunk.
@@ -139,7 +139,7 @@ public interface ShopkeepersAPI {
 	 *            specifies the chunk
 	 * @return an unmodifiable list of the shopkeepers in the specified chunk, empty if there are none
 	 */
-	public List<Shopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords);
+	public List<? extends Shopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords);
 
 	/**
 	 * Gets all shopkeepers in the specified world.
@@ -150,7 +150,7 @@ public interface ShopkeepersAPI {
 	 *            <code>true</code> to only include shopkeepers from loaded chunks
 	 * @return an unmodifiable view on the shopkeepers
 	 */
-	public List<Shopkeeper> getShopkeepersInWorld(World world, boolean onlyLoadedChunks);
+	public List<? extends Shopkeeper> getShopkeepersInWorld(World world, boolean onlyLoadedChunks);
 
 	/**
 	 * Checks if a given entity is a Shopkeeper.
@@ -166,14 +166,14 @@ public interface ShopkeepersAPI {
 	 * 
 	 * @return an unmodifiable view on all shopkeepers
 	 */
-	public Collection<Shopkeeper> getAllShopkeepers();
+	public Collection<? extends Shopkeeper> getAllShopkeepers();
 
 	/**
 	 * Gets all shopkeepers grouped by the chunks they are in.
 	 * 
 	 * @return an unmodifiable view on all shopkeepers grouped by the chunks they are in
 	 */
-	public Map<ChunkCoords, List<Shopkeeper>> getAllShopkeepersByChunks();
+	public Map<ChunkCoords, ? extends List<? extends Shopkeeper>> getAllShopkeepersByChunks();
 
 	/**
 	 * Gets all active shopkeepers. Some shopkeeper types might be always active (like sign shops),
@@ -181,5 +181,5 @@ public interface ShopkeepersAPI {
 	 * 
 	 * @return an unmodifiable view on all active shopkeepers
 	 */
-	public Collection<Shopkeeper> getActiveShopkeepers();
+	public Collection<? extends Shopkeeper> getActiveShopkeepers();
 }

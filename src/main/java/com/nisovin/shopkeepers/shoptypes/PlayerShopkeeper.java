@@ -13,10 +13,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.nisovin.shopkeepers.SKShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopCreationData;
 import com.nisovin.shopkeepers.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.ShopkeepersAPI;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
@@ -40,7 +40,7 @@ import com.nisovin.shopkeepers.util.Utils;
  * A shopkeeper that is managed by a player. This shopkeeper draws its supplies from a chest and will deposit earnings
  * back into that chest.
  */
-public abstract class PlayerShopkeeper extends Shopkeeper {
+public abstract class PlayerShopkeeper extends SKShopkeeper {
 
 	protected static abstract class PlayerShopEditorHandler extends EditorHandler {
 

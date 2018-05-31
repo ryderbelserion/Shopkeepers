@@ -32,7 +32,7 @@ class RemoveShopOnChestBreakListener implements Listener {
 						ItemStack shopCreationItem = Settings.createShopCreationItem();
 						block.getWorld().dropItemNaturally(block.getLocation(), shopCreationItem);
 					}
-					plugin.deleteShopkeeper(shopkeeper);
+					shopkeeper.delete();
 				}
 				plugin.getShopkeeperStorage().save();
 			}

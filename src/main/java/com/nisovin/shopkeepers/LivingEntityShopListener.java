@@ -51,7 +51,7 @@ class LivingEntityShopListener implements Listener {
 		Player player = event.getPlayer();
 		String playerName = player.getName();
 		Log.debug("Player " + playerName + " is interacting with entity at " + shopEntity.getLocation());
-		Shopkeeper shopkeeper = plugin.getShopkeeperByEntity(shopEntity); // also check for citizens npc shopkeepers
+		SKShopkeeper shopkeeper = plugin.getShopkeeperByEntity(shopEntity); // also check for citizens npc shopkeepers
 
 		if (event.isCancelled() && !Settings.bypassShopInteractionBlocking) {
 			Log.debug("  Cancelled by another plugin");

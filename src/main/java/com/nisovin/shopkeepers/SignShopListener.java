@@ -40,7 +40,7 @@ class SignShopListener implements Listener {
 
 		// check for sign shop
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && ItemUtils.isSign(block.getType())) {
-			Shopkeeper shopkeeper = plugin.getShopkeeperByBlock(block);
+			SKShopkeeper shopkeeper = plugin.getShopkeeperByBlock(block);
 			if (shopkeeper != null) {
 				// only trigger shopkeeper interaction for main-hand events:
 				if (NMSManager.getProvider().isMainHandInteraction(event)) {

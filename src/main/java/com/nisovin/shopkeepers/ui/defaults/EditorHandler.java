@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.SKShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Shopkeeper;
 import com.nisovin.shopkeepers.ShopkeepersPlugin;
@@ -27,7 +28,7 @@ public abstract class EditorHandler extends UIHandler {
 	// column = [0,7] (last column of the inventory is used for editor buttons)
 	protected static final int TRADE_COLUMNS = 8;
 
-	protected EditorHandler(UIType uiType, Shopkeeper shopkeeper) {
+	protected EditorHandler(UIType uiType, SKShopkeeper shopkeeper) {
 		super(uiType, shopkeeper);
 	}
 
@@ -54,7 +55,7 @@ public abstract class EditorHandler extends UIHandler {
 	@Override
 	protected void onInventoryClick(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
-		Shopkeeper shopkeeper = this.getShopkeeper();
+		SKShopkeeper shopkeeper = this.getShopkeeper();
 
 		// check for special action buttons:
 		int rawSlot = event.getRawSlot();
