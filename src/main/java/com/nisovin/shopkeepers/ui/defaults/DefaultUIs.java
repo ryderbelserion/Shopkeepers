@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.ui.UIType;
 public class DefaultUIs {
 
 	public static List<UIType> getAllUITypes() {
-		List<UIType> defaults = new ArrayList<UIType>();
+		List<UIType> defaults = new ArrayList<>();
 		defaults.add(EDITOR_WINDOW);
 		defaults.add(TRADING_WINDOW);
 		defaults.add(HIRING_WINDOW);
