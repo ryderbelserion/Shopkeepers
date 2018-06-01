@@ -14,11 +14,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
-import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.api.shoptypes.DefaultShopTypes;
-import com.nisovin.shopkeepers.api.shoptypes.ShopType;
+import com.nisovin.shopkeepers.api.shoptypes.ShopTypesRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
-import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
@@ -63,7 +62,7 @@ public final class ShopkeepersAPI {
 
 	// SHOP TYPES
 
-	public static SelectableTypeRegistry<? extends ShopType<?>> getShopTypeRegistry() {
+	public static ShopTypesRegistry<?> getShopTypeRegistry() {
 		return getPlugin().getShopTypeRegistry();
 	}
 
@@ -73,7 +72,7 @@ public final class ShopkeepersAPI {
 
 	// SHOP OBJECT TYPES
 
-	public static SelectableTypeRegistry<? extends ShopObjectType<?>> getShopObjectTypeRegistry() {
+	public static ShopObjectTypesRegistry<?> getShopObjectTypeRegistry() {
 		return getPlugin().getShopObjectTypeRegistry();
 	}
 

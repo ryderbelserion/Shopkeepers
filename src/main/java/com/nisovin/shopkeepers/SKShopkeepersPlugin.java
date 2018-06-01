@@ -48,7 +48,6 @@ import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
-import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
@@ -68,15 +67,16 @@ import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.shopobjects.SignShop;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.shoptypes.AbstractPlayerShopType;
 import com.nisovin.shopkeepers.shoptypes.AbstractShopType;
 import com.nisovin.shopkeepers.shoptypes.SKDefaultShopTypes;
+import com.nisovin.shopkeepers.shoptypes.SKShopTypesRegistry;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
-import com.nisovin.shopkeepers.types.AbstractSelectableTypeRegistry;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
@@ -96,32 +96,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return plugin;
 	}
 
-	// TODO create non-anonymous classes for these
-
-	// shop types registry:
-	private final SelectableTypeRegistry<AbstractShopType<?>> shopTypesRegistry = new AbstractSelectableTypeRegistry<AbstractShopType<?>>() {
-
-		@Override
-		protected String getTypeName() {
-			return "shop type";
-		}
-
-		@Override
-		public boolean canBeSelected(Player player, AbstractShopType<?> type) {
-			// TODO This currently skips the admin shop type. Maybe included the admin shop types here for players
-			// which are admins, because there /could/ be different types of admin shops in the future (?)
-			return super.canBeSelected(player, type) && (type instanceof PlayerShopType);
-		}
-	};
-
-	// shop object types registry:
-	private final SelectableTypeRegistry<AbstractShopObjectType<?>> shopObjectTypesRegistry = new AbstractSelectableTypeRegistry<AbstractShopObjectType<?>>() {
-
-		@Override
-		protected String getTypeName() {
-			return "shop object type";
-		}
-	};
+	// shop types and shop object types registry:
+	private final SKShopTypesRegistry shopTypesRegistry = new SKShopTypesRegistry();
+	private final SKShopObjectTypesRegistry shopObjectTypesRegistry = new SKShopObjectTypesRegistry();
 
 	// default shop and shop object types:
 	private SKDefaultShopTypes defaultShopTypes;
@@ -516,7 +493,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	// SHOP TYPES
 
 	@Override
-	public SelectableTypeRegistry<AbstractShopType<?>> getShopTypeRegistry() {
+	public SKShopTypesRegistry getShopTypeRegistry() {
 		return shopTypesRegistry;
 	}
 
@@ -528,7 +505,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	// SHOP OBJECT TYPES
 
 	@Override
-	public SelectableTypeRegistry<AbstractShopObjectType<?>> getShopObjectTypeRegistry() {
+	public SKShopObjectTypesRegistry getShopObjectTypeRegistry() {
 		return shopObjectTypesRegistry;
 	}
 
