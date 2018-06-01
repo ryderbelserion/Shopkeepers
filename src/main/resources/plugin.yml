@@ -1,8 +1,8 @@
 name: Shopkeepers
-version: '${project.version}'
+version: '${shopkeepers.version}'
 description: Custom villager shopkeepers
 authors: [nisovin, blablubbabc]
-website: http://dev.bukkit.org/server-mods/shopkeepers/
+website: '${shopkeepers.dbo.url}'
 softdepend: [Multiverse-Core, My Worlds, Transporter, Towny, WorldGuard, Citizens, Vault, Gringotts]
 
 main: com.nisovin.shopkeepers.SKShopkeepersPlugin

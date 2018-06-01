@@ -1,18 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>Shopkeepers</artifactId>
-	<packaging>jar</packaging>
-
-	<name>Shopkeepers</name>
-	<version>1.88-SNAPSHOT</version>
-
-	<url>https://github.com/Shopkeepers/Shopkeepers</url>
-
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<sk-version>${project.version}-unofficial</sk-version>
-	</properties>
 
 	<parent>
 		<groupId>com.nisovin.shopkeepers</groupId>
@@ -20,6 +8,12 @@
 		<version>parent</version>
 		<relativePath>../../</relativePath>
 	</parent>
+	<artifactId>Shopkeepers</artifactId>
+	<packaging>jar</packaging>
+
+	<name>Shopkeepers</name>
+	<version>${shopkeepers.version}</version>
+	<url>${shopkeepers.repository.url}</url>
 
 	<profiles>
 		<profile>
@@ -44,7 +38,7 @@
 						<configuration>
 							<doCheck>true</doCheck>
 							<revisionOnScmFailure>no-rev</revisionOnScmFailure>
-							<scmDirectory>../../</scmDirectory>
+							<scmDirectory>${project.parent.relativePath}</scmDirectory>
 							<shortRevisionLength>7</shortRevisionLength>
 						</configuration>
 					</plugin>
@@ -71,9 +65,9 @@
 	</distributionManagement>
 
 	<scm>
-		<connection>scm:git:git://github.com/nisovin/Shopkeepers.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/nisovin/Shopkeepers.git</developerConnection>
-		<url>https://github.com/nisovin/Shopkeepers</url>
+		<connection>scm:git:git://github.com/Shopkeepers/Shopkeepers.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/Shopkeepers/Shopkeepers.git</developerConnection>
+		<url>https://github.com/Shopkeepers/Shopkeepers</url>
 	</scm>
 
 	<dependencies>
@@ -230,28 +224,21 @@
 
 	<build>
 		<finalName>${project.artifactId}</finalName>
-		<testSourceDirectory>../../src/test/java</testSourceDirectory>
-		<sourceDirectory>../../target/filtered-sources/java</sourceDirectory>
-		<directory>../../target</directory>
+		<testSourceDirectory>${project.parent.relativePath}/src/test/java</testSourceDirectory>
+		<sourceDirectory>${project.parent.relativePath}/target/filtered-sources/java</sourceDirectory>
+		<directory>${project.parent.relativePath}/target</directory>
 		<resources>
 			<resource>
-				<directory>../../src/main/java</directory>
-				<filtering>true</filtering>
+				<directory>${project.parent.relativePath}/src/main/java</directory>
 				<targetPath>../filtered-sources/java</targetPath>
-			</resource>
-			<resource>
-				<targetPath>.</targetPath>
 				<filtering>true</filtering>
-				<directory>../../src/main/resources</directory>
-				<includes>
-					<include>plugin.yml</include>
-					<include>config.yml</include>
-					<include>language-de.yml</include>
-				</includes>
 			</resource>
 			<resource>
-				<targetPath>.</targetPath>
-				<directory>${basedir}/</directory>
+				<directory>${project.parent.relativePath}/src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>${project.parent.relativePath}</directory>
 				<includes>
 					<include>LICENSE</include>
 				</includes>
