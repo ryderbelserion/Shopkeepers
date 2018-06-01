@@ -11,6 +11,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
@@ -20,6 +21,7 @@ import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
+import com.nisovin.shopkeepers.api.util.TradingRecipe;
 
 public final class ShopkeepersAPI {
 
@@ -254,5 +256,9 @@ public final class ShopkeepersAPI {
 	 */
 	public static Collection<? extends Shopkeeper> getActiveShopkeepers() {
 		return getPlugin().getActiveShopkeepers();
+	}
+
+	public static TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+		return getPlugin().createTradingRecipe(resultItem, item1, item2);
 	}
 }

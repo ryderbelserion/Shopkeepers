@@ -25,10 +25,10 @@ import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.util.Vector;
 
+import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.SKTradingRecipe;
 
 import net.minecraft.server.v1_12_R1.Entity;
 import net.minecraft.server.v1_12_R1.EntityHuman;
@@ -98,7 +98,7 @@ public final class NMSHandler implements NMSCallProvider {
 			}
 		}
 		ItemStack resultItem = merchantRecipe.getResult();
-		return new SKTradingRecipe(resultItem, item1, item2);
+		return ShopkeepersAPI.createTradingRecipe(resultItem, item1, item2);
 	}
 
 	@Override

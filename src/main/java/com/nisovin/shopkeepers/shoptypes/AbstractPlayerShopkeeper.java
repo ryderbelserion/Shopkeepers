@@ -19,6 +19,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHiredEvent;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
@@ -35,7 +36,6 @@ import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
@@ -683,7 +683,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				item2 = currencyItem;
 			}
 		}
-		return new SKTradingRecipe(itemBeingSold, item1, item2);
+		return ShopkeepersAPI.createTradingRecipe(itemBeingSold, item1, item2);
 	}
 
 	// returns null (and logs a warning) if the price cannot be represented correctly by currency items
@@ -694,7 +694,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			return null;
 		}
 		ItemStack currencyItem = Settings.createCurrencyItem(price);
-		return new SKTradingRecipe(currencyItem, itemBeingBought, null);
+		return ShopkeepersAPI.createTradingRecipe(currencyItem, itemBeingBought, null);
 	}
 
 	@Override
