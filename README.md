@@ -40,5 +40,5 @@ If you really want to do it the old school way, you're free to import the projec
   * modules/v1_7_R1/src/main/java
   * ...
 * Under **Java Build Path > Library** click on **Add External JARs...** and add the needed CraftBukkit.jar files for the modules above. Information on how to get them: https://www.spigotmc.org/wiki/spigot/
-* After that you can create the plugin for example by right-clicking the project and selecting **Export > Java > JAR file** or another recommened way.
+* After that you can create the plugin for example by right-clicking the project and selecting **Export > Java > JAR file** or another recommended way.
 
