@@ -18,6 +18,12 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>
 
+	<scm>
+		<connection>scm:git:git://github.com/Shopkeepers/Shopkeepers.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/Shopkeepers/Shopkeepers.git</developerConnection>
+		<url>https://github.com/Shopkeepers/Shopkeepers</url>
+	</scm>
+
 	<modules>
 		<module>modules/main</module>
 		<module>modules/v1_8_R1</module>

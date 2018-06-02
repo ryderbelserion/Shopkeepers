@@ -62,12 +62,6 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<scm>
-		<connection>scm:git:git://github.com/Shopkeepers/Shopkeepers.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/Shopkeepers/Shopkeepers.git</developerConnection>
-		<url>https://github.com/Shopkeepers/Shopkeepers</url>
-	</scm>
-
 	<build>
 		<directory>${project.parent.relativePath}/target</directory>
 		<plugins>
