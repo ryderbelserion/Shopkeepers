@@ -1,0 +1,65 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.nisovin.shopkeepers</groupId>
+		<artifactId>sk-parent</artifactId>
+		<version>[0,)</version>
+		<relativePath>../../</relativePath>
+	</parent>
+	<artifactId>sk-main</artifactId>
+	<packaging>jar</packaging>
+	<name>SK Main</name>
+
+	<build>
+		<sourceDirectory>target/filtered-sources/java</sourceDirectory>
+		<testSourceDirectory>${project.parent.relativePath}/src/test/java</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>${project.parent.relativePath}/src/main/java</directory>
+				<targetPath>../filtered-sources/java</targetPath>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>${project.parent.relativePath}/src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>${project.parent.relativePath}</directory>
+				<includes>
+					<include>LICENSE</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<artifactSet>
+								<includes>
+									<include>org.bstats</include>
+								</includes>
+							</artifactSet>
+							<relocations>
+								<relocation>
+									<pattern>org.bstats.bukkit</pattern>
+									<shadedPattern>com.nisovin.shopkeepers.metrics.bstats</shadedPattern>
+								</relocation>
+							</relocations>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

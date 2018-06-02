@@ -5,14 +5,12 @@
 	<parent>
 		<groupId>com.nisovin.shopkeepers</groupId>
 		<artifactId>sk-parent</artifactId>
-		<version>parent</version>
+		<version>[0,)</version>
 		<relativePath>../../</relativePath>
 	</parent>
 	<artifactId>sk-v1_8_R1</artifactId>
 	<packaging>jar</packaging>
-
 	<name>SK for v1_8_R1</name>
-	<version>v1_8_R1</version>
 
 	<dependencies>
 		<dependency>
@@ -23,11 +21,11 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.nisovin.shopkeepers</groupId>
-			<artifactId>sk-api</artifactId>
-			<version>API</version>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>sk-main</artifactId>
+			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>org.bukkit</groupId>
@@ -36,27 +34,4 @@
 			</exclusions>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.7</version>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-			</plugin>
-		</plugins>
-	</build>
 </project>
