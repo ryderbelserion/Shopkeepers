@@ -15,6 +15,7 @@ Low priority:
 * Compress currency items in the chest (low currency to high currency)? To maximize available storage capacity. This would also mean that the usage of the high-currency-min-cost setting would be limited to creating the trading recipes, and not be used when adding currency items to the shop chests.
 * Maybe prevent any unrecognised types of clicks if running in compatibility mode? To reduce the risk of minecraft updates with new clicking actions causing issues.
 * Refactor command handling.
+* Separate parent and root pom? So main-project specific dependencies only affect main (and not the api project)
 
 Ideas:
 * Per-Trade/Shopkeeper settings, maybe via written books:<br>
