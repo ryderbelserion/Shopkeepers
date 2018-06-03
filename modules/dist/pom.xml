@@ -13,55 +13,6 @@
 	<name>SK Dist</name>
 	<url>${shopkeepers.repository.url}</url>
 
-	<profiles>
-		<profile>
-			<id>jenkins</id>
-			<properties>
-				<vnp-version>${project.version}-${buildNumber}</vnp-version>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>buildnumber-maven-plugin</artifactId>
-						<version>1.2</version>
-						<executions>
-							<execution>
-								<phase>validate</phase>
-								<goals>
-									<goal>create</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<doCheck>true</doCheck>
-							<revisionOnScmFailure>no-rev</revisionOnScmFailure>
-							<scmDirectory>${project.parent.relativePath}</scmDirectory>
-							<shortRevisionLength>7</shortRevisionLength>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>release</id>
-			<properties>
-				<vnp-version>${project.version}</vnp-version>
-			</properties>
-		</profile>
-	</profiles>
-
-	<distributionManagement>
-		<repository>
-			<id>de.cube-nation.nexus.release</id>
-			<url>http://nexus3.cube-nation.de/repository/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>de.cube-nation.nexus.snapshot</id>
-			<url>http://nexus3.cube-nation.de/repository/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<build>
 		<directory>${project.parent.relativePath}/target</directory>
 		<plugins>
@@ -157,6 +108,7 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+		<!-- Includes the API -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sk-main</artifactId>

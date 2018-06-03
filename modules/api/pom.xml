@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.nisovin.shopkeepers</groupId>
+		<artifactId>sk-parent</artifactId>
+		<version>[0,)</version>
+		<relativePath>../../</relativePath>
+	</parent>
+	<artifactId>ShopkeepersAPI</artifactId>
+	<packaging>jar</packaging>
+	<name>SK API</name>
+	<url>${shopkeepers.repository.url}</url>
+
+	<build>
+		<sourceDirectory>target/filtered-sources/java</sourceDirectory>
+		<testSourceDirectory>${project.parent.relativePath}/src/api/test</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>${project.parent.relativePath}/src/api/java</directory>
+				<targetPath>../filtered-sources/java</targetPath>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>${project.parent.relativePath}/src/api/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+			<resource>
+				<directory>${project.parent.relativePath}</directory>
+				<includes>
+					<include>LICENSE</include>
+				</includes>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
