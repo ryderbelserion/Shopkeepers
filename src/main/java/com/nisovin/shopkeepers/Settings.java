@@ -246,6 +246,7 @@ public class Settings {
 	public static String msgTypeNewName = "&aPlease type the shop's name into the chat.\n"
 			+ "  &aType a dash (-) to remove the name.";
 	public static String msgNameSet = "&aThe shop's name has been set!";
+	public static String msgNameHasNotChanged = "&aThe shop's name has not changed.";
 	public static String msgNameInvalid = "&aThat name is not valid!";
 	public static String msgUnknownShopkeeper = "&7No shopkeeper found with that name or id.";
 	public static String msgUnknownPlayer = "&7No player found with that name.";

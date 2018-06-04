@@ -420,7 +420,14 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		}
 
 		// apply new name:
+		String oldName = this.getName();
 		this.setName(newName);
+
+		// compare to previous name:
+		if (oldName.equals(this.getName())) {
+			Utils.sendMessage(player, Settings.msgNameHasNotChanged);
+			return false;
+		}
 
 		// inform player:
 		Utils.sendMessage(player, Settings.msgNameSet);
