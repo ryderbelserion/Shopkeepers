@@ -280,6 +280,16 @@ public final class FailedHandler implements NMSCallProvider {
 	}
 
 	@Override
+	public void setOnGround(Entity entity, boolean onGround) {
+		try {
+			Object mcEntity = obcGetHandleMethod.invoke(entity);
+			nmsOnGroundField.set(mcEntity, onGround);
+		} catch (Exception e) {
+			// ignoring, since this is not that important if it doesn't work
+		}
+	}
+
+	@Override
 	public void setEntitySilent(Entity entity, boolean silent) {
 		try {
 			bukkitSetSilentMethod.invoke(entity, silent);
@@ -297,14 +307,9 @@ public final class FailedHandler implements NMSCallProvider {
 			return;
 		}
 
-		try {
-			// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes
-			// that it is currently falling:
-			Object mcEntity = obcGetHandleMethod.invoke(entity);
-			nmsOnGroundField.set(mcEntity, true);
-		} catch (Exception e) {
-			// optional, ignore if not possible for some reason
-		}
+		// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes that
+		// it is currently falling:
+		this.setOnGround(entity, true);
 	}
 
 	@Override
@@ -317,14 +322,9 @@ public final class FailedHandler implements NMSCallProvider {
 		}
 
 		if (!gravity) {
-			try {
-				// making sure that Spigot's entity activation range does not keep this entity ticking, because it
-				// assumes that it is currently falling:
-				Object mcEntity = obcGetHandleMethod.invoke(entity);
-				nmsOnGroundField.set(mcEntity, true);
-			} catch (Exception e) {
-				// optional, ignore if not possible for some reason
-			}
+			// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes
+			// that it is currently falling:
+			this.setOnGround(entity, true);
 		}
 	}
 

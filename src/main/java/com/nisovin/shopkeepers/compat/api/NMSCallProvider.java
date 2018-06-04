@@ -37,6 +37,8 @@ public interface NMSCallProvider {
 	// note: does not modify the start location and direction vector
 	public double getCollisionDistance(Location start, Vector direction);
 
+	public void setOnGround(Entity entity, boolean onGround);
+
 	public void setEntitySilent(Entity entity, boolean silent);
 
 	public void setNoAI(LivingEntity entity);

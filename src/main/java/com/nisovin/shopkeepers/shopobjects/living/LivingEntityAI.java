@@ -37,7 +37,6 @@ public class LivingEntityAI {
 	// Players can see shop entities from further away, so we use a large enough range for the activation of falling
 	// checks (configurable in the config, default 4)
 	// TODO take view/tracking distances into account? (spigot-config specific though..)
-	// TODO visual glitch if a player is near the tracking range: SPIGOT-3948
 
 	// entities won't fall, if their distance-to-ground is smaller than this
 	private static final double DISTANCE_TO_GROUND_THRESHOLD = 0.01D;
@@ -274,7 +273,13 @@ public class LivingEntityAI {
 
 						// handle falling:
 						if (entityData.falling) {
+							// prevents SPIGOT-3948 / MC-130725
+							NMSManager.getProvider().setOnGround(entity, false);
 							this.handleFalling(entity, entityData);
+						}
+						if (!entityData.falling) {
+							// prevents SPIGOT-3948 / MC-130725
+							NMSManager.getProvider().setOnGround(entity, true);
 						}
 
 						// wait 10 ticks before checking again:

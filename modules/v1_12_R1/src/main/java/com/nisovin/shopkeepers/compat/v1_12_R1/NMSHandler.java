@@ -182,6 +182,12 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
+	public void setOnGround(org.bukkit.entity.Entity entity, boolean onGround) {
+		Entity mcEntity = ((CraftEntity) entity).getHandle();
+		mcEntity.onGround = onGround;
+	}
+
+	@Override
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 		entity.setSilent(silent);
 	}
@@ -192,8 +198,7 @@ public final class NMSHandler implements NMSCallProvider {
 
 		// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes that
 		// it is currently falling:
-		EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
-		mcLivingEntity.onGround = true;
+		this.setOnGround(entity, true);
 	}
 
 	@Override
@@ -203,8 +208,7 @@ public final class NMSHandler implements NMSCallProvider {
 		if (!gravity) {
 			// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes
 			// that it is currently falling:
-			EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
-			mcLivingEntity.onGround = true;
+			this.setOnGround(entity, true);
 		}
 	}
 

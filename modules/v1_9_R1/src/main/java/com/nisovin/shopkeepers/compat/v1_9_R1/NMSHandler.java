@@ -181,6 +181,12 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
+	public void setOnGround(org.bukkit.entity.Entity entity, boolean onGround) {
+		Entity mcEntity = ((CraftEntity) entity).getHandle();
+		mcEntity.onGround = onGround;
+	}
+
+	@Override
 	public void setEntitySilent(org.bukkit.entity.Entity entity, boolean silent) {
 		Entity mcEntity = ((CraftEntity) entity).getHandle();
 		mcEntity.c(silent);
