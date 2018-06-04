@@ -37,7 +37,7 @@ public class CitizensShopkeeperTrait extends Trait {
 		if (shopkeeperId == null) return null;
 		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
 		if (plugin == null) return null;
-		return plugin.getActiveShopkeeper(shopkeeperId);
+		return plugin.getShopkeeperRegistry().getActiveShopkeeper(shopkeeperId);
 	}
 
 	@Override
@@ -79,7 +79,7 @@ public class CitizensShopkeeperTrait extends Trait {
 			return false;
 		}
 
-		if (plugin.getActiveShopkeeper(CitizensShop.getId(npc.getId())) != null) {
+		if (plugin.getShopkeeperRegistry().getActiveShopkeeper(CitizensShop.getId(npc.getId())) != null) {
 			// there is already a shopkeeper for this npc:
 			// the trait was probably re-attached after a reload of citizens:
 			return false;

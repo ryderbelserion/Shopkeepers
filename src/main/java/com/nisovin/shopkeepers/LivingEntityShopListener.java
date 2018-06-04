@@ -30,6 +30,7 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.registry.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -38,10 +39,10 @@ class LivingEntityShopListener implements Listener {
 	// the radius around lightning strikes in which villagers turn into witches
 	private static final int VILLAGER_ZAP_RADIUS = 7; // minecraft wiki says 3-4, we use 7 to be safe
 
-	private final SKShopkeepersPlugin plugin;
+	private final SKShopkeeperRegistry shopkeeperRegistry;
 
-	LivingEntityShopListener(SKShopkeepersPlugin plugin) {
-		this.plugin = plugin;
+	LivingEntityShopListener(SKShopkeeperRegistry shopkeeperRegistry) {
+		this.shopkeeperRegistry = shopkeeperRegistry;
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
@@ -51,7 +52,8 @@ class LivingEntityShopListener implements Listener {
 		Player player = event.getPlayer();
 		String playerName = player.getName();
 		Log.debug("Player " + playerName + " is interacting with entity at " + shopEntity.getLocation());
-		AbstractShopkeeper shopkeeper = plugin.getShopkeeperByEntity(shopEntity); // also check for citizens npc shopkeepers
+		AbstractShopkeeper shopkeeper = shopkeeperRegistry.getShopkeeperByEntity(shopEntity); // also check for citizens
+																								 // npc shopkeepers
 
 		if (event.isCancelled() && !Settings.bypassShopInteractionBlocking) {
 			Log.debug("  Cancelled by another plugin");
@@ -76,7 +78,7 @@ class LivingEntityShopListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onEntityTarget(EntityTargetEvent event) {
-		if (plugin.isShopkeeper(event.getEntity()) || plugin.isShopkeeper(event.getTarget())) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity()) || shopkeeperRegistry.isShopkeeper(event.getTarget())) {
 			event.setCancelled(true);
 		}
 	}
@@ -85,7 +87,7 @@ class LivingEntityShopListener implements Listener {
 	void onEntityDamage(EntityDamageEvent event) {
 		Entity entity = event.getEntity();
 		// block damaging of shopkeepers
-		if (plugin.isShopkeeper(entity)) {
+		if (shopkeeperRegistry.isShopkeeper(entity)) {
 			event.setCancelled(true);
 			if (event instanceof EntityDamageByEntityEvent) {
 				EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent) event;
@@ -103,7 +105,7 @@ class LivingEntityShopListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	void onEntityEnterVehicle(VehicleEnterEvent event) {
 		Entity entity = event.getEntered();
-		if (plugin.isShopkeeper(entity)) {
+		if (shopkeeperRegistry.isShopkeeper(entity)) {
 			event.setCancelled(true);
 		}
 	}
@@ -112,14 +114,14 @@ class LivingEntityShopListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onExplodePrime(ExplosionPrimeEvent event) {
-		if (plugin.isShopkeeper(event.getEntity())) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	void onExplode(EntityExplodeEvent event) {
-		if (plugin.isShopkeeper(event.getEntity())) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 			Log.debug("Cancelled event for living shop: " + event.getEventName());
 		}
@@ -127,7 +129,7 @@ class LivingEntityShopListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onCreeperCharged(CreeperPowerEvent event) {
-		if (plugin.isShopkeeper(event.getEntity())) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
@@ -136,35 +138,35 @@ class LivingEntityShopListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onEntityChangeBlock(EntityChangeBlockEvent event) {
-		if (plugin.isShopkeeper(event.getEntity())) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	void onEntityTeleport(EntityTeleportEvent event) {
-		if (plugin.isShopkeeper(event.getEntity())) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	void onEntityPortalTeleport(EntityPortalEvent event) {
-		if (plugin.isShopkeeper(event.getEntity())) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	void onPigZap(PigZapEvent event) {
-		if (plugin.isShopkeeper(event.getEntity())) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
 
 	@EventHandler(ignoreCancelled = true)
 	void onSheepDyed(SheepDyeWoolEvent event) {
-		if (plugin.isShopkeeper(event.getEntity())) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
@@ -175,7 +177,7 @@ class LivingEntityShopListener implements Listener {
 		// because they would turn into witches
 		Location loc = event.getLightning().getLocation();
 		for (Entity entity : Utils.getNearbyEntities(loc, VILLAGER_ZAP_RADIUS, EntityType.VILLAGER)) {
-			if (plugin.isShopkeeper(entity)) {
+			if (shopkeeperRegistry.isShopkeeper(entity)) {
 				event.setCancelled(true);
 			}
 		}
@@ -184,7 +186,7 @@ class LivingEntityShopListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	void onPotionSplash(PotionSplashEvent event) {
 		for (LivingEntity entity : event.getAffectedEntities()) {
-			if (plugin.isShopkeeper(entity)) {
+			if (shopkeeperRegistry.isShopkeeper(entity)) {
 				event.setIntensity(entity, 0.0D);
 			}
 		}
@@ -195,7 +197,7 @@ class LivingEntityShopListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	void onEntityLaunchProjectile(ProjectileLaunchEvent event) {
 		ProjectileSource source = event.getEntity().getShooter();
-		if (source instanceof LivingEntity && plugin.isShopkeeper((LivingEntity) source)) {
+		if (source instanceof LivingEntity && shopkeeperRegistry.isShopkeeper((LivingEntity) source)) {
 			event.setCancelled(true);
 		}
 	}
@@ -204,7 +206,7 @@ class LivingEntityShopListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onEntityBlockForm(EntityBlockFormEvent event) {
-		if (plugin.isShopkeeper(event.getEntity())) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}

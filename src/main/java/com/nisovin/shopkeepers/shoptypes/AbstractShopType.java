@@ -52,7 +52,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 */
 	protected void registerShopkeeper(T shopkeeper) {
 		shopkeeper.getShopObject().onInit();
-		SKShopkeepersPlugin.getInstance().registerShopkeeper(shopkeeper);
+		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().registerShopkeeper(shopkeeper);
 	}
 
 	// common functions that might be useful for sub-classes:

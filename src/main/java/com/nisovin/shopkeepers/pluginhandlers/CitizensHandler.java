@@ -17,6 +17,7 @@ import org.bukkit.plugin.Plugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.registry.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.CitizensShopkeeperTrait;
 import com.nisovin.shopkeepers.util.Log;
@@ -143,8 +144,9 @@ public class CitizensHandler {
 			// cannot determine which shopkeepers have a backing npc if citizens isn't running:
 			return;
 		}
+		ShopkeeperRegistry shopkeeperRegistry = ShopkeepersPlugin.getInstance().getShopkeeperRegistry();
 		List<Shopkeeper> forRemoval = new ArrayList<>();
-		for (Shopkeeper shopkeeper : ShopkeepersPlugin.getInstance().getAllShopkeepers()) {
+		for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 			if (shopkeeper.getShopObject() instanceof CitizensShop) {
 				CitizensShop citizensShop = (CitizensShop) shopkeeper.getShopObject();
 				Integer npcId = citizensShop.getNpcId();
@@ -159,7 +161,7 @@ public class CitizensHandler {
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
 							+ ": No NPC existing with id '" + npcId + "'.");
-				} else if (ShopkeepersPlugin.getInstance().getActiveShopkeeper(shopkeeper.getObjectId()) != shopkeeper) {
+				} else if (shopkeeperRegistry.getActiveShopkeeper(shopkeeper.getObjectId()) != shopkeeper) {
 					// there is already another citizens shopkeeper using this npc id:
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()

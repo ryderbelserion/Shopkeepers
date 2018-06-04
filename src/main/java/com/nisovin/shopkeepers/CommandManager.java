@@ -29,6 +29,7 @@ import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.registry.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.shoptypes.DefaultShopTypes;
@@ -46,9 +47,11 @@ class CommandManager implements CommandExecutor {
 	private static final int LIST_PAGE_SIZE = 6;
 
 	private final SKShopkeepersPlugin plugin;
+	private final ShopkeeperRegistry shopkeeperRegistry;
 
 	CommandManager(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
+		this.shopkeeperRegistry = plugin.getShopkeeperRegistry();
 	}
 
 	private void sendHelp(CommandSender sender) {
@@ -135,12 +138,12 @@ class CommandManager implements CommandExecutor {
 				listActive = args[1].equals("active");
 			}
 
-			Map<ChunkCoords, List<AbstractShopkeeper>> shopsByChunk = plugin.getAllShopkeepersByChunks();
+			Map<ChunkCoords, ? extends List<?>> shopsByChunk = shopkeeperRegistry.getAllShopkeepersByChunks();
 
 			sender.sendMessage(ChatColor.YELLOW + "All shopkeepers:");
-			sender.sendMessage("  Total: " + plugin.getAllShopkeepers().size());
+			sender.sendMessage("  Total: " + shopkeeperRegistry.getAllShopkeepers().size());
 			sender.sendMessage("  Total chunks with shopkeepers: " + shopsByChunk.size());
-			sender.sendMessage("  Active: " + plugin.getActiveShopkeepers().size());
+			sender.sendMessage("  Active: " + shopkeeperRegistry.getActiveShopkeepers().size());
 			sender.sendMessage("  Active with AI: " + plugin.getLivingEntityAI().getEntityCount());
 			sender.sendMessage("  Active AI chunks: " + plugin.getLivingEntityAI().getActiveAIChunksCount());
 			sender.sendMessage("  Active with active AI: " + plugin.getLivingEntityAI().getActiveAIEntityCount());
@@ -175,10 +178,10 @@ class CommandManager implements CommandExecutor {
 				int loadedChunksWithShopkeepers = 0;
 				int shopkeepersInLoadedChunks = 0;
 
-				for (Entry<ChunkCoords, List<AbstractShopkeeper>> chunkEntry : shopsByChunk.entrySet()) {
+				for (Entry<ChunkCoords, ? extends List<?>> chunkEntry : shopsByChunk.entrySet()) {
 					ChunkCoords chunkCoords = chunkEntry.getKey();
 					if (!chunkCoords.getWorldName().equals(worldName)) continue;
-					List<AbstractShopkeeper> inChunk = chunkEntry.getValue();
+					List<?> inChunk = chunkEntry.getValue();
 					chunksWithShopkeepers++;
 					totalShopkeepers += inChunk.size();
 					if (chunkCoords.isChunkLoaded()) {
@@ -200,10 +203,10 @@ class CommandManager implements CommandExecutor {
 				if (isConsole && listChunks && totalShopkeepers > 0) {
 					sender.sendMessage("  Listing of all chunks with shopkeepers:");
 					int line = 0;
-					for (Entry<ChunkCoords, List<AbstractShopkeeper>> chunkEntry : shopsByChunk.entrySet()) {
+					for (Entry<ChunkCoords, ? extends List<?>> chunkEntry : shopsByChunk.entrySet()) {
 						ChunkCoords chunkCoords = chunkEntry.getKey();
 						if (!chunkCoords.getWorldName().equals(worldName)) continue;
-						List<AbstractShopkeeper> inChunk = chunkEntry.getValue();
+						List<?> inChunk = chunkEntry.getValue();
 						line++;
 						ChatColor lineColor = (line % 2 == 0 ? ChatColor.WHITE : ChatColor.GRAY);
 						sender.sendMessage("    (" + lineColor + chunkCoords.getChunkX() + "," + chunkCoords.getChunkZ() + ChatColor.RESET + ") ["
@@ -216,7 +219,7 @@ class CommandManager implements CommandExecutor {
 			// list all active shopkeepers:
 			if (isConsole && listActive) {
 				sender.sendMessage("All active shopkeepers:");
-				for (Shopkeeper shopkeeper : plugin.getActiveShopkeepers()) {
+				for (Shopkeeper shopkeeper : shopkeeperRegistry.getActiveShopkeepers()) {
 					if (shopkeeper.isActive()) {
 						Location loc = shopkeeper.getActualLocation();
 						sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": active (" + (loc != null ? loc.toString() : "maybe not?!?") + ")");
@@ -343,7 +346,7 @@ class CommandManager implements CommandExecutor {
 					}
 
 					// searching admin shops:
-					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+					for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 						if (!(shopkeeper instanceof PlayerShopkeeper)) {
 							shops.add(shopkeeper);
 						}
@@ -368,7 +371,7 @@ class CommandManager implements CommandExecutor {
 					Player listPlayer = Bukkit.getPlayerExact(playerName);
 					UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
 
-					for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+					for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 						if (shopkeeper instanceof PlayerShopkeeper) {
 							PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
 							if (playerShop.getOwnerName().equals(playerName)) {
@@ -459,14 +462,14 @@ class CommandManager implements CommandExecutor {
 
 					if (playerName.equals("admin")) {
 						// searching admin shops:
-						for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+						for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 							if (!(shopkeeper instanceof PlayerShopkeeper)) {
 								shops.add(shopkeeper);
 							}
 						}
 					} else if (playerName.equals("all")) {
 						// searching all player shops:
-						for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+						for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 							if (shopkeeper instanceof PlayerShopkeeper) {
 								shops.add(shopkeeper);
 							}
@@ -476,7 +479,7 @@ class CommandManager implements CommandExecutor {
 						Player listPlayer = Bukkit.getPlayerExact(playerName);
 						UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
 
-						for (Shopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+						for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 							if (shopkeeper instanceof PlayerShopkeeper) {
 								PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
 								if (playerShop.getOwnerName().equals(playerName)) {
@@ -900,7 +903,7 @@ class CommandManager implements CommandExecutor {
 		}
 
 		if (shopUniqueId != null) {
-			return plugin.getShopkeeper(shopUniqueId);
+			return shopkeeperRegistry.getShopkeeper(shopUniqueId);
 		}
 
 		// check if the argument is an integer:
@@ -912,10 +915,10 @@ class CommandManager implements CommandExecutor {
 		}
 
 		if (shopSessionId != -1) {
-			return plugin.getShopkeeper(shopSessionId);
+			return shopkeeperRegistry.getShopkeeper(shopSessionId);
 		}
 
 		// try to get shopkeeper by name:
-		return plugin.getShopkeeperByName(shopIdArg);
+		return shopkeeperRegistry.getShopkeeperByName(shopIdArg);
 	}
 }

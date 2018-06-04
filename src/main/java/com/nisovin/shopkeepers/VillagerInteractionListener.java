@@ -30,7 +30,10 @@ class VillagerInteractionListener implements Listener {
 		if (!(event.getRightClicked() instanceof Villager)) return;
 		Villager villager = (Villager) event.getRightClicked();
 
-		if (plugin.isShopkeeper(villager)) return; // shopkeeper interaction is handled elsewhere
+		if (plugin.getShopkeeperRegistry().isShopkeeper(villager)) {
+			// shopkeeper interaction is handled elsewhere
+			return;
+		}
 		Log.debug("Interaction with Non-shopkeeper villager ..");
 
 		if (villager.hasMetadata("NPC")) {

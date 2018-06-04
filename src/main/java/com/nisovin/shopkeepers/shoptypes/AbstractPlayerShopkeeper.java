@@ -376,7 +376,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				// check max shops limit:
 				maxShops = hireEvent.getMaxShopsForPlayer();
 				if (maxShops > 0) {
-					int count = SKShopkeepersPlugin.getInstance().countShopsOfPlayer(player);
+					int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().countShopsOfPlayer(player);
 					if (count >= maxShops) {
 						Utils.sendMessage(player, Settings.msgTooManyShops);
 						this.closeDelayed(player);
@@ -434,7 +434,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	protected void onRegistration(int sessionId) {
+	public void onRegistration(int sessionId) {
 		super.onRegistration(sessionId);
 
 		// register protected chest:
@@ -442,7 +442,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	protected void onDeletion() {
+	public void onDeletion() {
 		super.onDeletion();
 
 		// unregister previously protected chest:

@@ -179,11 +179,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		return shopObject;
 	}
 
-	protected void onChunkLoad() {
+	public void onChunkLoad() {
 		shopObject.onChunkLoad();
 	}
 
-	protected void onChunkUnload() {
+	public void onChunkUnload() {
 		shopObject.onChunkUnload();
 	}
 
@@ -218,10 +218,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public void delete() {
-		SKShopkeepersPlugin.getInstance().deleteShopkeeper(this);
+		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().deleteShopkeeper(this);
 	}
 
-	protected void onDeletion() {
+	public void onDeletion() {
 		// TODO actually: do this for every unregistration, including on reloads..
 		shopObject.delete();
 		valid = false;
@@ -232,7 +232,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		return valid;
 	}
 
-	protected void onRegistration(int sessionId) {
+	public void onRegistration(int sessionId) {
 		assert !valid;
 		this.sessionId = sessionId;
 		valid = true;
@@ -275,7 +275,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.updateChunkCoords();
 
 		// update shopkeeper in chunk map:
-		SKShopkeepersPlugin.getInstance().onShopkeeperMove(this, oldChunk);
+		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperMove(this, oldChunk);
 	}
 
 	@Override

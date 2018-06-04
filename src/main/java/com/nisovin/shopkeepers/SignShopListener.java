@@ -40,7 +40,7 @@ class SignShopListener implements Listener {
 
 		// check for sign shop
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && ItemUtils.isSign(block.getType())) {
-			AbstractShopkeeper shopkeeper = plugin.getShopkeeperByBlock(block);
+			AbstractShopkeeper shopkeeper = plugin.getShopkeeperRegistry().getShopkeeperByBlock(block);
 			if (shopkeeper != null) {
 				// only trigger shopkeeper interaction for main-hand events:
 				if (NMSManager.getProvider().isMainHandInteraction(event)) {
@@ -64,7 +64,7 @@ class SignShopListener implements Listener {
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
 		if (ItemUtils.isSign(block.getType())) {
-			if (plugin.getShopkeeperByBlock(block) != null) {
+			if (plugin.getShopkeeperRegistry().getShopkeeperByBlock(block) != null) {
 				event.setCancelled(true);
 			}
 		}
@@ -76,7 +76,7 @@ class SignShopListener implements Listener {
 		if (cancelNextBlockPhysicsLoc != null && cancelNextBlockPhysicsLoc.equals(block.getLocation())) {
 			event.setCancelled(true);
 		} else {
-			if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperByBlock(block) != null) {
+			if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperRegistry().getShopkeeperByBlock(block) != null) {
 				event.setCancelled(true);
 			}
 		}
@@ -88,7 +88,7 @@ class SignShopListener implements Listener {
 		Iterator<Block> iter = event.blockList().iterator();
 		while (iter.hasNext()) {
 			Block block = iter.next();
-			if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperByBlock(block) != null) {
+			if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperRegistry().getShopkeeperByBlock(block) != null) {
 				iter.remove();
 			}
 		}

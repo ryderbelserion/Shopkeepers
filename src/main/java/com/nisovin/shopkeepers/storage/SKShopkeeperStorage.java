@@ -275,7 +275,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		// store shopkeeper data into memory configuration:
 		YamlConfiguration config = new YamlConfiguration();
 		int counter = 1;
-		for (AbstractShopkeeper shopkeeper : plugin.getAllShopkeepers()) {
+		for (AbstractShopkeeper shopkeeper : plugin.getShopkeeperRegistry().getAllShopkeepers()) {
 			String sectionKey = String.valueOf(counter++);
 			ConfigurationSection section = config.createSection(sectionKey);
 			try {
