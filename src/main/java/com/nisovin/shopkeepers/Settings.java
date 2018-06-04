@@ -313,7 +313,7 @@ public class Settings {
 
 	public static String msgNoPermission = "&cYou don't have the permission to do that.";
 
-	public static String msgHelpHeader = "&9***** &8[&6Shopkeepers Help&8] &9*****";
+	public static String msgHelpHeader = "&9***** &8[&6Shopkeepers v{version}&8] &9*****";
 	public static String msgCommandHelp = "&a/shopkeepers help &8- &7Shows this help page.";
 	public static String msgCommandReload = "&a/shopkeepers reload &8- &7Reloads this plugin.";
 	public static String msgCommandDebug = "&a/shopkeepers debug &8- &7Toggles debug mode on and off.";

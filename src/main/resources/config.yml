@@ -467,7 +467,7 @@ msg-nothing-to-confirm: "&cThere is nothing to confirm currently."
 
 msg-no-permission: "&cYou don't have the permission to do that."
 
-msg-help-header: "&9***** &8[&6Shopkeepers Help&8] &9*****"
+msg-help-header: "&9***** &8[&6Shopkeepers v{version}&8] &9*****"
 msg-command-help: "&a/shopkeepers help &8- &7Shows this help page."
 msg-command-reload: "&a/shopkeepers reload &8- &7Reloads this plugin."
 msg-command-debug: "&a/shopkeepers debug &8- &7Toggles debug mode on and off."

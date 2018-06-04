@@ -57,7 +57,7 @@ class CommandManager implements CommandExecutor {
 	private void sendHelp(CommandSender sender) {
 		if (sender == null) return;
 
-		Utils.sendMessage(sender, Settings.msgHelpHeader);
+		Utils.sendMessage(sender, Settings.msgHelpHeader, "{version}", plugin.getDescription().getVersion());
 		Utils.sendMessage(sender, Settings.msgCommandHelp);
 		if (Utils.hasPermission(sender, ShopkeepersPlugin.RELOAD_PERMISSION)) {
 			Utils.sendMessage(sender, Settings.msgCommandReload);

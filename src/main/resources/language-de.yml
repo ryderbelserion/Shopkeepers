@@ -110,7 +110,7 @@ msg-nothing-to-confirm: "&cThere is nothing to confirm currently."
 
 msg-no-permission: "&cDafür hast du nicht die nötigen Berechtigungen."
 
-msg-help-header: "&9***** &8[&6Shopkeepers Hilfe&8] &9*****"
+msg-help-header: "&9***** &8[&6Shopkeepers v{version}&8] &9*****"
 msg-command-help: "&a/shopkeepers help &8- &7Zeigt diese Hilfe."
 msg-command-reload: "&a/shopkeepers reload &8- &7Lädt das Plugin neu."
 msg-command-debug: "&a/shopkeepers debug &8- &7Schaltet den Debug-Modus an und aus."
