@@ -16,7 +16,8 @@ public class ShopkeepersCountChart extends Metrics.SimplePie {
 			else if (numberOfShopkeepers >= 500) return "500+";
 			else if (numberOfShopkeepers >= 100) return "100+";
 			else if (numberOfShopkeepers >= 10) return "10+";
-			else return "<10";
+			else if (numberOfShopkeepers > 0) return "<10";
+			else return "0";
 		});
 	}
 }
