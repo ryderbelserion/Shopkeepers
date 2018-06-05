@@ -3,6 +3,9 @@ Date format: (YYYY-MM-DD)
 
 ## Next release
 ### Supported MC versions: xxx
+
+## v2.0 Beta (2018-06-05)
+### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
 **Major change to Shopkeepers' mob behavior:**
 * Shopkeeper mobs by default use minecraft's NoAI flag now:
   * This disables various internal AI behavior that would otherwise still be active in the background (villagers for example would periodically search for nearby villages and even cause chunk loads by that).
@@ -13,10 +16,10 @@ Date format: (YYYY-MM-DD)
   
 **Impact on performance:**
 * Shopkeepers only runs the AI and the gravity for mobs that are in range of players (AI: 1 chunk around players, gravity: 4 chunks around players by default).
-* You can experiment with the gravity chunk range by tuning the config setting 'gravity-chunk-range'. Setting it lower than your server's entity tracking range might however result in players being able to see mobs floating above the ground until they get closer. And if setting it higher than your server's entity tracking range, mobs that are falling for a larger distance might end up visually appearing inside the ground for players near the entity tracking range (see https://hub.spigotmc.org/jira/browse/SPIGOT-3948).
-  * This should not be that big of an issue though, since this only affects players at the edge of the tracking range and mobs that are falling for a large distance. And the mobs get teleported back to their spawn position every 10 seconds anyways.
+* You can experiment with the gravity chunk range by tuning the config setting 'gravity-chunk-range'. Setting it lower than your server's entity tracking range might however result in players being able to see mobs floating above the ground until they get closer.
 * Internal: The active AI and gravity chunks are currently determined only once every 20 ticks, and falling conditions of mobs are checked only once every 10 ticks (with a random initial offset to distribute the falling checks over all ticks).
-* Internal: The shopkeeper mobs get their internal isOnGround flag set, so that the mobs are properly recognized by Spigot's entity activation range and not getting ticked when far away.
+* Internal: The shopkeeper mobs get their internal 'onGround' flag set, so that the mobs are properly recognized by Spigot's entity activation range and not getting ticked when far away (see SPIGOT-3947).
+  * However, during our simulated 'falling' the flag gets disabled and enabled again at the end of the fall in order to workaround some visual glitch that might otherwise affect players near the entity tracking range (see MC-130725 and SPIGOT-3948).
 * Please note: Since at least some AI stuff is now run or triggered by the Shopkeepers plugin, your timings reports will show that Shopkeepers is using quite a bit more of your server's ticking time now. Don't be irritated by that though: I tried to optimize this quite a bit, so hopefully if you compare the performance of your server overall before and after the update, it should in summary even be a small improvement, since lots of unneeded AI and movement logic is no longer getting run.
 
 **Other related changes:**
@@ -43,26 +46,45 @@ Date format: (YYYY-MM-DD)
   * When using the legacy mob behavior and also disabling gravity, the mobs will additionally not be affected by gravity and they can no longer be pushed around by players.
 
 **Other changes:**
+* Changed: The default help page header message now includes the plugin's version. If you are updating, you will have to manually update the message or let it regenerate.
+* Added: A new message 'msg-name-has-not-changed' gets sent when a player attempts to change the name of a shopkeeper and the new name matches the old one.
+* Fixed: If renaming via item is enabled and the new shopkeeper name matches the old one, no item is removed from the player.
+* Added blaze and silverfish to the by default enabled mob types. They seem to work fine with NoAI.
+* Minor reordering of the default shop types: 'Buying' is placed between 'normal' and 'trading' now.
 * Added bStats metrics: This reports anonymous usage statistics to bstats.org.
   * Besides the general server and plugin information, this also collects Shopkeepers-specific information about: Usage of supported third-party plugins, used Vault economy, usage of various features, total shopkeeper count and the number of worlds containing shopkeepers.
   * All collected information can be publicly viewed here: https://bstats.org/plugin/bukkit/Shopkeepers/
   * You can disable this globally for all plugins on your server by editing 'plugins/bStats/config.yml'. Or you can alternatively also disable this for Shopkeepers only via the setting 'enable-metrics'.
   * Consider keeping this enabled: Having this information available allows me to determine when it is safe to drop support for older minecraft versions, and on which features I should focus development and optimization efforts.
-* Added blaze and silverfish to the by default enabled mob types. They seem to work fine with NoAI.
 * Documentation: The full changelog of the plugin can now also be found in the repository: https://github.com/Shopkeepers/Shopkeepers/blob/master/CHANGELOG.md
 * Debugging: Improved the output of debugging command '/shopkeepers check': It prints information about loaded chunks, and it lists various AI and gravity related timing statistics now. With the arguments 'chunks' and 'active' you can let it print additional information. Some information, that may not fit into the player's chat, may only get printed if the command is run from the console. 
 * Debugging: Added world name to chunk load and unload debug messages.
-* API: CreatePlayerShopkeeperEvent has changed a bit. It also no longer supports changing the shop type.
-* API: Removed createNewAdminShopkeeper and createNewPlayerShopkeeper and added a general createShopkeeper method instead.
-* API: The getShopkeepersFromChunk method now returns an empty list instead of null, in case a chunk doesn't contain any shopkeepers.
-* API: Added method to get all shopkeepers in a specific world (optionally only from loaded chunks).
-* API: Various javadoc improvements.
-* API/Internal: User interfaces now get requested via the UIType instead of a plain UI identifier.
-* API/Internal: Refactored shop creation and shop types.
-* API/Internal: ChunkCoords fields have to be accessed via getters now.
-* API/Internal: The shop creation data is now guarded against unintended modification.
+* Fixed/Internal: The license file gets properly included inside the plugin jar now.
 * Internal: Added a few plugins as soft dependencies (Vault, WorldGuard, Towny, Gringotts). They will now get reliably loaded before Shopkeepers.
-* Internal: Various other refactoring across the project.
+
+**Major internal restructuring (affects the API) and version bump to 2.0:**
+* All functions related to the public API of the plugin have been moved into a separate package, and are mostly behind interfaces now. This will break every plugin currently depending on Shopkeepers, sorry! However, this should make it far easier to differentiate between the public API and the internal API and implementation. This is only the first step towards providing a more stable and therefore more useful public API in the future. The functionality of the API hasn't changed much yet, and things will still keep changing quite a lot, until I have refined all the currently existing functions.
+* Various classes were split into abstract base classes (internal API) and interfaces (public API).
+* Everything related to shop type and shop object type was moved into the corresponding packages.
+* Renamed 'UIManager' to 'UIRegistry' and added an (read-only) interface for it to the API. UIHandler is no longer exposed in the API for now.
+* Added interfaces for accessing the default shop types, shop object types and UI types.
+* Various functionality was moved outside the plugin's main class into separate classes: ShopkeeperStorage, ShopkeeperRegistry.
+* ShopCreationData construction is now hidden behind a factory method.
+* Renamed a few primary classes: ShopkeepersPlugin is an interface now, ShopkeepersAPI provides static access to the methods of ShopkeepersPlugin, the actual main plugin class is called SKShopkeepersPlugin now.
+* Some restructuring and cleanup related to the internal project structure an how the plugin gets built. The API part gets built separately and can be depended on separately now from other projects.
+
+**Other API related changes:**
+* CreatePlayerShopkeeperEvent has changed a bit. It also no longer supports changing the shop type.
+* Removed createNewAdminShopkeeper and createNewPlayerShopkeeper and added a general createShopkeeper method instead.
+* The getShopkeepersFromChunk method now returns an empty list instead of null, in case a chunk doesn't contain any shopkeepers.
+* Added method to get all shopkeepers in a specific world (optionally only from loaded chunks).
+* Fixed: The returned shopkeepers-by-chunk mapping is now actually unmodifiable.
+* Various javadoc improvements.
+* Internal: User interfaces now get requested via the UIType instead of a plain UI identifier.
+* Internal: Refactored shop creation and shop types.
+* Internal: ChunkCoords fields have to be accessed via getters now.
+* Internal: The shop creation data is now guarded against unintended modification.
+* Internal: Various other refactoring and cleanup across the project.
 
 ## v1.87 Beta (2018-05-17)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
