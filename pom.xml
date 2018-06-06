@@ -59,7 +59,6 @@
 	</profiles>
 
 	<modules>
-		<module>modules/parent</module>
 		<module>modules/api</module>
 		<module>modules/main</module>
 		<module>modules/v1_8_R1</module>
