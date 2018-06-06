@@ -4,7 +4,7 @@
 
 	<parent>
 		<groupId>com.nisovin.shopkeepers</groupId>
-		<artifactId>sk-parent</artifactId>
+		<artifactId>sk-root</artifactId>
 		<version>[0,)</version>
 		<relativePath>../../</relativePath>
 	</parent>
@@ -24,15 +24,15 @@
 
 	<build>
 		<sourceDirectory>target/filtered-sources/java</sourceDirectory>
-		<testSourceDirectory>${project.parent.relativePath}/src/test/java</testSourceDirectory>
+		<testSourceDirectory>${root.relativePath}/src/test/java</testSourceDirectory>
 		<resources>
 			<resource>
-				<directory>${project.parent.relativePath}/src/main/java</directory>
+				<directory>${root.relativePath}/src/main/java</directory>
 				<targetPath>../filtered-sources/java</targetPath>
 				<filtering>true</filtering>
 			</resource>
 			<resource>
-				<directory>${project.parent.relativePath}/src/main/resources</directory>
+				<directory>${root.relativePath}/src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 			<resource>

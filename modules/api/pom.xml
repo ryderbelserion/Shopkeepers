@@ -6,28 +6,34 @@
 		<groupId>com.nisovin.shopkeepers</groupId>
 		<artifactId>sk-parent</artifactId>
 		<version>[0,)</version>
-		<relativePath>../../</relativePath>
+		<relativePath>../parent/</relativePath>
 	</parent>
 	<artifactId>ShopkeepersAPI</artifactId>
 	<packaging>jar</packaging>
 	<name>SK API</name>
 	<url>${shopkeepers.repository.url}</url>
 
+	<scm>
+		<connection>${shopkeepers.repository.connection}</connection>
+		<developerConnection>${shopkeepers.repository.developerConnection}</developerConnection>
+		<url>${shopkeepers.repository.url}</url>
+	</scm>
+
 	<build>
 		<sourceDirectory>target/filtered-sources/java</sourceDirectory>
-		<testSourceDirectory>${project.parent.relativePath}/src/api/test</testSourceDirectory>
+		<testSourceDirectory>${root.relativePath}/src/api/test</testSourceDirectory>
 		<resources>
 			<resource>
-				<directory>${project.parent.relativePath}/src/api/java</directory>
+				<directory>${root.relativePath}/src/api/java</directory>
 				<targetPath>../filtered-sources/java</targetPath>
 				<filtering>true</filtering>
 			</resource>
 			<resource>
-				<directory>${project.parent.relativePath}/src/api/resources</directory>
+				<directory>${root.relativePath}/src/api/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 			<resource>
-				<directory>${project.parent.relativePath}</directory>
+				<directory>${root.relativePath}</directory>
 				<includes>
 					<include>LICENSE</include>
 				</includes>
@@ -51,4 +57,15 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>bukkit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+	</dependencies>
 </project>

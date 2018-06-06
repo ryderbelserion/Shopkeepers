@@ -4,47 +4,15 @@
 
 	<parent>
 		<groupId>com.nisovin.shopkeepers</groupId>
-		<artifactId>sk-parent</artifactId>
+		<artifactId>sk-nms-parent</artifactId>
 		<version>[0,)</version>
-		<relativePath>../../</relativePath>
+		<relativePath>../nms-parent/</relativePath>
 	</parent>
 	<artifactId>sk-v1_12_R1</artifactId>
 	<packaging>jar</packaging>
 	<name>SK for v1_12_R1</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>craftbukkit</artifactId>
-			<version>1.12-pre2-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>sk-main</artifactId>
-			<version>${project.version}</version>
-			<type>jar</type>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bukkit</groupId>
-					<artifactId>bukkit</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
+	<properties>
+		<craftbukkit.version>1.12-pre2-SNAPSHOT</craftbukkit.version>
+	</properties>
 </project>

@@ -6,15 +6,21 @@
 		<groupId>com.nisovin.shopkeepers</groupId>
 		<artifactId>sk-parent</artifactId>
 		<version>[0,)</version>
-		<relativePath>../../</relativePath>
+		<relativePath>../parent/</relativePath>
 	</parent>
 	<artifactId>Shopkeepers</artifactId>
 	<packaging>pom</packaging>
 	<name>SK Dist</name>
 	<url>${shopkeepers.repository.url}</url>
 
+	<scm>
+		<connection>${shopkeepers.repository.connection}</connection>
+		<developerConnection>${shopkeepers.repository.developerConnection}</developerConnection>
+		<url>${shopkeepers.repository.url}</url>
+	</scm>
+
 	<build>
-		<directory>${project.parent.relativePath}/target</directory>
+		<directory>${root.relativePath}/target</directory>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -57,56 +63,56 @@
 			<artifactId>sk-v1_8_R1</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sk-v1_8_R2</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sk-v1_8_R3</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sk-v1_9_R1</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sk-v1_9_R2</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sk-v1_10_R1</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sk-v1_11_R1</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sk-v1_12_R1</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 		<!-- Includes the API -->
 		<dependency>
@@ -114,7 +120,7 @@
 			<artifactId>sk-main</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
-			<scope>compile</scope>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

@@ -2,38 +2,22 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.nisovin.shopkeepers</groupId>
-	<artifactId>sk-parent</artifactId>
+	<parent>
+		<groupId>com.nisovin.shopkeepers</groupId>
+		<artifactId>sk-parent</artifactId>
+		<version>[0,)</version>
+		<relativePath>modules/parent/</relativePath>
+	</parent>
+	<artifactId>sk-root</artifactId>
 	<packaging>pom</packaging>
-	<name>SK Parent</name>
-	<version>2.0.1-SNAPSHOT</version>
+	<name>SK Root</name>
 	<url>${shopkeepers.repository.url}</url>
 
-	<properties>
-		<shopkeepers.version>${project.version}</shopkeepers.version>
-		<shopkeepers.repository.url>https://github.com/Shopkeepers/Shopkeepers</shopkeepers.repository.url>
-		<shopkeepers.dbo.url>http://dev.bukkit.org/server-mods/shopkeepers/</shopkeepers.dbo.url>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
-	</properties>
-
 	<scm>
-		<connection>scm:git:git://github.com/Shopkeepers/Shopkeepers.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com/Shopkeepers/Shopkeepers.git</developerConnection>
-		<url>https://github.com/Shopkeepers/Shopkeepers</url>
+		<connection>${shopkeepers.repository.connection}</connection>
+		<developerConnection>${shopkeepers.repository.developerConnection}</developerConnection>
+		<url>${shopkeepers.repository.url}</url>
 	</scm>
-
-	<distributionManagement>
-		<repository>
-			<id>de.cube-nation.nexus.release</id>
-			<url>http://nexus3.cube-nation.de/repository/releases</url>
-		</repository>
-		<snapshotRepository>
-			<id>de.cube-nation.nexus.snapshot</id>
-			<url>http://nexus3.cube-nation.de/repository/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
 
 	<profiles>
 		<profile>
@@ -75,6 +59,7 @@
 	</profiles>
 
 	<modules>
+		<module>modules/parent</module>
 		<module>modules/api</module>
 		<module>modules/main</module>
 		<module>modules/v1_8_R1</module>
@@ -90,20 +75,8 @@
 
 	<repositories>
 		<repository>
-			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
-		</repository>
-		<repository>
 			<id>sk89q-repo</id>
 			<url>http://maven.sk89q.com/repo/</url>
-		</repository>
-		<repository>
-			<id>Cube-Nation Nexus</id>
-			<url>http://nexus3.cube-nation.de/repository/maven-public/</url>
-		</repository>
-		<repository>
-			<id>Cube-Nation Nexus Old</id>
-			<url>http://nexus.cube-nation.de/content/groups/public/</url>
 		</repository>
 		<repository>
 			<name>Citizens2 repository</name>
@@ -120,64 +93,15 @@
 		</repository>
 	</repositories>
 
-	<build>
-		<!-- Common plugin configuration -->
-		<!-- Default lifecycle bindings, that can be omitted in child modules:
-		http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Built-in_Lifecycle_Bindings
-		-->
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.7.0</version>
-					<configuration>
-						<skip>true</skip>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-jar-plugin</artifactId>
-					<version>3.1.0</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-shade-plugin</artifactId>
-					<version>3.1.1</version>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-assembly-plugin</artifactId>
-					<version>3.1.0</version>
-				</plugin>
-				<!-- Skip various goals by default if not explicitly specified otherwise -->
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-install-plugin</artifactId>
-					<version>2.5.2</version>
-					<configuration>
-						<skip>true</skip>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-deploy-plugin</artifactId>
-					<version>2.8.2</version>
-					<configuration>
-						<skip>true</skip>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
-
-	<!-- Main dependencies, placed in parent so that the root eclipse project finds them -->
+	<!-- Main dependencies, placed in this parent so that the root eclipse project finds them -->
 	<dependencies>
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>bukkit</artifactId>
-			<version>1.8-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>com.sk89q</groupId>
@@ -208,12 +132,6 @@
 			<artifactId>bstats-bukkit</artifactId>
 			<version>1.2</version>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-			<scope>test</scope>
 		</dependency>
 	</dependencies>
 </project>

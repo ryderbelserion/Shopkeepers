@@ -4,34 +4,15 @@
 
 	<parent>
 		<groupId>com.nisovin.shopkeepers</groupId>
-		<artifactId>sk-parent</artifactId>
+		<artifactId>sk-nms-parent</artifactId>
 		<version>[0,)</version>
-		<relativePath>../../</relativePath>
+		<relativePath>../nms-parent/</relativePath>
 	</parent>
 	<artifactId>sk-v1_8_R2</artifactId>
 	<packaging>jar</packaging>
 	<name>SK for v1_8_R2</name>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>craftbukkit</artifactId>
-			<version>1.8.3-R0.1-SNAPSHOT</version>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>sk-main</artifactId>
-			<version>${project.version}</version>
-			<type>jar</type>
-			<scope>provided</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>org.bukkit</groupId>
-					<artifactId>bukkit</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-	</dependencies>
+	<properties>
+		<craftbukkit.version>1.8.3-R0.1-SNAPSHOT</craftbukkit.version>
+	</properties>
 </project>

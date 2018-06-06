@@ -15,6 +15,7 @@ local.properties
 .classpath
 .settings/
 .loadpath
+.flattened-pom.xml
 
 # Locally stored "Eclipse launch configurations"
 *.launch
