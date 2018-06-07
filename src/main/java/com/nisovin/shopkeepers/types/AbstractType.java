@@ -10,6 +10,11 @@ import com.nisovin.shopkeepers.util.Utils;
 public abstract class AbstractType implements Type {
 
 	/**
+	 * An unique identifier.
+	 * <p>
+	 * Make sure that the identifier (and its {@link StringUtils#normalize(String) normalization}) are unique among all
+	 * other {@link Type types} of the same context.
+	 * <p>
 	 * This could for example be used inside save/configuration files, so it should not contain any characters which
 	 * could cause problems with that.
 	 */
@@ -17,8 +22,8 @@ public abstract class AbstractType implements Type {
 	protected final String permission; // can be null
 
 	protected AbstractType(String identifier, String permission) {
-		Validate.notEmpty(identifier, "Empty identifier!");
-		this.identifier = identifier;
+		this.identifier = StringUtils.normalize(identifier);
+		Validate.notEmpty(this.identifier, "Empty identifier!");
 		this.permission = StringUtils.isEmpty(permission) ? null : permission;
 	}
 
@@ -45,6 +50,8 @@ public abstract class AbstractType implements Type {
 	@Override
 	public boolean matches(String identifier) {
 		identifier = StringUtils.normalize(identifier);
-		return StringUtils.normalize(this.identifier).equals(identifier);
+		return this.identifier.equals(identifier);
 	}
+
+	// not overriding equals and hashCode: only the exact same type instance is considered equal
 }
