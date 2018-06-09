@@ -17,14 +17,20 @@
 		<craftbukkit.version>UNSPECIFIED</craftbukkit.version>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<!-- Inside dependency management in order to prevent the IDE from searching
+				 for the dependency with version 'UNSPECIFIED' in remote repositories -->
+			<dependency>
+				<groupId>org.bukkit</groupId>
+				<artifactId>craftbukkit</artifactId>
+				<version>${craftbukkit.version}</version>
+				<type>jar</type>
+				<scope>provided</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
-		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>craftbukkit</artifactId>
-			<version>${craftbukkit.version}</version>
-			<type>jar</type>
-			<scope>provided</scope>
-		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>sk-main</artifactId>

@@ -15,4 +15,11 @@
 	<properties>
 		<craftbukkit.version>1.9.4-R0.1-SNAPSHOT</craftbukkit.version>
 	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>craftbukkit</artifactId>
+		</dependency>
+	</dependencies>
 </project>
