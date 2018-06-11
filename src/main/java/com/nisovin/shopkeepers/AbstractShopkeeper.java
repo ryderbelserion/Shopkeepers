@@ -195,13 +195,24 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.z = configSection.getInt("z");
 		this.updateChunkCoords();
 
-		String objectTypeId = configSection.getString("object");
+		// shop object:
+		String objectTypeId;
+		ConfigurationSection objectSection = configSection.getConfigurationSection("object");
+		if (objectSection == null) {
+			// load from legacy data:
+			// TODO remove again at some point
+			objectTypeId = configSection.getString("object");
+			objectSection = configSection;
+			this.markDirty();
+		} else {
+			objectTypeId = objectSection.getString("type");
+		}
 		AbstractShopObjectType<?> objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(objectTypeId);
 		if (objectType == null) {
 			throw new ShopkeeperCreateException("Invalid object type for shopkeeper '" + id + "': " + objectTypeId);
 		}
 		this.shopObject = objectType.createObject(this, null);
-		this.shopObject.load(configSection);
+		this.shopObject.load(objectSection);
 	}
 
 	/**
@@ -222,7 +233,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		configSection.set("y", y);
 		configSection.set("z", z);
 		configSection.set("type", this.getType().getIdentifier());
-		shopObject.save(configSection);
+
+		// shop object:
+		ConfigurationSection objectSection = configSection.createSection("object");
+		shopObject.save(objectSection);
 	}
 
 	@Override
