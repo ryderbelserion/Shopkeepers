@@ -31,7 +31,7 @@ public class CatShop extends LivingEntityShop {
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		configSection.set("skeletonType", catType.name());
+		configSection.set("catType", catType.name());
 	}
 
 	// SUB TYPES
