@@ -18,23 +18,21 @@ public class BookPlayerShopType extends AbstractPlayerShopType<BookPlayerShopkee
 	}
 
 	@Override
-	public BookPlayerShopkeeper loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
-		this.validateConfigSection(config);
-		BookPlayerShopkeeper shopkeeper = new BookPlayerShopkeeper(config);
-		this.registerShopkeeper(shopkeeper);
+	public BookPlayerShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+		this.validateCreationData(shopCreationData);
+		BookPlayerShopkeeper shopkeeper = new BookPlayerShopkeeper(id, (PlayerShopCreationData) shopCreationData);
 		return shopkeeper;
 	}
 
 	@Override
-	public BookPlayerShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
-		this.validateCreationData(creationData);
-		BookPlayerShopkeeper shopkeeper = new BookPlayerShopkeeper((PlayerShopCreationData) creationData);
-		this.registerShopkeeper(shopkeeper);
+	public BookPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+		this.validateConfigSection(configSection);
+		BookPlayerShopkeeper shopkeeper = new BookPlayerShopkeeper(id, configSection);
 		return shopkeeper;
 	}
 
 	@Override
-	public String getCreatedMessage() {
+	protected String getCreatedMessage() {
 		return Settings.msgBookShopCreated;
 	}
 

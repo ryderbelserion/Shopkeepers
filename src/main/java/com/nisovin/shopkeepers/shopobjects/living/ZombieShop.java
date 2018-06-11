@@ -18,16 +18,18 @@ public class ZombieShop extends LivingEntityShop {
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
-		super.load(config);
-		baby = config.getBoolean("baby");
+	public void load(ConfigurationSection configSection) {
+		super.load(configSection);
+		baby = configSection.getBoolean("baby");
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
-		config.set("baby", baby);
+	public void save(ConfigurationSection configSection) {
+		super.save(configSection);
+		configSection.set("baby", baby);
 	}
+
+	// SUB TYPES
 
 	@Override
 	protected void applySubType() {
@@ -44,6 +46,7 @@ public class ZombieShop extends LivingEntityShop {
 
 	@Override
 	public void cycleSubType() {
+		shopkeeper.markDirty();
 		baby = !baby;
 		this.applySubType();
 	}

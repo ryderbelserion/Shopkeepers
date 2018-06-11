@@ -21,7 +21,9 @@ import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHiredEvent;
+import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHireEvent;
+import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
+import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
@@ -364,17 +366,18 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				}
 
 				// call event:
-				int maxShops = SKShopkeepersPlugin.getInstance().getMaxShops(player);
-				PlayerShopkeeperHiredEvent hireEvent = new PlayerShopkeeperHiredEvent(player, shopkeeper, newPlayerInventoryContents, maxShops);
+				int maxShops = Settings.getMaxShops(player);
+				PlayerShopkeeperHireEvent hireEvent = new PlayerShopkeeperHireEvent(shopkeeper, player, newPlayerInventoryContents, maxShops);
 				Bukkit.getPluginManager().callEvent(hireEvent);
 				if (hireEvent.isCancelled()) {
+					Log.debug("PlayerShopkeeperHireEvent was cancelled!");
 					// close window for this player:
 					this.closeDelayed(player);
 					return;
 				}
 
 				// check max shops limit:
-				maxShops = hireEvent.getMaxShopsForPlayer();
+				maxShops = hireEvent.getMaxShopsLimit();
 				if (maxShops > 0) {
 					int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().countShopsOfPlayer(player);
 					if (count >= maxShops) {
@@ -388,7 +391,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				player.getInventory().setContents(newPlayerInventoryContents); // apply inventory changes
 				shopkeeper.setForHire(null);
 				shopkeeper.setOwner(player);
-				ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+				shopkeeper.save();
 				Utils.sendMessage(player, Settings.msgHired);
 
 				// close all open windows for this shopkeeper:
@@ -405,18 +408,24 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	protected ItemStack hireCost = null; // null if not for hire
 
 	/**
-	 * For use in sub-classes.
+	 * Creates a not yet initialized {@link AbstractPlayerShopkeeper} (for use in sub-classes).
+	 * <p>
+	 * See {@link AbstractShopkeeper} for details on initialization.
+	 * 
+	 * @param id
+	 *            the shopkeeper id
 	 */
-	protected AbstractPlayerShopkeeper() {
+	protected AbstractPlayerShopkeeper(int id) {
+		super(id);
 	}
 
 	/**
 	 * Expects a {@link PlayerShopCreationData}.
 	 */
 	@Override
-	protected void initOnCreation(ShopCreationData creationData) throws ShopkeeperCreateException {
-		super.initOnCreation(creationData);
-		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) creationData;
+	protected void loadFromCreationData(ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+		super.loadFromCreationData(shopCreationData);
+		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) shopCreationData;
 		Player owner = playerShopCreationData.getOwner();
 		Block chest = playerShopCreationData.getShopChest();
 		assert owner != null;
@@ -428,22 +437,64 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	protected void onInitDone() {
-		super.onInitDone();
-		this.registerUIHandler(new PlayerShopHiringHandler(this));
+	protected void setup() {
+		if (this.getUIHandler(DefaultUITypes.HIRING()) == null) {
+			this.registerUIHandler(new PlayerShopHiringHandler(this));
+		}
+		super.setup();
 	}
 
 	@Override
-	public void onRegistration(int sessionId) {
-		super.onRegistration(sessionId);
+	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
+		super.loadFromSaveData(configSection);
+		try {
+			ownerUUID = UUID.fromString(configSection.getString("owner uuid"));
+		} catch (Exception e) {
+			// uuid invalid or non-existent:
+			throw new ShopkeeperCreateException("Missing owner uuid!");
+		}
+		ownerName = configSection.getString("owner", "unknown");
+
+		if (!configSection.isInt("chestx") || !configSection.isInt("chesty") || !configSection.isInt("chestz")) {
+			throw new ShopkeeperCreateException("Missing chest coordinate(s)");
+		}
+
+		// update chest:
+		this.setChest(configSection.getInt("chestx"), configSection.getInt("chesty"), configSection.getInt("chestz"));
+
+		hireCost = configSection.getItemStack("hirecost");
+		// hire cost itemstack is not null, but empty -> normalize to null:
+		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
+			Log.warning("Invalid (empty) hire cost! Disabling 'for hire' for shopkeeper at " + this.getPositionString());
+			hireCost = null;
+			this.markDirty();
+		}
+	}
+
+	@Override
+	public void save(ConfigurationSection configSection) {
+		super.save(configSection);
+		configSection.set("owner uuid", ownerUUID.toString());
+		configSection.set("owner", ownerName);
+		configSection.set("chestx", chestX);
+		configSection.set("chesty", chestY);
+		configSection.set("chestz", chestZ);
+		if (hireCost != null) {
+			configSection.set("hirecost", hireCost);
+		}
+	}
+
+	@Override
+	protected void onAdded(ShopkeeperAddedEvent.Cause cause) {
+		super.onAdded(cause);
 
 		// register protected chest:
 		SKShopkeepersPlugin.getInstance().getProtectedChests().addChest(this.getWorldName(), chestX, chestY, chestZ, this);
 	}
 
 	@Override
-	public void onDeletion() {
-		super.onDeletion();
+	protected void onRemoval(ShopkeeperRemoveEvent.Cause cause) {
+		super.onRemoval(cause);
 
 		// unregister previously protected chest:
 		SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(this.getWorldName(), chestX, chestY, chestZ, this);
@@ -503,51 +554,13 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
-		super.load(config);
-		try {
-			ownerUUID = UUID.fromString(config.getString("owner uuid"));
-		} catch (Exception e) {
-			// uuid invalid or non-existent:
-			throw new ShopkeeperCreateException("Missing owner uuid!");
-		}
-		ownerName = config.getString("owner", "unknown");
-
-		if (!config.isInt("chestx") || !config.isInt("chesty") || !config.isInt("chestz")) {
-			throw new ShopkeeperCreateException("Missing chest coordinate(s)");
-		}
-
-		// update chest:
-		this.setChest(config.getInt("chestx"), config.getInt("chesty"), config.getInt("chestz"));
-
-		hireCost = config.getItemStack("hirecost");
-		// hire cost itemstack is not null, but empty -> normalize to null:
-		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
-			Log.warning("Invalid (empty) hire cost! Disabling 'for hire' for shopkeeper at " + this.getPositionString());
-			hireCost = null;
-		}
-	}
-
-	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
-		config.set("owner uuid", ownerUUID.toString());
-		config.set("owner", ownerName);
-		config.set("chestx", chestX);
-		config.set("chesty", chestY);
-		config.set("chestz", chestZ);
-		if (hireCost != null) {
-			config.set("hirecost", hireCost);
-		}
-	}
-
-	@Override
 	public void setOwner(Player player) {
 		this.setOwner(player.getUniqueId(), player.getName());
 	}
 
 	@Override
 	public void setOwner(UUID ownerUUID, String ownerName) {
+		this.markDirty();
 		this.ownerUUID = ownerUUID;
 		this.ownerName = ownerName;
 		// TODO do this in a more abstract way
@@ -592,6 +605,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void setForHire(ItemStack hireCost) {
+		this.markDirty();
 		if (ItemUtils.isEmpty(hireCost)) {
 			// disable hiring:
 			this.hireCost = null;
@@ -619,6 +633,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		this.chestX = chestX;
 		this.chestY = chestY;
 		this.chestZ = chestZ;
+		this.markDirty();
 
 		if (this.isValid()) {
 			// register new protected chest:

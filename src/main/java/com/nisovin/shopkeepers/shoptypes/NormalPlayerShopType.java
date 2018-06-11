@@ -18,23 +18,21 @@ public class NormalPlayerShopType extends AbstractPlayerShopType<NormalPlayerSho
 	}
 
 	@Override
-	public NormalPlayerShopkeeper loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
-		this.validateConfigSection(config);
-		NormalPlayerShopkeeper shopkeeper = new NormalPlayerShopkeeper(config);
-		this.registerShopkeeper(shopkeeper);
+	public NormalPlayerShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+		this.validateCreationData(shopCreationData);
+		NormalPlayerShopkeeper shopkeeper = new NormalPlayerShopkeeper(id, (PlayerShopCreationData) shopCreationData);
 		return shopkeeper;
 	}
 
 	@Override
-	public NormalPlayerShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
-		this.validateCreationData(creationData);
-		NormalPlayerShopkeeper shopkeeper = new NormalPlayerShopkeeper((PlayerShopCreationData) creationData);
-		this.registerShopkeeper(shopkeeper);
+	public NormalPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+		this.validateConfigSection(configSection);
+		NormalPlayerShopkeeper shopkeeper = new NormalPlayerShopkeeper(id, configSection);
 		return shopkeeper;
 	}
 
 	@Override
-	public String getCreatedMessage() {
+	protected String getCreatedMessage() {
 		return Settings.msgPlayerShopCreated;
 	}
 

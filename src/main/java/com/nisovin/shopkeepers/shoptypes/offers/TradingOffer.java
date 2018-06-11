@@ -30,18 +30,23 @@ public class TradingOffer extends SKTradingRecipe { // shares its implementation
 		ConfigurationSection offersSection = config.createSection(node);
 		int id = 0;
 		for (TradingOffer offer : offers) {
+			// note: the items are clones
+			ItemStack item1 = offer.getItem1();
+			ItemStack item2 = offer.getItem2();
+			ItemStack resultItem = offer.getResultItem();
+
 			// TODO temporary, due to a bukkit bug custom head item can currently not be saved
 			if (Settings.skipCustomHeadSaving
-					&& (ItemUtils.isCustomHeadItem(offer.getItem1())
-							|| ItemUtils.isCustomHeadItem(offer.getItem2())
-							|| ItemUtils.isCustomHeadItem(offer.getResultItem()))) {
+					&& (ItemUtils.isCustomHeadItem(item1)
+							|| ItemUtils.isCustomHeadItem(item2)
+							|| ItemUtils.isCustomHeadItem(resultItem))) {
 				Log.warning("Skipping saving of trade involving a head item with custom texture, which cannot be saved currently due to a bukkit bug.");
 				continue;
 			}
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
-			ItemUtils.saveItem(offerSection, "resultItem", offer.getResultItem());
-			ItemUtils.saveItem(offerSection, "item1", offer.getItem1());
-			ItemUtils.saveItem(offerSection, "item2", offer.getItem2());
+			ItemUtils.saveItem(offerSection, "item1", item1);
+			ItemUtils.saveItem(offerSection, "item2", item2);
+			ItemUtils.saveItem(offerSection, "resultItem", resultItem);
 			id++;
 		}
 	}

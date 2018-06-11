@@ -17,10 +17,10 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
-import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
+import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -208,7 +208,7 @@ class CreateListener implements Listener {
 
 		// create player shopkeeper:
 		ShopCreationData creationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, clickedBlockFace, player, selectedChest);
-		Shopkeeper shopkeeper = plugin.createShopkeeper(creationData);
+		Shopkeeper shopkeeper = plugin.handleShopkeeperCreation(creationData);
 		if (shopkeeper == null) {
 			// something else prevented this shopkeeper from being created
 			return false;

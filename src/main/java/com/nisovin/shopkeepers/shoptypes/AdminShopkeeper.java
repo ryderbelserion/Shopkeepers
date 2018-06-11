@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
@@ -138,47 +139,61 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 	protected String tradePermission = null;
 
 	/**
-	 * For use in extending classes.
+	 * Creates a not yet initialized {@link AdminShopkeeper} (for use in sub-classes).
+	 * <p>
+	 * See {@link AbstractShopkeeper} for details on initialization.
+	 * 
+	 * @param id
+	 *            the shopkeeper id
 	 */
-	protected AdminShopkeeper() {
+	protected AdminShopkeeper(int id) {
+		super(id);
 	}
 
-	protected AdminShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
-		this.initOnLoad(config);
-		this.onInitDone();
+	protected AdminShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+		super(id);
+		this.initOnCreation(shopCreationData);
 	}
 
-	protected AdminShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
-		this.initOnCreation(creationData);
-		this.onInitDone();
-	}
-
-	@Override
-	protected void onInitDone() {
-		super.onInitDone();
-		this.registerUIHandler(new AdminShopEditorHandler(this));
-		this.registerUIHandler(new AdminShopTradingHandler(this));
+	protected AdminShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+		super(id);
+		this.initOnLoad(configSection);
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
-		super.load(config);
+	protected void setup() {
+		if (this.getUIHandler(DefaultUITypes.EDITOR()) == null) {
+			this.registerUIHandler(new AdminShopEditorHandler(this));
+		}
+		if (this.getUIHandler(DefaultUITypes.TRADING()) == null) {
+			this.registerUIHandler(new AdminShopTradingHandler(this));
+		}
+		super.setup();
+	}
+
+	@Override
+	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
+		super.loadFromSaveData(configSection);
 		// load trade permission:
-		tradePermission = config.getString("tradePerm", null);
+		tradePermission = configSection.getString("tradePerm", null);
 		// load offers:
-		this.clearOffers();
+		this._clearOffers();
 		// TODO remove legacy: load offers from old format
-		this.addOffers(this.loadFromConfigOld(config, "recipes"));
-		this.addOffers(TradingOffer.loadFromConfig(config, "recipes"));
+		List<TradingOffer> legacyOffers = this.loadFromConfigOld(configSection, "recipes");
+		if (!legacyOffers.isEmpty()) {
+			this._addOffers(legacyOffers);
+			this.markDirty();
+		}
+		this._addOffers(TradingOffer.loadFromConfig(configSection, "recipes"));
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
+	public void save(ConfigurationSection configSection) {
+		super.save(configSection);
 		// save trade permission:
-		config.set("tradePerm", tradePermission);
+		configSection.set("tradePerm", tradePermission);
 		// save offers:
-		TradingOffer.saveToConfig(config, "recipes", this.getOffers());
+		TradingOffer.saveToConfig(configSection, "recipes", this.getOffers());
 	}
 
 	@Override
@@ -195,6 +210,7 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 			tradePermission = null;
 		}
 		this.tradePermission = tradePermission;
+		this.markDirty();
 	}
 
 	@Override
@@ -213,28 +229,34 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 		TradingOffer newOffer = new TradingOffer(resultItem, item1, item2);
 
 		// add new offer:
-		this.addOffer(newOffer);
+		this._addOffer(newOffer);
+		this.markDirty();
 		return newOffer;
 	}
 
-	private void addOffer(TradingOffer offer) {
+	private void _addOffer(TradingOffer offer) {
 		assert offer != null;
 		offers.add(offer);
 		recipes.add(offer); // TradingOffer extends TradingRecipe
 	}
 
-	private void addOffers(Collection<TradingOffer> offers) {
+	private void _addOffers(Collection<TradingOffer> offers) {
 		assert offers != null;
 		for (TradingOffer offer : offers) {
 			if (offer == null) continue; // skip invalid entries
 			// add new offer:
-			this.addOffer(offer);
+			this._addOffer(offer);
 		}
 	}
 
-	public void clearOffers() {
+	private void _clearOffers() {
 		offers.clear();
 		recipes.clear();
+	}
+
+	public void clearOffers() {
+		this._clearOffers();
+		this.markDirty();
 	}
 
 	// legacy code:

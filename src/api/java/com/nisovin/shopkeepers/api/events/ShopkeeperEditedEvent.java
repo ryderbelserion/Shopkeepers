@@ -1,22 +1,20 @@
 package com.nisovin.shopkeepers.api.events;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.api.Shopkeeper;
 
 /**
- * This event is called whenever a player edited a {@link Shopkeeper} in some way.
+ * This event is called whenever a player has finished editing a {@link Shopkeeper} in some way.
  */
-public class ShopkeeperEditedEvent extends Event {
+public class ShopkeeperEditedEvent extends ShopkeeperEvent {
 
 	private final Player player;
-	private final Shopkeeper shopkeeper;
 
-	public ShopkeeperEditedEvent(Player player, Shopkeeper shopkeeper) {
+	public ShopkeeperEditedEvent(Shopkeeper shopkeeper, Player player) {
+		super(shopkeeper);
 		this.player = player;
-		this.shopkeeper = shopkeeper;
 	}
 
 	/**
@@ -26,15 +24,6 @@ public class ShopkeeperEditedEvent extends Event {
 	 */
 	public Player getPlayer() {
 		return player;
-	}
-
-	/**
-	 * The edited {@link Shopkeeper}.
-	 * 
-	 * @return the edited {@link Shopkeeper}
-	 */
-	public Shopkeeper getShopkeeper() {
-		return shopkeeper;
 	}
 
 	private static final HandlerList handlers = new HandlerList();

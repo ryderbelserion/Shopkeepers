@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -23,37 +22,26 @@ import com.nisovin.shopkeepers.api.util.TradingRecipe;
  * DO NOT modify the corresponding {@link InventoryClickEvent}, any affected inventories (player, merchant, chest, ..),
  * or any other state which might be affected by the trade during the handling of this event!
  */
-public class ShopkeeperTradeEvent extends Event implements Cancellable {
+public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable {
 
-	private final Shopkeeper shopkeeper;
 	private final Player player;
 	private final InventoryClickEvent clickEvent;
 	private final TradingRecipe tradingRecipe;
 	private final ItemStack offeredItem1;
 	private final ItemStack offeredItem2;
 	private final boolean swappedItemOrder;
-
 	private boolean cancelled = false;
 
 	public ShopkeeperTradeEvent(Shopkeeper shopkeeper, Player player, InventoryClickEvent clickEvent,
 								TradingRecipe tradingRecipe, ItemStack offeredItem1, ItemStack offeredItem2,
 								boolean swappedItemOrder) {
-		this.shopkeeper = shopkeeper;
+		super(shopkeeper);
 		this.player = player;
 		this.clickEvent = clickEvent;
 		this.tradingRecipe = tradingRecipe;
 		this.offeredItem1 = offeredItem1;
 		this.offeredItem2 = offeredItem2;
 		this.swappedItemOrder = swappedItemOrder;
-	}
-
-	/**
-	 * Gets the trading {@link Shopkeeper}.
-	 * 
-	 * @return the {@link Shopkeeper} involved in this trade
-	 */
-	public Shopkeeper getShopkeeper() {
-		return shopkeeper;
 	}
 
 	/**

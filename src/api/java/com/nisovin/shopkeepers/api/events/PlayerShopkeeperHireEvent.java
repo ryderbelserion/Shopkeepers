@@ -2,14 +2,13 @@ package com.nisovin.shopkeepers.api.events;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
-import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
 
 /**
- * This event is called whenever a player is about to hire a player shopkeeper.
+ * This event is called whenever a player is about to hire a {@link PlayerShopkeeper}.
  * <p>
  * This event is called after the inventory of the hiring player has been checked to contain the required hire cost
  * items and the new inventory contents resulting from hiring have been calculated.<br>
@@ -20,38 +19,32 @@ import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
  * This event is called before the max shops limit is checked for the player.<br>
  * If this event is cancelled or the player has reached the max shops limit, the shop will not be hired.
  */
-public class PlayerShopkeeperHiredEvent extends Event implements Cancellable {
+public class PlayerShopkeeperHireEvent extends ShopkeeperEvent implements Cancellable {
 
 	private final Player player;
-	private final PlayerShopkeeper shopkeeper;
 	private final ItemStack[] newPlayerInventoryContents;
-	private int maxShops;
+	private int maxShopsLimit;
+	private boolean cancelled = false;
 
-	private boolean cancelled;
-
-	public PlayerShopkeeperHiredEvent(Player player, PlayerShopkeeper shopkeeper, ItemStack[] newPlayerInventoryContents, int maxShops) {
+	public PlayerShopkeeperHireEvent(PlayerShopkeeper shopkeeper, Player player, ItemStack[] newPlayerInventoryContents, int maxShopsLimit) {
+		super(shopkeeper);
 		this.player = player;
-		this.shopkeeper = shopkeeper;
 		this.newPlayerInventoryContents = newPlayerInventoryContents;
-		this.maxShops = maxShops;
+		this.maxShopsLimit = maxShopsLimit;
+	}
+
+	@Override
+	public PlayerShopkeeper getShopkeeper() {
+		return (PlayerShopkeeper) super.getShopkeeper();
 	}
 
 	/**
-	 * Gets the player trying to hire the shop.
+	 * Gets the player who is trying to hire the shopkeeper.
 	 * 
-	 * @return the player
+	 * @return the hiring player
 	 */
 	public Player getPlayer() {
 		return player;
-	}
-
-	/**
-	 * Gets the shokeeper the player is about to hire.
-	 * 
-	 * @return the shopkeeper
-	 */
-	public PlayerShopkeeper getShopkeeper() {
-		return shopkeeper;
 	}
 
 	/**
@@ -68,24 +61,25 @@ public class PlayerShopkeeperHiredEvent extends Event implements Cancellable {
 	}
 
 	/**
-	 * Gets the maximum number of shops the player can have.
+	 * Gets the maximum number of shops the hiring player can have.
 	 * 
-	 * @return player max shops
+	 * @return the hiring player's max shops limit
 	 */
-	public int getMaxShopsForPlayer() {
-		return maxShops;
+	public int getMaxShopsLimit() {
+		return maxShopsLimit;
 	}
 
 	/**
-	 * Sets the maximum number of shops the creating player can have.
+	 * Sets the maximum number of shops the hiring player can have.
 	 * <p>
-	 * If the player has more than this number, the shop will not be hired.
+	 * The new max shops limit only affects this specific shopkeeper hire. If the player already has more shops than
+	 * this, the shop will not be hired.
 	 * 
-	 * @param maxShops
-	 *            the player's max shops
+	 * @param maxShopsLimit
+	 *            the hiring player's max shops limit to use for this hire
 	 */
-	public void setMaxShopsForPlayer(int maxShops) {
-		this.maxShops = maxShops;
+	public void setMaxShopsLimit(int maxShopsLimit) {
+		this.maxShopsLimit = maxShopsLimit;
 	}
 
 	/**

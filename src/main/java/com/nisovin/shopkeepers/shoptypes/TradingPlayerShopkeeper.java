@@ -13,10 +13,12 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shoptypes.offers.TradingOffer;
 import com.nisovin.shopkeepers.util.ItemCount;
@@ -201,43 +203,57 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	private ItemStack clickedItem;
 
 	/**
-	 * For use in extending classes.
+	 * Creates a not yet initialized {@link TradingPlayerShopkeeper} (for use in sub-classes).
+	 * <p>
+	 * See {@link AbstractShopkeeper} for details on initialization.
+	 * 
+	 * @param id
+	 *            the shopkeeper id
 	 */
-	protected TradingPlayerShopkeeper() {
+	protected TradingPlayerShopkeeper(int id) {
+		super(id);
 	}
 
-	public TradingPlayerShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
-		this.initOnLoad(config);
-		this.onInitDone();
+	protected TradingPlayerShopkeeper(int id, PlayerShopCreationData shopCreationData) throws ShopkeeperCreateException {
+		super(id);
+		this.initOnCreation(shopCreationData);
 	}
 
-	public TradingPlayerShopkeeper(PlayerShopCreationData creationData) throws ShopkeeperCreateException {
-		this.initOnCreation(creationData);
-		this.onInitDone();
-	}
-
-	@Override
-	protected void onInitDone() {
-		super.onInitDone();
-		this.registerUIHandler(new TradingPlayerShopEditorHandler(this));
-		this.registerUIHandler(new TradingPlayerShopTradingHandler(this));
+	protected TradingPlayerShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+		super(id);
+		this.initOnLoad(configSection);
 	}
 
 	@Override
-	protected void load(ConfigurationSection config) throws ShopkeeperCreateException {
-		super.load(config);
+	protected void setup() {
+		if (this.getUIHandler(DefaultUITypes.EDITOR()) == null) {
+			this.registerUIHandler(new TradingPlayerShopEditorHandler(this));
+		}
+		if (this.getUIHandler(DefaultUITypes.TRADING()) == null) {
+			this.registerUIHandler(new TradingPlayerShopTradingHandler(this));
+		}
+		super.setup();
+	}
+
+	@Override
+	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
+		super.loadFromSaveData(configSection);
 		// load offers:
-		this.clearOffers();
+		this._clearOffers();
 		// TODO remove legacy: load offers from old costs section
-		this.addOffers(TradingOffer.loadFromConfigOld(config, "costs"));
-		this.addOffers(TradingOffer.loadFromConfig(config, "offers"));
+		List<TradingOffer> legacyOffers = TradingOffer.loadFromConfigOld(configSection, "costs");
+		if (!legacyOffers.isEmpty()) {
+			this._addOffers(legacyOffers);
+			this.markDirty();
+		}
+		this._addOffers(TradingOffer.loadFromConfig(configSection, "offers"));
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
+	public void save(ConfigurationSection configSection) {
+		super.save(configSection);
 		// save offers:
-		TradingOffer.saveToConfig(config, "offers", this.getOffers());
+		TradingOffer.saveToConfig(configSection, "offers", this.getOffers());
 	}
 
 	@Override
@@ -287,28 +303,34 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		TradingOffer newOffer = new TradingOffer(resultItem, item1, item2);
 
 		// add new offer (replacing any previous offer for the same item):
-		this.addOffer(newOffer);
+		this._addOffer(newOffer);
+		this.markDirty();
 		return newOffer;
 	}
 
-	private void addOffer(TradingOffer offer) {
+	private void _addOffer(TradingOffer offer) {
 		assert offer != null;
 		// remove previous offer for the same item:
 		this.removeOffer(offer.getResultItem());
 		offers.add(offer);
 	}
 
-	private void addOffers(Collection<TradingOffer> offers) {
+	private void _addOffers(Collection<TradingOffer> offers) {
 		assert offers != null;
 		for (TradingOffer offer : offers) {
 			if (offer == null) continue; // skip invalid entries
 			// add new offer (replacing any previous offer for the same item):
-			this.addOffer(offer);
+			this._addOffer(offer);
 		}
 	}
 
-	public void clearOffers() {
+	private void _clearOffers() {
 		offers.clear();
+	}
+
+	public void clearOffers() {
+		this._clearOffers();
+		this.markDirty();
 	}
 
 	public void removeOffer(ItemStack tradedItem) {
@@ -316,6 +338,7 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		while (iterator.hasNext()) {
 			if (ItemUtils.isSimilar(iterator.next().getResultItem(), tradedItem)) {
 				iterator.remove();
+				this.markDirty();
 				break;
 			}
 		}

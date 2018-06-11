@@ -8,9 +8,14 @@ import java.util.UUID;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 
+import com.nisovin.shopkeepers.AbstractShopkeeper;
+import com.nisovin.shopkeepers.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 
 /**
@@ -18,32 +23,56 @@ import com.nisovin.shopkeepers.api.util.ChunkCoords;
  */
 public interface ShopkeeperRegistry {
 
-	/**
-	 * Gets the shopkeeper by its unique id.
-	 * 
-	 * <p>
-	 * Note: This is not the entity uuid, but the id from {@link Shopkeeper#getUniqueId()}.
-	 * </p>
-	 * 
-	 * @param shopkeeperId
-	 *            the shopkeeper's unique id
-	 * @return the shopkeeper for the given id, or <code>null</code>
-	 */
-	public Shopkeeper getShopkeeper(UUID shopkeeperId);
+	// SHOPKEEPER CREATION
 
 	/**
-	 * Gets the shopkeeper by its current session id.
+	 * Creates a shopkeeper from the given creation data and spawns it into the world.
 	 * 
-	 * <p>
-	 * This id is only guaranteed to be valid until the next server restart or reload of the shopkeepers. See
-	 * {@link Shopkeeper#getSessionId()} for details.
-	 * </p>
-	 * 
-	 * @param shopkeeperSessionId
-	 *            the shopkeeper's session id
-	 * @return the shopkeeper for the given session id, or <code>null</code>
+	 * @param id
+	 *            the shopkeepers id
+	 * @param creationData
+	 *            the shop creation data containing the necessary arguments (spawn location, object type, owner, etc.)
+	 *            for creating the shopkeeper
+	 * @return the created Shopkeeper
+	 * @throws ShopkeeperCreateException
+	 *             if the shopkeeper could not be created
 	 */
-	public Shopkeeper getShopkeeper(int shopkeeperSessionId);
+	public AbstractShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException;
+
+	/**
+	 * Recreates a shopkeeper by loading its previously saved data from the given config section.
+	 * 
+	 * @param shopType
+	 *            the shop type
+	 * @param id
+	 *            the shopkeepers id
+	 * @param configSection
+	 *            the config section to load the shopkeeper data from
+	 * @return the loaded shopkeeper
+	 * @throws ShopkeeperCreateException
+	 *             if the shopkeeper could not be loaded
+	 */
+	public AbstractShopkeeper loadShopkeeper(ShopType<?> shopType, int id, ConfigurationSection configSection) throws ShopkeeperCreateException;
+
+	// QUERYING
+
+	/**
+	 * Gets the shopkeeper by its {@link Shopkeeper#getUniqueId() unique id}.
+	 * 
+	 * @param shopkeeperUniqueId
+	 *            the shopkeeper's unique id
+	 * @return the shopkeeper for the given unique id, or <code>null</code>
+	 */
+	public Shopkeeper getShopkeeperByUniqueId(UUID shopkeeperUniqueId);
+
+	/**
+	 * Gets the shopkeeper by its {@link Shopkeeper#getId() id}.
+	 * 
+	 * @param shopkeeperId
+	 *            the shopkeeper's id
+	 * @return the shopkeeper for the given id, or <code>null</code>
+	 */
+	public Shopkeeper getShopkeeperById(int shopkeeperId);
 
 	/**
 	 * Tries to find a shopkeeper with the given name.

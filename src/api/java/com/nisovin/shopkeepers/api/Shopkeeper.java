@@ -6,35 +6,77 @@ import java.util.UUID;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.api.registry.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.shoptypes.ShopType;
+import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 
 public interface Shopkeeper {
 
+	// STORAGE
+
+	/**
+	 * Requests a {@link ShopkeeperStorage#save() save} of all shopkeepers data.
+	 * 
+	 * @see ShopkeeperStorage#save()
+	 */
+	public void save();
+
+	/**
+	 * Requests a {@link ShopkeeperStorage#saveDelayed() delayed save} of all shopkeepers data.
+	 * 
+	 * @see ShopkeeperStorage#saveDelayed()
+	 */
+	public void saveDelayed();
+
+	/**
+	 * Whether this shopkeeper has been marked as 'dirty' to indicate that it has unsaved changes to its data.
+	 * 
+	 * @return <code>true</code> if marked as dirty
+	 */
+	public boolean isDirty();
+
+	// LIFE CYCLE
+
+	/**
+	 * Checks whether this shopkeeper object is currently valid.
+	 * <p>
+	 * The shopkeeper gets marked as 'invalid' once it gets removed form the {@link ShopkeeperRegistry}.
+	 * 
+	 * @return <code>true</code> if valid
+	 */
+	public boolean isValid();
+
+	/**
+	 * Persistently removes this shopkeeper.
+	 */
+	public void delete();
+
+	// ATTRIBUTES
+
+	/**
+	 * Gets the shop's id.
+	 * 
+	 * <p>
+	 * This id is unique across all currently loaded shops, but there is no guarantee for it to be globally unique
+	 * across server sessions.
+	 * 
+	 * @return the shop's id
+	 */
+	public int getId();
+
 	/**
 	 * Gets the shop's unique id.
 	 * 
 	 * <p>
-	 * This id is meant to be unique and never change.
+	 * This id is globally unique across all shopkeepers that ever existed.
 	 * 
 	 * @return the shop's unique id
 	 */
 	public UUID getUniqueId();
-
-	/**
-	 * Gets the shop's session id.
-	 * 
-	 * <p>
-	 * This id is unique across all currently loaded shops, but may change across server restarts or when the shops are
-	 * getting reloaded.<br>
-	 * To reliable identify a shop use {@link #getUniqueId()} instead.
-	 * 
-	 * @return the shop's session id
-	 */
-	public int getSessionId();
 
 	/**
 	 * Gets the type of this shopkeeper (ex: admin, normal player, book player, buying player, trading player, etc.).
@@ -42,63 +84,6 @@ public interface Shopkeeper {
 	 * @return the shopkeeper type
 	 */
 	public ShopType<?> getType();
-
-	/**
-	 * Gets the object representing this shopkeeper in the world.
-	 * 
-	 * @return the shop object
-	 */
-	public ShopObject getShopObject();
-
-	/**
-	 * Spawns the shopkeeper into the world at its spawn location and overwrites it's AI.
-	 * 
-	 * @return <code>true</code> on success
-	 */
-	public boolean spawn();
-
-	/**
-	 * Whether or not this shopkeeper needs to be spawned and despawned with chunk load and unloads.
-	 * 
-	 * @return <code>true</code> if spawning is required
-	 */
-	public boolean needsSpawning();
-
-	/**
-	 * Checks if the shopkeeper is active (is present in the world).
-	 * 
-	 * @return <code>true</code> if the shopkeeper is active
-	 */
-	public boolean isActive();
-
-	/**
-	 * Removes this shopkeeper from the world.
-	 */
-	public void despawn();
-
-	/**
-	 * Persistently removes this shopkeeper.
-	 */
-	public void delete();
-
-	/**
-	 * The shopkeeper gets marked as 'invalid' when being unregistered (ex. on deletion or if being replaced with a
-	 * freshly loaded shopkeeper instance).
-	 * 
-	 * @return <code>true</code> if still valid
-	 */
-	public boolean isValid();
-
-	/**
-	 * Gets the ChunkCoords identifying the chunk this shopkeeper spawns in.
-	 * 
-	 * @return the chunk coordinates
-	 */
-	public ChunkCoords getChunkCoords();
-
-	public String getPositionString();
-
-	public Location getActualLocation();
 
 	/**
 	 * Gets the name of the world this shopkeeper lives in.
@@ -113,29 +98,25 @@ public interface Shopkeeper {
 
 	public int getZ();
 
+	public String getPositionString();
+
 	/**
+	 * Gets the shopkeeper's location.
+	 * <p>
 	 * This only works if the world is loaded.
 	 * 
-	 * @return <code>null</code> if the world this shopkeeper is in isn't loaded
+	 * @return the location of the shopkeeper, or <code>null</code> if the world isn't loaded
 	 */
 	public Location getLocation();
 
 	/**
-	 * Sets the stored location of this Shopkeeper.
-	 * <p>
-	 * This will not actually move the shopkeeper entity until the next time teleport() is called.
+	 * Gets the {@link ChunkCoords} identifying the chunk this shopkeeper spawns in.
 	 * 
-	 * @param location
-	 *            the new stored location of this shopkeeper
+	 * @return the chunk coordinates
 	 */
-	public void setLocation(Location location);
+	public ChunkCoords getChunkCoords();
 
-	/**
-	 * Gets the shopkeeper's object ID. This is can change when the shopkeeper object (ex. shopkeeper entity) respawns.
-	 * 
-	 * @return the object id, or <code>null</code> if the shopkeeper object is currently not active
-	 */
-	public String getObjectId();
+	// TRADING
 
 	/**
 	 * Gets the shopkeeper's currently available trading recipes for the given player.
@@ -155,7 +136,53 @@ public interface Shopkeeper {
 	 */
 	public List<TradingRecipe> getTradingRecipes(Player player);
 
-	// SHOPKEEPER UIs:
+	// ACTIVATION
+
+	/**
+	 * Gets the object representing this shopkeeper in the world.
+	 * 
+	 * @return the shop object
+	 */
+	public ShopObject getShopObject();
+
+	/**
+	 * Whether or not this shopkeeper needs to be spawned and despawned with chunk load and unloads.
+	 * 
+	 * @return <code>true</code> if spawning is required
+	 */
+	public boolean needsSpawning();
+
+	/**
+	 * Checks if the shopkeeper is active (is present in the world).
+	 * 
+	 * @return <code>true</code> if the shopkeeper is active
+	 */
+	public boolean isActive();
+
+	/**
+	 * Gets the shopkeeper's object id.
+	 * <p>
+	 * This is can change when the shopkeeper object (ex. shopkeeper entity) respawns.
+	 * 
+	 * @return the object id, or <code>null</code> if the shopkeeper object is currently not active
+	 */
+	public String getObjectId();
+
+	public Location getObjectLocation();
+
+	/**
+	 * Spawns the shopkeeper into the world at its spawn location.
+	 * 
+	 * @return <code>true</code> on success
+	 */
+	public boolean spawn();
+
+	/**
+	 * Removes this shopkeeper from the world.
+	 */
+	public void despawn();
+
+	// SHOPKEEPER UIs
 
 	public boolean isUIActive();
 
@@ -225,7 +252,7 @@ public interface Shopkeeper {
 	 */
 	public boolean openChestWindow(Player player);
 
-	// NAMING:
+	// NAMING
 
 	public String getName();
 

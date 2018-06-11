@@ -15,23 +15,21 @@ public class AdminShopType extends AbstractShopType<AdminShopkeeper> {
 	}
 
 	@Override
-	public AdminShopkeeper loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
-		this.validateConfigSection(config);
-		AdminShopkeeper shopkeeper = new AdminShopkeeper(config);
-		this.registerShopkeeper(shopkeeper);
+	public AdminShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+		this.validateCreationData(shopCreationData);
+		AdminShopkeeper shopkeeper = new AdminShopkeeper(id, shopCreationData);
 		return shopkeeper;
 	}
 
 	@Override
-	public AdminShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
-		this.validateCreationData(creationData);
-		AdminShopkeeper shopkeeper = new AdminShopkeeper(creationData);
-		this.registerShopkeeper(shopkeeper);
+	public AdminShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+		this.validateConfigSection(configSection);
+		AdminShopkeeper shopkeeper = new AdminShopkeeper(id, configSection);
 		return shopkeeper;
 	}
 
 	@Override
-	public String getCreatedMessage() {
+	protected String getCreatedMessage() {
 		return Settings.msgAdminShopCreated;
 	}
 

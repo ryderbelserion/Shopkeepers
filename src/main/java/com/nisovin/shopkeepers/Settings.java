@@ -9,6 +9,7 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.google.common.base.Objects;
@@ -589,5 +590,18 @@ public class Settings {
 		}
 		return ItemUtils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemData,
 				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
+	}
+
+	//
+
+	public static int getMaxShops(Player player) {
+		int maxShops = Settings.maxShopsPerPlayer;
+		String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
+		for (String perm : maxShopsPermOptions) {
+			if (Utils.hasPermission(player, "shopkeeper.maxshops." + perm)) {
+				maxShops = Integer.parseInt(perm);
+			}
+		}
+		return maxShops;
 	}
 }

@@ -18,7 +18,6 @@ import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.events.OpenTradeEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -128,15 +127,8 @@ public class TradingHandler extends UIHandler {
 
 	@Override
 	protected boolean openWindow(Player player) {
-		Shopkeeper shopkeeper = this.getShopkeeper();
-		OpenTradeEvent event = new OpenTradeEvent(player, shopkeeper);
-		Bukkit.getPluginManager().callEvent(event);
-		if (event.isCancelled()) {
-			Log.debug("Trade window not opened: Cancelled by another plugin.");
-			return false;
-		}
-
 		// create and open trading window:
+		Shopkeeper shopkeeper = this.getShopkeeper();
 		String title = this.getInventoryTitle();
 		return NMSManager.getProvider().openTradeWindow(title, shopkeeper.getTradingRecipes(player), player);
 	}

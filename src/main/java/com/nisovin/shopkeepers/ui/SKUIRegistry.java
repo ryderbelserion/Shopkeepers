@@ -13,6 +13,7 @@ import org.bukkit.event.HandlerList;
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.events.ShopkeeperOpenUIEvent;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
@@ -38,6 +39,8 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 
 	public void onDisable() {
 		assert uiListener != null;
+		// close all open UIs:
+		this.closeAll();
 		HandlerList.unregisterAll(uiListener);
 		uiListener = null;
 	}
@@ -61,27 +64,35 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 
 		String playerName = player.getName();
 		if (!uiHandler.canOpen(player)) {
-			Log.debug("Cannot open UI '" + uiIdentifier + "' for '" + playerName + "'.");
+			Log.debug("The player '" + playerName + "' cannot open UI '" + uiIdentifier + "'.");
 			return false;
 		}
 
 		SKUISession oldSession = this.getSession(player);
 		// filtering out duplicate open requests:
 		if (oldSession != null && oldSession.getShopkeeper().equals(shopkeeper) && oldSession.getUIHandler().equals(uiHandler)) {
-			Log.debug("UI '" + uiIdentifier + "'" + " is already opened for '" + playerName + "'.");
+			Log.debug("UI '" + uiIdentifier + "'" + " is already open for '" + playerName + "'.");
+			return false;
+		}
+
+		// call event:
+		ShopkeeperOpenUIEvent openUIEvent = new ShopkeeperOpenUIEvent(shopkeeper, uiType, player);
+		Bukkit.getPluginManager().callEvent(openUIEvent);
+		if (openUIEvent.isCancelled()) {
+			Log.debug("Opening of UI '" + uiIdentifier + "' for player '" + playerName + "' got cancelled by a plugin.");
 			return false;
 		}
 
 		Log.debug("Opening UI '" + uiIdentifier + "' ...");
 		boolean isOpen = uiHandler.openWindow(player);
 		if (isOpen) {
-			Log.debug(uiIdentifier + " opened");
+			Log.debug("UI '" + uiIdentifier + "' opened.");
 			// old window already should automatically have been closed by the new window.. no need currently, to do
 			// that here
 			playerSessions.put(playerName, new SKUISession(shopkeeper, uiHandler));
 			return true;
 		} else {
-			Log.debug(uiIdentifier + " NOT opened");
+			Log.debug("UI '" + uiIdentifier + "' NOT opened!");
 			return false;
 		}
 	}
@@ -124,14 +135,15 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 
 	@Override
 	public void closeAllDelayed(Shopkeeper shopkeeper) {
-		if (shopkeeper == null) return;
+		// ignore during disable: all UIs get closed anyways already
+		if (shopkeeper == null || !plugin.isEnabled()) return;
 
 		// deactivate currently active UIs:
 		shopkeeper.deactivateUI();
 
 		// delayed because this is/was originally called from inside the PlayerCloseInventoryEvent
 		Bukkit.getScheduler().runTask(plugin, () -> {
-			closeAll(shopkeeper);
+			this.closeAll(shopkeeper);
 
 			// reactivate UIs:
 			shopkeeper.activateUI();

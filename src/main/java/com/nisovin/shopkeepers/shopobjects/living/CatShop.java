@@ -19,9 +19,9 @@ public class CatShop extends LivingEntityShop {
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
-		super.load(config);
-		String catTypeName = config.getString("catType");
+	public void load(ConfigurationSection configSection) {
+		super.load(configSection);
+		String catTypeName = configSection.getString("catType");
 		try {
 			catType = Ocelot.Type.valueOf(catTypeName);
 		} catch (Exception e) {
@@ -29,10 +29,12 @@ public class CatShop extends LivingEntityShop {
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
-		config.set("skeletonType", catType.name());
+	public void save(ConfigurationSection configSection) {
+		super.save(configSection);
+		configSection.set("skeletonType", catType.name());
 	}
+
+	// SUB TYPES
 
 	@Override
 	protected void applySubType() {
@@ -49,6 +51,7 @@ public class CatShop extends LivingEntityShop {
 
 	@Override
 	public void cycleSubType() {
+		shopkeeper.markDirty();
 		int id = catType.getId();
 		catType = Ocelot.Type.getType(++id);
 		if (catType == null) {

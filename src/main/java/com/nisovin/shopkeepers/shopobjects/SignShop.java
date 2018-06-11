@@ -8,7 +8,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Attachable;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
@@ -42,10 +41,15 @@ public class SignShop extends AbstractShopObject {
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
-		super.load(config);
-		if (config.isString("signFacing")) {
-			String signFacingName = config.getString("signFacing");
+	public SignShopObjectType getObjectType() {
+		return SKDefaultShopObjectTypes.SIGN();
+	}
+
+	@Override
+	public void load(ConfigurationSection configSection) {
+		super.load(configSection);
+		if (configSection.isString("signFacing")) {
+			String signFacingName = configSection.getString("signFacing");
 			if (signFacingName != null) {
 				try {
 					signFacing = BlockFace.valueOf(signFacingName);
@@ -54,35 +58,51 @@ public class SignShop extends AbstractShopObject {
 			}
 		}
 
-		// in case no sign facing is stored: try getting the current sign facing from sign in the world
-		// if it is not possible (for ex. because the world isn't loaded yet), we will re-attempt this
+		// in case no sign facing is stored: try getting the current sign facing from the sign in the world
+		// if this is not possible (for ex. because the world isn't loaded yet), we will re-attempt this
 		// during the periodic checks
-		if (signFacing == null) {
-			signFacing = this.getSignFacingFromWorld();
-		}
+		this.updateSignFacingFromWorld();
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
+	public void save(ConfigurationSection configSection) {
+		super.save(configSection);
 		if (signFacing != null) {
-			config.set("signFacing", signFacing.name());
+			configSection.set("signFacing", signFacing.name());
 		}
 	}
 
 	@Override
-	public void onInit() {
-		super.onInit();
+	public void setup() {
+		super.setup();
 		this.spawn();
 	}
 
+	// LIFE CYCLE
+
 	@Override
-	public SignShopObjectType getObjectType() {
-		return SKDefaultShopObjectTypes.SIGN();
+	public void delete() {
+		World world = Bukkit.getWorld(shopkeeper.getWorldName());
+		if (world != null) {
+			// this should load the chunk if necessary, making sure that the block gets removed (though, might not work
+			// on server stops..):
+			Block signBlock = world.getBlockAt(shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
+			if (ItemUtils.isSign(signBlock.getType())) {
+				// remove sign:
+				signBlock.setType(Material.AIR);
+			}
+			// TODO trigger an unloadChunkRequest if the chunk had to be loaded? (for now let's assume that the server
+			// handles that kind of thing automatically)
+		} else {
+			// well: world unloaded and we didn't get an event.. not our fault
+			// TODO actually, we are not removing the sign on world unloads..
+		}
 	}
 
+	// ACTIVATION
+
 	public Sign getSign() {
-		Location signLocation = this.getActualLocation();
+		Location signLocation = this.getLocation();
 		if (signLocation == null) return null;
 		Block signBlock = signLocation.getBlock();
 		if (!ItemUtils.isSign(signBlock.getType())) return null;
@@ -98,13 +118,20 @@ public class SignShop extends AbstractShopObject {
 		return null;
 	}
 
+	private void updateSignFacingFromWorld() {
+		if (signFacing == null) {
+			signFacing = this.getSignFacingFromWorld();
+			if (signFacing != null) {
+				shopkeeper.markDirty();
+			}
+		}
+	}
+
 	@Override
 	public void onChunkLoad() {
 		super.onChunkLoad();
 		// get the sign facing, in case we weren't able yet, for example because the world wasn't loaded earlier:
-		if (signFacing == null) {
-			signFacing = this.getSignFacingFromWorld();
-		}
+		this.updateSignFacingFromWorld();
 
 		// update sign content if requested:
 		if (updateSign) {
@@ -114,8 +141,23 @@ public class SignShop extends AbstractShopObject {
 	}
 
 	@Override
+	public boolean isActive() {
+		Location signLocation = this.getLocation();
+		if (signLocation == null) return false;
+		Block signBlock = signLocation.getBlock();
+		return ItemUtils.isSign(signBlock.getType());
+	}
+
+	@Override
+	public String getId() {
+		Location location = shopkeeper.getLocation();
+		if (location == null) return null;
+		return getId(location.getBlock());
+	}
+
+	@Override
 	public boolean spawn() {
-		Location signLocation = this.getActualLocation();
+		Location signLocation = this.getLocation();
 		if (signLocation == null) return false;
 
 		Block signBlock = signLocation.getBlock();
@@ -151,38 +193,12 @@ public class SignShop extends AbstractShopObject {
 	}
 
 	@Override
-	public boolean isActive() {
-		Location signLocation = this.getActualLocation();
-		if (signLocation == null) return false;
-		Block signBlock = signLocation.getBlock();
-		return ItemUtils.isSign(signBlock.getType());
+	public void despawn() {
 	}
 
 	@Override
-	public String getId() {
-		Location location = shopkeeper.getLocation();
-		if (location == null) return null;
-		return getId(location.getBlock());
-	}
-
-	@Override
-	public Location getActualLocation() {
+	public Location getLocation() {
 		return shopkeeper.getLocation();
-	}
-
-	@Override
-	public void setName(String name) {
-		// always uses the name of the shopkeeper:
-		this.updateSign();
-	}
-
-	@Override
-	public int getNameLengthLimit() {
-		return 15;
-	}
-
-	@Override
-	public void setItem(ItemStack item) {
 	}
 
 	public void updateSign() {
@@ -199,7 +215,7 @@ public class SignShop extends AbstractShopObject {
 		String name = shopkeeper.getName();
 		String line1 = "";
 		if (name != null) {
-			name = this.trimToNameLength(name);
+			name = this.prepareName(name);
 			line1 = name;
 		}
 		sign.setLine(1, line1);
@@ -247,35 +263,31 @@ public class SignShop extends AbstractShopObject {
 		return false;
 	}
 
+	// NAMING
+
 	@Override
-	public void despawn() {
+	public int getNameLengthLimit() {
+		// TODO this is outdated
+		return 15;
 	}
 
 	@Override
-	public void delete() {
-		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		if (world != null) {
-			// this should load the chunk if necessary, making sure that the block gets removed (though, might not work
-			// on server stops..):
-			Block signBlock = world.getBlockAt(shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
-			if (ItemUtils.isSign(signBlock.getType())) {
-				// remove sign:
-				signBlock.setType(Material.AIR);
-			}
-			// TODO trigger an unloadChunkRequest if the chunk had to be loaded? (for now let's assume that the server
-			// handles that kind of thing automatically)
-		} else {
-			// well: world unloaded and we didn't get an event.. not our fault
-			// TODO actually, we are not removing the sign on world unloads..
-		}
+	public void setName(String name) {
+		// always uses the name of the shopkeeper:
+		// TODO really? why?
+		this.updateSign();
 	}
 
 	@Override
-	public ItemStack getSubTypeItem() {
-		return null;
+	public String getName() {
+		Sign sign = this.getSign();
+		if (sign == null) return null;
+		return sign.getLine(1);
 	}
 
-	@Override
-	public void cycleSubType() {
-	}
+	// SUB TYPES
+	// not supported
+
+	// OTHER PROPERTIES
+	// not supported
 }

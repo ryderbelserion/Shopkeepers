@@ -7,7 +7,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
@@ -41,26 +40,35 @@ public class CitizensShop extends AbstractShopObject {
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
-		super.load(config);
-		if (config.contains("npcId")) {
-			npcId = config.getInt("npcId");
+	public CitizensShopObjectType getObjectType() {
+		return SKDefaultShopObjectTypes.CITIZEN();
+	}
+
+	// can be null if not set yet
+	public Integer getNpcId() {
+		return npcId;
+	}
+
+	@Override
+	public void load(ConfigurationSection configSection) {
+		super.load(configSection);
+		if (configSection.isInt("npcId")) {
+			npcId = configSection.getInt("npcId");
 		}
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
+	public void save(ConfigurationSection configSection) {
+		super.save(configSection);
 		if (npcId != null) {
-			config.set("npcId", npcId);
+			configSection.set("npcId", npcId);
 		}
 	}
 
 	@Override
-	public void onInit() {
-		super.onInit();
-		if (this.isActive()) return;
-		if (!CitizensHandler.isEnabled()) return;
+	public void setup() {
+		super.setup();
+		if (this.isActive() || !CitizensHandler.isEnabled()) return;
 
 		// create npc:
 		EntityType entityType;
@@ -77,109 +85,10 @@ public class CitizensShop extends AbstractShopObject {
 		// create npc:
 		Location spawnLocation = this.getSpawnLocation();
 		npcId = CitizensHandler.createNPC(spawnLocation, entityType, name);
+		shopkeeper.markDirty();
 	}
 
-	private Location getSpawnLocation() {
-		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		return new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
-	}
-
-	@Override
-	public CitizensShopObjectType getObjectType() {
-		return SKDefaultShopObjectTypes.CITIZEN();
-	}
-
-	@Override
-	public boolean spawn() {
-		return false; // handled by citizens
-	}
-
-	@Override
-	public boolean isActive() {
-		return npcId != null && CitizensHandler.isEnabled();
-	}
-
-	@Override
-	public String getId() {
-		return npcId == null ? null : getId(npcId);
-	}
-
-	// can be null if not set yet
-	public Integer getNpcId() {
-		return npcId;
-	}
-
-	public NPC getNPC() {
-		if (!this.isActive()) return null;
-		return CitizensAPI.getNPCRegistry().getById(npcId);
-	}
-
-	public Entity getEntity() {
-		NPC npc = this.getNPC();
-		if (npc == null) return null;
-		return npc.getEntity();
-	}
-
-	@Override
-	public Location getActualLocation() {
-		Entity entity = this.getEntity();
-		return entity != null ? entity.getLocation() : null;
-	}
-
-	@Override
-	public void setName(String name) {
-		NPC npc = this.getNPC();
-		if (npc == null) return;
-
-		if (Settings.showNameplates && name != null && !name.isEmpty()) {
-			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
-				name = Settings.nameplatePrefix + name;
-			}
-			name = this.trimToNameLength(name);
-			// set entity name plate:
-			npc.setName(name);
-			// this.entity.setCustomNameVisible(Settings.alwaysShowNameplates);
-		} else {
-			// remove name plate:
-			npc.setName("");
-			// this.entity.setCustomNameVisible(false);
-		}
-	}
-
-	@Override
-	public int getNameLengthLimit() {
-		return 32; // TODO citizens seem to have different limits depending on mob type (16 for mobs, 64 for players)
-	}
-
-	@Override
-	public void setItem(ItemStack item) {
-		// TODO: No Citizens API for equipping items?
-	}
-
-	@Override
-	public boolean check() {
-		NPC npc = this.getNPC();
-		if (npc != null) {
-			Location currentLocation = npc.getStoredLocation();
-			Location expectedLocation = this.getSpawnLocation();
-			if (currentLocation == null) {
-				npc.teleport(expectedLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
-				Log.debug("Shopkeeper NPC (" + shopkeeper.getPositionString() + ") had no location, teleported");
-			} else if (!currentLocation.getWorld().equals(expectedLocation.getWorld()) || currentLocation.distanceSquared(expectedLocation) > 1.0D) {
-				shopkeeper.setLocation(currentLocation);
-				Log.debug("Shopkeeper NPC (" + shopkeeper.getPositionString() + ") out of place, re-indexing");
-			}
-		} else {
-			// Not going to force Citizens creation, this seems like it could go really wrong.
-		}
-
-		return false;
-	}
-
-	@Override
-	public void despawn() {
-		// handled by citizens
-	}
+	// LIFE CYCLE
 
 	protected void onTraitRemoval() {
 		destroyNPC = false;
@@ -199,15 +108,112 @@ public class CitizensShop extends AbstractShopObject {
 			}
 		}
 		npcId = null;
+		shopkeeper.markDirty();
+	}
+
+	// ACTIVATION
+
+	public NPC getNPC() {
+		if (npcId == null) return null;
+		if (!CitizensHandler.isEnabled()) return null;
+		return CitizensAPI.getNPCRegistry().getById(npcId);
+	}
+
+	public Entity getEntity() {
+		NPC npc = this.getNPC();
+		if (npc == null) return null;
+		return npc.getEntity();
 	}
 
 	@Override
-	public ItemStack getSubTypeItem() {
-		// TODO: A menu of entity types here would be cool
-		return null;
+	public boolean isActive() {
+		return (this.getNPC() != null);
 	}
 
 	@Override
-	public void cycleSubType() {
+	public String getId() {
+		return (npcId == null ? null : getId(npcId));
 	}
+
+	private Location getSpawnLocation() {
+		World world = Bukkit.getWorld(shopkeeper.getWorldName());
+		return new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
+	}
+
+	@Override
+	public boolean spawn() {
+		return false; // handled by citizens
+	}
+
+	@Override
+	public void despawn() {
+		// handled by citizens
+	}
+
+	@Override
+	public Location getLocation() {
+		Entity entity = this.getEntity();
+		return entity != null ? entity.getLocation() : null;
+	}
+
+	@Override
+	public boolean check() {
+		NPC npc = this.getNPC();
+		if (npc == null) {
+			// Not going to force Citizens creation, this seems like it could go really wrong.
+		} else {
+			Location currentLocation = npc.getStoredLocation();
+			Location expectedLocation = this.getSpawnLocation();
+			if (currentLocation == null) {
+				npc.teleport(expectedLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
+				Log.debug("Shopkeeper NPC (" + shopkeeper.getPositionString() + ") had no location, teleported");
+			} else if (!currentLocation.getWorld().equals(expectedLocation.getWorld()) || currentLocation.distanceSquared(expectedLocation) > 1.0D) {
+				shopkeeper.setLocation(currentLocation);
+				Log.debug("Shopkeeper NPC (" + shopkeeper.getPositionString() + ") out of place, re-indexing");
+			}
+		}
+		return false;
+	}
+
+	// NAMING
+
+	@Override
+	public int getNameLengthLimit() {
+		return 32; // TODO citizens seem to have different limits depending on mob type (16 for mobs, 64 for players)
+	}
+
+	@Override
+	public void setName(String name) {
+		NPC npc = this.getNPC();
+		if (npc == null) return;
+
+		if (Settings.showNameplates && name != null && !name.isEmpty()) {
+			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
+				name = Settings.nameplatePrefix + name;
+			}
+			name = this.prepareName(name);
+			// set entity name plate:
+			npc.setName(name);
+			// this.entity.setCustomNameVisible(Settings.alwaysShowNameplates);
+		} else {
+			// remove name plate:
+			npc.setName("");
+			// this.entity.setCustomNameVisible(false);
+		}
+	}
+
+	@Override
+	public String getName() {
+		NPC npc = this.getNPC();
+		if (npc == null) return null;
+		return npc.getName();
+	}
+
+	// SUB TYPES
+
+	// TODO: Support sub types? A menu of entity types here would be cool
+
+	// OTHER PROPERTIES
+
+	// TODO: Support equipping items? Is there a generic Citizens API for this?
 }

@@ -19,16 +19,18 @@ public class SheepShop extends LivingEntityShop {
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
-		super.load(config);
-		this.color = DyeColor.getByWoolData((byte) config.getInt("color"));
+	public void load(ConfigurationSection configSection) {
+		super.load(configSection);
+		this.color = DyeColor.getByWoolData((byte) configSection.getInt("color"));
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
-		config.set("color", color.getWoolData());
+	public void save(ConfigurationSection configSection) {
+		super.save(configSection);
+		configSection.set("color", color.getWoolData());
 	}
+
+	// SUB TYPES
 
 	@Override
 	protected void applySubType() {
@@ -45,6 +47,7 @@ public class SheepShop extends LivingEntityShop {
 
 	@Override
 	public void cycleSubType() {
+		shopkeeper.markDirty();
 		byte colorByte = color.getWoolData();
 		colorByte += 1;
 		color = DyeColor.getByWoolData(colorByte);

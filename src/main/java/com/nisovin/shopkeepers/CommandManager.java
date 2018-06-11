@@ -221,7 +221,7 @@ class CommandManager implements CommandExecutor {
 				sender.sendMessage("All active shopkeepers:");
 				for (Shopkeeper shopkeeper : shopkeeperRegistry.getActiveShopkeepers()) {
 					if (shopkeeper.isActive()) {
-						Location loc = shopkeeper.getActualLocation();
+						Location loc = shopkeeper.getObjectLocation();
 						sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": active (" + (loc != null ? loc.toString() : "maybe not?!?") + ")");
 					} else {
 						sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": INACTIVE!");
@@ -286,7 +286,7 @@ class CommandManager implements CommandExecutor {
 				sender.sendMessage(ChatColor.GREEN + "Creating " + shopCount + " shopkeepers, starting here!");
 				Location curSpawnLocation = player.getLocation();
 				for (int i = 0; i < shopCount; i++) {
-					plugin.createShopkeeper(ShopCreationData.create(player, DefaultShopTypes.ADMIN(),
+					plugin.handleShopkeeperCreation(ShopCreationData.create(player, DefaultShopTypes.ADMIN(),
 							DefaultShopObjectTypes.MOBS().getObjectType(EntityType.VILLAGER), curSpawnLocation.clone(), null));
 					curSpawnLocation.add(2, 0, 0);
 				}
@@ -410,7 +410,7 @@ class CommandManager implements CommandExecutor {
 					Utils.sendMessage(player, Settings.msgListShopsEntry,
 							"{shopIndex}", String.valueOf(index + 1),
 							"{shopId}", shopkeeper.getUniqueId().toString(),
-							"{shopSessionId}", String.valueOf(shopkeeper.getSessionId()),
+							"{shopSessionId}", String.valueOf(shopkeeper.getId()),
 							"{shopName}", (hasName ? (shopName + " ") : ""),
 							"{location}", shopkeeper.getPositionString(),
 							"{shopType}", shopkeeper.getType().getIdentifier(),
@@ -671,7 +671,7 @@ class CommandManager implements CommandExecutor {
 				((AdminShopkeeper) shopkeeper).setTradePermission(newTradePerm);
 
 				// save:
-				plugin.getShopkeeperStorage().save();
+				shopkeeper.save();
 
 				return true;
 			}
@@ -839,7 +839,7 @@ class CommandManager implements CommandExecutor {
 				Location spawnLocation = spawnBlock.getLocation();
 
 				// create player shopkeeper:
-				plugin.createShopkeeper(PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace, player, targetBlock));
+				plugin.handleShopkeeperCreation(PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace, player, targetBlock));
 				return true;
 			} else {
 				// create admin shopkeeper:
@@ -885,7 +885,7 @@ class CommandManager implements CommandExecutor {
 				Location spawnLocation = spawnBlock.getLocation();
 
 				// create admin shopkeeper:
-				plugin.createShopkeeper(ShopCreationData.create(player, DefaultShopTypes.ADMIN(), shopObjType, spawnLocation, targetBlockFace));
+				plugin.handleShopkeeperCreation(ShopCreationData.create(player, DefaultShopTypes.ADMIN(), shopObjType, spawnLocation, targetBlockFace));
 				return true;
 			}
 		}
@@ -903,19 +903,19 @@ class CommandManager implements CommandExecutor {
 		}
 
 		if (shopUniqueId != null) {
-			return shopkeeperRegistry.getShopkeeper(shopUniqueId);
+			return shopkeeperRegistry.getShopkeeperByUniqueId(shopUniqueId);
 		}
 
 		// check if the argument is an integer:
-		int shopSessionId = -1;
+		int shopId = -1;
 		try {
-			shopSessionId = Integer.parseInt(shopIdArg);
+			shopId = Integer.parseInt(shopIdArg);
 		} catch (NumberFormatException e) {
 			// invalid integer
 		}
 
-		if (shopSessionId != -1) {
-			return shopkeeperRegistry.getShopkeeper(shopSessionId);
+		if (shopId != -1) {
+			return shopkeeperRegistry.getShopkeeperById(shopId);
 		}
 
 		// try to get shopkeeper by name:

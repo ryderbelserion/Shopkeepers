@@ -21,18 +21,19 @@ public class VillagerShop extends LivingEntityShop {
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
-		super.load(config);
+	public void load(ConfigurationSection configSection) {
+		super.load(configSection);
 
 		// load profession:
 		String professionInput;
-		if (config.isInt("prof")) {
+		if (configSection.isInt("prof")) {
 			// import from pre 1.10 profession ids:
-			int profId = config.getInt("prof");
+			int profId = configSection.getInt("prof");
 			professionInput = String.valueOf(profId);
 			this.profession = getProfessionFromOldId(profId);
+			shopkeeper.markDirty();
 		} else {
-			professionInput = config.getString("prof");
+			professionInput = configSection.getString("prof");
 			this.profession = getProfession(professionInput);
 		}
 		// validate:
@@ -41,14 +42,17 @@ public class VillagerShop extends LivingEntityShop {
 			Log.warning("Missing or invalid villager profession '" + professionInput
 					+ "'. Using '" + Profession.FARMER + "' now.");
 			this.profession = Profession.FARMER;
+			shopkeeper.markDirty();
 		}
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
-		config.set("prof", profession.name());
+	public void save(ConfigurationSection configSection) {
+		super.save(configSection);
+		configSection.set("prof", profession.name());
 	}
+
+	// SUB TYPES
 
 	@Override
 	protected void applySubType() {
@@ -65,6 +69,7 @@ public class VillagerShop extends LivingEntityShop {
 
 	@Override
 	public void cycleSubType() {
+		shopkeeper.markDirty();
 		this.profession = this.getNextVillagerProfession();
 		this.applySubType();
 	}

@@ -30,6 +30,10 @@ public final class Log {
 		getLogger().warning(message);
 	}
 
+	public static void warning(String message, Throwable throwable) {
+		getLogger().log(Level.WARNING, message, throwable);
+	}
+
 	public static void severe(String message) {
 		getLogger().severe(message);
 	}

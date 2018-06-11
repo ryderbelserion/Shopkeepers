@@ -18,23 +18,21 @@ public class BuyingPlayerShopType extends AbstractPlayerShopType<BuyingPlayerSho
 	}
 
 	@Override
-	public BuyingPlayerShopkeeper loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
-		this.validateConfigSection(config);
-		BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(config);
-		this.registerShopkeeper(shopkeeper);
+	public BuyingPlayerShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+		this.validateCreationData(shopCreationData);
+		BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(id, (PlayerShopCreationData) shopCreationData);
 		return shopkeeper;
 	}
 
 	@Override
-	public BuyingPlayerShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
-		this.validateCreationData(creationData);
-		BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper((PlayerShopCreationData) creationData);
-		this.registerShopkeeper(shopkeeper);
+	public BuyingPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+		this.validateConfigSection(configSection);
+		BuyingPlayerShopkeeper shopkeeper = new BuyingPlayerShopkeeper(id, configSection);
 		return shopkeeper;
 	}
 
 	@Override
-	public String getCreatedMessage() {
+	protected String getCreatedMessage() {
 		return Settings.msgBuyShopCreated;
 	}
 

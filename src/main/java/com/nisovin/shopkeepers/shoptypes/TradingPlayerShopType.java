@@ -18,23 +18,21 @@ public class TradingPlayerShopType extends AbstractPlayerShopType<TradingPlayerS
 	}
 
 	@Override
-	public TradingPlayerShopkeeper loadShopkeeper(ConfigurationSection config) throws ShopkeeperCreateException {
-		this.validateConfigSection(config);
-		TradingPlayerShopkeeper shopkeeper = new TradingPlayerShopkeeper(config);
-		this.registerShopkeeper(shopkeeper);
+	public TradingPlayerShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+		this.validateCreationData(shopCreationData);
+		TradingPlayerShopkeeper shopkeeper = new TradingPlayerShopkeeper(id, (PlayerShopCreationData) shopCreationData);
 		return shopkeeper;
 	}
 
 	@Override
-	public TradingPlayerShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
-		this.validateCreationData(creationData);
-		TradingPlayerShopkeeper shopkeeper = new TradingPlayerShopkeeper((PlayerShopCreationData) creationData);
-		this.registerShopkeeper(shopkeeper);
+	public TradingPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+		this.validateConfigSection(configSection);
+		TradingPlayerShopkeeper shopkeeper = new TradingPlayerShopkeeper(id, configSection);
 		return shopkeeper;
 	}
 
 	@Override
-	public String getCreatedMessage() {
+	protected String getCreatedMessage() {
 		return Settings.msgTradeShopCreated;
 	}
 

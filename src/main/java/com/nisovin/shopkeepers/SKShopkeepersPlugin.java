@@ -29,13 +29,9 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.events.CreatePlayerShopkeeperEvent;
-import com.nisovin.shopkeepers.api.events.ShopkeeperCreatedEvent;
-import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
@@ -50,14 +46,11 @@ import com.nisovin.shopkeepers.metrics.VaultEconomyChart;
 import com.nisovin.shopkeepers.metrics.WorldGuardChart;
 import com.nisovin.shopkeepers.metrics.WorldsChart;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
-import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
-import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.registry.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
-import com.nisovin.shopkeepers.shoptypes.AbstractPlayerShopType;
 import com.nisovin.shopkeepers.shoptypes.AbstractShopType;
 import com.nisovin.shopkeepers.shoptypes.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shoptypes.SKShopTypesRegistry;
@@ -117,9 +110,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		plugin = this;
 		ShopkeepersAPI.enable(this);
 
-		// reset a bunch of variables:
-		shopkeeperStorage.reset();
-
 		// try to load suitable NMS code:
 		NMSManager.load(this);
 		if (NMSManager.getProvider() == null) {
@@ -165,6 +155,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 				Bukkit.getPluginManager().addPermission(new Permission("shopkeeper.maxshops." + perm, PermissionDefault.FALSE));
 			}
 		}
+
+		// enable shopkeeper storage:
+		shopkeeperStorage.onEnable();
 
 		// enable shopkeeper registry:
 		shopkeeperRegistry.onEnable();
@@ -228,7 +221,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		this.getCommand("shopkeeper").setExecutor(commandManager);
 
 		// load shopkeeper saved data:
-		boolean loadingSuccessful = shopkeeperStorage.load();
+		boolean loadingSuccessful = shopkeeperStorage.reload();
 		if (!loadingSuccessful) {
 			// detected an issue during loading
 			// disabling the plugin without saving, to prevent loss of shopkeeper data:
@@ -237,9 +230,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
+		// request delayed save to write back all updated data:
+		shopkeeperStorage.saveDelayed();
 
 		// activate (spawn) shopkeepers in loaded chunks:
-		shopkeeperRegistry.loadShopkeepersInLoadedWorlds();
+		shopkeeperRegistry.loadShopkeepersInAllWorlds();
 
 		Bukkit.getScheduler().runTaskLater(this, () -> {
 			// remove invalid citizens shopkeepers:
@@ -247,15 +242,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			// remove inactive player shopkeepers:
 			removeInactivePlayerShops();
 		}, 5L);
-
-		// start save task:
-		if (!Settings.saveInstantly) {
-			Bukkit.getScheduler().runTaskTimer(this, () -> {
-				if (shopkeeperStorage.isDirty()) {
-					shopkeeperStorage.saveReal();
-				}
-			}, 6000, 6000); // 5 minutes
-		}
 
 		// let's update the shopkeepers for all already online players:
 		for (Player player : Bukkit.getOnlinePlayers()) {
@@ -274,21 +260,19 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// wait for async tasks to complete:
 		SchedulerUtils.awaitAsyncTasksCompletion(this, ASYNC_TASKS_TIMEOUT_SECONDS, this.getLogger());
 
-		// close all open windows:
-		uiRegistry.closeAll();
 		// inform ui registry about disable:
 		uiRegistry.onDisable();
 
 		// despawn all active shopkeepers:
-		shopkeeperRegistry.despawnAll();
+		// TODO really required here? maybe replace with deactivate all, and also prevent re-activation during disable
+		// (due to new chunk loads)?
+		shopkeeperRegistry.despawnAllShopkeepers();
 
 		// disable citizens handler:
 		CitizensHandler.disable();
 
-		// save:
-		if (shopkeeperStorage.isDirty()) {
-			shopkeeperStorage.saveReal(false); // not async here
-		}
+		// disable storage (saves shopkeepers):
+		shopkeeperStorage.onDisable();
 
 		// inform other components:
 		livingEntityAI.stop();
@@ -557,102 +541,14 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	}
 
 	@Override
-	public AbstractShopkeeper createShopkeeper(ShopCreationData creationData) {
-		Validate.notNull(creationData, "CreationData is null!");
-		try {
-			// receives messages, can be null:
-			Player creator = creationData.getCreator();
-			ShopType<?> rawShopType = creationData.getShopType();
-			Validate.isTrue(rawShopType instanceof AbstractShopType,
-					"Expecting an AbstractShopType, got " + rawShopType.getClass().getName());
-			AbstractShopType<?> shopType = (AbstractShopType<?>) rawShopType;
-
-			// additional checks for player shops:
-			// TODO move this into PlayerShopType
-			if (shopType instanceof PlayerShopType) {
-				Validate.isTrue(shopType instanceof AbstractPlayerShopType,
-						"Expecting an AbstractPlayerShopType, got " + shopType.getClass().getName());
-				Validate.isTrue(creationData instanceof PlayerShopCreationData,
-						"Expecting PlayerShopCreationData, got " + creationData.getClass().getName());
-				PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) creationData;
-
-				// check if this chest is already used by some other shopkeeper:
-				if (this.getProtectedChests().isChestProtected(playerShopCreationData.getShopChest(), null)) {
-					Utils.sendMessage(creator, Settings.msgShopCreateFail);
-					return null;
-				}
-				Player owner = playerShopCreationData.getOwner();
-				Location spawnLocation = creationData.getSpawnLocation();
-
-				// check worldguard:
-				if (Settings.enableWorldGuardRestrictions) {
-					if (!WorldGuardHandler.isShopAllowed(owner, spawnLocation)) {
-						Utils.sendMessage(creator, Settings.msgShopCreateFail);
-						return null;
-					}
-				}
-
-				// check towny:
-				if (Settings.enableTownyRestrictions) {
-					if (!TownyHandler.isCommercialArea(spawnLocation)) {
-						Utils.sendMessage(creator, Settings.msgShopCreateFail);
-						return null;
-					}
-				}
-
-				int maxShops = this.getMaxShops(owner);
-				// call event:
-				CreatePlayerShopkeeperEvent event = new CreatePlayerShopkeeperEvent(creationData, maxShops);
-				Bukkit.getPluginManager().callEvent(event);
-				if (event.isCancelled()) {
-					Log.debug("CreatePlayerShopkeeperEvent was cancelled!");
-					return null;
-				} else {
-					maxShops = event.getMaxShopsForPlayer();
-				}
-
-				// count owned shops:
-				if (maxShops > 0) {
-					int count = shopkeeperRegistry.countShopsOfPlayer(owner);
-					if (count >= maxShops) {
-						Utils.sendMessage(creator, Settings.msgTooManyShops);
-						return null;
-					}
-				}
-			}
-
-			// create and spawn the shopkeeper:
-			AbstractShopkeeper shopkeeper = shopType.createShopkeeper(creationData);
-			if (shopkeeper == null) {
-				throw new ShopkeeperCreateException("ShopType returned null shopkeeper!");
-			}
-			assert shopkeeper != null;
-
-			// run shopkeeper-created-event:
-			Bukkit.getPluginManager().callEvent(new ShopkeeperCreatedEvent(creator, shopkeeper));
-
-			// send creation message to creator:
-			Utils.sendMessage(creator, shopType.getCreatedMessage());
-
-			// save:
-			shopkeeperStorage.save();
-
-			return shopkeeper;
-		} catch (ShopkeeperCreateException e) {
-			Log.warning("Couldn't create shopkeeper: " + e.getMessage());
-			return null;
-		}
-	}
-
-	public int getMaxShops(Player player) {
-		int maxShops = Settings.maxShopsPerPlayer;
-		String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
-		for (String perm : maxShopsPermOptions) {
-			if (Utils.hasPermission(player, "shopkeeper.maxshops." + perm)) {
-				maxShops = Integer.parseInt(perm);
-			}
-		}
-		return maxShops;
+	public AbstractShopkeeper handleShopkeeperCreation(ShopCreationData shopCreationData) {
+		Validate.notNull(shopCreationData, "CreationData is null!");
+		ShopType<?> rawShopType = shopCreationData.getShopType();
+		Validate.isTrue(rawShopType instanceof AbstractShopType,
+				"Expecting an AbstractShopType, got " + rawShopType.getClass().getName());
+		AbstractShopType<?> shopType = (AbstractShopType<?>) rawShopType;
+		// forward to shop type:
+		return shopType.handleShopkeeperCreation(shopCreationData);
 	}
 
 	// INACTIVE SHOPS

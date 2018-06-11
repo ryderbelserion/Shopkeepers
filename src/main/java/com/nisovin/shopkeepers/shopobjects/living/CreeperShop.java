@@ -18,16 +18,18 @@ public class CreeperShop extends LivingEntityShop {
 	}
 
 	@Override
-	public void load(ConfigurationSection config) {
-		super.load(config);
-		powered = config.getBoolean("powered", false);
+	public void load(ConfigurationSection configSection) {
+		super.load(configSection);
+		powered = configSection.getBoolean("powered");
 	}
 
 	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
-		config.set("powered", powered);
+	public void save(ConfigurationSection configSection) {
+		super.save(configSection);
+		configSection.set("powered", powered);
 	}
+
+	// SUB TYPES
 
 	@Override
 	protected void applySubType() {
@@ -44,6 +46,7 @@ public class CreeperShop extends LivingEntityShop {
 
 	@Override
 	public void cycleSubType() {
+		shopkeeper.markDirty();
 		powered = !powered;
 		this.applySubType();
 	}

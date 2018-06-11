@@ -6,8 +6,17 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 
+/**
+ * Abstract base class for all shop object implementations.
+ * <p>
+ * Implementation hints:<br>
+ * <ul>
+ * <li>Make sure to call {@link Shopkeeper#markDirty()} on every change of data that might need to be persisted.
+ * </ul>
+ */
 public abstract class AbstractShopObject implements ShopObject {
 
 	protected final AbstractShopkeeper shopkeeper;
@@ -21,34 +30,60 @@ public abstract class AbstractShopObject implements ShopObject {
 	@Override
 	public abstract AbstractShopObjectType<?> getObjectType();
 
-	public void load(ConfigurationSection config) {
-		// nothing to load by default
-	}
-
-	public void save(ConfigurationSection config) {
-		config.set("object", this.getObjectType().getIdentifier());
+	public void load(ConfigurationSection configSection) {
 	}
 
 	/**
-	 * Called after the ShopObject and the Shopkeeper was fully created and loaded.
-	 * Called before the underlying shopkeeper gets registered.
-	 * Ideal to initialize any remaining things, like creating the citizens npc
-	 * for citizens shopkeepers, if none was loaded before / is existent.
+	 * Saves the shop object's data to the specified configuration section.
+	 * <p>
+	 * Note: The serialization of the inserted data may happen asynchronously, so make sure that this is not a problem
+	 * (ex. only insert immutable objects, or always create copies of the data you insert and/or make sure to not modify
+	 * the inserted objects).
+	 * 
+	 * @param configSection
+	 *            the config section
 	 */
-	public void onInit() {
-		// nothing to do by default
+	public void save(ConfigurationSection configSection) {
+		configSection.set("object", this.getObjectType().getIdentifier());
 	}
 
+	/**
+	 * This gets called at the end of shopkeeper construction, when the shopkeeper has been loaded and setup.
+	 * <p>
+	 * The shopkeeper has not yet been registered at this point!
+	 * <p>
+	 * This can be used to perform any remaining initial shop object setup.
+	 */
+	public void setup() {
+	}
+
+	// LIFE CYCLE
+
+	/**
+	 * This gets called when the {@link ShopObject} is meant to be removed.
+	 * <p>
+	 * This can for example be used to disable any active components (ex. listeners) for this shop object.
+	 */
+	public void remove() {
+	}
+
+	/**
+	 * This gets called when the {@link ShopObject} is meant to be permanently deleted.
+	 * <p>
+	 * This gets called after {@link #remove()}.
+	 * <p>
+	 * This can for example be used to cleanup any persistent data corresponding to this shop object.
+	 */
+	public void delete() {
+	}
+
+	// ACTIVATION
+
 	public void onChunkLoad() {
-		// nothing by default
 	}
 
 	public void onChunkUnload() {
-		// nothing by default
 	}
-
-	@Override
-	public abstract boolean spawn();
 
 	@Override
 	public abstract boolean isActive();
@@ -57,43 +92,61 @@ public abstract class AbstractShopObject implements ShopObject {
 	public abstract String getId();
 
 	@Override
-	public abstract Location getActualLocation();
+	public abstract boolean spawn();
 
 	@Override
-	public abstract void setName(String name);
+	public abstract void despawn();
+
+	@Override
+	public abstract Location getLocation();
+
+	/**
+	 * This is periodically called for active shopkeepers.
+	 * <p>
+	 * It makes sure that everything is still alright with the shop object.<br>
+	 * Ex: Attempts to respawn shop entities, teleports them back into place, informs about their removal.
+	 * 
+	 * @return <code>true</code> to if the shop object might no longer be active or its id has changed
+	 */
+	public abstract boolean check();
+
+	// NAMING
 
 	@Override
 	public abstract int getNameLengthLimit();
 
 	@Override
-	public String trimToNameLength(String name) {
+	public String prepareName(String name) {
 		if (name == null) return null;
+		// trim to max name length:
 		int lengthLimit = this.getNameLengthLimit();
 		if (name.length() > lengthLimit) name = name.substring(0, lengthLimit);
 		return name;
 	}
 
 	@Override
-	public abstract void setItem(ItemStack item);
-
-	/**
-	 * This is periodically called for active shopkeepers.
-	 * It makes sure that everything is still alright with the shop object.
-	 * Ex: Attempts to respawn shop entities, teleports them back into place, informs about their removal.
-	 * 
-	 * @return <code>true</code> if the shopkeeper needs to be removed or freshly added to the active shopkeepers
-	 */
-	public abstract boolean check();
+	public abstract void setName(String name);
 
 	@Override
-	public abstract void despawn();
+	public abstract String getName();
+
+	// SUB TYPES
 
 	@Override
-	public abstract void delete();
+	public ItemStack getSubTypeItem() {
+		// not supported by default
+		return null;
+	}
 
 	@Override
-	public abstract ItemStack getSubTypeItem();
+	public void cycleSubType() {
+		// not supported by default
+	}
+
+	// OTHER PROPERTIES
 
 	@Override
-	public abstract void cycleSubType();
+	public void equipItem(ItemStack item) {
+		// not supported by default
+	}
 }

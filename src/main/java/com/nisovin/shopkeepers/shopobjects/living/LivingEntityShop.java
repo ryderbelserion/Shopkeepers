@@ -48,30 +48,46 @@ public class LivingEntityShop extends AbstractShopObject {
 		return livingObjectType;
 	}
 
-	@Override
-	public void load(ConfigurationSection config) {
-		super.load(config);
-		if (config.contains("uuid")) {
-			this.uuid = config.getString("uuid");
-		}
-	}
-
-	@Override
-	public void save(ConfigurationSection config) {
-		super.save(config);
-		// let's save last known uuid nevertheless, for the case that the entity somehow wasn't properly removed before
-		// (which seems to still happen sometimes during server shutdowns)
-		if (uuid != null && !uuid.isEmpty()) {
-			config.set("uuid", uuid);
-		}
-	}
-
 	public EntityType getEntityType() {
 		return livingObjectType.getEntityType();
 	}
 
+	@Override
+	public void load(ConfigurationSection configSection) {
+		super.load(configSection);
+		if (configSection.contains("uuid")) {
+			this.uuid = configSection.getString("uuid");
+		}
+	}
+
+	@Override
+	public void save(ConfigurationSection configSection) {
+		super.save(configSection);
+		// let's save last known uuid nevertheless, for the case that the entity somehow wasn't properly removed before
+		// (which seems to still happen sometimes during server shutdowns)
+		if (uuid != null && !uuid.isEmpty()) {
+			configSection.set("uuid", uuid);
+		}
+	}
+
+	// ACTIVATION
+
 	public LivingEntity getEntity() {
 		return entity;
+	}
+
+	@Override
+	public boolean isActive() {
+		// note: some spigot versions didn't check the isDead flag inside isValid:
+		// note: isValid-flag gets set at the tick after handling all queued chunk unloads, so isChunkLoaded check is
+		// needed if we check during chunk unloads and the entity in question might be in another chunk than the
+		// currently unloaded one
+		return entity != null && !entity.isDead() && entity.isValid() && ChunkCoords.isChunkLoaded(entity.getLocation());
+	}
+
+	@Override
+	public String getId() {
+		return getId(entity);
 	}
 
 	protected void assignShopkeeperMetadata(LivingEntity entity) {
@@ -138,6 +154,7 @@ public class LivingEntityShop extends AbstractShopObject {
 			SKShopkeepersPlugin.getInstance().forceCreatureSpawn(spawnLocation, entityType);
 			entity = (LivingEntity) world.spawnEntity(spawnLocation, entityType);
 			uuid = entity.getUniqueId().toString();
+			shopkeeper.markDirty();
 		}
 
 		if (this.isActive()) {
@@ -177,73 +194,89 @@ public class LivingEntityShop extends AbstractShopObject {
 		}
 	}
 
-	protected void applySubType() {
-		if (!this.isActive()) return;
-		// nothing to do by default
+	// some mobs will always get their AI disabled in order to properly work:
+	protected boolean isNoAIMobType() {
+		switch (livingObjectType.getEntityType()) {
+		case BAT:
+		case ENDER_DRAGON:
+		case ENDERMAN:
+		case WITHER:
+		case SILVERFISH:
+		case BLAZE:
+			return true;
+		default:
+			return false;
+		}
+	}
+
+	protected void overwriteAI() {
+		NMSManager.getProvider().overwriteLivingEntityAI(entity);
+
+		if (!Settings.useLegacyMobBehavior) {
+			// disable AI (also disables gravity) and replace it with our own handling:
+			NMSManager.getProvider().setNoAI(entity);
+			if (NMSManager.getProvider().supportsCustomMobAI()) {
+				SKShopkeepersPlugin.getInstance().getLivingEntityAI().addEntity(entity);
+			}
+		}
+
+		if (Settings.silenceLivingShopEntities) {
+			NMSManager.getProvider().setEntitySilent(entity, true);
+		}
+		if (Settings.disableGravity) {
+			NMSManager.getProvider().setGravity(entity, false);
+			// when gravity gets disabled, we might be able to also disable collisions/pushing of mobs via noclip:
+			NMSManager.getProvider().setNoclip(entity);
+		}
+
+		// set the NoAI tag always for certain entity types:
+		if (this.isNoAIMobType()) {
+			NMSManager.getProvider().setNoAI(entity);
+		}
+	}
+
+	protected void cleanupAI() {
+		// disable AI:
+		SKShopkeepersPlugin.getInstance().getLivingEntityAI().removeEntity(entity);
 	}
 
 	@Override
-	public ItemStack getSubTypeItem() {
-		// no sub types by default
-		return null;
+	public void despawn() {
+		if (entity != null) {
+			// note: in case the entity is not active but not in the same chunk, it was probably pushed into a different
+			// and now already unloaded chunk, in which case it got already removed inside the chunk-unload listener
+			if (!this.isActive() && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
+				Log.debug("Chunk was silently unloaded at (" + shopkeeper.getPositionString() + "): Loading it now to remove old entity");
+				World world = Bukkit.getWorld(shopkeeper.getWorldName());
+				if (world != null) {
+					this.searchOldEntity(); // this will load the chunk
+					// request a safe chunk unload which will call an ChunkUnloadEvent then: (for now let's assume
+					// that the server can handle this automatically)
+					// Chunk chunk = location.getChunk();
+					// world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
+				}
+			}
+
+			// disable AI:
+			this.cleanupAI();
+
+			// cleanup metadata:
+			this.removeShopkeeperMetadata(entity);
+
+			// remove entity:
+			entity.remove();
+			entity = null;
+			// TODO chunk loading and removal might not work during server shutdown.. :(
+			// so we are now storing the last known entity uuid
+		}
 	}
 
 	@Override
-	public void cycleSubType() {
-		// no sub types to cycle through by default
-	}
-
-	@Override
-	public boolean isActive() {
-		// note: some spigot versions didn't check the isDead flag inside isValid:
-		// note: isValid-flag gets set at the tick after handling all queued chunk unloads, so isChunkLoaded check is
-		// needed if we check during chunk unloads and the entity in question might be in another chunk than the
-		// currently unloaded one
-		return entity != null && !entity.isDead() && entity.isValid() && ChunkCoords.isChunkLoaded(entity.getLocation());
-	}
-
-	@Override
-	public String getId() {
-		return getId(entity);
-	}
-
-	@Override
-	public Location getActualLocation() {
+	public Location getLocation() {
 		if (this.isActive()) {
 			return entity.getLocation();
 		} else {
 			return null;
-		}
-	}
-
-	@Override
-	public void setName(String name) {
-		if (!this.isActive()) return;
-		if (Settings.showNameplates && name != null && !name.isEmpty()) {
-			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
-				name = Settings.nameplatePrefix + name;
-			}
-			name = this.trimToNameLength(name);
-			// set entity name plate:
-			entity.setCustomName(name);
-			entity.setCustomNameVisible(Settings.alwaysShowNameplates);
-		} else {
-			// remove name plate:
-			entity.setCustomName(null);
-			entity.setCustomNameVisible(false);
-		}
-	}
-
-	@Override
-	public int getNameLengthLimit() {
-		return 32;
-	}
-
-	@Override
-	public void setItem(ItemStack item) {
-		if (this.isActive()) {
-			entity.getEquipment().setItemInHand(item);
-			entity.getEquipment().setItemInHandDropChance(0);
 		}
 	}
 
@@ -294,85 +327,51 @@ public class LivingEntityShop extends AbstractShopObject {
 		}
 	}
 
+	// NAMING
+
 	@Override
-	public void despawn() {
-		if (entity != null) {
-			// note: in case the entity is not active but not in the same chunk, it was probably pushed into a different
-			// and now already unloaded chunk, in which case it got already removed inside the chunk-unload listener
-			if (!this.isActive() && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
-				Log.debug("Chunk was silently unloaded at (" + shopkeeper.getPositionString() + "): Loading it now to remove old entity");
-				World world = Bukkit.getWorld(shopkeeper.getWorldName());
-				if (world != null) {
-					this.searchOldEntity(); // this will load the chunk
-					// request a safe chunk unload which will call an ChunkUnloadEvent then: (for now let's assume
-					// that the server can handle this automatically)
-					// Chunk chunk = location.getChunk();
-					// world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
-				}
+	public int getNameLengthLimit() {
+		return 32;
+	}
+
+	@Override
+	public void setName(String name) {
+		if (!this.isActive()) return;
+		if (Settings.showNameplates && name != null && !name.isEmpty()) {
+			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
+				name = Settings.nameplatePrefix + name;
 			}
-
-			// disable AI:
-			this.cleanupAI();
-
-			// cleanup metadata:
-			this.removeShopkeeperMetadata(entity);
-
-			// remove entity:
-			entity.remove();
-			entity = null;
-			// TODO chunk loading and removal might not work during server shutdown.. :(
-			// so we are now storing the last known entity uuid
+			name = this.prepareName(name);
+			// set entity name plate:
+			entity.setCustomName(name);
+			entity.setCustomNameVisible(Settings.alwaysShowNameplates);
+		} else {
+			// remove name plate:
+			entity.setCustomName(null);
+			entity.setCustomNameVisible(false);
 		}
 	}
 
 	@Override
-	public void delete() {
-		this.despawn();
+	public String getName() {
+		if (!this.isActive()) return null;
+		return entity.getCustomName();
 	}
 
-	protected void overwriteAI() {
-		NMSManager.getProvider().overwriteLivingEntityAI(entity);
+	// SUB TYPES
+	// not supported by default
 
-		if (!Settings.useLegacyMobBehavior) {
-			// disable AI (also disables gravity) and replace it with our own handling:
-			NMSManager.getProvider().setNoAI(entity);
-			if (NMSManager.getProvider().supportsCustomMobAI()) {
-				SKShopkeepersPlugin.getInstance().getLivingEntityAI().addEntity(entity);
-			}
-		}
-
-		if (Settings.silenceLivingShopEntities) {
-			NMSManager.getProvider().setEntitySilent(entity, true);
-		}
-		if (Settings.disableGravity) {
-			NMSManager.getProvider().setGravity(entity, false);
-			// when gravity gets disabled, we might be able to also disable collisions/pushing of mobs via noclip:
-			NMSManager.getProvider().setNoclip(entity);
-		}
-
-		// set the NoAI tag always for certain entity types:
-		if (this.isNoAIMobType()) {
-			NMSManager.getProvider().setNoAI(entity);
-		}
+	protected void applySubType() {
+		// nothing to do by default
 	}
 
-	// some mobs will always get their AI disabled in order to properly work:
-	protected boolean isNoAIMobType() {
-		switch (livingObjectType.getEntityType()) {
-		case BAT:
-		case ENDER_DRAGON:
-		case ENDERMAN:
-		case WITHER:
-		case SILVERFISH:
-		case BLAZE:
-			return true;
-		default:
-			return false;
-		}
-	}
+	// OTHER PROPERTIES
 
-	protected void cleanupAI() {
-		// disable AI:
-		SKShopkeepersPlugin.getInstance().getLivingEntityAI().removeEntity(entity);
+	@Override
+	public void equipItem(ItemStack item) {
+		if (this.isActive()) {
+			entity.getEquipment().setItemInHand(item);
+			entity.getEquipment().setItemInHandDropChance(0);
+		}
 	}
 }

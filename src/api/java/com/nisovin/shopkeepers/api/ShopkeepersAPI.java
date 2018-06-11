@@ -96,15 +96,18 @@ public final class ShopkeepersAPI {
 	//
 
 	/**
-	 * Creates a new shopkeeper and spawns it into the world.
+	 * Creates and spawns a new shopkeeper in the same way a player would create it.
+	 * <p>
+	 * This takes any limitations into account that might affect the creator or owner of the shopkeeper, and this sends
+	 * the creator messages if the shopkeeper creation fails for some reason.
 	 * 
 	 * @param shopCreationData
 	 *            the shop creation data containing the necessary arguments (spawn location, object type, etc.) for
 	 *            creating this shopkeeper
 	 * @return the new shopkeeper, or <code>null</code> if the creation wasn't successful for some reason
 	 */
-	public static Shopkeeper createShopkeeper(ShopCreationData shopCreationData) {
-		return getPlugin().createShopkeeper(shopCreationData);
+	public static Shopkeeper handleShopkeeperCreation(ShopCreationData shopCreationData) {
+		return getPlugin().handleShopkeeperCreation(shopCreationData);
 	}
 
 	public static TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {

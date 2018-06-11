@@ -14,13 +14,14 @@ import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.events.ShopkeeperDeletedEvent;
+import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class EditorHandler extends UIHandler {
@@ -48,8 +49,9 @@ public abstract class EditorHandler extends UIHandler {
 	@Override
 	protected void onInventoryClose(InventoryCloseEvent event, Player player) {
 		this.saveEditor(event.getInventory(), player);
-		this.getShopkeeper().closeAllOpenWindows();
-		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+		Shopkeeper shopkeeper = this.getShopkeeper();
+		shopkeeper.closeAllOpenWindows();
+		shopkeeper.save();
 	}
 
 	@Override
@@ -63,24 +65,28 @@ public abstract class EditorHandler extends UIHandler {
 			// delete button - delete shopkeeper:
 			event.setCancelled(true);
 
-			// return shop creation item for player shopkeepers:
-			if (Settings.deletingPlayerShopReturnsCreationItem && shopkeeper.getType() instanceof PlayerShopType) {
-				ItemStack shopCreationItem = Settings.createShopCreationItem();
-				Map<Integer, ItemStack> remaining = player.getInventory().addItem(shopCreationItem);
-				if (!remaining.isEmpty()) {
-					player.getWorld().dropItem(shopkeeper.getActualLocation(), shopCreationItem);
+			// call event:
+			PlayerDeleteShopkeeperEvent deleteEvent = new PlayerDeleteShopkeeperEvent(shopkeeper, player);
+			Bukkit.getPluginManager().callEvent(deleteEvent);
+			if (deleteEvent.isCancelled()) {
+				Log.debug("ShopkeeperDeleteEvent was cancelled!");
+			} else {
+				// return shop creation item for player shopkeepers:
+				if (Settings.deletingPlayerShopReturnsCreationItem && shopkeeper.getType() instanceof PlayerShopType) {
+					ItemStack shopCreationItem = Settings.createShopCreationItem();
+					Map<Integer, ItemStack> remaining = player.getInventory().addItem(shopCreationItem);
+					if (!remaining.isEmpty()) {
+						player.getWorld().dropItem(shopkeeper.getObjectLocation(), shopCreationItem);
+					}
 				}
+
+				// delete shopkeeper:
+				// this also deactivates the ui and closes all open windows for this shopkeeper after a delay
+				shopkeeper.delete();
+
+				// save:
+				shopkeeper.save();
 			}
-
-			// delete shopkeeper:
-			// this also deactivates the ui and closes all open windows for this shopkeeper after a delay
-			shopkeeper.delete();
-
-			// run event:
-			Bukkit.getPluginManager().callEvent(new ShopkeeperDeletedEvent(player, shopkeeper));
-
-			// save:
-			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 		} else if (rawSlot == 17) {
 			// cycle button - cycle to next object type variation:
 			event.setCancelled(true);
@@ -88,7 +94,7 @@ public abstract class EditorHandler extends UIHandler {
 			ItemStack cursor = event.getCursor();
 			if (!ItemUtils.isEmpty(cursor)) {
 				// equip item:
-				shopkeeper.getShopObject().setItem(cursor.clone());
+				shopkeeper.getShopObject().equipItem(cursor.clone());
 				// TODO how to remove equipped item again?
 				// TODO equipped items don't get saved current -> they get lost when the entity is respawned
 				// TODO not possible for player shops currently, because clicking/picking up items in player inventory
@@ -104,11 +110,11 @@ public abstract class EditorHandler extends UIHandler {
 				}
 			}
 
-			// run event:
-			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
+			// call event:
+			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
 
 			// save:
-			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+			shopkeeper.save();
 		} else if (rawSlot == 8) {
 			// naming or chest inventory button:
 			event.setCancelled(true);
@@ -126,11 +132,11 @@ public abstract class EditorHandler extends UIHandler {
 			// prepare closing the editor window:
 			this.saveEditor(event.getInventory(), player);
 
-			// run event:
-			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(player, shopkeeper));
+			// call event:
+			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
 
 			// save:
-			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+			shopkeeper.save();
 
 			// ignore other click events for this shopkeeper in the same tick:
 			shopkeeper.deactivateUI();

@@ -44,7 +44,7 @@ public class PriceOffer {
 		ConfigurationSection offersSection = config.createSection(node);
 		int id = 0;
 		for (PriceOffer offer : offers) {
-			ItemStack item = offer.getItem();
+			ItemStack item = offer.getItem(); // is a clone
 			// TODO temporary, due to a bukkit bug custom head item can currently not be saved
 			if (Settings.skipCustomHeadSaving && ItemUtils.isCustomHeadItem(item)) {
 				Log.warning("Skipping saving of trade involving a head item with custom texture, which cannot be saved currently due to a bukkit bug.");

@@ -19,16 +19,19 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	public static final String TRAIT_NAME = "shopkeeper";
 
+	// citizens shop object id
 	private String shopkeeperId = null;
 
 	public CitizensShopkeeperTrait() {
 		super("shopkeeper");
 	}
 
+	@Override
 	public void load(DataKey key) {
 		this.shopkeeperId = key.getString("ShopkeeperId", null);
 	}
 
+	@Override
 	public void save(DataKey key) {
 		key.setString("ShopkeeperId", shopkeeperId);
 	}
@@ -60,7 +63,7 @@ public class CitizensShopkeeperTrait extends Trait {
 			// this should keep the citizens npc and only remove the shopkeeper data:
 			shopkeeper.delete();
 			// save:
-			ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+			shopkeeper.save();
 		} else {
 			// TODO what if the trait gets removed and Shopkeepers is disabled?
 			// -> does a new npc get created when Shopkeepers enables again?
@@ -120,7 +123,7 @@ public class CitizensShopkeeperTrait extends Trait {
 			if (location != null) {
 				ShopCreationData creationData = ShopCreationData.create(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
 				creationData.setValue(CitizensShop.CREATION_DATA_NPC_ID_KEY, npc.getId());
-				Shopkeeper shopkeeper = plugin.createShopkeeper(creationData);
+				Shopkeeper shopkeeper = plugin.handleShopkeeperCreation(creationData);
 				if (shopkeeper != null) {
 					shopkeeperId = shopkeeper.getObjectId();
 				} else {
