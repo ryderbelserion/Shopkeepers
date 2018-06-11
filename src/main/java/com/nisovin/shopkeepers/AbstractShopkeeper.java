@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
+import com.nisovin.shopkeepers.api.registry.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.registry.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;

@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.api.registry;
 
 /**
  * This exception gets used during shopkeeper creation and loading, if the shopkeeper cannot be created due to invalid

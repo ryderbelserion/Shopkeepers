@@ -11,8 +11,6 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 
-import com.nisovin.shopkeepers.AbstractShopkeeper;
-import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.shoptypes.ShopType;
@@ -37,7 +35,7 @@ public interface ShopkeeperRegistry {
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper could not be created
 	 */
-	public AbstractShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException;
+	public Shopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException;
 
 	/**
 	 * Recreates a shopkeeper by loading its previously saved data from the given config section.
@@ -52,7 +50,7 @@ public interface ShopkeeperRegistry {
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper could not be loaded
 	 */
-	public AbstractShopkeeper loadShopkeeper(ShopType<?> shopType, int id, ConfigurationSection configSection) throws ShopkeeperCreateException;
+	public Shopkeeper loadShopkeeper(ShopType<?> shopType, int id, ConfigurationSection configSection) throws ShopkeeperCreateException;
 
 	// QUERYING
 

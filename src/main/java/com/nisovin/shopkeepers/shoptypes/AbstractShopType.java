@@ -7,9 +7,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.ShopCreationData;
 import com.nisovin.shopkeepers.api.events.PlayerCreateShopkeeperEvent;
+import com.nisovin.shopkeepers.api.registry.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.registry.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
