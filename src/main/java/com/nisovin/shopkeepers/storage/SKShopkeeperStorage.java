@@ -56,7 +56,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private boolean savingDisabled = false;
 	private long lastSavingErrorMsgTimestamp = 0L;
 	// there might be shopkeepers with unsaved data, or we got an explicit save request:
-	private boolean dirty = false; //
+	private boolean dirty = false;
 	private int delayedSaveTaskId = -1;
 
 	// current loading:
@@ -81,7 +81,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// determines if there was another saveReal-request while the saveIOTask was still in progress
 	private boolean saveAgain = false;
 	// shopkeepers that got deleted during the last async save:
-	private final List<AbstractShopkeeper> deletedShopkeepers = new ArrayList<>();
+	private final List<AbstractShopkeeper> shopkeepersToDelete = new ArrayList<>();
+	// number of shopkeepers whose data got removed since the last save:
+	private int deletedShopkeepersCount = 0;
 
 	public SKShopkeeperStorage(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
@@ -118,6 +120,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		syncSavingCallback = null;
 		abortSave = false;
 		saveAgain = false;
+		shopkeepersToDelete.clear();
+		deletedShopkeepersCount = 0;
 	}
 
 	private SKShopkeeperRegistry getShopkeeperRegistry() {
@@ -214,11 +218,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		assert shopkeeper != null;
 		if (this.isCurrentlySavingAsync()) {
 			// remember to remove the data after the current async save has finished:
-			deletedShopkeepers.add(shopkeeper);
+			shopkeepersToDelete.add(shopkeeper);
 		} else {
 			String key = String.valueOf(shopkeeper.getId());
 			saveData.set(key, null);
 			saveDataBuffer.set(key, null);
+			deletedShopkeepersCount++;
 		}
 	}
 
@@ -498,12 +503,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		saveResult.startTime = System.currentTimeMillis();
 
 		// store data of dirty shopkeepers into memory configuration:
-		saveResult.dirtyShopkeeperCount = 0;
+		saveResult.dirtyShopkeepersCount = 0;
 		for (AbstractShopkeeper shopkeeper : this.getShopkeeperRegistry().getAllShopkeepers()) {
 			if (!shopkeeper.isDirty()) {
 				continue; // assume storage data is still up-to-date
 			}
-			saveResult.dirtyShopkeeperCount++;
+			saveResult.dirtyShopkeepersCount++;
 
 			String sectionKey = String.valueOf(shopkeeper.getId());
 			Object previousData = saveData.get(sectionKey);
@@ -526,6 +531,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			savingShopkeepers.add(shopkeeper);
 			shopkeeper.onSave();
 		}
+
+		// store number of deleted shopkeepers (for debugging purposes):
+		saveResult.deletedShopkeepersCount = deletedShopkeepersCount;
+		deletedShopkeepersCount = 0;
 
 		// time to store shopkeeper data in memory configuration:
 		saveResult.packingDuration = System.currentTimeMillis() - saveResult.startTime;
@@ -568,14 +577,17 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 							saveDelayed();
 						}
 					}
+
+					// restore number of deleted shopkeepers:
+					deletedShopkeepersCount = saveResult.deletedShopkeepersCount;
 				}
 				savingShopkeepers.clear();
 
 				// remove data of shopkeepers that have been deleted during the save:
-				for (AbstractShopkeeper deletedShopkeeper : deletedShopkeepers) {
+				for (AbstractShopkeeper deletedShopkeeper : shopkeepersToDelete) {
 					clearShopkeeperData(deletedShopkeeper);
 				}
-				deletedShopkeepers.clear();
+				shopkeepersToDelete.clear();
 
 				// if not aborted / cancelled:
 				if (saveResult.state == SaveResult.State.SUCCESS || saveResult.state == SaveResult.State.FAILURE) {
@@ -862,7 +874,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		private State state;
-		private int dirtyShopkeeperCount = 0;
+		private int dirtyShopkeepersCount = 0;
+		private int deletedShopkeepersCount = 0;
 		private boolean async;
 		private long startTime;
 		private long packingDuration;
@@ -878,7 +891,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		public void printDebugInfo() {
 			Log.debug("Saved shopkeeper data (" + totalDuration + "ms (Data packing ("
-					+ dirtyShopkeeperCount + " dirty shopkeepers): " + packingDuration + "ms, "
+					+ dirtyShopkeepersCount + " dirty, " + deletedShopkeepersCount + " deleted): " + packingDuration + "ms, "
 					+ (async ? "AsyncTask delay: " + asyncTaskDelay + "ms, " : "")
 					+ ((ioLockAcquireDuration > 1) ? "IO lock delay: " + ioLockAcquireDuration + "ms, " : "")
 					+ (async ? "Async " : "Sync ") + "IO: " + ioDuration + "ms))"

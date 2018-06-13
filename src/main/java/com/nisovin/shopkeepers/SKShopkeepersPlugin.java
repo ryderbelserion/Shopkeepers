@@ -240,7 +240,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			// remove invalid citizens shopkeepers:
 			CitizensHandler.removeInvalidCitizensShopkeepers();
 			// remove inactive player shopkeepers:
-			removeInactivePlayerShops();
+			this.removeInactivePlayerShops();
 		}, 5L);
 
 		// let's update the shopkeepers for all already online players:
