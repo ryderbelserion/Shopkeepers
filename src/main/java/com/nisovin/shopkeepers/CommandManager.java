@@ -385,7 +385,7 @@ class CommandManager implements CommandExecutor {
 				}
 
 				int shopsCount = shops.size();
-				int maxPage = (int) (shopsCount / LIST_PAGE_SIZE) + 1;
+				int maxPage = (int) Math.ceil((double) shopsCount / LIST_PAGE_SIZE);
 				page = Math.min(page, maxPage);
 
 				if (playerName == null) {
