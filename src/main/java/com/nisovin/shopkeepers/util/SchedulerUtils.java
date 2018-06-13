@@ -45,8 +45,8 @@ public final class SchedulerUtils {
 	 * Schedules the given task to be run on the primary thread if required.
 	 * <p>
 	 * If the current thread is already the primary thread, the task will be run immediately. Otherwise it attempts to
-	 * schedule the task to run on the server's primary thread. However, the task won't be scheduled if the current
-	 * thread is interrupted (for shutdown measures), or if the plugin is <code>null</code> or disabled.
+	 * schedule the task to run on the server's primary thread. However, if the plugin is <code>null</code> or disabled,
+	 * the task won't be scheduled.
 	 * 
 	 * @param plugin
 	 *            the plugin to use for scheduling
@@ -59,7 +59,6 @@ public final class SchedulerUtils {
 			task.run();
 		} else {
 			if (plugin == null) return false;
-			if (Thread.currentThread().isInterrupted()) return false;
 			if (!runTaskOrOmit(plugin, task)) return false;
 		}
 		return true;
@@ -134,7 +133,8 @@ public final class SchedulerUtils {
 				try {
 					Thread.sleep(5);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					// ignore, but reset interrupt flag:
+					Thread.currentThread().interrupt();
 				}
 				// update the number of active async task before breaking from loop:
 				activeAsyncTasks = getActiveAsyncTasks(plugin);
