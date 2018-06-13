@@ -7,6 +7,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.IllegalPluginAccessException;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.scheduler.BukkitWorker;
 
 /**
@@ -57,47 +58,45 @@ public final class SchedulerUtils {
 	public static boolean runOnMainThreadOrOmit(Plugin plugin, Runnable task) {
 		if (isMainThread()) {
 			task.run();
+			return true;
 		} else {
 			if (plugin == null) return false;
-			if (!runTaskOrOmit(plugin, task)) return false;
+			return (runTaskOrOmit(plugin, task) != null);
 		}
-		return true;
 	}
 
-	public static boolean runTaskOrOmit(Plugin plugin, Runnable task) {
+	public static BukkitTask runTaskOrOmit(Plugin plugin, Runnable task) {
 		return runTaskLaterOrOmit(plugin, task, 0L);
 	}
 
-	public static boolean runTaskLaterOrOmit(Plugin plugin, Runnable task, long delay) {
+	public static BukkitTask runTaskLaterOrOmit(Plugin plugin, Runnable task, long delay) {
 		validatePluginTask(plugin, task);
 		// tasks can only be registered while enabled:
 		if (plugin.isEnabled()) {
 			try {
-				Bukkit.getScheduler().runTaskLater(plugin, task, delay);
-				return true;
+				return Bukkit.getScheduler().runTaskLater(plugin, task, delay);
 			} catch (IllegalPluginAccessException e) {
 				// couldn't register task: the plugin got disabled just now
 			}
 		}
-		return false;
+		return null;
 	}
 
-	public static boolean runAsyncTaskOrOmit(Plugin plugin, Runnable task) {
+	public static BukkitTask runAsyncTaskOrOmit(Plugin plugin, Runnable task) {
 		return runAsyncTaskLaterOrOmit(plugin, task, 0L);
 	}
 
-	public static boolean runAsyncTaskLaterOrOmit(Plugin plugin, Runnable task, long delay) {
+	public static BukkitTask runAsyncTaskLaterOrOmit(Plugin plugin, Runnable task, long delay) {
 		validatePluginTask(plugin, task);
 		// tasks can only be registered while enabled:
 		if (plugin.isEnabled()) {
 			try {
-				Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task, delay);
-				return true;
+				return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task, delay);
 			} catch (IllegalPluginAccessException e) {
 				// couldn't register task: the plugin got disabled just now
 			}
 		}
-		return false;
+		return null;
 	}
 
 	/**
