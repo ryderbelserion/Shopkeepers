@@ -110,6 +110,8 @@ public class CitizensShop extends AbstractShopObject {
 				}
 			} else {
 				// TODO: npc not yet loaded or citizens not enabled: how to remove the citizens npc later?
+				// usually not a problem, because players cannot delete citizens shopkeepers if the corresponding
+				// citizens npc isn't present in the world (exception: deletion via commands..)
 			}
 		}
 		npcId = null;
