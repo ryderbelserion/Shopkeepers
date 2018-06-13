@@ -433,7 +433,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 		this.ownerUUID = owner.getUniqueId();
 		this.ownerName = owner.getName();
-		this.setChest(chest.getX(), chest.getY(), chest.getZ());
+		this._setChest(chest.getX(), chest.getY(), chest.getZ());
 	}
 
 	@Override
@@ -460,7 +460,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		}
 
 		// update chest:
-		this.setChest(configSection.getInt("chestx"), configSection.getInt("chesty"), configSection.getInt("chestz"));
+		this._setChest(configSection.getInt("chestx"), configSection.getInt("chesty"), configSection.getInt("chestz"));
 
 		hireCost = configSection.getItemStack("hirecost");
 		// hire cost itemstack is not null, but empty -> normalize to null:
@@ -622,8 +622,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return (this.isForHire() ? hireCost.clone() : null);
 	}
 
-	@Override
-	public void setChest(int chestX, int chestY, int chestZ) {
+	protected void _setChest(int chestX, int chestY, int chestZ) {
 		if (this.isValid()) {
 			// unregister previously protected chest:
 			SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(this.getWorldName(), chestX, chestY, chestZ, this);
@@ -633,12 +632,17 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		this.chestX = chestX;
 		this.chestY = chestY;
 		this.chestZ = chestZ;
-		this.markDirty();
 
 		if (this.isValid()) {
 			// register new protected chest:
 			SKShopkeepersPlugin.getInstance().getProtectedChests().addChest(this.getWorldName(), chestX, chestY, chestZ, this);
 		}
+	}
+
+	@Override
+	public void setChest(int chestX, int chestY, int chestZ) {
+		this._setChest(chestX, chestY, chestZ);
+		this.markDirty();
 	}
 
 	/**
