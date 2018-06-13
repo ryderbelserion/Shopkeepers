@@ -68,9 +68,11 @@ public class CitizensShop extends AbstractShopObject {
 	@Override
 	public void setup() {
 		super.setup();
-		if (this.isActive() || !CitizensHandler.isEnabled()) return;
+		if (npcId != null || !CitizensHandler.isEnabled()) return;
 
 		// create npc:
+		Log.debug("Creating citizens NPC for shopkeeper " + shopkeeper.getId());
+
 		EntityType entityType;
 		String name;
 		if (shopkeeper instanceof PlayerShopkeeper) {
@@ -103,8 +105,11 @@ public class CitizensShop extends AbstractShopObject {
 					// let the trait handle npc related cleanup:
 					npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperRemove();
 				} else {
+					Log.debug("Removing citizens NPC " + npc.getId() + " due to deletion of shopkeeper " + shopkeeper.getId());
 					npc.destroy(); // the npc was created by us, so we remove it again
 				}
+			} else {
+				// TODO: npc not yet loaded or citizens not enabled: how to remove the citizens npc later?
 			}
 		}
 		npcId = null;
@@ -114,8 +119,7 @@ public class CitizensShop extends AbstractShopObject {
 	// ACTIVATION
 
 	public NPC getNPC() {
-		if (npcId == null) return null;
-		if (!CitizensHandler.isEnabled()) return null;
+		if (!this.isActive()) return null;
 		return CitizensAPI.getNPCRegistry().getById(npcId);
 	}
 
@@ -127,7 +131,9 @@ public class CitizensShop extends AbstractShopObject {
 
 	@Override
 	public boolean isActive() {
-		return (this.getNPC() != null);
+		// note: usually the actual npcs get loaded after the shopkeepers have been loaded, so checking whether the npc
+		// exists won't work here
+		return npcId != null && CitizensHandler.isEnabled();
 	}
 
 	@Override

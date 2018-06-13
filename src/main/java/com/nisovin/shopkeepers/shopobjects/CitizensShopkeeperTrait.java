@@ -50,6 +50,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	}
 
 	void onShopkeeperRemove() {
+		Log.debug("Removing citizens trait due to shopkeeper removal for NPC " + npc.getId());
 		shopkeeperId = null;
 		this.getNPC().removeTrait(CitizensShopkeeperTrait.class);
 	}
@@ -57,6 +58,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	public void onTraitDeletion() {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		if (shopkeeper != null) {
+			Log.debug("Removing shopkeeper " + shopkeeper.getId() + " due to citizens trait removal for NPC " + npc.getId());
 			assert shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN();
 			CitizensShop shopObject = (CitizensShop) shopkeeper.getShopObject();
 			shopObject.onTraitRemoval();
@@ -105,13 +107,13 @@ public class CitizensShopkeeperTrait extends Trait {
 		// giving citizens some time to properly initialize the trait and npc:
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			// create a new shopkeeper if there isn't one already for this npc:
-			if (!isMissingShopkeeper()) {
+			if (!this.isMissingShopkeeper()) {
 				return;
 			}
 
+			NPC npc = this.getNPC();
 			Log.debug("Creating shopkeeper for NPC " + npc.getId());
 
-			NPC npc = getNPC();
 			Location location = null;
 			Entity entity = npc.getEntity();
 			if (entity != null) {
@@ -129,7 +131,7 @@ public class CitizensShopkeeperTrait extends Trait {
 				} else {
 					Log.warning("Shopkeeper creation via trait failed. Removing trait again.");
 					shopkeeperId = null;
-					Bukkit.getScheduler().runTask(plugin, () -> getNPC().removeTrait(CitizensShopkeeperTrait.class));
+					Bukkit.getScheduler().runTask(plugin, () -> npc.removeTrait(CitizensShopkeeperTrait.class));
 				}
 			} else {
 				// well.. no idea what to do in that case.. we cannot create a shopkeeper without a location, right?
