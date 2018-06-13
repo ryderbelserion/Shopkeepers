@@ -136,14 +136,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		this.savingDisabled = false;
 	}
 
-	public boolean isDirty() {
-		return dirty;
-	}
-
-	public void markDirty() {
-		dirty = true;
-	}
-
 	private File getSaveFile() {
 		return new File(plugin.getDataFolder(), "save.yml");
 	}
@@ -384,6 +376,15 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public boolean isDirty() {
+		return dirty;
+	}
+
+	public void markDirty() {
+		dirty = true;
 	}
 
 	@Override

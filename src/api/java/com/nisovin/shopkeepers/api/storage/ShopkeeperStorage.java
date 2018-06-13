@@ -6,6 +6,14 @@ package com.nisovin.shopkeepers.api.storage;
 public interface ShopkeeperStorage {
 
 	/**
+	 * Checks whether there are unsaved changes or whether there have been saving requests that haven't been handled
+	 * yet.
+	 * 
+	 * @return <code>true</code> if marked as dirty
+	 */
+	public boolean isDirty();
+
+	/**
 	 * Requests a save of all loaded shopkeepers data.
 	 * <p>
 	 * The actual saving might happen instantly or delayed, depending on the 'save-instantly' setting from the config.

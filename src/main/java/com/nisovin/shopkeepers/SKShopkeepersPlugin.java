@@ -230,8 +230,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
-		// request delayed save to write back all updated data:
-		shopkeeperStorage.saveDelayed();
 
 		// activate (spawn) shopkeepers in loaded chunks:
 		shopkeeperRegistry.loadShopkeepersInAllWorlds();
@@ -247,6 +245,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (Utils.isNPC(player)) continue;
 			this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
+		}
+
+		// write back all updated data:
+		if (shopkeeperStorage.isDirty()) {
+			shopkeeperStorage.saveNow();
 		}
 
 		// setup metrics:

@@ -33,7 +33,7 @@ public interface Shopkeeper {
 	public void saveDelayed();
 
 	/**
-	 * Whether this shopkeeper has been marked as 'dirty' to indicate that it has unsaved changes to its data.
+	 * Checks whether this shopkeeper has unsaved changes to its data.
 	 * 
 	 * @return <code>true</code> if marked as dirty
 	 */
