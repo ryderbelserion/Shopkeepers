@@ -293,8 +293,8 @@ public class Settings {
 	public static String msgAdminShopCreated = "&aShopkeeper created!\n"
 			+ "&aRight-click the shop while sneaking to modify trades.";
 
-	public static String msgListAdminShopsHeader = "&9There are &e{shopsCount} &9admin shops: &e(Page {page})";
-	public static String msgListPlayerShopsHeader = "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page})";
+	public static String msgListAdminShopsHeader = "&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})";
+	public static String msgListPlayerShopsHeader = "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})";
 	public static String msgListShopsEntry = "  &e{shopIndex}) &8{shopName}&r&7at &8({location})&7, type: &8{shopType}&7, object type: &8{objectType}";
 
 	public static String msgRemovedAdminShops = "&e{shopsCount} &aadmin shops were removed.";

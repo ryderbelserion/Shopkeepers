@@ -392,13 +392,15 @@ class CommandManager implements CommandExecutor {
 					// listing admin shops:
 					Utils.sendMessage(player, Settings.msgListAdminShopsHeader,
 							"{shopsCount}", String.valueOf(shopsCount),
-							"{page}", String.valueOf(page));
+							"{page}", String.valueOf(page),
+							"{maxPage}", String.valueOf(maxPage));
 				} else {
 					// listing player shops:
 					Utils.sendMessage(player, Settings.msgListPlayerShopsHeader,
 							"{player}", playerName,
 							"{shopsCount}", String.valueOf(shopsCount),
-							"{page}", String.valueOf(page));
+							"{page}", String.valueOf(page),
+							"{maxPage}", String.valueOf(maxPage));
 				}
 
 				int startIndex = (page - 1) * LIST_PAGE_SIZE;
