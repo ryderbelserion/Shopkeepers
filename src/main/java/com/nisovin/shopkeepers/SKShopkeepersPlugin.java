@@ -156,12 +156,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			}
 		}
 
-		// enable shopkeeper storage:
-		shopkeeperStorage.onEnable();
-
-		// enable shopkeeper registry:
-		shopkeeperRegistry.onEnable();
-
 		// initialize default shop and shop object types (after config has been loaded):
 		defaultShopTypes = new SKDefaultShopTypes();
 		defaultShopObjectTypes = new SKDefaultShopObjectTypes();
@@ -220,6 +214,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		CommandManager commandManager = new CommandManager(this);
 		this.getCommand("shopkeeper").setExecutor(commandManager);
 
+		// enable shopkeeper storage:
+		shopkeeperStorage.onEnable();
+
+		// enable shopkeeper registry:
+		shopkeeperRegistry.onEnable();
+
 		// load shopkeeper saved data:
 		boolean loadingSuccessful = shopkeeperStorage.reload();
 		if (!loadingSuccessful) {
@@ -274,8 +274,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// disable citizens handler:
 		CitizensHandler.disable();
 
-		// disable storage (saves shopkeepers):
-		shopkeeperStorage.onDisable();
+		// save shopkeepers:
+		shopkeeperStorage.saveImmediateIfDirty();
 
 		// inform other components:
 		livingEntityAI.stop();
@@ -285,7 +285,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// cleanup:
 		creatureForceSpawnListener = null;
 
+		// disable registry:
 		shopkeeperRegistry.onDisable();
+
+		// disable storage:
+		shopkeeperStorage.onDisable();
 
 		shopTypesRegistry.clearAllSelections();
 		shopObjectTypesRegistry.clearAllSelections();

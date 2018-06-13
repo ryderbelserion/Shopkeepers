@@ -92,23 +92,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	public void onEnable() {
 		// start save task:
 		if (!Settings.saveInstantly) {
-			Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-				if (this.isDirty()) {
-					this.saveNow();
-				}
-			}, 6000, 6000); // 5 minutes
+			this.startSaveTask();
 		}
 	}
 
 	public void onDisable() {
-		// wait for any async saving to finish:
-		this.waitOrAbortAsyncSave();
-
-		// save if dirty:
-		if (this.isDirty()) {
-			this.saveImmediate(); // not async here
-		}
-
 		// reset a few things:
 		this.clearSaveData();
 		savingShopkeepers.clear();
@@ -122,6 +110,14 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		saveAgain = false;
 		shopkeepersToDelete.clear();
 		deletedShopkeepersCount = 0;
+	}
+
+	private void startSaveTask() {
+		Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+			if (this.isDirty()) {
+				this.saveNow();
+			}
+		}, 6000, 6000); // 5 minutes
 	}
 
 	private SKShopkeeperRegistry getShopkeeperRegistry() {
@@ -417,6 +413,16 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	@Override
 	public void saveImmediate() {
 		this.saveReal(false);
+	}
+
+	public void saveImmediateIfDirty() {
+		// wait for any async saving to finish:
+		this.waitOrAbortAsyncSave();
+
+		// save if dirty:
+		if (this.isDirty()) {
+			this.saveImmediate(); // not async here
+		}
 	}
 
 	private boolean isCurrentlySavingAsync() {

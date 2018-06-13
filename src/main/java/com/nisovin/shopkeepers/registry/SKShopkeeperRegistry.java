@@ -64,6 +64,28 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	public void onEnable() {
 		// start teleporter task:
+		this.startTeleporterTask();
+
+		// start verifier task:
+		if (Settings.enableSpawnVerifier) {
+			this.startSpawnVerifierTask();
+		}
+	}
+
+	public void onDisable() {
+		// unload all shopkeepers:
+		this.unloadAllShopkeepers();
+		assert this.getAllShopkeepers().isEmpty();
+
+		// reset, clearing (just in case):
+		activeShopkeepers.clear();
+		shopkeepersByChunk.clear();
+		shopkeeperViewsByChunk.clear();
+		shopkeepersByUUID.clear();
+		shopkeepersById.clear();
+	}
+
+	private void startTeleporterTask() {
 		Bukkit.getScheduler().runTaskTimer(plugin, () -> {
 			List<AbstractShopkeeper> readd = new ArrayList<>();
 			Iterator<Map.Entry<String, AbstractShopkeeper>> iter = activeShopkeepers.entrySet().iterator();
@@ -89,59 +111,45 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 				// shop objects might have been removed or respawned, request a save:
 				if (dirty) {
-					plugin.getShopkeeperStorage().save();
+					this.getShopkeeperStorage().save();
 				}
 			}
 		}, 200, 200); // 10 seconds
-
-		// start verifier task:
-		if (Settings.enableSpawnVerifier) {
-			Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-				int count = 0;
-				boolean dirty = false;
-				for (Entry<ChunkCoords, List<AbstractShopkeeper>> chunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
-					ChunkCoords chunk = chunkEntry.getKey();
-					if (!chunk.isChunkLoaded()) continue;
-
-					List<AbstractShopkeeper> shopkeepers = chunkEntry.getValue();
-					for (AbstractShopkeeper shopkeeper : shopkeepers) {
-						if (!shopkeeper.needsSpawning() || shopkeeper.isActive()) continue;
-
-						// deactivate by old object id:
-						this._deactivateShopkeeper(shopkeeper);
-						// respawn:
-						boolean spawned = shopkeeper.spawn();
-						if (!spawned) {
-							Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
-							continue;
-						}
-						// activate with new object id:
-						this._activateShopkeeper(shopkeeper);
-						count++;
-						if (shopkeeper.isDirty()) dirty = true;
-					}
-				}
-				if (count > 0) {
-					Log.debug("Spawn verifier: " + count + " shopkeepers respawned");
-					if (dirty) {
-						plugin.getShopkeeperStorage().save();
-					}
-				}
-			}, 600, 1200); // 30,60 seconds
-		}
 	}
 
-	public void onDisable() {
-		// unload all shopkeepers:
-		this.unloadAllShopkeepers();
-		assert this.getAllShopkeepers().isEmpty();
+	private void startSpawnVerifierTask() {
+		Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+			int count = 0;
+			boolean dirty = false;
+			for (Entry<ChunkCoords, List<AbstractShopkeeper>> chunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
+				ChunkCoords chunk = chunkEntry.getKey();
+				if (!chunk.isChunkLoaded()) continue;
 
-		// reset, clearing (just in case):
-		activeShopkeepers.clear();
-		shopkeepersByChunk.clear();
-		shopkeeperViewsByChunk.clear();
-		shopkeepersByUUID.clear();
-		shopkeepersById.clear();
+				List<AbstractShopkeeper> shopkeepers = chunkEntry.getValue();
+				for (AbstractShopkeeper shopkeeper : shopkeepers) {
+					if (!shopkeeper.needsSpawning() || shopkeeper.isActive()) continue;
+
+					// deactivate by old object id:
+					this._deactivateShopkeeper(shopkeeper);
+					// respawn:
+					boolean spawned = shopkeeper.spawn();
+					if (!spawned) {
+						Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
+						continue;
+					}
+					// activate with new object id:
+					this._activateShopkeeper(shopkeeper);
+					count++;
+					if (shopkeeper.isDirty()) dirty = true;
+				}
+			}
+			if (count > 0) {
+				Log.debug("Spawn verifier: " + count + " shopkeepers respawned");
+				if (dirty) {
+					this.getShopkeeperStorage().save();
+				}
+			}
+		}, 600, 1200); // 30,60 seconds
 	}
 
 	// SHOPKEEPER CREATION
