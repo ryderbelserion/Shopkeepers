@@ -73,7 +73,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 				if (update) {
 					// if the shopkeeper had to be respawned its shop id changed:
 					// this removes the entry which was stored with the old shop id and later adds back the
-					// shopkeeper with it's new id
+					// shopkeeper with its new id
 					readd.add(shopkeeper);
 					iter.remove();
 				}

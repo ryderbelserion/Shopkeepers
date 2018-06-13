@@ -121,7 +121,8 @@ public class CitizensShop extends AbstractShopObject {
 	// ACTIVATION
 
 	public NPC getNPC() {
-		if (!this.isActive()) return null;
+		if (npcId == null) return null;
+		if (!CitizensHandler.isEnabled()) return null;
 		return CitizensAPI.getNPCRegistry().getById(npcId);
 	}
 
@@ -133,9 +134,7 @@ public class CitizensShop extends AbstractShopObject {
 
 	@Override
 	public boolean isActive() {
-		// note: usually the actual npcs get loaded after the shopkeepers have been loaded, so checking whether the npc
-		// exists won't work here
-		return npcId != null && CitizensHandler.isEnabled();
+		return (this.getNPC() != null);
 	}
 
 	@Override
