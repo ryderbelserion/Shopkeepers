@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
@@ -166,53 +165,6 @@ public class ShopCreationData {
 				additionalData = new HashMap<>();
 			}
 			additionalData.put(key, value);
-		}
-	}
-
-	/**
-	 * Creation data specific for player shops.
-	 */
-	public static class PlayerShopCreationData extends ShopCreationData {
-
-		public static PlayerShopCreationData create(Player creator, ShopType<?> shopType, ShopObjectType<?> objectType,
-													Location spawnLocation, BlockFace targetedBlockFace, Player owner, Block chest) {
-			return new PlayerShopCreationData(creator, shopType, objectType, spawnLocation, targetedBlockFace, owner, chest);
-		}
-
-		private Player owner; // not null, modifiable
-		private Block chest; // not null
-
-		protected PlayerShopCreationData(	Player creator, ShopType<?> shopType, ShopObjectType<?> objectType,
-											Location spawnLocation, BlockFace targetedBlockFace, Player owner, Block chest) {
-			super(creator, shopType, objectType, spawnLocation, targetedBlockFace);
-			Validate.notNull(owner, "Owner is null!");
-			Validate.notNull(chest, "Chest is null!");
-			Validate.isTrue(spawnLocation.getWorld().equals(chest.getWorld()),
-					"Chest is located in a different world than the spawn location!");
-			this.owner = owner;
-			this.chest = chest;
-		}
-
-		/**
-		 * The owner of the player shop.
-		 * <p>
-		 * Usually the same player as the creator.
-		 * 
-		 * @return the shop owner
-		 */
-		public Player getOwner() {
-			return owner;
-		}
-
-		/**
-		 * The chest which is backing the player shop.
-		 * <p>
-		 * Has to be located in the same world the shopkeeper.
-		 * 
-		 * @return the shop chest
-		 */
-		public Block getShopChest() {
-			return chest;
 		}
 	}
 }

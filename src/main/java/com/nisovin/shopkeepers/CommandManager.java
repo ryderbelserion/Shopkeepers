@@ -31,7 +31,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;

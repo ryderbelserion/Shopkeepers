@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
