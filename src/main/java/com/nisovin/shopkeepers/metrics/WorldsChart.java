@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.bstats.bukkit.Metrics;
 
-import com.nisovin.shopkeepers.api.registry.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 
 /**

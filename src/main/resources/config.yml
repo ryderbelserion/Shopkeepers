@@ -384,10 +384,10 @@ msg-button-hire-lore:
 msg-trading-title-prefix: "&2"
 msg-trading-title-default: "Shopkeeper"
 
-msg-selected-normal-shop: "&aNormal shopkeeper selected (sells items to players)."
-msg-selected-book-shop: "&aBook shopkeeper selected (sell books)."
+msg-selected-sell-shop: "&aSelling shopkeeper selected (sells items to players)."
 msg-selected-buy-shop: "&aBuying shopkeeper selected (buys items from players)."
 msg-selected-trade-shop: "&aTrading shopkeeper selected (trades items with players)."
+msg-selected-book-shop: "&aBook shopkeeper selected (sells books)."
 
 msg-selected-living-shop: "&aYou selected: &f{type}"
 msg-selected-sign-shop: "&aYou selected: &fsign shop"
@@ -430,13 +430,9 @@ msg-missing-trade-perm: "&7You do not have the permission to trade with this sho
 msg-missing-custom-trade-perm: "&7You do not have the permission to trade with this shop."
 msg-cant-trade-while-owner-online: "&7You cannot trade while the owner of this shop ('{owner}') is online."
 
-msg-player-shop-created: |
+msg-sell-shop-created: |
     &aShopkeeper created!
     &aAdd items you want to sell to your chest, then
-    &aright-click the shop while sneaking to modify costs.
-msg-book-shop-created: |
-    &aShopkeeper created!
-    &aAdd written books and blank books to your chest, then
     &aright-click the shop while sneaking to modify costs.
 msg-buy-shop-created: |
     &aShopkeeper created!
@@ -445,6 +441,10 @@ msg-buy-shop-created: |
 msg-trade-shop-created: |
     &aShopkeeper created!
     &aAdd items you want to sell to your chest, then
+    &aright-click the shop while sneaking to modify costs.
+msg-book-shop-created: |
+    &aShopkeeper created!
+    &aAdd written books and blank books to your chest, then
     &aright-click the shop while sneaking to modify costs.
 msg-admin-shop-created: |
     &aShopkeeper created!

@@ -30,7 +30,8 @@ import org.bukkit.projectiles.ProjectileSource;
 
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.registry.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 

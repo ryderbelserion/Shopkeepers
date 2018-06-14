@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.api.events;
 
 import org.bukkit.event.Event;
 
-import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
 /**
  * Represents an event involving a shopkeeper.

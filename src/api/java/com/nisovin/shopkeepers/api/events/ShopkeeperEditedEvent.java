@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.api.events;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
-import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
 /**
  * This event is called whenever a player has finished editing a {@link Shopkeeper} in some way.

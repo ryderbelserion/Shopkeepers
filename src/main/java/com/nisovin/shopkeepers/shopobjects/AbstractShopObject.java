@@ -4,10 +4,10 @@ import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.AbstractShopkeeper;
-import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 
 /**
  * Abstract base class for all shop object implementations.

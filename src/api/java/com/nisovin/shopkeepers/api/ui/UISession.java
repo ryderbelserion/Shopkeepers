@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.api.ui;
 
-import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
 public interface UISession {
 

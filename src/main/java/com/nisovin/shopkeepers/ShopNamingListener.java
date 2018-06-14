@@ -7,6 +7,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+
 class ShopNamingListener implements Listener {
 
 	private final SKShopkeepersPlugin plugin;

@@ -5,7 +5,9 @@ import java.util.List;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingEntityObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.sign.SignShopObjectType;
 
 public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 

@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.metrics;
 
 import org.bstats.bukkit.Metrics;
 
-import com.nisovin.shopkeepers.api.registry.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 
 /**
  * Reports the (rough) number of shopkeepers.

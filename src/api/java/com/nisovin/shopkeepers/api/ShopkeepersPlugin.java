@@ -4,11 +4,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import com.nisovin.shopkeepers.api.registry.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopTypesRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectTypesRegistry;
-import com.nisovin.shopkeepers.api.shoptypes.DefaultShopTypes;
-import com.nisovin.shopkeepers.api.shoptypes.ShopTypesRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
@@ -40,7 +42,7 @@ public interface ShopkeepersPlugin extends Plugin {
 	public static final String HIRE_PERMISSION = "shopkeeper.hire";
 	public static final String BYPASS_PERMISSION = "shopkeeper.bypass";
 	public static final String ADMIN_PERMISSION = "shopkeeper.admin";
-	public static final String PLAYER_NORMAL_PERMISSION = "shopkeeper.player.normal";
+	public static final String PLAYER_SELL_PERMISSION = "shopkeeper.player.sell";
 	public static final String PLAYER_BUY_PERMISSION = "shopkeeper.player.buy";
 	public static final String PLAYER_TRADE_PERMISSION = "shopkeeper.player.trade";
 	public static final String PLAYER_BOOK_PERMISSION = "shopkeeper.player.book";

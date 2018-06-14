@@ -8,8 +8,8 @@ import org.bukkit.entity.Villager.Profession;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
-import com.nisovin.shopkeepers.AbstractShopkeeper;
-import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.Log;
 
 public class VillagerShop extends LivingEntityShop {

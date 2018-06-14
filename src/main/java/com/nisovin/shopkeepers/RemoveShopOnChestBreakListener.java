@@ -9,7 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 class RemoveShopOnChestBreakListener implements Listener {

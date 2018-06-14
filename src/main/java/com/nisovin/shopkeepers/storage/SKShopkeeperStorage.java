@@ -17,15 +17,15 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.registry.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
-import com.nisovin.shopkeepers.registry.SKShopkeeperRegistry;
-import com.nisovin.shopkeepers.shoptypes.AbstractShopType;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -297,8 +297,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			}
 
 			String shopTypeString = shopkeeperSection.getString("type");
+			// convert legacy shop type identifiers:
+			if (shopTypeString != null && shopTypeString.equalsIgnoreCase("player")) {
+				shopTypeString = "sell";
+			}
+
 			AbstractShopType<?> shopType = plugin.getShopTypeRegistry().get(shopTypeString);
-			// unknown shop type
 			if (shopType == null) {
 				Log.warning("Failed to load shopkeeper '" + key + "': Unknown shop type: " + shopTypeString);
 				continue; // skip this shopkeeper

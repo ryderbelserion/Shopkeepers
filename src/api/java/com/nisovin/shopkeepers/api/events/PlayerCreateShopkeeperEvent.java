@@ -4,7 +4,7 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-import com.nisovin.shopkeepers.api.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 
 /**
  * This event is called whenever a player attempts to create a {@link Shopkeeper}.

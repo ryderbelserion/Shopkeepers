@@ -28,12 +28,12 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
-import com.nisovin.shopkeepers.api.shoptypes.ShopType;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.metrics.CitizensChart;
@@ -46,14 +46,15 @@ import com.nisovin.shopkeepers.metrics.VaultEconomyChart;
 import com.nisovin.shopkeepers.metrics.WorldGuardChart;
 import com.nisovin.shopkeepers.metrics.WorldsChart;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
-import com.nisovin.shopkeepers.registry.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
+import com.nisovin.shopkeepers.shopkeeper.SKShopTypesRegistry;
+import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
-import com.nisovin.shopkeepers.shoptypes.AbstractShopType;
-import com.nisovin.shopkeepers.shoptypes.SKDefaultShopTypes;
-import com.nisovin.shopkeepers.shoptypes.SKShopTypesRegistry;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
@@ -519,7 +520,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// SHOPKEEPER NAMING
 
-	void onNaming(Player player, AbstractShopkeeper shopkeeper) {
+	public void onNaming(Player player, AbstractShopkeeper shopkeeper) {
 		assert player != null && shopkeeper != null;
 		naming.put(player.getName(), shopkeeper);
 	}

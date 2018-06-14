@@ -1,7 +1,7 @@
 package com.nisovin.shopkeepers.ui;
 
-import com.nisovin.shopkeepers.AbstractShopkeeper;
 import com.nisovin.shopkeepers.api.ui.UISession;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 
 public class SKUISession implements UISession {
 

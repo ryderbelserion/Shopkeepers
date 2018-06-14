@@ -27,10 +27,10 @@ msg-button-hire-lore:
 msg-trading-title-prefix: "&2"
 msg-trading-title-default: "Händler"
 
-msg-selected-normal-shop: "&aStandard Verkäufer ausgewählt (verkauft Items)."
-msg-selected-book-shop: "&aBuchhändler ausgewählt (verkauft Kopien von Büchern)."
+msg-selected-sell-shop: "&aVerkäufer ausgewählt (verkauft Items)."
 msg-selected-buy-shop: "&aAnkäufer ausgewählt (kauft Items)."
 msg-selected-trade-shop: "&aHändler ausgewählt (tauscht Items für andere Items)."
+msg-selected-book-shop: "&aBuchhändler ausgewählt (verkauft Kopien von Büchern)."
 
 msg-selected-living-shop: "&aAusgewählt: &f{type}"
 msg-selected-sign-shop: "&aAusgewählt: &fSchild-Shop"
@@ -73,14 +73,10 @@ msg-missing-trade-perm: "&7Du hast nicht die nötige Befugnis, um mit diesem Sho
 msg-missing-custom-trade-perm: "&7Du hast nicht die nötige Befugnis, um mit diesem Shop zu handeln."
 msg-cant-trade-while-owner-online: "&7Du kannst nicht Handeln, während der Besitzer dieses Shops ('{owner}') online ist."
 
-msg-player-shop-created: |
+msg-sell-shop-created: |
     &aShop erstellt!
     &aLege die zu verkaufenden Items in die Truhe, und
     &agib mit Shift+Rechts Klick auf den Shop die Preise an.
-msg-book-shop-created: |
-    &aShop erstellt!
-    &aLege das signierte Buch und soviele leere Bücher in die Truhe, wie Kopien verkauft werden sollen.
-    &aMit Shift+Rechts Klick auf den Shop legst Du die Preise fest.
 msg-buy-shop-created: |
     &aShop erstellt!
     &aLege von jedem Item, das du aufkaufen möchtest eines in die Truhe.
@@ -89,6 +85,10 @@ msg-trade-shop-created: |
     &aShop erstellt!
     &aLege die Items, die du eintauschen möchtest in die Truhe.
     &aMit Shift+Rechts Klick auf den Shop legst Du die Angebote fest.
+msg-book-shop-created: |
+    &aShop erstellt!
+    &aLege das signierte Buch und soviele leere Bücher in die Truhe, wie Kopien verkauft werden sollen.
+    &aMit Shift+Rechts Klick auf den Shop legst Du die Preise fest.
 msg-admin-shop-created: |
     &aShop erstellt!
     &aMit Shift+Rechts Klick auf den Shop legst Du die Preise fest.

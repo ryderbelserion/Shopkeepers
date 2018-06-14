@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.api.shopobjects;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
 public interface ShopObject {
 

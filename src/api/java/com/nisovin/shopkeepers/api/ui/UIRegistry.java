@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.api.ui;
 
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.api.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.types.TypeRegistry;
 
 /**

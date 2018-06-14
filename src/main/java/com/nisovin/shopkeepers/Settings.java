@@ -229,10 +229,10 @@ public class Settings {
 	public static String msgTradingTitlePrefix = "&2";
 	public static String msgTradingTitleDefault = "Shopkeeper";
 
-	public static String msgSelectedNormalShop = "&aNormal shopkeeper selected (sells items to players).";
-	public static String msgSelectedBookShop = "&aBook shopkeeper selected (sell books).";
+	public static String msgSelectedSellShop = "&aSelling shopkeeper selected (sells items to players).";
 	public static String msgSelectedBuyShop = "&aBuying shopkeeper selected (buys items from players).";
 	public static String msgSelectedTradeShop = "&aTrading shopkeeper selected (trade items with players).";
+	public static String msgSelectedBookShop = "&aBook shopkeeper selected (sells books).";
 
 	public static String msgSelectedLivingShop = "&aYou selected: &f{type}";
 	public static String msgSelectedSignShop = "&aYou selected: &fsign shop";
@@ -278,17 +278,17 @@ public class Settings {
 	public static String msgMissingCustomTradePerm = "&7You do not have the permission to trade with this shop.";
 	public static String msgCantTradeWhileOwnerOnline = "&7You cannot trade while the owner of this shop ('{owner}') is online.";
 
-	public static String msgPlayerShopCreated = "&aShopkeeper created!\n"
+	public static String msgSellShopCreated = "&aShopkeeper created!\n"
 			+ "&aAdd items you want to sell to your chest, then\n"
-			+ "&aright-click the shop while sneaking to modify costs.";
-	public static String msgBookShopCreated = "&aShopkeeper created!\n"
-			+ "&aAdd written books and blank books to your chest, then\n"
 			+ "&aright-click the shop while sneaking to modify costs.";
 	public static String msgBuyShopCreated = "&aShopkeeper created!\n"
 			+ "&aAdd one of each item you want to buy to your chest, then\n"
 			+ "&aright-click the shop while sneaking to modify costs.";
 	public static String msgTradeShopCreated = "&aShopkeeper created!\n"
 			+ "&aAdd items you want to sell to your chest, then\n"
+			+ "&aright-click the shop while sneaking to modify costs.";
+	public static String msgBookShopCreated = "&aShopkeeper created!\n"
+			+ "&aAdd written books and blank books to your chest, then\n"
 			+ "&aright-click the shop while sneaking to modify costs.";
 	public static String msgAdminShopCreated = "&aShopkeeper created!\n"
 			+ "&aRight-click the shop while sneaking to modify trades.";

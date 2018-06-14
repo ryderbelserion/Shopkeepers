@@ -15,11 +15,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.registry.ShopkeeperRegistry;
-import com.nisovin.shopkeepers.shopobjects.CitizensShop;
-import com.nisovin.shopkeepers.shopobjects.CitizensShopkeeperTrait;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShop;
+import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShopkeeperTrait;
 import com.nisovin.shopkeepers.util.Log;
 
 import net.citizensnpcs.api.CitizensAPI;

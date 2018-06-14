@@ -25,19 +25,19 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.ShopCreationData.PlayerShopCreationData;
-import com.nisovin.shopkeepers.api.Shopkeeper;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.registry.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
-import com.nisovin.shopkeepers.api.shoptypes.DefaultShopTypes;
-import com.nisovin.shopkeepers.api.shoptypes.PlayerShopType;
-import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
-import com.nisovin.shopkeepers.api.shoptypes.ShopType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
-import com.nisovin.shopkeepers.shoptypes.AdminShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 

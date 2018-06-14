@@ -3,8 +3,8 @@ package com.nisovin.shopkeepers.api.events;
 import org.apache.commons.lang.Validate;
 import org.bukkit.event.HandlerList;
 
-import com.nisovin.shopkeepers.api.Shopkeeper;
-import com.nisovin.shopkeepers.api.registry.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 
 /**
  * This event is called whenever a {@link Shopkeeper} was added to the {@link ShopkeeperRegistry}.

@@ -2,8 +2,8 @@ package com.nisovin.shopkeepers.api.events;
 
 import org.bukkit.event.HandlerList;
 
-import com.nisovin.shopkeepers.api.ShopCreationData;
-import com.nisovin.shopkeepers.api.shoptypes.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 
 /**
  * This event is called whenever a player attempts to create a {@link PlayerShopkeeper}.

@@ -15,8 +15,8 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
-import com.nisovin.shopkeepers.api.Shopkeeper;
-import com.nisovin.shopkeepers.registry.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.Log;
 
 class WorldListener implements Listener {
