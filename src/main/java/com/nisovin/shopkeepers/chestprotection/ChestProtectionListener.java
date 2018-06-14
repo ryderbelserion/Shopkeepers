@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.chestprotection;
 
 import java.util.Iterator;
 
@@ -21,12 +21,15 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
-class ChestProtectListener implements Listener {
+/**
+ * Provides enhanced chest protection (can be disabled via a config setting).
+ */
+class ChestProtectionListener implements Listener {
 
-	private final SKShopkeepersPlugin plugin;
+	private final ProtectedChests protectedChests;
 
-	ChestProtectListener(SKShopkeepersPlugin plugin) {
-		this.plugin = plugin;
+	ChestProtectionListener(ProtectedChests protectedChests) {
+		this.protectedChests = protectedChests;
 	}
 
 	@EventHandler(ignoreCancelled = true)
@@ -36,7 +39,7 @@ class ChestProtectListener implements Listener {
 		Player player = event.getPlayer();
 		if (Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) return;
 
-		if (plugin.getProtectedChests().isChestProtected(block, player)) {
+		if (protectedChests.isChestProtected(block, player)) {
 			Log.debug("Cancelled breaking of chest block by '" + player.getName() + "' at '"
 					+ Utils.getLocationString(block) + "': Protected chest");
 			event.setCancelled(true);
@@ -49,20 +52,20 @@ class ChestProtectListener implements Listener {
 		Material type = block.getType();
 		Player player = event.getPlayer();
 		if (ItemUtils.isChest(type)) {
-			if (plugin.getProtectedChests().isChestProtected(block, player)) {
+			if (protectedChests.isChestProtected(block, player)) {
 				Log.debug("Cancelled placing of chest block by '" + player.getName() + "' at '"
 						+ Utils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 			}
 		} else if (type == Material.HOPPER) {
-			if (plugin.getProtectedChests().isProtectedChestAroundHopper(block, player)) {
+			if (protectedChests.isProtectedChestAroundHopper(block, player)) {
 				Log.debug("Cancelled placing of hopper block by '" + player.getName() + "' at '"
 						+ Utils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 			}
 		} else if (type == Material.RAILS || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL || type == Material.ACTIVATOR_RAIL) {
 			Block upperBlock = block.getRelative(BlockFace.UP);
-			if (ItemUtils.isChest(upperBlock.getType()) && plugin.getProtectedChests().isChestProtected(upperBlock, player)) {
+			if (ItemUtils.isChest(upperBlock.getType()) && protectedChests.isChestProtected(upperBlock, player)) {
 				Log.debug("Cancelled placing of rail block by '" + player.getName() + "' at '"
 						+ Utils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
@@ -77,7 +80,7 @@ class ChestProtectListener implements Listener {
 			InventoryHolder holder = event.getSource().getHolder();
 			if (holder != null && holder instanceof Chest) {
 				Block block = ((Chest) holder).getBlock();
-				if (plugin.getProtectedChests().isChestProtected(block, null)) {
+				if (protectedChests.isChestProtected(block, null)) {
 					event.setCancelled(true);
 				}
 			}
@@ -90,7 +93,7 @@ class ChestProtectListener implements Listener {
 		Iterator<Block> iter = event.blockList().iterator();
 		while (iter.hasNext()) {
 			Block block = iter.next();
-			if (ItemUtils.isChest(block.getType()) && plugin.getProtectedChests().isChestProtected(block, null)) {
+			if (ItemUtils.isChest(block.getType()) && protectedChests.isChestProtected(block, null)) {
 				iter.remove();
 			}
 		}

@@ -35,6 +35,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.util.TradingRecipe;
+import com.nisovin.shopkeepers.chestprotection.ProtectedChests;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.metrics.CitizensChart;
 import com.nisovin.shopkeepers.metrics.FeaturesChart;
@@ -95,7 +96,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<>();
 	private final Map<String, Block> selectedChest = new HashMap<>();
 
-	private final ProtectedChests protectedChests = new ProtectedChests();
+	private final ProtectedChests protectedChests = new ProtectedChests(this);
 	private final LivingEntityAI livingEntityAI = new LivingEntityAI(this);
 	private final SignShops signShops = new SignShops(this);
 
@@ -173,7 +174,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		uiRegistry.onEnable();
 
 		// inform ProtectedChests:
-		protectedChests.onEnable();
+		protectedChests.enable();
 
 		// register events
 		PluginManager pm = Bukkit.getPluginManager();
@@ -181,7 +182,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		pm.registerEvents(new WorldListener(this), this);
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new ShopNamingListener(this), this);
-		pm.registerEvents(new ChestListener(this), this);
+		pm.registerEvents(new RecentlyPlacedChestsListener(this), this);
 		pm.registerEvents(new CreateListener(this), this);
 		pm.registerEvents(new LivingEntityShopListener(shopkeeperRegistry), this);
 		pm.registerEvents(new TradingCountListener(this), this);
@@ -199,9 +200,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			pm.registerEvents(new BlockVillagerSpawnListener(), this);
 		}
 
-		if (Settings.protectChests) {
-			pm.registerEvents(new ChestProtectListener(this), this);
-		}
 		if (Settings.deleteShopkeeperOnBreakChest) {
 			pm.registerEvents(new RemoveShopOnChestBreakListener(this), this);
 		}
@@ -285,7 +283,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// inform other components:
 		livingEntityAI.stop();
 		livingEntityAI.reset(); // cleanup, reset timings, etc.
-		protectedChests.onDisable();
+		protectedChests.disable();
 
 		// cleanup:
 		creatureForceSpawnListener = null;

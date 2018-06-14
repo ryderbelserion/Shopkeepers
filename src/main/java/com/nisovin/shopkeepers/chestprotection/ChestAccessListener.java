@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.chestprotection;
 
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -6,7 +6,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -14,20 +13,16 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
-class ChestListener implements Listener {
+/**
+ * Prevents unauthorized opening of protected chests.
+ * TODO combine this with ChestProtectionListener? Is there a need for this if chest protection is disabled?
+ */
+class ChestAccessListener implements Listener {
 
-	private final SKShopkeepersPlugin plugin;
+	private final ProtectedChests protectedChests;
 
-	ChestListener(SKShopkeepersPlugin plugin) {
-		this.plugin = plugin;
-	}
-
-	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-	void onBlockPlace(BlockPlaceEvent event) {
-		Block block = event.getBlock();
-		if (ItemUtils.isChest(block.getType())) {
-			plugin.onChestPlacement(event.getPlayer(), block);
-		}
+	ChestAccessListener(ProtectedChests protectedChests) {
+		this.protectedChests = protectedChests;
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
@@ -40,7 +35,7 @@ class ChestListener implements Listener {
 
 			// check for protected chest
 			if (!Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-				if (plugin.getProtectedChests().isChestProtected(block, player)) {
+				if (protectedChests.isChestProtected(block, player)) {
 					// TODO always allow access to own shop chests, even if cancelled by other plugins?
 					Log.debug("Cancelled chest opening by '" + player.getName() + "' at '"
 							+ Utils.getLocationString(block) + "': Protected chest");

@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.chestprotection;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,10 +7,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
@@ -19,16 +23,31 @@ public class ProtectedChests {
 	public static final BlockFace[] CHEST_PROTECTED_FACES = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST };
 	public static final BlockFace[] HOPPER_PROTECTED_FACES = { BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN };
 
+	private final SKShopkeepersPlugin plugin;
+	private final ChestAccessListener chestAccessListener = new ChestAccessListener(this);
+	private final ChestProtectionListener chestProtectionListener = new ChestProtectionListener(this);
+	private final RemoveShopOnChestBreakListener removeShopOnChestBreakListener;
 	private final Map<String, List<PlayerShopkeeper>> protectedChests = new HashMap<>();
 
-	public ProtectedChests() {
+	public ProtectedChests(SKShopkeepersPlugin plugin) {
+		this.plugin = plugin;
+		removeShopOnChestBreakListener = new RemoveShopOnChestBreakListener(plugin, this);
 	}
 
-	void onEnable() {
+	public void enable() {
+		Bukkit.getPluginManager().registerEvents(chestAccessListener, plugin);
+		if (Settings.protectChests) {
+			Bukkit.getPluginManager().registerEvents(chestProtectionListener, plugin);
+		}
+		if (Settings.deleteShopkeeperOnBreakChest) {
+			Bukkit.getPluginManager().registerEvents(removeShopOnChestBreakListener, plugin);
+		}
 	}
 
-	void onDisable() {
+	public void disable() {
 		// cleanup:
+		HandlerList.unregisterAll(chestAccessListener);
+		HandlerList.unregisterAll(chestProtectionListener);
 		protectedChests.clear();
 	}
 
