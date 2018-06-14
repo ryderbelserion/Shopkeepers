@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -50,9 +51,18 @@ class CommandManager implements CommandExecutor {
 	private final SKShopkeepersPlugin plugin;
 	private final ShopkeeperRegistry shopkeeperRegistry;
 
-	CommandManager(SKShopkeepersPlugin plugin) {
+	CommandManager(SKShopkeepersPlugin plugin, ShopkeeperRegistry shopkeeperRegistry) {
 		this.plugin = plugin;
-		this.shopkeeperRegistry = plugin.getShopkeeperRegistry();
+		this.shopkeeperRegistry = shopkeeperRegistry;
+	}
+
+	public void enable() {
+		// register command executor:
+		plugin.getCommand("shopkeeper").setExecutor(this);
+	}
+
+	public void disable() {
+		confirming.clear();
 	}
 
 	private void sendHelp(CommandSender sender) {
@@ -298,7 +308,7 @@ class CommandManager implements CommandExecutor {
 
 			// confirm previous command:
 			if (args.length >= 1 && args[0].equals("confirm")) {
-				plugin.onConfirm(player);
+				this.onConfirm(player);
 				return true;
 			}
 
@@ -461,7 +471,7 @@ class CommandManager implements CommandExecutor {
 				}
 
 				// this is dangerous: let the player first confirm this action
-				plugin.waitForConfirm(player, () -> {
+				this.waitForConfirm(player, () -> {
 					List<Shopkeeper> shops = new ArrayList<>();
 
 					if (playerName.equals("admin")) {
@@ -842,7 +852,7 @@ class CommandManager implements CommandExecutor {
 				}
 				Location spawnLocation = spawnBlock.getLocation();
 
-				if (plugin.getShopkeeperRegistry().getShopkeepersAtLocation(spawnLocation).isEmpty()) {
+				if (shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
 					// there is already a shopkeeper at that location:
 					Utils.sendMessage(player, Settings.msgShopCreateFail);
 					return true;
@@ -894,7 +904,7 @@ class CommandManager implements CommandExecutor {
 				}
 				Location spawnLocation = spawnBlock.getLocation();
 
-				if (plugin.getShopkeeperRegistry().getShopkeepersAtLocation(spawnLocation).isEmpty()) {
+				if (shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
 					// there is already a shopkeeper at that location:
 					Utils.sendMessage(player, Settings.msgShopCreateFail);
 					return true;
@@ -936,5 +946,65 @@ class CommandManager implements CommandExecutor {
 
 		// try to get shopkeeper by name:
 		return shopkeeperRegistry.getShopkeeperByName(shopIdArg);
+	}
+
+	// COMMAND CONFIRMING
+
+	private static class ConfirmEntry {
+
+		private final Runnable action;
+		private final int taskId;
+
+		public ConfirmEntry(Runnable action, int taskId) {
+			this.taskId = taskId;
+			this.action = action;
+		}
+
+		public int getTaskId() {
+			return taskId;
+		}
+
+		public Runnable getAction() {
+			return action;
+		}
+	}
+
+	private final Map<String, ConfirmEntry> confirming = new HashMap<>();
+
+	private void waitForConfirm(final Player player, Runnable action, int timeoutTicks) {
+		assert player != null && timeoutTicks > 0;
+		int taskId = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			endConfirmation(player);
+			Utils.sendMessage(player, Settings.msgConfirmationExpired);
+		}, timeoutTicks).getTaskId();
+
+		ConfirmEntry oldEntry = confirming.put(player.getName(), new ConfirmEntry(action, taskId));
+		if (oldEntry != null) {
+			// end old confirmation task:
+			Bukkit.getScheduler().cancelTask(oldEntry.getTaskId());
+		}
+	}
+
+	Runnable endConfirmation(Player player) {
+		ConfirmEntry entry = confirming.remove(player.getName());
+		if (entry != null) {
+			// end confirmation task:
+			Bukkit.getScheduler().cancelTask(entry.getTaskId());
+
+			// return action:
+			return entry.getAction();
+		}
+		return null;
+	}
+
+	private void onConfirm(Player player) {
+		assert player != null;
+		Runnable action = this.endConfirmation(player);
+		if (action != null) {
+			// execute confirmed task:
+			action.run();
+		} else {
+			Utils.sendMessage(player, Settings.msgNothingToConfirm);
+		}
 	}
 }

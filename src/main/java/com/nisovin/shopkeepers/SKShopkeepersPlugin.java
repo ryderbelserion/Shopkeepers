@@ -90,7 +90,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final SKUIRegistry uiRegistry = new SKUIRegistry(this);
 	private final SKDefaultUITypes defaultUITypes = new SKDefaultUITypes();
 
-	private final Map<String, ConfirmEntry> confirming = new HashMap<>();
+	// shopkeeper registry:
+	private final SKShopkeeperRegistry shopkeeperRegistry = new SKShopkeeperRegistry(this);
+
+	// shopkeeper storage:
+	private final SKShopkeeperStorage shopkeeperStorage = new SKShopkeeperStorage(this);
+
+	private final CommandManager commandManager = new CommandManager(this, shopkeeperRegistry);
 	private final Map<String, AbstractShopkeeper> naming = Collections.synchronizedMap(new HashMap<>());
 	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<>();
 	private final Map<String, Block> selectedChest = new HashMap<>();
@@ -98,12 +104,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final ProtectedChests protectedChests = new ProtectedChests(this);
 	private final LivingEntityShops livingEntityShops = new LivingEntityShops(this);
 	private final SignShops signShops = new SignShops(this);
-
-	// shopkeeper registry:
-	private final SKShopkeeperRegistry shopkeeperRegistry = new SKShopkeeperRegistry(this);
-
-	// storage
-	private final SKShopkeeperStorage shopkeeperStorage = new SKShopkeeperStorage(this);
 
 	@Override
 	public void onEnable() {
@@ -198,9 +198,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			pm.registerEvents(new BlockVillagerSpawnListener(), this);
 		}
 
-		// register command handler:
-		CommandManager commandManager = new CommandManager(this);
-		this.getCommand("shopkeeper").setExecutor(commandManager);
+		// enable command manager:
+		commandManager.enable();
 
 		// enable shopkeeper storage:
 		shopkeeperStorage.onEnable();
@@ -283,7 +282,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopTypesRegistry.clearAllSelections();
 		shopObjectTypesRegistry.clearAllSelections();
 
-		confirming.clear();
+		commandManager.disable();
 		naming.clear();
 		selectedChest.clear();
 
@@ -333,7 +332,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		selectedChest.remove(playerName);
 		recentlyPlacedChests.remove(playerName);
 		naming.remove(playerName);
-		this.endConfirmation(player);
+		commandManager.endConfirmation(player);
 	}
 
 	// SHOPKEEPER REGISTRY
@@ -456,45 +455,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	public Block getSelectedChest(Player player) {
 		assert player != null;
 		return selectedChest.get(player.getName());
-	}
-
-	// COMMAND CONFIRMING
-
-	void waitForConfirm(final Player player, Runnable action, int timeoutTicks) {
-		assert player != null && timeoutTicks > 0;
-		int taskId = Bukkit.getScheduler().runTaskLater(this, () -> {
-			endConfirmation(player);
-			Utils.sendMessage(player, Settings.msgConfirmationExpired);
-		}, timeoutTicks).getTaskId();
-
-		ConfirmEntry oldEntry = confirming.put(player.getName(), new ConfirmEntry(action, taskId));
-		if (oldEntry != null) {
-			// end old confirmation task:
-			Bukkit.getScheduler().cancelTask(oldEntry.getTaskId());
-		}
-	}
-
-	Runnable endConfirmation(Player player) {
-		ConfirmEntry entry = confirming.remove(player.getName());
-		if (entry != null) {
-			// end confirmation task:
-			Bukkit.getScheduler().cancelTask(entry.getTaskId());
-
-			// return action:
-			return entry.getAction();
-		}
-		return null;
-	}
-
-	void onConfirm(Player player) {
-		assert player != null;
-		Runnable action = this.endConfirmation(player);
-		if (action != null) {
-			// execute confirmed task:
-			action.run();
-		} else {
-			Utils.sendMessage(player, Settings.msgNothingToConfirm);
-		}
 	}
 
 	// SHOPKEEPER NAMING
@@ -640,24 +600,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 	}
 
-	private static class ConfirmEntry {
-
-		private final Runnable action;
-		private final int taskId;
-
-		public ConfirmEntry(Runnable action, int taskId) {
-			this.taskId = taskId;
-			this.action = action;
-		}
-
-		public int getTaskId() {
-			return taskId;
-		}
-
-		public Runnable getAction() {
-			return action;
-		}
-	}
+	//
 
 	@Override
 	public TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {
