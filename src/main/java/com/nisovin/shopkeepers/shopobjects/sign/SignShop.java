@@ -169,10 +169,10 @@ public class SignShop extends AbstractShopObject {
 
 		// place sign: // TODO maybe also allow non-wall signs?
 		// cancel block physics for this placed sign if needed:
-		SKShopkeepersPlugin.getInstance().cancelNextBlockPhysics(signLocation);
+		SKShopkeepersPlugin.getInstance().getSignShops().cancelNextBlockPhysics(signLocation);
 		signBlock.setType(Material.WALL_SIGN);
 		// cleanup state if no block physics were triggered:
-		SKShopkeepersPlugin.getInstance().cancelNextBlockPhysics(null);
+		SKShopkeepersPlugin.getInstance().getSignShops().cancelNextBlockPhysics(null);
 
 		// in case sign placement has failed for some reason:
 		if (!ItemUtils.isSign(signBlock.getType())) {

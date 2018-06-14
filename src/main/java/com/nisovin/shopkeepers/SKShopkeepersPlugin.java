@@ -55,6 +55,7 @@ import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
+import com.nisovin.shopkeepers.shopobjects.sign.SignShops;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
@@ -94,9 +95,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<>();
 	private final Map<String, Block> selectedChest = new HashMap<>();
 
-	// protected chests:
 	private final ProtectedChests protectedChests = new ProtectedChests();
 	private final LivingEntityAI livingEntityAI = new LivingEntityAI(this);
+	private final SignShops signShops = new SignShops(this);
 
 	// shopkeeper registry:
 	private final SKShopkeeperRegistry shopkeeperRegistry = new SKShopkeeperRegistry(this);
@@ -106,7 +107,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// listeners:
 	private CreatureForceSpawnListener creatureForceSpawnListener = null;
-	private SignShopListener signShopListener = null;
 
 	@Override
 	public void onEnable() {
@@ -187,10 +187,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		pm.registerEvents(new TradingCountListener(this), this);
 		pm.registerEvents(new TradeFileLogger(this.getDataFolder()), this);
 
-		if (Settings.enableSignShops) {
-			this.signShopListener = new SignShopListener(this);
-			pm.registerEvents(signShopListener, this);
-		}
+		// enable sign shops:
+		signShops.enable();
 
 		// enable citizens handler:
 		CitizensHandler.enable();
@@ -274,6 +272,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// TODO really required here? maybe replace with deactivate all, and also prevent re-activation during disable
 		// (due to new chunk loads)?
 		shopkeeperRegistry.despawnAllShopkeepers();
+
+		// disable sign shops:
+		signShops.disable();
 
 		// disable citizens handler:
 		CitizensHandler.disable();
@@ -374,12 +375,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 	}
 
-	public void cancelNextBlockPhysics(Location location) {
-		if (signShopListener != null) {
-			signShopListener.cancelNextBlockPhysics(location);
-		}
-	}
-
 	// UI
 
 	@Override
@@ -402,6 +397,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	public LivingEntityAI getLivingEntityAI() {
 		return livingEntityAI;
+	}
+
+	// SIGN SHOPS
+
+	public SignShops getSignShops() {
+		return signShops;
 	}
 
 	// SHOP TYPES
