@@ -16,6 +16,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitWorker;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
@@ -432,6 +433,16 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private boolean isCurrentlySavingAsync() {
 		return (saveIOTask != -1);
 	}
+	
+	private boolean isAsyncTaskCurrentlyRunning(int taskId) {
+		// BukkitScheduler#isCurrentlyRunning doesn't work correctly currently (see SPIGOT-3619)
+		for (BukkitWorker worker : Bukkit.getScheduler().getActiveWorkers()) {
+			if (worker.getTaskId() == taskId) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	// gets run from the main thread
 	// makes sure that after this method returns there is no saving going on anymore
@@ -455,7 +466,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// syncSavingCallback is still remaining to get run, this flag signalizes that we don't want any new saving
 			// requests (needs to be synchronized here to get correctly propagated):
 			abortSave = true;
-			while (saveResult.state == SaveResult.State.NOT_YET_STARTED && Bukkit.getScheduler().isCurrentlyRunning(saveIOTask)) {
+			while (saveResult.state == SaveResult.State.NOT_YET_STARTED && this.isAsyncTaskCurrentlyRunning(saveIOTask)) {
 				try {
 					// release the lock, for the async task to be able to operate,
 					// the async task has to notify us once it has finished:
