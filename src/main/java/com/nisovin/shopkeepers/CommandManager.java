@@ -38,6 +38,7 @@ import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.shopkeeper.admin.AdminShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -139,34 +140,35 @@ class CommandManager implements CommandExecutor {
 			}
 
 			Map<ChunkCoords, ? extends List<?>> shopsByChunk = shopkeeperRegistry.getAllShopkeepersByChunks();
+			LivingEntityAI livingEntityAI = plugin.getLivingEntityShops().getLivingEntityAI();
 
 			sender.sendMessage(ChatColor.YELLOW + "All shopkeepers:");
 			sender.sendMessage("  Total: " + shopkeeperRegistry.getAllShopkeepers().size());
 			sender.sendMessage("  Total chunks with shopkeepers: " + shopsByChunk.size());
 			sender.sendMessage("  Active: " + shopkeeperRegistry.getActiveShopkeepers().size());
-			sender.sendMessage("  Active with AI: " + plugin.getLivingEntityAI().getEntityCount());
-			sender.sendMessage("  Active AI chunks: " + plugin.getLivingEntityAI().getActiveAIChunksCount());
-			sender.sendMessage("  Active with active AI: " + plugin.getLivingEntityAI().getActiveAIEntityCount());
-			sender.sendMessage("  Active gravity chunks: " + plugin.getLivingEntityAI().getActiveGravityChunksCount());
-			sender.sendMessage("  Active with active gravity: " + plugin.getLivingEntityAI().getActiveGravityEntityCount());
+			sender.sendMessage("  Active with AI: " + livingEntityAI.getEntityCount());
+			sender.sendMessage("  Active AI chunks: " + livingEntityAI.getActiveAIChunksCount());
+			sender.sendMessage("  Active with active AI: " + livingEntityAI.getActiveAIEntityCount());
+			sender.sendMessage("  Active gravity chunks: " + livingEntityAI.getActiveGravityChunksCount());
+			sender.sendMessage("  Active with active gravity: " + livingEntityAI.getActiveGravityEntityCount());
 
-			double avgTotalAITimings = plugin.getLivingEntityAI().getTotalTimings().getAverageTimeMillis();
-			double maxTotalAITiming = plugin.getLivingEntityAI().getTotalTimings().getMaxTimeMillis();
+			double avgTotalAITimings = livingEntityAI.getTotalTimings().getAverageTimeMillis();
+			double maxTotalAITiming = livingEntityAI.getTotalTimings().getMaxTimeMillis();
 			sender.sendMessage("  Avg. total AI timings: " + Utils.DECIMAL_FORMAT.format(avgTotalAITimings) + " ms");
 			sender.sendMessage("  Max. total AI timing: " + Utils.DECIMAL_FORMAT.format(maxTotalAITiming) + " ms");
 
-			double avgAIActivationTimings = plugin.getLivingEntityAI().getActivationTimings().getAverageTimeMillis();
-			double maxAIActivationTiming = plugin.getLivingEntityAI().getActivationTimings().getMaxTimeMillis();
+			double avgAIActivationTimings = livingEntityAI.getActivationTimings().getAverageTimeMillis();
+			double maxAIActivationTiming = livingEntityAI.getActivationTimings().getMaxTimeMillis();
 			sender.sendMessage("    Avg. AI activation timings: " + Utils.DECIMAL_FORMAT.format(avgAIActivationTimings) + " ms");
 			sender.sendMessage("    Max. AI activation timing: " + Utils.DECIMAL_FORMAT.format(maxAIActivationTiming) + " ms");
 
-			double avgGravityTimings = plugin.getLivingEntityAI().getGravityTimings().getAverageTimeMillis();
-			double maxGravityTiming = plugin.getLivingEntityAI().getGravityTimings().getMaxTimeMillis();
+			double avgGravityTimings = livingEntityAI.getGravityTimings().getAverageTimeMillis();
+			double maxGravityTiming = livingEntityAI.getGravityTimings().getMaxTimeMillis();
 			sender.sendMessage("    Avg. gravity timings: " + Utils.DECIMAL_FORMAT.format(avgGravityTimings) + " ms");
 			sender.sendMessage("    Max. gravity timing: " + Utils.DECIMAL_FORMAT.format(maxGravityTiming) + " ms");
 
-			double avgAITimings = plugin.getLivingEntityAI().getAITimings().getAverageTimeMillis();
-			double maxAITiming = plugin.getLivingEntityAI().getAITimings().getMaxTimeMillis();
+			double avgAITimings = livingEntityAI.getAITimings().getAverageTimeMillis();
+			double maxAITiming = livingEntityAI.getAITimings().getMaxTimeMillis();
 			sender.sendMessage("    Avg. AI timings: " + Utils.DECIMAL_FORMAT.format(avgAITimings) + " ms");
 			sender.sendMessage("    Max. AI timing: " + Utils.DECIMAL_FORMAT.format(maxAITiming) + " ms");
 

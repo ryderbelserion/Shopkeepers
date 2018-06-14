@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.shopobjects.living;
 
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;

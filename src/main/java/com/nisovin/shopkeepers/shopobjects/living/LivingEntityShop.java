@@ -151,7 +151,7 @@ public class LivingEntityShop extends AbstractShopObject {
 			// TODO check if the block is passable before spawning there?
 			// try to bypass entity-spawn blocking plugins:
 			EntityType entityType = this.getEntityType();
-			SKShopkeepersPlugin.getInstance().forceCreatureSpawn(spawnLocation, entityType);
+			SKShopkeepersPlugin.getInstance().getLivingEntityShops().forceCreatureSpawn(spawnLocation, entityType);
 			entity = (LivingEntity) world.spawnEntity(spawnLocation, entityType);
 			uuid = entity.getUniqueId().toString();
 			shopkeeper.markDirty();
@@ -216,7 +216,7 @@ public class LivingEntityShop extends AbstractShopObject {
 			// disable AI (also disables gravity) and replace it with our own handling:
 			NMSManager.getProvider().setNoAI(entity);
 			if (NMSManager.getProvider().supportsCustomMobAI()) {
-				SKShopkeepersPlugin.getInstance().getLivingEntityAI().addEntity(entity);
+				SKShopkeepersPlugin.getInstance().getLivingEntityShops().getLivingEntityAI().addEntity(entity);
 			}
 		}
 
@@ -237,7 +237,7 @@ public class LivingEntityShop extends AbstractShopObject {
 
 	protected void cleanupAI() {
 		// disable AI:
-		SKShopkeepersPlugin.getInstance().getLivingEntityAI().removeEntity(entity);
+		SKShopkeepersPlugin.getInstance().getLivingEntityShops().getLivingEntityAI().removeEntity(entity);
 	}
 
 	@Override

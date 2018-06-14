@@ -15,6 +15,12 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingEntityObjectTypes;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.CreeperShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.PigZombieShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.SheepShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.ZombieShop;
 import com.nisovin.shopkeepers.util.StringUtils;
 
 public class SKLivingEntityObjectTypes implements LivingEntityObjectTypes {

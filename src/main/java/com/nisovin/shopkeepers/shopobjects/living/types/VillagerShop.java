@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.shopobjects.living;
+package com.nisovin.shopkeepers.shopobjects.living.types;
 
 import org.bukkit.DyeColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -10,13 +10,15 @@ import org.bukkit.material.Wool;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.util.Log;
 
 public class VillagerShop extends LivingEntityShop {
 
 	private Profession profession = Profession.FARMER;
 
-	protected VillagerShop(LivingEntityObjectType<VillagerShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public VillagerShop(LivingEntityObjectType<VillagerShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingObjectType, shopkeeper, creationData);
 	}
 

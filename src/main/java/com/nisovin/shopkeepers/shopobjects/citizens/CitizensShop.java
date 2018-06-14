@@ -20,6 +20,10 @@ import com.nisovin.shopkeepers.util.Log;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 
+/**
+ * Note: This relies on the regular living entity shopkeeper interaction handling.
+ * TODO separate this?
+ */
 public class CitizensShop extends AbstractShopObject {
 
 	public static String CREATION_DATA_NPC_ID_KEY = "CitizensNpcId";

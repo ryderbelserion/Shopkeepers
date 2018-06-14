@@ -14,7 +14,6 @@ import java.util.UUID;
 import org.apache.commons.lang.Validate;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.Configuration;
@@ -55,7 +54,7 @@ import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShops;
 import com.nisovin.shopkeepers.shopobjects.sign.SignShops;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
@@ -97,7 +96,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final Map<String, Block> selectedChest = new HashMap<>();
 
 	private final ProtectedChests protectedChests = new ProtectedChests(this);
-	private final LivingEntityAI livingEntityAI = new LivingEntityAI(this);
+	private final LivingEntityShops livingEntityShops = new LivingEntityShops(this);
 	private final SignShops signShops = new SignShops(this);
 
 	// shopkeeper registry:
@@ -105,9 +104,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// storage
 	private final SKShopkeeperStorage shopkeeperStorage = new SKShopkeeperStorage(this);
-
-	// listeners:
-	private CreatureForceSpawnListener creatureForceSpawnListener = null;
 
 	@Override
 	public void onEnable() {
@@ -184,9 +180,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		pm.registerEvents(new ShopNamingListener(this), this);
 		pm.registerEvents(new RecentlyPlacedChestsListener(this), this);
 		pm.registerEvents(new CreateListener(this), this);
-		pm.registerEvents(new LivingEntityShopListener(shopkeeperRegistry), this);
 		pm.registerEvents(new TradingCountListener(this), this);
 		pm.registerEvents(new TradeFileLogger(this.getDataFolder()), this);
+
+		// enable living entity shops:
+		livingEntityShops.enable();
 
 		// enable sign shops:
 		signShops.enable();
@@ -198,16 +196,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		pm.registerEvents(new VillagerInteractionListener(this), this);
 		if (Settings.blockVillagerSpawns) {
 			pm.registerEvents(new BlockVillagerSpawnListener(), this);
-		}
-
-		if (Settings.deleteShopkeeperOnBreakChest) {
-			pm.registerEvents(new RemoveShopOnChestBreakListener(this), this);
-		}
-
-		// register force-creature-spawn event handler:
-		if (Settings.bypassSpawnBlocking) {
-			creatureForceSpawnListener = new CreatureForceSpawnListener();
-			pm.registerEvents(creatureForceSpawnListener, this);
 		}
 
 		// register command handler:
@@ -271,6 +259,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// (due to new chunk loads)?
 		shopkeeperRegistry.despawnAllShopkeepers();
 
+		// disable living entity shops:
+		livingEntityShops.disable();
+
 		// disable sign shops:
 		signShops.disable();
 
@@ -280,13 +271,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// save shopkeepers:
 		shopkeeperStorage.saveImmediateIfDirty();
 
-		// inform other components:
-		livingEntityAI.stop();
-		livingEntityAI.reset(); // cleanup, reset timings, etc.
+		// disable protected chests:
 		protectedChests.disable();
-
-		// cleanup:
-		creatureForceSpawnListener = null;
 
 		// disable registry:
 		shopkeeperRegistry.onDisable();
@@ -364,15 +350,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return shopkeeperStorage;
 	}
 
-	// CREATURE FORCE SPAWN
-
-	// bypassing creature blocking plugins ('region protection' plugins):
-	public void forceCreatureSpawn(Location location, EntityType entityType) {
-		if (creatureForceSpawnListener != null && Settings.bypassSpawnBlocking) {
-			creatureForceSpawnListener.forceCreatureSpawn(location, entityType);
-		}
-	}
-
 	// UI
 
 	@Override
@@ -391,10 +368,10 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return protectedChests;
 	}
 
-	// LIVING ENTITY AI
+	// LIVING ENTITY SHOPS
 
-	public LivingEntityAI getLivingEntityAI() {
-		return livingEntityAI;
+	public LivingEntityShops getLivingEntityShops() {
+		return livingEntityShops;
 	}
 
 	// SIGN SHOPS

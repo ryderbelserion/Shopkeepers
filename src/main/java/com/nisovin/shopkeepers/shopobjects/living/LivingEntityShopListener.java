@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.shopobjects.living;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -28,6 +28,7 @@ import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.projectiles.ProjectileSource;
 
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -53,27 +54,31 @@ class LivingEntityShopListener implements Listener {
 		Player player = event.getPlayer();
 		String playerName = player.getName();
 		Log.debug("Player " + playerName + " is interacting with entity at " + shopEntity.getLocation());
+
 		// also checks for citizens npc shopkeepers:
 		AbstractShopkeeper shopkeeper = shopkeeperRegistry.getShopkeeperByEntity(shopEntity);
+		if (shopkeeper == null) {
+			Log.debug("  Non-shopkeeper");
+			return;
+		}
 
 		if (event.isCancelled() && !Settings.bypassShopInteractionBlocking) {
 			Log.debug("  Cancelled by another plugin");
-		} else if (shopkeeper != null) {
-			// only trigger shopkeeper interaction for main-hand events:
-			if (NMSManager.getProvider().isMainHandInteraction(event)) {
-				shopkeeper.onPlayerInteraction(player);
-			}
+			return;
+		}
 
-			// if citizens npc: don't cancel the event, let Citizens perform other actions as appropriate
-			if (shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN()) {
-				// always cancel interactions with shopkeepers, to prevent any default behavior:
-				event.setCancelled(true);
+		// only trigger shopkeeper interaction for main-hand events:
+		if (NMSManager.getProvider().isMainHandInteraction(event)) {
+			shopkeeper.onPlayerInteraction(player);
+		}
 
-				// update inventory in case interaction would trigger feeding normally:
-				player.updateInventory();
-			}
-		} else {
-			Log.debug("  Non-shopkeeper");
+		// if citizens npc: don't cancel the event, let Citizens perform other actions as appropriate
+		if (shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN()) {
+			// always cancel interactions with shopkeepers, to prevent any default behavior:
+			event.setCancelled(true);
+
+			// update inventory in case interaction would trigger feeding normally:
+			player.updateInventory();
 		}
 	}
 
@@ -87,17 +92,17 @@ class LivingEntityShopListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	void onEntityDamage(EntityDamageEvent event) {
 		Entity entity = event.getEntity();
+		if (!shopkeeperRegistry.isShopkeeper(entity)) return;
+
 		// block damaging of shopkeepers
-		if (shopkeeperRegistry.isShopkeeper(entity)) {
-			event.setCancelled(true);
-			if (event instanceof EntityDamageByEntityEvent) {
-				EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent) event;
-				if (evt.getDamager() instanceof Monster) {
-					Monster monster = (Monster) evt.getDamager();
-					// reset target, future targeting should get prevented somewhere else:
-					if (entity.equals(monster.getTarget())) {
-						monster.setTarget(null);
-					}
+		event.setCancelled(true);
+		if (event instanceof EntityDamageByEntityEvent) {
+			EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent) event;
+			if (evt.getDamager() instanceof Monster) {
+				Monster monster = (Monster) evt.getDamager();
+				// reset target, future targeting should get prevented somewhere else:
+				if (entity.equals(monster.getTarget())) {
+					monster.setTarget(null);
 				}
 			}
 		}

@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.shopobjects.living;
+package com.nisovin.shopkeepers.shopobjects.living.types;
 
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -9,12 +9,14 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 
 public class CatShop extends LivingEntityShop {
 
 	private Ocelot.Type catType = Ocelot.Type.WILD_OCELOT;
 
-	protected CatShop(LivingEntityObjectType<CatShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public CatShop(LivingEntityObjectType<CatShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingObjectType, shopkeeper, creationData);
 	}
 

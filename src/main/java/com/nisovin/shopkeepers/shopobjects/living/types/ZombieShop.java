@@ -1,19 +1,21 @@
-package com.nisovin.shopkeepers.shopobjects.living;
+package com.nisovin.shopkeepers.shopobjects.living.types;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.PigZombie;
+import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 
-public class PigZombieShop extends LivingEntityShop {
+public class ZombieShop extends LivingEntityShop {
 
 	private boolean baby = false;
 
-	protected PigZombieShop(LivingEntityObjectType<PigZombieShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public ZombieShop(LivingEntityObjectType<ZombieShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingObjectType, shopkeeper, creationData);
 	}
 
@@ -35,13 +37,13 @@ public class PigZombieShop extends LivingEntityShop {
 	protected void applySubType() {
 		super.applySubType();
 		if (!this.isActive()) return;
-		assert entity.getType() == EntityType.PIG_ZOMBIE;
-		((PigZombie) entity).setBaby(baby);
+		assert entity.getType() == EntityType.ZOMBIE;
+		((Zombie) entity).setBaby(baby);
 	}
 
 	@Override
 	public ItemStack getSubTypeItem() {
-		return new ItemStack(Material.MONSTER_EGG, 1, (short) 57);
+		return new ItemStack(Material.MONSTER_EGG, 1, (short) 54);
 	}
 
 	@Override

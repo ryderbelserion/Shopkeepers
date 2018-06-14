@@ -1,32 +1,34 @@
-package com.nisovin.shopkeepers.shopobjects.living;
+package com.nisovin.shopkeepers.shopobjects.living.types;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Creeper;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 
-public class ZombieShop extends LivingEntityShop {
+public class CreeperShop extends LivingEntityShop {
 
-	private boolean baby = false;
+	private boolean powered = false;
 
-	protected ZombieShop(LivingEntityObjectType<ZombieShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	public CreeperShop(LivingEntityObjectType<CreeperShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		baby = configSection.getBoolean("baby");
+		powered = configSection.getBoolean("powered");
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		configSection.set("baby", baby);
+		configSection.set("powered", powered);
 	}
 
 	// SUB TYPES
@@ -35,19 +37,19 @@ public class ZombieShop extends LivingEntityShop {
 	protected void applySubType() {
 		super.applySubType();
 		if (!this.isActive()) return;
-		assert entity.getType() == EntityType.ZOMBIE;
-		((Zombie) entity).setBaby(baby);
+		assert entity.getType() == EntityType.CREEPER;
+		((Creeper) entity).setPowered(powered);
 	}
 
 	@Override
 	public ItemStack getSubTypeItem() {
-		return new ItemStack(Material.MONSTER_EGG, 1, (short) 54);
+		return new ItemStack(Material.WOOL, 1, powered ? (short) 3 : (short) 5);
 	}
 
 	@Override
 	public void cycleSubType() {
 		shopkeeper.markDirty();
-		baby = !baby;
+		powered = !powered;
 		this.applySubType();
 	}
 }
