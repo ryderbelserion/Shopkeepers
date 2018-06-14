@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
@@ -161,4 +162,13 @@ public interface ShopkeeperRegistry {
 	 * @return an unmodifiable view on all active shopkeepers
 	 */
 	public Collection<? extends Shopkeeper> getActiveShopkeepers();
+
+	/**
+	 * Gets all shopkeepers at the specified location.
+	 * 
+	 * @param location
+	 *            the location
+	 * @return all shopkeepers at the specified location
+	 */
+	public List<? extends Shopkeeper> getShopkeepersAtLocation(Location location);
 }

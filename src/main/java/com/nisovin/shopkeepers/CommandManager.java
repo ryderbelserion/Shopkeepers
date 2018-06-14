@@ -840,6 +840,12 @@ class CommandManager implements CommandExecutor {
 				}
 				Location spawnLocation = spawnBlock.getLocation();
 
+				if (plugin.getShopkeeperRegistry().getShopkeepersAtLocation(spawnLocation).isEmpty()) {
+					// there is already a shopkeeper at that location:
+					Utils.sendMessage(player, Settings.msgShopCreateFail);
+					return true;
+				}
+
 				// create player shopkeeper:
 				plugin.handleShopkeeperCreation(PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace, player, targetBlock));
 				return true;
@@ -885,6 +891,12 @@ class CommandManager implements CommandExecutor {
 					return true;
 				}
 				Location spawnLocation = spawnBlock.getLocation();
+
+				if (plugin.getShopkeeperRegistry().getShopkeepersAtLocation(spawnLocation).isEmpty()) {
+					// there is already a shopkeeper at that location:
+					Utils.sendMessage(player, Settings.msgShopCreateFail);
+					return true;
+				}
 
 				// create admin shopkeeper:
 				plugin.handleShopkeeperCreation(ShopCreationData.create(player, DefaultShopTypes.ADMIN(), shopObjType, spawnLocation, targetBlockFace));

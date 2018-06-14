@@ -15,6 +15,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
@@ -576,6 +577,24 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	@Override
 	public Collection<AbstractShopkeeper> getActiveShopkeepers() {
 		return activeShopkeepersView;
+	}
+
+	@Override
+	public List<AbstractShopkeeper> getShopkeepersAtLocation(Location location) {
+		Validate.notNull(location, "Location is null!");
+		Validate.notNull(location.getWorld(), "Location's world is null!");
+		String worldName = location.getWorld().getName();
+		int x = location.getBlockX();
+		int y = location.getBlockY();
+		int z = location.getBlockZ();
+
+		List<AbstractShopkeeper> shopkeepers = new ArrayList<>();
+		for (AbstractShopkeeper shopkeeper : this.getAllShopkeepers()) {
+			if (shopkeeper.getWorldName().equals(worldName) && shopkeeper.getX() == x && shopkeeper.getY() == y && shopkeeper.getZ() == z) {
+				shopkeepers.add(shopkeeper);
+			}
+		}
+		return shopkeepers;
 	}
 
 	@Override
