@@ -64,6 +64,8 @@ import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.villagers.BlockVillagerSpawnListener;
+import com.nisovin.shopkeepers.villagers.VillagerInteractionListener;
 
 public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin {
 
@@ -181,7 +183,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		pm.registerEvents(new ShopNamingListener(this), this);
 		pm.registerEvents(new ChestListener(this), this);
 		pm.registerEvents(new CreateListener(this), this);
-		pm.registerEvents(new VillagerInteractionListener(this), this);
 		pm.registerEvents(new LivingEntityShopListener(shopkeeperRegistry), this);
 		pm.registerEvents(new TradingCountListener(this), this);
 		pm.registerEvents(new TradeFileLogger(this.getDataFolder()), this);
@@ -194,6 +195,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// enable citizens handler:
 		CitizensHandler.enable();
 
+		// handling of regular villagers:
+		pm.registerEvents(new VillagerInteractionListener(this), this);
 		if (Settings.blockVillagerSpawns) {
 			pm.registerEvents(new BlockVillagerSpawnListener(), this);
 		}

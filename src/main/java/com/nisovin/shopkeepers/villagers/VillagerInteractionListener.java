@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.villagers;
 
 import java.util.Map;
 
@@ -11,17 +11,19 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.TestEntityDamageByEntityEvent;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
-class VillagerInteractionListener implements Listener {
+public class VillagerInteractionListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;
 
-	VillagerInteractionListener(ShopkeepersPlugin plugin) {
+	public VillagerInteractionListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
