@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.villagers;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
