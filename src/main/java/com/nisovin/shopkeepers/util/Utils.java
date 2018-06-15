@@ -428,10 +428,6 @@ public final class Utils {
 
 	// entity utilities:
 
-	public static boolean isNPC(Entity entity) {
-		return entity.hasMetadata("NPC");
-	}
-
 	public static List<Entity> getNearbyEntities(Location location, double radius, EntityType... types) {
 		List<Entity> entities = new ArrayList<>();
 		if (location == null) return entities;

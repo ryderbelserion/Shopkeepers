@@ -10,6 +10,7 @@ import com.nisovin.shopkeepers.Settings;
 public class SignShops {
 
 	private final SKShopkeepersPlugin plugin;
+	private final SignShopObjectType signShopObjectType = new SignShopObjectType(this);
 	private final SignShopListener signShopListener;
 
 	public SignShops(SKShopkeepersPlugin plugin) {
@@ -17,14 +18,18 @@ public class SignShops {
 		signShopListener = new SignShopListener(plugin);
 	}
 
-	public void enable() {
+	public void onEnable() {
 		if (Settings.enableSignShops) {
 			Bukkit.getPluginManager().registerEvents(signShopListener, plugin);
 		}
 	}
 
-	public void disable() {
+	public void onDisable() {
 		HandlerList.unregisterAll(signShopListener);
+	}
+
+	public SignShopObjectType getSignShopObjectType() {
+		return signShopObjectType;
 	}
 
 	void cancelNextBlockPhysics(Location location) {

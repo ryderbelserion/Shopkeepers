@@ -13,13 +13,16 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class SignShopObjectType extends AbstractShopObjectType<SignShop> {
 
-	public SignShopObjectType() {
+	private final SignShops signShops;
+
+	public SignShopObjectType(SignShops signShops) {
 		super("sign", "shopkeeper.sign");
+		this.signShops = signShops;
 	}
 
 	@Override
 	public SignShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		return new SignShop(shopkeeper, creationData);
+		return new SignShop(signShops, shopkeeper, creationData);
 	}
 
 	@Override

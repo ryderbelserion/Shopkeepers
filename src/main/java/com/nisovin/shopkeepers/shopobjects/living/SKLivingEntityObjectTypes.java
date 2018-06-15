@@ -95,11 +95,13 @@ public class SKLivingEntityObjectTypes implements LivingEntityObjectTypes {
 		ALIASES = Collections.unmodifiableMap(aliases);
 	}
 
+	private final LivingEntityShops livingEntityShops;
 	// order is specified by the 'enabled-living-shops' config setting:
 	private final Map<EntityType, LivingEntityObjectType<?>> objectTypes = new LinkedHashMap<>();
 	private final Collection<LivingEntityObjectType<?>> objectTypesView = Collections.unmodifiableCollection(objectTypes.values());
 
-	public SKLivingEntityObjectTypes() {
+	public SKLivingEntityObjectTypes(LivingEntityShops livingEntityShops) {
+		this.livingEntityShops = livingEntityShops;
 		// first, create the enabled living object types, in the same order as specified in the config:
 		for (String enabledEntityType : Settings.enabledLivingShops) {
 			if (enabledEntityType == null) continue; // just in case
@@ -149,58 +151,58 @@ public class SKLivingEntityObjectTypes implements LivingEntityObjectTypes {
 
 		switch (entityType) {
 		case VILLAGER:
-			objectType = new LivingEntityObjectType<VillagerShop>(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<VillagerShop>(livingEntityShops, entityType, aliases, typeName, permission) {
 				@Override
 				public VillagerShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new VillagerShop(this, shopkeeper, creationData);
+					return new VillagerShop(livingEntityShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case CREEPER:
-			objectType = new LivingEntityObjectType<CreeperShop>(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<CreeperShop>(livingEntityShops, entityType, aliases, typeName, permission) {
 				@Override
 				public CreeperShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new CreeperShop(this, shopkeeper, creationData);
+					return new CreeperShop(livingEntityShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case OCELOT:
-			objectType = new LivingEntityObjectType<CatShop>(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<CatShop>(livingEntityShops, entityType, aliases, typeName, permission) {
 				@Override
 				public CatShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new CatShop(this, shopkeeper, creationData);
+					return new CatShop(livingEntityShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case SHEEP:
-			objectType = new LivingEntityObjectType<SheepShop>(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<SheepShop>(livingEntityShops, entityType, aliases, typeName, permission) {
 				@Override
 				public SheepShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new SheepShop(this, shopkeeper, creationData);
+					return new SheepShop(livingEntityShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case ZOMBIE:
-			objectType = new LivingEntityObjectType<ZombieShop>(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<ZombieShop>(livingEntityShops, entityType, aliases, typeName, permission) {
 				@Override
 				public ZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new ZombieShop(this, shopkeeper, creationData);
+					return new ZombieShop(livingEntityShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case PIG_ZOMBIE:
-			objectType = new LivingEntityObjectType<PigZombieShop>(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<PigZombieShop>(livingEntityShops, entityType, aliases, typeName, permission) {
 				@Override
 				public PigZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new PigZombieShop(this, shopkeeper, creationData);
+					return new PigZombieShop(livingEntityShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		default:
-			objectType = new LivingEntityObjectType<LivingEntityShop>(entityType, aliases, typeName, permission) {
+			objectType = new LivingEntityObjectType<LivingEntityShop>(livingEntityShops, entityType, aliases, typeName, permission) {
 				@Override
 				public LivingEntityShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new LivingEntityShop(this, shopkeeper, creationData);
+					return new LivingEntityShop(livingEntityShops, this, shopkeeper, creationData);
 				}
 			};
 			break;

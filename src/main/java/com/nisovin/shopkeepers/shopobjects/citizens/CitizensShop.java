@@ -11,7 +11,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
-import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
@@ -32,12 +31,14 @@ public class CitizensShop extends AbstractShopObject {
 		return "NPC-" + npcId;
 	}
 
+	protected final CitizensShops citizensShops;
 	private Integer npcId = null;
 	// used by citizen shopkeeper traits: if false, this will not remove the npc on deletion:
 	private boolean destroyNPC = true;
 
-	protected CitizensShop(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	protected CitizensShop(CitizensShops citizensShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
+		this.citizensShops = citizensShops;
 		if (creationData != null) {
 			// can be null here, as currently only NPC shopkeepers created by the shopkeeper trait provide the npc id
 			// via the creation data:
@@ -74,7 +75,7 @@ public class CitizensShop extends AbstractShopObject {
 	@Override
 	public void setup() {
 		super.setup();
-		if (npcId != null || !CitizensHandler.isEnabled()) return;
+		if (npcId != null || !citizensShops.isEnabled()) return;
 
 		// create npc:
 		Log.debug("Creating citizens NPC for shopkeeper " + shopkeeper.getId());
@@ -92,7 +93,7 @@ public class CitizensShop extends AbstractShopObject {
 
 		// create npc:
 		Location spawnLocation = this.getSpawnLocation();
-		npcId = CitizensHandler.createNPC(spawnLocation, entityType, name);
+		npcId = citizensShops.createNPC(spawnLocation, entityType, name);
 		shopkeeper.markDirty();
 	}
 
@@ -128,7 +129,7 @@ public class CitizensShop extends AbstractShopObject {
 
 	public NPC getNPC() {
 		if (npcId == null) return null;
-		if (!CitizensHandler.isEnabled()) return null;
+		if (!citizensShops.isEnabled()) return null;
 		return CitizensAPI.getNPCRegistry().getById(npcId);
 	}
 

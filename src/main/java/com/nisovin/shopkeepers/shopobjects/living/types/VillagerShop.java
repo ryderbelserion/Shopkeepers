@@ -12,14 +12,16 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShops;
 import com.nisovin.shopkeepers.util.Log;
 
 public class VillagerShop extends LivingEntityShop {
 
 	private Profession profession = Profession.FARMER;
 
-	public VillagerShop(LivingEntityObjectType<VillagerShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		super(livingObjectType, shopkeeper, creationData);
+	public VillagerShop(LivingEntityShops livingEntityShops, LivingEntityObjectType<VillagerShop> livingObjectType,
+						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		super(livingEntityShops, livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override
@@ -54,14 +56,19 @@ public class VillagerShop extends LivingEntityShop {
 		configSection.set("prof", profession.name());
 	}
 
+	@Override
+	public Villager getEntity() {
+		assert super.getEntity().getType() == EntityType.VILLAGER;
+		return (Villager) super.getEntity();
+	}
+
 	// SUB TYPES
 
 	@Override
 	protected void applySubType() {
 		super.applySubType();
 		if (!this.isActive()) return;
-		assert entity.getType() == EntityType.VILLAGER;
-		((Villager) entity).setProfession(profession);
+		this.getEntity().setProfession(profession);
 	}
 
 	@Override

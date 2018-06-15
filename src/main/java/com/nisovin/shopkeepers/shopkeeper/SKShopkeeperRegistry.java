@@ -34,7 +34,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
-import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShop;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
 import com.nisovin.shopkeepers.shopobjects.sign.SignShop;
@@ -548,7 +547,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	public AbstractShopkeeper getCitizensShopkeeper(Entity entity) {
 		if (entity == null) return null;
-		Integer npcId = CitizensHandler.getNPCId(entity);
+		Integer npcId = plugin.getCitizensShops().getNPCId(entity);
 		if (npcId == null) return null;
 		return this.getActiveShopkeeper(CitizensShop.getId(npcId));
 	}

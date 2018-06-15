@@ -10,13 +10,15 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShops;
 
 public class ZombieShop extends LivingEntityShop {
 
 	private boolean baby = false;
 
-	public ZombieShop(LivingEntityObjectType<ZombieShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		super(livingObjectType, shopkeeper, creationData);
+	public ZombieShop(	LivingEntityShops livingEntityShops, LivingEntityObjectType<ZombieShop> livingObjectType,
+						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		super(livingEntityShops, livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override
@@ -31,14 +33,19 @@ public class ZombieShop extends LivingEntityShop {
 		configSection.set("baby", baby);
 	}
 
+	@Override
+	public Zombie getEntity() {
+		assert super.getEntity().getType() == EntityType.ZOMBIE;
+		return (Zombie) super.getEntity();
+	}
+
 	// SUB TYPES
 
 	@Override
 	protected void applySubType() {
 		super.applySubType();
 		if (!this.isActive()) return;
-		assert entity.getType() == EntityType.ZOMBIE;
-		((Zombie) entity).setBaby(baby);
+		this.getEntity().setBaby(baby);
 	}
 
 	@Override

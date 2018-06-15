@@ -10,14 +10,12 @@ import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.material.Attachable;
 
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
-import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
@@ -29,14 +27,15 @@ public class SignShop extends AbstractShopObject {
 		return "block" + Utils.getLocationString(block);
 	}
 
+	protected final SignShops signShops;
 	private BlockFace signFacing; // can be null, if not yet loaded or unknown
-
 	// update the sign content at least once after plugin start, in case some settings have changed which affect the
 	// sign content:
 	private boolean updateSign = true;
 
-	protected SignShop(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	protected SignShop(SignShops signShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
+		this.signShops = signShops;
 		if (creationData != null) {
 			this.signFacing = creationData.getTargetedBlockFace();
 		}
@@ -44,7 +43,7 @@ public class SignShop extends AbstractShopObject {
 
 	@Override
 	public SignShopObjectType getObjectType() {
-		return SKDefaultShopObjectTypes.SIGN();
+		return signShops.getSignShopObjectType();
 	}
 
 	@Override
@@ -169,10 +168,10 @@ public class SignShop extends AbstractShopObject {
 
 		// place sign: // TODO maybe also allow non-wall signs?
 		// cancel block physics for this placed sign if needed:
-		SKShopkeepersPlugin.getInstance().getSignShops().cancelNextBlockPhysics(signLocation);
+		signShops.cancelNextBlockPhysics(signLocation);
 		signBlock.setType(Material.WALL_SIGN);
 		// cleanup state if no block physics were triggered:
-		SKShopkeepersPlugin.getInstance().getSignShops().cancelNextBlockPhysics(null);
+		signShops.cancelNextBlockPhysics(null);
 
 		// in case sign placement has failed for some reason:
 		if (!ItemUtils.isSign(signBlock.getType())) {

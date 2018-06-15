@@ -13,7 +13,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -33,13 +32,15 @@ public class LivingEntityShop extends AbstractShopObject {
 		return null;
 	}
 
-	protected final LivingEntityObjectType<?> livingObjectType;
-	protected LivingEntity entity;
+	protected final LivingEntityShops livingEntityShops;
+	private final LivingEntityObjectType<?> livingObjectType;
+	private LivingEntity entity;
 	private String uuid;
 	private int respawnAttempts = 0;
 
-	protected LivingEntityShop(LivingEntityObjectType<?> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	protected LivingEntityShop(LivingEntityShops livingEntityShops, LivingEntityObjectType<?> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
+		this.livingEntityShops = livingEntityShops;
 		this.livingObjectType = livingObjectType;
 	}
 
@@ -151,7 +152,7 @@ public class LivingEntityShop extends AbstractShopObject {
 			// TODO check if the block is passable before spawning there?
 			// try to bypass entity-spawn blocking plugins:
 			EntityType entityType = this.getEntityType();
-			SKShopkeepersPlugin.getInstance().getLivingEntityShops().forceCreatureSpawn(spawnLocation, entityType);
+			livingEntityShops.forceCreatureSpawn(spawnLocation, entityType);
 			entity = (LivingEntity) world.spawnEntity(spawnLocation, entityType);
 			uuid = entity.getUniqueId().toString();
 			shopkeeper.markDirty();
@@ -216,7 +217,7 @@ public class LivingEntityShop extends AbstractShopObject {
 			// disable AI (also disables gravity) and replace it with our own handling:
 			NMSManager.getProvider().setNoAI(entity);
 			if (NMSManager.getProvider().supportsCustomMobAI()) {
-				SKShopkeepersPlugin.getInstance().getLivingEntityShops().getLivingEntityAI().addEntity(entity);
+				livingEntityShops.getLivingEntityAI().addEntity(entity);
 			}
 		}
 
@@ -237,7 +238,7 @@ public class LivingEntityShop extends AbstractShopObject {
 
 	protected void cleanupAI() {
 		// disable AI:
-		SKShopkeepersPlugin.getInstance().getLivingEntityShops().getLivingEntityAI().removeEntity(entity);
+		livingEntityShops.getLivingEntityAI().removeEntity(entity);
 	}
 
 	@Override

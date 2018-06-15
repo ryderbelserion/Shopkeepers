@@ -14,11 +14,13 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class LivingEntityObjectType<T extends LivingEntityShop> extends AbstractShopObjectType<T> {
 
+	protected final LivingEntityShops livingEntityShops;
 	protected final EntityType entityType;
 	protected final List<String> aliases; // unmodifiable, not null, might be empty
 
-	protected LivingEntityObjectType(EntityType entityType, List<String> aliases, String identifier, String permission) {
+	protected LivingEntityObjectType(LivingEntityShops livingEntityShops, EntityType entityType, List<String> aliases, String identifier, String permission) {
 		super(identifier, permission);
+		this.livingEntityShops = livingEntityShops;
 		this.entityType = entityType;
 		assert entityType.isAlive();
 		assert aliases != null;

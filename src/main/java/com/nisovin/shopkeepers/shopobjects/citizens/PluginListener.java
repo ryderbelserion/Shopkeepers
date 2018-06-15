@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.shopobjects.citizens;
 
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -10,14 +10,17 @@ import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 
 class PluginListener implements Listener {
 
-	PluginListener() {
+	private final CitizensShops citizensShops;
+
+	PluginListener(CitizensShops citizensShops) {
+		this.citizensShops = citizensShops;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onPluginEnable(PluginEnableEvent event) {
 		String pluginName = event.getPlugin().getName();
 		if (pluginName.equals(CitizensHandler.PLUGIN_NAME)) {
-			CitizensHandler.enable();
+			citizensShops.enable();
 		}
 	}
 
@@ -25,7 +28,7 @@ class PluginListener implements Listener {
 	void onPluginDisable(PluginDisableEvent event) {
 		String pluginName = event.getPlugin().getName();
 		if (pluginName.equals(CitizensHandler.PLUGIN_NAME)) {
-			CitizensHandler.disable();
+			citizensShops.disable();
 		}
 	}
 }

@@ -11,7 +11,7 @@ import com.sk89q.worldguard.protection.flags.DefaultFlag;
 
 public class WorldGuardHandler {
 
-	private static final String PLUGIN_NAME = "WorldGuard";
+	public static final String PLUGIN_NAME = "WorldGuard";
 
 	public static Plugin getPlugin() {
 		return Bukkit.getPluginManager().getPlugin(PLUGIN_NAME);

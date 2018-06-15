@@ -11,13 +11,15 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShops;
 
 public class CatShop extends LivingEntityShop {
 
 	private Ocelot.Type catType = Ocelot.Type.WILD_OCELOT;
 
-	public CatShop(LivingEntityObjectType<CatShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		super(livingObjectType, shopkeeper, creationData);
+	public CatShop(	LivingEntityShops livingEntityShops, LivingEntityObjectType<CatShop> livingObjectType,
+					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		super(livingEntityShops, livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override
@@ -36,14 +38,19 @@ public class CatShop extends LivingEntityShop {
 		configSection.set("catType", catType.name());
 	}
 
+	@Override
+	public Ocelot getEntity() {
+		assert super.getEntity().getType() == EntityType.OCELOT;
+		return (Ocelot) super.getEntity();
+	}
+
 	// SUB TYPES
 
 	@Override
 	protected void applySubType() {
 		super.applySubType();
 		if (!this.isActive()) return;
-		assert entity.getType() == EntityType.OCELOT;
-		((Ocelot) entity).setCatType(catType);
+		this.getEntity().setCatType(catType);
 	}
 
 	@Override

@@ -4,7 +4,6 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -12,18 +11,21 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class CitizensShopObjectType extends AbstractShopObjectType<CitizensShop> {
 
-	public CitizensShopObjectType() {
+	private final CitizensShops citizensShops;
+
+	public CitizensShopObjectType(CitizensShops citizensShops) {
 		super("citizen", "shopkeeper.citizen");
+		this.citizensShops = citizensShops;
 	}
 
 	@Override
 	public CitizensShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		return new CitizensShop(shopkeeper, creationData);
+		return new CitizensShop(citizensShops, shopkeeper, creationData);
 	}
 
 	@Override
 	public boolean isEnabled() {
-		return Settings.enableCitizenShops && CitizensHandler.isEnabled();
+		return Settings.enableCitizenShops && citizensShops.isEnabled();
 	}
 
 	@Override

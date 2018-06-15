@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
@@ -37,7 +38,7 @@ public class VillagerInteractionListener implements Listener {
 		}
 		Log.debug("Interaction with Non-shopkeeper villager ..");
 
-		if (villager.hasMetadata("NPC")) {
+		if (CitizensHandler.isNPC(villager)) {
 			// ignore any interaction with citizens2 NPCs
 			Log.debug("  ignoring (probably citizens2) NPC");
 			return;

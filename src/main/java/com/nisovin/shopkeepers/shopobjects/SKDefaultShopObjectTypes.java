@@ -11,37 +11,36 @@ import com.nisovin.shopkeepers.shopobjects.sign.SignShopObjectType;
 
 public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 
-	private final SKLivingEntityObjectTypes livingEntityObjectTypes = new SKLivingEntityObjectTypes();
-	private final SignShopObjectType signShopObjectType = new SignShopObjectType();
-	private final CitizensShopObjectType citizensShopObjectType = new CitizensShopObjectType();
-
 	// TODO maybe change object type permissions to 'shopkeeper.object.<type>'?
 
-	public SKDefaultShopObjectTypes() {
+	private final SKShopkeepersPlugin plugin;
+
+	public SKDefaultShopObjectTypes(SKShopkeepersPlugin plugin) {
+		this.plugin = plugin;
 	}
 
 	@Override
 	public List<AbstractShopObjectType<?>> getAllObjectTypes() {
 		List<AbstractShopObjectType<?>> shopObjectTypes = new ArrayList<>();
-		shopObjectTypes.addAll(livingEntityObjectTypes.getAllObjectTypes());
-		shopObjectTypes.add(signShopObjectType);
-		shopObjectTypes.add(citizensShopObjectType);
+		shopObjectTypes.addAll(this.getLivingEntityObjectTypes().getAllObjectTypes());
+		shopObjectTypes.add(this.getSignShopObjectType());
+		shopObjectTypes.add(this.getCitizensShopObjectType());
 		return shopObjectTypes;
 	}
 
 	@Override
 	public SKLivingEntityObjectTypes getLivingEntityObjectTypes() {
-		return livingEntityObjectTypes;
+		return plugin.getLivingEntityShops().getLivingEntityObjectTypes();
 	}
 
 	@Override
 	public SignShopObjectType getSignShopObjectType() {
-		return signShopObjectType;
+		return plugin.getSignShops().getSignShopObjectType();
 	}
 
 	@Override
 	public CitizensShopObjectType getCitizensShopObjectType() {
-		return citizensShopObjectType;
+		return plugin.getCitizensShops().getCitizensShopObjectType();
 	}
 
 	// STATICS (for convenience):

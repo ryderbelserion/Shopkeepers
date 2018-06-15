@@ -10,13 +10,15 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShops;
 
 public class CreeperShop extends LivingEntityShop {
 
 	private boolean powered = false;
 
-	public CreeperShop(LivingEntityObjectType<CreeperShop> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		super(livingObjectType, shopkeeper, creationData);
+	public CreeperShop(	LivingEntityShops livingEntityShops, LivingEntityObjectType<CreeperShop> livingObjectType,
+						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		super(livingEntityShops, livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override
@@ -31,14 +33,19 @@ public class CreeperShop extends LivingEntityShop {
 		configSection.set("powered", powered);
 	}
 
+	@Override
+	public Creeper getEntity() {
+		assert super.getEntity().getType() == EntityType.CREEPER;
+		return (Creeper) super.getEntity();
+	}
+
 	// SUB TYPES
 
 	@Override
 	protected void applySubType() {
 		super.applySubType();
 		if (!this.isActive()) return;
-		assert entity.getType() == EntityType.CREEPER;
-		((Creeper) entity).setPowered(powered);
+		this.getEntity().setPowered(powered);
 	}
 
 	@Override

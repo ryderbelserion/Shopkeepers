@@ -54,6 +54,7 @@ import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
+import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShops;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShops;
 import com.nisovin.shopkeepers.shopobjects.sign.SignShops;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
@@ -83,8 +84,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final SKShopObjectTypesRegistry shopObjectTypesRegistry = new SKShopObjectTypesRegistry();
 
 	// default shop and shop object types:
-	private SKDefaultShopTypes defaultShopTypes;
-	private SKDefaultShopObjectTypes defaultShopObjectTypes;
+	private final SKDefaultShopTypes defaultShopTypes = new SKDefaultShopTypes();
+	private final SKDefaultShopObjectTypes defaultShopObjectTypes = new SKDefaultShopObjectTypes(this);
 
 	// ui registry:
 	private final SKUIRegistry uiRegistry = new SKUIRegistry(this);
@@ -104,6 +105,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final ProtectedChests protectedChests = new ProtectedChests(this);
 	private final LivingEntityShops livingEntityShops = new LivingEntityShops(this);
 	private final SignShops signShops = new SignShops(this);
+	private final CitizensShops citizensShops = new CitizensShops(this);
 
 	@Override
 	public void onEnable() {
@@ -132,7 +134,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			this.saveConfig();
 		}
 
-		// load lang config:
+		// load language config:
 		String lang = Settings.language;
 		File langFile = new File(this.getDataFolder(), "language-" + lang + ".yml");
 		if (!langFile.exists() && this.getResource("language-" + lang + ".yml") != null) {
@@ -156,25 +158,15 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			}
 		}
 
-		// initialize default shop and shop object types (after config has been loaded):
-		defaultShopTypes = new SKDefaultShopTypes();
-		defaultShopObjectTypes = new SKDefaultShopObjectTypes();
-
-		// register default stuff:
-
-		shopTypesRegistry.registerAll(defaultShopTypes.getAllShopTypes());
-		shopObjectTypesRegistry.registerAll(defaultShopObjectTypes.getAllObjectTypes());
-		uiRegistry.registerAll(defaultUITypes.getAllUITypes());
-
 		// inform ui registry (registers ui event handlers):
 		uiRegistry.onEnable();
+		uiRegistry.registerAll(defaultUITypes.getAllUITypes());
 
-		// inform ProtectedChests:
+		// enable ProtectedChests:
 		protectedChests.enable();
 
-		// register events
+		// register events:
 		PluginManager pm = Bukkit.getPluginManager();
-		pm.registerEvents(new PluginListener(), this);
 		pm.registerEvents(new WorldListener(this), this);
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new ShopNamingListener(this), this);
@@ -183,14 +175,25 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		pm.registerEvents(new TradingCountListener(this), this);
 		pm.registerEvents(new TradeFileLogger(this.getDataFolder()), this);
 
+		// DEFAULT SHOP TYPES
+
+		shopTypesRegistry.registerAll(defaultShopTypes.getAllShopTypes());
+
+		// DEFAULT SHOP OBJECT TYPES
+
 		// enable living entity shops:
-		livingEntityShops.enable();
+		livingEntityShops.onEnable();
 
 		// enable sign shops:
-		signShops.enable();
+		signShops.onEnable();
 
-		// enable citizens handler:
-		CitizensHandler.enable();
+		// enable citizens shops:
+		citizensShops.onEnable();
+
+		// register default shop object types:
+		shopObjectTypesRegistry.registerAll(defaultShopObjectTypes.getAllObjectTypes());
+
+		//
 
 		// handling of regular villagers:
 		pm.registerEvents(new VillagerInteractionListener(this), this);
@@ -207,7 +210,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// enable shopkeeper registry:
 		shopkeeperRegistry.onEnable();
 
-		// load shopkeeper saved data:
+		// load shopkeepers from saved data:
 		boolean loadingSuccessful = shopkeeperStorage.reload();
 		if (!loadingSuccessful) {
 			// detected an issue during loading
@@ -223,14 +226,14 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		Bukkit.getScheduler().runTaskLater(this, () -> {
 			// remove invalid citizens shopkeepers:
-			CitizensHandler.removeInvalidCitizensShopkeepers();
+			citizensShops.removeInvalidCitizensShopkeepers();
 			// remove inactive player shopkeepers:
 			this.removeInactivePlayerShops();
 		}, 5L);
 
 		// let's update the shopkeepers for all already online players:
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (Utils.isNPC(player)) continue;
+			if (CitizensHandler.isNPC(player)) continue;
 			this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
 		}
 
@@ -259,13 +262,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopkeeperRegistry.despawnAllShopkeepers();
 
 		// disable living entity shops:
-		livingEntityShops.disable();
+		livingEntityShops.onDisable();
 
 		// disable sign shops:
-		signShops.disable();
+		signShops.onDisable();
 
-		// disable citizens handler:
-		CitizensHandler.disable();
+		// disable citizens shops:
+		citizensShops.onDisable();
 
 		// save shopkeepers:
 		shopkeeperStorage.saveImmediateIfDirty();
@@ -377,6 +380,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	public SignShops getSignShops() {
 		return signShops;
+	}
+
+	// CITIZENS SHOPS
+
+	public CitizensShops getCitizensShops() {
+		return citizensShops;
 	}
 
 	// SHOP TYPES
