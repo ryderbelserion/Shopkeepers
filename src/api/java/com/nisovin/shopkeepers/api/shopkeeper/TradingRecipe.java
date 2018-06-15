@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.api.util;
+package com.nisovin.shopkeepers.api.shopkeeper;
 
 import org.bukkit.inventory.ItemStack;
 

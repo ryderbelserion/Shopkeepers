@@ -7,7 +7,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
-import com.nisovin.shopkeepers.api.util.TradingRecipe;
+import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 
 /**
  * This event is called whenever a player is about to trade with a shopkeeper. Canceling it will cause the trade to not
