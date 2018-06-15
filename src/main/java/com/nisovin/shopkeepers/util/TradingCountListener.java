@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.util;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
@@ -14,13 +14,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.scheduler.BukkitTask;
 
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.compat.NMSManager;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
 
 /**
  * Tries to accurately detect individual trades handled by minecraft by listening to corresponding changes of the
@@ -33,7 +32,7 @@ import com.nisovin.shopkeepers.util.Log;
  * Since shopkeepers handles its trades on its own, only trades with vanilla villagers get detected here. This can
  * currently be used to debug and compare vanilla trading behavior with Shopkeeper's trading behavior.
  */
-class TradingCountListener implements Listener {
+public class TradingCountListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;
 	private final Runnable stopListeningAction = () -> {
@@ -45,7 +44,7 @@ class TradingCountListener implements Listener {
 	private int tradeCounter = 0;
 	private BukkitTask stopListeningTask = null;
 
-	TradingCountListener(ShopkeepersPlugin plugin) {
+	public TradingCountListener(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 

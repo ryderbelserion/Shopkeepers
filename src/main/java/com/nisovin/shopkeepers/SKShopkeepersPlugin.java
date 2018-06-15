@@ -65,6 +65,7 @@ import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
+import com.nisovin.shopkeepers.util.TradingCountListener;
 import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.villagers.BlockVillagerSpawnListener;
 import com.nisovin.shopkeepers.villagers.VillagerInteractionListener;
@@ -325,9 +326,14 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		metrics.addCustomChart(new WorldsChart(shopkeeperRegistry));
 	}
 
-	// PLAYER CLEANUP
+	// PLAYER JOINING AND QUITTING
+
+	void onPlayerJoin(Player player) {
+		this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
+	}
 
 	void onPlayerQuit(Player player) {
+		// player cleanup:
 		String playerName = player.getName();
 		shopTypesRegistry.clearSelection(player);
 		shopObjectTypesRegistry.clearSelection(player);
@@ -565,7 +571,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	// HANDLING PLAYER NAME CHANGES:
 
 	// updates owner names for the shopkeepers of the specified player:
-	void updateShopkeepersForPlayer(UUID playerUUID, String playerName) {
+	private void updateShopkeepersForPlayer(UUID playerUUID, String playerName) {
 		boolean dirty = false;
 		for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {

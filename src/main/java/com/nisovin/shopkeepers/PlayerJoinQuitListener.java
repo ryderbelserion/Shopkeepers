@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,8 +16,7 @@ class PlayerJoinQuitListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onPlayerJoin(PlayerJoinEvent event) {
-		Player player = event.getPlayer();
-		plugin.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
+		plugin.onPlayerJoin(event.getPlayer());
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
