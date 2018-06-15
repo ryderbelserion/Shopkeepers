@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.shopcreation;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -15,6 +15,8 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
@@ -32,9 +34,11 @@ import com.nisovin.shopkeepers.util.Utils;
 class CreateListener implements Listener {
 
 	private final SKShopkeepersPlugin plugin;
+	private final ShopkeeperCreation shopkeeperCreation;
 
-	CreateListener(SKShopkeepersPlugin plugin) {
+	CreateListener(SKShopkeepersPlugin plugin, ShopkeeperCreation shopkeeperCreation) {
 		this.plugin = plugin;
+		this.shopkeeperCreation = shopkeeperCreation;
 	}
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
@@ -114,17 +118,17 @@ class CreateListener implements Listener {
 		} else if (action == Action.RIGHT_CLICK_BLOCK) {
 			Block clickedBlock = event.getClickedBlock();
 
-			Block selectedChest = plugin.getSelectedChest(player);
+			Block selectedChest = shopkeeperCreation.getSelectedChest(player);
 			// validate old selected chest:
 			if (selectedChest != null && !ItemUtils.isChest(selectedChest.getType())) {
-				plugin.selectChest(player, null);
+				shopkeeperCreation.selectChest(player, null);
 				selectedChest = null;
 			}
 
 			// chest for chest selection:
 			if (ItemUtils.isChest(clickedBlock.getType()) && !clickedBlock.equals(selectedChest)) {
 				// check if the clicked chest was recently placed:
-				if (Settings.requireChestRecentlyPlaced && !plugin.isRecentlyPlaced(player, clickedBlock)) {
+				if (Settings.requireChestRecentlyPlaced && !shopkeeperCreation.isRecentlyPlacedChest(player, clickedBlock)) {
 					// chest was not recently placed:
 					Utils.sendMessage(player, Settings.msgChestNotPlaced);
 				} else {
@@ -145,7 +149,7 @@ class CreateListener implements Listener {
 						Log.debug("Right-click on chest prevented, player " + player.getName() + " at " + clickedBlock.getLocation().toString());
 					} else {
 						// select chest:
-						plugin.selectChest(player, clickedBlock);
+						shopkeeperCreation.selectChest(player, clickedBlock);
 						Utils.sendMessage(player, Settings.msgSelectedChest);
 					}
 				}
@@ -223,7 +227,7 @@ class CreateListener implements Listener {
 		// shopkeeper creation was successful:
 
 		// reset selected chest:
-		plugin.selectChest(player, null);
+		shopkeeperCreation.selectChest(player, null);
 
 		return true;
 	}

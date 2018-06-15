@@ -38,6 +38,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
+import com.nisovin.shopkeepers.shopcreation.TestPlayerInteractEvent;
 import com.nisovin.shopkeepers.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -750,7 +751,7 @@ class CommandManager implements CommandExecutor {
 
 				// check for recently placed:
 				if (Settings.requireChestRecentlyPlaced) {
-					if (!plugin.isRecentlyPlaced(player, targetBlock)) {
+					if (!plugin.getShopkeeperCreation().isRecentlyPlacedChest(player, targetBlock)) {
 						Utils.sendMessage(player, Settings.msgChestNotPlaced);
 						return true;
 					}

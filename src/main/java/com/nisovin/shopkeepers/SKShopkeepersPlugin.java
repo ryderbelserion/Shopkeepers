@@ -2,11 +2,8 @@ package com.nisovin.shopkeepers;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -14,7 +11,6 @@ import org.apache.commons.lang.Validate;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
@@ -46,6 +42,7 @@ import com.nisovin.shopkeepers.metrics.WorldGuardChart;
 import com.nisovin.shopkeepers.metrics.WorldsChart;
 import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.shopcreation.ShopkeeperCreation;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
@@ -62,11 +59,9 @@ import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
-import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.TradingCountListener;
-import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.villagers.BlockVillagerSpawnListener;
 import com.nisovin.shopkeepers.villagers.VillagerInteractionListener;
 
@@ -100,8 +95,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	private final CommandManager commandManager = new CommandManager(this, shopkeeperRegistry);
 	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(this);
-	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<>();
-	private final Map<String, Block> selectedChest = new HashMap<>();
+	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(this);
 
 	private final ProtectedChests protectedChests = new ProtectedChests(this);
 	private final LivingEntityShops livingEntityShops = new LivingEntityShops(this);
@@ -169,8 +163,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// register events:
 		PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
-		pm.registerEvents(new RecentlyPlacedChestsListener(this), this);
-		pm.registerEvents(new CreateListener(this), this);
 		pm.registerEvents(new TradingCountListener(this), this);
 		pm.registerEvents(new TradeFileLogger(this.getDataFolder()), this);
 
@@ -205,6 +197,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// enable shopkeeper naming:
 		shopkeeperNaming.onEnable();
+
+		// enable shopkeeper creation:
+		shopkeeperCreation.onEnable();
 
 		// enable shopkeeper storage:
 		shopkeeperStorage.onEnable();
@@ -289,7 +284,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		commandManager.disable();
 		shopkeeperNaming.onDisable();
-		selectedChest.clear();
+		shopkeeperCreation.onDisable();
 
 		// clear all types of registers:
 		shopTypesRegistry.clearAll();
@@ -334,14 +329,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	void onPlayerQuit(Player player) {
 		// player cleanup:
-		String playerName = player.getName();
 		shopTypesRegistry.clearSelection(player);
 		shopObjectTypesRegistry.clearSelection(player);
 		uiRegistry.onInventoryClose(player);
 
-		selectedChest.remove(playerName);
-		recentlyPlacedChests.remove(playerName);
-		shopkeeperNaming.endNaming(player);
+		shopkeeperNaming.onPlayerQuit(player);
+		shopkeeperCreation.onPlayerQuit(player);
 		commandManager.endConfirmation(player);
 	}
 
@@ -433,46 +426,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return this.getDefaultShopObjectTypes().getLivingEntityObjectTypes().getObjectType(EntityType.VILLAGER);
 	}
 
-	// RECENTLY PLACED CHESTS
-
-	void onChestPlacement(Player player, Block chest) {
-		assert player != null && chest != null && ItemUtils.isChest(chest.getType());
-		String playerName = player.getName();
-		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
-		if (recentlyPlaced == null) {
-			recentlyPlaced = new LinkedList<>();
-			recentlyPlacedChests.put(playerName, recentlyPlaced);
-		}
-		recentlyPlaced.add(Utils.getLocationString(chest));
-		if (recentlyPlaced.size() > 5) {
-			recentlyPlaced.remove(0);
-		}
-	}
-
-	public boolean isRecentlyPlaced(Player player, Block chest) {
-		assert player != null && chest != null && ItemUtils.isChest(chest.getType());
-		String playerName = player.getName();
-		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
-		return recentlyPlaced != null && recentlyPlaced.contains(Utils.getLocationString(chest));
-	}
-
-	// SELECTED CHEST
-
-	void selectChest(Player player, Block chest) {
-		assert player != null;
-		String playerName = player.getName();
-		if (chest == null) selectedChest.remove(playerName);
-		else {
-			assert ItemUtils.isChest(chest.getType());
-			selectedChest.put(playerName, chest);
-		}
-	}
-
-	public Block getSelectedChest(Player player) {
-		assert player != null;
-		return selectedChest.get(player.getName());
-	}
-
 	// SHOPKEEPER NAMING
 
 	public ShopkeeperNaming getShopkeeperNaming() {
@@ -480,6 +433,10 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	}
 
 	// SHOPKEEPER CREATION:
+
+	public ShopkeeperCreation getShopkeeperCreation() {
+		return shopkeeperCreation;
+	}
 
 	@Override
 	public boolean hasCreatePermission(Player player) {

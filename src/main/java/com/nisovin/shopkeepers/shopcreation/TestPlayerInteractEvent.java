@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.shopcreation;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;

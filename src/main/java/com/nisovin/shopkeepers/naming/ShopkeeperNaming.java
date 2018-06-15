@@ -30,6 +30,11 @@ public class ShopkeeperNaming {
 		naming.clear();
 	}
 
+	public void onPlayerQuit(Player player) {
+		assert player != null;
+		this.endNaming(player);
+	}
+
 	public void startNaming(Player player, AbstractShopkeeper shopkeeper) {
 		assert player != null && shopkeeper != null;
 		naming.put(player.getName(), shopkeeper);
