@@ -167,7 +167,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// register events:
 		PluginManager pm = Bukkit.getPluginManager();
-		pm.registerEvents(new WorldListener(this), this);
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new ShopNamingListener(this), this);
 		pm.registerEvents(new RecentlyPlacedChestsListener(this), this);

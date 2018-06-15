@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.shopkeeper;
 
 import java.util.UUID;
 
@@ -15,8 +15,8 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldSaveEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
-import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.Log;
 
 class WorldListener implements Listener {
@@ -24,9 +24,9 @@ class WorldListener implements Listener {
 	private final SKShopkeepersPlugin plugin;
 	private final SKShopkeeperRegistry shopkeeperRegistry;
 
-	WorldListener(SKShopkeepersPlugin plugin) {
+	WorldListener(SKShopkeepersPlugin plugin, SKShopkeeperRegistry shopkeeperRegistry) {
 		this.plugin = plugin;
-		this.shopkeeperRegistry = plugin.getShopkeeperRegistry();
+		this.shopkeeperRegistry = shopkeeperRegistry;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)

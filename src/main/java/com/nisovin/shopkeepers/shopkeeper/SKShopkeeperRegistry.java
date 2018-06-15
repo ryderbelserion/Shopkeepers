@@ -68,6 +68,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		if (Settings.enableSpawnVerifier) {
 			this.startSpawnVerifierTask();
 		}
+
+		Bukkit.getPluginManager().registerEvents(new WorldListener(plugin, this), plugin);
 	}
 
 	public void onDisable() {
