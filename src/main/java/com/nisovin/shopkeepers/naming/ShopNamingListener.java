@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.naming;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -7,14 +7,17 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 
 class ShopNamingListener implements Listener {
 
 	private final SKShopkeepersPlugin plugin;
+	private final ShopkeeperNaming shopkeeperNaming;
 
-	ShopNamingListener(SKShopkeepersPlugin plugin) {
+	ShopNamingListener(SKShopkeepersPlugin plugin, ShopkeeperNaming shopkeeperNaming) {
 		this.plugin = plugin;
+		this.shopkeeperNaming = shopkeeperNaming;
 	}
 
 	// SHOPKEEPER NAMING
@@ -22,11 +25,11 @@ class ShopNamingListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		AbstractShopkeeper shopkeeper = plugin.endNaming(player);
+		AbstractShopkeeper shopkeeper = shopkeeperNaming.endNaming(player);
 		if (shopkeeper == null) return;
 
 		event.setCancelled(true);
 		String newName = event.getMessage().trim();
-		Bukkit.getScheduler().runTask(plugin, () -> shopkeeper.requestNameChange(player, newName));
+		Bukkit.getScheduler().runTask(plugin, () -> shopkeeperNaming.requestNameChange(player, shopkeeper, newName));
 	}
 }

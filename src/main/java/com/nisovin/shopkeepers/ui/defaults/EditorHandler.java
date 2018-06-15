@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
@@ -162,7 +163,7 @@ public abstract class EditorHandler extends UIHandler {
 
 			if (renaming) {
 				// start naming:
-				shopkeeper.startNaming(player);
+				SKShopkeepersPlugin.getInstance().getShopkeeperNaming().startNaming(player, shopkeeper);
 				Utils.sendMessage(player, Settings.msgTypeNewName);
 			}
 		}

@@ -16,7 +16,6 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
-import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -575,55 +574,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.markDirty();
 	}
 
-	// TODO move these somewhere else
-
-	public void startNaming(Player player) {
-		SKShopkeepersPlugin.getInstance().onNaming(player, this);
-	}
-
 	public boolean isValidName(String name) {
 		return name != null && name.matches("^" + Settings.nameRegex + "$");
-	}
-
-	public boolean requestNameChange(Player player, String newName) {
-		if (player == null) return false;
-		if (!this.isValid()) return false;
-
-		// update name:
-		if (newName.isEmpty() || newName.equals("-")) {
-			// remove name:
-			newName = "";
-		} else {
-			// validate name:
-			if (!this.isValidName(newName)) {
-				Utils.sendMessage(player, Settings.msgNameInvalid);
-				return false;
-			}
-		}
-
-		// apply new name:
-		String oldName = this.getName();
-		this.setName(newName);
-
-		// compare to previous name:
-		if (oldName.equals(this.getName())) {
-			Utils.sendMessage(player, Settings.msgNameHasNotChanged);
-			return false;
-		}
-
-		// inform player:
-		Utils.sendMessage(player, Settings.msgNameSet);
-
-		// close all open windows:
-		this.closeAllOpenWindows(); // TODO really needed?
-
-		// call event:
-		Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(this, player));
-
-		// save:
-		this.save();
-
-		return true;
 	}
 
 	// INTERACTION HANDLING

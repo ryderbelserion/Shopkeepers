@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -45,6 +44,7 @@ import com.nisovin.shopkeepers.metrics.TownyChart;
 import com.nisovin.shopkeepers.metrics.VaultEconomyChart;
 import com.nisovin.shopkeepers.metrics.WorldGuardChart;
 import com.nisovin.shopkeepers.metrics.WorldsChart;
+import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -98,7 +98,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final SKShopkeeperStorage shopkeeperStorage = new SKShopkeeperStorage(this);
 
 	private final CommandManager commandManager = new CommandManager(this, shopkeeperRegistry);
-	private final Map<String, AbstractShopkeeper> naming = Collections.synchronizedMap(new HashMap<>());
+	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(this);
 	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<>();
 	private final Map<String, Block> selectedChest = new HashMap<>();
 
@@ -168,7 +168,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// register events:
 		PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
-		pm.registerEvents(new ShopNamingListener(this), this);
 		pm.registerEvents(new RecentlyPlacedChestsListener(this), this);
 		pm.registerEvents(new CreateListener(this), this);
 		pm.registerEvents(new TradingCountListener(this), this);
@@ -202,6 +201,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// enable command manager:
 		commandManager.enable();
+
+		// enable shopkeeper naming:
+		shopkeeperNaming.onEnable();
 
 		// enable shopkeeper storage:
 		shopkeeperStorage.onEnable();
@@ -285,7 +287,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopObjectTypesRegistry.clearAllSelections();
 
 		commandManager.disable();
-		naming.clear();
+		shopkeeperNaming.onDisable();
 		selectedChest.clear();
 
 		// clear all types of registers:
@@ -333,7 +335,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		selectedChest.remove(playerName);
 		recentlyPlacedChests.remove(playerName);
-		naming.remove(playerName);
+		shopkeeperNaming.endNaming(player);
 		commandManager.endConfirmation(player);
 	}
 
@@ -467,24 +469,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// SHOPKEEPER NAMING
 
-	public void onNaming(Player player, AbstractShopkeeper shopkeeper) {
-		assert player != null && shopkeeper != null;
-		naming.put(player.getName(), shopkeeper);
-	}
-
-	AbstractShopkeeper getCurrentlyNamedShopkeeper(Player player) {
-		assert player != null;
-		return naming.get(player.getName());
-	}
-
-	boolean isNaming(Player player) {
-		assert player != null;
-		return this.getCurrentlyNamedShopkeeper(player) != null;
-	}
-
-	AbstractShopkeeper endNaming(Player player) {
-		assert player != null;
-		return naming.remove(player.getName());
+	public ShopkeeperNaming getShopkeeperNaming() {
+		return shopkeeperNaming;
 	}
 
 	// SHOPKEEPER CREATION:

@@ -533,7 +533,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				}
 
 				// handled name changing:
-				if (this.requestNameChange(player, newName)) {
+				if (SKShopkeepersPlugin.getInstance().getShopkeeperNaming().requestNameChange(player, this, newName)) {
 					// manually remove rename item from player's hand after this event is processed:
 					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
 						ItemStack newItemInHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
