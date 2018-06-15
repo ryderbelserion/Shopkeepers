@@ -501,21 +501,6 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public boolean openChestWindow(Player player) {
-		Log.debug("checking open chest window ..");
-		// make sure the chest still exists
-		Block chest = this.getChest();
-		if (ItemUtils.isChest(chest.getType())) {
-			// open the chest directly as the player (no need for a custom UI)
-			Log.debug("opening chest inventory window");
-			Inventory inv = ((Chest) chest.getState()).getInventory();
-			player.openInventory(inv);
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public void onPlayerInteraction(Player player) {
 		// naming via item:
 		ItemStack itemInHand = player.getItemInHand();
@@ -743,5 +728,28 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		}
 		// returns an empty list if the chest couldn't be found:
 		return ItemUtils.countItems(chestContents, filter);
+	}
+
+	// SHOPKEEPER UIs - shortcuts for common UI types:
+
+	@Override
+	public boolean openHireWindow(Player player) {
+		return this.openWindow(DefaultUITypes.HIRING(), player);
+	}
+
+	@Override
+	public boolean openChestWindow(Player player) {
+		// make sure the chest still exists
+		Block chest = this.getChest();
+		if (!ItemUtils.isChest(chest.getType())) {
+			Log.debug("Cannot open chest inventory for player '" + player.getName() + "': The block is no longer a chest!");
+			return false;
+		}
+
+		Log.debug("Opening chest inventory for player '" + player.getName() + "'.");
+		// open the chest directly as the player (no need for a custom UI)
+		Inventory inv = ((Chest) chest.getState()).getInventory();
+		player.openInventory(inv);
+		return true;
 	}
 }

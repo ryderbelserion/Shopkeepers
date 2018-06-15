@@ -92,4 +92,28 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	public Block getChest();
 
 	public int getCurrencyInChest();
+
+	// SHOPKEEPER UIs - shortcuts for common UI types:
+
+	/**
+	 * Attempts to open the hiring interface of this shopkeeper for the specified player.
+	 * <p>
+	 * Fails if this shopkeeper type doesn't support hiring (ex. admin shops).
+	 * 
+	 * @param player
+	 *            the player requesting the hiring interface
+	 * @return <code>true</code> if the interface was successfully opened for the player
+	 */
+	public boolean openHireWindow(Player player);
+
+	/**
+	 * Attempts to open the chest inventory of this shopkeeper for the specified player.
+	 * <p>
+	 * Fails if this shopkeeper type doesn't have a chest (ex. admin shops).
+	 * 
+	 * @param player
+	 *            the player requesting the chest inventory window
+	 * @return <code>true</code> if the interface was successfully opened for the player
+	 */
+	public boolean openChestWindow(Player player);
 }

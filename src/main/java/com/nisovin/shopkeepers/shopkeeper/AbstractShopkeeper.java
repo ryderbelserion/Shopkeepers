@@ -545,17 +545,6 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		return this.openWindow(DefaultUITypes.TRADING(), player);
 	}
 
-	// TODO move these into PlayerShopkeeper
-	@Override
-	public boolean openHireWindow(Player player) {
-		return this.openWindow(DefaultUITypes.HIRING(), player);
-	}
-
-	@Override
-	public boolean openChestWindow(Player player) {
-		return false;
-	}
-
 	// NAMING:
 
 	@Override

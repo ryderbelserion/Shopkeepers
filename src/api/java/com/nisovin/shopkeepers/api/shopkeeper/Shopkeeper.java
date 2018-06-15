@@ -206,7 +206,7 @@ public interface Shopkeeper {
 	 */
 	public boolean openWindow(UIType uiType, Player player);
 
-	// shortcuts for the default window types:
+	// shortcuts for the default UI types:
 
 	/**
 	 * Attempts to open the editor interface of this shopkeeper for the specified player.
@@ -225,29 +225,6 @@ public interface Shopkeeper {
 	 * @return <code>true</code> if the interface was successfully opened for the player
 	 */
 	public boolean openTradingWindow(Player player);
-
-	// TODO move these into PlayerShopkeeper
-	/**
-	 * Attempts to open the hiring interface of this shopkeeper for the specified player.
-	 * <p>
-	 * Fails if this shopkeeper type doesn't support hiring (ex. admin shops).
-	 * 
-	 * @param player
-	 *            the player requesting the hiring interface
-	 * @return <code>true</code> if the interface was successfully opened for the player
-	 */
-	public boolean openHireWindow(Player player);
-
-	/**
-	 * Attempts to open the chest inventory of this shopkeeper for the specified player.
-	 * <p>
-	 * Fails if this shopkeeper type doesn't have a chest (ex. admin shops).
-	 * 
-	 * @param player
-	 *            the player requesting the chest inventory window
-	 * @return <code>true</code> if the interface was successfully opened for the player
-	 */
-	public boolean openChestWindow(Player player);
 
 	// NAMING
 

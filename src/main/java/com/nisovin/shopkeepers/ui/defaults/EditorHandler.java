@@ -17,6 +17,7 @@ import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
@@ -156,8 +157,8 @@ public abstract class EditorHandler extends UIHandler {
 				shopkeeper.activateUI();
 
 				// open chest inventory:
-				if (openChest) {
-					shopkeeper.openChestWindow(player);
+				if (openChest && shopkeeper instanceof PlayerShopkeeper) {
+					((PlayerShopkeeper) shopkeeper).openChestWindow(player);
 				}
 			});
 
