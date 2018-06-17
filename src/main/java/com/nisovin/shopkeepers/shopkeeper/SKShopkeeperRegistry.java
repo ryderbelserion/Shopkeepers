@@ -61,6 +61,17 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	public void onEnable() {
+		// making sure that certain classes, that are needed during shutdown, are loaded:
+		// this helps for hot reloads (when the plugin gets disabled, but the original jar got replaced and is therefore
+		// no longer available)
+		// TODO pre-load all classes?
+		try {
+			Class.forName(ShopkeeperRemoveEvent.class.getName());
+			Class.forName(ShopkeeperRemoveEvent.Cause.class.getName());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+
 		// start teleporter task:
 		this.startTeleporterTask();
 
