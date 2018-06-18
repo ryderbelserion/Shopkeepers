@@ -4,6 +4,68 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.1.0 Beta (2018-06-18)
+### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
+**Major internal changes to the way shopkeepers get created and their data gets saved:**
+* Changes to shopkeeper ids: 'Session id' is now named only 'id' , and persists across server restarts / plugin reloads.
+  * API: Renamed getShopkeeper-methods to ShopkeeperRegistry#getShopkeeperById and ShopkeeperRegistry#getShopkeeperByUniqueId
+* All shopkeeper data gets kept in memory now and during saves, only the data of dirty shopkeepers gets updated.
+  * This should come with a large performance improvement if there are many shopkeepers loaded, but only few of them change between saves.
+  * Internal/API: Shopkeepers should automatically get marked as dirty, when some of their data gets changed.
+  * When legacy shopkeeper or shop object data gets found and imported, the shopkeeper gets marked as dirty.
+  * Dirty shopkeeper data gets saved back to file right after plugin start (ex. any imported legacy data).
+  * Internal: Various changes to the way the sync saves get handled (ex. during plugin disable).
+  * Change: No longer shutting the plugin down if a shopkeeper cannot be loaded. The invalid shopkeeper data should get saved back to file again now, without any information getting lost.
+  * Change: No longer using default object type if a shopkeeper with invalid object type is loaded. Instead the shopkeeper gets skipped during loading.
+  * Change: No longer defaulting player shops of unknown type to 'normal'. Instead the shopkeeper gets skipped during loading.
+* Internal/API: Improvements to the life cycle handling of shopkeepers:
+  * Internal/API: The naming and calling of methods and events should be clearer and more consistent now.
+  * API: Shopkeepers get properly unloaded now (with removal events) during shutdown and reloads.
+  * API: Added ShopkeeperRegistry#createShopkeeper and ShopkeeperRegistry#loadShopkeeper.
+  * API: Renamed ShopkeepersPlugin#createShopkeeper to ShopkeepersPlugin#handleShopkeeperCreation to make it more clear that this creates the shopkeeper with player limitations taken into account and the creator receiving messages about a failed shopkeeper creation.
+  * Internal: Moved a few things around related to shopkeeper creation by players.
+* API: Various changes to all shopkeeper events:
+  * API: Various shopkeeper events got slightly renamed.
+  * API: Added PlayerCreateShopkeeperEvent that gets called every time a player creates a shopkeeper (including admin shopkeepers).
+  * API: Added ShopkeeperAddedEvent that gets called for the creation and loading of all shopkeepers.
+  * API: Added ShopkeeperRemoveEvent that gets called for the deletion and unloading of all shopkeepers.
+  * API: OpenTradeEvent was removed and replaced with a more generic ShopkeeperOpenUIEvent
+
+**Major restructuring of command handling:**
+* All commands come with fancy command completion now.
+  * Shopkeeper completions are limited to 30 entries, will prefer shopkeeper names over ids and unique ids, and will suggest only shopkeeper names if an empty argument is given.
+* Various command-related message have been changed, removed and added.
+* Behavior-wise commands should work like before. But if you notice any issues (especially related to permissions, or argument handling), let me know.
+
+**Other changes:**
+* Changed: 'normal' player shopkeeper was renamed to 'selling' player shopkeeper everywhere.
+  * The permission node has changed to 'shopkeeper.player.sell' ('shopkeeper.player.normal' keeps working though).
+  * Messages related to this have changed.
+  * Previous save data should get automatically converted.
+* Fixed: Cat shop object not correctly persisting the cat type.
+* Changed: Shop object data gets saved in its own config section now. Previous save data should get automatically converted.
+* Changed: The id of sign shop objects was changed from 'block' to 'sign'. Previous save data should get automatically converted.
+* Added: The max page number to the header of the list command output.
+* Fixed: The max page number used by the list command would sometimes be off by one.
+* Changed: 'shopkeepers-count' metric now returns '0' instead of '<10' if there are no shopkeepers at all.
+* Changed: No longer allowing the creation of shopkeepers at places where a shopkeeper already exists.
+* Changed: Minor change to how some of the default permissions are assigned inside the plugin.yml (should not have any noticeable impact).
+* API: Added ShopkeeperRegistry#getShopkeepersAtLocation(Location).
+* API: Removed Shopkeeper#setLocation from API.
+* API: Added ShopkeeperStorage#isDirty().
+* API: Renamed 'saveReal()' to 'saveNow()'.
+* API: Added Shopkeeper#save() and Shopkeeper#saveDelayed() as shortcuts for marking a specific shopkeeper dirty and requesting a save of the ShopkeeperStorage.
+* API: Added saveImmediate() to request a sync (blocking) save.
+* Debugging: Added various debugging output related to citizens shopkeepers.
+* Debugging: Saving debug messages show the number of dirty and number of deleted shopkeepers that were saved now.
+* Internal: Saving aborts any delayed saving task now (less unneeded saves).
+* Various internal project restructuring:
+  * This should also make it easier for other plugins to depend on Shopkeepers or ShopkeepersAPI.
+  * Various classes were moved around again: If your plugin depends on Shopkeepers' API, you may have to update.
+* Various other internal refactors.
+
+Due to the various message related changes, you will have to update your messages. The easiest way to do this, it to remove all messages from the config and let the plugin generate the defaults on the next server start.
+
 ## v2.0 Beta (2018-06-05)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
 **Major change to Shopkeepers' mob behavior:**
