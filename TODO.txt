@@ -2,7 +2,7 @@ High priority:
 * 
 
 Mid priority:
-* 
+* cleanup shop creation: currently there is lots of duplicated code inside ShopkeeperCommand and CreateListener
 
 Low priority:
 * Improve chest protection (the anti-hopper code is inefficient).
@@ -14,7 +14,7 @@ Low priority:
 * Change amount-per-click from 10 to 8 when clicking items in the player shopkeeper editor? (feels more intuitive due to minecraft's stack sizes)
 * Compress currency items in the chest (low currency to high currency)? To maximize available storage capacity. This would also mean that the usage of the high-currency-min-cost setting would be limited to creating the trading recipes, and not be used when adding currency items to the shop chests.
 * Maybe prevent any unrecognised types of clicks if running in compatibility mode? To reduce the risk of minecraft updates with new clicking actions causing issues.
-* cleanup shop creation: currently there is lots of duplicated code inside ShopkeeperCommand and CreateListener
+
 * remove entity uuid saving/finding of old duplicated entities? this doesn't work reliably anyways (because we don't keep track of world/chunk saves), and causes shopkeepers to become dirty with every spawning
   * also the entity duplication issue should be solved differently by now, by removing all shopkeepers during world saves
 * remove shop signs on chunk unloads and replace them on chunk load, just like entities get removed?
@@ -33,9 +33,8 @@ Low priority:
 
 * Remove AbstractType#matches with aliases
 * remove AbstractType#isEnabled() and instead dynamically register and unregister enabled/disabled types?
-  * might change the order of the types dynamically though..
+  * might change the order of the types dynamically though.. determine the order differently, via config?
 * set entity attributes before spawning the entity on newer versions (nicer looking)
-* improve fallback handler: we are on 1.8+, so we might be able to improve various things now
 * rename registry#getShopkeeperByBlock() to getShopkeeperBySignBlock or similar?
 * properly separate loading/unloading from activation/deactivation in debug messages/method names/etc
 
