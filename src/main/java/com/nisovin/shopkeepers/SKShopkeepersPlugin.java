@@ -30,7 +30,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.chestprotection.ProtectedChests;
-import com.nisovin.shopkeepers.command.Commands;
+import com.nisovin.shopkeepers.commands.Commands;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.metrics.CitizensChart;
 import com.nisovin.shopkeepers.metrics.FeaturesChart;
