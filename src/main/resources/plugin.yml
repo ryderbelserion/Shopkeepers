@@ -71,26 +71,26 @@ permissions:
     shopkeeper.admin:
         description: Create and modify admin shopkeepers
         default: op
+    shopkeeper.player.sell:
+        description: Create and modify selling player shopkeepers
+        default: false
+    shopkeeper.player.buy:
+        description: Create and modify buying player shopkeepers
+        default: false
+    shopkeeper.player.trade:
+        description: Create and modify trading player shopkeepers
+        default: false
+    shopkeeper.player.book:
+        description: Create and modify books selling player shopkeepers
+        default: false
     shopkeeper.player:
         description: Create and modify any player shopkeeper
-        default: false
+        default: true
         children:
             shopkeeper.player.sell: true
             shopkeeper.player.buy: true
             shopkeeper.player.trade: true
             shopkeeper.player.book: true
-    shopkeeper.player.sell:
-        description: Create and modify selling player shopkeepers
-        default: true
-    shopkeeper.player.buy:
-        description: Create and modify buying player shopkeepers
-        default: true
-    shopkeeper.player.trade:
-        description: Create and modify trading player shopkeepers
-        default: true
-    shopkeeper.player.book:
-        description: Create and modify books selling player shopkeepers
-        default: true
 
 # Shop objects:
     shopkeeper.sign:

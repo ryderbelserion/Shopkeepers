@@ -389,10 +389,8 @@ public final class Utils {
 		return colored;
 	}
 
-	public static void sendMessage(CommandSender sender, String message, String... args) {
-		// skip if sender is null or message is "empty":
-		if (sender == null || message == null || message.isEmpty()) return;
-		if (args != null && args.length >= 2) {
+	public static String replaceArgs(String message, String... args) {
+		if (!StringUtils.isEmpty(message) && args != null && args.length >= 2) {
 			// replace arguments (key-value replacement):
 			String key;
 			String value;
@@ -403,7 +401,17 @@ public final class Utils {
 				message = message.replace(key, value);
 			}
 		}
+		return message;
+	}
 
+	public static void sendMessage(CommandSender sender, String message, String... args) {
+		// replace message arguments:
+		message = replaceArgs(message, args);
+
+		// skip if sender is null or message is empty:
+		if (sender == null || StringUtils.isEmpty(message)) return;
+
+		// send message:
 		String[] msgs = message.split("\n");
 		for (String msg : msgs) {
 			sender.sendMessage(msg);
@@ -501,16 +509,6 @@ public final class Utils {
 			}
 		}
 		return entities;
-	}
-
-	// value conversion utilities:
-
-	public static Integer parseInt(String intString) {
-		try {
-			return Integer.parseInt(intString);
-		} catch (NumberFormatException e) {
-			return null;
-		}
 	}
 
 	// collections utilities:

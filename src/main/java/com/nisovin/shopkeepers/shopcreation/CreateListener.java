@@ -210,7 +210,7 @@ class CreateListener implements Listener {
 		}
 		Location spawnLocation = spawnBlock.getLocation();
 
-		if (plugin.getShopkeeperRegistry().getShopkeepersAtLocation(spawnLocation).isEmpty()) {
+		if (!plugin.getShopkeeperRegistry().getShopkeepersAtLocation(spawnLocation).isEmpty()) {
 			// there is already a shopkeeper at that location:
 			Utils.sendMessage(player, Settings.msgShopCreateFail);
 			return true;

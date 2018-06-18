@@ -30,6 +30,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.chestprotection.ProtectedChests;
+import com.nisovin.shopkeepers.command.Commands;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.metrics.CitizensChart;
 import com.nisovin.shopkeepers.metrics.FeaturesChart;
@@ -93,7 +94,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	// shopkeeper storage:
 	private final SKShopkeeperStorage shopkeeperStorage = new SKShopkeeperStorage(this);
 
-	private final CommandManager commandManager = new CommandManager(this, shopkeeperRegistry);
+	private final Commands commands = new Commands(this);
 	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(this);
 	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(this);
 
@@ -192,8 +193,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			pm.registerEvents(new BlockVillagerSpawnListener(), this);
 		}
 
-		// enable command manager:
-		commandManager.enable();
+		// enable commands:
+		commands.onEnable();
 
 		// enable shopkeeper naming:
 		shopkeeperNaming.onEnable();
@@ -282,7 +283,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopTypesRegistry.clearAllSelections();
 		shopObjectTypesRegistry.clearAllSelections();
 
-		commandManager.disable();
+		// disable commands:
+		commands.onDisable();
+
 		shopkeeperNaming.onDisable();
 		shopkeeperCreation.onDisable();
 
@@ -335,7 +338,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		shopkeeperNaming.onPlayerQuit(player);
 		shopkeeperCreation.onPlayerQuit(player);
-		commandManager.endConfirmation(player);
+		commands.onPlayerQuit(player);
 	}
 
 	// SHOPKEEPER REGISTRY
@@ -350,6 +353,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	@Override
 	public SKShopkeeperStorage getShopkeeperStorage() {
 		return shopkeeperStorage;
+	}
+
+	// COMMANDS
+
+	public Commands getCommands() {
+		return commands;
 	}
 
 	// UI

@@ -27,10 +27,10 @@ import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
 /**
  * Implementation notes:<br>
@@ -281,7 +281,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		Set<String> keys = saveData.getKeys(false);
 		Log.info("Loading data of " + keys.size() + " shopkeepers..");
 		for (String key : keys) {
-			Integer idInt = Utils.parseInt(key);
+			Integer idInt = ConversionUtils.parseInt(key);
 			if (idInt == null || idInt <= 0) {
 				Log.warning("Failed to load shopkeeper '" + key + "': Invalid id: " + key);
 				continue;
@@ -433,7 +433,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private boolean isCurrentlySavingAsync() {
 		return (saveIOTask != -1);
 	}
-	
+
 	private boolean isAsyncTaskCurrentlyRunning(int taskId) {
 		// BukkitScheduler#isCurrentlyRunning doesn't work correctly currently (see SPIGOT-3619)
 		for (BukkitWorker worker : Bukkit.getScheduler().getActiveWorkers()) {

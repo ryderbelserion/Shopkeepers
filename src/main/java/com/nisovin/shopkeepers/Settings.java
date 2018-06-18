@@ -244,16 +244,14 @@ public class Settings {
 	public static String msgChestNotPlaced = "&aYou must select a chest you have recently placed.";
 	public static String msgTooManyShops = "&aYou have too many shops.";
 	public static String msgShopCreateFail = "&aYou cannot create a shopkeeper there.";
+
 	public static String msgTypeNewName = "&aPlease type the shop's name into the chat.\n"
 			+ "  &aType a dash (-) to remove the name.";
 	public static String msgNameSet = "&aThe shop's name has been set!";
 	public static String msgNameHasNotChanged = "&aThe shop's name has not changed.";
 	public static String msgNameInvalid = "&aThat name is not valid!";
-	public static String msgUnknownShopkeeper = "&7No shopkeeper found with that name or id.";
-	public static String msgUnknownPlayer = "&7No player found with that name.";
-	public static String msgUnknowShopType = "&7Unknown shop type '{type}'.";
+
 	public static String msgShopTypeDisabled = "&7The shop type '{type}' is disabled.";
-	public static String msgUnknowShopObjectType = "&7Unknown shop object type '{type}'.";
 	public static String msgShopObjectTypeDisabled = "&7The shop object type '{type}' is disabled.";
 	public static String msgMustTargetChest = "&7You have to target a chest.";
 	public static String msgUnusedChest = "&7No shopkeeper is using this chest.";
@@ -301,31 +299,41 @@ public class Settings {
 	public static String msgRemovedPlayerShops = "&e{shopsCount} &ashops of player '&e{player}&a' were removed.";
 	public static String msgRemovedAllPlayerShops = "&aAll &e{shopsCount} &aplayer shops were removed.";
 
-	public static String msgConfirmRemoveAdminShops = "&cYou are about to irrevocable remove all admin shops!\n"
-			+ "&7Please confirm this action by typing &6/shopkeepers confirm";
-	public static String msgConfirmRemoveOwnShops = "&cYou are about to irrevocable remove all your shops!\n"
-			+ "&7Please confirm this action by typing &6/shopkeepers confirm";
-	public static String msgConfirmRemovePlayerShops = "&cYou are about to irrevocable remove all shops of player &6{player}&c!\n"
-			+ "&7Please confirm this action by typing &6/shopkeepers confirm";
-	public static String msgConfirmRemoveAllPlayerShops = "&cYou are about to irrevocable remove all player shops of all players!\n"
-			+ "&7Please confirm this action by typing &6/shopkeepers confirm";
+	public static String msgConfirmRemoveAdminShops = "&cYou are about to irrevocable remove all admin shops!";
+	public static String msgConfirmRemoveOwnShops = "&cYou are about to irrevocable remove all your shops!";
+	public static String msgConfirmRemovePlayerShops = "&cYou are about to irrevocable remove all shops of player &6{player}&c!";
+	public static String msgConfirmRemoveAllPlayerShops = "&cYou are about to irrevocable remove all player shops of all players!";
 
+	public static String msgConfirmationRequired = "&7Please confirm this action by typing &6/shopkeepers confirm";
 	public static String msgConfirmationExpired = "&cConfirmation expired.";
 	public static String msgNothingToConfirm = "&cThere is nothing to confirm currently.";
 
 	public static String msgNoPermission = "&cYou don't have the permission to do that.";
 
-	public static String msgHelpHeader = "&9***** &8[&6Shopkeepers v{version}&8] &9*****";
-	public static String msgCommandHelp = "&a/shopkeepers help &8- &7Shows this help page.";
-	public static String msgCommandReload = "&a/shopkeepers reload &8- &7Reloads this plugin.";
-	public static String msgCommandDebug = "&a/shopkeepers debug &8- &7Toggles debug mode on and off.";
-	public static String msgCommandList = "&a/shopkeepers list [player|admin] [page] &8- &7Lists all shops for the specified player, or all admin shops.";
-	public static String msgCommandRemove = "&a/shopkeepers remove [player|all|admin] &8- &7Removes all shops for the specified player, all players, or all admin shops.";
-	public static String msgCommandRemote = "&a/shopkeepers remote <shopName> &8- &7Remotely opens a shop.";
-	public static String msgCommandTransfer = "&a/shopkeepers transfer <newOwner> &8- &7Transfers the ownership of a shop.";
-	public static String msgCommandSettradeperm = "&a/shopkeepers setTradePerm <shopId> <tradePerm|-|?> &8- &7Sets, removes (-) or displays (?) the trading permission.";
-	public static String msgCommandSetforhire = "&a/shopkeepers setForHire &8- &7Sets one of your shops for sale.";
-	public static String msgCommandShopkeeper = "&a/shopkeepers [shop type] [object type] &8- &7Creates a shop.";
+	public static String msgCommandUnknown = "&cUnknown command '&e{command}&c'!";
+	public static String msgCommandArgumentUnexpected = "&cUnexpected argument '&e{argument}&c'.";
+	public static String msgCommandArgumentMissing = "&cMissing argument '&e{argumentFormat}&c'.";
+	public static String msgCommandArgumentInvalid = "&cInvalid argument '&e{argument}&c'.";
+	public static String msgCommandPlayerArgumentMissing = "&cNo player specified for '&e{argumentFormat}&c'.";
+	public static String msgCommandPlayerArgumentInvalid = "&cNo player found for '&e{argument}&c'.";
+	public static String msgCommandShopTypeArgumentInvalid = "&cUnknown shop type '&e{argument}&c'.";
+	public static String msgCommandShopObjectTypeArgumentInvalid = "&cUnknown shop object type '&e{argument}&c'.";
+	public static String msgCommandShopkeeperArgumentInvalid = "&cNo shopkeeper found for '&e{argument}&c'.";
+
+	public static String msgCommandHelpTitle = "&9***** &8[&6Shopkeepers v{version}&8] &9*****";
+	public static String msgCommandHelpUsageFormat = "&e{usage}";
+	public static String msgCommandHelpDescriptionFormat = "&8 - &3{description}";
+
+	public static String msgCommandDescriptionShopkeeper = "Creates a shopkeeper.";
+	public static String msgCommandDescriptionHelp = "Shows this help page.";
+	public static String msgCommandDescriptionReload = "Reloads this plugin.";
+	public static String msgCommandDescriptionDebug = "Toggles debug mode on and off.";
+	public static String msgCommandDescriptionList = "Lists all shops for the specified player, or all admin shops.";
+	public static String msgCommandDescriptionRemove = "Removes all shops for the specified player, all players, or all admin shops.";
+	public static String msgCommandDescriptionRemote = "Remotely opens a shop.";
+	public static String msgCommandDescriptionTransfer = "Transfers the ownership of a shop.";
+	public static String msgCommandDescriptionSettradeperm = "Sets, removes (-) or displays (?) the trading permission.";
+	public static String msgCommandDescriptionSetforhire = "Sets one of your shops for sale.";
 
 	// /////
 

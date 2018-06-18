@@ -47,6 +47,7 @@ public abstract class AbstractType implements Type {
 		return true;
 	}
 
+	// TODO remove this and instead add aliases?
 	@Override
 	public boolean matches(String identifier) {
 		identifier = StringUtils.normalize(identifier);
