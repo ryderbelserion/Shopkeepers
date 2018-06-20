@@ -436,6 +436,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	private boolean isAsyncTaskCurrentlyRunning(int taskId) {
 		// BukkitScheduler#isCurrentlyRunning doesn't work correctly currently (see SPIGOT-3619)
+		// TODO should be fixed with late 1.12.2
 		for (BukkitWorker worker : Bukkit.getScheduler().getActiveWorkers()) {
 			if (worker.getTaskId() == taskId) {
 				return true;
