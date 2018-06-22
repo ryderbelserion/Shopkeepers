@@ -37,8 +37,8 @@ public interface ShopkeepersPlugin extends Plugin {
 	public static final String REMOVE_ADMIN_PERMISSION = "shopkeeper.remove.admin";
 	public static final String REMOTE_PERMISSION = "shopkeeper.remote";
 	public static final String TRANSFER_PERMISSION = "shopkeeper.transfer";
-	public static final String SETTRADEPERM_PERMISSION = "shopkeeper.settradeperm";
-	public static final String SETFORHIRE_PERMISSION = "shopkeeper.setforhire";
+	public static final String SET_TRADE_PERM_PERMISSION = "shopkeeper.settradeperm";
+	public static final String SET_FOR_HIRE_PERMISSION = "shopkeeper.setforhire";
 	public static final String HIRE_PERMISSION = "shopkeeper.hire";
 	public static final String BYPASS_PERMISSION = "shopkeeper.bypass";
 	public static final String ADMIN_PERMISSION = "shopkeeper.admin";
