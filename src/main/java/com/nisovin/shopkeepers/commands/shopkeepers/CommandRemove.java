@@ -37,7 +37,7 @@ class CommandRemove extends PlayerCommand {
 	private final Confirmations confirmations;
 
 	CommandRemove(ShopkeepersPlugin plugin, ShopkeeperRegistry shopkeeperRegistry, Confirmations confirmations) {
-		super(Arrays.asList("remove", "delete"));
+		super("remove", Arrays.asList("delete"));
 		this.plugin = plugin;
 		this.shopkeeperRegistry = shopkeeperRegistry;
 		this.confirmations = confirmations;

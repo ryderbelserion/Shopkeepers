@@ -38,7 +38,7 @@ class CommandCheck extends Command {
 	private final ShopkeeperRegistry shopkeeperRegistry;
 
 	CommandCheck(SKShopkeepersPlugin plugin) {
-		super(Arrays.asList("check"));
+		super("check");
 		this.plugin = plugin;
 		this.shopkeeperRegistry = plugin.getShopkeeperRegistry();
 

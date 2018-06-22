@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -24,10 +23,10 @@ import com.nisovin.shopkeepers.util.Utils;
 class CommandSetForHire extends PlayerCommand {
 
 	CommandSetForHire() {
-		super(Arrays.asList("setForHire"));
+		super("setForHire");
 
 		// set permission:
-		this.setPermission(ShopkeepersPlugin.SETFORHIRE_PERMISSION);
+		this.setPermission(ShopkeepersPlugin.SET_FOR_HIRE_PERMISSION);
 
 		// set description:
 		this.setDescription(Settings.msgCommandDescriptionSetforhire);

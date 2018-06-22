@@ -28,10 +28,10 @@ class CommandSetTradePerm extends PlayerCommand {
 	private static final String ARGUMENT_QUERY_PERMISSION = "?";
 
 	CommandSetTradePerm() {
-		super(Arrays.asList("setTradePerm"));
+		super("setTradePerm");
 
 		// set permission:
-		this.setPermission(ShopkeepersPlugin.SETTRADEPERM_PERMISSION);
+		this.setPermission(ShopkeepersPlugin.SET_TRADE_PERM_PERMISSION);
 
 		// set description:
 		this.setDescription(Settings.msgCommandDescriptionSettradeperm);

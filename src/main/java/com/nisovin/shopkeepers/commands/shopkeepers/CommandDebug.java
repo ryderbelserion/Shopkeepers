@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Arrays;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -16,7 +14,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 class CommandDebug extends Command {
 
 	CommandDebug() {
-		super(Arrays.asList("debug"));
+		super("debug");
 
 		// set permission:
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);

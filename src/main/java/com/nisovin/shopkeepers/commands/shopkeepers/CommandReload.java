@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Arrays;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -19,7 +17,7 @@ class CommandReload extends Command {
 	private final SKShopkeepersPlugin plugin;
 
 	CommandReload(SKShopkeepersPlugin plugin) {
-		super(Arrays.asList("reload"));
+		super("reload");
 		this.plugin = plugin;
 
 		// set permission:

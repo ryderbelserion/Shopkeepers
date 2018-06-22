@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -26,7 +25,7 @@ class CommandTransfer extends PlayerCommand {
 	private static final String ARGUMENT_NEW_OWNER = "new-owner";
 
 	CommandTransfer() {
-		super(Arrays.asList("transfer"));
+		super("transfer");
 
 		// set permission:
 		this.setPermission(ShopkeepersPlugin.TRANSFER_PERMISSION);

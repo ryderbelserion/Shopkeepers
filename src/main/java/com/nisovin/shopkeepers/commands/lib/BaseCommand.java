@@ -1,9 +1,7 @@
 package com.nisovin.shopkeepers.commands.lib;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
@@ -12,16 +10,8 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class BaseCommand extends Command implements org.bukkit.command.CommandExecutor, TabCompleter {
 
-	private static List<String> getAliases(org.bukkit.command.PluginCommand bukkitCommand) {
-		Validate.notNull(bukkitCommand);
-		List<String> aliases = new ArrayList<>();
-		aliases.add(bukkitCommand.getName());
-		aliases.addAll(bukkitCommand.getAliases());
-		return aliases;
-	}
-
 	public BaseCommand(org.bukkit.command.PluginCommand bukkitCommand) {
-		super(getAliases(bukkitCommand));
+		super(bukkitCommand.getName(), bukkitCommand.getAliases());
 		String desc = bukkitCommand.getDescription();
 		if (desc != null && !desc.isEmpty()) {
 			this.setDescription(desc);
@@ -38,8 +28,8 @@ public abstract class BaseCommand extends Command implements org.bukkit.command.
 	}
 
 	@Override
-	public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String alias, String[] args) {
-		CommandInput input = new CommandInput(sender, command.getName(), alias);
+	public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String usedAlias, String[] args) {
+		CommandInput input = new CommandInput(sender, command.getName(), usedAlias);
 		try {
 			this.handleCommand(input, new CommandContext(), new CommandArgs(args));
 		} catch (CommandException e) {
@@ -55,8 +45,8 @@ public abstract class BaseCommand extends Command implements org.bukkit.command.
 	}
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String alias, String[] args) {
-		CommandInput input = new CommandInput(sender, command.getName(), alias);
+	public List<String> onTabComplete(CommandSender sender, org.bukkit.command.Command command, String usedAlias, String[] args) {
+		CommandInput input = new CommandInput(sender, command.getName(), usedAlias);
 		return this.handleTabCompletion(input, new CommandContext(), new CommandArgs(args));
 	}
 }

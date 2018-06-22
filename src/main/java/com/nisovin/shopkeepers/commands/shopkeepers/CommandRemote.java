@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Arrays;
-
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
@@ -20,7 +18,7 @@ class CommandRemote extends PlayerCommand {
 	private static final String ARGUMENT_SHOPKEEPER = "shopkeeper";
 
 	CommandRemote() {
-		super(Arrays.asList("remote"));
+		super("remote");
 
 		// set permission:
 		this.setPermission(ShopkeepersPlugin.REMOTE_PERMISSION);

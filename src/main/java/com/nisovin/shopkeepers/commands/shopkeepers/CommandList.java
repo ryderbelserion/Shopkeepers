@@ -37,7 +37,7 @@ class CommandList extends PlayerCommand {
 	private final ShopkeeperRegistry shopkeeperRegistry;
 
 	CommandList(ShopkeeperRegistry shopkeeperRegistry) {
-		super(Arrays.asList("list"));
+		super("list");
 		this.shopkeeperRegistry = shopkeeperRegistry;
 
 		// permission gets checked by testPermission and during execution

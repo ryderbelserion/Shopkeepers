@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Arrays;
-
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.commands.Confirmations;
@@ -16,7 +14,7 @@ class CommandConfirm extends PlayerCommand {
 	private final Confirmations confirmations;
 
 	CommandConfirm(Confirmations confirmations) {
-		super(Arrays.asList("confirm"));
+		super("confirm");
 		this.confirmations = confirmations;
 
 		// set description:

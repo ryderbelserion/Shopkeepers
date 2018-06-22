@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.commands.lib;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.Validate;
@@ -20,7 +20,8 @@ public abstract class Command {
 	public static final String ARGUMENTS_SEPARATOR = " ";
 	public static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
-	private final List<String> aliases; // all lowercase
+	private final String name;
+	private final List<String> aliases; // unmodifiable
 	private String description = "";
 	// null if no permission is required:
 	private String permission = null;
@@ -41,30 +42,48 @@ public abstract class Command {
 	private String helpChildUsageFormat = null;
 	private String helpChildDescFormat = null;
 
-	public Command(List<String> aliases) {
-		// validate aliases:
-		Validate.notNull(aliases);
-		ArrayList<String> validatedAliases = new ArrayList<>();
-		for (String alias : aliases) {
-			// validate alias:
-			Validate.notEmpty(alias);
-			alias = alias.toLowerCase(Locale.ROOT);
-			Validate.isTrue(!StringUtils.containsWhitespace(alias), "Command alias contains whitespace!");
+	public Command(String name) {
+		this(name, null);
+	}
 
-			// valid alias:
-			validatedAliases.add(alias);
+	public Command(String name, List<String> aliases) {
+		Validate.notEmpty(name, "Command name is empty!");
+		this.name = name;
+
+		// validate and copy aliases:
+		if (aliases == null || aliases.isEmpty()) {
+			this.aliases = Collections.emptyList();
+		} else {
+			List<String> aliasesCopy = new ArrayList<>(aliases);
+			// validate aliases:
+			for (String alias : aliasesCopy) {
+				Validate.notEmpty(alias, "Command contains empty alias!");
+				Validate.isTrue(!StringUtils.containsWhitespace(alias), "Command contains alias with whitespace!");
+			}
+			this.aliases = Collections.unmodifiableList(aliasesCopy);
 		}
-		Validate.isTrue(!validatedAliases.isEmpty(), "No valid command aliases specified!");
-		validatedAliases.trimToSize();
-		this.aliases = Collections.unmodifiableList(validatedAliases);
+	}
+
+	/**
+	 * Gets the name of this command.
+	 * <p>
+	 * For {@link BaseCommand base commands} this name is supposed to be unique among the commands of the same plugin.
+	 * There might conflicts with the commands of other plugins though.
+	 * <p>
+	 * For child commands this name is supposed to be unique among the child commands of the same parent command.
+	 * 
+	 * @return the name
+	 */
+	public final String getName() {
+		return name;
 	}
 
 	/**
 	 * Gets all the aliases of this command.
 	 * <p>
-	 * Depending on other the aliases of other commands with the same parent, not all aliases might get used.
+	 * Depending on the names and aliases of other commands, not all aliases might actually be active for this command.
 	 * 
-	 * @return the aliases
+	 * @return an unmodifiable view on the aliases, might be empty (but not <code>null</code>)
 	 */
 	public final List<String> getAliases() {
 		return aliases;
@@ -225,35 +244,10 @@ public abstract class Command {
 	public final String getCommandFormat() {
 		if (parent == null) {
 			// this is a base command:
-			return COMMAND_PREFIX + this.getAliases().get(0);
+			return COMMAND_PREFIX + this.getName();
 		} else {
 			// append primary alias to the format of the parent:
-			return parent.getCommandFormat() + ARGUMENTS_SEPARATOR + this.getPrimaryAlias();
-		}
-	}
-
-	/**
-	 * Gets the primary alias for this command.
-	 * <p>
-	 * In case this is a top-level command, the first alias is returned. Otherwise the primary alias is retrieved from
-	 * the {@link CommandRegistry command registers} of the parent command. Usually the primary alias is the first
-	 * alias, except if there is another child-command which got already registered for the same first alias.
-	 * 
-	 * @return the primary alias
-	 */
-	public final String getPrimaryAlias() {
-		if (parent == null) {
-			// this is a base command:
-			return this.getAliases().get(0);
-		} else {
-			// get primary alias from parent's child-commands registry:
-			String primaryAlias = parent.getChildCommands().getPrimaryAlias(this);
-			if (primaryAlias != null) {
-				return primaryAlias;
-			} else {
-				throw new IllegalStateException("Expecting parent (" + parent.getCommandFormat()
-						+ ") to know this child-command: " + this.getAliases().get(0));
-			}
+			return parent.getCommandFormat() + ARGUMENTS_SEPARATOR + this.getName();
 		}
 	}
 
@@ -517,25 +511,22 @@ public abstract class Command {
 
 		List<String> suggestions = new ArrayList<>();
 		if (args.getRemainingSize() == 1) {
-			String finalArgument = args.peek().toLowerCase();
+			String finalArgument = CommandUtils.normalize(args.peek());
 			// include matching child-command aliases (max one per command):
 			// asserts that all aliases for one command come in one row
 			Command lastMatchingCommand = null;
-			for (String alias : this.getChildCommands().getAliases()) {
-				Command aliasCommand = null;
-				if (lastMatchingCommand != null
-						&& lastMatchingCommand.equals(aliasCommand = this.getChildCommands().getCommand(alias))) {
-					// we have already included a suggestion for this child command:
+			for (Entry<String, Command> aliasEntry : this.getChildCommands().getAliasesMap().entrySet()) {
+				String alias = aliasEntry.getKey(); // normalized
+				Command aliasCommand = aliasEntry.getValue();
+				if (lastMatchingCommand != null && lastMatchingCommand == aliasCommand) {
+					// we have already included a suggestion for this child command, skip:
 					continue;
 				}
 				// we have reached an alias for a new child command:
 				lastMatchingCommand = null;
 
 				// does the alias match the input?
-				if (alias.toLowerCase().startsWith(finalArgument)) {
-					if (aliasCommand == null) {
-						aliasCommand = this.getChildCommands().getCommand(alias);
-					}
+				if (alias.startsWith(finalArgument)) {
 					// exclude further aliases for this command:
 					lastMatchingCommand = aliasCommand;
 
@@ -546,8 +537,8 @@ public abstract class Command {
 					}
 
 					// add this alias to the suggestions:
+					// TODO maybe use the original alias here, and not the normalized one?
 					suggestions.add(alias);
-
 				}
 			}
 		}

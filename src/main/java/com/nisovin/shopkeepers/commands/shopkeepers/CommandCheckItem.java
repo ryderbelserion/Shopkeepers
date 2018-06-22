@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Arrays;
-
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,7 +15,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 class CommandCheckItem extends PlayerCommand {
 
 	CommandCheckItem() {
-		super(Arrays.asList("checkitem"));
+		super("checkitem");
 
 		// set permission:
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);

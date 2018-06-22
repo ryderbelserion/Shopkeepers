@@ -10,7 +10,7 @@ import com.nisovin.shopkeepers.commands.lib.HelpCommand;
 class CommandHelp extends HelpCommand {
 
 	CommandHelp(Command helpSource) {
-		super(helpSource, Arrays.asList("help", "?"));
+		super("help", Arrays.asList("?"), helpSource);
 
 		// set permission:
 		this.setPermission(ShopkeepersPlugin.HELP_PERMISSION);

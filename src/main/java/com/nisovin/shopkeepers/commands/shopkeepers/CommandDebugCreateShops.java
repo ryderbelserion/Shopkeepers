@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Arrays;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.EntityType;
@@ -27,7 +25,7 @@ class CommandDebugCreateShops extends PlayerCommand {
 	private final SKShopkeepersPlugin plugin;
 
 	CommandDebugCreateShops(SKShopkeepersPlugin plugin) {
-		super(Arrays.asList("debugCreateShops"));
+		super("debugCreateShops");
 		this.plugin = plugin;
 
 		// set permission:

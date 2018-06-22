@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -17,12 +17,12 @@ public class CommandRegistry {
 	private final Command parent;
 
 	// gets only initialized when used, sorted by insertion order:
-	// lowercase aliases
+	private Set<Command> commands = null;
+	// normalized aliases:
 	private Map<String, Command> commandsByAlias = null;
-	private Map<Command, String> primaryAliases = null;
 
 	public CommandRegistry(Command parent) {
-		Validate.notNull(parent);
+		Validate.notNull(parent, "Parent is null!");
 		this.parent = parent;
 	}
 
@@ -31,77 +31,95 @@ public class CommandRegistry {
 	}
 
 	public void register(Command command) {
-		Validate.notNull(command);
+		Validate.notNull(command, "Command is null!");
 		Validate.isTrue(command.getParent() == null, "The given command is already registered somewhere!");
 
 		// lazy initialization:
-		if (commandsByAlias == null) {
+		if (commands == null) {
+			commands = new LinkedHashSet<>();
 			commandsByAlias = new LinkedHashMap<>();
-			primaryAliases = new LinkedHashMap<>();
 		}
 
-		Validate.isTrue(!primaryAliases.containsKey(command), "The given command is already registered!");
+		Validate.isTrue(!commands.contains(command), "The given command is already registered!");
 
-		// register aliases:
-		String primaryAlias = null;
+		// register command by name:
+		String name = CommandUtils.normalize(command.getName());
+		Validate.isTrue(!commandsByAlias.containsKey(name), "Another command is already registered for '" + name + "'!");
+		commandsByAlias.put(name, command);
+
+		// register command aliases:
 		for (String alias : command.getAliases()) {
-			alias = alias.toLowerCase(Locale.ROOT);
-			if (commandsByAlias.containsKey(alias)) {
-				// there is already another command for the current alias registered, skip this alias:
-				continue;
-			}
-			commandsByAlias.put(alias, command);
-			if (primaryAlias == null) {
-				primaryAlias = alias;
-			}
+			alias = CommandUtils.normalize(alias);
+			// only register the alias, if it is not yet mapped to another command:
+			commandsByAlias.putIfAbsent(alias, command);
 		}
-		Validate.notNull(primaryAlias, "All aliases for this command are already in use!");
 
 		// register command:
-		primaryAliases.put(command, primaryAlias);
+		commands.add(command);
 
 		// set parent command:
 		command.setParent(parent);
 	}
 
 	public boolean isRegistered(Command command) {
-		return primaryAliases != null && primaryAliases.containsKey(command);
+		return commands != null && commands.contains(command);
 	}
 
 	public void unregister(Command command) {
-		Validate.notNull(command);
+		Validate.notNull(command, "Command is null!");
 		Validate.isTrue(command.getParent() == parent, "The given command is not registered here!");
-		Validate.isTrue(primaryAliases.containsKey(command), "The given command is not registered here!");
+		Validate.isTrue(commands.contains(command), "The given command is not registered here!");
+
+		// unregister by name:
+		String name = CommandUtils.normalize(command.getName());
+		assert commandsByAlias.get(name) == command;
+		commandsByAlias.remove(name);
 
 		// unregister aliases:
 		for (String alias : command.getAliases()) {
-			alias = alias.toLowerCase(Locale.ROOT);
-			if (commandsByAlias.get(alias) == command) {
-				// there is another command for the current alias registered, skip this alias:
-				continue;
-			}
-			commandsByAlias.remove(alias);
+			alias = CommandUtils.normalize(alias);
+			// only remove the mapping, if the alias is currently mapped to this command:
+			commandsByAlias.remove(alias, command);
 		}
 
 		// unregister command:
-		primaryAliases.remove(command);
+		commands.remove(command);
 
 		// unset parent command:
 		command.setParent(null);
 	}
 
-	public Command getCommand(String alias) {
-		Validate.notNull(alias);
-		if (commandsByAlias == null) {
-			return null;
+	/**
+	 * Gets all registered commands.
+	 * 
+	 * @return an unmodifiable view on all registered commands
+	 */
+	public Collection<Command> getCommands() {
+		if (commands == null) {
+			return Collections.emptySet();
 		}
-		return commandsByAlias.get(alias.toLowerCase(Locale.ROOT));
+		return Collections.unmodifiableSet(commands);
 	}
 
 	/**
-	 * Gets all registered command aliases (in lower-case).
+	 * Gets the {@link Command} mapped to the given alias.
+	 * 
+	 * @param alias
+	 *            the alias
+	 * @return the command, or <code>null</code>
+	 */
+	public Command getCommand(String alias) {
+		Validate.notNull(alias, "Alias is null!");
+		if (commandsByAlias == null) {
+			return null;
+		}
+		return commandsByAlias.get(CommandUtils.normalize(alias));
+	}
+
+	/**
+	 * Gets all registered command aliases.
 	 * <p>
-	 * The aliases are ordered by insertion and grouped by command.
+	 * The aliases are {@link CommandUtils#normalize(String) normalized}, ordered by insertion and grouped by command.
 	 * 
 	 * @return an unmodifiable view on all registered command aliases
 	 */
@@ -112,6 +130,11 @@ public class CommandRegistry {
 		return Collections.unmodifiableSet(commandsByAlias.keySet());
 	}
 
+	/**
+	 * Gets all registered command aliases and the commands they are mapped to.
+	 * 
+	 * @return an unmodifiable view on all registered aliases and the commands they are mapped to
+	 */
 	public Map<String, Command> getAliasesMap() {
 		if (commandsByAlias == null) {
 			return Collections.emptyMap();
@@ -120,50 +143,22 @@ public class CommandRegistry {
 	}
 
 	/**
-	 * Gets all registered primary aliases (in lower-case).
-	 * <p>
-	 * One (the first successfully registered) alias per registered command, ordered by insertion.
+	 * Gets all registered aliases that are mapped to the specified command.
 	 * 
-	 * @return an unmodifiable view on all registered primary command aliases
+	 * @param command
+	 *            the command
+	 * @return an unmodifiable view on all registered aliases that are mapped to the specified command
 	 */
-	public Collection<String> getPrimaryAliases() {
-		if (primaryAliases == null) {
-			return Collections.emptySet();
-		}
-		return Collections.unmodifiableCollection(primaryAliases.values());
-	}
-
-	public Map<Command, String> getPrimaryAliasesMap() {
-		if (primaryAliases == null) {
-			return Collections.emptyMap();
-		}
-		return Collections.unmodifiableMap(primaryAliases);
-	}
-
-	public Set<Command> getCommands() {
-		if (primaryAliases == null) {
-			return Collections.emptySet();
-		}
-		return Collections.unmodifiableSet(primaryAliases.keySet());
-	}
-
 	public List<String> getAliases(Command command) {
 		if (commandsByAlias == null) {
 			return Collections.emptyList();
 		}
 		List<String> aliases = new ArrayList<>();
 		for (Entry<String, Command> entry : commandsByAlias.entrySet()) {
-			if (entry.getValue().equals(command)) {
+			if (entry.getValue() == command) {
 				aliases.add(entry.getKey());
 			}
 		}
-		return aliases;
-	}
-
-	public String getPrimaryAlias(Command command) {
-		if (primaryAliases == null) {
-			return null;
-		}
-		return primaryAliases.get(command);
+		return Collections.unmodifiableList(aliases);
 	}
 }

@@ -11,8 +11,12 @@ import org.bukkit.entity.Player;
  */
 public abstract class PlayerCommand extends Command {
 
-	public PlayerCommand(List<String> aliases) {
-		super(aliases);
+	public PlayerCommand(String name) {
+		this(name, null);
+	}
+
+	public PlayerCommand(String name, List<String> aliases) {
+		super(name, aliases);
 	}
 
 	@Override
