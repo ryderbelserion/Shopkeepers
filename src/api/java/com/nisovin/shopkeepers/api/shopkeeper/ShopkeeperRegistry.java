@@ -95,6 +95,15 @@ public interface ShopkeeperRegistry {
 	public Shopkeeper getShopkeeperByEntity(Entity entity);
 
 	/**
+	 * Checks if a given entity is a Shopkeeper.
+	 * 
+	 * @param entity
+	 *            the entity to check
+	 * @return <code>true</code> if the entity is a Shopkeeper
+	 */
+	public boolean isShopkeeper(Entity entity);
+
+	/**
 	 * Gets the shopkeeper for a given block (ex: sign shops).
 	 * 
 	 * @param block
@@ -102,6 +111,15 @@ public interface ShopkeeperRegistry {
 	 * @return the shopkeeper, or <code>null</code> if the given block is not a shopkeeper
 	 */
 	public Shopkeeper getShopkeeperByBlock(Block block);
+
+	/**
+	 * Checks if a given block is a Shopkeeper.
+	 * 
+	 * @param block
+	 *            the block to check
+	 * @return <code>true</code> if the block is a Shopkeeper
+	 */
+	public boolean isShopkeeper(Block block);
 
 	/**
 	 * Gets all shopkeepers for a given chunk.
@@ -131,15 +149,6 @@ public interface ShopkeeperRegistry {
 	 * @return an unmodifiable view on the shopkeepers
 	 */
 	public List<? extends Shopkeeper> getShopkeepersInWorld(World world, boolean onlyLoadedChunks);
-
-	/**
-	 * Checks if a given entity is a Shopkeeper.
-	 * 
-	 * @param entity
-	 *            the entity to check
-	 * @return whether the entity is a Shopkeeper
-	 */
-	public boolean isShopkeeper(Entity entity);
 
 	/**
 	 * Gets all shopkeepers.

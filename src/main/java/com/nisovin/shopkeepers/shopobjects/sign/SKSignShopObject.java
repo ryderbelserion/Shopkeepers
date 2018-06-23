@@ -14,18 +14,13 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
+import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
 
-public class SignShop extends AbstractShopObject {
-
-	public static String getId(Block block) {
-		if (block == null) return null;
-		return "block" + Utils.getLocationString(block);
-	}
+public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
 
 	protected final SignShops signShops;
 	private BlockFace signFacing; // can be null, if not yet loaded or unknown
@@ -33,7 +28,7 @@ public class SignShop extends AbstractShopObject {
 	// sign content:
 	private boolean updateSign = true;
 
-	protected SignShop(SignShops signShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	protected SKSignShopObject(SignShops signShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
 		this.signShops = signShops;
 		if (creationData != null) {
@@ -42,7 +37,7 @@ public class SignShop extends AbstractShopObject {
 	}
 
 	@Override
-	public SignShopObjectType getObjectType() {
+	public SKSignShopObjectType getType() {
 		return signShops.getSignShopObjectType();
 	}
 
@@ -102,11 +97,19 @@ public class SignShop extends AbstractShopObject {
 
 	// ACTIVATION
 
-	public Sign getSign() {
+	@Override
+	public Block getBlock() {
 		Location signLocation = this.getLocation();
-		if (signLocation == null) return null;
+		if (signLocation == null) return null; // world not loaded
 		Block signBlock = signLocation.getBlock();
 		if (!ItemUtils.isSign(signBlock.getType())) return null;
+		return signBlock;
+	}
+
+	public Sign getSign() {
+		Block signBlock = this.getBlock();
+		if (signBlock == null) return null;
+		assert ItemUtils.isSign(signBlock.getType());
 		return (Sign) signBlock.getState();
 	}
 
@@ -143,17 +146,12 @@ public class SignShop extends AbstractShopObject {
 
 	@Override
 	public boolean isActive() {
-		Location signLocation = this.getLocation();
-		if (signLocation == null) return false;
-		Block signBlock = signLocation.getBlock();
-		return ItemUtils.isSign(signBlock.getType());
+		return (this.getBlock() != null);
 	}
 
 	@Override
 	public String getId() {
-		Location location = shopkeeper.getLocation();
-		if (location == null) return null;
-		return getId(location.getBlock());
+		return this.getType().createObjectId(this.getBlock());
 	}
 
 	@Override
@@ -168,7 +166,7 @@ public class SignShop extends AbstractShopObject {
 
 		// place sign: // TODO maybe also allow non-wall signs?
 		// cancel block physics for this placed sign if needed:
-		signShops.cancelNextBlockPhysics(signLocation);
+		signShops.cancelNextBlockPhysics(signBlock);
 		signBlock.setType(Material.WALL_SIGN);
 		// cleanup state if no block physics were triggered:
 		signShops.cancelNextBlockPhysics(null);

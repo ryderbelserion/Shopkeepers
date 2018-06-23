@@ -143,7 +143,7 @@ class CommandList extends PlayerCommand {
 					"{shopName}", (hasName ? (shopName + " ") : ""),
 					"{location}", shopkeeper.getPositionString(),
 					"{shopType}", shopkeeper.getType().getIdentifier(),
-					"{objectType}", shopkeeper.getShopObject().getObjectType().getIdentifier());
+					"{objectType}", shopkeeper.getShopObject().getType().getIdentifier());
 		}
 	}
 }

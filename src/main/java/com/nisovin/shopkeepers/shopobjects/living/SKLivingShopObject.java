@@ -16,39 +16,34 @@ import org.bukkit.potion.PotionEffect;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObject;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
+import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class LivingEntityShop extends AbstractShopObject {
+public class SKLivingShopObject extends AbstractEntityShopObject implements LivingShopObject {
 
-	public static String getId(Entity entity) {
-		if (entity != null) {
-			return "entity" + entity.getUniqueId();
-		}
-		return null;
-	}
-
-	protected final LivingEntityShops livingEntityShops;
-	private final LivingEntityObjectType<?> livingObjectType;
+	protected final LivingShops livingShops;
+	private final SKLivingShopObjectType<?> livingObjectType;
 	private LivingEntity entity;
 	private String uuid;
 	private int respawnAttempts = 0;
 
-	protected LivingEntityShop(LivingEntityShops livingEntityShops, LivingEntityObjectType<?> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	protected SKLivingShopObject(LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
-		this.livingEntityShops = livingEntityShops;
+		this.livingShops = livingShops;
 		this.livingObjectType = livingObjectType;
 	}
 
 	@Override
-	public LivingEntityObjectType<?> getObjectType() {
+	public SKLivingShopObjectType<?> getType() {
 		return livingObjectType;
 	}
 
+	@Override
 	public EntityType getEntityType() {
 		return livingObjectType.getEntityType();
 	}
@@ -73,22 +68,27 @@ public class LivingEntityShop extends AbstractShopObject {
 
 	// ACTIVATION
 
-	public LivingEntity getEntity() {
-		return entity;
-	}
-
 	@Override
-	public boolean isActive() {
+	public LivingEntity getEntity() {
+		// is-active check:
 		// note: some spigot versions didn't check the isDead flag inside isValid:
 		// note: isValid-flag gets set at the tick after handling all queued chunk unloads, so isChunkLoaded check is
 		// needed if we check during chunk unloads and the entity in question might be in another chunk than the
 		// currently unloaded one
-		return entity != null && !entity.isDead() && entity.isValid() && ChunkCoords.isChunkLoaded(entity.getLocation());
+		if (entity != null && !entity.isDead() && entity.isValid() && ChunkCoords.isChunkLoaded(entity.getLocation())) {
+			return entity;
+		}
+		return null;
+	}
+
+	@Override
+	public boolean isActive() {
+		return (this.getEntity() != null);
 	}
 
 	@Override
 	public String getId() {
-		return getId(entity);
+		return this.getType().createObjectId(this.getEntity());
 	}
 
 	protected void assignShopkeeperMetadata(LivingEntity entity) {
@@ -152,7 +152,7 @@ public class LivingEntityShop extends AbstractShopObject {
 			// TODO check if the block is passable before spawning there?
 			// try to bypass entity-spawn blocking plugins:
 			EntityType entityType = this.getEntityType();
-			livingEntityShops.forceCreatureSpawn(spawnLocation, entityType);
+			livingShops.forceCreatureSpawn(spawnLocation, entityType);
 			entity = (LivingEntity) world.spawnEntity(spawnLocation, entityType);
 			uuid = entity.getUniqueId().toString();
 			shopkeeper.markDirty();
@@ -217,7 +217,7 @@ public class LivingEntityShop extends AbstractShopObject {
 			// disable AI (also disables gravity) and replace it with our own handling:
 			NMSManager.getProvider().setNoAI(entity);
 			if (NMSManager.getProvider().supportsCustomMobAI()) {
-				livingEntityShops.getLivingEntityAI().addEntity(entity);
+				livingShops.getLivingEntityAI().addEntity(entity);
 			}
 		}
 
@@ -238,7 +238,7 @@ public class LivingEntityShop extends AbstractShopObject {
 
 	protected void cleanupAI() {
 		// disable AI:
-		livingEntityShops.getLivingEntityAI().removeEntity(entity);
+		livingShops.getLivingEntityAI().removeEntity(entity);
 	}
 
 	@Override

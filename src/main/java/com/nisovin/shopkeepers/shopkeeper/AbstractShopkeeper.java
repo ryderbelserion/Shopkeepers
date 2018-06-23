@@ -436,7 +436,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public boolean needsSpawning() {
-		return shopObject.getObjectType().needsSpawning();
+		return shopObject.getType().needsSpawning();
 	}
 
 	@Override

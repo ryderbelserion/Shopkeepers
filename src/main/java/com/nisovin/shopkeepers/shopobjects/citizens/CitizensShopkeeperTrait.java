@@ -9,6 +9,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.util.Log;
 
 import net.citizensnpcs.api.npc.NPC;
@@ -59,8 +60,8 @@ public class CitizensShopkeeperTrait extends Trait {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		if (shopkeeper != null) {
 			Log.debug("Removing shopkeeper " + shopkeeper.getId() + " due to citizens trait removal for NPC " + npc.getId());
-			assert shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN();
-			CitizensShop shopObject = (CitizensShop) shopkeeper.getShopObject();
+			assert shopkeeper.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN();
+			SKCitizensShopObject shopObject = (SKCitizensShopObject) shopkeeper.getShopObject();
 			shopObject.onTraitRemoval();
 			// this should keep the citizens npc and only remove the shopkeeper data:
 			shopkeeper.delete();
@@ -84,7 +85,9 @@ public class CitizensShopkeeperTrait extends Trait {
 			return false;
 		}
 
-		if (plugin.getShopkeeperRegistry().getActiveShopkeeper(CitizensShop.getId(npc.getId())) != null) {
+		int npcId = npc.getId();
+		String shopObjectId = SKDefaultShopObjectTypes.CITIZEN().createObjectId(npcId);
+		if (plugin.getShopkeeperRegistry().getActiveShopkeeper(shopObjectId) != null) {
 			// there is already a shopkeeper for this npc:
 			// the trait was probably re-attached after a reload of citizens:
 			return false;
@@ -124,7 +127,7 @@ public class CitizensShopkeeperTrait extends Trait {
 
 			if (location != null) {
 				ShopCreationData creationData = ShopCreationData.create(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
-				creationData.setValue(CitizensShop.CREATION_DATA_NPC_ID_KEY, npc.getId());
+				creationData.setValue(SKCitizensShopObject.CREATION_DATA_NPC_ID_KEY, npc.getId());
 				Shopkeeper shopkeeper = plugin.handleShopkeeperCreation(creationData);
 				if (shopkeeper != null) {
 					shopkeeperId = shopkeeper.getObjectId();

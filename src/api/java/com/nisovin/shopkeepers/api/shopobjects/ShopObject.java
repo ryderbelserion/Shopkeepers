@@ -5,9 +5,12 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
+/**
+ * Represents a {@link Shopkeeper} in the world.
+ */
 public interface ShopObject {
 
-	public ShopObjectType<?> getObjectType();
+	public ShopObjectType<?> getType();
 
 	// ACTIVATION
 

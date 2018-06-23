@@ -8,15 +8,15 @@ import org.bukkit.event.HandlerList;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 
-public class LivingEntityShops {
+public class LivingShops {
 
 	private final SKShopkeepersPlugin plugin;
-	private final SKLivingEntityObjectTypes livingEntityObjectTypes = new SKLivingEntityObjectTypes(this);
+	private final SKLivingShopObjectTypes livingEntityObjectTypes = new SKLivingShopObjectTypes(this);
 	private final LivingEntityAI livingEntityAI;
 	private final LivingEntityShopListener livingEntityShopListener;
 	private final CreatureForceSpawnListener creatureForceSpawnListener = new CreatureForceSpawnListener();
 
-	public LivingEntityShops(SKShopkeepersPlugin plugin) {
+	public LivingShops(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 		livingEntityAI = new LivingEntityAI(plugin);
 		livingEntityShopListener = new LivingEntityShopListener(plugin.getShopkeeperRegistry());
@@ -41,7 +41,7 @@ public class LivingEntityShops {
 		livingEntityAI.reset(); // cleanup, reset timings, etc.
 	}
 
-	public SKLivingEntityObjectTypes getLivingEntityObjectTypes() {
+	public SKLivingShopObjectTypes getLivingEntityObjectTypes() {
 		return livingEntityObjectTypes;
 	}
 

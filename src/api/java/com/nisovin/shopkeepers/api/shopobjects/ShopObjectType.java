@@ -5,6 +5,12 @@ import org.bukkit.block.BlockFace;
 
 import com.nisovin.shopkeepers.api.types.SelectableType;
 
+/**
+ * Represents a certain type of {@link ShopObject}s.
+ *
+ * @param <T>
+ *            the type of the shop objects this represents
+ */
 public interface ShopObjectType<T extends ShopObject> extends SelectableType {
 
 	/**

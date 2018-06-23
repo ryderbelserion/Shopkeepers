@@ -6,23 +6,24 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObjectType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class SignShopObjectType extends AbstractShopObjectType<SignShop> {
+public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShopObject> implements SignShopObjectType<SKSignShopObject> {
 
 	private final SignShops signShops;
 
-	public SignShopObjectType(SignShops signShops) {
+	public SKSignShopObjectType(SignShops signShops) {
 		super("sign", "shopkeeper.sign");
 		this.signShops = signShops;
 	}
 
 	@Override
-	public SignShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		return new SignShop(signShops, shopkeeper, creationData);
+	public SKSignShopObject createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		return new SKSignShopObject(signShops, shopkeeper, creationData);
 	}
 
 	@Override

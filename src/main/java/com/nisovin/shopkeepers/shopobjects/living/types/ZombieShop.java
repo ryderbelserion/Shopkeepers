@@ -8,17 +8,17 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShops;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
+import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 
-public class ZombieShop extends LivingEntityShop {
+public class ZombieShop extends SKLivingShopObject {
 
 	private boolean baby = false;
 
-	public ZombieShop(	LivingEntityShops livingEntityShops, LivingEntityObjectType<ZombieShop> livingObjectType,
+	public ZombieShop(	LivingShops livingShops, SKLivingShopObjectType<ZombieShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		super(livingEntityShops, livingObjectType, shopkeeper, creationData);
+		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override

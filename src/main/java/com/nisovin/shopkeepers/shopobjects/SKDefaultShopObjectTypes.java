@@ -5,9 +5,9 @@ import java.util.List;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
-import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShopObjectType;
-import com.nisovin.shopkeepers.shopobjects.living.SKLivingEntityObjectTypes;
-import com.nisovin.shopkeepers.shopobjects.sign.SignShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.citizens.SKCitizensShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.sign.SKSignShopObjectType;
 
 public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 
@@ -20,26 +20,26 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 	}
 
 	@Override
-	public List<AbstractShopObjectType<?>> getAllObjectTypes() {
+	public List<AbstractShopObjectType<?>> getAll() {
 		List<AbstractShopObjectType<?>> shopObjectTypes = new ArrayList<>();
-		shopObjectTypes.addAll(this.getLivingEntityObjectTypes().getAllObjectTypes());
+		shopObjectTypes.addAll(this.getLivingShopObjectTypes().getAll());
 		shopObjectTypes.add(this.getSignShopObjectType());
 		shopObjectTypes.add(this.getCitizensShopObjectType());
 		return shopObjectTypes;
 	}
 
 	@Override
-	public SKLivingEntityObjectTypes getLivingEntityObjectTypes() {
-		return plugin.getLivingEntityShops().getLivingEntityObjectTypes();
+	public SKLivingShopObjectTypes getLivingShopObjectTypes() {
+		return plugin.getLivingShops().getLivingEntityObjectTypes();
 	}
 
 	@Override
-	public SignShopObjectType getSignShopObjectType() {
+	public SKSignShopObjectType getSignShopObjectType() {
 		return plugin.getSignShops().getSignShopObjectType();
 	}
 
 	@Override
-	public CitizensShopObjectType getCitizensShopObjectType() {
+	public SKCitizensShopObjectType getCitizensShopObjectType() {
 		return plugin.getCitizensShops().getCitizensShopObjectType();
 	}
 
@@ -49,15 +49,15 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 		return SKShopkeepersPlugin.getInstance().getDefaultShopObjectTypes();
 	}
 
-	public static SKLivingEntityObjectTypes MOBS() {
-		return getInstance().getLivingEntityObjectTypes();
+	public static SKLivingShopObjectTypes LIVING() {
+		return getInstance().getLivingShopObjectTypes();
 	}
 
-	public static SignShopObjectType SIGN() {
+	public static SKSignShopObjectType SIGN() {
 		return getInstance().getSignShopObjectType();
 	}
 
-	public static CitizensShopObjectType CITIZEN() {
+	public static SKCitizensShopObjectType CITIZEN() {
 		return getInstance().getCitizensShopObjectType();
 	}
 }

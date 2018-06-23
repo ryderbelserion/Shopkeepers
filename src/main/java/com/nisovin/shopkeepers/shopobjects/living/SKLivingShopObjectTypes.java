@@ -13,7 +13,7 @@ import org.bukkit.entity.EntityType;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.api.shopobjects.living.LivingEntityObjectTypes;
+import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObjectTypes;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.CreeperShop;
@@ -23,7 +23,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieShop;
 import com.nisovin.shopkeepers.util.StringUtils;
 
-public class SKLivingEntityObjectTypes implements LivingEntityObjectTypes {
+public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	/*
 	 * Notes about individual differences and issues for specific entity types:
 	 * All non-listed entity types are completely untested and therefore 'experimental' as well.
@@ -95,13 +95,13 @@ public class SKLivingEntityObjectTypes implements LivingEntityObjectTypes {
 		ALIASES = Collections.unmodifiableMap(aliases);
 	}
 
-	private final LivingEntityShops livingEntityShops;
+	private final LivingShops livingShops;
 	// order is specified by the 'enabled-living-shops' config setting:
-	private final Map<EntityType, LivingEntityObjectType<?>> objectTypes = new LinkedHashMap<>();
-	private final Collection<LivingEntityObjectType<?>> objectTypesView = Collections.unmodifiableCollection(objectTypes.values());
+	private final Map<EntityType, SKLivingShopObjectType<?>> objectTypes = new LinkedHashMap<>();
+	private final Collection<SKLivingShopObjectType<?>> objectTypesView = Collections.unmodifiableCollection(objectTypes.values());
 
-	public SKLivingEntityObjectTypes(LivingEntityShops livingEntityShops) {
-		this.livingEntityShops = livingEntityShops;
+	public SKLivingShopObjectTypes(LivingShops livingShops) {
+		this.livingShops = livingShops;
 		// first, create the enabled living object types, in the same order as specified in the config:
 		for (String enabledEntityType : Settings.enabledLivingShops) {
 			if (enabledEntityType == null) continue; // just in case
@@ -134,75 +134,75 @@ public class SKLivingEntityObjectTypes implements LivingEntityObjectTypes {
 	}
 
 	@Override
-	public Collection<LivingEntityObjectType<?>> getAllObjectTypes() {
+	public Collection<SKLivingShopObjectType<?>> getAll() {
 		return objectTypesView;
 	}
 
 	@Override
-	public LivingEntityObjectType<?> getObjectType(EntityType entityType) {
+	public SKLivingShopObjectType<?> get(EntityType entityType) {
 		return objectTypes.get(entityType);
 	}
 
-	private LivingEntityObjectType<?> createLivingEntityObjectType(EntityType entityType, List<String> aliases) {
+	private SKLivingShopObjectType<?> createLivingEntityObjectType(EntityType entityType, List<String> aliases) {
 		String typeName = entityType.name().toLowerCase(Locale.ROOT);
 		String permission = "shopkeeper.entity." + typeName;
 
-		LivingEntityObjectType<?> objectType;
+		SKLivingShopObjectType<?> objectType;
 
 		switch (entityType) {
 		case VILLAGER:
-			objectType = new LivingEntityObjectType<VillagerShop>(livingEntityShops, entityType, aliases, typeName, permission) {
+			objectType = new SKLivingShopObjectType<VillagerShop>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
 				public VillagerShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new VillagerShop(livingEntityShops, this, shopkeeper, creationData);
+					return new VillagerShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case CREEPER:
-			objectType = new LivingEntityObjectType<CreeperShop>(livingEntityShops, entityType, aliases, typeName, permission) {
+			objectType = new SKLivingShopObjectType<CreeperShop>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
 				public CreeperShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new CreeperShop(livingEntityShops, this, shopkeeper, creationData);
+					return new CreeperShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case OCELOT:
-			objectType = new LivingEntityObjectType<CatShop>(livingEntityShops, entityType, aliases, typeName, permission) {
+			objectType = new SKLivingShopObjectType<CatShop>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
 				public CatShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new CatShop(livingEntityShops, this, shopkeeper, creationData);
+					return new CatShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case SHEEP:
-			objectType = new LivingEntityObjectType<SheepShop>(livingEntityShops, entityType, aliases, typeName, permission) {
+			objectType = new SKLivingShopObjectType<SheepShop>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
 				public SheepShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new SheepShop(livingEntityShops, this, shopkeeper, creationData);
+					return new SheepShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case ZOMBIE:
-			objectType = new LivingEntityObjectType<ZombieShop>(livingEntityShops, entityType, aliases, typeName, permission) {
+			objectType = new SKLivingShopObjectType<ZombieShop>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
 				public ZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new ZombieShop(livingEntityShops, this, shopkeeper, creationData);
+					return new ZombieShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		case PIG_ZOMBIE:
-			objectType = new LivingEntityObjectType<PigZombieShop>(livingEntityShops, entityType, aliases, typeName, permission) {
+			objectType = new SKLivingShopObjectType<PigZombieShop>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
 				public PigZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new PigZombieShop(livingEntityShops, this, shopkeeper, creationData);
+					return new PigZombieShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
 		default:
-			objectType = new LivingEntityObjectType<LivingEntityShop>(livingEntityShops, entityType, aliases, typeName, permission) {
+			objectType = new SKLivingShopObjectType<SKLivingShopObject>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
-				public LivingEntityShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new LivingEntityShop(livingEntityShops, this, shopkeeper, creationData);
+				public SKLivingShopObject createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new SKLivingShopObject(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;

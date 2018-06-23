@@ -125,7 +125,7 @@ public abstract class EditorHandler extends UIHandler {
 			if (!Settings.enableChestOptionOnPlayerShop
 					&& !Settings.allowRenamingOfPlayerNpcShops
 					&& shopkeeper.getType() instanceof PlayerShopType
-					&& shopkeeper.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN()) {
+					&& shopkeeper.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN()) {
 				return;
 				// TODO restructure this all, to allow for dynamic editor buttons depending on shop (object) types and
 				// settings
@@ -233,7 +233,7 @@ public abstract class EditorHandler extends UIHandler {
 				// naming via button enabled?
 				if (!Settings.namingOfPlayerShopsViaItem) {
 					// no naming button for citizens player shops if renaming is disabled for those
-					if (Settings.allowRenamingOfPlayerNpcShops || shopkeeper.getShopObject().getObjectType() != DefaultShopObjectTypes.CITIZEN()) {
+					if (Settings.allowRenamingOfPlayerNpcShops || shopkeeper.getShopObject().getType() != DefaultShopObjectTypes.CITIZEN()) {
 						useNamingButton = true;
 					}
 				}

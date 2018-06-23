@@ -26,7 +26,7 @@ import net.citizensnpcs.trait.LookClose;
 public class CitizensShops {
 
 	private final SKShopkeepersPlugin plugin;
-	private final CitizensShopObjectType citizensShopObjectType = new CitizensShopObjectType(this);
+	private final SKCitizensShopObjectType citizensShopObjectType = new SKCitizensShopObjectType(this);
 	private final PluginListener pluginListener = new PluginListener(this);
 
 	private final CitizensListener citizensListener = new CitizensListener();
@@ -47,7 +47,7 @@ public class CitizensShops {
 		HandlerList.unregisterAll(pluginListener);
 	}
 
-	public CitizensShopObjectType getCitizensShopObjectType() {
+	public SKCitizensShopObjectType getCitizensShopObjectType() {
 		return citizensShopObjectType;
 	}
 
@@ -134,7 +134,7 @@ public class CitizensShops {
 	public Integer getNPCId(Entity entity) {
 		if (this.isEnabled()) {
 			NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
-			return npc != null ? npc.getId() : null;
+			return (npc != null ? npc.getId() : null);
 		} else {
 			return null;
 		}
@@ -162,8 +162,8 @@ public class CitizensShops {
 		ShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
 		List<Shopkeeper> forRemoval = new ArrayList<>();
 		for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
-			if (shopkeeper.getShopObject() instanceof CitizensShop) {
-				CitizensShop citizensShop = (CitizensShop) shopkeeper.getShopObject();
+			if (shopkeeper.getShopObject() instanceof SKCitizensShopObject) {
+				SKCitizensShopObject citizensShop = (SKCitizensShopObject) shopkeeper.getShopObject();
 				Integer npcId = citizensShop.getNpcId();
 				if (npcId == null) {
 					// npc wasn't created yet, which is only the case if a shopkeeper got somehow created without

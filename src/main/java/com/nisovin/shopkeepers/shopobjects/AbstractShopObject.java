@@ -28,7 +28,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	}
 
 	@Override
-	public abstract AbstractShopObjectType<?> getObjectType();
+	public abstract AbstractShopObjectType<?> getType();
 
 	public void load(ConfigurationSection configSection) {
 	}
@@ -44,7 +44,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	 *            the config section
 	 */
 	public void save(ConfigurationSection configSection) {
-		configSection.set("type", this.getObjectType().getIdentifier());
+		configSection.set("type", this.getType().getIdentifier());
 	}
 
 	/**

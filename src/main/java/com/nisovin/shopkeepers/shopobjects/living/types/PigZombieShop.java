@@ -8,17 +8,17 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShops;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
+import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 
-public class PigZombieShop extends LivingEntityShop {
+public class PigZombieShop extends SKLivingShopObject {
 
 	private boolean baby = false;
 
-	public PigZombieShop(	LivingEntityShops livingEntityShops, LivingEntityObjectType<PigZombieShop> livingObjectType,
+	public PigZombieShop(	LivingShops livingShops, SKLivingShopObjectType<PigZombieShop> livingObjectType,
 							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		super(livingEntityShops, livingObjectType, shopkeeper, creationData);
+		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class PigZombieShop extends LivingEntityShop {
 		assert super.getEntity().getType() == EntityType.PIG_ZOMBIE;
 		return (PigZombie) super.getEntity();
 	}
-	
+
 	// SUB TYPES
 
 	@Override

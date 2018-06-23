@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 
 import java.util.Iterator;
 
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
@@ -25,14 +24,14 @@ class SignShopListener implements Listener {
 
 	private final SKShopkeepersPlugin plugin;
 
-	private Location cancelNextBlockPhysicsLoc = null;
+	private Block cancelNextBlockPhysics = null;
 
 	SignShopListener(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
-	void cancelNextBlockPhysics(Location location) {
-		cancelNextBlockPhysicsLoc = location;
+	void cancelNextBlockPhysics(Block block) {
+		cancelNextBlockPhysics = block;
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
@@ -75,7 +74,7 @@ class SignShopListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	void onBlockPhysics(BlockPhysicsEvent event) {
 		Block block = event.getBlock();
-		if (cancelNextBlockPhysicsLoc != null && cancelNextBlockPhysicsLoc.equals(block.getLocation())) {
+		if (cancelNextBlockPhysics != null && cancelNextBlockPhysics.equals(block)) {
 			event.setCancelled(true);
 		} else {
 			if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperRegistry().getShopkeeperByBlock(block) != null) {
@@ -84,7 +83,7 @@ class SignShopListener implements Listener {
 		}
 	}
 
-	// TODO also listen to spigot's BlockExplodeEvent in 1.8?
+	// TODO also listen to spigot's BlockExplodeEvent (added in late 1.8)?
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	void onExplosion(EntityExplodeEvent event) {
 		Iterator<Block> iter = event.blockList().iterator();

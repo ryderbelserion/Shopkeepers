@@ -7,7 +7,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 
 public interface DefaultShopTypes {
 
-	public List<? extends ShopType<?>> getAllShopTypes();
+	public List<? extends ShopType<?>> getAll();
 
 	public ShopType<?> getAdminShopType();
 

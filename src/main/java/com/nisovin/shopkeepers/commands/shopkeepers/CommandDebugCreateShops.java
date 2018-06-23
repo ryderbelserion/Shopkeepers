@@ -51,7 +51,7 @@ class CommandDebugCreateShops extends PlayerCommand {
 		Location curSpawnLocation = player.getLocation();
 		for (int i = 0; i < shopCount; i++) {
 			plugin.handleShopkeeperCreation(ShopCreationData.create(player, DefaultShopTypes.ADMIN(),
-					DefaultShopObjectTypes.MOBS().getObjectType(EntityType.VILLAGER), curSpawnLocation.clone(), null));
+					DefaultShopObjectTypes.LIVING().get(EntityType.VILLAGER), curSpawnLocation.clone(), null));
 			curSpawnLocation.add(2, 0, 0);
 		}
 		player.sendMessage(ChatColor.GREEN + "Done!");

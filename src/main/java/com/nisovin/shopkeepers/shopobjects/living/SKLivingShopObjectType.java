@@ -7,20 +7,21 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObjectType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
-public abstract class LivingEntityObjectType<T extends LivingEntityShop> extends AbstractShopObjectType<T> {
+public abstract class SKLivingShopObjectType<T extends SKLivingShopObject> extends AbstractEntityShopObjectType<T> implements LivingShopObjectType<T> {
 
-	protected final LivingEntityShops livingEntityShops;
+	protected final LivingShops livingShops;
 	protected final EntityType entityType;
 	protected final List<String> aliases; // unmodifiable, not null, might be empty
 
-	protected LivingEntityObjectType(LivingEntityShops livingEntityShops, EntityType entityType, List<String> aliases, String identifier, String permission) {
+	protected SKLivingShopObjectType(LivingShops livingShops, EntityType entityType, List<String> aliases, String identifier, String permission) {
 		super(identifier, permission);
-		this.livingEntityShops = livingEntityShops;
+		this.livingShops = livingShops;
 		this.entityType = entityType;
 		assert entityType.isAlive();
 		assert aliases != null;
@@ -28,6 +29,7 @@ public abstract class LivingEntityObjectType<T extends LivingEntityShop> extends
 		this.aliases = aliases;
 	}
 
+	@Override
 	public EntityType getEntityType() {
 		return entityType;
 	}

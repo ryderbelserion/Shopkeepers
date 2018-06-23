@@ -28,8 +28,8 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShop;
-import com.nisovin.shopkeepers.shopobjects.sign.SignShop;
+import com.nisovin.shopkeepers.shopobjects.citizens.SKCitizensShopObject;
+import com.nisovin.shopkeepers.shopobjects.sign.SKSignShopObject;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.HiringHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
@@ -327,7 +327,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				// handle hiring:
 				// check if the player can hire (create) this type of shopkeeper:
 				if (Settings.hireRequireCreationPermission && (!this.getShopkeeper().getType().hasPermission(player)
-						|| !this.getShopkeeper().getShopObject().getObjectType().hasPermission(player))) {
+						|| !this.getShopkeeper().getShopObject().getType().hasPermission(player))) {
 					// missing permission to hire this type of shopkeeper:
 					Utils.sendMessage(player, Settings.msgCantHireShopType);
 					this.closeDelayed(player);
@@ -549,12 +549,12 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		this.ownerUUID = ownerUUID;
 		this.ownerName = ownerName;
 		// TODO do this in a more abstract way
-		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getObjectType() == DefaultShopObjectTypes.CITIZEN()) {
+		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN()) {
 			// update the npc's name:
-			((CitizensShop) this.getShopObject()).setName(ownerName);
-		} else if (this.getShopObject().getObjectType() == DefaultShopObjectTypes.SIGN()) {
+			((SKCitizensShopObject) this.getShopObject()).setName(ownerName);
+		} else if (this.getShopObject().getType() == DefaultShopObjectTypes.SIGN()) {
 			// update sign:
-			((SignShop) this.getShopObject()).updateSign();
+			((SKSignShopObject) this.getShopObject()).updateSign();
 		}
 	}
 

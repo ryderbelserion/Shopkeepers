@@ -33,10 +33,11 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
-import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShop;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
-import com.nisovin.shopkeepers.shopobjects.sign.SignShop;
+import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.util.Log;
 
@@ -359,8 +360,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		if (shopkeeper.needsSpawning() && !shopkeeper.isActive()) {
 			// deactivate shopkeeper by old shop object id, in case there is one:
 			if (this._deactivateShopkeeper(shopkeeper)) {
-				if (Settings.debug && shopkeeper.getShopObject() instanceof LivingEntityShop) {
-					LivingEntityShop livingShop = (LivingEntityShop) shopkeeper.getShopObject();
+				if (Settings.debug && shopkeeper.getShopObject() instanceof SKLivingShopObject) {
+					SKLivingShopObject livingShop = (SKLivingShopObject) shopkeeper.getShopObject();
 					LivingEntity oldEntity = livingShop.getEntity();
 					Log.debug("Old, active shopkeeper was found (unloading probably has been skipped earlier): "
 							+ (oldEntity == null ? "null" : (oldEntity.getUniqueId() + " | " + (oldEntity.isDead() ? "dead | " : "alive | ")
@@ -546,34 +547,37 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	@Override
 	public AbstractShopkeeper getShopkeeperByEntity(Entity entity) {
 		if (entity == null) return null;
-		// check if the entity is a living entity shopkeeper:
-		AbstractShopkeeper shopkeeper = this.getLivingEntityShopkeeper(entity);
-		if (shopkeeper != null) return shopkeeper;
-		// check if the entity is a citizens npc shopkeeper:
-		return this.getCitizensShopkeeper(entity);
+		for (ShopObjectType<?> shopObjectType : plugin.getShopObjectTypeRegistry().getRegisteredTypes()) {
+			if (shopObjectType instanceof AbstractEntityShopObjectType) {
+				String objectId = ((AbstractEntityShopObjectType<?>) shopObjectType).createObjectId(entity);
+				AbstractShopkeeper shopkeeper = this.getActiveShopkeeper(objectId);
+				if (shopkeeper != null) return shopkeeper;
+			}
+		}
+		return null;
 	}
 
-	public AbstractShopkeeper getLivingEntityShopkeeper(Entity entity) {
-		if (entity == null) return null;
-		return this.getActiveShopkeeper(LivingEntityShop.getId(entity));
-	}
-
-	public AbstractShopkeeper getCitizensShopkeeper(Entity entity) {
-		if (entity == null) return null;
-		Integer npcId = plugin.getCitizensShops().getNPCId(entity);
-		if (npcId == null) return null;
-		return this.getActiveShopkeeper(CitizensShop.getId(npcId));
+	@Override
+	public boolean isShopkeeper(Entity entity) {
+		return (this.getShopkeeperByEntity(entity) != null);
 	}
 
 	@Override
 	public AbstractShopkeeper getShopkeeperByBlock(Block block) {
 		if (block == null) return null;
-		return this.getActiveShopkeeper(SignShop.getId(block));
+		for (ShopObjectType<?> shopObjectType : plugin.getShopObjectTypeRegistry().getRegisteredTypes()) {
+			if (shopObjectType instanceof AbstractBlockShopObjectType) {
+				String objectId = ((AbstractBlockShopObjectType<?>) shopObjectType).createObjectId(block);
+				AbstractShopkeeper shopkeeper = this.getActiveShopkeeper(objectId);
+				if (shopkeeper != null) return shopkeeper;
+			}
+		}
+		return null;
 	}
 
 	@Override
-	public boolean isShopkeeper(Entity entity) {
-		return this.getShopkeeperByEntity(entity) != null;
+	public boolean isShopkeeper(Block block) {
+		return (this.getShopkeeperByBlock(block) != null);
 	}
 
 	@Override

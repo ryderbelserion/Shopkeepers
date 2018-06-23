@@ -66,7 +66,7 @@ class CommandCheck extends Command {
 		boolean listActive = context.has(ARGUMENT_ACTIVE);
 
 		Map<ChunkCoords, ? extends List<?>> shopsByChunk = shopkeeperRegistry.getAllShopkeepersByChunks();
-		LivingEntityAI livingEntityAI = plugin.getLivingEntityShops().getLivingEntityAI();
+		LivingEntityAI livingEntityAI = plugin.getLivingShops().getLivingEntityAI();
 
 		sender.sendMessage(ChatColor.YELLOW + "All shopkeepers:");
 		sender.sendMessage("  Total: " + shopkeeperRegistry.getAllShopkeepers().size());

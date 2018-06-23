@@ -23,7 +23,7 @@ public class SKDefaultShopTypes implements DefaultShopTypes {
 	}
 
 	@Override
-	public List<AbstractShopType<?>> getAllShopTypes() {
+	public List<AbstractShopType<?>> getAll() {
 		List<AbstractShopType<?>> shopTypes = new ArrayList<>();
 		shopTypes.add(adminShopType);
 		shopTypes.add(sellingPlayerShopType);

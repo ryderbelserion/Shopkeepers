@@ -9,17 +9,17 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShops;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
+import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 
-public class SheepShop extends LivingEntityShop {
+public class SheepShop extends SKLivingShopObject {
 
 	private DyeColor color = DyeColor.WHITE; // default white
 
-	public SheepShop(	LivingEntityShops livingEntityShops, LivingEntityObjectType<SheepShop> livingObjectType,
+	public SheepShop(	LivingShops livingShops, SKLivingShopObjectType<SheepShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		super(livingEntityShops, livingObjectType, shopkeeper, creationData);
+		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override

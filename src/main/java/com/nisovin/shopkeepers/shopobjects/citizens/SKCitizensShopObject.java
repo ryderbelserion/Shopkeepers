@@ -11,9 +11,10 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.shopobjects.citizens.CitizensShopObject;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.Log;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -23,20 +24,17 @@ import net.citizensnpcs.api.npc.NPC;
  * Note: This relies on the regular living entity shopkeeper interaction handling.
  * TODO separate this?
  */
-public class CitizensShop extends AbstractShopObject {
+public class SKCitizensShopObject extends AbstractEntityShopObject implements CitizensShopObject {
 
 	public static String CREATION_DATA_NPC_ID_KEY = "CitizensNpcId";
 
-	public static String getId(int npcId) {
-		return "NPC-" + npcId;
-	}
-
 	protected final CitizensShops citizensShops;
+	// TODO identify npc via unique id instead?
 	private Integer npcId = null;
 	// used by citizen shopkeeper traits: if false, this will not remove the npc on deletion:
 	private boolean destroyNPC = true;
 
-	protected CitizensShop(CitizensShops citizensShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	protected SKCitizensShopObject(CitizensShops citizensShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
 		this.citizensShops = citizensShops;
 		if (creationData != null) {
@@ -47,7 +45,7 @@ public class CitizensShop extends AbstractShopObject {
 	}
 
 	@Override
-	public CitizensShopObjectType getObjectType() {
+	public SKCitizensShopObjectType getType() {
 		return SKDefaultShopObjectTypes.CITIZEN();
 	}
 
@@ -133,6 +131,7 @@ public class CitizensShop extends AbstractShopObject {
 		return CitizensAPI.getNPCRegistry().getById(npcId);
 	}
 
+	@Override
 	public Entity getEntity() {
 		NPC npc = this.getNPC();
 		if (npc == null) return null;
@@ -146,7 +145,8 @@ public class CitizensShop extends AbstractShopObject {
 
 	@Override
 	public String getId() {
-		return (npcId == null ? null : getId(npcId));
+		if (npcId == null) return null;
+		return this.getType().createObjectId(npcId);
 	}
 
 	private Location getSpawnLocation() {

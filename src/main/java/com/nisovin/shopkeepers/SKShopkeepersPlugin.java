@@ -54,7 +54,7 @@ import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShops;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShops;
+import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.sign.SignShops;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
@@ -99,7 +99,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(this);
 
 	private final ProtectedChests protectedChests = new ProtectedChests(this);
-	private final LivingEntityShops livingEntityShops = new LivingEntityShops(this);
+	private final LivingShops livingShops = new LivingShops(this);
 	private final SignShops signShops = new SignShops(this);
 	private final CitizensShops citizensShops = new CitizensShops(this);
 
@@ -169,12 +169,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// DEFAULT SHOP TYPES
 
-		shopTypesRegistry.registerAll(defaultShopTypes.getAllShopTypes());
+		shopTypesRegistry.registerAll(defaultShopTypes.getAll());
 
 		// DEFAULT SHOP OBJECT TYPES
 
 		// enable living entity shops:
-		livingEntityShops.onEnable();
+		livingShops.onEnable();
 
 		// enable sign shops:
 		signShops.onEnable();
@@ -183,7 +183,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		citizensShops.onEnable();
 
 		// register default shop object types:
-		shopObjectTypesRegistry.registerAll(defaultShopObjectTypes.getAllObjectTypes());
+		shopObjectTypesRegistry.registerAll(defaultShopObjectTypes.getAll());
 
 		//
 
@@ -260,7 +260,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopkeeperRegistry.despawnAllShopkeepers();
 
 		// disable living entity shops:
-		livingEntityShops.onDisable();
+		livingShops.onDisable();
 
 		// disable sign shops:
 		signShops.onDisable();
@@ -381,8 +381,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// LIVING ENTITY SHOPS
 
-	public LivingEntityShops getLivingEntityShops() {
-		return livingEntityShops;
+	public LivingShops getLivingShops() {
+		return livingShops;
 	}
 
 	// SIGN SHOPS
@@ -432,7 +432,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	 */
 	public AbstractShopObjectType<?> getDefaultShopObjectType() {
 		// default: villager entity shop object type:
-		return this.getDefaultShopObjectTypes().getLivingEntityObjectTypes().getObjectType(EntityType.VILLAGER);
+		return this.getDefaultShopObjectTypes().getLivingShopObjectTypes().get(EntityType.VILLAGER);
 	}
 
 	// SHOPKEEPER NAMING

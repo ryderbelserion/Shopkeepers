@@ -10,18 +10,18 @@ import org.bukkit.material.Wool;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityObjectType;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShop;
-import com.nisovin.shopkeepers.shopobjects.living.LivingEntityShops;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
+import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.util.Log;
 
-public class VillagerShop extends LivingEntityShop {
+public class VillagerShop extends SKLivingShopObject {
 
 	private Profession profession = Profession.FARMER;
 
-	public VillagerShop(LivingEntityShops livingEntityShops, LivingEntityObjectType<VillagerShop> livingObjectType,
+	public VillagerShop(LivingShops livingShops, SKLivingShopObjectType<VillagerShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		super(livingEntityShops, livingObjectType, shopkeeper, creationData);
+		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
 	@Override
