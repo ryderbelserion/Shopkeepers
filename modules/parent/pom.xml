@@ -6,7 +6,7 @@
 	<artifactId>sk-parent</artifactId>
 	<packaging>pom</packaging>
 	<name>SK Parent</name>
-	<version>2.1.1-SNAPSHOT</version>
+	<version>2.2.0</version>
 	<url>${shopkeepers.repository.url}</url>
 
 	<properties>

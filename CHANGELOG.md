@@ -4,6 +4,18 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.2.0 (2018-06-29)
+### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
+* Various changes (and minor internal fixes) related to commands.
+  * Displayed command names and aliases don't get formatted into lower case anymore (matching still uses the lower case version).
+* API: Minor renaming of a few permission names (only affects the API, the actual permissions are still the same).
+* API: Various changes and additions related to shop object types.
+  * It is now possible to differentiate between entity and block shop object types, and to get the entity that is currently representing a shopkeeper.
+  * Renamed ShopObject#getObjectType() to ShopObject#getType().
+  * A few internal shop object ids have changes to be slightly more consistent.
+
+Since there have been no reported issues with the previous beta versions, I mark this version as 'release' to get a few more people to use this new version. If you are updating, please read through the changelogs of the previous beta versions! They also contain updating hints (ex. regarding changed messages). The easiest way to update your config and messages is to remove it and let the plugin regenerate it, and then re-apply you custom changes.
+
 ## v2.1.0 Beta (2018-06-18)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
 **Major internal changes to the way shopkeepers get created and their data gets saved:**
