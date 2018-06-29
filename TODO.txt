@@ -38,6 +38,9 @@ Low priority:
 * rename registry#getShopkeeperByBlock() to getShopkeeperBySignBlock or similar?
 * properly separate loading/unloading from activation/deactivation in debug messages/method names/etc
 
+* Rename ShopkeeperRegistry and ShopkeeperStorage to ShopkeepersRegistry and ShopkeepersStorage?
+  * Another major api break though.. maybe do this with the next larger API changes.
+
 Ideas:
 * Per-Trade/Shopkeeper settings, maybe via written books:<br>
   -> by adding another row to the shopkeeper-editor inventory window each trade option and shopkeeper could have a slot for a written-book<br>
