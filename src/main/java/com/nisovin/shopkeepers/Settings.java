@@ -5,6 +5,7 @@ import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
@@ -418,6 +419,18 @@ public class Settings {
 
 		// validation:
 
+		boolean foundInvalidEntityType = false;
+		for (String entityTypeId : enabledLivingShops) {
+			EntityType entityType = matchEntityType(entityTypeId);
+			if (entityType == null || !entityType.isAlive() || !entityType.isSpawnable()) {
+				foundInvalidEntityType = true;
+				Log.warning("Config: Invalid living entity type name in 'enabled-living-shops': " + entityTypeId);
+			}
+		}
+		if (foundInvalidEntityType) {
+			Log.warning("Config: All existing entity type names can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html");
+		}
+
 		if (maxChestDistance > 50) {
 			Log.warning("Config: 'max-chest-distance' can be at most 50.");
 			maxChestDistance = 50;
@@ -611,5 +624,17 @@ public class Settings {
 			}
 		}
 		return maxShops;
+	}
+
+	public static EntityType matchEntityType(String entityTypeId) {
+		if (StringUtils.isEmpty(entityTypeId)) return null;
+		// get by bukkit id:
+		String normalizedEntityTypeId = entityTypeId.trim().toUpperCase(Locale.ROOT).replace('-', '_').replace(' ', '_');
+		try {
+			return EntityType.valueOf(normalizedEntityTypeId);
+		} catch (IllegalArgumentException e) {
+			// unknown entity type:
+			return null;
+		}
 	}
 }

@@ -103,16 +103,9 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	public SKLivingShopObjectTypes(LivingShops livingShops) {
 		this.livingShops = livingShops;
 		// first, create the enabled living object types, in the same order as specified in the config:
-		for (String enabledEntityType : Settings.enabledLivingShops) {
-			if (enabledEntityType == null) continue; // just in case
-			EntityType entityType;
-			try {
-				entityType = EntityType.valueOf(enabledEntityType);
-			} catch (IllegalArgumentException e) {
-				// unknown entity type:
-				continue;
-			}
-			if (entityType != null && entityType.isAlive() && entityType.isSpawnable()) {
+		for (String entityTypeId : Settings.enabledLivingShops) {
+			EntityType entityType = Settings.matchEntityType(entityTypeId);
+			if (entityType != null && entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType)) {
 				// not using aliases (yet?)
 				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, getAliases(entityType)));
 			}
