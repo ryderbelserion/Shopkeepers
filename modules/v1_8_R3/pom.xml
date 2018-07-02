@@ -13,7 +13,9 @@
 	<name>SK for v1_8_R3</name>
 
 	<properties>
-		<craftbukkit.version>1.8.4-R0.1-SNAPSHOT</craftbukkit.version>
+		<!-- 1.8.4 was the first 1_8_R3 version, but only 1.8.8 is contained in the repository -->
+		<!-- <craftbukkit.version>1.8.4-R0.1-SNAPSHOT</craftbukkit.version> -->
+		<craftbukkit.version>1.8.8-R0.1-SNAPSHOT</craftbukkit.version>
 	</properties>
 
 	<dependencies>
