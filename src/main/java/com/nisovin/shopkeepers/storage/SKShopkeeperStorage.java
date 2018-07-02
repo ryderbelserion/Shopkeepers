@@ -125,6 +125,20 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		return plugin.getShopkeeperRegistry();
 	}
 
+	public int getDirtyCount() {
+		int dirtyShopkeepersCount = 0;
+		for (AbstractShopkeeper shopkeeper : this.getShopkeeperRegistry().getAllShopkeepers()) {
+			if (shopkeeper.isDirty()) {
+				dirtyShopkeepersCount++;
+			}
+		}
+		return dirtyShopkeepersCount;
+	}
+
+	public int getUnsavedDeletedCount() {
+		return deletedShopkeepersCount;
+	}
+
 	public void disableSaving() {
 		this.savingDisabled = true;
 	}

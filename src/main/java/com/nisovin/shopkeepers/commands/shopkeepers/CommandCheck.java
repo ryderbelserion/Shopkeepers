@@ -70,6 +70,11 @@ class CommandCheck extends Command {
 
 		sender.sendMessage(ChatColor.YELLOW + "All shopkeepers:");
 		sender.sendMessage("  Total: " + shopkeeperRegistry.getAllShopkeepers().size());
+		sender.sendMessage("  Unsaved dirty | deleted | dirty storage: "
+				+ plugin.getShopkeeperStorage().getDirtyCount()
+				+ " | " + plugin.getShopkeeperStorage().getUnsavedDeletedCount()
+				+ " | " + plugin.getShopkeeperStorage().isDirty());
+		sender.sendMessage("  Unsaved deleted: " + plugin.getShopkeeperStorage().getUnsavedDeletedCount());
 		sender.sendMessage("  Total chunks with shopkeepers: " + shopsByChunk.size());
 		sender.sendMessage("  Active: " + shopkeeperRegistry.getActiveShopkeepers().size());
 		sender.sendMessage("  Active with AI: " + livingEntityAI.getEntityCount());
