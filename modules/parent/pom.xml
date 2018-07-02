@@ -6,10 +6,11 @@
 	<artifactId>sk-parent</artifactId>
 	<packaging>pom</packaging>
 	<name>SK Parent</name>
-	<version>2.2.2-SNAPSHOT</version>
+	<version>${revision}</version>
 	<url>${shopkeepers.repository.url}</url>
 
 	<properties>
+		<revision>2.2.2-SNAPSHOT</revision>
 		<root.relativePath>../..</root.relativePath>
 		<shopkeepers.version>${project.version}</shopkeepers.version>
 		<shopkeepers.dbo.url>http://dev.bukkit.org/server-mods/shopkeepers/</shopkeepers.dbo.url>
