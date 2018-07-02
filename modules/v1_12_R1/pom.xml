@@ -13,7 +13,7 @@
 	<name>SK for v1_12_R1</name>
 
 	<properties>
-		<craftbukkit.version>1.12-pre2-SNAPSHOT</craftbukkit.version>
+		<craftbukkit.version>1.12-R0.1-SNAPSHOT</craftbukkit.version>
 	</properties>
 
 	<dependencies>
