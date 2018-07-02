@@ -144,6 +144,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	}
 
 	private SKLivingShopObjectType<?> createLivingEntityObjectType(EntityType entityType, List<String> aliases) {
+		// this determines the permission name, the actual used type name will be further normalized however:
 		String typeName = entityType.name().toLowerCase(Locale.ROOT);
 		String permission = "shopkeeper.entity." + typeName;
 

@@ -33,6 +33,7 @@ import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 /**
@@ -209,13 +210,30 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		}
 
 		// convert legacy object identifiers:
-		if (objectTypeId != null && objectTypeId.equalsIgnoreCase("block")) {
-			objectTypeId = "sign";
+		if (objectTypeId != null) {
+			// 'block' -> 'sign'
+			if (objectTypeId.equalsIgnoreCase("block")) {
+				objectTypeId = "sign";
+				this.markDirty();
+			}
+			// normalize:
+			String normalizedOjectTypeId = StringUtils.normalize(objectTypeId);
+			if (!normalizedOjectTypeId.equals(objectTypeId)) {
+				objectTypeId = normalizedOjectTypeId;
+				this.markDirty();
+			}
 		}
 
 		AbstractShopObjectType<?> objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(objectTypeId);
 		if (objectType == null) {
-			throw new ShopkeeperCreateException("Invalid object type for shopkeeper '" + id + "': " + objectTypeId);
+			// couldn't find object type by id, try to find object type via matching:
+			objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().match(objectTypeId);
+			if (objectType != null) {
+				// mark dirty, so the correct id gets saved:
+				this.markDirty();
+			} else {
+				throw new ShopkeeperCreateException("Invalid object type for shopkeeper '" + id + "': " + objectTypeId);
+			}
 		}
 
 		this.shopObject = objectType.createObject(this, null);
