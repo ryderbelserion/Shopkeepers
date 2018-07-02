@@ -60,7 +60,7 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject> exten
 	@Override
 	protected void onSelect(Player player) {
 		// TODO translation support for the entity type name?
-		Utils.sendMessage(player, Settings.msgSelectedLivingShop, "{type}", entityType.name());
+		Utils.sendMessage(player, Settings.msgSelectedLivingShop, "{type}", StringUtils.normalize(entityType.name()));
 	}
 
 	@Override
