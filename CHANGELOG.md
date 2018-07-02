@@ -4,6 +4,15 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.2.1 (2018-07-02)
+### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
+* Fixed: Some internal shop object ids have slightly changed in the save data. This update is able to load and convert those old ids.
+* Added config validation for enabled living shop types and improved entity type matching.
+* Changed: Using the normalized entity type name in the 'selected shop object type' messages.
+* Debugging: Added some storage debugging output to the 'check' command.
+
+If you are updating, please read through the changelogs of the previous few versions! They also contain updating hints (ex. regarding changed messages).
+
 ## v2.2.0 (2018-06-29)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
 * Various changes (and minor internal fixes) related to commands.
