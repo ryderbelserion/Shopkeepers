@@ -14,21 +14,15 @@ commands:
         usage: 'Unknown command! Try /<command> help'
 
 permissions:
-# Commands:
+    # Command permissions:
     shopkeeper.help:
-        description: Display command help.
-        default: true
-    shopkeeper.trade:
-        description: Trade with any shopkeeper
+        description: Display command help
         default: true
     shopkeeper.reload:
         description: Reload the plugin
         default: op
     shopkeeper.debug:
-        description: Toggles debug mode
-        default: op
-    shopkeeper.bypass:
-        description: Bypass player shop restrictions
+        description: Toggle debug mode and access debugging commands
         default: op
     shopkeeper.list.own:
         description: List your own player shops
@@ -52,39 +46,51 @@ permissions:
         description: Remove all admin shops via command
         default: op
     shopkeeper.remote:
-        description: Trade with a remote admin shop by name
+        description: Remotely open admin shops via command
         default: op
     shopkeeper.transfer:
-        description: Transfer ownership of a shopkeeper
+        description: Transfer ownership of player shops
         default: op
     shopkeeper.settradeperm:
-        description: Set the trade permissions for admin shopkeepers
+        description: Set the trade permissions for admin shops
         default: op
     shopkeeper.setforhire:
         description: Set a shopkeeper to be for hire
         default: op
-    shopkeeper.hire:
-        description: Hire a shopkeeper
-        default: true
 
-# Shop types:
+    # General permissions
+    shopkeeper.trade:
+        description: Allows trading with shopkeepers
+        default: true
+    shopkeeper.hire:
+        description: Allows hiring of shopkeepers
+        default: true
+    shopkeeper.bypass:
+        description: Bypass player shop restrictions (access player shops of others)
+        default: op
+    # Dynamic max shops permissions: The default max shops limit is configured in the config.
+    # shopkeeper.maxshops.<count>
+    #   description: The maximum number of shops a player can have, only values setup in the config can be used
+    #   default: false
+
+    # Shop types:
     shopkeeper.admin:
         description: Create and modify admin shopkeepers
         default: op
     shopkeeper.player.sell:
-        description: Create and modify selling player shopkeepers
+        description: Create selling player shopkeepers
         default: false
     shopkeeper.player.buy:
-        description: Create and modify buying player shopkeepers
+        description: Create buying player shopkeepers
         default: false
     shopkeeper.player.trade:
-        description: Create and modify trading player shopkeepers
+        description: Create trading player shopkeepers
         default: false
     shopkeeper.player.book:
-        description: Create and modify books selling player shopkeepers
+        description: Create books selling player shopkeepers
         default: false
     shopkeeper.player:
-        description: Create and modify any player shopkeeper
+        description: Create any type of player shopkeeper
         default: true
         children:
             shopkeeper.player.sell: true
@@ -92,18 +98,25 @@ permissions:
             shopkeeper.player.trade: true
             shopkeeper.player.book: true
 
-# Shop objects:
+    # Shop objects:
     shopkeeper.sign:
         description: Create sign shopkeepers
         default: true
     shopkeeper.citizen:
-        description: Create citizens shopkeepers
+        description: Create citizens (npc) shopkeepers
         default: op
     shopkeeper.entity.*:
         description: Create shopkeepers of any entity types
         default: op
+    # Dynamic mob type permissions:
+    # You can find all entity type names here:
+    # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
+    # The permissions use the lower case entity type name.
+    # shopkeeper.entity.<mob-type>:
+    #   description: Create shopkeepers of the specified mob type
+    #   default: false
 
-# Legacy permissions:
+    # Legacy permissions:
     shopkeeper.player.normal:
         description: Create and modify selling player shopkeepers
         default: true
@@ -125,16 +138,14 @@ permissions:
         children:
             shopkeeper.entity.creeper: true
 
-# Star notation:
+    # Star notation: Includes all other permissions
     shopkeeper.*:
         description: Access to everything
         default: op
         children:
             shopkeeper.help: true
-            shopkeeper.trade: true
             shopkeeper.reload: true
             shopkeeper.debug: true
-            shopkeeper.bypass: true
             shopkeeper.list.own: true
             shopkeeper.list.others: true
             shopkeeper.list.admin: true
@@ -147,6 +158,8 @@ permissions:
             shopkeeper.settradeperm: true
             shopkeeper.setforhire: true
             shopkeeper.hire: true
+            shopkeeper.trade: true
+            shopkeeper.bypass: true
             shopkeeper.admin: true
             shopkeeper.player: true
             shopkeeper.sign: true
