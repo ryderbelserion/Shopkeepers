@@ -77,7 +77,6 @@
 									<groupId>${project.groupId}</groupId>
 									<artifactId>ShopkeepersAPI</artifactId>
 									<version>${project.version}</version>
-									
 								</artifactItem>
 							</artifactItems>
 						</configuration>
@@ -150,6 +149,14 @@
 			<artifactId>sk-main</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
+		<!-- Dependency on the root project, so this build runs last -->
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>sk-root</artifactId>
+			<version>${project.version}</version>
+			<type>pom</type>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
