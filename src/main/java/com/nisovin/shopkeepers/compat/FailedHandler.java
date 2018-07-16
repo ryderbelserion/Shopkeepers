@@ -37,12 +37,10 @@ public final class FailedHandler implements NMSCallProvider {
 	private final Method nmsOpenTradeMethod;
 
 	private final Class<?> nmsEntityClass;
+	private final Method nmsGetBukkitEntityMethod;
 	private final Method nmsGetWorldMethod;
 	private final Field nmsNoclipField;
 	private final Field nmsOnGroundField;
-
-	private final Class<?> nmsEntityInsentientClass;
-	private final Method nmsSetCustomNameMethod;
 
 	private final Class<?> nmsMerchantRecipeListClass;
 
@@ -123,9 +121,6 @@ public final class FailedHandler implements NMSCallProvider {
 		nmsOpenTradeMethod = nmsEntityHumanClass.getDeclaredMethod("openTrade", nmsIMerchantClass);
 		nmsOpenTradeMethod.setAccessible(true);
 
-		nmsEntityInsentientClass = Class.forName(nmsPackageString + "EntityInsentient");
-		nmsSetCustomNameMethod = nmsEntityInsentientClass.getMethod("setCustomName", String.class);
-
 		nmsItemStackClass = Class.forName(nmsPackageString + "ItemStack");
 		nmsGetTagMethod = nmsItemStackClass.getDeclaredMethod("getTag");
 
@@ -143,6 +138,7 @@ public final class FailedHandler implements NMSCallProvider {
 		nmsMerchantRecipeListClass = Class.forName(nmsPackageString + "MerchantRecipeList");
 
 		nmsEntityClass = Class.forName(nmsPackageString + "Entity");
+		nmsGetBukkitEntityMethod = nmsEntityClass.getDeclaredMethod("getBukkitEntity");
 		nmsGetWorldMethod = nmsEntityClass.getDeclaredMethod("getWorld");
 		nmsNoclipField = nmsEntityClass.getDeclaredField("noclip");
 		nmsNoclipField.setAccessible(true);
@@ -197,7 +193,13 @@ public final class FailedHandler implements NMSCallProvider {
 			Object mcWorld = nmsGetWorldMethod.invoke(mcPlayer);
 			Object villager = nmsEntityVillagerConstructor.newInstance(mcWorld);
 			if (title != null && !title.isEmpty()) {
-				nmsSetCustomNameMethod.invoke(villager, title);
+				try {
+					Entity bukkitVillager = (Entity) nmsGetBukkitEntityMethod.invoke(villager);
+					bukkitVillager.setCustomName(title);
+				} catch (Exception e) {
+					// log but ignore:
+					e.printStackTrace();
+				}
 			}
 
 			List<?> recipeList = (List<?>) nmsRecipeListField.get(villager);
