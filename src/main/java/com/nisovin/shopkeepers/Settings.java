@@ -338,8 +338,9 @@ public class Settings {
 
 		// perform config migrations:
 		int configVersion = config.getInt("config-version");
-		if (configVersion <= 1) {
+		if (configVersion <= 0) {
 			migrateConfig_0_to_1(config);
+			configChanged = true;
 		}
 
 		// exempt a few string / string list settings from color conversion:
@@ -480,7 +481,7 @@ public class Settings {
 
 		// shop creation item:
 		Material shopCreationItem = loadMaterial(config, "shop-creation-item", true);
-		if (shopCreationItem != null && shopCreationItem.isLegacy()) {
+		if (shopCreationItem != null) {
 			String shopCreationItemSpawnEggEntityType = config.getString("shop-creation-item-spawn-egg-entity-type");
 			if (shopCreationItem == Material.LEGACY_MONSTER_EGG && !StringUtils.isEmpty(shopCreationItemSpawnEggEntityType)) {
 				// migrate spawn egg (ignores the data value): spawn eggs are different materials now
@@ -494,13 +495,17 @@ public class Settings {
 				if (newShopCreationItem == null) {
 					// fallback to default:
 					newShopCreationItem = Material.VILLAGER_SPAWN_EGG;
-					Log.warning("Could not migrate 'shop-creation-item': Unknown type of spawn egg '" + shopCreationItemSpawnEggEntityType
+					Log.warning("  Could not migrate 'shop-creation-item': Unknown type of spawn egg '" + shopCreationItemSpawnEggEntityType
 							+ "'. Using '" + Material.VILLAGER_SPAWN_EGG + "' now.");
 				}
 
 				Log.info("  Migrating 'shop-creation-item' from '" + shopCreationItem + "' to '" + newShopCreationItem.name() + "'.");
 				Log.info("  Removing 'shop-creation-item-spawn-egg-entity-type' (previously '" + shopCreationItemSpawnEggEntityType + "').");
 				config.set("shop-creation-item-spawn-egg-entity-type", null);
+				if (config.isSet("shop-creation-item-data")) {
+					Log.info("  Removing 'shop-creation-item-data' (previously '" + config.getInt("shop-creation-item-data") + "').");
+					config.set("shop-creation-item-data", null);
+				}
 				config.set("shop-creation-item", newShopCreationItem.name());
 			} else {
 				migrateLegacyItemData(config, "shop-creation-item", "shop-creation-item", "shop-creation-item-data", Material.VILLAGER_SPAWN_EGG);
@@ -541,19 +546,21 @@ public class Settings {
 		// convert legacy material + data value to new material:
 		Material itemType = loadMaterial(config, itemTypeKey, true);
 		// only migrate if present and legacy type:
-		if (itemType != null && itemType.isLegacy()) {
+		if (itemType != null) {
 			int itemData = config.getInt(itemDataKey);
 			Material newItemType = LegacyConversion.fromLegacy(itemType, (byte) itemData);
 			if (newItemType == null || newItemType == Material.AIR) {
 				// fallback to default:
 				newItemType = defaultType;
-				Log.warning("Could not migrate '" + migratedItemId + "' from type '" + itemType + "' and data value '" + itemData
+				Log.warning("  Could not migrate '" + migratedItemId + "' from type '" + itemType + "' and data value '" + itemData
 						+ "'. Using '" + defaultType + "' now.");
 			}
 
 			Log.info("  Converting '" + migratedItemId + "' from type '" + itemType + "' and data value '" + itemData + "' to type '" + newItemType.name() + "'.");
-			Log.info("  Removing '" + itemDataKey + "' (previously '" + itemData + "').");
-			config.set(itemDataKey, null);
+			if (config.isSet(itemDataKey)) {
+				Log.info("  Removing '" + itemDataKey + "' (previously '" + itemData + "').");
+				config.set(itemDataKey, null);
+			}
 			config.set(itemTypeKey, (newItemType != null ? newItemType.name() : null));
 			return true;
 		}
