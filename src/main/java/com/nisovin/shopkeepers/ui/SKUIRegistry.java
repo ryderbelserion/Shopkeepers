@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -23,8 +24,8 @@ import com.nisovin.shopkeepers.util.Log;
 public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implements UIRegistry<AbstractUIType> {
 
 	private final ShopkeepersPlugin plugin;
-	// player name -> ui session
-	private final Map<String, SKUISession> playerSessions = new HashMap<>();
+	// player id -> ui session
+	private final Map<UUID, SKUISession> playerSessions = new HashMap<>();
 	private UIListener uiListener = null;
 
 	public SKUIRegistry(ShopkeepersPlugin plugin) {
@@ -89,7 +90,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 			Log.debug("UI '" + uiIdentifier + "' opened.");
 			// old window already should automatically have been closed by the new window.. no need currently, to do
 			// that here
-			playerSessions.put(playerName, new SKUISession(shopkeeper, uiHandler));
+			playerSessions.put(player.getUniqueId(), new SKUISession(shopkeeper, uiHandler));
 			return true;
 		} else {
 			Log.debug("UI '" + uiIdentifier + "' NOT opened!");
@@ -100,7 +101,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	@Override
 	public SKUISession getSession(Player player) {
 		Validate.notNull(player, "Player is null!");
-		return playerSessions.get(player.getName());
+		return playerSessions.get(player.getUniqueId());
 	}
 
 	@Override
@@ -112,20 +113,20 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	@Override
 	public void onInventoryClose(Player player) {
 		if (player == null) return;
-		playerSessions.remove(player.getName());
+		playerSessions.remove(player.getUniqueId());
 	}
 
 	@Override
 	public void closeAll(Shopkeeper shopkeeper) {
 		if (shopkeeper == null) return;
 		assert shopkeeper != null;
-		Iterator<Entry<String, SKUISession>> iter = playerSessions.entrySet().iterator();
+		Iterator<Entry<UUID, SKUISession>> iter = playerSessions.entrySet().iterator();
 		while (iter.hasNext()) {
-			Entry<String, SKUISession> entry = iter.next();
+			Entry<UUID, SKUISession> entry = iter.next();
 			UISession session = entry.getValue();
 			if (session.getShopkeeper().equals(shopkeeper)) {
 				iter.remove();
-				Player player = Bukkit.getPlayerExact(entry.getKey());
+				Player player = Bukkit.getPlayer(entry.getKey());
 				if (player != null) {
 					player.closeInventory();
 				}
@@ -152,8 +153,8 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 
 	@Override
 	public void closeAll() {
-		for (String playerName : playerSessions.keySet()) {
-			Player player = Bukkit.getPlayerExact(playerName);
+		for (UUID playerId : playerSessions.keySet()) {
+			Player player = Bukkit.getPlayer(playerId);
 			if (player != null) {
 				player.closeInventory();
 			}

@@ -8,10 +8,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
 
 /**
  * Stores information about an item stack being sold or bought for a certain price.
@@ -45,13 +42,8 @@ public class PriceOffer {
 		int id = 0;
 		for (PriceOffer offer : offers) {
 			ItemStack item = offer.getItem(); // is a clone
-			// TODO temporary, due to a bukkit bug custom head item can currently not be saved
-			if (Settings.skipCustomHeadSaving && ItemUtils.isCustomHeadItem(item)) {
-				Log.warning("Skipping saving of trade involving a head item with custom texture, which cannot be saved currently due to a bukkit bug.");
-				continue;
-			}
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
-			ItemUtils.saveItem(offerSection, "item", item);
+			offerSection.set("item", item);
 			offerSection.set("price", offer.getPrice());
 			id++;
 		}
@@ -64,7 +56,7 @@ public class PriceOffer {
 			for (String id : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(id);
 				if (offerSection == null) continue; // invalid offer: not a section
-				ItemStack item = ItemUtils.loadItem(offerSection, "item");
+				ItemStack item = offerSection.getItemStack("item");
 				int price = offerSection.getInt("price");
 				if (ItemUtils.isEmpty(item) || price <= 0) continue; // invalid offer
 				offers.add(new PriceOffer(item, price));
@@ -104,12 +96,6 @@ public class PriceOffer {
 				if (item != null) {
 					// legacy: the amount was stored separately from the item
 					item.setAmount(offerSection.getInt("amount", 1));
-					if (offerSection.contains("attributes")) {
-						String attributes = offerSection.getString("attributes");
-						if (attributes != null && !attributes.isEmpty()) {
-							item = NMSManager.getProvider().loadItemAttributesFromString(item, attributes);
-						}
-					}
 				}
 				int price = offerSection.getInt("cost");
 				if (ItemUtils.isEmpty(item) || price <= 0) continue; // invalid offer

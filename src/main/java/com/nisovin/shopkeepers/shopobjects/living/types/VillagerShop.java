@@ -1,19 +1,19 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
-import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Wool;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
-import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class VillagerShop extends SKLivingShopObject {
 
@@ -32,6 +32,7 @@ public class VillagerShop extends SKLivingShopObject {
 		String professionInput;
 		if (configSection.isInt("prof")) {
 			// import from pre 1.10 profession ids:
+			// TODO remove this again at some point
 			int profId = configSection.getInt("prof");
 			professionInput = String.valueOf(profId);
 			this.profession = getProfessionFromOldId(profId);
@@ -43,7 +44,7 @@ public class VillagerShop extends SKLivingShopObject {
 		// validate:
 		if (!isVillagerProfession(profession)) {
 			// fallback:
-			Log.warning("Missing or invalid villager profession '" + professionInput
+			Log.warning("Missing or invalid villager profession '" + professionInput + "' for shopkeeper " + shopkeeper.getId()
 					+ "'. Using '" + Profession.FARMER + "' now.");
 			this.profession = Profession.FARMER;
 			shopkeeper.markDirty();
@@ -73,53 +74,33 @@ public class VillagerShop extends SKLivingShopObject {
 
 	@Override
 	public ItemStack getSubTypeItem() {
-		return new Wool(this.getProfessionWoolColor()).toItemStack(1);
+		switch (profession) {
+		case FARMER:
+			return new ItemStack(Material.BROWN_WOOL, 1);
+		case LIBRARIAN:
+			return new ItemStack(Material.WHITE_WOOL, 1);
+		case PRIEST:
+			return new ItemStack(Material.MAGENTA_WOOL, 1);
+		case BLACKSMITH:
+			return new ItemStack(Material.GRAY_WOOL, 1);
+		case BUTCHER:
+			return new ItemStack(Material.LIGHT_GRAY_WOOL, 1);
+		case NITWIT:
+			return new ItemStack(Material.GREEN_WOOL, 1);
+		default:
+			// unknown profession:
+			return new ItemStack(Material.RED_WOOL, 1);
+		}
 	}
 
 	@Override
 	public void cycleSubType() {
 		shopkeeper.markDirty();
-		this.profession = this.getNextVillagerProfession();
+		profession = Utils.getNextEnumConstant(Profession.class, profession, (profession) -> {
+			return isVillagerProfession(profession);
+		});
+		assert profession != null;
 		this.applySubType();
-	}
-
-	private DyeColor getProfessionWoolColor() {
-		switch (profession) {
-		case FARMER:
-			return DyeColor.BROWN;
-		case LIBRARIAN:
-			return DyeColor.WHITE;
-		case PRIEST:
-			return DyeColor.MAGENTA;
-		case BLACKSMITH:
-			return DyeColor.GRAY;
-		case BUTCHER:
-			return DyeColor.SILVER;
-		default:
-			// TODO update this once we only support MC 1.11 upwards
-			if (profession.name().equals("NITWIT")) {
-				return DyeColor.GREEN;
-			}
-			// unknown profession:
-			return DyeColor.RED;
-		}
-	}
-
-	private Profession getNextVillagerProfession() {
-		Profession[] professions = Profession.values();
-		int id = profession.ordinal();
-		while (true) {
-			id += 1;
-			if (id >= professions.length) {
-				id = 0;
-			}
-			Profession nextProfession = professions[id];
-			if (isVillagerProfession(nextProfession)) {
-				return nextProfession;
-			} else {
-				continue;
-			}
-		}
 	}
 
 	// pre 1.10 ids:
@@ -152,14 +133,8 @@ public class VillagerShop extends SKLivingShopObject {
 
 	private static boolean isVillagerProfession(Profession profession) {
 		if (profession == null) return false;
-		if (profession.ordinal() >= Profession.FARMER.ordinal()
-				&& profession.ordinal() <= Profession.BUTCHER.ordinal()) {
-			return true;
-		}
-		// TODO: update this once we only support MC 1.11 upwards
-		if (profession.name().equals("NITWIT")) {
-			return true;
-		}
-		return false;
+		// TODO update this once all legacy zombie profession got removed
+		return (profession.ordinal() >= Profession.FARMER.ordinal()
+				&& profession.ordinal() <= Profession.NITWIT.ordinal());
 	}
 }

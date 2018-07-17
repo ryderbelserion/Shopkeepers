@@ -32,7 +32,7 @@ class CommandCheckItem extends PlayerCommand {
 		assert (input.getSender() instanceof Player);
 		Player player = (Player) input.getSender();
 
-		ItemStack inHand = player.getItemInHand();
+		ItemStack inHand = player.getInventory().getItemInMainHand();
 		int holdSlot = player.getInventory().getHeldItemSlot();
 		ItemStack nextItem = player.getInventory().getItem(holdSlot == 8 ? 0 : holdSlot + 1);
 

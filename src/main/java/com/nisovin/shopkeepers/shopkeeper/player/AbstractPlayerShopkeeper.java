@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -503,15 +504,16 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	@Override
 	public void onPlayerInteraction(Player player) {
 		// naming via item:
-		ItemStack itemInHand = player.getItemInHand();
-		if (Settings.namingOfPlayerShopsViaItem && Settings.isNamingItem(itemInHand)) {
+		PlayerInventory playerInventory = player.getInventory();
+		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
+		if (Settings.namingOfPlayerShopsViaItem && Settings.isNamingItem(itemInMainHand)) {
 			// check if player can edit this shopkeeper:
 			PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUITypes.EDITOR());
 			if (editorHandler.canOpen(player)) {
 				// rename with the player's item in hand:
 				String newName;
 				ItemMeta itemMeta;
-				if (!itemInHand.hasItemMeta() || (itemMeta = itemInHand.getItemMeta()) == null || !itemMeta.hasDisplayName()) {
+				if (!itemInMainHand.hasItemMeta() || (itemMeta = itemInMainHand.getItemMeta()) == null || !itemMeta.hasDisplayName()) {
 					newName = "";
 				} else {
 					newName = itemMeta.getDisplayName();
@@ -521,8 +523,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				if (SKShopkeepersPlugin.getInstance().getShopkeeperNaming().requestNameChange(player, this, newName)) {
 					// manually remove rename item from player's hand after this event is processed:
 					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-						ItemStack newItemInHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
-						player.setItemInHand(newItemInHand);
+						ItemStack newItemInMainHand = ItemUtils.descreaseItemAmount(itemInMainHand, 1);
+						playerInventory.setItemInMainHand(newItemInMainHand);
 					});
 				}
 				return;

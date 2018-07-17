@@ -26,11 +26,11 @@ import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.projectiles.ProjectileSource;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.Log;
@@ -68,7 +68,7 @@ class LivingEntityShopListener implements Listener {
 		}
 
 		// only trigger shopkeeper interaction for main-hand events:
-		if (NMSManager.getProvider().isMainHandInteraction(event)) {
+		if (event.getHand() == EquipmentSlot.HAND) {
 			shopkeeper.onPlayerInteraction(player);
 		}
 

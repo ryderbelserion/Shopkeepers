@@ -13,7 +13,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
@@ -23,7 +25,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
@@ -90,7 +91,7 @@ class CreateListener implements Listener {
 
 		// ignore off-hand interactions from this point on:
 		// -> the item will only act as shop creation item if it is held in the main hand
-		if (!NMSManager.getProvider().isMainHandInteraction(event)) {
+		if (event.getHand() != EquipmentSlot.HAND) {
 			Log.debug("Ignoring off-hand interaction with creation item");
 			return;
 		}
@@ -135,14 +136,19 @@ class CreateListener implements Listener {
 					boolean chestAccessDenied = (useInteractedBlock == Result.DENY);
 					if (chestAccessDenied) {
 						// making sure that the chest access is really denied, and that the event
-						// is not cancelled because of denying usage with the item in hand:
-						player.setItemInHand(null);
+						// is not cancelled because of denying usage with the items in hands:
+						PlayerInventory playerInventory = player.getInventory();
+						ItemStack itemInOffHand = playerInventory.getItemInOffHand();
+						playerInventory.setItemInMainHand(null);
+						playerInventory.setItemInOffHand(null);
+
 						TestPlayerInteractEvent fakeInteractEvent = new TestPlayerInteractEvent(player, event.getAction(), null, clickedBlock, event.getBlockFace());
 						Bukkit.getPluginManager().callEvent(fakeInteractEvent);
 						chestAccessDenied = (fakeInteractEvent.useInteractedBlock() == Result.DENY);
 
-						// resetting item in hand:
-						player.setItemInHand(itemInHand);
+						// resetting items in main and off hand:
+						playerInventory.setItemInMainHand(itemInHand);
+						playerInventory.setItemInOffHand(itemInOffHand);
 					}
 
 					if (chestAccessDenied) {
@@ -163,8 +169,8 @@ class CreateListener implements Listener {
 					// manually remove creation item from player's hand after this event is processed:
 					event.setCancelled(true);
 					Bukkit.getScheduler().runTask(plugin, () -> {
-						ItemStack newItemInHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
-						player.setItemInHand(newItemInHand);
+						ItemStack newItemInMainHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
+						player.getInventory().setItemInMainHand(newItemInMainHand);
 					});
 				}
 

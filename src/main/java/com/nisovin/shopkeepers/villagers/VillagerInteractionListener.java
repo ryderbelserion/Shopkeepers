@@ -8,12 +8,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -51,7 +51,7 @@ public class VillagerInteractionListener implements Listener {
 		}
 
 		// only trigger hiring for main-hand events:
-		if (!NMSManager.getProvider().isMainHandInteraction(event)) return;
+		if (event.getHand() != EquipmentSlot.HAND) return;
 
 		if (Settings.hireOtherVillagers) {
 			Player player = event.getPlayer();
@@ -80,33 +80,31 @@ public class VillagerInteractionListener implements Listener {
 			return false;
 		}
 		// hire him if holding his hiring item
-		ItemStack inHand = player.getItemInHand();
-		if (!Settings.isHireItem(inHand)) {
+		PlayerInventory playerInventory = player.getInventory();
+		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
+		if (!Settings.isHireItem(itemInMainHand)) {
 			Utils.sendMessage(player, Settings.msgVillagerForHire, "{costs}", String.valueOf(Settings.hireOtherVillagersCosts),
 					"{hire-item}", Settings.hireItem.name()); // TODO also print required hire item name and lore?
 			return false;
 		} else {
-			Inventory playerInventory = player.getInventory();
 			// check if the player has enough of those hiring items
 			int costs = Settings.hireOtherVillagersCosts;
 			if (costs > 0) {
-				ItemStack[] storageContents = ItemUtils.getStorageContents(playerInventory);
-				if (ItemUtils.containsAtLeast(storageContents, Settings.hireItem, (short) Settings.hireItemData,
-						Settings.hireItemName, Settings.hireItemLore, costs)) {
+				ItemStack[] storageContents = playerInventory.getStorageContents();
+				if (ItemUtils.containsAtLeast(storageContents, Settings.hireItem, Settings.hireItemName, Settings.hireItemLore, costs)) {
 					Log.debug("  Villager hiring: the player has the needed amount of hiring items");
-					int inHandAmount = inHand.getAmount();
+					int inHandAmount = itemInMainHand.getAmount();
 					int remaining = inHandAmount - costs;
 					Log.debug("  Villager hiring: in hand=" + inHandAmount + " costs=" + costs + " remaining=" + remaining);
 					if (remaining > 0) {
-						inHand.setAmount(remaining);
+						itemInMainHand.setAmount(remaining);
 					} else { // remaining <= 0
-						player.setItemInHand(null); // remove item in hand
+						playerInventory.setItemInMainHand(null); // remove item in hand
 						if (remaining < 0) {
 							// remove remaining costs from inventory:
-							ItemUtils.removeItems(storageContents, Settings.hireItem, (short) Settings.hireItemData,
-									Settings.hireItemName, Settings.hireItemLore, -remaining);
+							ItemUtils.removeItems(storageContents, Settings.hireItem, Settings.hireItemName, Settings.hireItemLore, -remaining);
 							// apply the change to the player's inventory:
-							ItemUtils.setStorageContents(playerInventory, storageContents);
+							playerInventory.setStorageContents(storageContents);
 						}
 					}
 				} else {

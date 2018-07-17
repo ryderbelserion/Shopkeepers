@@ -10,12 +10,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -44,7 +45,7 @@ class SignShopListener implements Listener {
 			AbstractShopkeeper shopkeeper = plugin.getShopkeeperRegistry().getShopkeeperByBlock(block);
 			if (shopkeeper != null) {
 				// only trigger shopkeeper interaction for main-hand events:
-				if (NMSManager.getProvider().isMainHandInteraction(event)) {
+				if (event.getHand() == EquipmentSlot.HAND) {
 					Log.debug("Player " + player.getName() + " is interacting with sign shopkeeper at " + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
 					if (event.useInteractedBlock() == Result.DENY) {
 						Log.debug("  Cancelled by another plugin");
@@ -83,9 +84,19 @@ class SignShopListener implements Listener {
 		}
 	}
 
-	// TODO also listen to spigot's BlockExplodeEvent (added in late 1.8)?
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-	void onExplosion(EntityExplodeEvent event) {
+	void onEntityExplosion(EntityExplodeEvent event) {
+		Iterator<Block> iter = event.blockList().iterator();
+		while (iter.hasNext()) {
+			Block block = iter.next();
+			if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperRegistry().getShopkeeperByBlock(block) != null) {
+				iter.remove();
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	void onBlockExplosion(BlockExplodeEvent event) {
 		Iterator<Block> iter = event.blockList().iterator();
 		while (iter.hasNext()) {
 			Block block = iter.next();

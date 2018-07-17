@@ -16,7 +16,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.offers.TradingOffer;
@@ -322,16 +321,7 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 	 */
 	private ItemStack loadItemStackOld(ConfigurationSection section) {
 		if (section == null) return null;
-		ItemStack item = section.getItemStack("item");
-		if (item != null) {
-			if (section.contains("attributes")) {
-				String attributes = section.getString("attributes");
-				if (attributes != null && !attributes.isEmpty()) {
-					item = NMSManager.getProvider().loadItemAttributesFromString(item, attributes);
-				}
-			}
-		}
-		return item;
+		return section.getItemStack("item");
 	}
 
 	/**

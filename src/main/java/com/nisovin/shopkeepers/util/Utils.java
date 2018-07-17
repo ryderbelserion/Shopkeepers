@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.ChatColor;
@@ -30,6 +31,34 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 public final class Utils {
 
 	private Utils() {
+	}
+
+	public static <T extends Enum<T>> T getNextEnumConstant(Class<T> enumClass, T current) {
+		return getNextEnumConstant(enumClass, current, null);
+	}
+
+	// is only able to return null if the given 'current' is null
+	public static <T extends Enum<T>> T getNextEnumConstant(Class<T> enumClass, T current, Predicate<T> predicate) {
+		Validate.notNull(enumClass);
+		T[] values = enumClass.getEnumConstants();
+		int currentId = (current == null ? -1 : current.ordinal());
+		int nextId = currentId;
+		while (true) {
+			nextId += 1;
+			if (nextId >= values.length) {
+				nextId = 0;
+				if (current == null) {
+					return null;
+				}
+			}
+			if (nextId == currentId) {
+				return current;
+			}
+			T next = values[nextId];
+			if (predicate == null || predicate.test(next)) {
+				return next;
+			}
+		}
 	}
 
 	/**

@@ -65,7 +65,7 @@ class CommandSetForHire extends PlayerCommand {
 			}
 		}
 
-		ItemStack hireCost = player.getItemInHand();
+		ItemStack hireCost = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isEmpty(hireCost)) {
 			Utils.sendMessage(player, Settings.msgMustHoldHireItem);
 			return;

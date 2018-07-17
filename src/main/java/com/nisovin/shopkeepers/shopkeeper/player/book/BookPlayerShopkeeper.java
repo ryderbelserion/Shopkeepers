@@ -143,7 +143,7 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 			for (int slot = 0; slot < newChestContents.length; slot++) {
 				ItemStack itemStack = newChestContents[slot];
 				if (ItemUtils.isEmpty(itemStack)) continue;
-				if (itemStack.getType() != Material.BOOK_AND_QUILL) continue;
+				if (itemStack.getType() != Material.WRITABLE_BOOK) continue;
 
 				int newAmount = itemStack.getAmount() - 1;
 				assert newAmount >= 0;
@@ -286,7 +286,7 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		Block chest = this.getChest();
 		if (ItemUtils.isChest(chest.getType())) {
 			Inventory chestInventory = ((Chest) chest.getState()).getInventory();
-			return chestInventory.contains(Material.BOOK_AND_QUILL);
+			return chestInventory.contains(Material.WRITABLE_BOOK);
 		}
 		return false;
 	}

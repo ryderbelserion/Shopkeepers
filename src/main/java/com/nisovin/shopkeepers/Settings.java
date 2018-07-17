@@ -9,12 +9,11 @@ import java.util.Locale;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.google.common.base.Objects;
-import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -25,6 +24,7 @@ public class Settings {
 	/*
 	 * General Settings
 	 */
+	public static int configVersion = 1;
 	public static boolean debug = false;
 	public static boolean enableMetrics = true;
 
@@ -33,7 +33,6 @@ public class Settings {
 	 */
 	public static String fileEncoding = "UTF-8";
 	public static boolean saveInstantly = true;
-	public static boolean skipCustomHeadSaving = true;
 
 	/*
 	 * Plugin Compatibility
@@ -49,12 +48,9 @@ public class Settings {
 	/*
 	 * Shop Creation (and removal)
 	 */
-	public static Material shopCreationItem = Material.MONSTER_EGG;
-	public static int shopCreationItemData = 0;
+	public static Material shopCreationItem = Material.VILLAGER_SPAWN_EGG;
 	public static String shopCreationItemName = "";
 	public static List<String> shopCreationItemLore = new ArrayList<>(0);
-	// only works above bukkit 1.11.1, ignored if empty:
-	public static String shopCreationItemSpawnEggEntityType = "VILLAGER";
 	public static boolean preventShopCreationItemRegularUsage = false;
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
@@ -88,29 +84,30 @@ public class Settings {
 			EntityType.IRON_GOLEM.name(),
 			EntityType.BLAZE.name(),
 			EntityType.SILVERFISH.name(),
-			"POLAR_BEAR", // MC 1.10
+			EntityType.POLAR_BEAR.name(), // MC 1.10
 			EntityType.SKELETON.name(),
-			"STRAY", // MC 1.11
-			"WITHER_SKELETON", // MC 1.11
+			EntityType.STRAY.name(), // MC 1.11
+			EntityType.WITHER_SKELETON.name(), // MC 1.11
 			EntityType.SPIDER.name(),
 			EntityType.CAVE_SPIDER.name(),
 			EntityType.CREEPER.name(),
 			EntityType.WITCH.name(),
 			EntityType.ENDERMAN.name(),
 			EntityType.ZOMBIE.name(),
-			"ZOMBIE_VILLAGER", // MC 1.11
+			EntityType.ZOMBIE_VILLAGER.name(), // MC 1.11
 			EntityType.PIG_ZOMBIE.name(),
-			"HUSK", // MC 1.11
+			EntityType.HUSK.name(), // MC 1.11
 			EntityType.GIANT.name(),
 			EntityType.GHAST.name(),
 			EntityType.SLIME.name(),
 			EntityType.MAGMA_CUBE.name(),
 			EntityType.SQUID.name(),
-			"EVOKER", // MC 1.11
-			"VEX", // MC 1.11
-			"VINDICATOR", // MC 1.11
-			"ILLUSIONER", // MC 1.12
-			"PARROT" // MC 1.12
+			EntityType.EVOKER.name(), // MC 1.11
+			EntityType.VEX.name(), // MC 1.11
+			EntityType.VINDICATOR.name(), // MC 1.11
+			EntityType.ILLUSIONER.name(), // MC 1.12
+			EntityType.PARROT.name() // MC 1.12
+	// TODO MC 1.13 mobs
 	);
 
 	public static boolean useLegacyMobBehavior = false;
@@ -140,15 +137,12 @@ public class Settings {
 	public static String editorTitle = "Shopkeeper Editor";
 
 	public static Material nameItem = Material.NAME_TAG;
-	public static int nameItemData = 0;
 	public static List<String> nameItemLore = new ArrayList<>(0);
 
 	public static boolean enableChestOptionOnPlayerShop = false;
 	public static Material chestItem = Material.CHEST;
-	public static int chestItemData = 0;
 
 	public static Material deleteItem = Material.BONE;
-	public static int deleteItemData = 0;
 
 	/*
 	 * Non-shopkeeper villagers
@@ -161,7 +155,6 @@ public class Settings {
 	 * Hiring
 	 */
 	public static Material hireItem = Material.EMERALD;
-	public static int hireItemData = 0;
 	public static String hireItemName = "";
 	public static List<String> hireItemLore = new ArrayList<>(0);
 	public static int hireOtherVillagersCosts = 1;
@@ -183,17 +176,14 @@ public class Settings {
 	 * Currencies
 	 */
 	public static Material currencyItem = Material.EMERALD;
-	public static short currencyItemData = 0;
 	public static String currencyItemName = "";
 	public static List<String> currencyItemLore = new ArrayList<>(0);
 
 	public static Material zeroCurrencyItem = Material.BARRIER;
-	public static short zeroCurrencyItemData = 0;
 	public static String zeroCurrencyItemName = "";
 	public static List<String> zeroCurrencyItemLore = new ArrayList<>(0);
 
 	public static Material highCurrencyItem = Material.EMERALD_BLOCK;
-	public static short highCurrencyItemData = 0;
 	public static String highCurrencyItemName = "";
 	public static List<String> highCurrencyItemLore = new ArrayList<>(0);
 
@@ -202,7 +192,6 @@ public class Settings {
 	public static int highCurrencyMinCost = 20;
 
 	public static Material highZeroCurrencyItem = Material.BARRIER;
-	public static short highZeroCurrencyItemData = 0;
 	public static String highZeroCurrencyItemName = "";
 	public static List<String> highZeroCurrencyItemLore = new ArrayList<>(0);
 
@@ -345,7 +334,13 @@ public class Settings {
 	// TODO on reloads this will probably use the previous values as defaults, instead of the actual default values
 	// returns true, if the config misses values which need to be saved
 	public static boolean loadConfiguration(Configuration config) {
-		boolean settingsMissing = false;
+		boolean configChanged = false;
+
+		// perform config migrations:
+		int configVersion = config.getInt("config-version");
+		if (configVersion <= 1) {
+			migrateConfig_0_to_1(config);
+		}
 
 		// exempt a few string / string list settings from color conversion:
 		List<String> noColorConversionKeys = Arrays.asList(
@@ -370,7 +365,7 @@ public class Settings {
 					} else {
 						config.set(configKey, field.get(null));
 					}
-					settingsMissing = true;
+					configChanged = true;
 				}
 
 				if (typeClass == String.class) {
@@ -387,19 +382,13 @@ public class Settings {
 				} else if (typeClass == boolean.class) {
 					field.set(null, config.getBoolean(configKey, field.getBoolean(null)));
 				} else if (typeClass == Material.class) {
-					if (config.contains(configKey)) {
-						Material material = null;
-						if (config.isInt(configKey)) {
-							material = Material.getMaterial(config.getInt(configKey));
-						} else if (config.isString(configKey)) {
-							material = Material.matchMaterial(config.getString(configKey));
-						}
-						if (material != null) {
-							field.set(null, material);
-						} else {
-							Log.warning("Config: Unknown material for config entry '" + configKey + "': " + config.get(configKey));
-							Log.warning("Config: All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
-						}
+					// this assumes that legacy item conversion has already been performed
+					Material material = loadMaterial(config, configKey, false);
+					if (material != null) {
+						field.set(null, material);
+					} else {
+						Log.warning("Config: Unknown material for config entry '" + configKey + "': " + config.get(configKey));
+						Log.warning("Config: All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
 					}
 				} else if (typeClass == List.class) {
 					Class<?> genericType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
@@ -446,7 +435,7 @@ public class Settings {
 		// certain items cannot be of type AIR:
 		if (shopCreationItem == Material.AIR) {
 			Log.warning("Config: 'shop-creation-item' can not be AIR.");
-			shopCreationItem = Material.MONSTER_EGG;
+			shopCreationItem = Material.VILLAGER_SPAWN_EGG;
 		}
 		if (hireItem == Material.AIR) {
 			Log.warning("Config: 'hire-item' can not be AIR.");
@@ -470,7 +459,105 @@ public class Settings {
 			taxRate = 100;
 		}
 
-		return settingsMissing;
+		return configChanged;
+	}
+
+	private static Material loadMaterial(ConfigurationSection config, String key, boolean checkLegacy) {
+		String materialName = config.getString(key);
+		if (materialName == null) return null;
+		Material material = Material.matchMaterial(materialName);
+		if (material == null && checkLegacy) {
+			// check for legacy material:
+			String legacyMaterialName = Material.LEGACY_PREFIX + materialName;
+			material = Material.matchMaterial(legacyMaterialName);
+		}
+		return material;
+	}
+
+	private static void migrateConfig_0_to_1(Configuration config) {
+		// pre 1.13 to 1.13:
+		Log.info("Migrating config to version 1 ..");
+
+		// shop creation item:
+		Material shopCreationItem = loadMaterial(config, "shop-creation-item", true);
+		if (shopCreationItem != null && shopCreationItem.isLegacy()) {
+			String shopCreationItemSpawnEggEntityType = config.getString("shop-creation-item-spawn-egg-entity-type");
+			if (shopCreationItem == Material.LEGACY_MONSTER_EGG && !StringUtils.isEmpty(shopCreationItemSpawnEggEntityType)) {
+				// migrate spawn egg (ignores the data value): spawn eggs are different materials now
+				EntityType spawnEggEntityType = null;
+				try {
+					spawnEggEntityType = EntityType.valueOf(shopCreationItemSpawnEggEntityType);
+				} catch (IllegalArgumentException e) {
+					// unknown entity type
+				}
+				Material newShopCreationItem = LegacyConversion.fromLegacySpawnEgg(spawnEggEntityType);
+				if (newShopCreationItem == null) {
+					// fallback to default:
+					newShopCreationItem = Material.VILLAGER_SPAWN_EGG;
+					Log.warning("Could not migrate 'shop-creation-item': Unknown type of spawn egg '" + shopCreationItemSpawnEggEntityType
+							+ "'. Using '" + Material.VILLAGER_SPAWN_EGG + "' now.");
+				}
+
+				Log.info("  Migrating 'shop-creation-item' from '" + shopCreationItem + "' to '" + newShopCreationItem.name() + "'.");
+				Log.info("  Removing 'shop-creation-item-spawn-egg-entity-type' (previously '" + shopCreationItemSpawnEggEntityType + "').");
+				config.set("shop-creation-item-spawn-egg-entity-type", null);
+				config.set("shop-creation-item", newShopCreationItem.name());
+			} else {
+				migrateLegacyItemData(config, "shop-creation-item", "shop-creation-item", "shop-creation-item-data", Material.VILLAGER_SPAWN_EGG);
+			}
+		}
+
+		// name item:
+		migrateLegacyItemData(config, "name-item", "name-item", "name-item-data", Material.NAME_TAG);
+
+		// chest item:
+		migrateLegacyItemData(config, "chest-item", "chest-item", "chest-item-data", Material.CHEST);
+
+		// delete item:
+		migrateLegacyItemData(config, "delete-item", "delete-item", "delete-item-data", Material.BONE);
+
+		// hire item:
+		migrateLegacyItemData(config, "hire-item", "hire-item", "hire-item-data", Material.EMERALD);
+
+		// currency item:
+		migrateLegacyItemData(config, "currency-item", "currency-item", "currency-item-data", Material.EMERALD);
+
+		// zero currency item:
+		migrateLegacyItemData(config, "zero-currency-item", "zero-currency-item", "zero-currency-item-data", Material.BARRIER);
+
+		// high currency item:
+		migrateLegacyItemData(config, "high-currency-item", "high-currency-item", "high-currency-item-data", Material.EMERALD_BLOCK);
+
+		// high zero currency item:
+		migrateLegacyItemData(config, "high-zero-currency-item", "high-zero-currency-item", "high-zero-currency-item-data", Material.BARRIER);
+
+		// update config version:
+		config.set("config-version", 1);
+		Log.info("Config migration to version 1 done.");
+	}
+
+	// returns true if the item was migrated
+	private static boolean migrateLegacyItemData(ConfigurationSection config, String migratedItemId, String itemTypeKey, String itemDataKey, Material defaultType) {
+		// convert legacy material + data value to new material:
+		Material itemType = loadMaterial(config, itemTypeKey, true);
+		// only migrate if present and legacy type:
+		if (itemType != null && itemType.isLegacy()) {
+			int itemData = config.getInt(itemDataKey);
+			Material newItemType = LegacyConversion.fromLegacy(itemType, (byte) itemData);
+			if (newItemType == null || newItemType == Material.AIR) {
+				// fallback to default:
+				newItemType = defaultType;
+				Log.warning("Could not migrate '" + migratedItemId + "' from type '" + itemType + "' and data value '" + itemData
+						+ "'. Using '" + defaultType + "' now.");
+			}
+
+			Log.info("  Converting '" + migratedItemId + "' from type '" + itemType + "' and data value '" + itemData + "' to type '" + newItemType.name() + "'.");
+			Log.info("  Removing '" + itemDataKey + "' (previously '" + itemData + "').");
+			config.set(itemDataKey, null);
+			config.set(itemTypeKey, (newItemType != null ? newItemType.name() : null));
+			return true;
+		}
+		return false;
 	}
 
 	public static void loadLanguageConfiguration(Configuration config) {
@@ -491,79 +578,48 @@ public class Settings {
 
 	// creation item:
 	public static ItemStack createShopCreationItem() {
-		ItemStack creationItem = ItemUtils.createItemStack(shopCreationItem, 1, (short) shopCreationItemData, shopCreationItemName, shopCreationItemLore);
-
-		// apply spawn egg entity type:
-		if (shopCreationItem == Material.MONSTER_EGG && !StringUtils.isEmpty(shopCreationItemSpawnEggEntityType) && NMSManager.getProvider().supportsSpawnEggEntityType()) {
-			EntityType spawnEggEntityType = null;
-			try {
-				spawnEggEntityType = EntityType.valueOf(shopCreationItemSpawnEggEntityType);
-			} catch (IllegalArgumentException e) {
-				// unknown entity type, set 'empty' entity type
-			}
-			NMSManager.getProvider().setSpawnEggEntityType(creationItem, spawnEggEntityType);
-		}
-
-		return creationItem;
+		return ItemUtils.createItemStack(shopCreationItem, 1, shopCreationItemName, shopCreationItemLore);
 	}
 
 	public static boolean isShopCreationItem(ItemStack item) {
-		if (!ItemUtils.isSimilar(item, Settings.shopCreationItem, (short) Settings.shopCreationItemData, Settings.shopCreationItemName, Settings.shopCreationItemLore)) {
-			return false;
-		}
-
-		// check spawn egg entity type:
-		if (shopCreationItem == Material.MONSTER_EGG && !StringUtils.isEmpty(shopCreationItemSpawnEggEntityType) && NMSManager.getProvider().supportsSpawnEggEntityType()) {
-			EntityType spawnEggEntityType = NMSManager.getProvider().getSpawnEggEntityType(item); // can be null
-			EntityType requiredEntityType = null;
-			try {
-				requiredEntityType = EntityType.valueOf(shopCreationItemSpawnEggEntityType);
-			} catch (IllegalArgumentException e) {
-				// unknown entity type, require 'empty' entity type
-			}
-			if (!Objects.equal(spawnEggEntityType, requiredEntityType)) return false;
-		}
-
-		return true;
+		return ItemUtils.isSimilar(item, Settings.shopCreationItem, Settings.shopCreationItemName, Settings.shopCreationItemLore);
 	}
 
 	// naming item:
 	public static ItemStack createNameButtonItem() {
-		return ItemUtils.createItemStack(nameItem, 1, (short) nameItemData, msgButtonName, msgButtonNameLore);
+		return ItemUtils.createItemStack(nameItem, 1, msgButtonName, msgButtonNameLore);
 	}
 
 	public static boolean isNamingItem(ItemStack item) {
-		return ItemUtils.isSimilar(item, nameItem, (short) nameItemData, null, Settings.nameItemLore);
+		return ItemUtils.isSimilar(item, nameItem, null, Settings.nameItemLore);
 	}
 
 	// chest button:
 	public static ItemStack createChestButtonItem() {
-		return ItemUtils.createItemStack(chestItem, 1, (short) chestItemData, msgButtonChest, msgButtonChestLore);
+		return ItemUtils.createItemStack(chestItem, 1, msgButtonChest, msgButtonChestLore);
 	}
 
 	// delete button:
 	public static ItemStack createDeleteButtonItem() {
-		return ItemUtils.createItemStack(deleteItem, 1, (short) deleteItemData, msgButtonDelete, msgButtonDeleteLore);
+		return ItemUtils.createItemStack(deleteItem, 1, msgButtonDelete, msgButtonDeleteLore);
 	}
 
 	// hire item:
 	public static ItemStack createHireButtonItem() {
-		return ItemUtils.createItemStack(hireItem, 1, (short) hireItemData, msgButtonHire, msgButtonHireLore);
+		return ItemUtils.createItemStack(hireItem, 1, msgButtonHire, msgButtonHireLore);
 	}
 
 	public static boolean isHireItem(ItemStack item) {
-		return ItemUtils.isSimilar(item, hireItem, (short) hireItemData, hireItemName, hireItemLore);
+		return ItemUtils.isSimilar(item, hireItem, hireItemName, hireItemLore);
 	}
 
 	// currency item:
 	public static ItemStack createCurrencyItem(int amount) {
-		return ItemUtils.createItemStack(Settings.currencyItem, amount, Settings.currencyItemData,
-				Settings.currencyItemName, Settings.currencyItemLore);
+		return ItemUtils.createItemStack(Settings.currencyItem, amount, Settings.currencyItemName, Settings.currencyItemLore);
 	}
 
 	public static boolean isCurrencyItem(ItemStack item) {
-		return ItemUtils.isSimilar(item, Settings.currencyItem, Settings.currencyItemData,
-				Settings.currencyItemName, Settings.currencyItemLore);
+		return ItemUtils.isSimilar(item, Settings.currencyItem, Settings.currencyItemName, Settings.currencyItemLore);
 	}
 
 	// high currency item:
@@ -573,44 +629,38 @@ public class Settings {
 
 	public static ItemStack createHighCurrencyItem(int amount) {
 		if (!isHighCurrencyEnabled()) return null;
-		return ItemUtils.createItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemData,
-				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+		return ItemUtils.createItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}
 
 	public static boolean isHighCurrencyItem(ItemStack item) {
 		if (!isHighCurrencyEnabled()) return false;
-		return ItemUtils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemData,
-				Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+		return ItemUtils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
 	}
 
 	// zero currency item:
 	public static ItemStack createZeroCurrencyItem() {
 		if (Settings.zeroCurrencyItem == Material.AIR) return null;
-		return ItemUtils.createItemStack(Settings.zeroCurrencyItem, 1, Settings.zeroCurrencyItemData,
-				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+		return ItemUtils.createItemStack(Settings.zeroCurrencyItem, 1, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
 	}
 
 	public static boolean isZeroCurrencyItem(ItemStack item) {
 		if (Settings.zeroCurrencyItem == Material.AIR) {
 			return ItemUtils.isEmpty(item);
 		}
-		return ItemUtils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemData,
-				Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+		return ItemUtils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
 	}
 
 	// high zero currency item:
 	public static ItemStack createHighZeroCurrencyItem() {
 		if (Settings.highZeroCurrencyItem == Material.AIR) return null;
-		return ItemUtils.createItemStack(Settings.highZeroCurrencyItem, 1, Settings.highZeroCurrencyItemData,
-				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
+		return ItemUtils.createItemStack(Settings.highZeroCurrencyItem, 1, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 
 	public static boolean isHighZeroCurrencyItem(ItemStack item) {
 		if (Settings.highZeroCurrencyItem == Material.AIR) {
 			return ItemUtils.isEmpty(item);
 		}
-		return ItemUtils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemData,
-				Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
+		return ItemUtils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
 	}
 
 	//

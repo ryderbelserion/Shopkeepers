@@ -50,7 +50,11 @@ public class CreeperShop extends SKLivingShopObject {
 
 	@Override
 	public ItemStack getSubTypeItem() {
-		return new ItemStack(Material.WOOL, 1, powered ? (short) 3 : (short) 5);
+		if (powered) {
+			return new ItemStack(Material.LIGHT_BLUE_WOOL, 1);
+		} else {
+			return new ItemStack(Material.LIME_WOOL, 1);
+		}
 	}
 
 	@Override

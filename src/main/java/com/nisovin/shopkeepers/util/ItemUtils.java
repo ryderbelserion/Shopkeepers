@@ -1,24 +1,17 @@
 package com.nisovin.shopkeepers.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.SkullType;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
-import com.nisovin.shopkeepers.compat.NMSManager;
 
 /**
  * Utility functions related to materials, items and inventories.
@@ -35,7 +28,7 @@ public final class ItemUtils {
 	}
 
 	public static boolean isSign(Material material) {
-		return material == Material.WALL_SIGN || material == Material.SIGN_POST || material == Material.SIGN;
+		return material == Material.WALL_SIGN || material == Material.SIGN;
 	}
 
 	// itemstack utilities:
@@ -46,27 +39,6 @@ public final class ItemUtils {
 
 	public static ItemStack getNullIfEmpty(ItemStack item) {
 		return isEmpty(item) ? null : item;
-	}
-
-	// TODO temporary, due to a bukkit bug custom head item can currently not be saved
-	public static boolean isCustomHeadItem(ItemStack item) {
-		if (item == null) return false;
-		if (item.getType() != Material.SKULL_ITEM) {
-			return false;
-		}
-		if (item.getDurability() != SkullType.PLAYER.ordinal()) {
-			return false;
-		}
-
-		ItemMeta meta = item.getItemMeta();
-		if (meta instanceof SkullMeta) {
-			SkullMeta skullMeta = (SkullMeta) meta;
-			if (skullMeta.hasOwner() && skullMeta.getOwner() == null) {
-				// custom head items usually don't have a valid owner
-				return true;
-			}
-		}
-		return false;
 	}
 
 	/**
@@ -83,9 +55,9 @@ public final class ItemUtils {
 		return normalizedClone;
 	}
 
-	public static ItemStack createItemStack(Material type, int amount, short data, String displayName, List<String> lore) {
+	public static ItemStack createItemStack(Material type, int amount, String displayName, List<String> lore) {
 		// TODO return null in case of type AIR?
-		ItemStack item = new ItemStack(type, amount, data);
+		ItemStack item = new ItemStack(type, amount);
 		return ItemUtils.setItemStackNameAndLore(item, displayName, lore);
 	}
 
@@ -141,18 +113,15 @@ public final class ItemUtils {
 	 *            the item
 	 * @param type
 	 *            the item type
-	 * @param data
-	 *            the data value/durability, or <code>-1</code> to ignore it
 	 * @param displayName
 	 *            the displayName, or <code>null</code> or empty to ignore it
 	 * @param lore
 	 *            the item lore, or <code>null</code> or empty to ignore it
 	 * @return <code>true</code> if the item has similar attributes
 	 */
-	public static boolean isSimilar(ItemStack item, Material type, short data, String displayName, List<String> lore) {
+	public static boolean isSimilar(ItemStack item, Material type, String displayName, List<String> lore) {
 		if (item == null) return false;
 		if (item.getType() != type) return false;
-		if (data != -1 && item.getDurability() != data) return false;
 
 		ItemMeta itemMeta = null;
 		// compare display name:
@@ -229,92 +198,7 @@ public final class ItemUtils {
 		return (isEmpty(itemStack) ? 0 : itemStack.getAmount());
 	}
 
-	// save and load itemstacks from config, including attributes:
-
-	/**
-	 * Saves the given {@link ItemStack} to the given configuration section.
-	 * Also saves the item's attributes in the same section at '{node}_attributes'.
-	 * 
-	 * @param section
-	 *            a configuration section
-	 * @param node
-	 *            where to save the item stack inside the section
-	 * @param item
-	 *            the item stack to save, can be <code>null</code>
-	 */
-	public static void saveItem(ConfigurationSection section, String node, ItemStack item) {
-		assert section != null && node != null;
-		section.set(node, item);
-		// saving attributes manually, as they weren't saved by bukkit in the past:
-		String attributes = NMSManager.getProvider().saveItemAttributesToString(item);
-		if (attributes != null && !attributes.isEmpty()) {
-			String attributesNode = node + "_attributes";
-			section.set(attributesNode, attributes);
-		}
-	}
-
-	/**
-	 * Loads an {@link ItemStack} from the given configuration section.
-	 * Also attempts to load attributes saved at '{node}_attributes'.
-	 * 
-	 * @param section
-	 *            a configuration section
-	 * @param node
-	 *            where to load the item stack from inside the section
-	 * @return the loaded item stack, possibly <code>null</code>
-	 */
-	public static ItemStack loadItem(ConfigurationSection section, String node) {
-		assert section != null && node != null;
-		ItemStack item = section.getItemStack(node);
-		// loading separately stored attributes:
-		String attributesNode = node + "_attributes";
-		if (item != null && section.contains(attributesNode)) {
-			String attributes = section.getString(attributesNode);
-			if (attributes != null && !attributes.isEmpty()) {
-				item = NMSManager.getProvider().loadItemAttributesFromString(item, attributes);
-			}
-		}
-		return item;
-	}
-
 	// inventory utilities:
-
-	// somewhere in early 1.9 getStorageContents was introduced and the previous behavior of getContents was changed for
-	// player inventories to now return the combined inventory contents
-	// TODO remove this once we support 1.9+
-	private static final int PLAYER_INVENTORY_STORAGE_SIZE = 36;
-
-	/**
-	 * Gets the storage contents from the specified inventory.
-	 * 
-	 * @param inventory
-	 *            the inventory
-	 * @return the storage contents
-	 */
-	public static ItemStack[] getStorageContents(Inventory inventory) {
-		assert inventory != null;
-		ItemStack[] storageContents = inventory.getContents();
-		if (inventory instanceof PlayerInventory) {
-			storageContents = Arrays.copyOf(storageContents, PLAYER_INVENTORY_STORAGE_SIZE);
-		}
-		return storageContents;
-	}
-
-	/**
-	 * Sets the storage contents of the specified inventory.
-	 * 
-	 * @param inventory
-	 *            the inventory
-	 * @param storageContents
-	 *            the new storage contents
-	 */
-	public static void setStorageContents(Inventory inventory, ItemStack[] storageContents) {
-		assert inventory != null;
-		// storage contents are always stored at the beginning of the inventory
-		for (int slotId = 0; slotId < storageContents.length; slotId++) {
-			inventory.setItem(slotId, storageContents[slotId]);
-		}
-	}
 
 	public static List<ItemCount> countItems(ItemStack[] contents, Filter<ItemStack> filter) {
 		List<ItemCount> itemCounts = new ArrayList<>();
@@ -343,8 +227,6 @@ public final class ItemUtils {
 	 *            the contents to search through
 	 * @param type
 	 *            the item type
-	 * @param data
-	 *            the data value/durability, or <code>-1</code> to ignore it
 	 * @param displayName
 	 *            the displayName, or <code>null</code> to ignore it
 	 * @param lore
@@ -353,11 +235,11 @@ public final class ItemUtils {
 	 *            the amount of items to look for
 	 * @return <code>true</code> if the at least specified amount of matching items was found
 	 */
-	public static boolean containsAtLeast(ItemStack[] contents, Material type, short data, String displayName, List<String> lore, int amount) {
+	public static boolean containsAtLeast(ItemStack[] contents, Material type, String displayName, List<String> lore, int amount) {
 		if (contents == null) return false;
 		int remainingAmount = amount;
 		for (ItemStack itemStack : contents) {
-			if (!isSimilar(itemStack, type, data, displayName, lore)) continue;
+			if (!isSimilar(itemStack, type, displayName, lore)) continue;
 			int currentAmount = itemStack.getAmount() - remainingAmount;
 			if (currentAmount >= 0) {
 				return true;
@@ -375,8 +257,6 @@ public final class ItemUtils {
 	 *            the contents
 	 * @param type
 	 *            the item type
-	 * @param data
-	 *            the data value/durability, or <code>-1</code> to ignore it
 	 * @param displayName
 	 *            the display name, or <code>null</code> to ignore it
 	 * @param lore
@@ -385,12 +265,12 @@ public final class ItemUtils {
 	 *            the amount of matching items to remove
 	 * @return the amount of items that couldn't be removed (<code>0</code> on full success)
 	 */
-	public static int removeItems(ItemStack[] contents, Material type, short data, String displayName, List<String> lore, int amount) {
+	public static int removeItems(ItemStack[] contents, Material type, String displayName, List<String> lore, int amount) {
 		if (contents == null) return amount;
 		int remainingAmount = amount;
 		for (int slotId = 0; slotId < contents.length; slotId++) {
 			ItemStack itemStack = contents[slotId];
-			if (!isSimilar(itemStack, type, data, displayName, lore)) continue;
+			if (!isSimilar(itemStack, type, displayName, lore)) continue;
 			int newAmount = itemStack.getAmount() - remainingAmount;
 			if (newAmount > 0) {
 				itemStack.setAmount(newAmount);

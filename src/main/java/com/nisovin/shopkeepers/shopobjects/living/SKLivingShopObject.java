@@ -211,29 +211,49 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 	}
 
 	protected void overwriteAI() {
+		// setting the entity non-collidable:
+		entity.setCollidable(false);
 		NMSManager.getProvider().overwriteLivingEntityAI(entity);
 
 		if (!Settings.useLegacyMobBehavior) {
 			// disable AI (also disables gravity) and replace it with our own handling:
-			NMSManager.getProvider().setNoAI(entity);
+			this.setNoAI(entity);
+
 			if (NMSManager.getProvider().supportsCustomMobAI()) {
 				livingShops.getLivingEntityAI().addEntity(entity);
 			}
 		}
 
 		if (Settings.silenceLivingShopEntities) {
-			NMSManager.getProvider().setEntitySilent(entity, true);
+			entity.setSilent(true);
 		}
 		if (Settings.disableGravity) {
-			NMSManager.getProvider().setGravity(entity, false);
+			this.setNoGravity(entity);
 			// when gravity gets disabled, we might be able to also disable collisions/pushing of mobs via noclip:
 			NMSManager.getProvider().setNoclip(entity);
 		}
 
 		// set the NoAI tag always for certain entity types:
 		if (this.isNoAIMobType()) {
-			NMSManager.getProvider().setNoAI(entity);
+			this.setNoAI(entity);
 		}
+	}
+
+	protected final void setNoAI(LivingEntity entity) {
+		entity.setAI(false);
+
+		// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes that
+		// it is currently falling:
+		// TODO this can be removed once spigot ignores NoAI entities
+		NMSManager.getProvider().setOnGround(entity, true);
+	}
+
+	protected final void setNoGravity(org.bukkit.entity.Entity entity) {
+		entity.setGravity(false);
+
+		// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes
+		// that it is currently falling:
+		NMSManager.getProvider().setOnGround(entity, true);
 	}
 
 	protected void cleanupAI() {
@@ -371,8 +391,8 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 	@Override
 	public void equipItem(ItemStack item) {
 		if (this.isActive()) {
-			entity.getEquipment().setItemInHand(item);
-			entity.getEquipment().setItemInHandDropChance(0);
+			entity.getEquipment().setItemInMainHand(item);
+			entity.getEquipment().setItemInMainHandDropChance(0);
 		}
 	}
 }

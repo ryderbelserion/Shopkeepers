@@ -1,17 +1,21 @@
 package com.nisovin.shopkeepers.ui.defaults;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
+import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.Settings;
@@ -25,6 +29,7 @@ import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class TradingHandler extends UIHandler {
@@ -130,7 +135,39 @@ public class TradingHandler extends UIHandler {
 		// create and open trading window:
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		String title = this.getInventoryTitle();
-		return NMSManager.getProvider().openTradeWindow(title, shopkeeper.getTradingRecipes(player), player);
+		return this.openTradeWindow(title, shopkeeper.getTradingRecipes(player), player);
+	}
+
+	protected boolean openTradeWindow(String title, List<TradingRecipe> recipes, Player player) {
+		// create empty merchant:
+		Merchant merchant = Bukkit.createMerchant(title);
+
+		// create list of merchant recipes:
+		List<MerchantRecipe> merchantRecipes = new ArrayList<MerchantRecipe>();
+		for (TradingRecipe recipe : recipes) {
+			// create and add merchant recipe:
+			merchantRecipes.add(this.createMerchantRecipe(recipe.getItem1(), recipe.getItem2(), recipe.getResultItem()));
+		}
+
+		// set merchant's recipes:
+		merchant.setRecipes(merchantRecipes);
+
+		// increase 'talked-to-villager' statistic:
+		player.incrementStatistic(Statistic.TALKED_TO_VILLAGER);
+
+		// open merchant:
+		return (player.openMerchant(merchant, true) != null);
+	}
+
+	protected MerchantRecipe createMerchantRecipe(ItemStack buyItem1, ItemStack buyItem2, ItemStack sellingItem) {
+		assert !ItemUtils.isEmpty(sellingItem) && !ItemUtils.isEmpty(buyItem1);
+		MerchantRecipe recipe = new MerchantRecipe(sellingItem, 10000); // no max-uses limit
+		recipe.setExperienceReward(false); // no experience rewards
+		recipe.addIngredient(buyItem1);
+		if (!ItemUtils.isEmpty(buyItem2)) {
+			recipe.addIngredient(buyItem2);
+		}
+		return recipe;
 	}
 
 	protected String getInventoryTitle() {
@@ -268,7 +305,7 @@ public class TradingHandler extends UIHandler {
 			// equal to the previous result item
 			while (true) {
 				// check if there is enough space in the player's inventory:
-				ItemStack[] newPlayerContents = ItemUtils.getStorageContents(playerInventory);
+				ItemStack[] newPlayerContents = playerInventory.getStorageContents();
 
 				// minecraft is adding items in reverse container order (starting with hotbar slot 9),
 				// so we reverse the player contents accordingly before adding items:
@@ -295,7 +332,7 @@ public class TradingHandler extends UIHandler {
 				Collections.reverse(contentsView);
 
 				// apply player inventory changes:
-				ItemUtils.setStorageContents(playerInventory, newPlayerContents);
+				playerInventory.setStorageContents(newPlayerContents);
 
 				// common apply trade:
 				this.commonApplyTrade(tradeData);
@@ -335,7 +372,7 @@ public class TradingHandler extends UIHandler {
 		}
 
 		// find (and validate) the recipe minecraft is using for the trade:
-		TradingRecipe tradingRecipe = NMSManager.getProvider().getUsedTradingRecipe(merchantInventory);
+		TradingRecipe tradingRecipe = ShopkeeperUtils.getSelectedTradingRecipe(merchantInventory);
 		if (tradingRecipe == null) {
 			// this shouldn't happen..
 			if (!silent) {
@@ -393,21 +430,6 @@ public class TradingHandler extends UIHandler {
 					Log.debug("Recipe item 2: " + (ItemUtils.isSimilar(requiredItem2, offeredItem2) ? "similar" : "not similar"));
 				}
 				return null;
-			}
-		}
-
-		// detecting and preventing issue due to minecraft bug MC-81687 (traded items not being properly removed):
-		// TODO should be fixed in newer versions (1.9+), remove when no longer needed
-		if (NMSManager.getProvider().getVersionId().startsWith("1_8_")) {
-			if (ItemUtils.isSimilar(offeredItem1, offeredItem2)) {
-				assert requiredItem2 != null && offeredItem2 != null;
-				if (offeredItem1.getAmount() < requiredItem1.getAmount() || offeredItem2.getAmount() < requiredItem2.getAmount()) {
-					if (!silent) {
-						this.debugPreventedTrade(player, "Due to a minecraft bug (MC-81687), this trade might not get properly handled.");
-					}
-					// TODO: since we now manually implement trading, we could take care of this
-					return null;
-				}
 			}
 		}
 

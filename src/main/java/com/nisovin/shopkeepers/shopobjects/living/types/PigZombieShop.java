@@ -8,9 +8,9 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
-import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
+import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 
 public class PigZombieShop extends SKLivingShopObject {
 
@@ -50,7 +50,7 @@ public class PigZombieShop extends SKLivingShopObject {
 
 	@Override
 	public ItemStack getSubTypeItem() {
-		return new ItemStack(Material.MONSTER_EGG, 1, (short) 57);
+		return new ItemStack(Material.ZOMBIE_PIGMAN_SPAWN_EGG, 1);
 	}
 
 	@Override

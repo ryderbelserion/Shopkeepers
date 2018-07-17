@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
@@ -63,7 +64,7 @@ class ChestProtectionListener implements Listener {
 						+ Utils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 			}
-		} else if (type == Material.RAILS || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL || type == Material.ACTIVATOR_RAIL) {
+		} else if (type == Material.RAIL || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL || type == Material.ACTIVATOR_RAIL) {
 			Block upperBlock = block.getRelative(BlockFace.UP);
 			if (ItemUtils.isChest(upperBlock.getType()) && protectedChests.isChestProtected(upperBlock, player)) {
 				Log.debug("Cancelled placing of rail block by '" + player.getName() + "' at '"
@@ -87,9 +88,19 @@ class ChestProtectionListener implements Listener {
 		}
 	}
 
-	// TODO also listen to spigot's BlockExplodeEvent in 1.8.4 (R3)?
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
-	void onExplosion(EntityExplodeEvent event) {
+	void onEntityExplosion(EntityExplodeEvent event) {
+		Iterator<Block> iter = event.blockList().iterator();
+		while (iter.hasNext()) {
+			Block block = iter.next();
+			if (ItemUtils.isChest(block.getType()) && protectedChests.isChestProtected(block, null)) {
+				iter.remove();
+			}
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	void onBlockExplosion(BlockExplodeEvent event) {
 		Iterator<Block> iter = event.blockList().iterator();
 		while (iter.hasNext()) {
 			Block block = iter.next();

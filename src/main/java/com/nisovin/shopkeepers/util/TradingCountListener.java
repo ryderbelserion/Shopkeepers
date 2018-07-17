@@ -19,7 +19,6 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIType;
-import com.nisovin.shopkeepers.compat.NMSManager;
 
 /**
  * Tries to accurately detect individual trades handled by minecraft by listening to corresponding changes of the
@@ -80,7 +79,7 @@ public class TradingCountListener implements Listener {
 		if (ItemUtils.isEmpty(resultItem)) {
 			return; // no trade available, ignoring
 		}
-		TradingRecipe usedRecipe = NMSManager.getProvider().getUsedTradingRecipe(inventory);
+		TradingRecipe usedRecipe = ShopkeeperUtils.getSelectedTradingRecipe(inventory);
 		if (usedRecipe == null) {
 			return; // no used recipe found, ignoring
 		}
@@ -110,7 +109,7 @@ public class TradingCountListener implements Listener {
 
 		MerchantInventory merchantInventory = (MerchantInventory) inventory;
 		// find the recipe minecraft is using for the trade (the active recipe gets updated after the statistic change):
-		TradingRecipe usedRecipe = NMSManager.getProvider().getUsedTradingRecipe(merchantInventory);
+		TradingRecipe usedRecipe = ShopkeeperUtils.getSelectedTradingRecipe(merchantInventory);
 		if (usedRecipe == null) {
 			Log.debug("Non-shopkeeper trade detection: Couldn't find the used trading recipe.");
 			return;

@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
@@ -140,14 +141,22 @@ public class ShopkeepersCommand extends BaseCommand {
 
 			// check for permission:
 			if (Settings.simulateRightClickOnCommand) {
-				ItemStack itemInHand = player.getItemInHand();
-				player.setItemInHand(null);
+				// simulating right click on the chest to check if access is denied:
+				// making sure that access is really denied, and that the event is not cancelled because of denying
+				// usage with the items in hands:
+				PlayerInventory playerInventory = player.getInventory();
+				ItemStack itemInMainHand = playerInventory.getItemInMainHand();
+				ItemStack itemInOffHand = playerInventory.getItemInOffHand();
+				playerInventory.setItemInMainHand(null);
+				playerInventory.setItemInOffHand(null);
+
 				TestPlayerInteractEvent fakeInteractEvent = new TestPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, null, targetBlock, BlockFace.UP);
 				Bukkit.getPluginManager().callEvent(fakeInteractEvent);
 				boolean chestAccessDenied = (fakeInteractEvent.useInteractedBlock() == Result.DENY);
 
-				// resetting item in hand:
-				player.setItemInHand(itemInHand);
+				// resetting items in main and off hand:
+				playerInventory.setItemInMainHand(itemInMainHand);
+				playerInventory.setItemInOffHand(itemInOffHand);
 
 				if (chestAccessDenied) {
 					return;
