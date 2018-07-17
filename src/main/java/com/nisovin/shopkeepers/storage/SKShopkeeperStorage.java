@@ -14,7 +14,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -352,43 +351,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// validates and performs migration of the save data
 	// returns false to skip this shopkeeper
 	private boolean prepareShopkeeperData(int id, ConfigurationSection shopkeeperSection) {
-		// MC 1.11: convert old skeleton and zombie variants to new mob types
-		// TODO remove again in future updates
-		boolean hasStrayType = false;
-		boolean hasWitherSkeletonType = false;
-		boolean hasZombieVillagerType = false;
-		try {
-			hasStrayType = (EntityType.valueOf("STRAY") != null);
-		} catch (Exception e) {
-		}
-		try {
-			hasWitherSkeletonType = (EntityType.valueOf("WITHER_SKELETON") != null);
-		} catch (Exception e) {
-		}
-		try {
-			hasZombieVillagerType = (EntityType.valueOf("ZOMBIE_VILLAGER") != null);
-		} catch (Exception e) {
-		}
-
-		if (hasStrayType || hasWitherSkeletonType || hasZombieVillagerType) {
-			String objectType = shopkeeperSection.getString("object");
-			if ("skeleton".equalsIgnoreCase(objectType)) {
-				String skeletonType = shopkeeperSection.getString("skeletonType");
-				if (hasStrayType && "STRAY".equalsIgnoreCase(skeletonType)) {
-					Log.warning("Converting skeleton shopkeeper '" + id + "' with stray variant to new stray shopkeeper.");
-					shopkeeperSection.set("object", "stray");
-				} else if (hasWitherSkeletonType && "WITHER".equalsIgnoreCase(skeletonType)) {
-					Log.warning("Converting skeleton shopkeeper '" + id + "' with wither variant to new wither-skeleton shopkeeper.");
-					shopkeeperSection.set("object", "wither_skeleton");
-				}
-			}
-			if ("zombie".equalsIgnoreCase(objectType)) {
-				if (hasZombieVillagerType && shopkeeperSection.getBoolean("villagerZombie")) {
-					Log.warning("Converting zombie shopkeeper '" + id + "' with zombie-villager variant to new zombie-villager shopkeeper.");
-					shopkeeperSection.set("object", "zombie_villager");
-				}
-			}
-		}
+		// no migrations to do here currently
 		return true;
 	}
 
