@@ -44,6 +44,10 @@ import com.nisovin.shopkeepers.util.StringUtils;
  */
 public class SKShopkeeperStorage implements ShopkeeperStorage {
 
+	// this can be used to determine required migrations or force a save of all shopkeepers data:
+	private static final int DATA_VERSION = 1;
+	private static final String DATA_VERSION_KEY = "data-version";
+
 	private final SKShopkeepersPlugin plugin;
 
 	// data:
@@ -291,8 +295,20 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		Set<String> keys = saveData.getKeys(false);
-		Log.info("Loading data of " + keys.size() + " shopkeepers..");
+		int shopkeepersCount = (keys.contains(DATA_VERSION_KEY) ? keys.size() - 1 : keys.size());
+		Log.info("Loading data of " + shopkeepersCount + " shopkeepers..");
+
+		int dataVersion = saveData.getInt(DATA_VERSION_KEY);
+		boolean dataVersionChanged = (dataVersion != DATA_VERSION);
+		if (dataVersionChanged) {
+			Log.info("The data version has changed from '" + dataVersion + "' to '" + DATA_VERSION
+					+ "': Forcefully marking all loaded shopkeepers as dirty.");
+			saveData.set(DATA_VERSION_KEY, DATA_VERSION);
+		}
+
 		for (String key : keys) {
+			if (key.equals(DATA_VERSION_KEY)) continue;
+
 			Integer idInt = ConversionUtils.parseInt(key);
 			if (idInt == null || idInt <= 0) {
 				Log.warning("Failed to load shopkeeper '" + key + "': Invalid id: " + key);
@@ -309,33 +325,36 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				continue; // skip this shopkeeper
 			}
 
-			String shopTypeString = shopkeeperSection.getString("type");
-			// convert legacy shop type identifiers:
-			if (shopTypeString != null && shopTypeString.equalsIgnoreCase("player")) {
-				shopTypeString = "sell";
+			// perform common migrations:
+			MigrationResult migrationResult = this.migrateShopkeeperData(id, shopkeeperSection, dataVersion);
+			if (migrationResult == MigrationResult.FAILED) {
+				// migration failed, skip this skopkeeper
+				continue;
 			}
 
+			String shopTypeString = shopkeeperSection.getString("type");
 			AbstractShopType<?> shopType = plugin.getShopTypeRegistry().get(shopTypeString);
 			if (shopType == null) {
 				Log.warning("Failed to load shopkeeper '" + key + "': Unknown shop type: " + shopTypeString);
 				continue; // skip this shopkeeper
 			}
 
-			// performs additional data validation and migrations:
-			boolean preparationResult = this.prepareShopkeeperData(id, shopkeeperSection);
-			if (!preparationResult) {
-				continue; // skip this shopkeeper
-			}
-
 			// load shopkeeper:
+			AbstractShopkeeper shopkeeper;
 			try {
-				shopkeeperRegistry.loadShopkeeper(shopType, id, shopkeeperSection);
+				shopkeeper = shopkeeperRegistry.loadShopkeeper(shopType, id, shopkeeperSection);
+				assert shopkeeper != null && shopkeeper.isValid();
 			} catch (ShopkeeperCreateException e) {
 				Log.warning("Failed to load shopkeeper '" + key + "': " + e.getMessage());
 				continue; // skip this shopkeeper
 			} catch (Exception e) {
 				Log.warning("Failed to load shopkeeper '" + key + "'", e);
 				continue; // skip this shopkeeper
+			}
+
+			// if the shopkeeper got migrated or the data version has changed, mark as dirty:
+			if (migrationResult == MigrationResult.MIGRATED || dataVersionChanged) {
+				shopkeeper.markDirty();
 			}
 		}
 
@@ -348,11 +367,25 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		return true;
 	}
 
+	private enum MigrationResult {
+		NOTHING_MIGRATED,
+		MIGRATED,
+		FAILED,
+	}
+
 	// validates and performs migration of the save data
-	// returns false to skip this shopkeeper
-	private boolean prepareShopkeeperData(int id, ConfigurationSection shopkeeperSection) {
-		// no migrations to do here currently
-		return true;
+	private MigrationResult migrateShopkeeperData(int id, ConfigurationSection shopkeeperSection, int dataVersion) {
+		MigrationResult migrationResult = MigrationResult.NOTHING_MIGRATED;
+
+		// convert legacy shop type identifiers:
+		String shopTypeString = shopkeeperSection.getString("type");
+		if (shopTypeString != null && shopTypeString.equalsIgnoreCase("player")) {
+			Log.info("Migrating type of shopkeeper '" + id + "' from '" + shopTypeString + "' to 'sell'.");
+			shopTypeString = "sell";
+			migrationResult = MigrationResult.MIGRATED;
+		}
+
+		return migrationResult;
 	}
 
 	@Override
