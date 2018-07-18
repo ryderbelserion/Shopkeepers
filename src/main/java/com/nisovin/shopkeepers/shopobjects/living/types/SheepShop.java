@@ -36,6 +36,7 @@ public class SheepShop extends SKLivingShopObject {
 		if (configSection.isInt("color")) {
 			// import from pre 1.13 wool data values:
 			// TODO remove this again at some point
+			Log.info("Importing old sheep color for shopkeeper '" + this.getId() + "'.");
 			int woolData = configSection.getInt("color");
 			colorInput = String.valueOf(woolData);
 			color = DyeColor.getByWoolData((byte) woolData);

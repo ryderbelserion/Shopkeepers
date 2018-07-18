@@ -27,6 +27,7 @@ import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
 
 /**
  * Sells written books.
@@ -230,6 +231,7 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		// TODO remove legacy: load offers from old costs section (since late MC 1.12.2)
 		List<BookOffer> legacyOffers = BookOffer.loadFromConfig(configSection, "costs");
 		if (!legacyOffers.isEmpty()) {
+			Log.info("Importing old trading offers for shopkeeper '" + this.getId() + "'.");
 			this._addOffers(legacyOffers);
 			this.markDirty();
 		}
