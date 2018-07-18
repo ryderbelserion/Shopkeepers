@@ -3,7 +3,7 @@
 # Wiki: https://github.com/Shopkeepers/Shopkeepers-Wiki/wiki/Configuration
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
-# Config version. Do not edit manually!
+# Determines the required config migrations. Do not edit manually!
 config-version: 1
 # The initial debugging state of the plugin.
 debug: false
@@ -46,10 +46,10 @@ bypass-shop-interaction-blocking: false
 enable-world-guard-restrictions: false
 # If enabled (additionally to the enable-world-guard-restrictions setting),
 # players will only be able to place shopkeepers in regions where the
-# 'allow-shop' flag is set, but nowhere else. However, players will still require
-# chest access for shop setup to work. And in case they can't place chests in
-# the affected region, shop chests need to be pre-setup by someone else and the
-# require-chest-recently-placed setting needs to be disabled.
+# 'allow-shop' flag is set, but nowhere else. However, players will still
+# require chest access for shop setup to work. And in case they can't place
+# chests in the affected region, shop chests need to be pre-setup by someone
+# else and the require-chest-recently-placed setting needs to be disabled.
 require-world-guard-allow-shop-flag: false
 # If enabled, players will only be able to place shopkeepers in places that
 # have been designated as commercial areas by Towny.
