@@ -4,6 +4,46 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.30 (2018-07-18)
+### Supported MC versions: 1.13
+** This update brings support for MC 1.13:**
+**Some important notices to begin with:**
+* Support for versions below 1.13 has been dropped. It is only compatible with the latest builds of Spigot 1.13-pre7.
+* This update is **experimental**! Don't use it for live servers yet, until any upcoming issue have been fixed.
+* Before installing: **Backup your existing shopkeepers data!** This update will make irreversible changes and might not even be able to import all of the previous data.
+* **Updating is only supported from version v2.2.1 and MC 1.12.2!** Updating from older minecraft or shopkeepers versions hasn't been tested and might not properly work, because some old migration code has been removed with this update as well. So if you are updating from an older version of shopkeepers OR minecraft, first update to MC 1.12.2 and Shopkeepers v2.2.1.
+
+**Migration procedure:**
+Item data values have been removed and various material (item/block) names have changed to be more in-line with vanilla minecraft names. So this update require a migration of existing configs and shopkeepers data.
+* If you use any item ids inside your config (if your config is very old): Those are no longer supported at all and you will have to manually replace them with the corresponding material names prior to running this update.
+* Config migration: When being run for the first time (if there is no 'config-version' present in the existing config), this update attempts to convert previous materials and data values, and the shop-creation-item from the config. However, there is no guarantee for this to work for all materials. It will log every migration it performs and might fallback to using default materials. So check the log and the resulting config and make sure everything went fine.
+* Shopkeeper data migration: Shopkeeper trades will get converted by Bukkit/Spigot itself. So it's up to them to make sure that this works correctly.
+* The plugin will trigger a save of all shopkeepers data, so that any legacy materials that got converted by Bukkit during loading of the shopkeepers will also end up being saved with their updated materials to the save data. Any shopkeepers that cannot be loaded for some reason will skip this procedure however. So make sure that all your existing shopkeepers load fine prior to installing the update, or you might have to update the data of those shopkeepers manually in the future.
+* If some materials cannot be converted, the result might be some kind of fallback: Empty spawn eggs for example will be converted to pig spawn eggs by Bukkit. There is no existing documentation available so far regarding which fallbacks there exist.
+
+**Updating is only supported from version v2.2.1 and MC 1.12.2:**
+* Removed support for loading very old (MC 1.8) serialized item attributes.
+* Removed MC 1.10 villager profession id migrations. 
+* Removed MC 1.11 entity type migrations.
+* Removed support for importing very old shopkeeper trades (changed somewhere in 2015).
+
+**Other changes related to the update:**
+* Removed skip-custom-head-saving setting: Previously this was meant to workaround some issue with saving custom head items (head items with custom texture and no player name) causing corrupted save data. The data corruption / crashing should be fixed by Bukkit by now (by completely dropping 'support' for those custom head items though).
+* Added: All 1.13 mobs have been added to the default config. There is no support for them beyond that yet (no support to switch to baby variants, etc.).
+* Improvement: The chest and sign protection takes block explosions into account.
+* Internal: Reduced the amount of version specific code, since for many things there are Bukkit alternatives available by now.
+* Internal: The save data now contains a 'data-version'. This can be used to determine required migrations (not used for that currently), or force a save of all loaded shopkeepers data.
+
+**Other changes:**
+* Internal: Sheep colors were previous saved by using the old wool data values. They are now converted and saved by their color names.
+* Improvement: Logging a message when importing old book offers (changed during late 1.12.2) and old sheep colors (changed with this update).
+* Improvement: Added a warning message when not able to load a cat type or sheep color and falling back to the default in that case.
+* Improvement: When testing if a player can access a chest, it now clears the off hand as well during the check (making the check more accurate).
+* Improvement: When the plugin is reloaded and the config is missing values, it should now use the actual default values instead of the pre-reload values. (Fallback is still to use the previous values)
+* Internal: There have been some formatting changes to the permissions section of the plugin.yml. This gets copied into the wiki now.
+* Internal: Using player ids instead of player names for temporary data at a few places now.
+* Internal: Minor changes to the internal maven project layout.
+
 ## v2.2.1 (2018-07-02)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
 * Fixed: Some internal shop object ids have slightly changed in the save data. This update is able to load and convert those old ids.
