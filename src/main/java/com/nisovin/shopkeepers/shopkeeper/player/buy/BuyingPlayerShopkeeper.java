@@ -331,12 +331,6 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		super.loadFromSaveData(configSection);
 		// load offers:
 		this._clearOffers();
-		// TODO remove legacy: load offers from old costs section
-		List<PriceOffer> legacyOffers = PriceOffer.loadFromConfigOld(configSection, "costs");
-		if (!legacyOffers.isEmpty()) {
-			this._addOffers(legacyOffers);
-			this.markDirty();
-		}
 		this._addOffers(PriceOffer.loadFromConfig(configSection, "offers"));
 	}
 

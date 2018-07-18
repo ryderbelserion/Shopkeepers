@@ -64,44 +64,4 @@ public class PriceOffer {
 		}
 		return offers;
 	}
-
-	// legacy:
-
-	/*public static void saveToConfigOld(ConfigurationSection config, String node, Collection<PriceOffer> offers) {
-		ConfigurationSection offersSection = config.createSection(node);
-		int id = 0;
-		for (PriceOffer offer : offers) {
-			ItemStack item = offer.getItem();
-			ConfigurationSection offerSection = offersSection.createSection(id + "");
-			offerSection.set("item", item);
-			String attributes = NMSManager.getProvider().saveItemAttributesToString(item);
-			if (attributes != null && !attributes.isEmpty()) {
-				offerSection.set("attributes", attributes);
-			}
-			// legacy: amount was stored separately from the item
-			offerSection.set("amount", item.getAmount());
-			offerSection.set("cost", offer.getPrice());
-			id++;
-		}
-	}*/
-
-	public static List<PriceOffer> loadFromConfigOld(ConfigurationSection config, String node) {
-		List<PriceOffer> offers = new ArrayList<>();
-		ConfigurationSection offersSection = config.getConfigurationSection(node);
-		if (offersSection != null) {
-			for (String key : offersSection.getKeys(false)) {
-				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
-				if (offerSection == null) continue; // invalid offer: not a section
-				ItemStack item = offerSection.getItemStack("item");
-				if (item != null) {
-					// legacy: the amount was stored separately from the item
-					item.setAmount(offerSection.getInt("amount", 1));
-				}
-				int price = offerSection.getInt("cost");
-				if (ItemUtils.isEmpty(item) || price <= 0) continue; // invalid offer
-				offers.add(new PriceOffer(item, price));
-			}
-		}
-		return offers;
-	}
 }

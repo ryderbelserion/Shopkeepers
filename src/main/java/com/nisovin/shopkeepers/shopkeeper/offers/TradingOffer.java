@@ -56,49 +56,4 @@ public class TradingOffer extends SKTradingRecipe { // shares its implementation
 		}
 		return offers;
 	}
-
-	// legacy:
-
-	/*public static void saveToConfigOld(ConfigurationSection config, String node, Collection<TradingOffer> offers) {
-		ConfigurationSection offersSection = config.createSection(node);
-		int id = 0;
-		for (TradingOffer offer : offers) {
-			ItemStack resultItem = offer.getResultItem();
-			ConfigurationSection offerSection = offersSection.createSection(id + "");
-			offerSection.set("item", resultItem);
-			String attributes = NMSManager.getProvider().saveItemAttributesToString(resultItem);
-			if (attributes != null && !attributes.isEmpty()) {
-				offerSection.set("attributes", attributes);
-			}
-			// legacy: amount was stored separately from the item
-			offerSection.set("amount", resultItem.getAmount());
-			offerSection.set("item1", offer.getItem1());
-			offerSection.set("item2", offer.getItem2());
-			// legacy: no attributes were stored for item1 and item2
-			id++;
-		}
-	}*/
-
-	public static List<TradingOffer> loadFromConfigOld(ConfigurationSection config, String node) {
-		List<TradingOffer> offers = new ArrayList<>();
-		ConfigurationSection offersSection = config.getConfigurationSection(node);
-		if (offersSection != null) {
-			for (String key : offersSection.getKeys(false)) {
-				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
-				if (offerSection == null) continue; // invalid offer: not a section
-				ItemStack resultItem = offerSection.getItemStack("item");
-				if (resultItem != null) {
-					// legacy: the amount was stored separately from the item
-					resultItem.setAmount(offerSection.getInt("amount", 1));
-				}
-				if (ItemUtils.isEmpty(resultItem)) continue; // invalid offer
-				ItemStack item1 = offerSection.getItemStack("item1");
-				if (ItemUtils.isEmpty(item1)) continue; // invalid offer
-				ItemStack item2 = offerSection.getItemStack("item2");
-				// legacy: no attributes were stored for item1 and item2
-				offers.add(new TradingOffer(resultItem, item1, item2));
-			}
-		}
-		return offers;
-	}
 }
