@@ -360,6 +360,7 @@ public class Settings {
 		try {
 			Field[] fields = Settings.class.getDeclaredFields();
 			for (Field field : fields) {
+				if (field.isSynthetic()) continue;
 				Class<?> typeClass = field.getType();
 				String configKey = toConfigKey(field.getName());
 
@@ -495,7 +496,7 @@ public class Settings {
 	}
 
 	private static Material loadMaterial(ConfigurationSection config, String key, boolean checkLegacy) {
-		String materialName = config.getString(key); // note: takes default into account
+		String materialName = config.getString(key); // note: takes defaults into account
 		if (materialName == null) return null;
 		Material material = Material.matchMaterial(materialName);
 		if (material == null && checkLegacy) {
@@ -510,10 +511,11 @@ public class Settings {
 		// pre 1.13 to 1.13:
 		Log.info("Migrating config to version 1 ..");
 
-		// shop creation item:
-		// note: this takes defaults into account
-		Material shopCreationItem = loadMaterial(config, "shop-creation-item", true);
-		if (shopCreationItem != null && config.isSet("shop-creation-item")) {
+		// migrate shop creation item, if present:
+		String shopCreationItemTypeName = config.getString("shop-creation-item", null);
+		if (shopCreationItemTypeName != null) {
+			// note: this takes defaults into account:
+			Material shopCreationItem = loadMaterial(config, "shop-creation-item", true);
 			String shopCreationItemSpawnEggEntityType = config.getString("shop-creation-item-spawn-egg-entity-type");
 			if (shopCreationItem == Material.LEGACY_MONSTER_EGG && !StringUtils.isEmpty(shopCreationItemSpawnEggEntityType)) {
 				// migrate spawn egg (ignores the data value): spawn eggs are different materials now
@@ -524,15 +526,17 @@ public class Settings {
 					// unknown entity type
 				}
 				Material newShopCreationItem = LegacyConversion.fromLegacySpawnEgg(spawnEggEntityType);
-				if (newShopCreationItem == null) {
+
+				boolean usingDefault = false;
+				if (newShopCreationItem == null || newShopCreationItem == Material.AIR) {
 					// fallback to default:
 					newShopCreationItem = Material.VILLAGER_SPAWN_EGG;
-					Log.warning("  Could not migrate 'shop-creation-item': Unknown type of spawn egg '" + shopCreationItemSpawnEggEntityType
-							+ "'. Using '" + Material.VILLAGER_SPAWN_EGG + "' now.");
+					usingDefault = true;
 				}
 				assert newShopCreationItem != null;
 
-				Log.info("  Migrating 'shop-creation-item' from '" + shopCreationItem + "' to '" + newShopCreationItem + "'.");
+				Log.info("  Migrating 'shop-creation-item' from '" + shopCreationItemTypeName + "' and spawn egg entity type '"
+						+ shopCreationItemSpawnEggEntityType + "' to '" + newShopCreationItem + "'" + (usingDefault ? " (default)" : "") + ".");
 				config.set("shop-creation-item", newShopCreationItem.name());
 			} else {
 				// regular material + data value migration:
@@ -584,19 +588,26 @@ public class Settings {
 	// convert legacy material + data value to new material, returns true if the item was migrated
 	private static boolean migrateLegacyItemData(ConfigurationSection config, String migratedItemId, String itemTypeKey, String itemDataKey, Material defaultType) {
 		// migrate material, if present:
-		Material itemType = loadMaterial(config, itemTypeKey, true); // note: this takes defaults into account
-		if (itemType != null && config.isSet(itemTypeKey)) {
-			int itemData = config.getInt(itemDataKey, 0);
-			Material newItemType = LegacyConversion.fromLegacy(itemType, (byte) itemData);
+		String itemTypeName = config.getString(itemTypeKey, null);
+		if (itemTypeName != null) {
+			Material newItemType = null;
+			int itemData = 0;
+			Material itemType = loadMaterial(config, itemTypeKey, true);
+			if (itemType != null) {
+				itemData = config.getInt(itemDataKey, 0);
+				newItemType = LegacyConversion.fromLegacy(itemType, (byte) itemData);
+			}
+			boolean usingDefault = false;
 			if (newItemType == null || newItemType == Material.AIR) {
 				// fallback to default:
-				Log.warning("  Could not migrate '" + migratedItemId + "' from type '" + itemType + "' and data value '" + itemData
-						+ "'. Using '" + defaultType + "' now.");
 				newItemType = defaultType;
+				usingDefault = true;
 			}
-
-			Log.info("  Converting '" + migratedItemId + "' from type '" + itemType + "' and data value '" + itemData + "' to type '" + newItemType + "'.");
-			config.set(itemTypeKey, (newItemType != null ? newItemType.name() : null));
+			if (itemType != newItemType) {
+				Log.info("  Migrating '" + migratedItemId + "' from type '" + itemTypeName + "' and data value '" + itemData + "' to type '"
+						+ (newItemType == null ? "" : newItemType.name()) + "'" + (usingDefault ? " (default)" : "") + ".");
+				config.set(itemTypeKey, (newItemType != null ? newItemType.name() : null));
+			}
 			return true;
 		}
 

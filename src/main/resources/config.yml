@@ -60,17 +60,11 @@ enable-towny-restrictions: false
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
 # The item type used to create player shops.
-shop-creation-item: MONSTER_EGG
-# The data value of the shop-creation item. -1 to ignore.
-shop-creation-item-data: 0
+shop-creation-item: VILLAGER_SPAWN_EGG
 # The display name of the shop-creation item. Empty to ignore.
 shop-creation-item-name: ""
 # The item lore of the shop-creation item. Empty to ignore.
 shop-creation-item-lore: []
-# The required spawn-egg mob type of the shop-creation item (if the item is a
-# spawn-egg). Empty to ignore, or invalid (ex. whitespace ' ') to only accept
-# empty spawn eggs (without any mob type assigned).
-shop-creation-item-spawn-egg-entity-type: "VILLAGER"
 # Whether to prevent normal usage of the shop-creation item. Players with the
 # bypass permission (usually admins) can bypass this.
 prevent-shop-creation-item-regular-usage: false
@@ -154,6 +148,14 @@ enabled-living-shops:
 - VINDICATOR
 - ILLUSIONER
 - PARROT
+- TURTLE
+- PHANTOM
+- COD
+- SALMON
+- PUFFERFISH
+- TROPICAL_FISH
+- DROWNED
+- DOLPHIN
 
 # With the old behavior the mobs can be pushed around and their AI and gravity
 # is handled by minecraft itself. With the new behavior all their vanilla AI is
@@ -220,8 +222,6 @@ editor-title: "Shopkeeper Editor"
 
 # The item type of the set-name button, and of the naming item (if enabled).
 name-item: NAME_TAG
-# The data value of the set-name button, and of the naming item. -1 to ignore.
-name-item-data: 0
 # The required item lore of the naming item. Empty to ignore.
 name-item-lore: []
 
@@ -230,13 +230,9 @@ name-item-lore: []
 enable-chest-option-on-player-shop: false
 # The item type of the open-chest button.
 chest-item: CHEST
-# The data value of the open-chest button.
-chest-item-data: 0
 
 # The item type of the delete button.
 delete-item: BONE
-# The data value of the delete button item.
-delete-item-data: 0
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Non-shopkeeper villagers
@@ -256,8 +252,6 @@ hire-other-villagers: false
 # The item type to use for the hire button in player shopkeepers that are for
 # sale, and for the hire-cost item when hiring non-shopkeeper villagers.
 hire-item: EMERALD
-# The required data value of the hire-cost item. -1 to ignore.
-hire-item-data: 0
 # The required item name of the hire-cost item. Empty to ignore.
 hire-item-name: ""
 # The required item lore of the hire-cost item. Empty to ignore.
@@ -304,8 +298,6 @@ tax-round-up: false
 
 # The item type of the currency items used in player shops.
 currency-item: EMERALD
-# The data value of the currency item. -1 to ignore.
-currency-item-data: 0
 # The item name of the currency item. Empty to ignore.
 currency-item-name: ""
 # The item lore of the currency item. Empty to ignore.
@@ -314,8 +306,6 @@ currency-item-lore: []
 # The item type of the placeholder when a player has not set the cost for an
 # item.
 zero-currency-item: BARRIER
-# The data value of the zero-currency item.
-zero-currency-item-data: 0
 # The item name of the zero-currency item.
 zero-currency-item-name: ""
 # The item lore of the zero-currency item.
@@ -324,8 +314,6 @@ zero-currency-item-lore: []
 # The item type of a second, higher-value currency used in the second trading
 # slot of player shops. Set to 'AIR' to disable the second currency.
 high-currency-item: EMERALD_BLOCK
-# The data value of the second currency item. -1 to ignore.
-high-currency-item-data: 0
 # The item name of the second currency item. Empty to ignore.
 high-currency-item-name: ""
 # The item lore of the second currency item. Empty to ignore.
@@ -340,8 +328,6 @@ high-currency-min-cost: 20
 # The item type of the placeholder when a player has not set the second
 # currency cost for an item.
 high-zero-currency-item: BARRIER
-# The data value of the zero-second-currency item. -1 to ignore.
-high-zero-currency-item-data: 0
 # The item name of the zero-second-currency item. Empty to ignore.
 high-zero-currency-item-name: ""
 # The item lore of the zero-second-currency item. Empty to ignore.

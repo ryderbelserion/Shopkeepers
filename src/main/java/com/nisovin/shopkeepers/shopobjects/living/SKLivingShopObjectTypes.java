@@ -80,6 +80,15 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * # 1.12
 	 * <li> ILLUSIONER: okay
 	 * <li> PARROT: okay, dances, spawns with random color
+	 * * # 1.13
+	 * <li> TURTLE: okay
+	 * <li> PHANTOM: okay, burns in sun
+	 * <li> COD: okay, visually disappears in early versions of spigot 1.13-pre7 when clicked with water-bucket
+	 * <li> SALMON: okay, visually disappears in early versions of spigot 1.13-pre7 when clicked with water-bucket
+	 * <li> PUFFERFISH: okay, visually disappears in early versions of spigot 1.13-pre7 when clicked with water-bucket
+	 * <li> TROPICAL_FISH: okay, visually disappears in early versions of spigot 1.13-pre7 when clicked with water-bucket
+	 * <li> DROWNED: okay
+	 * <li> DOLPHIN: okay, slightly gliding inside water
 	 * </ul>
 	 */
 
