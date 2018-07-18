@@ -178,12 +178,6 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 		tradePermission = configSection.getString("tradePerm", null);
 		// load offers:
 		this._clearOffers();
-		// TODO remove legacy: load offers from old format
-		List<TradingOffer> legacyOffers = this.loadFromConfigOld(configSection, "recipes");
-		if (!legacyOffers.isEmpty()) {
-			this._addOffers(legacyOffers);
-			this.markDirty();
-		}
 		this._addOffers(TradingOffer.loadFromConfig(configSection, "recipes"));
 	}
 
@@ -258,83 +252,4 @@ public class AdminShopkeeper extends AbstractShopkeeper {
 		this._clearOffers();
 		this.markDirty();
 	}
-
-	// legacy code:
-
-	/*private void saveRecipesOld(ConfigurationSection config, String node, Collection<ItemStack[]> recipes) {
-		ConfigurationSection recipesSection = config.createSection(node);
-		int count = 0;
-		for (ItemStack[] recipe : recipes) {
-			ConfigurationSection recipeSection = recipesSection.createSection(String.valueOf(count));
-			for (int slot = 0; slot < 3; slot++) {
-				if (recipe[slot] != null) {
-					this.saveItemStackOld(recipe[slot], recipeSection.createSection(String.valueOf(slot)));
-				}
-			}
-			count++;
-		}
-	}*/
-
-	private List<TradingOffer> loadFromConfigOld(ConfigurationSection config, String node) {
-		List<TradingOffer> offers = new ArrayList<>();
-		ConfigurationSection offersSection = config.getConfigurationSection(node);
-		if (offersSection != null) {
-			for (String key : offersSection.getKeys(false)) {
-				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
-				if (offerSection == null) continue; // invalid offer: not a section
-
-				ItemStack resultItem = this.loadItemStackOld(offerSection.getConfigurationSection("2"));
-				if (ItemUtils.isEmpty(resultItem)) continue; // invalid offer
-				ItemStack item1 = this.loadItemStackOld(offerSection.getConfigurationSection("0"));
-				if (ItemUtils.isEmpty(item1)) continue; // invalid offer
-				ItemStack item2 = this.loadItemStackOld(offerSection.getConfigurationSection("1"));
-				offers.add(new TradingOffer(resultItem, item1, item2));
-			}
-		}
-		return offers;
-	}
-
-	/*private List<ItemStack[]> loadRecipesOld(ConfigurationSection config, String node) {
-		List<ItemStack[]> recipes = new ArrayList<>();
-		ConfigurationSection recipesSection = config.getConfigurationSection(node);
-		if (recipesSection != null) {
-			for (String key : recipesSection.getKeys(false)) {
-				ConfigurationSection recipeSection = recipesSection.getConfigurationSection(key);
-				ItemStack[] recipe = new ItemStack[3];
-				for (int slot = 0; slot < 3; slot++) {
-					if (recipeSection.isConfigurationSection(String.valueOf(slot))) {
-						recipe[slot] = Utils.getNullIfEmpty(this.loadItemStackOld(recipeSection.getConfigurationSection(String.valueOf(slot))));
-					}
-				}
-				if (recipe[0] == null || recipe[2] == null) continue; // invalid recipe
-				recipes.add(recipe);
-			}
-		}
-		return recipes;
-	}*/
-
-	/**
-	 * Loads an ItemStack from a config section.
-	 * 
-	 * @param section
-	 * @return
-	 */
-	private ItemStack loadItemStackOld(ConfigurationSection section) {
-		if (section == null) return null;
-		return section.getItemStack("item");
-	}
-
-	/**
-	 * Saves an ItemStack to a config section.
-	 * 
-	 * @param item
-	 * @param config
-	 */
-	/*private void saveItemStackOld(ItemStack item, ConfigurationSection config) {
-		config.set("item", item);
-		String attr = NMSManager.getProvider().saveItemAttributesToString(item);
-		if (attr != null && !attr.isEmpty()) {
-			config.set("attributes", attr);
-		}
-	}*/
 }
