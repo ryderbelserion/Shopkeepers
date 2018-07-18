@@ -63,8 +63,8 @@ public class LegacyConversion {
 	}
 
 	public static Material fromLegacySpawnEgg(EntityType entityType) {
-		// this is what craftbukkit uses internally:
-		//return fromLegacy(Material.LEGACY_MONSTER_EGG, (byte) entityType.getTypeId());
+		// this is what craftbukkit uses internally, but its missing some post-data-value mobs:
+		// return fromLegacy(Material.LEGACY_MONSTER_EGG, (byte) entityType.getTypeId());
 		return SPAWN_EGGS.get(entityType);
 	}
 

@@ -14,6 +14,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -106,8 +107,15 @@ public class Settings {
 			EntityType.VEX.name(), // MC 1.11
 			EntityType.VINDICATOR.name(), // MC 1.11
 			EntityType.ILLUSIONER.name(), // MC 1.12
-			EntityType.PARROT.name() // MC 1.12
-	// TODO MC 1.13 mobs
+			EntityType.PARROT.name(), // MC 1.12
+			EntityType.TURTLE.name(), // MC 1.13
+			EntityType.PHANTOM.name(), // MC 1.13
+			EntityType.COD.name(), // MC 1.13
+			EntityType.SALMON.name(), // MC 1.13
+			EntityType.PUFFERFISH.name(), // MC 1.13
+			EntityType.TROPICAL_FISH.name(), // MC 1.13
+			EntityType.DROWNED.name(), // MC 1.13
+			EntityType.DOLPHIN.name() // MC 1.13
 	);
 
 	public static boolean useLegacyMobBehavior = false;
@@ -331,16 +339,17 @@ public class Settings {
 		return fieldName.replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase();
 	}
 
-	// TODO on reloads this will probably use the previous values as defaults, instead of the actual default values
 	// returns true, if the config misses values which need to be saved
 	public static boolean loadConfiguration(Configuration config) {
 		boolean configChanged = false;
 
-		// perform config migrations:
-		int configVersion = config.getInt("config-version");
-		if (configVersion <= 0) {
-			migrateConfig_0_to_1(config);
-			configChanged = true;
+		// perform config migrations (if the config is not empty):
+		if (!config.getKeys(false).isEmpty()) {
+			int configVersion = config.getInt("config-version", 0); // default value is important here
+			if (configVersion <= 0) {
+				migrateConfig_0_to_1(config);
+				configChanged = true;
+			}
 		}
 
 		// exempt a few string / string list settings from color conversion:
@@ -357,12 +366,34 @@ public class Settings {
 				// initialize the setting with the default value, if it is missing in the config
 				if (!config.isSet(configKey)) {
 					Log.warning("Config: Inserting default value for missing config entry: " + configKey);
+
+					// determine default value:
+					Object defaultValue = null;
+					Configuration defaults = config.getDefaults(); // might be null or miss values
+					if (defaults != null) {
+						defaultValue = defaults.get(configKey);
+					}
+					if (defaultValue == null) {
+						// fallback to the current value:
+						defaultValue = field.get(null);
+					}
+
+					// validate default value:
+					if (defaultValue == null) {
+						Log.warning("Config: Missing default value for missing config entry: " + configKey);
+						continue;
+					} else if (defaultValue.getClass() == typeClass) {
+						Log.warning("Config: Default value for missing config entry '" + configKey + "' is of wrong type: " + defaultValue.getClass().getName());
+						continue;
+					}
+
+					// set default value:
 					if (typeClass == Material.class) {
-						config.set(configKey, ((Material) field.get(null)).name());
+						config.set(configKey, ((Material) defaultValue).name());
 					} else if (typeClass == String.class) {
-						config.set(configKey, Utils.decolorize((String) field.get(null)));
+						config.set(configKey, Utils.decolorize((String) defaultValue));
 					} else if (typeClass == List.class && (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0] == String.class) {
-						config.set(configKey, Utils.decolorize((List<String>) field.get(null)));
+						config.set(configKey, Utils.decolorize(ConversionUtils.toStringList((List<?>) defaultValue)));
 					} else {
 						config.set(configKey, field.get(null));
 					}
@@ -370,18 +401,18 @@ public class Settings {
 				}
 
 				if (typeClass == String.class) {
-					String string = config.getString(configKey, (String) field.get(null));
+					String string = config.getString(configKey);
 					// colorize, if not exempted:
 					if (!noColorConversionKeys.contains(configKey)) {
 						string = Utils.colorize(string);
 					}
 					field.set(null, string);
 				} else if (typeClass == int.class) {
-					field.set(null, config.getInt(configKey, field.getInt(null)));
+					field.set(null, config.getInt(configKey));
 				} else if (typeClass == short.class) {
-					field.set(null, (short) config.getInt(configKey, field.getShort(null)));
+					field.set(null, (short) config.getInt(configKey));
 				} else if (typeClass == boolean.class) {
-					field.set(null, config.getBoolean(configKey, field.getBoolean(null)));
+					field.set(null, config.getBoolean(configKey));
 				} else if (typeClass == Material.class) {
 					// this assumes that legacy item conversion has already been performed
 					Material material = loadMaterial(config, configKey, false);
@@ -464,7 +495,7 @@ public class Settings {
 	}
 
 	private static Material loadMaterial(ConfigurationSection config, String key, boolean checkLegacy) {
-		String materialName = config.getString(key);
+		String materialName = config.getString(key); // note: takes default into account
 		if (materialName == null) return null;
 		Material material = Material.matchMaterial(materialName);
 		if (material == null && checkLegacy) {
@@ -480,8 +511,9 @@ public class Settings {
 		Log.info("Migrating config to version 1 ..");
 
 		// shop creation item:
+		// note: this takes defaults into account
 		Material shopCreationItem = loadMaterial(config, "shop-creation-item", true);
-		if (shopCreationItem != null) {
+		if (shopCreationItem != null && config.isSet("shop-creation-item")) {
 			String shopCreationItemSpawnEggEntityType = config.getString("shop-creation-item-spawn-egg-entity-type");
 			if (shopCreationItem == Material.LEGACY_MONSTER_EGG && !StringUtils.isEmpty(shopCreationItemSpawnEggEntityType)) {
 				// migrate spawn egg (ignores the data value): spawn eggs are different materials now
@@ -498,18 +530,26 @@ public class Settings {
 					Log.warning("  Could not migrate 'shop-creation-item': Unknown type of spawn egg '" + shopCreationItemSpawnEggEntityType
 							+ "'. Using '" + Material.VILLAGER_SPAWN_EGG + "' now.");
 				}
+				assert newShopCreationItem != null;
 
-				Log.info("  Migrating 'shop-creation-item' from '" + shopCreationItem + "' to '" + newShopCreationItem.name() + "'.");
-				Log.info("  Removing 'shop-creation-item-spawn-egg-entity-type' (previously '" + shopCreationItemSpawnEggEntityType + "').");
-				config.set("shop-creation-item-spawn-egg-entity-type", null);
-				if (config.isSet("shop-creation-item-data")) {
-					Log.info("  Removing 'shop-creation-item-data' (previously '" + config.getInt("shop-creation-item-data") + "').");
-					config.set("shop-creation-item-data", null);
-				}
+				Log.info("  Migrating 'shop-creation-item' from '" + shopCreationItem + "' to '" + newShopCreationItem + "'.");
 				config.set("shop-creation-item", newShopCreationItem.name());
 			} else {
+				// regular material + data value migration:
 				migrateLegacyItemData(config, "shop-creation-item", "shop-creation-item", "shop-creation-item-data", Material.VILLAGER_SPAWN_EGG);
 			}
+		}
+
+		// remove shop-creation-item-spawn-egg-entity-type from config:
+		if (config.isSet("shop-creation-item-spawn-egg-entity-type")) {
+			Log.info("  Removing 'shop-creation-item-spawn-egg-entity-type' (previously '" + config.get("shop-creation-item-spawn-egg-entity-type", null) + "').");
+			config.set("shop-creation-item-spawn-egg-entity-type", null);
+		}
+
+		// remove shop-creation-item-data-value from config:
+		if (config.isSet("shop-creation-item-data")) {
+			Log.info("  Removing 'shop-creation-item-data' (previously '" + config.get("shop-creation-item-data", null) + "').");
+			config.set("shop-creation-item-data", null);
 		}
 
 		// name item:
@@ -541,28 +581,29 @@ public class Settings {
 		Log.info("Config migration to version 1 done.");
 	}
 
-	// returns true if the item was migrated
+	// convert legacy material + data value to new material, returns true if the item was migrated
 	private static boolean migrateLegacyItemData(ConfigurationSection config, String migratedItemId, String itemTypeKey, String itemDataKey, Material defaultType) {
-		// convert legacy material + data value to new material:
-		Material itemType = loadMaterial(config, itemTypeKey, true);
-		// only migrate if present and legacy type:
-		if (itemType != null) {
-			int itemData = config.getInt(itemDataKey);
+		// migrate material, if present:
+		Material itemType = loadMaterial(config, itemTypeKey, true); // note: this takes defaults into account
+		if (itemType != null && config.isSet(itemTypeKey)) {
+			int itemData = config.getInt(itemDataKey, 0);
 			Material newItemType = LegacyConversion.fromLegacy(itemType, (byte) itemData);
 			if (newItemType == null || newItemType == Material.AIR) {
 				// fallback to default:
-				newItemType = defaultType;
 				Log.warning("  Could not migrate '" + migratedItemId + "' from type '" + itemType + "' and data value '" + itemData
 						+ "'. Using '" + defaultType + "' now.");
+				newItemType = defaultType;
 			}
 
-			Log.info("  Converting '" + migratedItemId + "' from type '" + itemType + "' and data value '" + itemData + "' to type '" + newItemType.name() + "'.");
-			if (config.isSet(itemDataKey)) {
-				Log.info("  Removing '" + itemDataKey + "' (previously '" + itemData + "').");
-				config.set(itemDataKey, null);
-			}
+			Log.info("  Converting '" + migratedItemId + "' from type '" + itemType + "' and data value '" + itemData + "' to type '" + newItemType + "'.");
 			config.set(itemTypeKey, (newItemType != null ? newItemType.name() : null));
 			return true;
+		}
+
+		// remove data value from config:
+		if (config.isSet(itemDataKey)) {
+			Log.info("  Removing '" + itemDataKey + "' (previously '" + config.get(itemDataKey, null) + "').");
+			config.set(itemDataKey, null);
 		}
 		return false;
 	}
