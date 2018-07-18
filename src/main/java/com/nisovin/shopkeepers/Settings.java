@@ -585,8 +585,10 @@ public class Settings {
 		Log.info("Config migration to version 1 done.");
 	}
 
-	// convert legacy material + data value to new material, returns true if the item was migrated
+	// convert legacy material + data value to new material, returns true if migrations took place
 	private static boolean migrateLegacyItemData(ConfigurationSection config, String migratedItemId, String itemTypeKey, String itemDataKey, Material defaultType) {
+		boolean migrated = false;
+
 		// migrate material, if present:
 		String itemTypeName = config.getString(itemTypeKey, null);
 		if (itemTypeName != null) {
@@ -607,16 +609,17 @@ public class Settings {
 				Log.info("  Migrating '" + migratedItemId + "' from type '" + itemTypeName + "' and data value '" + itemData + "' to type '"
 						+ (newItemType == null ? "" : newItemType.name()) + "'" + (usingDefault ? " (default)" : "") + ".");
 				config.set(itemTypeKey, (newItemType != null ? newItemType.name() : null));
+				migrated = true;
 			}
-			return true;
 		}
 
 		// remove data value from config:
 		if (config.isSet(itemDataKey)) {
 			Log.info("  Removing '" + itemDataKey + "' (previously '" + config.get(itemDataKey, null) + "').");
 			config.set(itemDataKey, null);
+			migrated = true;
 		}
-		return false;
+		return migrated;
 	}
 
 	public static void loadLanguageConfiguration(Configuration config) {
