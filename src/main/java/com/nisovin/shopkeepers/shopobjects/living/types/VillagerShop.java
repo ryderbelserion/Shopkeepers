@@ -29,26 +29,17 @@ public class VillagerShop extends SKLivingShopObject {
 		super.load(configSection);
 
 		// load profession:
-		String professionInput;
-		if (configSection.isInt("prof")) {
-			// import from pre 1.10 profession ids:
-			// TODO remove this again at some point
-			int profId = configSection.getInt("prof");
-			professionInput = String.valueOf(profId);
-			this.profession = getProfessionFromOldId(profId);
-			shopkeeper.markDirty();
-		} else {
-			professionInput = configSection.getString("prof");
-			this.profession = getProfession(professionInput);
-		}
+		String professionName = configSection.getString("prof");
+		Profession profession = getProfession(professionName);
 		// validate:
 		if (!isVillagerProfession(profession)) {
 			// fallback:
-			Log.warning("Missing or invalid villager profession '" + professionInput + "' for shopkeeper " + shopkeeper.getId()
+			Log.warning("Missing or invalid villager profession '" + professionName + "' for shopkeeper " + shopkeeper.getId()
 					+ "'. Using '" + Profession.FARMER + "' now.");
-			this.profession = Profession.FARMER;
+			profession = Profession.FARMER;
 			shopkeeper.markDirty();
 		}
+		this.profession = profession;
 	}
 
 	@Override
@@ -101,24 +92,6 @@ public class VillagerShop extends SKLivingShopObject {
 		});
 		assert profession != null;
 		this.applySubType();
-	}
-
-	// pre 1.10 ids:
-	private static Profession getProfessionFromOldId(int oldProfessionId) {
-		switch (oldProfessionId) {
-		case 0:
-			return Profession.FARMER;
-		case 1:
-			return Profession.LIBRARIAN;
-		case 2:
-			return Profession.PRIEST;
-		case 3:
-			return Profession.BLACKSMITH;
-		case 4:
-			return Profession.BUTCHER;
-		default:
-			return null;
-		}
 	}
 
 	private static Profession getProfession(String professionName) {
