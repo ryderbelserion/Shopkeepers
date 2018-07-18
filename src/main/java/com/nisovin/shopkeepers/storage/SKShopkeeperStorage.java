@@ -303,6 +303,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		if (dataVersionChanged) {
 			Log.info("The data version has changed from '" + dataVersion + "' to '" + DATA_VERSION
 					+ "': Forcefully marking all loaded shopkeepers as dirty.");
+			// update data version:
 			saveData.set(DATA_VERSION_KEY, DATA_VERSION);
 		}
 
@@ -360,8 +361,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		// create a copy of the save data's top level data structure:
 		this.clearConfigSection(saveDataBuffer);
+		// set data version first (at the top):
+		saveDataBuffer.set(DATA_VERSION_KEY, DATA_VERSION);
 		for (Entry<String, Object> entry : saveData.getValues(false).entrySet()) {
-			saveDataBuffer.set(entry.getKey(), entry.getValue());
+			String key = entry.getKey();
+			if (key.equals(DATA_VERSION_KEY)) continue;
+			saveDataBuffer.set(key, entry.getValue());
 		}
 
 		return true;
