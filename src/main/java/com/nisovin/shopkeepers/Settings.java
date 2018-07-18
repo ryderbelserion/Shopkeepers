@@ -593,10 +593,9 @@ public class Settings {
 		String itemTypeName = config.getString(itemTypeKey, null);
 		if (itemTypeName != null) {
 			Material newItemType = null;
-			int itemData = 0;
+			int itemData = config.getInt(itemDataKey, 0);
 			Material itemType = loadMaterial(config, itemTypeKey, true);
 			if (itemType != null) {
-				itemData = config.getInt(itemDataKey, 0);
 				newItemType = LegacyConversion.fromLegacy(itemType, (byte) itemData);
 			}
 			boolean usingDefault = false;
