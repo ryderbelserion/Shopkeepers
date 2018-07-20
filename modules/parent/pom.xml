@@ -13,7 +13,7 @@
 		<revision>2.3.0</revision>
 		<root.relativePath>../..</root.relativePath>
 		<shopkeepers.version>${project.version}</shopkeepers.version>
-		<shopkeepers.dbo.url>http://dev.bukkit.org/server-mods/shopkeepers/</shopkeepers.dbo.url>
+		<shopkeepers.dbo.url>https://dev.bukkit.org/projects/shopkeepers/</shopkeepers.dbo.url>
 
 		<shopkeepers.repository.url>https://github.com/Shopkeepers/Shopkeepers</shopkeepers.repository.url>
 		<shopkeepers.repository.connection>scm:git:git://github.com/Shopkeepers/Shopkeepers.git</shopkeepers.repository.connection>
