@@ -6,14 +6,14 @@ Date format: (YYYY-MM-DD)
 
 ## v2.30 (2018-07-18)
 ### Supported MC versions: 1.13
-** This update brings support for MC 1.13:**
+**This update brings support for MC 1.13:**  
 **Some important notices to begin with:**
 * Support for versions below 1.13 has been dropped. It is only compatible with the latest builds of Spigot 1.13-pre7.
 * This update is **experimental**! Don't use it for live servers yet, until any upcoming issue have been fixed.
 * Before installing: **Backup your existing shopkeepers data!** This update will make irreversible changes and might not even be able to import all of the previous data.
 * **Updating is only supported from version v2.2.1 and MC 1.12.2!** Updating from older minecraft or shopkeepers versions hasn't been tested and might not properly work, because some old migration code has been removed with this update as well. So if you are updating from an older version of shopkeepers OR minecraft, first update to MC 1.12.2 and Shopkeepers v2.2.1.
 
-**Migration procedure:**
+**Migration procedure:**  
 Item data values have been removed and various material (item/block) names have changed to be more in-line with vanilla minecraft names. So this update require a migration of existing configs and shopkeepers data.
 * If you use any item ids inside your config (if your config is very old): Those are no longer supported at all and you will have to manually replace them with the corresponding material names prior to running this update.
 * Config migration: When being run for the first time (if there is no 'config-version' present in the existing config), this update attempts to convert previous materials and data values, and the shop-creation-item from the config. However, there is no guarantee for this to work for all materials. It will log every migration it performs and might fallback to using default materials. So check the log and the resulting config and make sure everything went fine.
