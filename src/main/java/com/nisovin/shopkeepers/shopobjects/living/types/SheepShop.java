@@ -109,7 +109,7 @@ public class SheepShop extends SKLivingShopObject {
 			return Material.PINK_WOOL;
 		case GRAY:
 			return Material.GRAY_WOOL;
-		case SILVER:
+		case LIGHT_GRAY:
 			return Material.LIGHT_GRAY_WOOL;
 		case CYAN:
 			return Material.CYAN_WOOL;
