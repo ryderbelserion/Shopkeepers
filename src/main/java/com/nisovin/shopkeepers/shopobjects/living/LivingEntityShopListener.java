@@ -14,8 +14,11 @@ import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDropItemEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntityPortalEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent;
+import org.bukkit.event.entity.EntityPotionEffectEvent.Action;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
@@ -81,6 +84,9 @@ class LivingEntityShopListener implements Listener {
 			player.updateInventory();
 		}
 	}
+
+	// TODO many of those behaviors might no longer be active, once all entities use noAI (once legacy mob behavior is
+	// no longer supported)
 
 	@EventHandler(ignoreCancelled = true)
 	void onEntityTarget(EntityTargetEvent event) {
@@ -213,6 +219,23 @@ class LivingEntityShopListener implements Listener {
 	@EventHandler(ignoreCancelled = true)
 	void onEntityBlockForm(EntityBlockFormEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
+			event.setCancelled(true);
+		}
+	}
+
+	// ex: chicken laying eggs
+
+	@EventHandler(ignoreCancelled = true)
+	void onEntityDropItem(EntityDropItemEvent event) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
+			event.setCancelled(true);
+		}
+	}
+
+	// prevent shopkeeper entities from being affected by potion effects
+	@EventHandler(ignoreCancelled = true)
+	void onEntityDropItem(EntityPotionEffectEvent event) {
+		if (event.getAction() == Action.ADDED && shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}

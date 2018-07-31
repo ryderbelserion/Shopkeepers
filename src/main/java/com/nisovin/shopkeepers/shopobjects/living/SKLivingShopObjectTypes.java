@@ -33,7 +33,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> BAT: experimental: requires NoAI, sleeping by default, but starts flying when 'hit'
 	 * <li> BLAZE: experimental: starts flying upwards -> NoAI for now, seems okay
 	 * <li> CAVE_SPIDER: okay
-	 * <li> CHICKEN: might still lays eggs, seems okay
+	 * <li> CHICKEN: might still lays eggs (TODO re-check: this might no longer be the case), seems okay
 	 * <li> COW: okay
 	 * <li> CREEPER: okay
 	 * <li> ENDER_DRAGON: experimental: requires NoAI, shows boss bar, not clickable..
