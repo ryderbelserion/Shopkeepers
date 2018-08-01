@@ -4,7 +4,17 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
-## v2.30 (2018-07-18)
+## v2.3.1 (2018-08-01)
+### Supported MC versions: 1.13
+* This version relies on the very latest version of Craftbukkit / Spigot. Make sure to **update your server** to the latest Spigot build before running this version!
+* Updated link to project website.
+* Fixed: Chicken shopkeepers should no longer lay eggs.
+* Fixed: Shopkeeper entities should no longer gain potion effects (for any reason).
+* Fixed: Player shop type migration broke in v2.3.0.
+
+**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.
+
+## v2.3.0 (2018-07-18)
 ### Supported MC versions: 1.13
 **This update brings support for MC 1.13:**  
 **Some important notices to begin with:**
