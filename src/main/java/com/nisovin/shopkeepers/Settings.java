@@ -383,8 +383,9 @@ public class Settings {
 					if (defaultValue == null) {
 						Log.warning("Config: Missing default value for missing config entry: " + configKey);
 						continue;
-					} else if (defaultValue.getClass() == typeClass) {
-						Log.warning("Config: Default value for missing config entry '" + configKey + "' is of wrong type: " + defaultValue.getClass().getName());
+					} else if (!typeClass.isAssignableFrom(defaultValue.getClass())) {
+						Log.warning("Config: Default value for missing config entry '" + configKey + "' is of wrong type: "
+								+ "Got " + defaultValue.getClass().getName() + ", expecting " + typeClass.getName());
 						continue;
 					}
 
@@ -392,11 +393,19 @@ public class Settings {
 					if (typeClass == Material.class) {
 						config.set(configKey, ((Material) defaultValue).name());
 					} else if (typeClass == String.class) {
-						config.set(configKey, Utils.decolorize((String) defaultValue));
+						// decolorize, if not exempted:
+						if (!noColorConversionKeys.contains(configKey)) {
+							defaultValue = Utils.decolorize((String) defaultValue);
+						}
+						config.set(configKey, defaultValue);
 					} else if (typeClass == List.class && (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0] == String.class) {
-						config.set(configKey, Utils.decolorize(ConversionUtils.toStringList((List<?>) defaultValue)));
+						// decolorize, if not exempted:
+						if (!noColorConversionKeys.contains(configKey)) {
+							defaultValue = Utils.decolorize(ConversionUtils.toStringList((List<?>) defaultValue));
+						}
+						config.set(configKey, defaultValue);
 					} else {
-						config.set(configKey, field.get(null));
+						config.set(configKey, defaultValue);
 					}
 					configChanged = true;
 				}

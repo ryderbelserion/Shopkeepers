@@ -123,9 +123,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 		this.reloadConfig();
 		Configuration config = this.getConfig();
-		boolean settingsMissing = Settings.loadConfiguration(config);
-		if (settingsMissing) {
-			// if settings were missing -> add those to the config and save it
+		boolean configChanged = Settings.loadConfiguration(config);
+		if (configChanged) {
+			// if missing settings were added -> save the modified config
 			// TODO persist comments somehow
 			this.saveConfig();
 		}
