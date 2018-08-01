@@ -4,12 +4,15 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
-## v2.3.2 (2018-08-01)
+## v2.3.3 (2018-08-01)
 ### Supported MC versions: 1.13
 * Fixed: Defaults values for missing config values not getting properly added.
 * Fixed: Not decolorizing default values which are not meant to be colorized.
 
 **Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.
+
+## v2.3.2 (2018-08-01) [broken]
+See 2.3.3 instead.
 
 ## v2.3.1 (2018-08-01)
 ### Supported MC versions: 1.13
