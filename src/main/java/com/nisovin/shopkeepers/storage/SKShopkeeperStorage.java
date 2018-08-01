@@ -385,8 +385,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		// convert legacy shop type identifiers:
 		String shopTypeString = shopkeeperSection.getString("type");
 		if (shopTypeString != null && shopTypeString.equalsIgnoreCase("player")) {
-			Log.info("Migrating type of shopkeeper '" + id + "' from '" + shopTypeString + "' to 'sell'.");
-			shopTypeString = "sell";
+			Log.info("Migrating type of shopkeeper '" + id + "' from 'player' to 'sell'.");
+			shopkeeperSection.set("type", "sell");
 			migrationResult = MigrationResult.MIGRATED;
 		}
 
