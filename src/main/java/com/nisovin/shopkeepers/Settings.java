@@ -383,7 +383,7 @@ public class Settings {
 					if (defaultValue == null) {
 						Log.warning("Config: Missing default value for missing config entry: " + configKey);
 						continue;
-					} else if (!typeClass.isAssignableFrom(defaultValue.getClass())) {
+					} else if (!Utils.isAssignableFrom(typeClass, defaultValue.getClass())) {
 						Log.warning("Config: Default value for missing config entry '" + configKey + "' is of wrong type: "
 								+ "Got " + defaultValue.getClass().getName() + ", expecting " + typeClass.getName());
 						continue;

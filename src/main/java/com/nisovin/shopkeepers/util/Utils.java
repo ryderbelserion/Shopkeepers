@@ -5,6 +5,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -31,6 +32,38 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 public final class Utils {
 
 	private Utils() {
+	}
+
+	private static final Map<Class<?>, Class<?>> PRIMITIVE_WRAPPERS;
+	static {
+		Map<Class<?>, Class<?>> primitiveWrappers = new HashMap<>();
+		primitiveWrappers.put(boolean.class, Boolean.class);
+		primitiveWrappers.put(byte.class, Byte.class);
+		primitiveWrappers.put(char.class, Character.class);
+		primitiveWrappers.put(double.class, Double.class);
+		primitiveWrappers.put(float.class, Float.class);
+		primitiveWrappers.put(int.class, Integer.class);
+		primitiveWrappers.put(long.class, Long.class);
+		primitiveWrappers.put(short.class, Short.class);
+		PRIMITIVE_WRAPPERS = Collections.unmodifiableMap(primitiveWrappers);
+	}
+
+	public static boolean isPrimitiveWrapperOf(Class<?> targetClass, Class<?> primitive) {
+		Validate.isTrue(primitive.isPrimitive(), "Second argument has to be a primitive!");
+		return (PRIMITIVE_WRAPPERS.get(primitive) == targetClass);
+	}
+
+	public static boolean isAssignableFrom(Class<?> to, Class<?> from) {
+		if (to.isAssignableFrom(from)) {
+			return true;
+		}
+		if (to.isPrimitive()) {
+			return isPrimitiveWrapperOf(from, to);
+		}
+		if (from.isPrimitive()) {
+			return isPrimitiveWrapperOf(to, from);
+		}
+		return false;
 	}
 
 	public static <T extends Enum<T>> T getNextEnumConstant(Class<T> enumClass, T current) {
