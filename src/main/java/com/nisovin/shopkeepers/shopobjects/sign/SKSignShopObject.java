@@ -7,8 +7,8 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.type.WallSign;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.material.Attachable;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -115,9 +115,13 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	private BlockFace getSignFacingFromWorld() {
 		// try getting the current sign facing from the sign in the world:
-		Sign sign = this.getSign();
-		if (sign != null) {
-			return ((Attachable) sign.getData()).getFacing();
+		Block signBlock = this.getBlock();
+		if (signBlock != null) {
+			if (signBlock.getType() == Material.WALL_SIGN) {
+				return ((WallSign) signBlock.getBlockData()).getFacing();
+			} else if (signBlock.getType() == Material.SIGN) {
+				return ((org.bukkit.block.data.type.Sign) signBlock.getBlockData()).getRotation();
+			}
 		}
 		return null;
 	}
@@ -165,23 +169,20 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		}
 
 		// place sign: // TODO maybe also allow non-wall signs?
+		WallSign wallSignData = (WallSign) Bukkit.createBlockData(Material.WALL_SIGN);
+		if (signFacing != null) {
+			// set sign facing:
+			wallSignData.setFacing(signFacing);
+		}
 		// cancel block physics for this placed sign if needed:
 		signShops.cancelNextBlockPhysics(signBlock);
-		signBlock.setType(Material.WALL_SIGN);
+		signBlock.setBlockData(wallSignData, false);
 		// cleanup state if no block physics were triggered:
 		signShops.cancelNextBlockPhysics(null);
 
 		// in case sign placement has failed for some reason:
 		if (!ItemUtils.isSign(signBlock.getType())) {
 			return false;
-		}
-
-		// set sign facing:
-		if (signFacing != null) {
-			Sign signState = (Sign) signBlock.getState();
-			((Attachable) signState.getData()).setFacingDirection(signFacing);
-			// apply facing:
-			signState.update();
 		}
 
 		// init sign content:

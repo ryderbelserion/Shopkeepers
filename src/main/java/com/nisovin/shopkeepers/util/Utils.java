@@ -245,13 +245,13 @@ public final class Utils {
 	}
 
 	/**
-	 * Determines the exact intersection point of a players view and a targeted block.
+	 * Determines the exact intersection point of a player's view and a targeted block.
 	 * 
 	 * @param player
 	 *            the player
 	 * @param targetBlock
 	 *            the block the player is looking at
-	 * @return the intersection point of the players view and the target block, or <code>null</code> if no intersection
+	 * @return the intersection point of the player's view and the target block, or <code>null</code> if no intersection
 	 *         was found
 	 */
 	public static Location getBlockIntersection(Player player, Block targetBlock) {
