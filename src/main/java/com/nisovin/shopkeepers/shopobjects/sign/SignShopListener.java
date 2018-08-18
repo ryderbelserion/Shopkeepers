@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 import java.util.Iterator;
 
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
@@ -20,6 +21,7 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.Utils;
 
 class SignShopListener implements Listener {
 
@@ -75,13 +77,28 @@ class SignShopListener implements Listener {
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	void onBlockPhysics(BlockPhysicsEvent event) {
 		Block block = event.getBlock();
-		if (cancelNextBlockPhysics != null && cancelNextBlockPhysics.equals(block)) {
+		if (this.checkCancelPhysics(block)) {
 			event.setCancelled(true);
-		} else {
-			if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperRegistry().getShopkeeperByBlock(block) != null) {
+			return;
+		}
+		// Spigot changed the behavior of this event in MC 1.13 to reduce the number of event calls:
+		// Related: https://hub.spigotmc.org/jira/browse/SPIGOT-4256
+		for (BlockFace blockFace : Utils.getBlockSides()) {
+			Block adjacentBlock = block.getRelative(blockFace);
+			if (this.checkCancelPhysics(adjacentBlock)) {
 				event.setCancelled(true);
+				return;
 			}
 		}
+	}
+
+	private boolean checkCancelPhysics(Block block) {
+		if (cancelNextBlockPhysics != null && cancelNextBlockPhysics.equals(block)) {
+			return true;
+		} else if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperRegistry().getShopkeeperByBlock(block) != null) {
+			return true;
+		}
+		return false;
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
