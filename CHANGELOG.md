@@ -4,6 +4,14 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.3.4 (2018-08-18)
+### Supported MC versions: 1.13
+* Fixed: Default config values for primitives were not handled correctly.
+* Fixed: Sign facing wasn't applied correctly since the update to 1.13.
+* Fixed: The sign physics protection broke somewhere in MC 1.13.
+
+**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.
+
 ## v2.3.3 (2018-08-01)
 ### Supported MC versions: 1.13
 * Fixed: Defaults values for missing config values not getting properly added.
