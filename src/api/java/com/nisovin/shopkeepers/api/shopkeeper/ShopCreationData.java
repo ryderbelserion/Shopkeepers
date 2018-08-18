@@ -51,7 +51,7 @@ public class ShopCreationData {
 		Validate.notNull(shopType, "Shop type is null!");
 		Validate.notNull(shopObjectType, "Shop object type is null!");
 		Validate.notNull(spawnLocation, "Spawn location is null!");
-		// TODO add spawnLocation.isFinite validation once bukkit 1.12+ is supported
+		spawnLocation.checkFinite();
 		this.creator = creator;
 		this.shopType = shopType;
 		this.shopObjectType = shopObjectType;
