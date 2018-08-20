@@ -223,8 +223,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopkeeperRegistry.loadShopkeepersInAllWorlds();
 
 		Bukkit.getScheduler().runTaskLater(this, () -> {
-			// remove invalid citizens shopkeepers:
-			citizensShops.removeInvalidCitizensShopkeepers();
 			// remove inactive player shopkeepers:
 			this.removeInactivePlayerShops();
 		}, 5L);

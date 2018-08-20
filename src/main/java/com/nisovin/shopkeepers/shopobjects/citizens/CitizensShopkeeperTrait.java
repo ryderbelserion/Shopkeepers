@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.citizens;
 
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -52,7 +54,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	}
 
 	void onShopkeeperRemove() {
-		Log.debug("Removing citizens trait due to shopkeeper removal for NPC " + npc.getId());
+		Log.debug("Removing citizens trait due to shopkeeper removal for NPC " + CitizensShops.getNPCIdString(npc));
 		shopkeeperId = null;
 		this.getNPC().removeTrait(CitizensShopkeeperTrait.class);
 	}
@@ -60,10 +62,10 @@ public class CitizensShopkeeperTrait extends Trait {
 	public void onTraitDeletion() {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		if (shopkeeper != null) {
-			Log.debug("Removing shopkeeper " + shopkeeper.getId() + " due to citizens trait removal for NPC " + npc.getId());
+			Log.debug("Removing shopkeeper " + shopkeeper.getId() + " due to citizens trait removal for NPC " + CitizensShops.getNPCIdString(npc));
 			assert shopkeeper.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN();
 			SKCitizensShopObject shopObject = (SKCitizensShopObject) shopkeeper.getShopObject();
-			shopObject.onTraitRemoval();
+			shopObject.setKeepNPCOnDeletion();
 			// this should keep the citizens npc and only remove the shopkeeper data:
 			shopkeeper.delete();
 			// save:
@@ -86,8 +88,8 @@ public class CitizensShopkeeperTrait extends Trait {
 			return false;
 		}
 
-		int npcId = npc.getId();
-		String shopObjectId = SKDefaultShopObjectTypes.CITIZEN().createObjectId(npcId);
+		UUID npcUniqueId = npc.getUniqueId();
+		String shopObjectId = SKDefaultShopObjectTypes.CITIZEN().createObjectId(npcUniqueId);
 		if (plugin.getShopkeeperRegistry().getActiveShopkeeper(shopObjectId) != null) {
 			// there is already a shopkeeper for this npc:
 			// the trait was probably re-attached after a reload of citizens:
@@ -116,7 +118,7 @@ public class CitizensShopkeeperTrait extends Trait {
 			}
 
 			NPC npc = this.getNPC();
-			Log.debug("Creating shopkeeper for NPC " + npc.getId());
+			Log.debug("Creating shopkeeper for NPC " + CitizensShops.getNPCIdString(npc));
 
 			Location location = null;
 			Entity entity = npc.getEntity();
@@ -128,7 +130,7 @@ public class CitizensShopkeeperTrait extends Trait {
 
 			if (location != null) {
 				ShopCreationData creationData = AdminShopCreationData.create(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
-				creationData.setValue(SKCitizensShopObject.CREATION_DATA_NPC_ID_KEY, npc.getId());
+				creationData.setValue(SKCitizensShopObject.CREATION_DATA_NPC_UUID_KEY, npc.getUniqueId());
 				Shopkeeper shopkeeper = plugin.handleShopkeeperCreation(creationData);
 				if (shopkeeper != null) {
 					shopkeeperId = shopkeeper.getObjectId();
@@ -139,7 +141,7 @@ public class CitizensShopkeeperTrait extends Trait {
 				}
 			} else {
 				// well.. no idea what to do in that case.. we cannot create a shopkeeper without a location, right?
-				Log.debug("Shopkeeper NPC Trait: Failed to create shopkeeper due to missing npc location.");
+				Log.debug("Shopkeeper NPC Trait: Failed to create shopkeeper due to missing NPC location.");
 			}
 		}, 5L);
 	}

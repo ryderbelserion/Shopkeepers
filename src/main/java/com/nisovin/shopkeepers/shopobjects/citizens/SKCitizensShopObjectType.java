@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.citizens;
 
+import java.util.UUID;
+
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -23,13 +25,18 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 	@Override
 	public String createObjectId(Entity entity) {
 		if (entity == null) return null;
-		Integer npcId = citizensShops.getNPCId(entity);
-		if (npcId == null) return null;
-		return this.createObjectId(npcId);
+		UUID npcUniqueId = citizensShops.getNPCUniqueId(entity);
+		if (npcUniqueId == null) return null;
+		return this.createObjectId(npcUniqueId);
 	}
 
-	public String createObjectId(int npcId) {
-		return this.getIdentifier() + ":" + npcId;
+	public String createObjectId(UUID npcUniqueId) {
+		return this.getIdentifier() + ":" + npcUniqueId;
+	}
+
+	// TODO remove again at some point
+	public String createObjectId(int npcLegacyId) {
+		return this.getIdentifier() + ":" + npcLegacyId;
 	}
 
 	@Override

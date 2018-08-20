@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopobjects.citizens;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -79,6 +80,14 @@ public class CitizensShops {
 		// register citizens listener:
 		Bukkit.getPluginManager().registerEvents(citizensListener, plugin);
 
+		// delayed to run after shopkeepers were loaded:
+		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			// run legacy id conversion: // TODO remove again at some point
+			this.convertLegacyNPCIds();
+			// remove invalid citizens shopkeepers:
+			this.removeInvalidCitizensShopkeepers();
+		}, 3L);
+
 		// enabled:
 		citizensShopsEnabled = true;
 	}
@@ -130,18 +139,22 @@ public class CitizensShops {
 		}
 	}
 
+	public static String getNPCIdString(NPC npc) {
+		return npc.getId() + " (" + npc.getUniqueId() + ")";
+	}
+
 	// returns null if this entity is no citizens npc (or citizens or citizens shops are disabled)
-	public Integer getNPCId(Entity entity) {
+	public UUID getNPCUniqueId(Entity entity) {
 		if (this.isEnabled()) {
 			NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
-			return (npc != null ? npc.getId() : null);
+			return (npc != null ? npc.getUniqueId() : null);
 		} else {
 			return null;
 		}
 	}
 
-	// returns the id of the created npc, or null
-	public Integer createNPC(Location location, EntityType entityType, String name) {
+	// returns the uuid of the created npc, or null
+	public UUID createNPC(Location location, EntityType entityType, String name) {
 		if (!this.isEnabled()) return null;
 		NPC npc = CitizensAPI.getNPCRegistry().createNPC(entityType, name);
 		if (npc == null) return null;
@@ -151,7 +164,28 @@ public class CitizensShops {
 		// but will then later attempt to spawn it when the chunk is loaded:
 		npc.spawn(location);
 		// npc.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
-		return npc.getId();
+		return npc.getUniqueId();
+	}
+
+	private void convertLegacyNPCIds() {
+		if (!this.isEnabled()) {
+			// cannot determine backing npcs if citizens isn't running:
+			return;
+		}
+		ShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
+		boolean dirty = false;
+		for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
+			if (shopkeeper.getShopObject() instanceof SKCitizensShopObject) {
+				SKCitizensShopObject citizensShop = (SKCitizensShopObject) shopkeeper.getShopObject();
+				citizensShop.convertLegacyId();
+				if (shopkeeper.isDirty()) dirty = true;
+			}
+		}
+
+		if (dirty) {
+			// save:
+			plugin.getShopkeeperStorage().save();
+		}
 	}
 
 	public void removeInvalidCitizensShopkeepers() {
@@ -164,23 +198,24 @@ public class CitizensShops {
 		for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 			if (shopkeeper.getShopObject() instanceof SKCitizensShopObject) {
 				SKCitizensShopObject citizensShop = (SKCitizensShopObject) shopkeeper.getShopObject();
-				Integer npcId = citizensShop.getNpcId();
-				if (npcId == null) {
+				UUID npcUniqueId = citizensShop.getNPCUniqueId();
+				if (npcUniqueId == null) {
 					// npc wasn't created yet, which is only the case if a shopkeeper got somehow created without
 					// citizens being enabled:
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
 							+ ": NPC has not been created.");
-				} else if (CitizensAPI.getNPCRegistry().getById(npcId.intValue()) == null) {
-					// there is no npc with the stored id:
+				} else if (CitizensAPI.getNPCRegistry().getByUniqueId(npcUniqueId) == null) {
+					// there is no npc with the stored unique id:
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
-							+ ": No NPC existing with id '" + npcId + "'.");
+							+ ": No NPC existing with unique id '" + npcUniqueId + "'.");
 				} else if (shopkeeperRegistry.getActiveShopkeeper(shopkeeper.getObjectId()) != shopkeeper) {
 					// there is already another citizens shopkeeper using this npc id:
+					citizensShop.setKeepNPCOnDeletion();
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
-							+ ": There exists another shopkeeper using the same NPC with id '" + npcId + "'.");
+							+ ": There exists another shopkeeper using the same NPC with unique id '" + npcUniqueId + "'.");
 				}
 			}
 		}

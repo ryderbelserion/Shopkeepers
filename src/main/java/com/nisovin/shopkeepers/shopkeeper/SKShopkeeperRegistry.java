@@ -348,6 +348,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	private boolean _deactivateShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		String objectId = shopkeeper.getObjectId();
+		return this._deactivateShopkeeper(shopkeeper, objectId);
+	}
+
+	private boolean _deactivateShopkeeper(AbstractShopkeeper shopkeeper, String objectId) {
+		assert shopkeeper != null && objectId != null;
 		if (activeShopkeepers.get(objectId) == shopkeeper) {
 			activeShopkeepers.remove(objectId);
 			return true;
@@ -395,6 +400,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		for (Shopkeeper shopkeeper : activeShopkeepers.values()) {
 			shopkeeper.despawn();
 		}
+	}
+
+	// this can be used if the shopkeeper's object id has changed for some reason
+	public void onShopkeeperObjectIdChanged(AbstractShopkeeper shopkeeper, String oldObjectId) {
+		// deactivate by old object id:
+		this._deactivateShopkeeper(shopkeeper, oldObjectId);
+		// re-activate by new / current object id:
+		this._activateShopkeeper(shopkeeper);
 	}
 
 	// SHOPKEEPERS BY CHUNK
