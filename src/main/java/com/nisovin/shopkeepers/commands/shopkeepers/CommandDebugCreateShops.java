@@ -8,7 +8,7 @@ import org.bukkit.entity.Player;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
@@ -50,7 +50,7 @@ class CommandDebugCreateShops extends PlayerCommand {
 		player.sendMessage(ChatColor.GREEN + "Creating " + shopCount + " shopkeepers, starting here!");
 		Location curSpawnLocation = player.getLocation();
 		for (int i = 0; i < shopCount; i++) {
-			plugin.handleShopkeeperCreation(ShopCreationData.create(player, DefaultShopTypes.ADMIN(),
+			plugin.handleShopkeeperCreation(AdminShopCreationData.create(player, DefaultShopTypes.ADMIN(),
 					DefaultShopObjectTypes.LIVING().get(EntityType.VILLAGER), curSpawnLocation.clone(), null));
 			curSpawnLocation.add(2, 0, 0);
 		}

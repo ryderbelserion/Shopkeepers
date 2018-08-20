@@ -16,33 +16,22 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 public class PlayerShopCreationData extends ShopCreationData {
 
 	public static PlayerShopCreationData create(Player creator, ShopType<?> shopType, ShopObjectType<?> objectType,
-												Location spawnLocation, BlockFace targetedBlockFace, Player owner, Block chest) {
-		return new PlayerShopCreationData(creator, shopType, objectType, spawnLocation, targetedBlockFace, owner, chest);
+												Location spawnLocation, BlockFace targetedBlockFace, Block chest) {
+		return new PlayerShopCreationData(creator, shopType, objectType, spawnLocation, targetedBlockFace, chest);
 	}
 
-	private final Player owner; // not null, modifiable
 	private final Block chest; // not null
 
 	protected PlayerShopCreationData(	Player creator, ShopType<?> shopType, ShopObjectType<?> objectType,
-										Location spawnLocation, BlockFace targetedBlockFace, Player owner, Block chest) {
+										Location spawnLocation, BlockFace targetedBlockFace, Block chest) {
 		super(creator, shopType, objectType, spawnLocation, targetedBlockFace);
-		Validate.notNull(owner, "Owner is null!");
+		Validate.isTrue(shopType instanceof PlayerShopType, "Shop type has to be a PlayerShopType!");
 		Validate.notNull(chest, "Chest is null!");
 		Validate.isTrue(spawnLocation.getWorld().equals(chest.getWorld()),
 				"Chest is located in a different world than the spawn location!");
-		this.owner = owner;
+		// the creator cannot be null for player shopkeepers:
+		Validate.notNull(creator, "Creator cannot be null!");
 		this.chest = chest;
-	}
-
-	/**
-	 * The owner of the player shop.
-	 * <p>
-	 * Usually the same player as the creator.
-	 * 
-	 * @return the shop owner
-	 */
-	public Player getOwner() {
-		return owner;
 	}
 
 	/**

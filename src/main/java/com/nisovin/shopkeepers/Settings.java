@@ -56,7 +56,6 @@ public class Settings {
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
 	public static boolean createPlayerShopWithCommand = false;
-	public static boolean simulateRightClickOnCommand = true;
 
 	public static boolean requireChestRecentlyPlaced = true;
 	public static int maxChestDistance = 15;
@@ -236,12 +235,17 @@ public class Settings {
 	public static String msgSelectedSignShop = "&aYou selected: &fsign shop";
 	public static String msgSelectedCitizenShop = "&aYou selected: &fcitizen npc shop";
 
-	public static String msgSelectedChest = "&aChest selected! Right click a block to place your shopkeeper.";
-	public static String msgMustSelectChest = "&aYou must right-click a chest before placing your shopkeeper.";
-	public static String msgChestTooFar = "&aThe shopkeeper's chest is too far away!";
-	public static String msgChestNotPlaced = "&aYou must select a chest you have recently placed.";
-	public static String msgTooManyShops = "&aYou have too many shops.";
-	public static String msgShopCreateFail = "&aYou cannot create a shopkeeper there.";
+	public static String msgSelectedChest = "&aChest selected! Right-click a block to place your shopkeeper.";
+	public static String msgMustSelectChest = "&7You must right-click a chest before placing your shopkeeper.";
+	public static String msgNoChestSelected = "&7The selected block is not a chest!";
+	public static String msgChestTooFar = "&7The shopkeeper's chest is too far away!";
+	public static String msgChestNotPlaced = "&7You must select a chest you have recently placed!";
+	public static String msgChestAlreadyInUse = "&7Another shopkeeper is already using the selected chest!";
+	public static String msgNoChestAccess = "&7You cannot access the selected chest!";
+	public static String msgTooManyShops = "&7You have too many shops!";
+	public static String msgNoAdminShopTypeSelected = "&7You have to select an admin shop type!";
+	public static String msgNoPlayerShopTypeSelected = "&7You have to select a player shop type!";
+	public static String msgShopCreateFail = "&7You cannot create a shopkeeper there.";
 
 	public static String msgTypeNewName = "&aPlease type the shop's name into the chat.\n"
 			+ "  &aType a dash (-) to remove the name.";

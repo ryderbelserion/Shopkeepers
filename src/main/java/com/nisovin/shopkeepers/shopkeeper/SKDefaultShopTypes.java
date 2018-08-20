@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
-import com.nisovin.shopkeepers.shopkeeper.admin.AdminShopType;
+import com.nisovin.shopkeepers.shopkeeper.admin.trading.RegularAdminShopType;
 import com.nisovin.shopkeepers.shopkeeper.player.book.BookPlayerShopType;
 import com.nisovin.shopkeepers.shopkeeper.player.buy.BuyingPlayerShopType;
 import com.nisovin.shopkeepers.shopkeeper.player.sell.SellingPlayerShopType;
@@ -13,7 +13,7 @@ import com.nisovin.shopkeepers.shopkeeper.player.trade.TradingPlayerShopType;
 
 public class SKDefaultShopTypes implements DefaultShopTypes {
 
-	private final AdminShopType adminShopType = new AdminShopType();
+	private final RegularAdminShopType adminShopType = new RegularAdminShopType();
 	private final SellingPlayerShopType sellingPlayerShopType = new SellingPlayerShopType();
 	private final BuyingPlayerShopType buyingPlayerShopType = new BuyingPlayerShopType();
 	private final TradingPlayerShopType tradingPlayerShopType = new TradingPlayerShopType();
@@ -34,7 +34,7 @@ public class SKDefaultShopTypes implements DefaultShopTypes {
 	}
 
 	@Override
-	public AdminShopType getAdminShopType() {
+	public RegularAdminShopType getAdminShopType() {
 		return adminShopType;
 	}
 
@@ -64,7 +64,7 @@ public class SKDefaultShopTypes implements DefaultShopTypes {
 		return SKShopkeepersPlugin.getInstance().getDefaultShopTypes();
 	}
 
-	public static AdminShopType ADMIN() {
+	public static RegularAdminShopType ADMIN() {
 		return getInstance().getAdminShopType();
 	}
 

@@ -2,9 +2,10 @@ High priority:
 * 
 
 Mid priority:
-* cleanup shop creation: currently there is lots of duplicated code inside ShopkeeperCommand and CreateListener
+* 
 
 Low priority:
+* Limit chest protection to the chest block and connected chest blocks. Since 1.13 (and before with trap chests) one is able to place disconnected chests side by side.
 * Improve chest protection (the anti-hopper code is inefficient).
 * Support for more than 8 trades
 * Sign shopkeepers somehow support non-wall signs (sign posts), maybe if a sign is targeted use that sign?

@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.sign;
 
-import org.bukkit.block.Block;
+import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
@@ -49,8 +49,8 @@ public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShop
 	}
 
 	@Override
-	public boolean isValidSpawnBlockFace(Block targetBlock, BlockFace targetBlockFace) {
+	public boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
 		// limit to wall sign faces:
-		return (targetBlockFace != BlockFace.UP) && super.isValidSpawnBlockFace(targetBlock, targetBlockFace);
+		return (targetedBlockFace != BlockFace.UP) && super.isValidSpawnLocation(spawnLocation, targetedBlockFace);
 	}
 }

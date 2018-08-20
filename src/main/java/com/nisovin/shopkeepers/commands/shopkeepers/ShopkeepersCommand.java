@@ -2,8 +2,6 @@ package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import java.util.Set;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -11,10 +9,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Result;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
@@ -23,6 +17,8 @@ import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
@@ -37,7 +33,6 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.CommandRegistry;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
-import com.nisovin.shopkeepers.shopcreation.TestPlayerInteractEvent;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -125,44 +120,6 @@ public class ShopkeepersCommand extends BaseCommand {
 		if (createPlayerShop) {
 			// create player shopkeeper:
 
-			// check if this chest is already used by some other shopkeeper:
-			if (plugin.getProtectedChests().isChestProtected(targetBlock, null)) {
-				Utils.sendMessage(player, Settings.msgShopCreateFail);
-				return;
-			}
-
-			// check for recently placed:
-			if (Settings.requireChestRecentlyPlaced) {
-				if (!plugin.getShopkeeperCreation().isRecentlyPlacedChest(player, targetBlock)) {
-					Utils.sendMessage(player, Settings.msgChestNotPlaced);
-					return;
-				}
-			}
-
-			// check for permission:
-			if (Settings.simulateRightClickOnCommand) {
-				// simulating right click on the chest to check if access is denied:
-				// making sure that access is really denied, and that the event is not cancelled because of denying
-				// usage with the items in hands:
-				PlayerInventory playerInventory = player.getInventory();
-				ItemStack itemInMainHand = playerInventory.getItemInMainHand();
-				ItemStack itemInOffHand = playerInventory.getItemInOffHand();
-				playerInventory.setItemInMainHand(null);
-				playerInventory.setItemInOffHand(null);
-
-				TestPlayerInteractEvent fakeInteractEvent = new TestPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, null, targetBlock, BlockFace.UP);
-				Bukkit.getPluginManager().callEvent(fakeInteractEvent);
-				boolean chestAccessDenied = (fakeInteractEvent.useInteractedBlock() == Result.DENY);
-
-				// resetting items in main and off hand:
-				playerInventory.setItemInMainHand(itemInMainHand);
-				playerInventory.setItemInOffHand(itemInOffHand);
-
-				if (chestAccessDenied) {
-					return;
-				}
-			}
-
 			// default shop type and shop object type: first use-able player shop type and shop object type
 			if (shopType == null) {
 				shopType = plugin.getShopTypeRegistry().getDefaultSelection(player);
@@ -172,9 +129,15 @@ public class ShopkeepersCommand extends BaseCommand {
 			}
 
 			if (shopType == null || shopObjType == null) {
-				// TODO maybe print different kind of no-permission message,
-				// because the player cannot create any shops at all:
+				// the player cannot create shops at all:
 				Utils.sendMessage(player, Settings.msgNoPermission);
+				return;
+			}
+
+			// validate the selected shop type:
+			if (!(shopType instanceof PlayerShopType)) {
+				// only player shop types are allowed here:
+				Utils.sendMessage(player, Settings.msgNoPlayerShopTypeSelected);
 				return;
 			}
 		} else {
@@ -195,76 +158,36 @@ public class ShopkeepersCommand extends BaseCommand {
 			}
 			assert shopType != null && shopObjType != null;
 
-			// can the selected shop type be used?
-			// TODO considering the addition of arbitrary new shop types: how to identify the shop types that are
-			// supported here?
-			if (shopType instanceof PlayerShopType) {
+			// validate the selected shop type:
+			if (!(shopType instanceof AdminShopType)) {
 				// only admin shop types are allowed here:
-				// TODO message translation?
-				Utils.sendMessage(player, ChatColor.RED + "You have to select an admin shop type!");
+				Utils.sendMessage(player, Settings.msgNoAdminShopTypeSelected);
 				return;
 			}
 		}
 		assert shopType != null && shopObjType != null;
 
-		// can the selected shop type be used?
-		if (!shopType.hasPermission(player)) {
-			Utils.sendMessage(player, Settings.msgNoPermission);
+		BlockFace targetBlockFace = Utils.getTargetBlockFace(player, targetBlock);
+		if (targetBlockFace == null) {
+			// invalid targeted block face:
+			Utils.sendMessage(player, Settings.msgShopCreateFail);
 			return;
-		}
-		if (!shopType.isEnabled()) {
-			Utils.sendMessage(player, Settings.msgShopTypeDisabled, "{type}", shopType.getIdentifier());
-			return;
-		}
-
-		// can the selected shop object type be used?
-		if (!shopObjType.hasPermission(player)) {
-			Utils.sendMessage(player, Settings.msgNoPermission);
-			return;
-		}
-		if (!shopObjType.isEnabled()) {
-			Utils.sendMessage(player, Settings.msgShopObjectTypeDisabled, "{type}", shopObjType.getIdentifier());
-			return;
-		}
-
-		// default: spawn on top of targeted block:
-		BlockFace targetBlockFace = BlockFace.UP;
-		if (!shopObjType.isValidSpawnBlockFace(targetBlock, targetBlockFace)) {
-			// some object types (signs) may allow placement on the targeted side:
-			targetBlockFace = Utils.getTargetBlockFace(player, targetBlock);
-			if (targetBlockFace == null || !shopObjType.isValidSpawnBlockFace(targetBlock, targetBlockFace)) {
-				// invalid targeted block face:
-				Utils.sendMessage(player, Settings.msgShopCreateFail);
-				return;
-			}
 		}
 		Block spawnBlock = targetBlock.getRelative(targetBlockFace);
-		// check if the shop can be placed there (enough space, etc.):
-		if (!shopObjType.isValidSpawnBlock(spawnBlock)) {
-			// invalid spawn location:
-			Utils.sendMessage(player, Settings.msgShopCreateFail);
-			return;
-		}
 		Location spawnLocation = spawnBlock.getLocation();
-
-		if (!shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
-			// there is already a shopkeeper at that location:
-			Utils.sendMessage(player, Settings.msgShopCreateFail);
-			return;
-		}
 
 		// shop creation data:
 		ShopCreationData shopCreationData;
 		if (createPlayerShop) {
 			// create player shopkeeper:
-			shopCreationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace, player, targetBlock);
+			shopCreationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace, targetBlock);
 		} else {
 			// create admin shopkeeper:
-			shopCreationData = ShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace);
+			shopCreationData = AdminShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace);
 		}
 		assert shopCreationData != null;
 
-		// create shopkeeper:
+		// handle shopkeeper creation:
 		plugin.handleShopkeeperCreation(shopCreationData);
 	}
 }

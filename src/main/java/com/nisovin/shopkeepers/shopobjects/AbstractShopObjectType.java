@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects;
 
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -31,13 +32,17 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 	public abstract boolean needsSpawning();
 
 	@Override
-	public boolean isValidSpawnBlockFace(Block targetBlock, BlockFace targetBlockFace) {
-		return (targetBlock != null) && (targetBlockFace != BlockFace.DOWN) && Utils.isBlockSide(targetBlockFace);
-	}
-
-	@Override
-	public boolean isValidSpawnBlock(Block spawnBlock) {
+	public boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
 		// TODO allow spawning inside of water?
-		return (spawnBlock != null) && (spawnBlock.getType() == Material.AIR);
+		// TODO check actual object size?
+		if (spawnLocation == null || spawnLocation.getWorld() == null) return false;
+		Block spawnBlock = spawnLocation.getBlock();
+		if (spawnBlock.getType() != Material.AIR) return false;
+		if (targetedBlockFace != null) {
+			if (targetedBlockFace == BlockFace.DOWN || !Utils.isBlockSide(targetedBlockFace)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

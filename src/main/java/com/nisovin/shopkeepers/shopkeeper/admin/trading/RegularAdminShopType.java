@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.shopkeeper.admin;
+package com.nisovin.shopkeepers.shopkeeper.admin.trading;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -7,25 +7,25 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
+import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopType;
 
-public class AdminShopType extends AbstractShopType<AdminShopkeeper> {
+public class RegularAdminShopType extends AbstractAdminShopType<RegularAdminShopkeeper> {
 
-	public AdminShopType() {
+	public RegularAdminShopType() {
 		super("admin", ShopkeepersPlugin.ADMIN_PERMISSION);
 	}
 
 	@Override
-	public AdminShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	public RegularAdminShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		this.validateCreationData(shopCreationData);
-		AdminShopkeeper shopkeeper = new AdminShopkeeper(id, shopCreationData);
+		RegularAdminShopkeeper shopkeeper = new RegularAdminShopkeeper(id, shopCreationData);
 		return shopkeeper;
 	}
 
 	@Override
-	public AdminShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+	public RegularAdminShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
 		this.validateConfigSection(configSection);
-		AdminShopkeeper shopkeeper = new AdminShopkeeper(id, configSection);
+		RegularAdminShopkeeper shopkeeper = new RegularAdminShopkeeper(id, configSection);
 		return shopkeeper;
 	}
 

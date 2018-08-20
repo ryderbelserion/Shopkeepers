@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
@@ -24,6 +23,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -96,13 +96,16 @@ class CreateListener implements Listener {
 			return;
 		}
 
+		// cancel interactions with our custom shop creation item:
+		event.setCancelled(true);
+
 		// get shop type:
 		ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);
 		// get shop object type:
 		ShopObjectType<?> shopObjType = plugin.getShopObjectTypeRegistry().getSelection(player);
 
 		if (shopType == null || shopObjType == null) {
-			// TODO maybe print different kind of no-permission message, because the player cannot create shops at all:
+			// the player cannot create shops at all:
 			Utils.sendMessage(player, Settings.msgNoPermission);
 			return;
 		}
@@ -126,115 +129,52 @@ class CreateListener implements Listener {
 				selectedChest = null;
 			}
 
-			// chest for chest selection:
+			// handle chest selection:
 			if (ItemUtils.isChest(clickedBlock.getType()) && !clickedBlock.equals(selectedChest)) {
-				// check if the clicked chest was recently placed:
-				if (Settings.requireChestRecentlyPlaced && !shopkeeperCreation.isRecentlyPlacedChest(player, clickedBlock)) {
-					// chest was not recently placed:
-					Utils.sendMessage(player, Settings.msgChestNotPlaced);
-				} else {
-					boolean chestAccessDenied = (useInteractedBlock == Result.DENY);
-					if (chestAccessDenied) {
-						// making sure that the chest access is really denied, and that the event
-						// is not cancelled because of denying usage with the items in hands:
-						PlayerInventory playerInventory = player.getInventory();
-						ItemStack itemInOffHand = playerInventory.getItemInOffHand();
-						playerInventory.setItemInMainHand(null);
-						playerInventory.setItemInOffHand(null);
-
-						TestPlayerInteractEvent fakeInteractEvent = new TestPlayerInteractEvent(player, event.getAction(), null, clickedBlock, event.getBlockFace());
-						Bukkit.getPluginManager().callEvent(fakeInteractEvent);
-						chestAccessDenied = (fakeInteractEvent.useInteractedBlock() == Result.DENY);
-
-						// resetting items in main and off hand:
-						playerInventory.setItemInMainHand(itemInHand);
-						playerInventory.setItemInOffHand(itemInOffHand);
-					}
-
-					if (chestAccessDenied) {
-						Log.debug("Right-click on chest prevented, player " + player.getName() + " at " + clickedBlock.getLocation().toString());
-					} else {
-						// select chest:
-						shopkeeperCreation.selectChest(player, clickedBlock);
-						Utils.sendMessage(player, Settings.msgSelectedChest);
-					}
+				// if chest access is denied, test again without items in hands to make sure that the event is not
+				// cancelled because of denying usage with the items in hands:
+				boolean chestAccessDenied = (useInteractedBlock == Result.DENY);
+				if (shopkeeperCreation.handleCheckChest(player, clickedBlock, chestAccessDenied)) {
+					// select chest:
+					shopkeeperCreation.selectChest(player, clickedBlock);
+					Utils.sendMessage(player, Settings.msgSelectedChest);
 				}
-
-				event.setCancelled(true);
-				return;
 			} else {
 				// player shop creation:
-				boolean shopkeeperCreated = this.handleShopkeeperCreation(player, shopType, shopObjType, selectedChest, clickedBlock, event.getBlockFace());
-				if (shopkeeperCreated) {
+				if (selectedChest == null) {
+					// clicked a location without having a chest selected:
+					Utils.sendMessage(player, Settings.msgMustSelectChest);
+					return;
+				}
+				assert ItemUtils.isChest(selectedChest.getType()); // we have checked that above already
+
+				// validate the selected shop type:
+				if (!(shopType instanceof PlayerShopType)) {
+					// only player shop types are allowed here:
+					Utils.sendMessage(player, Settings.msgNoPlayerShopTypeSelected);
+					return;
+				}
+
+				BlockFace clickedBlockFace = event.getBlockFace();
+				Block spawnBlock = clickedBlock.getRelative(clickedBlockFace);
+				Location spawnLocation = spawnBlock.getLocation();
+
+				// create player shopkeeper:
+				ShopCreationData creationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, clickedBlockFace, selectedChest);
+				Shopkeeper shopkeeper = plugin.handleShopkeeperCreation(creationData);
+				if (shopkeeper != null) {
+					// shopkeeper creation was successful:
+
+					// reset selected chest:
+					shopkeeperCreation.selectChest(player, null);
+
 					// manually remove creation item from player's hand after this event is processed:
-					event.setCancelled(true);
 					Bukkit.getScheduler().runTask(plugin, () -> {
 						ItemStack newItemInMainHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
 						player.getInventory().setItemInMainHand(newItemInMainHand);
 					});
 				}
-
-				// TODO maybe always prevent normal usage, also for cases in which shop creation failed because of some
-				// reason, and instead optionally allow normal usage when crouching? Or, if normal usage is not denied,
-				// allow shop creation only when crouching?
-				// Or handle chest selection and/or shop creation on left clicks only, instead of right clicks?
-				// Or with MC 1.9: Normal usage if the item is in the off-hand
 			}
 		}
-	}
-
-	// returns true on success
-	private boolean handleShopkeeperCreation(Player player, ShopType<?> shopType, ShopObjectType<?> shopObjType, Block selectedChest, Block clickedBlock, BlockFace clickedBlockFace) {
-		assert shopType != null && shopObjType != null; // has been check already
-
-		if (selectedChest == null) {
-			// clicked a location without having a chest selected:
-			Utils.sendMessage(player, Settings.msgMustSelectChest);
-			return false;
-		}
-		assert ItemUtils.isChest(selectedChest.getType()); // we have checked that above
-
-		// check for selected chest being too far away:
-		if (!selectedChest.getWorld().equals(clickedBlock.getWorld())
-				|| (int) selectedChest.getLocation().distanceSquared(clickedBlock.getLocation()) > (Settings.maxChestDistance * Settings.maxChestDistance)) {
-			Utils.sendMessage(player, Settings.msgChestTooFar);
-			return false;
-		}
-
-		if (!shopObjType.isValidSpawnBlockFace(clickedBlock, clickedBlockFace)) {
-			// invalid targeted block face:
-			Utils.sendMessage(player, Settings.msgShopCreateFail);
-			return false;
-		}
-
-		Block spawnBlock = clickedBlock.getRelative(clickedBlockFace);
-		// check if the shop can be placed there (enough space, etc.):
-		if (!shopObjType.isValidSpawnBlock(spawnBlock)) {
-			// invalid spawn location:
-			Utils.sendMessage(player, Settings.msgShopCreateFail);
-			return true;
-		}
-		Location spawnLocation = spawnBlock.getLocation();
-
-		if (!plugin.getShopkeeperRegistry().getShopkeepersAtLocation(spawnLocation).isEmpty()) {
-			// there is already a shopkeeper at that location:
-			Utils.sendMessage(player, Settings.msgShopCreateFail);
-			return true;
-		}
-
-		// create player shopkeeper:
-		ShopCreationData creationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, clickedBlockFace, player, selectedChest);
-		Shopkeeper shopkeeper = plugin.handleShopkeeperCreation(creationData);
-		if (shopkeeper == null) {
-			// something else prevented this shopkeeper from being created
-			return false;
-		}
-
-		// shopkeeper creation was successful:
-
-		// reset selected chest:
-		shopkeeperCreation.selectChest(player, null);
-
-		return true;
 	}
 }

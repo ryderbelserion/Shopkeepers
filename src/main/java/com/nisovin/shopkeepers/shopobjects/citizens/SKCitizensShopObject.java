@@ -75,6 +75,10 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		super.setup();
 		if (npcId != null || !citizensShops.isEnabled()) return;
 
+		// TODO search for an existing citizens npc at this location first?
+		// this might be useful when manually importing citizens shopkeepers and their corresponding npcs
+		// this might be obsolete however, once npcs are identified by uuids instead
+
 		// create npc:
 		Log.debug("Creating citizens NPC for shopkeeper " + shopkeeper.getId());
 

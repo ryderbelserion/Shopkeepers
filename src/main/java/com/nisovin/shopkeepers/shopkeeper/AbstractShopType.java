@@ -2,14 +2,19 @@ package com.nisovin.shopkeepers.shopkeeper;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.events.PlayerCreateShopkeeperEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
@@ -52,8 +57,49 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		this.validateCreationData(shopCreationData);
 		SKShopkeeperRegistry shopkeeperRegistry = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry();
 
-		// receives messages, can be null:
+		// the creator, can not be null when creating a shopkeeper via this method:
 		Player creator = shopCreationData.getCreator();
+		Validate.notNull(creator, "Creator cannot be null!");
+
+		ShopType<?> shopType = shopCreationData.getShopType();
+		ShopObjectType<?> shopObjectType = shopCreationData.getShopObjectType();
+
+		// can the selected shop type be used?
+		if (!shopType.hasPermission(creator)) {
+			Utils.sendMessage(creator, Settings.msgNoPermission);
+			return null;
+		}
+		if (!shopType.isEnabled()) {
+			Utils.sendMessage(creator, Settings.msgShopTypeDisabled, "{type}", shopType.getIdentifier());
+			return null;
+		}
+
+		// can the selected shop object type be used?
+		if (!shopObjectType.hasPermission(creator)) {
+			Utils.sendMessage(creator, Settings.msgNoPermission);
+			return null;
+		}
+		if (!shopObjectType.isEnabled()) {
+			Utils.sendMessage(creator, Settings.msgShopObjectTypeDisabled, "{type}", shopObjectType.getIdentifier());
+			return null;
+		}
+
+		Location spawnLocation = shopCreationData.getSpawnLocation();
+		BlockFace targetedBlockFace = shopCreationData.getTargetedBlockFace();
+
+		// check if the shop can be placed there (enough space, etc.):
+		if (!shopObjectType.isValidSpawnLocation(spawnLocation, targetedBlockFace)) {
+			// invalid spawn location or targeted block face:
+			Utils.sendMessage(creator, Settings.msgShopCreateFail);
+			return null;
+		}
+
+		if (!shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
+			// there is already a shopkeeper at that location:
+			Utils.sendMessage(creator, Settings.msgShopCreateFail);
+			return null;
+		}
+
 		try {
 			// shop type specific handling:
 			if (!this.handleSpecificShopkeeperCreation(shopCreationData)) {
@@ -73,8 +119,8 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 
 			return shopkeeper;
 		} catch (ShopkeeperCreateException e) {
-			// TODO translation for unknown issues
-			Utils.sendMessage(creator, "Couldn't create shopkeeper: " + e.getMessage());
+			// unexpected issue (hints to a bug):
+			Utils.sendMessage(creator, ChatColor.RED + "Shopkeeper creation failed: " + e.getMessage());
 			return null;
 		}
 	}

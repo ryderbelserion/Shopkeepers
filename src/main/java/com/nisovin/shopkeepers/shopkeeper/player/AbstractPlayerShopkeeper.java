@@ -427,7 +427,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	protected void loadFromCreationData(ShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		super.loadFromCreationData(shopCreationData);
 		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) shopCreationData;
-		Player owner = playerShopCreationData.getOwner();
+		Player owner = playerShopCreationData.getCreator();
 		Block chest = playerShopCreationData.getShopChest();
 		assert owner != null;
 		assert chest != null;

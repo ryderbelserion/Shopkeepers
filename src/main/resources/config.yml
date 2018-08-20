@@ -74,9 +74,6 @@ deleting-player-shop-returns-creation-item: false
 
 # Whether to allow creating player shops with the /shopkeeper command.
 create-player-shop-with-command: false
-# This enables compatibility with other plugins that might restrict chest
-# access.
-simulate-right-click-on-command: true
 
 # Whether the selected chest must have been recently placed by the player
 # attempting to create the shopkeeper.
@@ -377,12 +374,17 @@ msg-selected-living-shop: "&aYou selected: &f{type}"
 msg-selected-sign-shop: "&aYou selected: &fsign shop"
 msg-selected-citizen-shop: "&aYou selected: &fcitizen npc shop"
 
-msg-selected-chest: "&aChest selected! Right click a block to place your shopkeeper."
-msg-must-select-chest: "&aYou must right-click a chest before placing your shopkeeper."
-msg-chest-too-far: "&aThe shopkeeper's chest is too far away!"
-msg-chest-not-placed: "&aYou must select a chest you have recently placed."
-msg-too-many-shops: "&aYou have too many shops."
-msg-shop-create-fail: "&aYou cannot create a shopkeeper there."
+msg-selected-chest: "&aChest selected! Right-click a block to place your shopkeeper."
+msg-must-select-chest: "&7You must right-click a chest before placing your shopkeeper."
+msg-no-chest-selected: "&7The selected block is not a chest!"
+msg-chest-too-far: "&7The shopkeeper's chest is too far away!"
+msg-chest-not-placed: "&7You must select a chest you have recently placed!"
+msg-chest-already-in-use: "&7Another shopkeeper is already using the selected chest!"
+msg-no-chest-access: "&7You cannot access the selected chest!"
+msg-too-many-shops: "&7You have too many shops!"
+msg-no-admin-shop-type-selected: "&7You have to select an admin shop type!"
+msg-no-player-shop-type-selected: "&7You have to select a player shop type!"
+msg-shop-create-fail: "&7You cannot create a shopkeeper there."
 
 msg-type-new-name: "&aPlease type the shop's name into the chat.\n  &aType a dash (-) to remove the name."
 msg-name-set: "&aThe shop's name has been set!"

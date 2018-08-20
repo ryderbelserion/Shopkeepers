@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopkeeper.player;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -14,6 +15,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -25,24 +27,37 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 
 	@Override
 	protected boolean handleSpecificShopkeeperCreation(ShopCreationData shopCreationData) {
-		Validate.isTrue(shopCreationData instanceof PlayerShopCreationData,
-				"Expecting " + PlayerShopCreationData.class.getName() + ", got " + shopCreationData.getClass().getName());
+		assert shopCreationData instanceof PlayerShopCreationData; // shop creation data gets validated first
 		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) shopCreationData;
 
-		// receives messages, can be null:
+		// the creator, not null here:
 		Player creator = shopCreationData.getCreator();
 
-		// check if this chest is already used by some other shopkeeper:
-		if (SKShopkeepersPlugin.getInstance().getProtectedChests().isChestProtected(playerShopCreationData.getShopChest(), null)) {
-			Utils.sendMessage(creator, Settings.msgShopCreateFail);
+		Location spawnLocation = shopCreationData.getSpawnLocation();
+
+		// validate chest block:
+		Block chestBlock = playerShopCreationData.getShopChest();
+		if (!ItemUtils.isChest(chestBlock.getType())) {
+			// the block is not / no longer a chest:
+			Utils.sendMessage(creator, Settings.msgNoChestSelected);
 			return false;
 		}
-		Player owner = playerShopCreationData.getOwner();
-		Location spawnLocation = shopCreationData.getSpawnLocation();
+
+		// check for selected chest being too far away:
+		if (!chestBlock.getWorld().equals(spawnLocation.getWorld())
+				|| (int) chestBlock.getLocation().distanceSquared(spawnLocation) > (Settings.maxChestDistance * Settings.maxChestDistance)) {
+			Utils.sendMessage(creator, Settings.msgChestTooFar);
+			return false;
+		}
+
+		// check selected chest:
+		if (!SKShopkeepersPlugin.getInstance().getShopkeeperCreation().handleCheckChest(creator, chestBlock, true)) {
+			return false;
+		}
 
 		// check worldguard:
 		if (Settings.enableWorldGuardRestrictions) {
-			if (!WorldGuardHandler.isShopAllowed(owner, spawnLocation)) {
+			if (!WorldGuardHandler.isShopAllowed(creator, spawnLocation)) {
 				Utils.sendMessage(creator, Settings.msgShopCreateFail);
 				return false;
 			}
@@ -56,7 +71,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 			}
 		}
 
-		int maxShopsLimit = Settings.getMaxShops(owner);
+		int maxShopsLimit = Settings.getMaxShops(creator);
 		// call event:
 		PlayerCreatePlayerShopkeeperEvent createEvent = new PlayerCreatePlayerShopkeeperEvent(shopCreationData, maxShopsLimit);
 		Bukkit.getPluginManager().callEvent(createEvent);
@@ -69,7 +84,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 
 		// count owned shops:
 		if (maxShopsLimit > 0) {
-			int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().countShopsOfPlayer(owner);
+			int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().countShopsOfPlayer(creator);
 			if (count >= maxShopsLimit) {
 				Utils.sendMessage(creator, Settings.msgTooManyShops);
 				return false;

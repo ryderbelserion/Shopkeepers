@@ -8,6 +8,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.util.Log;
@@ -126,7 +127,7 @@ public class CitizensShopkeeperTrait extends Trait {
 			}
 
 			if (location != null) {
-				ShopCreationData creationData = ShopCreationData.create(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
+				ShopCreationData creationData = AdminShopCreationData.create(null, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
 				creationData.setValue(SKCitizensShopObject.CREATION_DATA_NPC_ID_KEY, npc.getId());
 				Shopkeeper shopkeeper = plugin.handleShopkeeperCreation(creationData);
 				if (shopkeeper != null) {

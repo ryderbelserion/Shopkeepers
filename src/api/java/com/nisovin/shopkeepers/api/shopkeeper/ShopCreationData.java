@@ -15,14 +15,8 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
  * <p>
  * Additional data might be available through sub-classes, or when dynamically added via
  * {@link #setValue(String, Object)}.
- * TODO: turn into an interface?
  */
-public class ShopCreationData {
-
-	public static ShopCreationData create(	Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
-											Location spawnLocation, BlockFace targetedBlockFace) {
-		return new ShopCreationData(creator, shopType, shopObjectType, spawnLocation, targetedBlockFace);
-	}
+public abstract class ShopCreationData {
 
 	private final Player creator; // can be null
 	private final ShopType<?> shopType; // not null
@@ -33,7 +27,7 @@ public class ShopCreationData {
 	private Map<String, Object> additionalData;
 
 	/**
-	 * Create a {@link ShopCreationData}.
+	 * Creates a {@link ShopCreationData}.
 	 * 
 	 * @param creator
 	 *            the creator, can be <code>null</code>
@@ -62,7 +56,8 @@ public class ShopCreationData {
 	/**
 	 * The creator of the shop.
 	 * 
-	 * @return the creating player, can be <code>null</code>
+	 * @return the creating player, might be <code>null</code> (depending on which type of shopkeeper is created and in
+	 *         which context)
 	 */
 	public Player getCreator() {
 		return creator;
