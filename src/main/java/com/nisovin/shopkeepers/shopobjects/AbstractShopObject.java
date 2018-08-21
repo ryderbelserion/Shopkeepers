@@ -79,10 +79,10 @@ public abstract class AbstractShopObject implements ShopObject {
 
 	// ACTIVATION
 
-	public void onChunkLoad() {
+	public void onChunkLoad(boolean worldSaving) {
 	}
 
-	public void onChunkUnload() {
+	public void onChunkUnload(boolean worldSaving) {
 	}
 
 	@Override

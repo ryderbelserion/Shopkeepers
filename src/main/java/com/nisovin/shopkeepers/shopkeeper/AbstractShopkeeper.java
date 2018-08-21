@@ -482,12 +482,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		shopObject.despawn();
 	}
 
-	public void onChunkLoad() {
-		shopObject.onChunkLoad();
+	public void onChunkLoad(boolean worldSaving) {
+		shopObject.onChunkLoad(worldSaving);
 	}
 
-	public void onChunkUnload() {
-		shopObject.onChunkUnload();
+	public void onChunkUnload(boolean worldSaving) {
+		shopObject.onChunkUnload(worldSaving);
 	}
 
 	/**

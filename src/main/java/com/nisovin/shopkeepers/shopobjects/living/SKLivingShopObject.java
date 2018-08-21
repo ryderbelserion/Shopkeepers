@@ -1,12 +1,10 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Ageable;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
@@ -22,14 +20,12 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
 
 public class SKLivingShopObject extends AbstractEntityShopObject implements LivingShopObject {
 
 	protected final LivingShops livingShops;
 	private final SKLivingShopObjectType<?> livingObjectType;
 	private LivingEntity entity;
-	private String uuid;
 	private int respawnAttempts = 0;
 
 	protected SKLivingShopObject(LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -51,19 +47,16 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
+		// check for legacy uuid entry:
 		if (configSection.contains("uuid")) {
-			this.uuid = configSection.getString("uuid");
+			// mark dirty to remove this entry with the next save:
+			shopkeeper.markDirty();
 		}
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		// let's save last known uuid nevertheless, for the case that the entity somehow wasn't properly removed before
-		// (which seems to still happen sometimes during server shutdowns)
-		if (uuid != null && !uuid.isEmpty()) {
-			configSection.set("uuid", uuid);
-		}
 	}
 
 	// ACTIVATION
@@ -99,32 +92,6 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 		entity.removeMetadata("shopkeeper", ShopkeepersPlugin.getInstance());
 	}
 
-	// returns true if we find a valid entity:
-	protected boolean searchOldEntity() {
-		assert !this.isActive();
-		if (uuid != null && !uuid.isEmpty()) {
-			Location spawnLocation = this.getSpawnLocation();
-			// this only checks loaded neighbor chunks
-			// remaining issues after server crashes or with missing chunk unload events:
-			// * depending on chunk loading order, old entities in neighboring chunks might not get found
-			// * if the entity is further away than 1 chunk we we won't find it again, and there is no real solution to
-			// this, because the entity could be anywhere now (even if we have a reference to the old entity instance
-			// after an unnoticed chunk unload, because after a subsequent chunk load the actual entity can wander away
-			// into a completely different chunk)
-			for (Entity e : Utils.getNearbyChunkEntities(spawnLocation.getChunk(), 1, false, this.getEntityType())) {
-				if (e.isValid() && !e.isDead() && e.getUniqueId().toString().equalsIgnoreCase(uuid)) {
-					Log.debug("  Found old shopkeeper entity, using it now");
-					entity = (LivingEntity) e;
-					// entity.setHealth(entity.getMaxHealth());
-					entity.teleport(spawnLocation);
-					assert this.isActive(); // let's assume that the found entity is still valid since we found it
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	private Location getSpawnLocation() {
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
 		double offset = 0.0D;
@@ -147,16 +114,13 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 		// prepare location:
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
 		Location spawnLocation = this.getSpawnLocation();
-		// find old shopkeeper entity, else spawn a new one:
-		if (!this.searchOldEntity()) {
-			// TODO check if the block is passable before spawning there?
-			// try to bypass entity-spawn blocking plugins:
-			EntityType entityType = this.getEntityType();
-			livingShops.forceCreatureSpawn(spawnLocation, entityType);
-			entity = (LivingEntity) world.spawnEntity(spawnLocation, entityType);
-			uuid = entity.getUniqueId().toString();
-			shopkeeper.markDirty();
-		}
+
+		// spawn entity:
+		// TODO check if the block is passable before spawning there?
+		// try to bypass entity-spawn blocking plugins:
+		EntityType entityType = this.getEntityType();
+		livingShops.forceCreatureSpawn(spawnLocation, entityType);
+		entity = (LivingEntity) world.spawnEntity(spawnLocation, entityType);
 
 		if (this.isActive()) {
 			// assign metadata for easy identification by other plugins:
@@ -167,6 +131,8 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 			entity.eject(); // some entities might automatically mount on nearby entities (like baby zombies on chicken)
 			entity.setRemoveWhenFarAway(false);
 			entity.setCanPickupItems(false);
+			// don't save the entity to the world data:
+			entity.setPersistent(false);
 
 			// disable breeding:
 			if (entity instanceof Ageable) {
@@ -263,33 +229,17 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 
 	@Override
 	public void despawn() {
-		if (entity != null) {
-			// note: in case the entity is not active but not in the same chunk, it was probably pushed into a different
-			// and now already unloaded chunk, in which case it got already removed inside the chunk-unload listener
-			if (!this.isActive() && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
-				Log.debug("Chunk was silently unloaded at (" + shopkeeper.getPositionString() + "): Loading it now to remove old entity");
-				World world = Bukkit.getWorld(shopkeeper.getWorldName());
-				if (world != null) {
-					this.searchOldEntity(); // this will load the chunk
-					// request a safe chunk unload which will call an ChunkUnloadEvent then: (for now let's assume
-					// that the server can handle this automatically)
-					// Chunk chunk = location.getChunk();
-					// world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
-				}
-			}
+		if (entity == null) return;
 
-			// disable AI:
-			this.cleanupAI();
+		// disable AI:
+		this.cleanupAI();
 
-			// cleanup metadata:
-			this.removeShopkeeperMetadata(entity);
+		// cleanup metadata:
+		this.removeShopkeeperMetadata(entity);
 
-			// remove entity:
-			entity.remove();
-			entity = null;
-			// TODO chunk loading and removal might not work during server shutdown.. :(
-			// so we are now storing the last known entity uuid
-		}
+		// remove entity:
+		entity.remove();
+		entity = null;
 	}
 
 	@Override
@@ -305,23 +255,13 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 	public boolean check() {
 		if (!this.isActive()) {
 			Log.debug("Shopkeeper (" + shopkeeper.getPositionString() + ") missing, triggering respawn now");
-			boolean silentlyUnloaded = (entity != null && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation()));
-			if (silentlyUnloaded) {
+			if (entity != null && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
 				// the chunk was silently unloaded before:
-				Log.debug("  Chunk was silently unloaded before: Loading it now and requesting controlled unload");
+				Log.debug("  Chunk was silently unloaded before!");
 			}
 			boolean spawned = this.spawn(); // this will load the chunk if necessary
 			if (spawned) {
 				respawnAttempts = 0;
-				if (silentlyUnloaded) {
-					String worldName = shopkeeper.getWorldName();
-					World world = Bukkit.getWorld(worldName);
-					Location location = this.getSpawnLocation();
-					Chunk chunk = location.getChunk();
-					// request a safe chunk unload which will call an ChunkUnloadEvent then: (in order to not keep the
-					// chunks loaded by constantly calling of this method)
-					world.unloadChunkRequest(chunk.getX(), chunk.getZ(), true);
-				}
 				return true;
 			} else {
 				// TODO maybe add a setting to remove shopkeeper if it can't be spawned a certain amount of times?

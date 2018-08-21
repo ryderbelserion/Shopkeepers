@@ -432,21 +432,37 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	 * @return the number of shops in the affected chunk
 	 */
 	public int loadShopkeepersInChunk(Chunk chunk) {
+		return this.loadShopkeepersInChunk(chunk, false);
+	}
+
+	/**
+	 * Loads (activates) all shopkeepers in the given chunk.
+	 * 
+	 * @param chunk
+	 *            the chunk
+	 * @param worldSaving
+	 *            whether the shopkeepers get loaded due to the world saving finished
+	 * @return the number of shops in the affected chunk
+	 */
+	public int loadShopkeepersInChunk(Chunk chunk, boolean worldSaving) {
 		assert chunk != null;
 		int affectedShops = 0;
 		List<AbstractShopkeeper> shopkeepers = this.getShopkeepersInChunk(chunk);
 		if (!shopkeepers.isEmpty()) {
 			affectedShops = shopkeepers.size();
 			Log.debug("Loading " + affectedShops + " shopkeepers in chunk "
-					+ chunk.getWorld().getName() + "," + chunk.getX() + "," + chunk.getZ());
+					+ chunk.getWorld().getName() + "," + chunk.getX() + "," + chunk.getZ()
+					+ (worldSaving ? " (world saving finished)" : ""));
 			boolean dirty = false;
 			for (AbstractShopkeeper shopkeeper : shopkeepers) {
 				// inform shopkeeper about chunk load:
-				shopkeeper.onChunkLoad();
+				shopkeeper.onChunkLoad(worldSaving);
 
 				// activate:
 				this.activateShopkeeper(shopkeeper);
-				if (shopkeeper.isDirty()) dirty = true;
+				if (shopkeeper.isDirty()) {
+					dirty = true;
+				}
 			}
 
 			if (dirty) {
@@ -465,19 +481,37 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	 * @return the number of shops in the affected chunk
 	 */
 	public int unloadShopkeepersInChunk(Chunk chunk) {
+		return unloadShopkeepersInChunk(chunk, false);
+	}
+
+	/**
+	 * Unloads (deactivates) all shopkeepers in the given chunk.
+	 * 
+	 * @param chunk
+	 *            the chunk
+	 * @param worldSaving
+	 *            whether the shopkeepers get unloaded due to the world saving
+	 * @return the number of shops in the affected chunk
+	 */
+	public int unloadShopkeepersInChunk(Chunk chunk, boolean worldSaving) {
 		assert chunk != null;
 		int affectedShops = 0;
 		List<AbstractShopkeeper> shopkeepers = this.getShopkeepersInChunk(chunk);
 		if (!shopkeepers.isEmpty()) {
 			affectedShops = shopkeepers.size();
 			Log.debug("Unloading " + affectedShops + " shopkeepers in chunk "
-					+ chunk.getWorld().getName() + "," + chunk.getX() + "," + chunk.getZ());
+					+ chunk.getWorld().getName() + "," + chunk.getX() + "," + chunk.getZ()
+					+ (worldSaving ? " (world saving)" : ""));
 			for (AbstractShopkeeper shopkeeper : shopkeepers) {
 				// inform shopkeeper about chunk unload:
-				shopkeeper.onChunkUnload();
+				shopkeeper.onChunkUnload(worldSaving);
 
-				// skip shopkeepers which are kept active all the time (ex. sign, citizens shops):
+				// skip shopkeepers which are kept active all the time (ex. citizens shops):
 				if (!shopkeeper.needsSpawning()) continue;
+				// if world save: skip shopkeepers that do not need to be despawned:
+				if (worldSaving && !shopkeeper.getShopObject().getType().despawnDuringWorldSaves()) {
+					continue;
+				}
 
 				// deactivate:
 				this.deactivateShopkeeper(shopkeeper, false);
@@ -494,12 +528,26 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	 * @return the number of loaded shopkeepers
 	 */
 	public int loadShopkeepersInWorld(World world) {
+		return this.loadShopkeepersInWorld(world, false);
+	}
+
+	/**
+	 * Loads all shopkeepers in the given world.
+	 * 
+	 * @param world
+	 *            the world
+	 * @param worldSaving
+	 *            whether the shopkeepers get loaded due to the world saving finished
+	 * @return the number of loaded shopkeepers
+	 */
+	public int loadShopkeepersInWorld(World world, boolean worldSaving) {
 		assert world != null;
 		int affectedShops = 0;
 		for (Chunk chunk : world.getLoadedChunks()) {
-			affectedShops += this.loadShopkeepersInChunk(chunk);
+			affectedShops += this.loadShopkeepersInChunk(chunk, worldSaving);
 		}
-		Log.debug("Loaded " + affectedShops + " shopkeepers in world " + world.getName());
+		Log.debug("Loaded " + affectedShops + " shopkeepers in world " + world.getName()
+				+ (worldSaving ? " (world saving finished)" : ""));
 		return affectedShops;
 	}
 
@@ -518,12 +566,26 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	 * @return the number of unloaded shopkeepers
 	 */
 	public int unloadShopkeepersInWorld(World world) {
+		return this.unloadShopkeepersInWorld(world, false);
+	}
+
+	/**
+	 * Unloads all shopkeepers in the given world.
+	 * 
+	 * @param world
+	 *            the world
+	 * @param worldSaving
+	 *            whether the shopkeepers get loaded due to the world saving
+	 * @return the number of unloaded shopkeepers
+	 */
+	public int unloadShopkeepersInWorld(World world, boolean worldSaving) {
 		assert world != null;
 		int affectedShops = 0;
 		for (Chunk chunk : world.getLoadedChunks()) {
-			affectedShops += this.unloadShopkeepersInChunk(chunk);
+			affectedShops += this.unloadShopkeepersInChunk(chunk, worldSaving);
 		}
-		Log.debug("Unloaded " + affectedShops + " shopkeepers in world " + world.getName());
+		Log.debug("Unloaded " + affectedShops + " shopkeepers in world " + world.getName()
+				+ (worldSaving ? " (world saving)" : ""));
 		return affectedShops;
 	}
 

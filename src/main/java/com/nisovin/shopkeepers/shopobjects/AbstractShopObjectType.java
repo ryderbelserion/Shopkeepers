@@ -31,6 +31,15 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 	@Override
 	public abstract boolean needsSpawning();
 
+	/**
+	 * Whether shop objects of this type get despawned right before world saves and respawned afterwards.
+	 * 
+	 * @return <code>true</code> if the shop objects of this type get despawned during world saves
+	 */
+	public boolean despawnDuringWorldSaves() {
+		return this.needsSpawning();
+	}
+
 	@Override
 	public boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
 		// TODO allow spawning inside of water?
