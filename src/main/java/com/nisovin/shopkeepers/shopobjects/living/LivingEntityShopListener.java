@@ -234,7 +234,7 @@ class LivingEntityShopListener implements Listener {
 
 	// prevent shopkeeper entities from being affected by potion effects
 	@EventHandler(ignoreCancelled = true)
-	void onEntityDropItem(EntityPotionEffectEvent event) {
+	void onEntityPotionEffectEvent(EntityPotionEffectEvent event) {
 		if (event.getAction() == Action.ADDED && shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
