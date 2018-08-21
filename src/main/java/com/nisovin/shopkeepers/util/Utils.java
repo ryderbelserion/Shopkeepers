@@ -123,8 +123,53 @@ public final class Utils {
 		return block.getLocation().add(0.5D, 0.5D, 0.5D);
 	}
 
-	private static final List<BlockFace> BLOCK_SIDES = Arrays.asList(BlockFace.UP, BlockFace.DOWN,
-			BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST);
+	public enum BlockFaceDirections {
+		// order matters for operations like yaw to block face
+		CARDINAL(Arrays.asList(BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST)),
+		INTERCARDINAL(Arrays.asList(BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST)),
+		SECONDARY_INTERCARDINAL(
+				Arrays.asList(
+						BlockFace.SOUTH, BlockFace.SOUTH_SOUTH_WEST, BlockFace.SOUTH_WEST, BlockFace.WEST_SOUTH_WEST,
+						BlockFace.WEST, BlockFace.WEST_NORTH_WEST, BlockFace.NORTH_WEST, BlockFace.NORTH_NORTH_WEST,
+						BlockFace.NORTH, BlockFace.NORTH_NORTH_EAST, BlockFace.NORTH_EAST, BlockFace.EAST_NORTH_EAST,
+						BlockFace.EAST, BlockFace.EAST_SOUTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_SOUTH_EAST));
+
+		private final List<BlockFace> directions;
+
+		private BlockFaceDirections(List<BlockFace> directions) {
+			this.directions = Collections.unmodifiableList(directions);
+		}
+
+		public List<BlockFace> getDirections() {
+			return directions;
+		}
+	}
+
+	/**
+	 * Gets the horizontal {@link BlockFace} corresponding to the given yaw angle.
+	 * 
+	 * @param yaw
+	 *            the yaw angle
+	 * @param blockFaceDirections
+	 *            the block face directions
+	 * @return the block face corresponding to the given yaw angle
+	 */
+	public static BlockFace yawToFace(float yaw, BlockFaceDirections blockFaceDirections) {
+		Validate.notNull(blockFaceDirections, "BlockFaceDirections is null!");
+		switch (blockFaceDirections) {
+		case CARDINAL:
+			return blockFaceDirections.getDirections().get(Math.round(yaw / 90.0f) & 3);
+		case INTERCARDINAL:
+			return blockFaceDirections.getDirections().get(Math.round(yaw / 45.0f) & 7);
+		case SECONDARY_INTERCARDINAL:
+			return blockFaceDirections.getDirections().get(Math.round(yaw / 22.5f) & 15);
+		default:
+			throw new IllegalArgumentException("Unsupported BlockFaceDirections: " + blockFaceDirections);
+		}
+	}
+
+	private static final List<BlockFace> BLOCK_SIDES = Collections.unmodifiableList(Arrays.asList(BlockFace.UP, BlockFace.DOWN,
+			BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST));
 
 	public static List<BlockFace> getBlockSides() {
 		return BLOCK_SIDES;
@@ -144,6 +189,14 @@ public final class Utils {
 	public static boolean isWallSignFace(BlockFace blockFace) {
 		return blockFace == BlockFace.NORTH || blockFace == BlockFace.SOUTH
 				|| blockFace == BlockFace.EAST || blockFace == BlockFace.WEST;
+	}
+
+	public static BlockFace getSignPostFacing(float yaw) {
+		return yawToFace(yaw, BlockFaceDirections.SECONDARY_INTERCARDINAL);
+	}
+
+	public static boolean isSignPostFacing(BlockFace blockFace) {
+		return BlockFaceDirections.SECONDARY_INTERCARDINAL.getDirections().contains(blockFace);
 	}
 
 	/**

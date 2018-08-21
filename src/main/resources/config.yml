@@ -186,6 +186,8 @@ enable-citizen-shops: false
 
 # Whether to allow sign shops.
 enable-sign-shops: true
+# Whether to allow the creation of sign posts (instead of only wall signs).
+enable-sign-post-shops: true
 # The first line of a sign shop.
 sign-shop-first-line: "[SHOP]"
 

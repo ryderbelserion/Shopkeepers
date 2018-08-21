@@ -6,6 +6,7 @@ import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 
 public class SignShops {
 
@@ -15,7 +16,7 @@ public class SignShops {
 
 	public SignShops(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
-		signShopListener = new SignShopListener(plugin);
+		signShopListener = new SignShopListener(this);
 	}
 
 	public void onEnable() {
@@ -30,6 +31,14 @@ public class SignShops {
 
 	public SKSignShopObjectType getSignShopObjectType() {
 		return signShopObjectType;
+	}
+
+	public AbstractShopkeeper getSignShop(Block block) {
+		return plugin.getShopkeeperRegistry().getActiveShopkeeper(signShopObjectType.createObjectId(block));
+	}
+
+	public boolean isSignShop(Block block) {
+		return (this.getSignShop(block) != null);
 	}
 
 	void cancelNextBlockPhysics(Block block) {

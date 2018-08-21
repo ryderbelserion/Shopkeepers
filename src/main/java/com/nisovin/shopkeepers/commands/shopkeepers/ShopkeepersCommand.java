@@ -174,7 +174,9 @@ public class ShopkeepersCommand extends BaseCommand {
 			return;
 		}
 		Block spawnBlock = targetBlock.getRelative(targetBlockFace);
-		Location spawnLocation = spawnBlock.getLocation();
+		Location spawnLocation = Utils.getBlockCenterLocation(spawnBlock);
+		// face towards player:
+		spawnLocation.setDirection(player.getEyeLocation().subtract(spawnLocation).toVector());
 
 		// shop creation data:
 		ShopCreationData shopCreationData;

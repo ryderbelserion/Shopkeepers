@@ -45,12 +45,12 @@ public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShop
 
 	@Override
 	public boolean needsSpawning() {
-		return false; // TODO maybe cleanup the shop signs on chunk unload in the future?
+		return true; // despawn signs on chunk unload, and spawn them again on chunk load
 	}
 
 	@Override
 	public boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
-		// limit to wall sign faces:
-		return (targetedBlockFace != BlockFace.UP) && super.isValidSpawnLocation(spawnLocation, targetedBlockFace);
+		// limit to wall sign faces if sign posts are disabled:
+		return (Settings.enableSignPostShops || targetedBlockFace != BlockFace.UP) && super.isValidSpawnLocation(spawnLocation, targetedBlockFace);
 	}
 }

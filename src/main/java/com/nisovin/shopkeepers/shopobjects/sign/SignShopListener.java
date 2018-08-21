@@ -13,11 +13,12 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExplodeEvent;
 import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -25,12 +26,12 @@ import com.nisovin.shopkeepers.util.Utils;
 
 class SignShopListener implements Listener {
 
-	private final SKShopkeepersPlugin plugin;
+	private final SignShops signShops;
 
 	private Block cancelNextBlockPhysics = null;
 
-	SignShopListener(SKShopkeepersPlugin plugin) {
-		this.plugin = plugin;
+	SignShopListener(SignShops signShops) {
+		this.signShops = signShops;
 	}
 
 	void cancelNextBlockPhysics(Block block) {
@@ -44,7 +45,7 @@ class SignShopListener implements Listener {
 
 		// check for sign shop
 		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && ItemUtils.isSign(block.getType())) {
-			AbstractShopkeeper shopkeeper = plugin.getShopkeeperRegistry().getShopkeeperByBlock(block);
+			AbstractShopkeeper shopkeeper = signShops.getSignShop(block);
 			if (shopkeeper != null) {
 				// only trigger shopkeeper interaction for main-hand events:
 				if (event.getHand() == EquipmentSlot.HAND) {
@@ -64,13 +65,42 @@ class SignShopListener implements Listener {
 
 	// protect sign block:
 
+	private boolean isProtectedBlock(Block block) {
+		// not protected if the sign shop is not active (if the block is not a sign currently):
+		if (ItemUtils.isSign(block.getType()) && signShops.isSignShop(block)) {
+			return true;
+		}
+		for (BlockFace blockFace : Utils.getBlockSides()) {
+			Block adjacentBlock = block.getRelative(blockFace);
+			Shopkeeper shopkeeper = signShops.getSignShop(adjacentBlock);
+			if (shopkeeper != null) {
+				SKSignShopObject signObject = (SKSignShopObject) shopkeeper.getShopObject();
+				BlockFace attachedFace = BlockFace.UP; // in case of sign post
+				if (signObject.isWallSign()) {
+					attachedFace = signObject.getSignFacing();
+				}
+				if (blockFace == attachedFace) {
+					// sign is (supposed to be) / might be attached to the given block:
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
-		if (ItemUtils.isSign(block.getType())) {
-			if (plugin.getShopkeeperRegistry().getShopkeeperByBlock(block) != null) {
-				event.setCancelled(true);
-			}
+		if (this.isProtectedBlock(block)) {
+			event.setCancelled(true);
+		}
+	}
+
+	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	void onBlockPlace(BlockPlaceEvent event) {
+		Block block = event.getBlock();
+		if (signShops.isSignShop(block)) {
+			event.setCancelled(true);
 		}
 	}
 
@@ -95,7 +125,7 @@ class SignShopListener implements Listener {
 	private boolean checkCancelPhysics(Block block) {
 		if (cancelNextBlockPhysics != null && cancelNextBlockPhysics.equals(block)) {
 			return true;
-		} else if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperRegistry().getShopkeeperByBlock(block) != null) {
+		} else if (signShops.isSignShop(block)) {
 			return true;
 		}
 		return false;
@@ -103,22 +133,22 @@ class SignShopListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	void onEntityExplosion(EntityExplodeEvent event) {
-		Iterator<Block> iter = event.blockList().iterator();
-		while (iter.hasNext()) {
-			Block block = iter.next();
-			if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperRegistry().getShopkeeperByBlock(block) != null) {
-				iter.remove();
+		Iterator<Block> iterator = event.blockList().iterator();
+		while (iterator.hasNext()) {
+			Block block = iterator.next();
+			if (this.isProtectedBlock(block)) {
+				iterator.remove();
 			}
 		}
 	}
 
 	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
 	void onBlockExplosion(BlockExplodeEvent event) {
-		Iterator<Block> iter = event.blockList().iterator();
-		while (iter.hasNext()) {
-			Block block = iter.next();
-			if (ItemUtils.isSign(block.getType()) && plugin.getShopkeeperRegistry().getShopkeeperByBlock(block) != null) {
-				iter.remove();
+		Iterator<Block> iterator = event.blockList().iterator();
+		while (iterator.hasNext()) {
+			Block block = iterator.next();
+			if (this.isProtectedBlock(block)) {
+				iterator.remove();
 			}
 		}
 	}

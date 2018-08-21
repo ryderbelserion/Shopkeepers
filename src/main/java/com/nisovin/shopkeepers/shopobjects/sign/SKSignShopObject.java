@@ -3,15 +3,14 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
@@ -19,20 +18,29 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
 
 	protected final SignShops signShops;
-	private BlockFace signFacing; // can be null, if not yet loaded or unknown
+	private boolean wallSign = true;
+	private BlockFace signFacing = BlockFace.SOUTH; // not null
 	// update the sign content at least once after plugin start, in case some settings have changed which affect the
 	// sign content:
 	private boolean updateSign = true;
+	private long lastFailedRespawnAttempt = 0;
 
 	protected SKSignShopObject(SignShops signShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
 		this.signShops = signShops;
 		if (creationData != null) {
-			this.signFacing = creationData.getTargetedBlockFace();
+			BlockFace targetedBlockFace = creationData.getTargetedBlockFace();
+			if (targetedBlockFace == BlockFace.UP) {
+				this.wallSign = false;
+				this.signFacing = Utils.getSignPostFacing(creationData.getSpawnLocation().getYaw());
+			} else if (Utils.isWallSignFace(targetedBlockFace)) {
+				this.signFacing = targetedBlockFace;
+			}
 		}
 	}
 
@@ -44,55 +52,51 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		if (configSection.isString("signFacing")) {
-			String signFacingName = configSection.getString("signFacing");
-			if (signFacingName != null) {
-				try {
-					signFacing = BlockFace.valueOf(signFacingName);
-				} catch (IllegalArgumentException e) {
-				}
+		// wall sign vs sign post:
+		if (!configSection.isBoolean("wallSign")) {
+			// missing value:
+			shopkeeper.markDirty();
+		}
+		wallSign = configSection.getBoolean("wallSign", true);
+
+		// sign facing:
+		signFacing = BlockFace.SOUTH; // default
+		String signFacingName = configSection.getString("signFacing");
+		if (signFacingName == null) {
+			Log.warning("Missing sign facing for shopkeeper " + shopkeeper.getId());
+			shopkeeper.markDirty();
+		} else {
+			try {
+				signFacing = BlockFace.valueOf(signFacingName);
+			} catch (IllegalArgumentException e) {
+				Log.warning("Could not parse sign facing for shopkeeper " + shopkeeper.getId() + ": " + signFacingName);
+				shopkeeper.markDirty();
+			}
+			if (wallSign ? !Utils.isWallSignFace(signFacing) : !Utils.isSignPostFacing(signFacing)) {
+				Log.warning("Invalid sign facing for shopkeeper " + shopkeeper.getId() + ": " + signFacingName);
+				signFacing = BlockFace.SOUTH; // fallback to default
+				shopkeeper.markDirty();
 			}
 		}
-
-		// in case no sign facing is stored: try getting the current sign facing from the sign in the world
-		// if this is not possible (for ex. because the world isn't loaded yet), we will re-attempt this
-		// during the periodic checks
-		this.updateSignFacingFromWorld();
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		if (signFacing != null) {
-			configSection.set("signFacing", signFacing.name());
-		}
+
+		// wall sign vs sign post:
+		configSection.set("wallSign", wallSign);
+
+		// sign facing:
+		configSection.set("signFacing", signFacing.name());
 	}
 
-	@Override
-	public void setup() {
-		super.setup();
-		this.spawn();
+	public boolean isWallSign() {
+		return wallSign;
 	}
 
-	// LIFE CYCLE
-
-	@Override
-	public void delete() {
-		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		if (world != null) {
-			// this should load the chunk if necessary, making sure that the block gets removed (though, might not work
-			// on server stops..):
-			Block signBlock = world.getBlockAt(shopkeeper.getX(), shopkeeper.getY(), shopkeeper.getZ());
-			if (ItemUtils.isSign(signBlock.getType())) {
-				// remove sign:
-				signBlock.setType(Material.AIR);
-			}
-			// TODO trigger an unloadChunkRequest if the chunk had to be loaded? (for now let's assume that the server
-			// handles that kind of thing automatically)
-		} else {
-			// well: world unloaded and we didn't get an event.. not our fault
-			// TODO actually, we are not removing the sign on world unloads..
-		}
+	public BlockFace getSignFacing() {
+		return signFacing;
 	}
 
 	// ACTIVATION
@@ -113,41 +117,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		return (Sign) signBlock.getState();
 	}
 
-	private BlockFace getSignFacingFromWorld() {
-		// try getting the current sign facing from the sign in the world:
-		Block signBlock = this.getBlock();
-		if (signBlock != null) {
-			if (signBlock.getType() == Material.WALL_SIGN) {
-				return ((WallSign) signBlock.getBlockData()).getFacing();
-			} else if (signBlock.getType() == Material.SIGN) {
-				return ((org.bukkit.block.data.type.Sign) signBlock.getBlockData()).getRotation();
-			}
-		}
-		return null;
-	}
-
-	private void updateSignFacingFromWorld() {
-		if (signFacing == null) {
-			signFacing = this.getSignFacingFromWorld();
-			if (signFacing != null) {
-				shopkeeper.markDirty();
-			}
-		}
-	}
-
-	@Override
-	public void onChunkLoad() {
-		super.onChunkLoad();
-		// get the sign facing, in case we weren't able yet, for example because the world wasn't loaded earlier:
-		this.updateSignFacingFromWorld();
-
-		// update sign content if requested:
-		if (updateSign) {
-			updateSign = false;
-			this.updateSign();
-		}
-	}
-
 	@Override
 	public boolean isActive() {
 		return (this.getBlock() != null);
@@ -161,27 +130,42 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	@Override
 	public boolean spawn() {
 		Location signLocation = this.getLocation();
-		if (signLocation == null) return false;
+		if (signLocation == null) {
+			return false;
+		}
 
-		Block signBlock = signLocation.getBlock();
-		if (signBlock.getType() != Material.AIR) {
+		// if re-spawning fails due to the sign dropping for some reason (ex. attached block missing) this could be
+		// abused (sign drop farming), therefore we limit the number of spawn attempts:
+		if (System.currentTimeMillis() - lastFailedRespawnAttempt < 3 * 60 * 1000L) {
+			Log.debug("Shopkeeper sign at " + shopkeeper.getPositionString() + " is on spawn cooldown.");
 			return false;
 		}
 
 		// place sign: // TODO maybe also allow non-wall signs?
-		WallSign wallSignData = (WallSign) Bukkit.createBlockData(Material.WALL_SIGN);
-		if (signFacing != null) {
-			// set sign facing:
+		Block signBlock = signLocation.getBlock();
+		BlockData signData = null;
+		if (wallSign) {
+			// place wall sign:
+			WallSign wallSignData = (WallSign) Bukkit.createBlockData(Material.WALL_SIGN);
 			wallSignData.setFacing(signFacing);
+			signData = wallSignData;
+		} else {
+			// place sign post:
+			org.bukkit.block.data.type.Sign signPostData = (org.bukkit.block.data.type.Sign) Bukkit.createBlockData(Material.SIGN);
+			signPostData.setRotation(signFacing);
+			signData = signPostData;
 		}
+		assert signData != null;
+
 		// cancel block physics for this placed sign if needed:
 		signShops.cancelNextBlockPhysics(signBlock);
-		signBlock.setBlockData(wallSignData, false);
+		signBlock.setBlockData(signData, false);
 		// cleanup state if no block physics were triggered:
 		signShops.cancelNextBlockPhysics(null);
 
 		// in case sign placement has failed for some reason:
 		if (!ItemUtils.isSign(signBlock.getType())) {
+			lastFailedRespawnAttempt = System.currentTimeMillis();
 			return false;
 		}
 
@@ -194,6 +178,12 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	@Override
 	public void despawn() {
+		Block signBlock = this.getBlock();
+		if (signBlock != null) {
+			assert ItemUtils.isSign(signBlock.getType());
+			// remove sign:
+			signBlock.setType(Material.AIR, false);
+		}
 	}
 
 	@Override
@@ -231,7 +221,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		sign.setLine(3, "");
 
 		// apply sign changes:
-		sign.update();
+		sign.update(false, false);
 	}
 
 	@Override
@@ -241,15 +231,11 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			return false;
 		}
 
-		Sign sign = this.getSign();
-		if (sign == null) {
-			// removing the shopkeeper, because re-spawning might fail (ex. attached block missing) or could be abused
-			// (sign drop farming):
+		Block signBlock = this.getBlock();
+		if (signBlock == null) {
 			Log.debug("Shopkeeper sign at " + shopkeeper.getPositionString() + " is no longer existing! Attempting respawn now.");
 			if (!this.spawn()) {
-				Log.warning("Shopkeeper sign at " + shopkeeper.getPositionString() + " could not be replaced! Removing shopkeeper now!");
-				// delayed removal:
-				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> shopkeeper.delete());
+				Log.warning("Shopkeeper sign at " + shopkeeper.getPositionString() + " could not be spawned!");
 			}
 			return true;
 		}

@@ -20,7 +20,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -37,7 +36,6 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
-import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.util.Log;
 
@@ -352,8 +350,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	private boolean _deactivateShopkeeper(AbstractShopkeeper shopkeeper, String objectId) {
-		assert shopkeeper != null && objectId != null;
-		if (activeShopkeepers.get(objectId) == shopkeeper) {
+		assert shopkeeper != null;
+		if (objectId != null && activeShopkeepers.get(objectId) == shopkeeper) {
 			activeShopkeepers.remove(objectId);
 			return true;
 		}
@@ -362,26 +360,28 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	private void activateShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
-		if (shopkeeper.needsSpawning() && !shopkeeper.isActive()) {
-			// deactivate shopkeeper by old shop object id, in case there is one:
-			if (this._deactivateShopkeeper(shopkeeper)) {
-				if (Settings.debug && shopkeeper.getShopObject() instanceof SKLivingShopObject) {
-					SKLivingShopObject livingShop = (SKLivingShopObject) shopkeeper.getShopObject();
-					LivingEntity oldEntity = livingShop.getEntity();
-					Log.debug("Old, active shopkeeper was found (unloading probably has been skipped earlier): "
-							+ (oldEntity == null ? "null" : (oldEntity.getUniqueId() + " | " + (oldEntity.isDead() ? "dead | " : "alive | ")
-									+ (oldEntity.isValid() ? "valid" : "invalid"))));
-				}
-			}
+		if (!shopkeeper.needsSpawning()) return;
 
-			// spawn and activate:
+		boolean activate = false;
+		// spawn if not yet active:
+		if (!shopkeeper.isActive()) {
+			// deactivate shopkeeper by old shop object id, in case there is one:
+			this._deactivateShopkeeper(shopkeeper);
+
 			boolean spawned = shopkeeper.spawn();
 			if (spawned) {
 				// activate with new object id:
-				this._activateShopkeeper(shopkeeper);
+				activate = true;
 			} else {
 				Log.warning("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 			}
+		} else if (this.getActiveShopkeeper(shopkeeper.getObjectId()) == null) {
+			// already active but missing activation, activate with current object id:
+			activate = true;
+		}
+		if (activate) {
+			// activate with current object id:
+			this._activateShopkeeper(shopkeeper);
 		}
 	}
 
