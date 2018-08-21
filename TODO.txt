@@ -8,7 +8,6 @@ Low priority:
 * Limit chest protection to the chest block and connected chest blocks. Since 1.13 (and before with trap chests) one is able to place disconnected chests side by side.
 * Improve chest protection (the anti-hopper code is inefficient).
 * Support for more than 8 trades
-* Sign shopkeepers somehow support non-wall signs (sign posts), maybe if a sign is targeted use that sign?
 * More types of block shops? -> clicking button to open shop
 * Virtual shops (command to edit and open trade menu), would allow tons of possibilities for other plugins / server admins to use shopkeeper shops in other contexts
 * Add debug categories (debug mode can produce quite a lot of spam currently)
@@ -16,21 +15,13 @@ Low priority:
 * Compress currency items in the chest (low currency to high currency)? To maximize available storage capacity. This would also mean that the usage of the high-currency-min-cost setting would be limited to creating the trading recipes, and not be used when adding currency items to the shop chests.
 * Maybe prevent any unrecognised types of clicks if running in compatibility mode? To reduce the risk of minecraft updates with new clicking actions causing issues.
 
-* remove entity uuid saving/finding of old duplicated entities? this doesn't work reliably anyways (because we don't keep track of world/chunk saves), and causes shopkeepers to become dirty with every spawning
-  * also the entity duplication issue should be solved differently by now, by removing all shopkeepers during world saves
-* remove shop signs on chunk unloads and replace them on chunk load, just like entities get removed?
-  * would also require removing them during saving..?
-
 * introduce separate editor window to be able to add new player editing options
   * add an option to reposition shops: button pressed > window closes + message > player clicks a block > runs new/updated/smarter placement logic there, checks distance to chest, option (default true) to not allow it for shops that are not directly placed on top of the shop chest (because those were probably created via command and it is unclear whether players are meant to be able to reposition those shops)
 * be smarter about determining the shop entity position, in order to not have it reposition every ~10seconds
   * add admin command to reposition all shops to their ideal position according to collisions below their current position (in a certain max range of only a few blocks..)
   * or: allow a greater distance, as long as the entity did only fall down and didn't move sidewards
 * allow shops below water (aquatic update!)
-* Improve shop placement via command by taking the targeted block face into account:
-  * Problem: For this to properly work, one has to take block collision boxes into account -> requires nms
-  * Add new setting then: place-player-shops-on-chest-on-command: false
-  * Setting comment: Whether to place player shops created via command on top of the shop chest, or to place them at the targeted side of the chest (sign shops are exempt from this: they always get placed at the targeted block side).
+* When determining the targeted block face when creating shopkeepers via command, take the blocks collision boxes into account (requires nms)
 
 * Remove AbstractType#matches with aliases
 * remove AbstractType#isEnabled() and instead dynamically register and unregister enabled/disabled types?
@@ -40,7 +31,7 @@ Low priority:
 * properly separate loading/unloading from activation/deactivation in debug messages/method names/etc
 
 * Rename ShopkeeperRegistry and ShopkeeperStorage to ShopkeepersRegistry and ShopkeepersStorage?
-  * Another major api break though.. maybe do this with the next larger API changes.
+  * Another major api break though.. maybe do this with the next larger API changes. Or not at all.
 
 Ideas:
 * Per-Trade/Shopkeeper settings, maybe via written books:<br>
@@ -49,5 +40,5 @@ Ideas:
 * Maybe move shop options (like currently name, profession, etc.) into a separate inventory view to have additional space there<br>
 * Add message to default zero-currency items explaining how to increase/decrease costs.
 * Add zero-cost items in trading shopkeeper, with lore which explains how to setup the trade.
-* Store shopkeeper data (save.yml) in smaller chunks? Maybe 1 file per chunk, or per region? Reducing the overhead when saving
+* Store shopkeeper data (save.yml) in smaller chunks? Maybe 1 file per world?
   * Makes only sense for very large numbers of shops, with many trades -> TODO benchmark
