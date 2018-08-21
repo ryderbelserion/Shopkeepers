@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.shopkeeper.admin.trading;
+package com.nisovin.shopkeepers.shopkeeper.admin.regular;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;

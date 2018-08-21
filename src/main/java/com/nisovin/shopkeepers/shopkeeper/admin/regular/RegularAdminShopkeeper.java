@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.shopkeeper.admin.trading;
+package com.nisovin.shopkeepers.shopkeeper.admin.regular;
 
 import java.util.ArrayList;
 import java.util.Collection;

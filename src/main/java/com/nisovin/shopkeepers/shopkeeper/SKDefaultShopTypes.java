@@ -5,7 +5,7 @@ import java.util.List;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
-import com.nisovin.shopkeepers.shopkeeper.admin.trading.RegularAdminShopType;
+import com.nisovin.shopkeepers.shopkeeper.admin.regular.RegularAdminShopType;
 import com.nisovin.shopkeepers.shopkeeper.player.book.BookPlayerShopType;
 import com.nisovin.shopkeepers.shopkeeper.player.buy.BuyingPlayerShopType;
 import com.nisovin.shopkeepers.shopkeeper.player.sell.SellingPlayerShopType;
