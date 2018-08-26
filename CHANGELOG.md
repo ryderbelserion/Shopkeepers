@@ -48,10 +48,10 @@ Added and changed (mostly colors) a few messages:
 * As consequence all existing fallback code was removed:
   * No longer keeping track of the uuid of the last spawned entity (this should also reduce the need of periodic saves of shopkeeper data) and no longer searching for old entities before spawning an entity.
   * No longer handling silent / unnoticed chunk unloads and no longer handling entities that got pushed out of their chunk (it's assumed that the non-persistent entities get automatically removed).
-  * No longer temporarily depsawning all shopkeeper entities during world saves (less performance impact and less visual disturbance for players).
+  * No longer temporarily despawning all shopkeeper entities during world saves (less performance impact and less visual disturbance for players).
 However, in case something doesn't work as expected, this change has the potential to cause entity related issues (thus 'experimental').
 
-**Other changes:**
+**Other changes:**  
 * Changed: Citizens shopkeepers are now identified by the citizens NPC's unique ids. Conversion should happen automatically once Citizens is detected to be running.
 * Fixed: No longer deleting the citizens NPC when a shopkeeper is deleted due to another shopkeeper using the same NPC.
 * Changed (internal): Removal of invalid citizens shopkeepers was moved and gets run now everytime Citizens gets enabled.
