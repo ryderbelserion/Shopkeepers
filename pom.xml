@@ -61,7 +61,7 @@
 	<modules>
 		<module>modules/api</module>
 		<module>modules/main</module>
-		<module>modules/v1_13_R1</module>
+		<module>modules/v1_13_R2</module>
 		<module>modules/dist</module>
 	</modules>
 

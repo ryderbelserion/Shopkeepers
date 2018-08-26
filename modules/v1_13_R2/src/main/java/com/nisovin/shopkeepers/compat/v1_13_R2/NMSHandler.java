@@ -1,13 +1,13 @@
-package com.nisovin.shopkeepers.compat.v1_13_R1;
+package com.nisovin.shopkeepers.compat.v1_13_R2;
 
 import java.lang.reflect.Field;
 import java.util.Set;
 
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_13_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_13_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_13_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_13_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_13_R2.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -15,24 +15,24 @@ import org.bukkit.util.Vector;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
-import net.minecraft.server.v1_13_R1.Entity;
-import net.minecraft.server.v1_13_R1.EntityHuman;
-import net.minecraft.server.v1_13_R1.EntityInsentient;
-import net.minecraft.server.v1_13_R1.EntityLiving;
-import net.minecraft.server.v1_13_R1.FluidCollisionOption;
-import net.minecraft.server.v1_13_R1.GameProfileSerializer;
-import net.minecraft.server.v1_13_R1.MovingObjectPosition;
-import net.minecraft.server.v1_13_R1.NBTTagCompound;
-import net.minecraft.server.v1_13_R1.PathfinderGoalFloat;
-import net.minecraft.server.v1_13_R1.PathfinderGoalLookAtPlayer;
-import net.minecraft.server.v1_13_R1.PathfinderGoalSelector;
-import net.minecraft.server.v1_13_R1.Vec3D;
+import net.minecraft.server.v1_13_R2.Entity;
+import net.minecraft.server.v1_13_R2.EntityHuman;
+import net.minecraft.server.v1_13_R2.EntityInsentient;
+import net.minecraft.server.v1_13_R2.EntityLiving;
+import net.minecraft.server.v1_13_R2.FluidCollisionOption;
+import net.minecraft.server.v1_13_R2.GameProfileSerializer;
+import net.minecraft.server.v1_13_R2.MovingObjectPosition;
+import net.minecraft.server.v1_13_R2.NBTTagCompound;
+import net.minecraft.server.v1_13_R2.PathfinderGoalFloat;
+import net.minecraft.server.v1_13_R2.PathfinderGoalLookAtPlayer;
+import net.minecraft.server.v1_13_R2.PathfinderGoalSelector;
+import net.minecraft.server.v1_13_R2.Vec3D;
 
 public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public String getVersionId() {
-		return "1_13_R1";
+		return "1_13_R2";
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public final class NMSHandler implements NMSCallProvider {
 		// example: armor stands are living, but not insentient
 		if (!(mcLivingEntity instanceof EntityInsentient)) return;
 		EntityInsentient mcInsentientEntity = ((EntityInsentient) mcLivingEntity);
-		mcInsentientEntity.goalSelector.a();
+		mcInsentientEntity.goalSelector.doTick();
 		mcInsentientEntity.getControllerLook().a();
 	}
 
@@ -137,14 +137,13 @@ public final class NMSHandler implements NMSCallProvider {
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
 		if (provided.getType() != required.getType()) return false;
-		net.minecraft.server.v1_13_R1.ItemStack nmsProvided = CraftItemStack.asNMSCopy(provided);
-		net.minecraft.server.v1_13_R1.ItemStack nmsRequired = CraftItemStack.asNMSCopy(required);
-		// assumption: asNMSCopy does not create damage tags for damage of 0
+		net.minecraft.server.v1_13_R2.ItemStack nmsProvided = CraftItemStack.asNMSCopy(provided);
+		net.minecraft.server.v1_13_R2.ItemStack nmsRequired = CraftItemStack.asNMSCopy(required);
 		// this makes sure that we have a 'damage' tag even if the damage is 0, so in case the required item for some
 		// reason has a damage tag of 0 the items are still considered equal by the following tag comparison:
-		/*if (ItemUtils.isDamageable(provided.getType())) {
-			nmsRequired.setDamage(nmsProvided.getDamage());
-		}*/
+		if (ItemUtils.isDamageable(provided.getType())) {
+			nmsProvided.setDamage(nmsProvided.getDamage());
+		}
 		NBTTagCompound providedTag = nmsProvided.getTag();
 		NBTTagCompound requiredTag = nmsRequired.getTag();
 		return GameProfileSerializer.a(requiredTag, providedTag, false);

@@ -116,16 +116,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			return;
 		}
 
-		// validate that this is running a required version of Spigot:
-		try {
-			// this has been added shortly after Entity#setPersistent(boolean)
-			Class.forName("org.bukkit.event.entity.EntityDropItemEvent");
-		} catch (ClassNotFoundException e1) {
-			Log.severe("Outdated server version: Shopkeepers cannot be enabled. Please update your server!");
-			this.setEnabled(false);
-			return;
-		}
-
 		// load config:
 		File file = new File(this.getDataFolder(), "config.yml");
 		if (!file.exists()) {
