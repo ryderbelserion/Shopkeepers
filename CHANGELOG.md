@@ -4,6 +4,62 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.4.0 (2018-08-26)
+### Supported MC versions: 1.13.1
+**This update brings support for MC 1.13.1:**  
+* Support for version 1.13 has been dropped. 1.13.1 is a bug fix release and there should be no reason not to update.
+
+**Internal refactoring related to shopkeeper creation:**  
+Shopkeeper creation via command and via item and via API (ShopkeepersPlugin#handleShopkeeperCreation) should be more consistent now.
+* Changed/Fixed: Various chest related checks that were previously only run during chest selection are now run during shopkeeper creation again as well (and by that also when creating player shopkeepers via command).
+* Changed: Shopkeeper creation via command now takes the targeted block face into account when determining the spawn location. You can now place shopkeepers on the sides of the targeted chest (previously it would always place player shopkeepers on top of the chest).
+* Changed: Always preventing all regular shop creation item usage, even when shopkeeper creation fails for some reason, or when selecting shop / shop object types. One can use the shop creation item regularly (if not disabled in the config) by using it from the off hand.
+* Removed: Removed the setting 'simulate-right-click-on-command'. Chest access is now always checked as part of shopkeeper creation.
+* API: ShopkeepersPlugin#handleShopkeeperCreation now takes various restrictions into account that were previously handled as part of chest selection or as part of shopkeeper creation preparation. This includes chest validation, chest access checks, permissions and enabled-state of shop and shop object types, spawn location validation, and checking for other shopkeepers at the spawn location.
+* API: Removed the separate owner from player shop creation data. The creator gets used as owner now. The creator can no longer be null when creating shopkeepers via ShopkeepersPlugin#handleShopkeeperCreation.
+* API: Added AdminShopType and AdminShopkeeper interfaces. There may be different types of admin shopkeepers in the future.
+* API: ShopCreationData is abstract now. For creating admin shopkeepers one has to use the new AdminShopCreationData instead.
+
+Added and changed (mostly colors) a few messages:
+* Added: msg-no-chest-selected
+* Added: msg-chest-already-in-use
+* Added: msg-no-chest-access
+* Added: msg-no-admin-shop-type-selected
+* Added: msg-no-player-shop-type-selected
+* Changed: msg-selected-chest
+* Changed: msg-must-select-chest
+* Changed: msg-chest-too-far
+* Changed: msg-chest-not-placed
+* Changed: msg-too-many-shops
+* Changed: msg-shop-create-fail
+
+**Various changes to sign shopkeepers:**  
+* Changed: Shopkeeper signs get despawned now with chunk unloads and during world saves.
+  * To prevent potential abuse of this temporarily despawning during world saves, players are prevented from placing blocks at the location where the sign is supposed to be. And shopkeeper signs will now replace any block that is at the location the sign tries to spawn at.
+  * Changed: Signs that could not be respawned will no longer cause the shopkeeper to be deleted. Instead a 3 minute spawning delay was added to prevent potential abuse (in case the spawned signs drop for some reason/bug).
+  * Added a warning if the facing direction of a sign shopkeeper could not be determined or is missing. Since the signs are getting removed now, it will no longer attempt to determine the sign facing from the world now. Instead it will fallback to using some arbitrary default facing direction then.
+* Changed: Blocks to which shopkeeper signs are attached to are now protected as well.
+* API/Internal: Spawn locations passed to the ShopCreationData are now in the center of the spawn block and contain yaw and pitch to face the creating player. Shop objects can now use this new information if they wish.
+* Added: Sign shopkeepers now support sign posts (if the creating player targets the top of a block). The sign is rotated to face towards the creating player.
+* Added: The setting 'enable-sign-post-shops' (default true) can be used to disable creation of sign post shops.
+
+**Experimental change related to handling shopkeeper entities:**  
+* Using Bukkit's new (experimental) non-persistent entities feature: This should make sure that shopkeeper entities don't get saved to the chunk data during world saves and by that also prevent any kind of duplicate entities issues (assuming it works correctly..).
+* As consequence all existing fallback code was removed:
+  * No longer keeping track of the uuid of the last spawned entity (this should also reduce the need of periodic saves of shopkeeper data) and no longer searching for old entities before spawning an entity.
+  * No longer handling silent / unnoticed chunk unloads and no longer handling entities that got pushed out of their chunk (it's assumed that the non-persistent entities get automatically removed).
+  * No longer temporarily depsawning all shopkeeper entities during world saves (less performance impact and less visual disturbance for players).
+However, in case something doesn't work as expected, this change has the potential to cause entity related issues (thus 'experimental').
+
+**Other changes:**
+* Changed: Citizens shopkeepers are now identified by the citizens NPC's unique ids. Conversion should happen automatically once Citizens is detected to be running.
+* Fixed: No longer deleting the citizens NPC when a shopkeeper is deleted due to another shopkeeper using the same NPC.
+* Changed (internal): Removal of invalid citizens shopkeepers was moved and gets run now everytime Citizens gets enabled.
+* Fixed: There might have been some trading issue related to undamaged damageable items not being considered matching since 1.13.
+* Debugging/Changed: Durability is no longer displayed as part of the recipe items debugging information.
+
+**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.x.
+
 ## v2.3.4 (2018-08-18)
 ### Supported MC versions: 1.13
 * Fixed: Default config values for primitives were not handled correctly.
