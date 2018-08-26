@@ -25,6 +25,7 @@ public final class FailedHandler implements NMSCallProvider {
 	private final Field nmsOnGroundField;
 
 	private final Class<?> nmsItemStackClass;
+	// private final Method nmsSetDamageMethod;
 	private final Method nmsGetTagMethod;
 
 	private final Class<?> nmsGameProfileSerializerClass;
@@ -50,6 +51,7 @@ public final class FailedHandler implements NMSCallProvider {
 
 		// Minecraft
 		nmsItemStackClass = Class.forName(nmsPackageString + "ItemStack");
+		// nmsSetDamageMethod = nmsItemStackClass.getDeclaredMethod("setDamage", int.class);
 		nmsGetTagMethod = nmsItemStackClass.getDeclaredMethod("getTag");
 
 		nmsEntityClass = Class.forName(nmsPackageString + "Entity");
@@ -136,10 +138,15 @@ public final class FailedHandler implements NMSCallProvider {
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
 		if (provided.getType() != required.getType()) return false;
-		if (provided.getDurability() != required.getDurability()) return false;
 		try {
 			Object nmsProvided = obcAsNMSCopyMethod.invoke(null, provided);
 			Object nmsRequired = obcAsNMSCopyMethod.invoke(null, required);
+			// assumption: asNMSCopy does not create damage tags for damage of 0
+			// this makes sure that we have a 'damage' tag even if the damage is 0, so in case the required item for
+			// some reason has a damage tag of 0 the items are still considered equal by the following tag comparison:
+			/*if (ItemUtils.isDamageable(provided.getType())) {
+				nmsSetDamageMethod.invoke(nmsProvided, ItemUtils.getDurability(provided));
+			}*/
 			Object providedTag = nmsGetTagMethod.invoke(nmsProvided);
 			Object requiredTag = nmsGetTagMethod.invoke(nmsRequired);
 			return (Boolean) nmsAreNBTMatchingMethod.invoke(null, requiredTag, providedTag, false);

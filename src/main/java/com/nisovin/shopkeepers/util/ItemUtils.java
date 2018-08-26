@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -72,13 +73,27 @@ public final class ItemUtils {
 		return item;
 	}
 
+	public static boolean isDamageable(ItemStack itemStack) {
+		if (itemStack == null) return false;
+		return isDamageable(itemStack.getType());
+	}
+
+	public static boolean isDamageable(Material type) {
+		return (type.getMaxDurability() > 0);
+	}
+
+	public static int getDurability(ItemStack itemStack) {
+		assert itemStack != null;
+		if (!itemStack.hasItemMeta()) return 0;
+		ItemMeta meta = itemStack.getItemMeta();
+		if (!(meta instanceof Damageable)) return 0;
+		return ((Damageable) meta).getDamage();
+	}
+
 	public static String getSimpleItemInfo(ItemStack item) {
 		if (item == null) return "empty";
 		StringBuilder sb = new StringBuilder();
 		sb.append(item.getAmount()).append('x').append(item.getType());
-		if (item.getDurability() != 0) {
-			sb.append('~').append(item.getDurability());
-		}
 		return sb.toString();
 	}
 

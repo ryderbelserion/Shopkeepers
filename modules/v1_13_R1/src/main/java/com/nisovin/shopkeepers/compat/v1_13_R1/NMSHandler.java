@@ -137,9 +137,14 @@ public final class NMSHandler implements NMSCallProvider {
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
 		if (provided.getType() != required.getType()) return false;
-		if (provided.getDurability() != required.getDurability()) return false;
 		net.minecraft.server.v1_13_R1.ItemStack nmsProvided = CraftItemStack.asNMSCopy(provided);
 		net.minecraft.server.v1_13_R1.ItemStack nmsRequired = CraftItemStack.asNMSCopy(required);
+		// assumption: asNMSCopy does not create damage tags for damage of 0
+		// this makes sure that we have a 'damage' tag even if the damage is 0, so in case the required item for some
+		// reason has a damage tag of 0 the items are still considered equal by the following tag comparison:
+		/*if (ItemUtils.isDamageable(provided.getType())) {
+			nmsRequired.setDamage(nmsProvided.getDamage());
+		}*/
 		NBTTagCompound providedTag = nmsProvided.getTag();
 		NBTTagCompound requiredTag = nmsRequired.getTag();
 		return GameProfileSerializer.a(requiredTag, providedTag, false);

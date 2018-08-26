@@ -70,10 +70,10 @@ public class TradeFileLogger implements Listener {
 			if (isNew) writer.append("TIME,PLAYER,SHOP ID,SHOP TYPE,SHOP POS,OWNER,ITEM TYPE,DATA,QUANTITY,CURRENCY 1,CURRENCY 1 AMOUNT,CURRENCY 2,CURRENCY 2 AMOUNT\n");
 			writer.append("\"" + TIME_FORMAT.format(now) + "\",\"" + Utils.getPlayerAsString(player) + "\",\"" + shopkeeper.getUniqueId()
 					+ "\",\"" + shopkeeper.getType().getIdentifier() + "\",\"" + shopkeeper.getPositionString() + "\",\"" + ownerString
-					+ "\",\"" + resultItem.getType().name() + "\",\"" + resultItem.getDurability() + "\",\"" + resultItem.getAmount()
-					+ "\",\"" + (usedItem1 != null ? usedItem1.getType().name() + ":" + usedItem1.getDurability() : "")
+					+ "\",\"" + resultItem.getType().name() + "\",\"" + ItemUtils.getDurability(resultItem) + "\",\"" + resultItem.getAmount()
+					+ "\",\"" + (usedItem1 != null ? usedItem1.getType().name() + ":" + ItemUtils.getDurability(usedItem1) : "")
 					+ "\",\"" + (requiredItem1.getAmount())
-					+ "\",\"" + (usedItem2 != null ? usedItem2.getType().name() + ":" + usedItem2.getDurability() : "")
+					+ "\",\"" + (usedItem2 != null ? usedItem2.getType().name() + ":" + ItemUtils.getDurability(usedItem2) : "")
 					+ "\",\"" + (requiredItem2 != null ? requiredItem2.getAmount() : "")
 					+ "\"\n");
 		} catch (IOException e) {

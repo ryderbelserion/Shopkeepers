@@ -38,14 +38,14 @@ public interface NMSCallProvider {
 	 * <code>required</code> itemstack.
 	 * <p>
 	 * This mimics minecraft's item comparison: This checks if the itemstacks are either both emtpy, or of same type and
-	 * durability and the provided itemstack's metadata contains all the contents of the required itemstack's metadata
-	 * (with list metadata having to be equal).
+	 * the provided itemstack's metadata contains all the contents of the required itemstack's metadata (with list
+	 * metadata having to be equal).
 	 * 
 	 * @param provided
 	 *            the provided itemstack
 	 * @param required
 	 *            the required itemstack
-	 * @return true if the provided itemstack matches the required itemstack
+	 * @return <code>true</code> if the provided itemstack matches the required itemstack
 	 */
 	public boolean matches(ItemStack provided, ItemStack required);
 }
