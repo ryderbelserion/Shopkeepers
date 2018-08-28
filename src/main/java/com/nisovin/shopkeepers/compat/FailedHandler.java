@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.compat;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -16,6 +15,7 @@ import org.bukkit.util.Vector;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Utils;
 
 public final class FailedHandler implements NMSCallProvider {
 
@@ -44,10 +44,10 @@ public final class FailedHandler implements NMSCallProvider {
 	private final AttributeModifier movementSpeedModifier;
 
 	public FailedHandler() throws Exception {
-		String versionString = Bukkit.getServer().getClass().getName().replace("org.bukkit.craftbukkit.", "").replace("CraftServer", "");
-		String nmsPackageString = "net.minecraft.server." + versionString;
+		String cbVersion = Utils.getServerCBVersion();
+		String nmsPackageString = "net.minecraft.server." + cbVersion + ".";
 		// String bukkitPackageString = "org.bukkit.";
-		String obcPackageString = "org.bukkit.craftbukkit." + versionString;
+		String obcPackageString = "org.bukkit.craftbukkit." + cbVersion + ".";
 
 		// Minecraft
 		nmsItemStackClass = Class.forName(nmsPackageString + "ItemStack");

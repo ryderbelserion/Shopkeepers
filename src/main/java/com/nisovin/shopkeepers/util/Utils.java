@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.function.Predicate;
 
 import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -32,6 +33,12 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 public final class Utils {
 
 	private Utils() {
+	}
+
+	public static String getServerCBVersion() {
+		String packageName = Bukkit.getServer().getClass().getPackage().getName();
+		String cbVersion = packageName.substring(packageName.lastIndexOf('.') + 1);
+		return cbVersion;
 	}
 
 	private static final Map<Class<?>, Class<?>> PRIMITIVE_WRAPPERS;
