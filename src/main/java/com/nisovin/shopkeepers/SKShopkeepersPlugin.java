@@ -108,6 +108,20 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		plugin = this;
 		ShopkeepersAPI.enable(this);
 
+		// validate that this is running a minimum required version of Spigot:
+		// TODO add proper version parsing
+		/*String cbVersion = Utils.getServerCBVersion(); // 1_13_R2
+		String bukkitVersion = Bukkit.getBukkitVersion(); // 1.13.1-R0.1-SNAPSHOT*/
+		try {
+			// this has been added shortly after Entity#setPersistent(boolean)
+			Class.forName("org.bukkit.event.entity.EntityDropItemEvent");
+		} catch (ClassNotFoundException e1) {
+			Log.severe("Outdated server version (" + Bukkit.getVersion()
+					+ "): Shopkeepers cannot be enabled. Please update your server!");
+			this.setEnabled(false);
+			return;
+		}
+
 		// try to load suitable NMS code:
 		NMSManager.load(this);
 		if (NMSManager.getProvider() == null) {
