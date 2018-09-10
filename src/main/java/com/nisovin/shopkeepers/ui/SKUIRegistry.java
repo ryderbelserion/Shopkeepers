@@ -120,12 +120,12 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	public void closeAll(Shopkeeper shopkeeper) {
 		if (shopkeeper == null) return;
 		assert shopkeeper != null;
-		Iterator<Entry<UUID, SKUISession>> iter = playerSessions.entrySet().iterator();
-		while (iter.hasNext()) {
-			Entry<UUID, SKUISession> entry = iter.next();
+		Iterator<Entry<UUID, SKUISession>> iterator = playerSessions.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Entry<UUID, SKUISession> entry = iterator.next();
 			UISession session = entry.getValue();
 			if (session.getShopkeeper().equals(shopkeeper)) {
-				iter.remove();
+				iterator.remove();
 				Player player = Bukkit.getPlayer(entry.getKey());
 				if (player != null) {
 					player.closeInventory();
@@ -153,12 +153,15 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 
 	@Override
 	public void closeAll() {
-		for (UUID playerId : playerSessions.keySet()) {
+		Iterator<UUID> iterator = playerSessions.keySet().iterator();
+		while (iterator.hasNext()) {
+			UUID playerId = iterator.next();
+			iterator.remove();
 			Player player = Bukkit.getPlayer(playerId);
 			if (player != null) {
 				player.closeInventory();
 			}
 		}
-		playerSessions.clear();
+		playerSessions.clear(); // just in case
 	}
 }
