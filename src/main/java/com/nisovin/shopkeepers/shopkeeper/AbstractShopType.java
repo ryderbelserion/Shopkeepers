@@ -119,7 +119,8 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 
 			return shopkeeper;
 		} catch (ShopkeeperCreateException e) {
-			// unexpected issue (hints to a bug):
+			// some issue identified during shopkeeper creation (possibly hinting to a bug):
+			// TODO translation?
 			Utils.sendMessage(creator, ChatColor.RED + "Shopkeeper creation failed: " + e.getMessage());
 			return null;
 		}

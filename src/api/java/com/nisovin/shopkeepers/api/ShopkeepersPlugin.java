@@ -92,12 +92,13 @@ public interface ShopkeepersPlugin extends Plugin {
 	/**
 	 * Creates and spawns a new shopkeeper in the same way a player would create it.
 	 * <p>
-	 * This takes any limitations into account that might affect the creator or owner of the shopkeeper, and this sends
-	 * the creator messages if the shopkeeper creation fails for some reason.
+	 * This takes any limitations into account that might affect the creator of the shopkeeper, and this sends the
+	 * creator messages if the shopkeeper creation fails for some reason.
+	 * <p>
+	 * This requires a {@link ShopCreationData} with non-<code>null</code> creator.
 	 * 
 	 * @param shopCreationData
-	 *            the shop creation data containing the necessary arguments (spawn location, object type, etc.) for
-	 *            creating this shopkeeper
+	 *            the shop creation data containing the necessary arguments for creating this shopkeeper
 	 * @return the new shopkeeper, or <code>null</code> if the creation wasn't successful for some reason
 	 */
 	public Shopkeeper handleShopkeeperCreation(ShopCreationData shopCreationData);
