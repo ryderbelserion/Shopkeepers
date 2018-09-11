@@ -4,6 +4,14 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.4.1 (2018-09-11)
+### Supported MC versions: 1.13.1
+* Added: A (very simple) minimum version check.
+* Fixed #522: CME during reload when closing shopkeeper UIs.
+* Fixed #521: Error when adding a shopkeeper to an existing citizens npc via trait.
+
+**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.x.
+
 ## v2.4.0 (2018-08-26)
 ### Supported MC versions: 1.13.1
 **This update brings support for MC 1.13.1:**  
