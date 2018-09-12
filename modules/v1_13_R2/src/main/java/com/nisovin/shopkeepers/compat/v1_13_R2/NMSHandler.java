@@ -90,13 +90,10 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public double getCollisionDistance(Location start, Vector direction) {
-		// rayTrace parameters: (Vec3d start, Vec3d end, boolean stopOnLiquid, boolean ignoreBlockWithoutBoundingBox,
-		// boolean returnLastUncollidableBlock)
-		// detects (full) liquid blocks if used with ignoreBlockWithoutBoundingBox=(inLiquid ? false : true)
-		// allowing entities to stand on full water blocks
-		/*BlockPosition blockPosition = mcEntity.getChunkCoordinates();
-		boolean inLiquid = mcEntity.getWorld().getType(blockPosition).getMaterial().isLiquid()
-				|| mcEntity.getWorld().getType(blockPosition.down()).getMaterial().isLiquid();*/
+		// rayTrace parameters: (Vec3d start, Vec3d end, FluidCollisionOption fluidCollisionOption, boolean
+		// ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock)
+		// ignoreBlockWithoutBoundingBox: whether to ignore collidable blocks without collision bounding box (signs,
+		// fire, portals, bushes, ..)
 		Vec3D startPos = new Vec3D(start.getX(), start.getY(), start.getZ());
 		Vec3D endPos = startPos.add(direction.getX(), direction.getY(), direction.getZ()); // creates a new vector
 		MovingObjectPosition hitResult = ((CraftWorld) start.getWorld()).getHandle().rayTrace(startPos, endPos, FluidCollisionOption.ALWAYS, true, false);
