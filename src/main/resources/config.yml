@@ -68,8 +68,8 @@ shop-creation-item-lore: []
 # Whether to prevent normal usage of the shop-creation item. Players with the
 # bypass permission (usually admins) can bypass this.
 prevent-shop-creation-item-regular-usage: false
-# Whether clicking the delete button of a player shop gives the player the
-# shop-creation item back.
+# Whether deleting (or destroying) a player shopkeeper returns (drops) the
+# shop-creation item.
 deleting-player-shop-returns-creation-item: false
 
 # Whether to allow creating player shops with the /shopkeeper command.
@@ -81,12 +81,6 @@ require-chest-recently-placed: true
 # The maximum distance a player shopkeeper can be placed from its backing
 # chest. This cannot be set to a value greater than 50.
 max-chest-distance: 15
-# Whether to protect player shop chests from being broken. Usually it is
-# recommended to keep this enabled.
-protect-chests: true
-# Whether to delete player shopkeepers when their backing chest is broken.
-delete-shopkeeper-on-break-chest: false
-
 # The default maximum number of shops a player can have. Set to 0 to allow any
 # number of shops.
 max-shops-per-player: 0
@@ -94,6 +88,16 @@ max-shops-per-player: 0
 # number of shops a specific player or group of players can have. Use the
 # shopkeeper.maxshops.<count> permission node pattern to use this feature.
 max-shops-perm-options: 5,15,25
+
+# Whether to protect player shop chests from being accessed or broken. Usually
+# it is recommended to keep this enabled.
+protect-chests: true
+# Whether to prevent item movement from and to protected shop chests (via
+# hoppers, droppers, etc.). Item movement will always be allowed if the chest
+# protection is disabled.
+prevent-item-movement: true
+# Whether to delete player shopkeepers when their backing chest is broken.
+delete-shopkeeper-on-break-chest: false
 
 # If enabled (set to a value greater than 0), Shopkeepers will check for and
 # remove the shops of inactive players once every plugin start. This setting

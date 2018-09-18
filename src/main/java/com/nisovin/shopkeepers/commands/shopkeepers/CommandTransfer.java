@@ -58,7 +58,7 @@ class CommandTransfer extends PlayerCommand {
 			return;
 		}
 
-		List<PlayerShopkeeper> shopkeepers = SKShopkeepersPlugin.getInstance().getProtectedChests().getShopkeeperOwnersOfChest(targetBlock);
+		List<PlayerShopkeeper> shopkeepers = SKShopkeepersPlugin.getInstance().getProtectedChests().getShopkeepersUsingChest(targetBlock);
 		if (shopkeepers.size() == 0) {
 			Utils.sendMessage(player, Settings.msgUnusedChest);
 			return;

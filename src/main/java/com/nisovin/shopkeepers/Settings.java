@@ -59,11 +59,12 @@ public class Settings {
 
 	public static boolean requireChestRecentlyPlaced = true;
 	public static int maxChestDistance = 15;
-	public static boolean protectChests = true;
-	public static boolean deleteShopkeeperOnBreakChest = false;
-
 	public static int maxShopsPerPlayer = 0;
 	public static String maxShopsPermOptions = "10,15,25";
+
+	public static boolean protectChests = true;
+	public static boolean preventItemMovement = true;
+	public static boolean deleteShopkeeperOnBreakChest = false;
 
 	public static int playerShopkeeperInactiveDays = 0;
 

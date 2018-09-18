@@ -7,6 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -27,10 +29,17 @@ class RemoveShopOnChestBreakListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
-		if (!ItemUtils.isChest(block.getType())) return;
+		if (this.handleShopkeeperChestBreakage(block)) {
+			plugin.getShopkeeperStorage().save();
+		}
+	}
 
-		List<PlayerShopkeeper> shopkeepers = protectedChests.getShopkeeperOwnersOfChest(block);
-		if (shopkeepers.isEmpty()) return;
+	// does not trigger saving on its own, returns true if there were shopkeepers using the chest, that got removed now
+	private boolean handleShopkeeperChestBreakage(Block block) {
+		if (!ItemUtils.isChest(block.getType())) return false;
+
+		List<PlayerShopkeeper> shopkeepers = protectedChests.getShopkeepers(block);
+		if (shopkeepers.isEmpty()) return false;
 
 		for (PlayerShopkeeper shopkeeper : shopkeepers) {
 			// return creation item for player shopkeepers:
@@ -40,6 +49,28 @@ class RemoveShopOnChestBreakListener implements Listener {
 			}
 			shopkeeper.delete();
 		}
-		plugin.getShopkeeperStorage().save();
+		return true;
+	}
+
+	private void handleBlocksBreakage(List<Block> blockList) {
+		boolean dirty = false;
+		for (Block block : blockList) {
+			if (this.handleShopkeeperChestBreakage(block)) {
+				dirty = true;
+			}
+		}
+		if (dirty) {
+			plugin.getShopkeeperStorage().save();
+		}
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	void onEntityExplosion(EntityExplodeEvent event) {
+		this.handleBlocksBreakage(event.blockList());
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	void onBlockExplosion(BlockExplodeEvent event) {
+		this.handleBlocksBreakage(event.blockList());
 	}
 }
