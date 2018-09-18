@@ -24,6 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -107,6 +108,18 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	public void onEnable() {
 		plugin = this;
 		ShopkeepersAPI.enable(this);
+
+		// making sure that certain classes, that are needed during shutdown, are loaded:
+		// this helps for hot reloads (when the plugin gets disabled, but the original jar got replaced and is therefore
+		// no longer available)
+		// TODO pre-load all classes?
+		try {
+			Class.forName(SchedulerUtils.class.getName());
+			Class.forName(ShopkeeperRemoveEvent.class.getName());
+			Class.forName(ShopkeeperRemoveEvent.Cause.class.getName());
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 
 		// validate that this is running a minimum required version of Spigot:
 		// TODO add proper version parsing
