@@ -632,27 +632,6 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		this.markDirty();
 	}
 
-	/**
-	 * Checks whether this shop uses the indicated chest.
-	 * 
-	 * @param chest
-	 *            the chest to check
-	 * @return
-	 * 		TODO unused?
-	 */
-	public boolean usesChest(Block chest) {
-		if (!chest.getWorld().getName().equals(this.getWorldName())) return false;
-		int x = chest.getX();
-		int y = chest.getY();
-		int z = chest.getZ();
-		if (x == chestX && y == chestY && z == chestZ) return true;
-		if (x == chestX + 1 && y == chestY && z == chestZ) return true;
-		if (x == chestX - 1 && y == chestY && z == chestZ) return true;
-		if (x == chestX && y == chestY && z == chestZ + 1) return true;
-		if (x == chestX && y == chestY && z == chestZ - 1) return true;
-		return false;
-	}
-
 	@Override
 	public Block getChest() {
 		return Bukkit.getWorld(this.getWorldName()).getBlockAt(chestX, chestY, chestZ);
