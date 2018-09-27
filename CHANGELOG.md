@@ -4,7 +4,7 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
-## v2.4.1 (2018-09-11)
+## v2.4.1 Beta (2018-09-11)
 ### Supported MC versions: 1.13.1
 * Added: A (very simple) minimum version check.
 * Fixed #522: CME during reload when closing shopkeeper UIs.
@@ -12,7 +12,11 @@ Date format: (YYYY-MM-DD)
 
 **Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.x.
 
-## v2.4.0 (2018-08-26)
+## v2.2.2 Release (2018-09-11)
+### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
+* Fixed #522: CME during reload when closing shopkeeper UIs.
+
+## v2.4.0 Alpha (2018-08-26)
 ### Supported MC versions: 1.13.1
 **This update brings support for MC 1.13.1:**  
 * Support for version 1.13 has been dropped. 1.13.1 is a bug fix release and there should be no reason not to update.
@@ -68,7 +72,7 @@ However, in case something doesn't work as expected, this change has the potenti
 
 **Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.x.
 
-## v2.3.4 (2018-08-18)
+## v2.3.4 Alpha (2018-08-18)
 ### Supported MC versions: 1.13
 * Fixed: Default config values for primitives were not handled correctly.
 * Fixed: Sign facing wasn't applied correctly since the update to 1.13.
@@ -76,17 +80,17 @@ However, in case something doesn't work as expected, this change has the potenti
 
 **Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.
 
-## v2.3.3 (2018-08-01)
+## v2.3.3 Alpha (2018-08-01)
 ### Supported MC versions: 1.13
 * Fixed: Defaults values for missing config values not getting properly added.
 * Fixed: Not decolorizing default values which are not meant to be colorized.
 
 **Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.
 
-## v2.3.2 (2018-08-01) [broken]
+## v2.3.2 Alpha (2018-08-01) [broken]
 See 2.3.3 instead.
 
-## v2.3.1 (2018-08-01)
+## v2.3.1 Alpha (2018-08-01)
 ### Supported MC versions: 1.13
 * This version relies on the very latest version of Craftbukkit / Spigot. Make sure to **update your server** to the latest Spigot build before running this version!
 * Updated link to project website.
@@ -96,7 +100,7 @@ See 2.3.3 instead.
 
 **Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.
 
-## v2.3.0 (2018-07-18)
+## v2.3.0 Alpha (2018-07-18)
 ### Supported MC versions: 1.13
 **This update brings support for MC 1.13:**  
 **Some important notices to begin with:**
@@ -136,7 +140,7 @@ Item data values have been removed and various material (item/block) names have 
 * Internal: Using player ids instead of player names for temporary data at a few places now.
 * Internal: Minor changes to the internal maven project layout.
 
-## v2.2.1 (2018-07-02)
+## v2.2.1 Release (2018-07-02)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
 * Fixed: Some internal shop object ids have slightly changed in the save data. This update is able to load and convert those old ids.
 * Added config validation for enabled living shop types and improved entity type matching.
@@ -145,7 +149,7 @@ Item data values have been removed and various material (item/block) names have 
 
 If you are updating, please read through the changelogs of the previous few versions! They also contain updating hints (ex. regarding changed messages).
 
-## v2.2.0 (2018-06-29)
+## v2.2.0 Release (2018-06-29)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
 * Various changes (and minor internal fixes) related to commands.
   * Displayed command names and aliases don't get formatted into lower case anymore (matching still uses the lower case version).
