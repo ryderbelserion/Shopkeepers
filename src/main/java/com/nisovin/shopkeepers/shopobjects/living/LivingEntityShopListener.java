@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
+import org.bukkit.event.entity.CreeperPowerEvent.PowerCause;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
@@ -141,7 +142,7 @@ class LivingEntityShopListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onCreeperCharged(CreeperPowerEvent event) {
-		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
+		if (event.getCause() == PowerCause.LIGHTNING && shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
