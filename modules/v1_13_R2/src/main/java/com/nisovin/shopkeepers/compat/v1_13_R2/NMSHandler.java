@@ -3,14 +3,11 @@ package com.nisovin.shopkeepers.compat.v1_13_R2;
 import java.lang.reflect.Field;
 import java.util.Set;
 
-import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_13_R2.CraftWorld;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_13_R2.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -19,14 +16,11 @@ import net.minecraft.server.v1_13_R2.Entity;
 import net.minecraft.server.v1_13_R2.EntityHuman;
 import net.minecraft.server.v1_13_R2.EntityInsentient;
 import net.minecraft.server.v1_13_R2.EntityLiving;
-import net.minecraft.server.v1_13_R2.FluidCollisionOption;
 import net.minecraft.server.v1_13_R2.GameProfileSerializer;
-import net.minecraft.server.v1_13_R2.MovingObjectPosition;
 import net.minecraft.server.v1_13_R2.NBTTagCompound;
 import net.minecraft.server.v1_13_R2.PathfinderGoalFloat;
 import net.minecraft.server.v1_13_R2.PathfinderGoalLookAtPlayer;
 import net.minecraft.server.v1_13_R2.PathfinderGoalSelector;
-import net.minecraft.server.v1_13_R2.Vec3D;
 
 public final class NMSHandler implements NMSCallProvider {
 
@@ -86,26 +80,6 @@ public final class NMSHandler implements NMSCallProvider {
 		EntityInsentient mcInsentientEntity = ((EntityInsentient) mcLivingEntity);
 		mcInsentientEntity.goalSelector.doTick();
 		mcInsentientEntity.getControllerLook().a();
-	}
-
-	@Override
-	public double getCollisionDistance(Location start, Vector direction) {
-		// rayTrace parameters: (Vec3d start, Vec3d end, FluidCollisionOption fluidCollisionOption, boolean
-		// ignoreBlockWithoutBoundingBox, boolean returnLastUncollidableBlock)
-		// ignoreBlockWithoutBoundingBox: whether to ignore collidable blocks without collision bounding box (signs,
-		// fire, portals, bushes, ..)
-		Vec3D startPos = new Vec3D(start.getX(), start.getY(), start.getZ());
-		Vec3D endPos = startPos.add(direction.getX(), direction.getY(), direction.getZ()); // creates a new vector
-		MovingObjectPosition hitResult = ((CraftWorld) start.getWorld()).getHandle().rayTrace(startPos, endPos, FluidCollisionOption.ALWAYS, true, false);
-		if (hitResult == null) return direction.length(); // no collisions within the checked range
-		return distance(start, hitResult.pos);
-	}
-
-	private double distance(Location from, Vec3D to) {
-		double dx = to.x - from.getX();
-		double dy = to.y - from.getY();
-		double dz = to.z - from.getZ();
-		return Math.sqrt(dx * dx + dy * dy + dz * dz);
 	}
 
 	@Override

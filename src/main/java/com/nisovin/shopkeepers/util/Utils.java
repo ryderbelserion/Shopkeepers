@@ -17,6 +17,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -26,9 +27,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
-
-import com.nisovin.shopkeepers.compat.NMSManager;
 
 public final class Utils {
 
@@ -283,137 +283,16 @@ public final class Utils {
 		return getAxisBlockFace(direction.getX(), 0.0D, direction.getZ());
 	}
 
-	// TODO this doesn't work properly for partial blocks (doesn't take the block collision box into account)
-	/**
-	 * Gets the block face a player is looking at.
-	 * 
-	 * @param player
-	 *            the player
-	 * @param targetBlock
-	 *            the block the player is looking at
-	 * @return the block face, or <code>null</code> if none was found
-	 */
-	public static BlockFace getTargetBlockFace(Player player, Block targetBlock) {
-		Location intersection = getBlockIntersection(player, targetBlock);
-		if (intersection == null) return null;
-		Location blockCenter = targetBlock.getLocation().add(0.5D, 0.5D, 0.5D);
-		Vector centerToIntersection = intersection.subtract(blockCenter).toVector();
-		double x = centerToIntersection.getX();
-		double y = centerToIntersection.getY();
-		double z = centerToIntersection.getZ();
-		return getAxisBlockFace(x, y, z);
-	}
-
-	/**
-	 * Determines the exact intersection point of a player's view and a targeted block.
-	 * 
-	 * @param player
-	 *            the player
-	 * @param targetBlock
-	 *            the block the player is looking at
-	 * @return the intersection point of the player's view and the target block, or <code>null</code> if no intersection
-	 *         was found
-	 */
-	public static Location getBlockIntersection(Player player, Block targetBlock) {
-		if (player == null || targetBlock == null) return null;
-
-		// block bounds:
-		double minX = targetBlock.getX();
-		double minY = targetBlock.getY();
-		double minZ = targetBlock.getZ();
-
-		double maxX = minX + 1.0D;
-		double maxY = minY + 1.0D;
-		double maxZ = minZ + 1.0D;
-
-		// ray origin:
-		Location origin = player.getEyeLocation();
-		double originX = origin.getX();
-		double originY = origin.getY();
-		double originZ = origin.getZ();
-
-		// ray direction
-		Vector dir = origin.getDirection();
-		double dirX = dir.getX();
-		double dirY = dir.getY();
-		double dirZ = dir.getZ();
-
-		// tiny improvement to save a few divisions below:
-		double divX = 1.0D / dirX;
-		double divY = 1.0D / dirY;
-		double divZ = 1.0D / dirZ;
-
-		// intersection interval:
-		double t0 = 0.0D;
-		double t1 = Double.MAX_VALUE;
-
-		double tmin;
-		double tmax;
-
-		double tymin;
-		double tymax;
-
-		double tzmin;
-		double tzmax;
-
-		if (dirX >= 0.0D) {
-			tmin = (minX - originX) * divX;
-			tmax = (maxX - originX) * divX;
-		} else {
-			tmin = (maxX - originX) * divX;
-			tmax = (minX - originX) * divX;
-		}
-
-		if (dirY >= 0.0D) {
-			tymin = (minY - originY) * divY;
-			tymax = (maxY - originY) * divY;
-		} else {
-			tymin = (maxY - originY) * divY;
-			tymax = (minY - originY) * divY;
-		}
-
-		if ((tmin > tymax) || (tymin > tmax)) {
-			return null;
-		}
-
-		if (tymin > tmin) tmin = tymin;
-		if (tymax < tmax) tmax = tymax;
-
-		if (dirZ >= 0.0D) {
-			tzmin = (minZ - originZ) * divZ;
-			tzmax = (maxZ - originZ) * divZ;
-		} else {
-			tzmin = (maxZ - originZ) * divZ;
-			tzmax = (minZ - originZ) * divZ;
-		}
-
-		if ((tmin > tzmax) || (tzmin > tmax)) {
-			return null;
-		}
-
-		if (tzmin > tmin) tmin = tzmin;
-		if (tzmax < tmax) tmax = tzmax;
-
-		if ((tmin >= t1) || (tmax <= t0)) {
-			return null;
-		}
-
-		// intersection:
-		Location intersection = origin.add(dir.multiply(tmin));
-		return intersection;
-	}
-
 	// temporary objects getting re-used during ray tracing:
-	private static final Location TEMP_LOCATION = new Location(null, 0, 0, 0);
-	private static final Vector TEMP_VECTOR = new Vector(0.0D, 0.0D, 0.0D);
+	private static final Location TEMP_START_LOCATION = new Location(null, 0, 0, 0);
+	private static final Vector TEMP_START_POSITION = new Vector();
+	private static final Vector DOWN_DIRECTION = new Vector(0.0D, -1.0D, 0.0D);
 	private static final double RAY_TRACE_OFFSET = 0.01D;
 
 	/**
 	 * Get the distance to the nearest block collision in the range of the given <code>maxDistance</code>.
 	 * <p>
-	 * This uses a NMS function to ray tray through the blocks' collision bounding boxes (so this goes through passable
-	 * blocks, like liquids, etc.). If the NMS function is not supported by this server version, then <code>0.0</code>
-	 * is returned.
+	 * This performs a ray trace through the blocks' collision boxes, ignoring fluids and passable blocks.
 	 * <p>
 	 * The ray tracing gets slightly offset (by <code>0.01</code>) in order to make sure that we don't miss any block
 	 * directly at the start location. If this results in a hit above the start location, we ignore it and return
@@ -427,21 +306,31 @@ public final class Utils {
 	 *         specified range
 	 */
 	public static double getCollisionDistanceToGround(Location startLocation, double maxDistance) {
-		// setup our re-used temporary location and vector objects:
-		TEMP_LOCATION.setWorld(startLocation.getWorld());
-		TEMP_LOCATION.setX(startLocation.getX());
-		TEMP_LOCATION.setY(startLocation.getY() + RAY_TRACE_OFFSET);
-		TEMP_LOCATION.setZ(startLocation.getZ());
+		World world = startLocation.getWorld();
+		assert world != null;
+		// setup re-used offset start location:
+		TEMP_START_LOCATION.setWorld(world);
+		TEMP_START_LOCATION.setX(startLocation.getX());
+		TEMP_START_LOCATION.setY(startLocation.getY() + RAY_TRACE_OFFSET);
+		TEMP_START_LOCATION.setZ(startLocation.getZ());
 
-		TEMP_VECTOR.setX(0.0D);
-		TEMP_VECTOR.setY(-(maxDistance + RAY_TRACE_OFFSET));
-		TEMP_VECTOR.setZ(0.0D);
+		// considers block collision boxes, ignoring fluids and passable blocks:
+		RayTraceResult rayTraceResult = world.rayTraceBlocks(TEMP_START_LOCATION, DOWN_DIRECTION, maxDistance + RAY_TRACE_OFFSET, FluidCollisionMode.NEVER, true);
+		TEMP_START_LOCATION.setWorld(null); // cleanup temporarily used start location
 
-		// nms function, that considers block collision boxes:
-		double distanceToGround = NMSManager.getProvider().getCollisionDistance(TEMP_LOCATION, TEMP_VECTOR) - RAY_TRACE_OFFSET;
-		TEMP_LOCATION.setWorld(null); // cleanup temporarily used location object
-		// might be negative if the hit is between the start location and the offset start location, we ignore it then:
-		if (distanceToGround < 0.0D) distanceToGround = 0.0D;
+		double distanceToGround;
+		if (rayTraceResult == null) {
+			// no collision with the range:
+			distanceToGround = maxDistance;
+		} else {
+			TEMP_START_POSITION.setX(TEMP_START_LOCATION.getX());
+			TEMP_START_POSITION.setY(TEMP_START_LOCATION.getY());
+			TEMP_START_POSITION.setZ(TEMP_START_LOCATION.getZ());
+			distanceToGround = TEMP_START_POSITION.distance(rayTraceResult.getHitPosition()) - RAY_TRACE_OFFSET;
+			// might be negative if the hit is between the start location and the offset start location, we ignore it
+			// then:
+			if (distanceToGround < 0.0D) distanceToGround = 0.0D;
+		}
 		return distanceToGround;
 	}
 

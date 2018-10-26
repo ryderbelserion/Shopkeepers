@@ -1,9 +1,7 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import java.util.List;
-import java.util.Set;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -38,13 +36,7 @@ class CommandSetForHire extends PlayerCommand {
 		Player player = (Player) input.getSender();
 
 		// get targeted block:
-		Block targetBlock = null;
-		try {
-			targetBlock = player.getTargetBlock((Set<Material>) null, 10);
-		} catch (Exception e) {
-			// getTargetBlock might sometimes throw an exception
-		}
-
+		Block targetBlock = player.getTargetBlockExact(10);
 		if (targetBlock == null || !ItemUtils.isChest(targetBlock.getType())) {
 			Utils.sendMessage(player, Settings.msgMustTargetChest);
 			return;

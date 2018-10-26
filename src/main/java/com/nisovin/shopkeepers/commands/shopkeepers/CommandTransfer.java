@@ -1,9 +1,7 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import java.util.List;
-import java.util.Set;
 
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -46,13 +44,7 @@ class CommandTransfer extends PlayerCommand {
 		assert newOwner != null;
 
 		// get targeted block:
-		Block targetBlock = null;
-		try {
-			targetBlock = player.getTargetBlock((Set<Material>) null, 10);
-		} catch (Exception e) {
-			// getTargetBlock might sometimes throw an exception
-		}
-
+		Block targetBlock = player.getTargetBlockExact(10);
 		if (targetBlock == null || !ItemUtils.isChest(targetBlock.getType())) {
 			Utils.sendMessage(player, Settings.msgMustTargetChest);
 			return;

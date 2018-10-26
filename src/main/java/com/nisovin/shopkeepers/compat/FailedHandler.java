@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.compat;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
@@ -11,7 +10,6 @@ import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -101,12 +99,6 @@ public final class FailedHandler implements NMSCallProvider {
 	@Override
 	public void tickAI(LivingEntity entity) {
 		// not supported
-	}
-
-	@Override
-	public double getCollisionDistance(Location start, Vector direction) {
-		// not supported
-		return 0.0D;
 	}
 
 	@Override

@@ -1,10 +1,8 @@
 package com.nisovin.shopkeepers.compat.api;
 
-import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.Vector;
 
 public interface NMSCallProvider {
 
@@ -18,11 +16,6 @@ public interface NMSCallProvider {
 	}
 
 	public void tickAI(LivingEntity entity);
-
-	// returns the distance to the nearest block collision in the range of the given direction vector
-	// note: this uses the blocks collision bounding boxes (so this goes through passable blocks, like liquids, etc.)
-	// note: does not modify the start location and direction vector
-	public double getCollisionDistance(Location start, Vector direction);
 
 	public void setOnGround(Entity entity, boolean onGround);
 

@@ -126,8 +126,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		/*String cbVersion = Utils.getServerCBVersion(); // 1_13_R2
 		String bukkitVersion = Bukkit.getBukkitVersion(); // 1.13.1-R0.1-SNAPSHOT*/
 		try {
-			// this has been added shortly after Entity#setPersistent(boolean)
-			Class.forName("org.bukkit.event.entity.EntityDropItemEvent");
+			// this has been added with the corresponding new ray tracing functions:
+			Class.forName("org.bukkit.util.RayTraceResult");
 		} catch (ClassNotFoundException e1) {
 			Log.severe("Outdated server version (" + Bukkit.getVersion()
 					+ "): Shopkeepers cannot be enabled. Please update your server!");

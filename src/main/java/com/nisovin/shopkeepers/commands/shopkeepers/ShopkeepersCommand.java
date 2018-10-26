@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Set;
-
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -9,6 +8,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
+import org.bukkit.util.RayTraceResult;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
@@ -99,19 +99,18 @@ public class ShopkeepersCommand extends BaseCommand {
 
 		// creating new shopkeeper:
 
-		// get targeted block:
-		Block targetBlock = null;
-		try {
-			targetBlock = player.getTargetBlock((Set<Material>) null, 10);
-		} catch (Exception e) {
-			// getTargetBlock might sometimes throw an exception
-		}
+		// get targeted block information:
+		RayTraceResult targetBlockInfo = player.rayTraceBlocks(10.0D, FluidCollisionMode.NEVER);
 
 		// check for valid targeted block:
-		if (targetBlock == null || targetBlock.getType() == Material.AIR) {
+		if (targetBlockInfo == null) {
 			Utils.sendMessage(player, Settings.msgShopCreateFail);
 			return;
 		}
+		Block targetBlock = targetBlockInfo.getHitBlock();
+		BlockFace targetBlockFace = targetBlockInfo.getHitBlockFace();
+		assert targetBlock != null && targetBlock.getType() != Material.AIR;
+		assert targetBlockFace != null;
 
 		ShopType<?> shopType = context.get(ARGUMENT_SHOP_TYPE);
 		ShopObjectType<?> shopObjType = context.get(ARGUMENT_OBJECT_TYPE);
@@ -167,12 +166,6 @@ public class ShopkeepersCommand extends BaseCommand {
 		}
 		assert shopType != null && shopObjType != null;
 
-		BlockFace targetBlockFace = Utils.getTargetBlockFace(player, targetBlock);
-		if (targetBlockFace == null) {
-			// invalid targeted block face:
-			Utils.sendMessage(player, Settings.msgShopCreateFail);
-			return;
-		}
 		Block spawnBlock = targetBlock.getRelative(targetBlockFace);
 		Location spawnLocation = Utils.getBlockCenterLocation(spawnBlock);
 		// face towards player:
