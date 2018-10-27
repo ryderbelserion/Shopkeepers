@@ -24,6 +24,9 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class SKLivingShopObject extends AbstractEntityShopObject implements LivingShopObject {
 
+	protected static final double SPAWN_LOCATION_OFFSET = 0.98D;
+	protected static final double SPAWN_LOCATION_RANGE = 2.0D;
+
 	protected final LivingShops livingShops;
 	private final SKLivingShopObjectType<?> livingObjectType;
 	private LivingEntity entity;
@@ -97,11 +100,11 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 	// (because shopkeepers might have been placed 1 block above passable or non-full blocks)
 	private Location getSpawnLocation() {
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		Location spawnLocation = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.98D, shopkeeper.getZ() + 0.5D);
-		double distanceToGround = Utils.getCollisionDistanceToGround(spawnLocation, 2.0D);
-		if (distanceToGround == 2.0D) {
+		Location spawnLocation = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + SPAWN_LOCATION_OFFSET, shopkeeper.getZ() + 0.5D);
+		double distanceToGround = Utils.getCollisionDistanceToGround(spawnLocation, SPAWN_LOCATION_RANGE);
+		if (distanceToGround == SPAWN_LOCATION_RANGE) {
 			// no collision within the checked range, remove offset from spawn location:
-			distanceToGround = 0.98D;
+			distanceToGround = SPAWN_LOCATION_OFFSET;
 		}
 		// adjust spawn location:
 		spawnLocation.add(0.0D, -distanceToGround, 0.0D);
