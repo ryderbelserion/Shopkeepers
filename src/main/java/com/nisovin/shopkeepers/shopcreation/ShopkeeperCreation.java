@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -130,5 +131,20 @@ public class ShopkeeperCreation {
 		playerInventory.setItemInMainHand(itemInMainHand);
 		playerInventory.setItemInOffHand(itemInOffHand);
 		return canAccessChest;
+	}
+
+	public Location determineSpawnLocation(Player player, Block targetBlock, BlockFace targetBlockFace) {
+		assert player != null && targetBlock != null && targetBlockFace != null;
+		// if the target block is passable, spawn there, otherwise shift according to target block face:
+		Block spawnBlock;
+		if (targetBlock.isPassable()) {
+			spawnBlock = targetBlock;
+		} else {
+			spawnBlock = targetBlock.getRelative(targetBlockFace);
+		}
+		Location spawnLocation = Utils.getBlockCenterLocation(spawnBlock);
+		// face towards player:
+		spawnLocation.setDirection(player.getEyeLocation().subtract(spawnLocation).toVector());
+		return spawnLocation;
 	}
 }

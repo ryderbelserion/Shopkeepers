@@ -166,10 +166,8 @@ public class ShopkeepersCommand extends BaseCommand {
 		}
 		assert shopType != null && shopObjType != null;
 
-		Block spawnBlock = targetBlock.getRelative(targetBlockFace);
-		Location spawnLocation = Utils.getBlockCenterLocation(spawnBlock);
-		// face towards player:
-		spawnLocation.setDirection(player.getEyeLocation().subtract(spawnLocation).toVector());
+		// determine spawn location:
+		Location spawnLocation = plugin.getShopkeeperCreation().determineSpawnLocation(player, targetBlock, targetBlockFace);
 
 		// shop creation data:
 		ShopCreationData shopCreationData;

@@ -155,11 +155,9 @@ class CreateListener implements Listener {
 					return;
 				}
 
+				// determine spawn location:
 				BlockFace clickedBlockFace = event.getBlockFace();
-				Block spawnBlock = clickedBlock.getRelative(clickedBlockFace);
-				Location spawnLocation = Utils.getBlockCenterLocation(spawnBlock);
-				// face towards player:
-				spawnLocation.setDirection(player.getEyeLocation().subtract(spawnLocation).toVector());
+				Location spawnLocation = shopkeeperCreation.determineSpawnLocation(player, clickedBlock, clickedBlockFace);
 
 				// create player shopkeeper:
 				ShopCreationData creationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, clickedBlockFace, selectedChest);
