@@ -20,6 +20,7 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class SKLivingShopObject extends AbstractEntityShopObject implements LivingShopObject {
 
@@ -92,14 +93,19 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 		entity.removeMetadata("shopkeeper", ShopkeepersPlugin.getInstance());
 	}
 
+	// positions the entity at the exact location it would fall to, within a range of at most 1 block below the spawn
+	// block (because legacy shopkeepers might have been placed 1 block above passable blocks)
 	private Location getSpawnLocation() {
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		double offset = 0.0D;
-		// is gravity active? -> spawn slightly above the ground:
-		if (!Settings.disableGravity && !(Settings.useLegacyMobBehavior && this.isNoAIMobType() && NMSManager.getProvider().isNoAIDisablingGravity())) {
-			offset = 0.5D;
+		Location spawnLocation = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.98D, shopkeeper.getZ() + 0.5D);
+		double distanceToGround = Utils.getCollisionDistanceToGround(spawnLocation, 2.0D);
+		if (distanceToGround == 2.0D) {
+			// no collision within the checked range, remove offset from spawn location:
+			distanceToGround = 0.98D;
 		}
-		return new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + offset, shopkeeper.getZ() + 0.5D);
+		// adjust spawn location:
+		spawnLocation.add(0.0D, -distanceToGround, 0.0D);
+		return spawnLocation;
 	}
 
 	@Override
