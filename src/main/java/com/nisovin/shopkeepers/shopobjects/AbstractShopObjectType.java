@@ -41,11 +41,10 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 
 	@Override
 	public boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
-		// TODO allow spawning inside of water?
 		// TODO check actual object size?
 		if (spawnLocation == null || spawnLocation.getWorld() == null) return false;
 		Block spawnBlock = spawnLocation.getBlock();
-		if (!spawnBlock.isEmpty()) return false;
+		if (!spawnBlock.isPassable()) return false;
 		if (targetedBlockFace != null) {
 			if (targetedBlockFace == BlockFace.DOWN || !Utils.isBlockSide(targetedBlockFace)) {
 				return false;

@@ -50,7 +50,9 @@ public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShop
 
 	@Override
 	public boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
-		// limit to wall sign faces if sign posts are disabled:
-		return (Settings.enableSignPostShops || targetedBlockFace != BlockFace.UP) && super.isValidSpawnLocation(spawnLocation, targetedBlockFace);
+		// block has to be empty, and limit to wall sign faces if sign posts are disabled:
+		return spawnLocation.getBlock().isEmpty()
+				&& (Settings.enableSignPostShops || targetedBlockFace != BlockFace.UP)
+				&& super.isValidSpawnLocation(spawnLocation, targetedBlockFace);
 	}
 }
