@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects;
 
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
@@ -46,7 +45,7 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 		// TODO check actual object size?
 		if (spawnLocation == null || spawnLocation.getWorld() == null) return false;
 		Block spawnBlock = spawnLocation.getBlock();
-		if (spawnBlock.getType() != Material.AIR) return false;
+		if (!spawnBlock.isEmpty()) return false;
 		if (targetedBlockFace != null) {
 			if (targetedBlockFace == BlockFace.DOWN || !Utils.isBlockSide(targetedBlockFace)) {
 				return false;

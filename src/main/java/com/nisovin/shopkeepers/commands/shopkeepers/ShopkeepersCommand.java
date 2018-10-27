@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
@@ -109,7 +108,7 @@ public class ShopkeepersCommand extends BaseCommand {
 		}
 		Block targetBlock = targetBlockInfo.getHitBlock();
 		BlockFace targetBlockFace = targetBlockInfo.getHitBlockFace();
-		assert targetBlock != null && targetBlock.getType() != Material.AIR;
+		assert targetBlock != null && !targetBlock.isEmpty();
 		assert targetBlockFace != null;
 
 		ShopType<?> shopType = context.get(ARGUMENT_SHOP_TYPE);
