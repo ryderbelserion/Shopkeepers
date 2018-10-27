@@ -17,11 +17,7 @@ Low priority:
 
 * introduce separate editor window to be able to add new player editing options
   * add an option to reposition shops: button pressed > window closes + message > player clicks a block > runs new/updated/smarter placement logic there, checks distance to chest, option (default true) to not allow it for shops that are not directly placed on top of the shop chest (because those were probably created via command and it is unclear whether players are meant to be able to reposition those shops)
-* be smarter about determining the shop entity position, in order to not have it reposition every ~10seconds
-  * add admin command to reposition all shops to their ideal position according to collisions below their current position (in a certain max range of only a few blocks..)
-  * or: allow a greater distance, as long as the entity did only fall down and didn't move sidewards
-* allow shops below water (aquatic update!)
-* When determining the targeted block face when creating shopkeepers via command, take the blocks collision boxes into account (requires nms)
+    * Or allow shops to be picked up (with all their data) inside an item (probably not possible right now via bukkit API)
 
 * Remove AbstractType#matches with aliases
 * remove AbstractType#isEnabled() and instead dynamically register and unregister enabled/disabled types?
