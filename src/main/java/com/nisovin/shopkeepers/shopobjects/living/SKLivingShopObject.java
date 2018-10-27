@@ -93,8 +93,8 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 		entity.removeMetadata("shopkeeper", ShopkeepersPlugin.getInstance());
 	}
 
-	// positions the entity at the exact location it would fall to, within a range of at most 1 block below the spawn
-	// block (because legacy shopkeepers might have been placed 1 block above passable blocks)
+	// places the entity at the exact location it would fall to, within a range of at most 1 block below the spawn block
+	// (because shopkeepers might have been placed 1 block above passable or non-full blocks)
 	private Location getSpawnLocation() {
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
 		Location spawnLocation = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.98D, shopkeeper.getZ() + 0.5D);
