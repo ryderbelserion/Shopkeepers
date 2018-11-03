@@ -1,11 +1,16 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
+import java.util.Collection;
+
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -27,6 +32,8 @@ import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
 import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent;
+import org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
@@ -203,6 +210,31 @@ class LivingEntityShopListener implements Listener {
 				event.setIntensity(entity, 0.0D);
 			}
 		}
+	}
+
+	// allow sleeping if the only nearby monsters are shopkeepers:
+	// note: cancellation state also reflects default behavior
+	@EventHandler(ignoreCancelled = false)
+	void onPlayerEnterBed(PlayerBedEnterEvent event) {
+		// bed entering prevented due to nearby monsters?
+		if (event.getBedEnterResult() != BedEnterResult.NOT_SAFE) return;
+
+		// find nearby monsters that prevent bed entering (see MC EntityHuman):
+		Block bedBlock = event.getBed();
+		Collection<Entity> monsters = bedBlock.getWorld().getNearbyEntities(bedBlock.getLocation(), 8.0D, 5.0D, 8.0D, (entity) -> {
+			// TODO bukkit API to check if monster prevents sleeping? ie. pigzombies only prevent sleeping if angered
+			return (entity instanceof Monster) && (!(entity instanceof PigZombie) || ((PigZombie) entity).isAngry());
+		});
+
+		for (Entity entity : monsters) {
+			if (!shopkeeperRegistry.isShopkeeper(entity)) {
+				// found non-shopkeeper entity: do nothing (keep bed entering prevented)
+				return;
+			}
+		}
+		// sleeping is only prevented due to nearby shopkeepers -> bypass and allow sleeping:
+		Log.debug("Allowing sleeping of player '" + event.getPlayer().getName() + "': The only nearby monsters are shopkeepers.");
+		event.setUseBed(Result.ALLOW);
 	}
 
 	// ex: blazes or skeletons
