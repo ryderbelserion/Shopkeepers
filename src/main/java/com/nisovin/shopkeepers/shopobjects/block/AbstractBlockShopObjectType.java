@@ -4,7 +4,6 @@ import org.bukkit.block.Block;
 
 import com.nisovin.shopkeepers.api.shopobjects.block.BlockShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
-import com.nisovin.shopkeepers.util.Utils;
 
 public abstract class AbstractBlockShopObjectType<T extends AbstractBlockShopObject> extends AbstractShopObjectType<T> implements BlockShopObjectType<T> {
 
@@ -14,6 +13,7 @@ public abstract class AbstractBlockShopObjectType<T extends AbstractBlockShopObj
 
 	public String createObjectId(Block block) {
 		if (block == null) return null;
-		return this.getIdentifier() + ":" + Utils.getLocationString(block);
+		// inline for performance:
+		return this.getIdentifier() + ":" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ();
 	}
 }

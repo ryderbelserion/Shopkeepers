@@ -349,6 +349,11 @@ public final class Utils {
 		return getLocationString(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
 	}
 
+	// more performant variant if coordinates are integers:
+	public static String getLocationString(String worldName, int x, int y, int z) {
+		return worldName + "," + x + "," + y + "," + z;
+	}
+
 	public static String getLocationString(String worldName, double x, double y, double z) {
 		return worldName + "," + DECIMAL_FORMAT.format(x) + "," + DECIMAL_FORMAT.format(y) + "," + DECIMAL_FORMAT.format(z);
 	}

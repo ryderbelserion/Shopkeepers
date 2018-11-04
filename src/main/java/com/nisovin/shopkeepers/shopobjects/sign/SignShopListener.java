@@ -26,6 +26,9 @@ import com.nisovin.shopkeepers.util.Utils;
 
 class SignShopListener implements Listener {
 
+	// local copy as array (allows very performant iteration):
+	private static final BlockFace[] BLOCK_SIDES = Utils.getBlockSides().toArray(new BlockFace[0]);
+
 	private final SignShops signShops;
 
 	private Block cancelNextBlockPhysics = null;
@@ -70,7 +73,7 @@ class SignShopListener implements Listener {
 		if (ItemUtils.isSign(block.getType()) && signShops.isSignShop(block)) {
 			return true;
 		}
-		for (BlockFace blockFace : Utils.getBlockSides()) {
+		for (BlockFace blockFace : BLOCK_SIDES) {
 			Block adjacentBlock = block.getRelative(blockFace);
 			Shopkeeper shopkeeper = signShops.getSignShop(adjacentBlock);
 			if (shopkeeper != null) {
@@ -113,8 +116,8 @@ class SignShopListener implements Listener {
 		}
 		// Spigot changed the behavior of this event in MC 1.13 to reduce the number of event calls:
 		// Related: https://hub.spigotmc.org/jira/browse/SPIGOT-4256
-		for (BlockFace blockFace : Utils.getBlockSides()) {
-			Block adjacentBlock = block.getRelative(blockFace);
+		for (BlockFace blockFace : BLOCK_SIDES) {
+			Block adjacentBlock = block.getRelative(blockFace.getModX(), blockFace.getModY(), blockFace.getModZ());
 			if (this.checkCancelPhysics(adjacentBlock)) {
 				event.setCancelled(true);
 				return;
