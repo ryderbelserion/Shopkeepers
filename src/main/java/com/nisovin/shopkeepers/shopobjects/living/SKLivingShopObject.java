@@ -146,6 +146,7 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 			// disable breeding:
 			if (entity instanceof Ageable) {
 				Ageable ageable = ((Ageable) entity);
+				ageable.setAdult();
 				ageable.setBreed(false);
 				ageable.setAgeLock(true);
 			}
