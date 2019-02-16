@@ -257,7 +257,11 @@ public class Settings {
 
 	public static String msgShopTypeDisabled = "&7The shop type '{type}' is disabled.";
 	public static String msgShopObjectTypeDisabled = "&7The shop object type '{type}' is disabled.";
-	public static String msgMustTargetChest = "&7You have to target a chest.";
+	
+	public static String msgMustTargetShop = "&7You have to target a shopkeeper.";
+	public static String msgMustTargetPlayerShop = "&7You have to target a player shopkeeper.";
+	public static String msgTargetEntityIsNoShop = "&7The targeted entity is no shopkeeper.";
+	public static String msgTargetShopIsNoPlayerShop = "&7The targeted shopkeeper is no player shopkeeper.";
 	public static String msgUnusedChest = "&7No shopkeeper is using this chest.";
 	public static String msgNotOwner = "&7You are not the owner of this shopkeeper.";
 	// placeholders: {owner} -> new owners name

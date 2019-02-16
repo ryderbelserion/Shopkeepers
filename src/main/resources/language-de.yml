@@ -55,7 +55,11 @@ msg-name-invalid: "&aDer Name ist ungültig!"
 
 msg-shop-type-disabled: "&7Der Shop-Typ '{type}' ist deaktiviert."
 msg-shop-object-type-disabled: "&7Der Shop-Objekt-Typ '{type}' ist deaktiviert."
-msg-must-target-chest: "&7Du musst eine Truhe anvisieren."
+
+msg-must-target-shop: "&7Du musst einen Shop anvisieren."
+msg-must-target-player-shop: "&7Du musst einen Spieler-Shop anvisieren."
+msg-target-entity-is-no-shop: "&7Das anvisierte Objekt ist kein Shop."
+msg-target-shop-is-no-player-shop: "&7Der anvisierte Shop ist kein Spieler-Shop."
 msg-unused-chest: "&7Kein Shop benutzt diese Truhe."
 msg-not-owner: "&7Du bist nicht der Besitzer von diesem Shop."
 msg-owner-set: "&aDer neue Besitzer ist jetzt: &e{owner}"

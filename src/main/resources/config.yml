@@ -399,7 +399,11 @@ msg-name-invalid: "&aThat name is not valid!"
 
 msg-shop-type-disabled: "&7The shop type '{type}' is disabled."
 msg-shop-object-type-disabled: "&7The shop object type '{type}' is disabled."
-msg-must-target-chest: "&7You have to target a chest."
+
+msg-must-target-shop: "&7You have to target a shopkeeper."
+msg-must-target-player-shop: "&7You have to target a player shopkeeper."
+msg-target-entity-is-no-shop: "&7The targeted entity is no shopkeeper."
+msg-target-shop-is-no-player-shop: "&7The targeted shopkeeper is no player shopkeeper."
 msg-unused-chest: "&7No shopkeeper is using this chest."
 msg-not-owner: "&7You are not the owner of this shopkeeper."
 msg-owner-set: "&aNew owner was set to &e{owner}"

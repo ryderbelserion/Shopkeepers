@@ -2,13 +2,12 @@ package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import java.util.List;
 
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
@@ -16,6 +15,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 class CommandSetForHire extends PlayerCommand {
@@ -35,27 +35,8 @@ class CommandSetForHire extends PlayerCommand {
 		assert (input.getSender() instanceof Player);
 		Player player = (Player) input.getSender();
 
-		// get targeted block:
-		Block targetBlock = player.getTargetBlockExact(10);
-		if (targetBlock == null || !ItemUtils.isChest(targetBlock.getType())) {
-			Utils.sendMessage(player, Settings.msgMustTargetChest);
-			return;
-		}
-
-		List<PlayerShopkeeper> shopkeepers = SKShopkeepersPlugin.getInstance().getProtectedChests().getShopkeepersUsingChest(targetBlock);
-		if (shopkeepers.size() == 0) {
-			Utils.sendMessage(player, Settings.msgUnusedChest);
-			return;
-		}
-
-		if (!Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-			for (PlayerShopkeeper shopkeeper : shopkeepers) {
-				if (!shopkeeper.isOwner(player)) {
-					Utils.sendMessage(player, Settings.msgNotOwner);
-					return;
-				}
-			}
-		}
+		List<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.getTargetedShopkeepers(player, true, true);
+		if (shopkeepers.isEmpty()) return; // messages were already handled
 
 		ItemStack hireCost = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isEmpty(hireCost)) {
@@ -63,10 +44,29 @@ class CommandSetForHire extends PlayerCommand {
 			return;
 		}
 
-		for (PlayerShopkeeper shopkeeper : shopkeepers) {
-			shopkeeper.setForHire(hireCost);
+		// set for hire:
+		final boolean bypass = Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION);
+		int affectedShops = 0;
+		for (Shopkeeper shopkeeper : shopkeepers) {
+			PlayerShopkeeper playerShopkeeper = (PlayerShopkeeper) shopkeeper; // this got already checked
+			// only transfer shops that are owned by the player:
+			if (bypass || playerShopkeeper.isOwner(player)) {
+				playerShopkeeper.setForHire(hireCost);
+				affectedShops++;
+			}
 		}
-		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
+
+		// inform if there was no single shopkeeper that could be set for hire:
+		assert !shopkeepers.isEmpty();
+		if (affectedShops == 0) {
+			Utils.sendMessage(player, Settings.msgNotOwner);
+			return;
+		}
+
+		// success:
 		Utils.sendMessage(player, Settings.msgSetForHire);
+
+		// save:
+		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 	}
 }
