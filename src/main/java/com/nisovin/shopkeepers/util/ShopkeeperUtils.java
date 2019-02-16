@@ -73,7 +73,7 @@ public class ShopkeeperUtils {
 				shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByBlock(targetBlock);
 				if (shopkeeper == null) {
 					// get player shopkeepers by targeted chest:
-					if (playerShop && ItemUtils.isChest(targetBlock.getType())) {
+					if (ItemUtils.isChest(targetBlock.getType())) {
 						List<PlayerShopkeeper> shopkeepers = SKShopkeepersPlugin.getInstance().getProtectedChests().getShopkeepersUsingChest(targetBlock);
 						if (shopkeepers.isEmpty()) {
 							if (message) {
