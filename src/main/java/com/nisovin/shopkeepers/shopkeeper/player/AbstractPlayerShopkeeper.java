@@ -325,6 +325,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			PlayerShopkeeper shopkeeper = this.getShopkeeper();
 			int slot = event.getRawSlot();
 			if (slot == 2 || slot == 6) {
+				// TODO prevent hiring own shops?
+				// actually: this feature was originally meant for admins to set up pre-existing shops
 				// handle hiring:
 				// check if the player can hire (create) this type of shopkeeper:
 				if (Settings.hireRequireCreationPermission && (!this.getShopkeeper().getType().hasPermission(player)

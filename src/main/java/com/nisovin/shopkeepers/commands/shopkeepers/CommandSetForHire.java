@@ -40,6 +40,7 @@ class CommandSetForHire extends PlayerCommand {
 
 		ItemStack hireCost = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isEmpty(hireCost)) {
+			// TODO allow disabling hiring again, with empty hand
 			Utils.sendMessage(player, Settings.msgMustHoldHireItem);
 			return;
 		}
