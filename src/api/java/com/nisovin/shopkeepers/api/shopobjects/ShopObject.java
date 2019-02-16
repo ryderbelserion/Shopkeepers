@@ -53,8 +53,6 @@ public interface ShopObject {
 	 * Prepares the given name for use for this shop object.
 	 * <p>
 	 * This might for example remove unsupported characters and trim the name to the maximum supported length.
-	 * <p>
-	 * The {@link Shopkeeper} might use this to adjust its set name during naming.
 	 * 
 	 * @param name
 	 *            the name to prepare

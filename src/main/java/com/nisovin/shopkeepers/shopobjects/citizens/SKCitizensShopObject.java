@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.util.Log;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
+import net.citizensnpcs.api.trait.trait.MobType;
 
 /**
  * Note: This relies on the regular living entity shopkeeper interaction handling.
@@ -234,7 +235,11 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	@Override
 	public int getNameLengthLimit() {
-		return 32; // TODO citizens seem to have different limits depending on mob type (16 for mobs, 64 for players)
+		// Citizens uses different limits depending on the npc type (64 for mobs, 46 for players)
+		// Citizens might dynamically truncate the name of the corresponding npc, and will then print a warning
+		NPC npc = this.getNPC();
+		if (npc != null && npc.getTrait(MobType.class).getType() == EntityType.PLAYER) return 46;
+		return 64;
 	}
 
 	@Override
@@ -261,7 +266,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	public String getName() {
 		NPC npc = this.getNPC();
 		if (npc == null) return null;
-		return npc.getName();
+		return npc.getFullName();
 	}
 
 	// SUB TYPES

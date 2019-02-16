@@ -47,6 +47,11 @@ import com.nisovin.shopkeepers.util.Utils;
  */
 public abstract class AbstractShopkeeper implements Shopkeeper {
 
+	// the maximum supported name length:
+	// the actual maximum name length that can be used might be lower depending on config settings
+	// and on shop object specific limits
+	public static final int MAX_NAME_LENGTH = 128;
+
 	private final int id;
 	private UUID uniqueId;
 	private AbstractShopObject shopObject;
@@ -189,7 +194,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.markDirty();
 		}
 
-		this.name = Utils.colorize(configSection.getString("name", ""));
+		this.name = this.trimName(Utils.colorize(configSection.getString("name", "")));
 		this.worldName = configSection.getString("world");
 		this.x = configSection.getInt("x");
 		this.y = configSection.getInt("y");
@@ -572,17 +577,30 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public void setName(String newName) {
-		// prepare new name:
-		if (newName == null) newName = "";
-		newName = Utils.colorize(newName);
-		newName = shopObject.prepareName(newName);
-		this.name = newName;
-		shopObject.setName(newName);
-		this.markDirty();
+		// prepare and apply new name:
+		String preparedName = newName;
+		if (preparedName == null) preparedName = "";
+		preparedName = Utils.colorize(preparedName);
+		preparedName = this.trimName(preparedName);
+		this.name = preparedName;
+
+		// update shop object:
+		shopObject.setName(preparedName);
+		this.markDirty(); // mark dirty
 	}
 
 	public boolean isValidName(String name) {
-		return name != null && name.matches("^" + Settings.nameRegex + "$");
+		return (name != null && name.length() <= MAX_NAME_LENGTH && name.matches("^" + Settings.nameRegex + "$"));
+	}
+
+	private String trimName(String name) {
+		if (name.length() <= MAX_NAME_LENGTH) {
+			return name;
+		}
+		String trimmedName = name.substring(0, MAX_NAME_LENGTH);
+		Log.warning("Name of shopkeeper " + id + " is longer than " + MAX_NAME_LENGTH
+				+ ". Trimming name '" + name + "' to '" + trimmedName + "'.");
+		return trimmedName;
 	}
 
 	// INTERACTION HANDLING

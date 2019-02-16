@@ -113,7 +113,9 @@ public abstract class AbstractShopObject implements ShopObject {
 	// NAMING
 
 	@Override
-	public abstract int getNameLengthLimit();
+	public int getNameLengthLimit() {
+		return AbstractShopkeeper.MAX_NAME_LENGTH;
+	}
 
 	@Override
 	public String prepareName(String name) {

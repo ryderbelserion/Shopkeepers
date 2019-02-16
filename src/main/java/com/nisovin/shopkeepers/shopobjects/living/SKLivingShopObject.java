@@ -301,11 +301,6 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 	// NAMING
 
 	@Override
-	public int getNameLengthLimit() {
-		return 32;
-	}
-
-	@Override
 	public void setName(String name) {
 		if (!this.isActive()) return;
 		if (Settings.showNameplates && name != null && !name.isEmpty()) {

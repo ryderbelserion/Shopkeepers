@@ -252,15 +252,10 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	// NAMING
 
 	@Override
-	public int getNameLengthLimit() {
-		// TODO this is outdated
-		return 15;
-	}
-
-	@Override
 	public void setName(String name) {
-		// always uses the name of the shopkeeper:
-		// TODO really? why?
+		// the name gets set during sign update, which always uses the name of the shopkeeper:
+		// TODO allow changing only the name? Currently this restriction allows to not have to store
+		// custom names inside this sign shop object
 		this.updateSign();
 	}
 
