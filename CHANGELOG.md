@@ -4,6 +4,40 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.5.0 (2019-02-16)
+### Supported MC versions: 1.13.2
+**Chest protection improvements:**  
+* Fixed: Also preventing items being moved into a protected chest. Players might have previously abused this to fill a chest with useless items to prevent the shop from being able to trade due to being out of storage space.
+* Fixed: Item movement protection for double chests might not have worked correctly.
+* Added: The setting 'prevent-item-movement' (default: true) can now be used to allow item movement from/to the shop chest. This gives the shop owner more possibilities to manage the chest contents, but also opens possibilities for other players to maliciously inject or extract items if this is not properly prevented by other means. If chest protection is disabled, this setting will have no effect (item movement will always be allowed then).
+* Reworked chest protection to by slightly less strict:
+  * Players with bypass permission can now bypass block placement restrictions when placing blocks next to protected shop chests.
+  * Chests next to a shop's chest are now only protected / prevented from being placed if they are actually connected to the shop's chest.
+  * Placement of adjacent hoppers is now only prevented if they would able to extract or inject items into the chest.
+  * Added: Also restricting placement of droppers in a similar way now.
+* Changed: If chest protection is disabled in the config, chest access will not prevented either now. (It doesn't seem to make much sense to prevent chest access but allow the chest to be broken/destroyed)
+* Changed: If 'delete-shopkeeper-on-break-chest' is enabled, the shopkeeper will now no longer be removed if the half of a double chest gets broken that is not directly used by the shopkeeper.
+* Changed: If 'delete-shopkeeper-on-break-chest' is enabled, the shopkeepers will now also be removed if the chest gets destroyed by an explosion. And if 'deleting-player-shop-returns-creation-item' is enabled, shop creations items will be dropped for those shopkeepers as well.
+
+**Improved shopkeeper placement:**
+* Fixed: Treating other air variants as empty as well when trying to place a shopkeeper.
+* Slightly changed how the spawn block is determined to match more closely to vanilla minecraft's behavior: If the clicked / targeted block is passable (i.e. tall grass, etc.) this block gets used as spawn location. Only otherwise the spawn location is shifted according to the clicked / targeted block face.
+  * This now also allows placement of shopkeepers underwater (Update aquatic)! Signs can still only be placed at air blocks.
+* Shopkeeper entities get now spawned at the exact location they would fall to due to gravity (within a range of 1 block below their spawn block, and even if gravity is disabled).
+  * This also resolves the issue for shopkeepers periodically 'jumping' if their spawn location is 1 block above a passable or non-full block (such as grass, snow, carpet, etc.).
+
+**Various:**  
+* Bumped Bukkit dependency to the latest version of 1.13.2.
+* Updated for WorldGuard 7.0.0.
+* Pre-loading another class. This might fix an occasional issue during reloads when replacing the jar file.
+* Fixed: Creeper shopkeepers' powered state not being applied immediately.
+* Fixed: Nearby shopkeeper monsters will no longer prevent sleeping.
+* Small performance improvements to related to sign shopkeepers.
+* Fixed: No longer randomly spawning baby variants of shopkeeper mobs.
+* Increased the built-in max shopkeeper name length from 32 to to 128. The actual name length limit is still further limited by the config settings by default and some shopkeeper object types will not be able to actually display names of those length.
+
+**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.x.
+
 ## v2.4.1 Beta (2018-09-11)
 ### Supported MC versions: 1.13.1
 * Added: A (very simple) minimum version check.
