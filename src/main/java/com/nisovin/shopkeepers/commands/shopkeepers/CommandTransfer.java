@@ -56,19 +56,24 @@ class CommandTransfer extends PlayerCommand {
 			return;
 		}
 
-		if (!Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-			for (PlayerShopkeeper shopkeeper : shopkeepers) {
-				if (!shopkeeper.isOwner(player)) {
-					Utils.sendMessage(player, Settings.msgNotOwner);
-					return;
-				}
+		// set new owner:
+		final boolean bypass = Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION);
+		int changedOwner = 0;
+		for (PlayerShopkeeper shopkeeper : shopkeepers) {
+			// only transfer shops that are owned by the player:
+			if (bypass || shopkeeper.isOwner(player)) {
+				shopkeeper.setOwner(newOwner);
+				changedOwner++;
 			}
 		}
 
-		// set new owner:
-		for (PlayerShopkeeper shopkeeper : shopkeepers) {
-			shopkeeper.setOwner(newOwner);
+		// inform if there was no single shopkeeper that could be transferred:
+		assert shopkeepers.size() > 0;
+		if (changedOwner == 0) {
+			Utils.sendMessage(player, Settings.msgNotOwner);
+			return;
 		}
+
 		Utils.sendMessage(player, Settings.msgOwnerSet, "{owner}", newOwner.getName());
 
 		// save:
