@@ -28,6 +28,8 @@ public interface SelectableTypeRegistry<T extends SelectableType> extends TypeRe
 
 	public T selectNext(Player player);
 
+	public T selectPrevious(Player player);
+
 	public void clearSelection(Player player);
 
 	public void clearAllSelections();

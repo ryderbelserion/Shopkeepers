@@ -65,9 +65,9 @@ class CreateListener implements Listener {
 		// ignore our own fake interact event:
 		if (event instanceof TestPlayerInteractEvent) return;
 
-		// ignore if the player isn't right-clicking:
+		// ignore if the player isn't right-clicking, or left-clicking air:
 		Action action = event.getAction();
-		if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK) return;
+		if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_AIR) return;
 
 		// ignore creative mode players:
 		Player player = event.getPlayer();
@@ -83,7 +83,7 @@ class CreateListener implements Listener {
 		Result useInteractedBlock = event.useInteractedBlock();
 
 		// prevent regular usage:
-		// TODO are there items which would require canceling the event for left clicks or physical interaction as well?
+		// TODO are there items which would require canceling the event for all left clicks or physical interaction as well?
 		if (Settings.preventShopCreationItemRegularUsage && !Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Log.debug("Preventing normal shop creation item usage");
 			event.setCancelled(true);
@@ -118,6 +118,14 @@ class CreateListener implements Listener {
 			} else {
 				// cycle shopkeeper types:
 				plugin.getShopTypeRegistry().selectNext(player);
+			}
+		} else if (action == Action.LEFT_CLICK_AIR) {
+			if (player.isSneaking()) {
+				// cycle shop objects backwards:
+				plugin.getShopObjectTypeRegistry().selectPrevious(player);
+			} else {
+				// cycle shopkeeper types backwards:
+				plugin.getShopTypeRegistry().selectPrevious(player);
 			}
 		} else if (action == Action.RIGHT_CLICK_BLOCK) {
 			Block clickedBlock = event.getClickedBlock();

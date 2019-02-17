@@ -209,8 +209,8 @@ public class Settings {
 	 */
 	public static String language = "en";
 
-	public static String msgCreationItemSelected = "&aRight-click to select the shop type.\n"
-			+ "&aSneak + right-click to select the object type.\n"
+	public static String msgCreationItemSelected = "&aLeft/Right-click to select the shop type.\n"
+			+ "&aSneak + left/right-click to select the object type.\n"
 			+ "&aRight-click a chest to select it.\n"
 			+ "&aThen right-click a block to place the shopkeeper.";
 

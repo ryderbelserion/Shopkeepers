@@ -343,8 +343,8 @@ high-zero-currency-item-lore: []
 language: en
 
 msg-creation-item-selected: |
-    &aRight-click to select the shop type.
-    &aSneak + right-click to select the object type.
+    &aLeft/Right-click to select the shop type.
+    &aSneak + left/right-click to select the object type.
     &aRight-click a chest to select it.
     &aThen right-click a block to place the shopkeeper.
 

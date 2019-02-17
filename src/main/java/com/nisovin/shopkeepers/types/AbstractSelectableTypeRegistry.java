@@ -11,6 +11,7 @@ import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
 public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectableType> extends AbstractTypeRegistry<T> implements SelectableTypeRegistry<T> {
 
 	private static class Link<T> {
+		private T prev = null;
 		private T next = null;
 	}
 
@@ -30,7 +31,9 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 		Link<T> link = new Link<>();
 		links.put(type.getIdentifier(), link);
 		if (last != null) {
-			links.get(last.getIdentifier()).next = type;
+			Link<T> lastLink = links.get(last.getIdentifier());
+			lastLink.next = type;
+			link.prev = last;
 		}
 		last = type;
 	}
@@ -39,9 +42,20 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 		return first;
 	}
 
+	protected T getLast() {
+		return last;
+	}
+
 	protected T getNext(T current) {
 		Link<T> link = (current != null) ? links.get(current.getIdentifier()) : null;
-		return (link == null || link.next == null) ? first : link.next;
+		if (link == null) return first;
+		return (link.next == null) ? first : link.next;
+	}
+
+	protected T getPrevious(T current) {
+		Link<T> link = (current != null) ? links.get(current.getIdentifier()) : null;
+		if (link == null) return first;
+		return (link.prev == null) ? last : link.prev;
 	}
 
 	protected boolean canBeSelected(Player player, T type) {
@@ -71,6 +85,30 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 			next = current;
 		}
 		return next;
+	}
+
+	protected T getPrevious(Player player, T current) {
+		assert player != null;
+		T prev = current;
+
+		int count = this.getRegisteredTypes().size();
+		while (count > 0) {
+			// automatically selects the first type if prev is null, or the last type if prev is the first type
+			prev = this.getPrevious(prev);
+			if (this.canBeSelected(player, prev)) {
+				break;
+			}
+			count--;
+		}
+
+		// use the currently selected type (can be null) after it went through all types and didn't find one the player
+		// can use:
+		if (count == 0) {
+			// check if the currently selected type can still be used by this player:
+			if (current != null && !this.canBeSelected(player, current)) current = null;
+			prev = current;
+		}
+		return prev;
 	}
 
 	// SELECTION MANAGEMENT
@@ -107,6 +145,22 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 			// selections.remove(playerName);
 		}
 		return next;
+	}
+
+	@Override
+	public T selectPrevious(Player player) {
+		Validate.notNull(player);
+		String playerName = player.getName();
+		T current = selections.get(playerName);
+		T prev = this.getPrevious(player, current);
+		if (prev != null) {
+			selections.put(playerName, prev);
+			this.onSelect(prev, player);
+		} else {
+			// for now remember the current selection
+			// selections.remove(playerName);
+		}
+		return prev;
 	}
 
 	protected void onSelect(T type, Player selectedBy) {
