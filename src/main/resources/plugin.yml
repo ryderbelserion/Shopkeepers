@@ -49,6 +49,9 @@ permissions:
     shopkeeper.remote:
         description: Remotely open admin shops via command
         default: op
+    shopkeeper.remoteedit:
+        description: Remotely edit shops via command
+        default: op
     shopkeeper.transfer:
         description: Transfer ownership of player shops
         default: op

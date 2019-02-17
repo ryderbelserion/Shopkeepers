@@ -339,6 +339,7 @@ public class Settings {
 	public static String msgCommandDescriptionList = "Lists all shops for the specified player, or all admin shops.";
 	public static String msgCommandDescriptionRemove = "Removes all shops for the specified player, all players, or all admin shops.";
 	public static String msgCommandDescriptionRemote = "Remotely opens a shop.";
+	public static String msgCommandDescriptionRemoteEdit = "Remotely edits a shop.";
 	public static String msgCommandDescriptionTransfer = "Transfers the ownership of a shop.";
 	public static String msgCommandDescriptionSettradeperm = "Sets, removes (-) or displays (?) the trading permission.";
 	public static String msgCommandDescriptionSetforhire = "Sets one of your shops for sale.";
