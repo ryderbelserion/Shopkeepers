@@ -112,7 +112,7 @@ class CommandList extends PlayerCommand {
 		}
 
 		int shopsCount = shops.size();
-		int maxPage = (int) Math.ceil((double) shopsCount / ENTRIES_PER_PAGE);
+		int maxPage = Math.max(1, (int) Math.ceil((double) shopsCount / ENTRIES_PER_PAGE));
 		page = Math.max(1, Math.min(page, maxPage));
 
 		if (playerName == null) {
