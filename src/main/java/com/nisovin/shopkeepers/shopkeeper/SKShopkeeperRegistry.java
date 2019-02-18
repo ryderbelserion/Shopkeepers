@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -38,6 +37,8 @@ import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.StringUtils;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
@@ -593,10 +594,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	@Override
 	public AbstractShopkeeper getShopkeeperByName(String shopName) {
 		if (shopName == null) return null;
-		shopName = ChatColor.stripColor(shopName);
+		shopName = Utils.stripColor(shopName);
+		shopName = StringUtils.normalize(shopName);
 		for (AbstractShopkeeper shopkeeper : this.getAllShopkeepers()) {
 			String shopkeeperName = shopkeeper.getName();
-			if (shopkeeperName != null && ChatColor.stripColor(shopkeeperName).equalsIgnoreCase(shopName)) {
+			if (shopkeeperName == null) continue;
+			shopkeeperName = Utils.stripColor(shopkeeperName);
+			shopkeeperName = StringUtils.normalize(shopkeeperName);
+			if (shopkeeperName.equals(shopName)) {
 				return shopkeeper;
 			}
 		}

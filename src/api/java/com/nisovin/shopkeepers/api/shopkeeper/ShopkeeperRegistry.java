@@ -74,7 +74,7 @@ public interface ShopkeeperRegistry {
 	 * Tries to find a shopkeeper with the given name.
 	 * 
 	 * <p>
-	 * This search ignores colors in the shop names.<br>
+	 * This search ignores colors and whitespace in the shop names.<br>
 	 * Note: Shop names are not unique!
 	 * 
 	 * @param shopName

@@ -3,9 +3,8 @@ package com.nisovin.shopkeepers.commands.arguments;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
-
-import org.bukkit.ChatColor;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
@@ -122,13 +121,19 @@ public class ShopkeeperArgument extends StringArgument {
 	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
 		if (args.getRemainingSize() == 1 || (joinRemainingArgs && args.getRemainingSize() > 1)) {
 			List<String> suggestions = new ArrayList<>();
-			String partialArg = (joinRemainingArgs ? this.getJoinedRemainingArgs(args) : args.next()).toLowerCase();
+			String partialArg = (joinRemainingArgs ? this.getJoinedRemainingArgs(args) : args.next());
+			partialArg = Utils.stripColor(partialArg);
+			partialArg = StringUtils.normalize(partialArg);
 
 			// check for matching shop names:
 			for (Shopkeeper shopkeeper : ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers()) {
 				if (!this.testFilter(shopkeeper)) continue; // filtered
-				String shopName = ChatColor.stripColor(shopkeeper.getName());
-				if (!StringUtils.isEmpty(shopName) && shopName.toLowerCase().startsWith(partialArg)) {
+				String shopName = shopkeeper.getName();
+				if (StringUtils.isEmpty(shopName)) continue;
+				shopName = Utils.stripColor(shopName);
+				shopName = StringUtils.normalizeKeepCase(shopName);
+				String shopNameLower = shopName.toLowerCase(Locale.ROOT);
+				if (shopNameLower.startsWith(partialArg)) {
 					// TODO only add the part of the name past the matching parts as suggestion (in case of joined
 					// remaining args)
 					suggestions.add(shopName);

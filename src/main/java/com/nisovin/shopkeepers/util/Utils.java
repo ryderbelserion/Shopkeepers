@@ -12,6 +12,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -366,6 +367,9 @@ public final class Utils {
 		return playerName + (uniqueId == null ? "" : "(" + uniqueId.toString() + ")");
 	}
 
+	private static final char COLOR_CHAR_ALTERNATIVE = '&';
+	private static final Pattern STRIP_COLOR_ALTERNATIVE_PATTERN = Pattern.compile("(?i)" + String.valueOf(COLOR_CHAR_ALTERNATIVE) + "[0-9A-FK-OR]");
+
 	public static String translateColorCodesToAlternative(char altColorChar, String textToTranslate) {
 		char[] b = textToTranslate.toCharArray();
 		for (int i = 0; i < b.length - 1; i++) {
@@ -377,23 +381,30 @@ public final class Utils {
 		return new String(b);
 	}
 
+	public static String stripColor(String colored) {
+		if (colored == null) return null;
+		String uncolored = ChatColor.stripColor(colored);
+		uncolored = STRIP_COLOR_ALTERNATIVE_PATTERN.matcher(uncolored).replaceAll("");
+		return uncolored;
+	}
+
 	public static String decolorize(String colored) {
 		if (colored == null) return null;
-		return Utils.translateColorCodesToAlternative('&', colored);
+		return Utils.translateColorCodesToAlternative(COLOR_CHAR_ALTERNATIVE, colored);
 	}
 
 	public static List<String> decolorize(List<String> colored) {
 		if (colored == null) return null;
 		List<String> decolored = new ArrayList<>(colored.size());
 		for (String string : colored) {
-			decolored.add(Utils.translateColorCodesToAlternative('&', string));
+			decolored.add(Utils.translateColorCodesToAlternative(COLOR_CHAR_ALTERNATIVE, string));
 		}
 		return decolored;
 	}
 
 	public static String colorize(String message) {
 		if (message == null || message.isEmpty()) return message;
-		return ChatColor.translateAlternateColorCodes('&', message);
+		return ChatColor.translateAlternateColorCodes(COLOR_CHAR_ALTERNATIVE, message);
 	}
 
 	public static List<String> colorize(List<String> messages) {

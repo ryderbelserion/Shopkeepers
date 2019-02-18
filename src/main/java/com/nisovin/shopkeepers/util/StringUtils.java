@@ -13,15 +13,24 @@ public class StringUtils {
 	private StringUtils() {
 	}
 
-	private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s");
+	private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
 	public static boolean isEmpty(String string) {
 		return string == null || string.isEmpty();
 	}
 
+	public static String normalizeKeepCase(String identifier) {
+		if (identifier == null) return null;
+		identifier = identifier.trim();
+		identifier = identifier.replace('_', '-');
+		identifier = replaceWhitespace(identifier, "-");
+		return identifier;
+	}
+
 	public static String normalize(String identifier) {
 		if (identifier == null) return null;
-		return identifier.trim().replace('_', '-').replace(' ', '-').toLowerCase(Locale.ROOT);
+		identifier = normalizeKeepCase(identifier);
+		return identifier.toLowerCase(Locale.ROOT);
 	}
 
 	public static List<String> normalize(List<String> identifiers) {
@@ -62,9 +71,25 @@ public class StringUtils {
 	 * @return the source string itself if it is empty, otherwise the string without any whitespace characters
 	 */
 	public static String removeWhitespace(String source) {
+		return replaceWhitespace(source, "");
+	}
+
+	/**
+	 * Replaces all whitespace characters from the given string.
+	 * 
+	 * @param source
+	 *            the source string
+	 * @param replacement
+	 *            the replacement string
+	 * @return the source string itself if it is empty, otherwise the string with any whitespace characters replaced
+	 */
+	public static String replaceWhitespace(String source, String replacement) {
 		if (isEmpty(source)) {
 			return source;
 		}
-		return WHITESPACE_PATTERN.matcher(source).replaceAll("");
+		if (replacement == null) {
+			replacement = "";
+		}
+		return WHITESPACE_PATTERN.matcher(source).replaceAll(replacement);
 	}
 }
