@@ -209,10 +209,30 @@ public class Settings {
 	 */
 	public static String language = "en";
 
-	public static String msgCreationItemSelected = "&aLeft/Right-click to select the shop type.\n"
-			+ "&aSneak + left/right-click to select the object type.\n"
-			+ "&aRight-click a chest to select it.\n"
-			+ "&aThen right-click a block to place the shopkeeper.";
+	public static String msgShopTypeAdminRegular = "admin";
+	public static String msgShopTypeSelling = "selling";
+	public static String msgShopTypeBuying = "buying";
+	public static String msgShopTypeTrading = "trading";
+	public static String msgShopTypeBook = "book";
+
+	public static String msgShopTypeDescAdminRegular = "trades items with players";
+	public static String msgShopTypeDescSelling = "sells items to players";
+	public static String msgShopTypeDescBuying = "buys items from players";
+	public static String msgShopTypeDescTrading = "trades items with players";
+	public static String msgShopTypeDescBook = "sells books";
+
+	public static String msgShopObjectTypeLiving = "{type}";
+	public static String msgShopObjectTypeSign = "sign";
+	public static String msgShopObjectTypeNpc = "npc";
+
+	public static String msgSelectedShopType = "&aSelected shop type: &6{type} &7({description})";
+	public static String msgSelectedShopObjectType = "&aSelected object type: &6{type}";
+
+	public static String msgCreationItemSelected = "&aShop creation:\n"
+			+ "&e  Left/Right-click to select the shop type.\n"
+			+ "&e  Sneak + left/right-click to select the object type.\n"
+			+ "&e  Right-click a chest to select it.\n"
+			+ "&e  Then right-click a block to place the shopkeeper.";
 
 	public static String msgButtonName = "&aSet Shop Name";
 	public static List<String> msgButtonNameLore = Arrays.asList("Lets you rename", "your shopkeeper");
@@ -227,15 +247,6 @@ public class Settings {
 
 	public static String msgTradingTitlePrefix = "&2";
 	public static String msgTradingTitleDefault = "Shopkeeper";
-
-	public static String msgSelectedSellShop = "&aSelling shopkeeper selected (sells items to players).";
-	public static String msgSelectedBuyShop = "&aBuying shopkeeper selected (buys items from players).";
-	public static String msgSelectedTradeShop = "&aTrading shopkeeper selected (trade items with players).";
-	public static String msgSelectedBookShop = "&aBook shopkeeper selected (sells books).";
-
-	public static String msgSelectedLivingShop = "&aYou selected: &f{type}";
-	public static String msgSelectedSignShop = "&aYou selected: &fsign shop";
-	public static String msgSelectedCitizenShop = "&aYou selected: &fcitizen npc shop";
 
 	public static String msgSelectedChest = "&aChest selected! Right-click a block to place your shopkeeper.";
 	public static String msgMustSelectChest = "&7You must right-click a chest before placing your shopkeeper.";
@@ -255,20 +266,22 @@ public class Settings {
 	public static String msgNameHasNotChanged = "&aThe shop's name has not changed.";
 	public static String msgNameInvalid = "&aThat name is not valid!";
 
-	public static String msgShopTypeDisabled = "&7The shop type '{type}' is disabled.";
-	public static String msgShopObjectTypeDisabled = "&7The shop object type '{type}' is disabled.";
-	
+	public static String msgShopTypeDisabled = "&7The shop type '&6{type}&7' is disabled.";
+	public static String msgShopObjectTypeDisabled = "&7The shop object type '&6{type}&7' is disabled.";
+
 	public static String msgMustTargetShop = "&7You have to target a shopkeeper.";
+	public static String msgMustTargetAdminShop = "&7You have to target an admin shopkeeper.";
 	public static String msgMustTargetPlayerShop = "&7You have to target a player shopkeeper.";
 	public static String msgTargetEntityIsNoShop = "&7The targeted entity is no shopkeeper.";
+	public static String msgTargetShopIsNoAdminShop = "&7The targeted shopkeeper is no admin shopkeeper.";
 	public static String msgTargetShopIsNoPlayerShop = "&7The targeted shopkeeper is no player shopkeeper.";
 	public static String msgUnusedChest = "&7No shopkeeper is using this chest.";
 	public static String msgNotOwner = "&7You are not the owner of this shopkeeper.";
 	// placeholders: {owner} -> new owners name
 	public static String msgOwnerSet = "&aNew owner was set to &e{owner}";
 
-	public static String msgTradePermSet = "&aThe shop's trading permission has been set!";
-	public static String msgTradePermRemoved = "&aThe shop's trading permission has been removed!";
+	public static String msgTradePermSet = "&aThe shop's trading permission has been set to '&e{perm}&a'!";
+	public static String msgTradePermRemoved = "&aThe shop's trading permission '&e{perm}&a' has been removed!";
 	public static String msgTradePermView = "&aThe shop's current trading permission is '&e{perm}&a'.";
 
 	public static String msgMustHoldHireItem = "&7You have to hold the required hire item in your hand.";
@@ -282,22 +295,19 @@ public class Settings {
 
 	public static String msgMissingTradePerm = "&7You do not have the permission to trade with this shop.";
 	public static String msgMissingCustomTradePerm = "&7You do not have the permission to trade with this shop.";
-	public static String msgCantTradeWhileOwnerOnline = "&7You cannot trade while the owner of this shop ('{owner}') is online.";
+	public static String msgCantTradeWhileOwnerOnline = "&7You cannot trade while the owner of this shop ('&e{owner}&7') is online.";
 
-	public static String msgSellShopCreated = "&aShopkeeper created!\n"
-			+ "&aAdd items you want to sell to your chest, then\n"
-			+ "&aright-click the shop while sneaking to modify costs.";
-	public static String msgBuyShopCreated = "&aShopkeeper created!\n"
-			+ "&aAdd one of each item you want to buy to your chest, then\n"
-			+ "&aright-click the shop while sneaking to modify costs.";
-	public static String msgTradeShopCreated = "&aShopkeeper created!\n"
-			+ "&aAdd items you want to sell to your chest, then\n"
-			+ "&aright-click the shop while sneaking to modify costs.";
-	public static String msgBookShopCreated = "&aShopkeeper created!\n"
-			+ "&aAdd written books and blank books to your chest, then\n"
-			+ "&aright-click the shop while sneaking to modify costs.";
-	public static String msgAdminShopCreated = "&aShopkeeper created!\n"
-			+ "&aRight-click the shop while sneaking to modify trades.";
+	public static String msgShopkeeperCreated = "&aShopkeeper created: &6{type} &7({description})\n{setupDesc}";
+
+	public static String msgShopSetupDescSelling = "&e  Add items you want to sell to your chest, then\n"
+			+ "&e  right-click the shop while sneaking to modify costs.";
+	public static String msgShopSetupDescBuying = "&e  Add one of each item you want to buy to your chest, then\n"
+			+ "&e  right-click the shop while sneaking to modify costs.";
+	public static String msgShopSetupDescTrading = "&e  Add items you want to sell to your chest, then\n"
+			+ "&e  right-click the shop while sneaking to modify costs.";
+	public static String msgShopSetupDescBook = "&e  Add written books and blank books to your chest, then\n"
+			+ "&e  right-click the shop while sneaking to modify costs.";
+	public static String msgShopSetupDescAdminRegular = "&e  Right-click the shop while sneaking to modify trades.";
 
 	public static String msgListAdminShopsHeader = "&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})";
 	public static String msgListPlayerShopsHeader = "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})";
@@ -327,6 +337,8 @@ public class Settings {
 	public static String msgCommandShopTypeArgumentInvalid = "&cUnknown shop type '&e{argument}&c'.";
 	public static String msgCommandShopObjectTypeArgumentInvalid = "&cUnknown shop object type '&e{argument}&c'.";
 	public static String msgCommandShopkeeperArgumentInvalid = "&cNo shopkeeper found for '&e{argument}&c'.";
+	public static String msgCommandShopkeeperArgumentNoAdminShop = "&cShopkeeper '&e{argument}&c' is no admin shopkeeper.";
+	public static String msgCommandShopkeeperArgumentNoPlayerShop = "&cShopkeeper '&e{argument}&c' is no player shopkeeper.";
 
 	public static String msgCommandHelpTitle = "&9***** &8[&6Shopkeepers v{version}&8] &9*****";
 	public static String msgCommandHelpUsageFormat = "&e{usage}";

@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -10,7 +9,6 @@ import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObjectType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
 public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShopObject> implements SignShopObjectType<SKSignShopObject> {
 
@@ -19,6 +17,11 @@ public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShop
 	public SKSignShopObjectType(SignShops signShops) {
 		super("sign", "shopkeeper.sign");
 		this.signShops = signShops;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return Settings.msgShopObjectTypeSign;
 	}
 
 	@Override
@@ -36,11 +39,6 @@ public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShop
 		identifier = StringUtils.normalize(identifier);
 		if (super.matches(identifier)) return true;
 		return identifier.startsWith("sign");
-	}
-
-	@Override
-	protected void onSelect(Player player) {
-		Utils.sendMessage(player, Settings.msgSelectedSignShop);
 	}
 
 	@Override

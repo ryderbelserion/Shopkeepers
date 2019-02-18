@@ -40,6 +40,13 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject> exten
 	}
 
 	@Override
+	public String getDisplayName() {
+		// TODO translation support for the entity type name?
+		return Utils.replaceArgs(Settings.msgShopObjectTypeLiving,
+				"{type}", StringUtils.normalize(entityType.name()));
+	}
+
+	@Override
 	public abstract T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData);
 
 	@Override
@@ -55,12 +62,6 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject> exten
 			if (identifier.startsWith(alias)) return true;
 		}
 		return false;
-	}
-
-	@Override
-	protected void onSelect(Player player) {
-		// TODO translation support for the entity type name?
-		Utils.sendMessage(player, Settings.msgSelectedLivingShop, "{type}", StringUtils.normalize(entityType.name()));
 	}
 
 	@Override

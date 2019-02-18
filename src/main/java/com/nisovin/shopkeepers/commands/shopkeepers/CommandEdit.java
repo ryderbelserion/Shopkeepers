@@ -41,7 +41,7 @@ class CommandEdit extends PlayerCommand {
 		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
 		if (shopkeeper == null) {
 			// get shopkeeper via targeting:
-			List<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.getTargetedShopkeepers(player, false, true);
+			List<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.getTargetedShopkeepers(player, null, true);
 			if (shopkeepers.isEmpty()) return; // messages were already handled
 			shopkeeper = shopkeepers.get(0); // use the first returned shopkeeper
 		}

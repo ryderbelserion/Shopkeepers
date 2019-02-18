@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.bukkit.entity.Player;
 
@@ -8,6 +9,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
+import com.nisovin.shopkeepers.commands.arguments.AdminShopkeeperFilter;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
@@ -18,6 +20,8 @@ import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
+import com.nisovin.shopkeepers.shopkeeper.ShopTypeCategory;
+import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 class CommandSetTradePerm extends PlayerCommand {
@@ -37,7 +41,7 @@ class CommandSetTradePerm extends PlayerCommand {
 		this.setDescription(Settings.msgCommandDescriptionSettradeperm);
 
 		// arguments:
-		this.addArgument(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, (shopkeeper) -> shopkeeper instanceof AdminShopkeeper));
+		this.addArgument(new OptionalArgument(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, new AdminShopkeeperFilter())));
 		this.addArgument(new OptionalArgument(new FirstOfArgument("permArg", Arrays.asList(
 				new LiteralArgument(ARGUMENT_QUERY_PERMISSION),
 				new LiteralArgument(ARGUMENT_REMOVE_PERMISSION),
@@ -50,21 +54,28 @@ class CommandSetTradePerm extends PlayerCommand {
 		Player player = (Player) input.getSender();
 
 		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		assert shopkeeper != null && shopkeeper instanceof AdminShopkeeper;
+		assert shopkeeper == null || (shopkeeper instanceof AdminShopkeeper);
+		if (shopkeeper == null) {
+			// get shopkeeper via targeting:
+			List<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.getTargetedShopkeepers(player, ShopTypeCategory.ADMIN, true);
+			if (shopkeepers.isEmpty()) return; // messages were already handled
+			shopkeeper = shopkeepers.get(0);
+		}
+
 		String newTradePerm = context.get(ARGUMENT_NEW_PERMISSION);
 		boolean removePerm = context.has(ARGUMENT_REMOVE_PERMISSION);
+		String currentTradePerm = ((AdminShopkeeper) shopkeeper).getTradePremission();
+		if (currentTradePerm == null) currentTradePerm = "-";
 
 		if (removePerm) {
 			// remove trade permission:
 			assert newTradePerm == null;
-			Utils.sendMessage(player, Settings.msgTradePermRemoved);
+			Utils.sendMessage(player, Settings.msgTradePermRemoved, "{perm}", currentTradePerm);
 		} else if (newTradePerm != null) {
 			// set trade permission:
-			Utils.sendMessage(player, Settings.msgTradePermSet);
+			Utils.sendMessage(player, Settings.msgTradePermSet, "{perm}", newTradePerm);
 		} else {
 			// display current trade permission:
-			String currentTradePerm = ((AdminShopkeeper) shopkeeper).getTradePremission();
-			if (currentTradePerm == null) currentTradePerm = "-";
 			Utils.sendMessage(player, Settings.msgTradePermView, "{perm}", currentTradePerm);
 			return;
 		}

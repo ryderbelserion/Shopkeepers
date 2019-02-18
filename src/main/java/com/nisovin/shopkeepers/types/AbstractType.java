@@ -50,8 +50,11 @@ public abstract class AbstractType implements Type {
 	// TODO remove this and instead add aliases?
 	@Override
 	public boolean matches(String identifier) {
+		if (StringUtils.isEmpty(identifier)) return false;
 		identifier = StringUtils.normalize(identifier);
-		return this.identifier.equals(identifier);
+		if (identifier.equals(this.identifier)) return true;
+		String displayName = StringUtils.normalize(this.getDisplayName());
+		return identifier.equals(displayName);
 	}
 
 	// not overriding equals and hashCode: only the exact same type instance is considered equal

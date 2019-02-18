@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopobjects.citizens;
 import java.util.UUID;
 
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -11,7 +10,6 @@ import com.nisovin.shopkeepers.api.shopobjects.citizens.CitizensShopObjectType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
 public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCitizensShopObject> implements CitizensShopObjectType<SKCitizensShopObject> {
 
@@ -20,6 +18,11 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 	public SKCitizensShopObjectType(CitizensShops citizensShops) {
 		super("citizen", "shopkeeper.citizen");
 		this.citizensShops = citizensShops;
+	}
+
+	@Override
+	public String getDisplayName() {
+		return Settings.msgShopObjectTypeNpc;
 	}
 
 	@Override
@@ -54,11 +57,6 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 		identifier = StringUtils.normalize(identifier);
 		if (super.matches(identifier)) return true;
 		return identifier.startsWith("citizen") || identifier.startsWith("npc");
-	}
-
-	@Override
-	protected void onSelect(Player player) {
-		Utils.sendMessage(player, Settings.msgSelectedCitizenShop);
 	}
 
 	@Override

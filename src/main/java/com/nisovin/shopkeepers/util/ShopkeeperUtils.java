@@ -21,7 +21,9 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.ShopTypeCategory;
 
 /**
  * Utility functions related to shopkeepers and trading.
@@ -53,7 +55,8 @@ public class ShopkeeperUtils {
 		return ShopkeepersAPI.createTradingRecipe(resultItem, item1, item2);
 	}
 
-	public static List<? extends Shopkeeper> getTargetedShopkeepers(Player player, boolean playerShop, boolean message) {
+	// type is null to allow any shopkeeper type to be returned
+	public static List<? extends Shopkeeper> getTargetedShopkeepers(Player player, ShopTypeCategory type, boolean message) {
 		Location playerLoc = player.getEyeLocation();
 		World world = playerLoc.getWorld();
 		Vector viewDirection = playerLoc.getDirection();
@@ -80,6 +83,11 @@ public class ShopkeeperUtils {
 								Utils.sendMessage(player, Settings.msgUnusedChest);
 							}
 							return Collections.emptyList();
+						} else if (type == ShopTypeCategory.ADMIN) {
+							if (message) {
+								Utils.sendMessage(player, Settings.msgTargetShopIsNoAdminShop);
+							}
+							return Collections.emptyList();
 						}
 						return shopkeepers;
 					}
@@ -98,9 +106,14 @@ public class ShopkeeperUtils {
 
 			// check if found shopkeeper is a player shopkeeper:
 			if (shopkeeper != null) {
-				if (playerShop && !(shopkeeper instanceof PlayerShopkeeper)) {
+				if (type == ShopTypeCategory.PLAYER && !(shopkeeper instanceof PlayerShopkeeper)) {
 					if (message) {
 						Utils.sendMessage(player, Settings.msgTargetShopIsNoPlayerShop);
+					}
+					return Collections.emptyList();
+				} else if (type == ShopTypeCategory.ADMIN && !(shopkeeper instanceof AdminShopkeeper)) {
+					if (message) {
+						Utils.sendMessage(player, Settings.msgTargetShopIsNoAdminShop);
 					}
 					return Collections.emptyList();
 				}
@@ -108,10 +121,12 @@ public class ShopkeeperUtils {
 			}
 		}
 
-		// no ray trace result, or the targeted block is no shopkeeper:
+		// no targeted shopkeeper found:
 		if (message) {
-			if (playerShop) {
+			if (type == ShopTypeCategory.PLAYER) {
 				Utils.sendMessage(player, Settings.msgMustTargetPlayerShop);
+			} else if (type == ShopTypeCategory.ADMIN) {
+				Utils.sendMessage(player, Settings.msgMustTargetAdminShop);
 			} else {
 				Utils.sendMessage(player, Settings.msgMustTargetShop);
 			}

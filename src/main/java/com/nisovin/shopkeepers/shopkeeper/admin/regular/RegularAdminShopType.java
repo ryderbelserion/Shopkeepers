@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shopkeeper.admin.regular;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -16,6 +15,21 @@ public class RegularAdminShopType extends AbstractAdminShopType<RegularAdminShop
 	}
 
 	@Override
+	public String getDisplayName() {
+		return Settings.msgShopTypeAdminRegular;
+	}
+
+	@Override
+	public String getDescription() {
+		return Settings.msgShopTypeDescAdminRegular;
+	}
+
+	@Override
+	public String getSetupDescription() {
+		return Settings.msgShopSetupDescAdminRegular;
+	}
+
+	@Override
 	public RegularAdminShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		this.validateCreationData(shopCreationData);
 		RegularAdminShopkeeper shopkeeper = new RegularAdminShopkeeper(id, shopCreationData);
@@ -27,15 +41,5 @@ public class RegularAdminShopType extends AbstractAdminShopType<RegularAdminShop
 		this.validateConfigSection(configSection);
 		RegularAdminShopkeeper shopkeeper = new RegularAdminShopkeeper(id, configSection);
 		return shopkeeper;
-	}
-
-	@Override
-	protected String getCreatedMessage() {
-		return Settings.msgAdminShopCreated;
-	}
-
-	@Override
-	protected void onSelect(Player player) {
-		// currently can't be 'selected'
 	}
 }

@@ -25,6 +25,20 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		super(identifier, permission);
 	}
 
+	@Override
+	protected void onSelect(Player player) {
+		Utils.sendMessage(player, Settings.msgSelectedShopType,
+				"{type}", this.getDisplayName(),
+				"{description}", this.getDescription());
+	}
+
+	protected String getCreatedMessage() {
+		return Utils.replaceArgs(Settings.msgShopkeeperCreated,
+				"{type}", this.getDisplayName(),
+				"{description}", this.getDescription(),
+				"{setupDesc}", this.getSetupDescription());
+	}
+
 	/**
 	 * Recreates a shopkeeper of this type by loading its previously saved data from the given config section.
 	 * 
@@ -138,8 +152,6 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		}
 		return true;
 	}
-
-	protected abstract String getCreatedMessage();
 
 	// common functions that might be useful for sub-classes:
 

@@ -12,6 +12,15 @@ public interface Type {
 	public String getIdentifier();
 
 	/**
+	 * Gets the display name of this type.
+	 * 
+	 * @return the display name
+	 */
+	public default String getDisplayName() {
+		return this.getIdentifier();
+	}
+
+	/**
 	 * Gets the permission that is required for players to access or use this type in some way.
 	 * 
 	 * @return the permission, or <code>null</code> to indicate that no permission is required

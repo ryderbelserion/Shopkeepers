@@ -14,6 +14,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
+import com.nisovin.shopkeepers.shopkeeper.ShopTypeCategory;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -42,7 +43,7 @@ class CommandTransfer extends PlayerCommand {
 		Player newOwner = context.get(ARGUMENT_NEW_OWNER);
 		assert newOwner != null;
 
-		List<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.getTargetedShopkeepers(player, true, true);
+		List<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.getTargetedShopkeepers(player, ShopTypeCategory.PLAYER, true);
 		if (shopkeepers.isEmpty()) return; // messages were already handled
 
 		// set new owner:

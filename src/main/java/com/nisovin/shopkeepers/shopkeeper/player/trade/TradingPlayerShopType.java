@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shopkeeper.player.trade;
 
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -10,12 +9,26 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
 public class TradingPlayerShopType extends AbstractPlayerShopType<TradingPlayerShopkeeper> {
 
 	public TradingPlayerShopType() {
 		super("trade", ShopkeepersPlugin.PLAYER_TRADE_PERMISSION);
+	}
+
+	@Override
+	public String getDisplayName() {
+		return Settings.msgShopTypeTrading;
+	}
+
+	@Override
+	public String getDescription() {
+		return Settings.msgShopTypeDescTrading;
+	}
+
+	@Override
+	public String getSetupDescription() {
+		return Settings.msgShopSetupDescTrading;
 	}
 
 	@Override
@@ -33,19 +46,9 @@ public class TradingPlayerShopType extends AbstractPlayerShopType<TradingPlayerS
 	}
 
 	@Override
-	protected String getCreatedMessage() {
-		return Settings.msgTradeShopCreated;
-	}
-
-	@Override
 	public boolean matches(String identifier) {
 		identifier = StringUtils.normalize(identifier);
 		if (super.matches(identifier)) return true;
 		return identifier.startsWith("trad");
-	}
-
-	@Override
-	protected void onSelect(Player player) {
-		Utils.sendMessage(player, Settings.msgSelectedTradeShop);
 	}
 }
