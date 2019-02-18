@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.commands.arguments;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -49,9 +50,16 @@ public class ShopTypeArgument extends CommandArgument {
 			List<String> suggestions = new ArrayList<>();
 			String partialArg = StringUtils.normalize(args.next());
 			for (ShopType<?> shopType : ShopkeepersPlugin.getInstance().getShopTypeRegistry().getRegisteredTypes()) {
-				String identifier = shopType.getIdentifier();
-				if (identifier.startsWith(partialArg)) {
-					suggestions.add(identifier);
+				String displayName = shopType.getDisplayName();
+				displayName = StringUtils.normalizeKeepCase(displayName);
+				String displayNameNorm = displayName.toLowerCase(Locale.ROOT);
+				if (displayNameNorm.startsWith(partialArg)) {
+					suggestions.add(displayName);
+				} else {
+					String identifier = shopType.getIdentifier();
+					if (identifier.startsWith(partialArg)) {
+						suggestions.add(identifier);
+					}
 				}
 			}
 			return Collections.unmodifiableList(suggestions);
