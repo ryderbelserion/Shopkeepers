@@ -46,6 +46,9 @@ permissions:
     shopkeeper.remove.admin:
         description: Remove all admin shops via command
         default: op
+    shopkeeper.give:
+        description: Give shop creation items per command
+        default: op
     shopkeeper.remote:
         description: Remotely open admin shops via command
         default: op
@@ -157,7 +160,9 @@ permissions:
             shopkeeper.remove.others: true
             shopkeeper.remove.all: true
             shopkeeper.remove.admin: true
+            shopkeeper.give: true
             shopkeeper.remote: true
+            shopkeeper.remoteedit: true
             shopkeeper.transfer: true
             shopkeeper.settradeperm: true
             shopkeeper.setforhire: true

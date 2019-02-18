@@ -279,6 +279,7 @@ public class Settings {
 	public static String msgNotOwner = "&7You are not the owner of this shopkeeper.";
 	// placeholders: {owner} -> new owners name
 	public static String msgOwnerSet = "&aNew owner was set to &e{owner}";
+	public static String msgShopCreationItemsGiven = "&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!";
 
 	public static String msgTradePermSet = "&aThe shop's trading permission has been set to '&e{perm}&a'!";
 	public static String msgTradePermRemoved = "&aThe shop's trading permission '&e{perm}&a' has been removed!";
@@ -350,6 +351,7 @@ public class Settings {
 	public static String msgCommandDescriptionDebug = "Toggles debug mode on and off.";
 	public static String msgCommandDescriptionList = "Lists all shops for the specified player, or all admin shops.";
 	public static String msgCommandDescriptionRemove = "Removes all shops for the specified player, all players, or all admin shops.";
+	public static String msgCommandDescriptionGive = "Gives shop creation item(s) to the specified player.";
 	public static String msgCommandDescriptionRemote = "Remotely opens a shop.";
 	public static String msgCommandDescriptionRemoteEdit = "Remotely edits a shop.";
 	public static String msgCommandDescriptionTransfer = "Transfers the ownership of a shop.";

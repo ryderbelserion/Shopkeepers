@@ -51,6 +51,49 @@ public class CommandArgs {
 	}
 
 	/**
+	 * Checks whether there is a current argument.
+	 * 
+	 * @return <code>true</code> if there is a current argument
+	 */
+	public boolean hasCurrent() {
+		return (curIndex >= 0);
+	}
+
+	private void checkHasCurrent() throws NoSuchElementException {
+		if (!hasCurrent()) {
+			throw new NoSuchElementException("No current argument available!");
+		}
+	}
+
+	/**
+	 * Gets the current argument.
+	 * <p>
+	 * This keeps the cursor at its current position.
+	 * 
+	 * @return the current argument
+	 * @throws NoSuchElementException
+	 *             if there is no current argument
+	 */
+	public String current() throws NoSuchElementException {
+		this.checkHasCurrent();
+		return args.get(curIndex);
+	}
+
+	/**
+	 * Gets the current argument, if there is one.
+	 * <p>
+	 * This keeps the cursor at its current position.
+	 * 
+	 * @return the current argument, <code>null</code> if none is available
+	 */
+	public String currentIfPresent() {
+		if (!this.hasCurrent()) {
+			return null;
+		}
+		return args.get(curIndex);
+	}
+
+	/**
 	 * Checks whether there are more arguments remaining to be read.
 	 * 
 	 * @return <code>true</code> if there are more arguments

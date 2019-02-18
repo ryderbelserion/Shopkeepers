@@ -59,6 +59,7 @@ public class PlayerArgument extends CommandArgument {
 	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		Player player = null;
 		String playerArg = null;
+		Object argsState = args.getState();
 		if (args.hasNext()) {
 			playerArg = args.next();
 			// check if the argument matches a player name:
@@ -77,6 +78,8 @@ public class PlayerArgument extends CommandArgument {
 			CommandSender sender = input.getSender();
 			if (sender instanceof Player) {
 				player = (Player) sender;
+				// reset arguments:
+				args.setState(argsState);
 			}
 		}
 
