@@ -28,9 +28,9 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class SellingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
-	protected static class NormalPlayerShopEditorHandler extends PlayerShopEditorHandler {
+	protected static class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-		protected NormalPlayerShopEditorHandler(SellingPlayerShopkeeper shopkeeper) {
+		protected SellingPlayerShopEditorHandler(SellingPlayerShopkeeper shopkeeper) {
 			super(shopkeeper);
 		}
 
@@ -97,9 +97,9 @@ public class SellingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		}
 	}
 
-	protected static class NormalPlayerShopTradingHandler extends PlayerShopTradingHandler {
+	protected static class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
-		protected NormalPlayerShopTradingHandler(SellingPlayerShopkeeper shopkeeper) {
+		protected SellingPlayerShopTradingHandler(SellingPlayerShopkeeper shopkeeper) {
 			super(shopkeeper);
 		}
 
@@ -203,10 +203,10 @@ public class SellingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	@Override
 	protected void setup() {
 		if (this.getUIHandler(DefaultUITypes.EDITOR()) == null) {
-			this.registerUIHandler(new NormalPlayerShopEditorHandler(this));
+			this.registerUIHandler(new SellingPlayerShopEditorHandler(this));
 		}
 		if (this.getUIHandler(DefaultUITypes.TRADING()) == null) {
-			this.registerUIHandler(new NormalPlayerShopTradingHandler(this));
+			this.registerUIHandler(new SellingPlayerShopTradingHandler(this));
 		}
 		super.setup();
 	}
