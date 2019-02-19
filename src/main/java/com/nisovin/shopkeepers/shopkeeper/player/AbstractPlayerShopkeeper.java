@@ -9,6 +9,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -61,6 +62,13 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		@Override
 		protected boolean canOpen(Player player) {
 			return super.canOpen(player) && (this.getShopkeeper().isOwner(player) || Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION));
+		}
+
+		@Override
+		protected void onInventoryDrag(InventoryDragEvent event, Player player) {
+			// cancel all inventory clicks and handle everything on our own:
+			// TODO maybe allow certain inventory actions which only affect the player's inventory?
+			event.setCancelled(true);
 		}
 
 		@Override

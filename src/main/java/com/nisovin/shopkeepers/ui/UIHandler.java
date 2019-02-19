@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -129,4 +130,15 @@ public abstract class UIHandler {
 	 *            the clicking player
 	 */
 	protected abstract void onInventoryClick(InventoryClickEvent event, Player player);
+
+	/**
+	 * Called when a player triggers an InventoryDragEvent for an inventory for which {@link #isWindow(Inventory)}
+	 * returned true.
+	 * 
+	 * @param event
+	 *            the event which triggered this method call
+	 * @param player
+	 *            the dragging player
+	 */
+	protected abstract void onInventoryDrag(InventoryDragEvent event, Player player);
 }

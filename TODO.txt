@@ -28,6 +28,8 @@ Low priority:
 * Rename ShopkeeperRegistry and ShopkeeperStorage to ShopkeepersRegistry and ShopkeepersStorage?
   * Another major api break though.. maybe do this with the next larger API changes. Or not at all.
 
+* Display trades that are out of stock, but disable trading by setting their max uses to 0
+
 Ideas:
 * Per-Trade/Shopkeeper settings, maybe via written books:<br>
   -> by adding another row to the shopkeeper-editor inventory window each trade option and shopkeeper could have a slot for a written-book<br>

@@ -3,14 +3,16 @@ package com.nisovin.shopkeepers.shopkeeper.player.trade;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
@@ -45,27 +47,12 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
 			// add the shopkeeper's offers:
-			List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
-			for (int column = 0; column < chestItems.size() && column < TRADE_COLUMNS; column++) {
-				ItemCount itemCount = chestItems.get(column);
-				ItemStack tradedItem = itemCount.getItem(); // this item is already a copy with amount 1
-				TradingOffer offer = shopkeeper.getOffer(tradedItem);
-				if (offer != null) {
-					// adjust traded item amount:
-					tradedItem.setAmount(offer.getResultItem().getAmount());
-
-					// fill in costs:
-					ItemStack item1 = offer.getItem1();
-					assert !ItemUtils.isEmpty(item1);
-					inventory.setItem(column + 9, item1);
-
-					ItemStack item2 = offer.getItem2();
-					if (!ItemUtils.isEmpty(item2)) {
-						inventory.setItem(column + 18, item2);
-					}
-				}
-				// fill in traded item:
-				inventory.setItem(column, tradedItem);
+			List<TradingOffer> offers = shopkeeper.getOffers();
+			for (int column = 0; column < offers.size() && column < TRADE_COLUMNS; column++) {
+				TradingOffer offer = offers.get(column);
+				inventory.setItem(column, offer.getResultItem());
+				inventory.setItem(column + 9, offer.getItem1());
+				inventory.setItem(column + 18, offer.getItem2()); // can be null
 			}
 
 			// add the special buttons:
@@ -77,37 +64,40 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 		@Override
 		protected void onInventoryClick(InventoryClickEvent event, Player player) {
-			TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			event.setCancelled(true);
 			int slot = event.getRawSlot();
-			if (slot >= 0 && slot < TRADE_COLUMNS) {
-				// handle changing sell stack size:
-				this.handleUpdateItemAmountOnClick(event, 1);
-			} else if ((slot >= 9 && slot <= 16) || (slot >= 18 && slot <= 25)) {
-				if (shopkeeper.clickedItem != null) {
-					// placing item:
+			boolean topRow = (slot >= 0 && slot < TRADE_COLUMNS);
+			if (topRow || (slot >= 9 && slot <= 16) || (slot >= 18 && slot <= 25)) {
+				ItemStack cursor = event.getCursor();
+				if (!ItemUtils.isEmpty(cursor)) {
+					// place item from cursor:
 					Inventory inventory = event.getInventory();
+					ItemStack cursorClone = cursor.clone();
+					cursorClone.setAmount(1);
 					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-						inventory.setItem(slot, shopkeeper.clickedItem);
-						shopkeeper.clickedItem = null;
+						inventory.setItem(slot, cursorClone);
 					});
 				} else {
 					// changing stack size of clicked item:
-					this.handleUpdateItemAmountOnClick(event, 0);
+					this.handleUpdateItemAmountOnClick(event, topRow ? 1 : 0);
 				}
 			} else if (slot >= 27) {
 				// clicking in player inventory:
-				if (event.isShiftClick() || !event.isLeftClick()) {
+				if (event.isShiftClick()) {
 					return;
 				}
 				ItemStack cursor = event.getCursor();
-				if (!ItemUtils.isEmpty(cursor)) {
-					return;
-				}
 				ItemStack current = event.getCurrentItem();
-				if (!ItemUtils.isEmpty(current)) {
-					shopkeeper.clickedItem = current.clone();
-					shopkeeper.clickedItem.setAmount(1);
+				if (!ItemUtils.isEmpty(cursor)) {
+					if (ItemUtils.isEmpty(current)) {
+						// place item from cursor:
+						event.setCurrentItem(cursor);
+						event.setCursor(null);
+					}
+				} else if (!ItemUtils.isEmpty(current)) {
+					// pick up item to cursor:
+					event.setCurrentItem(null);
+					event.setCursor(current);
 				}
 			} else {
 				super.onInventoryClick(event, player);
@@ -115,8 +105,45 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		}
 
 		@Override
+		protected void onInventoryDrag(InventoryDragEvent event, Player player) {
+			event.setCancelled(true);
+			ItemStack cursor = event.getOldCursor();
+			// assert: cursor item is already a clone
+			if (ItemUtils.isEmpty(cursor)) return;
+
+			Set<Integer> slots = event.getRawSlots();
+			if (slots.size() != 1) return;
+
+			int slot = slots.iterator().next();
+			if ((slot >= 0 && slot < TRADE_COLUMNS) || (slot >= 9 && slot <= 16) || (slot >= 18 && slot <= 25)) {
+				// place item from cursor:
+				Inventory inventory = event.getInventory();
+				cursor.setAmount(1);
+				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+					inventory.setItem(slot, cursor);
+				});
+			} else if (slot >= 27) {
+				// clicking in player inventory:
+				InventoryView view = event.getView();
+				// the cancelled drag event resets the cursor afterwards, so we need this delay:
+				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+					// freshly get and check cursor to make sure that players don't abuse this delay:
+					ItemStack cursorCurrent = view.getCursor();
+					if (ItemUtils.isEmpty(cursorCurrent)) return;
+					ItemStack current = view.getItem(slot);
+					if (ItemUtils.isEmpty(current)) {
+						// place item from cursor:
+						view.setItem(slot, cursorCurrent);
+						view.setCursor(null);
+					}
+				});
+			}
+		}
+
+		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
 			TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			shopkeeper.clearOffers();
 			for (int column = 0; column < TRADE_COLUMNS; column++) {
 				ItemStack resultItem = inventory.getItem(column);
 				if (ItemUtils.isEmpty(resultItem)) continue; // not valid recipe column
@@ -130,14 +157,11 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 					cost2 = null;
 				}
 
-				// add or remove offer:
+				// add offer:
 				if (cost1 != null) {
 					shopkeeper.addOffer(resultItem, cost1, cost2);
-				} else {
-					shopkeeper.removeOffer(resultItem);
 				}
 			}
-			shopkeeper.clickedItem = null;
 		}
 	}
 
@@ -196,13 +220,8 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		}
 	}
 
-	// contains only one offer for a specific type of item:
 	private final List<TradingOffer> offers = new ArrayList<>();
 	private final List<TradingOffer> offersView = Collections.unmodifiableList(offers);
-
-	// TODO conflicts if multiple players are editing at the same time
-	// TODO maybe enforce only one editor at the same time? (currently shop owner and admins can edit at the same time)
-	private ItemStack clickedItem;
 
 	/**
 	 * Creates a not yet initialized {@link TradingPlayerShopkeeper} (for use in sub-classes).
@@ -285,20 +304,11 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		return offersView;
 	}
 
-	public TradingOffer getOffer(ItemStack tradedItem) {
-		for (TradingOffer offer : this.getOffers()) {
-			if (ItemUtils.isSimilar(offer.getResultItem(), tradedItem)) {
-				return offer;
-			}
-		}
-		return null;
-	}
-
 	public TradingOffer addOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		// create offer (also handles validation):
 		TradingOffer newOffer = new TradingOffer(resultItem, item1, item2);
 
-		// add new offer (replacing any previous offer for the same item):
+		// add new offer:
 		this._addOffer(newOffer);
 		this.markDirty();
 		return newOffer;
@@ -306,8 +316,6 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	private void _addOffer(TradingOffer offer) {
 		assert offer != null;
-		// remove previous offer for the same item:
-		this.removeOffer(offer.getResultItem());
 		offers.add(offer);
 	}
 
@@ -315,7 +323,7 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		assert offers != null;
 		for (TradingOffer offer : offers) {
 			if (offer == null) continue; // skip invalid entries
-			// add new offer (replacing any previous offer for the same item):
+			// add new offer:
 			this._addOffer(offer);
 		}
 	}
@@ -327,16 +335,5 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	public void clearOffers() {
 		this._clearOffers();
 		this.markDirty();
-	}
-
-	public void removeOffer(ItemStack tradedItem) {
-		Iterator<TradingOffer> iterator = offers.iterator();
-		while (iterator.hasNext()) {
-			if (ItemUtils.isSimilar(iterator.next().getResultItem(), tradedItem)) {
-				iterator.remove();
-				this.markDirty();
-				break;
-			}
-		}
 	}
 }

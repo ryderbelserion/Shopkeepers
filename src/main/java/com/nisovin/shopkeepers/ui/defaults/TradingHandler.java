@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
@@ -186,6 +187,11 @@ public class TradingHandler extends UIHandler {
 	@Override
 	protected void onInventoryClose(InventoryCloseEvent event, Player player) {
 		// nothing to do by default
+	}
+
+	@Override
+	protected void onInventoryDrag(InventoryDragEvent event, Player player) {
+		// allowed by default
 	}
 
 	// TRADE PROCESSING
