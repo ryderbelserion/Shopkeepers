@@ -48,12 +48,32 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
 			// add the shopkeeper's offers:
+			int column = 0;
 			List<TradingOffer> offers = shopkeeper.getOffers();
-			for (int column = 0; column < offers.size() && column < TRADE_COLUMNS; column++) {
+			for (; column < offers.size() && column < TRADE_COLUMNS; column++) {
 				TradingOffer offer = offers.get(column);
 				inventory.setItem(column, offer.getResultItem());
 				inventory.setItem(column + 9, offer.getItem1());
 				inventory.setItem(column + 18, offer.getItem2()); // can be null
+			}
+
+			if (column < TRADE_COLUMNS) {
+				// add empty offers for items from the chest:
+				List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
+				int chestItemIndex = 0;
+				for (; chestItemIndex < chestItems.size() && column < TRADE_COLUMNS; column++, chestItemIndex++) {
+					ItemCount itemCount = chestItems.get(chestItemIndex);
+					ItemStack tradedItem = itemCount.getItem(); // this item is already a copy with amount 1
+
+					TradingOffer offer = shopkeeper.getOffer(tradedItem);
+					if (offer != null) {
+						column--;
+						continue; // already added
+					}
+
+					// add offer to inventory:
+					inventory.setItem(column, tradedItem);
+				}
 			}
 
 			// add the special buttons:
@@ -348,6 +368,16 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	public void clearOffers() {
 		this._clearOffers();
 		this.markDirty();
+	}
+
+	// note: there might be multiple trades involving this item
+	public TradingOffer getOffer(ItemStack tradedItem) {
+		for (TradingOffer offer : this.getOffers()) {
+			if (ItemUtils.isSimilar(offer.getResultItem(), tradedItem)) {
+				return offer;
+			}
+		}
+		return null;
 	}
 
 	public TradingOffer getOffer(TradingRecipe tradingRecipe) {
