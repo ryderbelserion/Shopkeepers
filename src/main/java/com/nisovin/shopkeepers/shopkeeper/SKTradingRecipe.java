@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopkeeper;
 import org.apache.commons.lang.Validate;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.base.Objects;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
@@ -68,5 +69,14 @@ public class SKTradingRecipe implements TradingRecipe {
 	@Override
 	public final boolean isOutOfStock() {
 		return outOfStock;
+	}
+
+	public boolean areItemsEqual(TradingRecipe otherRecipe) {
+		if (!(otherRecipe instanceof SKTradingRecipe)) return false; // also checks for null
+		SKTradingRecipe otherSKRecipe = (SKTradingRecipe) otherRecipe;
+		if (!resultItem.equals(otherSKRecipe.resultItem)) return false;
+		if (!item1.equals(otherSKRecipe.item1)) return false;
+		if (!Objects.equal(item2, otherSKRecipe.item2)) return false;
+		return true;
 	}
 }

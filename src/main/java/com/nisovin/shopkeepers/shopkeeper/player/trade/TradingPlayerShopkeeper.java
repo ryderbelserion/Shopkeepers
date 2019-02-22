@@ -180,8 +180,17 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		@Override
 		protected boolean prepareTrade(TradeData tradeData) {
 			if (!super.prepareTrade(tradeData)) return false;
+			TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Player tradingPlayer = tradeData.tradingPlayer;
 			TradingRecipe tradingRecipe = tradeData.tradingRecipe;
+
+			// find offer:
+			TradingOffer offer = shopkeeper.getOffer(tradingRecipe);
+			if (offer == null) {
+				// this should not happen.. because the recipes were created based on the shopkeeper's offers
+				this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
+				return false;
+			}
 
 			assert chestInventory != null & newChestContents != null;
 
@@ -339,5 +348,14 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	public void clearOffers() {
 		this._clearOffers();
 		this.markDirty();
+	}
+
+	public TradingOffer getOffer(TradingRecipe tradingRecipe) {
+		for (TradingOffer offer : this.getOffers()) {
+			if (offer.areItemsEqual(tradingRecipe)) {
+				return offer;
+			}
+		}
+		return null;
 	}
 }
