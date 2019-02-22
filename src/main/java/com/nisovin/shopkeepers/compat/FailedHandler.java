@@ -9,7 +9,9 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Merchant;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -147,5 +149,9 @@ public final class FailedHandler implements NMSCallProvider {
 			// behavior!
 			return provided.isSimilar(required);
 		}
+	}
+
+	@Override
+	public void updateTrades(Player player, Merchant merchant) {
 	}
 }

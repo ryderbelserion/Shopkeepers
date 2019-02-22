@@ -15,7 +15,6 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperOpenUIEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
-import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.types.AbstractTypeRegistry;
@@ -84,13 +83,22 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 			return false;
 		}
 
+		// opening a window should automatically trigger a close of the previous window
+		// however, we do this manually here just in case, because we cannot be sure what the UI handler is actually
+		// doing inside openWindow
+		// closing previous window:
+		if (oldSession != null) {
+			Log.debug("Closing previous UI '" + uiIdentifier + "' for player '" + playerName + "'.");
+			player.closeInventory(); // this will call a PlayerCloseInventoryEvent
+		}
+
 		Log.debug("Opening UI '" + uiIdentifier + "' ...");
 		boolean isOpen = uiHandler.openWindow(player);
 		if (isOpen) {
-			Log.debug("UI '" + uiIdentifier + "' opened.");
-			// old window already should automatically have been closed by the new window.. no need currently, to do
-			// that here
-			playerSessions.put(player.getUniqueId(), new SKUISession(shopkeeper, uiHandler));
+			assert playerSessions.get(player.getUniqueId()) == null;
+			SKUISession session = new SKUISession(shopkeeper, uiHandler, player);
+			playerSessions.put(player.getUniqueId(), session);
+			this.onSessionStart(session);
 			return true;
 		} else {
 			Log.debug("UI '" + uiIdentifier + "' NOT opened!");
@@ -113,7 +121,20 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	@Override
 	public void onInventoryClose(Player player) {
 		if (player == null) return;
-		playerSessions.remove(player.getUniqueId());
+		SKUISession session = playerSessions.remove(player.getUniqueId());
+		if (session != null) {
+			this.onSessionEnd(session);
+		}
+	}
+
+	private void onSessionStart(SKUISession session) {
+		Log.debug("UI '" + session.getUIType().getIdentifier() + "' session started for player '" + session.getPlayer().getName() + "'.");
+		session.getUIHandler().onSessionStart(session.getPlayer()); // inform UI handler
+	}
+
+	private void onSessionEnd(SKUISession session) {
+		Log.debug("UI '" + session.getUIType().getIdentifier() + "' session ended for player '" + session.getPlayer().getName() + "'.");
+		session.getUIHandler().onSessionEnd(session.getPlayer()); // inform UI handler
 	}
 
 	@Override
@@ -123,13 +144,12 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		Iterator<Entry<UUID, SKUISession>> iterator = playerSessions.entrySet().iterator();
 		while (iterator.hasNext()) {
 			Entry<UUID, SKUISession> entry = iterator.next();
-			UISession session = entry.getValue();
+			SKUISession session = entry.getValue();
 			if (session.getShopkeeper().equals(shopkeeper)) {
 				iterator.remove();
-				Player player = Bukkit.getPlayer(entry.getKey());
-				if (player != null) {
-					player.closeInventory();
-				}
+				this.onSessionEnd(session);
+				Player player = session.getPlayer();
+				player.closeInventory();
 			}
 		}
 	}
@@ -153,14 +173,14 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 
 	@Override
 	public void closeAll() {
-		Iterator<UUID> iterator = playerSessions.keySet().iterator();
+		Iterator<Entry<UUID, SKUISession>> iterator = playerSessions.entrySet().iterator();
 		while (iterator.hasNext()) {
-			UUID playerId = iterator.next();
+			Entry<UUID, SKUISession> entry = iterator.next();
+			SKUISession session = entry.getValue();
 			iterator.remove();
-			Player player = Bukkit.getPlayer(playerId);
-			if (player != null) {
-				player.closeInventory();
-			}
+			this.onSessionEnd(session);
+			Player player = session.getPlayer();
+			player.closeInventory();
 		}
 		playerSessions.clear(); // just in case
 	}

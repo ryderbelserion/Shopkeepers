@@ -44,21 +44,37 @@ public class SellingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 			SellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
-			// add offers:
-			List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
-			for (int column = 0; column < chestItems.size() && column < TRADE_COLUMNS; column++) {
-				ItemCount itemCount = chestItems.get(column);
-				ItemStack item = itemCount.getItem(); // this item is already a copy with amount 1
-				int price = 0;
-				PriceOffer offer = shopkeeper.getOffer(item);
-				if (offer != null) {
-					price = offer.getPrice();
-					item.setAmount(offer.getItem().getAmount());
-				}
+			// TODO allow setup similar to trading shopkeeper?
+			// add the shopkeeper's offers:
+			int column = 0;
+			List<PriceOffer> offers = shopkeeper.getOffers();
+			for (; column < offers.size() && column < TRADE_COLUMNS; column++) {
+				PriceOffer offer = offers.get(column);
+				ItemStack tradedItem = offer.getItem();
 
-				// add offer to editor inventory:
-				inventory.setItem(column, item);
-				this.setEditColumnCost(inventory, column, price);
+				// add offer to inventory:
+				inventory.setItem(column, tradedItem);
+				this.setEditColumnCost(inventory, column, offer.getPrice());
+			}
+
+			if (column < TRADE_COLUMNS) {
+				// add empty offers for items from the chest:
+				List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
+				int chestItemIndex = 0;
+				for (; chestItemIndex < chestItems.size() && column < TRADE_COLUMNS; column++, chestItemIndex++) {
+					ItemCount itemCount = chestItems.get(chestItemIndex);
+					ItemStack tradedItem = itemCount.getItem(); // this item is already a copy with amount 1
+
+					PriceOffer offer = shopkeeper.getOffer(tradedItem);
+					if (offer != null) {
+						column--;
+						continue; // already added
+					}
+
+					// add offer to inventory:
+					inventory.setItem(column, tradedItem);
+					this.setEditColumnCost(inventory, column, 0);
+				}
 			}
 
 			// add the special buttons:
@@ -82,17 +98,16 @@ public class SellingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
 			SellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			shopkeeper.clearOffers();
 			for (int column = 0; column < TRADE_COLUMNS; column++) {
 				ItemStack tradedItem = inventory.getItem(column);
-				if (!ItemUtils.isEmpty(tradedItem)) {
-					int price = this.getPriceFromColumn(inventory, column);
-					if (price > 0) {
-						// replaces the previous offer for this item:
-						shopkeeper.addOffer(tradedItem, price);
-					} else {
-						shopkeeper.removeOffer(tradedItem);
-					}
-				}
+				if (ItemUtils.isEmpty(tradedItem)) continue; // not valid recipe column
+
+				int price = this.getPriceFromColumn(inventory, column);
+				if (price <= 0) continue;
+
+				// add offer:
+				shopkeeper.addOffer(tradedItem, price);
 			}
 		}
 	}
@@ -237,15 +252,15 @@ public class SellingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		List<ItemCount> chestItems = this.getItemsFromChest();
 		for (PriceOffer offer : this.getOffers()) {
 			ItemStack tradedItem = offer.getItem();
+			int itemAmountInChest = 0;
 			ItemCount itemCount = ItemCount.findSimilar(chestItems, tradedItem);
-			if (itemCount == null) continue;
-
-			int itemAmountInChest = itemCount.getAmount();
-			if (itemAmountInChest >= offer.getItem().getAmount()) {
-				TradingRecipe recipe = this.createSellingRecipe(tradedItem, offer.getPrice());
-				if (recipe != null) {
-					recipes.add(recipe);
-				}
+			if (itemCount != null) {
+				itemAmountInChest = itemCount.getAmount();
+			}
+			boolean outOfStock = (itemAmountInChest < tradedItem.getAmount());
+			TradingRecipe recipe = this.createSellingRecipe(tradedItem, offer.getPrice(), outOfStock);
+			if (recipe != null) {
+				recipes.add(recipe);
 			}
 		}
 		return Collections.unmodifiableList(recipes);

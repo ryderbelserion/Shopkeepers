@@ -55,6 +55,38 @@ public class ShopkeeperUtils {
 		return ShopkeepersAPI.createTradingRecipe(resultItem, item1, item2);
 	}
 
+	// note: this method considers the recipes equal even if their uses and max uses don't match
+	public static boolean areMerchantRecipesEqual(MerchantRecipe recipe1, MerchantRecipe recipe2) {
+		if (recipe1 == recipe2) return true;
+		if (recipe1 == null) return false;
+		if (recipe2 == null) return false;
+
+		if (!recipe1.getResult().equals(recipe2.getResult())) return false;
+		boolean outOfStock1 = (recipe1.getUses() >= recipe1.getMaxUses());
+		boolean outOfStock2 = (recipe2.getUses() >= recipe2.getMaxUses());
+		if (outOfStock1 != outOfStock2) return false;
+		if (recipe1.hasExperienceReward() != recipe2.hasExperienceReward()) return false;
+		if (!recipe1.getIngredients().equals(recipe2.getIngredients())) return false;
+		return true;
+	}
+
+	// note: this method considers the recipes equal even if their uses and max uses don't match
+	public static boolean areMerchantRecipesEqual(List<MerchantRecipe> recipes1, List<MerchantRecipe> recipes2) {
+		if (recipes1 == recipes2) return true;
+		if (recipes1 == null) return false;
+		if (recipes2 == null) return false;
+
+		if (recipes1.size() != recipes2.size()) return false;
+		for (int i = 0; i < recipes1.size(); ++i) {
+			MerchantRecipe recipe1 = recipes1.get(i);
+			MerchantRecipe recipe2 = recipes2.get(i);
+			if (!areMerchantRecipesEqual(recipe1, recipe2)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	// type is null to allow any shopkeeper type to be returned
 	public static List<? extends Shopkeeper> getTargetedShopkeepers(Player player, ShopTypeCategory type, boolean message) {
 		Location playerLoc = player.getEyeLocation();

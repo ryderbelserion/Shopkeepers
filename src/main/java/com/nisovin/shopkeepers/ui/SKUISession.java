@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.ui;
 
+import org.bukkit.entity.Player;
+
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 
@@ -9,10 +11,12 @@ public class SKUISession implements UISession {
 	// (for inactive shopkeepers).. especially important for remotely opened windows
 	private final AbstractShopkeeper shopkeeper;
 	private final UIHandler uiHandler;
+	private final Player player;
 
-	public SKUISession(AbstractShopkeeper shopkeeper, UIHandler handler) {
+	public SKUISession(AbstractShopkeeper shopkeeper, UIHandler handler, Player player) {
 		this.shopkeeper = shopkeeper;
 		this.uiHandler = handler;
+		this.player = player;
 	}
 
 	@Override
@@ -27,5 +31,9 @@ public class SKUISession implements UISession {
 	@Override
 	public AbstractUIType getUIType() {
 		return uiHandler.getUIType();
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 }

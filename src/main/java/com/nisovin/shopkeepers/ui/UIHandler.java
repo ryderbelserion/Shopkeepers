@@ -28,19 +28,6 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Informs the UI registry that the window is/gets closed for this player.
-	 * <p>
-	 * This is only needed if the inventory gets manually closed by a plugin.
-	 * 
-	 * @param player
-	 *            the player whose user interface inventory gets closed
-	 */
-	protected void informOnClose(Player player) {
-		assert player != null;
-		ShopkeepersPlugin.getInstance().getUIRegistry().onInventoryClose(player);
-	}
-
-	/**
 	 * Gets the shopkeeper for which this object is handling the specific interface type for.
 	 * 
 	 * @return the shopkeeper
@@ -60,7 +47,6 @@ public abstract class UIHandler {
 		// temporary deactivate ui and close open window delayed for this player:
 		shopkeeper.deactivateUI();
 		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-			informOnClose(player);
 			player.closeInventory();
 
 			// reactivate ui:
@@ -104,14 +90,30 @@ public abstract class UIHandler {
 	 */
 	public abstract boolean isWindow(Inventory inventory);
 
+	/**
+	 * Gets called when a player opens this UI.
+	 * 
+	 * @param player
+	 *            the player
+	 */
+	protected void onSessionStart(Player player) {
+	}
+
+	/**
+	 * Gets called when this UI gets closed for a player.
+	 * 
+	 * @param player
+	 *            the player
+	 */
+	protected void onSessionEnd(Player player) {
+	}
+
 	// handling of interface window interaction
 
 	/**
-	 * Called when a player closes an inventory for which (@link #isInterface(Inventory)) returned <code>true</code>.
+	 * Called when a player closes an inventory for which {@link #isWindow(Inventory)} returned <code>true</code>.
 	 * <p>
-	 * It is not guaranteed that this method gets called for all user interface windows which were opened by this
-	 * handler (for example plugin triggered closing of a players inventory might not trigger a call to this method). So
-	 * don't rely on it for cleanup.
+	 * For performing cleanup, consider using {@link #onSessionEnd(Player)}, which might be more reliable.
 	 * 
 	 * @param event
 	 *            the event which triggered this method call

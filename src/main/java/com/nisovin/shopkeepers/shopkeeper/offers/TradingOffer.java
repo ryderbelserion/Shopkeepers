@@ -13,7 +13,8 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 /**
  * Stores information about up to two items being traded for another item.
  */
-public class TradingOffer extends SKTradingRecipe { // shares its implementation with SKTradingRecipe
+public class TradingOffer extends SKTradingRecipe {
+	// shares its implementation with TradingRecipe, but always reports to not be out of stock
 
 	public TradingOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		super(resultItem, item1, item2);

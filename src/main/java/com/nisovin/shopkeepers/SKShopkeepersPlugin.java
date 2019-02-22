@@ -359,6 +359,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// player cleanup:
 		shopTypesRegistry.clearSelection(player);
 		shopObjectTypesRegistry.clearSelection(player);
+		// TODO this might not actually be needed, because CraftBukkit triggers an inventory close event prior to the
+		// player quitting
 		uiRegistry.onInventoryClose(player);
 
 		shopkeeperNaming.onPlayerQuit(player);
@@ -596,5 +598,10 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	@Override
 	public TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		return new SKTradingRecipe(resultItem, item1, item2);
+	}
+
+	@Override
+	public TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2, boolean outOfStock) {
+		return new SKTradingRecipe(resultItem, item1, item2, outOfStock);
 	}
 }

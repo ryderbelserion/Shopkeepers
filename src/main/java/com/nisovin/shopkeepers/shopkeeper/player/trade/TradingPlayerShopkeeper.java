@@ -16,6 +16,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
@@ -283,12 +284,15 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		for (TradingOffer offer : this.getOffers()) {
 			ItemStack resultItem = offer.getResultItem();
 			assert !ItemUtils.isEmpty(resultItem);
+			int itemAmountInChest = 0;
 			ItemCount itemCount = ItemCount.findSimilar(chestItems, resultItem);
-			if (itemCount == null) continue;
-
-			int itemAmountInChest = itemCount.getAmount();
-			if (itemAmountInChest >= resultItem.getAmount()) {
-				recipes.add(offer); // TradingOffer extends TradingRecipe
+			if (itemCount != null) {
+				itemAmountInChest = itemCount.getAmount();
+			}
+			boolean outOfStock = (itemAmountInChest < resultItem.getAmount());
+			TradingRecipe recipe = ShopkeepersAPI.createTradingRecipe(resultItem, offer.getItem1(), offer.getItem2(), outOfStock);
+			if (recipe != null) {
+				recipes.add(recipe);
 			}
 		}
 		return Collections.unmodifiableList(recipes);

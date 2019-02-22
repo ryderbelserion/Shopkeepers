@@ -44,7 +44,6 @@ class UIListener implements Listener {
 					+ uiHandler.getUIType().getIdentifier() + "'.");
 			event.setCancelled(true);
 			Bukkit.getScheduler().runTask(plugin, () -> {
-				uiRegistry.onInventoryClose(player); // cleanup
 				player.closeInventory();
 			});
 			return false;

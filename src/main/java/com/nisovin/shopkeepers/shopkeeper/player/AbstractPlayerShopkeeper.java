@@ -648,7 +648,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	// returns null (and logs a warning) if the price cannot be represented correctly by currency items
-	protected TradingRecipe createSellingRecipe(ItemStack itemBeingSold, int price) {
+	protected TradingRecipe createSellingRecipe(ItemStack itemBeingSold, int price, boolean outOfStock) {
 		int remainingPrice = price;
 
 		ItemStack item1 = null;
@@ -678,18 +678,18 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				item2 = currencyItem;
 			}
 		}
-		return ShopkeepersAPI.createTradingRecipe(itemBeingSold, item1, item2);
+		return ShopkeepersAPI.createTradingRecipe(itemBeingSold, item1, item2, outOfStock);
 	}
 
 	// returns null (and logs a warning) if the price cannot be represented correctly by currency items
-	protected TradingRecipe createBuyingRecipe(ItemStack itemBeingBought, int price) {
+	protected TradingRecipe createBuyingRecipe(ItemStack itemBeingBought, int price, boolean outOfStock) {
 		if (price > Settings.currencyItem.getMaxStackSize()) {
 			// cannot represent this price with the used currency items:
 			Log.warning("Shopkeeper at " + this.getPositionString() + " owned by " + ownerName + " has an invalid cost!");
 			return null;
 		}
 		ItemStack currencyItem = Settings.createCurrencyItem(price);
-		return ShopkeepersAPI.createTradingRecipe(currencyItem, itemBeingBought, null);
+		return ShopkeepersAPI.createTradingRecipe(currencyItem, itemBeingBought, null, outOfStock);
 	}
 
 	@Override

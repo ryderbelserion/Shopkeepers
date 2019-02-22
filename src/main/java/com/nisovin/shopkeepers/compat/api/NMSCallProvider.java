@@ -2,7 +2,9 @@ package com.nisovin.shopkeepers.compat.api;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Merchant;
 
 public interface NMSCallProvider {
 
@@ -41,4 +43,7 @@ public interface NMSCallProvider {
 	 * @return <code>true</code> if the provided itemstack matches the required itemstack
 	 */
 	public boolean matches(ItemStack provided, ItemStack required);
+
+	// Note: It is not safe to reduce the number of trading recipes!
+	public void updateTrades(Player player, Merchant merchant);
 }

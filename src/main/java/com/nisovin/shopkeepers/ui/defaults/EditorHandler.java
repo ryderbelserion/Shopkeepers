@@ -156,7 +156,6 @@ public abstract class EditorHandler extends UIHandler {
 
 			// close editor window delayed, and optionally open chest inventory afterwards:
 			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-				informOnClose(player);
 				player.closeInventory();
 
 				// reactivate ui for this shopkeeper:

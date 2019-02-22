@@ -106,4 +106,6 @@ public interface ShopkeepersPlugin extends Plugin {
 	public Shopkeeper handleShopkeeperCreation(ShopCreationData shopCreationData);
 
 	public TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2);
+
+	public TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2, boolean outOfStock);
 }

@@ -29,6 +29,9 @@ import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 
+// TODO only allow copying copyable books?
+// TODO mark copied books as copy just like minecraft marks books as copy of original and copy of copy to control further copying?
+
 /**
  * Sells written books.
  */
@@ -50,6 +53,8 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 			BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
+			// TODO store book items and display trades even if the book is no longer in the chest? (similar to the
+			// other player shops)
 			// add offers:
 			List<ItemStack> books = shopkeeper.getBooksFromChest();
 			for (int column = 0; column < books.size() && column < TRADE_COLUMNS; column++) {
@@ -253,18 +258,17 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	@Override
 	public List<TradingRecipe> getTradingRecipes(Player player) {
 		List<TradingRecipe> recipes = new ArrayList<>();
-		if (this.hasChestBlankBooks()) {
-			List<ItemStack> bookItems = this.getBooksFromChest();
-			for (ItemStack bookItem : bookItems) {
-				assert !ItemUtils.isEmpty(bookItem);
-				String bookTitle = getTitleOfBook(bookItem); // can be null
-				BookOffer offer = this.getOffer(bookTitle);
-				if (offer == null) continue;
+		boolean outOfStock = !this.hasChestBlankBooks();
+		List<ItemStack> bookItems = this.getBooksFromChest();
+		for (ItemStack bookItem : bookItems) {
+			assert !ItemUtils.isEmpty(bookItem);
+			String bookTitle = getTitleOfBook(bookItem); // can be null
+			BookOffer offer = this.getOffer(bookTitle);
+			if (offer == null) continue;
 
-				TradingRecipe recipe = this.createSellingRecipe(bookItem.clone(), offer.getPrice());
-				if (recipe != null) {
-					recipes.add(recipe);
-				}
+			TradingRecipe recipe = this.createSellingRecipe(bookItem, offer.getPrice(), outOfStock);
+			if (recipe != null) {
+				recipes.add(recipe);
 			}
 		}
 		return Collections.unmodifiableList(recipes);
@@ -296,7 +300,8 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	private boolean isBookAuthoredByShopOwner(ItemStack book) {
 		assert book.getType() == Material.WRITTEN_BOOK;
 		// checking for ownerName might break if the player changes his name but the book metadata doesn't get updated.
-		// Also: why do we even filter for only books of the shop owner?
+		// Also: why do we even filter for only books of the shop owner? -> might make sense to only allow the author to
+		// create copies of his book. So enablew again? Maybe via config setting?
 		/*
 		 * if (book.hasItemMeta()) {
 		 * BookMeta meta = (BookMeta) book.getItemMeta();

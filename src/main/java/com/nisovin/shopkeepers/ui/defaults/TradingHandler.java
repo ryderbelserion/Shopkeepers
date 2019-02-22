@@ -3,7 +3,10 @@ package com.nisovin.shopkeepers.ui.defaults;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
@@ -113,11 +116,28 @@ public class TradingHandler extends UIHandler {
 	protected static final int BUY_ITEM_2_SLOT_ID = 1;
 	protected static final int RESULT_ITEM_SLOT_ID = 2;
 
+	private final Map<UUID, Merchant> merchants = new HashMap<>();
+
 	// counts the trades triggered by the last click-event:
 	protected int tradeCounter = 0;
 
 	public TradingHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
 		super(uiType, shopkeeper);
+	}
+
+	@Override
+	protected void onSessionStart(Player player) {
+		super.onSessionStart(player);
+	}
+
+	@Override
+	protected void onSessionEnd(Player player) {
+		super.onSessionEnd(player);
+		merchants.remove(player.getUniqueId());
+	}
+
+	protected Merchant getMerchant(Player player) {
+		return merchants.get(player.getUniqueId());
 	}
 
 	@Override
@@ -136,22 +156,14 @@ public class TradingHandler extends UIHandler {
 		// create and open trading window:
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		String title = this.getInventoryTitle();
-		return this.openTradeWindow(title, shopkeeper.getTradingRecipes(player), player);
+		List<TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
+		return this.openTradeWindow(title, recipes, player);
 	}
 
 	protected boolean openTradeWindow(String title, List<TradingRecipe> recipes, Player player) {
-		// create empty merchant:
-		Merchant merchant = Bukkit.createMerchant(title);
-
-		// create list of merchant recipes:
-		List<MerchantRecipe> merchantRecipes = new ArrayList<MerchantRecipe>();
-		for (TradingRecipe recipe : recipes) {
-			// create and add merchant recipe:
-			merchantRecipes.add(this.createMerchantRecipe(recipe.getItem1(), recipe.getItem2(), recipe.getResultItem()));
-		}
-
-		// set merchant's recipes:
-		merchant.setRecipes(merchantRecipes);
+		// setup merchant:
+		Merchant merchant = this.setupMerchant(title, recipes);
+		merchants.put(player.getUniqueId(), merchant);
 
 		// increase 'talked-to-villager' statistic:
 		player.incrementStatistic(Statistic.TALKED_TO_VILLAGER);
@@ -160,15 +172,42 @@ public class TradingHandler extends UIHandler {
 		return (player.openMerchant(merchant, true) != null);
 	}
 
-	protected MerchantRecipe createMerchantRecipe(ItemStack buyItem1, ItemStack buyItem2, ItemStack sellingItem) {
-		assert !ItemUtils.isEmpty(sellingItem) && !ItemUtils.isEmpty(buyItem1);
-		MerchantRecipe recipe = new MerchantRecipe(sellingItem, 10000); // no max-uses limit
-		recipe.setExperienceReward(false); // no experience rewards
-		recipe.addIngredient(buyItem1);
-		if (!ItemUtils.isEmpty(buyItem2)) {
-			recipe.addIngredient(buyItem2);
+	protected Merchant setupMerchant(String title, List<TradingRecipe> recipes) {
+		// setup merchant:
+		Merchant merchant = Bukkit.createMerchant(title);
+		this.setupMerchantRecipes(merchant, recipes);
+		return merchant;
+	}
+
+	protected void setupMerchantRecipes(Merchant merchant, List<TradingRecipe> recipes) {
+		// create list of merchant recipes:
+		List<MerchantRecipe> merchantRecipes = this.createMerchantRecipes(recipes);
+		// set merchant's recipes:
+		merchant.setRecipes(merchantRecipes);
+	}
+
+	protected List<MerchantRecipe> createMerchantRecipes(List<TradingRecipe> recipes) {
+		List<MerchantRecipe> merchantRecipes = new ArrayList<>();
+		for (TradingRecipe recipe : recipes) {
+			merchantRecipes.add(this.createMerchantRecipe(recipe));
 		}
-		return recipe;
+		return merchantRecipes;
+	}
+
+	protected MerchantRecipe createMerchantRecipe(TradingRecipe recipe) {
+		ItemStack buyItem1 = recipe.getItem1();
+		ItemStack buyItem2 = recipe.getItem2();
+		ItemStack sellingItem = recipe.getResultItem();
+		assert !ItemUtils.isEmpty(sellingItem) && !ItemUtils.isEmpty(buyItem1);
+
+		MerchantRecipe merchantRecipe = new MerchantRecipe(sellingItem, 10000); // no max-uses limit
+		if (recipe.isOutOfStock()) merchantRecipe.setUses(10000); // .. except if it is out of stock
+		merchantRecipe.setExperienceReward(false); // no experience rewards
+		merchantRecipe.addIngredient(buyItem1);
+		if (!ItemUtils.isEmpty(buyItem2)) {
+			merchantRecipe.addIngredient(buyItem2);
+		}
+		return merchantRecipe;
 	}
 
 	protected String getInventoryTitle() {
@@ -177,6 +216,32 @@ public class TradingHandler extends UIHandler {
 			title = Settings.msgTradingTitleDefault;
 		}
 		return Settings.msgTradingTitlePrefix + title;
+	}
+
+	protected void updateTrades(Player player) {
+		Merchant merchant = this.getMerchant(player);
+		if (merchant == null) return;
+		List<MerchantRecipe> oldMerchantRecipes = merchant.getRecipes();
+
+		Shopkeeper shopkeeper = this.getShopkeeper();
+		List<TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
+		List<MerchantRecipe> newMerchantRecipes = this.createMerchantRecipes(recipes);
+		if (ShopkeeperUtils.areMerchantRecipesEqual(oldMerchantRecipes, newMerchantRecipes)) {
+			Log.debug("Trades are still up-to-date for player " + player.getName());
+			return; // recipes did not change
+		}
+		Log.debug("Updating trades for player " + player.getName());
+
+		// it is not safe to reduce the number of trading recipes for the player, so we need to add dummy recipes:
+		for (int i = recipes.size(); i < oldMerchantRecipes.size(); ++i) {
+			MerchantRecipe merchantRecipe = new MerchantRecipe(null, 0, 0, false);
+			newMerchantRecipes.add(merchantRecipe);
+		}
+		// set merchant's recipes:
+		merchant.setRecipes(newMerchantRecipes);
+
+		// update recipes:
+		NMSManager.getProvider().updateTrades(player, merchant);
 	}
 
 	@Override
@@ -276,6 +341,7 @@ public class TradingHandler extends UIHandler {
 					// common apply trade:
 					this.commonApplyTrade(tradeData);
 				}
+				this.updateTrades(player);
 			}
 		} else if (action == InventoryAction.DROP_ONE_SLOT || action == InventoryAction.DROP_ALL_SLOT) {
 			// not supported for now, since this might be tricky to accurately reproduce
@@ -303,6 +369,7 @@ public class TradingHandler extends UIHandler {
 					// common apply trade:
 					this.commonApplyTrade(tradeData);
 				}
+				this.updateTrades(player);
 			}
 		} else if (action == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 			// trades as often as possible (depending on offered items and inventory space) for the current result item:
@@ -358,6 +425,7 @@ public class TradingHandler extends UIHandler {
 				// update result item:
 				resultItem = newResultItem;
 			}
+			this.updateTrades(player);
 		} else {
 			// the inventory action involves the result slot, but doesn't trigger a trade usually, or isn't supported
 			// yet

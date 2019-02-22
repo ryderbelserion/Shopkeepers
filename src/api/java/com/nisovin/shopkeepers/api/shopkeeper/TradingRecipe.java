@@ -27,4 +27,11 @@ public interface TradingRecipe {
 	 * @return a copy of the second required item, can be <code>null</code>
 	 */
 	public ItemStack getItem2();
+
+	/**
+	 * Gets whether this trading recipe is out of stock.
+	 * 
+	 * @return <code>true</code> if out of stock
+	 */
+	public boolean isOutOfStock();
 }

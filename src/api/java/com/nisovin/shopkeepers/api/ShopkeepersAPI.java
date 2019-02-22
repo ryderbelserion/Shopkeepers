@@ -115,4 +115,8 @@ public final class ShopkeepersAPI {
 	public static TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		return getPlugin().createTradingRecipe(resultItem, item1, item2);
 	}
+
+	public static TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2, boolean outOfStock) {
+		return getPlugin().createTradingRecipe(resultItem, item1, item2, outOfStock);
+	}
 }

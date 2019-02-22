@@ -46,26 +46,39 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 			BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
 
+			// TODO allow setup similar to trading shopkeeper?
 			// add the shopkeeper's offers:
-			List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
-			for (int column = 0; column < chestItems.size() && column < TRADE_COLUMNS; column++) {
-				ItemCount itemCount = chestItems.get(column);
-				ItemStack type = itemCount.getItem(); // this item is already a copy with amount 1
-				ItemStack currencyItem = null;
-				PriceOffer offer = shopkeeper.getOffer(type);
-
-				if (offer != null) {
-					currencyItem = Settings.createCurrencyItem(offer.getPrice());
-					int tradedItemAmount = offer.getItem().getAmount();
-					type.setAmount(tradedItemAmount);
-				} else {
-					currencyItem = Settings.createZeroCurrencyItem();
-				}
-				assert currencyItem != null;
+			int column = 0;
+			List<PriceOffer> offers = shopkeeper.getOffers();
+			for (; column < offers.size() && column < TRADE_COLUMNS; column++) {
+				PriceOffer offer = offers.get(column);
+				ItemStack tradedItem = offer.getItem();
+				ItemStack currencyItem = Settings.createCurrencyItem(offer.getPrice());
 
 				// add offer to inventory:
 				inventory.setItem(column, currencyItem);
-				inventory.setItem(column + 18, type);
+				inventory.setItem(column + 18, tradedItem);
+			}
+
+			if (column < TRADE_COLUMNS) {
+				// add empty offers for items from the chest:
+				List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
+				int chestItemIndex = 0;
+				for (; chestItemIndex < chestItems.size() && column < TRADE_COLUMNS; column++, chestItemIndex++) {
+					ItemCount itemCount = chestItems.get(chestItemIndex);
+					ItemStack tradedItem = itemCount.getItem(); // this item is already a copy with amount 1
+
+					PriceOffer offer = shopkeeper.getOffer(tradedItem);
+					if (offer != null) {
+						column--;
+						continue; // already added
+					}
+					ItemStack currencyItem = Settings.createZeroCurrencyItem();
+
+					// add offer to inventory:
+					inventory.setItem(column, currencyItem);
+					inventory.setItem(column + 18, tradedItem);
+				}
 			}
 
 			// add the special buttons:
@@ -96,16 +109,17 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
 			BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			shopkeeper.clearOffers();
 			for (int column = 0; column < TRADE_COLUMNS; column++) {
 				ItemStack tradedItem = inventory.getItem(column + 18);
-				if (ItemUtils.isEmpty(tradedItem)) continue;
+				if (ItemUtils.isEmpty(tradedItem)) continue; // not valid recipe column
 
 				ItemStack priceItem = inventory.getItem(column);
-				if (priceItem != null && priceItem.getType() == Settings.currencyItem && priceItem.getAmount() > 0) {
-					shopkeeper.addOffer(tradedItem, priceItem.getAmount());
-				} else {
-					shopkeeper.removeOffer(tradedItem);
-				}
+				if (ItemUtils.isEmpty(priceItem)) continue;
+				if (priceItem.getType() != Settings.currencyItem) continue;
+
+				// add offer:
+				shopkeeper.addOffer(tradedItem, priceItem.getAmount());
 			}
 		}
 	}
@@ -349,18 +363,13 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	@Override
 	public List<TradingRecipe> getTradingRecipes(Player player) {
 		List<TradingRecipe> recipes = new ArrayList<>();
-		List<ItemCount> chestItems = this.getItemsFromChest();
 		int currencyInChest = this.getCurrencyInChest();
 		for (PriceOffer offer : this.getOffers()) {
 			ItemStack tradedItem = offer.getItem();
-			ItemCount itemCount = ItemCount.findSimilar(chestItems, tradedItem);
-			if (itemCount == null) continue;
-
-			if (currencyInChest >= offer.getPrice()) {
-				TradingRecipe recipe = this.createBuyingRecipe(tradedItem, offer.getPrice());
-				if (recipe != null) {
-					recipes.add(recipe);
-				}
+			boolean outOfStock = (currencyInChest < offer.getPrice());
+			TradingRecipe recipe = this.createBuyingRecipe(tradedItem, offer.getPrice(), outOfStock);
+			if (recipe != null) {
+				recipes.add(recipe);
 			}
 		}
 		return Collections.unmodifiableList(recipes);
