@@ -280,6 +280,7 @@ public class Settings {
 	// placeholders: {owner} -> new owners name
 	public static String msgOwnerSet = "&aNew owner was set to &e{owner}";
 	public static String msgShopCreationItemsGiven = "&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!";
+	public static String msgUnknownBookAuthor = "Unknown";
 
 	public static String msgTradePermSet = "&aThe shop's trading permission has been set to '&e{perm}&a'!";
 	public static String msgTradePermRemoved = "&aThe shop's trading permission '&e{perm}&a' has been removed!";

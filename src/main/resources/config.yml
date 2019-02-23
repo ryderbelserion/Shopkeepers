@@ -421,6 +421,7 @@ msg-unused-chest: "&7No shopkeeper is using this chest."
 msg-not-owner: "&7You are not the owner of this shopkeeper."
 msg-owner-set: "&aNew owner was set to &e{owner}"
 msg-shop-creation-items-given: "&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!"
+msg-unknown-book-author: "Unknown"
 
 msg-trade-perm-set: "&aThe shop's trading permission has been set to '&e{perm}&a'!"
 msg-trade-perm-removed: "&aThe shop's trading permission '&e{perm}&a' has been removed!"

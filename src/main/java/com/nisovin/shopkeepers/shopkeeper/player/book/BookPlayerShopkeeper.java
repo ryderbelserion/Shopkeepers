@@ -5,8 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -16,6 +16,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.BookMeta.Generation;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
@@ -26,21 +27,65 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
+import com.nisovin.shopkeepers.util.Filter;
+import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-
-// TODO only allow copying copyable books?
-// TODO mark copied books as copy just like minecraft marks books as copy of original and copy of copy to control further copying?
 
 /**
  * Sells written books.
  */
 public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
-	protected static class WrittenBookPlayerShopEditorHandler extends PlayerShopEditorHandler {
+	protected static class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-		protected WrittenBookPlayerShopEditorHandler(BookPlayerShopkeeper shopkeeper) {
+		protected static class EditorSetup extends CommonEditorSetup<BookPlayerShopkeeper, BookOffer> {
+
+			private List<ItemCount> copyableBookItems = null; // gets set right before setup and reset afterwards
+
+			public EditorSetup(BookPlayerShopkeeper shopkeeper, BookPlayerShopEditorHandler editorHandler) {
+				super(shopkeeper, editorHandler);
+			}
+
+			@Override
+			protected List<BookOffer> getOffers() {
+				return shopkeeper.getOffers();
+			}
+
+			@Override
+			protected List<ItemCount> getItemsFromChest() {
+				return shopkeeper.getCopyableBooksFromChest();
+			}
+
+			@Override
+			protected boolean hasOffer(ItemStack itemFromChest) {
+				return (shopkeeper.getOffer(itemFromChest) != null);
+			}
+
+			@Override
+			protected void setupColumnForOffer(Inventory inventory, int column, BookOffer offer) {
+				String bookTitle = offer.getBookTitle();
+				ItemStack bookItem = shopkeeper.getBookItem(copyableBookItems, bookTitle);
+				if (bookItem == null) {
+					bookItem = shopkeeper.createDummyBook(bookTitle);
+				}
+				int price = offer.getPrice();
+				inventory.setItem(column, bookItem);
+				((BookPlayerShopEditorHandler) editorHandler).setEditColumnCost(inventory, column, price);
+			}
+
+			@Override
+			protected void setupColumnForItem(Inventory inventory, int column, ItemStack itemFromChest) {
+				inventory.setItem(column, itemFromChest);
+				((BookPlayerShopEditorHandler) editorHandler).setEditColumnCost(inventory, column, 0);
+			}
+		}
+
+		protected final EditorSetup setup;
+
+		protected BookPlayerShopEditorHandler(BookPlayerShopkeeper shopkeeper) {
 			super(shopkeeper);
+			this.setup = new EditorSetup(shopkeeper, this);
 		}
 
 		@Override
@@ -50,36 +95,10 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 		@Override
 		protected boolean openWindow(Player player) {
-			BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
-			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
-
-			// TODO store book items and display trades even if the book is no longer in the chest? (similar to the
-			// other player shops)
-			// add offers:
-			List<ItemStack> books = shopkeeper.getBooksFromChest();
-			for (int column = 0; column < books.size() && column < TRADE_COLUMNS; column++) {
-				String bookTitle = getTitleOfBook(books.get(column));
-				if (bookTitle == null) {
-					// allow another book to take its place:
-					column--;
-					continue;
-				}
-
-				// add offer to editor inventory:
-				int price = 0;
-				BookOffer offer = shopkeeper.getOffer(bookTitle);
-				if (offer != null) {
-					price = offer.getPrice();
-				}
-				inventory.setItem(column, books.get(column));
-				this.setEditColumnCost(inventory, column, price);
-			}
-
-			// add the special buttons:
-			this.setActionButtons(inventory);
-			// show editing inventory:
-			player.openInventory(inventory);
-			return true;
+			setup.copyableBookItems = this.getShopkeeper().getCopyableBooksFromChest();
+			boolean result = setup.openWindow(player);
+			setup.copyableBookItems = null;
+			return result;
 		}
 
 		@Override
@@ -90,27 +109,26 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		@Override
 		protected void saveEditor(Inventory inventory, Player player) {
 			BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+			shopkeeper.clearOffers();
 			for (int column = 0; column < TRADE_COLUMNS; column++) {
 				ItemStack item = inventory.getItem(column);
-				if (ItemUtils.isEmpty(item) || item.getType() != Material.WRITTEN_BOOK) {
-					continue;
-				}
+				if (!isCopyableOrDummyBook(item)) continue;
+
 				String bookTitle = getTitleOfBook(item);
 				if (bookTitle == null) continue;
 
 				int price = this.getPriceFromColumn(inventory, column);
-				if (price > 0) {
-					shopkeeper.addOffer(bookTitle, price);
-				} else {
-					shopkeeper.removeOffer(bookTitle);
-				}
+				if (price <= 0) continue;
+
+				// add offer:
+				shopkeeper.addOffer(bookTitle, price);
 			}
 		}
 	}
 
-	protected static class WrittenBookPlayerShopTradingHandler extends PlayerShopTradingHandler {
+	protected static class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
-		protected WrittenBookPlayerShopTradingHandler(BookPlayerShopkeeper shopkeeper) {
+		protected BookPlayerShopTradingHandler(BookPlayerShopkeeper shopkeeper) {
 			super(shopkeeper);
 		}
 
@@ -127,6 +145,11 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 			TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
 			ItemStack bookItem = tradingRecipe.getResultItem();
+			if (!isValidBookCopy(bookItem)) {
+				this.debugPreventedTrade(tradingPlayer, "The traded item is no valid book copy!");
+				return false;
+			}
+
 			String bookTitle = getTitleOfBook(bookItem);
 			if (bookTitle == null) {
 				// this should not happen.. because the recipes were created based on the shopkeeper's offers
@@ -191,6 +214,10 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		}
 	}
 
+	private static final Filter<ItemStack> ITEM_FILTER = (item) -> {
+		return isCopyableBook(item);
+	};
+
 	// contains only one offer for a specific book (book title):
 	private final List<BookOffer> offers = new ArrayList<>();
 	private final List<BookOffer> offersView = Collections.unmodifiableList(offers);
@@ -220,10 +247,10 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	@Override
 	protected void setup() {
 		if (this.getUIHandler(DefaultUITypes.EDITOR()) == null) {
-			this.registerUIHandler(new WrittenBookPlayerShopEditorHandler(this));
+			this.registerUIHandler(new BookPlayerShopEditorHandler(this));
 		}
 		if (this.getUIHandler(DefaultUITypes.TRADING()) == null) {
-			this.registerUIHandler(new WrittenBookPlayerShopTradingHandler(this));
+			this.registerUIHandler(new BookPlayerShopTradingHandler(this));
 		}
 		super.setup();
 	}
@@ -258,13 +285,19 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	@Override
 	public List<TradingRecipe> getTradingRecipes(Player player) {
 		List<TradingRecipe> recipes = new ArrayList<>();
-		boolean outOfStock = !this.hasChestBlankBooks();
-		List<ItemStack> bookItems = this.getBooksFromChest();
-		for (ItemStack bookItem : bookItems) {
-			assert !ItemUtils.isEmpty(bookItem);
-			String bookTitle = getTitleOfBook(bookItem); // can be null
-			BookOffer offer = this.getOffer(bookTitle);
-			if (offer == null) continue;
+		boolean hasBlankBooks = this.hasChestBlankBooks();
+		List<ItemCount> bookItems = this.getCopyableBooksFromChest();
+		for (BookOffer offer : this.getOffers()) {
+			String bookTitle = offer.getBookTitle();
+			ItemStack bookItem = this.getBookItem(bookItems, bookTitle);
+			boolean outOfStock = !hasBlankBooks;
+			if (bookItem == null) {
+				outOfStock = true;
+				bookItem = this.createDummyBook(bookTitle);
+			} else {
+				// create copy:
+				bookItem = this.copyBook(bookItem);
+			}
 
 			TradingRecipe recipe = this.createSellingRecipe(bookItem, offer.getPrice(), outOfStock);
 			if (recipe != null) {
@@ -274,18 +307,55 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		return Collections.unmodifiableList(recipes);
 	}
 
-	private List<ItemStack> getBooksFromChest() {
-		List<ItemStack> list = new ArrayList<>();
-		Block chest = this.getChest();
-		if (!ItemUtils.isChest(chest.getType())) return list;
-		Inventory chestInventory = ((Chest) chest.getState()).getInventory();
-		for (ItemStack item : chestInventory.getContents()) {
-			if (ItemUtils.isEmpty(item)) continue;
-			if (item.getType() == Material.WRITTEN_BOOK && this.isBookAuthoredByShopOwner(item)) {
-				list.add(item);
+	private List<ItemCount> getCopyableBooksFromChest() {
+		return this.getItemsFromChest(ITEM_FILTER);
+	}
+
+	private ItemStack getBookItem(List<ItemCount> itemCounts, String title) {
+		if (itemCounts == null) return null;
+		for (ItemCount itemCount : itemCounts) {
+			if (itemCount == null) continue;
+			ItemStack item = itemCount.getItem(); // note: no additional copy
+			if (Objects.equals(getTitleOfBook(item), title)) {
+				return item;
 			}
 		}
-		return list;
+		return null;
+	}
+
+	private static BookMeta getBookMeta(ItemStack item) {
+		if (ItemUtils.isEmpty(item)) return null;
+		if (item.getType() != Material.WRITTEN_BOOK) return null;
+		if (!item.hasItemMeta()) return null;
+
+		return (BookMeta) item.getItemMeta();
+	}
+
+	private static Generation getBookGeneration(ItemStack item) {
+		BookMeta meta = getBookMeta(item);
+		if (meta == null) return null;
+		return meta.getGeneration();
+	}
+
+	private static boolean isCopyableBook(ItemStack item) {
+		Generation generation = getBookGeneration(item);
+		return (generation == Generation.ORIGINAL || generation == Generation.COPY_OF_ORIGINAL);
+	}
+
+	private static boolean isCopyableOrDummyBook(ItemStack item) {
+		Generation generation = getBookGeneration(item);
+		return (generation == Generation.ORIGINAL || generation == Generation.COPY_OF_ORIGINAL || generation == Generation.TATTERED);
+	}
+
+	private static boolean isValidBookCopy(ItemStack item) {
+		Generation generation = getBookGeneration(item);
+		return (generation == Generation.COPY_OF_ORIGINAL || generation == Generation.COPY_OF_COPY);
+	}
+
+	private static String getTitleOfBook(ItemStack item) {
+		BookMeta meta = getBookMeta(item);
+		if (meta == null) return null;
+		return meta.getTitle();
 	}
 
 	private boolean hasChestBlankBooks() {
@@ -297,35 +367,52 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		return false;
 	}
 
-	private boolean isBookAuthoredByShopOwner(ItemStack book) {
-		assert book.getType() == Material.WRITTEN_BOOK;
-		// checking for ownerName might break if the player changes his name but the book metadata doesn't get updated.
-		// Also: why do we even filter for only books of the shop owner? -> might make sense to only allow the author to
-		// create copies of his book. So enablew again? Maybe via config setting?
-		/*
-		 * if (book.hasItemMeta()) {
-		 * BookMeta meta = (BookMeta) book.getItemMeta();
-		 * if (meta.hasAuthor() && meta.getAuthor().equalsIgnoreCase(ownerName)) {
-		 * return true;
-		 * }
-		 * }
-		 * return false;
-		 */
-		return book.getType() == Material.WRITTEN_BOOK;
+	private ItemStack createDummyBook(String title) {
+		ItemStack item = new ItemStack(Material.WRITTEN_BOOK, 1);
+		BookMeta meta = (BookMeta) item.getItemMeta();
+		meta.setTitle(title);
+		meta.setAuthor(Settings.msgUnknownBookAuthor);
+		meta.setGeneration(Generation.TATTERED);
+		item.setItemMeta(meta);
+		return item;
 	}
 
-	private static String getTitleOfBook(ItemStack book) {
-		if (book.getType() == Material.WRITTEN_BOOK && book.hasItemMeta()) {
-			BookMeta meta = (BookMeta) book.getItemMeta();
-			return meta.getTitle();
+	private ItemStack copyBook(ItemStack book) {
+		assert isCopyableBook(book);
+		BookMeta oldMeta = (BookMeta) book.getItemMeta();
+		Generation oldGeneration = oldMeta.getGeneration();
+		Generation nextGeneration = getNextGeneration(oldGeneration);
+		assert nextGeneration != null;
+
+		ItemStack copy = book.clone();
+		BookMeta newMeta = (BookMeta) copy.getItemMeta();
+		newMeta.setGeneration(nextGeneration);
+		copy.setItemMeta(newMeta);
+		return copy;
+	}
+
+	private static Generation getNextGeneration(Generation generation) {
+		assert generation != null;
+		switch (generation) {
+		case ORIGINAL:
+			return Generation.COPY_OF_ORIGINAL;
+		case COPY_OF_ORIGINAL:
+			return Generation.COPY_OF_COPY;
+		default:
+			// all other books cannot be copied
+			return null;
 		}
-		return null;
 	}
 
 	// OFFERS:
 
 	public List<BookOffer> getOffers() {
 		return offersView;
+	}
+
+	public BookOffer getOffer(ItemStack bookItem) {
+		String bookTitle = getTitleOfBook(bookItem);
+		return this.getOffer(bookTitle);
 	}
 
 	public BookOffer getOffer(String bookTitle) {

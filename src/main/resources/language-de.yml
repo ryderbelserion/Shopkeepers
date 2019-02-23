@@ -77,6 +77,7 @@ msg-unused-chest: "&7Kein Shop benutzt diese Truhe."
 msg-not-owner: "&7Du bist nicht der Besitzer von diesem Shop."
 msg-owner-set: "&aDer neue Besitzer ist jetzt: &e{owner}"
 msg-shop-creation-items-given: "&aSpieler &e{player}&a hat &e{amount}&a Shop-Erstellungs Items bekommen!"
+msg-unknown-book-author: "Unbekannt"
 
 msg-trade-perm-set: "&aDie Handel-Permission für den Shop wurde auf '&e{perm}&a' gesetzt!"
 msg-trade-perm-removed: "&aDie Handel-Permission '&e{perm}&a' für den Shop wurde entfernt!"
