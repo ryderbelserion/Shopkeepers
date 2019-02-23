@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -30,8 +29,46 @@ public class SellingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	protected static class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
+		protected static class EditorSetup extends CommonEditorSetup<SellingPlayerShopkeeper, PriceOffer> {
+
+			public EditorSetup(SellingPlayerShopkeeper shopkeeper, SellingPlayerShopEditorHandler editorHandler) {
+				super(shopkeeper, editorHandler);
+			}
+
+			@Override
+			protected List<PriceOffer> getOffers() {
+				return shopkeeper.getOffers();
+			}
+
+			@Override
+			protected List<ItemCount> getItemsFromChest() {
+				return shopkeeper.getItemsFromChest();
+			}
+
+			@Override
+			protected boolean hasOffer(ItemStack itemFromChest) {
+				return (shopkeeper.getOffer(itemFromChest) != null);
+			}
+
+			@Override
+			protected void setupColumnForOffer(Inventory inventory, int column, PriceOffer offer) {
+				ItemStack tradedItem = offer.getItem();
+				inventory.setItem(column, tradedItem);
+				((SellingPlayerShopEditorHandler) editorHandler).setEditColumnCost(inventory, column, offer.getPrice());
+			}
+
+			@Override
+			protected void setupColumnForItem(Inventory inventory, int column, ItemStack itemFromChest) {
+				inventory.setItem(column, itemFromChest);
+				((SellingPlayerShopEditorHandler) editorHandler).setEditColumnCost(inventory, column, 0);
+			}
+		}
+
+		protected final EditorSetup setup;
+
 		protected SellingPlayerShopEditorHandler(SellingPlayerShopkeeper shopkeeper) {
 			super(shopkeeper);
+			this.setup = new EditorSetup(shopkeeper, this);
 		}
 
 		@Override
@@ -39,49 +76,15 @@ public class SellingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 			return (SellingPlayerShopkeeper) super.getShopkeeper();
 		}
 
+		// redeclare for visibility reasons
+		@Override
+		protected void setEditColumnCost(Inventory inventory, int column, int cost) {
+			super.setEditColumnCost(inventory, column, cost);
+		}
+
 		@Override
 		protected boolean openWindow(Player player) {
-			SellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
-
-			// TODO allow setup similar to trading shopkeeper?
-			// add the shopkeeper's offers:
-			int column = 0;
-			List<PriceOffer> offers = shopkeeper.getOffers();
-			for (; column < offers.size() && column < TRADE_COLUMNS; column++) {
-				PriceOffer offer = offers.get(column);
-				ItemStack tradedItem = offer.getItem();
-
-				// add offer to inventory:
-				inventory.setItem(column, tradedItem);
-				this.setEditColumnCost(inventory, column, offer.getPrice());
-			}
-
-			if (column < TRADE_COLUMNS) {
-				// add empty offers for items from the chest:
-				List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
-				int chestItemIndex = 0;
-				for (; chestItemIndex < chestItems.size() && column < TRADE_COLUMNS; column++, chestItemIndex++) {
-					ItemCount itemCount = chestItems.get(chestItemIndex);
-					ItemStack tradedItem = itemCount.getItem(); // this item is already a copy with amount 1
-
-					PriceOffer offer = shopkeeper.getOffer(tradedItem);
-					if (offer != null) {
-						column--;
-						continue; // already added
-					}
-
-					// add offer to inventory:
-					inventory.setItem(column, tradedItem);
-					this.setEditColumnCost(inventory, column, 0);
-				}
-			}
-
-			// add the special buttons:
-			this.setActionButtons(inventory);
-			// show editing inventory:
-			player.openInventory(inventory);
-			return true;
+			return setup.openWindow(player);
 		}
 
 		@Override

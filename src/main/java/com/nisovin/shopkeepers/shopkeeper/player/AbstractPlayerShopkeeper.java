@@ -46,6 +46,73 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	public static abstract class PlayerShopEditorHandler extends EditorHandler {
 
+		protected static abstract class CommonEditorSetup<S extends AbstractPlayerShopkeeper, O> {
+
+			protected final S shopkeeper;
+			protected final PlayerShopEditorHandler editorHandler;
+
+			public CommonEditorSetup(S shopkeeper, PlayerShopEditorHandler editorHandler) {
+				this.shopkeeper = shopkeeper;
+				this.editorHandler = editorHandler;
+			}
+
+			public boolean openWindow(Player player) {
+				// create inventory:
+				Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
+
+				// setup trade columns:
+				this.setupOfferColumns(inventory, player);
+
+				// add the special buttons:
+				editorHandler.setActionButtons(inventory);
+
+				// show editing inventory:
+				player.openInventory(inventory);
+
+				return true;
+			}
+
+			protected void setupOfferColumns(Inventory inventory, Player player) {
+				// TODO allow setup similar to trading shopkeeper?
+				// add the shopkeeper's offers:
+				int column = 0;
+				List<O> offers = this.getOffers();
+				for (; column < offers.size() && column < TRADE_COLUMNS; column++) {
+					O offer = offers.get(column);
+					// add offer to inventory:
+					this.setupColumnForOffer(inventory, column, offer);
+				}
+
+				if (column < TRADE_COLUMNS) {
+					// add empty offers for items from the chest:
+					List<ItemCount> chestItems = this.getItemsFromChest();
+					int chestItemIndex = 0;
+					for (; chestItemIndex < chestItems.size() && column < TRADE_COLUMNS; column++, chestItemIndex++) {
+						ItemCount itemCount = chestItems.get(chestItemIndex);
+						ItemStack itemFromChest = itemCount.getItem(); // this item is already a copy with amount 1
+
+						if (this.hasOffer(itemFromChest)) {
+							column--;
+							continue; // already added
+						}
+
+						// add new offer to inventory:
+						this.setupColumnForItem(inventory, column, itemFromChest);
+					}
+				}
+			}
+
+			protected abstract List<O> getOffers();
+
+			protected abstract List<ItemCount> getItemsFromChest();
+
+			protected abstract boolean hasOffer(ItemStack itemFromChest);
+
+			protected abstract void setupColumnForOffer(Inventory inventory, int column, O offer);
+
+			protected abstract void setupColumnForItem(Inventory inventory, int column, ItemStack itemFromChest);
+		}
+
 		// slot = column + offset:
 		protected static final int HIGH_COST_OFFSET = 9;
 		protected static final int LOW_COST_OFFSET = 18;
