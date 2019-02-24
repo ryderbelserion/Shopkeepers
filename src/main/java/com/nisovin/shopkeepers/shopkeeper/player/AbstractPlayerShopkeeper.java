@@ -46,14 +46,12 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	public static abstract class PlayerShopEditorHandler extends EditorHandler {
 
-		protected static abstract class CommonEditorSetup<S extends AbstractPlayerShopkeeper, O> {
+		protected abstract class CommonEditorSetup<S extends AbstractPlayerShopkeeper, O> {
 
 			protected final S shopkeeper;
-			protected final PlayerShopEditorHandler editorHandler;
 
-			public CommonEditorSetup(S shopkeeper, PlayerShopEditorHandler editorHandler) {
+			public CommonEditorSetup(S shopkeeper) {
 				this.shopkeeper = shopkeeper;
-				this.editorHandler = editorHandler;
 			}
 
 			public boolean openWindow(Player player) {
@@ -64,7 +62,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				this.setupOfferColumns(inventory, player);
 
 				// add the special buttons:
-				editorHandler.setActionButtons(inventory);
+				setActionButtons(inventory);
 
 				// show editing inventory:
 				player.openInventory(inventory);

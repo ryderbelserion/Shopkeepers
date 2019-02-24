@@ -29,10 +29,10 @@ public class SellingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	protected static class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-		protected static class EditorSetup extends CommonEditorSetup<SellingPlayerShopkeeper, PriceOffer> {
+		protected class EditorSetup extends CommonEditorSetup<SellingPlayerShopkeeper, PriceOffer> {
 
-			public EditorSetup(SellingPlayerShopkeeper shopkeeper, SellingPlayerShopEditorHandler editorHandler) {
-				super(shopkeeper, editorHandler);
+			public EditorSetup(SellingPlayerShopkeeper shopkeeper) {
+				super(shopkeeper);
 			}
 
 			@Override
@@ -54,13 +54,13 @@ public class SellingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 			protected void setupColumnForOffer(Inventory inventory, int column, PriceOffer offer) {
 				ItemStack tradedItem = offer.getItem();
 				inventory.setItem(column, tradedItem);
-				((SellingPlayerShopEditorHandler) editorHandler).setEditColumnCost(inventory, column, offer.getPrice());
+				setEditColumnCost(inventory, column, offer.getPrice());
 			}
 
 			@Override
 			protected void setupColumnForItem(Inventory inventory, int column, ItemStack itemFromChest) {
 				inventory.setItem(column, itemFromChest);
-				((SellingPlayerShopEditorHandler) editorHandler).setEditColumnCost(inventory, column, 0);
+				setEditColumnCost(inventory, column, 0);
 			}
 		}
 
@@ -68,18 +68,12 @@ public class SellingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 		protected SellingPlayerShopEditorHandler(SellingPlayerShopkeeper shopkeeper) {
 			super(shopkeeper);
-			this.setup = new EditorSetup(shopkeeper, this);
+			this.setup = new EditorSetup(shopkeeper);
 		}
 
 		@Override
 		public SellingPlayerShopkeeper getShopkeeper() {
 			return (SellingPlayerShopkeeper) super.getShopkeeper();
-		}
-
-		// redeclare for visibility reasons
-		@Override
-		protected void setEditColumnCost(Inventory inventory, int column, int cost) {
-			super.setEditColumnCost(inventory, column, cost);
 		}
 
 		@Override

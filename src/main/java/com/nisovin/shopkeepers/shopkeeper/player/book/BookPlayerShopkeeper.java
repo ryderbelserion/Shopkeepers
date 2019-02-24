@@ -39,12 +39,12 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	protected static class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-		protected static class EditorSetup extends CommonEditorSetup<BookPlayerShopkeeper, BookOffer> {
+		protected class EditorSetup extends CommonEditorSetup<BookPlayerShopkeeper, BookOffer> {
 
 			private List<ItemCount> copyableBookItems = null; // gets set right before setup and reset afterwards
 
-			public EditorSetup(BookPlayerShopkeeper shopkeeper, BookPlayerShopEditorHandler editorHandler) {
-				super(shopkeeper, editorHandler);
+			public EditorSetup(BookPlayerShopkeeper shopkeeper) {
+				super(shopkeeper);
 			}
 
 			@Override
@@ -71,13 +71,13 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 				}
 				int price = offer.getPrice();
 				inventory.setItem(column, bookItem);
-				((BookPlayerShopEditorHandler) editorHandler).setEditColumnCost(inventory, column, price);
+				setEditColumnCost(inventory, column, price);
 			}
 
 			@Override
 			protected void setupColumnForItem(Inventory inventory, int column, ItemStack itemFromChest) {
 				inventory.setItem(column, itemFromChest);
-				((BookPlayerShopEditorHandler) editorHandler).setEditColumnCost(inventory, column, 0);
+				setEditColumnCost(inventory, column, 0);
 			}
 		}
 
@@ -85,7 +85,7 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 		protected BookPlayerShopEditorHandler(BookPlayerShopkeeper shopkeeper) {
 			super(shopkeeper);
-			this.setup = new EditorSetup(shopkeeper, this);
+			this.setup = new EditorSetup(shopkeeper);
 		}
 
 		@Override

@@ -31,10 +31,10 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	protected static class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-		protected static class EditorSetup extends CommonEditorSetup<BuyingPlayerShopkeeper, PriceOffer> {
+		protected class EditorSetup extends CommonEditorSetup<BuyingPlayerShopkeeper, PriceOffer> {
 
-			public EditorSetup(BuyingPlayerShopkeeper shopkeeper, BuyingPlayerShopEditorHandler editorHandler) {
-				super(shopkeeper, editorHandler);
+			public EditorSetup(BuyingPlayerShopkeeper shopkeeper) {
+				super(shopkeeper);
 			}
 
 			@Override
@@ -73,7 +73,7 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 		protected BuyingPlayerShopEditorHandler(BuyingPlayerShopkeeper shopkeeper) {
 			super(shopkeeper);
-			this.setup = new EditorSetup(shopkeeper, this);
+			this.setup = new EditorSetup(shopkeeper);
 		}
 
 		@Override
