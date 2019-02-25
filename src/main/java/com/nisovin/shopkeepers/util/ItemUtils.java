@@ -42,6 +42,10 @@ public final class ItemUtils {
 		return isEmpty(item) ? null : item;
 	}
 
+	public static ItemStack cloneOrNullIfEmpty(ItemStack item) {
+		return isEmpty(item) ? null : item.clone();
+	}
+
 	/**
 	 * Creates a clone of the given {@link ItemStack} with amount <code>1</code>.
 	 * 

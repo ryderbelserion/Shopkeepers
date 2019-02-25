@@ -5,13 +5,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
@@ -20,86 +17,12 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.offers.TradingOffer;
-import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
-import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
-import com.nisovin.shopkeepers.util.ItemUtils;
 
 /**
  * Represents a shopkeeper that is managed by the server. This shopkeeper will have unlimited supply and will not store
  * earnings anywhere.
  */
 public class RegularAdminShopkeeper extends AbstractAdminShopkeeper {
-
-	protected static class AdminShopEditorHandler extends EditorHandler {
-
-		protected AdminShopEditorHandler(RegularAdminShopkeeper shopkeeper) {
-			super(SKDefaultUITypes.EDITOR(), shopkeeper);
-		}
-
-		@Override
-		public RegularAdminShopkeeper getShopkeeper() {
-			return (RegularAdminShopkeeper) super.getShopkeeper();
-		}
-
-		@Override
-		protected boolean canOpen(Player player) {
-			assert player != null;
-			return super.canOpen(player) && this.getShopkeeper().getType().hasPermission(player);
-		}
-
-		@Override
-		protected boolean openWindow(Player player) {
-			RegularAdminShopkeeper shopkeeper = this.getShopkeeper();
-			Inventory inventory = Bukkit.createInventory(player, 27, Settings.editorTitle);
-
-			// add the shopkeeper's trade offers:
-			List<TradingOffer> offers = shopkeeper.getOffers();
-			for (int column = 0; column < offers.size() && column < TRADE_COLUMNS; column++) {
-				TradingOffer offer = offers.get(column);
-				inventory.setItem(column, offer.getItem1());
-				inventory.setItem(column + 9, offer.getItem2());
-				inventory.setItem(column + 18, offer.getResultItem());
-			}
-			// add the special buttons:
-			this.setActionButtons(inventory);
-			// show editing inventory:
-			player.openInventory(inventory);
-			return true;
-		}
-
-		@Override
-		protected void saveEditor(Inventory inventory, Player player) {
-			RegularAdminShopkeeper shopkeeper = this.getShopkeeper();
-			shopkeeper.clearOffers();
-			for (int column = 0; column < TRADE_COLUMNS; column++) {
-				ItemStack cost1 = ItemUtils.getNullIfEmpty(inventory.getItem(column));
-				ItemStack cost2 = ItemUtils.getNullIfEmpty(inventory.getItem(column + 9));
-				ItemStack resultItem = ItemUtils.getNullIfEmpty(inventory.getItem(column + 18));
-
-				// handle cost2 item as cost1 item if there is no cost1 item:
-				if (cost1 == null) {
-					cost1 = cost2;
-					cost2 = null;
-				}
-
-				if (cost1 != null && resultItem != null) {
-					// add trading recipe:
-					shopkeeper.addOffer(resultItem, cost1, cost2);
-				} else if (player != null) {
-					// return unused items to inventory:
-					if (cost1 != null) {
-						player.getInventory().addItem(cost1);
-					}
-					if (cost2 != null) {
-						player.getInventory().addItem(cost2);
-					}
-					if (resultItem != null) {
-						player.getInventory().addItem(resultItem);
-					}
-				}
-			}
-		}
-	}
 
 	// can contain multiple offers for a specific type of item:
 	private final List<TradingOffer> offers = new ArrayList<>();
@@ -134,7 +57,7 @@ public class RegularAdminShopkeeper extends AbstractAdminShopkeeper {
 	@Override
 	protected void setup() {
 		if (this.getUIHandler(DefaultUITypes.EDITOR()) == null) {
-			this.registerUIHandler(new AdminShopEditorHandler(this));
+			this.registerUIHandler(new RegularAdminShopEditorHandler(this));
 		}
 		super.setup();
 	}
