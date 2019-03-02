@@ -14,8 +14,6 @@ public interface UIRegistry<T extends UIType> extends TypeRegistry<T> {
 
 	public UIType getOpenUIType(Player player);
 
-	public void onInventoryClose(Player player);
-
 	public void closeAll(Shopkeeper shopkeeper);
 
 	public void closeAllDelayed(Shopkeeper shopkeeper);

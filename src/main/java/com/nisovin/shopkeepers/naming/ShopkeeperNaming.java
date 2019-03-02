@@ -10,13 +10,14 @@ import org.bukkit.entity.Player;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class ShopkeeperNaming {
 
 	private final SKShopkeepersPlugin plugin;
-	private final Map<String, AbstractShopkeeper> naming = Collections.synchronizedMap(new HashMap<>());
+	private final Map<String, Shopkeeper> naming = Collections.synchronizedMap(new HashMap<>());
 
 	public ShopkeeperNaming(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
@@ -35,12 +36,12 @@ public class ShopkeeperNaming {
 		this.endNaming(player);
 	}
 
-	public void startNaming(Player player, AbstractShopkeeper shopkeeper) {
+	public void startNaming(Player player, Shopkeeper shopkeeper) {
 		assert player != null && shopkeeper != null;
 		naming.put(player.getName(), shopkeeper);
 	}
 
-	public AbstractShopkeeper getCurrentlyNamedShopkeeper(Player player) {
+	public Shopkeeper getCurrentlyNamedShopkeeper(Player player) {
 		assert player != null;
 		return naming.get(player.getName());
 	}
@@ -50,12 +51,12 @@ public class ShopkeeperNaming {
 		return this.getCurrentlyNamedShopkeeper(player) != null;
 	}
 
-	public AbstractShopkeeper endNaming(Player player) {
+	public Shopkeeper endNaming(Player player) {
 		assert player != null;
 		return naming.remove(player.getName());
 	}
 
-	public boolean requestNameChange(Player player, AbstractShopkeeper shopkeeper, String newName) {
+	public boolean requestNameChange(Player player, Shopkeeper shopkeeper, String newName) {
 		if (player == null) return false;
 		if (!shopkeeper.isValid()) return false;
 
@@ -65,7 +66,7 @@ public class ShopkeeperNaming {
 			newName = "";
 		} else {
 			// validate name:
-			if (!shopkeeper.isValidName(newName)) {
+			if (!((AbstractShopkeeper) shopkeeper).isValidName(newName)) {
 				Utils.sendMessage(player, Settings.msgNameInvalid);
 				return false;
 			}

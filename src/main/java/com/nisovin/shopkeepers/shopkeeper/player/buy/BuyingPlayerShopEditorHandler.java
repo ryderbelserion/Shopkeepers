@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.shopkeeper.player.buy;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
@@ -16,67 +16,8 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	protected class EditorSetup extends CommonEditorSetup<BuyingPlayerShopkeeper, PriceOffer> {
-
-		public EditorSetup(BuyingPlayerShopkeeper shopkeeper) {
-			super(shopkeeper);
-		}
-
-		@Override
-		protected List<PriceOffer> getOffers() {
-			return shopkeeper.getOffers();
-		}
-
-		@Override
-		protected List<ItemCount> getItemsFromChest() {
-			return shopkeeper.getItemsFromChest();
-		}
-
-		@Override
-		protected boolean hasOffer(ItemStack itemFromChest) {
-			return (shopkeeper.getOffer(itemFromChest) != null);
-		}
-
-		@Override
-		protected TradingRecipeDraft toTradingRecipe(PriceOffer offer) {
-			assert offer != null;
-			ItemStack currencyItem = Settings.createCurrencyItem(offer.getPrice());
-			return new TradingRecipeDraft(currencyItem, offer.getItem(), null);
-		}
-
-		@Override
-		protected TradingRecipeDraft toTradingRecipe(ItemStack itemFromChest) {
-			ItemStack currencyItem = Settings.createZeroCurrencyItem();
-			return new TradingRecipeDraft(currencyItem, itemFromChest, null);
-		}
-
-		@Override
-		protected void clearOffers() {
-			shopkeeper.clearOffers();
-		}
-
-		@Override
-		protected void addOffer(Player player, TradingRecipeDraft recipe) {
-			assert recipe != null && recipe.isValid();
-			assert recipe.getItem2() == null;
-
-			ItemStack tradedItem = recipe.getItem1();
-			assert tradedItem != null;
-
-			ItemStack priceItem = recipe.getResultItem();
-			assert priceItem != null;
-			if (priceItem.getType() != Settings.currencyItem) return; // checking this just in case
-			assert priceItem.getAmount() > 0;
-
-			shopkeeper.addOffer(tradedItem, priceItem.getAmount());
-		}
-	}
-
-	protected final EditorSetup setup;
-
 	protected BuyingPlayerShopEditorHandler(BuyingPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
-		this.setup = new EditorSetup(shopkeeper);
 	}
 
 	@Override
@@ -85,13 +26,62 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected boolean openWindow(Player player) {
-		return setup.openWindow(player);
+	protected List<TradingRecipeDraft> getTradingRecipes() {
+		BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		List<TradingRecipeDraft> recipes = new ArrayList<>();
+
+		// add the shopkeeper's offers:
+		for (PriceOffer offer : shopkeeper.getOffers()) {
+			ItemStack currencyItem = Settings.createCurrencyItem(offer.getPrice());
+			TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, offer.getItem(), null);
+			recipes.add(recipe);
+		}
+
+		// add empty offers for items from the chest:
+		List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
+		for (int chestItemIndex = 0; chestItemIndex < chestItems.size(); chestItemIndex++) {
+			ItemCount itemCount = chestItems.get(chestItemIndex);
+			ItemStack itemFromChest = itemCount.getItem(); // this item is already a copy with amount 1
+
+			if (shopkeeper.getOffer(itemFromChest) != null) {
+				continue; // already added
+			}
+
+			// add recipe:
+			ItemStack currencyItem = Settings.createZeroCurrencyItem();
+			TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, itemFromChest, null);
+			recipes.add(recipe);
+		}
+
+		return recipes;
 	}
 
 	@Override
-	protected void onInventoryClick(InventoryClickEvent event, Player player) {
-		event.setCancelled(true);
+	protected void clearRecipes() {
+		BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		shopkeeper.clearOffers();
+	}
+
+	@Override
+	protected void addRecipe(Player player, TradingRecipeDraft recipe) {
+		assert recipe != null && recipe.isValid();
+		assert recipe.getItem2() == null;
+
+		ItemStack tradedItem = recipe.getItem1();
+		assert tradedItem != null;
+
+		ItemStack priceItem = recipe.getResultItem();
+		assert priceItem != null;
+		if (priceItem.getType() != Settings.currencyItem) return; // checking this just in case
+		assert priceItem.getAmount() > 0;
+
+		BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		shopkeeper.addOffer(tradedItem, priceItem.getAmount());
+	}
+
+	@Override
+	protected void handleTradesClick(Session session, InventoryClickEvent event) {
+		assert this.isTradesArea(event.getRawSlot());
 		int rawSlot = event.getRawSlot();
 		if (this.isResultRow(rawSlot)) {
 			// modifying cost:
@@ -104,13 +94,6 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			this.handleUpdateItemAmountOnClick(event, 1);
 		} else if (this.isItem2Row(rawSlot)) {
 			// not used by the buying shopkeeper
-		} else {
-			super.onInventoryClick(event, player);
 		}
-	}
-
-	@Override
-	protected void saveEditor(Inventory inventory, Player player) {
-		setup.saveEditor(inventory, player);
 	}
 }

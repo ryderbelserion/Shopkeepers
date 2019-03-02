@@ -10,6 +10,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperOpenUIEvent;
@@ -118,23 +119,31 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		return (session != null ? session.getUIType() : null);
 	}
 
-	@Override
-	public void onInventoryClose(Player player) {
-		if (player == null) return;
+	// closeEvent might be null
+	void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
+		assert player != null;
 		SKUISession session = playerSessions.remove(player.getUniqueId());
-		if (session != null) {
-			this.onSessionEnd(session);
-		}
+		if (session == null) return;
+
+		UIHandler uiHandler = session.getUIHandler();
+		Log.debug("Player " + player.getName() + " closed UI '" + uiHandler.getUIType().getIdentifier() + "'.");
+		this.onSessionEnd(session, closeEvent);
+	}
+
+	public void onPlayerQuit(Player player) {
+		// TODO this might have no effect, because CraftBukkit triggers an inventory close event prior to the player
+		// quitting
+		this.onInventoryClose(player, null);
 	}
 
 	private void onSessionStart(SKUISession session) {
 		Log.debug("UI '" + session.getUIType().getIdentifier() + "' session started for player '" + session.getPlayer().getName() + "'.");
-		session.getUIHandler().onSessionStart(session.getPlayer()); // inform UI handler
 	}
 
-	private void onSessionEnd(SKUISession session) {
+	// closeEvent can be null
+	private void onSessionEnd(SKUISession session, InventoryCloseEvent closeEvent) {
 		Log.debug("UI '" + session.getUIType().getIdentifier() + "' session ended for player '" + session.getPlayer().getName() + "'.");
-		session.getUIHandler().onSessionEnd(session.getPlayer()); // inform UI handler
+		session.getUIHandler().onInventoryClose(session.getPlayer(), closeEvent); // inform UI handler
 	}
 
 	@Override
@@ -147,7 +156,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 			SKUISession session = entry.getValue();
 			if (session.getShopkeeper().equals(shopkeeper)) {
 				iterator.remove();
-				this.onSessionEnd(session);
+				this.onSessionEnd(session, null);
 				Player player = session.getPlayer();
 				player.closeInventory();
 			}
@@ -178,7 +187,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 			Entry<UUID, SKUISession> entry = iterator.next();
 			SKUISession session = entry.getValue();
 			iterator.remove();
-			this.onSessionEnd(session);
+			this.onSessionEnd(session, null);
 			Player player = session.getPlayer();
 			player.closeInventory();
 		}

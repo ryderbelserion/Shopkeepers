@@ -1,13 +1,13 @@
 package com.nisovin.shopkeepers.shopkeeper.player.book;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
@@ -15,70 +15,8 @@ import com.nisovin.shopkeepers.util.ItemCount;
 
 public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	protected class EditorSetup extends CommonEditorSetup<BookPlayerShopkeeper, BookOffer> {
-
-		private List<ItemCount> copyableBookItems = null; // gets set right before setup and reset afterwards
-
-		public EditorSetup(BookPlayerShopkeeper shopkeeper) {
-			super(shopkeeper);
-		}
-
-		@Override
-		protected List<BookOffer> getOffers() {
-			return shopkeeper.getOffers();
-		}
-
-		@Override
-		protected List<ItemCount> getItemsFromChest() {
-			return shopkeeper.getCopyableBooksFromChest();
-		}
-
-		@Override
-		protected boolean hasOffer(ItemStack itemFromChest) {
-			return (shopkeeper.getOffer(itemFromChest) != null);
-		}
-
-		@Override
-		protected TradingRecipeDraft toTradingRecipe(BookOffer offer) {
-			assert offer != null;
-			String bookTitle = offer.getBookTitle();
-			ItemStack bookItem = shopkeeper.getBookItem(copyableBookItems, bookTitle);
-			if (bookItem == null) {
-				bookItem = shopkeeper.createDummyBook(bookTitle);
-			}
-			return createTradingRecipeDraft(bookItem, offer.getPrice());
-		}
-
-		@Override
-		protected TradingRecipeDraft toTradingRecipe(ItemStack itemFromChest) {
-			return createTradingRecipeDraft(itemFromChest, 0);
-		}
-
-		@Override
-		protected void clearOffers() {
-			shopkeeper.clearOffers();
-		}
-
-		@Override
-		protected void addOffer(Player player, TradingRecipeDraft recipe) {
-			assert recipe != null && recipe.isValid();
-			ItemStack bookItem = recipe.getResultItem();
-			if (!BookPlayerShopkeeper.isCopyableOrDummyBook(bookItem)) return;
-
-			String bookTitle = BookPlayerShopkeeper.getTitleOfBook(bookItem);
-			if (bookTitle == null) return;
-
-			int price = getPrice(recipe);
-			if (price <= 0) return;
-			shopkeeper.addOffer(bookTitle, price);
-		}
-	}
-
-	protected final EditorSetup setup;
-
 	protected BookPlayerShopEditorHandler(BookPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
-		this.setup = new EditorSetup(shopkeeper);
 	}
 
 	@Override
@@ -87,20 +25,64 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected boolean openWindow(Player player) {
-		setup.copyableBookItems = this.getShopkeeper().getCopyableBooksFromChest();
-		boolean result = setup.openWindow(player);
-		setup.copyableBookItems = null;
-		return result;
+	protected List<TradingRecipeDraft> getTradingRecipes() {
+		BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		List<TradingRecipeDraft> recipes = new ArrayList<>();
+
+		// only adding one recipe per book title:
+		Set<String> bookTitles = new HashSet<>();
+
+		// add the shopkeeper's offers:
+		List<ItemCount> chestItems = shopkeeper.getCopyableBooksFromChest();
+		for (BookOffer offer : shopkeeper.getOffers()) {
+			String bookTitle = offer.getBookTitle();
+			bookTitles.add(bookTitle);
+			ItemStack bookItem = shopkeeper.getBookItem(chestItems, bookTitle);
+			if (bookItem == null) {
+				bookItem = shopkeeper.createDummyBook(bookTitle);
+			}
+			TradingRecipeDraft recipe = this.createTradingRecipeDraft(bookItem, offer.getPrice());
+			recipes.add(recipe);
+		}
+
+		// add empty offers for items from the chest:
+		for (int chestItemIndex = 0; chestItemIndex < chestItems.size(); chestItemIndex++) {
+			ItemCount itemCount = chestItems.get(chestItemIndex);
+			ItemStack itemFromChest = itemCount.getItem(); // this item is already a copy with amount 1
+
+			String bookTitle = BookPlayerShopkeeper.getTitleOfBook(itemFromChest);
+			if (bookTitles.contains(bookTitle)) {
+				continue; // already added a recipe for a book with this name
+			}
+			bookTitles.add(bookTitle);
+
+			// add recipe:
+			TradingRecipeDraft recipe = this.createTradingRecipeDraft(itemFromChest, 0);
+			recipes.add(recipe);
+		}
+
+		return recipes;
 	}
 
 	@Override
-	protected void onInventoryClick(InventoryClickEvent event, Player player) {
-		super.onInventoryClick(event, player);
+	protected void clearRecipes() {
+		BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		shopkeeper.clearOffers();
 	}
 
 	@Override
-	protected void saveEditor(Inventory inventory, Player player) {
-		setup.saveEditor(inventory, player);
+	protected void addRecipe(Player player, TradingRecipeDraft recipe) {
+		assert recipe != null && recipe.isValid();
+		ItemStack bookItem = recipe.getResultItem();
+		if (!BookPlayerShopkeeper.isCopyableOrDummyBook(bookItem)) return;
+
+		String bookTitle = BookPlayerShopkeeper.getTitleOfBook(bookItem);
+		if (bookTitle == null) return;
+
+		int price = this.getPrice(recipe);
+		if (price <= 0) return;
+
+		BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		shopkeeper.addOffer(bookTitle, price);
 	}
 }

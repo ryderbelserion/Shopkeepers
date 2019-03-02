@@ -91,36 +91,19 @@ public abstract class UIHandler {
 	public abstract boolean isWindow(Inventory inventory);
 
 	/**
-	 * Gets called when a player opens this UI.
-	 * 
-	 * @param player
-	 *            the player
-	 */
-	protected void onSessionStart(Player player) {
-	}
-
-	/**
 	 * Gets called when this UI gets closed for a player.
+	 * <p>
+	 * The corresponding inventory close event might be <code>null</code> if the UI session gets ended for a different
+	 * reason.
 	 * 
 	 * @param player
 	 *            the player
+	 * @param closeEvent
+	 *            the inventory closing event, can be <code>null</code>
 	 */
-	protected void onSessionEnd(Player player) {
-	}
+	protected abstract void onInventoryClose(Player player, InventoryCloseEvent closeEvent);
 
 	// handling of interface window interaction
-
-	/**
-	 * Called when a player closes an inventory for which {@link #isWindow(Inventory)} returned <code>true</code>.
-	 * <p>
-	 * For performing cleanup, consider using {@link #onSessionEnd(Player)}, which might be more reliable.
-	 * 
-	 * @param event
-	 *            the event which triggered this method call
-	 * @param player
-	 *            the player who closed the inventory
-	 */
-	protected abstract void onInventoryClose(InventoryCloseEvent event, Player player);
 
 	/**
 	 * Called when a player triggers an InventoryClickEvent for an inventory for which {@link #isWindow(Inventory)}

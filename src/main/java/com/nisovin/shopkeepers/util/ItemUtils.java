@@ -70,8 +70,12 @@ public final class ItemUtils {
 		if (item == null) return null;
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
-			meta.setDisplayName(displayName);
-			meta.setLore(lore);
+			if (displayName != null) {
+				meta.setDisplayName(displayName);
+			}
+			if (lore != null) {
+				meta.setLore(lore);
+			}
 			item.setItemMeta(meta);
 		}
 		return item;

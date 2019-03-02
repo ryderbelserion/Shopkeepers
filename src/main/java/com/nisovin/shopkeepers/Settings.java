@@ -145,6 +145,10 @@ public class Settings {
 	 */
 	public static String editorTitle = "Shopkeeper Editor";
 
+	public static Material previousPageItem = Material.WRITABLE_BOOK;
+	public static Material nextPageItem = Material.WRITABLE_BOOK;
+	public static Material currentPageItem = Material.WRITABLE_BOOK;
+
 	public static Material nameItem = Material.NAME_TAG;
 	public static List<String> nameItemLore = new ArrayList<>(0);
 
@@ -233,6 +237,13 @@ public class Settings {
 			+ "&e  Sneak + left/right-click to select the object type.\n"
 			+ "&e  Right-click a chest to select it.\n"
 			+ "&e  Then right-click a block to place the shopkeeper.";
+
+	public static String msgButtonPreviousPage = "&6<- Previous page ({prev_page} of {max_page})";
+	public static List<String> msgButtonPreviousPageLore = Arrays.asList();
+	public static String msgButtonNextPage = "&6Next page ({next_page} of {max_page}) ->";
+	public static List<String> msgButtonNextPageLore = Arrays.asList();
+	public static String msgButtonCurrentPage = "&6Page {page} of {max_page}";
+	public static List<String> msgButtonCurrentPageLore = Arrays.asList();
 
 	public static String msgButtonName = "&aSet Shop Name";
 	public static List<String> msgButtonNameLore = Arrays.asList("Lets you rename", "your shopkeeper");

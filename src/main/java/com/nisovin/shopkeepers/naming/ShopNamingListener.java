@@ -8,7 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
 class ShopNamingListener implements Listener {
 
@@ -25,7 +25,7 @@ class ShopNamingListener implements Listener {
 	@EventHandler(priority = EventPriority.LOWEST)
 	void onChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
-		AbstractShopkeeper shopkeeper = shopkeeperNaming.endNaming(player);
+		Shopkeeper shopkeeper = shopkeeperNaming.endNaming(player);
 		if (shopkeeper == null) return;
 
 		event.setCancelled(true);

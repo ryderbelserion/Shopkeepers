@@ -125,17 +125,6 @@ public class TradingHandler extends UIHandler {
 		super(uiType, shopkeeper);
 	}
 
-	@Override
-	protected void onSessionStart(Player player) {
-		super.onSessionStart(player);
-	}
-
-	@Override
-	protected void onSessionEnd(Player player) {
-		super.onSessionEnd(player);
-		merchants.remove(player.getUniqueId());
-	}
-
 	protected Merchant getMerchant(Player player) {
 		return merchants.get(player.getUniqueId());
 	}
@@ -250,8 +239,8 @@ public class TradingHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryClose(InventoryCloseEvent event, Player player) {
-		// nothing to do by default
+	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
+		merchants.remove(player.getUniqueId());
 	}
 
 	@Override

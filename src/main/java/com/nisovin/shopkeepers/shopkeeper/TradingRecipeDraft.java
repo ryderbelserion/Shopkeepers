@@ -17,6 +17,8 @@ import com.nisovin.shopkeepers.util.ItemUtils;
  */
 public class TradingRecipeDraft {
 
+	public static final TradingRecipeDraft EMPTY = new TradingRecipeDraft(null, null, null);
+
 	protected final ItemStack resultItem;
 	protected final ItemStack item1;
 	protected final ItemStack item2;
@@ -71,6 +73,15 @@ public class TradingRecipeDraft {
 	 */
 	public ItemStack getItem2() {
 		return item2;
+	}
+
+	/**
+	 * Checks if all the items of this recipe are empty.
+	 * 
+	 * @return <code>true</code> if empty
+	 */
+	public boolean isEmpty() {
+		return resultItem == null && item1 == null && item2 == null;
 	}
 
 	/**

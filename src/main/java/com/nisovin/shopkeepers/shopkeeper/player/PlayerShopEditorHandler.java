@@ -37,6 +37,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		// cancel all inventory clicks and handle everything on our own:
 		// TODO maybe allow certain inventory actions which only affect the player's inventory?
 		event.setCancelled(true);
+		super.onInventoryDrag(event, player);
 	}
 
 	@Override
@@ -45,23 +46,25 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		// TODO maybe allow certain inventory actions which only affect the player's inventory?
 		// (like moving items around)
 		event.setCancelled(true);
+		super.onInventoryClick(event, player);
+	}
 
+	@Override
+	protected void handleTradesClick(Session session, InventoryClickEvent event) {
+		super.handleTradesClick(session, event);
 		int rawSlot = event.getRawSlot();
 		if (this.isItem1Row(rawSlot)) {
 			// change low cost:
 			int column = rawSlot - ITEM_1_OFFSET;
-			ItemStack soldItem = event.getInventory().getItem(column);
-			if (ItemUtils.isEmpty(soldItem)) return;
+			ItemStack item = event.getInventory().getItem(column);
+			if (ItemUtils.isEmpty(item)) return;
 			this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
 		} else if (this.isItem2Row(rawSlot)) {
 			// change high cost:
 			int column = rawSlot - ITEM_2_OFFSET;
-			ItemStack soldItem = event.getInventory().getItem(column);
-			if (ItemUtils.isEmpty(soldItem)) return;
+			ItemStack item = event.getInventory().getItem(column);
+			if (ItemUtils.isEmpty(item)) return;
 			this.handleUpdateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), Settings.createHighZeroCurrencyItem());
-		} else {
-			// handle common editor buttons:
-			super.onInventoryClick(event, player);
 		}
 	}
 

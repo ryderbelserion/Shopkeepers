@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.shopkeeper.player.sell;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
@@ -14,57 +14,8 @@ import com.nisovin.shopkeepers.util.ItemCount;
 
 public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	protected class EditorSetup extends CommonEditorSetup<SellingPlayerShopkeeper, PriceOffer> {
-
-		public EditorSetup(SellingPlayerShopkeeper shopkeeper) {
-			super(shopkeeper);
-		}
-
-		@Override
-		protected List<PriceOffer> getOffers() {
-			return shopkeeper.getOffers();
-		}
-
-		@Override
-		protected List<ItemCount> getItemsFromChest() {
-			return shopkeeper.getItemsFromChest();
-		}
-
-		@Override
-		protected boolean hasOffer(ItemStack itemFromChest) {
-			return (shopkeeper.getOffer(itemFromChest) != null);
-		}
-
-		@Override
-		protected TradingRecipeDraft toTradingRecipe(PriceOffer offer) {
-			assert offer != null;
-			return createTradingRecipeDraft(offer.getItem(), offer.getPrice());
-		}
-
-		@Override
-		protected TradingRecipeDraft toTradingRecipe(ItemStack itemFromChest) {
-			return createTradingRecipeDraft(itemFromChest, 0);
-		}
-
-		@Override
-		protected void clearOffers() {
-			shopkeeper.clearOffers();
-		}
-
-		@Override
-		protected void addOffer(Player player, TradingRecipeDraft recipe) {
-			assert recipe != null && recipe.isValid();
-			int price = getPrice(recipe);
-			if (price <= 0) return;
-			shopkeeper.addOffer(recipe.getResultItem(), price);
-		}
-	}
-
-	protected final EditorSetup setup;
-
 	protected SellingPlayerShopEditorHandler(SellingPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
-		this.setup = new EditorSetup(shopkeeper);
 	}
 
 	@Override
@@ -73,24 +24,59 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected boolean openWindow(Player player) {
-		return setup.openWindow(player);
+	protected List<TradingRecipeDraft> getTradingRecipes() {
+		SellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		List<TradingRecipeDraft> recipes = new ArrayList<>();
+
+		// add the shopkeeper's offers:
+		for (PriceOffer offer : shopkeeper.getOffers()) {
+			TradingRecipeDraft recipe = this.createTradingRecipeDraft(offer.getItem(), offer.getPrice());
+			recipes.add(recipe);
+		}
+
+		// add empty offers for items from the chest:
+		List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
+		for (int chestItemIndex = 0; chestItemIndex < chestItems.size(); chestItemIndex++) {
+			ItemCount itemCount = chestItems.get(chestItemIndex);
+			ItemStack itemFromChest = itemCount.getItem(); // this item is already a copy with amount 1
+
+			if (shopkeeper.getOffer(itemFromChest) != null) {
+				continue; // already added
+			}
+
+			// add recipe:
+			TradingRecipeDraft recipe = this.createTradingRecipeDraft(itemFromChest, 0);
+			recipes.add(recipe);
+		}
+
+		return recipes;
 	}
 
 	@Override
-	protected void onInventoryClick(InventoryClickEvent event, Player player) {
-		event.setCancelled(true);
+	protected void clearRecipes() {
+		SellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		shopkeeper.clearOffers();
+	}
+
+	@Override
+	protected void addRecipe(Player player, TradingRecipeDraft recipe) {
+		assert recipe != null && recipe.isValid();
+		int price = this.getPrice(recipe);
+		if (price <= 0) return;
+
+		SellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		shopkeeper.addOffer(recipe.getResultItem(), price);
+	}
+
+	@Override
+	protected void handleTradesClick(Session session, InventoryClickEvent event) {
+		assert this.isTradesArea(event.getRawSlot());
 		int rawSlot = event.getRawSlot();
 		if (this.isResultRow(rawSlot)) {
 			// handle changing sell stack size:
 			this.handleUpdateItemAmountOnClick(event, 1);
 		} else {
-			super.onInventoryClick(event, player);
+			super.handleTradesClick(session, event);
 		}
-	}
-
-	@Override
-	protected void saveEditor(Inventory inventory, Player player) {
-		setup.saveEditor(inventory, player);
 	}
 }

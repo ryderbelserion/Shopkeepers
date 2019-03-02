@@ -223,13 +223,17 @@ allow-renaming-of-player-npc-shops: false
 # The window title of the shopkeeper editor menu.
 editor-title: "Shopkeeper Editor"
 
+previous-page-item: WRITABLE_BOOK
+next-page-item: WRITABLE_BOOK
+current-page-item: WRITABLE_BOOK
+
 # The item type of the set-name button, and of the naming item (if enabled).
 name-item: NAME_TAG
 # The required item lore of the naming item. Empty to ignore.
 name-item-lore: []
 
 # Whether the editor menu of player shops contains an options to open the
-# shop's chest. Note: This will replace the set-name option in the editor menu!
+# shop's chest.
 enable-chest-option-on-player-shop: false
 # The item type of the open-chest button.
 chest-item: CHEST
@@ -367,6 +371,13 @@ msg-creation-item-selected: |
     &e  Sneak + left/right-click to select the object type.
     &e  Right-click a chest to select it.
     &e  Then right-click a block to place the shopkeeper.
+
+msg-button-previous-page: "&6<- Previous page ({prev_page} of {max_page})"
+msg-button-previous-page-lore: []
+msg-button-next-page: "&6Next page ({next_page} of {max_page}) ->"
+msg-button-next-page-lore: []
+msg-button-current-page: "&6Page {page} of {max_page}"
+msg-button-current-page-lore: []
 
 msg-button-name: "&aSet Shop Name"
 msg-button-name-lore:

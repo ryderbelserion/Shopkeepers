@@ -63,20 +63,13 @@ class UIListener implements Listener {
 
 	@EventHandler(priority = EventPriority.NORMAL)
 	void onInventoryClose(InventoryCloseEvent event) {
-		SKUISession session = this.getUISession(event.getPlayer());
-		if (session == null) return;
-
-		Player player = (Player) event.getPlayer();
-		Inventory inventory = event.getInventory();
-		UIHandler uiHandler = session.getUIHandler();
-
-		Log.debug("Player " + player.getName() + " closed UI '" + uiHandler.getUIType().getIdentifier() + "'.");
-		// inform ui registry so that it can cleanup session data:
-		uiRegistry.onInventoryClose(player);
-		// inform uiHandler so that it can react to it:
-		if (uiHandler.isWindow(inventory)) {
-			uiHandler.onInventoryClose(event, player);
+		if (!(event.getPlayer() instanceof Player)) {
+			return;
 		}
+		Player player = (Player) event.getPlayer();
+
+		// inform ui registry so that it can cleanup session data:
+		uiRegistry.onInventoryClose(player, event);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)

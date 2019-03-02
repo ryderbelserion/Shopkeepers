@@ -359,9 +359,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// player cleanup:
 		shopTypesRegistry.clearSelection(player);
 		shopObjectTypesRegistry.clearSelection(player);
-		// TODO this might not actually be needed, because CraftBukkit triggers an inventory close event prior to the
-		// player quitting
-		uiRegistry.onInventoryClose(player);
+		uiRegistry.onPlayerQuit(player);
 
 		shopkeeperNaming.onPlayerQuit(player);
 		shopkeeperCreation.onPlayerQuit(player);

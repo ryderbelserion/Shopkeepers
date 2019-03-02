@@ -38,7 +38,7 @@ public abstract class HiringHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryClose(InventoryCloseEvent event, Player player) {
+	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
 		// nothing to do by default
 	}
 

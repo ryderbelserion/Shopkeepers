@@ -108,8 +108,6 @@ public interface PlayerShopkeeper extends Shopkeeper {
 
 	/**
 	 * Attempts to open the chest inventory of this shopkeeper for the specified player.
-	 * <p>
-	 * Fails if this shopkeeper type doesn't have a chest (ex. admin shops).
 	 * 
 	 * @param player
 	 *            the player requesting the chest inventory window
