@@ -4,6 +4,129 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.6.0 Alpha (2019-03-04)
+### Supported MC versions: 1.13.2
+
+Since the changes of this update are manifold and prone to potentially exploitable issues, this update is initially marked as 'alpha' version to see if any issues come up.
+
+**Completely changed the editor interface(s):**
+* Unified the trade representation in the editor among all shopkeeper types to be more consistent:
+  * The top item is now always representing the result item and the next two items represent from bottom to top the buy items 1 and 2.
+  * The only exception to this are the selling and book shopkeeper: Here the high cost item will appear as buy item 2 inside the editor, but as first item inside the trading recipe (like before).
+  * The admin and trading shop editors were updated to reflect those changes. This change might initially confuse anyone who is used to the previous admin trades setup (with the result item being at the bottom), but should ultimately be easier to remember due to being consistent among all shopkeeper types.
+* It is now possible to switch between up to 5 pages inside the editor, allowing for a total of 45 trades to be setup per shopkeeper.
+  * Added settings for the button items used to switch between pages.
+* The editor buttons were moved to the bottom row. In the future the additional space may be used for more editor options.
+  * The chest button option for player shops will no longer replace the naming button, but they will be both available side by side now.
+* Improved the setup of the trading player shopkeepers:
+  * Inside the editor, the player picks up items in their inventory and can then freely place copies of those items in the trades section of the editor to specify the traded items. The picked up items will appear on the player's cursor, making the setup more apparent.
+  * To make the inventory interaction more fluent, item dragging that only involves a single slot gets interpreted as click.
+  * It is now also possible to setup multiple trades for the same result item.
+* Visualizing trades that are out of stock:
+  * When a trade runs out of stock it gets deactivated, but is still visualized by limiting the trade's remaining uses.
+  * The trades get updated for the trading player dynamically after every trade attempt. This will not work in compatibility mode in which case it will behave as before, with trading simply getting cancelled without visual feedback for the user.
+  * The player shopkeepers will also keep displaying their setup trades in the editor, even if the corresponding items are no longer present in the chest.
+  * Trades of the book shopkeeper for books that are no longer present in the chest will be displayed in the form of dummy books with unknown author and 'tattered' generation.
+* An item inside the editor briefly explains the trades setup for the specific type of shopkeeper.
+  * Added setting 'trade-setup-item'.
+  * Changed the shop type display names to upper case and with 'shop' prefix, since this is now also used for the trades setup item.
+  * Slightly changed the admin and book shopkeeper description messages.
+
+Other changes:  
+* Changed: Clicking the naming or chest editor buttons will no longer trigger two consecutive saves.
+* Changed: The book shopkeeper's behavior more closely matches minecraft's behavior now: Only original and copies of original books can be copied. When copied, the book's generation is increased.
+* Changed: The book shopkeeper editor will filter different books with the same title and only consider the first one it finds in the chest.
+* Changed: The transfer command will now transfer all shops that use a chest that are owned by the player. Previously it would report 'no permission' if there was a single non-owned shop that was using the same chest. If the player has the bypass permission, all shops will get transferred (like before), regardless of the owner.
+* Added: The transfer, remote, setForHire and setTradePerm commands allow targeting the shopkeeper directly now, instead of having to target the corresponding chest.
+* Changed: The shopkeeper remote command can now also be used to open player shopkeepers. Also added the alias 'open' for this command.
+* Added: 'edit' command to remotely edit shops. Permission 'shopkeeper.remoteedit' (default: op). This works with both admin and player shops. Shops can be specified via argument (id, name, ..) or by targeting a shop or shop chest.
+* Added: 'give' command that can be used to give players shop creation items. Permission 'shopkeeper.give' (default: op).
+* Added: Allow backwards cycling through shop and shop object types with the shop creation item in hand by left clicking.
+* Changed: Improved handling of shopkeeper names with colors and whitespace in commands.
+* Changed: Using the shop type and object type display names for the command argument suggestions.
+* Fixed: The list command's max page is now at least 1 (even if there are no shops to list).
+* Fixed: Missing material settings couldn't be automatically inserted from the defaults.
+* Fixed: List messages wouldn't be loaded from alternative language files.
+
+Internal changes:  
+* Various refactoring related to the editor code common to all shopkeeper types.
+* Small changes related to handling start and end of UI sessions of players.
+* As precaution the trading player shop now verifies that there actually still is a corresponding offer setup for the currently traded recipe.
+* API: Removed UIRegistry#onInventoryClose(Player)
+* API: Calling ShopkeeperEditedEvent on regular editor inventory closes as well now.
+
+This update includes many message changes. It is therefore suggested to let shopkeeper freshly generate all default messages.  
+
+Changed messages:
+* msg-creation-item-selected
+* msg-shop-type-disabled
+* msg-shop-object-type-disabled:
+* msg-cant-trade-while-owner-online
+* msg-trade-perm-set
+* msg-trade-perm-removed
+
+Added messages:
+* msg-must-target-shop
+* msg-must-target-player-shop
+* msg-target-entity-is-no-shop
+* msg-target-shop-is-no-player-shop
+* msg-command-description-remote-edit
+* msg-shop-type-admin-regular
+* msg-shop-type-selling
+* msg-shop-type-buying
+* msg-shop-type-trading
+* msg-shop-type-book
+* msg-shop-type-desc-admin-regular
+* msg-shop-type-desc-selling
+* msg-shop-type-desc-buying
+* msg-shop-type-desc-trading
+* msg-shop-type-desc-book
+* msg-shop-object-type-living
+* msg-shop-object-type-sign
+* msg-shop-object-type-npc
+* msg-selected-shop-type
+* msg-selected-shop-object-type
+* msg-must-target-admin-shop
+* msg-target-shop-is-no-admin-shop
+* msg-shopkeeper-created
+* msg-shop-setup-desc-selling
+* msg-shop-setup-desc-buying
+* msg-shop-setup-desc-trading
+* msg-shop-setup-desc-book
+* msg-shop-setup-desc-admin-regular
+* msg-command-shopkeeper-argument-no-admin-shop
+* msg-command-shopkeeper-argument-no-player-shop
+* msg-command-description-give
+* msg-shop-creation-items-given
+* msg-unknown-book-author
+* msg-button-previous-page
+* msg-button-previous-page-lore
+* msg-button-next-page
+* msg-button-next-page-lore
+* msg-button-current-page
+* msg-button-current-page-lore
+* msg-trade-setup-desc-header
+* msg-trade-setup-desc-admin-regular
+* msg-trade-setup-desc-selling
+* msg-trade-setup-desc-buying
+* msg-trade-setup-desc-trading
+* msg-trade-setup-desc-book
+
+Removed messages:
+* msg-must-target-chest
+* msg-selected-sell-shop
+* msg-selected-buy-shop
+* msg-selected-trade-shop
+* msg-selected-book-shop
+* msg-selected-living-shop
+* msg-selected-sign-shop
+* msg-selected-citizen-shop
+* msg-sell-shop-created
+* msg-buy-shop-created
+* msg-trade-shop-created
+* msg-book-shop-created
+* msg-admin-shop-created
+
 ## v2.5.0 (2019-02-16)
 ### Supported MC versions: 1.13.2
 **Chest protection improvements:**  
