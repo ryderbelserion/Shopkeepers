@@ -10,7 +10,7 @@
 	<url>${shopkeepers.repository.url}</url>
 
 	<properties>
-		<revision>2.6.0</revision>
+		<revision>2.6.1-SNAPSHOT</revision>
 		<root.relativePath>../..</root.relativePath>
 		<shopkeepers.version>${project.version}</shopkeepers.version>
 		<shopkeepers.dbo.url>https://dev.bukkit.org/projects/shopkeepers/</shopkeepers.dbo.url>
