@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.player.sell;
 
+import java.util.List;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.Settings;
@@ -29,6 +31,11 @@ public class SellingPlayerShopType extends AbstractPlayerShopType<SellingPlayerS
 	@Override
 	public String getSetupDescription() {
 		return Settings.msgShopSetupDescSelling;
+	}
+
+	@Override
+	public List<String> getTradeSetupDescription() {
+		return Settings.msgTradeSetupDescSelling;
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.player.trade;
 
+import java.util.List;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.Settings;
@@ -29,6 +31,11 @@ public class TradingPlayerShopType extends AbstractPlayerShopType<TradingPlayerS
 	@Override
 	public String getSetupDescription() {
 		return Settings.msgShopSetupDescTrading;
+	}
+
+	@Override
+	public List<String> getTradeSetupDescription() {
+		return Settings.msgTradeSetupDescTrading;
 	}
 
 	@Override

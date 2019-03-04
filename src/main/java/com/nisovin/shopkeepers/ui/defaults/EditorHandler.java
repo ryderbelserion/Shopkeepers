@@ -24,6 +24,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -54,6 +55,7 @@ public abstract class EditorHandler extends UIHandler {
 	protected static final int TRADES_PAGE_BAR_START = TRADES_ROW_3_END + (COLUMNS_PER_ROW - TRADES_COLUMNS) + 1;
 	protected static final int TRADES_PAGE_BAR_END = TRADES_PAGE_BAR_START + TRADES_COLUMNS - 1;
 	protected static final int TRADES_PAGE_ICON = TRADES_PAGE_BAR_START + (TRADES_PAGE_BAR_END - TRADES_PAGE_BAR_START) / 2;
+	protected static final int TRADES_SETUP_ICON = TRADES_PAGE_ICON - 1;
 
 	protected static final int BUTTONS_START = TRADES_PAGE_BAR_END + (COLUMNS_PER_ROW - TRADES_COLUMNS) + 1;
 	protected static final int BUTTON_MAX_ROWS = 2;
@@ -185,6 +187,10 @@ public abstract class EditorHandler extends UIHandler {
 		prevPageButton.slot = TRADES_PAGE_BAR_START;
 		tradesPageBarButtons[0] = prevPageButton;
 
+		Button tradeSetupButton = this.createTradeSetupButton(shopkeeper);
+		tradeSetupButton.slot = TRADES_SETUP_ICON;
+		tradesPageBarButtons[TRADES_SETUP_ICON - TRADES_PAGE_BAR_START] = tradeSetupButton;
+
 		Button currentPageButton = this.createCurrentPageButton(shopkeeper);
 		currentPageButton.slot = TRADES_PAGE_ICON;
 		tradesPageBarButtons[TRADES_PAGE_ICON - TRADES_PAGE_BAR_START] = currentPageButton;
@@ -263,6 +269,15 @@ public abstract class EditorHandler extends UIHandler {
 		};
 	}
 
+	protected Button createTradeSetupButton(Shopkeeper shopkeeper) {
+		return new Button(shopkeeper, this.createTradeSetupIcon(), true) {
+			@Override
+			protected void onClick(InventoryClickEvent clickEvent, Player player) {
+				// trade setup button: doing nothing
+			}
+		};
+	}
+
 	protected ItemStack createPrevPageIcon(int page) {
 		String prevPage = "-";
 		if (page > 1) {
@@ -292,6 +307,13 @@ public abstract class EditorHandler extends UIHandler {
 				"{page}", String.valueOf(page),
 				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
 		return ItemUtils.createItemStack(Settings.currentPageItem, page, itemName, Settings.msgButtonCurrentPageLore);
+	}
+
+	protected ItemStack createTradeSetupIcon() {
+		ShopType<?> shopType = this.getShopkeeper().getType();
+		String itemName = Utils.replaceArgs(Settings.msgTradeSetupDescHeader,
+				"{shopType}", shopType.getDisplayName());
+		return ItemUtils.createItemStack(Settings.tradeSetupItem, 1, itemName, shopType.getTradeSetupDescription());
 	}
 
 	private final List<Button> buttons = new ArrayList<>();

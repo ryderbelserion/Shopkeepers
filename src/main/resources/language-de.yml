@@ -1,10 +1,10 @@
-msg-shop-type-admin-regular: "Admin"
+msg-shop-type-admin-regular: "Admin Shop"
 msg-shop-type-selling: "Verkäufer"
 msg-shop-type-buying: "Ankäufer"
 msg-shop-type-trading: "Händler"
 msg-shop-type-book: "Buchhändler"
 
-msg-shop-type-desc-admin-regular: "tauscht Items für andere Items"
+msg-shop-type-desc-admin-regular: "hat unbegrenzten Vorrat"
 msg-shop-type-desc-selling: "verkauft Items"
 msg-shop-type-desc-buying: "kauft Items"
 msg-shop-type-desc-trading: "tauscht Items für andere Items"
@@ -118,6 +118,40 @@ msg-shop-setup-desc-book: |
     &e  Mit Shift+Rechts Klick auf den Shop legst du die Preise fest.
 msg-shop-setup-desc-admin-regular: |
     &e  Mit Shift+Rechts Klick auf den Shop legst du die Preise fest.
+
+msg-trade-setup-desc-header: '&6{shopType}'
+msg-trade-setup-desc-admin-regular:
+- Hat unbegrenzten Vorrat.
+- Füge Items aus deinem Inventar ein.
+- Links/Rechts Klick zum Ändern der Mengen.
+- 'Obere Reihe: Ergebnis Items'
+- 'Untere Reihen: Kosten'
+msg-trade-setup-desc-selling:
+- Verkauft Items an Spieler.
+- Lege die zu verkaufenden Items in die Truhe.
+- Links/Rechts Klick zum Ändern der Mengen.
+- 'Obere Reihe: Verkaufte Items'
+- 'Untere Reihen: Kosten'
+msg-trade-setup-desc-buying:
+- Kauft Items von Spielern.
+- Lege von jedem anzukaufendem Item eines
+- in die Truhe, sowie reichlich Währung.
+- Links/Rechts Klick zum Ändern der Mengen.
+- 'Obere Reihe: Kosten'
+- 'Untere Reihe: Angekaufte Items'
+msg-trade-setup-desc-trading:
+- Tauscht Items mit Spielern.
+- Wähle ein Item aus deinem Inventar und
+- klicke ein Feld an, um es zu platzieren.
+- Links/Rechts Klick zum Ändern der Mengen.
+- 'Obere Reihe: Ergebnis Items'
+- 'Untere Reihen: Kosten'
+msg-trade-setup-desc-book:
+- Verkauft Kopien von Büchern.
+- Lege signierte und leere Bücher in die Truhe.
+- Links/Rechts Klick zum Ändern der Kosten.
+- 'Obere Reihe: Verkaufte Bücher'
+- 'Untere Reihen: Kosten'
 
 msg-list-admin-shops-header: "&9Es gibt &e{shopsCount} &9Admin-Shops: &e(Seite {page} von {maxPage})"
 msg-list-player-shops-header: "&9Spieler '&e{player}&9' hat &e{shopsCount} &9Shops: &e(Seite {page} von {maxPage})"

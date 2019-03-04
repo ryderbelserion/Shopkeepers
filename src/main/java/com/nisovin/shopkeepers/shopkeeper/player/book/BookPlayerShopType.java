@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.player.book;
 
+import java.util.List;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.Settings;
@@ -29,6 +31,11 @@ public class BookPlayerShopType extends AbstractPlayerShopType<BookPlayerShopkee
 	@Override
 	public String getSetupDescription() {
 		return Settings.msgShopSetupDescBook;
+	}
+
+	@Override
+	public List<String> getTradeSetupDescription() {
+		return Settings.msgTradeSetupDescBook;
 	}
 
 	@Override

@@ -223,9 +223,11 @@ allow-renaming-of-player-npc-shops: false
 # The window title of the shopkeeper editor menu.
 editor-title: "Shopkeeper Editor"
 
+# The item types for the buttons and icons in the trades page row.
 previous-page-item: WRITABLE_BOOK
 next-page-item: WRITABLE_BOOK
 current-page-item: WRITABLE_BOOK
+trade-setup-item: PAPER
 
 # The item type of the set-name button, and of the naming item (if enabled).
 name-item: NAME_TAG
@@ -346,17 +348,17 @@ high-zero-currency-item-lore: []
 
 language: en
 
-msg-shop-type-admin-regular: "admin"
-msg-shop-type-selling: "selling"
-msg-shop-type-buying: "buying"
-msg-shop-type-trading: "trading"
-msg-shop-type-book: "book"
+msg-shop-type-admin-regular: "Admin shop"
+msg-shop-type-selling: "Selling shop"
+msg-shop-type-buying: "Buying shop"
+msg-shop-type-trading: "Trading shop"
+msg-shop-type-book: "Book shop"
 
-msg-shop-type-desc-admin-regular: "trades items with players"
+msg-shop-type-desc-admin-regular: "has unlimited stock"
 msg-shop-type-desc-selling: "sells items to players"
 msg-shop-type-desc-buying: "buys items from players"
 msg-shop-type-desc-trading: "trades items with players"
-msg-shop-type-desc-book: "sells books"
+msg-shop-type-desc-book: "sells book copies"
 
 msg-shop-object-type-living: "{type}"
 msg-shop-object-type-sign: "sign"
@@ -466,6 +468,42 @@ msg-shop-setup-desc-book: |
     &e  right-click the shop while sneaking to modify costs.
 msg-shop-setup-desc-admin-regular: |
     &e  Right-click the shop while sneaking to modify trades.
+
+msg-trade-setup-desc-header: '&6{shopType}'
+msg-trade-setup-desc-admin-regular:
+- Has unlimited stock.
+- Insert items from your inventory.
+- Left/Right click to adjust amounts.
+- 'Top row: Result items'
+- 'Bottom rows: Cost items'
+msg-trade-setup-desc-selling:
+- Sells items to players.
+- Insert items to sell into the chest.
+- Left/Right click to adjust amounts.
+- 'Top row: Items being sold'
+- 'Bottom rows: Cost items'
+msg-trade-setup-desc-buying:
+- Buys items from players.
+- Insert one of each item you want to
+- buy and plenty of currency items
+- into the chest.
+- Left/Right click to adjust amounts.
+- 'Top row: Cost items'
+- 'Bottom row: Items being bought'
+msg-trade-setup-desc-trading:
+- Trades items with players.
+- Pickup an item from your inventory
+- and then click a slot to place it.
+- Left/Right click to adjust amounts.
+- 'Top row: Result items'
+- 'Bottom rows: Cost items'
+msg-trade-setup-desc-book:
+- Sells book copies.
+- Insert written and blank books
+- into the chest.
+- Left/Right click to adjust costs.
+- 'Top row: Books being sold'
+- 'Bottom rows: Cost items'
 
 msg-list-admin-shops-header: "&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})"
 msg-list-player-shops-header: "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})"

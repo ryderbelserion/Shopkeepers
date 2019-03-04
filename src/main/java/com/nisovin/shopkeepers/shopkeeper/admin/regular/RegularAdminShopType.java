@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.admin.regular;
 
+import java.util.List;
+
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.Settings;
@@ -27,6 +29,11 @@ public class RegularAdminShopType extends AbstractAdminShopType<RegularAdminShop
 	@Override
 	public String getSetupDescription() {
 		return Settings.msgShopSetupDescAdminRegular;
+	}
+
+	@Override
+	public List<String> getTradeSetupDescription() {
+		return Settings.msgTradeSetupDescAdminRegular;
 	}
 
 	@Override

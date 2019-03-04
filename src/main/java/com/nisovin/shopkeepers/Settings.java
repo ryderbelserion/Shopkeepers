@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -148,6 +149,7 @@ public class Settings {
 	public static Material previousPageItem = Material.WRITABLE_BOOK;
 	public static Material nextPageItem = Material.WRITABLE_BOOK;
 	public static Material currentPageItem = Material.WRITABLE_BOOK;
+	public static Material tradeSetupItem = Material.PAPER;
 
 	public static Material nameItem = Material.NAME_TAG;
 	public static List<String> nameItemLore = new ArrayList<>(0);
@@ -213,17 +215,17 @@ public class Settings {
 	 */
 	public static String language = "en";
 
-	public static String msgShopTypeAdminRegular = "admin";
-	public static String msgShopTypeSelling = "selling";
-	public static String msgShopTypeBuying = "buying";
-	public static String msgShopTypeTrading = "trading";
-	public static String msgShopTypeBook = "book";
+	public static String msgShopTypeAdminRegular = "Admin shop";
+	public static String msgShopTypeSelling = "Selling shop";
+	public static String msgShopTypeBuying = "Buying shop";
+	public static String msgShopTypeTrading = "Trading shop";
+	public static String msgShopTypeBook = "Book shop";
 
-	public static String msgShopTypeDescAdminRegular = "trades items with players";
+	public static String msgShopTypeDescAdminRegular = "has unlimited stock";
 	public static String msgShopTypeDescSelling = "sells items to players";
 	public static String msgShopTypeDescBuying = "buys items from players";
 	public static String msgShopTypeDescTrading = "trades items with players";
-	public static String msgShopTypeDescBook = "sells books";
+	public static String msgShopTypeDescBook = "sells book copies";
 
 	public static String msgShopObjectTypeLiving = "{type}";
 	public static String msgShopObjectTypeSign = "sign";
@@ -322,6 +324,13 @@ public class Settings {
 			+ "&e  right-click the shop while sneaking to modify costs.";
 	public static String msgShopSetupDescAdminRegular = "&e  Right-click the shop while sneaking to modify trades.";
 
+	public static String msgTradeSetupDescHeader = "&6{shopType}";
+	public static List<String> msgTradeSetupDescAdminRegular = Arrays.asList("Has unlimited stock.", "Insert items from your inventory.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items");
+	public static List<String> msgTradeSetupDescSelling = Arrays.asList("Sells items.", "Insert items to sell into the chest.", "Left/Right click to adjust amounts.", "Top row: Items being sold", "Bottom rows: Cost items");
+	public static List<String> msgTradeSetupDescBuying = Arrays.asList("Buys items.", "Insert one of each item you want to", "buy and plenty of currency items", "into the chest.", "Left/Right click to adjust amounts.", "Top row: Cost items", "Bottom row: Items being bought");
+	public static List<String> msgTradeSetupDescTrading = Arrays.asList("Trades items.", "Pickup an item from your inventory", "and then click a slot to place it.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items");
+	public static List<String> msgTradeSetupDescBook = Arrays.asList("Sells book copies.", "Insert written and blank books", "into the chest.", "Left/Right click to adjust costs.", "Top row: Books being sold", "Bottom rows: Cost items");
+
 	public static String msgListAdminShopsHeader = "&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})";
 	public static String msgListPlayerShopsHeader = "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})";
 	public static String msgListShopsEntry = "  &e{shopIndex}) &8{shopName}&r&7at &8({location})&7, type: &8{shopType}&7, object type: &8{objectType}";
@@ -399,6 +408,10 @@ public class Settings {
 			for (Field field : fields) {
 				if (field.isSynthetic()) continue;
 				Class<?> typeClass = field.getType();
+				Class<?> genericType = null;
+				if (typeClass == List.class) {
+					genericType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
+				}
 				String configKey = toConfigKey(field.getName());
 
 				// initialize the setting with the default value, if it is missing in the config
@@ -406,15 +419,8 @@ public class Settings {
 					Log.warning("Config: Inserting default value for missing config entry: " + configKey);
 
 					// determine default value:
-					Object defaultValue = null;
-					Configuration defaults = config.getDefaults(); // might be null or miss values
-					if (defaults != null) {
-						defaultValue = defaults.get(configKey);
-					}
-					if (defaultValue == null) {
-						// fallback to the current value:
-						defaultValue = field.get(null);
-					}
+					Configuration defaults = config.getDefaults();
+					Object defaultValue = loadConfigValue(defaults, configKey, noColorConversionKeys, typeClass, genericType);
 
 					// validate default value:
 					if (defaultValue == null) {
@@ -427,59 +433,13 @@ public class Settings {
 					}
 
 					// set default value:
-					if (typeClass == Material.class) {
-						config.set(configKey, ((Material) defaultValue).name());
-					} else if (typeClass == String.class) {
-						// decolorize, if not exempted:
-						if (!noColorConversionKeys.contains(configKey)) {
-							defaultValue = Utils.decolorize((String) defaultValue);
-						}
-						config.set(configKey, defaultValue);
-					} else if (typeClass == List.class && (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0] == String.class) {
-						// decolorize, if not exempted:
-						if (!noColorConversionKeys.contains(configKey)) {
-							defaultValue = Utils.decolorize(ConversionUtils.toStringList((List<?>) defaultValue));
-						}
-						config.set(configKey, defaultValue);
-					} else {
-						config.set(configKey, defaultValue);
-					}
+					setConfigValue(config, configKey, noColorConversionKeys, typeClass, genericType, defaultValue);
 					configChanged = true;
 				}
 
-				if (typeClass == String.class) {
-					String string = config.getString(configKey);
-					// colorize, if not exempted:
-					if (!noColorConversionKeys.contains(configKey)) {
-						string = Utils.colorize(string);
-					}
-					field.set(null, string);
-				} else if (typeClass == int.class) {
-					field.set(null, config.getInt(configKey));
-				} else if (typeClass == short.class) {
-					field.set(null, (short) config.getInt(configKey));
-				} else if (typeClass == boolean.class) {
-					field.set(null, config.getBoolean(configKey));
-				} else if (typeClass == Material.class) {
-					// this assumes that legacy item conversion has already been performed
-					Material material = loadMaterial(config, configKey, false);
-					if (material != null) {
-						field.set(null, material);
-					} else {
-						Log.warning("Config: Unknown material for config entry '" + configKey + "': " + config.get(configKey));
-						Log.warning("Config: All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
-					}
-				} else if (typeClass == List.class) {
-					Class<?> genericType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-					if (genericType == String.class) {
-						List<String> stringList = config.getStringList(configKey);
-						// colorize, if not exempted:
-						if (!noColorConversionKeys.contains(configKey)) {
-							stringList = Utils.colorize(stringList);
-						}
-						field.set(null, stringList);
-					}
-				}
+				// load value:
+				Object value = loadConfigValue(config, configKey, noColorConversionKeys, typeClass, genericType);
+				field.set(null, value);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -539,6 +499,63 @@ public class Settings {
 		}
 
 		return configChanged;
+	}
+
+	private static Object loadConfigValue(Configuration config, String configKey, List<String> noColorConversionKeys, Class<?> typeClass, Class<?> genericType) {
+		if (typeClass == String.class) {
+			String string = config.getString(configKey);
+			// colorize, if not exempted:
+			if (!noColorConversionKeys.contains(configKey)) {
+				string = Utils.colorize(string);
+			}
+			return string;
+		} else if (typeClass == int.class) {
+			return config.getInt(configKey);
+		} else if (typeClass == short.class) {
+			return (short) config.getInt(configKey);
+		} else if (typeClass == boolean.class) {
+			return config.getBoolean(configKey);
+		} else if (typeClass == Material.class) {
+			// this assumes that legacy item conversion has already been performed
+			Material material = loadMaterial(config, configKey, false);
+			if (material == null) {
+				Log.warning("Config: Unknown material for config entry '" + configKey + "': " + config.get(configKey));
+				Log.warning("Config: All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
+			}
+			return material;
+		} else if (typeClass == List.class) {
+			if (genericType == String.class) {
+				List<String> stringList = config.getStringList(configKey);
+				// colorize, if not exempted:
+				if (!noColorConversionKeys.contains(configKey)) {
+					stringList = Utils.colorize(stringList);
+				}
+				return stringList;
+			} else {
+				return null; // not supported currently
+			}
+		}
+		return null;
+	}
+
+	private static void setConfigValue(Configuration config, String configKey, List<String> noColorConversionKeys, Class<?> typeClass, Class<?> genericType, Object value) {
+		if (typeClass == Material.class) {
+			config.set(configKey, ((Material) value).name());
+		} else if (typeClass == String.class) {
+			// decolorize, if not exempted:
+			if (!noColorConversionKeys.contains(configKey)) {
+				value = Utils.decolorize((String) value);
+			}
+			config.set(configKey, value);
+		} else if (typeClass == List.class && genericType == String.class) {
+			// decolorize, if not exempted:
+			if (!noColorConversionKeys.contains(configKey)) {
+				value = Utils.decolorize(ConversionUtils.toStringList((List<?>) value));
+			}
+			config.set(configKey, value);
+		} else {
+			config.set(configKey, value);
+		}
 	}
 
 	private static Material loadMaterial(ConfigurationSection config, String key, boolean checkLegacy) {
@@ -671,10 +688,22 @@ public class Settings {
 		try {
 			Field[] fields = Settings.class.getDeclaredFields();
 			for (Field field : fields) {
-				if (field.getType() == String.class && field.getName().startsWith("msg")) {
-					String configKey = toConfigKey(field.getName());
-					field.set(null, Utils.colorize(config.getString(configKey, (String) field.get(null))));
+				if (!field.getName().startsWith("msg")) continue;
+				Class<?> typeClass = field.getType();
+				Class<?> genericType = null;
+				if (typeClass == List.class) {
+					genericType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
 				}
+				String configKey = toConfigKey(field.getName());
+				if (!config.isSet(configKey)) {
+					continue; // skip, keeps default
+				}
+
+				Object value = loadConfigValue(config, configKey, Collections.emptyList(), typeClass, genericType);
+				if (value == null) {
+					continue; // skip, keeps default
+				}
+				field.set(null, value);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
