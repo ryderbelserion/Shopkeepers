@@ -60,7 +60,7 @@ This update includes many message changes. It is therefore suggested to let shop
 Changed messages:
 * msg-creation-item-selected
 * msg-shop-type-disabled
-* msg-shop-object-type-disabled:
+* msg-shop-object-type-disabled
 * msg-cant-trade-while-owner-online
 * msg-trade-perm-set
 * msg-trade-perm-removed
