@@ -15,7 +15,8 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
@@ -234,8 +235,8 @@ public class TradingHandler extends UIHandler {
 	}
 
 	@Override
-	public boolean isWindow(Inventory inventory) {
-		return inventory instanceof MerchantInventory;
+	public boolean isWindow(InventoryView view) {
+		return view != null && view.getType() == InventoryType.MERCHANT;
 	}
 
 	@Override

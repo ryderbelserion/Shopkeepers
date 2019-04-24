@@ -6,6 +6,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -79,16 +80,16 @@ public abstract class UIHandler {
 	protected abstract boolean openWindow(Player player);
 
 	/**
-	 * Checks whether or not the given inventory is a custom inventory created by this handler (for example
-	 * by comparing the inventory titles). The result of this method gets checked before any inventory events
-	 * are passed through to this handler.
+	 * Checks whether or not the given inventory view is a custom inventory created by this handler (for example by
+	 * comparing the titles). The result of this method gets checked before any inventory events are passed through to
+	 * this handler.
 	 * 
-	 * @param inventory
-	 *            an inventory
-	 * @return <code>true</code> if the given inventory is representing a custom interface window created and handled by
-	 *         this handler
+	 * @param view
+	 *            an inventory view
+	 * @return <code>true</code> if the given inventory view is representing a custom interface window created and
+	 *         handled by this handler
 	 */
-	public abstract boolean isWindow(Inventory inventory);
+	public abstract boolean isWindow(InventoryView view);
 
 	/**
 	 * Gets called when this UI gets closed for a player.

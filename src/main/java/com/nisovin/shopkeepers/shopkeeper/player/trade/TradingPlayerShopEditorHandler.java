@@ -74,6 +74,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 	@Override
 	protected void handlePlayerInventoryClick(Session session, InventoryClickEvent event) {
+		// assert: event cancelled
 		// clicking in player inventory:
 		if (event.isShiftClick()) return; // ignoring shift clicks
 
@@ -83,12 +84,12 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			if (ItemUtils.isEmpty(current)) {
 				// place item from cursor:
 				event.setCurrentItem(cursor);
-				event.setCursor(null);
+				event.getView().setCursor(null); // requires the event to be cancelled
 			}
 		} else if (!ItemUtils.isEmpty(current)) {
 			// pick up item to cursor:
 			event.setCurrentItem(null);
-			event.setCursor(current);
+			event.getView().setCursor(current); // requires the event to be cancelled
 		}
 	}
 

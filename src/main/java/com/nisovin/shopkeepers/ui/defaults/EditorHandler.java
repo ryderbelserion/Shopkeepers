@@ -543,8 +543,6 @@ public abstract class EditorHandler extends UIHandler {
 		private final List<TradingRecipeDraft> recipes;
 		private final Inventory inventory;
 		private int currentPage = 1;
-		private boolean dirtyPage = false;
-		private boolean saved = false;
 
 		private Session(Player player, List<TradingRecipeDraft> recipes, Inventory inventory) {
 			this.player = player;
@@ -558,7 +556,6 @@ public abstract class EditorHandler extends UIHandler {
 
 		private void setPage(int newPage) {
 			this.currentPage = newPage;
-			this.dirtyPage = false; // reset dirty flag
 		}
 	}
 
@@ -663,8 +660,8 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	@Override
-	public boolean isWindow(Inventory inventory) {
-		return inventory != null && inventory.getTitle().equals(Settings.editorTitle);
+	public boolean isWindow(InventoryView view) {
+		return view != null && view.getTitle().equals(Settings.editorTitle);
 	}
 
 	@Override
@@ -690,7 +687,6 @@ public abstract class EditorHandler extends UIHandler {
 		int rawSlot = event.getRawSlot();
 		if (this.isTradesArea(rawSlot)) {
 			// trades area:
-			session.dirtyPage = true; // mark as potentially dirty
 			this.handleTradesClick(session, event);
 		} else if (this.isTradesPageBar(rawSlot)) {
 			// trades page bar:

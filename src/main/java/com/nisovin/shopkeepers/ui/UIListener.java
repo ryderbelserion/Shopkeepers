@@ -11,7 +11,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.Log;
@@ -33,13 +33,13 @@ class UIListener implements Listener {
 	}
 
 	private boolean validateSession(InventoryInteractEvent event, Player player, SKUISession session) {
-		Inventory inventory = event.getInventory();
+		InventoryView view = event.getView();
 		UIHandler uiHandler = session.getUIHandler();
 
 		// validate open inventory:
-		if (!uiHandler.isWindow(inventory)) {
+		if (!uiHandler.isWindow(view)) {
 			// the player probably has some other inventory open, but an active session.. let's close it:
-			Log.debug("Closing inventory of type " + inventory.getType() + " with title '" + inventory.getTitle()
+			Log.debug("Closing inventory of type " + view.getType() + " with title '" + view.getTitle()
 					+ "' for " + player.getName() + ", because a different open inventory was expected for '"
 					+ uiHandler.getUIType().getIdentifier() + "'.");
 			event.setCancelled(true);
@@ -83,12 +83,12 @@ class UIListener implements Listener {
 			return;
 		}
 
-		Inventory inventory = event.getInventory();
+		InventoryView view = event.getView();
 		UIHandler uiHandler = session.getUIHandler();
 
 		// debug information:
 		Log.debug("Inventory click: player=" + player.getName()
-				+ ", inventory-type=" + inventory.getType() + ", inventory-title=" + inventory.getTitle()
+				+ ", view-type=" + view.getType() + ", view-title=" + view.getTitle()
 				+ ", raw-slot-id=" + event.getRawSlot() + ", slot-id=" + event.getSlot() + ", slot-type=" + event.getSlotType()
 				+ ", shift=" + event.isShiftClick() + ", hotbar key=" + event.getHotbarButton()
 				+ ", left-or-right=" + (event.isLeftClick() ? "left" : (event.isRightClick() ? "right" : "unknown"))
@@ -109,12 +109,12 @@ class UIListener implements Listener {
 			return;
 		}
 
-		Inventory inventory = event.getInventory();
+		InventoryView view = event.getView();
 		UIHandler uiHandler = session.getUIHandler();
 
 		// debug information:
 		Log.debug("Inventory dragging: player=" + player.getName()
-				+ ", inventory-type=" + inventory.getType() + ", inventory-title=" + inventory.getTitle()
+				+ ", view-type=" + view.getType() + ", view-title=" + view.getTitle()
 				+ ", drag-type=" + event.getType());
 
 		// let the UIHandler handle the dragging:

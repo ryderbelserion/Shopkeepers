@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -33,8 +33,8 @@ public abstract class HiringHandler extends UIHandler {
 	}
 
 	@Override
-	public boolean isWindow(Inventory inventory) {
-		return inventory != null && inventory.getTitle().equals(Settings.forHireTitle);
+	public boolean isWindow(InventoryView view) {
+		return view != null && view.getTitle().equals(Settings.forHireTitle);
 	}
 
 	@Override
