@@ -35,6 +35,7 @@ Low priority:
 * Allow changing the sign text color?
 * Allow changing villager biome type
 * Allow changing villager level (novice, .., master)
+* Set villager trades and test if they display trade-able items when the player holds corresponding items
 
 Ideas:
 * Per-Trade/Shopkeeper settings, maybe via written books:<br>
