@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Cat;
@@ -76,35 +77,38 @@ public class CatShop extends SKLivingShopObject {
 			ItemUtils.setLeatherColor(item, Color.BLACK);
 			break;
 		case BLACK:
-			ItemUtils.setLeatherColor(item, Color.BLACK.mixColors(Color.GRAY));
+			ItemUtils.setLeatherColor(item, Color.BLACK.mixDyes(DyeColor.GRAY));
 			break;
 		case BRITISH_SHORTHAIR:
 			ItemUtils.setLeatherColor(item, Color.SILVER);
 			break;
 		case CALICO:
-			ItemUtils.setLeatherColor(item, Color.ORANGE.mixColors(Color.MAROON));
+			ItemUtils.setLeatherColor(item, Color.ORANGE.mixDyes(DyeColor.BROWN));
 			break;
 		case JELLIE:
 			ItemUtils.setLeatherColor(item, Color.GRAY);
 			break;
 		case PERSIAN:
-			ItemUtils.setLeatherColor(item, Color.WHITE.mixColors(Color.ORANGE));
+			ItemUtils.setLeatherColor(item, Color.WHITE.mixDyes(DyeColor.ORANGE));
 			break;
 		case RAGDOLL:
-			ItemUtils.setLeatherColor(item, Color.WHITE.mixColors(Color.MAROON));
+			ItemUtils.setLeatherColor(item, Color.WHITE.mixDyes(DyeColor.BROWN));
 			break;
 		case RED:
 			ItemUtils.setLeatherColor(item, Color.ORANGE);
 			break;
 		case SIAMESE:
-			ItemUtils.setLeatherColor(item, Color.MAROON.mixColors(Color.GRAY));
+			ItemUtils.setLeatherColor(item, Color.GRAY.mixDyes(DyeColor.BROWN));
 			break;
 		case WHITE:
 			ItemUtils.setLeatherColor(item, Color.WHITE);
 			break;
 		case TABBY:
-		default:
 			ItemUtils.setLeatherColor(item, Color.BLACK.mixColors(Color.ORANGE));
+			break;
+		default:
+			// unknown type:
+			ItemUtils.setLeatherColor(item, Color.PURPLE);
 			break;
 		}
 		return item;
