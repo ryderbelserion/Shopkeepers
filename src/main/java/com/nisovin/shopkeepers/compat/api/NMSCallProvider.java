@@ -44,6 +44,8 @@ public interface NMSCallProvider {
 	 */
 	public boolean matches(ItemStack provided, ItemStack required);
 
-	// Note: It is not safe to reduce the number of trading recipes!
+	// Note: It is not safe to reduce the number of trading recipes! Reducing the size below the selected index can
+	// crash the client. It's left to the caller to ensure that the number of recipes does not get reduced, for example
+	// by inserting dummy entries
 	public void updateTrades(Player player, Merchant merchant);
 }

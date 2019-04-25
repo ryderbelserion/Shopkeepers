@@ -223,14 +223,16 @@ public class TradingHandler extends UIHandler {
 		Log.debug("Updating trades for player " + player.getName());
 
 		// it is not safe to reduce the number of trading recipes for the player, so we need to add dummy recipes:
+		// TODO check if this still applies in MC 1.14
 		for (int i = recipes.size(); i < oldMerchantRecipes.size(); ++i) {
+			// TODO API doesn't expect null here (but works).. use something else?
 			MerchantRecipe merchantRecipe = new MerchantRecipe(null, 0, 0, false);
 			newMerchantRecipes.add(merchantRecipe);
 		}
 		// set merchant's recipes:
 		merchant.setRecipes(newMerchantRecipes);
 
-		// update recipes:
+		// update recipes for the client:
 		NMSManager.getProvider().updateTrades(player, merchant);
 	}
 

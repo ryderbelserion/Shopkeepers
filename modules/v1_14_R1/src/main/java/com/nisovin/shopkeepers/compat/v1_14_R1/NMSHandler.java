@@ -133,33 +133,20 @@ public final class NMSHandler implements NMSCallProvider {
 			return;
 		}
 
-		// MerchantInventory merchantInventory = (MerchantInventory) inventory;
+		// update merchant inventory on the server (updates the result item, etc.):
+		inventory.setItem(0, inventory.getItem(0));
+
 		IMerchant nmsMerchant;
 		if (merchant instanceof Villager) {
 			nmsMerchant = ((CraftVillager) merchant).getHandle();
 		} else {
 			nmsMerchant = ((CraftMerchant) merchant).getMerchant();
 		}
-
-		MerchantRecipeList newRecipeList = new MerchantRecipeList();
 		MerchantRecipeList merchantRecipeList = nmsMerchant.getOffers();
-		if (merchantRecipeList != null) {
-			newRecipeList.addAll(merchantRecipeList);
-		}
+		if (merchantRecipeList == null) merchantRecipeList = new MerchantRecipeList(); // just in case
 
-		// insert dummy entries, because reducing the size below the selected index can crash the client:
-		// TODO: actually, this might still not be safe since the player can concurrently select another trading
-		// recipe..
-		// It's left to the caller to ensure that the number of recipes does not get reduced
-		/*int selectedRecipeIndex = merchantInventory.getSelectedRecipeIndex();
-		if (selectedRecipeIndex > 0) {
-			for (int i = merchantRecipeList.size(); i <= selectedRecipeIndex; ++i) {
-				net.minecraft.server.v1_14_R1.ItemStack empty = CraftItemStack.asNMSCopy(null);
-				newRecipeList.add(new net.minecraft.server.v1_14_R1.MerchantRecipe(empty, empty, empty, 0, 0));
-			}
-		}*/
 		// send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1: Novice, .., 5:
 		// Master), merchant total experience, is regular villager flag (false: hides some gui elements)
-		((CraftPlayer) player).getHandle().openTrade(((CraftPlayer) player).getHandle().activeContainer.windowId, newRecipeList, 0, 0, true);
+		((CraftPlayer) player).getHandle().openTrade(((CraftPlayer) player).getHandle().activeContainer.windowId, merchantRecipeList, 0, 0, true);
 	}
 }
