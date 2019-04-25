@@ -44,7 +44,8 @@ import com.nisovin.shopkeepers.util.StringUtils;
  */
 public class SKShopkeeperStorage implements ShopkeeperStorage {
 
-	// this can be used to determine required migrations or force a save of all shopkeepers data:
+	// this can be used to determine required migrations (that affect all shopkeepers or the save format as a whole)
+	// or force a save of all shopkeepers data:
 	private static final int DATA_VERSION = 1;
 	private static final String DATA_VERSION_KEY = "data-version";
 

@@ -89,6 +89,14 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> TROPICAL_FISH: okay, visually disappears in early versions of spigot 1.13-pre7 when clicked with water-bucket
 	 * <li> DROWNED: okay
 	 * <li> DOLPHIN: okay, slightly gliding inside water
+	 * * # 1.14
+	 * <li> CAT: 
+	 * <li> PANDA:
+	 * <li> PILLAGER:
+	 * <li> RAVAGER:
+	 * <li> TRADER_LLAMA:
+	 * <li> WANDERING_VILLAGER:
+	 * <li> FOX:
 	 * </ul>
 	 */
 
@@ -169,7 +177,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 				}
 			};
 			break;
-		case OCELOT:
+		case CAT:
 			objectType = new SKLivingShopObjectType<CatShop>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
 				public CatShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {

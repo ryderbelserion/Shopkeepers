@@ -13,7 +13,10 @@ public class BlockVillagerSpawnListener implements Listener {
 
 	@EventHandler(ignoreCancelled = true)
 	void onSpawn(CreatureSpawnEvent event) {
-		if (event.getEntityType() == EntityType.VILLAGER && event.getSpawnReason() != SpawnReason.CUSTOM) {
+		if (event.getSpawnReason() == SpawnReason.CUSTOM) return; // ignore plugin spawns
+		EntityType entityType = event.getEntityType();
+		// prevent spawning of villagers, wandering traders and their trader llamas:
+		if (entityType == EntityType.VILLAGER || entityType == EntityType.WANDERING_TRADER || entityType == EntityType.TRADER_LLAMA) {
 			event.setCancelled(true);
 		}
 	}

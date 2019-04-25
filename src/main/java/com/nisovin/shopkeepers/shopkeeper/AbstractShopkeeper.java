@@ -29,6 +29,7 @@ import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
@@ -221,11 +222,33 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 				objectTypeId = "sign";
 				this.markDirty();
 			}
+
 			// normalize:
 			String normalizedOjectTypeId = StringUtils.normalize(objectTypeId);
 			if (!normalizedOjectTypeId.equals(objectTypeId)) {
 				objectTypeId = normalizedOjectTypeId;
 				this.markDirty();
+			}
+
+			// MC 1.14:
+			// convert ocelots to cats:
+			if (objectTypeId.equals("ocelot")) {
+				String ocelotType = objectSection.getString("catType");
+				if (ocelotType != null) {
+					if (ocelotType.equals("WILD_OCELOT")) {
+						// stays an ocelot, but remove cat type data:
+						objectSection.set("catType", null);
+						this.markDirty();
+					} else {
+						// convert to cat:
+						objectTypeId = "cat";
+						String catType = CatShop.fromOcelotType(ocelotType).name();
+						objectSection.set("catType", catType);
+						this.markDirty();
+						Log.warning("Migrated ocelot shopkeeper '" + id + "' of type '" + ocelotType
+								+ "' to cat shopkeeper of type '" + catType + "'.");
+					}
+				} // else: stays ocelot
 			}
 		}
 

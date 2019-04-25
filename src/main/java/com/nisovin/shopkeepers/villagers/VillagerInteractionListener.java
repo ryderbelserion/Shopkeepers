@@ -2,8 +2,8 @@ package com.nisovin.shopkeepers.villagers;
 
 import java.util.Map;
 
+import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -29,14 +29,14 @@ public class VillagerInteractionListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	void onEntityInteract(PlayerInteractEntityEvent event) {
-		if (!(event.getRightClicked() instanceof Villager)) return;
-		Villager villager = (Villager) event.getRightClicked();
+		if (!(event.getRightClicked() instanceof AbstractVillager)) return;
+		AbstractVillager villager = (AbstractVillager) event.getRightClicked();
 
 		if (plugin.getShopkeeperRegistry().isShopkeeper(villager)) {
 			// shopkeeper interaction is handled elsewhere
 			return;
 		}
-		Log.debug("Interaction with Non-shopkeeper villager ..");
+		Log.debug("Interaction with non-shopkeeper villager ..");
 
 		if (CitizensHandler.isNPC(villager)) {
 			// ignore any interaction with citizens2 NPCs
@@ -69,7 +69,7 @@ public class VillagerInteractionListener implements Listener {
 	}
 
 	// returns false, if the player wasn't able to hire this villager
-	private boolean handleHireOtherVillager(Player player, Villager villager) {
+	private boolean handleHireOtherVillager(Player player, AbstractVillager villager) {
 		// check if the player is allowed to remove (attack) the entity (in case the entity is protected by another
 		// plugin)
 		Log.debug("    checking villager access ..");
@@ -121,6 +121,7 @@ public class VillagerInteractionListener implements Listener {
 			}
 
 			// remove the entity:
+			// note: the leashed trader llamas for the wandering trader will break and the llamas will remain
 			villager.remove();
 
 			// update client's inventory

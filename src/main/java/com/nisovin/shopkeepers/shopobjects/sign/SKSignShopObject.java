@@ -3,12 +3,14 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.TreeSpecies;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -23,6 +25,7 @@ import com.nisovin.shopkeepers.util.Utils;
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
 
 	protected final SignShops signShops;
+	private TreeSpecies signType = TreeSpecies.GENERIC; // default oak
 	private boolean wallSign = true;
 	private BlockFace signFacing = BlockFace.SOUTH; // not null
 	// update the sign content at least once after plugin start, in case some settings have changed which affect the
@@ -52,6 +55,18 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
+		// sign wood type:
+		String signTypeName = configSection.getString("signType");
+		try {
+			signType = TreeSpecies.valueOf(signTypeName);
+		} catch (Exception e) {
+			// fallback to default:
+			Log.warning("Missing or invalid sign type '" + signTypeName + "' for shopkeeper " + shopkeeper.getId()
+					+ "'. Using '" + TreeSpecies.GENERIC + "' now.");
+			this.signType = TreeSpecies.GENERIC;
+			shopkeeper.markDirty();
+		}
+
 		// wall sign vs sign post:
 		if (!configSection.isBoolean("wallSign")) {
 			// missing value:
@@ -83,6 +98,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
+
+		// sign type:
+		configSection.set("signType", signType.name());
 
 		// wall sign vs sign post:
 		configSection.set("wallSign", wallSign);
@@ -141,25 +159,14 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			return false;
 		}
 
-		// place sign: // TODO maybe also allow non-wall signs?
+		// place sign:
 		Block signBlock = signLocation.getBlock();
-		BlockData signData = null;
-		if (wallSign) {
-			// place wall sign:
-			WallSign wallSignData = (WallSign) Bukkit.createBlockData(Material.WALL_SIGN);
-			wallSignData.setFacing(signFacing);
-			signData = wallSignData;
-		} else {
-			// place sign post:
-			org.bukkit.block.data.type.Sign signPostData = (org.bukkit.block.data.type.Sign) Bukkit.createBlockData(Material.SIGN);
-			signPostData.setRotation(signFacing);
-			signData = signPostData;
-		}
+		BlockData signData = this.createBlockData();
 		assert signData != null;
 
 		// cancel block physics for this placed sign if needed:
 		signShops.cancelNextBlockPhysics(signBlock);
-		signBlock.setBlockData(signData, false);
+		signBlock.setBlockData(signData, false); // skip physics update
 		// cleanup state if no block physics were triggered:
 		signShops.cancelNextBlockPhysics(null);
 
@@ -174,6 +181,24 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		this.updateSign();
 
 		return true;
+	}
+
+	private BlockData createBlockData() {
+		Material signMaterial = getMaterial(signType, wallSign);
+		assert ItemUtils.isSign(signMaterial);
+		BlockData signData = null;
+		if (wallSign) {
+			// wall sign:
+			WallSign wallSignData = (WallSign) Bukkit.createBlockData(signMaterial);
+			wallSignData.setFacing(signFacing);
+			signData = wallSignData;
+		} else {
+			// sign post:
+			org.bukkit.block.data.type.Sign signPostData = (org.bukkit.block.data.type.Sign) Bukkit.createBlockData(signMaterial);
+			signPostData.setRotation(signFacing);
+			signData = signPostData;
+		}
+		return signData;
 	}
 
 	@Override
@@ -266,8 +291,50 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		return sign.getLine(1);
 	}
 
-	// SUB TYPES
-	// not supported
+	// SUB TYPES (different sign types)
+
+	@Override
+	public ItemStack getSubTypeItem() {
+		return new ItemStack(getMaterial(signType, false));
+	}
+
+	@Override
+	public void cycleSubType() {
+		shopkeeper.markDirty();
+		signType = Utils.getNextEnumConstant(TreeSpecies.class, signType);
+		assert signType != null;
+		this.applySubType();
+	}
+
+	protected void applySubType() {
+		Sign sign = this.getSign();
+		if (sign != null) {
+			BlockData signData = this.createBlockData();
+			sign.setBlockData(signData); // keeps sign data (text) the same
+			sign.update(true, false); // force: material has changed, skip physics update
+		}
+	}
+
+	private static Material getMaterial(TreeSpecies treeSpecies, boolean wallSign) {
+		if (treeSpecies == null) {
+			treeSpecies = TreeSpecies.GENERIC; // default
+		}
+		switch (treeSpecies) {
+		case ACACIA:
+			return wallSign ? Material.ACACIA_WALL_SIGN : Material.ACACIA_SIGN;
+		case BIRCH:
+			return wallSign ? Material.BIRCH_WALL_SIGN : Material.BIRCH_SIGN;
+		case DARK_OAK:
+			return wallSign ? Material.DARK_OAK_WALL_SIGN : Material.DARK_OAK_SIGN;
+		case JUNGLE:
+			return wallSign ? Material.JUNGLE_WALL_SIGN : Material.JUNGLE_SIGN;
+		case REDWOOD: // spruce
+			return wallSign ? Material.SPRUCE_WALL_SIGN : Material.SPRUCE_SIGN;
+		case GENERIC: // oak
+		default:
+			return wallSign ? Material.OAK_WALL_SIGN : Material.OAK_SIGN;
+		}
+	}
 
 	// OTHER PROPERTIES
 	// not supported

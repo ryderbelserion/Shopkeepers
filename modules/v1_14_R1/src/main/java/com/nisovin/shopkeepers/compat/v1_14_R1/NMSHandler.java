@@ -1,14 +1,15 @@
-package com.nisovin.shopkeepers.compat.v1_13_R2;
+package com.nisovin.shopkeepers.compat.v1_14_R1;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_13_R2.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_13_R2.inventory.CraftMerchant;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftMerchant;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -20,26 +21,23 @@ import org.bukkit.inventory.MerchantInventory;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
-import io.netty.buffer.Unpooled;
-import net.minecraft.server.v1_13_R2.Entity;
-import net.minecraft.server.v1_13_R2.EntityHuman;
-import net.minecraft.server.v1_13_R2.EntityInsentient;
-import net.minecraft.server.v1_13_R2.EntityLiving;
-import net.minecraft.server.v1_13_R2.GameProfileSerializer;
-import net.minecraft.server.v1_13_R2.IMerchant;
-import net.minecraft.server.v1_13_R2.MerchantRecipeList;
-import net.minecraft.server.v1_13_R2.NBTTagCompound;
-import net.minecraft.server.v1_13_R2.PacketDataSerializer;
-import net.minecraft.server.v1_13_R2.PacketPlayOutCustomPayload;
-import net.minecraft.server.v1_13_R2.PathfinderGoalFloat;
-import net.minecraft.server.v1_13_R2.PathfinderGoalLookAtPlayer;
-import net.minecraft.server.v1_13_R2.PathfinderGoalSelector;
+import net.minecraft.server.v1_14_R1.Entity;
+import net.minecraft.server.v1_14_R1.EntityHuman;
+import net.minecraft.server.v1_14_R1.EntityInsentient;
+import net.minecraft.server.v1_14_R1.EntityLiving;
+import net.minecraft.server.v1_14_R1.GameProfileSerializer;
+import net.minecraft.server.v1_14_R1.IMerchant;
+import net.minecraft.server.v1_14_R1.MerchantRecipeList;
+import net.minecraft.server.v1_14_R1.NBTTagCompound;
+import net.minecraft.server.v1_14_R1.PathfinderGoalFloat;
+import net.minecraft.server.v1_14_R1.PathfinderGoalLookAtPlayer;
+import net.minecraft.server.v1_14_R1.PathfinderGoalSelector;
 
 public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public String getVersionId() {
-		return "1_13_R2";
+		return "1_14_R1";
 	}
 
 	@Override
@@ -50,10 +48,10 @@ public final class NMSHandler implements NMSCallProvider {
 			if (!(mcLivingEntity instanceof EntityInsentient)) return;
 
 			// make goal selector items accessible:
-			Field bField = PathfinderGoalSelector.class.getDeclaredField("b");
-			bField.setAccessible(true);
-			Field cField = PathfinderGoalSelector.class.getDeclaredField("c");
+			Field cField = PathfinderGoalSelector.class.getDeclaredField("c"); // active goals
 			cField.setAccessible(true);
+			Field dField = PathfinderGoalSelector.class.getDeclaredField("d"); // registered goals
+			dField.setAccessible(true);
 
 			// overwrite goal selector:
 			Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
@@ -61,10 +59,10 @@ public final class NMSHandler implements NMSCallProvider {
 			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(mcLivingEntity);
 
 			// clear old goals:
-			Set<?> goals_b = (Set<?>) bField.get(goals);
-			goals_b.clear();
-			Set<?> goals_c = (Set<?>) cField.get(goals);
+			Map<?, ?> goals_c = (Map<?, ?>) cField.get(goals);
 			goals_c.clear();
+			Set<?> goals_d = (Set<?>) dField.get(goals);
+			goals_d.clear();
 
 			// add new goals:
 			goals.a(0, new PathfinderGoalFloat((EntityInsentient) mcLivingEntity));
@@ -76,10 +74,10 @@ public final class NMSHandler implements NMSCallProvider {
 			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(mcLivingEntity);
 
 			// clear old target goals:
-			Set<?> targets_b = (Set<?>) bField.get(targets);
-			targets_b.clear();
-			Set<?> targets_c = (Set<?>) cField.get(targets);
+			Map<?, ?> targets_c = (Map<?, ?>) cField.get(targets);
 			targets_c.clear();
+			Set<?> targets_d = (Set<?>) dField.get(targets);
+			targets_d.clear();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -92,7 +90,7 @@ public final class NMSHandler implements NMSCallProvider {
 		if (!(mcLivingEntity instanceof EntityInsentient)) return;
 		EntityInsentient mcInsentientEntity = ((EntityInsentient) mcLivingEntity);
 		mcInsentientEntity.goalSelector.doTick();
-		mcInsentientEntity.getControllerLook().a();
+		mcInsentientEntity.getControllerLook().a(); // tick look controller
 	}
 
 	@Override
@@ -121,8 +119,8 @@ public final class NMSHandler implements NMSCallProvider {
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
 		if (provided.getType() != required.getType()) return false;
-		net.minecraft.server.v1_13_R2.ItemStack nmsProvided = CraftItemStack.asNMSCopy(provided);
-		net.minecraft.server.v1_13_R2.ItemStack nmsRequired = CraftItemStack.asNMSCopy(required);
+		net.minecraft.server.v1_14_R1.ItemStack nmsProvided = CraftItemStack.asNMSCopy(provided);
+		net.minecraft.server.v1_14_R1.ItemStack nmsRequired = CraftItemStack.asNMSCopy(required);
 		// this makes sure that we have a 'damage' tag even if the damage is 0, so in case the required item for some
 		// reason has a damage tag of 0 the items are still considered equal by the following tag comparison:
 		if (ItemUtils.isDamageable(provided.getType())) {
@@ -130,7 +128,7 @@ public final class NMSHandler implements NMSCallProvider {
 		}
 		NBTTagCompound providedTag = nmsProvided.getTag();
 		NBTTagCompound requiredTag = nmsRequired.getTag();
-		return GameProfileSerializer.a(requiredTag, providedTag, false);
+		return GameProfileSerializer.a(requiredTag, providedTag, false); // compare tags
 	}
 
 	@Override
@@ -149,7 +147,7 @@ public final class NMSHandler implements NMSCallProvider {
 		}
 
 		MerchantRecipeList newRecipeList = new MerchantRecipeList();
-		MerchantRecipeList merchantRecipeList = nmsMerchant.getOffers(((CraftPlayer) player).getHandle());
+		MerchantRecipeList merchantRecipeList = nmsMerchant.getOffers();
 		if (merchantRecipeList != null) {
 			newRecipeList.addAll(merchantRecipeList);
 		}
@@ -161,13 +159,12 @@ public final class NMSHandler implements NMSCallProvider {
 		/*int selectedRecipeIndex = merchantInventory.getSelectedRecipeIndex();
 		if (selectedRecipeIndex > 0) {
 			for (int i = merchantRecipeList.size(); i <= selectedRecipeIndex; ++i) {
-				net.minecraft.server.v1_13_R2.ItemStack empty = CraftItemStack.asNMSCopy(null);
-				newRecipeList.add(new net.minecraft.server.v1_13_R2.MerchantRecipe(empty, empty, empty, 0, 0));
+				net.minecraft.server.v1_14_R1.ItemStack empty = CraftItemStack.asNMSCopy(null);
+				newRecipeList.add(new net.minecraft.server.v1_14_R1.MerchantRecipe(empty, empty, empty, 0, 0));
 			}
 		}*/
-		PacketDataSerializer packetdataserializer = new PacketDataSerializer(Unpooled.buffer());
-		packetdataserializer.writeInt(((CraftPlayer) player).getHandle().activeContainer.windowId);
-		newRecipeList.a(packetdataserializer); // serialize
-		((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutCustomPayload(PacketPlayOutCustomPayload.a, packetdataserializer)); // TRADER_LIST
+		// send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1: Novice, .., 5:
+		// Master), merchant total experience, is regular villager flag (false: hides some gui elements)
+		((CraftPlayer) player).getHandle().openTrade(((CraftPlayer) player).getHandle().activeContainer.windowId, newRecipeList, 0, 0, true);
 	}
 }

@@ -267,7 +267,8 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 			Log.debug("Shopkeeper (" + shopkeeper.getPositionString() + ") missing, triggering respawn now");
 			if (entity != null && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
 				// the chunk was silently unloaded before:
-				Log.debug("  Chunk was silently unloaded before!");
+				Log.debug("  Chunk was silently unloaded before! (dead: " + entity.isDead() + ", valid: " + entity.isValid()
+						+ ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()) + ")");
 			}
 			boolean spawned = this.spawn(); // this will load the chunk if necessary
 			if (spawned) {

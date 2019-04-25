@@ -1,5 +1,8 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
+import java.util.Locale;
+
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
@@ -12,12 +15,13 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class VillagerShop extends SKLivingShopObject {
 
-	private Profession profession = Profession.FARMER;
+	private Profession profession = Profession.NONE;
 
 	public VillagerShop(LivingShops livingShops, SKLivingShopObjectType<VillagerShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -28,15 +32,29 @@ public class VillagerShop extends SKLivingShopObject {
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
 
-		// load profession:
+		// profession:
 		String professionName = configSection.getString("prof");
+		// pre MC 1.14 migration:
+		if (professionName != null) {
+			String newProfessionName = null;
+			if (professionName.equals("PRIEST")) {
+				newProfessionName = Profession.CLERIC.name();
+			} else if (professionName.equals("BLACKSMITH")) {
+				newProfessionName = Profession.ARMORER.name();
+			}
+			if (newProfessionName != null) {
+				Log.warning("Migrated villager shopkeeper '" + shopkeeper.getId() + "' of type '" + professionName
+						+ "' to type '" + newProfessionName + "'.");
+				professionName = newProfessionName;
+				shopkeeper.markDirty();
+			}
+		}
 		Profession profession = getProfession(professionName);
-		// validate:
-		if (!isVillagerProfession(profession)) {
+		if (profession == null) {
 			// fallback:
 			Log.warning("Missing or invalid villager profession '" + professionName + "' for shopkeeper " + shopkeeper.getId()
-					+ "'. Using '" + Profession.FARMER + "' now.");
-			profession = Profession.FARMER;
+					+ "'. Using '" + Profession.NONE + "' now.");
+			profession = Profession.NONE;
 			shopkeeper.markDirty();
 		}
 		this.profession = profession;
@@ -65,31 +83,65 @@ public class VillagerShop extends SKLivingShopObject {
 
 	@Override
 	public ItemStack getSubTypeItem() {
+		ItemStack item;
 		switch (profession) {
-		case FARMER:
-			return new ItemStack(Material.BROWN_WOOL, 1);
-		case LIBRARIAN:
-			return new ItemStack(Material.WHITE_WOOL, 1);
-		case PRIEST:
-			return new ItemStack(Material.MAGENTA_WOOL, 1);
-		case BLACKSMITH:
-			return new ItemStack(Material.GRAY_WOOL, 1);
+		case ARMORER:
+			item = new ItemStack(Material.BLAST_FURNACE);
+			break;
 		case BUTCHER:
-			return new ItemStack(Material.LIGHT_GRAY_WOOL, 1);
+			item = new ItemStack(Material.SMOKER);
+			break;
+		case CARTOGRAPHER:
+			item = new ItemStack(Material.CARTOGRAPHY_TABLE);
+			break;
+		case CLERIC:
+			item = new ItemStack(Material.BREWING_STAND);
+			break;
+		case FARMER:
+			item = new ItemStack(Material.WHEAT); // instead of COMPOSTER
+			break;
+		case FISHERMAN:
+			item = new ItemStack(Material.FISHING_ROD); // instead of BARREL
+			break;
+		case FLETCHER:
+			item = new ItemStack(Material.FLETCHING_TABLE);
+			break;
+		case LEATHERWORKER:
+			item = new ItemStack(Material.LEATHER); // instead of CAULDRON
+			break;
+		case LIBRARIAN:
+			item = new ItemStack(Material.LECTERN);
+			break;
+		case MASON:
+			item = new ItemStack(Material.STONECUTTER);
+			break;
+		case SHEPHERD:
+			item = new ItemStack(Material.LOOM);
+			break;
+		case TOOLSMITH:
+			item = new ItemStack(Material.SMITHING_TABLE);
+			break;
+		case WEAPONSMITH:
+			item = new ItemStack(Material.GRINDSTONE);
+			break;
 		case NITWIT:
-			return new ItemStack(Material.GREEN_WOOL, 1);
+			item = new ItemStack(Material.LEATHER_CHESTPLATE);
+			ItemUtils.setLeatherColor(item, Color.GREEN);
+			break;
+		case NONE:
 		default:
-			// unknown profession:
-			return new ItemStack(Material.RED_WOOL, 1);
+			item = new ItemStack(Material.BARRIER);
+			break;
 		}
+		assert item != null;
+		ItemUtils.setLocalizedName(item, "entity.minecraft.villager." + profession.name().toLowerCase(Locale.ROOT));
+		return item;
 	}
 
 	@Override
 	public void cycleSubType() {
 		shopkeeper.markDirty();
-		profession = Utils.getNextEnumConstant(Profession.class, profession, (profession) -> {
-			return isVillagerProfession(profession);
-		});
+		profession = Utils.getNextEnumConstant(Profession.class, profession);
 		assert profession != null;
 		this.applySubType();
 	}
@@ -102,12 +154,5 @@ public class VillagerShop extends SKLivingShopObject {
 			}
 		}
 		return null;
-	}
-
-	private static boolean isVillagerProfession(Profession profession) {
-		if (profession == null) return false;
-		// TODO update this once all legacy zombie profession got removed
-		return (profession.ordinal() >= Profession.FARMER.ordinal()
-				&& profession.ordinal() <= Profession.NITWIT.ordinal());
 	}
 }

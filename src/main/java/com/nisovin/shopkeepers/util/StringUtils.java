@@ -92,4 +92,26 @@ public class StringUtils {
 		}
 		return WHITESPACE_PATTERN.matcher(source).replaceAll(replacement);
 	}
+
+	public static String capitalizeAll(String source) {
+		if (source == null || source.isEmpty()) {
+			return source;
+		}
+		int sourceLength = source.length();
+		StringBuilder builder = new StringBuilder(sourceLength);
+		boolean capitalizeNext = true; // capitalize first letter
+		for (int i = 0; i < sourceLength; i++) {
+			char currentChar = source.charAt(i);
+			if (Character.isWhitespace(currentChar)) {
+				capitalizeNext = true;
+				builder.append(currentChar);
+			} else if (capitalizeNext) {
+				capitalizeNext = false;
+				builder.append(Character.toTitleCase(currentChar));
+			} else {
+				builder.append(currentChar);
+			}
+		}
+		return builder.toString();
+	}
 }

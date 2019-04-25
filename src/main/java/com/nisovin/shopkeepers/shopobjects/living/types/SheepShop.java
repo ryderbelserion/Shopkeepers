@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
 import org.bukkit.DyeColor;
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Sheep;
@@ -12,6 +11,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -31,26 +31,13 @@ public class SheepShop extends SKLivingShopObject {
 	}
 
 	private void loadColor(ConfigurationSection configSection) {
-		DyeColor color = null;
-		String colorInput;
-		if (configSection.isInt("color")) {
-			// import from pre 1.13 wool data values:
-			// TODO remove this again at some point
-			Log.info("Importing old sheep color for shopkeeper '" + this.shopkeeper.getId() + "'.");
-			int woolData = configSection.getInt("color");
-			colorInput = String.valueOf(woolData);
-			color = DyeColor.getByWoolData((byte) woolData);
-			shopkeeper.markDirty();
-		} else {
-			String colorName = configSection.getString("color");
-			colorInput = colorName;
-			color = parseColor(colorName);
-		}
+		String colorName = configSection.getString("color");
+		DyeColor color = parseColor(colorName);
 		if (color == null) {
 			// fallback to default white:
-			color = DyeColor.WHITE;
-			Log.warning("Missing or invalid sheep color '" + colorInput + "' for shopkeeper " + shopkeeper.getId()
+			Log.warning("Missing or invalid sheep color '" + colorName + "' for shopkeeper " + shopkeeper.getId()
 					+ ". Using '" + DyeColor.WHITE + "' now.");
+			color = DyeColor.WHITE;
 			shopkeeper.markDirty();
 		}
 		this.color = color;
@@ -89,46 +76,7 @@ public class SheepShop extends SKLivingShopObject {
 
 	@Override
 	public ItemStack getSubTypeItem() {
-		return new ItemStack(getWoolType(color), 1);
-	}
-
-	// TODO this can be removed again once bukkit provides a non-deprecated mapping itself
-	private static Material getWoolType(DyeColor dyeColor) {
-		switch (dyeColor) {
-		case ORANGE:
-			return Material.ORANGE_WOOL;
-		case MAGENTA:
-			return Material.MAGENTA_WOOL;
-		case LIGHT_BLUE:
-			return Material.LIGHT_BLUE_WOOL;
-		case YELLOW:
-			return Material.YELLOW_WOOL;
-		case LIME:
-			return Material.LIME_WOOL;
-		case PINK:
-			return Material.PINK_WOOL;
-		case GRAY:
-			return Material.GRAY_WOOL;
-		case LIGHT_GRAY:
-			return Material.LIGHT_GRAY_WOOL;
-		case CYAN:
-			return Material.CYAN_WOOL;
-		case PURPLE:
-			return Material.PURPLE_WOOL;
-		case BLUE:
-			return Material.BLUE_WOOL;
-		case BROWN:
-			return Material.BROWN_WOOL;
-		case GREEN:
-			return Material.GREEN_WOOL;
-		case RED:
-			return Material.RED_WOOL;
-		case BLACK:
-			return Material.BLACK_WOOL;
-		case WHITE:
-		default:
-			return Material.WHITE_WOOL;
-		}
+		return new ItemStack(ItemUtils.getWoolType(color), 1);
 	}
 
 	@Override

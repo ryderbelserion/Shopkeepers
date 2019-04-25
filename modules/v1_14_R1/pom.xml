@@ -8,12 +8,12 @@
 		<version>${revision}</version>
 		<relativePath>../nms-parent/</relativePath>
 	</parent>
-	<artifactId>sk-v1_13_R2</artifactId>
+	<artifactId>sk-v1_14_R1</artifactId>
 	<packaging>jar</packaging>
-	<name>SK for v1_13_R2</name>
+	<name>SK for v1_14_R1</name>
 
 	<properties>
-		<craftbukkit.version>1.13.2-R0.1-SNAPSHOT</craftbukkit.version>
+		<craftbukkit.version>1.14-pre5-SNAPSHOT</craftbukkit.version>
 	</properties>
 
 	<dependencies>

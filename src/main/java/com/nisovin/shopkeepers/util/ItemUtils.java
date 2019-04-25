@@ -5,11 +5,14 @@ import java.util.List;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
@@ -29,7 +32,8 @@ public final class ItemUtils {
 	}
 
 	public static boolean isSign(Material material) {
-		return material == Material.WALL_SIGN || material == Material.SIGN;
+		if (material == null) return false;
+		return material.data == org.bukkit.block.data.type.Sign.class || material.data == org.bukkit.block.data.type.WallSign.class;
 	}
 
 	// itemstack utilities:
@@ -79,6 +83,66 @@ public final class ItemUtils {
 			item.setItemMeta(meta);
 		}
 		return item;
+	}
+	
+	public static ItemStack setLocalizedName(ItemStack item, String locName) {
+		if (item == null) return null;
+		ItemMeta meta = item.getItemMeta();
+		if (meta != null) {
+			meta.setLocalizedName(locName);
+			item.setItemMeta(meta);
+		}
+		return item;
+	}
+
+	public static ItemStack setLeatherColor(ItemStack leatherArmorItem, Color color) {
+		if (leatherArmorItem == null) return null;
+		ItemMeta meta = leatherArmorItem.getItemMeta();
+		if (meta instanceof LeatherArmorMeta) {
+			LeatherArmorMeta leatherMeta = (LeatherArmorMeta) meta;
+			leatherMeta.setColor(color);
+			leatherArmorItem.setItemMeta(leatherMeta);
+		}
+		return leatherArmorItem;
+	}
+
+	// TODO this can be removed once bukkit provides a non-deprecated mapping itself
+	public static Material getWoolType(DyeColor dyeColor) {
+		switch (dyeColor) {
+		case ORANGE:
+			return Material.ORANGE_WOOL;
+		case MAGENTA:
+			return Material.MAGENTA_WOOL;
+		case LIGHT_BLUE:
+			return Material.LIGHT_BLUE_WOOL;
+		case YELLOW:
+			return Material.YELLOW_WOOL;
+		case LIME:
+			return Material.LIME_WOOL;
+		case PINK:
+			return Material.PINK_WOOL;
+		case GRAY:
+			return Material.GRAY_WOOL;
+		case LIGHT_GRAY:
+			return Material.LIGHT_GRAY_WOOL;
+		case CYAN:
+			return Material.CYAN_WOOL;
+		case PURPLE:
+			return Material.PURPLE_WOOL;
+		case BLUE:
+			return Material.BLUE_WOOL;
+		case BROWN:
+			return Material.BROWN_WOOL;
+		case GREEN:
+			return Material.GREEN_WOOL;
+		case RED:
+			return Material.RED_WOOL;
+		case BLACK:
+			return Material.BLACK_WOOL;
+		case WHITE:
+		default:
+			return Material.WHITE_WOOL;
+		}
 	}
 
 	public static boolean isDamageable(ItemStack itemStack) {

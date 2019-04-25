@@ -89,7 +89,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>sk-v1_13_R2</artifactId>
+			<artifactId>sk-v1_14_R1</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
 			<scope>provided</scope>
