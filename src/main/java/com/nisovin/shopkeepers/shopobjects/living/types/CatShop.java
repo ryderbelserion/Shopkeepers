@@ -1,8 +1,5 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
-import java.util.Locale;
-
-import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -18,7 +15,6 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class CatShop extends SKLivingShopObject {
@@ -70,8 +66,9 @@ public class CatShop extends SKLivingShopObject {
 	public ItemStack getSubTypeItem() {
 		ItemStack item = new ItemStack(Material.LEATHER_CHESTPLATE);
 		// TODO translations?
-		String catTypeName = StringUtils.capitalizeAll(catType.name().toLowerCase(Locale.ROOT).replace('_', ' '));
-		ItemUtils.setItemStackNameAndLore(item, ChatColor.GOLD + catTypeName, null);
+		// TODO not used currently, because it gets replaces inside the editor handler with a generic name and lore
+		//String catTypeName = StringUtils.capitalizeAll(catType.name().toLowerCase(Locale.ROOT).replace('_', ' '));
+		//ItemUtils.setItemStackNameAndLore(item, ChatColor.GOLD + catTypeName, null);
 		switch (catType) {
 		case ALL_BLACK:
 			ItemUtils.setLeatherColor(item, Color.BLACK);

@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
-import java.util.Locale;
-
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -134,7 +132,8 @@ public class VillagerShop extends SKLivingShopObject {
 			break;
 		}
 		assert item != null;
-		ItemUtils.setLocalizedName(item, "entity.minecraft.villager." + profession.name().toLowerCase(Locale.ROOT));
+		// TODO not used currently, because it gets replaces inside the editor handler with a generic name and lore
+		//ItemUtils.setLocalizedName(item, "entity.minecraft.villager." + profession.name().toLowerCase(Locale.ROOT));
 		return item;
 	}
 
