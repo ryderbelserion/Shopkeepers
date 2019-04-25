@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.block;
 
+import java.util.List;
+
 import org.bukkit.block.Block;
 
 import com.nisovin.shopkeepers.api.shopobjects.block.BlockShopObjectType;
@@ -9,6 +11,10 @@ public abstract class AbstractBlockShopObjectType<T extends AbstractBlockShopObj
 
 	protected AbstractBlockShopObjectType(String identifier, String permission) {
 		super(identifier, permission);
+	}
+
+	protected AbstractBlockShopObjectType(String identifier, List<String> aliases, String permission) {
+		super(identifier, aliases, permission);
 	}
 
 	public String createObjectId(Block block) {

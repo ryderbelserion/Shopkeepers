@@ -8,7 +8,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObjectType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
-import com.nisovin.shopkeepers.util.StringUtils;
 
 public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShopObject> implements SignShopObjectType<SKSignShopObject> {
 
@@ -32,13 +31,6 @@ public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShop
 	@Override
 	public boolean isEnabled() {
 		return Settings.enableSignShops;
-	}
-
-	@Override
-	public boolean matches(String identifier) {
-		identifier = StringUtils.normalize(identifier);
-		if (super.matches(identifier)) return true;
-		return identifier.startsWith("sign");
 	}
 
 	@Override

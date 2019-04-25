@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects;
 
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -16,6 +18,10 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 
 	protected AbstractShopObjectType(String identifier, String permission) {
 		super(identifier, permission);
+	}
+
+	protected AbstractShopObjectType(String identifier, List<String> aliases, String permission) {
+		super(identifier, aliases, permission);
 	}
 
 	@Override

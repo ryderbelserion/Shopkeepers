@@ -10,7 +10,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
-import com.nisovin.shopkeepers.util.StringUtils;
 
 public class BookPlayerShopType extends AbstractPlayerShopType<BookPlayerShopkeeper> {
 
@@ -50,12 +49,5 @@ public class BookPlayerShopType extends AbstractPlayerShopType<BookPlayerShopkee
 		this.validateConfigSection(configSection);
 		BookPlayerShopkeeper shopkeeper = new BookPlayerShopkeeper(id, configSection);
 		return shopkeeper;
-	}
-
-	@Override
-	public boolean matches(String identifier) {
-		identifier = StringUtils.normalize(identifier);
-		if (super.matches(identifier)) return true;
-		return identifier.startsWith("book");
 	}
 }

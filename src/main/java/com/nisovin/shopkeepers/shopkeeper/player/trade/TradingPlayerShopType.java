@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopkeeper.player.trade;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -10,12 +11,11 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
-import com.nisovin.shopkeepers.util.StringUtils;
 
 public class TradingPlayerShopType extends AbstractPlayerShopType<TradingPlayerShopkeeper> {
 
 	public TradingPlayerShopType() {
-		super("trade", ShopkeepersPlugin.PLAYER_TRADE_PERMISSION);
+		super("trade", Arrays.asList("trading"), ShopkeepersPlugin.PLAYER_TRADE_PERMISSION);
 	}
 
 	@Override
@@ -50,12 +50,5 @@ public class TradingPlayerShopType extends AbstractPlayerShopType<TradingPlayerS
 		this.validateConfigSection(configSection);
 		TradingPlayerShopkeeper shopkeeper = new TradingPlayerShopkeeper(id, configSection);
 		return shopkeeper;
-	}
-
-	@Override
-	public boolean matches(String identifier) {
-		identifier = StringUtils.normalize(identifier);
-		if (super.matches(identifier)) return true;
-		return identifier.startsWith("trad");
 	}
 }

@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.admin;
 
+import java.util.List;
+
 import org.apache.commons.lang.Validate;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -11,6 +13,10 @@ public abstract class AbstractAdminShopType<T extends AbstractAdminShopkeeper> e
 
 	protected AbstractAdminShopType(String identifier, String permission) {
 		super(identifier, permission);
+	}
+
+	protected AbstractAdminShopType(String identifier, List<String> aliases, String permission) {
+		super(identifier, aliases, permission);
 	}
 
 	// common functions that might be useful for sub-classes:

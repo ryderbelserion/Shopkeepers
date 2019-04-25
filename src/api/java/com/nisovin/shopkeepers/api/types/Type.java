@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.api.types;
 
+import java.util.Collection;
+
 import org.bukkit.entity.Player;
 
 public interface Type {
@@ -10,6 +12,14 @@ public interface Type {
 	 * @return the unique identifier, not <code>null</code> or empty
 	 */
 	public String getIdentifier();
+
+	/**
+	 * Gets aliases for this type.
+	 *
+	 * @return the aliases, not <code>null</code>
+	 * @see Type#matches(String)
+	 */
+	public Collection<String> getAliases();
 
 	/**
 	 * Gets the display name of this type.
@@ -45,6 +55,9 @@ public interface Type {
 
 	/**
 	 * Checks if the given (possibly inaccurate) identifier matches to this type.
+	 * <p>
+	 * Typically this normalizes and compares the given identifier with the identifier of this type, the aliases and the
+	 * display name.
 	 * 
 	 * @param identifier
 	 *            an (possible inaccurate) identifier

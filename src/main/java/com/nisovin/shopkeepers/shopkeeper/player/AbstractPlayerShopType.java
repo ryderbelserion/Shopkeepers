@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.player;
 
+import java.util.List;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -23,6 +25,10 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 
 	protected AbstractPlayerShopType(String identifier, String permission) {
 		super(identifier, permission);
+	}
+
+	protected AbstractPlayerShopType(String identifier, List<String> aliases, String permission) {
+		super(identifier, aliases, permission);
 	}
 
 	@Override

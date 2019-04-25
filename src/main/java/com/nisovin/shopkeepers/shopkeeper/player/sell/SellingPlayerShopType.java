@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopkeeper.player.sell;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
@@ -10,12 +11,11 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
-import com.nisovin.shopkeepers.util.StringUtils;
 
 public class SellingPlayerShopType extends AbstractPlayerShopType<SellingPlayerShopkeeper> {
 
 	public SellingPlayerShopType() {
-		super("sell", ShopkeepersPlugin.PLAYER_SELL_PERMISSION);
+		super("sell", Arrays.asList("selling", "normal", "player"), ShopkeepersPlugin.PLAYER_SELL_PERMISSION);
 	}
 
 	@Override
@@ -50,12 +50,5 @@ public class SellingPlayerShopType extends AbstractPlayerShopType<SellingPlayerS
 		this.validateConfigSection(configSection);
 		SellingPlayerShopkeeper shopkeeper = new SellingPlayerShopkeeper(id, configSection);
 		return shopkeeper;
-	}
-
-	@Override
-	public boolean matches(String identifier) {
-		identifier = StringUtils.normalize(identifier);
-		if (super.matches(identifier)) return true;
-		return identifier.startsWith("norm") || identifier.startsWith("sell") || identifier.startsWith("player");
 	}
 }

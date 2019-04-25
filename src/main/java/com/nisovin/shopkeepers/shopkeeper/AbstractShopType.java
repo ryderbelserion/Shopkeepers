@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper;
 
+import java.util.List;
+
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -23,6 +25,10 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 
 	protected AbstractShopType(String identifier, String permission) {
 		super(identifier, permission);
+	}
+
+	protected AbstractShopType(String identifier, List<String> aliases, String permission) {
+		super(identifier, aliases, permission);
 	}
 
 	@Override

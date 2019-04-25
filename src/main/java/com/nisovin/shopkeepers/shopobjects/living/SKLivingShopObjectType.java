@@ -17,16 +17,12 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject> exten
 
 	protected final LivingShops livingShops;
 	protected final EntityType entityType;
-	protected final List<String> aliases; // unmodifiable, not null, might be empty
 
 	protected SKLivingShopObjectType(LivingShops livingShops, EntityType entityType, List<String> aliases, String identifier, String permission) {
-		super(identifier, permission);
+		super(identifier, aliases, permission);
 		this.livingShops = livingShops;
 		this.entityType = entityType;
 		assert entityType.isAlive();
-		assert aliases != null;
-		// assert: aliases are normalized
-		this.aliases = aliases;
 	}
 
 	@Override
@@ -52,16 +48,6 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject> exten
 	@Override
 	public boolean isEnabled() {
 		return Settings.enabledLivingShops.contains(entityType.name());
-	}
-
-	@Override
-	public boolean matches(String identifier) {
-		identifier = StringUtils.normalize(identifier);
-		if (super.matches(identifier)) return true;
-		for (String alias : aliases) {
-			if (identifier.startsWith(alias)) return true;
-		}
-		return false;
 	}
 
 	@Override

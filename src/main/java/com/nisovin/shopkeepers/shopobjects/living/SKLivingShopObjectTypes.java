@@ -29,7 +29,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * All non-listed entity types are completely untested and therefore 'experimental' as well.
 	 * 
 	 * <ul>
-	 * <li> VILLAGER: okay, default
+	 * <li> VILLAGER: okay, default, MC 1.14: shake their head when clicked (TODO might be a upstream bug)
 	 * <li> BAT: experimental: requires NoAI, sleeping by default, but starts flying when 'hit'
 	 * <li> BLAZE: experimental: starts flying upwards -> NoAI for now, seems okay
 	 * <li> CAVE_SPIDER: okay
@@ -108,7 +108,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 
 	static {
 		Map<EntityType, List<String>> aliases = new HashMap<>();
-		aliases.put(EntityType.MUSHROOM_COW, prepareAliases(Arrays.asList("mooshroom")));
+		aliases.put(EntityType.MUSHROOM_COW, prepareAliases(Arrays.asList("mooshroom", "mooshroom-cow", "mushroom")));
 		ALIASES = Collections.unmodifiableMap(aliases);
 	}
 

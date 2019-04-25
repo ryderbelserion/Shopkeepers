@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.entity;
 
+import java.util.List;
+
 import org.bukkit.entity.Entity;
 
 import com.nisovin.shopkeepers.api.shopobjects.entity.EntityShopObjectType;
@@ -9,6 +11,10 @@ public abstract class AbstractEntityShopObjectType<T extends AbstractEntityShopO
 
 	protected AbstractEntityShopObjectType(String identifier, String permission) {
 		super(identifier, permission);
+	}
+
+	protected AbstractEntityShopObjectType(String identifier, List<String> aliases, String permission) {
+		super(identifier, aliases, permission);
 	}
 
 	public String createObjectId(Entity entity) {
