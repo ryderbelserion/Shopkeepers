@@ -116,7 +116,14 @@ public class Settings {
 			EntityType.PUFFERFISH.name(), // MC 1.13
 			EntityType.TROPICAL_FISH.name(), // MC 1.13
 			EntityType.DROWNED.name(), // MC 1.13
-			EntityType.DOLPHIN.name() // MC 1.13
+			EntityType.DOLPHIN.name(), // MC 1.13
+			EntityType.CAT.name(), // MC 1.14
+			EntityType.PANDA.name(), // MC 1.14
+			EntityType.PILLAGER.name(), // MC 1.14
+			EntityType.RAVAGER.name(), // MC 1.14
+			EntityType.TRADER_LLAMA.name(), // MC 1.14
+			EntityType.WANDERING_TRADER.name(), // MC 1.14
+			EntityType.FOX.name() // MC 1.14
 	);
 
 	public static boolean useLegacyMobBehavior = false;

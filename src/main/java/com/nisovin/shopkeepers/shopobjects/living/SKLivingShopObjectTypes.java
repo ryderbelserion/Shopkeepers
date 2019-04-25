@@ -83,20 +83,20 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * * # 1.13
 	 * <li> TURTLE: okay
 	 * <li> PHANTOM: okay, burns in sun
-	 * <li> COD: okay, visually disappears in early versions of spigot 1.13-pre7 when clicked with water-bucket
-	 * <li> SALMON: okay, visually disappears in early versions of spigot 1.13-pre7 when clicked with water-bucket
-	 * <li> PUFFERFISH: okay, visually disappears in early versions of spigot 1.13-pre7 when clicked with water-bucket
-	 * <li> TROPICAL_FISH: okay, visually disappears in early versions of spigot 1.13-pre7 when clicked with water-bucket
+	 * <li> COD: okay
+	 * <li> SALMON: okay
+	 * <li> PUFFERFISH: okay
+	 * <li> TROPICAL_FISH: okay
 	 * <li> DROWNED: okay
 	 * <li> DOLPHIN: okay, slightly gliding inside water
 	 * * # 1.14
-	 * <li> CAT: 
-	 * <li> PANDA:
-	 * <li> PILLAGER:
-	 * <li> RAVAGER:
-	 * <li> TRADER_LLAMA:
-	 * <li> WANDERING_VILLAGER:
-	 * <li> FOX:
+	 * <li> CAT: okay
+	 * <li> PANDA: okay
+	 * <li> PILLAGER: okay
+	 * <li> RAVAGER: okay
+	 * <li> TRADER_LLAMA: okay
+	 * <li> WANDERING_VILLAGER: okay
+	 * <li> FOX: okay
 	 * </ul>
 	 */
 
@@ -124,7 +124,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 			EntityType entityType = Settings.matchEntityType(entityTypeId);
 			if (entityType != null && entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType)) {
 				// not using aliases (yet?)
-				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, getAliases(entityType)));
+				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, this.getAliases(entityType)));
 			}
 		}
 
@@ -132,7 +132,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 		for (EntityType entityType : EntityType.values()) {
 			if (entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType)) {
 				// not using aliases (yet?)
-				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, getAliases(entityType)));
+				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, this.getAliases(entityType)));
 			}
 		}
 	}

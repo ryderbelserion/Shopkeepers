@@ -157,6 +157,13 @@ enabled-living-shops:
 - TROPICAL_FISH
 - DROWNED
 - DOLPHIN
+- CAT
+- PANDA
+- PILLAGER
+- RAVAGER
+- TRADER_LLAMA
+- WANDERING_TRADER
+- FOX
 
 # With the old behavior the mobs can be pushed around and their AI and gravity
 # is handled by minecraft itself. With the new behavior all their vanilla AI is
