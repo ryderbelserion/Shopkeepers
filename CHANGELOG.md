@@ -4,7 +4,33 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
-## v2.6.0 Alpha (2019-03-04)
+## v2.7.0 (TBA)
+### Supported MC versions: 1.14
+
+**Update for MC 1.14:**
+* Dropped support for MC 1.13. This version only supports MC 1.14!
+* If you are upgrading, make sure that you have successfully updated shopkeepers to 1.13 first. Migration from older MC are not supported and might not work. Reverting to older versions isn't supported either.
+  * Removed pre 1.13 sheep color migration.
+* Villager shopkeepers:
+  * Changed default profession from farmer to 'none'.
+  * Priest villagers get converted to 'cleric' and blacksmiths become 'armorer'. Previous regular farmer villagers stay farmers (but they look differently now).
+  * Changed the items representing the villager professions in the editor.
+  * Note: Wandering traders are not a villager sub-variant, but a different mob type.
+* Ocelot shopkeepers of cat types have been converted to corresponding cat shopkeepers.
+  * You might have to adapt your players' permissions, since cat and ocelot shopkeepers require different permissions now. With this migration players can end up with cat shopkeepers even though they don't have the permission to freshly create those if they wanted.
+  * The different cat types are represented by colored leather armor inside the editor.
+* Any settings affecting regular villagers will affect wandering traders as well now. There are no settings for now to handle wandering traders differently.
+  * When preventing regular villagers from spawning, the trader llamas of the wandering trader are prevented from spawning as well.
+  * When hiring a wandering trader, its leashed llama should get unleashed due to the removal of the wandering trader.
+* Added: Sign shops can now switch between different wood types.
+* Added all new 1.14 mobs to the by default enabled mobs. If you are updating you will have to manually enable them in the config.
+
+Other (mostly internal) changes:
+* Made shop and object type matching more strict. This uses a fixed list of internal aliases now.
+* Fixed a minor internal inconsistency with the updating of trades: Trades were updated on the client, but the server was left in the previous state (mostly affected debug messages).
+* Removed special handling of item damage tags from item comparison. Spigot has made some changes that should make this obsolete.
+
+## v2.6.0 (2019-03-04)
 ### Supported MC versions: 1.13.2
 
 Since the changes of this update are manifold and prone to potentially exploitable issues, this update is initially marked as 'alpha' version to see if any issues come up.
