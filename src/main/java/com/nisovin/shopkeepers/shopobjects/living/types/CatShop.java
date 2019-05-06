@@ -1,23 +1,28 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Cat;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
-import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
+import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class CatShop extends SKLivingShopObject {
+public class CatShop extends BabyableShop<Cat> {
 
 	private Cat.Type catType = Cat.Type.TABBY;
 
@@ -48,75 +53,95 @@ public class CatShop extends SKLivingShopObject {
 	}
 
 	@Override
-	public Cat getEntity() {
-		assert super.getEntity().getType() == EntityType.CAT;
-		return (Cat) super.getEntity();
+	protected void onSpawn(Cat entity) {
+		super.onSpawn(entity);
+		this.applyCatType(entity);
 	}
 
-	// SUB TYPES
+	// EDITOR ACTIONS
 
 	@Override
-	protected void applySubType() {
-		super.applySubType();
-		if (!this.isActive()) return;
-		this.getEntity().setCatType(catType);
+	public List<EditorHandler.Button> getEditorButtons() {
+		List<EditorHandler.Button> editorButtons = super.getEditorButtons(); // assumes modifiable
+		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
+			@Override
+			public ItemStack getIcon(EditorHandler.Session session) {
+				return getCatTypeEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				cycleCatType();
+				return true;
+			}
+		});
+		return editorButtons;
 	}
 
-	@Override
-	public ItemStack getSubTypeItem() {
-		ItemStack item = new ItemStack(Material.LEATHER_CHESTPLATE);
-		// TODO translations?
-		// TODO not used currently, because it gets replaces inside the editor handler with a generic name and lore
-		//String catTypeName = StringUtils.capitalizeAll(catType.name().toLowerCase(Locale.ROOT).replace('_', ' '));
-		//ItemUtils.setItemStackNameAndLore(item, ChatColor.GOLD + catTypeName, null);
+	// CAT TYPE
+
+	public void setCatType(Cat.Type catType) {
+		Validate.notNull(catType, "Cat type is null!");
+		this.catType = catType;
+		shopkeeper.markDirty();
+		this.applyCatType(this.getEntity()); // null if not active
+	}
+
+	protected void applyCatType(Cat entity) {
+		if (entity == null) return;
+		entity.setCatType(catType);
+	}
+
+	public void cycleCatType() {
+		this.setCatType(Utils.getNextEnumConstant(Cat.Type.class, catType));
+	}
+
+	protected ItemStack getCatTypeEditorItem() {
+		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
 		switch (catType) {
 		case ALL_BLACK:
-			ItemUtils.setLeatherColor(item, Color.BLACK);
+			ItemUtils.setLeatherColor(iconItem, Color.BLACK);
 			break;
 		case BLACK:
-			ItemUtils.setLeatherColor(item, Color.BLACK.mixDyes(DyeColor.GRAY));
+			ItemUtils.setLeatherColor(iconItem, Color.BLACK.mixDyes(DyeColor.GRAY));
 			break;
 		case BRITISH_SHORTHAIR:
-			ItemUtils.setLeatherColor(item, Color.SILVER);
+			ItemUtils.setLeatherColor(iconItem, Color.SILVER);
 			break;
 		case CALICO:
-			ItemUtils.setLeatherColor(item, Color.ORANGE.mixDyes(DyeColor.BROWN));
+			ItemUtils.setLeatherColor(iconItem, Color.ORANGE.mixDyes(DyeColor.BROWN));
 			break;
 		case JELLIE:
-			ItemUtils.setLeatherColor(item, Color.GRAY);
+			ItemUtils.setLeatherColor(iconItem, Color.GRAY);
 			break;
 		case PERSIAN:
-			ItemUtils.setLeatherColor(item, Color.WHITE.mixDyes(DyeColor.ORANGE));
+			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.ORANGE));
 			break;
 		case RAGDOLL:
-			ItemUtils.setLeatherColor(item, Color.WHITE.mixDyes(DyeColor.BROWN));
+			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
 			break;
 		case RED:
-			ItemUtils.setLeatherColor(item, Color.ORANGE);
+			ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
 			break;
 		case SIAMESE:
-			ItemUtils.setLeatherColor(item, Color.GRAY.mixDyes(DyeColor.BROWN));
+			ItemUtils.setLeatherColor(iconItem, Color.GRAY.mixDyes(DyeColor.BROWN));
 			break;
 		case WHITE:
-			ItemUtils.setLeatherColor(item, Color.WHITE);
+			ItemUtils.setLeatherColor(iconItem, Color.WHITE);
 			break;
 		case TABBY:
-			ItemUtils.setLeatherColor(item, Color.BLACK.mixColors(Color.ORANGE));
+			ItemUtils.setLeatherColor(iconItem, Color.BLACK.mixColors(Color.ORANGE));
 			break;
 		default:
 			// unknown type:
-			ItemUtils.setLeatherColor(item, Color.PURPLE);
+			ItemUtils.setLeatherColor(iconItem, Color.PURPLE);
 			break;
 		}
-		return item;
-	}
-
-	@Override
-	public void cycleSubType() {
-		shopkeeper.markDirty();
-		catType = Utils.getNextEnumConstant(Cat.Type.class, catType);
-		assert catType != null;
-		this.applySubType();
+		// TODO use more specific text
+		// String catTypeName = StringUtils.capitalizeAll(catType.name().toLowerCase(Locale.ROOT).replace('_', ' '));
+		// ItemUtils.setItemStackNameAndLore(item, ChatColor.GOLD + catTypeName, null);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		return iconItem;
 	}
 
 	// MC 1.14: conversion from ocelot types to similar cat types:

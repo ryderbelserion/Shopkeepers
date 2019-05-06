@@ -1,23 +1,28 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
-import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
+import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class VillagerShop extends SKLivingShopObject {
+public class VillagerShop extends BabyableShop<Villager> {
 
 	private Profession profession = Profession.NONE;
 
@@ -31,7 +36,12 @@ public class VillagerShop extends SKLivingShopObject {
 		super.load(configSection);
 
 		// profession:
-		String professionName = configSection.getString("prof");
+		String professionName = configSection.getString("profession");
+		if (professionName == null) {
+			// migration from 'prof' key:
+			// TODO added with 1.14 update, remove again at some point
+			professionName = configSection.getString("prof");
+		}
 		// pre MC 1.14 migration:
 		if (professionName != null) {
 			String newProfessionName = null;
@@ -58,100 +68,121 @@ public class VillagerShop extends SKLivingShopObject {
 		this.profession = profession;
 	}
 
+	private static Profession getProfession(String professionName) {
+		if (professionName == null) return null;
+		try {
+			return Profession.valueOf(professionName);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		configSection.set("prof", profession.name());
+		configSection.set("profession", profession.name());
 	}
 
 	@Override
-	public Villager getEntity() {
-		assert super.getEntity().getType() == EntityType.VILLAGER;
-		return (Villager) super.getEntity();
+	protected void onSpawn(Villager entity) {
+		super.onSpawn(entity);
+		this.applyProfession(entity);
 	}
 
-	// SUB TYPES
+	// EDITOR ACTIONS
 
 	@Override
-	protected void applySubType() {
-		super.applySubType();
-		if (!this.isActive()) return;
-		this.getEntity().setProfession(profession);
+	public List<EditorHandler.Button> getEditorButtons() {
+		List<EditorHandler.Button> editorButtons = super.getEditorButtons(); // assumes modifiable
+		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
+			@Override
+			public ItemStack getIcon(EditorHandler.Session session) {
+				return getProfessionEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				cycleProfession();
+				return true;
+			}
+		});
+		return editorButtons;
 	}
 
-	@Override
-	public ItemStack getSubTypeItem() {
-		ItemStack item;
+	// PROFESSION
+
+	public void setProfession(Profession profession) {
+		Validate.notNull(profession, "Profession is null!");
+		this.profession = profession;
+		shopkeeper.markDirty();
+		this.applyProfession(this.getEntity()); // null if not active
+	}
+
+	protected void applyProfession(Villager entity) {
+		if (entity == null) return;
+		entity.setProfession(profession);
+	}
+
+	public void cycleProfession() {
+		this.setProfession(Utils.getNextEnumConstant(Profession.class, profession));
+	}
+
+	protected ItemStack getProfessionEditorItem() {
+		ItemStack iconItem;
 		switch (profession) {
 		case ARMORER:
-			item = new ItemStack(Material.BLAST_FURNACE);
+			iconItem = new ItemStack(Material.BLAST_FURNACE);
 			break;
 		case BUTCHER:
-			item = new ItemStack(Material.SMOKER);
+			iconItem = new ItemStack(Material.SMOKER);
 			break;
 		case CARTOGRAPHER:
-			item = new ItemStack(Material.CARTOGRAPHY_TABLE);
+			iconItem = new ItemStack(Material.CARTOGRAPHY_TABLE);
 			break;
 		case CLERIC:
-			item = new ItemStack(Material.BREWING_STAND);
+			iconItem = new ItemStack(Material.BREWING_STAND);
 			break;
 		case FARMER:
-			item = new ItemStack(Material.WHEAT); // instead of COMPOSTER
+			iconItem = new ItemStack(Material.WHEAT); // instead of COMPOSTER
 			break;
 		case FISHERMAN:
-			item = new ItemStack(Material.FISHING_ROD); // instead of BARREL
+			iconItem = new ItemStack(Material.FISHING_ROD); // instead of BARREL
 			break;
 		case FLETCHER:
-			item = new ItemStack(Material.FLETCHING_TABLE);
+			iconItem = new ItemStack(Material.FLETCHING_TABLE);
 			break;
 		case LEATHERWORKER:
-			item = new ItemStack(Material.LEATHER); // instead of CAULDRON
+			iconItem = new ItemStack(Material.LEATHER); // instead of CAULDRON
 			break;
 		case LIBRARIAN:
-			item = new ItemStack(Material.LECTERN);
+			iconItem = new ItemStack(Material.LECTERN);
 			break;
 		case MASON:
-			item = new ItemStack(Material.STONECUTTER);
+			iconItem = new ItemStack(Material.STONECUTTER);
 			break;
 		case SHEPHERD:
-			item = new ItemStack(Material.LOOM);
+			iconItem = new ItemStack(Material.LOOM);
 			break;
 		case TOOLSMITH:
-			item = new ItemStack(Material.SMITHING_TABLE);
+			iconItem = new ItemStack(Material.SMITHING_TABLE);
 			break;
 		case WEAPONSMITH:
-			item = new ItemStack(Material.GRINDSTONE);
+			iconItem = new ItemStack(Material.GRINDSTONE);
 			break;
 		case NITWIT:
-			item = new ItemStack(Material.LEATHER_CHESTPLATE);
-			ItemUtils.setLeatherColor(item, Color.GREEN);
+			iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
+			ItemUtils.setLeatherColor(iconItem, Color.GREEN);
 			break;
 		case NONE:
 		default:
-			item = new ItemStack(Material.BARRIER);
+			iconItem = new ItemStack(Material.BARRIER);
 			break;
 		}
-		assert item != null;
-		// TODO not used currently, because it gets replaces inside the editor handler with a generic name and lore
-		//ItemUtils.setLocalizedName(item, "entity.minecraft.villager." + profession.name().toLowerCase(Locale.ROOT));
-		return item;
-	}
-
-	@Override
-	public void cycleSubType() {
-		shopkeeper.markDirty();
-		profession = Utils.getNextEnumConstant(Profession.class, profession);
-		assert profession != null;
-		this.applySubType();
-	}
-
-	private static Profession getProfession(String professionName) {
-		if (professionName != null) {
-			try {
-				return Profession.valueOf(professionName);
-			} catch (IllegalArgumentException e) {
-			}
-		}
-		return null;
+		assert iconItem != null;
+		// TODO use more specific text
+		// ItemUtils.setLocalizedName(iconItem, "entity.minecraft.villager." +
+		// profession.name().toLowerCase(Locale.ROOT));
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		return iconItem;
 	}
 }

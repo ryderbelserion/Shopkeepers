@@ -1,21 +1,26 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
 import org.bukkit.DyeColor;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
-import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
+import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class SheepShop extends SKLivingShopObject {
+public class SheepShop extends BabyableShop<Sheep> {
 
 	private DyeColor color = DyeColor.WHITE; // default white
 
@@ -60,30 +65,53 @@ public class SheepShop extends SKLivingShopObject {
 	}
 
 	@Override
-	public Sheep getEntity() {
-		assert super.getEntity().getType() == EntityType.SHEEP;
-		return (Sheep) super.getEntity();
+	protected void onSpawn(Sheep entity) {
+		super.onSpawn(entity);
+		this.applyColor(entity);
 	}
 
-	// SUB TYPES
+	// EDITOR ACTIONS
 
 	@Override
-	protected void applySubType() {
-		super.applySubType();
-		if (!this.isActive()) return;
-		this.getEntity().setColor(color);
+	public List<EditorHandler.Button> getEditorButtons() {
+		List<EditorHandler.Button> editorButtons = super.getEditorButtons(); // assumes modifiable
+		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
+			@Override
+			public ItemStack getIcon(EditorHandler.Session session) {
+				return getColorEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				cycleColor();
+				return true;
+			}
+		});
+		return editorButtons;
 	}
 
-	@Override
-	public ItemStack getSubTypeItem() {
-		return new ItemStack(ItemUtils.getWoolType(color), 1);
-	}
+	// COLOR
 
-	@Override
-	public void cycleSubType() {
+	public void setColor(DyeColor color) {
+		Validate.notNull(color, "Color is null!");
+		this.color = color;
 		shopkeeper.markDirty();
-		color = Utils.getNextEnumConstant(DyeColor.class, color);
-		assert color != null;
-		this.applySubType();
+		this.applyColor(this.getEntity()); // null if not active
+	}
+
+	protected void applyColor(Sheep entity) {
+		if (entity == null) return;
+		entity.setColor(color);
+	}
+
+	public void cycleColor() {
+		this.setColor(Utils.getNextEnumConstant(DyeColor.class, color));
+	}
+
+	protected ItemStack getColorEditorItem() {
+		ItemStack iconItem = new ItemStack(ItemUtils.getWoolType(color), 1);
+		// TODO use more specific text
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		return iconItem;
 	}
 }

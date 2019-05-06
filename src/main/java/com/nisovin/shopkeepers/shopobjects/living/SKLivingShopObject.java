@@ -7,7 +7,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 
@@ -22,17 +21,18 @@ import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class SKLivingShopObject extends AbstractEntityShopObject implements LivingShopObject {
+public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntityShopObject implements LivingShopObject {
 
 	protected static final double SPAWN_LOCATION_OFFSET = 0.98D;
 	protected static final double SPAWN_LOCATION_RANGE = 2.0D;
 
 	protected final LivingShops livingShops;
 	private final SKLivingShopObjectType<?> livingObjectType;
-	private LivingEntity entity;
+	private E entity;
 	private int respawnAttempts = 0;
 
-	protected SKLivingShopObject(LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+	protected SKLivingShopObject(	LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
+									AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
 		this.livingShops = livingShops;
 		this.livingObjectType = livingObjectType;
@@ -66,7 +66,7 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 	// ACTIVATION
 
 	@Override
-	public LivingEntity getEntity() {
+	public E getEntity() {
 		// is-active check:
 		// note: some spigot versions didn't check the isDead flag inside isValid:
 		// note: isValid-flag gets set at the tick after handling all queued chunk unloads, so isChunkLoaded check is
@@ -88,11 +88,11 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 		return this.getType().createObjectId(this.getEntity());
 	}
 
-	protected void assignShopkeeperMetadata(LivingEntity entity) {
+	protected void assignShopkeeperMetadata(E entity) {
 		entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
 	}
 
-	protected void removeShopkeeperMetadata(LivingEntity entity) {
+	protected void removeShopkeeperMetadata(E entity) {
 		entity.removeMetadata("shopkeeper", ShopkeepersPlugin.getInstance());
 	}
 
@@ -129,7 +129,8 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 		// try to bypass entity-spawn blocking plugins:
 		EntityType entityType = this.getEntityType();
 		livingShops.forceCreatureSpawn(spawnLocation, entityType);
-		entity = (LivingEntity) world.spawnEntity(spawnLocation, entityType);
+
+		entity = (E) world.spawnEntity(spawnLocation, entityType);
 
 		if (this.isActive()) {
 			// assign metadata for easy identification by other plugins:
@@ -156,11 +157,11 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 				entity.removePotionEffect(potionEffect.getType());
 			}
 
-			// apply sub type:
-			this.applySubType();
-
 			// overwrite AI:
 			this.overwriteAI();
+
+			// apply sub type:
+			this.onSpawn(entity);
 
 			// success:
 			return true;
@@ -169,6 +170,11 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 			entity = null;
 			return false;
 		}
+	}
+
+	// gets called after the entity was spawned; can be used to apply any additionally configured mob-specific setup
+	protected void onSpawn(E entity) {
+		// nothing to do by default
 	}
 
 	// some mobs will always get their AI disabled in order to properly work:
@@ -215,7 +221,7 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 		}
 	}
 
-	protected final void setNoAI(LivingEntity entity) {
+	protected final void setNoAI(E entity) {
 		entity.setAI(false);
 
 		// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes that
@@ -224,7 +230,7 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 		NMSManager.getProvider().setOnGround(entity, true);
 	}
 
-	protected final void setNoGravity(org.bukkit.entity.Entity entity) {
+	protected final void setNoGravity(E entity) {
 		entity.setGravity(false);
 
 		// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes
@@ -325,20 +331,7 @@ public class SKLivingShopObject extends AbstractEntityShopObject implements Livi
 		return entity.getCustomName();
 	}
 
-	// SUB TYPES
-	// not supported by default
+	// EDITOR ACTIONS
 
-	protected void applySubType() {
-		// nothing to do by default
-	}
-
-	// OTHER PROPERTIES
-
-	@Override
-	public void equipItem(ItemStack item) {
-		if (this.isActive()) {
-			entity.getEquipment().setItemInMainHand(item);
-			entity.getEquipment().setItemInMainHandDropChance(0);
-		}
-	}
+	// no default actions
 }

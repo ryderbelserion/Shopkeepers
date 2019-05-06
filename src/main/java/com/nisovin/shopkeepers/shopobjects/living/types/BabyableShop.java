@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -18,11 +18,11 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
-public class CreeperShop extends SKLivingShopObject<Creeper> {
+public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 
-	private boolean powered = false;
+	private boolean baby = false;
 
-	public CreeperShop(	LivingShops livingShops, SKLivingShopObjectType<CreeperShop> livingObjectType,
+	public BabyableShop(LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
@@ -30,19 +30,19 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		powered = configSection.getBoolean("powered");
+		baby = configSection.getBoolean("baby");
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		configSection.set("powered", powered);
+		configSection.set("baby", baby);
 	}
 
 	@Override
-	protected void onSpawn(Creeper entity) {
+	protected void onSpawn(E entity) {
 		super.onSpawn(entity);
-		this.applyPowered(entity);
+		this.applyBaby(entity);
 	}
 
 	// EDITOR ACTIONS
@@ -53,42 +53,43 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
-				return getPoweredEditorItem();
+				return getBabyEditorItem();
 			}
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cyclePowered();
+				cycleBaby();
 				return true;
 			}
 		});
 		return editorButtons;
 	}
 
-	// POWERED STATE
+	// BABY STATE
 
-	public void setPowered(boolean powered) {
-		this.powered = powered;
+	public void setBaby(boolean baby) {
+		this.baby = baby;
 		shopkeeper.markDirty();
-		this.applyPowered(this.getEntity()); // null if not active
+		this.applyBaby(this.getEntity()); // null if not active
 	}
 
-	protected void applyPowered(Creeper entity) {
+	protected void applyBaby(Ageable entity) {
 		if (entity == null) return;
-		entity.setPowered(powered);
-	}
-
-	public void cyclePowered() {
-		this.setPowered(!powered);
-	}
-
-	protected ItemStack getPoweredEditorItem() {
-		ItemStack iconItem;
-		if (powered) {
-			iconItem = new ItemStack(Material.LIGHT_BLUE_WOOL);
+		if (baby) {
+			entity.setBaby();
 		} else {
-			iconItem = new ItemStack(Material.LIME_WOOL);
+			entity.setAdult();
 		}
+	}
+
+	public void cycleBaby() {
+		this.setBaby(!baby);
+	}
+
+	protected ItemStack getBabyEditorItem() {
+		// TODO use mob-specific spawn egg (if available; some mobs (illusioner) don't have a spawn egg)?
+		// on the other hand: using a single item consistently for the editor icon has benefits as well
+		ItemStack iconItem = new ItemStack(Material.EGG);
 		// TODO use more specific text
 		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
 		return iconItem;

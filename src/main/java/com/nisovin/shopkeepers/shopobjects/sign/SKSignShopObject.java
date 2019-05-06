@@ -1,5 +1,9 @@
 package com.nisovin.shopkeepers.shopobjects.sign;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -10,6 +14,8 @@ import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
@@ -18,6 +24,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
+import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
@@ -201,6 +208,27 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		return signData;
 	}
 
+	private static Material getMaterial(TreeSpecies treeSpecies, boolean wallSign) {
+		if (treeSpecies == null) {
+			treeSpecies = TreeSpecies.GENERIC; // default
+		}
+		switch (treeSpecies) {
+		case ACACIA:
+			return wallSign ? Material.ACACIA_WALL_SIGN : Material.ACACIA_SIGN;
+		case BIRCH:
+			return wallSign ? Material.BIRCH_WALL_SIGN : Material.BIRCH_SIGN;
+		case DARK_OAK:
+			return wallSign ? Material.DARK_OAK_WALL_SIGN : Material.DARK_OAK_SIGN;
+		case JUNGLE:
+			return wallSign ? Material.JUNGLE_WALL_SIGN : Material.JUNGLE_SIGN;
+		case REDWOOD: // spruce
+			return wallSign ? Material.SPRUCE_WALL_SIGN : Material.SPRUCE_SIGN;
+		case GENERIC: // oak
+		default:
+			return wallSign ? Material.OAK_WALL_SIGN : Material.OAK_SIGN;
+		}
+	}
+
 	@Override
 	public void despawn() {
 		Block signBlock = this.getBlock();
@@ -291,22 +319,37 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		return sign.getLine(1);
 	}
 
-	// SUB TYPES (different sign types)
+	// EDITOR ACTIONS
 
 	@Override
-	public ItemStack getSubTypeItem() {
-		return new ItemStack(getMaterial(signType, false));
+	public List<EditorHandler.Button> getEditorButtons() {
+		List<EditorHandler.Button> editorButtons = new ArrayList<EditorHandler.Button>();
+		editorButtons.addAll(super.getEditorButtons());
+		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
+			@Override
+			public ItemStack getIcon(EditorHandler.Session session) {
+				return getSignTypeEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				cycleSignType();
+				return true;
+			}
+		});
+		return editorButtons;
 	}
 
-	@Override
-	public void cycleSubType() {
+	// SIGN TYPE
+
+	public void setSignType(TreeSpecies signType) {
+		Validate.notNull(signType, "Sign type is null!");
+		this.signType = signType;
 		shopkeeper.markDirty();
-		signType = Utils.getNextEnumConstant(TreeSpecies.class, signType);
-		assert signType != null;
-		this.applySubType();
+		this.applySignType();
 	}
 
-	protected void applySubType() {
+	protected void applySignType() {
 		Sign sign = this.getSign();
 		if (sign != null) {
 			BlockData signData = this.createBlockData();
@@ -315,27 +358,13 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		}
 	}
 
-	private static Material getMaterial(TreeSpecies treeSpecies, boolean wallSign) {
-		if (treeSpecies == null) {
-			treeSpecies = TreeSpecies.GENERIC; // default
-		}
-		switch (treeSpecies) {
-		case ACACIA:
-			return wallSign ? Material.ACACIA_WALL_SIGN : Material.ACACIA_SIGN;
-		case BIRCH:
-			return wallSign ? Material.BIRCH_WALL_SIGN : Material.BIRCH_SIGN;
-		case DARK_OAK:
-			return wallSign ? Material.DARK_OAK_WALL_SIGN : Material.DARK_OAK_SIGN;
-		case JUNGLE:
-			return wallSign ? Material.JUNGLE_WALL_SIGN : Material.JUNGLE_SIGN;
-		case REDWOOD: // spruce
-			return wallSign ? Material.SPRUCE_WALL_SIGN : Material.SPRUCE_SIGN;
-		case GENERIC: // oak
-		default:
-			return wallSign ? Material.OAK_WALL_SIGN : Material.OAK_SIGN;
-		}
+	public void cycleSignType() {
+		this.setSignType(Utils.getNextEnumConstant(TreeSpecies.class, signType));
 	}
 
-	// OTHER PROPERTIES
-	// not supported
+	protected ItemStack getSignTypeEditorItem() {
+		ItemStack iconItem = new ItemStack(getMaterial(signType, false));
+		// TODO use more specific text
+		return ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+	}
 }

@@ -1,13 +1,16 @@
 package com.nisovin.shopkeepers.shopobjects;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 
 /**
  * Abstract base class for all shop object implementations.
@@ -132,23 +135,9 @@ public abstract class AbstractShopObject implements ShopObject {
 	@Override
 	public abstract String getName();
 
-	// SUB TYPES
+	// EDITOR ACTIONS
 
-	@Override
-	public ItemStack getSubTypeItem() {
-		// not supported by default
-		return null;
-	}
-
-	@Override
-	public void cycleSubType() {
-		// not supported by default
-	}
-
-	// OTHER PROPERTIES
-
-	@Override
-	public void equipItem(ItemStack item) {
-		// not supported by default
+	public List<EditorHandler.Button> getEditorButtons() {
+		return Collections.emptyList(); // none by default
 	}
 }

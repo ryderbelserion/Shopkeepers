@@ -13,7 +13,7 @@ import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
-public abstract class SKLivingShopObjectType<T extends SKLivingShopObject> extends AbstractEntityShopObjectType<T> implements LivingShopObjectType<T> {
+public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> extends AbstractEntityShopObjectType<T> implements LivingShopObjectType<T> {
 
 	protected final LivingShops livingShops;
 	protected final EntityType entityType;

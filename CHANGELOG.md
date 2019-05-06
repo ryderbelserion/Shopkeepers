@@ -25,8 +25,14 @@ Date format: (YYYY-MM-DD)
 * Added: Sign shops can now switch between different wood types.
 * Added all new 1.14 mobs to the by default enabled mobs. If you are updating you will have to manually enable them in the config.
 
-Other (mostly internal) changes:
+Other changes:  
+* Removed the generic 'sub type' editor option in favour of letting each shop object supply a list of editor options. This allows living shopkeepers to provide multiple editor options now.
+  * API: Removed getSubTypeItem, cycleSubType and equipItem from ShopObject. Editor options are internal API for now, and mob equipment hasn't properly worked already before due to not getting persisted.
+* All ageable mobs can now be turned into baby variants. Previously this options was only available for zombie and pig zombie shopkeepers. The editor item for this option is a regular chicken egg now.
+* Villagers store their profession under 'profession' now. Previous values under 'prof' get imported.
 * Made shop and object type matching more strict. This uses a fixed list of internal aliases now.
+
+Internal:  
 * Fixed a minor internal inconsistency with the updating of trades: Trades were updated on the client, but the server was left in the previous state (mostly affected debug messages).
 * Removed special handling of item damage tags from item comparison. Spigot has made some changes that should make this obsolete.
 

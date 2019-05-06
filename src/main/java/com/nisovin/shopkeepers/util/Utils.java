@@ -74,6 +74,7 @@ public final class Utils {
 		return false;
 	}
 
+	// is only able to return null if the given 'current' is null
 	public static <T extends Enum<T>> T getNextEnumConstant(Class<T> enumClass, T current) {
 		return getNextEnumConstant(enumClass, current, null);
 	}

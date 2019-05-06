@@ -269,11 +269,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		return npc.getFullName();
 	}
 
-	// SUB TYPES
+	// EDITOR ACTIONS
 
 	// TODO: Support sub types? A menu of entity types here would be cool
-
-	// OTHER PROPERTIES
-
 	// TODO: Support equipping items? Is there a generic Citizens API for this?
 }

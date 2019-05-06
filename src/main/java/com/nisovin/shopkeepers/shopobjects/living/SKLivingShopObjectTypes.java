@@ -9,12 +9,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.bukkit.entity.Ageable;
 import org.bukkit.entity.EntityType;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObjectTypes;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.living.types.BabyableShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.CreeperShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PigZombieShop;
@@ -159,7 +161,6 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 		String permission = "shopkeeper.entity." + typeName;
 
 		SKLivingShopObjectType<?> objectType;
-
 		switch (entityType) {
 		case VILLAGER:
 			objectType = new SKLivingShopObjectType<VillagerShop>(livingShops, entityType, aliases, typeName, permission) {
@@ -210,15 +211,18 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 			};
 			break;
 		default:
-			objectType = new SKLivingShopObjectType<SKLivingShopObject>(livingShops, entityType, aliases, typeName, permission) {
+			objectType = new SKLivingShopObjectType<SKLivingShopObject<?>>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
-				public SKLivingShopObject createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new SKLivingShopObject(livingShops, this, shopkeeper, creationData);
+				public SKLivingShopObject<?> createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					if (Ageable.class.isAssignableFrom(entityType.getEntityClass())) {
+						return new BabyableShop<>(livingShops, this, shopkeeper, creationData);
+					} else {
+						return new SKLivingShopObject<>(livingShops, this, shopkeeper, creationData);
+					}
 				}
 			};
 			break;
 		}
-
 		assert objectType != null;
 		return objectType;
 	}

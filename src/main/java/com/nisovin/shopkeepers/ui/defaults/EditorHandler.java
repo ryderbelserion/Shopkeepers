@@ -124,43 +124,78 @@ public abstract class EditorHandler extends UIHandler {
 
 	// EDITOR BUTTONS
 
-	protected abstract class Button {
+	public static abstract class Button {
 
 		private static final int NO_SLOT = -1;
 
 		protected final Shopkeeper shopkeeper;
 		private final boolean placeAtEnd;
-		private ItemStack icon;
+
+		private EditorHandler editorHandler;
 		private int slot = NO_SLOT;
 
-		public Button(Shopkeeper shopkeeper, ItemStack icon) {
-			this(shopkeeper, icon, false);
+		public Button(Shopkeeper shopkeeper) {
+			this(shopkeeper, false);
 		}
 
-		public Button(Shopkeeper shopkeeper, ItemStack icon, boolean placeAtEnd) {
+		public Button(Shopkeeper shopkeeper, boolean placeAtEnd) {
 			Validate.notNull(shopkeeper);
 			this.shopkeeper = shopkeeper;
 			this.placeAtEnd = placeAtEnd;
-			this.setIcon(icon);
 		}
 
-		public ItemStack getIcon(Session session) {
-			return icon;
+		private void setEditorHandler(EditorHandler editorHandler) {
+			if (this.editorHandler != null) {
+				throw new IllegalStateException("Button already registered!");
+			}
+			this.editorHandler = editorHandler;
 		}
 
-		public void setIcon(ItemStack icon) {
-			Validate.isTrue(!ItemUtils.isEmpty(icon), "Icon cannot be empty!");
-			this.icon = icon;
-			// update in open sessions:
-			if (slot != NO_SLOT) {
-				for (Session session : sessions.values()) {
-					session.inventory.setItem(slot, this.icon);
+		public abstract ItemStack getIcon(Session session);
+
+		protected final void updateIcon() {
+			if (slot != NO_SLOT && editorHandler != null) {
+				for (Session session : editorHandler.sessions.values()) {
+					session.inventory.setItem(slot, this.getIcon(session));
 					session.player.updateInventory();
 				}
 			}
 		}
 
 		protected abstract void onClick(InventoryClickEvent clickEvent, Player player);
+	}
+
+	// for simple one-click actions
+	public static abstract class ActionButton extends Button {
+
+		public ActionButton(Shopkeeper shopkeeper) {
+			super(shopkeeper);
+		}
+
+		public ActionButton(Shopkeeper shopkeeper, boolean placeAtEnd) {
+			super(shopkeeper, placeAtEnd);
+		}
+
+		@Override
+		protected final void onClick(InventoryClickEvent clickEvent, Player player) {
+			if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return; // ignore double clicks
+
+			// run action:
+			boolean success = this.runAction(clickEvent, player);
+			if (!success) return;
+
+			// icon might have changed:
+			this.updateIcon();
+
+			// call event:
+			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
+
+			// save:
+			shopkeeper.save();
+		}
+
+		// returns true on success
+		protected abstract boolean runAction(InventoryClickEvent clickEvent, Player player);
 	}
 
 	private final Button[] tradesPageBarButtons = new Button[TRADES_PAGE_BAR_END - TRADES_PAGE_BAR_START + 1];
@@ -201,7 +236,7 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	protected Button createPrevPageButton(Shopkeeper shopkeeper) {
-		return new Button(shopkeeper, this.createPrevPageIcon(1), true) {
+		return new Button(shopkeeper) {
 			@Override
 			public ItemStack getIcon(Session session) {
 				int page = session.currentPage;
@@ -228,7 +263,7 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	protected Button createNextPageButton(Shopkeeper shopkeeper) {
-		return new Button(shopkeeper, this.createNextPageIcon(1), true) {
+		return new Button(shopkeeper) {
 			@Override
 			public ItemStack getIcon(Session session) {
 				int page = session.currentPage;
@@ -255,7 +290,7 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	protected Button createCurrentPageButton(Shopkeeper shopkeeper) {
-		return new Button(shopkeeper, this.createCurrentPageIcon(1), true) {
+		return new Button(shopkeeper) {
 			@Override
 			public ItemStack getIcon(Session session) {
 				int page = session.currentPage;
@@ -270,7 +305,12 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	protected Button createTradeSetupButton(Shopkeeper shopkeeper) {
-		return new Button(shopkeeper, this.createTradeSetupIcon(), true) {
+		return new Button(shopkeeper) {
+			@Override
+			public ItemStack getIcon(Session session) {
+				return createTradeSetupIcon();
+			}
+
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
 				// trade setup button: doing nothing
@@ -379,8 +419,9 @@ public abstract class EditorHandler extends UIHandler {
 		return bakedButtons[rawSlot - BUTTONS_START];
 	}
 
-	protected void addButton(Button button) {
-		Validate.notNull(button);
+	public void addButton(Button button) {
+		Validate.notNull(button, "Button is null");
+		button.setEditorHandler(this); // validates that the button isn't used elsewhere yet
 		buttons.add(button);
 		dirtyButtons = true;
 	}
@@ -390,16 +431,28 @@ public abstract class EditorHandler extends UIHandler {
 		this.addButton(button);
 	}
 
+	protected void addButtonsOrIgnore(Iterable<Button> buttons) {
+		if (buttons == null) return;
+		for (Button button : buttons) {
+			this.addButtonOrIgnore(button);
+		}
+	}
+
 	protected void setupButtons() {
-		Shopkeeper shopkeeper = this.getShopkeeper();
+		AbstractShopkeeper shopkeeper = this.getShopkeeper();
+		this.addButtonOrIgnore(this.createDeleteButton(shopkeeper));
 		this.addButtonOrIgnore(this.createNamingButton(shopkeeper));
 		this.addButtonOrIgnore(this.createChestButton(shopkeeper));
-		this.addButtonOrIgnore(this.createObjectVariantButton(shopkeeper));
-		this.addButtonOrIgnore(this.createDeleteButton(shopkeeper));
+		this.addButtonsOrIgnore(shopkeeper.getShopObject().getEditorButtons());
 	}
 
 	protected Button createDeleteButton(Shopkeeper shopkeeper) {
-		return new Button(shopkeeper, Settings.createDeleteButtonItem(), true) {
+		return new Button(shopkeeper, true) {
+			@Override
+			public ItemStack getIcon(Session session) {
+				return Settings.createDeleteButtonItem();
+			}
+
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
 				// delete button - delete shopkeeper:
@@ -446,7 +499,12 @@ public abstract class EditorHandler extends UIHandler {
 		}
 		if (!useNamingButton) return null;
 
-		return new Button(shopkeeper, Settings.createNameButtonItem()) {
+		return new Button(shopkeeper) {
+			@Override
+			public ItemStack getIcon(Session session) {
+				return Settings.createNameButtonItem();
+			}
+
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
 				// naming button:
@@ -463,7 +521,12 @@ public abstract class EditorHandler extends UIHandler {
 		if (!Settings.enableChestOptionOnPlayerShop || !(shopkeeper.getType() instanceof PlayerShopType)) {
 			return null;
 		}
-		return new Button(shopkeeper, Settings.createChestButtonItem()) {
+		return new Button(shopkeeper) {
+			@Override
+			public ItemStack getIcon(Session session) {
+				return Settings.createChestButtonItem();
+			}
+
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
 				// chest inventory button:
@@ -472,43 +535,6 @@ public abstract class EditorHandler extends UIHandler {
 					if (!player.isValid()) return;
 					((PlayerShopkeeper) shopkeeper).openChestWindow(player);
 				});
-			}
-		};
-	}
-
-	protected Button createObjectVariantButton(Shopkeeper shopkeeper) {
-		ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
-		if (ItemUtils.isEmpty(typeItem)) return null;
-		ItemStack buttonItem = ItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
-		return new Button(shopkeeper, buttonItem) {
-			@Override
-			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// cycle button - cycle to next object type variation:
-				ItemStack cursor = clickEvent.getCursor();
-				if (!ItemUtils.isEmpty(cursor)) {
-					// equip item:
-					shopkeeper.getShopObject().equipItem(cursor.clone());
-					// TODO how to remove equipped item again?
-					// TODO equipped items don't get saved current -> they get lost when the entity is respawned
-					// TODO not possible for all player shops currently, because clicking/picking up items in player
-					// inventory is blocked for some
-				} else {
-					// cycle object type variant:
-					if (clickEvent.getClick() != ClickType.DOUBLE_CLICK) { // ignore double clicks
-						shopkeeper.getShopObject().cycleSubType();
-						ItemStack typeItem = shopkeeper.getShopObject().getSubTypeItem();
-						if (!ItemUtils.isEmpty(typeItem)) {
-							ItemStack buttonItem = ItemUtils.setItemStackNameAndLore(typeItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
-							this.setIcon(buttonItem);
-						}
-					}
-				}
-
-				// call event:
-				Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
-
-				// save:
-				shopkeeper.save();
 			}
 		};
 	}
@@ -537,7 +563,7 @@ public abstract class EditorHandler extends UIHandler {
 
 	// PLAYER SESSIONS
 
-	protected static class Session {
+	public static final class Session {
 
 		private final Player player;
 		private final List<TradingRecipeDraft> recipes;
@@ -550,12 +576,21 @@ public abstract class EditorHandler extends UIHandler {
 			this.inventory = inventory;
 		}
 
-		public Player getPlayer() {
+		public final Player getPlayer() {
 			return player;
+		}
+
+		// starts at 1
+		public final int getCurrentPage() {
+			return currentPage;
 		}
 
 		private void setPage(int newPage) {
 			this.currentPage = newPage;
+		}
+
+		public final List<TradingRecipeDraft> getRecipes() {
+			return recipes;
 		}
 	}
 

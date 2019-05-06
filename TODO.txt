@@ -28,7 +28,8 @@ Low priority:
 * Rename ShopkeeperRegistry and ShopkeeperStorage to ShopkeepersRegistry and ShopkeepersStorage?
   * Another major api break though.. maybe do this with the next larger API changes. Or not at all.
 
-* Display trades that are out of stock, but disable trading by setting their max uses to 0
+* More editor options for mob shopkeepers
+  * Allow equipping (and unequipping again) items to mobs
 
 # 1.14:
 * Settings to handle wandering trader differently to regular villagers? (spawn blocking, hiring, trade blocking)

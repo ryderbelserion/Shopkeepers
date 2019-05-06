@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.api.shopobjects;
 
 import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
@@ -83,23 +82,4 @@ public interface ShopObject {
 	 *         name
 	 */
 	public String getName();
-
-	// SUB TYPES
-
-	public ItemStack getSubTypeItem();
-
-	public void cycleSubType();
-
-	// OTHER PROPERTIES
-
-	/**
-	 * Equips the given item.
-	 * 
-	 * <p>
-	 * Might not be supported by all types of shop objects.
-	 * 
-	 * @param item
-	 *            the item, or <code>null</code> to unequip any currently equipped item
-	 */
-	public void equipItem(ItemStack item);
 }
