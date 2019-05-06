@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.Validate;
@@ -41,6 +42,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 			// migration from 'prof' key:
 			// TODO added with 1.14 update, remove again at some point
 			professionName = configSection.getString("prof");
+			shopkeeper.markDirty();
 		}
 		// pre MC 1.14 migration:
 		if (professionName != null) {
@@ -93,7 +95,8 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 	@Override
 	public List<EditorHandler.Button> getEditorButtons() {
-		List<EditorHandler.Button> editorButtons = super.getEditorButtons(); // assumes modifiable
+		List<EditorHandler.Button> editorButtons = new ArrayList<>();
+		editorButtons.addAll(super.getEditorButtons());
 		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {

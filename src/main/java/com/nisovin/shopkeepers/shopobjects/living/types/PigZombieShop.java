@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -50,7 +51,8 @@ public class PigZombieShop extends SKLivingShopObject<PigZombie> {
 
 	@Override
 	public List<EditorHandler.Button> getEditorButtons() {
-		List<EditorHandler.Button> editorButtons = super.getEditorButtons(); // assumes modifiable
+		List<EditorHandler.Button> editorButtons = new ArrayList<>();
+		editorButtons.addAll(super.getEditorButtons());
 		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
