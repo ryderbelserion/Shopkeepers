@@ -30,12 +30,12 @@ Low priority:
 
 * More editor options for mob shopkeepers
   * Allow equipping (and unequipping again) items to mobs
+  * Love mode for animals (love particles)
+* Add individual config options for the different editor options?
 
 # 1.14:
 * Settings to handle wandering trader differently to regular villagers? (spawn blocking, hiring, trade blocking)
 * Allow changing the sign text color?
-* Allow changing villager biome type
-* Allow changing villager level (novice, .., master)
 * Set villager trades and test if they display trade-able items when the player holds corresponding items
 
 Ideas:

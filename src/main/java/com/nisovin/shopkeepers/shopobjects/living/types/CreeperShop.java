@@ -18,10 +18,13 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
 
 public class CreeperShop extends SKLivingShopObject<Creeper> {
 
-	private boolean powered = false;
+	private static final boolean DEFAULT_POWERED = false;
+
+	private boolean powered = DEFAULT_POWERED;
 
 	public CreeperShop(	LivingShops livingShops, SKLivingShopObjectType<CreeperShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -31,13 +34,13 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		powered = configSection.getBoolean("powered");
+		this.loadPowered(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		configSection.set("powered", powered);
+		this.savePowered(configSection);
 	}
 
 	@Override
@@ -46,13 +49,60 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 		this.applyPowered(entity);
 	}
 
-	// EDITOR ACTIONS
-
 	@Override
 	public List<EditorHandler.Button> getEditorButtons() {
 		List<EditorHandler.Button> editorButtons = new ArrayList<>();
 		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
+		editorButtons.add(this.getPoweredEditorButton());
+		return editorButtons;
+	}
+
+	// POWERED STATE
+
+	private void loadPowered(ConfigurationSection configSection) {
+		if (!configSection.isBoolean("powered")) {
+			Log.warning("Missing or invalid 'powered' state for shopkeeper " + shopkeeper.getId()
+					+ "'. Using '" + DEFAULT_POWERED + "' now.");
+			powered = DEFAULT_POWERED;
+			shopkeeper.markDirty();
+		} else {
+			powered = configSection.getBoolean("powered");
+		}
+	}
+
+	private void savePowered(ConfigurationSection configSection) {
+		configSection.set("powered", powered);
+	}
+
+	public void setPowered(boolean powered) {
+		this.powered = powered;
+		shopkeeper.markDirty();
+		this.applyPowered(this.getEntity()); // null if not active
+	}
+
+	private void applyPowered(Creeper entity) {
+		if (entity == null) return;
+		entity.setPowered(powered);
+	}
+
+	public void cyclePowered() {
+		this.setPowered(!powered);
+	}
+
+	private ItemStack getPoweredEditorItem() {
+		ItemStack iconItem;
+		if (powered) {
+			iconItem = new ItemStack(Material.LIGHT_BLUE_WOOL);
+		} else {
+			iconItem = new ItemStack(Material.LIME_WOOL);
+		}
+		// TODO use more specific text
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		return iconItem;
+	}
+
+	private EditorHandler.Button getPoweredEditorButton() {
+		return new EditorHandler.ActionButton(shopkeeper) {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getPoweredEditorItem();
@@ -63,36 +113,6 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 				cyclePowered();
 				return true;
 			}
-		});
-		return editorButtons;
-	}
-
-	// POWERED STATE
-
-	public void setPowered(boolean powered) {
-		this.powered = powered;
-		shopkeeper.markDirty();
-		this.applyPowered(this.getEntity()); // null if not active
-	}
-
-	protected void applyPowered(Creeper entity) {
-		if (entity == null) return;
-		entity.setPowered(powered);
-	}
-
-	public void cyclePowered() {
-		this.setPowered(!powered);
-	}
-
-	protected ItemStack getPoweredEditorItem() {
-		ItemStack iconItem;
-		if (powered) {
-			iconItem = new ItemStack(Material.LIGHT_BLUE_WOOL);
-		} else {
-			iconItem = new ItemStack(Material.LIME_WOOL);
-		}
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
-		return iconItem;
+		};
 	}
 }

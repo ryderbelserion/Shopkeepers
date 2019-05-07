@@ -103,6 +103,15 @@ public final class Utils {
 		}
 	}
 
+	public static <E extends Enum<E>> E parseEnumValue(Class<E> enumClass, String name) {
+		if (name == null) return null;
+		try {
+			return Enum.valueOf(enumClass, name);
+		} catch (IllegalArgumentException e) {
+			return null;
+		}
+	}
+
 	/**
 	 * Calculates the average of the given values.
 	 * <p>

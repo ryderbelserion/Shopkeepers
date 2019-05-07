@@ -18,10 +18,13 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
 
 public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 
-	private boolean baby = false;
+	private static final boolean DEFAULT_BABY = false;
+
+	private boolean baby = DEFAULT_BABY;
 
 	public BabyableShop(LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -31,13 +34,13 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		baby = configSection.getBoolean("baby");
+		this.loadBaby(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		configSection.set("baby", baby);
+		this.saveBaby(configSection);
 	}
 
 	@Override
@@ -46,28 +49,30 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 		this.applyBaby(entity);
 	}
 
-	// EDITOR ACTIONS
-
 	@Override
 	public List<EditorHandler.Button> getEditorButtons() {
 		List<EditorHandler.Button> editorButtons = new ArrayList<>();
 		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
-			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
-				return getBabyEditorItem();
-			}
-
-			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleBaby();
-				return true;
-			}
-		});
+		editorButtons.add(this.getBabyEditorButton());
 		return editorButtons;
 	}
 
 	// BABY STATE
+
+	private void loadBaby(ConfigurationSection configSection) {
+		if (!configSection.isBoolean("baby")) {
+			Log.warning("Missing or invalid 'baby' state for shopkeeper " + shopkeeper.getId()
+					+ "'. Using '" + DEFAULT_BABY + "' now.");
+			baby = DEFAULT_BABY;
+			shopkeeper.markDirty();
+		} else {
+			baby = configSection.getBoolean("baby");
+		}
+	}
+
+	private void saveBaby(ConfigurationSection configSection) {
+		configSection.set("baby", baby);
+	}
 
 	public void setBaby(boolean baby) {
 		this.baby = baby;
@@ -75,7 +80,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 		this.applyBaby(this.getEntity()); // null if not active
 	}
 
-	protected void applyBaby(Ageable entity) {
+	private void applyBaby(Ageable entity) {
 		if (entity == null) return;
 		if (baby) {
 			entity.setBaby();
@@ -88,12 +93,25 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 		this.setBaby(!baby);
 	}
 
-	protected ItemStack getBabyEditorItem() {
-		// TODO use mob-specific spawn egg (if available; some mobs (illusioner) don't have a spawn egg)?
-		// on the other hand: using a single item consistently for the editor icon has benefits as well
+	private ItemStack getBabyEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.EGG);
 		// TODO use more specific text
 		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
 		return iconItem;
+	}
+
+	private EditorHandler.Button getBabyEditorButton() {
+		return new EditorHandler.ActionButton(shopkeeper) {
+			@Override
+			public ItemStack getIcon(EditorHandler.Session session) {
+				return getBabyEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				cycleBaby();
+				return true;
+			}
+		};
 	}
 }

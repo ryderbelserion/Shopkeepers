@@ -25,7 +25,11 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class CatShop extends BabyableShop<Cat> {
 
-	private Cat.Type catType = Cat.Type.TABBY;
+	private static final Cat.Type DEFAULT_CAT_TYPE = Cat.Type.TABBY;
+	private static final DyeColor DEFAULT_COLLAR_COLOR = null; // null to indicate 'no collar / untamed'
+
+	private Cat.Type catType = DEFAULT_CAT_TYPE;
+	private DyeColor collarColor = DEFAULT_COLLAR_COLOR; // can be null
 
 	public CatShop(	LivingShops livingShops, SKLivingShopObjectType<CatShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -35,52 +39,67 @@ public class CatShop extends BabyableShop<Cat> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		String catTypeName = configSection.getString("catType");
-		try {
-			catType = Cat.Type.valueOf(catTypeName);
-		} catch (Exception e) {
-			// fallback:
-			Log.warning("Missing or invalid cat type '" + catTypeName + "' for shopkeeper " + shopkeeper.getId()
-					+ "'. Using '" + Cat.Type.TABBY + "' now.");
-			this.catType = Cat.Type.TABBY;
-			shopkeeper.markDirty();
-		}
+		this.loadCatType(configSection);
+		this.loadCollarColor(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		configSection.set("catType", catType.name());
+		this.saveCatType(configSection);
+		this.saveCollarColor(configSection);
 	}
 
 	@Override
 	protected void onSpawn(Cat entity) {
 		super.onSpawn(entity);
 		this.applyCatType(entity);
+		this.applyCollarColor(entity);
 	}
-
-	// EDITOR ACTIONS
 
 	@Override
 	public List<EditorHandler.Button> getEditorButtons() {
 		List<EditorHandler.Button> editorButtons = new ArrayList<>();
 		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
-			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
-				return getCatTypeEditorItem();
-			}
-
-			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleCatType();
-				return true;
-			}
-		});
+		editorButtons.add(this.getCatTypeEditorButton());
+		editorButtons.add(this.getCollarColorEditorButton());
 		return editorButtons;
 	}
 
 	// CAT TYPE
+
+	// MC 1.14: conversion from ocelot types to similar cat types:
+	public static Cat.Type fromOcelotType(String ocelotType) {
+		if (ocelotType == null) ocelotType = "WILD_OCELOT"; // default ocelot type
+		switch (ocelotType) {
+		case "BLACK_CAT":
+			return Cat.Type.BLACK;
+		case "RED_CAT":
+		case "WILD_OCELOT": // there is no equivalent, RED seems to visually match the best
+			return Cat.Type.RED;
+		case "SIAMESE_CAT":
+			return Cat.Type.SIAMESE;
+		default:
+			return DEFAULT_CAT_TYPE; // fallback to default
+		}
+	}
+
+	private void loadCatType(ConfigurationSection configSection) {
+		String catTypeName = configSection.getString("catType");
+		Cat.Type catType = Utils.parseEnumValue(Cat.Type.class, catTypeName);
+		if (catType == null) {
+			// fallback:
+			Log.warning("Missing or invalid cat type '" + catTypeName + "' for shopkeeper " + shopkeeper.getId()
+					+ "'. Using '" + DEFAULT_CAT_TYPE + "' now.");
+			catType = DEFAULT_CAT_TYPE;
+			shopkeeper.markDirty();
+		}
+		this.catType = catType;
+	}
+
+	private void saveCatType(ConfigurationSection configSection) {
+		configSection.set("catType", catType.name());
+	}
 
 	public void setCatType(Cat.Type catType) {
 		Validate.notNull(catType, "Cat type is null!");
@@ -89,7 +108,7 @@ public class CatShop extends BabyableShop<Cat> {
 		this.applyCatType(this.getEntity()); // null if not active
 	}
 
-	protected void applyCatType(Cat entity) {
+	private void applyCatType(Cat entity) {
 		if (entity == null) return;
 		entity.setCatType(catType);
 	}
@@ -98,9 +117,12 @@ public class CatShop extends BabyableShop<Cat> {
 		this.setCatType(Utils.getNextEnumConstant(Cat.Type.class, catType));
 	}
 
-	protected ItemStack getCatTypeEditorItem() {
+	private ItemStack getCatTypeEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
 		switch (catType) {
+		case TABBY:
+			ItemUtils.setLeatherColor(iconItem, Color.BLACK.mixColors(Color.ORANGE));
+			break;
 		case ALL_BLACK:
 			ItemUtils.setLeatherColor(iconItem, Color.BLACK);
 			break;
@@ -131,9 +153,6 @@ public class CatShop extends BabyableShop<Cat> {
 		case WHITE:
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE);
 			break;
-		case TABBY:
-			ItemUtils.setLeatherColor(iconItem, Color.BLACK.mixColors(Color.ORANGE));
-			break;
 		default:
 			// unknown type:
 			ItemUtils.setLeatherColor(iconItem, Color.PURPLE);
@@ -146,19 +165,91 @@ public class CatShop extends BabyableShop<Cat> {
 		return iconItem;
 	}
 
-	// MC 1.14: conversion from ocelot types to similar cat types:
-	public static Cat.Type fromOcelotType(String ocelotType) {
-		if (ocelotType == null) ocelotType = "WILD_OCELOT"; // default ocelot type
-		switch (ocelotType) {
-		case "BLACK_CAT":
-			return Cat.Type.BLACK;
-		case "RED_CAT":
-			return Cat.Type.RED;
-		case "SIAMESE_CAT":
-			return Cat.Type.SIAMESE;
-		case "WILD_OCELOT":
-		default:
-			return Cat.Type.TABBY; // fallback to default
+	private EditorHandler.Button getCatTypeEditorButton() {
+		return new EditorHandler.ActionButton(shopkeeper) {
+			@Override
+			public ItemStack getIcon(EditorHandler.Session session) {
+				return getCatTypeEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				cycleCatType();
+				return true;
+			}
+		};
+	}
+
+	// COLLAR COLOR
+
+	private void loadCollarColor(ConfigurationSection configSection) {
+		String colorName = configSection.getString("collarColor");
+		DyeColor collarColor = Utils.parseEnumValue(DyeColor.class, colorName);
+		if (collarColor == null && colorName != null) {
+			// fallback to default:
+			Log.warning("Invalid cat collar color '" + colorName + "' for shopkeeper " + shopkeeper.getId()
+					+ ". Using '" + (DEFAULT_COLLAR_COLOR == null ? "none" : DEFAULT_COLLAR_COLOR) + "' now.");
+			collarColor = DEFAULT_COLLAR_COLOR;
+			shopkeeper.markDirty();
 		}
+		this.collarColor = collarColor;
+	}
+
+	private void saveCollarColor(ConfigurationSection configSection) {
+		configSection.set("collarColor", collarColor == null ? null : collarColor.name());
+	}
+
+	public void setCollarColor(DyeColor collarColor) {
+		this.collarColor = collarColor;
+		shopkeeper.markDirty();
+		this.applyCollarColor(this.getEntity()); // null if not active
+	}
+
+	private void applyCollarColor(Cat entity) {
+		if (entity == null) return;
+		if (collarColor == null) {
+			// no collar / untamed:
+			entity.setTamed(false);
+		} else {
+			entity.setTamed(true); // only tamed cats will show the collar
+			entity.setCollarColor(collarColor);
+		}
+	}
+
+	public void cycleCollarColor() {
+		DyeColor nextCollarColor;
+		if (collarColor == DyeColor.BLACK) {
+			nextCollarColor = null;
+		} else {
+			nextCollarColor = Utils.getNextEnumConstant(DyeColor.class, collarColor);
+		}
+		this.setCollarColor(nextCollarColor);
+	}
+
+	private ItemStack getCollarColorEditorItem() {
+		ItemStack iconItem;
+		if (collarColor == null) {
+			iconItem = new ItemStack(Material.BARRIER);
+		} else {
+			iconItem = new ItemStack(ItemUtils.getWoolType(collarColor));
+		}
+		// TODO use more specific text
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		return iconItem;
+	}
+
+	private EditorHandler.Button getCollarColorEditorButton() {
+		return new EditorHandler.ActionButton(shopkeeper) {
+			@Override
+			public ItemStack getIcon(EditorHandler.Session session) {
+				return getCollarColorEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				cycleCollarColor();
+				return true;
+			}
+		};
 	}
 }

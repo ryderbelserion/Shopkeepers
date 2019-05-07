@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Sheep;
@@ -23,7 +24,11 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class SheepShop extends BabyableShop<Sheep> {
 
-	private DyeColor color = DyeColor.WHITE; // default white
+	private static final DyeColor DEFAULT_COLOR = DyeColor.WHITE;
+	private static final boolean DEFAULT_SHEARED = false;
+
+	private DyeColor color = DEFAULT_COLOR;
+	private boolean sheared = DEFAULT_SHEARED;
 
 	public SheepShop(	LivingShops livingShops, SKLivingShopObjectType<SheepShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -34,50 +39,76 @@ public class SheepShop extends BabyableShop<Sheep> {
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
 		this.loadColor(configSection);
-	}
-
-	private void loadColor(ConfigurationSection configSection) {
-		String colorName = configSection.getString("color");
-		DyeColor color = parseColor(colorName);
-		if (color == null) {
-			// fallback to default white:
-			Log.warning("Missing or invalid sheep color '" + colorName + "' for shopkeeper " + shopkeeper.getId()
-					+ ". Using '" + DyeColor.WHITE + "' now.");
-			color = DyeColor.WHITE;
-			shopkeeper.markDirty();
-		}
-		this.color = color;
-	}
-
-	private static DyeColor parseColor(String colorName) {
-		if (colorName != null) {
-			try {
-				return DyeColor.valueOf(colorName);
-			} catch (IllegalArgumentException e) {
-			}
-		}
-		return null;
+		this.loadSheared(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		configSection.set("color", color.name());
+		this.saveColor(configSection);
+		this.saveSheared(configSection);
 	}
 
 	@Override
 	protected void onSpawn(Sheep entity) {
 		super.onSpawn(entity);
 		this.applyColor(entity);
+		this.applySheared(entity);
 	}
-
-	// EDITOR ACTIONS
 
 	@Override
 	public List<EditorHandler.Button> getEditorButtons() {
 		List<EditorHandler.Button> editorButtons = new ArrayList<>();
 		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
+		editorButtons.add(this.getColorEditorButton());
+		editorButtons.add(this.getShearedEditorButton());
+		return editorButtons;
+	}
+
+	// COLOR
+
+	private void loadColor(ConfigurationSection configSection) {
+		String colorName = configSection.getString("color");
+		DyeColor color = Utils.parseEnumValue(DyeColor.class, colorName);
+		if (color == null) {
+			// fallback to default:
+			Log.warning("Missing or invalid sheep color '" + colorName + "' for shopkeeper " + shopkeeper.getId()
+					+ ". Using '" + DEFAULT_COLOR + "' now.");
+			color = DEFAULT_COLOR;
+			shopkeeper.markDirty();
+		}
+		this.color = color;
+	}
+
+	private void saveColor(ConfigurationSection configSection) {
+		configSection.set("color", color.name());
+	}
+
+	public void setColor(DyeColor color) {
+		Validate.notNull(color, "Color is null!");
+		this.color = color;
+		shopkeeper.markDirty();
+		this.applyColor(this.getEntity()); // null if not active
+	}
+
+	private void applyColor(Sheep entity) {
+		if (entity == null) return;
+		entity.setColor(color);
+	}
+
+	public void cycleColor() {
+		this.setColor(Utils.getNextEnumConstant(DyeColor.class, color));
+	}
+
+	private ItemStack getColorEditorItem() {
+		ItemStack iconItem = new ItemStack(ItemUtils.getWoolType(color));
+		// TODO use more specific text
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		return iconItem;
+	}
+
+	private EditorHandler.Button getColorEditorButton() {
+		return new EditorHandler.ActionButton(shopkeeper) {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getColorEditorItem();
@@ -88,32 +119,60 @@ public class SheepShop extends BabyableShop<Sheep> {
 				cycleColor();
 				return true;
 			}
-		});
-		return editorButtons;
+		};
 	}
 
-	// COLOR
+	// SHEARED
 
-	public void setColor(DyeColor color) {
-		Validate.notNull(color, "Color is null!");
-		this.color = color;
+	private void loadSheared(ConfigurationSection configSection) {
+		if (!configSection.isBoolean("sheared")) {
+			Log.warning("Missing or invalid 'sheared' state for shopkeeper " + shopkeeper.getId()
+					+ "'. Using '" + DEFAULT_SHEARED + "' now.");
+			sheared = DEFAULT_SHEARED;
+			shopkeeper.markDirty();
+		} else {
+			sheared = configSection.getBoolean("sheared");
+		}
+	}
+
+	private void saveSheared(ConfigurationSection configSection) {
+		configSection.set("sheared", sheared);
+	}
+
+	public void setSheared(boolean sheared) {
+		this.sheared = sheared;
 		shopkeeper.markDirty();
-		this.applyColor(this.getEntity()); // null if not active
+		this.applySheared(this.getEntity()); // null if not active
 	}
 
-	protected void applyColor(Sheep entity) {
+	private void applySheared(Sheep entity) {
 		if (entity == null) return;
-		entity.setColor(color);
+		entity.setSheared(sheared);
 	}
 
-	public void cycleColor() {
-		this.setColor(Utils.getNextEnumConstant(DyeColor.class, color));
+	public void cycleSheared() {
+		this.setSheared(!sheared);
 	}
 
-	protected ItemStack getColorEditorItem() {
-		ItemStack iconItem = new ItemStack(ItemUtils.getWoolType(color), 1);
+	private ItemStack getShearedEditorItem() {
+		ItemStack iconItem = new ItemStack(Material.SHEARS);
 		// TODO use more specific text
 		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
 		return iconItem;
+	}
+
+	private EditorHandler.Button getShearedEditorButton() {
+		return new EditorHandler.ActionButton(shopkeeper) {
+			@Override
+			public ItemStack getIcon(EditorHandler.Session session) {
+				return getShearedEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				cycleSheared();
+				return true;
+			}
+		};
 	}
 }

@@ -26,11 +26,15 @@ Date format: (YYYY-MM-DD)
 * Added all new 1.14 mobs to the by default enabled mobs. If you are updating you will have to manually enable them in the config.
 
 Other changes:  
+* Made shop and object type matching more strict. This uses a fixed list of internal aliases now.
+* Villagers store their profession under 'profession' now. Previous values under 'prof' get imported.
 * Removed the generic 'sub type' editor option in favour of letting each shop object supply a list of editor options. This allows living shopkeepers to provide multiple editor options now.
   * API: Removed getSubTypeItem, cycleSubType and equipItem from ShopObject. Editor options are internal API for now, and mob equipment hasn't properly worked already before due to not getting persisted.
-* All ageable mobs can now be turned into baby variants. Previously this options was only available for zombie and pig zombie shopkeepers. The editor item for this option is a regular chicken egg now.
-* Villagers store their profession under 'profession' now. Previous values under 'prof' get imported.
-* Made shop and object type matching more strict. This uses a fixed list of internal aliases now.
+* Added new mob attribute editor options:
+  * All ageable mobs (except the wandering trader) can now be turned into baby variants. Previously this options was only available for zombie and pig zombie shopkeepers. The editor item for this option is a regular chicken egg now.
+  * Sheep can now be set sheared.
+  * Cat collar color can be specified now.
+  * Villager type (biome) and level can be specified.
 
 Internal:  
 * Fixed a minor internal inconsistency with the updating of trades: Trades were updated on the client, but the server was left in the previous state (mostly affected debug messages).
