@@ -12,19 +12,20 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.property.BooleanProperty;
+import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
 
 public class CreeperShop extends SKLivingShopObject<Creeper> {
 
-	private static final boolean DEFAULT_POWERED = false;
+	private static final Property<Boolean> PROPERTY_POWERED = new BooleanProperty("powered", false);
 
-	private boolean powered = DEFAULT_POWERED;
+	private boolean powered = PROPERTY_POWERED.getDefaultValue();
 
 	public CreeperShop(	LivingShops livingShops, SKLivingShopObjectType<CreeperShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -34,13 +35,13 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.loadPowered(configSection);
+		this.powered = PROPERTY_POWERED.load(shopkeeper, configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		this.savePowered(configSection);
+		PROPERTY_POWERED.save(shopkeeper, configSection, powered);
 	}
 
 	@Override
@@ -58,21 +59,6 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 	}
 
 	// POWERED STATE
-
-	private void loadPowered(ConfigurationSection configSection) {
-		if (!configSection.isBoolean("powered")) {
-			Log.warning("Missing or invalid 'powered' state for shopkeeper " + shopkeeper.getId()
-					+ "'. Using '" + DEFAULT_POWERED + "' now.");
-			powered = DEFAULT_POWERED;
-			shopkeeper.markDirty();
-		} else {
-			powered = configSection.getBoolean("powered");
-		}
-	}
-
-	private void savePowered(ConfigurationSection configSection) {
-		configSection.set("powered", powered);
-	}
 
 	public void setPowered(boolean powered) {
 		this.powered = powered;

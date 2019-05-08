@@ -19,9 +19,12 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.types.BabyableShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.CreeperShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.FoxShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.ParrotShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PigZombieShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SheepShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.WolfShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieShop;
 import com.nisovin.shopkeepers.util.StringUtils;
 
@@ -207,6 +210,30 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 				@Override
 				public PigZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new PigZombieShop(livingShops, this, shopkeeper, creationData);
+				}
+			};
+			break;
+		case FOX:
+			objectType = new SKLivingShopObjectType<FoxShop>(livingShops, entityType, aliases, typeName, permission) {
+				@Override
+				public FoxShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new FoxShop(livingShops, this, shopkeeper, creationData);
+				}
+			};
+			break;
+		case PARROT:
+			objectType = new SKLivingShopObjectType<ParrotShop>(livingShops, entityType, aliases, typeName, permission) {
+				@Override
+				public ParrotShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new ParrotShop(livingShops, this, shopkeeper, creationData);
+				}
+			};
+			break;
+		case WOLF:
+			objectType = new SKLivingShopObjectType<WolfShop>(livingShops, entityType, aliases, typeName, permission) {
+				@Override
+				public WolfShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new WolfShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;

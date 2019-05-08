@@ -30,7 +30,6 @@ Low priority:
 
 * More editor options for mob shopkeepers
   * Allow equipping (and unequipping again) items to mobs
-  * Love mode for animals (love particles)
 * Add individual config options for the different editor options?
 
 # 1.14:

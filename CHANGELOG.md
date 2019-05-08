@@ -35,10 +35,14 @@ Other changes:
   * Sheep can now be set sheared.
   * Cat collar color can be specified now.
   * Villager type (biome) and level can be specified.
+  * Fox type, crouching and sleeping state can be set.
+  * Wolf collar color can be set. (Angry state isn't working yet)
+  * Parrot color and sitting state can be set. (Baby variant isn't working for parrots)
 
 Internal:  
 * Fixed a minor internal inconsistency with the updating of trades: Trades were updated on the client, but the server was left in the previous state (mostly affected debug messages).
 * Removed special handling of item damage tags from item comparison. Spigot has made some changes that should make this obsolete.
+* Moved common de/serialization and validation code of shop object properties into new Property classes.
 
 ## v2.6.0 (2019-03-04)
 ### Supported MC versions: 1.13.2

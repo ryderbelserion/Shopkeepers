@@ -5,8 +5,9 @@ import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Zombie;
+import org.bukkit.entity.Sittable;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -16,19 +17,18 @@ import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
-import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
-// TODO use BabyableShop as base once there is a common interface for this inside bukkit
-public class ZombieShop extends SKLivingShopObject<Zombie> {
+// using Babyable as common super type of all sittable mobs for now
+public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> {
 
-	private static final Property<Boolean> PROPERTY_BABY = new BooleanProperty("baby", false);
+	private static final Property<Boolean> PROPERTY_SITTING = new BooleanProperty("sitting", false);
 
-	private boolean baby = PROPERTY_BABY.getDefaultValue();
+	private boolean sitting = PROPERTY_SITTING.getDefaultValue();
 
-	public ZombieShop(	LivingShops livingShops, SKLivingShopObjectType<ZombieShop> livingObjectType,
+	public SittableShop(LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
@@ -36,65 +36,63 @@ public class ZombieShop extends SKLivingShopObject<Zombie> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.baby = PROPERTY_BABY.load(shopkeeper, configSection);
+		this.sitting = PROPERTY_SITTING.load(shopkeeper, configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_BABY.save(shopkeeper, configSection, baby);
+		PROPERTY_SITTING.save(shopkeeper, configSection, sitting);
 	}
 
 	@Override
-	protected void onSpawn(Zombie entity) {
+	protected void onSpawn(E entity) {
 		super.onSpawn(entity);
-		this.applyBaby(entity);
+		this.applySitting(entity);
 	}
 
 	@Override
 	public List<EditorHandler.Button> getEditorButtons() {
 		List<EditorHandler.Button> editorButtons = new ArrayList<>();
 		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(this.getBabyEditorButton());
+		editorButtons.add(this.getSittingEditorButton());
 		return editorButtons;
 	}
 
-	// BABY STATE
+	// SITTING STATE
 
-	public void setBaby(boolean baby) {
-		this.baby = baby;
+	public void setSitting(boolean sitting) {
+		this.sitting = sitting;
 		shopkeeper.markDirty();
-		this.applyBaby(this.getEntity()); // null if not active
+		this.applySitting(this.getEntity()); // null if not active
 	}
 
-	private void applyBaby(Zombie entity) {
+	private void applySitting(Sittable entity) {
 		if (entity == null) return;
-		entity.setBaby(baby);
+		entity.setSitting(sitting);
 	}
 
-	public void cycleBaby() {
-		this.setBaby(!baby);
+	public void cycleSitting() {
+		this.setSitting(!sitting);
 	}
 
-	private ItemStack getBabyEditorItem() {
-		// TODO use mob-specific spawn egg (if available; some mobs (illusioner) don't have a spawn egg)?
-		// on the other hand: using a single item consistently for the editor icon has benefits as well
-		ItemStack iconItem = new ItemStack(Material.EGG);
+	private ItemStack getSittingEditorItem() {
+		ItemStack iconItem = new ItemStack(Material.IRON_HORSE_ARMOR);
 		// TODO use more specific text
 		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
 		return iconItem;
 	}
 
-	private EditorHandler.Button getBabyEditorButton() {
+	private EditorHandler.Button getSittingEditorButton() {
 		return new EditorHandler.ActionButton(shopkeeper) {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
-				return getBabyEditorItem();
+				return getSittingEditorItem();
 			}
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleBaby();
+				cycleSitting();
 				return true;
 			}
 		};

@@ -16,6 +16,9 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.property.EnumProperty;
+import com.nisovin.shopkeepers.property.IntegerProperty;
+import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
@@ -26,13 +29,42 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class VillagerShop extends BabyableShop<Villager> {
 
-	private static final Profession DEFAULT_PROFESSION = Profession.NONE;
-	private static final Villager.Type DEFAULT_VILLAGER_TYPE = Villager.Type.PLAINS;
-	private final int DEFAULT_VILLAGER_LEVEL = 1; // novice
+	private static final Property<Profession> PROPERTY_PROFESSION = new EnumProperty<Profession>(Profession.class, "profession", Profession.NONE) {
+		@Override
+		protected void migrate(AbstractShopkeeper shopkeeper, ConfigurationSection configSection) {
+			// migration from 'prof' key: TODO added with 1.14 update, remove again at some point
+			String professionName = configSection.getString("prof");
+			if (professionName != null) {
+				Log.warning("Shopkeeper " + shopkeeper.getId() + ": Migrated villager profession from key 'prof' to key 'profession'.");
+				configSection.set(this.key, professionName);
+				configSection.set("prof", null);
+				shopkeeper.markDirty();
+			}
 
-	private Profession profession = DEFAULT_PROFESSION;
-	private Villager.Type villagerType = DEFAULT_VILLAGER_TYPE;
-	private int villagerLevel = DEFAULT_VILLAGER_LEVEL;
+			// MC 1.14 migration:
+			professionName = configSection.getString(this.key);
+			if (professionName != null) {
+				String newProfessionName = null;
+				if (professionName.equals("PRIEST")) {
+					newProfessionName = Profession.CLERIC.name();
+				} else if (professionName.equals("BLACKSMITH")) {
+					newProfessionName = Profession.ARMORER.name();
+				}
+				if (newProfessionName != null) {
+					Log.warning("Shopkeeper " + shopkeeper.getId() + ": Migrated villager profession from '" + professionName
+							+ "' to '" + newProfessionName + ".");
+					configSection.set(this.key, newProfessionName);
+					shopkeeper.markDirty();
+				}
+			}
+		}
+	};
+	private static final Property<Villager.Type> PROPERTY_VILLAGER_TYPE = new EnumProperty<>(Villager.Type.class, "villagerType", Villager.Type.PLAINS);
+	private static final Property<Integer> PROPERTY_VILLAGER_LEVEL = new IntegerProperty("villagerLevel", 1, 5, 1);
+
+	private Profession profession = PROPERTY_PROFESSION.getDefaultValue();
+	private Villager.Type villagerType = PROPERTY_VILLAGER_TYPE.getDefaultValue();
+	private int villagerLevel = PROPERTY_VILLAGER_LEVEL.getDefaultValue();
 
 	public VillagerShop(LivingShops livingShops, SKLivingShopObjectType<VillagerShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -42,17 +74,17 @@ public class VillagerShop extends BabyableShop<Villager> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.loadProfession(configSection);
-		this.loadVillagerType(configSection);
-		this.loadVillagerLevel(configSection);
+		this.profession = PROPERTY_PROFESSION.load(shopkeeper, configSection);
+		this.villagerType = PROPERTY_VILLAGER_TYPE.load(shopkeeper, configSection);
+		this.villagerLevel = PROPERTY_VILLAGER_LEVEL.load(shopkeeper, configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		this.saveProfession(configSection);
-		this.saveVillagerType(configSection);
-		this.saveVillagerLevel(configSection);
+		PROPERTY_PROFESSION.save(shopkeeper, configSection, profession);
+		PROPERTY_VILLAGER_TYPE.save(shopkeeper, configSection, villagerType);
+		PROPERTY_VILLAGER_LEVEL.save(shopkeeper, configSection, villagerLevel);
 	}
 
 	@Override
@@ -74,44 +106,6 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	// PROFESSION
-
-	private void loadProfession(ConfigurationSection configSection) {
-		String professionName = configSection.getString("profession");
-		if (professionName == null) {
-			// migration from 'prof' key:
-			// TODO added with 1.14 update, remove again at some point
-			professionName = configSection.getString("prof");
-			shopkeeper.markDirty();
-		}
-		// pre MC 1.14 migration:
-		if (professionName != null) {
-			String newProfessionName = null;
-			if (professionName.equals("PRIEST")) {
-				newProfessionName = Profession.CLERIC.name();
-			} else if (professionName.equals("BLACKSMITH")) {
-				newProfessionName = Profession.ARMORER.name();
-			}
-			if (newProfessionName != null) {
-				Log.warning("Migrated villager shopkeeper '" + shopkeeper.getId() + "' of type '" + professionName
-						+ "' to type '" + newProfessionName + "'.");
-				professionName = newProfessionName;
-				shopkeeper.markDirty();
-			}
-		}
-		Profession profession = Utils.parseEnumValue(Profession.class, professionName);
-		if (profession == null) {
-			// fallback:
-			Log.warning("Missing or invalid villager profession '" + professionName + "' for shopkeeper " + shopkeeper.getId()
-					+ "'. Using '" + DEFAULT_PROFESSION + "' now.");
-			profession = DEFAULT_PROFESSION;
-			shopkeeper.markDirty();
-		}
-		this.profession = profession;
-	}
-
-	private void saveProfession(ConfigurationSection configSection) {
-		configSection.set("profession", profession.name());
-	}
 
 	public void setProfession(Profession profession) {
 		Validate.notNull(profession, "Profession is null!");
@@ -205,23 +199,6 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 	// VILLAGER TYPE
 
-	private void loadVillagerType(ConfigurationSection configSection) {
-		String typeName = configSection.getString("villagerType");
-		Villager.Type villagerType = Utils.parseEnumValue(Villager.Type.class, typeName);
-		if (villagerType == null) {
-			// fallback:
-			Log.warning("Missing or invalid villager type '" + typeName + "' for shopkeeper " + shopkeeper.getId()
-					+ "'. Using '" + DEFAULT_VILLAGER_TYPE + "' now.");
-			villagerType = DEFAULT_VILLAGER_TYPE;
-			shopkeeper.markDirty();
-		}
-		this.villagerType = villagerType;
-	}
-
-	private void saveVillagerType(ConfigurationSection configSection) {
-		configSection.set("villagerType", villagerType.name());
-	}
-
 	public void setVillagerType(Villager.Type villagerType) {
 		Validate.notNull(villagerType, "Villager type is null!");
 		this.villagerType = villagerType;
@@ -285,28 +262,6 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	// VILLAGER LEVEL
-
-	private void loadVillagerLevel(ConfigurationSection configSection) {
-		Integer villagerLevel;
-		if (!configSection.isInt("villagerLevel")) {
-			villagerLevel = null;
-			villagerLevel = DEFAULT_VILLAGER_LEVEL;
-		} else {
-			villagerLevel = configSection.getInt("villagerLevel");
-		}
-		if (villagerLevel == null || villagerLevel < 1 || villagerLevel > 5) {
-			// fallback:
-			Log.warning("Missing or invalid villager level '" + villagerLevel + "' for shopkeeper " + shopkeeper.getId()
-					+ "'. Using '" + DEFAULT_VILLAGER_LEVEL + "' now.");
-			villagerLevel = DEFAULT_VILLAGER_LEVEL;
-			shopkeeper.markDirty();
-		}
-		this.villagerLevel = villagerLevel;
-	}
-
-	private void saveVillagerLevel(ConfigurationSection configSection) {
-		configSection.set("villagerLevel", villagerLevel);
-	}
 
 	public void setVillagerLevel(int villagerLevel) {
 		Validate.isTrue(villagerLevel >= 1 && villagerLevel <= 5, "Invalid villager level: " + villagerLevel);

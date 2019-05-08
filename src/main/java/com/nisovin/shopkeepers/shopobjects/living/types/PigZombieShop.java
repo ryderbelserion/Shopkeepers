@@ -12,20 +12,21 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.property.BooleanProperty;
+import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
 
 // TODO use BabyableShop as base once there is a common interface for this inside bukkit
 public class PigZombieShop extends SKLivingShopObject<PigZombie> {
 
-	private static final boolean DEFAULT_BABY = false;
+	private static final Property<Boolean> PROPERTY_BABY = new BooleanProperty("baby", false);
 
-	private boolean baby = DEFAULT_BABY;
+	private boolean baby = PROPERTY_BABY.getDefaultValue();
 
 	public PigZombieShop(	LivingShops livingShops, SKLivingShopObjectType<PigZombieShop> livingObjectType,
 							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -35,13 +36,13 @@ public class PigZombieShop extends SKLivingShopObject<PigZombie> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.loadBaby(configSection);
+		this.baby = PROPERTY_BABY.load(shopkeeper, configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		this.saveBaby(configSection);
+		PROPERTY_BABY.save(shopkeeper, configSection, baby);
 	}
 
 	@Override
@@ -59,21 +60,6 @@ public class PigZombieShop extends SKLivingShopObject<PigZombie> {
 	}
 
 	// BABY STATE
-
-	private void loadBaby(ConfigurationSection configSection) {
-		if (!configSection.isBoolean("baby")) {
-			Log.warning("Missing or invalid 'baby' state for shopkeeper " + shopkeeper.getId()
-					+ "'. Using '" + DEFAULT_BABY + "' now.");
-			baby = DEFAULT_BABY;
-			shopkeeper.markDirty();
-		} else {
-			baby = configSection.getBoolean("baby");
-		}
-	}
-
-	private void saveBaby(ConfigurationSection configSection) {
-		configSection.set("baby", baby);
-	}
 
 	public void setBaby(boolean baby) {
 		this.baby = baby;

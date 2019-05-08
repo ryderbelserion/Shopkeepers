@@ -14,21 +14,23 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.property.BooleanProperty;
+import com.nisovin.shopkeepers.property.EnumProperty;
+import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class SheepShop extends BabyableShop<Sheep> {
 
-	private static final DyeColor DEFAULT_COLOR = DyeColor.WHITE;
-	private static final boolean DEFAULT_SHEARED = false;
+	private static final Property<DyeColor> PROPERTY_COLOR = new EnumProperty<>(DyeColor.class, "color", DyeColor.WHITE);
+	private static final Property<Boolean> PROPERTY_SHEARED = new BooleanProperty("sheared", false);
 
-	private DyeColor color = DEFAULT_COLOR;
-	private boolean sheared = DEFAULT_SHEARED;
+	private DyeColor color = PROPERTY_COLOR.getDefaultValue();
+	private boolean sheared = PROPERTY_SHEARED.getDefaultValue();
 
 	public SheepShop(	LivingShops livingShops, SKLivingShopObjectType<SheepShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -38,15 +40,15 @@ public class SheepShop extends BabyableShop<Sheep> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.loadColor(configSection);
-		this.loadSheared(configSection);
+		this.color = PROPERTY_COLOR.load(shopkeeper, configSection);
+		this.sheared = PROPERTY_SHEARED.load(shopkeeper, configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		this.saveColor(configSection);
-		this.saveSheared(configSection);
+		PROPERTY_COLOR.save(shopkeeper, configSection, color);
+		PROPERTY_SHEARED.save(shopkeeper, configSection, sheared);
 	}
 
 	@Override
@@ -66,23 +68,6 @@ public class SheepShop extends BabyableShop<Sheep> {
 	}
 
 	// COLOR
-
-	private void loadColor(ConfigurationSection configSection) {
-		String colorName = configSection.getString("color");
-		DyeColor color = Utils.parseEnumValue(DyeColor.class, colorName);
-		if (color == null) {
-			// fallback to default:
-			Log.warning("Missing or invalid sheep color '" + colorName + "' for shopkeeper " + shopkeeper.getId()
-					+ ". Using '" + DEFAULT_COLOR + "' now.");
-			color = DEFAULT_COLOR;
-			shopkeeper.markDirty();
-		}
-		this.color = color;
-	}
-
-	private void saveColor(ConfigurationSection configSection) {
-		configSection.set("color", color.name());
-	}
 
 	public void setColor(DyeColor color) {
 		Validate.notNull(color, "Color is null!");
@@ -123,21 +108,6 @@ public class SheepShop extends BabyableShop<Sheep> {
 	}
 
 	// SHEARED
-
-	private void loadSheared(ConfigurationSection configSection) {
-		if (!configSection.isBoolean("sheared")) {
-			Log.warning("Missing or invalid 'sheared' state for shopkeeper " + shopkeeper.getId()
-					+ "'. Using '" + DEFAULT_SHEARED + "' now.");
-			sheared = DEFAULT_SHEARED;
-			shopkeeper.markDirty();
-		} else {
-			sheared = configSection.getBoolean("sheared");
-		}
-	}
-
-	private void saveSheared(ConfigurationSection configSection) {
-		configSection.set("sheared", sheared);
-	}
 
 	public void setSheared(boolean sheared) {
 		this.sheared = sheared;

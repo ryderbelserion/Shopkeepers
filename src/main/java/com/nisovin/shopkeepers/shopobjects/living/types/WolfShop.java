@@ -3,18 +3,17 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
-import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Cat;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Wolf;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -24,9 +23,9 @@ import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class CatShop extends SittableShop<Cat> {
+public class WolfShop extends SittableShop<Wolf> {
 
-	private static final Property<Cat.Type> PROPERTY_CAT_TYPE = new EnumProperty<>(Cat.Type.class, "catType", Cat.Type.TABBY);
+	private static final Property<Boolean> PROPERTY_ANGRY = new BooleanProperty("angry", false);
 	private static final Property<DyeColor> PROPERTY_COLLAR_COLOR = new EnumProperty<DyeColor>(DyeColor.class, "collarColor", null) {
 		@Override
 		public boolean isNullable() {
@@ -35,10 +34,10 @@ public class CatShop extends SittableShop<Cat> {
 		}
 	};
 
-	private Cat.Type catType = PROPERTY_CAT_TYPE.getDefaultValue();
+	private boolean angry = PROPERTY_ANGRY.getDefaultValue();
 	private DyeColor collarColor = PROPERTY_COLLAR_COLOR.getDefaultValue(); // can be null
 
-	public CatShop(	LivingShops livingShops, SKLivingShopObjectType<CatShop> livingObjectType,
+	public WolfShop(LivingShops livingShops, SKLivingShopObjectType<WolfShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
@@ -46,21 +45,21 @@ public class CatShop extends SittableShop<Cat> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.catType = PROPERTY_CAT_TYPE.load(shopkeeper, configSection);
+		this.angry = PROPERTY_ANGRY.load(shopkeeper, configSection);
 		this.collarColor = PROPERTY_COLLAR_COLOR.load(shopkeeper, configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_CAT_TYPE.save(shopkeeper, configSection, catType);
+		PROPERTY_ANGRY.save(shopkeeper, configSection, angry);
 		PROPERTY_COLLAR_COLOR.save(shopkeeper, configSection, collarColor);
 	}
 
 	@Override
-	protected void onSpawn(Cat entity) {
+	protected void onSpawn(Wolf entity) {
 		super.onSpawn(entity);
-		this.applyCatType(entity);
+		this.applyAngry(entity);
 		this.applyCollarColor(entity);
 	}
 
@@ -68,103 +67,47 @@ public class CatShop extends SittableShop<Cat> {
 	public List<EditorHandler.Button> getEditorButtons() {
 		List<EditorHandler.Button> editorButtons = new ArrayList<>();
 		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(this.getCatTypeEditorButton());
+		// TODO this doesn't currently work since minecraft will reset the angry state every tick if the wolf has no
+		// target
+		// editorButtons.add(this.getAngryEditorButton());
 		editorButtons.add(this.getCollarColorEditorButton());
 		return editorButtons;
 	}
 
-	// CAT TYPE
+	// ANGRY
 
-	// MC 1.14: conversion from ocelot types to similar cat types:
-	public static Cat.Type fromOcelotType(String ocelotType) {
-		if (ocelotType == null) ocelotType = "WILD_OCELOT"; // default ocelot type
-		switch (ocelotType) {
-		case "BLACK_CAT":
-			return Cat.Type.BLACK;
-		case "RED_CAT":
-		case "WILD_OCELOT": // there is no equivalent, RED seems to visually match the best
-			return Cat.Type.RED;
-		case "SIAMESE_CAT":
-			return Cat.Type.SIAMESE;
-		default:
-			return PROPERTY_CAT_TYPE.getDefaultValue(); // fallback to default
-		}
-	}
-
-	public void setCatType(Cat.Type catType) {
-		Validate.notNull(catType, "Cat type is null!");
-		this.catType = catType;
+	public void setAngry(boolean angry) {
+		this.angry = angry;
 		shopkeeper.markDirty();
-		this.applyCatType(this.getEntity()); // null if not active
+		this.applyAngry(this.getEntity()); // null if not active
 	}
 
-	private void applyCatType(Cat entity) {
+	private void applyAngry(Wolf entity) {
 		if (entity == null) return;
-		entity.setCatType(catType);
+		entity.setAngry(angry);
 	}
 
-	public void cycleCatType() {
-		this.setCatType(Utils.getNextEnumConstant(Cat.Type.class, catType));
+	public void cycleAngry() {
+		this.setAngry(!angry);
 	}
 
-	private ItemStack getCatTypeEditorItem() {
-		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
-		switch (catType) {
-		case TABBY:
-			ItemUtils.setLeatherColor(iconItem, Color.BLACK.mixColors(Color.ORANGE));
-			break;
-		case ALL_BLACK:
-			ItemUtils.setLeatherColor(iconItem, Color.BLACK);
-			break;
-		case BLACK:
-			ItemUtils.setLeatherColor(iconItem, Color.BLACK.mixDyes(DyeColor.GRAY));
-			break;
-		case BRITISH_SHORTHAIR:
-			ItemUtils.setLeatherColor(iconItem, Color.SILVER);
-			break;
-		case CALICO:
-			ItemUtils.setLeatherColor(iconItem, Color.ORANGE.mixDyes(DyeColor.BROWN));
-			break;
-		case JELLIE:
-			ItemUtils.setLeatherColor(iconItem, Color.GRAY);
-			break;
-		case PERSIAN:
-			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.ORANGE));
-			break;
-		case RAGDOLL:
-			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
-			break;
-		case RED:
-			ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
-			break;
-		case SIAMESE:
-			ItemUtils.setLeatherColor(iconItem, Color.GRAY.mixDyes(DyeColor.BROWN));
-			break;
-		case WHITE:
-			ItemUtils.setLeatherColor(iconItem, Color.WHITE);
-			break;
-		default:
-			// unknown type:
-			ItemUtils.setLeatherColor(iconItem, Color.PURPLE);
-			break;
-		}
+	private ItemStack getAngryEditorItem() {
+		ItemStack iconItem = new ItemStack(angry ? Material.RED_WOOL : Material.WHITE_WOOL);
 		// TODO use more specific text
-		// String catTypeName = StringUtils.capitalizeAll(catType.name().toLowerCase(Locale.ROOT).replace('_', ' '));
-		// ItemUtils.setItemStackNameAndLore(item, ChatColor.GOLD + catTypeName, null);
 		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
 		return iconItem;
 	}
 
-	private EditorHandler.Button getCatTypeEditorButton() {
+	private EditorHandler.Button getAngryEditorButton() {
 		return new EditorHandler.ActionButton(shopkeeper) {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
-				return getCatTypeEditorItem();
+				return getAngryEditorItem();
 			}
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleCatType();
+				cycleAngry();
 				return true;
 			}
 		};
@@ -178,7 +121,7 @@ public class CatShop extends SittableShop<Cat> {
 		this.applyCollarColor(this.getEntity()); // null if not active
 	}
 
-	private void applyCollarColor(Cat entity) {
+	private void applyCollarColor(Wolf entity) {
 		if (entity == null) return;
 		if (collarColor == null) {
 			// no collar / untamed:
