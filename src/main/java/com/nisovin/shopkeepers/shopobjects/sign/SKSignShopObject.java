@@ -359,7 +359,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	public void cycleSignType() {
-		this.setSignType(Utils.getNextEnumConstant(TreeSpecies.class, signType));
+		this.setSignType(Utils.cycleEnumConstant(TreeSpecies.class, signType));
 	}
 
 	protected ItemStack getSignTypeEditorItem() {

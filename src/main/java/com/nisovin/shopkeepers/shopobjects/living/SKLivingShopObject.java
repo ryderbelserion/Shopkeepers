@@ -305,6 +305,17 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		}
 	}
 
+	public void teleportBack() {
+		E entity = this.getEntity(); // null if not active
+		if (entity == null) return;
+
+		Location entityLoc = entity.getLocation();
+		Location spawnLocation = this.getSpawnLocation();
+		spawnLocation.setYaw(entityLoc.getYaw());
+		spawnLocation.setPitch(entityLoc.getPitch());
+		entity.teleport(spawnLocation);
+	}
+
 	// NAMING
 
 	@Override

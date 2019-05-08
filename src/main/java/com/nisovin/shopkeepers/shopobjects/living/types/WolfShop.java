@@ -133,13 +133,7 @@ public class WolfShop extends SittableShop<Wolf> {
 	}
 
 	public void cycleCollarColor() {
-		DyeColor nextCollarColor;
-		if (collarColor == DyeColor.BLACK) {
-			nextCollarColor = null;
-		} else {
-			nextCollarColor = Utils.getNextEnumConstant(DyeColor.class, collarColor);
-		}
-		this.setCollarColor(nextCollarColor);
+		this.setCollarColor(Utils.cycleEnumConstantNullable(DyeColor.class, collarColor));
 	}
 
 	private ItemStack getCollarColorEditorItem() {

@@ -74,29 +74,40 @@ public final class Utils {
 		return false;
 	}
 
-	// is only able to return null if the given 'current' is null
-	public static <T extends Enum<T>> T getNextEnumConstant(Class<T> enumClass, T current) {
-		return getNextEnumConstant(enumClass, current, null);
+	public static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, T current) {
+		return cycleEnumConstant(enumClass, current, null);
 	}
 
-	// is only able to return null if the given 'current' is null
-	public static <T extends Enum<T>> T getNextEnumConstant(Class<T> enumClass, T current, Predicate<T> predicate) {
+	public static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, T current, Predicate<T> predicate) {
+		return cycleEnumConstant(enumClass, false, current, predicate);
+	}
+
+	public static <T extends Enum<T>> T cycleEnumConstantNullable(Class<T> enumClass, T current) {
+		return cycleEnumConstantNullable(enumClass, current, null);
+	}
+
+	public static <T extends Enum<T>> T cycleEnumConstantNullable(Class<T> enumClass, T current, Predicate<T> predicate) {
+		return cycleEnumConstant(enumClass, true, current, predicate);
+	}
+
+	// nullable: uses null as first value
+	// current==null: nullable has to be true
+	// cycled through all values but none got accepted: returns current value (can be null)
+	private static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, boolean nullable, T current, Predicate<T> predicate) {
 		Validate.notNull(enumClass);
+		Validate.isTrue(current != null || nullable, "Not nullable, but current is null!");
 		T[] values = enumClass.getEnumConstants();
 		int currentId = (current == null ? -1 : current.ordinal());
 		int nextId = currentId;
 		while (true) {
 			nextId += 1;
 			if (nextId >= values.length) {
-				nextId = 0;
-				if (current == null) {
-					return null;
-				}
+				nextId = (nullable ? -1 : 0);
 			}
 			if (nextId == currentId) {
 				return current;
 			}
-			T next = values[nextId];
+			T next = (nextId == -1 ? null : values[nextId]);
 			if (predicate == null || predicate.test(next)) {
 				return next;
 			}

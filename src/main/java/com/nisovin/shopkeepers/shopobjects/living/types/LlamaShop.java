@@ -3,18 +3,17 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
+import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Llama;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Sheep;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -24,15 +23,21 @@ import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class SheepShop extends BabyableShop<Sheep> {
+public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
-	private static final Property<DyeColor> PROPERTY_COLOR = new EnumProperty<>(DyeColor.class, "color", DyeColor.WHITE);
-	private static final Property<Boolean> PROPERTY_SHEARED = new BooleanProperty("sheared", false);
+	private static final Property<Llama.Color> PROPERTY_COLOR = new EnumProperty<>(Llama.Color.class, "color", Llama.Color.CREAMY);
+	private static final Property<DyeColor> PROPERTY_CARPET_COLOR = new EnumProperty<DyeColor>(DyeColor.class, "carpetColor", null) {
+		@Override
+		public boolean isNullable() {
+			// null to indicate 'no carpet'
+			return true;
+		}
+	};
 
-	private DyeColor color = PROPERTY_COLOR.getDefaultValue();
-	private boolean sheared = PROPERTY_SHEARED.getDefaultValue();
+	private Llama.Color color = PROPERTY_COLOR.getDefaultValue();
+	private DyeColor carpetColor = PROPERTY_CARPET_COLOR.getDefaultValue();
 
-	public SheepShop(	LivingShops livingShops, SKLivingShopObjectType<SheepShop> livingObjectType,
+	public LlamaShop(	LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
@@ -41,21 +46,21 @@ public class SheepShop extends BabyableShop<Sheep> {
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
 		this.color = PROPERTY_COLOR.load(shopkeeper, configSection);
-		this.sheared = PROPERTY_SHEARED.load(shopkeeper, configSection);
+		this.carpetColor = PROPERTY_CARPET_COLOR.load(shopkeeper, configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
 		PROPERTY_COLOR.save(shopkeeper, configSection, color);
-		PROPERTY_SHEARED.save(shopkeeper, configSection, sheared);
+		PROPERTY_CARPET_COLOR.save(shopkeeper, configSection, carpetColor);
 	}
 
 	@Override
-	protected void onSpawn(Sheep entity) {
+	protected void onSpawn(E entity) {
 		super.onSpawn(entity);
 		this.applyColor(entity);
-		this.applySheared(entity);
+		this.applyCarpetColor(entity);
 	}
 
 	@Override
@@ -63,30 +68,44 @@ public class SheepShop extends BabyableShop<Sheep> {
 		List<EditorHandler.Button> editorButtons = new ArrayList<>();
 		editorButtons.addAll(super.getEditorButtons());
 		editorButtons.add(this.getColorEditorButton());
-		editorButtons.add(this.getShearedEditorButton());
+		editorButtons.add(this.getCarpetColorEditorButton());
 		return editorButtons;
 	}
 
 	// COLOR
 
-	public void setColor(DyeColor color) {
-		Validate.notNull(color, "Color is null!");
+	public void setColor(Llama.Color color) {
 		this.color = color;
 		shopkeeper.markDirty();
 		this.applyColor(this.getEntity()); // null if not active
 	}
 
-	private void applyColor(Sheep entity) {
+	private void applyColor(E entity) {
 		if (entity == null) return;
 		entity.setColor(color);
 	}
 
 	public void cycleColor() {
-		this.setColor(Utils.cycleEnumConstant(DyeColor.class, color));
+		this.setColor(Utils.cycleEnumConstant(Llama.Color.class, color));
 	}
 
 	private ItemStack getColorEditorItem() {
-		ItemStack iconItem = new ItemStack(ItemUtils.getWoolType(color));
+		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
+		switch (color) {
+		case BROWN:
+			ItemUtils.setLeatherColor(iconItem, DyeColor.BROWN.getColor());
+			break;
+		case GRAY:
+			ItemUtils.setLeatherColor(iconItem, Color.SILVER);
+			break;
+		case WHITE:
+			ItemUtils.setLeatherColor(iconItem, Color.WHITE);
+			break;
+		case CREAMY:
+		default:
+			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.ORANGE));
+			break;
+		}
 		// TODO use more specific text
 		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
 		return iconItem;
@@ -107,40 +126,40 @@ public class SheepShop extends BabyableShop<Sheep> {
 		};
 	}
 
-	// SHEARED
+	// CARPET COLOR
 
-	public void setSheared(boolean sheared) {
-		this.sheared = sheared;
+	public void setCarpetColor(DyeColor carpetColor) {
+		this.carpetColor = carpetColor;
 		shopkeeper.markDirty();
-		this.applySheared(this.getEntity()); // null if not active
+		this.applyCarpetColor(this.getEntity()); // null if not active
 	}
 
-	private void applySheared(Sheep entity) {
+	private void applyCarpetColor(E entity) {
 		if (entity == null) return;
-		entity.setSheared(sheared);
+		entity.getInventory().setDecor(carpetColor == null ? null : new ItemStack(ItemUtils.getCarpetType(carpetColor)));
 	}
 
-	public void cycleSheared() {
-		this.setSheared(!sheared);
+	public void cycleCarpetColor() {
+		this.setCarpetColor(Utils.cycleEnumConstantNullable(DyeColor.class, carpetColor));
 	}
 
-	private ItemStack getShearedEditorItem() {
-		ItemStack iconItem = new ItemStack(Material.SHEARS);
+	private ItemStack getCarpetColorEditorItem() {
+		ItemStack iconItem = new ItemStack(carpetColor == null ? Material.BARRIER : ItemUtils.getCarpetType(carpetColor));
 		// TODO use more specific text
 		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
 		return iconItem;
 	}
 
-	private EditorHandler.Button getShearedEditorButton() {
+	private EditorHandler.Button getCarpetColorEditorButton() {
 		return new EditorHandler.ActionButton(shopkeeper) {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
-				return getShearedEditorItem();
+				return getCarpetColorEditorItem();
 			}
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleSheared();
+				cycleCarpetColor();
 				return true;
 			}
 		};

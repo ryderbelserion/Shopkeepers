@@ -27,19 +27,22 @@ Date format: (YYYY-MM-DD)
 
 Other changes:  
 * Made shop and object type matching more strict. This uses a fixed list of internal aliases now.
-* Villagers store their profession under 'profession' now. Previous values under 'prof' get imported.
-* Removed the generic 'sub type' editor option in favour of letting each shop object supply a list of editor options. This allows living shopkeepers to provide multiple editor options now.
+* Removed the generic 'sub type' editor option in favor of letting each shop object supply a list of editor options. This allows living shopkeepers to provide multiple editor options now.
   * API: Removed getSubTypeItem, cycleSubType and equipItem from ShopObject. Editor options are internal API for now, and mob equipment hasn't properly worked already before due to not getting persisted.
 * Added new mob attribute editor options:
-  * All ageable mobs (except the wandering trader) can now be turned into baby variants. Previously this options was only available for zombie and pig zombie shopkeepers. The editor item for this option is a regular chicken egg now.
-  * Sheep can now be set sheared.
-  * Cat collar color can be specified now.
-  * Villager type (biome) and level can be specified.
-  * Fox type, crouching and sleeping state can be set.
-  * Wolf collar color can be set. (Angry state isn't working yet)
-  * Parrot color and sitting state can be set. (Baby variant isn't working for parrots)
+  * All ageable mobs (except the wandering trader and parrots): Baby variant. Previously this options was only available for zombie and pig zombie shopkeepers. The editor item for this option is a regular chicken egg now.
+  * Sheep: Sheared state.
+  * Cat: Collar color.
+  * Villager: Biome type and level.
+  * Fox: Variant, crouching and sleeping state.
+  * Wolf: Collar color. (Angry state isn't working yet)
+  * Parrot: Color and sitting state.
+  * Chested horse (Donkey, Llama, Mule, TraderLlama): Carrying chest state.
+  * Horse: Color, style and armor.
+  * Llama: Color and carpet color.
 
 Internal:  
+* Villagers store their profession under 'profession' now. Previous values under 'prof' get imported.
 * Fixed a minor internal inconsistency with the updating of trades: Trades were updated on the client, but the server was left in the previous state (mostly affected debug messages).
 * Removed special handling of item damage tags from item comparison. Spigot has made some changes that should make this obsolete.
 * Moved common de/serialization and validation code of shop object properties into new Property classes.

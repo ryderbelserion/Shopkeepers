@@ -104,7 +104,7 @@ public class CatShop extends SittableShop<Cat> {
 	}
 
 	public void cycleCatType() {
-		this.setCatType(Utils.getNextEnumConstant(Cat.Type.class, catType));
+		this.setCatType(Utils.cycleEnumConstant(Cat.Type.class, catType));
 	}
 
 	private ItemStack getCatTypeEditorItem() {
@@ -194,7 +194,7 @@ public class CatShop extends SittableShop<Cat> {
 		if (collarColor == DyeColor.BLACK) {
 			nextCollarColor = null;
 		} else {
-			nextCollarColor = Utils.getNextEnumConstant(DyeColor.class, collarColor);
+			nextCollarColor = Utils.cycleEnumConstantNullable(DyeColor.class, collarColor);
 		}
 		this.setCollarColor(nextCollarColor);
 	}

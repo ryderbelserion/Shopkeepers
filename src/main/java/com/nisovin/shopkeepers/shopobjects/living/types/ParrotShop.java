@@ -79,7 +79,7 @@ public class ParrotShop extends SittableShop<Parrot> {
 	}
 
 	public void cycleParrotVariant() {
-		this.setParrotVariant(Utils.getNextEnumConstant(Parrot.Variant.class, parrotVariant));
+		this.setParrotVariant(Utils.cycleEnumConstant(Parrot.Variant.class, parrotVariant));
 	}
 
 	private ItemStack getParrotVariantEditorItem() {

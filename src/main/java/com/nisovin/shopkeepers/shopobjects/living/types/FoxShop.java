@@ -92,7 +92,7 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	public void cycleFoxType() {
-		this.setFoxType(Utils.getNextEnumConstant(Fox.Type.class, foxType));
+		this.setFoxType(Utils.cycleEnumConstant(Fox.Type.class, foxType));
 	}
 
 	private ItemStack getFoxTypeEditorItem() {

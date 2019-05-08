@@ -84,7 +84,7 @@ public final class ItemUtils {
 		}
 		return item;
 	}
-	
+
 	public static ItemStack setLocalizedName(ItemStack item, String locName) {
 		if (item == null) return null;
 		ItemMeta meta = item.getItemMeta();
@@ -142,6 +142,44 @@ public final class ItemUtils {
 		case WHITE:
 		default:
 			return Material.WHITE_WOOL;
+		}
+	}
+
+	public static Material getCarpetType(DyeColor dyeColor) {
+		switch (dyeColor) {
+		case ORANGE:
+			return Material.ORANGE_CARPET;
+		case MAGENTA:
+			return Material.MAGENTA_CARPET;
+		case LIGHT_BLUE:
+			return Material.LIGHT_BLUE_CARPET;
+		case YELLOW:
+			return Material.YELLOW_CARPET;
+		case LIME:
+			return Material.LIME_CARPET;
+		case PINK:
+			return Material.PINK_CARPET;
+		case GRAY:
+			return Material.GRAY_CARPET;
+		case LIGHT_GRAY:
+			return Material.LIGHT_GRAY_CARPET;
+		case CYAN:
+			return Material.CYAN_CARPET;
+		case PURPLE:
+			return Material.PURPLE_CARPET;
+		case BLUE:
+			return Material.BLUE_CARPET;
+		case BROWN:
+			return Material.BROWN_CARPET;
+		case GREEN:
+			return Material.GREEN_CARPET;
+		case RED:
+			return Material.RED_CARPET;
+		case BLACK:
+			return Material.BLACK_CARPET;
+		case WHITE:
+		default:
+			return Material.WHITE_CARPET;
 		}
 	}
 

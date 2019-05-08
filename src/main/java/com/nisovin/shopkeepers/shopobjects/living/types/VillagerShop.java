@@ -120,7 +120,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	public void cycleProfession() {
-		this.setProfession(Utils.getNextEnumConstant(Profession.class, profession));
+		this.setProfession(Utils.cycleEnumConstant(Profession.class, profession));
 	}
 
 	private ItemStack getProfessionEditorItem() {
@@ -212,7 +212,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	public void cycleVillagerType() {
-		this.setVillagerType(Utils.getNextEnumConstant(Villager.Type.class, villagerType));
+		this.setVillagerType(Utils.cycleEnumConstant(Villager.Type.class, villagerType));
 	}
 
 	private ItemStack getVillagerTypeEditorItem() {
