@@ -27,6 +27,7 @@ Date format: (YYYY-MM-DD)
 
 Other changes:  
 * Made shop and object type matching more strict. This uses a fixed list of internal aliases now.
+* Enabled various mobs by default now, which previously had some issues but seem to work fine now: Horse, mule, donkey, skeleton horse, zombie horse, llama.
 * Removed the generic 'sub type' editor option in favor of letting each shop object supply a list of editor options. This allows living shopkeepers to provide multiple editor options now.
   * API: Removed getSubTypeItem, cycleSubType and equipItem from ShopObject. Editor options are internal API for now, and mob equipment hasn't properly worked already before due to not getting persisted.
 * Added new mob attribute editor options:

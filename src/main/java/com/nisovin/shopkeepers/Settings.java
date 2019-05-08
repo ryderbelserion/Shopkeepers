@@ -104,6 +104,11 @@ public class Settings {
 			EntityType.SLIME.name(),
 			EntityType.MAGMA_CUBE.name(),
 			EntityType.SQUID.name(),
+			EntityType.HORSE.name(),
+			EntityType.MULE.name(),
+			EntityType.DONKEY.name(),
+			EntityType.SKELETON_HORSE.name(),
+			EntityType.ZOMBIE_HORSE.name(),
 			EntityType.EVOKER.name(), // MC 1.11
 			EntityType.VEX.name(), // MC 1.11
 			EntityType.VINDICATOR.name(), // MC 1.11
@@ -121,6 +126,7 @@ public class Settings {
 			EntityType.PANDA.name(), // MC 1.14
 			EntityType.PILLAGER.name(), // MC 1.14
 			EntityType.RAVAGER.name(), // MC 1.14
+			EntityType.LLAMA.name(), // MC 1.11
 			EntityType.TRADER_LLAMA.name(), // MC 1.14
 			EntityType.WANDERING_TRADER.name(), // MC 1.14
 			EntityType.FOX.name() // MC 1.14

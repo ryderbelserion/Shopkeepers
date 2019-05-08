@@ -51,7 +51,6 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> ENDERMAN: experimental: requires NoAI, still teleports away if hit by projectile, starts starring
 	 * <li> GHAST: seems okay
 	 * <li> GIANT: seems okay
-	 * <li> HORSE: experimental: randomly spawning as baby, if not baby and if clicking with empty hand, the player turns into fixed direction (horse direction?)
 	 * <li> IRON_GOLEM: okay
 	 * <li> MAGMA_CUBE: spawns with random size, weird behavior in water, seems okay
 	 * <li> MUSHROOM_COW: okay
@@ -74,6 +73,11 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> GUARDIAN: does not work, error when trying to apply common AI goals
 	 * <li> ARMOR_STAND: cannot be clicked / accessed yet
 	 * <li> SHULKER: seems to work on first glance, though it is rather uninteresting because it stays in closed form
+	 * <li> HORSE: okay
+	 * <li> MULE: okay
+	 * <li> DONKEY: okay
+	 * <li> SKELETON_HORSE: okay
+	 * <li> ZOMBIE_HORSE: okay
 	 * # 1.11
 	 * <li> ELDER_GUARDIAN: same issues as guardian
 	 * <li> WITHER_SKELETON: okay
@@ -87,7 +91,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> EVOKER: okay
 	 * <li> VEX: starts gliding into the ground once spawned and occasionally,other than that it seems to work fine
 	 * <li> VINDICATOR: okay
-	 * <li> LLAMA: same issues as horse
+	 * <li> LLAMA: okay
 	 * # 1.12
 	 * <li> ILLUSIONER: okay
 	 * <li> PARROT: okay, dances, spawns with random color
