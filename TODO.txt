@@ -30,6 +30,20 @@ Low priority:
 
 * More editor options for mob shopkeepers
   * Allow equipping (and unequipping again) items to mobs
+  * Mobs riding other mobs?
+  * Panda: appearance (genes)
+  * MushroomCow: variant
+  * Pig: saddle
+  * Rabbit: type
+  * Enderman: carrying block
+  * Slime, MagmaCube: size.
+  * Phantom: size
+  * Puffer fish: puff up state.
+  * Shulker: color
+  * Snowman: derp
+  * Tropical fish: color, pattern, pattern color
+  * Vex: charged state?
+  * Zombie villager: profession
 * Add individual config options for the different editor options?
 
 # 1.14:
