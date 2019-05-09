@@ -165,6 +165,7 @@ public class FoxShop extends SittableShop<Fox> {
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				cycleSleeping();
+				this.updateAllIcons(); // required if crouching got disabled
 				return true;
 			}
 		};
@@ -209,6 +210,7 @@ public class FoxShop extends SittableShop<Fox> {
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				cycleCrouching();
+				this.updateAllIcons(); // required if sleeping got disabled
 				return true;
 			}
 		};

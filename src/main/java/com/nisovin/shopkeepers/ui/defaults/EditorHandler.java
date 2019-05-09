@@ -99,7 +99,12 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	protected boolean isButtonArea(int rawSlot) {
-		return rawSlot >= BUTTONS_START && rawSlot <= BUTTONS_START + (this.getButtonRows() * COLUMNS_PER_ROW) - 1;
+		return rawSlot >= BUTTONS_START && rawSlot <= this.getButtonsEnd();
+	}
+
+	// depends on the number of buttons rows currently used
+	protected int getButtonsEnd() {
+		return BUTTONS_START + (this.getButtonRows() * COLUMNS_PER_ROW) - 1;
 	}
 
 	protected boolean isPlayerInventory(InventoryView view, SlotType slotType, int rawSlot) {
@@ -153,10 +158,22 @@ public abstract class EditorHandler extends UIHandler {
 
 		public abstract ItemStack getIcon(Session session);
 
+		// updates the icon in all sessions
+		// note: cannot deal with changes to the registered buttons (the button's slot) while the inventory is open
 		protected final void updateIcon() {
 			if (slot != NO_SLOT && editorHandler != null) {
 				for (Session session : editorHandler.sessions.values()) {
 					session.inventory.setItem(slot, this.getIcon(session));
+					session.player.updateInventory();
+				}
+			}
+		}
+
+		// updates all icons in all sessions
+		protected final void updateAllIcons() {
+			if (editorHandler != null) {
+				for (Session session : editorHandler.sessions.values()) {
+					editorHandler.updateButtons(session);
 					session.player.updateInventory();
 				}
 			}
@@ -608,7 +625,7 @@ public abstract class EditorHandler extends UIHandler {
 		// setup session:
 		List<TradingRecipeDraft> recipes = this.getTradingRecipes();
 		// create inventory:
-		Inventory inventory = Bukkit.createInventory(player, getInventorySize(), Settings.editorTitle);
+		Inventory inventory = Bukkit.createInventory(player, this.getInventorySize(), Settings.editorTitle);
 		Session session = new Session(player, recipes, inventory);
 		sessions.put(player.getUniqueId(), session);
 
@@ -674,15 +691,28 @@ public abstract class EditorHandler extends UIHandler {
 		}
 	}
 
+	// note: this cannot deal with new button rows being required due to newly added buttons (which would require
+	// creating and freshly open a new inventory, resulting in flicker)
+	protected void updateButtons(Session session) {
+		this.setupButtons(session);
+	}
+
+	// also used to refresh all button icons in an already open inventory
 	protected void setupButtons(Session session) {
 		Inventory inventory = session.inventory;
+		final int inventorySize = inventory.getSize();
 		Button[] buttons = this.getBakedButtons();
-		for (int i = 0; i < buttons.length; ++i) {
-			Button button = buttons[i];
-			if (button == null) continue;
-			ItemStack icon = button.getIcon(session);
-			if (icon == null) continue;
-			inventory.setItem(button.slot, icon);
+		for (int buttonIndex = 0; buttonIndex < buttons.length; ++buttonIndex) {
+			int slot = BUTTONS_START + buttonIndex;
+			if (slot >= inventorySize) break; // this can be reached if called on a previously setup inventory
+			ItemStack icon = null;
+			Button button = buttons[buttonIndex];
+			if (button != null) {
+				icon = button.getIcon(session);
+			}
+			// null will clear the slot (required if this is called to refresh the buttons in an already setup
+			// inventory):
+			inventory.setItem(slot, icon);
 		}
 	}
 
