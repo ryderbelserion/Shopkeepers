@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 
@@ -151,6 +152,10 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 				ageable.setBreed(false);
 				ageable.setAgeLock(true);
 			}
+
+			// clear equipment:
+			EntityEquipment equipment = entity.getEquipment();
+			equipment.clear();
 
 			// remove potion effects:
 			for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
