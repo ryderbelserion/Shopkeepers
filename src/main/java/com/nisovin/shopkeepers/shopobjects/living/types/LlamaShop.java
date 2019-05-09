@@ -37,7 +37,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	private Llama.Color color = PROPERTY_COLOR.getDefaultValue();
 	private DyeColor carpetColor = PROPERTY_CARPET_COLOR.getDefaultValue();
 
-	public LlamaShop(	LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
+	public LlamaShop(	LivingShops livingShops, SKLivingShopObjectType<? extends LlamaShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}

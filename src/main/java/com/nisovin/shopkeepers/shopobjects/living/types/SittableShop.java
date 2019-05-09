@@ -28,7 +28,7 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 
 	private boolean sitting = PROPERTY_SITTING.getDefaultValue();
 
-	public SittableShop(LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
+	public SittableShop(LivingShops livingShops, SKLivingShopObjectType<? extends SittableShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}

@@ -11,9 +11,11 @@ import java.util.Map;
 
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.ChestedHorse;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Llama;
 import org.bukkit.entity.TraderLlama;
+import org.bukkit.entity.Zombie;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -30,11 +32,11 @@ import com.nisovin.shopkeepers.shopobjects.living.types.MushroomCowShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PandaShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ParrotShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PigShop;
-import com.nisovin.shopkeepers.shopobjects.living.types.PigZombieShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SheepShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.WolfShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.ZombieVillagerShop;
 import com.nisovin.shopkeepers.util.StringUtils;
 
 public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
@@ -219,18 +221,18 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 			};
 			break;
 		case ZOMBIE:
-			objectType = new SKLivingShopObjectType<ZombieShop>(livingShops, entityType, aliases, typeName, permission) {
+			objectType = new SKLivingShopObjectType<ZombieShop<Zombie>>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
-				public ZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new ZombieShop(livingShops, this, shopkeeper, creationData);
+				public ZombieShop<Zombie> createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new ZombieShop<>(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
-		case PIG_ZOMBIE:
-			objectType = new SKLivingShopObjectType<PigZombieShop>(livingShops, entityType, aliases, typeName, permission) {
+		case ZOMBIE_VILLAGER:
+			objectType = new SKLivingShopObjectType<ZombieVillagerShop>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
-				public PigZombieShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new PigZombieShop(livingShops, this, shopkeeper, creationData);
+				public ZombieVillagerShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new ZombieVillagerShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
@@ -299,19 +301,27 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 			};
 			break;
 		default:
+			Class<? extends Entity> entityClass = entityType.getEntityClass();
 			if (ChestedHorse.class.isAssignableFrom(entityType.getEntityClass())) {
-				objectType = new SKLivingShopObjectType<SKLivingShopObject<?>>(livingShops, entityType, aliases, typeName, permission) {
+				objectType = new SKLivingShopObjectType<ChestedHorseShop<ChestedHorse>>(livingShops, entityType, aliases, typeName, permission) {
 					@Override
-					public SKLivingShopObject<?> createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					public ChestedHorseShop<ChestedHorse> createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 						return new ChestedHorseShop<>(livingShops, this, shopkeeper, creationData);
+					}
+				};
+			} else if (Zombie.class.isAssignableFrom(entityClass)) {
+				objectType = new SKLivingShopObjectType<ZombieShop<Zombie>>(livingShops, entityType, aliases, typeName, permission) {
+					@Override
+					public ZombieShop<Zombie> createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+						return new ZombieShop<Zombie>(livingShops, this, shopkeeper, creationData);
 					}
 				};
 			} else if (Ageable.class.isAssignableFrom(entityType.getEntityClass()) && entityType != EntityType.WANDERING_TRADER) {
 				// baby state is not supported for the wandering trader:
-				objectType = new SKLivingShopObjectType<SKLivingShopObject<?>>(livingShops, entityType, aliases, typeName, permission) {
+				objectType = new SKLivingShopObjectType<BabyableShop<Ageable>>(livingShops, entityType, aliases, typeName, permission) {
 					@Override
-					public SKLivingShopObject<?> createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-						return new BabyableShop<>(livingShops, this, shopkeeper, creationData);
+					public BabyableShop<Ageable> createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+						return new BabyableShop<Ageable>(livingShops, this, shopkeeper, creationData);
 					}
 				};
 			} else {

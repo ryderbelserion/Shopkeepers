@@ -22,13 +22,13 @@ import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 // TODO use BabyableShop as base once there is a common interface for this inside bukkit
-public class ZombieShop extends SKLivingShopObject<Zombie> {
+public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 
 	private static final Property<Boolean> PROPERTY_BABY = new BooleanProperty("baby", false);
 
 	private boolean baby = PROPERTY_BABY.getDefaultValue();
 
-	public ZombieShop(	LivingShops livingShops, SKLivingShopObjectType<ZombieShop> livingObjectType,
+	public ZombieShop(	LivingShops livingShops, SKLivingShopObjectType<? extends ZombieShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
@@ -46,7 +46,7 @@ public class ZombieShop extends SKLivingShopObject<Zombie> {
 	}
 
 	@Override
-	protected void onSpawn(Zombie entity) {
+	protected void onSpawn(E entity) {
 		super.onSpawn(entity);
 		this.applyBaby(entity);
 	}
@@ -67,7 +67,7 @@ public class ZombieShop extends SKLivingShopObject<Zombie> {
 		this.applyBaby(this.getEntity()); // null if not active
 	}
 
-	private void applyBaby(Zombie entity) {
+	private void applyBaby(E entity) {
 		if (entity == null) return;
 		entity.setBaby(baby);
 	}

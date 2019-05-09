@@ -58,7 +58,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	private Horse.Style style = PROPERTY_STYLE.getDefaultValue();
 	private HorseArmor armor = PROPERTY_ARMOR.getDefaultValue();
 
-	public HorseShop(	LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
+	public HorseShop(	LivingShops livingShops, SKLivingShopObjectType<HorseShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}

@@ -31,7 +31,8 @@ Other changes:
 * Removed the generic 'sub type' editor option in favor of letting each shop object supply a list of editor options. This allows living shopkeepers to provide multiple editor options now.
   * API: Removed getSubTypeItem, cycleSubType and equipItem from ShopObject. Editor options are internal API for now, and mob equipment hasn't properly worked already before due to not getting persisted.
 * Added new mob attribute editor options:
-  * All ageable mobs (except the wandering trader and parrots): Baby variant. Previously this options was only available for zombie and pig zombie shopkeepers. The editor item for this option is a regular chicken egg now.
+  * All ageable mobs (except the wandering trader and parrots) and all zombies (zombie, husk, drowned, pig zombie, zombie villager): Baby variant. Previously this options was only available for zombie and pig zombie shopkeepers. The editor item for this option is a regular chicken egg now.
+  * Zombie villager: Villager profession.
   * Sheep: Sheared state.
   * Cat: Collar color.
   * Villager: Biome type and level.

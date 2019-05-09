@@ -27,7 +27,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 
 	private boolean baby = PROPERTY_BABY.getDefaultValue();
 
-	public BabyableShop(LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
+	public BabyableShop(LivingShops livingShops, SKLivingShopObjectType<? extends BabyableShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}

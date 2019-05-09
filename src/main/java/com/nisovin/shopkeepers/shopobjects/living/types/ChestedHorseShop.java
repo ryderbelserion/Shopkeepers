@@ -26,7 +26,7 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 
 	private boolean carryingChest = PROPERTY_CARRYING_CHEST.getDefaultValue();
 
-	public ChestedHorseShop(LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
+	public ChestedHorseShop(LivingShops livingShops, SKLivingShopObjectType<? extends ChestedHorseShop<E>> livingObjectType,
 							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}

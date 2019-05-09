@@ -40,7 +40,6 @@ Low priority:
   * Snowman: derp
   * Tropical fish: color, pattern, pattern color
   * Vex: charged state?
-  * Zombie villager: profession
 * Add individual config options for the different editor options?
 
 # 1.14:
