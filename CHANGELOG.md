@@ -41,6 +41,9 @@ Other changes:
   * Chested horse (Donkey, Llama, Mule, TraderLlama): Carrying chest state.
   * Horse: Color, style and armor.
   * Llama: Color and carpet color.
+  * Panda: Genes (appearance).
+  * MushroomCow: Variant.
+  * Pig: Saddled.
 
 Internal:  
 * Villagers store their profession under 'profession' now. Previous values under 'prof' get imported.

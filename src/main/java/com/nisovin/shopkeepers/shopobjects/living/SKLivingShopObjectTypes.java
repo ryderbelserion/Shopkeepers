@@ -26,7 +26,10 @@ import com.nisovin.shopkeepers.shopobjects.living.types.CreeperShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.FoxShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.HorseShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.LlamaShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.MushroomCowShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.PandaShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ParrotShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.PigShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PigZombieShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SheepShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
@@ -183,6 +186,14 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 				}
 			};
 			break;
+		case PIG:
+			objectType = new SKLivingShopObjectType<PigShop>(livingShops, entityType, aliases, typeName, permission) {
+				@Override
+				public PigShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new PigShop(livingShops, this, shopkeeper, creationData);
+				}
+			};
+			break;
 		case CREEPER:
 			objectType = new SKLivingShopObjectType<CreeperShop>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
@@ -268,6 +279,22 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 				@Override
 				public LlamaShop<TraderLlama> createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new LlamaShop<>(livingShops, this, shopkeeper, creationData);
+				}
+			};
+			break;
+		case PANDA:
+			objectType = new SKLivingShopObjectType<PandaShop>(livingShops, entityType, aliases, typeName, permission) {
+				@Override
+				public PandaShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new PandaShop(livingShops, this, shopkeeper, creationData);
+				}
+			};
+			break;
+		case MUSHROOM_COW:
+			objectType = new SKLivingShopObjectType<MushroomCowShop>(livingShops, entityType, aliases, typeName, permission) {
+				@Override
+				public MushroomCowShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new MushroomCowShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
