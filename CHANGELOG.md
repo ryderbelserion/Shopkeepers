@@ -37,7 +37,7 @@ Other changes:
   * Cat: Collar color.
   * Villager: Biome type and level.
   * Fox: Variant, crouching and sleeping state.
-  * Wolf: Collar color. (Angry state isn't working yet)
+  * Wolf: Collar color, angry state.
   * Parrot: Color and sitting state.
   * Chested horse (Donkey, Llama, Mule, TraderLlama): Carrying chest state.
   * Horse: Color, style and armor.

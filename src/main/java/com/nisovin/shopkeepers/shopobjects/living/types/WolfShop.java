@@ -67,9 +67,7 @@ public class WolfShop extends SittableShop<Wolf> {
 	public List<EditorHandler.Button> getEditorButtons() {
 		List<EditorHandler.Button> editorButtons = new ArrayList<>();
 		editorButtons.addAll(super.getEditorButtons());
-		// TODO this doesn't currently work since minecraft will reset the angry state every tick if the wolf has no
-		// target
-		// editorButtons.add(this.getAngryEditorButton());
+		editorButtons.add(this.getAngryEditorButton());
 		editorButtons.add(this.getCollarColorEditorButton());
 		return editorButtons;
 	}
