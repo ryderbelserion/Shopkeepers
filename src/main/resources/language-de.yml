@@ -90,6 +90,7 @@ msg-trade-perm-set: "&aDie Handel-Permission für den Shop wurde auf '&e{perm}&a
 msg-trade-perm-removed: "&aDie Handel-Permission '&e{perm}&a' für den Shop wurde entfernt!"
 msg-trade-perm-view: "&aDie aktuelle Handel-Permission für den Shop ist '&e{perm}&a'."
 
+msg-zombie-villager-curing-disabled: "&7Das Heilen von Dorfbewohnerzombies ist deaktiviert."
 msg-must-hold-hire-item: "&7Du musst das benötigte Shop-Kauf-Item in deiner Hand halten."
 msg-set-for-hire: "&aDieser Shop steht jetzt zum Verkauf."
 msg-hired: "&aDu hast diesen Shop gekauft!"

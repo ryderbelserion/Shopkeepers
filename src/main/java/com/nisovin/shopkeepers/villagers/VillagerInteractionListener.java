@@ -4,6 +4,8 @@ import java.util.Map;
 
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
+import org.bukkit.entity.WanderingTrader;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -19,6 +21,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
+// Handles prevention of trading and hiring of other villagers (including wandering traders)
 public class VillagerInteractionListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;
@@ -31,6 +34,9 @@ public class VillagerInteractionListener implements Listener {
 	void onEntityInteract(PlayerInteractEntityEvent event) {
 		if (!(event.getRightClicked() instanceof AbstractVillager)) return;
 		AbstractVillager villager = (AbstractVillager) event.getRightClicked();
+		boolean isVillager = (villager instanceof Villager);
+		boolean isWanderingTrader = (!isVillager && villager instanceof WanderingTrader);
+		if (!isVillager && !isWanderingTrader) return; // unknown villager sub-type
 
 		if (plugin.getShopkeeperRegistry().isShopkeeper(villager)) {
 			// shopkeeper interaction is handled elsewhere
@@ -43,9 +49,9 @@ public class VillagerInteractionListener implements Listener {
 			Log.debug("  ignoring (probably citizens2) NPC");
 			return;
 		}
-
-		if (Settings.disableOtherVillagers) {
-			// don't allow trading with other villagers
+		
+		if ((isVillager && Settings.disableOtherVillagers) || (isWanderingTrader && Settings.disableWanderingTraders)) {
+			// prevent trading with non-shopkeeper villagers:
 			event.setCancelled(true);
 			Log.debug("  trade prevented");
 		}
@@ -53,7 +59,7 @@ public class VillagerInteractionListener implements Listener {
 		// only trigger hiring for main-hand events:
 		if (event.getHand() != EquipmentSlot.HAND) return;
 
-		if (Settings.hireOtherVillagers) {
+		if ((isVillager && Settings.hireOtherVillagers) || (isWanderingTrader && Settings.hireWanderingTraders)) {
 			Player player = event.getPlayer();
 			// allow hiring of other villagers
 			Log.debug("  possible hire ..");

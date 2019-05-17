@@ -13,6 +13,7 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.util.ConversionUtils;
@@ -177,7 +178,12 @@ public class Settings {
 	 */
 	public static boolean disableOtherVillagers = false;
 	public static boolean blockVillagerSpawns = false;
+	public static boolean disableZombieVillagerCuring = false;
 	public static boolean hireOtherVillagers = false;
+
+	public static boolean disableWanderingTraders = false;
+	public static boolean blockWanderingTraderSpawns = false;
+	public static boolean hireWanderingTraders = false;
 
 	/*
 	 * Hiring
@@ -312,6 +318,7 @@ public class Settings {
 	public static String msgTradePermRemoved = "&aThe shop's trading permission '&e{perm}&a' has been removed!";
 	public static String msgTradePermView = "&aThe shop's current trading permission is '&e{perm}&a'.";
 
+	public static String msgZombieVillagerCuringDisabled = "&7Curing of zombie villagers is disabled.";
 	public static String msgMustHoldHireItem = "&7You have to hold the required hire item in your hand.";
 	public static String msgSetForHire = "&aThe Shopkeeper was set for hire.";
 	public static String msgHired = "&aYou have hired this shopkeeper!";

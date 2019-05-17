@@ -65,6 +65,7 @@ import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.TradingCountListener;
 import com.nisovin.shopkeepers.villagers.BlockVillagerSpawnListener;
+import com.nisovin.shopkeepers.villagers.BlockZombieVillagerCuringListener;
 import com.nisovin.shopkeepers.villagers.VillagerInteractionListener;
 
 public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin {
@@ -216,8 +217,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// handling of regular villagers:
 		pm.registerEvents(new VillagerInteractionListener(this), this);
-		if (Settings.blockVillagerSpawns) {
+		if (Settings.blockVillagerSpawns || Settings.blockWanderingTraderSpawns) {
 			pm.registerEvents(new BlockVillagerSpawnListener(), this);
+		}
+		if (Settings.disableZombieVillagerCuring) {
+			pm.registerEvents(new BlockZombieVillagerCuringListener(), this);
 		}
 
 		// enable commands:

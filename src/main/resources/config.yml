@@ -262,10 +262,23 @@ delete-item: BONE
 
 # Whether to prevent trading with non-shopkeeper villagers.
 disable-other-villagers: false
-# Whether to block all regular non-shopkeeper villagers from spawning.
+# Whether to block regular non-shopkeeper villagers from spawning. Villagers
+# spawned by plugins, spawn eggs, mob spawners or by curing zombie villagers
+# are however not affected by this.
 block-villager-spawns: false
+# Whether to prevent curing of zombie villagers.
+disable-zombie-villager-curing: false
 # Whether non-shopkeeper villagers can be hired.
 hire-other-villagers: false
+
+# Whether to prevent trading with non-shopkeeper wandering traders.
+disable-wandering-traders: false
+# Whether to block non-shopkeeper wandering traders and trader llamas from
+# spawning. Wandering traders and trader llamas spawned by plugins, spawn eggs
+# or mob spawners are however not affected by this.
+block-wandering-trader-spawns: false
+# Whether non-shopkeeper wandering traders can be hired.
+hire-wandering-traders: false
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Hiring
@@ -453,6 +466,7 @@ msg-trade-perm-set: "&aThe shop's trading permission has been set to '&e{perm}&a
 msg-trade-perm-removed: "&aThe shop's trading permission '&e{perm}&a' has been removed!"
 msg-trade-perm-view: "&aThe shop's current trading permission is '&e{perm}&a'."
 
+msg-zombie-villager-curing-disabled: "&7Curing of zombie villagers is disabled."
 msg-must-hold-hire-item: "&7You have to hold the required hire item in your hand."
 msg-set-for-hire: "&aThe Shopkeeper was set for hire."
 msg-hired: "&aYou have hired this shopkeeper!"
