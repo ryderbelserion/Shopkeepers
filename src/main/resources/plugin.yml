@@ -3,7 +3,7 @@ version: '${shopkeepers.version}'
 description: Custom villager shopkeepers
 authors: [nisovin, blablubbabc]
 website: '${shopkeepers.dbo.url}'
-softdepend: [Multiverse-Core, My Worlds, Transporter, Towny, WorldGuard, Citizens, Vault, Gringotts]
+softdepend: [Multiverse-Core, My Worlds, Transporter, Towny, WorldGuard, Citizens, Vault, Gringotts, ChestShop]
 
 main: com.nisovin.shopkeepers.SKShopkeepersPlugin
 api-version: '1.14'

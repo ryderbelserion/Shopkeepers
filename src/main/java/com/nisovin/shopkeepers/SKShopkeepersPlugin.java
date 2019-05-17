@@ -44,6 +44,7 @@ import com.nisovin.shopkeepers.metrics.WorldGuardChart;
 import com.nisovin.shopkeepers.metrics.WorldsChart;
 import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.shopcreation.ShopkeeperCreation;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -104,6 +105,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final LivingShops livingShops = new LivingShops(this);
 	private final SignShops signShops = new SignShops(this);
 	private final CitizensShops citizensShops = new CitizensShops(this);
+
+	@Override
+	public void onLoad() {
+		// WorldGuard only allows registering flags before it got enabled.
+		// The config gets loaded later, so we always attempt to register the flag.
+		WorldGuardHandler.registerAllowShopFlag();
+	}
 
 	@Override
 	public void onEnable() {
