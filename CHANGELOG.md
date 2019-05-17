@@ -5,10 +5,10 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: xxx
 
 ## v2.7.0 (TBA)
-### Supported MC versions: 1.14
+### Supported MC versions: 1.14.1
 
 **Update for MC 1.14:**
-* Dropped support for MC 1.13. This version only supports MC 1.14!
+* Dropped support for MC 1.13. This version only supports MC 1.14.1!
 * If you are upgrading, make sure that you have successfully updated shopkeepers to 1.13 first. Migration from older MC are not supported and might not work. Reverting to older versions isn't supported either.
   * Removed pre 1.13 sheep color migration.
 * Villager shopkeepers:
