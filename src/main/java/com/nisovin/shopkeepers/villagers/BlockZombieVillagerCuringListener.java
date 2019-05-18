@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.villagers;
 
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.EventHandler;
@@ -45,13 +46,15 @@ public class BlockZombieVillagerCuringListener implements Listener {
 		if (event.getTransformReason() != TransformReason.CURED) return;
 		if (!(event.getEntity() instanceof ZombieVillager)) return;
 
-		ZombieVillager zomvieVillager = (ZombieVillager) event.getEntity();
+		ZombieVillager zombieVillager = (ZombieVillager) event.getEntity();
 		event.setCancelled(true);
-		zomvieVillager.setConversionTime(-1); // stop conversion
-		// inform the player who initiated the curing // TODO once bukkit has the API for that
-		// Player conversionPlayer = null;
-		// if (conversionPlayer != null) {
-		// Utils.sendMessage(conversionPlayer, Settings.msgZombieVillagerCuringDisabled);
-		// }
+		zombieVillager.setConversionTime(-1); // stop conversion
+
+		// inform the player who initiated the curing:
+		OfflinePlayer conversionOfflinePlayer = zombieVillager.getConversionPlayer();
+		Player conversionPlayer = (conversionOfflinePlayer == null) ? null : conversionOfflinePlayer.getPlayer();
+		if (conversionPlayer != null) {
+			Utils.sendMessage(conversionPlayer, Settings.msgZombieVillagerCuringDisabled);
+		}
 	}
 }
