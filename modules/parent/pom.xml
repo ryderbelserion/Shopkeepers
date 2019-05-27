@@ -31,13 +31,15 @@
 	</scm>
 
 	<distributionManagement>
+		<!-- Formerly nexus.cube-nation.de -->
+		<!-- Contact person: d1rty (dbo: d1rtyseven) -->
 		<repository>
-			<id>de.cube-nation.nexus.release</id>
-			<url>http://nexus3.cube-nation.de/repository/releases</url>
+			<id>org.lichtspiele.nexus.release</id>
+			<url>https://nexus.lichtspiele.org/repository/releases</url>
 		</repository>
 		<snapshotRepository>
-			<id>de.cube-nation.nexus.snapshot</id>
-			<url>http://nexus3.cube-nation.de/repository/snapshots</url>
+			<id>org.lichtspiele.nexus.snapshot</id>
+			<url>https://nexus.lichtspiele.org/repository/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
 
@@ -48,7 +50,7 @@
 		</repository>
 		<repository>
 			<id>Cube-Nation Nexus</id>
-			<url>http://nexus3.cube-nation.de/repository/maven-public/</url>
+			<url>https://nexus.lichtspiele.org/repository/maven-public/</url>
 		</repository>
 	</repositories>
 
