@@ -22,13 +22,13 @@ import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
-public class MushroomCowShop extends BabyableShop<MushroomCow> {
+public class MooshroomShop extends BabyableShop<MushroomCow> {
 
 	private static final Property<MushroomCow.Variant> PROPERTY_VARIANT = new EnumProperty<>(MushroomCow.Variant.class, "variant", MushroomCow.Variant.RED);
 
 	private MushroomCow.Variant variant = PROPERTY_VARIANT.getDefaultValue();
 
-	public MushroomCowShop(	LivingShops livingShops, SKLivingShopObjectType<MushroomCowShop> livingObjectType,
+	public MooshroomShop(	LivingShops livingShops, SKLivingShopObjectType<MooshroomShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}

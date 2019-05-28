@@ -28,7 +28,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.CreeperShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.FoxShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.HorseShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.LlamaShop;
-import com.nisovin.shopkeepers.shopobjects.living.types.MushroomCowShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.MooshroomShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PandaShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ParrotShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PigShop;
@@ -293,10 +293,10 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 			};
 			break;
 		case MUSHROOM_COW:
-			objectType = new SKLivingShopObjectType<MushroomCowShop>(livingShops, entityType, aliases, typeName, permission) {
+			objectType = new SKLivingShopObjectType<MooshroomShop>(livingShops, entityType, aliases, typeName, permission) {
 				@Override
-				public MushroomCowShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-					return new MushroomCowShop(livingShops, this, shopkeeper, creationData);
+				public MooshroomShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new MooshroomShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
