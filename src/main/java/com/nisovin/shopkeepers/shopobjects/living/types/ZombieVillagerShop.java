@@ -75,8 +75,8 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 		entity.setVillagerProfession(profession);
 	}
 
-	public void cycleProfession() {
-		this.setProfession(Utils.cycleEnumConstant(Profession.class, profession));
+	public void cycleProfession(boolean backwards) {
+		this.setProfession(Utils.cycleEnumConstant(Profession.class, profession, backwards));
 	}
 
 	private ItemStack getProfessionEditorItem() {
@@ -144,7 +144,8 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleProfession();
+				boolean backwards = clickEvent.isRightClick();
+				cycleProfession(backwards);
 				return true;
 			}
 		};

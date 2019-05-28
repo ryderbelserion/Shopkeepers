@@ -73,8 +73,8 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 		entity.setVariant(variant);
 	}
 
-	public void cycleVariant() {
-		this.setVariant(Utils.cycleEnumConstant(MushroomCow.Variant.class, variant));
+	public void cycleVariant(boolean backwards) {
+		this.setVariant(Utils.cycleEnumConstant(MushroomCow.Variant.class, variant, backwards));
 	}
 
 	private ItemStack getVariantEditorItem() {
@@ -101,7 +101,8 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleVariant();
+				boolean backwards = clickEvent.isRightClick();
+				cycleVariant(backwards);
 				return true;
 			}
 		};

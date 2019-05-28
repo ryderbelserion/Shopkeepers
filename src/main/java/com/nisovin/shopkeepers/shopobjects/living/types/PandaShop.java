@@ -75,8 +75,8 @@ public class PandaShop extends BabyableShop<Panda> {
 		entity.setHiddenGene(gene);
 	}
 
-	public void cycleGene() {
-		this.setGene(Utils.cycleEnumConstant(Panda.Gene.class, gene));
+	public void cycleGene(boolean backwards) {
+		this.setGene(Utils.cycleEnumConstant(Panda.Gene.class, gene, backwards));
 	}
 
 	private ItemStack getGeneEditorItem() {
@@ -94,7 +94,8 @@ public class PandaShop extends BabyableShop<Panda> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleGene();
+				boolean backwards = clickEvent.isRightClick();
+				cycleGene(backwards);
 				return true;
 			}
 		};

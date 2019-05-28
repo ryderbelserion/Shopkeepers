@@ -78,8 +78,8 @@ public class ParrotShop extends SittableShop<Parrot> {
 		entity.setVariant(parrotVariant);
 	}
 
-	public void cycleParrotVariant() {
-		this.setParrotVariant(Utils.cycleEnumConstant(Parrot.Variant.class, parrotVariant));
+	public void cycleParrotVariant(boolean backwards) {
+		this.setParrotVariant(Utils.cycleEnumConstant(Parrot.Variant.class, parrotVariant, backwards));
 	}
 
 	private ItemStack getParrotVariantEditorItem() {
@@ -115,7 +115,8 @@ public class ParrotShop extends SittableShop<Parrot> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleParrotVariant();
+				boolean backwards = clickEvent.isRightClick();
+				cycleParrotVariant(backwards);
 				return true;
 			}
 		};

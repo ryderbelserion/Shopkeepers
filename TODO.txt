@@ -41,7 +41,7 @@ Low priority:
   * Tropical fish: color, pattern, pattern color
   * Vex: charged state?
 * Add individual config options for the different editor options?
-* Allow switching between editor options back and forth via left and right clicking
+* Allow changing the editor option button items
 
 * Sign shopkeepers temporarily load the chunk on plugin reloads
 

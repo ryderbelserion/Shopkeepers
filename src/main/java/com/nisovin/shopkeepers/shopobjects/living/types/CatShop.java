@@ -103,8 +103,8 @@ public class CatShop extends SittableShop<Cat> {
 		entity.setCatType(catType);
 	}
 
-	public void cycleCatType() {
-		this.setCatType(Utils.cycleEnumConstant(Cat.Type.class, catType));
+	public void cycleCatType(boolean backwards) {
+		this.setCatType(Utils.cycleEnumConstant(Cat.Type.class, catType, backwards));
 	}
 
 	private ItemStack getCatTypeEditorItem() {
@@ -161,7 +161,8 @@ public class CatShop extends SittableShop<Cat> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleCatType();
+				boolean backwards = clickEvent.isRightClick();
+				cycleCatType(backwards);
 				return true;
 			}
 		};
@@ -186,14 +187,8 @@ public class CatShop extends SittableShop<Cat> {
 		}
 	}
 
-	public void cycleCollarColor() {
-		DyeColor nextCollarColor;
-		if (collarColor == DyeColor.BLACK) {
-			nextCollarColor = null;
-		} else {
-			nextCollarColor = Utils.cycleEnumConstantNullable(DyeColor.class, collarColor);
-		}
-		this.setCollarColor(nextCollarColor);
+	public void cycleCollarColor(boolean backwards) {
+		this.setCollarColor(Utils.cycleEnumConstantNullable(DyeColor.class, collarColor, backwards));
 	}
 
 	private ItemStack getCollarColorEditorItem() {
@@ -216,7 +211,8 @@ public class CatShop extends SittableShop<Cat> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleCollarColor();
+				boolean backwards = clickEvent.isRightClick();
+				cycleCollarColor(backwards);
 				return true;
 			}
 		};

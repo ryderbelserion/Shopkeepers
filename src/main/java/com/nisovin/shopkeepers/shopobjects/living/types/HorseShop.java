@@ -110,8 +110,8 @@ public class HorseShop extends BabyableShop<Horse> {
 		entity.setColor(color);
 	}
 
-	public void cycleColor() {
-		this.setColor(Utils.cycleEnumConstant(Horse.Color.class, color));
+	public void cycleColor(boolean backwards) {
+		this.setColor(Utils.cycleEnumConstant(Horse.Color.class, color, backwards));
 	}
 
 	private ItemStack getColorEditorItem() {
@@ -153,7 +153,8 @@ public class HorseShop extends BabyableShop<Horse> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleColor();
+				boolean backwards = clickEvent.isRightClick();
+				cycleColor(backwards);
 				return true;
 			}
 		};
@@ -172,8 +173,8 @@ public class HorseShop extends BabyableShop<Horse> {
 		entity.setStyle(style);
 	}
 
-	public void cycleStyle() {
-		this.setStyle(Utils.cycleEnumConstant(Horse.Style.class, style));
+	public void cycleStyle(boolean backwards) {
+		this.setStyle(Utils.cycleEnumConstant(Horse.Style.class, style, backwards));
 	}
 
 	private ItemStack getStyleEditorItem() {
@@ -196,7 +197,8 @@ public class HorseShop extends BabyableShop<Horse> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleStyle();
+				boolean backwards = clickEvent.isRightClick();
+				cycleStyle(backwards);
 				return true;
 			}
 		};
@@ -215,8 +217,8 @@ public class HorseShop extends BabyableShop<Horse> {
 		entity.getInventory().setArmor(armor == null ? null : new ItemStack(armor.getMaterial()));
 	}
 
-	public void cycleArmor() {
-		this.setArmor(Utils.cycleEnumConstantNullable(HorseArmor.class, armor));
+	public void cycleArmor(boolean backwards) {
+		this.setArmor(Utils.cycleEnumConstantNullable(HorseArmor.class, armor, backwards));
 	}
 
 	private ItemStack getArmorEditorItem() {
@@ -234,7 +236,8 @@ public class HorseShop extends BabyableShop<Horse> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleArmor();
+				boolean backwards = clickEvent.isRightClick();
+				cycleArmor(backwards);
 				return true;
 			}
 		};

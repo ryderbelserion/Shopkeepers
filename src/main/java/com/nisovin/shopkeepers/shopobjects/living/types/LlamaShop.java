@@ -85,8 +85,8 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 		entity.setColor(color);
 	}
 
-	public void cycleColor() {
-		this.setColor(Utils.cycleEnumConstant(Llama.Color.class, color));
+	public void cycleColor(boolean backwards) {
+		this.setColor(Utils.cycleEnumConstant(Llama.Color.class, color, backwards));
 	}
 
 	private ItemStack getColorEditorItem() {
@@ -119,7 +119,8 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleColor();
+				boolean backwards = clickEvent.isRightClick();
+				cycleColor(backwards);
 				return true;
 			}
 		};
@@ -138,8 +139,8 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 		entity.getInventory().setDecor(carpetColor == null ? null : new ItemStack(ItemUtils.getCarpetType(carpetColor)));
 	}
 
-	public void cycleCarpetColor() {
-		this.setCarpetColor(Utils.cycleEnumConstantNullable(DyeColor.class, carpetColor));
+	public void cycleCarpetColor(boolean backwards) {
+		this.setCarpetColor(Utils.cycleEnumConstantNullable(DyeColor.class, carpetColor, backwards));
 	}
 
 	private ItemStack getCarpetColorEditorItem() {
@@ -157,7 +158,8 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleCarpetColor();
+				boolean backwards = clickEvent.isRightClick();
+				cycleCarpetColor(backwards);
 				return true;
 			}
 		};

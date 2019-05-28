@@ -29,6 +29,9 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class VillagerShop extends BabyableShop<Villager> {
 
+	private static final int MIN_VILLAGER_LEVEL = 1;
+	private static final int MAX_VILLAGER_LEVEL = 5;
+
 	private static final Property<Profession> PROPERTY_PROFESSION = new EnumProperty<Profession>(Profession.class, "profession", Profession.NONE) {
 		@Override
 		protected void migrate(AbstractShopkeeper shopkeeper, ConfigurationSection configSection) {
@@ -119,8 +122,8 @@ public class VillagerShop extends BabyableShop<Villager> {
 		entity.setProfession(profession);
 	}
 
-	public void cycleProfession() {
-		this.setProfession(Utils.cycleEnumConstant(Profession.class, profession));
+	public void cycleProfession(boolean backwards) {
+		this.setProfession(Utils.cycleEnumConstant(Profession.class, profession, backwards));
 	}
 
 	private ItemStack getProfessionEditorItem() {
@@ -188,7 +191,8 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleProfession();
+				boolean backwards = clickEvent.isRightClick();
+				cycleProfession(backwards);
 				return true;
 			}
 		};
@@ -208,8 +212,8 @@ public class VillagerShop extends BabyableShop<Villager> {
 		entity.setVillagerType(villagerType);
 	}
 
-	public void cycleVillagerType() {
-		this.setVillagerType(Utils.cycleEnumConstant(Villager.Type.class, villagerType));
+	public void cycleVillagerType(boolean backwards) {
+		this.setVillagerType(Utils.cycleEnumConstant(Villager.Type.class, villagerType, backwards));
 	}
 
 	private ItemStack getVillagerTypeEditorItem() {
@@ -251,7 +255,8 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleVillagerType();
+				boolean backwards = clickEvent.isRightClick();
+				cycleVillagerType(backwards);
 				return true;
 			}
 		};
@@ -260,7 +265,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	// VILLAGER LEVEL
 
 	public void setVillagerLevel(int villagerLevel) {
-		Validate.isTrue(villagerLevel >= 1 && villagerLevel <= 5, "Invalid villager level: " + villagerLevel);
+		Validate.isTrue(villagerLevel >= MIN_VILLAGER_LEVEL && villagerLevel <= MAX_VILLAGER_LEVEL, "Invalid villager level: " + villagerLevel);
 		this.villagerLevel = villagerLevel;
 		shopkeeper.markDirty();
 		this.applyVillagerLevel(this.getEntity()); // null if not active
@@ -271,8 +276,14 @@ public class VillagerShop extends BabyableShop<Villager> {
 		entity.setVillagerLevel(villagerLevel);
 	}
 
-	public void cycleVillagerLevel() {
-		this.setVillagerLevel(villagerLevel >= 5 ? 1 : villagerLevel + 1);
+	public void cycleVillagerLevel(boolean backwards) {
+		int nextLevel;
+		if (backwards) {
+			nextLevel = (villagerLevel <= MIN_VILLAGER_LEVEL ? MAX_VILLAGER_LEVEL : villagerLevel - 1);
+		} else {
+			nextLevel = (villagerLevel >= MAX_VILLAGER_LEVEL ? MIN_VILLAGER_LEVEL : villagerLevel + 1);
+		}
+		this.setVillagerLevel(nextLevel);
 	}
 
 	private ItemStack getVillagerLevelEditorItem() {
@@ -309,7 +320,8 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleVillagerLevel();
+				boolean backwards = clickEvent.isRightClick();
+				cycleVillagerLevel(backwards);
 				return true;
 			}
 		};

@@ -333,7 +333,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleSignType();
+				boolean backwards = clickEvent.isRightClick();
+				cycleSignType(backwards);
 				return true;
 			}
 		});
@@ -358,8 +359,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		}
 	}
 
-	public void cycleSignType() {
-		this.setSignType(Utils.cycleEnumConstant(TreeSpecies.class, signType));
+	public void cycleSignType(boolean backwards) {
+		this.setSignType(Utils.cycleEnumConstant(TreeSpecies.class, signType, backwards));
 	}
 
 	protected ItemStack getSignTypeEditorItem() {

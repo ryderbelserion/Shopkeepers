@@ -91,8 +91,8 @@ public class FoxShop extends SittableShop<Fox> {
 		entity.setFoxType(foxType);
 	}
 
-	public void cycleFoxType() {
-		this.setFoxType(Utils.cycleEnumConstant(Fox.Type.class, foxType));
+	public void cycleFoxType(boolean backwards) {
+		this.setFoxType(Utils.cycleEnumConstant(Fox.Type.class, foxType, backwards));
 	}
 
 	private ItemStack getFoxTypeEditorItem() {
@@ -119,7 +119,8 @@ public class FoxShop extends SittableShop<Fox> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleFoxType();
+				boolean backwards = clickEvent.isRightClick();
+				cycleFoxType(backwards);
 				return true;
 			}
 		};

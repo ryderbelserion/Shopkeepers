@@ -129,8 +129,8 @@ public class WolfShop extends SittableShop<Wolf> {
 		}
 	}
 
-	public void cycleCollarColor() {
-		this.setCollarColor(Utils.cycleEnumConstantNullable(DyeColor.class, collarColor));
+	public void cycleCollarColor(boolean backwards) {
+		this.setCollarColor(Utils.cycleEnumConstantNullable(DyeColor.class, collarColor, backwards));
 	}
 
 	private ItemStack getCollarColorEditorItem() {
@@ -153,7 +153,8 @@ public class WolfShop extends SittableShop<Wolf> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleCollarColor();
+				boolean backwards = clickEvent.isRightClick();
+				cycleCollarColor(backwards);
 				return true;
 			}
 		};

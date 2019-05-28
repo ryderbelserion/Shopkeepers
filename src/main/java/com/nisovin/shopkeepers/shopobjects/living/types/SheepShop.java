@@ -81,8 +81,8 @@ public class SheepShop extends BabyableShop<Sheep> {
 		entity.setColor(color);
 	}
 
-	public void cycleColor() {
-		this.setColor(Utils.cycleEnumConstant(DyeColor.class, color));
+	public void cycleColor(boolean backwards) {
+		this.setColor(Utils.cycleEnumConstant(DyeColor.class, color, backwards));
 	}
 
 	private ItemStack getColorEditorItem() {
@@ -100,7 +100,8 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				cycleColor();
+				boolean backwards = clickEvent.isRightClick();
+				cycleColor(backwards);
 				return true;
 			}
 		};

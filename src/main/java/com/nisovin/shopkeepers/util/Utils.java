@@ -75,35 +75,42 @@ public final class Utils {
 		return false;
 	}
 
-	public static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, T current) {
-		return cycleEnumConstant(enumClass, current, null);
+	public static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, T current, boolean backwards) {
+		return cycleEnumConstant(enumClass, current, backwards, null);
 	}
 
-	public static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, T current, Predicate<T> predicate) {
-		return cycleEnumConstant(enumClass, false, current, predicate);
+	public static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, T current, boolean backwards, Predicate<T> predicate) {
+		return cycleEnumConstant(enumClass, false, current, backwards, predicate);
 	}
 
-	public static <T extends Enum<T>> T cycleEnumConstantNullable(Class<T> enumClass, T current) {
-		return cycleEnumConstantNullable(enumClass, current, null);
+	public static <T extends Enum<T>> T cycleEnumConstantNullable(Class<T> enumClass, T current, boolean backwards) {
+		return cycleEnumConstantNullable(enumClass, current, backwards, null);
 	}
 
-	public static <T extends Enum<T>> T cycleEnumConstantNullable(Class<T> enumClass, T current, Predicate<T> predicate) {
-		return cycleEnumConstant(enumClass, true, current, predicate);
+	public static <T extends Enum<T>> T cycleEnumConstantNullable(Class<T> enumClass, T current, boolean backwards, Predicate<T> predicate) {
+		return cycleEnumConstant(enumClass, true, current, backwards, predicate);
 	}
 
 	// nullable: uses null as first value
 	// current==null: nullable has to be true
 	// cycled through all values but none got accepted: returns current value (can be null)
-	private static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, boolean nullable, T current, Predicate<T> predicate) {
+	private static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, boolean nullable, T current, boolean backwards, Predicate<T> predicate) {
 		Validate.notNull(enumClass);
 		Validate.isTrue(current != null || nullable, "Not nullable, but current is null!");
 		T[] values = enumClass.getEnumConstants();
 		int currentId = (current == null ? -1 : current.ordinal());
 		int nextId = currentId;
 		while (true) {
-			nextId += 1;
-			if (nextId >= values.length) {
-				nextId = (nullable ? -1 : 0);
+			if (backwards) {
+				nextId -= 1;
+				if (nextId < (nullable ? -1 : 0)) {
+					nextId = (values.length - 1);
+				}
+			} else {
+				nextId += 1;
+				if (nextId >= values.length) {
+					nextId = (nullable ? -1 : 0);
+				}
 			}
 			if (nextId == currentId) {
 				return current;

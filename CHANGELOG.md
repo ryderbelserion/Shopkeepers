@@ -47,6 +47,7 @@ Other changes:
   * Panda: Genes (appearance).
   * MushroomCow: Variant.
   * Pig: Saddled.
+* Added the ability to cycle the editor options back and forth via left and right clicking.
 * Updated for the latest WorldGuard changes. You will have to update WorldGuard for the WorldGuard integration to work.
   * The 'allow-shop' flag got removed from WorldGuard itself and left for other plugins to register it themselves. Shopkeepers will now attempt to register this flag, if no other plugins has registered it yet (one such other plugin is for example ChestShop). Since WorldGuard only allows registering flags before it got enabled, but we are loading the config at a later point, we will always attempt to register the flag, even if the WorldGuard integration is disabled in the config.
   * Removed: We no longer check for the alternative 'enable-shop' flag, if the 'allow-shop' flag is not present.
