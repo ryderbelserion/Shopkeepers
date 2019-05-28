@@ -4,7 +4,7 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
-## v2.7.0 (TBA)
+## v2.7.0 (2019-05-29)
 ### Supported MC versions: 1.14.2
 
 **Update for MC 1.14:**
