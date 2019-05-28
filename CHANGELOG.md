@@ -9,7 +9,7 @@ Date format: (YYYY-MM-DD)
 
 **Update for MC 1.14:**
 * Dropped support for MC 1.13. This version only supports MC 1.14.2!
-* If you are upgrading, make sure that you have successfully updated shopkeepers to 1.13 first. Migration from older MC are not supported and might not work. Reverting to older versions isn't supported either.
+* If you are upgrading, make sure that you have successfully updated Shopkeepers to 1.13 first. Migration from older MC versions are not supported and might not work. Reverting to older versions isn't supported either.
   * Removed pre 1.13 sheep color migration.
 * Villager shopkeepers:
   * Changed default profession from farmer to 'none'.
@@ -49,12 +49,12 @@ Other changes:
   * Pig: Saddled.
 * Added the ability to cycle the editor options back and forth via left and right clicking.
 * Updated for the latest WorldGuard changes. You will have to update WorldGuard for the WorldGuard integration to work.
-  * The 'allow-shop' flag got removed from WorldGuard itself and left for other plugins to register it themselves. Shopkeepers will now attempt to register this flag, if no other plugins has registered it yet (one such other plugin is for example ChestShop). Since WorldGuard only allows registering flags before it got enabled, but we are loading the config at a later point, we will always attempt to register the flag, even if the WorldGuard integration is disabled in the config.
+  * The 'allow-shop' flag got removed from WorldGuard itself and it is left for other plugins to register themselves. Shopkeepers will now attempt to register this flag, if no other plugin has registered it yet (one such other plugin is for example ChestShop). Since WorldGuard only allows registering flags before it got enabled, but we are loading the config at a later point, we will always attempt to register the flag, even if the WorldGuard integration is disabled in the config.
   * Removed: We no longer check for the alternative 'enable-shop' flag, if the 'allow-shop' flag is not present.
 * Fixed a class loading issue in case the WorldGuard integration is enabled but WorldGuard is not present.
 * Fix: Sign shops no longer temporarily load the chunk when checking if they are active.
 
-Internal:  
+Internal changes:  
 * Villagers store their profession under 'profession' now. Previous values under 'prof' get imported.
 * Fixed a minor internal inconsistency with the updating of trades: Trades were updated on the client, but the server was left in the previous state (mostly affected debug messages).
 * Removed special handling of item damage tags from item comparison. Spigot has made some changes that should make this obsolete.
