@@ -30,7 +30,6 @@ Other changes:
 * Changed: When spawning of villagers or wandering traders is disabled, villagers and wandering traders spawned by other plugins, spawn eggs, mob spawners or due to curing zombie villagers are still allowed to spawn now.
 * Added a separate setting 'disable-zombie-villager-curing' (default: false) that can be used to prevent curing of zombie villagers.
 * Made shop and object type matching more strict. This uses a fixed list of internal aliases now.
-* Enabled various mobs by default now, which previously had some issues but seem to work fine now: Horse, mule, donkey, skeleton horse, zombie horse, llama.
 * Removed the generic 'sub type' editor option in favor of letting each shop object supply a list of editor options. This allows living shopkeepers to provide multiple editor options now.
   * API: Removed getSubTypeItem, cycleSubType and equipItem from ShopObject. Editor options are internal API for now, and mob equipment hasn't properly worked already before due to not getting persisted.
 * Added new mob attribute editor options:
@@ -59,8 +58,72 @@ Internal:
 * Removed special handling of item damage tags from item comparison. Spigot has made some changes that should make this obsolete.
 * Moved common de/serialization and validation code of shop object properties into new Property classes.
 
+Config changes (if you are updating, you have to manually apply those changes):  
+* Enabled various mobs by default now, which previously had some issues but seem to work fine now: Horse, mule, donkey, skeleton horse, zombie horse, llama.
+* Changed the default value for the setting enable-chest-option-on-player-shop to 'true'.
+
 New messages:  
 * msg-zombie-villager-curing-disabled
+* msg-button-sign-variant
+* msg-button-sign-variant-lore
+* msg-button-baby
+* msg-button-baby-lore
+* msg-button-sitting
+* msg-button-sitting-lore
+* msg-button-cat-variant
+* msg-button-cat-variant-lore
+* msg-button-collar-color
+* msg-button-collar-color-lore
+* msg-button-wolf-angry
+* msg-button-wolf-angry-lore
+* msg-button-carrying-chest
+* msg-button-carrying-chest-lore
+* msg-button-horse-color
+* msg-button-horse-color-lore
+* msg-button-horse-style
+* msg-button-horse-style-lore
+* msg-button-horse-armor
+* msg-button-horse-armor-lore
+* msg-button-llama-variant
+* msg-button-llama-variant-lore
+* msg-button-llama-carpet-color
+* msg-button-llama-carpet-color-lore
+* msg-button-creeper-charged
+* msg-button-creeper-charged-lore
+* msg-button-fox-variant
+* msg-button-fox-variant-lore
+* msg-button-fox-crouching
+* msg-button-fox-crouching-lore
+* msg-button-fox-sleeping
+* msg-button-fox-sleeping-lore
+* msg-button-mushroom-cow-variant
+* msg-button-mushroom-cow-variant-lore
+* msg-button-panda-variant
+* msg-button-panda-variant-lore
+* msg-button-parrot-variant
+* msg-button-parrot-variant-lore
+* msg-button-pig-saddle
+* msg-button-pig-saddle-lore
+* msg-button-sheep-color
+* msg-button-sheep-color-lore
+* msg-button-sheep-sheared
+* msg-button-sheep-sheared-lore
+* msg-button-villager-profession
+* msg-button-villager-profession-lore
+* msg-button-villager-variant
+* msg-button-villager-variant-lore
+* msg-button-villager-level
+* msg-button-villager-level-lore
+* msg-button-zombie-villager-profession
+* msg-button-zombie-villager-profession-lore
+
+Removed messages:  
+* msg-button-type
+* msg-button-type-lore
+
+Changed messages (if you are updating, you have to manually apply those changes):  
+* msg-button-name (lower case words)
+* msg-button-chest (lower case words)
 
 ## v2.6.0 (2019-03-04)
 ### Supported MC versions: 1.13.2

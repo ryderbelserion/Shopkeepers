@@ -102,8 +102,7 @@ public class ParrotShop extends SittableShop<Parrot> {
 			iconItem = new ItemStack(ItemUtils.getWoolType(DyeColor.RED));
 			break;
 		}
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonParrotVariant, Settings.msgButtonParrotVariantLore);
 		return iconItem;
 	}
 

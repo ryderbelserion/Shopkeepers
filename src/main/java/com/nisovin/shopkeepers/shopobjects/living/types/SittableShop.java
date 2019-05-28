@@ -78,8 +78,7 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 
 	private ItemStack getSittingEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.IRON_HORSE_ARMOR);
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonSitting, Settings.msgButtonSittingLore);
 		return iconItem;
 	}
 

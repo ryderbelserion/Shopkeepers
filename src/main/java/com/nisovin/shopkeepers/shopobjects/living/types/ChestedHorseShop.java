@@ -76,8 +76,7 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 
 	private ItemStack getCarryingChestEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.CHEST);
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonCarryingChest, Settings.msgButtonCarryingChestLore);
 		return iconItem;
 	}
 

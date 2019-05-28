@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -450,6 +451,14 @@ public final class Utils {
 			}
 		}
 		return message;
+	}
+
+	public static List<String> replaceArgs(Collection<String> messages, String... args) {
+		List<String> replaced = new ArrayList<>(messages.size());
+		for (String message : messages) {
+			replaced.add(replaceArgs(message, args));
+		}
+		return replaced;
 	}
 
 	public static void sendMessage(CommandSender sender, String message, String... args) {

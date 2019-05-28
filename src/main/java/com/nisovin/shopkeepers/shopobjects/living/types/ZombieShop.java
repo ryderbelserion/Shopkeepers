@@ -77,11 +77,8 @@ public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 	}
 
 	private ItemStack getBabyEditorItem() {
-		// TODO use mob-specific spawn egg (if available; some mobs (illusioner) don't have a spawn egg)?
-		// on the other hand: using a single item consistently for the editor icon has benefits as well
 		ItemStack iconItem = new ItemStack(Material.EGG);
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonBaby, Settings.msgButtonBabyLore);
 		return iconItem;
 	}
 

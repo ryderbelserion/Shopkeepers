@@ -41,9 +41,11 @@ Low priority:
   * Tropical fish: color, pattern, pattern color
   * Vex: charged state?
 * Add individual config options for the different editor options?
+* Allow switching between editor options back and forth via left and right clicking
+
+* Sign shopkeepers temporarily load the chunk on plugin reloads
 
 # 1.14:
-* Settings to handle wandering trader differently to regular villagers? (spawn blocking, hiring, trade blocking)
 * Allow changing the sign text color?
 * Set villager trades and test if they display trade-able items when the player holds corresponding items
 

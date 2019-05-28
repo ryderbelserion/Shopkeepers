@@ -100,8 +100,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 
 	private ItemStack getBabyEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.EGG);
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonBaby, Settings.msgButtonBabyLore);
 		return iconItem;
 	}
 

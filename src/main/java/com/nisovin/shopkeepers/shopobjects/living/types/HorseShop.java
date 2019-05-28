@@ -140,8 +140,7 @@ public class HorseShop extends BabyableShop<Horse> {
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE);
 			break;
 		}
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonHorseColor, Settings.msgButtonHorseColorLore);
 		return iconItem;
 	}
 
@@ -184,8 +183,7 @@ public class HorseShop extends BabyableShop<Horse> {
 		meta.addPattern(new Pattern(DyeColor.BROWN, PatternType.TRIANGLES_BOTTOM));
 		meta.addPattern(new Pattern(DyeColor.BROWN, PatternType.TRIANGLES_TOP));
 		iconItem.setItemMeta(meta);
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonHorseStyle, Settings.msgButtonHorseStyleLore);
 		return iconItem;
 	}
 
@@ -223,8 +221,7 @@ public class HorseShop extends BabyableShop<Horse> {
 
 	private ItemStack getArmorEditorItem() {
 		ItemStack iconItem = new ItemStack(armor == null ? Material.BARRIER : armor.getMaterial());
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonHorseArmor, Settings.msgButtonHorseArmorLore);
 		return iconItem;
 	}
 

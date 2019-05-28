@@ -39,10 +39,6 @@ msg-button-chest: "&aShop-Inventar öffnen"
 msg-button-chest-lore:
 - Zeigt dir das Inventar
 - deines Verkäufers
-msg-button-type: "&aAussehen ändern"
-msg-button-type-lore:
-- Ändert das Aussehen
-- deines Verkäufers
 msg-button-delete: "&4Entfernen"
 msg-button-delete-lore:
 - Schließt diesen Shop und
@@ -50,6 +46,114 @@ msg-button-delete-lore:
 msg-button-hire: "&aAnheuern"
 msg-button-hire-lore:
 - Kaufe diesen Shop
+
+msg-button-type: "&aAussehen ändern"
+msg-button-type-lore:
+- Ändert das Aussehen
+- deines Verkäufers
+
+msg-button-sign-variant: "&aSchild-Variante ändern"
+msg-button-sign-variant-lore:
+- "Ändert den Holztyp"
+- "des Schildes"
+msg-button-baby: "&aBaby-Variante umschalten"
+msg-button-baby-lore:
+- "Wechselt zwischen der Kind- und"
+- "Erwachsenen-Variante des Mobs"
+msg-button-sitting: "&aSitzhaltung umschalten"
+msg-button-sitting-lore:
+- "Wechselt die Sitzhaltung"
+msg-button-cat-variant: "&aKatzen-Variante ändern"
+msg-button-cat-variant-lore:
+- "Ändert das Aussehen"
+- "der Katze"
+msg-button-collar-color: "&aHalsband Farbe ändern"
+msg-button-collar-color-lore:
+- "Ändert die Farbe"
+- "des Halsbandes"
+msg-button-wolf-angry: "&aWütender Wolf umschalten"
+msg-button-wolf-angry-lore:
+- "Wechselt zwischen wütendem"
+- "und zahmen Wolf"
+msg-button-carrying-chest: "&aTragetasche umschalten"
+msg-button-carrying-chest-lore:
+- "Schaltet die Tragetasche"
+- "an und aus"
+msg-button-horse-color: "&aFellfarbe ändern"
+msg-button-horse-color-lore:
+- "Ändert die Fellfarbe"
+- "des Pferdes"
+msg-button-horse-style: "&aFellmuster ändern"
+msg-button-horse-style-lore:
+- "Ändert das Fellmuster"
+- "des Pferdes"
+msg-button-horse-armor: "&aPferderüstung ändern"
+msg-button-horse-armor-lore:
+- "Ändert die Pferderüstung"
+msg-button-llama-variant: "&aLama-Variante ändern"
+msg-button-llama-variant-lore:
+- "Ändert das Aussehen"
+- "des Lamas"
+msg-button-llama-carpet-color: "&aTeppich Farbe ändern"
+msg-button-llama-carpet-color-lore:
+- "Ändert die Farbe"
+- "des Teppichs"
+msg-button-creeper-charged: "&aAufladung umschalten"
+msg-button-creeper-charged-lore:
+- "Wechselt zwischen normalem"
+- "und aufgeladenem Creeper"
+msg-button-fox-variant: "&aFuchs-Variante ändern"
+msg-button-fox-variant-lore:
+- "Ändert das Aussehen"
+- "des Fuchses"
+msg-button-fox-crouching: "&aPirschhaltung umschalten"
+msg-button-fox-crouching-lore:
+- "Wechselt zwischen normaler"
+- "und pirschender Haltung"
+msg-button-fox-sleeping: "&aSchlafhaltung umschalten"
+msg-button-fox-sleeping-lore:
+- "Wechselt zwischen normaler"
+- "und Schlafhaltung"
+msg-button-mooshroom-variant: "&aMooshroom-Variante ändern"
+msg-button-mooshroom-variant-lore:
+- "Ändert das Aussehen"
+- "der Mooshroom"
+msg-button-panda-variant: "&aPanda-Variante ändern"
+msg-button-panda-variant-lore:
+- "Ändert das Aussehen"
+- "des Pandas"
+msg-button-parrot-variant: "&aPapagei-Variante ändern"
+msg-button-parrot-variant-lore:
+- "Ändert das Aussehen"
+- "des Papageis"
+msg-button-pig-saddle: "&aSattel umschalten"
+msg-button-pig-saddle-lore:
+- "Schaltet den Sattel"
+- "an oder aus"
+msg-button-sheep-color: "&aWollfarbe ändern"
+msg-button-sheep-color-lore:
+- "Ändert die Wollfarbe"
+- "des Schafs"
+msg-button-sheep-sheared: "&aGeschoren umschalten"
+msg-button-sheep-sheared-lore:
+- "Schaltet zwischen geschorenem"
+- "und ungeschorenem Schaf um"
+msg-button-villager-profession: "&aBeruf ändern"
+msg-button-villager-profession-lore:
+- "Ändert den Beruf"
+- "des Dorfbewohners"
+msg-button-villager-variant: "&aDorfbewohner-Variante ändern"
+msg-button-villager-variant-lore:
+- "Ändert das Aussehen"
+- "des Dorfbewohners"
+msg-button-villager-level: "&aErfahrungslevel ändern"
+msg-button-villager-level-lore:
+- "Ändert das Erfahrungslevel"
+- "des Dorfbewohners"
+msg-button-zombie-villager-profession: "&aBeruf ändern"
+msg-button-zombie-villager-profession-lore:
+- "Ändert den Beruf des"
+- "Dorfbewohner-Zombies"
 
 msg-trading-title-prefix: "&2"
 msg-trading-title-default: "Händler"

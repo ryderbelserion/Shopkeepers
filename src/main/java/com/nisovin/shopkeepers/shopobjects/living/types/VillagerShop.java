@@ -175,10 +175,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 			break;
 		}
 		assert iconItem != null;
-		// TODO use more specific text
-		// ItemUtils.setLocalizedName(iconItem, "entity.minecraft.villager." +
-		// profession.name().toLowerCase(Locale.ROOT));
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonVillagerProfession, Settings.msgButtonVillagerProfessionLore);
 		return iconItem;
 	}
 
@@ -241,8 +238,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
 			break;
 		}
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonVillagerVariant, Settings.msgButtonVillagerVariantLore);
 		return iconItem;
 	}
 
@@ -300,10 +296,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 			break;
 		}
 		assert iconItem != null;
-		// TODO use more specific text
-		// ItemUtils.setLocalizedName(iconItem, "entity.minecraft.villager." +
-		// profession.name().toLowerCase(Locale.ROOT));
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonVillagerLevel, Settings.msgButtonVillagerLevelLore);
 		return iconItem;
 	}
 

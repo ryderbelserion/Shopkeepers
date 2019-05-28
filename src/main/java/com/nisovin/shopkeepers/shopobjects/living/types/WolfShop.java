@@ -91,8 +91,7 @@ public class WolfShop extends SittableShop<Wolf> {
 
 	private ItemStack getAngryEditorItem() {
 		ItemStack iconItem = new ItemStack(angry ? Material.RED_WOOL : Material.WHITE_WOOL);
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonWolfAngry, Settings.msgButtonWolfAngryLore);
 		return iconItem;
 	}
 
@@ -141,8 +140,7 @@ public class WolfShop extends SittableShop<Wolf> {
 		} else {
 			iconItem = new ItemStack(ItemUtils.getWoolType(collarColor));
 		}
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonCollarColor, Settings.msgButtonCollarColorLore);
 		return iconItem;
 	}
 

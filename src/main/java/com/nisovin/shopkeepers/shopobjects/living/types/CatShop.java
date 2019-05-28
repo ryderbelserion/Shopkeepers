@@ -148,10 +148,7 @@ public class CatShop extends SittableShop<Cat> {
 			ItemUtils.setLeatherColor(iconItem, Color.PURPLE);
 			break;
 		}
-		// TODO use more specific text
-		// String catTypeName = StringUtils.capitalizeAll(catType.name().toLowerCase(Locale.ROOT).replace('_', ' '));
-		// ItemUtils.setItemStackNameAndLore(item, ChatColor.GOLD + catTypeName, null);
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonCatVariant, Settings.msgButtonCatVariantLore);
 		return iconItem;
 	}
 
@@ -206,8 +203,7 @@ public class CatShop extends SittableShop<Cat> {
 		} else {
 			iconItem = new ItemStack(ItemUtils.getWoolType(collarColor));
 		}
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonCollarColor, Settings.msgButtonCollarColorLore);
 		return iconItem;
 	}
 

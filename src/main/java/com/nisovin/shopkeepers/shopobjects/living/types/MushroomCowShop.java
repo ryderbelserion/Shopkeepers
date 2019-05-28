@@ -88,8 +88,7 @@ public class MushroomCowShop extends BabyableShop<MushroomCow> {
 			iconItem = new ItemStack(Material.BROWN_MUSHROOM);
 			break;
 		}
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonMooshroomVariant, Settings.msgButtonMooshroomVariantLore);
 		return iconItem;
 	}
 

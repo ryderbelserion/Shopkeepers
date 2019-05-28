@@ -116,7 +116,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> RAVAGER: okay
 	 * <li> TRADER_LLAMA: okay
 	 * <li> WANDERING_VILLAGER: okay
-	 * <li> FOX: okay
+	 * <li> FOX: okay, randomly spawns with an item in its mouth (clearing its equipment doesn't work, yet)
 	 * </ul>
 	 */
 

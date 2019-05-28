@@ -76,8 +76,7 @@ public class PigShop extends BabyableShop<Pig> {
 
 	private ItemStack getSaddleEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.SADDLE);
-		// TODO use more specific text
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonPigSaddle, Settings.msgButtonPigSaddleLore);
 		return iconItem;
 	}
 

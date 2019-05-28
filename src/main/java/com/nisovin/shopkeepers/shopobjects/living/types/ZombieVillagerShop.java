@@ -131,10 +131,7 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 			break;
 		}
 		assert iconItem != null;
-		// TODO use more specific text
-		// ItemUtils.setLocalizedName(iconItem, "entity.minecraft.villager." +
-		// profession.name().toLowerCase(Locale.ROOT));
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonType, Settings.msgButtonTypeLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonZombieVillagerProfession, Settings.msgButtonZombieVillagerProfessionLore);
 		return iconItem;
 	}
 

@@ -155,7 +155,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 			// clear equipment:
 			EntityEquipment equipment = entity.getEquipment();
-			equipment.clear();
+			equipment.clear(); // TODO Does not work for foxes yet
 
 			// remove potion effects:
 			for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
