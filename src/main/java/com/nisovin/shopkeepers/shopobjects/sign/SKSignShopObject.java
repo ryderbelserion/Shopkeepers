@@ -130,8 +130,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	public Block getBlock() {
 		Location signLocation = this.getLocation();
 		if (signLocation == null) return null; // world not loaded
+		if (!shopkeeper.getChunkCoords().isChunkLoaded()) return null; // chunk not loaded
 		Block signBlock = signLocation.getBlock();
-		if (!ItemUtils.isSign(signBlock.getType())) return null;
+		if (!ItemUtils.isSign(signBlock.getType())) return null; // not a sign
 		return signBlock;
 	}
 

@@ -52,6 +52,7 @@ Other changes:
   * The 'allow-shop' flag got removed from WorldGuard itself and left for other plugins to register it themselves. Shopkeepers will now attempt to register this flag, if no other plugins has registered it yet (one such other plugin is for example ChestShop). Since WorldGuard only allows registering flags before it got enabled, but we are loading the config at a later point, we will always attempt to register the flag, even if the WorldGuard integration is disabled in the config.
   * Removed: We no longer check for the alternative 'enable-shop' flag, if the 'allow-shop' flag is not present.
 * Fixed a class loading issue in case the WorldGuard integration is enabled but WorldGuard is not present.
+* Fix: Sign shops no longer temporarily load the chunk when checking if they are active.
 
 Internal:  
 * Villagers store their profession under 'profession' now. Previous values under 'prof' get imported.

@@ -43,8 +43,6 @@ Low priority:
 * Add individual config options for the different editor options?
 * Allow changing the editor option button items
 
-* Sign shopkeepers temporarily load the chunk on plugin reloads
-
 # 1.14:
 * Allow changing the sign text color?
 * Set villager trades and test if they display trade-able items when the player holds corresponding items
