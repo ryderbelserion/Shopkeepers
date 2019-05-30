@@ -4,6 +4,13 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.7.1 (2019-05-30)
+### Supported MC versions: 1.14.2
+
+Checkout the changelog of v2.7.0 regarding the update to 1.14.
+
+* Fix: Shopkeeper mobs sensing cache is never cleared, resulting in them not looking towards nearby players sometimes.
+
 ## v2.7.0 (2019-05-29)
 ### Supported MC versions: 1.14.2
 

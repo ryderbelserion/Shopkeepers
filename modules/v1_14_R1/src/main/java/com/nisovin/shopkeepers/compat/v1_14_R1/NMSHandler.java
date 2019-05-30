@@ -89,8 +89,10 @@ public final class NMSHandler implements NMSCallProvider {
 		// example: armor stands are living, but not insentient
 		if (!(mcLivingEntity instanceof EntityInsentient)) return;
 		EntityInsentient mcInsentientEntity = ((EntityInsentient) mcLivingEntity);
+		mcInsentientEntity.getEntitySenses().a(); // clear sensing cache
 		mcInsentientEntity.goalSelector.doTick();
 		mcInsentientEntity.getControllerLook().a(); // tick look controller
+		mcInsentientEntity.getEntitySenses().a(); // clear sensing cache
 	}
 
 	@Override
