@@ -46,6 +46,7 @@ Low priority:
 # 1.14:
 * Allow changing the sign text color?
 * Set villager trades and test if they display trade-able items when the player holds corresponding items
+* legacyMobBehavior might no longer work correctly, since new mob villager behaviors are not getting cleared.
 
 Ideas:
 * Per-Trade/Shopkeeper settings, maybe via written books:<br>
