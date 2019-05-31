@@ -4,6 +4,11 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.7.2 (TBA)
+### Supported MC versions: 1.14.2
+
+* Added debug messages for mob spawn blocking and zombie villager curing.
+
 ## v2.7.1 (2019-05-30)
 ### Supported MC versions: 1.14.2
 

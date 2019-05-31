@@ -13,6 +13,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
 // Prevents curing of zombie villagers
@@ -36,6 +37,7 @@ public class BlockZombieVillagerCuringListener implements Listener {
 		}
 		if (itemInHand != null && itemInHand.getType() == Material.GOLDEN_APPLE) {
 			// prevent curing:
+			Log.debug("Preventing zombie villager curing at " + Utils.getLocationString(player.getLocation()));
 			event.setCancelled(true);
 			Utils.sendMessage(player, Settings.msgZombieVillagerCuringDisabled);
 		}
@@ -47,6 +49,7 @@ public class BlockZombieVillagerCuringListener implements Listener {
 		if (!(event.getEntity() instanceof ZombieVillager)) return;
 
 		ZombieVillager zombieVillager = (ZombieVillager) event.getEntity();
+		Log.debug("Preventing zombie villager curing (transform) at " + Utils.getLocationString(zombieVillager.getLocation()));
 		event.setCancelled(true);
 		zombieVillager.setConversionTime(-1); // stop conversion
 
