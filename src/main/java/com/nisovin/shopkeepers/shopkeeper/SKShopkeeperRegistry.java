@@ -49,7 +49,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	private final Collection<AbstractShopkeeper> allShopkeepersView = Collections.unmodifiableCollection(shopkeepersByUUID.values());
 	private final Map<Integer, AbstractShopkeeper> shopkeepersById = new LinkedHashMap<>();
 	// TODO add index by world, to speed up functions that only affect the shopkeepers of a certain world (eg. world
-	// save handling)
+	// save handling), maybe use a guava Table<String, ChunkCoords, List<AbstractShopkeeper>>
+	// temporary shortcut to speed up metrics:
+	private final Map<String, Integer> shopkeeperCountsByWorld = new HashMap<>();
 	private final Map<ChunkCoords, List<AbstractShopkeeper>> shopkeepersByChunk = new HashMap<>();
 	// unmodifiable entries:
 	private final Map<ChunkCoords, List<AbstractShopkeeper>> shopkeeperViewsByChunk = new HashMap<>();
@@ -57,6 +59,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	private final Map<ChunkCoords, List<AbstractShopkeeper>> shopkeepersByChunkView = Collections.unmodifiableMap(shopkeeperViewsByChunk);
 	private final Map<String, AbstractShopkeeper> activeShopkeepers = new HashMap<>(); // TODO remove this (?)
 	private final Collection<AbstractShopkeeper> activeShopkeepersView = Collections.unmodifiableCollection(activeShopkeepers.values());
+	private int playerShopCount = 0;
 
 	public SKShopkeeperRegistry(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
@@ -85,6 +88,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		shopkeeperViewsByChunk.clear();
 		shopkeepersByUUID.clear();
 		shopkeepersById.clear();
+		shopkeeperCountsByWorld.clear();
+		playerShopCount = 0;
 	}
 
 	private void startTeleporterTask() {
@@ -231,6 +236,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		ChunkCoords chunkCoords = shopkeeper.getChunkCoords();
 		this.addShopkeeperToChunk(shopkeeper, chunkCoords);
 
+		// update player shop count:
+		if (shopkeeper instanceof PlayerShopkeeper) {
+			playerShopCount++;
+		}
+
 		// inform shopkeeper:
 		shopkeeper.informAdded(cause);
 
@@ -267,6 +277,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		ChunkCoords chunkCoords = shopkeeper.getChunkCoords();
 		this.removeShopkeeperFromChunk(shopkeeper, chunkCoords);
 
+		// update player shop count:
+		if (shopkeeper instanceof PlayerShopkeeper) {
+			playerShopCount--;
+		}
+
 		// remove shopkeeper from storage:
 		this.getShopkeeperStorage().clearShopkeeperData(shopkeeper);
 	}
@@ -302,14 +317,36 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			shopkeeperViewsByChunk.put(chunkCoords, Collections.unmodifiableList(byChunk));
 		}
 		byChunk.add(shopkeeper);
+
+		// update shopkeeper count by world:
+		String worldName = chunkCoords.getWorldName();
+		Integer shopkeeperWorldCount = shopkeeperCountsByWorld.get(worldName);
+		int newShopkeeperWorldCount = (shopkeeperWorldCount == null ? 0 : shopkeeperWorldCount.intValue()) + 1;
+		if (newShopkeeperWorldCount > 0) {
+			shopkeeperCountsByWorld.put(worldName, newShopkeeperWorldCount);
+		} else {
+			shopkeeperCountsByWorld.remove(worldName);
+		}
 	}
 
 	private void removeShopkeeperFromChunk(AbstractShopkeeper shopkeeper, ChunkCoords chunkCoords) {
 		List<AbstractShopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
 		if (byChunk == null) return;
-		if (byChunk.remove(shopkeeper) && byChunk.isEmpty()) {
-			shopkeepersByChunk.remove(chunkCoords);
-			shopkeeperViewsByChunk.remove(chunkCoords);
+		if (byChunk.remove(shopkeeper)) {
+			if (byChunk.isEmpty()) {
+				shopkeepersByChunk.remove(chunkCoords);
+				shopkeeperViewsByChunk.remove(chunkCoords);
+			}
+
+			// update shopkeeper count by world:
+			String worldName = chunkCoords.getWorldName();
+			Integer shopkeeperWorldCount = shopkeeperCountsByWorld.get(worldName);
+			int newShopkeeperWorldCount = (shopkeeperWorldCount == null ? 0 : shopkeeperWorldCount.intValue()) - 1;
+			if (newShopkeeperWorldCount > 0) {
+				shopkeeperCountsByWorld.put(worldName, newShopkeeperWorldCount);
+			} else {
+				shopkeeperCountsByWorld.remove(worldName);
+			}
 		}
 	}
 
@@ -590,6 +627,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	// QUERYING
+
+	public int getPlayerShopCount() {
+		return playerShopCount;
+	}
+
+	public Map<String, Integer> getShopkeeperCountsByWorld() {
+		return Collections.unmodifiableMap(shopkeeperCountsByWorld);
+	}
 
 	@Override
 	public AbstractShopkeeper getShopkeeperByUniqueId(UUID shopkeeperUUID) {
