@@ -48,6 +48,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	private final Map<UUID, AbstractShopkeeper> shopkeepersByUUID = new LinkedHashMap<>();
 	private final Collection<AbstractShopkeeper> allShopkeepersView = Collections.unmodifiableCollection(shopkeepersByUUID.values());
 	private final Map<Integer, AbstractShopkeeper> shopkeepersById = new LinkedHashMap<>();
+	// TODO add index by world, to speed up functions that only affect the shopkeepers of a certain world (eg. world
+	// save handling)
 	private final Map<ChunkCoords, List<AbstractShopkeeper>> shopkeepersByChunk = new HashMap<>();
 	// unmodifiable entries:
 	private final Map<ChunkCoords, List<AbstractShopkeeper>> shopkeeperViewsByChunk = new HashMap<>();
@@ -533,7 +535,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	public int loadShopkeepersInWorld(World world, boolean worldSaving) {
 		assert world != null;
 		int affectedShops = 0;
-		for (Chunk chunk : world.getLoadedChunks()) {
+		String worldName = world.getName();
+		for (ChunkCoords chunkCoords : this.getAllShopkeepersByChunks().keySet()) {
+			if (!chunkCoords.getWorldName().equals(worldName)) continue; // different world
+			Chunk chunk = chunkCoords.getChunk();
+			if (chunk == null) continue; // not loaded
 			affectedShops += this.loadShopkeepersInChunk(chunk, worldSaving);
 		}
 		Log.debug("Loaded " + affectedShops + " shopkeepers in world " + world.getName()
@@ -571,7 +577,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	public int unloadShopkeepersInWorld(World world, boolean worldSaving) {
 		assert world != null;
 		int affectedShops = 0;
-		for (Chunk chunk : world.getLoadedChunks()) {
+		String worldName = world.getName();
+		for (ChunkCoords chunkCoords : this.getAllShopkeepersByChunks().keySet()) {
+			if (!chunkCoords.getWorldName().equals(worldName)) continue; // different world
+			Chunk chunk = chunkCoords.getChunk();
+			if (chunk == null) continue; // not loaded
 			affectedShops += this.unloadShopkeepersInChunk(chunk, worldSaving);
 		}
 		Log.debug("Unloaded " + affectedShops + " shopkeepers in world " + world.getName()
@@ -698,17 +708,12 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	public List<AbstractShopkeeper> getShopkeepersInWorld(World world, boolean onlyLoadedChunks) {
 		Validate.notNull(world, "World is null!");
 		List<AbstractShopkeeper> shopkeepersInWorld = new ArrayList<>();
-		if (onlyLoadedChunks) {
-			for (Chunk chunk : world.getLoadedChunks()) {
-				shopkeepersInWorld.addAll(this.getShopkeepersInChunk(chunk));
-			}
-		} else {
-			String worldName = world.getName();
-			for (Entry<ChunkCoords, List<AbstractShopkeeper>> byChunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
-				if (byChunkEntry.getKey().getWorldName().equals(worldName)) {
-					shopkeepersInWorld.addAll(byChunkEntry.getValue());
-				}
-			}
+		String worldName = world.getName();
+		for (Entry<ChunkCoords, List<AbstractShopkeeper>> byChunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
+			ChunkCoords chunkCoords = byChunkEntry.getKey();
+			if (!chunkCoords.getWorldName().equals(worldName)) continue; // different world
+			if (onlyLoadedChunks && !chunkCoords.isChunkLoaded()) continue; // not loaded
+			shopkeepersInWorld.addAll(byChunkEntry.getValue());
 		}
 		return Collections.unmodifiableList(shopkeepersInWorld);
 	}

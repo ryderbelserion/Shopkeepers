@@ -75,12 +75,30 @@ public final class ChunkCoords {
 		return chunkZ;
 	}
 
+	/**
+	 * Checks if the chunk is loaded.
+	 * 
+	 * @return <code>true</code> if loaded
+	 */
 	public boolean isChunkLoaded() {
 		World world = Bukkit.getServer().getWorld(worldName);
 		if (world != null) {
 			return world.isChunkLoaded(chunkX, chunkZ);
 		}
 		return false;
+	}
+
+	/**
+	 * Gets the Chunk if it is loaded.
+	 * 
+	 * @return the loaded chunk, or <code>null</code>
+	 */
+	public Chunk getChunk() {
+		World world = Bukkit.getServer().getWorld(worldName);
+		if (world != null && world.isChunkLoaded(chunkX, chunkZ)) {
+			return world.getChunkAt(chunkX, chunkZ);
+		}
+		return null;
 	}
 
 	public boolean isSameChunk(Chunk chunk) {
