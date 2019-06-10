@@ -8,6 +8,8 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.14.2
 
 * Added debug messages for mob spawn blocking and zombie villager curing.
+* Improved performance of world save handling.
+* Slightly improved metrics performance.
 
 ## v2.7.1 (2019-05-30)
 ### Supported MC versions: 1.14.2
