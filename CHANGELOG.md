@@ -10,6 +10,7 @@ Date format: (YYYY-MM-DD)
 * Added debug messages for mob spawn blocking and zombie villager curing.
 * Improved performance of world save handling.
 * Slightly improved metrics performance.
+* Internal: Updated bstats to version 1.5.
 
 ## v2.7.1 (2019-05-30)
 ### Supported MC versions: 1.14.2
