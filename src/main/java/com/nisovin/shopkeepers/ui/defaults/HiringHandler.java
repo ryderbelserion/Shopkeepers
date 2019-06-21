@@ -33,7 +33,7 @@ public abstract class HiringHandler extends UIHandler {
 	}
 
 	@Override
-	public boolean isWindow(InventoryView view) {
+	protected boolean isWindow(InventoryView view) {
 		return view != null && view.getTitle().equals(Settings.forHireTitle);
 	}
 

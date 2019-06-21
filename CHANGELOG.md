@@ -11,6 +11,8 @@ Date format: (YYYY-MM-DD)
 * Improved performance of world save handling.
 * Slightly improved metrics performance.
 * Internal: Updated bstats to version 1.5.
+* Internal: Retrieving the merchant from the player's open inventory instead of manually keeping track of it.
+* Internal: Changed the visibility of UIHandler#isWindow to protected and added UIHandler#isOpen.
 
 ## v2.7.1 (2019-05-30)
 ### Supported MC versions: 1.14.2

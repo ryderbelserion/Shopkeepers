@@ -725,7 +725,7 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	@Override
-	public boolean isWindow(InventoryView view) {
+	protected boolean isWindow(InventoryView view) {
 		return view != null && view.getTitle().equals(Settings.editorTitle);
 	}
 

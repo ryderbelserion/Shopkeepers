@@ -4,12 +4,14 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftAbstractVillager;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftMerchant;
+import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
@@ -129,26 +131,38 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public void updateTrades(Player player, Merchant merchant) {
-		Inventory inventory = player.getOpenInventory().getTopInventory();
-		if (!(inventory instanceof MerchantInventory)) {
+	public void updateTrades(Player player) {
+		Inventory openInventory = player.getOpenInventory().getTopInventory();
+		if (!(openInventory instanceof MerchantInventory)) {
 			return;
 		}
+		MerchantInventory merchantInventory = (MerchantInventory) openInventory;
 
 		// update merchant inventory on the server (updates the result item, etc.):
-		inventory.setItem(0, inventory.getItem(0));
+		merchantInventory.setItem(0, merchantInventory.getItem(0));
 
+		Merchant merchant = merchantInventory.getMerchant();
 		IMerchant nmsMerchant;
+		boolean regularVillager = false;
+		int merchantLevel = 0;
+		int merchantExperience = 0;
 		if (merchant instanceof Villager) {
 			nmsMerchant = ((CraftVillager) merchant).getHandle();
+			Villager villager = (Villager) merchant;
+			regularVillager = true;
+			merchantLevel = villager.getVillagerLevel();
+			merchantExperience = villager.getVillagerExperience();
+		} else if (merchant instanceof AbstractVillager) {
+			nmsMerchant = ((CraftAbstractVillager) merchant).getHandle();
 		} else {
 			nmsMerchant = ((CraftMerchant) merchant).getMerchant();
 		}
 		MerchantRecipeList merchantRecipeList = nmsMerchant.getOffers();
 		if (merchantRecipeList == null) merchantRecipeList = new MerchantRecipeList(); // just in case
+		regularVillager = true; // TODO bukkit currently sends custom merchants with this flag
 
 		// send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1: Novice, .., 5:
 		// Master), merchant total experience, is regular villager flag (false: hides some gui elements)
-		((CraftPlayer) player).getHandle().openTrade(((CraftPlayer) player).getHandle().activeContainer.windowId, merchantRecipeList, 0, 0, true);
+		((CraftPlayer) player).getHandle().openTrade(((CraftPlayer) player).getHandle().activeContainer.windowId, merchantRecipeList, merchantLevel, merchantExperience, regularVillager);
 	}
 }

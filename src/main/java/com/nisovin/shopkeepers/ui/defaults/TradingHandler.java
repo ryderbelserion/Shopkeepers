@@ -3,10 +3,7 @@ package com.nisovin.shopkeepers.ui.defaults;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
@@ -117,17 +114,11 @@ public class TradingHandler extends UIHandler {
 	protected static final int BUY_ITEM_2_SLOT_ID = 1;
 	protected static final int RESULT_ITEM_SLOT_ID = 2;
 
-	private final Map<UUID, Merchant> merchants = new HashMap<>();
-
 	// counts the trades triggered by the last click-event:
 	protected int tradeCounter = 0;
 
 	public TradingHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
 		super(uiType, shopkeeper);
-	}
-
-	protected Merchant getMerchant(Player player) {
-		return merchants.get(player.getUniqueId());
 	}
 
 	@Override
@@ -153,7 +144,6 @@ public class TradingHandler extends UIHandler {
 	protected boolean openTradeWindow(String title, List<TradingRecipe> recipes, Player player) {
 		// setup merchant:
 		Merchant merchant = this.setupMerchant(title, recipes);
-		merchants.put(player.getUniqueId(), merchant);
 
 		// increase 'talked-to-villager' statistic:
 		player.incrementStatistic(Statistic.TALKED_TO_VILLAGER);
@@ -209,8 +199,13 @@ public class TradingHandler extends UIHandler {
 	}
 
 	protected void updateTrades(Player player) {
-		Merchant merchant = this.getMerchant(player);
-		if (merchant == null) return;
+		// check if the currently open inventory still corresponds to this UI:
+		if (!this.isOpen(player)) return;
+
+		InventoryView openInventory = player.getOpenInventory();
+		assert openInventory.getType() == InventoryType.MERCHANT;
+		MerchantInventory merchantInventory = (MerchantInventory) openInventory.getTopInventory();
+		Merchant merchant = merchantInventory.getMerchant();
 		List<MerchantRecipe> oldMerchantRecipes = merchant.getRecipes();
 
 		Shopkeeper shopkeeper = this.getShopkeeper();
@@ -233,17 +228,16 @@ public class TradingHandler extends UIHandler {
 		merchant.setRecipes(newMerchantRecipes);
 
 		// update recipes for the client:
-		NMSManager.getProvider().updateTrades(player, merchant);
+		NMSManager.getProvider().updateTrades(player);
 	}
 
 	@Override
-	public boolean isWindow(InventoryView view) {
+	protected boolean isWindow(InventoryView view) {
 		return view != null && view.getType() == InventoryType.MERCHANT;
 	}
 
 	@Override
 	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
-		merchants.remove(player.getUniqueId());
 	}
 
 	@Override

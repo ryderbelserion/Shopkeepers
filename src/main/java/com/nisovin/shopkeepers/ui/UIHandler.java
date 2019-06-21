@@ -8,6 +8,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 
@@ -81,15 +82,30 @@ public abstract class UIHandler {
 
 	/**
 	 * Checks whether or not the given inventory view is a custom inventory created by this handler (for example by
-	 * comparing the titles). The result of this method gets checked before any inventory events are passed through to
-	 * this handler.
+	 * comparing the titles).
+	 * <p>
+	 * The UI registry already keeps track of players' currently open UI. This is an additional check that aims to
+	 * verify that the inventory the player is interacting with actually corresponds to the expected UI. The result of
+	 * this method gets checked before any inventory events are passed through to this handler.
 	 * 
 	 * @param view
 	 *            an inventory view
 	 * @return <code>true</code> if the given inventory view is representing a custom interface window created and
 	 *         handled by this handler
 	 */
-	public abstract boolean isWindow(InventoryView view);
+	protected abstract boolean isWindow(InventoryView view);
+
+	/**
+	 * Checks if the player has this UI open currently.
+	 * 
+	 * @param player
+	 *            the player
+	 * @return <code>true</code> if this UI is open currently
+	 */
+	protected final boolean isOpen(Player player) {
+		SKUISession session = SKShopkeepersPlugin.getInstance().getUIRegistry().getSession(player);
+		return (session != null && session.getUIHandler() == this && this.isWindow(player.getOpenInventory()));
+	}
 
 	/**
 	 * Gets called when this UI gets closed for a player.

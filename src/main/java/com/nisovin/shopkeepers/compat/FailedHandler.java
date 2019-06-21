@@ -11,7 +11,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Merchant;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -145,6 +144,6 @@ public final class FailedHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public void updateTrades(Player player, Merchant merchant) {
+	public void updateTrades(Player player) {
 	}
 }

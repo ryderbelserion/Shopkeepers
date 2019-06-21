@@ -4,7 +4,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.Merchant;
 
 public interface NMSCallProvider {
 
@@ -47,5 +46,5 @@ public interface NMSCallProvider {
 	// Note: It is not safe to reduce the number of trading recipes! Reducing the size below the selected index can
 	// crash the client. It's left to the caller to ensure that the number of recipes does not get reduced, for example
 	// by inserting dummy entries
-	public void updateTrades(Player player, Merchant merchant);
+	public void updateTrades(Player player);
 }
