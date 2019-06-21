@@ -144,7 +144,8 @@ public final class NMSHandler implements NMSCallProvider {
 		Merchant merchant = merchantInventory.getMerchant();
 		IMerchant nmsMerchant;
 		boolean regularVillager = false;
-		int merchantLevel = 0;
+		// note: when using the 'is-regular-villager'-flag, using level 0 allows hiding the level name suffix
+		int merchantLevel = 1;
 		int merchantExperience = 0;
 		if (merchant instanceof Villager) {
 			nmsMerchant = ((CraftVillager) merchant).getHandle();
@@ -156,6 +157,7 @@ public final class NMSHandler implements NMSCallProvider {
 			nmsMerchant = ((CraftAbstractVillager) merchant).getHandle();
 		} else {
 			nmsMerchant = ((CraftMerchant) merchant).getMerchant();
+			merchantLevel = 0; // hide name suffix
 		}
 		MerchantRecipeList merchantRecipeList = nmsMerchant.getOffers();
 		if (merchantRecipeList == null) merchantRecipeList = new MerchantRecipeList(); // just in case
