@@ -10,6 +10,7 @@ Date format: (YYYY-MM-DD)
 * Added debug messages for mob spawn blocking and zombie villager curing.
 * Improved performance of world save handling.
 * Slightly improved metrics performance.
+* Changed: Spigot is hiding the unused xp bar from custom merchant inventories now. The dynamic updating of trades (out of stock icon) was adapted accordingly.
 * Internal: Updated bstats to version 1.5.
 * Internal: Retrieving the merchant from the player's open inventory instead of manually keeping track of it.
 * Internal: Changed the visibility of UIHandler#isWindow to protected and added UIHandler#isOpen.

@@ -161,7 +161,6 @@ public final class NMSHandler implements NMSCallProvider {
 		}
 		MerchantRecipeList merchantRecipeList = nmsMerchant.getOffers();
 		if (merchantRecipeList == null) merchantRecipeList = new MerchantRecipeList(); // just in case
-		regularVillager = true; // TODO bukkit currently sends custom merchants with this flag
 
 		// send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1: Novice, .., 5:
 		// Master), merchant total experience, is regular villager flag (false: hides some gui elements)
