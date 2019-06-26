@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.ui;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -124,7 +125,8 @@ public abstract class UIHandler {
 	// handling of interface window interaction
 
 	/**
-	 * Called early for InventoryClickEvent's for inventories for which {@link #isWindow(Inventory)} returned true.
+	 * Called early ({@link EventPriority#LOW} for InventoryClickEvent's for inventories for which
+	 * {@link #isWindow(Inventory)} returned true.
 	 * <p>
 	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
 	 * event.
@@ -139,7 +141,8 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called late for InventoryClickEvent's for inventories for which {@link #isWindow(Inventory)} returned true.
+	 * Called late ({@link EventPriority#HIGH} for InventoryClickEvent's for inventories for which
+	 * {@link #isWindow(Inventory)} returned true.
 	 * 
 	 * @param event
 	 *            the inventory click event
@@ -151,7 +154,8 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called early for InventoryDragEvent's for inventories for which {@link #isWindow(Inventory)} returned true.
+	 * Called early ({@link EventPriority#LOW} for InventoryDragEvent's for inventories for which
+	 * {@link #isWindow(Inventory)} returned true.
 	 * <p>
 	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
 	 * event.
@@ -166,7 +170,8 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called late for InventoryDragEvent's for inventories for which {@link #isWindow(Inventory)} returned true.
+	 * Called late ({@link EventPriority#HIGH} for InventoryDragEvent's for inventories for which
+	 * {@link #isWindow(Inventory)} returned true.
 	 * 
 	 * @param event
 	 *            the inventory drag event

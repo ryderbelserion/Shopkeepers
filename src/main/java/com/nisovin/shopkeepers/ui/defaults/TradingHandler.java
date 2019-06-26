@@ -241,7 +241,7 @@ public class TradingHandler extends UIHandler {
 
 	// TRADE PROCESSING
 
-	// late processing, so that other plugins can cancel the trading earlier without having to rely on Shopkeepers' API
+	// late processing, so that other plugins can cancel the trading without having to rely on Shopkeepers' API
 	@Override
 	protected void onInventoryClickLate(InventoryClickEvent clickEvent, Player player) {
 		assert clickEvent != null && player != null;

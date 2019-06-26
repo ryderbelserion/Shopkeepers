@@ -130,7 +130,9 @@ class UIListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	// priority HIGH instead of HIGHEST, since we might cancel the event and other plugins might want to react to that
+	// (see TradingHandler)
+	@EventHandler(priority = EventPriority.HIGH)
 	void onInventoryClickLate(InventoryClickEvent event) {
 		UIHandler uiHandler = clickHandlerStack.pop(); // not expected to be empty
 		if (uiHandler == DUMMY_UI_HANDLER) return; // ignore
@@ -172,7 +174,9 @@ class UIListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST)
+	// priority HIGH instead of HIGHEST, since we might cancel the event and other plugins might want to react to that
+	// (see TradingHandler)
+	@EventHandler(priority = EventPriority.HIGH)
 	void onInventoryDragLate(InventoryDragEvent event) {
 		UIHandler uiHandler = dragHandlerStack.pop(); // not expected to be empty
 		if (uiHandler == DUMMY_UI_HANDLER) return; // ignore
