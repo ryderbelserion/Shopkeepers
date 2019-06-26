@@ -116,7 +116,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected void onInventoryDrag(InventoryDragEvent event, Player player) {
+	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
 		event.setCancelled(true);
 		ItemStack cursor = event.getOldCursor();
 		// assert: cursor item is already a clone

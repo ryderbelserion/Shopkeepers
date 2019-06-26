@@ -33,20 +33,20 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 	}
 
 	@Override
-	protected void onInventoryDrag(InventoryDragEvent event, Player player) {
+	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
 		// cancel all inventory clicks and handle everything on our own:
 		// TODO maybe allow certain inventory actions which only affect the player's inventory?
 		event.setCancelled(true);
-		super.onInventoryDrag(event, player);
+		super.onInventoryDragEarly(event, player);
 	}
 
 	@Override
-	protected void onInventoryClick(InventoryClickEvent event, Player player) {
+	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
 		// cancel all inventory clicks and handle everything on our own:
 		// TODO maybe allow certain inventory actions which only affect the player's inventory?
 		// (like moving items around)
 		event.setCancelled(true);
-		super.onInventoryClick(event, player);
+		super.onInventoryClickEarly(event, player);
 	}
 
 	@Override

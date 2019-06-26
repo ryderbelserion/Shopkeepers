@@ -43,13 +43,13 @@ public abstract class HiringHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryClick(InventoryClickEvent event, Player player) {
+	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
 		event.setCancelled(true);
 	}
 
 	@Override
-	protected void onInventoryDrag(InventoryDragEvent event, Player player) {
+	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
 		assert event != null && player != null;
 		event.setCancelled(true);
 	}

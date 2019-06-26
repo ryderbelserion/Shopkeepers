@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
-import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -240,15 +239,11 @@ public class TradingHandler extends UIHandler {
 	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
 	}
 
-	@Override
-	protected void onInventoryDrag(InventoryDragEvent event, Player player) {
-		// allowed by default
-	}
-
 	// TRADE PROCESSING
 
+	// late processing, so that other plugins can cancel the trading earlier without having to rely on Shopkeepers' API
 	@Override
-	protected void onInventoryClick(InventoryClickEvent clickEvent, Player player) {
+	protected void onInventoryClickLate(InventoryClickEvent clickEvent, Player player) {
 		assert clickEvent != null && player != null;
 		// note: this expects that there are no other click-events while this event is getting processed
 		// reset trade counter:

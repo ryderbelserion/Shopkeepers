@@ -48,8 +48,8 @@ public class PlayerShopHiringHandler extends HiringHandler {
 	}
 
 	@Override
-	protected void onInventoryClick(InventoryClickEvent event, Player player) {
-		super.onInventoryClick(event, player);
+	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
+		super.onInventoryClickEarly(event, player);
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 		int slot = event.getRawSlot();
 		if (slot == BUTTON_HIRE_1 || slot == BUTTON_HIRE_2) {

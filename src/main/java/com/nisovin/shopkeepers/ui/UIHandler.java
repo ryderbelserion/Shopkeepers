@@ -118,29 +118,62 @@ public abstract class UIHandler {
 	 * @param closeEvent
 	 *            the inventory closing event, can be <code>null</code>
 	 */
-	protected abstract void onInventoryClose(Player player, InventoryCloseEvent closeEvent);
+	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
+	}
 
 	// handling of interface window interaction
 
 	/**
-	 * Called when a player triggers an InventoryClickEvent for an inventory for which {@link #isWindow(Inventory)}
-	 * returned true.
+	 * Called early for InventoryClickEvent's for inventories for which {@link #isWindow(Inventory)} returned true.
+	 * <p>
+	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
+	 * event.
 	 * 
 	 * @param event
-	 *            the event which triggered this method call
+	 *            the inventory click event
 	 * @param player
 	 *            the clicking player
+	 * @see #onInventoryClickLate(InventoryClickEvent, Player)
 	 */
-	protected abstract void onInventoryClick(InventoryClickEvent event, Player player);
+	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
+	}
 
 	/**
-	 * Called when a player triggers an InventoryDragEvent for an inventory for which {@link #isWindow(Inventory)}
-	 * returned true.
+	 * Called late for InventoryClickEvent's for inventories for which {@link #isWindow(Inventory)} returned true.
 	 * 
 	 * @param event
-	 *            the event which triggered this method call
+	 *            the inventory click event
+	 * @param player
+	 *            the clicking player
+	 * @see #onInventoryClickEarly(InventoryClickEvent, Player)
+	 */
+	protected void onInventoryClickLate(InventoryClickEvent event, Player player) {
+	}
+
+	/**
+	 * Called early for InventoryDragEvent's for inventories for which {@link #isWindow(Inventory)} returned true.
+	 * <p>
+	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
+	 * event.
+	 * 
+	 * @param event
+	 *            the inventory drag event
 	 * @param player
 	 *            the dragging player
+	 * @see #onInventoryDragLate(InventoryDragEvent, Player)
 	 */
-	protected abstract void onInventoryDrag(InventoryDragEvent event, Player player);
+	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
+	}
+
+	/**
+	 * Called late for InventoryDragEvent's for inventories for which {@link #isWindow(Inventory)} returned true.
+	 * 
+	 * @param event
+	 *            the inventory drag event
+	 * @param player
+	 *            the dragging player
+	 * @see #onInventoryDragEarly(InventoryDragEvent, Player)
+	 */
+	protected void onInventoryDragLate(InventoryDragEvent event, Player player) {
+	}
 }

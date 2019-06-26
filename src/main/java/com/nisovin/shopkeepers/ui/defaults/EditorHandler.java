@@ -730,7 +730,7 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryDrag(InventoryDragEvent event, Player player) {
+	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
 		// dragging is allowed by default only inside the player inventory and the trades area:
 		if (event.isCancelled()) return; // already cancelled
 		InventoryView view = event.getView();
@@ -744,7 +744,7 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryClick(InventoryClickEvent event, Player player) {
+	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
 		Session session = this.getSession(player);
 		assert session != null;
