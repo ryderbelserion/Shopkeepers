@@ -27,6 +27,7 @@ import net.minecraft.server.v1_14_R1.Entity;
 import net.minecraft.server.v1_14_R1.EntityHuman;
 import net.minecraft.server.v1_14_R1.EntityInsentient;
 import net.minecraft.server.v1_14_R1.EntityLiving;
+import net.minecraft.server.v1_14_R1.EntityPlayer;
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.IMerchant;
 import net.minecraft.server.v1_14_R1.MerchantRecipeList;
@@ -144,6 +145,7 @@ public final class NMSHandler implements NMSCallProvider {
 		Merchant merchant = merchantInventory.getMerchant();
 		IMerchant nmsMerchant;
 		boolean regularVillager = false;
+		boolean canRestock = false;
 		// note: when using the 'is-regular-villager'-flag, using level 0 allows hiding the level name suffix
 		int merchantLevel = 1;
 		int merchantExperience = 0;
@@ -151,6 +153,7 @@ public final class NMSHandler implements NMSCallProvider {
 			nmsMerchant = ((CraftVillager) merchant).getHandle();
 			Villager villager = (Villager) merchant;
 			regularVillager = true;
+			canRestock = true;
 			merchantLevel = villager.getVillagerLevel();
 			merchantExperience = villager.getVillagerExperience();
 		} else if (merchant instanceof AbstractVillager) {
@@ -163,7 +166,9 @@ public final class NMSHandler implements NMSCallProvider {
 		if (merchantRecipeList == null) merchantRecipeList = new MerchantRecipeList(); // just in case
 
 		// send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1: Novice, .., 5:
-		// Master), merchant total experience, is regular villager flag (false: hides some gui elements)
-		((CraftPlayer) player).getHandle().openTrade(((CraftPlayer) player).getHandle().activeContainer.windowId, merchantRecipeList, merchantLevel, merchantExperience, regularVillager);
+		// Master), merchant total experience, is-regular-villager flag (false: hides some gui elements), can-restock
+		// flag (false: hides restock message if out of stock)
+		EntityPlayer nmsPlayer =  ((CraftPlayer) player).getHandle();
+		nmsPlayer.openTrade(nmsPlayer.activeContainer.windowId, merchantRecipeList, merchantLevel, merchantExperience, regularVillager, canRestock);
 	}
 }
