@@ -16,6 +16,8 @@ Date format: (YYYY-MM-DD)
 * Internal: Updated bstats to version 1.5.
 * Internal: Retrieving the merchant from the player's open inventory instead of manually keeping track of it.
 * Internal: Changed the visibility of UIHandler#isWindow to protected and added UIHandler#isOpen.
+* Internal / Plugin compatibility: Handling most custom inventory interactions early (event priority LOW), so that other plugins can ignore cancelled events.
+* Internal / Plugin compatibility: Reduced the event priority for the handling of trades from HIGHEST to HIGH. This allows other plugins to still cancel the trading at NORMAL and below priorities, while giving other plugins which run late (like StackableItems) a chance to ignore the event if we are cancelling it.
 
 ## v2.7.1 (2019-05-30)
 ### Supported MC versions: 1.14.2
