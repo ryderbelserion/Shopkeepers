@@ -6,7 +6,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -126,7 +125,7 @@ public abstract class UIHandler {
 
 	/**
 	 * Called early ({@link EventPriority#LOW} for InventoryClickEvent's for inventories for which
-	 * {@link #isWindow(Inventory)} returned true.
+	 * {@link #isWindow(InventoryView)} returned true.
 	 * <p>
 	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
 	 * event.
@@ -142,7 +141,7 @@ public abstract class UIHandler {
 
 	/**
 	 * Called late ({@link EventPriority#HIGH} for InventoryClickEvent's for inventories for which
-	 * {@link #isWindow(Inventory)} returned true.
+	 * {@link #isWindow(InventoryView)} returned true.
 	 * 
 	 * @param event
 	 *            the inventory click event
@@ -155,7 +154,7 @@ public abstract class UIHandler {
 
 	/**
 	 * Called early ({@link EventPriority#LOW} for InventoryDragEvent's for inventories for which
-	 * {@link #isWindow(Inventory)} returned true.
+	 * {@link #isWindow(InventoryView)} returned true.
 	 * <p>
 	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
 	 * event.
@@ -171,7 +170,7 @@ public abstract class UIHandler {
 
 	/**
 	 * Called late ({@link EventPriority#HIGH} for InventoryDragEvent's for inventories for which
-	 * {@link #isWindow(Inventory)} returned true.
+	 * {@link #isWindow(InventoryView)} returned true.
 	 * 
 	 * @param event
 	 *            the inventory drag event
