@@ -22,6 +22,9 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 		super("used_features", () -> {
 			Map<String, Map<String, Integer>> allFeatures = new LinkedHashMap<>();
 			// plugin compatibility features:
+			addFeatureEntry(allFeatures, "bypass-shop-interaction-blocking", Settings.bypassShopInteractionBlocking);
+			addFeatureEntry(allFeatures, "bypass-spawn-blocking", Settings.bypassSpawnBlocking);
+			addFeatureEntry(allFeatures, "enable-spawn-verifier", Settings.enableSpawnVerifier);
 			addFeatureEntry(allFeatures, "enable-world-guard-restrictions", Settings.enableWorldGuardRestrictions && WorldGuardHandler.isPluginEnabled());
 			addFeatureEntry(allFeatures, "require-world-guard-allow-shop-flag", Settings.requireWorldGuardAllowShopFlag && WorldGuardHandler.isPluginEnabled());
 			addFeatureEntry(allFeatures, "enable-towny-restrictions", Settings.enableTownyRestrictions && TownyHandler.isPluginEnabled());

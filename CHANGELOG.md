@@ -9,6 +9,7 @@ Date format: (YYYY-MM-DD)
 
 * Changed: The bypass-shop-interaction-blocking setting also applies to sign shops now.
 * Changed: When forcing an entity to spawn, the pitch and yaw of the expected and actual spawn location are ignored now. This avoids a warning message for some entity types (such as shulkers), which always spawn with fixed pitch and yaw.
+* Changed: Metrics will now also report whether the settings 'bypass-shop-interaction-blocking', 'bypass-spawn-blocking' and 'enable-spawn-verifier' are used.
 
 ## v2.7.2 (2019-07-02)
 ### Supported MC versions: 1.14.3
