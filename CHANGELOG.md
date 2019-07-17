@@ -4,10 +4,11 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
-## v2.7.3 (TBA)
-### Supported MC versions: 
+## v2.8.0 (TBA)
+### Supported MC versions: 1.14.3
 
 * Changed: The bypass-shop-interaction-blocking setting also applies to sign shops now.
+* Changed: When forcing an entity to spawn, the pitch and yaw of the expected and actual spawn location are ignored now. This avoids a warning message for some entity types (such as shulkers), which always spawn with fixed pitch and yaw.
 
 ## v2.7.2 (2019-07-02)
 ### Supported MC versions: 1.14.3
@@ -22,7 +23,7 @@ Date format: (YYYY-MM-DD)
 * Internal: Retrieving the merchant from the player's open inventory instead of manually keeping track of it.
 * Internal: Changed the visibility of UIHandler#isWindow to protected and added UIHandler#isOpen.
 * Internal / Plugin compatibility: Handling most custom inventory interactions early (event priority LOW), so that other plugins can ignore cancelled events.
-* Internal / Plugin compatibility: Reduced the event priority for the handling of trades from HIGHEST to HIGH. This allows other plugins to still cancel the trading at NORMAL and below priorities, while giving other plugins which run late (like StackableItems) a chance to ignore the event if we are cancelling it.
+* Internal / Plugin compatibility: Reduced the event priority for the handling of trades from HIGHEST to HIGH. This allows other plugins to still cancel the trading at NORMAL and below priorities, while giving other plugins which run late (like StackableItems) a chance to ignore the event if we are canceling it.
 
 ## v2.7.1 (2019-05-30)
 ### Supported MC versions: 1.14.2

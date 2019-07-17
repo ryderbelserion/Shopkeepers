@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -146,6 +147,33 @@ public final class Utils {
 			total += value;
 		}
 		return ((double) total / values.length);
+	}
+
+	/**
+	 * Checks if the given locations represent the same world and coordinates (ignores pitch and yaw).
+	 * 
+	 * @param location1
+	 *            location 1
+	 * @param location2
+	 *            location 2
+	 * @return <code>true</code> if the locations correspond to the same position
+	 */
+	public static boolean isEqualPosition(Location location1, Location location2) {
+		if (location1 == location2) return true; // also handles both being null
+		if (location1 == null || location2 == null) return false;
+		if (!Objects.equals(location1.getWorld(), location2.getWorld())) {
+			return false;
+		}
+		if (Double.doubleToLongBits(location1.getX()) != Double.doubleToLongBits(location2.getX())) {
+			return false;
+		}
+		if (Double.doubleToLongBits(location1.getY()) != Double.doubleToLongBits(location2.getY())) {
+			return false;
+		}
+		if (Double.doubleToLongBits(location1.getZ()) != Double.doubleToLongBits(location2.getZ())) {
+			return false;
+		}
+		return true;
 	}
 
 	/**

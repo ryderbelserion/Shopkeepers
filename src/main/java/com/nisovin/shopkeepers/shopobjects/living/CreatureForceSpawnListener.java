@@ -8,6 +8,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class CreatureForceSpawnListener implements Listener {
 
@@ -18,7 +19,7 @@ public class CreatureForceSpawnListener implements Listener {
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	void onCreatureSpawn(CreatureSpawnEvent event) {
 		if (nextSpawnLocation == null) return;
-		if (event.getEntityType() == nextEntityType && event.getLocation().equals(nextSpawnLocation)) {
+		if (event.getEntityType() == nextEntityType && Utils.isEqualPosition(nextSpawnLocation, event.getLocation())) {
 			event.setCancelled(false);
 		} else {
 			// this shouldn't normally be reached..
