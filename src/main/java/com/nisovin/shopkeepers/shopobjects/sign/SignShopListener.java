@@ -18,6 +18,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -52,8 +53,8 @@ class SignShopListener implements Listener {
 			if (shopkeeper != null) {
 				// only trigger shopkeeper interaction for main-hand events:
 				if (event.getHand() == EquipmentSlot.HAND) {
-					Log.debug("Player " + player.getName() + " is interacting with sign shopkeeper at " + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ());
-					if (event.useInteractedBlock() == Result.DENY) {
+					Log.debug("Player " + player.getName() + " is interacting with sign shopkeeper at " + Utils.getLocationString(block));
+					if (event.useInteractedBlock() == Result.DENY && !Settings.bypassShopInteractionBlocking) {
 						Log.debug("  Cancelled by another plugin");
 					} else {
 						shopkeeper.onPlayerInteraction(player);

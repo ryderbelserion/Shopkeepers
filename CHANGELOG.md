@@ -7,6 +7,7 @@ Date format: (YYYY-MM-DD)
 ## v2.7.3 (TBA)
 ### Supported MC versions: 
 
+* Changed: The bypass-shop-interaction-blocking setting also applies to sign shops now.
 
 ## v2.7.2 (2019-07-02)
 ### Supported MC versions: 1.14.3
