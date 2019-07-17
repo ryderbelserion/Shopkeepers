@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.api.ui.UIType;
  * This event is called whenever a {@link Shopkeeper} is about to open a user interface of a certain {@link UIType} for
  * a player.
  * <p>
- * If the event is cancelled, the UI will not open. However, event if the event does not get cancelled, the UI might not
+ * If the event is cancelled, the UI will not open. However, even if the event does not get cancelled, the UI might not
  * get opened if there are other reasons preventing that.
  * <p>
  * Do not attempt to open any UIs for the player or shopkeeper during the handling of this event!
