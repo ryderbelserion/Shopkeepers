@@ -5,11 +5,29 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: xxx
 
 ## v2.8.0 (TBA)
-### Supported MC versions: 1.14.3
+### Supported MC versions: 1.14.3, 1.14.4
 
-* Changed: The bypass-shop-interaction-blocking setting also applies to sign shops now.
+* Changed: All priorities and ignoring of cancelled events were reconsidered.
+  * Event handlers potentially modifying or canceling the event and which don't depend on other plugins' event handling are called early (LOW or LOWEST), so that other plugins can react to / ignore those modified or canceled events.
+    * All event handlers which simply cancel some event use the LOW priority now and more consistently ignore the event if already cancelled. Previously they mostly used NORMAL priority.
+    * Zombie villager curing is prevented (this includes sending the player a message) on LOW priority now. If some plugin wants to bypass Shopkeepers (for example to allow the curing of specific zombie villagers) it can still cancel the event on lowest priority, so that Shopkeepers ignores it, and then uncancel it afterwards.
+    * Interaction with the shop creation item (chest selection, shop creation) is handled at LOWEST priority now, so that hopefully even protection plugins can ignore the cancelled event and don't handle it twice when we check chest access by calling another fake interact event. In order to resolve potential conflicts with other event handlers acting on LOWEST priority (such as Shopkeepers' sign interaction listener), we ignore the event if interaction with the item got already cancelled.
+    * Interaction with shopkeepers (entities and signs) are handled at LOWEST priority now, so that other plugins more reliably ignore the cancelled event. This makes bypassing of other plugin's interaction blocking the new default behavior. Taking the interaction result of other plugins into account can be enabled by the new setting 'check-shop-interaction-result', which involves calling a fake interact event (similarly to how chest access is checked). Since this is usually not wanted and might in general cause side effects (depending on the other plugins active on the server) this is disabled by default. In order to resolve conflicts with other event handlers acting on LOWEST priority (such as Shopkeepers' shop creation item interaction handling), the interaction is ignored if the event got already cancelled.
+    * Most UI clicking is handled at LOW priority (like before).
+  * Event handlers purely reacting to an event (without modifying or canceling it) are called at the MONITOR stage.
+    * The shop creation item usage gets sent on MONITOR priority now when switching the held item.
+    * Handling of shopkeepers spawning and despawning on chunk/world loading/unloading and world saving happens on MONITOR priority to reliably ignore cancelled events. Loading of shopkeepers might even happen delayed, to ignore chunks which only get loaded temporarily (like before).
+    * Handling of UI closing happens on MONITOR priority now.
+  * Event handlers potentially modifying or canceling the event and which depend on other plugins' event handling are called late (HIGH or HIGHEST).
+    * Clicks in the trading UI are handled at HIGH priority (like before), so that other plugins have a chance to cancel the trading by canceling the corresponding click event, while still allowing other plugins to react to / ignore the event after we have cancelled it.
+    * Interactions with regular villagers (blocking, hiring) are handled at HIGH priority (like before), so that hiring can be skipped if some other plugin has cancelled the interaction.
+* Changed: Replaced the 'bypass-shop-interaction-blocking' setting (default: false) with the new setting 'check-shop-interaction-result' (default: false).
+* Changed: The new 'check-shop-interaction-result' setting also applies to sign shops now.
 * Changed: When forcing an entity to spawn, the pitch and yaw of the expected and actual spawn location are ignored now. This avoids a warning message for some entity types (such as shulkers), which always spawn with fixed pitch and yaw.
-* Changed: Metrics will now also report whether the settings 'bypass-shop-interaction-blocking', 'bypass-spawn-blocking' and 'enable-spawn-verifier' are used.
+* Internal: Made all priorities and ignoring of cancelled events explicit.
+* Internal: Moved code for checking chest access into util package.
+* Internal: Metrics will also report now whether the settings 'check-shop-interaction-result', 'bypass-spawn-blocking' and 'enable-spawn-verifier' are used.
+* Internal: Minor changes to some debug messages.
 
 ## v2.7.2 (2019-07-02)
 ### Supported MC versions: 1.14.3

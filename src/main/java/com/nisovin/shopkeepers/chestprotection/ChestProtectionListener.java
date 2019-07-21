@@ -36,7 +36,7 @@ class ChestProtectionListener implements Listener {
 	/**
 	 * Prevents unauthorized opening of protected chests.
 	 */
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		// prevent opening shop chests
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
@@ -50,7 +50,7 @@ class ChestProtectionListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
 		Player player = event.getPlayer();
@@ -61,7 +61,7 @@ class ChestProtectionListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 		Material type = block.getType();
@@ -105,12 +105,12 @@ class ChestProtectionListener implements Listener {
 		return directionalBlock.getRelative(facing);
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityExplosion(EntityExplodeEvent event) {
 		this.removeProtectedChests(event.blockList());
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockExplosion(BlockExplodeEvent event) {
 		this.removeProtectedChests(event.blockList());
 	}

@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.shopcreation;
+package com.nisovin.shopkeepers.util;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -8,8 +8,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * A test event that is called to check if a player can access the given block (ex. when the player tries to create a
- * shop using a given chest).
+ * A test event that is called to check if a player can interact with the given block.
  */
 public class TestPlayerInteractEvent extends PlayerInteractEvent {
 

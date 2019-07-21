@@ -19,6 +19,11 @@ import com.nisovin.shopkeepers.util.Log;
 
 class WorldListener implements Listener {
 
+	// TODO: Unload shopkeepers on HIGHEST priority instead, so that monitoring plugins can determine the actually
+	// unloaded (saved) entities / blocks? However, it is important to not unload them if the event gets cancelled.
+	// Possible workaround: Unload on HIGHEST priority and then check and respawn on MONITOR priority in case the event
+	// got cancelled? For now, keep it at MONITOR until an actual usecase comes up.
+
 	private final SKShopkeepersPlugin plugin;
 	private final SKShopkeeperRegistry shopkeeperRegistry;
 
@@ -27,9 +32,13 @@ class WorldListener implements Listener {
 		this.shopkeeperRegistry = shopkeeperRegistry;
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onChunkLoad(ChunkLoadEvent event) {
 		Chunk chunk = event.getChunk();
+		// not loading shopkeepers for temporarily loaded chunks:
+		// TODO Further improve, by stopping this task in case the chunk gets unloaded (and then reloaded) in the
+		// meantime. So to only load the shopkeepers if the chunk has been loaded for x ticks in a row without unloads
+		// in between.
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			if (chunk.isLoaded()) {
 				shopkeeperRegistry.loadShopkeepersInChunk(chunk);
@@ -43,7 +52,7 @@ class WorldListener implements Listener {
 		shopkeeperRegistry.unloadShopkeepersInChunk(chunk);
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onWorldSave(WorldSaveEvent event) {
 		World world = event.getWorld();
 		UUID worldUID = world.getUID();
@@ -59,12 +68,12 @@ class WorldListener implements Listener {
 		});
 	}
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onWorldLoad(WorldLoadEvent event) {
 		shopkeeperRegistry.loadShopkeepersInWorld(event.getWorld());
 	}
 
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onWorldUnload(WorldUnloadEvent event) {
 		shopkeeperRegistry.unloadShopkeepersInWorld(event.getWorld());
 	}

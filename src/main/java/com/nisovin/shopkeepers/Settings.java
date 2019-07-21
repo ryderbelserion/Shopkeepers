@@ -41,7 +41,7 @@ public class Settings {
 	 */
 	public static boolean enableSpawnVerifier = false;
 	public static boolean bypassSpawnBlocking = true;
-	public static boolean bypassShopInteractionBlocking = false;
+	public static boolean checkShopInteractionResult = false;
 
 	public static boolean enableWorldGuardRestrictions = false;
 	public static boolean requireWorldGuardAllowShopFlag = false;

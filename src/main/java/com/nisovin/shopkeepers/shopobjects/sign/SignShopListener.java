@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
 import com.nisovin.shopkeepers.util.Utils;
 
 class SignShopListener implements Listener {
@@ -42,29 +43,49 @@ class SignShopListener implements Listener {
 		cancelNextBlockPhysics = block;
 	}
 
-	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
+	// See LivingEntityShopListener for a reasoning behind using event priority LOWEST.
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
-		Player player = event.getPlayer();
+		// ignore our own fake interact event:
+		if (event instanceof TestPlayerInteractEvent) return;
+
+		// check for sign shop interaction:
+		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+
 		Block block = event.getClickedBlock();
+		if (!ItemUtils.isSign(block.getType())) return;
 
-		// check for sign shop
-		if (event.getAction() == Action.RIGHT_CLICK_BLOCK && ItemUtils.isSign(block.getType())) {
-			AbstractShopkeeper shopkeeper = signShops.getSignShop(block);
-			if (shopkeeper != null) {
-				// only trigger shopkeeper interaction for main-hand events:
-				if (event.getHand() == EquipmentSlot.HAND) {
-					Log.debug("Player " + player.getName() + " is interacting with sign shopkeeper at " + Utils.getLocationString(block));
-					if (event.useInteractedBlock() == Result.DENY && !Settings.bypassShopInteractionBlocking) {
-						Log.debug("  Cancelled by another plugin");
-					} else {
-						shopkeeper.onPlayerInteraction(player);
-					}
-				}
+		AbstractShopkeeper shopkeeper = signShops.getSignShop(block);
+		if (shopkeeper == null) return;
+		Player player = event.getPlayer();
 
-				// always cancel interactions with shopkeepers, to prevent any default behavior:
-				event.setCancelled(true);
+		// only trigger shopkeeper interaction for main-hand events:
+		if (event.getHand() == EquipmentSlot.HAND) {
+			Log.debug("Player " + player.getName() + " is interacting with sign shopkeeper at " + Utils.getLocationString(block));
+
+			// Ignore if already cancelled. Resolves conflicts with other event handlers running at LOWEST priority (eg.
+			// Shopkeepers' shop creation item listener acts on LOWEST priority as well).
+			if (event.useInteractedBlock() == Result.DENY) {
+				Log.debug("  Ignoring already cancelled block interaction");
+				return;
 			}
+
+			if (Settings.checkShopInteractionResult) {
+				// Check the sign interaction result by calling another interact event:
+				if (!Utils.checkBlockInteract(player, block)) {
+					Log.debug("  Cancelled by another plugin");
+					return;
+				}
+			}
+
+			// handle interaction:
+			shopkeeper.onPlayerInteraction(player);
 		}
+
+		// always cancel interactions with shopkeepers, to prevent any default behavior:
+		event.setCancelled(true);
+		// update inventory in case the interaction would trigger an item action normally:
+		player.updateInventory();
 	}
 
 	// protect sign block:
@@ -92,7 +113,7 @@ class SignShopListener implements Listener {
 		return false;
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockBreak(BlockBreakEvent event) {
 		Block block = event.getBlock();
 		if (this.isProtectedBlock(block)) {
@@ -100,7 +121,7 @@ class SignShopListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
 		if (signShops.isSignShop(block)) {
@@ -108,7 +129,7 @@ class SignShopListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockPhysics(BlockPhysicsEvent event) {
 		Block block = event.getBlock();
 		if (this.checkCancelPhysics(block)) {
@@ -135,7 +156,7 @@ class SignShopListener implements Listener {
 		return false;
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityExplosion(EntityExplodeEvent event) {
 		Iterator<Block> iterator = event.blockList().iterator();
 		while (iterator.hasNext()) {
@@ -146,7 +167,7 @@ class SignShopListener implements Listener {
 		}
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockExplosion(BlockExplodeEvent event) {
 		Iterator<Block> iterator = event.blockList().iterator();
 		while (iterator.hasNext()) {

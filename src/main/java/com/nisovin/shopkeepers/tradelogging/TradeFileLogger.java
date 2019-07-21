@@ -39,9 +39,9 @@ public class TradeFileLogger implements Listener {
 		this.dataFolder = dataFolder;
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onTradeCompleted(ShopkeeperTradeEvent event) {
-		if (!Settings.enablePurchaseLogging || event.isCancelled()) {
+		if (!Settings.enablePurchaseLogging) {
 			return;
 		}
 		Player player = event.getPlayer();

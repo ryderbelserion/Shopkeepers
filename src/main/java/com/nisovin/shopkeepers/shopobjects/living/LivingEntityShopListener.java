@@ -45,6 +45,7 @@ import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.TestPlayerInteractEntityEvent;
 import com.nisovin.shopkeepers.util.Utils;
 
 class LivingEntityShopListener implements Listener {
@@ -58,13 +59,28 @@ class LivingEntityShopListener implements Listener {
 		this.shopkeeperRegistry = shopkeeperRegistry;
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = false)
+	// We want to bypass other plugins by default. To allow other plugins (eg. protection plugins) to ignore the event
+	// if we have cancelled it, we handle the event as early as possible (LOWEST priority).
+	// In order to resolve conflicts with other event handlers potentially running at LOWEST priority, we ignore the
+	// event if it already got cancelled.
+	// In some usecases it may make sense to take into account if some other plugin wants to cancel the interaction. For
+	// those situations the setting check-shop-interaction-result can be used to call an additional interact event
+	// that other plugins can react to and which determines whether we handle the interaction. Since this might cause
+	// side-effects in general due to other plugins handling the event, this is disabled by default.
+	// Using a higher event priority with a setting to ignore whether the event got already cancelled by other
+	// plugins is not an option, because then other plugins will already have handled the event and we have no chance to
+	// avoid their side-effects (eg. protection plugins will already have sent the player a message, that interaction
+	// with the entity is denied).
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onEntityInteract(PlayerInteractEntityEvent event) {
+		// ignore our own fake interact event:
+		if (event instanceof TestPlayerInteractEntityEvent) return;
+
 		if (!(event.getRightClicked() instanceof LivingEntity)) return;
 		LivingEntity shopEntity = (LivingEntity) event.getRightClicked();
 		Player player = event.getPlayer();
 		String playerName = player.getName();
-		Log.debug("Player " + playerName + " is interacting with entity at " + shopEntity.getLocation());
+		Log.debug("Player " + playerName + " is interacting (" + (event.getHand()) + ") with entity at " + shopEntity.getLocation());
 
 		// also checks for citizens npc shopkeepers:
 		AbstractShopkeeper shopkeeper = shopkeeperRegistry.getShopkeeperByEntity(shopEntity);
@@ -73,13 +89,23 @@ class LivingEntityShopListener implements Listener {
 			return;
 		}
 
-		if (event.isCancelled() && !Settings.bypassShopInteractionBlocking) {
-			Log.debug("  Cancelled by another plugin");
+		// Ignore if already cancelled. Resolves conflicts with other event handlers running at LOWEST priority as well.
+		if (event.isCancelled()) {
+			Log.debug("  Ignoring already cancelled event");
 			return;
 		}
 
 		// only trigger shopkeeper interaction for main-hand events:
 		if (event.getHand() == EquipmentSlot.HAND) {
+			if (Settings.checkShopInteractionResult) {
+				// Check the entity interaction result by calling another interact event:
+				if (!Utils.checkEntityInteract(player, shopEntity)) {
+					Log.debug("  Cancelled by another plugin");
+					return;
+				}
+			}
+
+			// handle interaction:
 			shopkeeper.onPlayerInteraction(player);
 		}
 
@@ -87,8 +113,7 @@ class LivingEntityShopListener implements Listener {
 		if (shopkeeper.getShopObject().getType() != DefaultShopObjectTypes.CITIZEN()) {
 			// always cancel interactions with shopkeepers, to prevent any default behavior:
 			event.setCancelled(true);
-
-			// update inventory in case interaction would trigger feeding normally:
+			// update inventory in case the interaction would trigger an item action normally (such as animal feeding):
 			player.updateInventory();
 		}
 	}
@@ -96,14 +121,14 @@ class LivingEntityShopListener implements Listener {
 	// TODO many of those behaviors might no longer be active, once all entities use noAI (once legacy mob behavior is
 	// no longer supported)
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityTarget(EntityTargetEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity()) || shopkeeperRegistry.isShopkeeper(event.getTarget())) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityDamage(EntityDamageEvent event) {
 		Entity entity = event.getEntity();
 		if (!shopkeeperRegistry.isShopkeeper(entity)) return;
@@ -122,7 +147,7 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityEnterVehicle(VehicleEnterEvent event) {
 		Entity entity = event.getEntered();
 		if (shopkeeperRegistry.isShopkeeper(entity)) {
@@ -132,14 +157,14 @@ class LivingEntityShopListener implements Listener {
 
 	// ex: creepers
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onExplodePrime(ExplosionPrimeEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onExplode(EntityExplodeEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
@@ -147,7 +172,7 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onCreeperCharged(CreeperPowerEvent event) {
 		if (event.getCause() == PowerCause.LIGHTNING && shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
@@ -156,42 +181,42 @@ class LivingEntityShopListener implements Listener {
 
 	// ex: enderman
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityChangeBlock(EntityChangeBlockEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityTeleport(EntityTeleportEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityPortalTeleport(EntityPortalEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onPigZap(PigZapEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onSheepDyed(SheepDyeWoolEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onLightningStrike(LightningStrikeEvent event) {
 		// workaround: preventing lightning strikes near villager shopkeepers
 		// because they would turn into witches
@@ -203,7 +228,7 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onPotionSplash(PotionSplashEvent event) {
 		for (LivingEntity entity : event.getAffectedEntities()) {
 			if (shopkeeperRegistry.isShopkeeper(entity)) {
@@ -214,7 +239,7 @@ class LivingEntityShopListener implements Listener {
 
 	// allow sleeping if the only nearby monsters are shopkeepers:
 	// note: cancellation state also reflects default behavior
-	@EventHandler(ignoreCancelled = false)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	void onPlayerEnterBed(PlayerBedEnterEvent event) {
 		// bed entering prevented due to nearby monsters?
 		if (event.getBedEnterResult() != BedEnterResult.NOT_SAFE) return;
@@ -239,7 +264,7 @@ class LivingEntityShopListener implements Listener {
 
 	// ex: blazes or skeletons
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityLaunchProjectile(ProjectileLaunchEvent event) {
 		ProjectileSource source = event.getEntity().getShooter();
 		if (source instanceof LivingEntity && shopkeeperRegistry.isShopkeeper((LivingEntity) source)) {
@@ -249,7 +274,7 @@ class LivingEntityShopListener implements Listener {
 
 	// ex: snowmans
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityBlockForm(EntityBlockFormEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
@@ -258,7 +283,7 @@ class LivingEntityShopListener implements Listener {
 
 	// ex: chicken laying eggs
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityDropItem(EntityDropItemEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
@@ -266,7 +291,7 @@ class LivingEntityShopListener implements Listener {
 	}
 
 	// prevent shopkeeper entities from being affected by potion effects
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityPotionEffectEvent(EntityPotionEffectEvent event) {
 		if (event.getAction() == Action.ADDED && shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);

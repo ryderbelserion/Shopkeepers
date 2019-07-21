@@ -86,7 +86,7 @@ class UIListener implements Listener {
 		return true;
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onInventoryClose(InventoryCloseEvent event) {
 		if (!(event.getPlayer() instanceof Player)) {
 			return;
@@ -97,7 +97,7 @@ class UIListener implements Listener {
 		uiRegistry.onInventoryClose(player, event);
 	}
 
-	@EventHandler(priority = EventPriority.LOW)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	void onInventoryEarly(InventoryClickEvent event) {
 		// the ui handler processing this click, or DUMMY_UI_HANDLER if none is processing the event
 		UIHandler uiHandler = DUMMY_UI_HANDLER;
@@ -132,7 +132,7 @@ class UIListener implements Listener {
 
 	// priority HIGH instead of HIGHEST, since we might cancel the event and other plugins might want to react to that
 	// (see TradingHandler)
-	@EventHandler(priority = EventPriority.HIGH)
+	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	void onInventoryClickLate(InventoryClickEvent event) {
 		UIHandler uiHandler = clickHandlerStack.pop(); // not expected to be empty
 		if (uiHandler == DUMMY_UI_HANDLER) return; // ignore

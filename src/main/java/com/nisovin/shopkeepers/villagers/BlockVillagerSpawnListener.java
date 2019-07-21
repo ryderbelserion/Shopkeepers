@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.villagers;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
@@ -37,7 +38,7 @@ public class BlockVillagerSpawnListener implements Listener {
 		return false;
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onSpawn(CreatureSpawnEvent event) {
 		SpawnReason spawnReason = event.getSpawnReason();
 		if (this.isSpawnBlockingBypassed(spawnReason)) return;
@@ -50,7 +51,8 @@ public class BlockVillagerSpawnListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	// LOW priority so that other plugins don't have to process those meant-to-be-removed entities
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onChunkLoad(ChunkLoadEvent event) {
 		// remove villagers that got spawned as part of chunk generation:
 		if (!event.isNewChunk()) return;

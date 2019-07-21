@@ -22,7 +22,7 @@ class ShopNamingListener implements Listener {
 
 	// SHOPKEEPER NAMING
 
-	@EventHandler(priority = EventPriority.LOWEST)
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
 		Shopkeeper shopkeeper = shopkeeperNaming.endNaming(player);

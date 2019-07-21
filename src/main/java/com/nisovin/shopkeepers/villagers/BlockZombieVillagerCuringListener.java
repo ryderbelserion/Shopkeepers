@@ -5,6 +5,7 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.EntityTransformEvent.TransformReason;
@@ -23,7 +24,7 @@ public class BlockZombieVillagerCuringListener implements Listener {
 	}
 
 	// Try to prevent curing as early as possible, so that the player doesn't waste his golden apple
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onZombieVillagerCureStarted(PlayerInteractEntityEvent event) {
 		if (!(event.getRightClicked() instanceof ZombieVillager)) return;
 		Player player = event.getPlayer();
@@ -43,7 +44,7 @@ public class BlockZombieVillagerCuringListener implements Listener {
 		}
 	}
 
-	@EventHandler(ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onZombieVillagerCured(EntityTransformEvent event) {
 		if (event.getTransformReason() != TransformReason.CURED) return;
 		if (!(event.getEntity() instanceof ZombieVillager)) return;

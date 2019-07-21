@@ -27,6 +27,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
 import com.nisovin.shopkeepers.util.Utils;
 
 /**
@@ -42,7 +43,7 @@ class CreateListener implements Listener {
 		this.shopkeeperCreation = shopkeeperCreation;
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onItemHeld(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
 		if (player.getGameMode() == GameMode.CREATIVE) return;
@@ -60,7 +61,10 @@ class CreateListener implements Listener {
 		Utils.sendMessage(player, Settings.msgCreationItemSelected);
 	}
 
-	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
+	// Since this might check chest access by calling another dummy interaction event, we handle (cancel) this event as
+	// early as possible, so that other plugins (eg. protection plugins) can ignore it and don't handle it twice. In
+	// case some other event handler managed to already cancel the event on LOWEST priority, we ignore the interaction.
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		// ignore our own fake interact event:
 		if (event instanceof TestPlayerInteractEvent) return;
@@ -69,30 +73,40 @@ class CreateListener implements Listener {
 		Action action = event.getAction();
 		if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_AIR) return;
 
-		// ignore creative mode players:
-		Player player = event.getPlayer();
-		if (player.getGameMode() == GameMode.CREATIVE) return;
-
 		// make sure the item used is the shop creation item:
 		ItemStack itemInHand = event.getItem();
 		if (!Settings.isShopCreationItem(itemInHand)) {
 			return;
 		}
 
-		// remember previous interaction result:
-		Result useInteractedBlock = event.useInteractedBlock();
+		Player player = event.getPlayer();
+		Log.debug("Player " + player.getName() + " is interacting with the shop creation item");
+
+		// ignore creative mode players:
+		if (player.getGameMode() == GameMode.CREATIVE) {
+			Log.debug("  Ignoring creative mode player");
+			return;
+		}
 
 		// prevent regular usage:
-		// TODO are there items which would require canceling the event for all left clicks or physical interaction as well?
+		// TODO are there items which would require canceling the event for all left clicks or physical interaction as
+		// well?
 		if (Settings.preventShopCreationItemRegularUsage && !Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-			Log.debug("Preventing normal shop creation item usage");
+			Log.debug("  Preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
 
 		// ignore off-hand interactions from this point on:
 		// -> the item will only act as shop creation item if it is held in the main hand
 		if (event.getHand() != EquipmentSlot.HAND) {
-			Log.debug("Ignoring off-hand interaction with creation item");
+			Log.debug("  Ignoring off-hand interaction");
+			return;
+		}
+
+		// Ignore if already cancelled. Resolves conflicts with other event handlers running at LOWEST priority (eg.
+		// Shopkeepers' sign shop listener acts on LOWEST priority as well).
+		if (event.useItemInHand() == Result.DENY) {
+			Log.debug("  Ignoring already cancelled item interaction");
 			return;
 		}
 
@@ -139,10 +153,8 @@ class CreateListener implements Listener {
 
 			// handle chest selection:
 			if (ItemUtils.isChest(clickedBlock.getType()) && !clickedBlock.equals(selectedChest)) {
-				// if chest access is denied, test again without items in hands to make sure that the event is not
-				// cancelled because of denying usage with the items in hands:
-				boolean chestAccessDenied = (useInteractedBlock == Result.DENY);
-				if (shopkeeperCreation.handleCheckChest(player, clickedBlock, chestAccessDenied)) {
+				// check if the chest can be used for a shop:
+				if (shopkeeperCreation.handleCheckChest(player, clickedBlock)) {
 					// select chest:
 					shopkeeperCreation.selectChest(player, clickedBlock);
 					Utils.sendMessage(player, Settings.msgSelectedChest);

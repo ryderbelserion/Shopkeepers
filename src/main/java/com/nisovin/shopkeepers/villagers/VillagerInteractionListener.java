@@ -30,6 +30,8 @@ public class VillagerInteractionListener implements Listener {
 		this.plugin = plugin;
 	}
 
+	// HIGH, since we don't want to handle hiring if another plugin has cancelled the event.
+	// But not HIGHEST, so that other plugins can still react to us cancelling the event.
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	void onEntityInteract(PlayerInteractEntityEvent event) {
 		if (!(event.getRightClicked() instanceof AbstractVillager)) return;
@@ -53,7 +55,7 @@ public class VillagerInteractionListener implements Listener {
 		if ((isVillager && Settings.disableOtherVillagers) || (isWanderingTrader && Settings.disableWanderingTraders)) {
 			// prevent trading with non-shopkeeper villagers:
 			event.setCancelled(true);
-			Log.debug("  trade prevented");
+			Log.debug("  trading prevented");
 		}
 
 		// only trigger hiring for main-hand events:

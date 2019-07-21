@@ -21,7 +21,7 @@ class InventoryMoveItemListener implements Listener {
 		this.protectedChests = protectedChests;
 	}
 
-	@EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onInventoryMoveItem(InventoryMoveItemEvent event) {
 		if (this.isProtectedInventory(event.getSource()) || this.isProtectedInventory(event.getDestination())) {
 			event.setCancelled(true);

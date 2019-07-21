@@ -57,7 +57,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		}
 
 		// check selected chest:
-		if (!SKShopkeepersPlugin.getInstance().getShopkeeperCreation().handleCheckChest(creator, chestBlock, true)) {
+		if (!SKShopkeepersPlugin.getInstance().getShopkeeperCreation().handleCheckChest(creator, chestBlock)) {
 			return false;
 		}
 

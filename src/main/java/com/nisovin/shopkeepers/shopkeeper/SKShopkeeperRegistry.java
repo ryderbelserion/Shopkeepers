@@ -61,6 +61,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	private final Collection<AbstractShopkeeper> activeShopkeepersView = Collections.unmodifiableCollection(activeShopkeepers.values());
 	private int playerShopCount = 0;
 
+	// TODO: Since chunk loading is handled delayed, there might be multiple requests for loading the shopkeepers in a
+	// chunk getting queued (if the chunk gets unloaded and reloaded frequently), and unloading may get invoked before
+	// the shopkeepers got actually loaded.
+	// This might not actually be an issue right now (shopkeepers only get loaded if the chunk is verified to currently
+	// be loaded), but results in inconsistent (duplicate, wrong order) calls to Shopkeeper#onChunk(Un)Load
+	// It would therefore be nicer to keep track for which chunks the shopkeepers got actually loaded and then ignore
+	// duplicate load requests, and unload requests for not currently loaded chunks.
+
 	public SKShopkeeperRegistry(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}

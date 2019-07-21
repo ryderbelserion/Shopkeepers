@@ -10,10 +10,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Result;
-import org.bukkit.event.block.Action;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
@@ -90,7 +86,7 @@ public class ShopkeeperCreation {
 	// SHOPKEEPER CREATION
 
 	// checks if the player can use the given chest for a player shopkeeper:
-	public boolean handleCheckChest(Player player, Block chestBlock, boolean checkChestAccess) {
+	public boolean handleCheckChest(Player player, Block chestBlock) {
 		// check if this chest is already used by some other shopkeeper:
 		if (SKShopkeepersPlugin.getInstance().getProtectedChests().isChestProtected(chestBlock, null)) {
 			Utils.sendMessage(player, Settings.msgChestAlreadyInUse);
@@ -105,32 +101,11 @@ public class ShopkeeperCreation {
 		}
 
 		// check if the player can access the chest:
-		if (checkChestAccess && !plugin.getShopkeeperCreation().checkChestAccess(player, chestBlock)) {
+		if (!Utils.checkBlockInteract(player, chestBlock)) { // checks access via dummy interact event
 			Utils.sendMessage(player, Settings.msgNoChestAccess);
 			return false;
 		}
 		return true;
-	}
-
-	// checks if the player can access the given chest:
-	public boolean checkChestAccess(Player player, Block chestBlock) {
-		// simulating right click on the chest to check if access is denied:
-		// making sure that access is really denied, and that the event is not cancelled because of denying
-		// usage with the items in hands:
-		PlayerInventory playerInventory = player.getInventory();
-		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
-		ItemStack itemInOffHand = playerInventory.getItemInOffHand();
-		playerInventory.setItemInMainHand(null);
-		playerInventory.setItemInOffHand(null);
-
-		TestPlayerInteractEvent fakeInteractEvent = new TestPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, null, chestBlock, BlockFace.UP);
-		Bukkit.getPluginManager().callEvent(fakeInteractEvent);
-		boolean canAccessChest = (fakeInteractEvent.useInteractedBlock() != Result.DENY);
-
-		// resetting items in main and off hand:
-		playerInventory.setItemInMainHand(itemInMainHand);
-		playerInventory.setItemInOffHand(itemInOffHand);
-		return canAccessChest;
 	}
 
 	public Location determineSpawnLocation(Player player, Block targetBlock, BlockFace targetBlockFace) {

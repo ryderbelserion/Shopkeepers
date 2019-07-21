@@ -37,9 +37,9 @@ enable-spawn-verifier: false
 # If enabled, Shopkeepers tries to bypass other plugins which deny mob spawning
 # (ex. land protection plugins).
 bypass-spawn-blocking: true
-# If enabled, Shopkeepers tries to bypass other plugins which deny interaction
-# with the shopkeepers.
-bypass-shop-interaction-blocking: false
+# If enabled, Shopkeepers takes into account whether other plugins deny
+# interaction with the shopkeepers.
+check-shop-interaction-result: false
 
 # If enabled, players will only be able to place shopkeepers where they have
 # permission from WorldGuard to build or where the 'allow-shop' flag is set.
