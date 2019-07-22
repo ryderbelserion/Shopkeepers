@@ -76,11 +76,13 @@ class LivingEntityShopListener implements Listener {
 	void onEntityInteract(PlayerInteractEntityEvent event) {
 		// ignore our own fake interact event:
 		if (event instanceof TestPlayerInteractEntityEvent) return;
-
 		if (!(event.getRightClicked() instanceof LivingEntity)) return;
+
 		LivingEntity shopEntity = (LivingEntity) event.getRightClicked();
 		Player player = event.getPlayer();
-		Log.debug("Player " + player.getName() + " is interacting (" + (event.getHand()) + ") with entity at " + shopEntity.getLocation());
+		boolean isInteractAtEvent = (event instanceof PlayerInteractAtEntityEvent);
+		Log.debug("Player " + player.getName() + " is interacting (" + (event.getHand()) + ") "
+				+ (isInteractAtEvent ? "at" : "with") + " entity at " + shopEntity.getLocation());
 
 		// also checks for citizens npc shopkeepers:
 		AbstractShopkeeper shopkeeper = shopkeeperRegistry.getShopkeeperByEntity(shopEntity);
@@ -106,7 +108,7 @@ class LivingEntityShopListener implements Listener {
 
 		// The PlayerInteractAtEntityEvent gets sometimes called additionally to the PlayerInteractEntityEvent.
 		// We cancel the event but don't process it any further.
-		if (event instanceof PlayerInteractAtEntityEvent) {
+		if (isInteractAtEvent) {
 			Log.debug("  Ignoring InteractAtEntity event");
 			return;
 		}
