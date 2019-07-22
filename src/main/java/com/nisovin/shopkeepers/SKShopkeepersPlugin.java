@@ -62,6 +62,7 @@ import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
+import com.nisovin.shopkeepers.util.DebugListener;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.TradingCountListener;
@@ -280,6 +281,17 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// setup metrics:
 		if (Settings.enableMetrics) {
 			this.setupMetrics();
+		}
+
+		// debugging tools:
+		if (Settings.debug) {
+			// register debug listener:
+			// run delayed to also catch events / event listeners of other plugins:
+			Bukkit.getScheduler().runTaskLater(this, () -> {
+				if (Settings.debugOptions.contains("log-all-events") || Settings.debugOptions.contains("print-listeners")) {
+					DebugListener.register();
+				}
+			}, 10L);
 		}
 	}
 

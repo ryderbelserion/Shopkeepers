@@ -29,17 +29,28 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.permissions.Permissible;
+import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 public final class Utils {
 
 	private Utils() {
+	}
+
+	public static void printRegisteredListeners(Event event) {
+		HandlerList handlerList = event.getHandlers();
+		Log.info("Registered listeners for event " + event.getEventName() + ":");
+		for (RegisteredListener rl : handlerList.getRegisteredListeners()) {
+			Log.info(" - " + rl.getPlugin().getName() + ", priority: " + rl.getPriority() + ", ignoring cancelled: " + rl.isIgnoringCancelled());
+		}
 	}
 
 	/**

@@ -27,7 +27,10 @@ Date format: (YYYY-MM-DD)
 * Internal: Made all priorities and ignoring of cancelled events explicit.
 * Internal: Moved code for checking chest access into util package.
 * Internal: Metrics will also report now whether the settings 'check-shop-interaction-result', 'bypass-spawn-blocking' and 'enable-spawn-verifier' are used.
-* Internal: Minor changes to some debug messages.
+* Debugging: Small changes and additions to some debug messages, especially related to shopkeeper interactions.
+* Debugging: Added setting 'debug-options', which can be used to enable additional debugging tools.
+  * Option 'log-all-events': Logs all events. Subsequent calls of the same event get combined into a single logging entry to slightly reduce spam.
+  * Option 'print-listeners': Prints the registered listeners for the first call of each event.
 
 ## v2.7.2 (2019-07-02)
 ### Supported MC versions: 1.14.3

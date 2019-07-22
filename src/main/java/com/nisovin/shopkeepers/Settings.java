@@ -28,6 +28,12 @@ public class Settings {
 	 */
 	public static int configVersion = 1;
 	public static boolean debug = false;
+	/*
+	 * Available options:
+	 * - log-all-events: Logs all events (spams!). Starts slightly delayed.
+	 * - print-listeners: Prints the registered listeners for the first call of each event.
+	 */
+	public static List<String> debugOptions = new ArrayList<>(0);
 	public static boolean enableMetrics = true;
 
 	/*
