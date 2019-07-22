@@ -82,18 +82,19 @@ class SignShopListener implements Listener {
 		// only trigger shopkeeper interaction for main-hand events:
 		if (event.getHand() != EquipmentSlot.HAND) {
 			Log.debug("  Ignoring off-hand interaction");
-		} else {
-			if (Settings.checkShopInteractionResult) {
-				// Check the sign interaction result by calling another interact event:
-				if (!Utils.checkBlockInteract(player, block)) {
-					Log.debug("  Cancelled by another plugin");
-					return;
-				}
-			}
-
-			// handle interaction:
-			shopkeeper.onPlayerInteraction(player);
+			return;
 		}
+
+		// Check the sign interaction result by calling another interact event:
+		if (Settings.checkShopInteractionResult) {
+			if (!Utils.checkBlockInteract(player, block)) {
+				Log.debug("  Cancelled by another plugin");
+				return;
+			}
+		}
+
+		// handle interaction:
+		shopkeeper.onPlayerInteraction(player);
 	}
 
 	// protect sign block:
