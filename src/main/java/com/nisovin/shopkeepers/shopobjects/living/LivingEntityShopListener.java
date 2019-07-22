@@ -79,8 +79,7 @@ class LivingEntityShopListener implements Listener {
 		if (!(event.getRightClicked() instanceof LivingEntity)) return;
 		LivingEntity shopEntity = (LivingEntity) event.getRightClicked();
 		Player player = event.getPlayer();
-		String playerName = player.getName();
-		Log.debug("Player " + playerName + " is interacting (" + (event.getHand()) + ") with entity at " + shopEntity.getLocation());
+		Log.debug("Player " + player.getName() + " is interacting (" + (event.getHand()) + ") with entity at " + shopEntity.getLocation());
 
 		// also checks for citizens npc shopkeepers:
 		AbstractShopkeeper shopkeeper = shopkeeperRegistry.getShopkeeperByEntity(shopEntity);
@@ -95,8 +94,19 @@ class LivingEntityShopListener implements Listener {
 			return;
 		}
 
+		// if citizens npc: don't cancel the event, let Citizens perform other actions as appropriate
+		if (shopkeeper.getShopObject().getType() != DefaultShopObjectTypes.CITIZEN()) {
+			// always cancel interactions with shopkeepers, to prevent any default behavior:
+			Log.debug("  Cancelling entity interaction");
+			event.setCancelled(true);
+			// update inventory in case the interaction would trigger an item action normally (such as animal feeding):
+			player.updateInventory();
+		}
+
 		// only trigger shopkeeper interaction for main-hand events:
-		if (event.getHand() == EquipmentSlot.HAND) {
+		if (event.getHand() != EquipmentSlot.HAND) {
+			Log.debug("  Ignoring off-hand interaction");
+		} else {
 			if (Settings.checkShopInteractionResult) {
 				// Check the entity interaction result by calling another interact event:
 				if (!Utils.checkEntityInteract(player, shopEntity)) {
@@ -107,14 +117,6 @@ class LivingEntityShopListener implements Listener {
 
 			// handle interaction:
 			shopkeeper.onPlayerInteraction(player);
-		}
-
-		// if citizens npc: don't cancel the event, let Citizens perform other actions as appropriate
-		if (shopkeeper.getShopObject().getType() != DefaultShopObjectTypes.CITIZEN()) {
-			// always cancel interactions with shopkeepers, to prevent any default behavior:
-			event.setCancelled(true);
-			// update inventory in case the interaction would trigger an item action normally (such as animal feeding):
-			player.updateInventory();
 		}
 	}
 

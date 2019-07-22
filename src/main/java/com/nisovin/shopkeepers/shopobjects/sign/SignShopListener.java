@@ -55,21 +55,34 @@ class SignShopListener implements Listener {
 		Block block = event.getClickedBlock();
 		if (!ItemUtils.isSign(block.getType())) return;
 
-		AbstractShopkeeper shopkeeper = signShops.getSignShop(block);
-		if (shopkeeper == null) return;
 		Player player = event.getPlayer();
+		Log.debug("Player " + player.getName() + " is interacting (" + (event.getHand()) + ") with sign at " + Utils.getLocationString(block));
+
+		AbstractShopkeeper shopkeeper = signShops.getSignShop(block);
+		if (shopkeeper == null) {
+			Log.debug("  Non-shopkeeper");
+			return;
+		}
+
+		// keep track of the previous interaction result:
+		boolean useInteractedBlock = (event.useInteractedBlock() != Result.DENY);
+
+		// always cancel interactions with shopkeepers, to prevent any default behavior:
+		event.setCancelled(true); // also cancels the item interaction
+		// update inventory in case the interaction would trigger an item action normally:
+		player.updateInventory();
+
+		// Ignore if already cancelled. Resolves conflicts with other event handlers running at LOWEST priority (eg.
+		// Shopkeepers' shop creation item listener acts on LOWEST priority as well).
+		if (!useInteractedBlock) {
+			Log.debug("  Ignoring already cancelled block interaction");
+			return;
+		}
 
 		// only trigger shopkeeper interaction for main-hand events:
-		if (event.getHand() == EquipmentSlot.HAND) {
-			Log.debug("Player " + player.getName() + " is interacting with sign shopkeeper at " + Utils.getLocationString(block));
-
-			// Ignore if already cancelled. Resolves conflicts with other event handlers running at LOWEST priority (eg.
-			// Shopkeepers' shop creation item listener acts on LOWEST priority as well).
-			if (event.useInteractedBlock() == Result.DENY) {
-				Log.debug("  Ignoring already cancelled block interaction");
-				return;
-			}
-
+		if (event.getHand() != EquipmentSlot.HAND) {
+			Log.debug("  Ignoring off-hand interaction");
+		} else {
 			if (Settings.checkShopInteractionResult) {
 				// Check the sign interaction result by calling another interact event:
 				if (!Utils.checkBlockInteract(player, block)) {
@@ -81,11 +94,6 @@ class SignShopListener implements Listener {
 			// handle interaction:
 			shopkeeper.onPlayerInteraction(player);
 		}
-
-		// always cancel interactions with shopkeepers, to prevent any default behavior:
-		event.setCancelled(true);
-		// update inventory in case the interaction would trigger an item action normally:
-		player.updateInventory();
 	}
 
 	// protect sign block:
