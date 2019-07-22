@@ -23,6 +23,7 @@ Date format: (YYYY-MM-DD)
     * Interactions with regular villagers (blocking, hiring) are handled at HIGH priority (like before), so that hiring can be skipped if some other plugin has cancelled the interaction.
 * Changed: Replaced the 'bypass-shop-interaction-blocking' setting (default: false) with the new setting 'check-shop-interaction-result' (default: false).
 * Changed: The new 'check-shop-interaction-result' setting also applies to sign shops now.
+* Fixed: Also cancelling the PlayerInteractAtEntityEvent for shopkeeper entity interactions.
 * Changed: When forcing an entity to spawn, the pitch and yaw of the expected and actual spawn location are ignored now. This avoids a warning message for some entity types (such as shulkers), which always spawn with fixed pitch and yaw.
 * Internal: Made all priorities and ignoring of cancelled events explicit.
 * Internal: Moved code for checking chest access into util package.

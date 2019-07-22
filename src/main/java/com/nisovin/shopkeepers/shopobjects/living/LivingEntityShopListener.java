@@ -34,6 +34,7 @@ import org.bukkit.event.entity.ProjectileLaunchEvent;
 import org.bukkit.event.entity.SheepDyeWoolEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent;
 import org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.weather.LightningStrikeEvent;
@@ -103,21 +104,35 @@ class LivingEntityShopListener implements Listener {
 			player.updateInventory();
 		}
 
+		// The PlayerInteractAtEntityEvent gets sometimes called additionally to the PlayerInteractEntityEvent.
+		// We cancel the event but don't process it any further.
+		if (event instanceof PlayerInteractAtEntityEvent) {
+			Log.debug("  Ignoring InteractAtEntity event");
+			return;
+		}
+
 		// only trigger shopkeeper interaction for main-hand events:
 		if (event.getHand() != EquipmentSlot.HAND) {
 			Log.debug("  Ignoring off-hand interaction");
-		} else {
-			if (Settings.checkShopInteractionResult) {
-				// Check the entity interaction result by calling another interact event:
-				if (!Utils.checkEntityInteract(player, shopEntity)) {
-					Log.debug("  Cancelled by another plugin");
-					return;
-				}
-			}
-
-			// handle interaction:
-			shopkeeper.onPlayerInteraction(player);
+			return;
 		}
+
+		// Check the entity interaction result by calling another interact event:
+		if (Settings.checkShopInteractionResult) {
+			if (!Utils.checkEntityInteract(player, shopEntity)) {
+				Log.debug("  Cancelled by another plugin");
+				return;
+			}
+		}
+
+		// handle interaction:
+		shopkeeper.onPlayerInteraction(player);
+	}
+
+	// This event gets sometimes called additionally to the PlayerInteractEntityEvent
+	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
+	void onEntityInteractAt(PlayerInteractAtEntityEvent event) {
+		this.onEntityInteract(event);
 	}
 
 	// TODO many of those behaviors might no longer be active, once all entities use noAI (once legacy mob behavior is
