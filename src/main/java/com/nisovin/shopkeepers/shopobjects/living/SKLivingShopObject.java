@@ -101,6 +101,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	// (because shopkeepers might have been placed 1 block above passable or non-full blocks)
 	private Location getSpawnLocation() {
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
+		if (world == null) return null; // world not loaded
 		Location spawnLocation = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + SPAWN_LOCATION_OFFSET, shopkeeper.getZ() + 0.5D);
 		double distanceToGround = Utils.getCollisionDistanceToGround(spawnLocation, SPAWN_LOCATION_RANGE);
 		if (distanceToGround == SPAWN_LOCATION_RANGE) {
@@ -119,11 +120,16 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		if (entity != null) {
 			// clean up metadata before replacing the currently stored entity with a new one:
 			this.removeShopkeeperMetadata(entity);
+			entity = null; // reset
 		}
 
-		// prepare location:
-		World world = Bukkit.getWorld(shopkeeper.getWorldName());
+		// prepare spawn location:
 		Location spawnLocation = this.getSpawnLocation();
+		if (spawnLocation == null) {
+			return false; // world not loaded
+		}
+		World world = spawnLocation.getWorld();
+		assert world != null;
 
 		// spawn entity:
 		// TODO check if the block is passable before spawning there?
@@ -172,6 +178,13 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			return true;
 		} else {
 			// failure:
+			if (entity == null) {
+				Log.debug("Failed to spawn shopkeeper entity: Entity is null");
+			} else {
+				Log.debug("Failed to spawn shopkeeper entity: Entity dead: " + entity.isDead() + ", entity valid: " + entity.isValid()
+						+ ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()));
+			}
+
 			entity = null;
 			return false;
 		}
@@ -293,6 +306,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		} else {
 			Location entityLoc = entity.getLocation();
 			Location spawnLocation = this.getSpawnLocation();
+			assert spawnLocation != null; // since entity is active
 			spawnLocation.setYaw(entityLoc.getYaw());
 			spawnLocation.setPitch(entityLoc.getPitch());
 			if (!entityLoc.getWorld().equals(spawnLocation.getWorld()) || entityLoc.distanceSquared(spawnLocation) > 0.4D) {
@@ -314,8 +328,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		E entity = this.getEntity(); // null if not active
 		if (entity == null) return;
 
-		Location entityLoc = entity.getLocation();
 		Location spawnLocation = this.getSpawnLocation();
+		assert spawnLocation != null; // since entity is active
+		Location entityLoc = entity.getLocation();
 		spawnLocation.setYaw(entityLoc.getYaw());
 		spawnLocation.setPitch(entityLoc.getPitch());
 		entity.teleport(spawnLocation);

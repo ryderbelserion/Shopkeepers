@@ -149,7 +149,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 					// respawn:
 					boolean spawned = shopkeeper.spawn();
 					if (!spawned) {
-						Log.debug("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
+						Log.debug("Spawn verifier: Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 						continue;
 					}
 					// activate with new object id:
