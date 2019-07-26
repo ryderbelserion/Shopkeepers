@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
@@ -19,6 +20,8 @@ import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
+import com.nisovin.shopkeepers.util.DebugListener;
+import com.nisovin.shopkeepers.util.EventDebugListener;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -31,6 +34,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	private final SKLivingShopObjectType<?> livingObjectType;
 	private E entity;
 	private int respawnAttempts = 0;
+	private boolean debuggingSpawn = false;
+	private static long lastSpawnDebugging = 0; // shared among all living shopkeepers to prevent spam
 
 	protected SKLivingShopObject(	LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
 									AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -113,6 +118,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		return spawnLocation;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean spawn() {
 		// check if our current old entity is still valid:
@@ -137,7 +143,12 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		EntityType entityType = this.getEntityType();
 		livingShops.forceCreatureSpawn(spawnLocation, entityType);
 
-		entity = (E) world.spawnEntity(spawnLocation, entityType);
+		entity = (E) world.spawn(spawnLocation, entityType.getEntityClass(), (e) -> {
+			// debugging entity spawning:
+			if (e.isDead()) {
+				Log.debug("Spawning shopkeeper entity is dead already!");
+			}
+		});
 
 		if (this.isActive()) {
 			// assign metadata for easy identification by other plugins:
@@ -178,14 +189,48 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			return true;
 		} else {
 			// failure:
-			if (entity == null) {
-				Log.debug("Failed to spawn shopkeeper entity: Entity is null");
-			} else {
-				Log.debug("Failed to spawn shopkeeper entity: Entity dead: " + entity.isDead() + ", entity valid: " + entity.isValid()
-						+ ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()));
-			}
+			E localEntity = this.entity;
+			this.entity = null; // reset
 
-			entity = null;
+			if (localEntity == null) {
+				Log.warning("Failed to spawn shopkeeper entity: Entity is null");
+			} else {
+				// debug, if not already debugging and cooldown over:
+				boolean debug = (Settings.debug && !debuggingSpawn && (System.currentTimeMillis() - lastSpawnDebugging) > (5 * 60 * 1000)
+						&& localEntity.isDead() && ChunkCoords.isChunkLoaded(localEntity.getLocation()));
+
+				Log.warning("Failed to spawn shopkeeper entity: Entity dead: " + localEntity.isDead() + ", entity valid: " + localEntity.isValid()
+						+ ", chunk loaded: " + ChunkCoords.isChunkLoaded(localEntity.getLocation()) + ", debug -> " + debug);
+
+				// debug entity spawning:
+				if (debug) {
+					// Try again and log event activity:
+					debuggingSpawn = true;
+					lastSpawnDebugging = System.currentTimeMillis();
+					Log.info("Trying again and logging event activity ..");
+
+					// log all events occurring during spawning, and their registered listeners:
+					DebugListener debugListener = DebugListener.register(true, true);
+
+					// log creature spawn handling:
+					EventDebugListener<CreatureSpawnEvent> spawnListener = new EventDebugListener<>(CreatureSpawnEvent.class, (priority, event) -> {
+						LivingEntity spawnedEntity = event.getEntity();
+						Log.info("  CreatureSpawnEvent (" + priority + "): " + "cancelled: " + event.isCancelled() + ", dead: " + spawnedEntity.isDead()
+								+ ", valid: " + spawnedEntity.isValid() + ", chunk loaded: " + ChunkCoords.isChunkLoaded(spawnedEntity.getLocation()));
+					});
+
+					// try to spawn entity again:
+					boolean result = this.spawn();
+
+					// unregister listeners again:
+					debugListener.unregister();
+					spawnListener.unregister();
+					debuggingSpawn = false;
+					Log.info(".. Done.");
+
+					return result; // true if retry was successful
+				}
+			}
 			return false;
 		}
 	}
