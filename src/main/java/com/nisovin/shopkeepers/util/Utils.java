@@ -49,7 +49,8 @@ public final class Utils {
 		HandlerList handlerList = event.getHandlers();
 		Log.info("Registered listeners for event " + event.getEventName() + ":");
 		for (RegisteredListener rl : handlerList.getRegisteredListeners()) {
-			Log.info(" - " + rl.getPlugin().getName() + ", priority: " + rl.getPriority() + ", ignoring cancelled: " + rl.isIgnoringCancelled());
+			Log.info(" - " + rl.getPlugin().getName() + " (" + rl.getListener().getClass().getName() + ")"
+					+ ", priority: " + rl.getPriority() + ", ignoring cancelled: " + rl.isIgnoringCancelled());
 		}
 	}
 

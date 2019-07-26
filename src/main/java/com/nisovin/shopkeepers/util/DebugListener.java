@@ -13,15 +13,13 @@ import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.RegisteredListener;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.Settings;
 
 public class DebugListener implements Listener {
 
-	public static void register() {
+	public static DebugListener register(boolean logAllEvents, boolean printListeners) {
 		// TODO might only log events whose classes got loaded yet (eg. with registered listeners).
-		// TODO quite spammy. Filter/Reduce spamming events output.
-		Log.info("Registering DebugListener to log all events!");
-		DebugListener debugListener = new DebugListener();
+		Log.info("Registering DebugListener.");
+		DebugListener debugListener = new DebugListener(logAllEvents, printListeners);
 		List<HandlerList> allHandlerLists = HandlerList.getHandlerLists();
 		for (HandlerList handlerList : allHandlerLists) {
 			handlerList.register(new RegisteredListener(debugListener, new EventExecutor() {
@@ -31,6 +29,7 @@ public class DebugListener implements Listener {
 				}
 			}, EventPriority.LOWEST, SKShopkeepersPlugin.getInstance(), false));
 		}
+		return debugListener;
 	}
 
 	private static class EventData {
@@ -41,13 +40,19 @@ public class DebugListener implements Listener {
 	private String lastLoggedEvent = null;
 	private int lastLoggedEventCounter = 0;
 
-	private boolean logAllEvents = Settings.debugOptions.contains("log-all-events");
-	private boolean printListeners = Settings.debugOptions.contains("print-listeners");
+	private final boolean logAllEvents;
+	private final boolean printListeners;
 
-	DebugListener() {
+	private DebugListener(boolean logAllEvents, boolean printListeners) {
+		this.logAllEvents = logAllEvents;
+		this.printListeners = printListeners;
 	}
 
-	public void handleEvent(Event event) {
+	public void unregister() {
+		HandlerList.unregisterAll(this);
+	}
+
+	private void handleEvent(Event event) {
 		String eventName = event.getEventName();
 		EventData data = eventData.get(eventName);
 		if (data == null) {

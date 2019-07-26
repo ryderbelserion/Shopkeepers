@@ -288,8 +288,10 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			// register debug listener:
 			// run delayed to also catch events / event listeners of other plugins:
 			Bukkit.getScheduler().runTaskLater(this, () -> {
-				if (Settings.debugOptions.contains("log-all-events") || Settings.debugOptions.contains("print-listeners")) {
-					DebugListener.register();
+				boolean logAllEvent = Settings.debugOptions.contains("log-all-events");
+				boolean printListeners = Settings.debugOptions.contains("print-listeners");
+				if (logAllEvent || printListeners) {
+					DebugListener.register(logAllEvent, printListeners);
 				}
 			}, 10L);
 		}
