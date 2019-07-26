@@ -52,7 +52,6 @@ public class BlockZombieVillagerCuringListener implements Listener {
 		ZombieVillager zombieVillager = (ZombieVillager) event.getEntity();
 		Log.debug("Preventing zombie villager curing (transform) at " + Utils.getLocationString(zombieVillager.getLocation()));
 		event.setCancelled(true);
-		zombieVillager.setConversionTime(-1); // stop conversion
 
 		// inform the player who initiated the curing:
 		OfflinePlayer conversionOfflinePlayer = zombieVillager.getConversionPlayer();

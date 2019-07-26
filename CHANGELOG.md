@@ -29,6 +29,7 @@ Date format: (YYYY-MM-DD)
 * Internal: Moved code for checking chest access into util package.
 * Internal: Metrics will also report now whether the settings 'check-shop-interaction-result', 'bypass-spawn-blocking' and 'enable-spawn-verifier' are used.
 * Internal: Skipping shopkeeper spawning requests for unloaded worlds (should usually not be the case, but we guard against this anyways now).
+* Internal: Spigot is stopping the conversion of zombie villagers on its own now if the corresponding transform event gets cancelled.
 * Debugging: Small changes and additions to some debug messages, especially related to shopkeeper interactions and shopkeeper spawning.
 * Debugging: Added setting 'debug-options', which can be used to enable additional debugging tools.
   * Option 'log-all-events': Logs all events. Subsequent calls of the same event get combined into a single logging entry to slightly reduce spam.
