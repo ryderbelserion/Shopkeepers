@@ -226,7 +226,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 					debugListener.unregister();
 					spawnListener.unregister();
 					debuggingSpawn = false;
-					Log.info(".. Done.");
+					Log.info(".. Done. Successful: " + result);
 
 					return result; // true if retry was successful
 				}
