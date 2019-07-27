@@ -204,6 +204,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 				// debug entity spawning:
 				if (debug) {
+					// Print chunk's entity counts:
+					Utils.printEntityCounts(spawnLocation.getChunk());
+
 					// Try again and log event activity:
 					debuggingSpawn = true;
 					lastSpawnDebugging = System.currentTimeMillis();

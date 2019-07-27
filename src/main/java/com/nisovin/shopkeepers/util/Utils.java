@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -40,9 +41,26 @@ import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
+import com.nisovin.shopkeepers.api.util.ChunkCoords;
+
 public final class Utils {
 
 	private Utils() {
+	}
+
+	public static void printEntityCounts(Chunk chunk) {
+		Map<EntityType, Integer> entityCounts = new EnumMap<>(EntityType.class);
+		Entity[] entities = chunk.getEntities();
+		for (Entity entity : entities) {
+			EntityType entityType = entity.getType();
+			Integer entityCount = entityCounts.get(entityType);
+			if (entityCount == null) {
+				entityCount = 0;
+			}
+			entityCount += 1;
+			entityCounts.put(entityType, entityCount);
+		}
+		Log.info("Entities of chunk " + getChunkString(chunk) + " (total: " + entities.length + "): " + entityCounts);
 	}
 
 	public static void printRegisteredListeners(Event event) {
@@ -501,6 +519,18 @@ public final class Utils {
 
 	public static String getLocationString(String worldName, double x, double y, double z) {
 		return worldName + "," + DECIMAL_FORMAT.format(x) + "," + DECIMAL_FORMAT.format(y) + "," + DECIMAL_FORMAT.format(z);
+	}
+
+	public static String getChunkString(ChunkCoords chunk) {
+		return getChunkString(chunk.getWorldName(), chunk.getChunkX(), chunk.getChunkZ());
+	}
+
+	public static String getChunkString(Chunk chunk) {
+		return getChunkString(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
+	}
+
+	public static String getChunkString(String worldName, int cx, int cz) {
+		return worldName + "," + cx + "," + cz;
 	}
 
 	public static String getPlayerAsString(Player player) {
