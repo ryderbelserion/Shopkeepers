@@ -25,6 +25,7 @@ Date format: (YYYY-MM-DD)
 * Changed: The new 'check-shop-interaction-result' setting also applies to sign shops now.
 * Fixed: Also cancelling the PlayerInteractAtEntityEvent for shopkeeper entity interactions.
 * Changed: When forcing an entity to spawn, the pitch and yaw of the expected and actual spawn location are ignored now. This avoids a warning message for some entity types (such as shulkers), which always spawn with fixed pitch and yaw.
+* Changed: Some entity attributes are setup prior to entity spawning now (such as metadata, non-persist flag and name (if it has/uses one)). This should help other plugins to identify Shopkeeper entities during spawning.
 * Internal: Made all priorities and ignoring of cancelled events explicit.
 * Internal: Moved code for checking chest access into util package.
 * Internal: Metrics will also report now whether the settings 'check-shop-interaction-result', 'bypass-spawn-blocking' and 'enable-spawn-verifier' are used.

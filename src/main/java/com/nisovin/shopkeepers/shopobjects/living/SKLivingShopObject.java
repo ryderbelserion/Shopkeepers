@@ -118,14 +118,35 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		return spawnLocation;
 	}
 
+	// Any preparation that needs to be done before spawning. Might only allow limited operations.
+	protected void prepareEntity(E entity) {
+		// assign metadata for easy identification by other plugins:
+		this.assignShopkeeperMetadata(entity);
+
+		// don't save the entity to the world data:
+		entity.setPersistent(false);
+
+		// apply name (if it has/uses one):
+		this.applyName(entity, shopkeeper.getName());
+	}
+
+	// Any clean up that needs to happen for the entity. The entity might not be fully setup yet.
+	protected void cleanUpEntity(E entity) {
+		// disable AI:
+		this.cleanupAI();
+
+		// remove metadata again:
+		this.removeShopkeeperMetadata(entity);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean spawn() {
 		// check if our current old entity is still valid:
 		if (this.isActive()) return true;
 		if (entity != null) {
-			// clean up metadata before replacing the currently stored entity with a new one:
-			this.removeShopkeeperMetadata(entity);
+			// perform cleanup before replacing the currently stored entity with a new one:
+			this.cleanUpEntity(entity);
 			entity = null; // reset
 		}
 
@@ -143,24 +164,21 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		EntityType entityType = this.getEntityType();
 		livingShops.forceCreatureSpawn(spawnLocation, entityType);
 
-		entity = (E) world.spawn(spawnLocation, entityType.getEntityClass(), (e) -> {
+		entity = (E) world.spawn(spawnLocation, entityType.getEntityClass(), (entity) -> {
 			// debugging entity spawning:
-			if (e.isDead()) {
+			if (entity.isDead()) {
 				Log.debug("Spawning shopkeeper entity is dead already!");
 			}
+
+			// prepare entity, before it gets spawned:
+			prepareEntity((E) entity);
 		});
 
 		if (this.isActive()) {
-			// assign metadata for easy identification by other plugins:
-			this.assignShopkeeperMetadata(entity);
-			this.setName(shopkeeper.getName());
-
-			// configure some entity attributes:
+			// further setup entity after it was successfully spawned:
 			entity.eject(); // some entities might automatically mount on nearby entities (like baby zombies on chicken)
 			entity.setRemoveWhenFarAway(false);
 			entity.setCanPickupItems(false);
-			// don't save the entity to the world data:
-			entity.setPersistent(false);
 
 			// disable breeding:
 			if (entity instanceof Ageable) {
@@ -313,11 +331,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	public void despawn() {
 		if (entity == null) return;
 
-		// disable AI:
-		this.cleanupAI();
-
-		// cleanup metadata:
-		this.removeShopkeeperMetadata(entity);
+		// clean up entity:
+		this.cleanUpEntity(entity);
 
 		// remove entity:
 		entity.remove();
@@ -389,6 +404,10 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	@Override
 	public void setName(String name) {
 		if (!this.isActive()) return;
+		this.applyName(entity, name);
+	}
+
+	protected void applyName(E entity, String name) {
 		if (Settings.showNameplates && name != null && !name.isEmpty()) {
 			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
 				name = Settings.nameplatePrefix + name;
