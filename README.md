@@ -11,7 +11,7 @@ You can set up admin shops, which have infinite supply, and you can also set up 
 **BukkitDev Page**: https://dev.bukkit.org/projects/shopkeepers  
 **Wiki**: https://github.com/Shopkeepers/Shopkeepers-Wiki/wiki  
 **Issue Tracker**: https://github.com/Shopkeepers/Shopkeepers/issues  
-**Discord Server **: https://discord.gg/d9NKd5z  
+**Discord Server**: https://discord.gg/d9NKd5z  
 **Source code**: https://github.com/Shopkeepers/Shopkeepers/  
 
 Maven repository for releases: https://nexus.lichtspiele.org/repository/releases/  
