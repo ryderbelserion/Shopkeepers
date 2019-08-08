@@ -3,7 +3,10 @@ version: '${shopkeepers.version}'
 description: Custom villager shopkeepers
 authors: [nisovin, blablubbabc]
 website: '${shopkeepers.dbo.url}'
+# Loading after world management plugins and soft dependencies:
 softdepend: [Multiverse-Core, My Worlds, Transporter, Towny, WorldGuard, Citizens, Vault, Gringotts, ChestShop]
+# Ensuring that our listeners run before those of some protection plugins which listen on LOWEST priority as well:
+loadbefore: [GriefPrevention]
 
 main: com.nisovin.shopkeepers.SKShopkeepersPlugin
 api-version: '1.14'
