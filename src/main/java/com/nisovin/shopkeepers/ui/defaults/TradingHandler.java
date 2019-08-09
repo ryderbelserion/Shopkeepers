@@ -144,8 +144,10 @@ public class TradingHandler extends UIHandler {
 		// setup merchant:
 		Merchant merchant = this.setupMerchant(title, recipes);
 
-		// increase 'talked-to-villager' statistic:
-		player.incrementStatistic(Statistic.TALKED_TO_VILLAGER);
+		// increment 'talked-to-villager' statistic when opening trading menu:
+		if (Settings.incrementVillagerStatistics) {
+			player.incrementStatistic(Statistic.TALKED_TO_VILLAGER);
+		}
 
 		// open merchant:
 		return (player.openMerchant(merchant, true) != null);
@@ -578,8 +580,11 @@ public class TradingHandler extends UIHandler {
 		// TODO add support for exp-rewards?
 		// TODO support modifications to the MerchantRecipe's maxUses?
 
-		// TODO option to increase the player's crafting statistic for the traded item (like in vanilla minecraft)?
-		// TODO option to increase the player's trading statistic (like in vanilla minecraft)?
+		// increment 'traded-with-villager' statistic for every trade:
+		if (Settings.incrementVillagerStatistics) {
+			Player player = tradeData.tradingPlayer;
+			player.incrementStatistic(Statistic.TRADED_WITH_VILLAGER);
+		}
 
 		// shopkeeper-specific application of the trade:
 		this.onTradeApplied(tradeData);

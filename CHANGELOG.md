@@ -23,14 +23,18 @@ Date format: (YYYY-MM-DD)
     * Interactions with regular villagers (blocking, hiring) are handled at HIGH priority (like before), so that hiring can be skipped if some other plugin has cancelled the interaction.
 * Changed: Replaced the 'bypass-shop-interaction-blocking' setting (default: false) with the new setting 'check-shop-interaction-result' (default: false).
 * Changed: The new 'check-shop-interaction-result' setting also applies to sign shops now.
+
 * Fixed: Also cancelling the PlayerInteractAtEntityEvent for shopkeeper entity interactions.
 * Changed: When forcing an entity to spawn, the pitch and yaw of the expected and actual spawn location are ignored now. This avoids a warning message for some entity types (such as shulkers), which always spawn with fixed pitch and yaw.
 * Changed: Some entity attributes are setup prior to entity spawning now (such as metadata, non-persist flag and name (if it has/uses one)). This should help other plugins to identify Shopkeeper entities during spawning.
+* Changed: Added setting 'increment-villager-statistics' (default: false) which controls whether opening the trading menu and trading with shopkeepers increment minecraft's 'talked-to-villager' and 'traded-with-villager' statistics. Previously the talked-to-villager statistics would always get incremented and the traded-with-villager statistic was not used.
+
 * Internal: Made all priorities and ignoring of cancelled events explicit.
 * Internal: Moved code for checking chest access into util package.
-* Internal: Metrics will also report now whether the settings 'check-shop-interaction-result', 'bypass-spawn-blocking' and 'enable-spawn-verifier' are used.
+* Internal: Metrics will also report now whether the settings 'check-shop-interaction-result', 'bypass-spawn-blocking', 'enable-spawn-verifier' and 'increment-villager-statistics' are used.
 * Internal: Skipping shopkeeper spawning requests for unloaded worlds (should usually not be the case, but we guard against this anyways now).
 * Internal: Spigot is stopping the conversion of zombie villagers on its own now if the corresponding transform event gets cancelled.
+
 * Debugging: Small changes and additions to some debug messages, especially related to shopkeeper interactions and shopkeeper spawning.
 * Debugging: Added setting 'debug-options', which can be used to enable additional debugging tools.
   * Option 'log-all-events': Logs all events. Subsequent calls of the same event get combined into a single logging entry to slightly reduce spam.

@@ -322,6 +322,10 @@ use-strict-item-comparison: false
 # folder. Note: This might currently not properly work for admin shops, so
 # don't rely on the correctness of the logged purchases for those!
 enable-purchase-logging: false
+# Whether to increment minecraft's talked-to-villager and traded-with-villager
+# statistics whenever a player opens the trading menu and trades with a
+# shopkeeper.
+increment-villager-statistics: false
 
 # The percentage that should be removed from player shop earnings.
 tax-rate: 0

@@ -207,6 +207,7 @@ public class Settings {
 	public static boolean preventTradingWhileOwnerIsOnline = false;
 	public static boolean useStrictItemComparison = false;
 	public static boolean enablePurchaseLogging = false;
+	public static boolean incrementVillagerStatistics = false;
 
 	public static int taxRate = 0;
 	public static boolean taxRoundUp = false;

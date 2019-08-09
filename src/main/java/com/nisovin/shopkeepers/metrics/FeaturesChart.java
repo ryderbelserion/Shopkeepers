@@ -30,6 +30,13 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 			addFeatureEntry(allFeatures, "enable-towny-restrictions", Settings.enableTownyRestrictions && TownyHandler.isPluginEnabled());
 			addFeatureEntry(allFeatures, "enable-citizen-shops", Settings.enableCitizenShops && CitizensHandler.isPluginEnabled());
 
+			// mob behavior features:
+			addFeatureEntry(allFeatures, "use-legacy-mob-behavior", Settings.useLegacyMobBehavior);
+			addFeatureEntry(allFeatures, "disable-gravity", Settings.disableGravity);
+			addFeatureEntry(allFeatures, "increased gravity chunk range", Settings.gravityChunkRange > 4);
+			addFeatureEntry(allFeatures, "decreased gravity chunk range", Settings.gravityChunkRange < 4);
+
+			// others:
 			addFeatureEntry(allFeatures, "save-instantly", Settings.saveInstantly);
 			addFeatureEntry(allFeatures, "colored names allowed", Settings.nameRegex.contains("&"));
 			addFeatureEntry(allFeatures, "protect-chests", Settings.protectChests);
@@ -42,10 +49,7 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 			addFeatureEntry(allFeatures, "disable-other-villagers", Settings.disableOtherVillagers);
 			addFeatureEntry(allFeatures, "block-villager-spawns", Settings.blockVillagerSpawns);
 			addFeatureEntry(allFeatures, "hire-other-villagers", Settings.hireOtherVillagers);
-			addFeatureEntry(allFeatures, "use-legacy-mob-behavior", Settings.useLegacyMobBehavior);
-			addFeatureEntry(allFeatures, "disable-gravity", Settings.disableGravity);
-			addFeatureEntry(allFeatures, "increased gravity chunk range", Settings.gravityChunkRange > 4);
-			addFeatureEntry(allFeatures, "decreased gravity chunk range", Settings.gravityChunkRange < 4);
+			addFeatureEntry(allFeatures, "increment-villager-statistics", Settings.incrementVillagerStatistics);
 			return allFeatures;
 		});
 	}
