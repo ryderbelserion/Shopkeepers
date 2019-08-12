@@ -34,6 +34,7 @@ Date format: (YYYY-MM-DD)
 * Internal: Metrics will also report now whether the settings 'check-shop-interaction-result', 'bypass-spawn-blocking', 'enable-spawn-verifier' and 'increment-villager-statistics' are used.
 * Internal: Skipping shopkeeper spawning requests for unloaded worlds (should usually not be the case, but we guard against this anyways now).
 * Internal: Spigot is stopping the conversion of zombie villagers on its own now if the corresponding transform event gets cancelled.
+* Internal: Added a test to ensure consistency between ShopkeepersPlugin and ShopkeepersAPI.
 
 * Debugging: Small changes and additions to some debug messages, especially related to shopkeeper interactions and shopkeeper spawning.
 * Debugging: Added setting 'debug-options', which can be used to enable additional debugging tools.
