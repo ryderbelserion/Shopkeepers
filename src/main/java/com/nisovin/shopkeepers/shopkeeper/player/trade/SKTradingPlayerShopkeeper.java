@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.shopkeeper.player.trade;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -12,38 +12,40 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.player.trade.TradingPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
-import com.nisovin.shopkeepers.shopkeeper.offers.TradingOffer;
+import com.nisovin.shopkeepers.shopkeeper.offers.SKTradingOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
-public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
+public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implements TradingPlayerShopkeeper {
 
 	private final List<TradingOffer> offers = new ArrayList<>();
 	private final List<TradingOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
-	 * Creates a not yet initialized {@link TradingPlayerShopkeeper} (for use in sub-classes).
+	 * Creates a not yet initialized {@link SKTradingPlayerShopkeeper} (for use in sub-classes).
 	 * <p>
 	 * See {@link AbstractShopkeeper} for details on initialization.
 	 * 
 	 * @param id
 	 *            the shopkeeper id
 	 */
-	protected TradingPlayerShopkeeper(int id) {
+	protected SKTradingPlayerShopkeeper(int id) {
 		super(id);
 	}
 
-	protected TradingPlayerShopkeeper(int id, PlayerShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	protected SKTradingPlayerShopkeeper(int id, PlayerShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		super(id);
 		this.initOnCreation(shopCreationData);
 	}
 
-	protected TradingPlayerShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+	protected SKTradingPlayerShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super(id);
 		this.initOnLoad(configSection);
 	}
@@ -63,15 +65,14 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
 		// load offers:
-		this._clearOffers();
-		this._addOffers(TradingOffer.loadFromConfig(configSection, "offers"));
+		this._setOffers(SKTradingOffer.loadFromConfig(configSection, "offers"));
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
 		// save offers:
-		TradingOffer.saveToConfig(configSection, "offers", this.getOffers());
+		SKTradingOffer.saveToConfig(configSection, "offers", this.getOffers());
 	}
 
 	@Override
@@ -106,44 +107,12 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	// OFFERS:
 
+	@Override
 	public List<TradingOffer> getOffers() {
 		return offersView;
 	}
 
-	public TradingOffer addOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		// create offer (also handles validation):
-		TradingOffer newOffer = new TradingOffer(resultItem, item1, item2);
-
-		// add new offer:
-		this._addOffer(newOffer);
-		this.markDirty();
-		return newOffer;
-	}
-
-	private void _addOffer(TradingOffer offer) {
-		assert offer != null;
-		offers.add(offer);
-	}
-
-	private void _addOffers(Collection<TradingOffer> offers) {
-		assert offers != null;
-		for (TradingOffer offer : offers) {
-			if (offer == null) continue; // skip invalid entries
-			// add new offer:
-			this._addOffer(offer);
-		}
-	}
-
-	private void _clearOffers() {
-		offers.clear();
-	}
-
-	public void clearOffers() {
-		this._clearOffers();
-		this.markDirty();
-	}
-
-	// note: there might be multiple trades involving this item
+	// note: there might be multiple offers involving this item, this only returns the first one it finds
 	public TradingOffer getOffer(ItemStack tradedItem) {
 		for (TradingOffer offer : this.getOffers()) {
 			if (ItemUtils.isSimilar(offer.getResultItem(), tradedItem)) {
@@ -160,5 +129,57 @@ public class TradingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 			}
 		}
 		return null;
+	}
+
+	@Override
+	public void clearOffers() {
+		this._clearOffers();
+		this.markDirty();
+	}
+
+	private void _clearOffers() {
+		offers.clear();
+	}
+
+	@Override
+	public void setOffers(List<TradingOffer> offers) {
+		Validate.notNull(offers, "Offers is null!");
+		Validate.noNullElements(offers, "Offers contains null elements!");
+		this._setOffers(offers);
+		this.markDirty();
+	}
+
+	private void _setOffers(List<? extends TradingOffer> offers) {
+		assert offers != null && !offers.contains(null);
+		this._clearOffers();
+		this._addOffers(offers);
+	}
+
+	@Override
+	public void addOffer(TradingOffer offer) {
+		Validate.notNull(offer, "Offer is null!");
+		this._addOffer(offer);
+		this.markDirty();
+	}
+
+	private void _addOffer(TradingOffer offer) {
+		assert offer != null;
+		offers.add(offer);
+	}
+
+	@Override
+	public void addOffers(List<TradingOffer> offers) {
+		Validate.notNull(offers, "Offers is null!");
+		Validate.noNullElements(offers, "Offers contains null elements!");
+		this._addOffers(offers);
+		this.markDirty();
+	}
+
+	private void _addOffers(List<? extends TradingOffer> offers) {
+		assert offers != null && !offers.contains(null);
+		for (TradingOffer offer : offers) {
+			assert offer != null;
+			this._addOffer(offer);
+		}
 	}
 }

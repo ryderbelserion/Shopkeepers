@@ -7,25 +7,26 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
-import com.nisovin.shopkeepers.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.util.ItemCount;
 
 public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	protected SellingPlayerShopEditorHandler(SellingPlayerShopkeeper shopkeeper) {
+	protected SellingPlayerShopEditorHandler(SKSellingPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
 	}
 
 	@Override
-	public SellingPlayerShopkeeper getShopkeeper() {
-		return (SellingPlayerShopkeeper) super.getShopkeeper();
+	public SKSellingPlayerShopkeeper getShopkeeper() {
+		return (SKSellingPlayerShopkeeper) super.getShopkeeper();
 	}
 
 	@Override
 	protected List<TradingRecipeDraft> getTradingRecipes() {
-		SellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		SKSellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
 		// add the shopkeeper's offers:
@@ -54,7 +55,7 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 	@Override
 	protected void clearRecipes() {
-		SellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		SKSellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		shopkeeper.clearOffers();
 	}
 
@@ -64,8 +65,8 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		int price = this.getPrice(recipe);
 		if (price <= 0) return;
 
-		SellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.addOffer(recipe.getResultItem(), price);
+		SKSellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		shopkeeper.addOffer(ShopkeepersAPI.createPriceOffer(recipe.getResultItem(), price));
 	}
 
 	@Override

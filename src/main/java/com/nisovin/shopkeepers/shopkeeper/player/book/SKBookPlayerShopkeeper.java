@@ -1,12 +1,12 @@
 package com.nisovin.shopkeepers.shopkeeper.player.book;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
@@ -20,21 +20,20 @@ import org.bukkit.inventory.meta.BookMeta.Generation;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.player.book.BookPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
-import com.nisovin.shopkeepers.shopkeeper.offers.BookOffer;
+import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 
-/**
- * Sells written books.
- */
-public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
+public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements BookPlayerShopkeeper {
 
 	private static final Filter<ItemStack> ITEM_FILTER = (ItemStack item) -> {
 		return isCopyableBook(item);
@@ -45,23 +44,23 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	private final List<BookOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
-	 * Creates a not yet initialized {@link BookPlayerShopkeeper} (for use in sub-classes).
+	 * Creates a not yet initialized {@link SKBookPlayerShopkeeper} (for use in sub-classes).
 	 * <p>
 	 * See {@link AbstractShopkeeper} for details on initialization.
 	 * 
 	 * @param id
 	 *            the shopkeeper id
 	 */
-	protected BookPlayerShopkeeper(int id) {
+	protected SKBookPlayerShopkeeper(int id) {
 		super(id);
 	}
 
-	protected BookPlayerShopkeeper(int id, PlayerShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	protected SKBookPlayerShopkeeper(int id, PlayerShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		super(id);
 		this.initOnCreation(shopCreationData);
 	}
 
-	protected BookPlayerShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+	protected SKBookPlayerShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super(id);
 		this.initOnLoad(configSection);
 	}
@@ -83,20 +82,20 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		// load offers:
 		this._clearOffers();
 		// TODO remove legacy: load offers from old costs section (since late MC 1.12.2)
-		List<BookOffer> legacyOffers = BookOffer.loadFromConfig(configSection, "costs");
+		List<SKBookOffer> legacyOffers = SKBookOffer.loadFromConfig(configSection, "costs");
 		if (!legacyOffers.isEmpty()) {
 			Log.info("Importing old trading offers for shopkeeper '" + this.getId() + "'.");
 			this._addOffers(legacyOffers);
 			this.markDirty();
 		}
-		this._addOffers(BookOffer.loadFromConfig(configSection, "offers"));
+		this._addOffers(SKBookOffer.loadFromConfig(configSection, "offers"));
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
 		// save offers:
-		BookOffer.saveToConfig(configSection, "offers", this.getOffers());
+		SKBookOffer.saveToConfig(configSection, "offers", this.getOffers());
 	}
 
 	@Override
@@ -156,7 +155,8 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	protected static Generation getBookGeneration(ItemStack item) {
 		BookMeta meta = getBookMeta(item);
 		if (meta == null) return null;
-		return meta.getGeneration();
+		if (!meta.hasGeneration()) return null;
+		return meta.getGeneration(); // assert: not null
 	}
 
 	protected static boolean isCopyableBook(ItemStack item) {
@@ -177,7 +177,8 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	protected static String getTitleOfBook(ItemStack item) {
 		BookMeta meta = getBookMeta(item);
 		if (meta == null) return null;
-		return meta.getTitle();
+		if (!meta.hasTitle()) return null;
+		return meta.getTitle(); // assert: not null or empty
 	}
 
 	protected boolean hasChestBlankBooks() {
@@ -228,15 +229,18 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	// OFFERS:
 
+	@Override
 	public List<BookOffer> getOffers() {
 		return offersView;
 	}
 
+	@Override
 	public BookOffer getOffer(ItemStack bookItem) {
 		String bookTitle = getTitleOfBook(bookItem);
 		return this.getOffer(bookTitle);
 	}
 
+	@Override
 	public BookOffer getOffer(String bookTitle) {
 		for (BookOffer offer : this.getOffers()) {
 			if (offer.getBookTitle().equals(bookTitle)) {
@@ -246,14 +250,47 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		return null;
 	}
 
-	public BookOffer addOffer(String bookTitle, int price) {
-		// create offer (also handles validation):
-		BookOffer newOffer = new BookOffer(bookTitle, price);
+	@Override
+	public void removeOffer(String bookTitle) {
+		Iterator<BookOffer> iterator = offers.iterator();
+		while (iterator.hasNext()) {
+			if (iterator.next().getBookTitle().equals(bookTitle)) {
+				iterator.remove();
+				this.markDirty();
+				break;
+			}
+		}
+	}
 
-		// add new offer (replacing any previous offer for the same book):
-		this._addOffer(newOffer);
+	@Override
+	public void clearOffers() {
+		this._clearOffers();
 		this.markDirty();
-		return newOffer;
+	}
+
+	private void _clearOffers() {
+		offers.clear();
+	}
+
+	@Override
+	public void setOffers(List<BookOffer> offers) {
+		Validate.notNull(offers, "Offers is null!");
+		Validate.noNullElements(offers, "Offers contains null elements!");
+		this._setOffers(offers);
+		this.markDirty();
+	}
+
+	private void _setOffers(List<? extends BookOffer> offers) {
+		assert offers != null && !offers.contains(null);
+		this._clearOffers();
+		this._addOffers(offers);
+	}
+
+	@Override
+	public void addOffer(BookOffer offer) {
+		Validate.notNull(offer, "Offer is null!");
+		this._addOffer(offer);
+		this.markDirty();
 	}
 
 	private void _addOffer(BookOffer offer) {
@@ -263,32 +300,20 @@ public class BookPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		offers.add(offer);
 	}
 
-	private void _addOffers(Collection<BookOffer> offers) {
-		assert offers != null;
-		for (BookOffer offer : offers) {
-			if (offer == null) continue; // skip invalid entries
-			// add new offer (replacing any previous offer for the same book):
-			this._addOffer(offer);
-		}
-	}
-
-	private void _clearOffers() {
-		offers.clear();
-	}
-
-	public void clearOffers() {
-		this._clearOffers();
+	@Override
+	public void addOffers(List<BookOffer> offers) {
+		Validate.notNull(offers, "Offers is null!");
+		Validate.noNullElements(offers, "Offers contains null elements!");
+		this._addOffers(offers);
 		this.markDirty();
 	}
 
-	public void removeOffer(String bookTitle) {
-		Iterator<BookOffer> iterator = offers.iterator();
-		while (iterator.hasNext()) {
-			if (iterator.next().getBookTitle().equals(bookTitle)) {
-				iterator.remove();
-				this.markDirty();
-				break;
-			}
+	private void _addOffers(List<? extends BookOffer> offers) {
+		assert offers != null && !offers.contains(null);
+		for (BookOffer offer : offers) {
+			assert offer != null;
+			// add new offer; replaces any previous offer for the same book:
+			this._addOffer(offer);
 		}
 	}
 }

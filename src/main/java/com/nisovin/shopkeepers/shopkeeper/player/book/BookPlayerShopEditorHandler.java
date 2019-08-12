@@ -8,25 +8,26 @@ import java.util.Set;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
-import com.nisovin.shopkeepers.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.util.ItemCount;
 
 public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	protected BookPlayerShopEditorHandler(BookPlayerShopkeeper shopkeeper) {
+	protected BookPlayerShopEditorHandler(SKBookPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
 	}
 
 	@Override
-	public BookPlayerShopkeeper getShopkeeper() {
-		return (BookPlayerShopkeeper) super.getShopkeeper();
+	public SKBookPlayerShopkeeper getShopkeeper() {
+		return (SKBookPlayerShopkeeper) super.getShopkeeper();
 	}
 
 	@Override
 	protected List<TradingRecipeDraft> getTradingRecipes() {
-		BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		SKBookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
 		// only adding one recipe per book title:
@@ -50,7 +51,7 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			ItemCount itemCount = chestItems.get(chestItemIndex);
 			ItemStack itemFromChest = itemCount.getItem(); // this item is already a copy with amount 1
 
-			String bookTitle = BookPlayerShopkeeper.getTitleOfBook(itemFromChest);
+			String bookTitle = SKBookPlayerShopkeeper.getTitleOfBook(itemFromChest);
 			if (bookTitles.contains(bookTitle)) {
 				continue; // already added a recipe for a book with this name
 			}
@@ -66,7 +67,7 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 	@Override
 	protected void clearRecipes() {
-		BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		SKBookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		shopkeeper.clearOffers();
 	}
 
@@ -74,15 +75,15 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	protected void addRecipe(Player player, TradingRecipeDraft recipe) {
 		assert recipe != null && recipe.isValid();
 		ItemStack bookItem = recipe.getResultItem();
-		if (!BookPlayerShopkeeper.isCopyableOrDummyBook(bookItem)) return;
+		if (!SKBookPlayerShopkeeper.isCopyableOrDummyBook(bookItem)) return;
 
-		String bookTitle = BookPlayerShopkeeper.getTitleOfBook(bookItem);
+		String bookTitle = SKBookPlayerShopkeeper.getTitleOfBook(bookItem);
 		if (bookTitle == null) return;
 
 		int price = this.getPrice(recipe);
 		if (price <= 0) return;
 
-		BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.addOffer(bookTitle, price);
+		SKBookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		shopkeeper.addOffer(ShopkeepersAPI.createBookOffer(bookTitle, price));
 	}
 }

@@ -1,11 +1,11 @@
 package com.nisovin.shopkeepers.shopkeeper.player.buy;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -14,17 +14,19 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.player.buy.BuyingPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
-import com.nisovin.shopkeepers.shopkeeper.offers.PriceOffer;
+import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
-public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
+public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implements BuyingPlayerShopkeeper {
 
 	private static final Filter<ItemStack> ITEM_FILTER = (ItemStack item) -> {
 		if (Settings.isCurrencyItem(item) || Settings.isHighCurrencyItem(item)) return false;
@@ -38,23 +40,23 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	private final List<PriceOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
-	 * Creates a not yet initialized {@link BuyingPlayerShopkeeper} (for use in sub-classes).
+	 * Creates a not yet initialized {@link SKBuyingPlayerShopkeeper} (for use in sub-classes).
 	 * <p>
 	 * See {@link AbstractShopkeeper} for details on initialization.
 	 * 
 	 * @param id
 	 *            the shopkeeper id
 	 */
-	protected BuyingPlayerShopkeeper(int id) {
+	protected SKBuyingPlayerShopkeeper(int id) {
 		super(id);
 	}
 
-	protected BuyingPlayerShopkeeper(int id, PlayerShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	protected SKBuyingPlayerShopkeeper(int id, PlayerShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		super(id);
 		this.initOnCreation(shopCreationData);
 	}
 
-	protected BuyingPlayerShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+	protected SKBuyingPlayerShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super(id);
 		this.initOnLoad(configSection);
 	}
@@ -74,15 +76,14 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
 		// load offers:
-		this._clearOffers();
-		this._addOffers(PriceOffer.loadFromConfig(configSection, "offers"));
+		this._setOffers(SKPriceOffer.loadFromConfig(configSection, "offers"));
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
 		// save offers:
-		PriceOffer.saveToConfig(configSection, "offers", this.getOffers());
+		SKPriceOffer.saveToConfig(configSection, "offers", this.getOffers());
 	}
 
 	@Override
@@ -111,10 +112,12 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 
 	// OFFERS:
 
+	@Override
 	public List<PriceOffer> getOffers() {
 		return offersView;
 	}
 
+	@Override
 	public PriceOffer getOffer(ItemStack tradedItem) {
 		for (PriceOffer offer : this.getOffers()) {
 			if (ItemUtils.isSimilar(offer.getItem(), tradedItem)) {
@@ -124,14 +127,47 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		return null;
 	}
 
-	public PriceOffer addOffer(ItemStack tradedItem, int price) {
-		// create offer (also handles validation):
-		PriceOffer newOffer = new PriceOffer(tradedItem, price);
+	@Override
+	public void removeOffer(ItemStack tradedItem) {
+		Iterator<PriceOffer> iterator = offers.iterator();
+		while (iterator.hasNext()) {
+			if (ItemUtils.isSimilar(iterator.next().getItem(), tradedItem)) {
+				iterator.remove();
+				this.markDirty();
+				break;
+			}
+		}
+	}
 
-		// add new offer (replacing any previous offer for the same item):
-		this._addOffer(newOffer);
+	@Override
+	public void clearOffers() {
+		this._clearOffers();
 		this.markDirty();
-		return newOffer;
+	}
+
+	private void _clearOffers() {
+		offers.clear();
+	}
+
+	@Override
+	public void setOffers(List<PriceOffer> offers) {
+		Validate.notNull(offers, "Offers is null!");
+		Validate.noNullElements(offers, "Offers contains null elements!");
+		this._setOffers(offers);
+		this.markDirty();
+	}
+
+	private void _setOffers(List<? extends PriceOffer> offers) {
+		assert offers != null && !offers.contains(null);
+		this._clearOffers();
+		this._addOffers(offers);
+	}
+
+	@Override
+	public void addOffer(PriceOffer offer) {
+		Validate.notNull(offer, "Offer is null!");
+		this._addOffer(offer);
+		this.markDirty();
 	}
 
 	private void _addOffer(PriceOffer offer) {
@@ -141,32 +177,20 @@ public class BuyingPlayerShopkeeper extends AbstractPlayerShopkeeper {
 		offers.add(offer);
 	}
 
-	private void _addOffers(Collection<PriceOffer> offers) {
-		assert offers != null;
-		for (PriceOffer offer : offers) {
-			if (offer == null) continue; // skip invalid entries
-			// add new offer (replacing any previous offer for the same item):
-			this._addOffer(offer);
-		}
-	}
-
-	private void _clearOffers() {
-		offers.clear();
-	}
-
-	public void clearOffers() {
-		this._clearOffers();
+	@Override
+	public void addOffers(List<PriceOffer> offers) {
+		Validate.notNull(offers, "Offers is null!");
+		Validate.noNullElements(offers, "Offers contains null elements!");
+		this._addOffers(offers);
 		this.markDirty();
 	}
 
-	public void removeOffer(ItemStack tradedItem) {
-		Iterator<PriceOffer> iterator = offers.iterator();
-		while (iterator.hasNext()) {
-			if (ItemUtils.isSimilar(iterator.next().getItem(), tradedItem)) {
-				iterator.remove();
-				this.markDirty();
-				break;
-			}
+	private void _addOffers(List<? extends PriceOffer> offers) {
+		assert offers != null && !offers.contains(null);
+		for (PriceOffer offer : offers) {
+			assert offer != null;
+			// add new offer; replaces any previous offer for the same item:
+			this._addOffer(offer);
 		}
 	}
 }

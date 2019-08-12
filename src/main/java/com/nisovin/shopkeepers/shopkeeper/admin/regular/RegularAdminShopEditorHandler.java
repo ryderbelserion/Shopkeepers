@@ -7,20 +7,21 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
-import com.nisovin.shopkeepers.shopkeeper.offers.TradingOffer;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 
 public class RegularAdminShopEditorHandler extends EditorHandler {
 
-	protected RegularAdminShopEditorHandler(RegularAdminShopkeeper shopkeeper) {
+	protected RegularAdminShopEditorHandler(SKRegularAdminShopkeeper shopkeeper) {
 		super(SKDefaultUITypes.EDITOR(), shopkeeper);
 	}
 
 	@Override
-	public RegularAdminShopkeeper getShopkeeper() {
-		return (RegularAdminShopkeeper) super.getShopkeeper();
+	public SKRegularAdminShopkeeper getShopkeeper() {
+		return (SKRegularAdminShopkeeper) super.getShopkeeper();
 	}
 
 	@Override
@@ -31,7 +32,7 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 
 	@Override
 	protected List<TradingRecipeDraft> getTradingRecipes() {
-		RegularAdminShopkeeper shopkeeper = this.getShopkeeper();
+		SKRegularAdminShopkeeper shopkeeper = this.getShopkeeper();
 		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
 		// add the shopkeeper's offers:
@@ -44,15 +45,15 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 
 	@Override
 	protected void clearRecipes() {
-		RegularAdminShopkeeper shopkeeper = this.getShopkeeper();
+		SKRegularAdminShopkeeper shopkeeper = this.getShopkeeper();
 		shopkeeper.clearOffers();
 	}
 
 	@Override
 	protected void addRecipe(Player player, TradingRecipeDraft recipe) {
 		assert recipe != null && recipe.isValid();
-		RegularAdminShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.addOffer(recipe.getResultItem(), recipe.getItem1(), recipe.getItem2());
+		SKRegularAdminShopkeeper shopkeeper = this.getShopkeeper();
+		shopkeeper.addOffer(ShopkeepersAPI.createTradingOffer(recipe.getResultItem(), recipe.getItem1(), recipe.getItem2()));
 	}
 
 	@Override

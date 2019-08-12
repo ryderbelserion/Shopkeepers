@@ -1,16 +1,16 @@
-package com.nisovin.shopkeepers.api.shopkeeper;
+package com.nisovin.shopkeepers.api.shopkeeper.offers;
 
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 
 /**
- * An unmodifiable trading recipe.
+ * Stores information about up to two items being traded for another item.
  * <p>
- * Instances of this can be created via
- * {@link ShopkeepersAPI#createTradingRecipe(ItemStack, ItemStack, ItemStack, boolean)}.
+ * Instances of this can be created via {@link ShopkeepersAPI#createTradingOffer(ItemStack, ItemStack, ItemStack)}.
  */
-public interface TradingRecipe {
+public interface TradingOffer {
 
 	/**
 	 * Gets the result item.
@@ -34,14 +34,7 @@ public interface TradingRecipe {
 	public ItemStack getItem2();
 
 	/**
-	 * Gets whether this trading recipe is out of stock.
-	 * 
-	 * @return <code>true</code> if out of stock
-	 */
-	public boolean isOutOfStock();
-
-	/**
-	 * Checks if the given items are equal to the items of this trading recipe.
+	 * Checks if the given items are equal to the items of this trading offer.
 	 * 
 	 * @param resultItem
 	 *            the result item
@@ -54,11 +47,11 @@ public interface TradingRecipe {
 	public boolean areItemsEqual(ItemStack resultItem, ItemStack item1, ItemStack item2);
 
 	/**
-	 * Checks if the items of this and the given trading recipe are equal.
+	 * Checks if the items of this offer and the given trading recipe are equal.
 	 * 
-	 * @param otherRecipe
-	 *            the other trading recipe
+	 * @param tradingRecipe
+	 *            the trading recipe to compare with
 	 * @return <code>true</code> if the items are equal
 	 */
-	public boolean areItemsEqual(TradingRecipe otherRecipe);
+	public boolean areItemsEqual(TradingRecipe tradingRecipe);
 }

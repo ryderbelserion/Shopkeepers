@@ -10,7 +10,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopType;
 
-public class RegularAdminShopType extends AbstractAdminShopType<RegularAdminShopkeeper> {
+public class RegularAdminShopType extends AbstractAdminShopType<SKRegularAdminShopkeeper> {
 
 	public RegularAdminShopType() {
 		super("admin", ShopkeepersPlugin.ADMIN_PERMISSION);
@@ -37,16 +37,16 @@ public class RegularAdminShopType extends AbstractAdminShopType<RegularAdminShop
 	}
 
 	@Override
-	public RegularAdminShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	public SKRegularAdminShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		this.validateCreationData(shopCreationData);
-		RegularAdminShopkeeper shopkeeper = new RegularAdminShopkeeper(id, shopCreationData);
+		SKRegularAdminShopkeeper shopkeeper = new SKRegularAdminShopkeeper(id, shopCreationData);
 		return shopkeeper;
 	}
 
 	@Override
-	public RegularAdminShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+	public SKRegularAdminShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
 		this.validateConfigSection(configSection);
-		RegularAdminShopkeeper shopkeeper = new RegularAdminShopkeeper(id, configSection);
+		SKRegularAdminShopkeeper shopkeeper = new SKRegularAdminShopkeeper(id, configSection);
 		return shopkeeper;
 	}
 }

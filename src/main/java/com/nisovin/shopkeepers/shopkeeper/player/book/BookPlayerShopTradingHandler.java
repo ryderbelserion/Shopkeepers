@@ -6,35 +6,35 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
-import com.nisovin.shopkeepers.shopkeeper.offers.BookOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
-	protected BookPlayerShopTradingHandler(BookPlayerShopkeeper shopkeeper) {
+	protected BookPlayerShopTradingHandler(SKBookPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
 	}
 
 	@Override
-	public BookPlayerShopkeeper getShopkeeper() {
-		return (BookPlayerShopkeeper) super.getShopkeeper();
+	public SKBookPlayerShopkeeper getShopkeeper() {
+		return (SKBookPlayerShopkeeper) super.getShopkeeper();
 	}
 
 	@Override
 	protected boolean prepareTrade(TradeData tradeData) {
 		if (!super.prepareTrade(tradeData)) return false;
-		BookPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		SKBookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Player tradingPlayer = tradeData.tradingPlayer;
 		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
 		ItemStack bookItem = tradingRecipe.getResultItem();
-		if (!BookPlayerShopkeeper.isValidBookCopy(bookItem)) {
+		if (!SKBookPlayerShopkeeper.isValidBookCopy(bookItem)) {
 			this.debugPreventedTrade(tradingPlayer, "The traded item is no valid book copy!");
 			return false;
 		}
 
-		String bookTitle = BookPlayerShopkeeper.getTitleOfBook(bookItem);
+		String bookTitle = SKBookPlayerShopkeeper.getTitleOfBook(bookItem);
 		if (bookTitle == null) {
 			// this should not happen.. because the recipes were created based on the shopkeeper's offers
 			this.debugPreventedTrade(tradingPlayer, "Couldn't determine the book title of the traded item!");
@@ -44,7 +44,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		// get offer for this type of item:
 		BookOffer offer = shopkeeper.getOffer(bookTitle);
 		if (offer == null) {
-			// this should not happen.. because the recipes were created based on the shopkeeper's offers
+			// this might happen if the trades got modified while the player was trading:
 			this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
 			return false;
 		}

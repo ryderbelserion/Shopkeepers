@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 
-public class BookPlayerShopType extends AbstractPlayerShopType<BookPlayerShopkeeper> {
+public class BookPlayerShopType extends AbstractPlayerShopType<SKBookPlayerShopkeeper> {
 
 	public BookPlayerShopType() {
 		super("book", ShopkeepersPlugin.PLAYER_BOOK_PERMISSION);
@@ -38,16 +38,16 @@ public class BookPlayerShopType extends AbstractPlayerShopType<BookPlayerShopkee
 	}
 
 	@Override
-	public BookPlayerShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	public SKBookPlayerShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		this.validateCreationData(shopCreationData);
-		BookPlayerShopkeeper shopkeeper = new BookPlayerShopkeeper(id, (PlayerShopCreationData) shopCreationData);
+		SKBookPlayerShopkeeper shopkeeper = new SKBookPlayerShopkeeper(id, (PlayerShopCreationData) shopCreationData);
 		return shopkeeper;
 	}
 
 	@Override
-	public BookPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+	public SKBookPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
 		this.validateConfigSection(configSection);
-		BookPlayerShopkeeper shopkeeper = new BookPlayerShopkeeper(id, configSection);
+		SKBookPlayerShopkeeper shopkeeper = new SKBookPlayerShopkeeper(id, configSection);
 		return shopkeeper;
 	}
 }

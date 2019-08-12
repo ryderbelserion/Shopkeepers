@@ -29,6 +29,12 @@ Date format: (YYYY-MM-DD)
 * Changed: Some entity attributes are setup prior to entity spawning now (such as metadata, non-persist flag and name (if it has/uses one)). This should help other plugins to identify Shopkeeper entities during spawning.
 * Changed: Added setting 'increment-villager-statistics' (default: false) which controls whether opening the trading menu and trading with shopkeepers increment minecraft's 'talked-to-villager' and 'traded-with-villager' statistics. Previously the talked-to-villager statistics would always get incremented and the traded-with-villager statistic was not used.
 
+* API: Added interfaces for the different shopkeeper types and their offers to the API. They allow modifying the shopkeepers' trades. Factory methods for the different types of offers are provided via ShopkeepersPlugin and ShopkeepersAPI. The internal shopkeeper classes got renamed.
+* API: Added a few utility methods to TradingRecipe for comparing the recipes with given items or other recipes.
+* API: Added toString, hashCode and equals to TradingRecipe and the new offer types.
+* API: Minor javadoc changes.
+* API/Fixed: ShopkeepersAPI was missing getDefaultUITypes.
+
 * Internal: Made all priorities and ignoring of cancelled events explicit.
 * Internal: Moved code for checking chest access into util package.
 * Internal: Metrics will also report now whether the settings 'check-shop-interaction-result', 'bypass-spawn-blocking', 'enable-spawn-verifier' and 'increment-villager-statistics' are used.

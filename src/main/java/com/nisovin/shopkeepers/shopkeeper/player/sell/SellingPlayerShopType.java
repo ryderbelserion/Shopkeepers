@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 
-public class SellingPlayerShopType extends AbstractPlayerShopType<SellingPlayerShopkeeper> {
+public class SellingPlayerShopType extends AbstractPlayerShopType<SKSellingPlayerShopkeeper> {
 
 	public SellingPlayerShopType() {
 		super("sell", Arrays.asList("selling", "normal", "player"), ShopkeepersPlugin.PLAYER_SELL_PERMISSION);
@@ -39,16 +39,16 @@ public class SellingPlayerShopType extends AbstractPlayerShopType<SellingPlayerS
 	}
 
 	@Override
-	public SellingPlayerShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	public SKSellingPlayerShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		this.validateCreationData(shopCreationData);
-		SellingPlayerShopkeeper shopkeeper = new SellingPlayerShopkeeper(id, (PlayerShopCreationData) shopCreationData);
+		SKSellingPlayerShopkeeper shopkeeper = new SKSellingPlayerShopkeeper(id, (PlayerShopCreationData) shopCreationData);
 		return shopkeeper;
 	}
 
 	@Override
-	public SellingPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+	public SKSellingPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
 		this.validateConfigSection(configSection);
-		SellingPlayerShopkeeper shopkeeper = new SellingPlayerShopkeeper(id, configSection);
+		SKSellingPlayerShopkeeper shopkeeper = new SKSellingPlayerShopkeeper(id, configSection);
 		return shopkeeper;
 	}
 }

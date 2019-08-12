@@ -4,32 +4,32 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
-import com.nisovin.shopkeepers.shopkeeper.offers.TradingOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
-	protected TradingPlayerShopTradingHandler(TradingPlayerShopkeeper shopkeeper) {
+	protected TradingPlayerShopTradingHandler(SKTradingPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
 	}
 
 	@Override
-	public TradingPlayerShopkeeper getShopkeeper() {
-		return (TradingPlayerShopkeeper) super.getShopkeeper();
+	public SKTradingPlayerShopkeeper getShopkeeper() {
+		return (SKTradingPlayerShopkeeper) super.getShopkeeper();
 	}
 
 	@Override
 	protected boolean prepareTrade(TradeData tradeData) {
 		if (!super.prepareTrade(tradeData)) return false;
-		TradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		SKTradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Player tradingPlayer = tradeData.tradingPlayer;
 		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
 		// find offer:
 		TradingOffer offer = shopkeeper.getOffer(tradingRecipe);
 		if (offer == null) {
-			// this should not happen.. because the recipes were created based on the shopkeeper's offers
+			// this might happen if the trades got modified while the player was trading:
 			this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
 			return false;
 		}

@@ -64,4 +64,47 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	public final boolean isOutOfStock() {
 		return outOfStock;
 	}
+
+	@Override
+	public boolean areItemsEqual(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+		return super.areItemsEqual(resultItem, item1, item2);
+	}
+
+	@Override
+	public boolean areItemsEqual(TradingRecipe otherRecipe) {
+		return super.areItemsEqual(otherRecipe);
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("SKTradingRecipe [resultItem=");
+		builder.append(resultItem);
+		builder.append(", item1=");
+		builder.append(item1);
+		builder.append(", item2=");
+		builder.append(item2);
+		builder.append(", outOfStock=");
+		builder.append(outOfStock);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + (outOfStock ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (!super.equals(obj)) return false;
+		if (!(obj instanceof SKTradingRecipe)) return false;
+		SKTradingRecipe other = (SKTradingRecipe) obj;
+		if (outOfStock != other.outOfStock) return false;
+		return true;
+	}
 }

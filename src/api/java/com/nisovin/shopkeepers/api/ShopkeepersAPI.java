@@ -10,9 +10,13 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopTypesRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
 
 public final class ShopkeepersAPI {
@@ -78,6 +82,10 @@ public final class ShopkeepersAPI {
 		return getPlugin().getUIRegistry();
 	}
 
+	public static DefaultUITypes getDefaultUITypes() {
+		return getPlugin().getDefaultUITypes();
+	}
+
 	// SHOPKEEPER REGISTRY
 
 	public static ShopkeeperRegistry getShopkeeperRegistry() {
@@ -112,11 +120,27 @@ public final class ShopkeepersAPI {
 		return getPlugin().handleShopkeeperCreation(shopCreationData);
 	}
 
+	// FACTORY
+
 	public static TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		return getPlugin().createTradingRecipe(resultItem, item1, item2);
 	}
 
 	public static TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2, boolean outOfStock) {
 		return getPlugin().createTradingRecipe(resultItem, item1, item2, outOfStock);
+	}
+
+	// OFFERS
+
+	public static PriceOffer createPriceOffer(ItemStack item, int price) {
+		return getPlugin().createPriceOffer(item, price);
+	}
+
+	public static TradingOffer createTradingOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+		return getPlugin().createTradingOffer(resultItem, item1, item2);
+	}
+
+	public static BookOffer createBookOffer(String bookTitle, int price) {
+		return getPlugin().createBookOffer(bookTitle, price);
 	}
 }

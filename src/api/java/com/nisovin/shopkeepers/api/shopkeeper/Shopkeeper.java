@@ -69,7 +69,7 @@ public interface Shopkeeper {
 	 * Gets the shop's unique id.
 	 * 
 	 * <p>
-	 * This id is globally unique across all shopkeepers that ever existed.
+	 * This id is globally unique across all shopkeepers.
 	 * 
 	 * @return the shop's unique id
 	 */
@@ -123,7 +123,7 @@ public interface Shopkeeper {
 	 * Managing (adding, removing, editing, validating) the overall available trading recipes of this shopkeeper might
 	 * differ between different shopkeeper types and is therefore in their responsibility.
 	 * <p>
-	 * The <code>player</code> parameter can be used to request player-specific trading recipes, if the shopkeeper types
+	 * The <code>player</code> parameter can be used to request player-specific trading recipes, if the shopkeeper type
 	 * supports that.
 	 * 
 	 * @param player

@@ -29,6 +29,9 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.chestprotection.ProtectedChests;
 import com.nisovin.shopkeepers.commands.Commands;
@@ -52,6 +55,9 @@ import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.SKShopTypesRegistry;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
+import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
+import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
+import com.nisovin.shopkeepers.shopkeeper.offers.SKTradingOffer;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
@@ -617,7 +623,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 	}
 
-	//
+	// FACTORY
 
 	@Override
 	public TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {
@@ -627,5 +633,22 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	@Override
 	public TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2, boolean outOfStock) {
 		return new SKTradingRecipe(resultItem, item1, item2, outOfStock);
+	}
+
+	// OFFERS
+
+	@Override
+	public PriceOffer createPriceOffer(ItemStack item, int price) {
+		return new SKPriceOffer(item, price);
+	}
+
+	@Override
+	public TradingOffer createTradingOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+		return new SKTradingOffer(resultItem, item1, item2);
+	}
+
+	@Override
+	public BookOffer createBookOffer(String bookTitle, int price) {
+		return new SKBookOffer(bookTitle, price);
 	}
 }

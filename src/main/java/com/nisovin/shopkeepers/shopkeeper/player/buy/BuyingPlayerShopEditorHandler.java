@@ -8,26 +8,27 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
-import com.nisovin.shopkeepers.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
-	protected BuyingPlayerShopEditorHandler(BuyingPlayerShopkeeper shopkeeper) {
+	protected BuyingPlayerShopEditorHandler(SKBuyingPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
 	}
 
 	@Override
-	public BuyingPlayerShopkeeper getShopkeeper() {
-		return (BuyingPlayerShopkeeper) super.getShopkeeper();
+	public SKBuyingPlayerShopkeeper getShopkeeper() {
+		return (SKBuyingPlayerShopkeeper) super.getShopkeeper();
 	}
 
 	@Override
 	protected List<TradingRecipeDraft> getTradingRecipes() {
-		BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
 		// add the shopkeeper's offers:
@@ -58,7 +59,7 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 	@Override
 	protected void clearRecipes() {
-		BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		shopkeeper.clearOffers();
 	}
 
@@ -75,8 +76,8 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		if (priceItem.getType() != Settings.currencyItem) return; // checking this just in case
 		assert priceItem.getAmount() > 0;
 
-		BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.addOffer(tradedItem, priceItem.getAmount());
+		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		shopkeeper.addOffer(ShopkeepersAPI.createPriceOffer(tradedItem, priceItem.getAmount()));
 	}
 
 	@Override

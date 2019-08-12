@@ -6,25 +6,25 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
-import com.nisovin.shopkeepers.shopkeeper.offers.PriceOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
-	protected BuyingPlayerShopTradingHandler(BuyingPlayerShopkeeper shopkeeper) {
+	protected BuyingPlayerShopTradingHandler(SKBuyingPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
 	}
 
 	@Override
-	public BuyingPlayerShopkeeper getShopkeeper() {
-		return (BuyingPlayerShopkeeper) super.getShopkeeper();
+	public SKBuyingPlayerShopkeeper getShopkeeper() {
+		return (SKBuyingPlayerShopkeeper) super.getShopkeeper();
 	}
 
 	@Override
 	protected boolean prepareTrade(TradeData tradeData) {
 		if (!super.prepareTrade(tradeData)) return false;
-		BuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
+		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Player tradingPlayer = tradeData.tradingPlayer;
 		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 

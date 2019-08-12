@@ -106,17 +106,60 @@ public class TradingRecipeDraft {
 		return ShopkeepersAPI.createTradingRecipe(resultItem, item1, item2, outOfStock);
 	}
 
-	public boolean areItemsEqual(TradingRecipeDraft otherRecipe) {
-		if (otherRecipe == null) return false;
-		if (!Objects.equal(resultItem, otherRecipe.resultItem)) return false;
-		if (!Objects.equal(item1, otherRecipe.item1)) return false;
-		if (!Objects.equal(item2, otherRecipe.item2)) return false;
+	public boolean areItemsEqual(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+		if (!Objects.equal(this.resultItem, resultItem)) return false;
+		if (!Objects.equal(this.item1, item1)) return false;
+		if (!Objects.equal(this.item2, item2)) return false;
 		return true;
 	}
 
+	public boolean areItemsEqual(TradingRecipeDraft otherRecipe) {
+		if (otherRecipe == null) return false;
+		return this.areItemsEqual(otherRecipe.resultItem, otherRecipe.item1, otherRecipe.item2);
+	}
+
 	public boolean areItemsEqual(TradingRecipe otherRecipe) {
-		// this is true for TradingRecipes based on SKTradingRecipe
-		if (!(otherRecipe instanceof TradingRecipeDraft)) return false; // also checks for null
-		return this.areItemsEqual((TradingRecipeDraft) otherRecipe);
+		if (otherRecipe == null) return false;
+		if (otherRecipe instanceof TradingRecipeDraft) {
+			// this is true for TradingRecipes based on SKTradingRecipe
+			return this.areItemsEqual((TradingRecipeDraft) otherRecipe); // avoids copying the items
+		} else {
+			return this.areItemsEqual(otherRecipe.getResultItem(), otherRecipe.getItem1(), otherRecipe.getItem2());
+		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("TradingRecipeDraft [resultItem=");
+		builder.append(resultItem);
+		builder.append(", item1=");
+		builder.append(item1);
+		builder.append(", item2=");
+		builder.append(item2);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((resultItem == null) ? 0 : resultItem.hashCode());
+		result = prime * result + ((item1 == null) ? 0 : item1.hashCode());
+		result = prime * result + ((item2 == null) ? 0 : item2.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (!(obj instanceof TradingRecipeDraft)) return false;
+		TradingRecipeDraft other = (TradingRecipeDraft) obj;
+		if (!Objects.equal(resultItem, other.resultItem)) return false;
+		if (!Objects.equal(item1, other.item1)) return false;
+		if (!Objects.equal(item2, other.item2)) return false;
+		return true;
 	}
 }
