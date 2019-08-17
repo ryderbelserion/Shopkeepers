@@ -5,8 +5,9 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: xxx
 
 ## v2.8.0 (TBA)
-### Supported MC versions: 1.14.3, 1.14.4
+### Supported MC versions: 1.14.4
 
+* Bumped Bukkit dependency from 1.14.3 to 1.14.4.
 * Changed: All priorities and ignoring of cancelled events were reconsidered.
   * Event handlers potentially modifying or canceling the event and which don't depend on other plugins' event handling are called early (LOW or LOWEST), so that other plugins can react to / ignore those modified or canceled events.
     * All event handlers which simply cancel some event use the LOW priority now and more consistently ignore the event if already cancelled. Previously they mostly used NORMAL priority.

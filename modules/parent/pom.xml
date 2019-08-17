@@ -10,6 +10,7 @@
 	<url>${shopkeepers.repository.url}</url>
 
 	<properties>
+		<!-- Shopkeepers version -->
 		<revision>2.8.0-SNAPSHOT</revision>
 		<root.relativePath>../..</root.relativePath>
 		<shopkeepers.version>${project.version}</shopkeepers.version>
@@ -139,10 +140,11 @@
 
 	<dependencyManagement>
 		<dependencies>
+			<!-- Lowest supported bukkit version. -->
 			<dependency>
 				<groupId>org.bukkit</groupId>
 				<artifactId>bukkit</artifactId>
-				<version>1.14.3-R0.1-SNAPSHOT</version>
+				<version>1.14.4-R0.1-SNAPSHOT</version>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>
