@@ -4,7 +4,7 @@
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
 # Determines the required config migrations. Do not edit manually!
-config-version: 1
+config-version: 2
 # The initial debugging state of the plugin.
 debug: false
 # Additional debugging options.

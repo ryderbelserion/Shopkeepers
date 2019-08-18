@@ -28,7 +28,7 @@ public class Settings {
 	/*
 	 * General Settings
 	 */
-	public static int configVersion = 1;
+	public static int configVersion = 2;
 	public static boolean debug = false;
 	/*
 	 * Available options:
