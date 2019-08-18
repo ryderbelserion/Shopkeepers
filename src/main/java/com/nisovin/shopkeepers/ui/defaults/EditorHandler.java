@@ -336,34 +336,47 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	protected ItemStack createPrevPageIcon(int page) {
-		String prevPage = "-";
+		int prevPage = 1;
+		String prevPageText = "-";
 		if (page > 1) {
-			prevPage = String.valueOf(page - 1);
+			prevPage = (page - 1);
+			prevPageText = String.valueOf(prevPage);
 		}
 		String itemName = Utils.replaceArgs(Settings.msgButtonPreviousPage,
-				"{prev_page}", prevPage,
+				"{prev_page}", prevPageText,
 				"{page}", String.valueOf(page),
 				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
-		return ItemUtils.setItemStackNameAndLore(Settings.previousPageItem.createItemStack(), itemName, Settings.msgButtonPreviousPageLore);
+		ItemStack item = Settings.previousPageItem.createItemStack();
+		// note: can exceed the item's natural max stack size
+		item.setAmount(Utils.trim(prevPage, 1, ItemUtils.MAX_STACK_SIZE));
+		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonPreviousPageLore);
 	}
 
 	protected ItemStack createNextPageIcon(int page) {
-		String nextPage = "-";
+		int nextPage = 1;
+		String nextPageText = "-";
 		if (page < TRADES_MAX_PAGES) {
-			nextPage = String.valueOf(page + 1);
+			nextPage = (page + 1);
+			nextPageText = String.valueOf(nextPage);
 		}
 		String itemName = Utils.replaceArgs(Settings.msgButtonNextPage,
-				"{next_page}", nextPage,
+				"{next_page}", nextPageText,
 				"{page}", String.valueOf(page),
 				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
-		return ItemUtils.setItemStackNameAndLore(Settings.nextPageItem.createItemStack(), itemName, Settings.msgButtonNextPageLore);
+		ItemStack item = Settings.nextPageItem.createItemStack();
+		// note: can exceed the item's natural max stack size
+		item.setAmount(Utils.trim(nextPage, 1, ItemUtils.MAX_STACK_SIZE));
+		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonNextPageLore);
 	}
 
 	protected ItemStack createCurrentPageIcon(int page) {
 		String itemName = Utils.replaceArgs(Settings.msgButtonCurrentPage,
 				"{page}", String.valueOf(page),
 				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
-		return ItemUtils.setItemStackNameAndLore(Settings.currentPageItem.createItemStack(), itemName, Settings.msgButtonCurrentPageLore);
+		ItemStack item = Settings.currentPageItem.createItemStack();
+		// note: can exceed the item's natural max stack size
+		item.setAmount(Utils.trim(page, 1, ItemUtils.MAX_STACK_SIZE));
+		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonCurrentPageLore);
 	}
 
 	protected ItemStack createTradeSetupIcon() {

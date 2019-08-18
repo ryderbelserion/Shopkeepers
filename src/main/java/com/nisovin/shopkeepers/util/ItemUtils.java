@@ -27,6 +27,8 @@ public final class ItemUtils {
 	private ItemUtils() {
 	}
 
+	public static int MAX_STACK_SIZE = 64;
+
 	// material utilities:
 
 	public static boolean isChest(Material material) {
@@ -64,6 +66,15 @@ public final class ItemUtils {
 		ItemStack normalizedClone = item.clone();
 		normalizedClone.setAmount(1);
 		return normalizedClone;
+	}
+
+	public static int trimItemAmount(ItemStack item, int amount) {
+		return trimItemAmount(item.getType(), amount);
+	}
+
+	// trims the amount between 1 and the item's max-stack-size
+	public static int trimItemAmount(Material itemType, int amount) {
+		return Utils.trim(amount, 1, itemType.getMaxStackSize());
 	}
 
 	public static ItemStack createItemStack(Material type, int amount, String displayName, List<String> lore) {

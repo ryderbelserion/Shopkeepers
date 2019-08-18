@@ -34,6 +34,7 @@ Date format: (YYYY-MM-DD)
 * Changed: When forcing an entity to spawn, the pitch and yaw of the expected and actual spawn location are ignored now. This avoids a warning message for some entity types (such as shulkers), which always spawn with fixed pitch and yaw.
 * Changed: Some entity attributes are setup prior to entity spawning now (such as metadata, non-persist flag and name (if it has/uses one)). This should help other plugins to identify Shopkeeper entities during spawning.
 * Changed: Added setting 'increment-villager-statistics' (default: false) which controls whether opening the trading menu and trading with shopkeepers increment minecraft's 'talked-to-villager' and 'traded-with-villager' statistics. Previously the talked-to-villager statistics would always get incremented and the traded-with-villager statistic was not used.
+* Added: The previous, current and next page items inside the editor view will now use their stack size to visualize the previous, current and next page number. This even works for items which are usually not stackable.
 
 * API: Added interfaces for the different shopkeeper types and their offers to the API. They allow modifying the shopkeepers' trades. Factory methods for the different types of offers are provided via ShopkeepersPlugin and ShopkeepersAPI. The internal shopkeeper classes got renamed.
 * API: Added a few utility methods to TradingRecipe for comparing the recipes with given items or other recipes.
