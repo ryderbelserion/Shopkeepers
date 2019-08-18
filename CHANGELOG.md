@@ -8,6 +8,10 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.14.4
 
 * Bumped Bukkit dependency from 1.14.3 to 1.14.4.
+* Added: Changed how items are getting defined in the config. Internally this new format uses Bukkit's item serialization for parsing the item data, which allows it to support the specification of arbitrary item data and hopefully not require any major maintenance for future minecraft versions. At the same time it tries to stay (slightly) more user-friendly than Bukkit's item serialization by omitting any data that can be restored by the plugin, by avoiding one level of nesting between the item type and item data, by translating ampersand ('&') color codes in display name and lore, and by offering a compact representation for specifying an item only by its type.
+  * This change also allows a more detailed specification of some of the editor button items. However, many editor buttons still miss corresponding config settings. Also keep in mind that the display name and lore for these button items get specified via corresponding message settings, so any specified item display name and lore will get replaced by that.
+  * When checking if an in-game item matches the item data specified in the config, only the specified data gets compared. So this does not check for item data equality, but instead the checked item is able to contain additional data but still get matched (like before, but previously this was limited to checking display name and lore).
+  * The previous item data gets automatically migrated to the new format (config version 2).
 * Changed: All priorities and ignoring of cancelled events were reconsidered.
   * Event handlers potentially modifying or canceling the event and which don't depend on other plugins' event handling are called early (LOW or LOWEST), so that other plugins can react to / ignore those modified or canceled events.
     * All event handlers which simply cancel some event use the LOW priority now and more consistently ignore the event if already cancelled. Previously they mostly used NORMAL priority.
@@ -24,7 +28,7 @@ Date format: (YYYY-MM-DD)
     * Interactions with regular villagers (blocking, hiring) are handled at HIGH priority (like before), so that hiring can be skipped if some other plugin has cancelled the interaction.
 * Changed: Replaced the 'bypass-shop-interaction-blocking' setting (default: false) with the new setting 'check-shop-interaction-result' (default: false).
 * Changed: The new 'check-shop-interaction-result' setting also applies to sign shops now.
-
+* Changed: Added a new 'loadbefore' entry for GriefPrevention as workaround to fix some compatibility issue caused by our changed event priorities and GriefPrevention reacting to entity interactions at LOWEST priority.
 * Fixed: Also cancelling the PlayerInteractAtEntityEvent for shopkeeper entity interactions.
 * Changed: When forcing an entity to spawn, the pitch and yaw of the expected and actual spawn location are ignored now. This avoids a warning message for some entity types (such as shulkers), which always spawn with fixed pitch and yaw.
 * Changed: Some entity attributes are setup prior to entity spawning now (such as metadata, non-persist flag and name (if it has/uses one)). This should help other plugins to identify Shopkeeper entities during spawning.
@@ -36,12 +40,17 @@ Date format: (YYYY-MM-DD)
 * API: Minor javadoc changes.
 * API/Fixed: ShopkeepersAPI was missing getDefaultUITypes.
 
+* Internal: Avoiding ItemStack#hasItemMeta calls before getting an item's ItemMeta, since this might be heavier than simply getting the ItemMeta directly and performing only the relevant checks on that. Internally ItemStack#hasItemMeta checks emptiness for all item attributes and might (for CraftItemStacks) even first copy all the item's data into a new ItemMeta object. And even if the item actually has no data (Bukkit ItemStack with null ItemMeta), ItemStack#getItemMeta will simply create a new empty ItemMeta object without having to copy any data, so this is still a similarly lightweight operation anyways.
 * Internal: Made all priorities and ignoring of cancelled events explicit.
 * Internal: Moved code for checking chest access into util package.
+* Internal: Moved config migrations into a separate package.
+* Internal: Moved some functions into ConfigUtils.
+* Internal: Slightly changed how the plugin checks whether the high currency is enabled.
 * Internal: Metrics will also report now whether the settings 'check-shop-interaction-result', 'bypass-spawn-blocking', 'enable-spawn-verifier' and 'increment-villager-statistics' are used.
 * Internal: Skipping shopkeeper spawning requests for unloaded worlds (should usually not be the case, but we guard against this anyways now).
 * Internal: Spigot is stopping the conversion of zombie villagers on its own now if the corresponding transform event gets cancelled.
 * Internal: Added a test to ensure consistency between ShopkeepersPlugin and ShopkeepersAPI.
+* Internal: Added ItemData tests. This requires CraftBukkit as new test dependency due to relying on item serialization.
 
 * Debugging: Small changes and additions to some debug messages, especially related to shopkeeper interactions and shopkeeper spawning.
 * Debugging: Added setting 'debug-options', which can be used to enable additional debugging tools.

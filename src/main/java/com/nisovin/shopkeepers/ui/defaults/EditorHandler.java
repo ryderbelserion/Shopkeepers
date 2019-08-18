@@ -344,7 +344,7 @@ public abstract class EditorHandler extends UIHandler {
 				"{prev_page}", prevPage,
 				"{page}", String.valueOf(page),
 				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
-		return ItemUtils.createItemStack(Settings.previousPageItem, 1, itemName, Settings.msgButtonPreviousPageLore);
+		return ItemUtils.setItemStackNameAndLore(Settings.previousPageItem.createItemStack(), itemName, Settings.msgButtonPreviousPageLore);
 	}
 
 	protected ItemStack createNextPageIcon(int page) {
@@ -356,21 +356,21 @@ public abstract class EditorHandler extends UIHandler {
 				"{next_page}", nextPage,
 				"{page}", String.valueOf(page),
 				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
-		return ItemUtils.createItemStack(Settings.nextPageItem, 1, itemName, Settings.msgButtonNextPageLore);
+		return ItemUtils.setItemStackNameAndLore(Settings.nextPageItem.createItemStack(), itemName, Settings.msgButtonNextPageLore);
 	}
 
 	protected ItemStack createCurrentPageIcon(int page) {
 		String itemName = Utils.replaceArgs(Settings.msgButtonCurrentPage,
 				"{page}", String.valueOf(page),
 				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
-		return ItemUtils.createItemStack(Settings.currentPageItem, page, itemName, Settings.msgButtonCurrentPageLore);
+		return ItemUtils.setItemStackNameAndLore(Settings.currentPageItem.createItemStack(), itemName, Settings.msgButtonCurrentPageLore);
 	}
 
 	protected ItemStack createTradeSetupIcon() {
 		ShopType<?> shopType = this.getShopkeeper().getType();
 		String itemName = Utils.replaceArgs(Settings.msgTradeSetupDescHeader,
 				"{shopType}", shopType.getDisplayName());
-		return ItemUtils.createItemStack(Settings.tradeSetupItem, 1, itemName, shopType.getTradeSetupDescription());
+		return ItemUtils.setItemStackNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, shopType.getTradeSetupDescription());
 	}
 
 	private final List<Button> buttons = new ArrayList<>();

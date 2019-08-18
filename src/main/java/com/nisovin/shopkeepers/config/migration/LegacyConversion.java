@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers;
+package com.nisovin.shopkeepers.config.migration;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

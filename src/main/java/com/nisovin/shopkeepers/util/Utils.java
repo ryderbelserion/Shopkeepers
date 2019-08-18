@@ -576,6 +576,20 @@ public final class Utils {
 		return decolored;
 	}
 
+	// decolorizes string entries, otherwise adopts them as they are
+	public static List<Object> decolorizeUnknown(List<?> colored) {
+		if (colored == null) return null;
+		List<Object> decolored = new ArrayList<>(colored.size());
+		for (Object entry : colored) {
+			Object decolorizedEntry = entry;
+			if (entry instanceof String) {
+				decolorizedEntry = Utils.translateColorCodesToAlternative(COLOR_CHAR_ALTERNATIVE, (String) entry);
+			}
+			decolored.add(decolorizedEntry);
+		}
+		return decolored;
+	}
+
 	public static String colorize(String message) {
 		if (message == null || message.isEmpty()) return message;
 		return ChatColor.translateAlternateColorCodes(COLOR_CHAR_ALTERNATIVE, message);
@@ -586,6 +600,20 @@ public final class Utils {
 		List<String> colored = new ArrayList<>(messages.size());
 		for (String message : messages) {
 			colored.add(Utils.colorize(message));
+		}
+		return colored;
+	}
+
+	// colorizes string entries, otherwise adopts them as they are
+	public static List<Object> colorizeUnknown(List<?> uncolored) {
+		if (uncolored == null) return null;
+		List<Object> colored = new ArrayList<>(uncolored.size());
+		for (Object entry : uncolored) {
+			Object colorizedEntry = entry;
+			if (entry instanceof String) {
+				colorizedEntry = Utils.colorize((String) entry);
+			}
+			colored.add(colorizedEntry);
 		}
 		return colored;
 	}

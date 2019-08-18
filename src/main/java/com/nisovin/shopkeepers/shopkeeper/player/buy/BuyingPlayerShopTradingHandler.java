@@ -162,7 +162,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
 		// add the remaining change into empty slots (all partial slots have already been cleared above):
 		// TODO this could probably be replaced with Utils.addItems
-		int maxStackSize = Settings.currencyItem.getMaxStackSize();
+		int maxStackSize = Settings.currencyItem.getType().getMaxStackSize();
 		for (int slot = 0; slot < contents.length; slot++) {
 			ItemStack itemStack = contents[slot];
 			if (!ItemUtils.isEmpty(itemStack)) continue;

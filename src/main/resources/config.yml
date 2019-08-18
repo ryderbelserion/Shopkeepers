@@ -61,12 +61,9 @@ enable-towny-restrictions: false
 # Shop Creation (and removal)
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
-# The item type used to create player shops.
+# The item used to create player shops.
 shop-creation-item: VILLAGER_SPAWN_EGG
-# The display name of the shop-creation item. Empty to ignore.
-shop-creation-item-name: ""
-# The item lore of the shop-creation item. Empty to ignore.
-shop-creation-item-lore: []
+
 # Whether to prevent normal usage of the shop-creation item. Players with the
 # bypass permission (usually admins) can bypass this.
 prevent-shop-creation-item-regular-usage: false
@@ -238,24 +235,24 @@ allow-renaming-of-player-npc-shops: false
 # The window title of the shopkeeper editor menu.
 editor-title: "Shopkeeper Editor"
 
-# The item types for the buttons and icons in the trades page row.
+# The items used for the buttons and icons in the trades page row.
+# The display name and lore of these items get set via the corresponding
+# messages and can therefore not be defined here.
 previous-page-item: WRITABLE_BOOK
 next-page-item: WRITABLE_BOOK
 current-page-item: WRITABLE_BOOK
 trade-setup-item: PAPER
 
-# The item type of the set-name button, and of the naming item (if enabled).
+# The item used for the set-name button, and the naming item (if enabled).
 name-item: NAME_TAG
-# The required item lore of the naming item. Empty to ignore.
-name-item-lore: []
 
 # Whether the editor menu of player shops contains an options to open the
 # shop's chest.
 enable-chest-option-on-player-shop: true
-# The item type of the open-chest button.
+# The item used for the open-chest button.
 chest-item: CHEST
 
-# The item type of the delete button.
+# The item used for the delete button.
 delete-item: BONE
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
@@ -286,13 +283,9 @@ hire-wandering-traders: false
 # Hiring
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
-# The item type to use for the hire button in player shopkeepers that are for
-# sale, and for the hire-cost item when hiring non-shopkeeper villagers.
+# The item to use for the hire button in player shopkeepers that are for sale,
+# and for the hire-cost when hiring non-shopkeeper villagers.
 hire-item: EMERALD
-# The required item name of the hire-cost item. Empty to ignore.
-hire-item-name: ""
-# The required item lore of the hire-cost item. Empty to ignore.
-hire-item-lore: []
 # The amount of hire-cost items it costs to hire a non-shopkeeper villager.
 hire-other-villagers-costs: 1
 # The title of the hiring inventory window when hiring a player shopkeeper.
@@ -337,42 +330,25 @@ tax-round-up: false
 # Currencies
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
-# The item type of the currency items used in player shops.
+# The item for the currency used in player shops.
 currency-item: EMERALD
-# The item name of the currency item. Empty to ignore.
-currency-item-name: ""
-# The item lore of the currency item. Empty to ignore.
-currency-item-lore: []
 
-# The item type of the placeholder when a player has not set the cost for an
-# item.
+# The item for the placeholder when a player has not set the cost for an item.
 zero-currency-item: BARRIER
-# The item name of the zero-currency item.
-zero-currency-item-name: ""
-# The item lore of the zero-currency item.
-zero-currency-item-lore: []
 
-# The item type of a second, higher-value currency used in the second trading
-# slot of player shops. Set to 'AIR' to disable the second currency.
+# The item for a second, higher-value currency used in the second trading slot
+# of player shops. Set to 'AIR' to disable the second currency.
 high-currency-item: EMERALD_BLOCK
-# The item name of the second currency item. Empty to ignore.
-high-currency-item-name: ""
-# The item lore of the second currency item. Empty to ignore.
-high-currency-item-lore: []
+
+# The item for the placeholder when a player has not set the second currency
+# cost for an item.
+high-zero-currency-item: BARRIER
 
 # The value of the second currency, based on the first currency.
 high-currency-value: 9
 # The second currency will only be used if an item's cost is greater than this
 # value.
 high-currency-min-cost: 20
-
-# The item type of the placeholder when a player has not set the second
-# currency cost for an item.
-high-zero-currency-item: BARRIER
-# The item name of the zero-second-currency item. Empty to ignore.
-high-zero-currency-item-name: ""
-# The item lore of the zero-second-currency item. Empty to ignore.
-high-zero-currency-item-lore: []
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Messages

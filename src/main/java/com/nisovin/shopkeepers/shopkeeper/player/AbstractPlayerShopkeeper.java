@@ -147,13 +147,9 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUITypes.EDITOR());
 			if (editorHandler.canOpen(player)) {
 				// rename with the player's item in hand:
-				String newName;
-				ItemMeta itemMeta;
-				if (!itemInMainHand.hasItemMeta() || (itemMeta = itemInMainHand.getItemMeta()) == null || !itemMeta.hasDisplayName()) {
-					newName = "";
-				} else {
-					newName = itemMeta.getDisplayName();
-				}
+				ItemMeta itemMeta = itemInMainHand.getItemMeta(); // can be null
+				String newName = (itemMeta != null && itemMeta.hasDisplayName()) ? itemMeta.getDisplayName() : "";
+				assert newName != null; // ItemMeta#getDisplayName returns non-null in all cases
 
 				// handled name changing:
 				if (SKShopkeepersPlugin.getInstance().getShopkeeperNaming().requestNameChange(player, this, newName)) {
@@ -281,7 +277,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		ItemStack item2 = null;
 
 		if (Settings.isHighCurrencyEnabled() && price > Settings.highCurrencyMinCost) {
-			int highCurrencyAmount = Math.min(price / Settings.highCurrencyValue, Settings.highCurrencyItem.getMaxStackSize());
+			int highCurrencyAmount = Math.min(price / Settings.highCurrencyValue, Settings.highCurrencyItem.getType().getMaxStackSize());
 			if (highCurrencyAmount > 0) {
 				remainingPrice -= (highCurrencyAmount * Settings.highCurrencyValue);
 				ItemStack highCurrencyItem = Settings.createHighCurrencyItem(highCurrencyAmount);
@@ -290,7 +286,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		}
 
 		if (remainingPrice > 0) {
-			if (remainingPrice > Settings.currencyItem.getMaxStackSize()) {
+			if (remainingPrice > Settings.currencyItem.getType().getMaxStackSize()) {
 				// cannot represent this price with the used currency items:
 				Log.warning("Shopkeeper at " + this.getPositionString() + " owned by " + ownerName + " has an invalid cost!");
 				return null;
@@ -309,7 +305,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// returns null (and logs a warning) if the price cannot be represented correctly by currency items
 	protected TradingRecipe createBuyingRecipe(ItemStack itemBeingBought, int price, boolean outOfStock) {
-		if (price > Settings.currencyItem.getMaxStackSize()) {
+		if (price > Settings.currencyItem.getType().getMaxStackSize()) {
 			// cannot represent this price with the used currency items:
 			Log.warning("Shopkeeper at " + this.getPositionString() + " owned by " + ownerName + " has an invalid cost!");
 			return null;

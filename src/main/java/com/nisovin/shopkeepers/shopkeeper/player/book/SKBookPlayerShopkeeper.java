@@ -147,9 +147,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	protected static BookMeta getBookMeta(ItemStack item) {
 		if (ItemUtils.isEmpty(item)) return null;
 		if (item.getType() != Material.WRITTEN_BOOK) return null;
-		if (!item.hasItemMeta()) return null;
-
-		return (BookMeta) item.getItemMeta();
+		return (BookMeta) item.getItemMeta(); // can be null
 	}
 
 	protected static Generation getBookGeneration(ItemStack item) {

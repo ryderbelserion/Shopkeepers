@@ -10,12 +10,14 @@ import java.util.Locale;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
+import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ConversionUtils;
+import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -56,9 +58,7 @@ public class Settings {
 	/*
 	 * Shop Creation (and removal)
 	 */
-	public static Material shopCreationItem = Material.VILLAGER_SPAWN_EGG;
-	public static String shopCreationItemName = "";
-	public static List<String> shopCreationItemLore = new ArrayList<>(0);
+	public static ItemData shopCreationItem = new ItemData(Material.VILLAGER_SPAWN_EGG);
 	public static boolean preventShopCreationItemRegularUsage = false;
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
@@ -165,18 +165,17 @@ public class Settings {
 	 */
 	public static String editorTitle = "Shopkeeper Editor";
 
-	public static Material previousPageItem = Material.WRITABLE_BOOK;
-	public static Material nextPageItem = Material.WRITABLE_BOOK;
-	public static Material currentPageItem = Material.WRITABLE_BOOK;
-	public static Material tradeSetupItem = Material.PAPER;
+	public static ItemData previousPageItem = new ItemData(Material.WRITABLE_BOOK);
+	public static ItemData nextPageItem = new ItemData(Material.WRITABLE_BOOK);
+	public static ItemData currentPageItem = new ItemData(Material.WRITABLE_BOOK);
+	public static ItemData tradeSetupItem = new ItemData(Material.PAPER);
 
-	public static Material nameItem = Material.NAME_TAG;
-	public static List<String> nameItemLore = new ArrayList<>(0);
+	public static ItemData nameItem = new ItemData(Material.NAME_TAG);
 
 	public static boolean enableChestOptionOnPlayerShop = true;
-	public static Material chestItem = Material.CHEST;
+	public static ItemData chestItem = new ItemData(Material.CHEST);
 
-	public static Material deleteItem = Material.BONE;
+	public static ItemData deleteItem = new ItemData(Material.BONE);
 
 	/*
 	 * Non-shopkeeper villagers
@@ -193,9 +192,7 @@ public class Settings {
 	/*
 	 * Hiring
 	 */
-	public static Material hireItem = Material.EMERALD;
-	public static String hireItemName = "";
-	public static List<String> hireItemLore = new ArrayList<>(0);
+	public static ItemData hireItem = new ItemData(Material.EMERALD);
 	public static int hireOtherVillagersCosts = 1;
 	public static String forHireTitle = "For Hire";
 	public static boolean hireRequireCreationPermission = true;
@@ -215,25 +212,14 @@ public class Settings {
 	/*
 	 * Currencies
 	 */
-	public static Material currencyItem = Material.EMERALD;
-	public static String currencyItemName = "";
-	public static List<String> currencyItemLore = new ArrayList<>(0);
-
-	public static Material zeroCurrencyItem = Material.BARRIER;
-	public static String zeroCurrencyItemName = "";
-	public static List<String> zeroCurrencyItemLore = new ArrayList<>(0);
-
-	public static Material highCurrencyItem = Material.EMERALD_BLOCK;
-	public static String highCurrencyItemName = "";
-	public static List<String> highCurrencyItemLore = new ArrayList<>(0);
+	public static ItemData currencyItem = new ItemData(Material.EMERALD);
+	public static ItemData zeroCurrencyItem = new ItemData(Material.BARRIER);
+	public static ItemData highCurrencyItem = new ItemData(Material.EMERALD_BLOCK);
+	public static ItemData highZeroCurrencyItem = new ItemData(Material.BARRIER);
 
 	// note: this can in general be larger than 64!
 	public static int highCurrencyValue = 9;
 	public static int highCurrencyMinCost = 20;
-
-	public static Material highZeroCurrencyItem = Material.BARRIER;
-	public static String highZeroCurrencyItemName = "";
-	public static List<String> highZeroCurrencyItemLore = new ArrayList<>(0);
 
 	/*
 	 * Messages
@@ -466,13 +452,10 @@ public class Settings {
 	public static boolean loadConfiguration(Configuration config) {
 		boolean configChanged = false;
 
-		// perform config migrations (if the config is not empty):
-		if (!config.getKeys(false).isEmpty()) {
-			int configVersion = config.getInt("config-version", 0); // default value is important here
-			if (configVersion <= 0) {
-				migrateConfig_0_to_1(config);
-				configChanged = true;
-			}
+		// perform config migrations:
+		boolean migrated = ConfigMigrations.applyMigrations(config);
+		if (migrated) {
+			configChanged = true;
 		}
 
 		// exempt a few string / string list settings from color conversion:
@@ -544,27 +527,23 @@ public class Settings {
 			Log.warning("Config: 'gravity-chunk-range' cannot be negative.");
 			gravityChunkRange = 0;
 		}
-		if (highCurrencyValue <= 0 && highCurrencyItem != Material.AIR) {
-			Log.debug("Config: 'high-currency-item' disabled because of 'high-currency-value' being less than 1.");
-			highCurrencyItem = Material.AIR;
-		}
 		// certain items cannot be of type AIR:
-		if (shopCreationItem == Material.AIR) {
+		if (shopCreationItem.getType() == Material.AIR) {
 			Log.warning("Config: 'shop-creation-item' can not be AIR.");
-			shopCreationItem = Material.VILLAGER_SPAWN_EGG;
+			shopCreationItem = shopCreationItem.withType(Material.VILLAGER_SPAWN_EGG);
 		}
-		if (hireItem == Material.AIR) {
+		if (hireItem.getType() == Material.AIR) {
 			Log.warning("Config: 'hire-item' can not be AIR.");
-			hireItem = Material.EMERALD;
+			hireItem = hireItem.withType(Material.EMERALD);
 		}
-		if (currencyItem == Material.AIR) {
+		if (currencyItem.getType() == Material.AIR) {
 			Log.warning("Config: 'currency-item' can not be AIR.");
-			currencyItem = Material.EMERALD;
+			currencyItem = currencyItem.withType(Material.EMERALD);
 		}
 		if (namingOfPlayerShopsViaItem) {
-			if (nameItem == Material.AIR) {
+			if (nameItem.getType() == Material.AIR) {
 				Log.warning("Config: 'name-item' can not be AIR if naming-of-player-shops-via-item is enabled!");
-				nameItem = Material.NAME_TAG;
+				nameItem = nameItem.withType(Material.NAME_TAG);
 			}
 		}
 		if (taxRate < 0) {
@@ -574,6 +553,9 @@ public class Settings {
 			Log.warning("Config: 'tax-rate' can not be larger than 100!");
 			taxRate = 100;
 		}
+
+		// prepare derived settings:
+		DerivedSettings.setup();
 
 		return configChanged;
 	}
@@ -594,12 +576,24 @@ public class Settings {
 			return config.getBoolean(configKey);
 		} else if (typeClass == Material.class) {
 			// this assumes that legacy item conversion has already been performed
-			Material material = loadMaterial(config, configKey, false);
+			Material material = ConfigUtils.loadMaterial(config, configKey);
 			if (material == null) {
 				Log.warning("Config: Unknown material for config entry '" + configKey + "': " + config.get(configKey));
 				Log.warning("Config: All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
 			}
 			return material;
+		} else if (typeClass == ItemData.class) {
+			ItemData itemData = ItemData.deserialize(config.get(configKey), (warning) -> {
+				Log.warning("Config: Couldn't load item data for config entry '" + configKey + "': " + warning);
+				if (warning.contains("Unknown item type")) { // TODO this is ugly
+					Log.warning("Config: All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
+				}
+			});
+			// normalize to not null:
+			if (itemData == null) {
+				itemData = new ItemData(Material.AIR);
+			}
+			return itemData;
 		} else if (typeClass == List.class) {
 			if (genericType == String.class) {
 				List<String> stringList = config.getStringList(configKey);
@@ -616,6 +610,11 @@ public class Settings {
 	}
 
 	private static void setConfigValue(Configuration config, String configKey, List<String> noColorConversionKeys, Class<?> typeClass, Class<?> genericType, Object value) {
+		if (value == null) {
+			config.set(configKey, value); // removes value
+			return;
+		}
+
 		if (typeClass == Material.class) {
 			config.set(configKey, ((Material) value).name());
 		} else if (typeClass == String.class) {
@@ -630,135 +629,11 @@ public class Settings {
 				value = Utils.decolorize(ConversionUtils.toStringList((List<?>) value));
 			}
 			config.set(configKey, value);
+		} else if (typeClass == ItemData.class) {
+			config.set(configKey, ((ItemData) value).serialize());
 		} else {
 			config.set(configKey, value);
 		}
-	}
-
-	private static Material loadMaterial(ConfigurationSection config, String key, boolean checkLegacy) {
-		String materialName = config.getString(key); // note: takes defaults into account
-		if (materialName == null) return null;
-		Material material = Material.matchMaterial(materialName);
-		if (material == null && checkLegacy) {
-			// check for legacy material:
-			String legacyMaterialName = Material.LEGACY_PREFIX + materialName;
-			material = Material.matchMaterial(legacyMaterialName);
-		}
-		return material;
-	}
-
-	private static void migrateConfig_0_to_1(Configuration config) {
-		// pre 1.13 to 1.13:
-		Log.info("Migrating config to version 1 ..");
-
-		// migrate shop creation item, if present:
-		String shopCreationItemTypeName = config.getString("shop-creation-item", null);
-		if (shopCreationItemTypeName != null) {
-			// note: this takes defaults into account:
-			Material shopCreationItem = loadMaterial(config, "shop-creation-item", true);
-			String shopCreationItemSpawnEggEntityType = config.getString("shop-creation-item-spawn-egg-entity-type");
-			if (shopCreationItem == Material.LEGACY_MONSTER_EGG && !StringUtils.isEmpty(shopCreationItemSpawnEggEntityType)) {
-				// migrate spawn egg (ignores the data value): spawn eggs are different materials now
-				EntityType spawnEggEntityType = null;
-				try {
-					spawnEggEntityType = EntityType.valueOf(shopCreationItemSpawnEggEntityType);
-				} catch (IllegalArgumentException e) {
-					// unknown entity type
-				}
-				Material newShopCreationItem = LegacyConversion.fromLegacySpawnEgg(spawnEggEntityType);
-
-				boolean usingDefault = false;
-				if (newShopCreationItem == null || newShopCreationItem == Material.AIR) {
-					// fallback to default:
-					newShopCreationItem = Material.VILLAGER_SPAWN_EGG;
-					usingDefault = true;
-				}
-				assert newShopCreationItem != null;
-
-				Log.info("  Migrating 'shop-creation-item' from '" + shopCreationItemTypeName + "' and spawn egg entity type '"
-						+ shopCreationItemSpawnEggEntityType + "' to '" + newShopCreationItem + "'" + (usingDefault ? " (default)" : "") + ".");
-				config.set("shop-creation-item", newShopCreationItem.name());
-			} else {
-				// regular material + data value migration:
-				migrateLegacyItemData(config, "shop-creation-item", "shop-creation-item", "shop-creation-item-data", Material.VILLAGER_SPAWN_EGG);
-			}
-		}
-
-		// remove shop-creation-item-spawn-egg-entity-type from config:
-		if (config.isSet("shop-creation-item-spawn-egg-entity-type")) {
-			Log.info("  Removing 'shop-creation-item-spawn-egg-entity-type' (previously '" + config.get("shop-creation-item-spawn-egg-entity-type", null) + "').");
-			config.set("shop-creation-item-spawn-egg-entity-type", null);
-		}
-
-		// remove shop-creation-item-data-value from config:
-		if (config.isSet("shop-creation-item-data")) {
-			Log.info("  Removing 'shop-creation-item-data' (previously '" + config.get("shop-creation-item-data", null) + "').");
-			config.set("shop-creation-item-data", null);
-		}
-
-		// name item:
-		migrateLegacyItemData(config, "name-item", "name-item", "name-item-data", Material.NAME_TAG);
-
-		// chest item:
-		migrateLegacyItemData(config, "chest-item", "chest-item", "chest-item-data", Material.CHEST);
-
-		// delete item:
-		migrateLegacyItemData(config, "delete-item", "delete-item", "delete-item-data", Material.BONE);
-
-		// hire item:
-		migrateLegacyItemData(config, "hire-item", "hire-item", "hire-item-data", Material.EMERALD);
-
-		// currency item:
-		migrateLegacyItemData(config, "currency-item", "currency-item", "currency-item-data", Material.EMERALD);
-
-		// zero currency item:
-		migrateLegacyItemData(config, "zero-currency-item", "zero-currency-item", "zero-currency-item-data", Material.BARRIER);
-
-		// high currency item:
-		migrateLegacyItemData(config, "high-currency-item", "high-currency-item", "high-currency-item-data", Material.EMERALD_BLOCK);
-
-		// high zero currency item:
-		migrateLegacyItemData(config, "high-zero-currency-item", "high-zero-currency-item", "high-zero-currency-item-data", Material.BARRIER);
-
-		// update config version:
-		config.set("config-version", 1);
-		Log.info("Config migration to version 1 done.");
-	}
-
-	// convert legacy material + data value to new material, returns true if migrations took place
-	private static boolean migrateLegacyItemData(ConfigurationSection config, String migratedItemId, String itemTypeKey, String itemDataKey, Material defaultType) {
-		boolean migrated = false;
-
-		// migrate material, if present:
-		String itemTypeName = config.getString(itemTypeKey, null);
-		if (itemTypeName != null) {
-			Material newItemType = null;
-			int itemData = config.getInt(itemDataKey, 0);
-			Material itemType = loadMaterial(config, itemTypeKey, true);
-			if (itemType != null) {
-				newItemType = LegacyConversion.fromLegacy(itemType, (byte) itemData);
-			}
-			boolean usingDefault = false;
-			if (newItemType == null || newItemType == Material.AIR) {
-				// fallback to default:
-				newItemType = defaultType;
-				usingDefault = true;
-			}
-			if (itemType != newItemType) {
-				Log.info("  Migrating '" + migratedItemId + "' from type '" + itemTypeName + "' and data value '" + itemData + "' to type '"
-						+ (newItemType == null ? "" : newItemType.name()) + "'" + (usingDefault ? " (default)" : "") + ".");
-				config.set(itemTypeKey, (newItemType != null ? newItemType.name() : null));
-				migrated = true;
-			}
-		}
-
-		// remove data value from config:
-		if (config.isSet(itemDataKey)) {
-			Log.info("  Removing '" + itemDataKey + "' (previously '" + config.get(itemDataKey, null) + "').");
-			config.set(itemDataKey, null);
-			migrated = true;
-		}
-		return migrated;
 	}
 
 	public static void loadLanguageConfiguration(Configuration config) {
@@ -789,91 +664,117 @@ public class Settings {
 
 	// item utilities:
 
+	// stores derived settings that get setup after loading the config
+	public static class DerivedSettings {
+
+		public static ItemData namingItemData = new ItemData(Material.AIR);
+
+		// button items:
+		public static ItemData nameButtonItem = new ItemData(Material.AIR);
+		public static ItemData chestButtonItem = new ItemData(Material.AIR);
+		public static ItemData deleteButtonItem = new ItemData(Material.AIR);
+		public static ItemData hireButtonItem = new ItemData(Material.AIR);
+
+		// gets called after the config has been loaded:
+		private static void setup() {
+			// ignore display name (which is used for specifying the new shopkeeper name):
+			namingItemData = new ItemData(ItemUtils.setItemStackName(nameItem.createItemStack(), null));
+
+			// button items:
+			nameButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(nameItem.createItemStack(), msgButtonName, msgButtonNameLore));
+			chestButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(chestItem.createItemStack(), msgButtonChest, msgButtonChestLore));
+			deleteButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), msgButtonDelete, msgButtonDeleteLore));
+			hireButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(hireItem.createItemStack(), msgButtonHire, msgButtonHireLore));
+		}
+	}
+
 	// creation item:
 	public static ItemStack createShopCreationItem() {
-		return ItemUtils.createItemStack(shopCreationItem, 1, shopCreationItemName, shopCreationItemLore);
+		return shopCreationItem.createItemStack();
 	}
 
 	public static boolean isShopCreationItem(ItemStack item) {
-		return ItemUtils.isSimilar(item, Settings.shopCreationItem, Settings.shopCreationItemName, Settings.shopCreationItemLore);
+		return shopCreationItem.matches(item);
 	}
 
 	// naming item:
-	public static ItemStack createNameButtonItem() {
-		return ItemUtils.createItemStack(nameItem, 1, msgButtonName, msgButtonNameLore);
+	public static boolean isNamingItem(ItemStack item) {
+		return DerivedSettings.namingItemData.matches(item);
 	}
 
-	public static boolean isNamingItem(ItemStack item) {
-		return ItemUtils.isSimilar(item, nameItem, null, Settings.nameItemLore);
+	public static ItemStack createNameButtonItem() {
+		return DerivedSettings.nameButtonItem.createItemStack();
 	}
 
 	// chest button:
 	public static ItemStack createChestButtonItem() {
-		return ItemUtils.createItemStack(chestItem, 1, msgButtonChest, msgButtonChestLore);
+		return DerivedSettings.chestButtonItem.createItemStack();
 	}
 
 	// delete button:
 	public static ItemStack createDeleteButtonItem() {
-		return ItemUtils.createItemStack(deleteItem, 1, msgButtonDelete, msgButtonDeleteLore);
+		return DerivedSettings.deleteButtonItem.createItemStack();
 	}
 
 	// hire item:
 	public static ItemStack createHireButtonItem() {
-		return ItemUtils.createItemStack(hireItem, 1, msgButtonHire, msgButtonHireLore);
+		return DerivedSettings.hireButtonItem.createItemStack();
 	}
 
 	public static boolean isHireItem(ItemStack item) {
-		return ItemUtils.isSimilar(item, hireItem, hireItemName, hireItemLore);
+		return hireItem.matches(item);
 	}
+
+	// CURRENCY
 
 	// currency item:
 	public static ItemStack createCurrencyItem(int amount) {
-		return ItemUtils.createItemStack(Settings.currencyItem, amount, Settings.currencyItemName, Settings.currencyItemLore);
+		return currencyItem.createItemStack(amount);
 	}
 
 	public static boolean isCurrencyItem(ItemStack item) {
-		return ItemUtils.isSimilar(item, Settings.currencyItem, Settings.currencyItemName, Settings.currencyItemLore);
+		return currencyItem.matches(item);
 	}
 
 	// high currency item:
 	public static boolean isHighCurrencyEnabled() {
-		return (Settings.highCurrencyItem != Material.AIR);
+		return (highCurrencyValue > 0 && highCurrencyItem.getType() != Material.AIR);
 	}
 
 	public static ItemStack createHighCurrencyItem(int amount) {
 		if (!isHighCurrencyEnabled()) return null;
-		return ItemUtils.createItemStack(Settings.highCurrencyItem, amount, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+		return highCurrencyItem.createItemStack(amount);
 	}
 
 	public static boolean isHighCurrencyItem(ItemStack item) {
 		if (!isHighCurrencyEnabled()) return false;
-		return ItemUtils.isSimilar(item, Settings.highCurrencyItem, Settings.highCurrencyItemName, Settings.highCurrencyItemLore);
+		return highCurrencyItem.matches(item);
 	}
 
 	// zero currency item:
 	public static ItemStack createZeroCurrencyItem() {
-		if (Settings.zeroCurrencyItem == Material.AIR) return null;
-		return ItemUtils.createItemStack(Settings.zeroCurrencyItem, 1, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+		if (zeroCurrencyItem.getType() == Material.AIR) return null;
+		return zeroCurrencyItem.createItemStack();
 	}
 
 	public static boolean isZeroCurrencyItem(ItemStack item) {
-		if (Settings.zeroCurrencyItem == Material.AIR) {
+		if (zeroCurrencyItem.getType() == Material.AIR) {
 			return ItemUtils.isEmpty(item);
 		}
-		return ItemUtils.isSimilar(item, Settings.zeroCurrencyItem, Settings.zeroCurrencyItemName, Settings.zeroCurrencyItemLore);
+		return zeroCurrencyItem.matches(item);
 	}
 
 	// high zero currency item:
 	public static ItemStack createHighZeroCurrencyItem() {
-		if (Settings.highZeroCurrencyItem == Material.AIR) return null;
-		return ItemUtils.createItemStack(Settings.highZeroCurrencyItem, 1, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
+		if (highZeroCurrencyItem.getType() == Material.AIR) return null;
+		return highZeroCurrencyItem.createItemStack();
 	}
 
 	public static boolean isHighZeroCurrencyItem(ItemStack item) {
-		if (Settings.highZeroCurrencyItem == Material.AIR) {
+		if (highZeroCurrencyItem.getType() == Material.AIR) {
 			return ItemUtils.isEmpty(item);
 		}
-		return ItemUtils.isSimilar(item, Settings.highZeroCurrencyItem, Settings.highZeroCurrencyItemName, Settings.highZeroCurrencyItemLore);
+		return highZeroCurrencyItem.matches(item);
 	}
 
 	//

@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -66,8 +68,8 @@ public final class ItemUtils {
 
 	public static ItemStack createItemStack(Material type, int amount, String displayName, List<String> lore) {
 		// TODO return null in case of type AIR?
-		ItemStack item = new ItemStack(type, amount);
-		return ItemUtils.setItemStackNameAndLore(item, displayName, lore);
+		ItemStack itemStack = new ItemStack(type, amount);
+		return ItemUtils.setItemStackNameAndLore(itemStack, displayName, lore);
 	}
 
 	public static ItemStack setItemStackNameAndLore(ItemStack item, String displayName, List<String> lore) {
@@ -83,6 +85,19 @@ public final class ItemUtils {
 			item.setItemMeta(meta);
 		}
 		return item;
+	}
+
+	// null to remove display name
+	public static ItemStack setItemStackName(ItemStack itemStack, String displayName) {
+		if (itemStack == null) return null;
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		if (itemMeta == null) return itemStack;
+		if (displayName == null && !itemMeta.hasDisplayName()) {
+			return itemStack;
+		}
+		itemMeta.setDisplayName(displayName); // null will clear the display name
+		itemStack.setItemMeta(itemMeta);
+		return itemStack;
 	}
 
 	public static ItemStack setLocalizedName(ItemStack item, String locName) {
@@ -194,10 +209,9 @@ public final class ItemUtils {
 
 	public static int getDurability(ItemStack itemStack) {
 		assert itemStack != null;
-		if (!itemStack.hasItemMeta()) return 0;
-		ItemMeta meta = itemStack.getItemMeta();
-		if (!(meta instanceof Damageable)) return 0;
-		return ((Damageable) meta).getDamage();
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		if (!(itemMeta instanceof Damageable)) return 0; // also checks for null ItemMeta
+		return ((Damageable) itemMeta).getDamage();
 	}
 
 	public static String getSimpleItemInfo(ItemStack item) {
@@ -248,26 +262,22 @@ public final class ItemUtils {
 		if (item == null) return false;
 		if (item.getType() != type) return false;
 
-		ItemMeta itemMeta = null;
-		// compare display name:
-		if (displayName != null && !displayName.isEmpty()) {
-			if (!item.hasItemMeta()) return false;
-			itemMeta = item.getItemMeta();
-			if (itemMeta == null) return false;
+		boolean checkDisplayName = (displayName != null && !displayName.isEmpty());
+		boolean checkLore = (lore != null && !lore.isEmpty());
+		if (!checkDisplayName && !checkLore) return true;
 
+		ItemMeta itemMeta = item.getItemMeta();
+		if (itemMeta == null) return false;
+
+		// compare display name:
+		if (checkDisplayName) {
 			if (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName())) {
 				return false;
 			}
 		}
 
 		// compare lore:
-		if (lore != null && !lore.isEmpty()) {
-			if (itemMeta == null) {
-				if (!item.hasItemMeta()) return false;
-				itemMeta = item.getItemMeta();
-				if (itemMeta == null) return false;
-			}
-
+		if (checkLore) {
 			if (!itemMeta.hasLore() || !lore.equals(itemMeta.getLore())) {
 				return false;
 			}
@@ -275,6 +285,116 @@ public final class ItemUtils {
 
 		return true;
 	}
+
+	// ITEM DATA MATCHING
+
+	public static boolean matchesData(ItemStack item, ItemStack data) {
+		return matchesData(item, data, false); // not matching partial lists
+	}
+
+	// same type and contains data
+	public static boolean matchesData(ItemStack item, ItemStack data, boolean matchPartialLists) {
+		if (item == data) return true;
+		if (data == null) return true;
+		if (item == null) return false;
+		// compare item types:
+		if (item.getType() != data.getType()) return false;
+
+		// check if meta data is contained in item:
+		return matchesData(item.getItemMeta(), data.getItemMeta(), matchPartialLists);
+	}
+
+	public static boolean matchesData(ItemStack item, Material dataType, Map<String, Object> data, boolean matchPartialLists) {
+		assert dataType != null;
+		if (item == null) return false;
+		if (item.getType() != dataType) return false;
+		if (data == null || data.isEmpty()) return true;
+		return matchesData(item.getItemMeta(), data, matchPartialLists);
+	}
+
+	public static boolean matchesData(ItemMeta itemMetaData, ItemMeta dataMetaData) {
+		return matchesData(itemMetaData, dataMetaData, false); // not matching partial lists
+	}
+
+	// Checks if the meta data contains the other given meta data.
+	// Similar to minecraft's nbt data matching (trading does not match partial lists, but data specified in commands
+	// does), but there are a few differences: Minecraft requires explicitly specified empty lists to perfectly match in
+	// all cases, and some data is treated as list in Minecraft but as map in Bukkit (eg. enchantments). But the
+	// behavior is the same if not matching partial lists.
+	public static boolean matchesData(ItemMeta itemMetaData, ItemMeta dataMetaData, boolean matchPartialLists) {
+		if (itemMetaData == dataMetaData) return true;
+		if (dataMetaData == null) return true;
+		if (itemMetaData == null) return false;
+
+		// TODO maybe there is a better way of doing this in the future..
+		Map<String, Object> itemMetaDataMap = itemMetaData.serialize();
+		Map<String, Object> dataMetaDataMap = dataMetaData.serialize();
+		return matchesData(itemMetaDataMap, dataMetaDataMap, matchPartialLists);
+	}
+
+	public static boolean matchesData(ItemMeta itemMetaData, Map<String, Object> data, boolean matchPartialLists) {
+		if (data == null || data.isEmpty()) return true;
+		if (itemMetaData == null) return false;
+		Map<String, Object> itemMetaDataMap = itemMetaData.serialize();
+		return matchesData(itemMetaDataMap, data, matchPartialLists);
+	}
+
+	public static boolean matchesData(Map<String, Object> itemData, Map<String, Object> data, boolean matchPartialLists) {
+		return _matchesData(itemData, data, matchPartialLists);
+	}
+
+	private static boolean _matchesData(Object target, Object data, boolean matchPartialLists) {
+		if (target == data) return true;
+		if (data == null) return true;
+		if (target == null) return false;
+
+		// check if map contains given data:
+		if (data instanceof Map) {
+			if (!(target instanceof Map)) return false;
+			Map<?, ?> targetMap = (Map<?, ?>) target;
+			Map<?, ?> dataMap = (Map<?, ?>) data;
+			for (Entry<?, ?> entry : dataMap.entrySet()) {
+				Object targetValue = targetMap.get(entry.getKey());
+				if (!_matchesData(targetValue, entry.getValue(), matchPartialLists)) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		// check if list contains given data:
+		if (matchPartialLists && data instanceof List) {
+			if (!(target instanceof List)) return false;
+			List<?> targetList = (List<?>) target;
+			List<?> dataList = (List<?>) data;
+			// if empty list is explicitly specified, then target list has to be empty as well:
+			/*if (dataList.isEmpty()) {
+				return targetList.isEmpty();
+			}*/
+			// Avoid loop (TODO: only works if dataList doesn't contain duplicate entries):
+			if (dataList.size() > targetList.size()) {
+				return false;
+			}
+			for (Object dataEntry : dataList) {
+				boolean dataContained = false;
+				for (Object targetEntry : targetList) {
+					if (_matchesData(targetEntry, dataEntry, matchPartialLists)) {
+						dataContained = true;
+						break;
+					}
+				}
+				if (!dataContained) {
+					return false;
+				}
+			}
+			return true;
+		}
+
+		// check if objects are equal:
+		return data.equals(target);
+	}
+
+	//
 
 	/**
 	 * Increases the amount of the given {@link ItemStack}.
@@ -346,25 +466,23 @@ public final class ItemUtils {
 	}
 
 	/**
-	 * Checks if the given contents contains at least the specified amount of items matching the specified attributes.
+	 * Checks if the given contents contains at least the specified amount of items matching the specified
+	 * {@link ItemData}.
 	 * 
 	 * @param contents
 	 *            the contents to search through
-	 * @param type
-	 *            the item type
-	 * @param displayName
-	 *            the displayName, or <code>null</code> to ignore it
-	 * @param lore
-	 *            the item lore, or <code>null</code> or empty to ignore it
+	 * @param itemData
+	 *            the item data to match, <code>null</code> will not match any item
 	 * @param amount
 	 *            the amount of items to look for
 	 * @return <code>true</code> if the at least specified amount of matching items was found
 	 */
-	public static boolean containsAtLeast(ItemStack[] contents, Material type, String displayName, List<String> lore, int amount) {
+	public static boolean containsAtLeast(ItemStack[] contents, ItemData itemData, int amount) {
 		if (contents == null) return false;
+		if (itemData == null) return false; // consider null to match no item here
 		int remainingAmount = amount;
 		for (ItemStack itemStack : contents) {
-			if (!isSimilar(itemStack, type, displayName, lore)) continue;
+			if (!itemData.matches(itemStack)) continue;
 			int currentAmount = itemStack.getAmount() - remainingAmount;
 			if (currentAmount >= 0) {
 				return true;
@@ -376,26 +494,23 @@ public final class ItemUtils {
 	}
 
 	/**
-	 * Removes the specified amount of items which match the specified attributes from the given contents.
+	 * Removes the specified amount of items which match the specified {@link ItemData} from the given contents.
 	 * 
 	 * @param contents
 	 *            the contents
-	 * @param type
-	 *            the item type
-	 * @param displayName
-	 *            the display name, or <code>null</code> to ignore it
-	 * @param lore
-	 *            the item lore, or <code>null</code> or empty to ignore it
+	 * @param itemData
+	 *            the item data to match, <code>null</code> will not match any item
 	 * @param amount
 	 *            the amount of matching items to remove
 	 * @return the amount of items that couldn't be removed (<code>0</code> on full success)
 	 */
-	public static int removeItems(ItemStack[] contents, Material type, String displayName, List<String> lore, int amount) {
+	public static int removeItems(ItemStack[] contents, ItemData itemData, int amount) {
 		if (contents == null) return amount;
+		if (itemData == null) return amount;
 		int remainingAmount = amount;
 		for (int slotId = 0; slotId < contents.length; slotId++) {
 			ItemStack itemStack = contents[slotId];
-			if (!isSimilar(itemStack, type, displayName, lore)) continue;
+			if (!itemData.matches(itemStack)) continue;
 			int newAmount = itemStack.getAmount() - remainingAmount;
 			if (newAmount > 0) {
 				itemStack.setAmount(newAmount);

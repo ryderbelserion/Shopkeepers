@@ -134,7 +134,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		if (Settings.isHighCurrencyEnabled()) {
 			int highCost = 0;
 			if (remainingCost > Settings.highCurrencyMinCost) {
-				highCost = Math.min((remainingCost / Settings.highCurrencyValue), Settings.highCurrencyItem.getMaxStackSize());
+				highCost = Math.min((remainingCost / Settings.highCurrencyValue), Settings.highCurrencyItem.getType().getMaxStackSize());
 			}
 			if (highCost > 0) {
 				remainingCost -= (highCost * Settings.highCurrencyValue);
@@ -144,7 +144,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 			}
 		}
 		if (remainingCost > 0) {
-			if (remainingCost <= Settings.currencyItem.getMaxStackSize()) {
+			if (remainingCost <= Settings.currencyItem.getType().getMaxStackSize()) {
 				lowCostItem = Settings.createCurrencyItem(remainingCost);
 			} else {
 				// cost is to large to represent: reset cost to zero:
@@ -165,10 +165,10 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		ItemStack lowCostItem = recipe.getItem1();
 		ItemStack highCostItem = recipe.getItem2();
 		int price = 0;
-		if (lowCostItem != null && lowCostItem.getType() == Settings.currencyItem && lowCostItem.getAmount() > 0) {
+		if (lowCostItem != null && lowCostItem.getType() == Settings.currencyItem.getType() && lowCostItem.getAmount() > 0) {
 			price += lowCostItem.getAmount();
 		}
-		if (Settings.isHighCurrencyEnabled() && highCostItem != null && highCostItem.getType() == Settings.highCurrencyItem && highCostItem.getAmount() > 0) {
+		if (Settings.isHighCurrencyEnabled() && highCostItem != null && highCostItem.getType() == Settings.highCurrencyItem.getType() && highCostItem.getAmount() > 0) {
 			price += (highCostItem.getAmount() * Settings.highCurrencyValue);
 		}
 		return price;

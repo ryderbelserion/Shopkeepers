@@ -73,7 +73,7 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 		ItemStack priceItem = recipe.getResultItem();
 		assert priceItem != null;
-		if (priceItem.getType() != Settings.currencyItem) return; // checking this just in case
+		if (priceItem.getType() != Settings.currencyItem.getType()) return; // checking this just in case
 		assert priceItem.getAmount() > 0;
 
 		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();

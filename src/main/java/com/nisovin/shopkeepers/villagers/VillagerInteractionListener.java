@@ -51,7 +51,7 @@ public class VillagerInteractionListener implements Listener {
 			Log.debug("  ignoring (probably citizens2) NPC");
 			return;
 		}
-		
+
 		if ((isVillager && Settings.disableOtherVillagers) || (isWanderingTrader && Settings.disableWanderingTraders)) {
 			// prevent trading with non-shopkeeper villagers:
 			event.setCancelled(true);
@@ -92,14 +92,14 @@ public class VillagerInteractionListener implements Listener {
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
 		if (!Settings.isHireItem(itemInMainHand)) {
 			Utils.sendMessage(player, Settings.msgVillagerForHire, "{costs}", String.valueOf(Settings.hireOtherVillagersCosts),
-					"{hire-item}", Settings.hireItem.name()); // TODO also print required hire item name and lore?
+					"{hire-item}", Settings.hireItem.getType().name()); // TODO also print required hire item name and lore?
 			return false;
 		} else {
 			// check if the player has enough of those hiring items
 			int costs = Settings.hireOtherVillagersCosts;
 			if (costs > 0) {
 				ItemStack[] storageContents = playerInventory.getStorageContents();
-				if (ItemUtils.containsAtLeast(storageContents, Settings.hireItem, Settings.hireItemName, Settings.hireItemLore, costs)) {
+				if (ItemUtils.containsAtLeast(storageContents, Settings.hireItem, costs)) {
 					Log.debug("  Villager hiring: the player has the needed amount of hiring items");
 					int inHandAmount = itemInMainHand.getAmount();
 					int remaining = inHandAmount - costs;
@@ -110,7 +110,7 @@ public class VillagerInteractionListener implements Listener {
 						playerInventory.setItemInMainHand(null); // remove item in hand
 						if (remaining < 0) {
 							// remove remaining costs from inventory:
-							ItemUtils.removeItems(storageContents, Settings.hireItem, Settings.hireItemName, Settings.hireItemLore, -remaining);
+							ItemUtils.removeItems(storageContents, Settings.hireItem, -remaining);
 							// apply the change to the player's inventory:
 							playerInventory.setStorageContents(storageContents);
 						}

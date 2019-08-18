@@ -160,8 +160,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 
 		// load config:
-		File file = new File(this.getDataFolder(), "config.yml");
-		if (!file.exists()) {
+		File configFile = new File(this.getDataFolder(), "config.yml");
+		if (!configFile.exists()) {
 			this.saveDefaultConfig();
 		}
 		this.reloadConfig();
