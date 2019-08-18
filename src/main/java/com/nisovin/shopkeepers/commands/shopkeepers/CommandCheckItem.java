@@ -39,14 +39,14 @@ class CommandCheckItem extends PlayerCommand {
 		player.sendMessage("Item in hand:");
 		player.sendMessage("-Is low currency: " + (Settings.isCurrencyItem(inHand)));
 		player.sendMessage("-Is high currency: " + (Settings.isHighCurrencyItem(inHand)));
-		player.sendMessage("-Is low zero currency: " + (Settings.isZeroCurrencyItem(inHand)));
-		player.sendMessage("-Is high zero currency: " + (Settings.isHighZeroCurrencyItem(inHand)));
+		player.sendMessage("-Is zero low currency: " + (Settings.isZeroCurrencyItem(inHand)));
+		player.sendMessage("-Is zero high currency: " + (Settings.isZeroHighCurrencyItem(inHand)));
 		player.sendMessage("-Similar to next item: " + (ItemUtils.isSimilar(nextItem, inHand) ? "yes" : "nope"));
 
 		player.sendMessage("Next item:");
 		player.sendMessage("-Is low currency: " + (Settings.isCurrencyItem(nextItem)));
 		player.sendMessage("-Is high currency: " + (Settings.isHighCurrencyItem(nextItem)));
-		player.sendMessage("-Is low zero currency: " + (Settings.isZeroCurrencyItem(nextItem)));
-		player.sendMessage("-Is high zero currency: " + (Settings.isHighZeroCurrencyItem(nextItem)));
+		player.sendMessage("-Is zero low currency: " + (Settings.isZeroCurrencyItem(nextItem)));
+		player.sendMessage("-Is zero high currency: " + (Settings.isZeroHighCurrencyItem(nextItem)));
 	}
 }

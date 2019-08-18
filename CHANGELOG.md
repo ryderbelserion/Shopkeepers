@@ -12,6 +12,7 @@ Date format: (YYYY-MM-DD)
   * This change also allows a more detailed specification of some of the editor button items. However, many editor buttons still miss corresponding config settings. Also keep in mind that the display name and lore for these button items get specified via corresponding message settings, so any specified item display name and lore will get replaced by that.
   * When checking if an in-game item matches the item data specified in the config, only the specified data gets compared. So this does not check for item data equality, but instead the checked item is able to contain additional data but still get matched (like before, but previously this was limited to checking display name and lore).
   * The previous item data gets automatically migrated to the new format (config version 2).
+* Renamed the setting 'high-zero-currency-item' to 'zero-high-currency-item'. This gets automatically updated during the migration.
 * Changed: All priorities and ignoring of cancelled events were reconsidered.
   * Event handlers potentially modifying or canceling the event and which don't depend on other plugins' event handling are called early (LOW or LOWEST), so that other plugins can react to / ignore those modified or canceled events.
     * All event handlers which simply cancel some event use the LOW priority now and more consistently ignore the event if already cancelled. Previously they mostly used NORMAL priority.

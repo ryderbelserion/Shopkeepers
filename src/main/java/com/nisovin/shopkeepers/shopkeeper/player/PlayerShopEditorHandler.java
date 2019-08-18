@@ -64,7 +64,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 			int column = rawSlot - ITEM_2_OFFSET;
 			ItemStack item = event.getInventory().getItem(column);
 			if (ItemUtils.isEmpty(item)) return;
-			this.handleUpdateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), Settings.createHighZeroCurrencyItem());
+			this.handleUpdateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), Settings.createZeroHighCurrencyItem());
 		}
 	}
 
@@ -140,7 +140,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 				remainingCost -= (highCost * Settings.highCurrencyValue);
 				highCostItem = Settings.createHighCurrencyItem(highCost);
 			} else {
-				highCostItem = Settings.createHighZeroCurrencyItem();
+				highCostItem = Settings.createZeroHighCurrencyItem();
 			}
 		}
 		if (remainingCost > 0) {
@@ -150,7 +150,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 				// cost is to large to represent: reset cost to zero:
 				lowCostItem = Settings.createZeroCurrencyItem();
 				if (Settings.isHighCurrencyEnabled()) {
-					highCostItem = Settings.createHighZeroCurrencyItem();
+					highCostItem = Settings.createZeroHighCurrencyItem();
 				}
 			}
 		} else {

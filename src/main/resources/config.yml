@@ -342,7 +342,7 @@ high-currency-item: EMERALD_BLOCK
 
 # The item for the placeholder when a player has not set the second currency
 # cost for an item.
-high-zero-currency-item: BARRIER
+zero-high-currency-item: BARRIER
 
 # The value of the second currency, based on the first currency.
 high-currency-value: 9

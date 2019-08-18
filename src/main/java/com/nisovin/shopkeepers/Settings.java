@@ -215,7 +215,7 @@ public class Settings {
 	public static ItemData currencyItem = new ItemData(Material.EMERALD);
 	public static ItemData zeroCurrencyItem = new ItemData(Material.BARRIER);
 	public static ItemData highCurrencyItem = new ItemData(Material.EMERALD_BLOCK);
-	public static ItemData highZeroCurrencyItem = new ItemData(Material.BARRIER);
+	public static ItemData zeroHighCurrencyItem = new ItemData(Material.BARRIER);
 
 	// note: this can in general be larger than 64!
 	public static int highCurrencyValue = 9;
@@ -765,16 +765,16 @@ public class Settings {
 	}
 
 	// high zero currency item:
-	public static ItemStack createHighZeroCurrencyItem() {
-		if (highZeroCurrencyItem.getType() == Material.AIR) return null;
-		return highZeroCurrencyItem.createItemStack();
+	public static ItemStack createZeroHighCurrencyItem() {
+		if (zeroHighCurrencyItem.getType() == Material.AIR) return null;
+		return zeroHighCurrencyItem.createItemStack();
 	}
 
-	public static boolean isHighZeroCurrencyItem(ItemStack item) {
-		if (highZeroCurrencyItem.getType() == Material.AIR) {
+	public static boolean isZeroHighCurrencyItem(ItemStack item) {
+		if (zeroHighCurrencyItem.getType() == Material.AIR) {
 			return ItemUtils.isEmpty(item);
 		}
-		return highZeroCurrencyItem.matches(item);
+		return zeroHighCurrencyItem.matches(item);
 	}
 
 	//

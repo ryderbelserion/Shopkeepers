@@ -23,23 +23,23 @@ public class ConfigMigration2 implements ConfigMigration {
 		// further data (such as custom display name and/or lore).
 
 		// shop-creation-item:
-		migrateItem(config, "shop-creation-item", "shop-creation-item-name", "shop-creation-item-lore");
+		migrateItem(config, "shop-creation-item", "shop-creation-item", "shop-creation-item-name", "shop-creation-item-lore");
 		// name-item:
-		migrateItem(config, "name-item", null, "name-item-lore");
+		migrateItem(config, "name-item", "name-item", null, "name-item-lore");
 		// hire-item:
-		migrateItem(config, "hire-item", "hire-item-name", "hire-item-lore");
+		migrateItem(config, "hire-item", "hire-item", "hire-item-name", "hire-item-lore");
 		// currency-item:
-		migrateItem(config, "currency-item", "currency-item-name", "currency-item-lore");
+		migrateItem(config, "currency-item", "currency-item", "currency-item-name", "currency-item-lore");
 		// zero-currency-item:
-		migrateItem(config, "zero-currency-item", "zero-currency-item-name", "zero-currency-item-lore");
+		migrateItem(config, "zero-currency-item", "zero-currency-item", "zero-currency-item-name", "zero-currency-item-lore");
 		// high-currency-item
-		migrateItem(config, "high-currency-item", "high-currency-item-name", "high-currency-item-lore");
-		// zero-high-currency-item:
-		migrateItem(config, "zero-high-currency-item", "zero-high-currency-item-name", "zero-high-currency-item-lore");
+		migrateItem(config, "high-currency-item", "high-currency-item", "high-currency-item-name", "high-currency-item-lore");
+		// high-zero-currency-item -> zero-high-currency-item:
+		migrateItem(config, "zero-high-currency-item", "high-zero-currency-item", "high-zero-currency-item-name", "high-zero-currency-item-lore");
 	}
 
 	// displayNameKey and loreKey can be null if they don't exist
-	private static void migrateItem(Configuration config, String itemTypeKey, String displayNameKey, String loreKey) {
+	private static void migrateItem(Configuration config, String newItemKey, String itemTypeKey, String displayNameKey, String loreKey) {
 		assert config != null && itemTypeKey != null;
 		StringBuilder msgBuilder = new StringBuilder();
 		msgBuilder.append("  Migrating item data for '")
@@ -61,7 +61,7 @@ public class ConfigMigration2 implements ConfigMigration {
 					.append(config.get(loreKey))
 					.append(")");
 		}
-		msgBuilder.append(" to new format.");
+		msgBuilder.append(" to new format at '" + newItemKey + "'.");
 		Log.info(msgBuilder.toString());
 
 		// item type:
@@ -100,7 +100,7 @@ public class ConfigMigration2 implements ConfigMigration {
 			config.set(loreKey, null);
 		}
 
-		// save new data (under previous itemTypeKey):
-		config.set(itemTypeKey, itemData.serialize());
+		// save new data (under potentially new key):
+		config.set(newItemKey, itemData.serialize());
 	}
 }
