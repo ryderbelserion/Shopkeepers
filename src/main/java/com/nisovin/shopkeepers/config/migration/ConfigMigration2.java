@@ -92,7 +92,10 @@ public class ConfigMigration2 implements ConfigMigration {
 		ItemData itemData = new ItemData(itemType, displayName, lore);
 
 		// remove old data:
-		config.set(itemTypeKey, null);
+		// if old and new key are the same, try to persist the position of the setting inside the config
+		if (!itemTypeKey.equals(newItemKey)) {
+			config.set(itemTypeKey, null);
+		}
 		if (displayNameKey != null) {
 			config.set(displayNameKey, null);
 		}
