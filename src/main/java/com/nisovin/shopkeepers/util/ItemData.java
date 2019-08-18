@@ -49,14 +49,19 @@ public class ItemData implements Cloneable {
 			assert typeName != null;
 		} else {
 			if (dataObject instanceof ConfigurationSection) {
-				dataMap = ((ConfigurationSection) dataObject).getValues(false);
+				dataMap = ((ConfigurationSection) dataObject).getValues(false); // returns a (shallow) copy
 			} else if (dataObject instanceof Map) {
-				dataMap = (Map<String, Object>) dataObject; // assuming this is safe
+				// make a (shallow) copy of the map, since we will later insert missing data and don't want to modify
+				// the original data from the config:
+				dataMap = new LinkedHashMap<>();
+				for (Entry<?, ?> entry : ((Map<?, ?>) dataObject).entrySet()) {
+					dataMap.put(entry.getKey().toString(), entry.getValue());
+				}
 			} else {
 				warningHandler.accept("Unknown item data: " + dataObject);
 				return null;
 			}
-			assert dataMap != null;
+			assert dataMap != null; // assert: dataMap is a (shallow) copy
 
 			Object typeData = dataMap.get("type");
 			if (typeData != null) {
@@ -302,6 +307,4 @@ public class ItemData implements Cloneable {
 		}
 		return dataMap;
 	}
-
-	// TODO clone
 }

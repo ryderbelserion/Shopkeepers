@@ -221,7 +221,7 @@ public class ItemDataTest extends AbstractTestBase {
 
 	// UNCOMMON
 
-	public static ItemStack createItemStackUncommon() {
+	private static ItemStack createItemStackUncommon() {
 		ItemStack itemStack = new ItemStack(Material.LEATHER_CHESTPLATE);
 		LeatherArmorMeta itemMeta = (LeatherArmorMeta) itemStack.getItemMeta();
 		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
@@ -265,7 +265,7 @@ public class ItemDataTest extends AbstractTestBase {
 
 	// TILE ENTITY SIMPLE
 
-	public static ItemStack createItemStackTileEntitySimple() {
+	private static ItemStack createItemStackTileEntitySimple() {
 		ItemStack itemStack = new ItemStack(Material.CHEST);
 		return itemStack;
 	}
@@ -298,7 +298,7 @@ public class ItemDataTest extends AbstractTestBase {
 
 	// TILE ENTITY MINIMAL
 
-	public static ItemStack createItemStackTileEntityMinimal() {
+	private static ItemStack createItemStackTileEntityMinimal() {
 		ItemStack itemStack = new ItemStack(Material.CHEST);
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
