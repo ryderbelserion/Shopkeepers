@@ -12,6 +12,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.entity.Entity;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -74,38 +75,50 @@ class CommandCheck extends Command {
 				+ plugin.getShopkeeperStorage().getDirtyCount()
 				+ " | " + plugin.getShopkeeperStorage().getUnsavedDeletedCount()
 				+ " | " + plugin.getShopkeeperStorage().isDirty());
-		sender.sendMessage("  Unsaved deleted: " + plugin.getShopkeeperStorage().getUnsavedDeletedCount());
-		sender.sendMessage("  Total chunks with shopkeepers: " + shopsByChunk.size());
-		sender.sendMessage("  Active: " + shopkeeperRegistry.getActiveShopkeepers().size());
-		sender.sendMessage("  Active with AI: " + livingEntityAI.getEntityCount());
-		sender.sendMessage("  Active AI chunks: " + livingEntityAI.getActiveAIChunksCount());
-		sender.sendMessage("  Active with active AI: " + livingEntityAI.getActiveAIEntityCount());
-		sender.sendMessage("  Active gravity chunks: " + livingEntityAI.getActiveGravityChunksCount());
-		sender.sendMessage("  Active with active gravity: " + livingEntityAI.getActiveGravityEntityCount());
+		sender.sendMessage("  Chunks with shopkeepers: " + shopsByChunk.size());
+		sender.sendMessage("    With active AI: " + livingEntityAI.getActiveAIChunksCount());
+		sender.sendMessage("    With active gravity: " + livingEntityAI.getActiveGravityChunksCount());
+		sender.sendMessage("  Active shopkeepers: " + shopkeeperRegistry.getActiveShopkeepers().size());
+		sender.sendMessage("    With AI: " + livingEntityAI.getEntityCount());
+		sender.sendMessage("    With active AI: " + livingEntityAI.getActiveAIEntityCount());
+		sender.sendMessage("    With active gravity: " + livingEntityAI.getActiveGravityEntityCount());
 
 		double avgTotalAITimings = livingEntityAI.getTotalTimings().getAverageTimeMillis();
 		double maxTotalAITiming = livingEntityAI.getTotalTimings().getMaxTimeMillis();
-		sender.sendMessage("  Avg. total AI timings: " + Utils.DECIMAL_FORMAT.format(avgTotalAITimings) + " ms");
-		sender.sendMessage("  Max. total AI timing: " + Utils.DECIMAL_FORMAT.format(maxTotalAITiming) + " ms");
+		sender.sendMessage("  Total AI timings (avg | max): "
+				+ Utils.DECIMAL_FORMAT.format(avgTotalAITimings) + " ms" + " | "
+				+ Utils.DECIMAL_FORMAT.format(maxTotalAITiming) + " ms");
 
+		// note: these are per activation, which happens only every 20 ticks (not per tick)
 		double avgAIActivationTimings = livingEntityAI.getActivationTimings().getAverageTimeMillis();
 		double maxAIActivationTiming = livingEntityAI.getActivationTimings().getMaxTimeMillis();
-		sender.sendMessage("    Avg. AI activation timings: " + Utils.DECIMAL_FORMAT.format(avgAIActivationTimings) + " ms");
-		sender.sendMessage("    Max. AI activation timing: " + Utils.DECIMAL_FORMAT.format(maxAIActivationTiming) + " ms");
+		sender.sendMessage("    AI activation timings (per " + LivingEntityAI.AI_ACTIVATION_TICK_RATE + " ticks) (avg | max): "
+				+ Utils.DECIMAL_FORMAT.format(avgAIActivationTimings) + " ms" + " | "
+				+ Utils.DECIMAL_FORMAT.format(maxAIActivationTiming) + " ms");
 
 		double avgGravityTimings = livingEntityAI.getGravityTimings().getAverageTimeMillis();
 		double maxGravityTiming = livingEntityAI.getGravityTimings().getMaxTimeMillis();
-		sender.sendMessage("    Avg. gravity timings: " + Utils.DECIMAL_FORMAT.format(avgGravityTimings) + " ms");
-		sender.sendMessage("    Max. gravity timing: " + Utils.DECIMAL_FORMAT.format(maxGravityTiming) + " ms");
+		sender.sendMessage("    Gravity timings (avg | max): "
+				+ Utils.DECIMAL_FORMAT.format(avgGravityTimings) + " ms" + " | "
+				+ Utils.DECIMAL_FORMAT.format(maxGravityTiming) + " ms");
 
 		double avgAITimings = livingEntityAI.getAITimings().getAverageTimeMillis();
 		double maxAITiming = livingEntityAI.getAITimings().getMaxTimeMillis();
-		sender.sendMessage("    Avg. AI timings: " + Utils.DECIMAL_FORMAT.format(avgAITimings) + " ms");
-		sender.sendMessage("    Max. AI timing: " + Utils.DECIMAL_FORMAT.format(maxAITiming) + " ms");
+		sender.sendMessage("    AI timings (avg | max): "
+				+ Utils.DECIMAL_FORMAT.format(avgAITimings) + " ms" + " | "
+				+ Utils.DECIMAL_FORMAT.format(maxAITiming) + " ms");
 
 		for (World world : Bukkit.getWorlds()) {
 			String worldName = world.getName();
 			Chunk[] loadedChunks = world.getLoadedChunks();
+			List<Entity> entities = world.getEntities();
+			int deadEntities = 0;
+			int invalidEntities = 0;
+			for (Entity entity : entities) {
+				if (entity.isDead()) ++deadEntities;
+				if (!entity.isValid()) ++invalidEntities;
+			}
+
 			int totalShopkeepers = 0;
 			int chunksWithShopkeepers = 0;
 			int loadedChunksWithShopkeepers = 0;
@@ -125,10 +138,10 @@ class CommandCheck extends Command {
 
 			sender.sendMessage(ChatColor.YELLOW + "Shopkeepers in world '" + world.getName() + "':");
 			sender.sendMessage("  Total: " + totalShopkeepers);
+			sender.sendMessage("  Entities | invalid | dead: " + entities.size() + " | " + invalidEntities + " | " + deadEntities);
 			sender.sendMessage("  Loaded chunks: " + loadedChunks.length);
 			if (totalShopkeepers > 0) {
-				sender.sendMessage("  Chunks with shopkeepers: " + chunksWithShopkeepers);
-				sender.sendMessage("  Loaded chunks with shopkeepers: " + loadedChunksWithShopkeepers);
+				sender.sendMessage("  Chunks with shopkeepers | loaded: " + chunksWithShopkeepers + " | " + loadedChunksWithShopkeepers);
 				sender.sendMessage("  Shopkeepers in loaded chunks: " + shopkeepersInLoadedChunks);
 			}
 

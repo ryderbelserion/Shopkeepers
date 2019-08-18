@@ -30,6 +30,8 @@ import com.nisovin.shopkeepers.util.Utils;
  */
 public class LivingEntityAI {
 
+	// Determines how often AI activations get rechecked (every X ticks):
+	public static final int AI_ACTIVATION_TICK_RATE = 20;
 	// The look-at-players ai goal only targets players in 12 block radius, so we can limit the ai ticking to the direct
 	// chunks around the player:
 	private static final int AI_ACTIVATION_CHUNK_RANGE = 1;
@@ -217,8 +219,8 @@ public class LivingEntityAI {
 			gravityTimings.startPaused();
 			aiTimings.startPaused();
 
-			// freshly determine active chunks/entities (near players) every 20 ticks:
-			boolean activationPhase = (tickCounter % 20 == 0);
+			// freshly determine active chunks/entities (near players) every AI_ACTIVATION_TICK_RATE ticks:
+			boolean activationPhase = (tickCounter % AI_ACTIVATION_TICK_RATE == 0);
 			if (activationPhase) {
 				activationTimings.start();
 

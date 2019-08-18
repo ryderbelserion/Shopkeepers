@@ -57,6 +57,7 @@ Internal:
 * Internal: Added ItemData tests. This requires CraftBukkit as new test dependency due to relying on item serialization.
 
 Debugging:  
+* Debugging: Added entity, invalid entity and dead entity count to shopkeeper's "check" command. Also restructured the output slightly to make it more compact and clearer.
 * Debugging: Small changes and additions to some debug messages, especially related to shopkeeper interactions and shopkeeper spawning.
 * Debugging: Added setting 'debug-options', which can be used to enable additional debugging tools.
   * Option 'log-all-events': Logs all events. Subsequent calls of the same event get combined into a single logging entry to slightly reduce spam.
