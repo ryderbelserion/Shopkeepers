@@ -118,6 +118,14 @@ class CommandCheck extends Command {
 				if (entity.isDead()) ++deadEntities;
 				if (!entity.isValid()) ++invalidEntities;
 			}
+			int deadEntitiesInChunks = 0;
+			int invalidEntitiesInChunks = 0;
+			for (Chunk chunk : loadedChunks) {
+				for (Entity entity : chunk.getEntities()) {
+					if (entity.isDead()) ++deadEntitiesInChunks;
+					if (!entity.isValid()) ++invalidEntitiesInChunks;
+				}
+			}
 
 			int totalShopkeepers = 0;
 			int chunksWithShopkeepers = 0;
@@ -139,6 +147,7 @@ class CommandCheck extends Command {
 			sender.sendMessage(ChatColor.YELLOW + "Shopkeepers in world '" + world.getName() + "':");
 			sender.sendMessage("  Total: " + totalShopkeepers);
 			sender.sendMessage("  Entities | invalid | dead: " + entities.size() + " | " + invalidEntities + " | " + deadEntities);
+			sender.sendMessage("  Entities in chunks (invalid | dead): " + invalidEntitiesInChunks + " | " + deadEntitiesInChunks);
 			sender.sendMessage("  Loaded chunks: " + loadedChunks.length);
 			if (totalShopkeepers > 0) {
 				sender.sendMessage("  Chunks with shopkeepers | loaded: " + chunksWithShopkeepers + " | " + loadedChunksWithShopkeepers);
