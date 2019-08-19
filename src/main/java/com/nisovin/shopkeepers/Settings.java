@@ -53,6 +53,8 @@ public class Settings {
 
 	public static boolean enableWorldGuardRestrictions = false;
 	public static boolean requireWorldGuardAllowShopFlag = false;
+	public static boolean registerWorldGuardAllowShopFlag = true;
+
 	public static boolean enableTownyRestrictions = false;
 
 	/*

@@ -213,11 +213,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		this.loadConfig();
 
 		// WorldGuard only allows registering flags before it gets enabled.
-		// By default, we always attempt to register the flag. There is no config setting for this, because this is not
-		// expected to be required. And a config setting would also not work for later config reloads.
-		// Instead, in case this is really required for some reason, a system property can be used to disable the flag
-		// registration.
-		if (System.getProperty("shopkeepers.skip-wg-allow-shop-flag", "false").equals("false")) {
+		// Note: Changing the config setting has no effect until the next server restart or server reload.
+		if (Settings.registerWorldGuardAllowShopFlag) {
 			WorldGuardHandler.registerAllowShopFlag();
 		}
 	}

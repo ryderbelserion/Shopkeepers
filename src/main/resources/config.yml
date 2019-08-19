@@ -53,6 +53,12 @@ enable-world-guard-restrictions: false
 # chests in the affected region, shop chests need to be pre-setup by someone
 # else and the require-chest-recently-placed setting needs to be disabled.
 require-world-guard-allow-shop-flag: false
+# Whether to register the allow-shop flag with WorldGuard (if no other plugin
+# has registered it yet). Usually there should be no need to disable this.
+# Changing this setting has no effect until the next server restart or full
+# server reload!
+register-world-guard-allow-shop-flag: true
+
 # If enabled, players will only be able to place shopkeepers in places that
 # have been designated as commercial areas by Towny.
 enable-towny-restrictions: false
