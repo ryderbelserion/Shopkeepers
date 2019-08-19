@@ -113,18 +113,10 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final SignShops signShops = new SignShops(this);
 	private final CitizensShops citizensShops = new CitizensShops(this);
 
-	@Override
-	public void onLoad() {
-		// WorldGuard only allows registering flags before it got enabled.
-		// The config gets loaded later, so we always attempt to register the flag.
-		WorldGuardHandler.registerAllowShopFlag();
-	}
+	private boolean outdatedServer = false;
+	private boolean incompatibleServer = false;
 
-	@Override
-	public void onEnable() {
-		plugin = this;
-		ShopkeepersAPI.enable(this);
-
+	private void loadRequiredClasses() {
 		// making sure that certain classes, that are needed during shutdown, are loaded:
 		// this helps for hot reloads (when the plugin gets disabled, but the original jar got replaced and is therefore
 		// no longer available)
@@ -136,48 +128,52 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
+	}
 
-		// validate that this is running a minimum required version of Spigot:
+	// returns true if server is outdated
+	private boolean isOutdatedServerVersion() {
+		// validate that this server is running a minimum required version:
 		// TODO add proper version parsing
-		/*String cbVersion = Utils.getServerCBVersion(); // 1_13_R2
-		String bukkitVersion = Bukkit.getBukkitVersion(); // 1.13.1-R0.1-SNAPSHOT*/
+		/*String cbVersion = Utils.getServerCBVersion(); // eg. 1_13_R2
+		String bukkitVersion = Bukkit.getBukkitVersion(); // eg. 1.13.1-R0.1-SNAPSHOT*/
 		try {
-			// this has been added with the recent changes to PlayerBedEnterEvent:
+			// this has been added with the recent changes to PlayerBedEnterEvent: TODO outdated
 			Class.forName("org.bukkit.event.player.PlayerBedEnterEvent$BedEnterResult");
-		} catch (ClassNotFoundException e1) {
-			Log.severe("Outdated server version (" + Bukkit.getVersion()
-					+ "): Shopkeepers cannot be enabled. Please update your server!");
-			this.setEnabled(false);
-			return;
+			return false;
+		} catch (ClassNotFoundException e) {
+			return true;
 		}
+	}
 
-		// try to load suitable NMS code:
+	// returns false if no compatible NMS version, nor the fallback handler could be setup
+	private boolean setupNMS() {
 		NMSManager.load(this);
-		if (NMSManager.getProvider() == null) {
-			Log.severe("Incompatible server version: Shopkeepers cannot be enabled.");
-			this.setEnabled(false);
-			return;
-		}
+		return (NMSManager.getProvider() != null);
+	}
+
+	private void loadConfig() {
+		Log.info("Loading config.");
+		// save default config in case the config file doesn't exist
+		this.saveDefaultConfig();
 
 		// load config:
-		File configFile = new File(this.getDataFolder(), "config.yml");
-		if (!configFile.exists()) {
-			this.saveDefaultConfig();
-		}
 		this.reloadConfig();
+
+		// load settings from config:
 		Configuration config = this.getConfig();
 		boolean configChanged = Settings.loadConfiguration(config);
 		if (configChanged) {
-			// if missing settings were added -> save the modified config
+			// if the config was modified (migrations, adding missing settings, ..), save it:
 			// TODO persist comments somehow
 			this.saveConfig();
 		}
 
 		// load language config:
 		String lang = Settings.language;
-		File langFile = new File(this.getDataFolder(), "language-" + lang + ".yml");
-		if (!langFile.exists() && this.getResource("language-" + lang + ".yml") != null) {
-			this.saveResource("language-" + lang + ".yml", false);
+		String langFileName = "language-" + lang + ".yml";
+		File langFile = new File(this.getDataFolder(), langFileName);
+		if (!langFile.exists() && this.getResource(langFileName) != null) {
+			this.saveResource(langFileName, false);
 		}
 		if (langFile.exists()) {
 			try {
@@ -187,6 +183,74 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	@Override
+	public void onLoad() {
+		// setting plugin reference early, so it is also available for any code running here:
+		plugin = this;
+		ShopkeepersAPI.enable(this);
+
+		// making sure that certain classes, that are needed during shutdown, are loaded:
+		// this helps for hot reloads (when the plugin gets disabled, but the original jar got replaced and is therefore
+		// no longer available)
+		this.loadRequiredClasses();
+
+		// validate that this server is running a minimum required version:
+		this.outdatedServer = this.isOutdatedServerVersion();
+		if (this.outdatedServer) {
+			return;
+		}
+
+		// try to load suitable NMS (or fallback) code:
+		this.incompatibleServer = !this.setupNMS();
+		if (this.incompatibleServer) {
+			return;
+		}
+
+		// load config:
+		this.loadConfig();
+
+		// WorldGuard only allows registering flags before it gets enabled.
+		// By default, we always attempt to register the flag. There is no config setting for this, because this is not
+		// expected to be required. And a config setting would also not work for later config reloads.
+		// Instead, in case this is really required for some reason, a system property can be used to disable the flag
+		// registration.
+		if (System.getProperty("shopkeepers.skip-wg-allow-shop-flag", "false").equals("false")) {
+			WorldGuardHandler.registerAllowShopFlag();
+		}
+	}
+
+	@Override
+	public void onEnable() {
+		// plugin instance and API might already have been set during onLoad:
+		boolean alreadySetup = true;
+		if (plugin == null) {
+			alreadySetup = false;
+			plugin = this;
+			ShopkeepersAPI.enable(this);
+		}
+
+		// validate that this server is running a minimum required version:
+		if (this.outdatedServer) {
+			Log.severe("Outdated server version (" + Bukkit.getVersion() + "): Shopkeepers cannot be enabled. Please update your server!");
+			this.setEnabled(false); // also calls onDisable
+			return;
+		}
+
+		// check if the server version is incompatible:
+		if (this.incompatibleServer) {
+			Log.severe("Incompatible server version: Shopkeepers cannot be enabled.");
+			this.setEnabled(false); // also calls onDisable
+			return;
+		}
+
+		// load config (if it hasn't just been loaded already during onLoad):
+		if (!alreadySetup) {
+			this.loadConfig();
+		} else {
+			Log.info("Config already loaded.");
 		}
 
 		// process additional permissions

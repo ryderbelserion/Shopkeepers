@@ -35,6 +35,7 @@ Date format: (YYYY-MM-DD)
 * Changed: Some entity attributes are setup prior to entity spawning now (such as metadata, non-persist flag and name (if it has/uses one)). This should help other plugins to identify Shopkeeper entities during spawning.
 * Changed: Added setting 'increment-villager-statistics' (default: false) which controls whether opening the trading menu and trading with shopkeepers increment minecraft's 'talked-to-villager' and 'traded-with-villager' statistics. Previously the talked-to-villager statistics would always get incremented and the traded-with-villager statistic was not used.
 * Added: The previous, current and next page items inside the editor view will now use their stack size to visualize the previous, current and next page number. This even works for items which are usually not stackable.
+* Added: Added a system property 'shopkeepers.skip-wg-allow-shop-flag' which can be used to disable the registration of the 'allow-shop' WorldGuard flag. This should usually not be required though.
 
 API:  
 * API: Added interfaces for the different shopkeeper types and their offers to the API. They allow modifying the shopkeepers' trades. Factory methods for the different types of offers are provided via ShopkeepersPlugin and ShopkeepersAPI. The internal shopkeeper classes got renamed.
@@ -44,6 +45,7 @@ API:
 * API/Fixed: ShopkeepersAPI was missing getDefaultUITypes.
 
 Internal:  
+* Internal: Moved some initialization and config loading into the onLoad phase.
 * Internal: Avoiding ItemStack#hasItemMeta calls before getting an item's ItemMeta, since this might be heavier than simply getting the ItemMeta directly and performing only the relevant checks on that. Internally ItemStack#hasItemMeta checks emptiness for all item attributes and might (for CraftItemStacks) even first copy all the item's data into a new ItemMeta object. And even if the item actually has no data (Bukkit ItemStack with null ItemMeta), ItemStack#getItemMeta will simply create a new empty ItemMeta object without having to copy any data, so this is still a similarly lightweight operation anyways.
 * Internal: Made all priorities and ignoring of cancelled events explicit.
 * Internal: Moved code for checking chest access into util package.

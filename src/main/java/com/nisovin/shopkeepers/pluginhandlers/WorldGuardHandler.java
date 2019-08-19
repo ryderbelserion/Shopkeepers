@@ -50,14 +50,14 @@ public class WorldGuardHandler {
 	private static class Link {
 
 		public static void registerAllowShopFlag() {
-			Log.debug("Registering WorldGuard flag '" + FLAG_ALLOW_SHOP + "'.");
+			Log.info("Registering WorldGuard flag '" + FLAG_ALLOW_SHOP + "'.");
 			try {
 				StateFlag allowShopFlag = new StateFlag(FLAG_ALLOW_SHOP, false);
 				WorldGuard.getInstance().getFlagRegistry().register(allowShopFlag);
 			} catch (FlagConflictException | IllegalStateException e) {
 				// another plugin has probably already registered this flag,
 				// or this plugin got hard reloaded by some plugin manager plugin
-				Log.debug("Couldn't register WorldGuard flag '" + FLAG_ALLOW_SHOP + "': " + e.getMessage());
+				Log.info("Couldn't register WorldGuard flag '" + FLAG_ALLOW_SHOP + "': " + e.getMessage());
 			}
 		}
 
