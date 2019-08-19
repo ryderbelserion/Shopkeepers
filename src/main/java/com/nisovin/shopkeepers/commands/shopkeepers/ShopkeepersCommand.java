@@ -80,6 +80,7 @@ public class ShopkeepersCommand extends BaseCommand {
 		// hidden debugging commands:
 		childCommands.register(new CommandCheck(plugin));
 		childCommands.register(new CommandCheckItem());
+		childCommands.register(new CommandYaml());
 		childCommands.register(new CommandDebugCreateShops(plugin));
 	}
 

@@ -57,6 +57,7 @@ Internal:
 * Internal: Added ItemData tests. This requires CraftBukkit as new test dependency due to relying on item serialization.
 
 Debugging:  
+* Debugging: Added new debug command "/shopkeepers yaml", which prints Bukkit's yaml serialization and the item data representation used in the config for the currently held item.
 * Debugging: Added entity, invalid entity and dead entity count to shopkeeper's "check" command. Also restructured the output slightly to make it more compact and clearer.
 * Debugging: Small changes and additions to some debug messages, especially related to shopkeeper interactions and shopkeeper spawning.
 * Debugging: Added setting 'debug-options', which can be used to enable additional debugging tools.

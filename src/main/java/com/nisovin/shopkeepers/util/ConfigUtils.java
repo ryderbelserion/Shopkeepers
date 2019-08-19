@@ -5,6 +5,8 @@ import java.util.Map.Entry;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public class ConfigUtils {
 
@@ -37,6 +39,10 @@ public class ConfigUtils {
 		}
 	}
 
+	public static String yamlLineBreak() {
+		return "\n"; // YAML used unix line breaks by default
+	}
+
 	public static void convertSectionsToMaps(Map<String, Object> sectionMap) {
 		for (Entry<String, Object> entry : sectionMap.entrySet()) {
 			Object value = entry.getValue();
@@ -47,6 +53,17 @@ public class ConfigUtils {
 				convertSectionsToMaps(innerSectionMap);
 			}
 		}
+	}
+
+	public static String[] getYAMLOutput(ConfigurationSerializable serializable) {
+		return getYAMLOutput(serializable.serialize());
+	}
+
+	public static String[] getYAMLOutput(Object serializedObject) {
+		YamlConfiguration config = new YamlConfiguration();
+		config.set("yaml-output", serializedObject);
+		String configOutput = config.saveToString();
+		return configOutput.split(yamlLineBreak());
 	}
 
 	private ConfigUtils() {
