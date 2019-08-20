@@ -12,7 +12,7 @@
 			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="src/api/java"/>
+	<classpathentry kind="src" output="target/classes" path="src/api/java"/>
 	<classpathentry kind="src" output="target/eclipse-test-classes-api" path="src/api/test">
 		<attributes>
 			<attribute name="test" value="true"/>
@@ -29,5 +29,5 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="output" path="target/eclipse-build-classes"/>
+	<classpathentry kind="output" path="target/classes"/>
 </classpath>
