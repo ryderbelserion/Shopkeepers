@@ -61,6 +61,7 @@ Internal:
 Debugging:  
 * Debugging: Added new debug command "/shopkeepers yaml", which prints Bukkit's yaml serialization and the item data representation used in the config for the currently held item.
 * Debugging: Added entity, invalid entity and dead entity count to shopkeeper's "check" command. Also restructured the output slightly to make it more compact and clearer.
+* Debugging: Minor changes to the "checkitem" command. It nows compares the items in main and off hand and also checks if the item in the main hand matches the item in the off-hand.
 * Debugging: Small changes and additions to some debug messages, especially related to shopkeeper interactions and shopkeeper spawning.
 * Debugging: Added setting 'debug-options', which can be used to enable additional debugging tools.
   * Option 'log-all-events': Logs all events. Subsequent calls of the same event get combined into a single logging entry to slightly reduce spam.

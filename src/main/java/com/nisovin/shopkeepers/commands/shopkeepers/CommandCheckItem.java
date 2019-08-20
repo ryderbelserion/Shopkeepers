@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -32,21 +33,21 @@ class CommandCheckItem extends PlayerCommand {
 		assert (input.getSender() instanceof Player);
 		Player player = (Player) input.getSender();
 
-		ItemStack inHand = player.getInventory().getItemInMainHand();
-		int holdSlot = player.getInventory().getHeldItemSlot();
-		ItemStack nextItem = player.getInventory().getItem(holdSlot == 8 ? 0 : holdSlot + 1);
+		ItemStack mainHandItem = player.getInventory().getItemInMainHand();
+		ItemStack offHandItem = player.getInventory().getItemInOffHand();
 
-		player.sendMessage("Item in hand:");
-		player.sendMessage("-Is low currency: " + (Settings.isCurrencyItem(inHand)));
-		player.sendMessage("-Is high currency: " + (Settings.isHighCurrencyItem(inHand)));
-		player.sendMessage("-Is zero low currency: " + (Settings.isZeroCurrencyItem(inHand)));
-		player.sendMessage("-Is zero high currency: " + (Settings.isZeroHighCurrencyItem(inHand)));
-		player.sendMessage("-Similar to next item: " + (ItemUtils.isSimilar(nextItem, inHand) ? "yes" : "nope"));
+		player.sendMessage(ChatColor.YELLOW + "Item in main hand:");
+		player.sendMessage("- Is low currency: " + (Settings.isCurrencyItem(mainHandItem)));
+		player.sendMessage("- Is high currency: " + (Settings.isHighCurrencyItem(mainHandItem)));
+		player.sendMessage("- Is zero low currency: " + (Settings.isZeroCurrencyItem(mainHandItem)));
+		player.sendMessage("- Is zero high currency: " + (Settings.isZeroHighCurrencyItem(mainHandItem)));
+		player.sendMessage("- Similar to off-hand item: " + (ItemUtils.isSimilar(mainHandItem, offHandItem) ? "yes" : "nope"));
+		player.sendMessage("- Matching off-hand item: " + (ItemUtils.matchesData(mainHandItem, offHandItem) ? "yes" : "nope"));
 
-		player.sendMessage("Next item:");
-		player.sendMessage("-Is low currency: " + (Settings.isCurrencyItem(nextItem)));
-		player.sendMessage("-Is high currency: " + (Settings.isHighCurrencyItem(nextItem)));
-		player.sendMessage("-Is zero low currency: " + (Settings.isZeroCurrencyItem(nextItem)));
-		player.sendMessage("-Is zero high currency: " + (Settings.isZeroHighCurrencyItem(nextItem)));
+		player.sendMessage(ChatColor.YELLOW + "Item in off-hand:");
+		player.sendMessage("- Is low currency: " + (Settings.isCurrencyItem(offHandItem)));
+		player.sendMessage("- Is high currency: " + (Settings.isHighCurrencyItem(offHandItem)));
+		player.sendMessage("- Is zero low currency: " + (Settings.isZeroCurrencyItem(offHandItem)));
+		player.sendMessage("- Is zero high currency: " + (Settings.isZeroHighCurrencyItem(offHandItem)));
 	}
 }
