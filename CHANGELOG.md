@@ -4,6 +4,11 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
+## v2.8.1 (TBA)
+### Supported MC versions: 1.14.4
+
+* Config: Added a comment about the available debug options.
+
 ## v2.8.0 (2019-08-22)
 ### Supported MC versions: 1.14.4
 
