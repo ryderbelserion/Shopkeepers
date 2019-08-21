@@ -1,7 +1,9 @@
 package com.nisovin.shopkeepers.shopobjects.sign;
 
 import java.util.Iterator;
+import java.util.UUID;
 
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -33,14 +35,42 @@ class SignShopListener implements Listener {
 
 	private final SignShops signShops;
 
-	private Block cancelNextBlockPhysics = null;
+	private static class ModifiableBlockPos {
+
+		private UUID worldId = null; // null indicates clear block pos
+		private int x;
+		private int y;
+		private int z;
+
+		// null to clear
+		public void set(Block block) {
+			if (block == null) {
+				// clear:
+				worldId = null;
+			} else {
+				worldId = block.getWorld().getUID();
+				x = block.getX();
+				y = block.getY();
+				z = block.getZ();
+			}
+		}
+
+		public boolean matches(UUID otherWorldId, int otherX, int otherY, int otherZ) {
+			assert otherWorldId != null;
+			// Comparing world ids by identity should work, since all world ids are retrieved from the same source.
+			// See also CraftWorld#equals(Object).
+			return this.worldId == otherWorldId && this.x == otherX && this.y == otherY && this.z == otherZ;
+		}
+	}
+
+	private final ModifiableBlockPos cancelNextBlockPhysics = new ModifiableBlockPos();
 
 	SignShopListener(SignShops signShops) {
 		this.signShops = signShops;
 	}
 
 	void cancelNextBlockPhysics(Block block) {
-		cancelNextBlockPhysics = block;
+		cancelNextBlockPhysics.set(block); // null to clear
 	}
 
 	// See LivingEntityShopListener for a reasoning behind using event priority LOWEST.
@@ -141,25 +171,34 @@ class SignShopListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockPhysics(BlockPhysicsEvent event) {
 		Block block = event.getBlock();
-		if (this.checkCancelPhysics(block)) {
+		World world = block.getWorld();
+		String worldName = world.getName();
+		UUID worldId = world.getUID();
+		int blockX = block.getX();
+		int blockY = block.getY();
+		int blockZ = block.getZ();
+		if (this.checkCancelPhysics(worldName, worldId, blockX, blockY, blockZ)) {
 			event.setCancelled(true);
 			return;
 		}
 		// Spigot changed the behavior of this event in MC 1.13 to reduce the number of event calls:
 		// Related: https://hub.spigotmc.org/jira/browse/SPIGOT-4256
 		for (BlockFace blockFace : BLOCK_SIDES) {
-			Block adjacentBlock = block.getRelative(blockFace.getModX(), blockFace.getModY(), blockFace.getModZ());
-			if (this.checkCancelPhysics(adjacentBlock)) {
+			// Note: Avoiding getting the adjacent block slightly improves performance of handling this event.
+			int adjacentX = blockX + blockFace.getModX();
+			int adjacentY = blockY + blockFace.getModY();
+			int adjacentZ = blockZ + blockFace.getModZ();
+			if (this.checkCancelPhysics(worldName, worldId, adjacentX, adjacentY, adjacentZ)) {
 				event.setCancelled(true);
 				return;
 			}
 		}
 	}
 
-	private boolean checkCancelPhysics(Block block) {
-		if (cancelNextBlockPhysics != null && cancelNextBlockPhysics.equals(block)) {
+	private boolean checkCancelPhysics(String worldName, UUID worldId, int blockX, int blockY, int blockZ) {
+		if (cancelNextBlockPhysics.matches(worldId, blockX, blockY, blockZ)) {
 			return true;
-		} else if (signShops.isSignShop(block)) {
+		} else if (signShops.isSignShop(worldName, blockX, blockY, blockZ)) {
 			return true;
 		}
 		return false;

@@ -37,8 +37,16 @@ public class SignShops {
 		return plugin.getShopkeeperRegistry().getActiveShopkeeper(signShopObjectType.createObjectId(block));
 	}
 
+	AbstractShopkeeper getSignShop(String worldName, int blockX, int blockY, int blockZ) {
+		return plugin.getShopkeeperRegistry().getActiveShopkeeper(signShopObjectType.createObjectId(worldName, blockX, blockY, blockZ));
+	}
+
 	public boolean isSignShop(Block block) {
 		return (this.getSignShop(block) != null);
+	}
+
+	boolean isSignShop(String worldName, int blockX, int blockY, int blockZ) {
+		return (this.getSignShop(worldName, blockX, blockY, blockZ) != null);
 	}
 
 	void cancelNextBlockPhysics(Block block) {

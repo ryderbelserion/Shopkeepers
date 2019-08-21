@@ -46,6 +46,7 @@ API:
 
 Internal:  
 * Internal: Made some small change that resulted in major performance improvements for handling items moving between inventories (hoppers, droppers, etc.).
+* Internal: Slightly improved performance for handling block physics events.
 * Internal: Moved some initialization and config loading into the onLoad phase.
 * Internal: Avoiding ItemStack#hasItemMeta calls before getting an item's ItemMeta, since this might be heavier than simply getting the ItemMeta directly and performing only the relevant checks on that. Internally ItemStack#hasItemMeta checks emptiness for all item attributes and might (for CraftItemStacks) even first copy all the item's data into a new ItemMeta object. And even if the item actually has no data (Bukkit ItemStack with null ItemMeta), ItemStack#getItemMeta will simply create a new empty ItemMeta object without having to copy any data, so this is still a similarly lightweight operation anyways.
 * Internal: Made all priorities and ignoring of cancelled events explicit.

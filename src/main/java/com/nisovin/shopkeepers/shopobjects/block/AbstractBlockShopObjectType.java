@@ -19,7 +19,12 @@ public abstract class AbstractBlockShopObjectType<T extends AbstractBlockShopObj
 
 	public String createObjectId(Block block) {
 		if (block == null) return null;
+		return this.createObjectId(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+	}
+
+	public String createObjectId(String worldName, int blockX, int blockY, int blockZ) {
+		if (worldName == null) return null;
 		// inline for performance:
-		return this.getIdentifier() + ":" + block.getWorld().getName() + "," + block.getX() + "," + block.getY() + "," + block.getZ();
+		return this.getIdentifier() + ":" + worldName + "," + blockX + "," + blockY + "," + blockZ;
 	}
 }
