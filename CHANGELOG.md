@@ -4,7 +4,7 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
-## v2.8.0 (TBA)
+## v2.8.0 (2019-08-22)
 ### Supported MC versions: 1.14.4
 
 * Bumped Bukkit dependency from 1.14.3 to 1.14.4.
