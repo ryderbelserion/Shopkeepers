@@ -116,18 +116,20 @@ public class ProtectedChests {
 		}
 	}
 
+	// gets the shopkeepers which are directly using the chest at the specified location
 	private List<PlayerShopkeeper> _getShopkeepers(String worldName, int x, int y, int z) {
 		String key = this.getKey(worldName, x, y, z);
 		return protectedChests.get(key);
 	}
 
+	// gets the shopkeepers which are directly using the specified chest block
 	private List<PlayerShopkeeper> _getShopkeepers(Block block) {
 		return this._getShopkeepers(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
 	}
 
 	//
 
-	// gets the shopkeepers which are directly using this chest block:
+	// gets the shopkeepers which are directly using the chest at the specified location:
 	public List<PlayerShopkeeper> getShopkeepers(String worldName, int x, int y, int z) {
 		List<PlayerShopkeeper> shopkeepers = this._getShopkeepers(worldName, x, y, z);
 		return (shopkeepers == null ? Collections.emptyList() : Collections.unmodifiableList(shopkeepers));
@@ -188,13 +190,12 @@ public class ProtectedChests {
 
 		// reuse logic from getShopkeeperOwnersOfChest:
 		this.getShopkeepersUsingChest(chest, tempResultsList);
-		boolean result;
 		if (tempResultsList.isEmpty()) {
 			// no protection found:
-			result = false;
+			return false;
 		} else {
 			// protection found:
-			result = true;
+			boolean result = true;
 			// check if the player is affected by the protection:
 			if (player != null) {
 				// note: the bypass permission does not get checked here but needs to be checked separately
@@ -209,8 +210,8 @@ public class ProtectedChests {
 			}
 			// cleanup temporary results list:
 			tempResultsList.clear();
+			return result;
 		}
-		return result;
 	}
 
 	/**
@@ -237,20 +238,19 @@ public class ProtectedChests {
 		return this.getShopkeepersUsingChest(chest, null);
 	}
 
-	// gets the shopkeepers which use the chest at the given location (directly or by a connected chest), uses the
-	// provided collection for the results:
+	// gets the shopkeepers which use the chest at the given location (directly or by a connected chest), and adds them
+	// to the provided list:
 	private List<PlayerShopkeeper> getShopkeepersUsingChest(Block chest, List<PlayerShopkeeper> results) {
 		Validate.notNull(chest, "Chest block is null!");
-		// prepare results list:
+		// create results list if none is provided:
 		if (results == null) {
 			results = new ArrayList<>();
-		} else {
-			results.clear();
 		}
 
 		// checking if this block is used directly by shopkeepers:
 		List<PlayerShopkeeper> shopkeepers = this._getShopkeepers(chest);
 		if (shopkeepers != null) {
+			assert !shopkeepers.isEmpty();
 			results.addAll(shopkeepers);
 		}
 
