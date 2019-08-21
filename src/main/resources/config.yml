@@ -1,6 +1,7 @@
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Shopkeepers Config
 # Wiki: https://github.com/Shopkeepers/Shopkeepers-Wiki/wiki/Configuration
+# The wiki also explains how item data gets specified inside the config.
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
 # Determines the required config migrations. Do not edit manually!
