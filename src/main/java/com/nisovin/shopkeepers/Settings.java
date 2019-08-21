@@ -25,16 +25,21 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class Settings {
 
+	public static final class DebugOptions {
+
+		// Logs all events (spams!). Starts slightly delayed. Subsequent calls of the same event get combined into a
+		// single logging entry to slightly reduce spam.
+		public static final String logAllEvents = "log-all-events";
+		// Prints the registered listeners for the first call of each event.
+		public static final String printListeners = "print-listeners";
+	}
+
 	/*
 	 * General Settings
 	 */
 	public static int configVersion = 2;
 	public static boolean debug = false;
-	/*
-	 * Available options:
-	 * - log-all-events: Logs all events (spams!). Starts slightly delayed.
-	 * - print-listeners: Prints the registered listeners for the first call of each event.
-	 */
+	// See DebugOptions for all available options.
 	public static List<String> debugOptions = new ArrayList<>(0);
 	public static boolean enableMetrics = true;
 
