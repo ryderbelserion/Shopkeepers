@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class ShopkeeperCreation {
@@ -53,7 +54,7 @@ public class ShopkeeperCreation {
 			recentlyPlaced = new LinkedList<>();
 			recentlyPlacedChests.put(playerName, recentlyPlaced);
 		}
-		recentlyPlaced.add(Utils.getLocationString(chest));
+		recentlyPlaced.add(TextUtils.getLocationString(chest));
 		if (recentlyPlaced.size() > 5) {
 			recentlyPlaced.remove(0);
 		}
@@ -63,7 +64,7 @@ public class ShopkeeperCreation {
 		assert player != null && chest != null;
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
-		return recentlyPlaced != null && recentlyPlaced.contains(Utils.getLocationString(chest));
+		return recentlyPlaced != null && recentlyPlaced.contains(TextUtils.getLocationString(chest));
 	}
 
 	// SELECTED CHEST
@@ -89,20 +90,20 @@ public class ShopkeeperCreation {
 	public boolean handleCheckChest(Player player, Block chestBlock) {
 		// check if this chest is already used by some other shopkeeper:
 		if (SKShopkeepersPlugin.getInstance().getProtectedChests().isChestProtected(chestBlock, null)) {
-			Utils.sendMessage(player, Settings.msgChestAlreadyInUse);
+			TextUtils.sendMessage(player, Settings.msgChestAlreadyInUse);
 			return false;
 		}
 
 		// check for recently placed:
 		if (Settings.requireChestRecentlyPlaced && !plugin.getShopkeeperCreation().isRecentlyPlacedChest(player, chestBlock)) {
 			// chest was not recently placed:
-			Utils.sendMessage(player, Settings.msgChestNotPlaced);
+			TextUtils.sendMessage(player, Settings.msgChestNotPlaced);
 			return false;
 		}
 
 		// check if the player can access the chest:
 		if (!Utils.checkBlockInteract(player, chestBlock)) { // checks access via dummy interact event
-			Utils.sendMessage(player, Settings.msgNoChestAccess);
+			TextUtils.sendMessage(player, Settings.msgNoChestAccess);
 			return false;
 		}
 		return true;

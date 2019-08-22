@@ -19,7 +19,7 @@ import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper> extends AbstractShopType<T> implements PlayerShopType<T> {
 
@@ -45,14 +45,14 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		Block chestBlock = playerShopCreationData.getShopChest();
 		if (!ItemUtils.isChest(chestBlock.getType())) {
 			// the block is not / no longer a chest:
-			Utils.sendMessage(creator, Settings.msgNoChestSelected);
+			TextUtils.sendMessage(creator, Settings.msgNoChestSelected);
 			return false;
 		}
 
 		// check for selected chest being too far away:
 		if (!chestBlock.getWorld().equals(spawnLocation.getWorld())
 				|| (int) chestBlock.getLocation().distanceSquared(spawnLocation) > (Settings.maxChestDistance * Settings.maxChestDistance)) {
-			Utils.sendMessage(creator, Settings.msgChestTooFar);
+			TextUtils.sendMessage(creator, Settings.msgChestTooFar);
 			return false;
 		}
 
@@ -64,7 +64,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		// check worldguard:
 		if (Settings.enableWorldGuardRestrictions) {
 			if (!WorldGuardHandler.isShopAllowed(creator, spawnLocation)) {
-				Utils.sendMessage(creator, Settings.msgShopCreateFail);
+				TextUtils.sendMessage(creator, Settings.msgShopCreateFail);
 				return false;
 			}
 		}
@@ -72,7 +72,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		// check towny:
 		if (Settings.enableTownyRestrictions) {
 			if (!TownyHandler.isCommercialArea(spawnLocation)) {
-				Utils.sendMessage(creator, Settings.msgShopCreateFail);
+				TextUtils.sendMessage(creator, Settings.msgShopCreateFail);
 				return false;
 			}
 		}
@@ -92,7 +92,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		if (maxShopsLimit > 0) {
 			int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().countShopsOfPlayer(creator);
 			if (count >= maxShopsLimit) {
-				Utils.sendMessage(creator, Settings.msgTooManyShops);
+				TextUtils.sendMessage(creator, Settings.msgTooManyShops);
 				return false;
 			}
 		}

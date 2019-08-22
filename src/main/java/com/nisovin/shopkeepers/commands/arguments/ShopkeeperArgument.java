@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public class ShopkeeperArgument extends StringArgument {
 
@@ -45,7 +45,7 @@ public class ShopkeeperArgument extends StringArgument {
 	@Override
 	public String getInvalidArgumentErrorMsg(String argument) {
 		if (argument == null) argument = "";
-		return Utils.replaceArgs(Settings.msgCommandShopkeeperArgumentInvalid,
+		return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentInvalid,
 				"{argumentName}", this.getName(),
 				"{argumentFormat}", this.getFormat(),
 				"{argument}", argument);
@@ -122,7 +122,7 @@ public class ShopkeeperArgument extends StringArgument {
 		if (args.getRemainingSize() == 1 || (joinRemainingArgs && args.getRemainingSize() > 1)) {
 			List<String> suggestions = new ArrayList<>();
 			String partialArg = (joinRemainingArgs ? this.getJoinedRemainingArgs(args) : args.next());
-			partialArg = Utils.stripColor(partialArg);
+			partialArg = TextUtils.stripColor(partialArg);
 			partialArg = StringUtils.normalize(partialArg);
 
 			// check for matching shop names:
@@ -130,7 +130,7 @@ public class ShopkeeperArgument extends StringArgument {
 				if (!this.testFilter(shopkeeper)) continue; // filtered
 				String shopName = shopkeeper.getName();
 				if (StringUtils.isEmpty(shopName)) continue;
-				shopName = Utils.stripColor(shopName);
+				shopName = TextUtils.stripColor(shopName);
 				shopName = StringUtils.normalizeKeepCase(shopName);
 				String shopNameLower = shopName.toLowerCase(Locale.ROOT);
 				if (shopNameLower.startsWith(partialArg)) {

@@ -112,12 +112,12 @@ public class ShopkeeperUtils {
 						List<PlayerShopkeeper> shopkeepers = SKShopkeepersPlugin.getInstance().getProtectedChests().getShopkeepersUsingChest(targetBlock);
 						if (shopkeepers.isEmpty()) {
 							if (message) {
-								Utils.sendMessage(player, Settings.msgUnusedChest);
+								TextUtils.sendMessage(player, Settings.msgUnusedChest);
 							}
 							return Collections.emptyList();
 						} else if (type == ShopTypeCategory.ADMIN) {
 							if (message) {
-								Utils.sendMessage(player, Settings.msgTargetShopIsNoAdminShop);
+								TextUtils.sendMessage(player, Settings.msgTargetShopIsNoAdminShop);
 							}
 							return Collections.emptyList();
 						}
@@ -130,7 +130,7 @@ public class ShopkeeperUtils {
 				shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByEntity(targetEntity);
 				if (shopkeeper == null) {
 					if (message) {
-						Utils.sendMessage(player, Settings.msgTargetEntityIsNoShop);
+						TextUtils.sendMessage(player, Settings.msgTargetEntityIsNoShop);
 					}
 					return Collections.emptyList();
 				}
@@ -140,12 +140,12 @@ public class ShopkeeperUtils {
 			if (shopkeeper != null) {
 				if (type == ShopTypeCategory.PLAYER && !(shopkeeper instanceof PlayerShopkeeper)) {
 					if (message) {
-						Utils.sendMessage(player, Settings.msgTargetShopIsNoPlayerShop);
+						TextUtils.sendMessage(player, Settings.msgTargetShopIsNoPlayerShop);
 					}
 					return Collections.emptyList();
 				} else if (type == ShopTypeCategory.ADMIN && !(shopkeeper instanceof AdminShopkeeper)) {
 					if (message) {
-						Utils.sendMessage(player, Settings.msgTargetShopIsNoAdminShop);
+						TextUtils.sendMessage(player, Settings.msgTargetShopIsNoAdminShop);
 					}
 					return Collections.emptyList();
 				}
@@ -156,11 +156,11 @@ public class ShopkeeperUtils {
 		// no targeted shopkeeper found:
 		if (message) {
 			if (type == ShopTypeCategory.PLAYER) {
-				Utils.sendMessage(player, Settings.msgMustTargetPlayerShop);
+				TextUtils.sendMessage(player, Settings.msgMustTargetPlayerShop);
 			} else if (type == ShopTypeCategory.ADMIN) {
-				Utils.sendMessage(player, Settings.msgMustTargetAdminShop);
+				TextUtils.sendMessage(player, Settings.msgMustTargetAdminShop);
 			} else {
-				Utils.sendMessage(player, Settings.msgMustTargetShop);
+				TextUtils.sendMessage(player, Settings.msgMustTargetShop);
 			}
 		}
 		return Collections.emptyList();

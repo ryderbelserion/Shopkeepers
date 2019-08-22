@@ -22,7 +22,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
 import com.nisovin.shopkeepers.shopkeeper.ShopTypeCategory;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandSetTradePerm extends PlayerCommand {
 
@@ -70,13 +70,13 @@ class CommandSetTradePerm extends PlayerCommand {
 		if (removePerm) {
 			// remove trade permission:
 			assert newTradePerm == null;
-			Utils.sendMessage(player, Settings.msgTradePermRemoved, "{perm}", currentTradePerm);
+			TextUtils.sendMessage(player, Settings.msgTradePermRemoved, "{perm}", currentTradePerm);
 		} else if (newTradePerm != null) {
 			// set trade permission:
-			Utils.sendMessage(player, Settings.msgTradePermSet, "{perm}", newTradePerm);
+			TextUtils.sendMessage(player, Settings.msgTradePermSet, "{perm}", newTradePerm);
 		} else {
 			// display current trade permission:
-			Utils.sendMessage(player, Settings.msgTradePermView, "{perm}", currentTradePerm);
+			TextUtils.sendMessage(player, Settings.msgTradePermView, "{perm}", currentTradePerm);
 			return;
 		}
 

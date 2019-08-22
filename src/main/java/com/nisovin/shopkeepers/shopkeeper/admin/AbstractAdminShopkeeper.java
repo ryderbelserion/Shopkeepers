@@ -13,7 +13,8 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.PermissionUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper implements AdminShopkeeper {
 
@@ -34,9 +35,9 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 
 			// check trading permission:
 			String tradePermission = this.getShopkeeper().getTradePremission();
-			if (tradePermission != null && !Utils.hasPermission(player, tradePermission)) {
+			if (tradePermission != null && !PermissionUtils.hasPermission(player, tradePermission)) {
 				Log.debug("Blocked trading UI opening for " + player.getName() + ": Missing custom trade permission '" + tradePermission + "'.");
-				Utils.sendMessage(player, Settings.msgMissingCustomTradePerm);
+				TextUtils.sendMessage(player, Settings.msgMissingCustomTradePerm);
 				return false;
 			}
 			return true;

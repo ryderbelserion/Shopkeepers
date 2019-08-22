@@ -24,7 +24,8 @@ import com.nisovin.shopkeepers.commands.lib.arguments.IntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.PermissionUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandList extends PlayerCommand {
 
@@ -55,9 +56,9 @@ class CommandList extends PlayerCommand {
 	@Override
 	public boolean testPermission(CommandSender sender) {
 		if (!super.testPermission(sender)) return false;
-		return Utils.hasPermission(sender, ShopkeepersPlugin.LIST_OWN_PERMISSION)
-				|| Utils.hasPermission(sender, ShopkeepersPlugin.LIST_OTHERS_PERMISSION)
-				|| Utils.hasPermission(sender, ShopkeepersPlugin.LIST_ADMIN_PERMISSION);
+		return PermissionUtils.hasPermission(sender, ShopkeepersPlugin.LIST_OWN_PERMISSION)
+				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.LIST_OTHERS_PERMISSION)
+				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.LIST_ADMIN_PERMISSION);
 	}
 
 	@Override
@@ -117,13 +118,13 @@ class CommandList extends PlayerCommand {
 
 		if (playerName == null) {
 			// listing admin shops:
-			Utils.sendMessage(player, Settings.msgListAdminShopsHeader,
+			TextUtils.sendMessage(player, Settings.msgListAdminShopsHeader,
 					"{shopsCount}", String.valueOf(shopsCount),
 					"{page}", String.valueOf(page),
 					"{maxPage}", String.valueOf(maxPage));
 		} else {
 			// listing player shops:
-			Utils.sendMessage(player, Settings.msgListPlayerShopsHeader,
+			TextUtils.sendMessage(player, Settings.msgListPlayerShopsHeader,
 					"{player}", playerName,
 					"{shopsCount}", String.valueOf(shopsCount),
 					"{page}", String.valueOf(page),
@@ -136,7 +137,7 @@ class CommandList extends PlayerCommand {
 			Shopkeeper shopkeeper = shops.get(index);
 			String shopName = shopkeeper.getName();
 			boolean hasName = shopName != null && !shopName.isEmpty();
-			Utils.sendMessage(player, Settings.msgListShopsEntry,
+			TextUtils.sendMessage(player, Settings.msgListShopsEntry,
 					"{shopIndex}", String.valueOf(index + 1),
 					"{shopId}", shopkeeper.getUniqueId().toString(),
 					"{shopSessionId}", String.valueOf(shopkeeper.getId()),

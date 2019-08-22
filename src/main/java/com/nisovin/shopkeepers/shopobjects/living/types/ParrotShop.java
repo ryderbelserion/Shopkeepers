@@ -19,8 +19,8 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
 public class ParrotShop extends SittableShop<Parrot> {
 
@@ -79,7 +79,7 @@ public class ParrotShop extends SittableShop<Parrot> {
 	}
 
 	public void cycleParrotVariant(boolean backwards) {
-		this.setParrotVariant(Utils.cycleEnumConstant(Parrot.Variant.class, parrotVariant, backwards));
+		this.setParrotVariant(EnumUtils.cycleEnumConstant(Parrot.Variant.class, parrotVariant, backwards));
 	}
 
 	private ItemStack getParrotVariantEditorItem() {

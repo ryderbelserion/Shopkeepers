@@ -24,7 +24,8 @@ import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.PermissionUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandRemove extends PlayerCommand {
 
@@ -57,10 +58,10 @@ class CommandRemove extends PlayerCommand {
 	@Override
 	public boolean testPermission(CommandSender sender) {
 		if (!super.testPermission(sender)) return false;
-		return Utils.hasPermission(sender, ShopkeepersPlugin.REMOVE_OWN_PERMISSION)
-				|| Utils.hasPermission(sender, ShopkeepersPlugin.REMOVE_OTHERS_PERMISSION)
-				|| Utils.hasPermission(sender, ShopkeepersPlugin.REMOVE_ALL_PERMISSION)
-				|| Utils.hasPermission(sender, ShopkeepersPlugin.REMOVE_ADMIN_PERMISSION);
+		return PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_OWN_PERMISSION)
+				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_OTHERS_PERMISSION)
+				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_ALL_PERMISSION)
+				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_ADMIN_PERMISSION);
 	}
 
 	@Override
@@ -142,15 +143,15 @@ class CommandRemove extends PlayerCommand {
 			int shopsCount = shops.size();
 			if (admin) {
 				// removed admin shops:
-				Utils.sendMessage(player, Settings.msgRemovedAdminShops,
+				TextUtils.sendMessage(player, Settings.msgRemovedAdminShops,
 						"{shopsCount}", String.valueOf(shopsCount));
 			} else if (all) {
 				// removed all player shops:
-				Utils.sendMessage(player, Settings.msgRemovedAllPlayerShops,
+				TextUtils.sendMessage(player, Settings.msgRemovedAllPlayerShops,
 						"{shopsCount}", String.valueOf(shopsCount));
 			} else {
 				// removed shops of specific player:
-				Utils.sendMessage(player, Settings.msgRemovedPlayerShops,
+				TextUtils.sendMessage(player, Settings.msgRemovedPlayerShops,
 						"{player}", playerName,
 						"{shopsCount}", String.valueOf(shopsCount));
 			}
@@ -159,19 +160,19 @@ class CommandRemove extends PlayerCommand {
 		// inform player about required confirmation:
 		if (admin) {
 			// removing admin shops:
-			Utils.sendMessage(player, Settings.msgConfirmRemoveAdminShops);
+			TextUtils.sendMessage(player, Settings.msgConfirmRemoveAdminShops);
 		} else if (all) {
 			// removing all player shops:
-			Utils.sendMessage(player, Settings.msgConfirmRemoveAllPlayerShops);
+			TextUtils.sendMessage(player, Settings.msgConfirmRemoveAllPlayerShops);
 		} else if (playerName.equals(player.getName())) {
 			// removing own shops:
-			Utils.sendMessage(player, Settings.msgConfirmRemoveOwnShops);
+			TextUtils.sendMessage(player, Settings.msgConfirmRemoveOwnShops);
 		} else {
 			// removing shops of specific player:
-			Utils.sendMessage(player, Settings.msgConfirmRemovePlayerShops,
+			TextUtils.sendMessage(player, Settings.msgConfirmRemovePlayerShops,
 					"{player}", playerName);
 		}
 		// inform player on how to confirm the action:
-		Utils.sendMessage(player, Settings.msgConfirmationRequired);
+		TextUtils.sendMessage(player, Settings.msgConfirmationRequired);
 	}
 }

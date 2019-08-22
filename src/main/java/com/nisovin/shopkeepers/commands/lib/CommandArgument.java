@@ -7,7 +7,7 @@ import org.apache.commons.lang.Validate;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class CommandArgument {
 
@@ -89,7 +89,7 @@ public abstract class CommandArgument {
 	 * @return the error message
 	 */
 	public String getMissingArgumentErrorMsg() {
-		return Utils.replaceArgs(Settings.msgCommandArgumentMissing,
+		return TextUtils.replaceArgs(Settings.msgCommandArgumentMissing,
 				"{argumentName}", this.getName(),
 				"{argumentFormat}", this.getFormat());
 	}
@@ -103,7 +103,7 @@ public abstract class CommandArgument {
 	 */
 	public String getInvalidArgumentErrorMsg(String argument) {
 		if (argument == null) argument = "";
-		return Utils.replaceArgs(Settings.msgCommandArgumentInvalid,
+		return TextUtils.replaceArgs(Settings.msgCommandArgumentInvalid,
 				"{argumentName}", this.getName(),
 				"{argumentFormat}", this.getFormat(),
 				"{argument}", argument);

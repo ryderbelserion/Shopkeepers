@@ -20,8 +20,8 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
 public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
@@ -86,7 +86,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	}
 
 	public void cycleColor(boolean backwards) {
-		this.setColor(Utils.cycleEnumConstant(Llama.Color.class, color, backwards));
+		this.setColor(EnumUtils.cycleEnumConstant(Llama.Color.class, color, backwards));
 	}
 
 	private ItemStack getColorEditorItem() {
@@ -140,7 +140,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	}
 
 	public void cycleCarpetColor(boolean backwards) {
-		this.setCarpetColor(Utils.cycleEnumConstantNullable(DyeColor.class, carpetColor, backwards));
+		this.setCarpetColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, carpetColor, backwards));
 	}
 
 	private ItemStack getCarpetColorEditorItem() {

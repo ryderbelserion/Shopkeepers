@@ -19,7 +19,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class AbstractShopType<T extends AbstractShopkeeper> extends AbstractSelectableType implements ShopType<T> {
 
@@ -33,13 +33,13 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 
 	@Override
 	protected void onSelect(Player player) {
-		Utils.sendMessage(player, Settings.msgSelectedShopType,
+		TextUtils.sendMessage(player, Settings.msgSelectedShopType,
 				"{type}", this.getDisplayName(),
 				"{description}", this.getDescription());
 	}
 
 	protected String getCreatedMessage() {
-		return Utils.replaceArgs(Settings.msgShopkeeperCreated,
+		return TextUtils.replaceArgs(Settings.msgShopkeeperCreated,
 				"{type}", this.getDisplayName(),
 				"{description}", this.getDescription(),
 				"{setupDesc}", this.getSetupDescription());
@@ -86,21 +86,21 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 
 		// can the selected shop type be used?
 		if (!shopType.hasPermission(creator)) {
-			Utils.sendMessage(creator, Settings.msgNoPermission);
+			TextUtils.sendMessage(creator, Settings.msgNoPermission);
 			return null;
 		}
 		if (!shopType.isEnabled()) {
-			Utils.sendMessage(creator, Settings.msgShopTypeDisabled, "{type}", shopType.getIdentifier());
+			TextUtils.sendMessage(creator, Settings.msgShopTypeDisabled, "{type}", shopType.getIdentifier());
 			return null;
 		}
 
 		// can the selected shop object type be used?
 		if (!shopObjectType.hasPermission(creator)) {
-			Utils.sendMessage(creator, Settings.msgNoPermission);
+			TextUtils.sendMessage(creator, Settings.msgNoPermission);
 			return null;
 		}
 		if (!shopObjectType.isEnabled()) {
-			Utils.sendMessage(creator, Settings.msgShopObjectTypeDisabled, "{type}", shopObjectType.getIdentifier());
+			TextUtils.sendMessage(creator, Settings.msgShopObjectTypeDisabled, "{type}", shopObjectType.getIdentifier());
 			return null;
 		}
 
@@ -110,13 +110,13 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		// check if the shop can be placed there (enough space, etc.):
 		if (!shopObjectType.isValidSpawnLocation(spawnLocation, targetedBlockFace)) {
 			// invalid spawn location or targeted block face:
-			Utils.sendMessage(creator, Settings.msgShopCreateFail);
+			TextUtils.sendMessage(creator, Settings.msgShopCreateFail);
 			return null;
 		}
 
 		if (!shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
 			// there is already a shopkeeper at that location:
-			Utils.sendMessage(creator, Settings.msgShopCreateFail);
+			TextUtils.sendMessage(creator, Settings.msgShopCreateFail);
 			return null;
 		}
 
@@ -132,7 +132,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 			assert shopkeeper != null;
 
 			// send creation message to creator:
-			Utils.sendMessage(creator, this.getCreatedMessage());
+			TextUtils.sendMessage(creator, this.getCreatedMessage());
 
 			// save:
 			shopkeeper.save();
@@ -141,7 +141,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		} catch (ShopkeeperCreateException e) {
 			// some issue identified during shopkeeper creation (possibly hinting to a bug):
 			// TODO translation?
-			Utils.sendMessage(creator, ChatColor.RED + "Shopkeeper creation failed: " + e.getMessage());
+			TextUtils.sendMessage(creator, ChatColor.RED + "Shopkeeper creation failed: " + e.getMessage());
 			return null;
 		}
 	}

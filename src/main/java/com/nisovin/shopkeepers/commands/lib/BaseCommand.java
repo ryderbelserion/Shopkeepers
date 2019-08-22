@@ -6,7 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class BaseCommand extends Command implements org.bukkit.command.CommandExecutor, TabCompleter {
 
@@ -33,10 +33,10 @@ public abstract class BaseCommand extends Command implements org.bukkit.command.
 		try {
 			this.handleCommand(input, new CommandContext(), new CommandArgs(args));
 		} catch (CommandException e) {
-			Utils.sendMessage(sender, e.getMessage());
+			TextUtils.sendMessage(sender, e.getMessage());
 		} catch (Exception e) {
 			// an unexpected exception was caught:
-			Utils.sendMessage(sender, ChatColor.RED + "An error occurred during command handling! Check the console log.");
+			TextUtils.sendMessage(sender, ChatColor.RED + "An error occurred during command handling! Check the console log.");
 			e.printStackTrace();
 		}
 

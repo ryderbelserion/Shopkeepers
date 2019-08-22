@@ -9,6 +9,9 @@ Date format: (YYYY-MM-DD)
 
 * Config: Added a comment about the available debug options.
 
+Internal:  
+* Refactoring: Moved lots of utilities from Utils class into more specific utility classes.
+
 ## v2.8.0 (2019-08-22)
 ### Supported MC versions: 1.14.4
 

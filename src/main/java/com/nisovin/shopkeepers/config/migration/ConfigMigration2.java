@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
  * Migrate the config from version 1 to version 2.
@@ -74,7 +74,7 @@ public class ConfigMigration2 implements ConfigMigration {
 		// display name:
 		String displayName = null;
 		if (displayNameKey != null) {
-			displayName = Utils.colorize(config.getString(displayNameKey));
+			displayName = TextUtils.colorize(config.getString(displayNameKey));
 			if (StringUtils.isEmpty(displayName)) {
 				displayName = null; // normalize empty display name to null
 			}
@@ -82,7 +82,7 @@ public class ConfigMigration2 implements ConfigMigration {
 		// lore:
 		List<String> lore = null;
 		if (loreKey != null) {
-			lore = Utils.colorize(config.getStringList(loreKey));
+			lore = TextUtils.colorize(config.getStringList(loreKey));
 			if (lore == null || lore.isEmpty()) {
 				lore = null; // normalize empty lore to null
 			}

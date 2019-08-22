@@ -20,6 +20,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.util.MathUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 /**
@@ -182,7 +183,7 @@ public class LivingEntityAI {
 		}
 
 		public double getAverageTimeMillis() {
-			return (Utils.average(timingsHistory) * 1.0E-6D);
+			return (MathUtils.average(timingsHistory) * 1.0E-6D);
 		}
 
 		public double getMaxTimeMillis() {

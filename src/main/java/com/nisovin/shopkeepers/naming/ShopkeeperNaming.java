@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public class ShopkeeperNaming {
 
@@ -67,7 +67,7 @@ public class ShopkeeperNaming {
 		} else {
 			// validate name:
 			if (!((AbstractShopkeeper) shopkeeper).isValidName(newName)) {
-				Utils.sendMessage(player, Settings.msgNameInvalid);
+				TextUtils.sendMessage(player, Settings.msgNameInvalid);
 				return false;
 			}
 		}
@@ -78,12 +78,12 @@ public class ShopkeeperNaming {
 
 		// compare to previous name:
 		if (oldName.equals(shopkeeper.getName())) {
-			Utils.sendMessage(player, Settings.msgNameHasNotChanged);
+			TextUtils.sendMessage(player, Settings.msgNameHasNotChanged);
 			return false;
 		}
 
 		// inform player:
-		Utils.sendMessage(player, Settings.msgNameSet);
+		TextUtils.sendMessage(player, Settings.msgNameSet);
 
 		// close all open windows:
 		shopkeeper.closeAllOpenWindows(); // TODO really needed?

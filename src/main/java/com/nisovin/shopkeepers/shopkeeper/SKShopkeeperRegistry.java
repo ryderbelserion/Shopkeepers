@@ -38,7 +38,7 @@ import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
@@ -657,12 +657,12 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	@Override
 	public AbstractShopkeeper getShopkeeperByName(String shopName) {
 		if (shopName == null) return null;
-		shopName = Utils.stripColor(shopName);
+		shopName = TextUtils.stripColor(shopName);
 		shopName = StringUtils.normalize(shopName);
 		for (AbstractShopkeeper shopkeeper : this.getAllShopkeepers()) {
 			String shopkeeperName = shopkeeper.getName();
 			if (shopkeeperName == null) continue;
-			shopkeeperName = Utils.stripColor(shopkeeperName);
+			shopkeeperName = TextUtils.stripColor(shopkeeperName);
 			shopkeeperName = StringUtils.normalize(shopkeeperName);
 			if (shopkeeperName.equals(shopName)) {
 				return shopkeeper;

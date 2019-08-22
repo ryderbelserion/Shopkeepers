@@ -27,8 +27,9 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
  * Handling usage of the creation item.
@@ -58,7 +59,7 @@ class CreateListener implements Listener {
 		}
 
 		// print info message about usage:
-		Utils.sendMessage(player, Settings.msgCreationItemSelected);
+		TextUtils.sendMessage(player, Settings.msgCreationItemSelected);
 	}
 
 	// Since this might check chest access by calling another dummy interaction event, we handle (cancel) this event as
@@ -91,7 +92,7 @@ class CreateListener implements Listener {
 		// prevent regular usage:
 		// TODO are there items which would require canceling the event for all left clicks or physical interaction as
 		// well?
-		if (Settings.preventShopCreationItemRegularUsage && !Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+		if (Settings.preventShopCreationItemRegularUsage && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Log.debug("  Preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
@@ -120,7 +121,7 @@ class CreateListener implements Listener {
 
 		if (shopType == null || shopObjType == null) {
 			// the player cannot create shops at all:
-			Utils.sendMessage(player, Settings.msgNoPermission);
+			TextUtils.sendMessage(player, Settings.msgNoPermission);
 			return;
 		}
 
@@ -157,13 +158,13 @@ class CreateListener implements Listener {
 				if (shopkeeperCreation.handleCheckChest(player, clickedBlock)) {
 					// select chest:
 					shopkeeperCreation.selectChest(player, clickedBlock);
-					Utils.sendMessage(player, Settings.msgSelectedChest);
+					TextUtils.sendMessage(player, Settings.msgSelectedChest);
 				}
 			} else {
 				// player shop creation:
 				if (selectedChest == null) {
 					// clicked a location without having a chest selected:
-					Utils.sendMessage(player, Settings.msgMustSelectChest);
+					TextUtils.sendMessage(player, Settings.msgMustSelectChest);
 					return;
 				}
 				assert ItemUtils.isChest(selectedChest.getType()); // we have checked that above already
@@ -171,7 +172,7 @@ class CreateListener implements Listener {
 				// validate the selected shop type:
 				if (!(shopType instanceof PlayerShopType)) {
 					// only player shop types are allowed here:
-					Utils.sendMessage(player, Settings.msgNoPlayerShopTypeSelected);
+					TextUtils.sendMessage(player, Settings.msgNoPlayerShopTypeSelected);
 					return;
 				}
 

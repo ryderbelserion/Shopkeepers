@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandGive extends Command {
 
@@ -73,7 +73,7 @@ class CommandGive extends Command {
 		}
 
 		// success:
-		Utils.sendMessage(sender, Settings.msgShopCreationItemsGiven,
+		TextUtils.sendMessage(sender, Settings.msgShopCreationItemsGiven,
 				"{player}", targetPlayer.getDisplayName(),
 				"{amount}", String.valueOf(amount));
 	}

@@ -33,7 +33,7 @@ import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
 
@@ -204,7 +204,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public String getOwnerAsString() {
-		return Utils.getPlayerAsString(ownerName, ownerUUID);
+		return TextUtils.getPlayerAsString(ownerName, ownerUUID);
 	}
 
 	@Override

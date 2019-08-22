@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.DebugListener;
+import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.EventDebugListener;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
@@ -223,7 +224,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 				// debug entity spawning:
 				if (debug) {
 					// Print chunk's entity counts:
-					Utils.printEntityCounts(spawnLocation.getChunk());
+					EntityUtils.printEntityCounts(spawnLocation.getChunk());
 
 					// Try again and log event activity:
 					debuggingSpawn = true;

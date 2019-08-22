@@ -11,8 +11,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class Command {
 
@@ -155,7 +156,7 @@ public abstract class Command {
 	 */
 	public boolean testPermission(CommandSender sender) {
 		Validate.notNull(sender);
-		return permission == null || Utils.hasPermission(sender, permission);
+		return permission == null || PermissionUtils.hasPermission(sender, permission);
 	}
 
 	/**
@@ -187,7 +188,7 @@ public abstract class Command {
 	 */
 	public void checkPermission(CommandSender sender, String permission) throws NoPermissionException {
 		Validate.notNull(sender);
-		if (permission != null && !Utils.hasPermission(sender, permission)) {
+		if (permission != null && !PermissionUtils.hasPermission(sender, permission)) {
 			throw this.noPermissionException();
 		}
 	}
@@ -437,7 +438,7 @@ public abstract class Command {
 					throw firstUnparsedArgument.invalidArgument(firstUnparsedArg);
 				} else {
 					// throw an 'unexpected argument' exception:
-					throw new ArgumentParseException(Utils.replaceArgs(Settings.msgCommandArgumentUnexpected,
+					throw new ArgumentParseException(TextUtils.replaceArgs(Settings.msgCommandArgumentUnexpected,
 							"{argument}", firstUnparsedArg));
 				}
 			}
@@ -445,7 +446,7 @@ public abstract class Command {
 	}
 
 	protected String getUnknownCommandMessage(String command) {
-		return Utils.replaceArgs(Settings.msgCommandUnknown, "{command}", command);
+		return TextUtils.replaceArgs(Settings.msgCommandUnknown, "{command}", command);
 	}
 
 	/**
@@ -890,7 +891,7 @@ public abstract class Command {
 		String titleFormat = this.getHelpTitleFormat();
 		assert titleFormat != null;
 		if (!titleFormat.isEmpty()) {
-			Utils.sendMessage(recipient, titleFormat, placeholders);
+			TextUtils.sendMessage(recipient, titleFormat, placeholders);
 		}
 
 		// skip info about the command if it is hidden or the recipient does not have the required permission:
@@ -901,7 +902,7 @@ public abstract class Command {
 			String usageFormat = this.getHelpUsageFormat();
 			assert usageFormat != null;
 			if (!usageFormat.isEmpty()) {
-				String commandUsage = Utils.replaceArgs(usageFormat, placeholders);
+				String commandUsage = TextUtils.replaceArgs(usageFormat, placeholders);
 				commandInfo += commandUsage;
 			}
 
@@ -911,13 +912,13 @@ public abstract class Command {
 			if (!descriptionFormat.isEmpty()) {
 				String description = this.getDescription();
 				if (!description.isEmpty()) {
-					String commandDescription = Utils.replaceArgs(descriptionFormat, "{description}", description);
+					String commandDescription = TextUtils.replaceArgs(descriptionFormat, "{description}", description);
 					commandInfo += commandDescription;
 				}
 			}
 
 			if (!commandInfo.isEmpty()) {
-				Utils.sendMessage(recipient, commandInfo);
+				TextUtils.sendMessage(recipient, commandInfo);
 			}
 		}
 
@@ -948,20 +949,20 @@ public abstract class Command {
 				String commandInfo = "";
 
 				// command usage:
-				String childUsage = Utils.replaceArgs(childUsageFormat, childPlaceholders);
+				String childUsage = TextUtils.replaceArgs(childUsageFormat, childPlaceholders);
 				commandInfo += childUsage;
 
 				// command description:
 				if (childDescFormat != null && !childDescFormat.isEmpty()) {
 					String childDescription = childCommand.getDescription();
 					if (!childDescription.isEmpty()) {
-						String childDescriptionFormat = Utils.replaceArgs(childDescFormat,
+						String childDescriptionFormat = TextUtils.replaceArgs(childDescFormat,
 								"{description}", childDescription);
 						commandInfo += childDescriptionFormat;
 					}
 				}
 
-				Utils.sendMessage(recipient, commandInfo);
+				TextUtils.sendMessage(recipient, commandInfo);
 			}
 
 			// optionally include the child-command's child-commands in help content:

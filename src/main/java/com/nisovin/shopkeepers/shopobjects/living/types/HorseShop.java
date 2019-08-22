@@ -23,8 +23,8 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
 public class HorseShop extends BabyableShop<Horse> {
 
@@ -111,7 +111,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	public void cycleColor(boolean backwards) {
-		this.setColor(Utils.cycleEnumConstant(Horse.Color.class, color, backwards));
+		this.setColor(EnumUtils.cycleEnumConstant(Horse.Color.class, color, backwards));
 	}
 
 	private ItemStack getColorEditorItem() {
@@ -174,7 +174,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	public void cycleStyle(boolean backwards) {
-		this.setStyle(Utils.cycleEnumConstant(Horse.Style.class, style, backwards));
+		this.setStyle(EnumUtils.cycleEnumConstant(Horse.Style.class, style, backwards));
 	}
 
 	private ItemStack getStyleEditorItem() {
@@ -218,7 +218,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	public void cycleArmor(boolean backwards) {
-		this.setArmor(Utils.cycleEnumConstantNullable(HorseArmor.class, armor, backwards));
+		this.setArmor(EnumUtils.cycleEnumConstantNullable(HorseArmor.class, armor, backwards));
 	}
 
 	private ItemStack getArmorEditorItem() {

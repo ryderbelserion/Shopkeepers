@@ -21,8 +21,8 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
 public class CatShop extends SittableShop<Cat> {
 
@@ -104,7 +104,7 @@ public class CatShop extends SittableShop<Cat> {
 	}
 
 	public void cycleCatType(boolean backwards) {
-		this.setCatType(Utils.cycleEnumConstant(Cat.Type.class, catType, backwards));
+		this.setCatType(EnumUtils.cycleEnumConstant(Cat.Type.class, catType, backwards));
 	}
 
 	private ItemStack getCatTypeEditorItem() {
@@ -188,7 +188,7 @@ public class CatShop extends SittableShop<Cat> {
 	}
 
 	public void cycleCollarColor(boolean backwards) {
-		this.setCollarColor(Utils.cycleEnumConstantNullable(DyeColor.class, collarColor, backwards));
+		this.setCollarColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, collarColor, backwards));
 	}
 
 	private ItemStack getCollarColorEditorItem() {

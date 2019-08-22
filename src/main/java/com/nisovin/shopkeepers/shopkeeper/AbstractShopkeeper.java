@@ -35,7 +35,7 @@ import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
  * Abstract base class for all shopkeeper implementations.
@@ -195,7 +195,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.markDirty();
 		}
 
-		this.name = this.trimName(Utils.colorize(configSection.getString("name", "")));
+		this.name = this.trimName(TextUtils.colorize(configSection.getString("name", "")));
 		this.worldName = configSection.getString("world");
 		this.x = configSection.getInt("x");
 		this.y = configSection.getInt("y");
@@ -280,7 +280,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 */
 	public void save(ConfigurationSection configSection) {
 		configSection.set("uniqueId", uniqueId.toString());
-		configSection.set("name", Utils.decolorize(name));
+		configSection.set("name", TextUtils.decolorize(name));
 		configSection.set("world", worldName);
 		configSection.set("x", x);
 		configSection.set("y", y);
@@ -427,7 +427,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public String getPositionString() {
-		return Utils.getLocationString(worldName, x, y, z);
+		return TextUtils.getLocationString(worldName, x, y, z);
 	}
 
 	@Override
@@ -603,7 +603,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		// prepare and apply new name:
 		String preparedName = newName;
 		if (preparedName == null) preparedName = "";
-		preparedName = Utils.colorize(preparedName);
+		preparedName = TextUtils.colorize(preparedName);
 		preparedName = this.trimName(preparedName);
 		this.name = preparedName;
 

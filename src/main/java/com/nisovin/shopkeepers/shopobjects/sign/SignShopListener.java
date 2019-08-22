@@ -23,15 +23,17 @@ import org.bukkit.inventory.EquipmentSlot;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.util.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
+import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 class SignShopListener implements Listener {
 
 	// local copy as array (allows very performant iteration):
-	private static final BlockFace[] BLOCK_SIDES = Utils.getBlockSides().toArray(new BlockFace[0]);
+	private static final BlockFace[] BLOCK_SIDES = BlockFaceUtils.getBlockSides().toArray(new BlockFace[0]);
 
 	private final SignShops signShops;
 
@@ -86,7 +88,7 @@ class SignShopListener implements Listener {
 		if (!ItemUtils.isSign(block.getType())) return;
 
 		Player player = event.getPlayer();
-		Log.debug("Player " + player.getName() + " is interacting (" + (event.getHand()) + ") with sign at " + Utils.getLocationString(block));
+		Log.debug("Player " + player.getName() + " is interacting (" + (event.getHand()) + ") with sign at " + TextUtils.getLocationString(block));
 
 		AbstractShopkeeper shopkeeper = signShops.getSignShop(block);
 		if (shopkeeper == null) {

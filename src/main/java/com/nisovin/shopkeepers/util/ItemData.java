@@ -113,11 +113,11 @@ public class ItemData implements Cloneable {
 			// convert color codes for display name and lore:
 			Object displayNameData = dataMap.get(DISPLAY_NAME_KEY);
 			if (displayNameData instanceof String) { // also checks for null
-				dataMap.put(DISPLAY_NAME_KEY, Utils.colorize((String) displayNameData));
+				dataMap.put(DISPLAY_NAME_KEY, TextUtils.colorize((String) displayNameData));
 			}
 			Object loreData = dataMap.get(LORE_KEY);
 			if (loreData instanceof List) { // also checks for null
-				dataMap.put(LORE_KEY, Utils.colorizeUnknown((List<?>) loreData));
+				dataMap.put(LORE_KEY, TextUtils.colorizeUnknown((List<?>) loreData));
 			}
 
 			// deserialize item meta:
@@ -294,11 +294,11 @@ public class ItemData implements Cloneable {
 			// use alternative color codes for display name and lore:
 			if (DISPLAY_NAME_KEY.equals(key)) {
 				if (value instanceof String) {
-					value = Utils.decolorize((String) value);
+					value = TextUtils.decolorize((String) value);
 				}
 			} else if (LORE_KEY.equals(key)) {
 				if (value instanceof List) {
-					value = Utils.decolorizeUnknown((List<?>) value);
+					value = TextUtils.decolorizeUnknown((List<?>) value);
 				}
 			}
 

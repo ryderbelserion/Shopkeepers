@@ -28,7 +28,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandCheck extends Command {
 
@@ -86,27 +86,27 @@ class CommandCheck extends Command {
 		double avgTotalAITimings = livingEntityAI.getTotalTimings().getAverageTimeMillis();
 		double maxTotalAITiming = livingEntityAI.getTotalTimings().getMaxTimeMillis();
 		sender.sendMessage("  Total AI timings (avg | max): "
-				+ Utils.DECIMAL_FORMAT.format(avgTotalAITimings) + " ms" + " | "
-				+ Utils.DECIMAL_FORMAT.format(maxTotalAITiming) + " ms");
+				+ TextUtils.DECIMAL_FORMAT.format(avgTotalAITimings) + " ms" + " | "
+				+ TextUtils.DECIMAL_FORMAT.format(maxTotalAITiming) + " ms");
 
 		// note: these are per activation, which happens only every 20 ticks (not per tick)
 		double avgAIActivationTimings = livingEntityAI.getActivationTimings().getAverageTimeMillis();
 		double maxAIActivationTiming = livingEntityAI.getActivationTimings().getMaxTimeMillis();
 		sender.sendMessage("    AI activation timings (per " + LivingEntityAI.AI_ACTIVATION_TICK_RATE + " ticks) (avg | max): "
-				+ Utils.DECIMAL_FORMAT.format(avgAIActivationTimings) + " ms" + " | "
-				+ Utils.DECIMAL_FORMAT.format(maxAIActivationTiming) + " ms");
+				+ TextUtils.DECIMAL_FORMAT.format(avgAIActivationTimings) + " ms" + " | "
+				+ TextUtils.DECIMAL_FORMAT.format(maxAIActivationTiming) + " ms");
 
 		double avgGravityTimings = livingEntityAI.getGravityTimings().getAverageTimeMillis();
 		double maxGravityTiming = livingEntityAI.getGravityTimings().getMaxTimeMillis();
 		sender.sendMessage("    Gravity timings (avg | max): "
-				+ Utils.DECIMAL_FORMAT.format(avgGravityTimings) + " ms" + " | "
-				+ Utils.DECIMAL_FORMAT.format(maxGravityTiming) + " ms");
+				+ TextUtils.DECIMAL_FORMAT.format(avgGravityTimings) + " ms" + " | "
+				+ TextUtils.DECIMAL_FORMAT.format(maxGravityTiming) + " ms");
 
 		double avgAITimings = livingEntityAI.getAITimings().getAverageTimeMillis();
 		double maxAITiming = livingEntityAI.getAITimings().getMaxTimeMillis();
 		sender.sendMessage("    AI timings (avg | max): "
-				+ Utils.DECIMAL_FORMAT.format(avgAITimings) + " ms" + " | "
-				+ Utils.DECIMAL_FORMAT.format(maxAITiming) + " ms");
+				+ TextUtils.DECIMAL_FORMAT.format(avgAITimings) + " ms" + " | "
+				+ TextUtils.DECIMAL_FORMAT.format(maxAITiming) + " ms");
 
 		for (World world : Bukkit.getWorlds()) {
 			String worldName = world.getName();

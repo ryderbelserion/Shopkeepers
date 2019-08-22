@@ -13,7 +13,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.ui.defaults.HiringHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public class PlayerShopHiringHandler extends HiringHandler {
 
@@ -60,7 +60,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			if (Settings.hireRequireCreationPermission && (!this.getShopkeeper().getType().hasPermission(player)
 					|| !this.getShopkeeper().getShopObject().getType().hasPermission(player))) {
 				// missing permission to hire this type of shopkeeper:
-				Utils.sendMessage(player, Settings.msgCantHireShopType);
+				TextUtils.sendMessage(player, Settings.msgCantHireShopType);
 				this.closeDelayed(player);
 				return;
 			}
@@ -90,7 +90,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 
 			if (hireCost.getAmount() != 0) {
 				// not enough money:
-				Utils.sendMessage(player, Settings.msgCantHire);
+				TextUtils.sendMessage(player, Settings.msgCantHire);
 				// close window for this player:
 				this.closeDelayed(player);
 				return;
@@ -112,7 +112,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			if (maxShops > 0) {
 				int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().countShopsOfPlayer(player);
 				if (count >= maxShops) {
-					Utils.sendMessage(player, Settings.msgTooManyShops);
+					TextUtils.sendMessage(player, Settings.msgTooManyShops);
 					this.closeDelayed(player);
 					return;
 				}
@@ -123,7 +123,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			shopkeeper.setForHire(null);
 			shopkeeper.setOwner(player);
 			shopkeeper.save();
-			Utils.sendMessage(player, Settings.msgHired);
+			TextUtils.sendMessage(player, Settings.msgHired);
 
 			// close all open windows for this shopkeeper:
 			shopkeeper.closeAllOpenWindows();

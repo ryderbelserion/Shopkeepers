@@ -20,7 +20,9 @@ import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class Settings {
@@ -572,7 +574,7 @@ public class Settings {
 			String string = config.getString(configKey);
 			// colorize, if not exempted:
 			if (!noColorConversionKeys.contains(configKey)) {
-				string = Utils.colorize(string);
+				string = TextUtils.colorize(string);
 			}
 			return string;
 		} else if (typeClass == int.class) {
@@ -606,7 +608,7 @@ public class Settings {
 				List<String> stringList = config.getStringList(configKey);
 				// colorize, if not exempted:
 				if (!noColorConversionKeys.contains(configKey)) {
-					stringList = Utils.colorize(stringList);
+					stringList = TextUtils.colorize(stringList);
 				}
 				return stringList;
 			} else {
@@ -627,13 +629,13 @@ public class Settings {
 		} else if (typeClass == String.class) {
 			// decolorize, if not exempted:
 			if (!noColorConversionKeys.contains(configKey)) {
-				value = Utils.decolorize((String) value);
+				value = TextUtils.decolorize((String) value);
 			}
 			config.set(configKey, value);
 		} else if (typeClass == List.class && genericType == String.class) {
 			// decolorize, if not exempted:
 			if (!noColorConversionKeys.contains(configKey)) {
-				value = Utils.decolorize(ConversionUtils.toStringList((List<?>) value));
+				value = TextUtils.decolorize(ConversionUtils.toStringList((List<?>) value));
 			}
 			config.set(configKey, value);
 		} else if (typeClass == ItemData.class) {
@@ -790,7 +792,7 @@ public class Settings {
 		int maxShops = Settings.maxShopsPerPlayer;
 		String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
 		for (String perm : maxShopsPermOptions) {
-			if (Utils.hasPermission(player, "shopkeeper.maxshops." + perm)) {
+			if (PermissionUtils.hasPermission(player, "shopkeeper.maxshops." + perm)) {
 				maxShops = Integer.parseInt(perm);
 			}
 		}

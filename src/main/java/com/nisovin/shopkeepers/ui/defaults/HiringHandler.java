@@ -12,7 +12,8 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.PermissionUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class HiringHandler extends UIHandler {
 
@@ -24,9 +25,9 @@ public abstract class HiringHandler extends UIHandler {
 	protected boolean canOpen(Player player) {
 		assert player != null;
 		// check for hire permission:
-		if (!Utils.hasPermission(player, ShopkeepersPlugin.HIRE_PERMISSION)) {
+		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.HIRE_PERMISSION)) {
 			Log.debug("Blocked hire window opening from " + player.getName() + ": missing hire permission");
-			Utils.sendMessage(player, Settings.msgMissingHirePerm);
+			TextUtils.sendMessage(player, Settings.msgMissingHirePerm);
 			return false;
 		}
 		return true;

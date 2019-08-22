@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.ConversionUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
  * Valid formats:
@@ -41,7 +41,7 @@ public class PlayerArgument extends CommandArgument {
 
 	@Override
 	public String getMissingArgumentErrorMsg() {
-		return Utils.replaceArgs(Settings.msgCommandPlayerArgumentMissing,
+		return TextUtils.replaceArgs(Settings.msgCommandPlayerArgumentMissing,
 				"{argumentName}", this.getName(),
 				"{argumentFormat}", this.getFormat());
 	}
@@ -49,7 +49,7 @@ public class PlayerArgument extends CommandArgument {
 	@Override
 	public String getInvalidArgumentErrorMsg(String argument) {
 		if (argument == null) argument = "";
-		return Utils.replaceArgs(Settings.msgCommandPlayerArgumentInvalid,
+		return TextUtils.replaceArgs(Settings.msgCommandPlayerArgumentInvalid,
 				"{argumentName}", this.getName(),
 				"{argumentFormat}", this.getFormat(),
 				"{argument}", argument);
@@ -97,11 +97,9 @@ public class PlayerArgument extends CommandArgument {
 
 	/**
 	 * Gets a {@link Player} which matches the given player name input.
-	 * 
 	 * <p>
 	 * By default this uses {@link Bukkit#getPlayer(String)}. This can be overridden if a different behavior is
 	 * required.
-	 * </p>
 	 * 
 	 * @param playerNameInput
 	 *            the raw player name input

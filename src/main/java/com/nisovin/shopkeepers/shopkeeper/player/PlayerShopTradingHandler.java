@@ -13,7 +13,8 @@ import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.PermissionUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class PlayerShopTradingHandler extends TradingHandler {
 
@@ -36,11 +37,11 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 
 		// stop opening if trading shall be prevented while the owner is offline:
-		if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+		if (Settings.preventTradingWhileOwnerIsOnline && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null) {
 				Log.debug("Blocked trade window opening from " + player.getName() + " because the owner is online");
-				Utils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
+				TextUtils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
 				return false;
 			}
 		}
@@ -60,10 +61,10 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		}
 
 		// no trading while shop owner is online:
-		if (Settings.preventTradingWhileOwnerIsOnline && !Utils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+		if (Settings.preventTradingWhileOwnerIsOnline && !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null && !shopkeeper.isOwner(tradingPlayer)) {
-				Utils.sendMessage(tradingPlayer, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
+				TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
 				this.debugPreventedTrade(tradingPlayer, "Trading is not allowed while the shop owner is online.");
 				return false;
 			}

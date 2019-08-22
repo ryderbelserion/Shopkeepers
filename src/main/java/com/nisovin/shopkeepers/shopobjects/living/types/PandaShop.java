@@ -19,8 +19,8 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
 // TODO pose (laying, sitting, eating, worried)
 public class PandaShop extends BabyableShop<Panda> {
@@ -76,7 +76,7 @@ public class PandaShop extends BabyableShop<Panda> {
 	}
 
 	public void cycleGene(boolean backwards) {
-		this.setGene(Utils.cycleEnumConstant(Panda.Gene.class, gene, backwards));
+		this.setGene(EnumUtils.cycleEnumConstant(Panda.Gene.class, gene, backwards));
 	}
 
 	private ItemStack getGeneEditorItem() {

@@ -4,7 +4,7 @@ import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.EnumUtils;
 
 public class EnumProperty<E extends Enum<E>> extends Property<E> {
 
@@ -20,7 +20,7 @@ public class EnumProperty<E extends Enum<E>> extends Property<E> {
 	protected E loadValue(AbstractShopkeeper shopkeeper, ConfigurationSection configSection) throws InvalidValueException {
 		String valueName = configSection.getString(this.key);
 		if (valueName == null) return null;
-		E enumValue = Utils.parseEnumValue(enumClass, valueName);
+		E enumValue = EnumUtils.parseEnumValue(enumClass, valueName);
 		if (enumValue == null) {
 			throw this.invalidValueError(shopkeeper, valueName);
 		} else {

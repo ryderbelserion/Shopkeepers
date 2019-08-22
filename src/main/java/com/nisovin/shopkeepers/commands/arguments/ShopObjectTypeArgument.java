@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public class ShopObjectTypeArgument extends CommandArgument {
 
@@ -25,7 +25,7 @@ public class ShopObjectTypeArgument extends CommandArgument {
 	@Override
 	public String getInvalidArgumentErrorMsg(String argument) {
 		if (argument == null) argument = "";
-		return Utils.replaceArgs(Settings.msgCommandShopObjectTypeArgumentInvalid,
+		return TextUtils.replaceArgs(Settings.msgCommandShopObjectTypeArgumentInvalid,
 				"{argumentName}", this.getName(),
 				"{argumentFormat}", this.getFormat(),
 				"{argument}", argument);

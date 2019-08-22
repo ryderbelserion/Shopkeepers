@@ -74,7 +74,7 @@ public final class ItemUtils {
 
 	// trims the amount between 1 and the item's max-stack-size
 	public static int trimItemAmount(Material itemType, int amount) {
-		return Utils.trim(amount, 1, itemType.getMaxStackSize());
+		return MathUtils.trim(amount, 1, itemType.getMaxStackSize());
 	}
 
 	public static ItemStack createItemStack(Material type, int amount, String displayName, List<String> lore) {

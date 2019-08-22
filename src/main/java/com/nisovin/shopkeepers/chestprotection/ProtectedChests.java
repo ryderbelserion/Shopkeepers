@@ -21,7 +21,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.PermissionUtils;
 
 /**
  * <b>Chest protection:</b>
@@ -229,7 +229,7 @@ public class ProtectedChests {
 	public boolean isProtectedChest(Block block, Player player) {
 		if (block == null || !ItemUtils.isChest(block.getType())) return false;
 		if (!this.isChestProtected(block, player)) return false;
-		if (player != null && Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) return false;
+		if (player != null && PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) return false;
 		return true;
 	}
 

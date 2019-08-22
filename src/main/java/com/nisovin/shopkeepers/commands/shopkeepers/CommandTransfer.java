@@ -15,8 +15,9 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.shopkeeper.ShopTypeCategory;
+import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandTransfer extends PlayerCommand {
 
@@ -47,7 +48,7 @@ class CommandTransfer extends PlayerCommand {
 		if (shopkeepers.isEmpty()) return; // messages were already handled
 
 		// set new owner:
-		final boolean bypass = Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION);
+		final boolean bypass = PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION);
 		int affectedShops = 0;
 		for (Shopkeeper shopkeeper : shopkeepers) {
 			PlayerShopkeeper playerShopkeeper = (PlayerShopkeeper) shopkeeper; // this got already checked
@@ -61,12 +62,12 @@ class CommandTransfer extends PlayerCommand {
 		// inform if there was no single shopkeeper that could be transferred:
 		assert !shopkeepers.isEmpty();
 		if (affectedShops == 0) {
-			Utils.sendMessage(player, Settings.msgNotOwner);
+			TextUtils.sendMessage(player, Settings.msgNotOwner);
 			return;
 		}
 
 		// success:
-		Utils.sendMessage(player, Settings.msgOwnerSet, "{owner}", newOwner.getName());
+		TextUtils.sendMessage(player, Settings.msgOwnerSet, "{owner}", newOwner.getName());
 
 		// save:
 		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();

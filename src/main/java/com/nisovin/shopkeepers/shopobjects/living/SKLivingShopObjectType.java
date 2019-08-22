@@ -10,8 +10,9 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObjectType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
+import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> extends AbstractEntityShopObjectType<T> implements LivingShopObjectType<T> {
 
@@ -32,13 +33,13 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> ex
 
 	@Override
 	public boolean hasPermission(Player player) {
-		return super.hasPermission(player) || Utils.hasPermission(player, "shopkeeper.entity.*");
+		return super.hasPermission(player) || PermissionUtils.hasPermission(player, "shopkeeper.entity.*");
 	}
 
 	@Override
 	public String getDisplayName() {
 		// TODO translation support for the entity type name?
-		return Utils.replaceArgs(Settings.msgShopObjectTypeLiving,
+		return TextUtils.replaceArgs(Settings.msgShopObjectTypeLiving,
 				"{type}", StringUtils.normalize(entityType.name()));
 	}
 

@@ -33,7 +33,8 @@ import com.nisovin.shopkeepers.commands.lib.CommandRegistry;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.PermissionUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public class ShopkeepersCommand extends BaseCommand {
 
@@ -54,7 +55,7 @@ public class ShopkeepersCommand extends BaseCommand {
 		this.setDescription(Settings.msgCommandDescriptionShopkeeper);
 
 		// formatting:
-		this.setHelpTitleFormat(Utils.replaceArgs(Settings.msgCommandHelpTitle, "{version}", plugin.getDescription().getVersion()));
+		this.setHelpTitleFormat(TextUtils.replaceArgs(Settings.msgCommandHelpTitle, "{version}", plugin.getDescription().getVersion()));
 		this.setHelpUsageFormat(Settings.msgCommandHelpUsageFormat);
 		this.setHelpDescFormat(Settings.msgCommandHelpDescriptionFormat);
 
@@ -88,7 +89,7 @@ public class ShopkeepersCommand extends BaseCommand {
 	@Override
 	public boolean testPermission(CommandSender sender) {
 		if (!super.testPermission(sender)) return false;
-		return Settings.createPlayerShopWithCommand || Utils.hasPermission(sender, ShopkeepersPlugin.ADMIN_PERMISSION);
+		return Settings.createPlayerShopWithCommand || PermissionUtils.hasPermission(sender, ShopkeepersPlugin.ADMIN_PERMISSION);
 	}
 
 	@Override
@@ -106,7 +107,7 @@ public class ShopkeepersCommand extends BaseCommand {
 
 		// check for valid targeted block:
 		if (targetBlockInfo == null) {
-			Utils.sendMessage(player, Settings.msgShopCreateFail);
+			TextUtils.sendMessage(player, Settings.msgShopCreateFail);
 			return;
 		}
 		Block targetBlock = targetBlockInfo.getHitBlock();
@@ -131,22 +132,22 @@ public class ShopkeepersCommand extends BaseCommand {
 
 			if (shopType == null || shopObjType == null) {
 				// the player cannot create shops at all:
-				Utils.sendMessage(player, Settings.msgNoPermission);
+				TextUtils.sendMessage(player, Settings.msgNoPermission);
 				return;
 			}
 
 			// validate the selected shop type:
 			if (!(shopType instanceof PlayerShopType)) {
 				// only player shop types are allowed here:
-				Utils.sendMessage(player, Settings.msgNoPlayerShopTypeSelected);
+				TextUtils.sendMessage(player, Settings.msgNoPlayerShopTypeSelected);
 				return;
 			}
 		} else {
 			// create admin shopkeeper:
 
 			// check permission:
-			if (!Utils.hasPermission(player, ShopkeepersPlugin.ADMIN_PERMISSION)) {
-				Utils.sendMessage(sender, Settings.msgNoPermission);
+			if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.ADMIN_PERMISSION)) {
+				TextUtils.sendMessage(sender, Settings.msgNoPermission);
 				return;
 			}
 
@@ -162,7 +163,7 @@ public class ShopkeepersCommand extends BaseCommand {
 			// validate the selected shop type:
 			if (!(shopType instanceof AdminShopType)) {
 				// only admin shop types are allowed here:
-				Utils.sendMessage(player, Settings.msgNoAdminShopTypeSelected);
+				TextUtils.sendMessage(player, Settings.msgNoAdminShopTypeSelected);
 				return;
 			}
 		}

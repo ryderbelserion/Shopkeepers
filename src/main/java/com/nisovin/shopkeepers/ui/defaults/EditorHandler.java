@@ -35,7 +35,8 @@ import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.MathUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class EditorHandler extends UIHandler {
 
@@ -342,13 +343,13 @@ public abstract class EditorHandler extends UIHandler {
 			prevPage = (page - 1);
 			prevPageText = String.valueOf(prevPage);
 		}
-		String itemName = Utils.replaceArgs(Settings.msgButtonPreviousPage,
+		String itemName = TextUtils.replaceArgs(Settings.msgButtonPreviousPage,
 				"{prev_page}", prevPageText,
 				"{page}", String.valueOf(page),
 				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
 		ItemStack item = Settings.previousPageItem.createItemStack();
 		// note: can exceed the item's natural max stack size
-		item.setAmount(Utils.trim(prevPage, 1, ItemUtils.MAX_STACK_SIZE));
+		item.setAmount(MathUtils.trim(prevPage, 1, ItemUtils.MAX_STACK_SIZE));
 		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonPreviousPageLore);
 	}
 
@@ -359,29 +360,29 @@ public abstract class EditorHandler extends UIHandler {
 			nextPage = (page + 1);
 			nextPageText = String.valueOf(nextPage);
 		}
-		String itemName = Utils.replaceArgs(Settings.msgButtonNextPage,
+		String itemName = TextUtils.replaceArgs(Settings.msgButtonNextPage,
 				"{next_page}", nextPageText,
 				"{page}", String.valueOf(page),
 				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
 		ItemStack item = Settings.nextPageItem.createItemStack();
 		// note: can exceed the item's natural max stack size
-		item.setAmount(Utils.trim(nextPage, 1, ItemUtils.MAX_STACK_SIZE));
+		item.setAmount(MathUtils.trim(nextPage, 1, ItemUtils.MAX_STACK_SIZE));
 		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonNextPageLore);
 	}
 
 	protected ItemStack createCurrentPageIcon(int page) {
-		String itemName = Utils.replaceArgs(Settings.msgButtonCurrentPage,
+		String itemName = TextUtils.replaceArgs(Settings.msgButtonCurrentPage,
 				"{page}", String.valueOf(page),
 				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
 		ItemStack item = Settings.currentPageItem.createItemStack();
 		// note: can exceed the item's natural max stack size
-		item.setAmount(Utils.trim(page, 1, ItemUtils.MAX_STACK_SIZE));
+		item.setAmount(MathUtils.trim(page, 1, ItemUtils.MAX_STACK_SIZE));
 		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonCurrentPageLore);
 	}
 
 	protected ItemStack createTradeSetupIcon() {
 		ShopType<?> shopType = this.getShopkeeper().getType();
-		String itemName = Utils.replaceArgs(Settings.msgTradeSetupDescHeader,
+		String itemName = TextUtils.replaceArgs(Settings.msgTradeSetupDescHeader,
 				"{shopType}", shopType.getDisplayName());
 		return ItemUtils.setItemStackNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, shopType.getTradeSetupDescription());
 	}
@@ -542,7 +543,7 @@ public abstract class EditorHandler extends UIHandler {
 
 				// start naming:
 				SKShopkeepersPlugin.getInstance().getShopkeeperNaming().startNaming(player, shopkeeper);
-				Utils.sendMessage(player, Settings.msgTypeNewName);
+				TextUtils.sendMessage(player, Settings.msgTypeNewName);
 			}
 		};
 	}

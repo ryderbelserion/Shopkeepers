@@ -30,8 +30,9 @@ import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public class TradingHandler extends UIHandler {
 
@@ -123,9 +124,9 @@ public class TradingHandler extends UIHandler {
 	@Override
 	protected boolean canOpen(Player player) {
 		assert player != null;
-		if (!Utils.hasPermission(player, ShopkeepersPlugin.TRADE_PERMISSION)) {
+		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.TRADE_PERMISSION)) {
 			Log.debug("Blocked trade window opening from " + player.getName() + ": Missing trade permission.");
-			Utils.sendMessage(player, Settings.msgMissingTradePerm);
+			TextUtils.sendMessage(player, Settings.msgMissingTradePerm);
 			return false;
 		}
 		return true;

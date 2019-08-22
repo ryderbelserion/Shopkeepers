@@ -19,7 +19,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 // Handles prevention of trading and hiring of other villagers (including wandering traders)
 public class VillagerInteractionListener implements Listener {
@@ -91,7 +91,7 @@ public class VillagerInteractionListener implements Listener {
 		PlayerInventory playerInventory = player.getInventory();
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
 		if (!Settings.isHireItem(itemInMainHand)) {
-			Utils.sendMessage(player, Settings.msgVillagerForHire, "{costs}", String.valueOf(Settings.hireOtherVillagersCosts),
+			TextUtils.sendMessage(player, Settings.msgVillagerForHire, "{costs}", String.valueOf(Settings.hireOtherVillagersCosts),
 					"{hire-item}", Settings.hireItem.getType().name()); // TODO also print required hire item name and lore?
 			return false;
 		} else {
@@ -116,7 +116,7 @@ public class VillagerInteractionListener implements Listener {
 						}
 					}
 				} else {
-					Utils.sendMessage(player, Settings.msgCantHire);
+					TextUtils.sendMessage(player, Settings.msgCantHire);
 					return false;
 				}
 			}
@@ -135,7 +135,7 @@ public class VillagerInteractionListener implements Listener {
 			// update client's inventory
 			player.updateInventory();
 
-			Utils.sendMessage(player, Settings.msgHired);
+			TextUtils.sendMessage(player, Settings.msgHired);
 			return true;
 		}
 	}

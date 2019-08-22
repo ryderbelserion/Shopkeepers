@@ -25,9 +25,10 @@ import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.util.BlockFaceUtils;
+import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Utils;
 
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
 
@@ -47,8 +48,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			BlockFace targetedBlockFace = creationData.getTargetedBlockFace();
 			if (targetedBlockFace == BlockFace.UP) {
 				this.wallSign = false;
-				this.signFacing = Utils.getSignPostFacing(creationData.getSpawnLocation().getYaw());
-			} else if (Utils.isWallSignFace(targetedBlockFace)) {
+				this.signFacing = BlockFaceUtils.getSignPostFacing(creationData.getSpawnLocation().getYaw());
+			} else if (BlockFaceUtils.isWallSignFace(targetedBlockFace)) {
 				this.signFacing = targetedBlockFace;
 			}
 		}
@@ -94,7 +95,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 				Log.warning("Could not parse sign facing for shopkeeper " + shopkeeper.getId() + ": " + signFacingName);
 				shopkeeper.markDirty();
 			}
-			if (wallSign ? !Utils.isWallSignFace(signFacing) : !Utils.isSignPostFacing(signFacing)) {
+			if (wallSign ? !BlockFaceUtils.isWallSignFace(signFacing) : !BlockFaceUtils.isSignPostFacing(signFacing)) {
 				Log.warning("Invalid sign facing for shopkeeper " + shopkeeper.getId() + ": " + signFacingName);
 				signFacing = BlockFace.SOUTH; // fallback to default
 				shopkeeper.markDirty();
@@ -361,7 +362,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	public void cycleSignType(boolean backwards) {
-		this.setSignType(Utils.cycleEnumConstant(TreeSpecies.class, signType, backwards));
+		this.setSignType(EnumUtils.cycleEnumConstant(TreeSpecies.class, signType, backwards));
 	}
 
 	protected ItemStack getSignTypeEditorItem() {

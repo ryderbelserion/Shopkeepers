@@ -5,7 +5,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.ArgumentFilter;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public class AdminShopkeeperFilter implements ArgumentFilter<Shopkeeper> {
 
@@ -17,7 +17,7 @@ public class AdminShopkeeperFilter implements ArgumentFilter<Shopkeeper> {
 	@Override
 	public String getInvalidArgumentErrorMsg(CommandArgument argument, String input, Shopkeeper value) {
 		if (input == null) input = "";
-		return Utils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoAdminShop,
+		return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoAdminShop,
 				"{argumentName}", argument.getName(),
 				"{argumentFormat}", argument.getFormat(),
 				"{argument}", input);

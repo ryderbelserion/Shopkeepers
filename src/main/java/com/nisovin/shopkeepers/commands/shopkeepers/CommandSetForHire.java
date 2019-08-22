@@ -16,8 +16,9 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.shopkeeper.ShopTypeCategory;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandSetForHire extends PlayerCommand {
 
@@ -42,12 +43,12 @@ class CommandSetForHire extends PlayerCommand {
 		ItemStack hireCost = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isEmpty(hireCost)) {
 			// TODO allow disabling hiring again, with empty hand
-			Utils.sendMessage(player, Settings.msgMustHoldHireItem);
+			TextUtils.sendMessage(player, Settings.msgMustHoldHireItem);
 			return;
 		}
 
 		// set for hire:
-		final boolean bypass = Utils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION);
+		final boolean bypass = PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION);
 		int affectedShops = 0;
 		for (Shopkeeper shopkeeper : shopkeepers) {
 			PlayerShopkeeper playerShopkeeper = (PlayerShopkeeper) shopkeeper; // this got already checked
@@ -61,12 +62,12 @@ class CommandSetForHire extends PlayerCommand {
 		// inform if there was no single shopkeeper that could be set for hire:
 		assert !shopkeepers.isEmpty();
 		if (affectedShops == 0) {
-			Utils.sendMessage(player, Settings.msgNotOwner);
+			TextUtils.sendMessage(player, Settings.msgNotOwner);
 			return;
 		}
 
 		// success:
-		Utils.sendMessage(player, Settings.msgSetForHire);
+		TextUtils.sendMessage(player, Settings.msgSetForHire);
 
 		// save:
 		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
