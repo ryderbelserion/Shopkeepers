@@ -8,6 +8,7 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.14.4
 
 * Config: Added a comment about the available debug options.
+* Changed: Cancelling all EntityTransformEvents involving shopkeeper entities. This replaces the previously used workaround for preventing villagers struck by lightning turning into witches.
 
 Internal:  
 * Refactoring: Moved lots of utilities from Utils class into more specific utility classes.

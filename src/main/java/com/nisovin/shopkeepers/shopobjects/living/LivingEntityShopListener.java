@@ -2,10 +2,8 @@ package com.nisovin.shopkeepers.shopobjects.living;
 
 import java.util.Collection;
 
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.PigZombie;
@@ -27,6 +25,7 @@ import org.bukkit.event.entity.EntityPotionEffectEvent;
 import org.bukkit.event.entity.EntityPotionEffectEvent.Action;
 import org.bukkit.event.entity.EntityTargetEvent;
 import org.bukkit.event.entity.EntityTeleportEvent;
+import org.bukkit.event.entity.EntityTransformEvent;
 import org.bukkit.event.entity.ExplosionPrimeEvent;
 import org.bukkit.event.entity.PigZapEvent;
 import org.bukkit.event.entity.PotionSplashEvent;
@@ -37,7 +36,6 @@ import org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
-import org.bukkit.event.weather.LightningStrikeEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.projectiles.ProjectileSource;
 
@@ -50,9 +48,6 @@ import com.nisovin.shopkeepers.util.TestPlayerInteractEntityEvent;
 import com.nisovin.shopkeepers.util.Utils;
 
 class LivingEntityShopListener implements Listener {
-
-	// the radius around lightning strikes in which villagers turn into witches
-	private static final int VILLAGER_ZAP_RADIUS = 7; // minecraft wiki says 3-4, we use 7 to be safe
 
 	private final SKShopkeeperRegistry shopkeeperRegistry;
 
@@ -235,15 +230,11 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
+	// handles all kinds of events, such as for example villagers struck by lightning turning into witches
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
-	void onLightningStrike(LightningStrikeEvent event) {
-		// workaround: preventing lightning strikes near villager shopkeepers
-		// because they would turn into witches
-		Location loc = event.getLightning().getLocation();
-		for (Entity entity : Utils.getNearbyEntities(loc, VILLAGER_ZAP_RADIUS, EntityType.VILLAGER)) {
-			if (shopkeeperRegistry.isShopkeeper(entity)) {
-				event.setCancelled(true);
-			}
+	void onEntityTransform(EntityTransformEvent event) {
+		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
+			event.setCancelled(true);
 		}
 	}
 
