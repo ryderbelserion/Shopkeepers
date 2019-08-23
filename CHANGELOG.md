@@ -4,7 +4,7 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
-## v2.8.1 (TBA)
+## v2.8.1 (2019-08-23)
 ### Supported MC versions: 1.14.4
 
 * Fixed: An issue introduced in the previous update prevented players from using the shop creation item if the item's regular usage got disabled in the config.
