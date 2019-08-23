@@ -5,14 +5,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import org.apache.commons.lang.Validate;
-
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.Pair;
+import com.nisovin.shopkeepers.util.Validate;
 
 /**
  * A {@link CommandArgument} which stores the value for the first of the given command arguments which successfully

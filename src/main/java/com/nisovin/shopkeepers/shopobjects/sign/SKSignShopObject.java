@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -29,6 +28,7 @@ import com.nisovin.shopkeepers.util.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.Validate;
 
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
 

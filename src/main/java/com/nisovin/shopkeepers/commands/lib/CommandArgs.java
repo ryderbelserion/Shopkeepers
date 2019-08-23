@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.apache.commons.lang.Validate;
+import com.nisovin.shopkeepers.util.Validate;
 
 public class CommandArgs {
 

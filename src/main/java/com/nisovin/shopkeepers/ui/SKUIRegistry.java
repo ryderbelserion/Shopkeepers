@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -20,6 +19,7 @@ import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.types.AbstractTypeRegistry;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.Validate;
 
 public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implements UIRegistry<AbstractUIType> {
 

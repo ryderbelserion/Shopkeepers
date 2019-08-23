@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Panda;
@@ -21,6 +20,7 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Validate;
 
 // TODO pose (laying, sitting, eating, worried)
 public class PandaShop extends BabyableShop<Panda> {

@@ -19,6 +19,28 @@ public class StringUtils {
 		return string == null || string.isEmpty();
 	}
 
+	/**
+	 * Makes sure that the given string is not empty.
+	 * 
+	 * @param string
+	 *            the string
+	 * @return the string itself, or <code>null</code> if it is empty
+	 */
+	public static String getNotEmpty(String string) {
+		return isEmpty(string) ? null : string;
+	}
+
+	/**
+	 * Makes sure that the given string is not <code>null</code>.
+	 * 
+	 * @param string
+	 *            the string
+	 * @return the string itself, or an empty string if it is <code>null</code>
+	 */
+	public static String getNotNull(String string) {
+		return string == null ? "" : string;
+	}
+
 	public static String normalizeKeepCase(String identifier) {
 		if (identifier == null) return null;
 		identifier = identifier.trim();

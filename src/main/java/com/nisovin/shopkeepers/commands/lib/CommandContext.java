@@ -4,7 +4,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang.Validate;
+import com.nisovin.shopkeepers.util.Validate;
 
 /**
  * Stores parsed command arguments.

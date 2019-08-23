@@ -2,12 +2,11 @@ package com.nisovin.shopkeepers.commands.lib;
 
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
-
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class CommandArgument {
 

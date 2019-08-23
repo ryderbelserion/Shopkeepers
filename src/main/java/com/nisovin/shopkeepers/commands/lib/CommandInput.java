@@ -1,7 +1,8 @@
 package com.nisovin.shopkeepers.commands.lib;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.command.CommandSender;
+
+import com.nisovin.shopkeepers.util.Validate;
 
 /**
  * Stores info about the original command input, excluding the arguments (as those get handled separately).

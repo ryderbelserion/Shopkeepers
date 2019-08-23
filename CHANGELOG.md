@@ -12,6 +12,7 @@ Date format: (YYYY-MM-DD)
 
 Internal:  
 * Refactoring: Moved lots of utilities from Utils class into more specific utility classes.
+* Refactoring: Using our own Validation class, since the one bundled in Bukkit is outdated and missing some features.
 
 ## v2.8.0 (2019-08-22)
 ### Supported MC versions: 1.14.4

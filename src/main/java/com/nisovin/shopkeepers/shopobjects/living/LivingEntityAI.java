@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -22,6 +21,7 @@ import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.MathUtils;
 import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.Validate;
 
 /**
  * Handles gravity and look-at-nearby-players behavior.

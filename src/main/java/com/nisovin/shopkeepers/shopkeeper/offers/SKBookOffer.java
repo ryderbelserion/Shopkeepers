@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
+import com.nisovin.shopkeepers.util.Validate;
 
 public class SKBookOffer implements BookOffer {
 

@@ -3,10 +3,10 @@ package com.nisovin.shopkeepers.types;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.types.SelectableTypeRegistry;
+import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectableType> extends AbstractTypeRegistry<T> implements SelectableTypeRegistry<T> {
 

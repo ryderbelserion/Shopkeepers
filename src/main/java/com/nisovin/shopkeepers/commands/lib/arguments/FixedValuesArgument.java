@@ -5,13 +5,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.Validate;
-
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.util.Validate;
 
 public class FixedValuesArgument extends CommandArgument {
 

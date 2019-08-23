@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.shopkeeper.player.buy;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -9,6 +8,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Validate;
 
 public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 

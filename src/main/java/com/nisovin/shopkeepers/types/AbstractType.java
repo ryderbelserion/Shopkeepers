@@ -5,12 +5,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.types.Type;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
+import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class AbstractType implements Type {
 

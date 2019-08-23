@@ -28,12 +28,16 @@ public final class ShopkeepersAPI {
 
 	public static void enable(ShopkeepersPlugin plugin) {
 		Validate.notNull(plugin, "Plugin is null!");
-		Validate.isTrue(ShopkeepersAPI.plugin == null, "API is already enabled!");
+		if (ShopkeepersAPI.plugin != null) {
+			throw new IllegalStateException("API is already enabled!");
+		}
 		ShopkeepersAPI.plugin = plugin;
 	}
 
 	public static void disable() {
-		Validate.notNull(ShopkeepersAPI.plugin, "API is already disabled!");
+		if (ShopkeepersAPI.plugin == null) {
+			throw new IllegalStateException("API is already disabled!");
+		}
 		ShopkeepersAPI.plugin = null;
 	}
 

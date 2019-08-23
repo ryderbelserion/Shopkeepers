@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.shopkeeper;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Validate;
 
 public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe {
 

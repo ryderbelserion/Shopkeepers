@@ -2,9 +2,10 @@ package com.nisovin.shopkeepers.commands.lib;
 
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.nisovin.shopkeepers.util.Validate;
 
 /**
  * Base class for commands that can only be executed by players.

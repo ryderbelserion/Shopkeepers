@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.apache.commons.lang.Validate;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -72,6 +71,7 @@ import com.nisovin.shopkeepers.util.DebugListener;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.TradingCountListener;
+import com.nisovin.shopkeepers.util.Validate;
 import com.nisovin.shopkeepers.villagers.BlockVillagerSpawnListener;
 import com.nisovin.shopkeepers.villagers.BlockZombieVillagerCuringListener;
 import com.nisovin.shopkeepers.villagers.VillagerInteractionListener;

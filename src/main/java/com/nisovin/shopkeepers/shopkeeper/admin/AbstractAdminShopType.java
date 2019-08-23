@@ -2,12 +2,11 @@ package com.nisovin.shopkeepers.shopkeeper.admin;
 
 import java.util.List;
 
-import org.apache.commons.lang.Validate;
-
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
+import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class AbstractAdminShopType<T extends AbstractAdminShopkeeper> extends AbstractShopType<T> implements AdminShopType<T> {
 

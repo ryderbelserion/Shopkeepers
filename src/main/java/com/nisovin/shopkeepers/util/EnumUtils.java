@@ -2,8 +2,6 @@ package com.nisovin.shopkeepers.util;
 
 import java.util.function.Predicate;
 
-import org.apache.commons.lang.Validate;
-
 public class EnumUtils {
 
 	private EnumUtils() {

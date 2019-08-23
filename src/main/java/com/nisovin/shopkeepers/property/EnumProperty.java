@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.property;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.EnumUtils;
+import com.nisovin.shopkeepers.util.Validate;
 
 public class EnumProperty<E extends Enum<E>> extends Property<E> {
 

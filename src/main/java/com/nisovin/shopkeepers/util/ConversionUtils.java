@@ -9,8 +9,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.lang.Validate;
-
 public class ConversionUtils {
 
 	public static final Map<String, Boolean> BOOLEAN_VALUES;
