@@ -7,6 +7,7 @@ Date format: (YYYY-MM-DD)
 ## v2.8.1 (TBA)
 ### Supported MC versions: 1.14.4
 
+* Fixed: An issue introduced in the previous update prevented players from using the shop creation item if the item's regular usage got disabled in the config.
 * Config: Added a comment about the available debug options.
 * Changed: Cancelling all EntityTransformEvents involving shopkeeper entities. This replaces the previously used workaround for preventing villagers struck by lightning turning into witches.
 

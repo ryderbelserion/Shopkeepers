@@ -89,6 +89,9 @@ class CreateListener implements Listener {
 			return;
 		}
 
+		// capture event's cancellation state:
+		Result useItemInHand = event.useItemInHand();
+
 		// prevent regular usage:
 		// TODO are there items which would require canceling the event for all left clicks or physical interaction as
 		// well?
@@ -106,7 +109,7 @@ class CreateListener implements Listener {
 
 		// Ignore if already cancelled. Resolves conflicts with other event handlers running at LOWEST priority (eg.
 		// Shopkeepers' sign shop listener acts on LOWEST priority as well).
-		if (event.useItemInHand() == Result.DENY) {
+		if (useItemInHand == Result.DENY) {
 			Log.debug("  Ignoring already cancelled item interaction");
 			return;
 		}
