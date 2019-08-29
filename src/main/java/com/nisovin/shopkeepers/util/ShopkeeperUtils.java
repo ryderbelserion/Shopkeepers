@@ -96,7 +96,7 @@ public class ShopkeeperUtils {
 		// ray trace to check for the closest block and entity collision:
 		// not ignoring passable blocks, in case some type of shopkeeper object makes use of them
 		RayTraceResult rayTraceResult = world.rayTrace(playerLoc, viewDirection, SHOPKEEPER_TARGET_RANGE, FluidCollisionMode.NEVER, false, 0.0D, (entity) -> {
-			return !entity.equals(player);
+			return !entity.isDead() && !entity.equals(player); // TODO SPIGOT-5228: filtering dead entities
 		});
 
 		// determine targeted shopkeeper, and print context dependent failure messages:

@@ -7,7 +7,7 @@ Date format: (YYYY-MM-DD)
 ## v2.8.2 (TBA)
 ### Supported MC versions: 1.14.4
 
-
+Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored now by the commands.
 
 ## v2.8.1 (2019-08-23)
 ### Supported MC versions: 1.14.4
