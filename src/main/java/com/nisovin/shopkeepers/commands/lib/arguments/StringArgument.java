@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 
-public class StringArgument extends CommandArgument {
+public class StringArgument extends CommandArgument<String> {
 
 	protected final boolean joinRemainingArgs;
 
@@ -22,13 +22,17 @@ public class StringArgument extends CommandArgument {
 		this.joinRemainingArgs = joinRemainingArgs;
 	}
 
+	public final boolean isJoiningRemainingArgs() {
+		return joinRemainingArgs;
+	}
+
 	@Override
-	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public String parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
 			throw this.missingArgument();
 		}
 		if (joinRemainingArgs) {
-			return this.getJoinedRemainingArgs(args);
+			return getJoinedRemainingArgs(args);
 		} else {
 			return args.next();
 		}
@@ -39,7 +43,8 @@ public class StringArgument extends CommandArgument {
 		return Collections.emptyList();
 	}
 
-	public String getJoinedRemainingArgs(CommandArgs args) {
+	public static String getJoinedRemainingArgs(CommandArgs args) {
+		if (!args.hasNext()) return "";
 		StringBuilder value = new StringBuilder(args.next());
 		while (args.hasNext()) {
 			value.append(' ').append(args.next());

@@ -7,7 +7,29 @@ Date format: (YYYY-MM-DD)
 ## v2.8.2 (TBA)
 ### Supported MC versions: 1.14.4
 
-Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored now by the commands.
+* Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored now by the commands.
+* Various (mostly internal) changes to commands and argument parsing:
+  * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information. A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
+  * Most optional arguments, default values and fallbacks were updated to use this new fallback mechanism, which should provide more relevant error messages in a few edge cases.
+  * "list", "remove", "transfer" and "setTradePerm" commands can be used from console now. Command confirmations work for the console well now (any command sender that is not a player is considered to be the 'console' for this purpose).
+  * "setForHire" and "transfer" commands allow specifying the shopkeeper via argument now. Also: When targeting a chest that happens to be used by multiple shopkeepers (eg. due to manually modified save data..), it picks the first one now (instead of applying the command to all shops). In the future this will likely print an error message instead.
+  * "debugCreateShops" command: Shop count per command invocation is limited to 1000 now.
+  * All argument suggestions are limited to 20 entries by default now.
+  * Player arguments suggest matching uuids now. To avoid spamming the suggestions with uuids for the first few characters of input, suggestions are only provided after at least 3 characters of matching input.
+  * Some commands (eg. "list") provide suggestions for names of online players now.
+  * Internal: Refactored uuid and name based parsing of players and shopkeepers to allow for more code reuse.
+  * Internal: Minor refactoring to the targeting of shopkeepers.
+  * Internal changes to how targeting of shopkeepers is handled in case no shopkeeper can be parsed from the command input. This should result in more appropriate error messages when specifying an invalid shopkeeper.
+  * Internal: FirstOf-arguments reset the parsed arguments before every child argument's completion attempt, so that every child argument has a chance to provide completions.
+  * Internal: FirstOf-arguments now forward the exceptions of its child arguments (instead of using their own).
+  * Internal: Added the ability to define 'hidden' command arguments. These can for example be used to inject information into the command's execution context without requiring textual input from the user.
+  * Internal: CommandArgument#isOptional now only controls the formatting. The parsing behavior is left to the individual argument implementations.
+  * Internal: CommandArgs no longer makes a copy of the passed arguments.
+  * Internal: When resetting CommandArgs to a previous state they ensure now that the state got created from the same CommandArgs instance.
+  * Internal: Added type parameter to CommandArgument.
+  * Internal: Added ArgumentRejectedException and PostponedArgumentParseException, which can be used to providing more relevant error messages.
+  * Internal: Added more general BoundedIntegerArgument. PositiveIntegerArgument makes use of it.
+  * Internal: Moved ArgumentFilter into base commands lib package.
 
 ## v2.8.1 (2019-08-23)
 ### Supported MC versions: 1.14.4

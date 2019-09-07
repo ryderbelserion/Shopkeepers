@@ -10,14 +10,14 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 
-public class IntegerArgument extends CommandArgument {
+public class IntegerArgument extends CommandArgument<Integer> {
 
 	public IntegerArgument(String name) {
 		super(name);
 	}
 
 	@Override
-	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public Integer parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
 			throw this.missingArgument();
 		}

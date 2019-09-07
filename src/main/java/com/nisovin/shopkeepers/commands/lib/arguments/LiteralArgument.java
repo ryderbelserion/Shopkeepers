@@ -12,12 +12,12 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
-public class LiteralArgument extends CommandArgument {
+public class LiteralArgument extends CommandArgument<String> {
 
 	public static final String FORMAT_PREFIX = "'";
 	public static final String FORMAT_SUFFIX = "'";
 
-	private final List<String> literals;
+	private final List<String> literals; // not null nor containing null or empty literals
 
 	public LiteralArgument(String name) {
 		this(name, null);
@@ -46,7 +46,7 @@ public class LiteralArgument extends CommandArgument {
 	}
 
 	@Override
-	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public String parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
 			throw this.missingArgument();
 		}
@@ -71,7 +71,7 @@ public class LiteralArgument extends CommandArgument {
 			List<String> suggestions = new ArrayList<>();
 			String partialArg = args.next().toLowerCase();
 			for (String literal : literals) {
-				if (literal == null) continue;
+				if (suggestions.size() >= MAX_SUGGESTIONS) break;
 				if (literal.toLowerCase().startsWith(partialArg)) {
 					suggestions.add(literal);
 				}

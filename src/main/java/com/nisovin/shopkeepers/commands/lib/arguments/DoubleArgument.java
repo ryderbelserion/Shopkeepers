@@ -10,14 +10,14 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 
-public class DoubleArgument extends CommandArgument {
+public class DoubleArgument extends CommandArgument<Double> {
 
 	public DoubleArgument(String name) {
 		super(name);
 	}
 
 	@Override
-	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public Double parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
 			throw this.missingArgument();
 		}

@@ -15,19 +15,20 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.commands.Confirmations;
+import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
+import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.PlayerNameArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerNameFallback;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
-class CommandRemove extends PlayerCommand {
+class CommandRemove extends Command {
 
 	private static final String ARGUMENT_PLAYER = "player";
 	private static final String ARGUMENT_ALL = "all";
@@ -48,11 +49,14 @@ class CommandRemove extends PlayerCommand {
 		// set description:
 		this.setDescription(Settings.msgCommandDescriptionRemove);
 
-		// arguments:
-		this.addArgument(new OptionalArgument(new FirstOfArgument("target", Arrays.asList(
+		// arguments: TODO allow specifying a single shopkeeper?
+		this.addArgument(new FirstOfArgument("target", Arrays.asList(
 				new LiteralArgument(ARGUMENT_ADMIN),
 				new LiteralArgument(ARGUMENT_ALL),
-				new StringArgument(ARGUMENT_PLAYER)), true, true)));
+				// not matching names of online players to avoid accidental matches
+				// allows any given name or falls back to sender TODO alias 'own'?
+				new SenderPlayerNameFallback(new PlayerNameArgument(ARGUMENT_PLAYER, ArgumentFilter.acceptAny(), false))),
+				true, true));
 	}
 
 	@Override
@@ -66,33 +70,34 @@ class CommandRemove extends PlayerCommand {
 
 	@Override
 	protected void execute(CommandInput input, CommandContext context, CommandArgs args) throws CommandException {
-		assert (input.getSender() instanceof Player);
-		Player player = (Player) input.getSender();
+		CommandSender sender = input.getSender();
 
-		String playerName = context.getOrDefault(ARGUMENT_PLAYER, player.getName());
+		String targetPlayerName = context.get(ARGUMENT_PLAYER); // can be null
+		boolean targetOwnShops = (sender instanceof Player && sender.getName().equals(targetPlayerName));
 		boolean all = context.has(ARGUMENT_ALL);
 		boolean admin = context.has(ARGUMENT_ADMIN);
+		assert all || admin || targetPlayerName != null;
 
 		// permission checks:
 		if (admin) {
-			// remove admin shopkeepers:
-			this.checkPermission(player, ShopkeepersPlugin.REMOVE_ADMIN_PERMISSION);
+			// remove all admin shopkeepers:
+			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_ADMIN_PERMISSION);
 		} else if (all) {
 			// remove all player shopkeepers:
-			this.checkPermission(player, ShopkeepersPlugin.REMOVE_ALL_PERMISSION);
-		} else if (playerName.equals(player.getName())) {
+			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_ALL_PERMISSION);
+		} else if (targetOwnShops) {
 			// remove own player shopkeepers:
-			this.checkPermission(player, ShopkeepersPlugin.REMOVE_OWN_PERMISSION);
+			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_OWN_PERMISSION);
 		} else {
-			// remove other player shopkeepers:
-			this.checkPermission(player, ShopkeepersPlugin.REMOVE_OTHERS_PERMISSION);
+			// remove other player's shopkeepers:
+			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_OTHERS_PERMISSION);
 		}
 
-		// this is dangerous: let the player first confirm this action
-		confirmations.awaitConfirmation(player, () -> {
+		// this is dangerous: let the sender first confirm this action
+		confirmations.awaitConfirmation(sender, () -> {
 			List<Shopkeeper> shops = new ArrayList<>();
 			if (admin) {
-				// searching admin shops:
+				// searching all admin shops:
 				for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 					if (!(shopkeeper instanceof PlayerShopkeeper)) {
 						shops.add(shopkeeper);
@@ -106,14 +111,15 @@ class CommandRemove extends PlayerCommand {
 					}
 				}
 			} else {
+				assert targetPlayerName != null;
 				// searching shops of specific player:
-				Player listPlayer = Bukkit.getPlayerExact(playerName);
-				UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
+				Player targetPlayer = Bukkit.getPlayerExact(targetPlayerName);
+				UUID targetPlayerUUID = (targetPlayer != null) ? targetPlayer.getUniqueId() : null;
 
 				for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 					if (shopkeeper instanceof PlayerShopkeeper) {
 						PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-						if (playerShop.getOwnerName().equals(playerName)) {
+						if (playerShop.getOwnerName().equals(targetPlayerName)) {
 							UUID shopOwnerUUID = playerShop.getOwnerUUID();
 							// TODO really ignore owner uuid if the player is currently offline? - consider:
 							// TODO * player A 'peter' creating shops
@@ -121,9 +127,9 @@ class CommandRemove extends PlayerCommand {
 							// TODO * player B joins before player A has joined again yet, and creates shops
 							// TODO * situation: shops with the same owner name, but different uuid.
 							// Problem?
-							// instead: allow specifying an uuid instead of player name and then detect if there are
-							// shops with the same owner name but different uuids
-							if (shopOwnerUUID == null || listPlayerUUID == null || shopOwnerUUID.equals(listPlayerUUID)) {
+							// instead: output an error if the name is ambiguous and allow clarifying by specifying an
+							// uuid instead of player name
+							if (shopOwnerUUID == null || targetPlayerUUID == null || shopOwnerUUID.equals(targetPlayerUUID)) {
 								shops.add(playerShop);
 							}
 						}
@@ -142,37 +148,37 @@ class CommandRemove extends PlayerCommand {
 			// printing result message:
 			int shopsCount = shops.size();
 			if (admin) {
-				// removed admin shops:
-				TextUtils.sendMessage(player, Settings.msgRemovedAdminShops,
+				// removed all admin shops:
+				TextUtils.sendMessage(sender, Settings.msgRemovedAdminShops,
 						"{shopsCount}", String.valueOf(shopsCount));
 			} else if (all) {
 				// removed all player shops:
-				TextUtils.sendMessage(player, Settings.msgRemovedAllPlayerShops,
+				TextUtils.sendMessage(sender, Settings.msgRemovedAllPlayerShops,
 						"{shopsCount}", String.valueOf(shopsCount));
 			} else {
 				// removed shops of specific player:
-				TextUtils.sendMessage(player, Settings.msgRemovedPlayerShops,
-						"{player}", playerName,
+				TextUtils.sendMessage(sender, Settings.msgRemovedPlayerShops,
+						"{player}", targetPlayerName,
 						"{shopsCount}", String.valueOf(shopsCount));
 			}
 		});
 
 		// inform player about required confirmation:
 		if (admin) {
-			// removing admin shops:
-			TextUtils.sendMessage(player, Settings.msgConfirmRemoveAdminShops);
+			// removing all admin shops:
+			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveAdminShops);
 		} else if (all) {
 			// removing all player shops:
-			TextUtils.sendMessage(player, Settings.msgConfirmRemoveAllPlayerShops);
-		} else if (playerName.equals(player.getName())) {
+			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveAllPlayerShops);
+		} else if (targetOwnShops) {
 			// removing own shops:
-			TextUtils.sendMessage(player, Settings.msgConfirmRemoveOwnShops);
+			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveOwnShops);
 		} else {
 			// removing shops of specific player:
-			TextUtils.sendMessage(player, Settings.msgConfirmRemovePlayerShops,
-					"{player}", playerName);
+			TextUtils.sendMessage(sender, Settings.msgConfirmRemovePlayerShops,
+					"{player}", targetPlayerName);
 		}
 		// inform player on how to confirm the action:
-		TextUtils.sendMessage(player, Settings.msgConfirmationRequired);
+		TextUtils.sendMessage(sender, Settings.msgConfirmationRequired);
 	}
 }

@@ -3,11 +3,13 @@ package com.nisovin.shopkeepers.commands.arguments;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
+import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.ArgumentFilter;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 public class AdminShopkeeperFilter implements ArgumentFilter<Shopkeeper> {
+
+	public static final AdminShopkeeperFilter INSTANCE = new AdminShopkeeperFilter();
 
 	@Override
 	public boolean test(Shopkeeper shopkeeper) {
@@ -15,7 +17,7 @@ public class AdminShopkeeperFilter implements ArgumentFilter<Shopkeeper> {
 	}
 
 	@Override
-	public String getInvalidArgumentErrorMsg(CommandArgument argument, String input, Shopkeeper value) {
+	public String getInvalidArgumentErrorMsg(CommandArgument<Shopkeeper> argument, String input, Shopkeeper value) {
 		if (input == null) input = "";
 		return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoAdminShop,
 				"{argumentName}", argument.getName(),

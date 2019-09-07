@@ -16,7 +16,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
-public class ShopObjectTypeArgument extends CommandArgument {
+public class ShopObjectTypeArgument extends CommandArgument<ShopObjectType<?>> {
 
 	public ShopObjectTypeArgument(String name) {
 		super(name);
@@ -32,7 +32,7 @@ public class ShopObjectTypeArgument extends CommandArgument {
 	}
 
 	@Override
-	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public ShopObjectType<?> parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
 			throw this.missingArgument();
 		}
@@ -50,6 +50,7 @@ public class ShopObjectTypeArgument extends CommandArgument {
 			List<String> suggestions = new ArrayList<>();
 			String partialArg = StringUtils.normalize(args.next());
 			for (ShopObjectType<?> shopObjectType : ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().getRegisteredTypes()) {
+				if (suggestions.size() >= MAX_SUGGESTIONS) break;
 				String displayName = shopObjectType.getDisplayName();
 				displayName = StringUtils.normalizeKeepCase(displayName);
 				String displayNameNorm = displayName.toLowerCase(Locale.ROOT);

@@ -2,12 +2,25 @@ High priority:
 * 
 
 Mid priority:
-* 
+* For any commands allowing for a targeted shopkeeper: Print 'Ambiguous shopkeeper. Specify the shopkeeper explicitly instead.' error in case more than one shopkeeper is targeted?
+  * Instead of either only using the first shopkeeper, or applying the operation to all of them
+
 
 Low priority:
+* Command library revamp:
+  * Allow arguments to change the following arguments, similar to how subcommands have different chains of arguments
+    * Eg. /shopkeeper info ['own'|'admin'|<player>] <shopkeeper>: Different suggestions/allowed arguments for the second argument depending on the first argument
+    * But: Avoid duplicate definition of common argument chains, if different chains are not required/used
+      * Eg. by defining an argument chain once and then reusing it for different sub-commands/arguments
+    * Maybe even dynamically, by allowing arguments that get parameterized by the arguments parsed before
+      * Eg. /region <region> removeMember <member>: Only suggest members that are part of the region
+  * Bind executing code directly to an argument chain, to avoid having to manually check the CommandContext for which arguments got actually parsed
+  * Allow for easier debugging of command execution and argument parsing (without introducing plugin-specific logging dependencies into the library classes).
+
 * Prohibit multiple shopkeepers using the same chest (currently only possible by manually editing the save file)?
   * Or make this an official 'feature'? (Allowing players to link multiple of their shops to the same chest.
     * Maybe together with the ability to link shopkeepers to multiple chests (because otherwise this might not make much sense, since a single chest might be quite limiting if used by multiple shops)
+
 * More types of block shops? -> clicking button to open shop
 * Virtual shops (command to edit and open trade menu), would allow tons of possibilities for other plugins / server admins to use shopkeeper shops in other contexts
 * Change amount-per-click from 10 to 8 when clicking items in the player shopkeeper editor? (feels more intuitive due to minecraft's stack sizes)

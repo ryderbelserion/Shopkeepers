@@ -1,26 +1,27 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.List;
-
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.commands.arguments.PlayerShopkeeperFilter;
+import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
+import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
-import com.nisovin.shopkeepers.shopkeeper.ShopTypeCategory;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils;
+import com.nisovin.shopkeepers.util.ShopkeeperUtils.TargetShopkeeperFilter;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandSetForHire extends PlayerCommand {
+
+	private static final String ARGUMENT_SHOPKEEPER = "shopkeeper";
 
 	CommandSetForHire() {
 		super("setForHire");
@@ -30,6 +31,9 @@ class CommandSetForHire extends PlayerCommand {
 
 		// set description:
 		this.setDescription(Settings.msgCommandDescriptionSetforhire);
+
+		// arguments:
+		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, PlayerShopkeeperFilter.INSTANCE), TargetShopkeeperFilter.PLAYER));
 	}
 
 	@Override
@@ -37,8 +41,8 @@ class CommandSetForHire extends PlayerCommand {
 		assert (input.getSender() instanceof Player);
 		Player player = (Player) input.getSender();
 
-		List<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.getTargetedShopkeepers(player, ShopTypeCategory.PLAYER, true);
-		if (shopkeepers.isEmpty()) return; // messages were already handled
+		PlayerShopkeeper shopkeeper = (PlayerShopkeeper) context.get(ARGUMENT_SHOPKEEPER);
+		assert shopkeeper != null;
 
 		ItemStack hireCost = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isEmpty(hireCost)) {
@@ -47,23 +51,13 @@ class CommandSetForHire extends PlayerCommand {
 			return;
 		}
 
-		// set for hire:
-		final boolean bypass = PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION);
-		int affectedShops = 0;
-		for (Shopkeeper shopkeeper : shopkeepers) {
-			PlayerShopkeeper playerShopkeeper = (PlayerShopkeeper) shopkeeper; // this got already checked
-			// only transfer shops that are owned by the player:
-			if (bypass || playerShopkeeper.isOwner(player)) {
-				playerShopkeeper.setForHire(hireCost);
-				affectedShops++;
-			}
-		}
-
-		// inform if there was no single shopkeeper that could be set for hire:
-		assert !shopkeepers.isEmpty();
-		if (affectedShops == 0) {
+		// check that the shop is owned by the executing player:
+		if (!shopkeeper.isOwner(player) && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			TextUtils.sendMessage(player, Settings.msgNotOwner);
 			return;
+		} else {
+			// set for hire:
+			shopkeeper.setForHire(hireCost);
 		}
 
 		// success:

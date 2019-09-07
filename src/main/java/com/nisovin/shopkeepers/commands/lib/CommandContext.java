@@ -9,10 +9,10 @@ import com.nisovin.shopkeepers.util.Validate;
 /**
  * Stores parsed command arguments.
  */
-public final class CommandContext {
+public class CommandContext {
 
 	// gets only initialized when used:
-	private Map<String, Object> parsedArgs = null;
+	protected Map<String, Object> parsedArgs = null;
 
 	/**
 	 * Creates a new and empty {@link CommandContext}.

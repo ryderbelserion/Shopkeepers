@@ -60,8 +60,8 @@ public class ShopkeepersCommand extends BaseCommand {
 		this.setHelpDescFormat(Settings.msgCommandHelpDescriptionFormat);
 
 		// arguments for shopkeeper creation:
-		this.addArgument(new OptionalArgument(new ShopTypeArgument(ARGUMENT_SHOP_TYPE)));
-		this.addArgument(new OptionalArgument(new ShopObjectTypeArgument(ARGUMENT_OBJECT_TYPE)));
+		this.addArgument(new OptionalArgument<>(new ShopTypeArgument(ARGUMENT_SHOP_TYPE)));
+		this.addArgument(new OptionalArgument<>(new ShopObjectTypeArgument(ARGUMENT_OBJECT_TYPE)));
 
 		// register child commands:
 		CommandRegistry childCommands = this.getChildCommands();

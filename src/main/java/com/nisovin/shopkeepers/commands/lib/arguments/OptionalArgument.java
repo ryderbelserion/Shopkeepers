@@ -11,15 +11,14 @@ import com.nisovin.shopkeepers.util.Validate;
 
 /**
  * Wraps a given {@link CommandArgument} and makes it optional.
- * 
  * <p>
- * See also {@link CommandArgument#isOptional()}.
+ * If no value can be parsed, no {@link ArgumentParseException} is thrown, but <code>null</code> is returned instead.
  */
-public class OptionalArgument extends CommandArgument {
+public class OptionalArgument<T> extends CommandArgument<T> {
 
-	protected final CommandArgument argument;
+	protected final CommandArgument<T> argument;
 
-	public OptionalArgument(CommandArgument argument) {
+	public OptionalArgument(CommandArgument<T> argument) {
 		super(argument.getName());
 		Validate.notNull(argument);
 		this.argument = argument;
@@ -43,13 +42,13 @@ public class OptionalArgument extends CommandArgument {
 			argument.parse(input, context, args);
 		} catch (ArgumentParseException e) {
 			assert this.isOptional();
-			// restoring previous args state:
+			// restore previous args state:
 			args.setState(state);
 		}
 	}
 
 	@Override
-	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public T parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		return argument.parseValue(input, args);
 	}
 

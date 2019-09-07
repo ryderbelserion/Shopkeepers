@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.commands.lib;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -10,17 +9,19 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class CommandArgs {
 
+	public static final CommandArgs EMPTY = new CommandArgs(Collections.emptyList());
+
 	private final List<String> args; // unmodifiable
 	private int curIndex = -1;
 
 	public CommandArgs(String[] args) {
-		this(args == null ? Collections.<String>emptyList() : Arrays.asList(args));
+		this(args == null ? Collections.emptyList() : Arrays.asList(args));
 	}
 
 	public CommandArgs(List<String> args) {
-		Validate.notNull(args);
+		Validate.notNull(args, "Arguments cannot be null!");
 		Validate.isTrue(!args.contains(null), "Arguments contain null!");
-		this.args = Collections.unmodifiableList(new ArrayList<>(args));
+		this.args = Collections.unmodifiableList(args);
 	}
 
 	/**
@@ -33,9 +34,9 @@ public class CommandArgs {
 	}
 
 	/**
-	 * Gets the number of total arguments.
+	 * Gets the total number of arguments.
 	 * 
-	 * @return the number of total arguments
+	 * @return the total number of arguments
 	 */
 	public int getSize() {
 		return args.size();
@@ -48,6 +49,18 @@ public class CommandArgs {
 	 */
 	public int getRemainingSize() {
 		return this.getSize() - (curIndex + 1);
+	}
+
+	/**
+	 * Gets the cursor's current position.
+	 * <p>
+	 * The first argument is at index <code>0</code>. The cursor initially starts before the first argument, at position
+	 * <code>-1</code>.
+	 * 
+	 * @return the cursor's current position
+	 */
+	public int getCurrentIndex() {
+		return curIndex;
 	}
 
 	/**
@@ -181,23 +194,36 @@ public class CommandArgs {
 
 	// Get and set state: In case we ever add more state specific data, besides the index.
 
+	public static final class State {
+
+		private final CommandArgs args;
+		private final int curIndex;
+
+		private State(CommandArgs args, int curIndex) {
+			this.args = args;
+			this.curIndex = curIndex;
+		}
+	}
+
 	/**
 	 * Gets the current state of this {@link CommandArgs}, which can be used to reset with {@link #setState(Object)}.
 	 * 
 	 * @return the current state
 	 */
 	public Object getState() {
-		return curIndex;
+		return new State(this, curIndex);
 	}
 
 	/**
 	 * Restores the state of this {@link CommandArgs} to a state previously captured via {@link #getState()}.
 	 * 
-	 * @param state
+	 * @param stateObject
 	 *            the state to reset to
 	 */
-	public void setState(Object state) {
-		Validate.isTrue(state instanceof Integer, "Invalid state!");
-		this.curIndex = (Integer) state;
+	public void setState(Object stateObject) {
+		Validate.isTrue(stateObject instanceof State, "Invalid state!");
+		State state = (State) stateObject;
+		Validate.isTrue(state.args == this, "The given state wasn't created from this CommandArgs instance!");
+		this.curIndex = state.curIndex;
 	}
 }

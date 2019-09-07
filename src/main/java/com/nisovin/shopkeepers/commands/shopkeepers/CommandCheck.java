@@ -53,7 +53,7 @@ class CommandCheck extends Command {
 		this.setHiddenInParentHelp(true);
 
 		// arguments:
-		this.addArgument(new OptionalArgument(new FirstOfArgument("context", Arrays.asList(
+		this.addArgument(new OptionalArgument<>(new FirstOfArgument("context", Arrays.asList(
 				new LiteralArgument(ARGUMENT_CHUNKS),
 				new LiteralArgument(ARGUMENT_ACTIVE)))));
 	}

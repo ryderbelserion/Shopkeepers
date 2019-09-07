@@ -11,14 +11,14 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 
-public class BooleanArgument extends CommandArgument {
+public class BooleanArgument extends CommandArgument<Boolean> {
 
 	public BooleanArgument(String name) {
 		super(name);
 	}
 
 	@Override
-	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public Boolean parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
 			throw this.missingArgument();
 		}
@@ -36,6 +36,7 @@ public class BooleanArgument extends CommandArgument {
 			List<String> suggestions = new ArrayList<>();
 			String partialArg = args.next().toLowerCase();
 			for (String value : ConversionUtils.BOOLEAN_VALUES.keySet()) {
+				if (suggestions.size() >= MAX_SUGGESTIONS) break;
 				if (value.toLowerCase().startsWith(partialArg)) {
 					suggestions.add(value);
 				}

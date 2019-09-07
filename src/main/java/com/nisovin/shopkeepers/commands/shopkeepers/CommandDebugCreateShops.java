@@ -15,8 +15,8 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
-import com.nisovin.shopkeepers.commands.lib.arguments.IntegerArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
+import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
 
 class CommandDebugCreateShops extends PlayerCommand {
 
@@ -38,14 +38,19 @@ class CommandDebugCreateShops extends PlayerCommand {
 		this.setHiddenInParentHelp(true);
 
 		// arguments:
-		this.addArgument(new OptionalArgument(new IntegerArgument(ARGUMENT_SHOP_COUNT)));
+		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_SHOP_COUNT), 10));
 	}
 
 	@Override
 	protected void execute(CommandInput input, CommandContext context, CommandArgs args) throws CommandException {
 		assert (input.getSender() instanceof Player);
 		Player player = (Player) input.getSender();
-		int shopCount = context.getOrDefault(ARGUMENT_SHOP_COUNT, 10);
+		int shopCount = context.get(ARGUMENT_SHOP_COUNT);
+		// not using BoundedIntegerArgument for now due to missing descriptive error messages TODO use in future
+		if (shopCount > 1000) {
+			player.sendMessage(ChatColor.RED + "Shopkeeper count to high, limiting to 1000!");
+			shopCount = 1000;
+		}
 
 		player.sendMessage(ChatColor.GREEN + "Creating " + shopCount + " shopkeepers, starting here!");
 		Location curSpawnLocation = player.getLocation();

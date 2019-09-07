@@ -6,10 +6,12 @@ import java.util.List;
 import java.util.ListIterator;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
+import com.nisovin.shopkeepers.commands.lib.ArgumentRejectedException;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
 import com.nisovin.shopkeepers.util.Pair;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -21,29 +23,29 @@ import com.nisovin.shopkeepers.util.Validate;
  * parse something 'more useful'. However, no {@link ArgumentParseException} will be thrown in this case if no argument
  * parses a non-null value.
  */
-public class FirstOfArgument extends CommandArgument {
+public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Object>> {
 
 	public static final String FORMAT_DELIMITER = "|";
 
-	private final List<CommandArgument> arguments;
+	private final List<CommandArgument<?>> arguments;
 	private final String reducedFormat;
 
-	public FirstOfArgument(String name, List<CommandArgument> arguments) {
+	public FirstOfArgument(String name, List<CommandArgument<?>> arguments) {
 		this(name, arguments, true, false);
 	}
 
-	public FirstOfArgument(String name, List<CommandArgument> arguments, boolean joinFormats) {
+	public FirstOfArgument(String name, List<CommandArgument<?>> arguments, boolean joinFormats) {
 		this(name, arguments, joinFormats, false);
 	}
 
-	public FirstOfArgument(String name, List<CommandArgument> arguments, boolean joinFormats, boolean reverseFormat) {
+	public FirstOfArgument(String name, List<CommandArgument<?>> arguments, boolean joinFormats, boolean reverseFormat) {
 		super(name);
 
 		// arguments:
 		Validate.notNull(arguments);
-		List<CommandArgument> argumentsList = new ArrayList<>(arguments.size());
+		List<CommandArgument<?>> argumentsList = new ArrayList<>(arguments.size());
 		this.arguments = Collections.unmodifiableList(argumentsList);
-		for (CommandArgument argument : arguments) {
+		for (CommandArgument<?> argument : arguments) {
 			Validate.notNull(argument);
 			argumentsList.add(argument);
 		}
@@ -53,32 +55,39 @@ public class FirstOfArgument extends CommandArgument {
 		if (joinFormats) {
 			String delimiter = FORMAT_DELIMITER;
 			StringBuilder format = new StringBuilder();
-			ListIterator<CommandArgument> iterator = this.arguments.listIterator(reverseFormat ? this.arguments.size() : 0);
+			ListIterator<CommandArgument<?>> iterator = this.arguments.listIterator(reverseFormat ? this.arguments.size() : 0);
 			while (reverseFormat ? iterator.hasPrevious() : iterator.hasNext()) {
-				CommandArgument argument = (reverseFormat ? iterator.previous() : iterator.next());
+				CommandArgument<?> argument = (reverseFormat ? iterator.previous() : iterator.next());
 				// appending reduced format for child-arguments here:
-				format.append(argument.getReducedFormat()).append(delimiter);
+				String argumentFormat = argument.getReducedFormat();
+				if (!argumentFormat.isEmpty()) {
+					format.append(argumentFormat).append(delimiter);
+				}
 			}
-			this.reducedFormat = format.substring(0, format.length() - delimiter.length());
+			if (format.length() == 0) {
+				this.reducedFormat = "";
+			} else {
+				this.reducedFormat = format.substring(0, format.length() - delimiter.length());
+			}
 		} else {
 			// using the default format:
 			this.reducedFormat = super.getReducedFormat();
 		}
 	}
 
-	public List<CommandArgument> getArguments() {
+	public List<CommandArgument<?>> getArguments() {
 		return arguments;
 	}
 
 	@Override
 	public boolean isOptional() {
-		// this argument is optional, if all child-arguments are optional:
-		for (CommandArgument argument : arguments) {
-			if (!argument.isOptional()) {
-				return false;
+		// this argument is optional, if at least one child-argument is optional:
+		for (CommandArgument<?> argument : arguments) {
+			if (argument.isOptional()) {
+				return true;
 			}
 		}
-		return true;
+		return false;
 	}
 
 	@Override
@@ -89,26 +98,19 @@ public class FirstOfArgument extends CommandArgument {
 	@Override
 	public void parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
 		Object state = args.getState();
-		Pair<CommandArgument, Object> result;
+		Pair<CommandArgument<?>, Object> result;
 		try {
 			result = this.parseValue(input, args);
 		} catch (ArgumentParseException e) {
-			// restoring previous args state:
+			// restore previous args state:
 			args.setState(state);
-
-			if (this.isOptional()) {
-				// set value to null:
-				result = null;
-			} else {
-				// pass on exception:
-				throw e;
-			}
+			throw e;
 		}
 		if (result != null) {
 			context.put(this.getName(), result);
 
 			// store the parsed result under the parsed argument's name:
-			CommandArgument argument = result.getFirst();
+			CommandArgument<?> argument = result.getFirst();
 			Object value = result.getSecond();
 			if (argument != null && value != null) {
 				context.put(argument.getName(), value);
@@ -118,16 +120,15 @@ public class FirstOfArgument extends CommandArgument {
 
 	// returns a pair with the argument and the parsed value, or null if nothing was parsed
 	@Override
-	public Pair<CommandArgument, Object> parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-		if (!args.hasNext()) {
-			throw this.missingArgument();
-		}
-		Object state = args.getState();
-
+	public Pair<CommandArgument<?>, Object> parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		// try one after the other:
+		Object state = args.getState();
 		Object value = null;
+		FallbackArgumentException fallbackException = null;
 		boolean nullParsed = false;
-		for (CommandArgument argument : arguments) {
+		ArgumentRejectedException rejectedException = null;
+		ArgumentParseException firstParseException = null;
+		for (CommandArgument<?> argument : arguments) {
 			try {
 				value = argument.parseValue(input, args);
 				if (value != null) {
@@ -137,30 +138,68 @@ public class FirstOfArgument extends CommandArgument {
 					nullParsed = true;
 					// continue: maybe some other argument can parse something more useful..
 				}
+			} catch (FallbackArgumentException e) {
+				// ignore, but keep track of the first fallback exception:
+				if (fallbackException == null) {
+					fallbackException = e;
+				}
+			} catch (ArgumentRejectedException e) {
+				// ignore, but keep track of the first argument-rejected exception:
+				if (rejectedException == null) {
+					rejectedException = e;
+				}
 			} catch (ArgumentParseException e) {
-				// ignore
+				// ignore, but keep track of the first exception:
+				if (firstParseException == null) {
+					firstParseException = e;
+				}
 			}
 			// reset state and continue:
 			args.setState(state);
 		}
 
+		if (fallbackException != null) {
+			// if some argument might be able to provide a fallback, prefer following that path:
+			// TODO but if the fallback turns out failing, we might want to prefer null, rejected or first exception
+			throw fallbackException;
+		}
+
 		if (nullParsed) {
-			// if one argument did return null as parsing result, and did not
-			// throw an exception (like optional argument tend to do), we don't
-			// throw an exception here either:
+			// if one argument did return null as parsing result, and did not throw an exception (like optional
+			// arguments tend to do), we don't throw an exception here either:
 			return null;
 		}
 
+		if (rejectedException != null) {
+			// Some argument was able to parse something but rejected the result due to some filter.
+			// Prefer this more specific exception since it is likely to be more relevant to the user.
+			throw rejectedException;
+		}
+
 		// invalid argument for all of them:
-		throw this.invalidArgument(args.peek());
+		assert firstParseException != null; // otherwise we would have parsed something (or null)
+		throw firstParseException;
 	}
 
 	@Override
 	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
 		List<String> suggestions = new ArrayList<>();
-		for (CommandArgument argument : arguments) {
-			suggestions.addAll(argument.complete(input, context, args));
+		Object state = args.getState(); // keep track of the initial state
+		for (CommandArgument<?> argument : arguments) {
+			int limit = (MAX_SUGGESTIONS - suggestions.size());
+			if (limit <= 0) break;
+
+			// reset args so that every argument has a chance to provide completions:
+			args.setState(state);
+
+			List<String> argumentSuggestions = argument.complete(input, context, args);
+			if (argumentSuggestions.size() < limit) {
+				suggestions.addAll(argumentSuggestions);
+			} else {
+				suggestions.addAll(argumentSuggestions.subList(0, limit));
+				break;
+			}
 		}
-		return suggestions;
+		return Collections.unmodifiableList(suggestions);
 	}
 }

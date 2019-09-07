@@ -1,8 +1,10 @@
 package com.nisovin.shopkeepers.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -23,7 +25,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
-import com.nisovin.shopkeepers.shopkeeper.ShopTypeCategory;
 
 /**
  * Utility functions related to shopkeepers and trading.
@@ -87,8 +88,98 @@ public class ShopkeeperUtils {
 		return true;
 	}
 
+	public static final class TargetShopkeepersResult {
+
+		private final List<Shopkeeper> shopkeepers;
+		private final String errorMessage;
+		// assert: !shopkeepers.isEmpty || errorMessage != null
+
+		private TargetShopkeepersResult(List<Shopkeeper> shopkeepers) {
+			Validate.isTrue(shopkeepers != null && !shopkeepers.isEmpty());
+			this.shopkeepers = shopkeepers;
+			this.errorMessage = null;
+		}
+
+		private TargetShopkeepersResult(String errorMessage) {
+			Validate.notEmpty(errorMessage);
+			this.errorMessage = errorMessage;
+			this.shopkeepers = Collections.emptyList();
+		}
+
+		public boolean isSuccess() {
+			return (errorMessage == null);
+		}
+
+		public List<Shopkeeper> getShopkeepers() {
+			return shopkeepers;
+		}
+
+		public String getErrorMessage() {
+			return errorMessage;
+		}
+	}
+
+	public interface TargetShopkeeperFilter extends Predicate<Shopkeeper> {
+
+		public static final TargetShopkeeperFilter ANY = new TargetShopkeeperFilter() {
+			@Override
+			public boolean test(Shopkeeper shopkeeper) {
+				return true;
+			}
+
+			@Override
+			public String getNoTargetErrorMsg() {
+				return Settings.msgMustTargetShop;
+			}
+
+			@Override
+			public String getInvalidTargetErrorMsg(Shopkeeper shopkeeper) {
+				return ""; // not used
+			}
+		};
+
+		public static final TargetShopkeeperFilter ADMIN = new TargetShopkeeperFilter() {
+			@Override
+			public boolean test(Shopkeeper shopkeeper) {
+				return (shopkeeper instanceof AdminShopkeeper);
+			}
+
+			@Override
+			public String getNoTargetErrorMsg() {
+				return Settings.msgMustTargetAdminShop;
+			}
+
+			@Override
+			public String getInvalidTargetErrorMsg(Shopkeeper shopkeeper) {
+				return Settings.msgTargetShopIsNoAdminShop;
+			}
+		};
+
+		public static final TargetShopkeeperFilter PLAYER = new TargetShopkeeperFilter() {
+			@Override
+			public boolean test(Shopkeeper shopkeeper) {
+				return (shopkeeper instanceof PlayerShopkeeper);
+			}
+
+			@Override
+			public String getNoTargetErrorMsg() {
+				return Settings.msgMustTargetPlayerShop;
+			}
+
+			@Override
+			public String getInvalidTargetErrorMsg(Shopkeeper shopkeeper) {
+				return Settings.msgTargetShopIsNoPlayerShop;
+			}
+		};
+
+		public abstract String getNoTargetErrorMsg();
+
+		public abstract String getInvalidTargetErrorMsg(Shopkeeper shopkeeper);
+	}
+
 	// type is null to allow any shopkeeper type to be returned
-	public static List<? extends Shopkeeper> getTargetedShopkeepers(Player player, ShopTypeCategory type, boolean message) {
+	public static TargetShopkeepersResult getTargetedShopkeepers(Player player, TargetShopkeeperFilter shopkeeperFilter) {
+		if (shopkeeperFilter == null) shopkeeperFilter = TargetShopkeeperFilter.ANY;
 		Location playerLoc = player.getEyeLocation();
 		World world = playerLoc.getWorld();
 		Vector viewDirection = playerLoc.getDirection();
@@ -99,7 +190,7 @@ public class ShopkeeperUtils {
 			return !entity.isDead() && !entity.equals(player); // TODO SPIGOT-5228: filtering dead entities
 		});
 
-		// determine targeted shopkeeper, and print context dependent failure messages:
+		// determine targeted shopkeeper, and return context dependent failure messages:
 		if (rayTraceResult != null) {
 			Shopkeeper shopkeeper = null;
 			Block targetBlock = rayTraceResult.getHitBlock();
@@ -109,19 +200,24 @@ public class ShopkeeperUtils {
 				if (shopkeeper == null) {
 					// get player shopkeepers by targeted chest:
 					if (ItemUtils.isChest(targetBlock.getType())) {
-						List<PlayerShopkeeper> shopkeepers = SKShopkeepersPlugin.getInstance().getProtectedChests().getShopkeepersUsingChest(targetBlock);
-						if (shopkeepers.isEmpty()) {
-							if (message) {
-								TextUtils.sendMessage(player, Settings.msgUnusedChest);
+						List<PlayerShopkeeper> shopsUsingChest = SKShopkeepersPlugin.getInstance().getProtectedChests().getShopkeepersUsingChest(targetBlock);
+						if (shopsUsingChest.isEmpty()) {
+							return new TargetShopkeepersResult(Settings.msgUnusedChest);
+						} else {
+							// filter shops:
+							List<Shopkeeper> acceptedShops = new ArrayList<>();
+							for (Shopkeeper shopUsingChest : shopsUsingChest) {
+								if (shopkeeperFilter.test(shopUsingChest)) {
+									acceptedShops.add(shopUsingChest);
+								}
 							}
-							return Collections.emptyList();
-						} else if (type == ShopTypeCategory.ADMIN) {
-							if (message) {
-								TextUtils.sendMessage(player, Settings.msgTargetShopIsNoAdminShop);
+							if (acceptedShops.isEmpty()) {
+								// use the first shopkeeper using the chest for the error message:
+								return new TargetShopkeepersResult(shopkeeperFilter.getInvalidTargetErrorMsg(shopsUsingChest.get(0)));
+							} else {
+								return new TargetShopkeepersResult(acceptedShops);
 							}
-							return Collections.emptyList();
 						}
-						return shopkeepers;
 					}
 				}
 			} else {
@@ -129,40 +225,21 @@ public class ShopkeeperUtils {
 				assert targetEntity != null;
 				shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByEntity(targetEntity);
 				if (shopkeeper == null) {
-					if (message) {
-						TextUtils.sendMessage(player, Settings.msgTargetEntityIsNoShop);
-					}
-					return Collections.emptyList();
+					return new TargetShopkeepersResult(Settings.msgTargetEntityIsNoShop);
 				}
 			}
 
-			// check if found shopkeeper is a player shopkeeper:
+			// check if found shopkeeper is accepted:
 			if (shopkeeper != null) {
-				if (type == ShopTypeCategory.PLAYER && !(shopkeeper instanceof PlayerShopkeeper)) {
-					if (message) {
-						TextUtils.sendMessage(player, Settings.msgTargetShopIsNoPlayerShop);
-					}
-					return Collections.emptyList();
-				} else if (type == ShopTypeCategory.ADMIN && !(shopkeeper instanceof AdminShopkeeper)) {
-					if (message) {
-						TextUtils.sendMessage(player, Settings.msgTargetShopIsNoAdminShop);
-					}
-					return Collections.emptyList();
+				if (shopkeeperFilter.test(shopkeeper)) {
+					return new TargetShopkeepersResult(Arrays.asList(shopkeeper)); // accepted
+				} else {
+					return new TargetShopkeepersResult(shopkeeperFilter.getInvalidTargetErrorMsg(shopkeeper));
 				}
-				return Arrays.asList(shopkeeper);
 			}
 		}
 
 		// no targeted shopkeeper found:
-		if (message) {
-			if (type == ShopTypeCategory.PLAYER) {
-				TextUtils.sendMessage(player, Settings.msgMustTargetPlayerShop);
-			} else if (type == ShopTypeCategory.ADMIN) {
-				TextUtils.sendMessage(player, Settings.msgMustTargetAdminShop);
-			} else {
-				TextUtils.sendMessage(player, Settings.msgMustTargetShop);
-			}
-		}
-		return Collections.emptyList();
+		return new TargetShopkeepersResult(shopkeeperFilter.getNoTargetErrorMsg());
 	}
 }

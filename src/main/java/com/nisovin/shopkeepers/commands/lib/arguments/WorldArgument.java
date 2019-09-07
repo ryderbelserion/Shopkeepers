@@ -14,14 +14,14 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 
-public class WorldArgument extends CommandArgument {
+public class WorldArgument extends CommandArgument<World> {
 
 	public WorldArgument(String name) {
 		super(name);
 	}
 
 	@Override
-	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public World parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
 			throw this.missingArgument();
 		}
@@ -42,7 +42,6 @@ public class WorldArgument extends CommandArgument {
 
 	@Override
 	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-		// TODO
 		return Collections.emptyList();
 	}
 }

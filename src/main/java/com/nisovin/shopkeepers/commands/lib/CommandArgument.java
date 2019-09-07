@@ -8,7 +8,16 @@ import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
-public abstract class CommandArgument {
+/**
+ * @param <T>
+ *            the type of the parsed argument
+ */
+public abstract class CommandArgument<T> {
+
+	/**
+	 * The recommended default limit on the number of command suggestions.
+	 */
+	public static final int MAX_SUGGESTIONS = 20;
 
 	public static final String REQUIRED_FORMAT_PREFIX = "<";
 	public static final String REQUIRED_FORMAT_SUFFIX = ">";
@@ -18,6 +27,17 @@ public abstract class CommandArgument {
 
 	private final String name;
 
+	/**
+	 * Create a new {@link CommandArgument}.
+	 * <p>
+	 * The argument name can not contain any whitespace and should be unique among all arguments of the same command.
+	 * <p>
+	 * Some compound arguments may delegate parsing to internal arguments. To avoid naming conflicts, the character
+	 * <code>:</code> is reserved for use by those internal arguments.
+	 * 
+	 * @param name
+	 *            the argument's name
+	 */
 	public CommandArgument(String name) {
 		Validate.notEmpty(StringUtils.removeWhitespace(name), "Invalid argument name!");
 		this.name = name;
@@ -35,14 +55,14 @@ public abstract class CommandArgument {
 	/**
 	 * Checks whether this {@link CommandArgument} is optional.
 	 * <p>
-	 * Optional arguments have slightly different behavior:
-	 * <ul>
-	 * <li>If no value can be parsed, no {@link ArgumentParseException} is thrown, but <code>null</code> is returned
-	 * instead.
-	 * <li>A different format is used to visually mark them as optional.
-	 * </ul>
+	 * Optional command arguments do not strictly require any input, but may for example provide a fallback or default
+	 * value if no value is specified by the user.
 	 * <p>
-	 * For making a given {@link CommandArgument} optional, {@link OptionalArgument} may be used.
+	 * The return value of this method alone does not change the argument's parsing behavior, but only acts as indicator
+	 * for other components. This is for example used to pick a different format to visually mark this argument as
+	 * optional.
+	 * <p>
+	 * For making a given {@link CommandArgument} optional, {@link OptionalArgument} can be used.
 	 * 
 	 * @return <code>true</code> if this argument is optional, <code>false</code> otherwise
 	 */
@@ -59,14 +79,24 @@ public abstract class CommandArgument {
 	 * {@link #getReducedFormat()} when generating the format, because certain types of arguments which consist of
 	 * several child-arguments might only modify the reduced format and expect those changes to get carried over into
 	 * the argument's format.
+	 * <p>
+	 * The returned format can be empty for 'hidden arguments'. Often these don't require any textual user input, but
+	 * may still inject information into the {@link CommandContext} depending on the context of command execution. An
+	 * example would be an argument that requires the user to target a specific block or entity when executing the
+	 * command. These hidden arguments may also be useful as components of other (non-hidden) arguments, for example to
+	 * inject defaults for optional arguments. Another use could be to actually hide optional textual arguments, for
+	 * example optional debugging options.
 	 * 
-	 * @return the argument format
+	 * @return the argument format, not <code>null</code>, but may be empty for hidden arguments
 	 */
 	public String getFormat() {
-		if (this.isOptional()) {
-			return OPTIONAL_FORMAT_PREFIX + this.getReducedFormat() + OPTIONAL_FORMAT_SUFFIX;
+		String reducedFormat = this.getReducedFormat();
+		if (reducedFormat.isEmpty()) {
+			return "";
+		} else if (this.isOptional()) {
+			return OPTIONAL_FORMAT_PREFIX + reducedFormat + OPTIONAL_FORMAT_SUFFIX;
 		} else {
-			return REQUIRED_FORMAT_PREFIX + this.getReducedFormat() + REQUIRED_FORMAT_SUFFIX;
+			return REQUIRED_FORMAT_PREFIX + reducedFormat + REQUIRED_FORMAT_SUFFIX;
 		}
 	}
 
@@ -75,8 +105,15 @@ public abstract class CommandArgument {
 	 * <p>
 	 * Usually the reduced format does simply not contain any surrounding brackets and gets then used by
 	 * {@link #getFormat()} or by other {@link CommandArgument}s which wrap this reduced format into their format.
+	 * <p>
+	 * The returned format can be empty for 'hidden arguments'. Often these don't require any textual user input, but
+	 * may still inject information into the {@link CommandContext} depending on the context of command execution. An
+	 * example would be an argument that requires the user to target a specific block or entity when executing the
+	 * command. These hidden arguments may also be useful as components of other (non-hidden) arguments, for example to
+	 * inject defaults for optional arguments. Another use could be to actually hide optional textual arguments, for
+	 * example optional debugging options.
 	 * 
-	 * @return the reduced format
+	 * @return the reduced format, not <code>null</code>, but may be empty for hidden arguments
 	 */
 	public String getReducedFormat() {
 		return name;
@@ -136,10 +173,10 @@ public abstract class CommandArgument {
 	 * {@link CommandContext} with the argument's name as key.
 	 * <p>
 	 * This moves the cursor of the {@link CommandArgs} forward for all successfully used-up arguments. In case parsing
-	 * fails, the state of the {@link CommandArgs} gets restored.<br>
-	 * If parsing returns <code>null</code>, then nothing gets stored in the {@link CommandContext}.<br>
-	 * Optional arguments will not throw any exceptions caused by parsing, but will instead handle it as if parsing
-	 * returned <code>null</code>. See {@link #isOptional()}.
+	 * fails, the state of the {@link CommandArgs} gets restored.
+	 * <p>
+	 * If parsing returns <code>null</code> (i.e. for optional arguments), then nothing gets stored in the
+	 * {@link CommandContext}.
 	 * 
 	 * @param input
 	 *            the input
@@ -148,24 +185,17 @@ public abstract class CommandArgument {
 	 * @param args
 	 *            the command arguments from which the value will get extracted from
 	 * @throws ArgumentParseException
-	 *             if unable to parse a value and not optional
+	 *             if unable to parse a value
 	 */
 	public void parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
 		Object state = args.getState();
-		Object value;
+		T value;
 		try {
 			value = this.parseValue(input, args);
 		} catch (ArgumentParseException e) {
-			// restoring previous args state:
+			// restore previous args state:
 			args.setState(state);
-
-			if (this.isOptional()) {
-				// set value to null:
-				value = null;
-			} else {
-				// pass on exception:
-				throw e;
-			}
+			throw e;
 		}
 		if (value != null) {
 			context.put(name, value);
@@ -184,11 +214,14 @@ public abstract class CommandArgument {
 	 * @throws ArgumentParseException
 	 *             if unable to parse a value
 	 */
-	public abstract Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException;
+	public abstract T parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException;
 
 	/**
 	 * This provides suggestions for the last argument, IF parsing this argument would use up the last argument of
 	 * the {@link CommandArgs}.
+	 * <p>
+	 * Don't expect the returned suggestions list to be mutable. However, <code>null</code> is not a valid return value,
+	 * neither for the suggestions list nor its contents.
 	 * 
 	 * @param input
 	 *            the input
@@ -196,7 +229,8 @@ public abstract class CommandArgument {
 	 *            the command context
 	 * @param args
 	 *            the command arguments, including the final, possibly partial or empty argument
-	 * @return the suggestions for the final argument, <code>null</code> or empty to indicate 'no suggestions'
+	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions' (not
+	 *         <code>null</code> and not containing <code>null</code>)
 	 */
 	public abstract List<String> complete(CommandInput input, CommandContext context, CommandArgs args);
 }

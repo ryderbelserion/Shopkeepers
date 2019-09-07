@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
-public class EnumArgument<T extends Enum<T>> extends CommandArgument {
+public class EnumArgument<T extends Enum<T>> extends CommandArgument<T> {
 
 	private final Class<T> clazz;
 
@@ -23,7 +23,7 @@ public class EnumArgument<T extends Enum<T>> extends CommandArgument {
 	}
 
 	@Override
-	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public T parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
 			throw this.missingArgument();
 		}
@@ -41,6 +41,7 @@ public class EnumArgument<T extends Enum<T>> extends CommandArgument {
 			List<String> suggestions = new ArrayList<>();
 			String partialArg = args.next().toUpperCase();
 			for (T value : clazz.getEnumConstants()) {
+				if (suggestions.size() >= MAX_SUGGESTIONS) break;
 				if (value.name().toUpperCase().startsWith(partialArg)) {
 					suggestions.add(value.name());
 				}

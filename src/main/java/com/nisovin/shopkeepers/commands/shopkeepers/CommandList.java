@@ -14,20 +14,22 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
+import com.nisovin.shopkeepers.commands.lib.arguments.AnyStringFallback;
+import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.IntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.PlayerNameArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerNameFallback;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
-class CommandList extends PlayerCommand {
+class CommandList extends Command {
 
 	private static final String ARGUMENT_PLAYER = "player";
 	private static final String ARGUMENT_ADMIN = "admin";
@@ -47,10 +49,14 @@ class CommandList extends PlayerCommand {
 		this.setDescription(Settings.msgCommandDescriptionList);
 
 		// arguments:
-		this.addArgument(new OptionalArgument(new FirstOfArgument("target", Arrays.asList(
+		this.addArgument(new FirstOfArgument("target", Arrays.asList(
 				new LiteralArgument(ARGUMENT_ADMIN),
-				new StringArgument(ARGUMENT_PLAYER)), true, true)));
-		this.addArgument(new OptionalArgument(new IntegerArgument(ARGUMENT_PAGE)));
+				// matches names of online players, but falls back to any given name or the sender's name
+				// using a fallback instead of adjusting the filter, so that the following page argument has a chance to
+				// parse the argument first before the fallback gets used
+				new SenderPlayerNameFallback(new AnyStringFallback(new PlayerNameArgument(ARGUMENT_PLAYER, PlayerNameArgument.ACCEPT_ONLINE_PLAYERS)))),
+				true, true));
+		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_PAGE), 1));
 	}
 
 	@Override
@@ -63,21 +69,19 @@ class CommandList extends PlayerCommand {
 
 	@Override
 	protected void execute(CommandInput input, CommandContext context, CommandArgs args) throws CommandException {
-		assert (input.getSender() instanceof Player);
-		Player player = (Player) input.getSender();
-		int page = context.getOrDefault(ARGUMENT_PAGE, 1);
-		// list own shops:
-		String playerName = context.getOrDefault(ARGUMENT_PLAYER, player.getName());
+		CommandSender sender = input.getSender();
+		int page = context.get(ARGUMENT_PAGE);
+		String targetPlayerName = context.get(ARGUMENT_PLAYER);
 		if (context.has(ARGUMENT_ADMIN)) {
 			// list admin shopkeepers:
-			playerName = null;
+			targetPlayerName = null;
 		}
 
 		List<Shopkeeper> shops = new ArrayList<>();
 
-		if (playerName == null) {
+		if (targetPlayerName == null) {
 			// permission check:
-			this.checkPermission(player, ShopkeepersPlugin.LIST_ADMIN_PERMISSION);
+			this.checkPermission(sender, ShopkeepersPlugin.LIST_ADMIN_PERMISSION);
 
 			// searching admin shops:
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
@@ -87,22 +91,22 @@ class CommandList extends PlayerCommand {
 			}
 		} else {
 			// permission check:
-			if (playerName.equals(player.getName())) {
+			if (sender instanceof Player && targetPlayerName.equals(sender.getName())) {
 				// list own player shopkeepers:
-				this.checkPermission(player, ShopkeepersPlugin.LIST_OWN_PERMISSION);
+				this.checkPermission(sender, ShopkeepersPlugin.LIST_OWN_PERMISSION);
 			} else {
 				// list other player shopkeepers:
-				this.checkPermission(player, ShopkeepersPlugin.LIST_OTHERS_PERMISSION);
+				this.checkPermission(sender, ShopkeepersPlugin.LIST_OTHERS_PERMISSION);
 			}
 
 			// searching shops of specific player:
-			Player listPlayer = Bukkit.getPlayerExact(playerName);
+			Player listPlayer = Bukkit.getPlayerExact(targetPlayerName);
 			UUID listPlayerUUID = (listPlayer != null ? listPlayer.getUniqueId() : null);
 
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 				if (shopkeeper instanceof PlayerShopkeeper) {
 					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
-					if (playerShop.getOwnerName().equals(playerName)) {
+					if (playerShop.getOwnerName().equals(targetPlayerName)) {
 						UUID shopOwnerUUID = playerShop.getOwnerUUID();
 						if (shopOwnerUUID == null || shopOwnerUUID.equals(listPlayerUUID) || listPlayerUUID == null) {
 							shops.add(playerShop);
@@ -116,16 +120,16 @@ class CommandList extends PlayerCommand {
 		int maxPage = Math.max(1, (int) Math.ceil((double) shopsCount / ENTRIES_PER_PAGE));
 		page = Math.max(1, Math.min(page, maxPage));
 
-		if (playerName == null) {
+		if (targetPlayerName == null) {
 			// listing admin shops:
-			TextUtils.sendMessage(player, Settings.msgListAdminShopsHeader,
+			TextUtils.sendMessage(sender, Settings.msgListAdminShopsHeader,
 					"{shopsCount}", String.valueOf(shopsCount),
 					"{page}", String.valueOf(page),
 					"{maxPage}", String.valueOf(maxPage));
 		} else {
 			// listing player shops:
-			TextUtils.sendMessage(player, Settings.msgListPlayerShopsHeader,
-					"{player}", playerName,
+			TextUtils.sendMessage(sender, Settings.msgListPlayerShopsHeader,
+					"{player}", targetPlayerName,
 					"{shopsCount}", String.valueOf(shopsCount),
 					"{page}", String.valueOf(page),
 					"{maxPage}", String.valueOf(maxPage));
@@ -137,7 +141,7 @@ class CommandList extends PlayerCommand {
 			Shopkeeper shopkeeper = shops.get(index);
 			String shopName = shopkeeper.getName();
 			boolean hasName = shopName != null && !shopName.isEmpty();
-			TextUtils.sendMessage(player, Settings.msgListShopsEntry,
+			TextUtils.sendMessage(sender, Settings.msgListShopsEntry,
 					"{shopIndex}", String.valueOf(index + 1),
 					"{shopId}", shopkeeper.getUniqueId().toString(),
 					"{shopSessionId}", String.valueOf(shopkeeper.getId()),

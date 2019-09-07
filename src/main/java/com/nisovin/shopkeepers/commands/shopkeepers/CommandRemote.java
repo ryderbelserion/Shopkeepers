@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.bukkit.entity.Player;
 
@@ -9,13 +8,13 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
+import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
-import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils;
+import com.nisovin.shopkeepers.util.ShopkeeperUtils.TargetShopkeeperFilter;
 
 class CommandRemote extends PlayerCommand {
 
@@ -31,7 +30,7 @@ class CommandRemote extends PlayerCommand {
 		this.setDescription(Settings.msgCommandDescriptionRemote);
 
 		// arguments:
-		this.addArgument(new OptionalArgument(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, true)));
+		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, true), TargetShopkeeperFilter.ANY));
 	}
 
 	@Override
@@ -40,12 +39,6 @@ class CommandRemote extends PlayerCommand {
 		Player player = (Player) input.getSender();
 
 		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
-		if (shopkeeper == null) {
-			// get shopkeeper via targeting:
-			List<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.getTargetedShopkeepers(player, null, true);
-			if (shopkeepers.isEmpty()) return; // messages were already handled
-			shopkeeper = shopkeepers.get(0); // use the first returned shopkeeper
-		}
 		assert shopkeeper != null;
 
 		// open shop trading window:

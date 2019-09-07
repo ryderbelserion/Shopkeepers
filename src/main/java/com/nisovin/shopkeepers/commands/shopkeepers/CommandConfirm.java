@@ -1,15 +1,13 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import org.bukkit.entity.Player;
-
 import com.nisovin.shopkeepers.commands.Confirmations;
+import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 
-class CommandConfirm extends PlayerCommand {
+class CommandConfirm extends Command {
 
 	private final Confirmations confirmations;
 
@@ -26,8 +24,6 @@ class CommandConfirm extends PlayerCommand {
 
 	@Override
 	protected void execute(CommandInput input, CommandContext context, CommandArgs args) throws CommandException {
-		assert (input.getSender() instanceof Player);
-		Player player = (Player) input.getSender();
-		confirmations.handleConfirmation(player);
+		confirmations.handleConfirmation(input.getSender());
 	}
 }

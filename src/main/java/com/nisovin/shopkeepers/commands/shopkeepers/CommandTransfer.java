@@ -1,26 +1,27 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.List;
-
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.commands.arguments.PlayerShopkeeperFilter;
+import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
+import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
+import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
-import com.nisovin.shopkeepers.shopkeeper.ShopTypeCategory;
 import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils;
+import com.nisovin.shopkeepers.util.ShopkeeperUtils.TargetShopkeeperFilter;
 import com.nisovin.shopkeepers.util.TextUtils;
 
-class CommandTransfer extends PlayerCommand {
+class CommandTransfer extends Command {
 
+	private static final String ARGUMENT_SHOPKEEPER = "shopkeeper";
 	private static final String ARGUMENT_NEW_OWNER = "new-owner";
 
 	CommandTransfer() {
@@ -33,38 +34,29 @@ class CommandTransfer extends PlayerCommand {
 		this.setDescription(Settings.msgCommandDescriptionTransfer);
 
 		// arguments:
-		this.addArgument(new PlayerArgument(ARGUMENT_NEW_OWNER));
+		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, PlayerShopkeeperFilter.INSTANCE), TargetShopkeeperFilter.PLAYER));
+		this.addArgument(new PlayerArgument(ARGUMENT_NEW_OWNER)); // new owner has to be online
+		// TODO allow offline-player?
 	}
 
 	@Override
 	protected void execute(CommandInput input, CommandContext context, CommandArgs args) throws CommandException {
-		assert (input.getSender() instanceof Player);
-		Player player = (Player) input.getSender();
+		CommandSender sender = input.getSender();
 
+		PlayerShopkeeper shopkeeper = (PlayerShopkeeper) context.get(ARGUMENT_SHOPKEEPER);
+		assert shopkeeper != null;
 		Player newOwner = context.get(ARGUMENT_NEW_OWNER);
 		assert newOwner != null;
 
-		List<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.getTargetedShopkeepers(player, ShopTypeCategory.PLAYER, true);
-		if (shopkeepers.isEmpty()) return; // messages were already handled
-
-		// set new owner:
-		final boolean bypass = PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION);
-		int affectedShops = 0;
-		for (Shopkeeper shopkeeper : shopkeepers) {
-			PlayerShopkeeper playerShopkeeper = (PlayerShopkeeper) shopkeeper; // this got already checked
-			// only transfer shops that are owned by the player:
-			if (bypass || playerShopkeeper.isOwner(player)) {
-				playerShopkeeper.setOwner(newOwner);
-				affectedShops++;
-			}
-		}
-
-		// inform if there was no single shopkeeper that could be transferred:
-		assert !shopkeepers.isEmpty();
-		if (affectedShops == 0) {
-			TextUtils.sendMessage(player, Settings.msgNotOwner);
+		// check that the shop is owned by the executing player:
+		Player player = (sender instanceof Player) ? (Player) sender : null;
+		if ((player == null || !shopkeeper.isOwner(player)) && !PermissionUtils.hasPermission(sender, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+			TextUtils.sendMessage(sender, Settings.msgNotOwner);
 			return;
 		}
+
+		// set new owner:
+		shopkeeper.setOwner(newOwner);
 
 		// success:
 		TextUtils.sendMessage(player, Settings.msgOwnerSet, "{owner}", newOwner.getName());
