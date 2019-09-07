@@ -1,9 +1,12 @@
 package com.nisovin.shopkeepers.util;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
@@ -27,6 +30,14 @@ import org.bukkit.util.Vector;
 public final class Utils {
 
 	private Utils() {
+	}
+
+	public static <T> Stream<T> stream(Iterable<T> iterable) {
+		if (iterable instanceof Collection) {
+			return ((Collection<T>) iterable).stream();
+		} else {
+			return StreamSupport.stream(iterable.spliterator(), false);
+		}
 	}
 
 	public static void printRegisteredListeners(Event event) {
