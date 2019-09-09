@@ -30,6 +30,7 @@ Date format: (YYYY-MM-DD)
   * Internal: Added ArgumentRejectedException and PostponedArgumentParseException, which can be used to providing more relevant error messages.
   * Internal: Added more general BoundedIntegerArgument. PositiveIntegerArgument makes use of it.
   * Internal: Moved ArgumentFilter into base commands lib package.
+* Fixed: The shop creation item can no longer be used from dispensers if regular use is disabled.
 
 ## v2.8.1 (2019-08-23)
 ### Supported MC versions: 1.14.4

@@ -11,6 +11,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockDispenseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -199,6 +200,16 @@ class CreateListener implements Listener {
 					});
 				}
 			}
+		}
+	}
+	
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	void onBlockDispense(BlockDispenseEvent event) {
+		if (Settings.preventShopCreationItemRegularUsage && Settings.isShopCreationItem(event.getItem())) {
+			Log.debug("Preventing dispensing of shop creation item at " + TextUtils.getLocationString(event.getBlock()));
+			event.setCancelled(true);
+			// TODO drop item instead
+			// TODO only prevent it for items that have a special dispense behavior
 		}
 	}
 }
