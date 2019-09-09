@@ -54,7 +54,7 @@ public class ShopkeeperByNameArgument extends CommandArgument<Shopkeeper> {
 		};
 		// always match known names: we keep track of the matched shopkeeper to avoid duplicate name lookups later (eg.
 		// for the filters)
-		this.shopkeeperNameArgument = new ShopkeeperNameArgument(name, joinRemainingArgs, nameFilter, true, minimalCompletionInput) {
+		this.shopkeeperNameArgument = new ShopkeeperNameArgument(name + ":name", joinRemainingArgs, nameFilter, true, minimalCompletionInput) {
 			@Override
 			protected String matchKnownId(String input) {
 				Shopkeeper shopkeeper = ShopkeeperByNameArgument.this.matchShopkeeper(input);
@@ -64,6 +64,7 @@ public class ShopkeeperByNameArgument extends CommandArgument<Shopkeeper> {
 				return (shopkeeper == null) ? input : shopkeeper.getName();
 			}
 		};
+		this.shopkeeperNameArgument.setParent(this);
 	}
 
 	private Shopkeeper getShopkeeperByName(String name) {

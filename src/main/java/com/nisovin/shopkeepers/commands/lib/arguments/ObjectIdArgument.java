@@ -36,9 +36,11 @@ public abstract class ObjectIdArgument<Id> extends CommandArgument<Id> {
 	// completions are only provided after at least that many matching input characters:
 	protected final int minimalCompletionInput; // <= 0 to deactivate
 
-	public ObjectIdArgument(CommandArgument<Id> idArgument, ArgumentFilter<Id> filter, boolean matchKnownIds, int minimalCompletionInput) {
-		super(Validate.notNull(idArgument).getName());
+	public ObjectIdArgument(String name, CommandArgument<Id> idArgument, ArgumentFilter<Id> filter, boolean matchKnownIds, int minimalCompletionInput) {
+		super(name);
+		Validate.notNull(idArgument, "Id-argument is null!");
 		this.idArgument = idArgument;
+		idArgument.setParent(this);
 		this.filter = (filter == null) ? ArgumentFilter.acceptAny() : filter;
 		this.matchKnownIds = matchKnownIds;
 		this.minimalCompletionInput = minimalCompletionInput;

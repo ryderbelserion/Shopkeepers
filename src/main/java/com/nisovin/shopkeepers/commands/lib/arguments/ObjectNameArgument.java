@@ -29,11 +29,7 @@ public abstract class ObjectNameArgument extends ObjectIdArgument<String> {
 	}
 
 	public ObjectNameArgument(String name, boolean joinRemainingArgs, ArgumentFilter<String> filter, boolean matchKnownNames, int minimalCompletionInput) {
-		super(new StringArgument(name, joinRemainingArgs), filter, matchKnownNames, minimalCompletionInput);
-	}
-	
-	public String test() {
-		return "";
+		super(name, new StringArgument(name + ":string", joinRemainingArgs), filter, matchKnownNames, minimalCompletionInput);
 	}
 
 	@Override

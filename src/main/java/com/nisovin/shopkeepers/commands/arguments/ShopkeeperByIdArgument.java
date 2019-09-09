@@ -31,16 +31,17 @@ public class ShopkeeperByIdArgument extends CommandArgument<Shopkeeper> {
 	public ShopkeeperByIdArgument(String name, ArgumentFilter<Shopkeeper> filter) {
 		super(name);
 		this.filter = (filter == null) ? ArgumentFilter.acceptAny() : filter;
-		this.idArgument = new IntegerArgument(name);
+		this.idArgument = new IntegerArgument(name + ":id");
+		idArgument.setParent(this);
 	}
 
 	@Override
-	public String getInvalidArgumentErrorMsg(String argument) {
-		if (argument == null) argument = "";
+	public String getInvalidArgumentErrorMsg(String argumentInput) {
+		if (argumentInput == null) argumentInput = "";
 		return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentInvalid,
-				"{argumentName}", this.getName(),
-				"{argumentFormat}", this.getFormat(),
-				"{argument}", argument);
+				"{argumentName}", this.getRootArgument().getName(),
+				"{argumentFormat}", this.getRootArgument().getFormat(),
+				"{argument}", argumentInput);
 	}
 
 	@Override

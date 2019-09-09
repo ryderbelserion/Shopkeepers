@@ -19,6 +19,9 @@ public interface ArgumentFilter<T> extends Predicate<T> {
 	/**
 	 * Gets an 'invalid argument' error message for the given parsed but declined value.
 	 * <p>
+	 * When overriding this method, consider using {@link CommandArgument#getRootArgument()} for the argument name and
+	 * format.
+	 * <p>
 	 * Consider using an {@link ArgumentRejectedException} when using this for an exception.
 	 * 
 	 * @param argument

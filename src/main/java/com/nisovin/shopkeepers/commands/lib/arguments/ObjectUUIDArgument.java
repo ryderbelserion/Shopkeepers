@@ -26,7 +26,7 @@ public abstract class ObjectUUIDArgument extends ObjectIdArgument<UUID> {
 
 	public ObjectUUIDArgument(String name, ArgumentFilter<UUID> filter, int minimalCompletionInput) {
 		// matching doesn't make much sense for UUIDs
-		super(new UUIDArgument(name), filter, false, minimalCompletionInput);
+		super(name, new UUIDArgument(name + ":uuid"), filter, false, minimalCompletionInput);
 	}
 
 	@Override

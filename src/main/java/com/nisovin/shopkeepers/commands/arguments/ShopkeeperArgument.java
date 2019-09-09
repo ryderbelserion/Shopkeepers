@@ -38,15 +38,16 @@ public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 
 	public ShopkeeperArgument(String name, boolean joinRemainingArgs, ArgumentFilter<Shopkeeper> filter, int minimalNameCompletionInput, int minimalUUIDCompletionInput) {
 		super(name);
-		this.shopUUIDArgument = new ShopkeeperByUUIDArgument(name, filter, minimalUUIDCompletionInput);
-		this.shopIdArgument = new ShopkeeperByIdArgument(name, filter);
-		this.shopNameArgument = new ShopkeeperByNameArgument(name, joinRemainingArgs, filter, minimalNameCompletionInput) {
+		this.shopUUIDArgument = new ShopkeeperByUUIDArgument(name + ":uuid", filter, minimalUUIDCompletionInput);
+		this.shopIdArgument = new ShopkeeperByIdArgument(name + ":id", filter);
+		this.shopNameArgument = new ShopkeeperByNameArgument(name + ":name", joinRemainingArgs, filter, minimalNameCompletionInput) {
 			@Override
 			public Shopkeeper matchShopkeeper(String nameInput) {
 				return ShopkeeperArgument.this.matchShopkeeper(nameInput);
 			}
 		};
-		this.firstOfArgument = new FirstOfArgument(name, Arrays.asList(shopUUIDArgument, shopIdArgument, shopNameArgument), false, false);
+		this.firstOfArgument = new FirstOfArgument(name + ":firstOf", Arrays.asList(shopUUIDArgument, shopIdArgument, shopNameArgument), false, false);
+		firstOfArgument.setParent(this);
 	}
 
 	/**

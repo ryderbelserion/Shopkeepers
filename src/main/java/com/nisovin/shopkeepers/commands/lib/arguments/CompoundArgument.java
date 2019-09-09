@@ -35,14 +35,15 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 		super(name);
 
 		// arguments:
-		Validate.notNull(arguments);
+		Validate.notNull(arguments, "Arguments is null!");
 		List<CommandArgument<?>> argumentsList = new ArrayList<>(arguments.size());
 		this.arguments = Collections.unmodifiableList(argumentsList);
 		for (CommandArgument<?> argument : arguments) {
-			Validate.notNull(argument);
+			Validate.notNull(argument, "A contained argument is null!");
+			argument.setParent(this);
 			argumentsList.add(argument);
 		}
-		Validate.isTrue(this.arguments.size() != 0, "No (valid) arguments given!");
+		Validate.isTrue(this.arguments.size() != 0, "No arguments given!");
 
 		// format:
 		// the reduced format can only be used in conjunction with joinFormats:

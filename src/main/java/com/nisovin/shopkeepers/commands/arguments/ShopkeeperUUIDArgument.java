@@ -30,8 +30,8 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String input, UUID value) {
 			if (input == null) input = "";
 			return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentInvalid,
-					"{argumentName}", argument.getName(),
-					"{argumentFormat}", argument.getFormat(),
+					"{argumentName}", argument.getRootArgument().getName(),
+					"{argumentFormat}", argument.getRootArgument().getFormat(),
 					"{argument}", input);
 		}
 	};
@@ -51,8 +51,8 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 				return ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, input, value);
 			} else {
 				return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoAdminShop,
-						"{argumentName}", argument.getName(),
-						"{argumentFormat}", argument.getFormat(),
+						"{argumentName}", argument.getRootArgument().getName(),
+						"{argumentFormat}", argument.getRootArgument().getFormat(),
 						"{argument}", input);
 			}
 		}
@@ -73,8 +73,8 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 				return ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, input, value);
 			} else {
 				return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoPlayerShop,
-						"{argumentName}", argument.getName(),
-						"{argumentFormat}", argument.getFormat(),
+						"{argumentName}", argument.getRootArgument().getName(),
+						"{argumentFormat}", argument.getRootArgument().getFormat(),
 						"{argument}", input);
 			}
 		}

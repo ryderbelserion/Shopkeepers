@@ -270,7 +270,11 @@ public abstract class Command {
 	 *            the argument
 	 */
 	protected final void addArgument(CommandArgument<?> argument) {
-		Validate.notNull(argument);
+		Validate.notNull(argument, "Argument is null!");
+		Validate.notNull(argument.getParent() != null, "Cannot add argument with parent!");
+		// make sure that no parent can be set once the argument has been added:
+		argument.setParent(null); // parent can only be set once
+
 		// lazy initialization:
 		if (arguments == null) {
 			arguments = new ArrayList<>();

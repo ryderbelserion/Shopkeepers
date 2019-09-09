@@ -20,8 +20,8 @@ public class AdminShopkeeperFilter implements ArgumentFilter<Shopkeeper> {
 	public String getInvalidArgumentErrorMsg(CommandArgument<Shopkeeper> argument, String input, Shopkeeper value) {
 		if (input == null) input = "";
 		return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoAdminShop,
-				"{argumentName}", argument.getName(),
-				"{argumentFormat}", argument.getFormat(),
+				"{argumentName}", argument.getRootArgument().getName(),
+				"{argumentFormat}", argument.getRootArgument().getFormat(),
 				"{argument}", input);
 	}
 }

@@ -46,8 +46,8 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 		public String getInvalidArgumentErrorMsg(CommandArgument<String> argument, String input, String value) {
 			if (input == null) input = "";
 			return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentInvalid,
-					"{argumentName}", argument.getName(),
-					"{argumentFormat}", argument.getFormat(),
+					"{argumentName}", argument.getRootArgument().getName(),
+					"{argumentFormat}", argument.getRootArgument().getFormat(),
 					"{argument}", input);
 		}
 	};
@@ -67,8 +67,8 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 				return ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, input, value);
 			} else {
 				return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoAdminShop,
-						"{argumentName}", argument.getName(),
-						"{argumentFormat}", argument.getFormat(),
+						"{argumentName}", argument.getRootArgument().getName(),
+						"{argumentFormat}", argument.getRootArgument().getFormat(),
 						"{argument}", input);
 			}
 		}
@@ -89,8 +89,8 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 				return ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, input, value);
 			} else {
 				return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoPlayerShop,
-						"{argumentName}", argument.getName(),
-						"{argumentFormat}", argument.getFormat(),
+						"{argumentName}", argument.getRootArgument().getName(),
+						"{argumentFormat}", argument.getRootArgument().getFormat(),
 						"{argument}", input);
 			}
 		}

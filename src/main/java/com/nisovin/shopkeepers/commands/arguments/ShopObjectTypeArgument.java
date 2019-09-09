@@ -23,12 +23,12 @@ public class ShopObjectTypeArgument extends CommandArgument<ShopObjectType<?>> {
 	}
 
 	@Override
-	public String getInvalidArgumentErrorMsg(String argument) {
-		if (argument == null) argument = "";
+	public String getInvalidArgumentErrorMsg(String argumentInput) {
+		if (argumentInput == null) argumentInput = "";
 		return TextUtils.replaceArgs(Settings.msgCommandShopObjectTypeArgumentInvalid,
-				"{argumentName}", this.getName(),
-				"{argumentFormat}", this.getFormat(),
-				"{argument}", argument);
+				"{argumentName}", this.getRootArgument().getName(),
+				"{argumentFormat}", this.getRootArgument().getFormat(),
+				"{argument}", argumentInput);
 	}
 
 	@Override

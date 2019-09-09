@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.commands.lib;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.nisovin.shopkeepers.Settings;
@@ -15,6 +16,21 @@ import com.nisovin.shopkeepers.util.Validate;
 public abstract class CommandArgument<T> {
 
 	/**
+	 * Dummy {@link CommandArgument} used internally to indicate that an argument has no parent.
+	 */
+	private static final CommandArgument<Object> NO_PARENT = new CommandArgument<Object>("NO_PARENT") {
+		@Override
+		public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+			return null;
+		}
+
+		@Override
+		public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
+			return Collections.emptyList();
+		}
+	};
+
+	/**
 	 * The recommended default limit on the number of command suggestions.
 	 */
 	public static final int MAX_SUGGESTIONS = 20;
@@ -26,6 +42,7 @@ public abstract class CommandArgument<T> {
 	public static final String OPTIONAL_FORMAT_SUFFIX = "]";
 
 	private final String name;
+	private CommandArgument<?> parent = null; // can be null if not yet set
 
 	/**
 	 * Create a new {@link CommandArgument}.
@@ -50,6 +67,50 @@ public abstract class CommandArgument<T> {
 	 */
 	public final String getName() {
 		return name;
+	}
+
+	/**
+	 * Sets the parent argument.
+	 * <p>
+	 * The parent can only be set once, and it cannot be set after this argument has already been added to a
+	 * {@link Command}.
+	 * 
+	 * @param parent
+	 *            the parent argument, or <code>null</code> to indicate that this argument has no parent
+	 */
+	public final void setParent(CommandArgument<?> parent) {
+		Validate.isTrue(this.parent == null, "Parent has already been set!");
+		this.parent = (parent == null) ? NO_PARENT : parent;
+	}
+
+	/**
+	 * Gets the parent argument.
+	 * <p>
+	 * The parent being not <code>null</code> indicates that this argument is not a top-level (root) argument, but is
+	 * used internally by another argument.
+	 * 
+	 * @return the parent argument, can be <code>null</code>
+	 */
+	public final CommandArgument<?> getParent() {
+		return (parent == NO_PARENT) ? null : parent;
+	}
+
+	/**
+	 * Gets the root argument.
+	 * <p>
+	 * This follows the chain of parent arguments to the top-level argument which itself does not have any parent. If
+	 * this argument does not have a parent, then this argument is returned.
+	 * 
+	 * @return the root argument, not <code>null</code>
+	 */
+	public final CommandArgument<?> getRootArgument() {
+		CommandArgument<?> current = this;
+		CommandArgument<?> currentParent = this.getParent();
+		while (currentParent != null) {
+			current = currentParent;
+			currentParent = current.getParent();
+		}
+		return current;
 	}
 
 	/**
@@ -121,28 +182,32 @@ public abstract class CommandArgument<T> {
 
 	/**
 	 * Gets the 'missing argument' error message.
+	 * <p>
+	 * When overriding this method, consider using {@link #getRootArgument()} for the argument name and format.
 	 * 
 	 * @return the error message
 	 */
 	public String getMissingArgumentErrorMsg() {
 		return TextUtils.replaceArgs(Settings.msgCommandArgumentMissing,
-				"{argumentName}", this.getName(),
-				"{argumentFormat}", this.getFormat());
+				"{argumentName}", this.getRootArgument().getName(),
+				"{argumentFormat}", this.getRootArgument().getFormat());
 	}
 
 	/**
 	 * Gets the 'invalid argument' error message.
+	 * <p>
+	 * When overriding this method, consider using {@link #getRootArgument()} for the argument name and format.
 	 * 
-	 * @param argument
+	 * @param argumentInput
 	 *            the argument input
 	 * @return the error message
 	 */
-	public String getInvalidArgumentErrorMsg(String argument) {
-		if (argument == null) argument = "";
+	public String getInvalidArgumentErrorMsg(String argumentInput) {
+		if (argumentInput == null) argumentInput = "";
 		return TextUtils.replaceArgs(Settings.msgCommandArgumentInvalid,
-				"{argumentName}", this.getName(),
-				"{argumentFormat}", this.getFormat(),
-				"{argument}", argument);
+				"{argumentName}", this.getRootArgument().getName(),
+				"{argumentFormat}", this.getRootArgument().getFormat(),
+				"{argument}", argumentInput);
 	}
 
 	/**

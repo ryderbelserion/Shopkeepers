@@ -49,7 +49,8 @@ public class ShopkeeperByUUIDArgument extends CommandArgument<Shopkeeper> {
 				}
 			}
 		};
-		this.shopkeeperUUIDArgument = new ShopkeeperUUIDArgument(name, uuidFilter, minimalCompletionInput);
+		this.shopkeeperUUIDArgument = new ShopkeeperUUIDArgument(name + ":uuid", uuidFilter, minimalCompletionInput);
+		shopkeeperUUIDArgument.setParent(this);
 	}
 
 	@Override

@@ -32,6 +32,7 @@ public abstract class FallbackArgument<T> extends CommandArgument<T> {
 		super(argument.getName());
 		Validate.notNull(argument);
 		this.argument = argument;
+		argument.setParent(this);
 	}
 
 	@Override
@@ -59,8 +60,8 @@ public abstract class FallbackArgument<T> extends CommandArgument<T> {
 	}
 
 	@Override
-	public String getInvalidArgumentErrorMsg(String argument) {
-		return this.argument.getInvalidArgumentErrorMsg(argument);
+	public String getInvalidArgumentErrorMsg(String argumentInput) {
+		return this.argument.getInvalidArgumentErrorMsg(argumentInput);
 	}
 
 	@Override

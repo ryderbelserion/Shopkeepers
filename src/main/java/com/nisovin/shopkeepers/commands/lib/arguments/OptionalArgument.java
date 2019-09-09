@@ -20,7 +20,8 @@ public class OptionalArgument<T> extends CommandArgument<T> {
 
 	public OptionalArgument(CommandArgument<T> argument) {
 		super(argument.getName());
-		Validate.notNull(argument);
+		Validate.notNull(argument, "Argument is null!");
+		argument.setParent(this);
 		this.argument = argument;
 	}
 

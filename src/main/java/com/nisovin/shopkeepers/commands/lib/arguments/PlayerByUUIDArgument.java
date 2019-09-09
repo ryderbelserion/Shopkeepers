@@ -53,7 +53,8 @@ public class PlayerByUUIDArgument extends CommandArgument<Player> {
 				}
 			}
 		};
-		this.playerUUIDArgument = new PlayerUUIDArgument(name, uuidFilter, minimalCompletionInput);
+		this.playerUUIDArgument = new PlayerUUIDArgument(name + ":uuid", uuidFilter, minimalCompletionInput);
+		playerUUIDArgument.setParent(this);
 	}
 
 	@Override

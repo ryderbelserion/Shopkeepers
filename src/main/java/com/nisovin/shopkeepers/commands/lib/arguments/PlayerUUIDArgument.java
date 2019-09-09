@@ -27,8 +27,8 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String input, UUID value) {
 			if (input == null) input = "";
 			return TextUtils.replaceArgs(Settings.msgCommandPlayerArgumentInvalid,
-					"{argumentName}", argument.getName(),
-					"{argumentFormat}", argument.getFormat(),
+					"{argumentName}", argument.getRootArgument().getName(),
+					"{argumentFormat}", argument.getRootArgument().getFormat(),
 					"{argument}", input);
 		}
 	};

@@ -34,14 +34,15 @@ public class PlayerArgument extends CommandArgument<Player> {
 
 	public PlayerArgument(String name, ArgumentFilter<Player> filter, int minimalNameCompletionInput, int minimalUUIDCompletionInput) {
 		super(name);
-		this.playerNameArgument = new PlayerByNameArgument(name, filter, minimalNameCompletionInput) {
+		this.playerNameArgument = new PlayerByNameArgument(name + ":name", filter, minimalNameCompletionInput) {
 			@Override
 			public Player matchPlayer(String nameInput) {
 				return PlayerArgument.this.matchPlayer(nameInput);
 			}
 		};
-		this.playerUUIDArgument = new PlayerByUUIDArgument(name, filter, minimalUUIDCompletionInput);
-		this.firstOfArgument = new FirstOfArgument(name, Arrays.asList(playerNameArgument, playerUUIDArgument), false, false);
+		this.playerUUIDArgument = new PlayerByUUIDArgument(name + ":uuid", filter, minimalUUIDCompletionInput);
+		this.firstOfArgument = new FirstOfArgument(name + ":firstOf", Arrays.asList(playerNameArgument, playerUUIDArgument), false, false);
+		firstOfArgument.setParent(this);
 	}
 
 	@Override

@@ -58,7 +58,7 @@ public class PlayerByNameArgument extends CommandArgument<Player> {
 		};
 		// always match known names: we keep track of the matched player to avoid duplicate name lookups later (eg. for
 		// the filters)
-		this.playerNameArgument = new PlayerNameArgument(name, nameFilter, true, minimalCompletionInput) {
+		this.playerNameArgument = new PlayerNameArgument(name + ":name", nameFilter, true, minimalCompletionInput) {
 			@Override
 			protected String matchKnownId(String input) {
 				Player player = PlayerByNameArgument.this.matchPlayer(input);
@@ -68,6 +68,7 @@ public class PlayerByNameArgument extends CommandArgument<Player> {
 				return (player == null) ? input : player.getName();
 			}
 		};
+		playerNameArgument.setParent(this);
 	}
 
 	private Player getPlayerByName(String name) {

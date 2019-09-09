@@ -41,8 +41,8 @@ public class PlayerNameArgument extends ObjectNameArgument {
 		public String getInvalidArgumentErrorMsg(CommandArgument<String> argument, String input, String value) {
 			if (input == null) input = "";
 			return TextUtils.replaceArgs(Settings.msgCommandPlayerArgumentInvalid,
-					"{argumentName}", argument.getName(),
-					"{argumentFormat}", argument.getFormat(),
+					"{argumentName}", argument.getRootArgument().getName(),
+					"{argumentFormat}", argument.getRootArgument().getFormat(),
 					"{argument}", input);
 		}
 	};
@@ -67,8 +67,8 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	@Override
 	public String getMissingArgumentErrorMsg() {
 		return TextUtils.replaceArgs(Settings.msgCommandPlayerArgumentMissing,
-				"{argumentName}", this.getName(),
-				"{argumentFormat}", this.getFormat());
+				"{argumentName}", this.getRootArgument().getName(),
+				"{argumentFormat}", this.getRootArgument().getFormat());
 	}
 
 	// using the filter's 'invalid player' message if the name is not accepted
