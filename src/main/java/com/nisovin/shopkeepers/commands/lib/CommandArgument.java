@@ -165,7 +165,7 @@ public abstract class CommandArgument<T> {
 	 * {@link CommandArgument}s can implement this to return a reduced format for this argument.
 	 * <p>
 	 * Usually the reduced format does simply not contain any surrounding brackets and gets then used by
-	 * {@link #getFormat()} or by other {@link CommandArgument}s which wrap this reduced format into their format.
+	 * {@link #getFormat()} or by other {@link CommandArgument}s which embed this reduced format into their format.
 	 * <p>
 	 * The returned format can be empty for 'hidden arguments'. Often these don't require any textual user input, but
 	 * may still inject information into the {@link CommandContext} depending on the context of command execution. An
