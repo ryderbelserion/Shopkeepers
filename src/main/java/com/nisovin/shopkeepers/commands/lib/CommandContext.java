@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.commands.lib;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -115,5 +116,27 @@ public class CommandContext {
 			return false;
 		}
 		return parsedArgs.containsKey(key);
+	}
+
+	/**
+	 * Gets an unmodifiable map view on the command context.
+	 * 
+	 * @return an unmodifiable map view on the command context
+	 */
+	public Map<String, Object> getMapView() {
+		if (parsedArgs == null) {
+			return Collections.emptyMap();
+		} else {
+			return Collections.unmodifiableMap(parsedArgs);
+		}
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CommandContext [parsedArgs=");
+		builder.append(parsedArgs);
+		builder.append("]");
+		return builder.toString();
 	}
 }

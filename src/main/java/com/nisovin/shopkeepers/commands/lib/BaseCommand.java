@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class BaseCommand extends Command implements org.bukkit.command.CommandExecutor, TabCompleter {
@@ -30,14 +31,17 @@ public abstract class BaseCommand extends Command implements org.bukkit.command.
 	@Override
 	public boolean onCommand(CommandSender sender, org.bukkit.command.Command command, String usedAlias, String[] args) {
 		CommandInput input = new CommandInput(sender, command.getName(), usedAlias);
+		CommandContext commandContext = new CommandContext();
+		CommandArgs commandArgs = new CommandArgs(args);
 		try {
-			this.handleCommand(input, new CommandContext(), new CommandArgs(args));
+			this.handleCommand(input, commandContext, commandArgs);
 		} catch (CommandException e) {
 			TextUtils.sendMessage(sender, e.getMessage());
 		} catch (Exception e) {
 			// an unexpected exception was caught:
 			TextUtils.sendMessage(sender, ChatColor.RED + "An error occurred during command handling! Check the console log.");
-			e.printStackTrace();
+			Log.severe("An error occurred during command handling!", e);
+			Log.severe(commandContext.toString());
 		}
 
 		// we completely handle the command, including printing usage or help on syntax failure:
