@@ -97,11 +97,12 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 	}
 
 	@Override
-	public void parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
+	public Pair<CommandArgument<?>, Object> parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
 		Object state = args.getState();
 		Pair<CommandArgument<?>, Object> result;
 		try {
-			result = this.parseValue(input, args);
+			// with context, so that the child argument can store its value(s)
+			result = this.parseValue(input, context, args);
 		} catch (ArgumentParseException e) {
 			// restore previous args state:
 			args.setState(state);
@@ -109,19 +110,18 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 		}
 		if (result != null) {
 			context.put(this.getName(), result);
-
-			// store the parsed result under the parsed argument's name:
-			CommandArgument<?> argument = result.getFirst();
-			Object value = result.getSecond();
-			if (argument != null && value != null) {
-				context.put(argument.getName(), value);
-			}
 		}
+		return result;
 	}
 
 	// returns a pair with the argument and the parsed value, or null if nothing was parsed
 	@Override
 	public Pair<CommandArgument<?>, Object> parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+		return this.parseValue(input, null, args); // without context
+	}
+
+	// context != null: use 'parse' rather than 'parseValue' in order to let the child argument store its parsed value
+	private Pair<CommandArgument<?>, Object> parseValue(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
 		// try one after the other:
 		Object state = args.getState();
 		Object value = null;
@@ -131,7 +131,11 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 		ArgumentParseException firstParseException = null;
 		for (CommandArgument<?> argument : arguments) {
 			try {
-				value = argument.parseValue(input, args);
+				if (context != null) {
+					value = argument.parse(input, context, args);
+				} else {
+					value = argument.parseValue(input, args);
+				}
 				if (value != null) {
 					// we successfully parsed something:
 					return Pair.of(argument, value);

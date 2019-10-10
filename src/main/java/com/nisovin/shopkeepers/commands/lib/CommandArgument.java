@@ -249,10 +249,11 @@ public abstract class CommandArgument<T> {
 	 *            the context which will store the parsed value
 	 * @param args
 	 *            the command arguments from which the value will get extracted from
+	 * @return the parsed value, or <code>null</code> if nothing was parsed
 	 * @throws ArgumentParseException
 	 *             if unable to parse a value
 	 */
-	public void parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
+	public T parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
 		Object state = args.getState();
 		T value;
 		try {
@@ -265,6 +266,7 @@ public abstract class CommandArgument<T> {
 		if (value != null) {
 			context.put(name, value);
 		}
+		return value;
 	}
 
 	/**

@@ -36,16 +36,19 @@ public class OptionalArgument<T> extends CommandArgument<T> {
 	}
 
 	@Override
-	public void parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
+	public T parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
 		Object state = args.getState();
+		T value;
 		try {
 			// let the wrapped argument handle the parsing:
-			argument.parse(input, context, args);
+			value = argument.parse(input, context, args);
 		} catch (ArgumentParseException e) {
 			assert this.isOptional();
+			value = null;
 			// restore previous args state:
 			args.setState(state);
 		}
+		return value;
 	}
 
 	@Override

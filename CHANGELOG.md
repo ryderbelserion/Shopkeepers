@@ -34,6 +34,8 @@ Date format: (YYYY-MM-DD)
   * Internal: Added AliasArgument, that can be used to change the display name of an command argument (used in the command format). This may for example be useful in the presence of multiple, otherwise conflicting literal arguments.
   * Internal: Minor changes to handling errors during command handling. Besides the stack trace, the plugin also logs the command context (parsed arguments) now.
   * Internal: Added map view and toString to CommandContext.
+  * Internal: CommandArgument#parse now also returns the parsed value. This is useful when there is a chain of wrapped arguments and the parent needs to handle the value parsed by the child argument in some way.
+  * Fixed: Chains of FirstOfArguments should now be able to properly store all the values parsed by child arguments along the chain. Previously this only worked for a chain depth of 1.
 * Fixed: The shop creation item can no longer be used from dispensers if regular use is disabled.
 
 ## v2.8.1 (2019-08-23)

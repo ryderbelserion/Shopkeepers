@@ -65,14 +65,16 @@ public abstract class FallbackArgument<T> extends CommandArgument<T> {
 	}
 
 	@Override
-	public void parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
+	public T parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
 		Object state = args.getState();
+		T value;
 		try {
-			argument.parse(input, context, args);
+			value = argument.parse(input, context, args);
 		} catch (ArgumentParseException e) {
 			args.setState(state); // reset arguments
 			throw new FallbackArgumentException(this, e); // throw fallback exception
 		}
+		return value;
 	}
 
 	@Override
