@@ -11,7 +11,7 @@ Date format: (YYYY-MM-DD)
 * Various (mostly internal) changes to commands and argument parsing:
   * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information. A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
   * Most optional arguments, default values and fallbacks were updated to use this new fallback mechanism, which should provide more relevant error messages in a few edge cases.
-  * "list", "remove", "transfer" and "setTradePerm" commands can be used from console now. Command confirmations work for the console well now (any command sender that is not a player is considered to be the 'console' for this purpose).
+  * "list", "remove", "transfer" and "setTradePerm" commands can be used from console now. Command confirmations work for the console as well now (any command sender that is not a player is considered to be the 'console' for this purpose).
   * "setForHire" and "transfer" commands allow specifying the shopkeeper via argument now. Also: When targeting a chest that happens to be used by multiple shopkeepers (eg. due to manually modified save data..), it picks the first one now (instead of applying the command to all shops). In the future this will likely print an error message instead.
   * "debugCreateShops" command: Shop count per command invocation is limited to 1000 now.
   * All argument suggestions are limited to 20 entries by default now.
@@ -27,7 +27,7 @@ Date format: (YYYY-MM-DD)
   * Internal: CommandArgs no longer makes a copy of the passed arguments.
   * Internal: When resetting CommandArgs to a previous state they ensure now that the state got created from the same CommandArgs instance.
   * Internal: Added type parameter to CommandArgument.
-  * Internal: Added ArgumentRejectedException and PostponedArgumentParseException, which can be used to providing more relevant error messages.
+  * Internal: Added ArgumentRejectedException and PostponedArgumentParseException, which can be used to provide more relevant error messages.
   * Internal: Added more general BoundedIntegerArgument. PositiveIntegerArgument makes use of it.
   * Internal: Moved ArgumentFilter into base commands lib package.
   * Internal: CommandArguments keep track of their parent argument now (if used internally by another argument) and use that for their error messages.
