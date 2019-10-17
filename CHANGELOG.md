@@ -60,6 +60,7 @@ Other internal changes:
 
 Changed messages (you will have to manually update those!):  
 * msg-list-shops-entry: 'object type' changed to 'object', and the arguments '{shopSessionId}' and '{shopId}' changed to '{shopId}' and '{shopUUID}' respectively. Argument '{shopSessionId}' still works but will likely get removed in the future.
+* msg-villager-for-hire: The german translation was slightly changed.
 
 Removed messages:  
 * The default german translation contained a few no longer used messages: msg-button-type and msg-button-type-lore

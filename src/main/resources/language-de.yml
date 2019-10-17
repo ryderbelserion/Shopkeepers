@@ -198,7 +198,7 @@ msg-hired: "&aDu hast diesen Shop gekauft!"
 msg-missing-hire-perm: "&7Dir fehlt die nötige Berechtigung, um Shops zu kaufen."
 msg-cant-hire: "&7Du kannst es dir nicht leisten, diesen Shop zu kaufen."
 msg-cant-hire-shop-type: "&7Dir fehlt die nötige Berechtigung, um diesen Typ von Shop zu kaufen."
-msg-villager-for-hire: "&aDieser Dorfbewohner bietet dir seine Dienste als Shopkeeper im Tausch für &6{costs}x {hire-item}&a an."
+msg-villager-for-hire: "&aDieser Dorfbewohner bietet dir im Tausch für &6{costs}x {hire-item}&a seine Dienste als Händler an."
 
 msg-missing-trade-perm: "&7Du hast nicht die nötige Befugnis, um mit diesem Shop zu handeln."
 msg-missing-custom-trade-perm: "&7Du hast nicht die nötige Befugnis, um mit diesem Shop zu handeln."
