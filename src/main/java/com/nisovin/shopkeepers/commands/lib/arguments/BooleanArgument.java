@@ -20,12 +20,12 @@ public class BooleanArgument extends CommandArgument<Boolean> {
 	@Override
 	public Boolean parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
-			throw this.missingArgument();
+			throw this.missingArgumentError();
 		}
 		String argument = args.next();
 		Boolean value = ConversionUtils.parseBoolean(argument);
 		if (value == null) {
-			throw this.invalidArgument(argument);
+			throw this.invalidArgumentError(argument);
 		}
 		return value;
 	}

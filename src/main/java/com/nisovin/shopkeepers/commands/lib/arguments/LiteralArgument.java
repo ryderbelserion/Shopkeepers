@@ -48,7 +48,7 @@ public class LiteralArgument extends CommandArgument<String> {
 	@Override
 	public String parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
-			throw this.missingArgument();
+			throw this.missingArgumentError();
 		}
 
 		String argument = args.next();
@@ -60,7 +60,7 @@ public class LiteralArgument extends CommandArgument<String> {
 			}
 		}
 		if (value == null) {
-			throw this.invalidArgument(argument);
+			throw this.invalidArgumentError(argument);
 		}
 		return value;
 	}

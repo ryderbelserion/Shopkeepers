@@ -19,12 +19,12 @@ public class IntegerArgument extends CommandArgument<Integer> {
 	@Override
 	public Integer parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
-			throw this.missingArgument();
+			throw this.missingArgumentError();
 		}
 		String argument = args.next();
 		Integer value = ConversionUtils.parseInt(argument);
 		if (value == null) {
-			throw this.invalidArgument(argument);
+			throw this.invalidArgumentError(argument);
 		}
 		return value;
 	}

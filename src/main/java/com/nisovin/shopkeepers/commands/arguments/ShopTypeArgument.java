@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 
@@ -25,21 +26,20 @@ public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 	@Override
 	public String getInvalidArgumentErrorMsg(String argumentInput) {
 		if (argumentInput == null) argumentInput = "";
+		String[] defaultArgs = this.getDefaultErrorMsgArgs();
 		return TextUtils.replaceArgs(Settings.msgCommandShopTypeArgumentInvalid,
-				"{argumentName}", this.getRootArgument().getName(),
-				"{argumentFormat}", this.getRootArgument().getFormat(),
-				"{argument}", argumentInput);
+				Utils.concat(defaultArgs, "{argument}", argumentInput));
 	}
 
 	@Override
 	public ShopType<?> parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
-			throw this.missingArgument();
+			throw this.missingArgumentError();
 		}
 		String argument = args.next();
 		ShopType<?> value = ShopkeepersPlugin.getInstance().getShopTypeRegistry().match(argument);
 		if (value == null) {
-			throw this.invalidArgument(argument);
+			throw this.invalidArgumentError(argument);
 		}
 		return value;
 	}

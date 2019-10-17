@@ -7,6 +7,7 @@ Date format: (YYYY-MM-DD)
 ## v2.8.2 (TBA)
 ### Supported MC versions: 1.14.4
 
+* Fixed: The shop creation item can no longer be used from dispensers if regular use is disabled.
 * Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored now by the commands.
 * Various (mostly internal) changes to commands and argument parsing:
   * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information. A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
@@ -35,8 +36,18 @@ Date format: (YYYY-MM-DD)
   * Internal: Minor changes to handling errors during command handling. Besides the stack trace, the plugin also logs the command context (parsed arguments) now.
   * Internal: Added map view and toString to CommandContext.
   * Internal: CommandArgument#parse now also returns the parsed value. This is useful when there is a chain of wrapped arguments and the parent needs to handle the value parsed by the child argument in some way.
-  * Fixed: Chains of FirstOfArguments should now be able to properly store all the values parsed by child arguments along the chain. Previously this only worked for a chain depth of 1.
-* Fixed: The shop creation item can no longer be used from dispensers if regular use is disabled.
+  * Internal/Fixed: Chains of FirstOfArguments should now be able to properly store all the values parsed by child arguments along the chain. Previously this only worked for a chain depth of 1.
+  * Internal: Clarified CommandArgument#isOptional javadoc.
+  * Internal: Validating that no arguments with the same name are added to the same command.
+  * Internal: Added MissingArgumentException and InvalidArgumentException (which ArgumentRejectedException extends) which allows specifically handling those types of exceptions.
+  * Internal: Renamed CommandArgument#missingArgument and #invalidArgument to #missingArgumentError and #invalidArgumentError.
+  * Internal: Added CommandArgument#requiresPlayerError with a corresponding default message (msg-command-argument-requires-player) for arguments that require a player as executor.
+  
+Other internal changes:  
+* Internal: Added Utils#concat() for arrays.
+
+New messages:  
+* msg-command-argument-requires-player
 
 ## v2.8.1 (2019-08-23)
 ### Supported MC versions: 1.14.4

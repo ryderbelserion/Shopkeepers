@@ -28,11 +28,11 @@ public class UUIDArgument extends CommandArgument<UUID> {
 	public UUID parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		String uuidArg = args.nextIfPresent();
 		if (uuidArg == null) {
-			throw this.missingArgument();
+			throw this.missingArgumentError();
 		} else {
 			UUID uuid = ConversionUtils.parseUUID(uuidArg);
 			if (uuid == null) {
-				throw this.invalidArgument(uuidArg);
+				throw this.invalidArgumentError(uuidArg);
 			} else {
 				return uuid;
 			}

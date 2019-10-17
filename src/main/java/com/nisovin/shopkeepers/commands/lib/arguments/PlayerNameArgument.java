@@ -66,9 +66,8 @@ public class PlayerNameArgument extends ObjectNameArgument {
 
 	@Override
 	public String getMissingArgumentErrorMsg() {
-		return TextUtils.replaceArgs(Settings.msgCommandPlayerArgumentMissing,
-				"{argumentName}", this.getRootArgument().getName(),
-				"{argumentFormat}", this.getRootArgument().getFormat());
+		String[] defaultArgs = this.getDefaultErrorMsgArgs();
+		return TextUtils.replaceArgs(Settings.msgCommandPlayerArgumentMissing, defaultArgs);
 	}
 
 	// using the filter's 'invalid player' message if the name is not accepted

@@ -640,6 +640,7 @@ msg-no-permission: "&cYou don't have the permission to do that."
 
 msg-command-unknown: "&cUnknown command '&e{command}&c'!"
 msg-command-argument-unexpected: "&cUnexpected argument '&e{argument}&c'."
+msg-command-argument-requires-player: "&cArgument '&e{argumentFormat}&c' requires a player to execute the command."
 msg-command-argument-missing: "&cMissing argument '&e{argumentFormat}&c'."
 msg-command-argument-invalid: "&cInvalid argument '&e{argument}&c'."
 msg-command-player-argument-missing: "&cNo player specified for '&e{argumentFormat}&c'."

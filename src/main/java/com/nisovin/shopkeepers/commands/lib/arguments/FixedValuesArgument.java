@@ -28,7 +28,7 @@ public class FixedValuesArgument extends CommandArgument<Object> {
 	@Override
 	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
-			throw this.missingArgument();
+			throw this.missingArgumentError();
 		}
 		String argument = args.next();
 		Object value = values.get(argument);
@@ -38,7 +38,7 @@ public class FixedValuesArgument extends CommandArgument<Object> {
 			if (value == null) {
 				value = values.get(argument.toUpperCase(Locale.ROOT));
 				if (value == null) {
-					throw this.invalidArgument(argument);
+					throw this.invalidArgumentError(argument);
 				}
 			}
 		}

@@ -424,6 +424,7 @@ public class Settings {
 
 	public static String msgCommandUnknown = "&cUnknown command '&e{command}&c'!";
 	public static String msgCommandArgumentUnexpected = "&cUnexpected argument '&e{argument}&c'.";
+	public static String msgCommandArgumentRequiresPlayer = "&cArgument '&e{argumentFormat}&c' requires a player to execute the command.";
 	public static String msgCommandArgumentMissing = "&cMissing argument '&e{argumentFormat}&c'.";
 	public static String msgCommandArgumentInvalid = "&cInvalid argument '&e{argument}&c'.";
 	public static String msgCommandPlayerArgumentMissing = "&cNo player specified for '&e{argumentFormat}&c'.";

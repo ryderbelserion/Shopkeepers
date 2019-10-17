@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.IntegerArgument;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class ShopkeeperByIdArgument extends CommandArgument<Shopkeeper> {
 
@@ -38,10 +39,9 @@ public class ShopkeeperByIdArgument extends CommandArgument<Shopkeeper> {
 	@Override
 	public String getInvalidArgumentErrorMsg(String argumentInput) {
 		if (argumentInput == null) argumentInput = "";
+		String[] defaultArgs = this.getDefaultErrorMsgArgs();
 		return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentInvalid,
-				"{argumentName}", this.getRootArgument().getName(),
-				"{argumentFormat}", this.getRootArgument().getFormat(),
-				"{argument}", argumentInput);
+				Utils.concat(defaultArgs, "{argument}", argumentInput));
 	}
 
 	@Override
@@ -50,7 +50,7 @@ public class ShopkeeperByIdArgument extends CommandArgument<Shopkeeper> {
 		Integer shopId = idArgument.parseValue(input, args);
 		Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperById(shopId);
 		if (shopkeeper == null) {
-			throw this.invalidArgument(args.current());
+			throw this.invalidArgumentError(args.current());
 		} else if (!filter.test(shopkeeper)) {
 			throw new ArgumentRejectedException(filter.getInvalidArgumentErrorMsg(this, args.current(), shopkeeper));
 		} else {

@@ -24,7 +24,7 @@ public class BoundedIntegerArgument extends IntegerArgument {
 		Integer value = super.parseValue(input, args);
 		assert value != null;
 		if (value < min || value > max) {
-			throw this.invalidArgument(args.current());
+			throw this.invalidArgumentError(args.current());
 		}
 		return value;
 	}

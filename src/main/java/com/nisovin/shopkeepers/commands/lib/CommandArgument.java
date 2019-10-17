@@ -1,12 +1,13 @@
 package com.nisovin.shopkeepers.commands.lib;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -14,21 +15,6 @@ import com.nisovin.shopkeepers.util.Validate;
  *            the type of the parsed argument
  */
 public abstract class CommandArgument<T> {
-
-	/**
-	 * Dummy {@link CommandArgument} used internally to indicate that an argument has no parent.
-	 */
-	private static final CommandArgument<Object> NO_PARENT = new CommandArgument<Object>("NO_PARENT") {
-		@Override
-		public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-			return null;
-		}
-
-		@Override
-		public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-			return Collections.emptyList();
-		}
-	};
 
 	/**
 	 * The recommended default limit on the number of command suggestions.
@@ -42,12 +28,12 @@ public abstract class CommandArgument<T> {
 	public static final String OPTIONAL_FORMAT_SUFFIX = "]";
 
 	private final String name;
-	private CommandArgument<?> parent = null; // can be null if not yet set
+	private Optional<CommandArgument<?>> parent = null; // null if not yet set, empty if it has no parent
 
 	/**
 	 * Create a new {@link CommandArgument}.
 	 * <p>
-	 * The argument name can not contain any whitespace and should be unique among all arguments of the same command.
+	 * The argument name can not contain any whitespace and has to be unique among all arguments of the same command.
 	 * <p>
 	 * Some compound arguments may delegate parsing to internal arguments. To avoid naming conflicts, the character
 	 * <code>:</code> is reserved for use by those internal arguments.
@@ -80,26 +66,27 @@ public abstract class CommandArgument<T> {
 	 */
 	public final void setParent(CommandArgument<?> parent) {
 		Validate.isTrue(this.parent == null, "Parent has already been set!");
-		this.parent = (parent == null) ? NO_PARENT : parent;
+		Validate.isTrue(parent != this, "Cannot set parent to self!");
+		this.parent = Optional.ofNullable(parent); // can be empty
 	}
 
 	/**
 	 * Gets the parent argument.
 	 * <p>
-	 * The parent being not <code>null</code> indicates that this argument is not a top-level (root) argument, but is
-	 * used internally by another argument.
+	 * The parent being <code>null</code> indicates that either the parent hasn't been set yet, or this argument is a
+	 * top-level (root) argument. Otherwise this argument is used internally by another (the parent) argument.
 	 * 
 	 * @return the parent argument, can be <code>null</code>
 	 */
 	public final CommandArgument<?> getParent() {
-		return (parent == NO_PARENT) ? null : parent;
+		return (parent == null) ? null : parent.orElse(null);
 	}
 
 	/**
 	 * Gets the root argument.
 	 * <p>
 	 * This follows the chain of parent arguments to the top-level argument which itself does not have any parent. If
-	 * this argument does not have a parent, then this argument is returned.
+	 * this argument does not have a parent, then this argument itself is returned.
 	 * 
 	 * @return the root argument, not <code>null</code>
 	 */
@@ -114,10 +101,12 @@ public abstract class CommandArgument<T> {
 	}
 
 	/**
-	 * Checks whether this {@link CommandArgument} is optional.
+	 * Returns whether this {@link CommandArgument} is optional.
 	 * <p>
-	 * Optional command arguments do not strictly require any input, but may for example provide a fallback or default
-	 * value if no value is specified by the user.
+	 * Optional command arguments do not necessarily require any user input. This includes not only arguments that are
+	 * actually optional in the sense that the user can decide to use or not use some command option, but also arguments
+	 * that provide some kind of fallback handling that injects a default or context dependent value if none is
+	 * specified by the user. The fallback handling may however fail as well.
 	 * <p>
 	 * The return value of this method alone does not change the argument's parsing behavior, but only acts as indicator
 	 * for other components. This is for example used to pick a different format to visually mark this argument as
@@ -180,23 +169,82 @@ public abstract class CommandArgument<T> {
 		return name;
 	}
 
+	// COMMON ERRORS
+
+	/**
+	 * Gets the common default error message arguments.
+	 * <p>
+	 * This includes:
+	 * <ul>
+	 * <li><code>{argumentName}</code>
+	 * <li><code>{argumentFormat}</code>
+	 * </ul>
+	 * This uses the {@link #getRootArgument() root argument} for determining the argument name and format. If the
+	 * format is empty (eg. for hidden arguments), the name is used instead.
+	 * 
+	 * @return the common default error message arguments
+	 */
+	protected final String[] getDefaultErrorMsgArgs() {
+		CommandArgument<?> rootArgument = this.getRootArgument();
+		String name = rootArgument.getName();
+		String format = rootArgument.getFormat();
+		// use the name in case the format is empty (eg. for hidden arguments):
+		if (format.isEmpty()) {
+			format = name;
+		}
+		return new String[] {
+
+		};
+	}
+
+	/**
+	 * Gets the 'requires a player' error message.
+	 * <p>
+	 * When overriding this method, consider using {@link #getDefaultErrorMsgArgs()} for the common message arguments.
+	 * 
+	 * @return the error message
+	 */
+	public String getRequiresPlayerErrorMsg() {
+		String[] defaultArgs = this.getDefaultErrorMsgArgs();
+		return TextUtils.replaceArgs(Settings.msgCommandArgumentRequiresPlayer, defaultArgs);
+	}
+
+	/**
+	 * This creates a {@link ArgumentParseException} with the 'requires a player' error message.
+	 * 
+	 * @return the exception
+	 * @see #getRequiresPlayerErrorMsg()
+	 */
+	protected final RequiresPlayerArgumentException requiresPlayerError() {
+		return new RequiresPlayerArgumentException(this.getRequiresPlayerErrorMsg());
+	}
+
 	/**
 	 * Gets the 'missing argument' error message.
 	 * <p>
-	 * When overriding this method, consider using {@link #getRootArgument()} for the argument name and format.
+	 * When overriding this method, consider using {@link #getDefaultErrorMsgArgs()} for the common message arguments.
 	 * 
 	 * @return the error message
 	 */
 	public String getMissingArgumentErrorMsg() {
-		return TextUtils.replaceArgs(Settings.msgCommandArgumentMissing,
-				"{argumentName}", this.getRootArgument().getName(),
-				"{argumentFormat}", this.getRootArgument().getFormat());
+		String[] defaultArgs = this.getDefaultErrorMsgArgs();
+		return TextUtils.replaceArgs(Settings.msgCommandArgumentMissing, defaultArgs);
+	}
+
+	/**
+	 * This creates a {@link MissingArgumentException} with the 'missing argument' error message.
+	 * 
+	 * @return the exception
+	 * @see #getMissingArgumentErrorMsg()
+	 */
+	protected final MissingArgumentException missingArgumentError() {
+		return new MissingArgumentException(this.getMissingArgumentErrorMsg());
 	}
 
 	/**
 	 * Gets the 'invalid argument' error message.
 	 * <p>
-	 * When overriding this method, consider using {@link #getRootArgument()} for the argument name and format.
+	 * When overriding this method, consider using {@link #getDefaultErrorMsgArgs()} for the common message arguments.
 	 * 
 	 * @param argumentInput
 	 *            the argument input
@@ -204,40 +252,28 @@ public abstract class CommandArgument<T> {
 	 */
 	public String getInvalidArgumentErrorMsg(String argumentInput) {
 		if (argumentInput == null) argumentInput = "";
+		String[] defaultArgs = this.getDefaultErrorMsgArgs();
 		return TextUtils.replaceArgs(Settings.msgCommandArgumentInvalid,
-				"{argumentName}", this.getRootArgument().getName(),
-				"{argumentFormat}", this.getRootArgument().getFormat(),
-				"{argument}", argumentInput);
+				Utils.concat(defaultArgs, "{argument}", argumentInput));
 	}
 
 	/**
-	 * This creates an {@link ArgumentParseException} with the 'missing argument' error message.
+	 * This creates an {@link InvalidArgumentException} with the 'invalid argument' error message.
 	 * 
-	 * @return the created exception
-	 * @see #getMissingArgumentErrorMsg()
-	 */
-	protected final ArgumentParseException missingArgument() {
-		return new ArgumentParseException(this.getMissingArgumentErrorMsg());
-	}
-
-	/**
-	 * This creates an {@link ArgumentParseException} with the 'invalid argument' error message.
-	 * 
-	 * @return the created exception
+	 * @param argumentInput
+	 *            the invalid argument input
+	 * @return the exception
 	 * @see #getInvalidArgumentErrorMsg(String)
-	 * 
-	 * @param argument
-	 *            the invalid argument input from the {@link CommandArgs}
 	 */
-	protected final ArgumentParseException invalidArgument(String argument) {
-		return new ArgumentParseException(this.getInvalidArgumentErrorMsg(argument));
+	protected final InvalidArgumentException invalidArgumentError(String argumentInput) {
+		return new InvalidArgumentException(this.getInvalidArgumentErrorMsg(argumentInput));
 	}
 
 	/**
 	 * Parses a value for this argument via {@link #parseValue(CommandInput, CommandArgs)} and stores it in the
 	 * {@link CommandContext} with the argument's name as key.
 	 * <p>
-	 * This moves the cursor of the {@link CommandArgs} forward for all successfully used-up arguments. In case parsing
+	 * This moves the cursor of the {@link CommandArgs} forward for all successfully used-up arguments. If parsing
 	 * fails, the state of the {@link CommandArgs} gets restored.
 	 * <p>
 	 * If parsing returns <code>null</code> (i.e. for optional arguments), then nothing gets stored in the

@@ -29,7 +29,7 @@ public class StringArgument extends CommandArgument<String> {
 	@Override
 	public String parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
-			throw this.missingArgument();
+			throw this.missingArgumentError();
 		}
 		if (joinRemainingArgs) {
 			return getJoinedRemainingArgs(args);

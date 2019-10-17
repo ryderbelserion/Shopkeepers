@@ -7,6 +7,9 @@ Mid priority:
 
 
 Low priority:
+* German translation:
+  * Rename all occurrences of 'Shop/Shops' with 'Laden/Läden/Händler'?
+
 * Command library revamp:
   * Allow arguments to change the following arguments, similar to how subcommands have different chains of arguments
     * Eg. /shopkeeper info ['own'|'admin'|<player>] <shopkeeper>: Different suggestions/allowed arguments for the second argument depending on the first argument
@@ -16,6 +19,23 @@ Low priority:
       * Eg. /region <region> removeMember <member>: Only suggest members that are part of the region
   * Bind executing code directly to an argument chain, to avoid having to manually check the CommandContext for which arguments got actually parsed
   * Allow for easier debugging of command execution and argument parsing (without introducing plugin-specific logging dependencies into the library classes).
+    * Maybe define separate logging interface for the command lib, current the Log class is used directly
+    * The same applies for any other utilities and plugin-specific stuff
+  * Dealing with ambiguities:
+    * Example: /list [player (default:sender)] [page (default:1)])
+      * "/list 123" ("123" is a valid player name!)
+      * Also: "/list 123 2" would currently try to parse "123" as page number and then print an error due to the unexpected "2" due to the fallback mechanic used for the player argument
+    * Warning if command/arguments allow for ambiguity? Eg. by letting arguments provide a list of examples and evaluating all possible combinations
+    * Parse all possible argument assignments and print a warning if the input is ambigous?
+    * Allow resolving ambiguities by explicitly binding arguments, eg. "/list player=blablubbabc page=3"
+      * or '::' or ':=' or '!='? '=' might likely be used/useful in various arguments as well, and ':' alone is ambiguous because the use in namespaces
+      * or "/list -player blablubbabc -page 2" ? or "/list !player=blablubbabc !page=2"?
+      * Also allow for multi-part arguments: "/text text='some text'"
+      * And empty/missing argument: "/list player='' 1" (player argument is optional)
+      * Problem: FirstOf arguments with literals can internally have ambiguities as well, eg. "/list <'all'|player>" (with an existing player named 'all')
+        * This is only a problem if the sub arguments are joined to a single name in the argument format (which unusual if literal arguments are involved)
+    * Allow quoted string parsing "'some text'" (accepting "" and '' and ``)
+      * Also: "{some: map, like: data}"
 
 * Prohibit multiple shopkeepers using the same chest (currently only possible by manually editing the save file)?
   * Or make this an official 'feature'? (Allowing players to link multiple of their shops to the same chest.
@@ -37,9 +57,6 @@ Low priority:
 * set entity attributes (subtypes/look) before spawning the entity (avoids short flicker)
 * rename registry#getShopkeeperByBlock() to getShopkeeperBySignBlock or similar?
 * properly separate loading/unloading from activation/deactivation in debug messages/method names/etc
-
-* Rename ShopkeeperRegistry and ShopkeeperStorage to ShopkeepersRegistry and ShopkeepersStorage?
-  * Another major api break though.. maybe do this with the next larger API changes. Or not at all.
 
 * More editor options for mob shopkeepers
   * Allow equipping (and unequipping again) items to mobs

@@ -279,6 +279,7 @@ msg-no-permission: "&cDafür hast du nicht die nötigen Berechtigungen."
 
 msg-command-unknown: "&cUnbekannter Befehl '&e{command}&c'!"
 msg-command-argument-unexpected: "&cUnerwartetes Argument '&e{argument}&c'."
+msg-command-argument-requires-player: "&cArgument '&e{argumentFormat}&c' benötigt einen Spieler zur Ausführung des Befehls."
 msg-command-argument-missing: "&cFehlendes Argument '&e{argumentFormat}&c'."
 msg-command-argument-invalid: "&cUngültiges Argument '&e{argument}&c'."
 msg-command-player-argument-missing: "&cEs wurde kein Spieler angegeben für '&e{argumentFormat}&c'."

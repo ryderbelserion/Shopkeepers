@@ -25,12 +25,12 @@ public class EnumArgument<T extends Enum<T>> extends CommandArgument<T> {
 	@Override
 	public T parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
-			throw this.missingArgument();
+			throw this.missingArgumentError();
 		}
 		String argument = args.next();
 		T value = ConversionUtils.parseEnum(clazz, argument);
 		if (value == null) {
-			throw this.invalidArgument(argument);
+			throw this.invalidArgumentError(argument);
 		}
 		return value;
 	}

@@ -47,9 +47,8 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 
 	@Override
 	public String getMissingArgumentErrorMsg() {
-		return TextUtils.replaceArgs(Settings.msgCommandPlayerArgumentMissing,
-				"{argumentName}", this.getName(),
-				"{argumentFormat}", this.getFormat());
+		String[] defaultArgs = this.getDefaultErrorMsgArgs();
+		return TextUtils.replaceArgs(Settings.msgCommandPlayerArgumentMissing, defaultArgs);
 	}
 
 	// override this to limit which player uuids get used for suggestions

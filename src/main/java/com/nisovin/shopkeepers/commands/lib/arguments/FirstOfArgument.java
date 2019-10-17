@@ -166,6 +166,7 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 		if (fallbackException != null) {
 			// if some argument might be able to provide a fallback, prefer following that path:
 			// TODO but if the fallback turns out failing, we might want to prefer null, rejected or first exception
+			// TODO there might also be more than one applicable fallback
 			throw fallbackException;
 		}
 

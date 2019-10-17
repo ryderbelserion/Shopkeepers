@@ -23,7 +23,7 @@ public class WorldArgument extends CommandArgument<World> {
 	@Override
 	public World parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		if (!args.hasNext()) {
-			throw this.missingArgument();
+			throw this.missingArgumentError();
 		}
 		String argument = args.next();
 		World value = Bukkit.getWorld(argument);
@@ -34,7 +34,7 @@ public class WorldArgument extends CommandArgument<World> {
 				value = Bukkit.getWorld(uuid);
 			}
 			if (value == null) {
-				throw this.invalidArgument(argument);
+				throw this.invalidArgumentError(argument);
 			}
 		}
 		return value;

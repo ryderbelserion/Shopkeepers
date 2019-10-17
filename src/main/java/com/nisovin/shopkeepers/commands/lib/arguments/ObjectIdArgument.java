@@ -67,7 +67,7 @@ public abstract class ObjectIdArgument<Id> extends CommandArgument<Id> {
 	public Id parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
 		// prefer this class's missing-argument exception over the id-argument's exception:
 		if (!args.hasNext()) {
-			throw this.missingArgument();
+			throw this.missingArgumentError();
 		}
 		int startIndex = args.getCurrentIndex();
 		// throws exceptions with appropriate messages if the id cannot be parsed:

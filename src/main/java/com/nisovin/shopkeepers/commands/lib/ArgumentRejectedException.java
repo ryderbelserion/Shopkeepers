@@ -1,11 +1,10 @@
 package com.nisovin.shopkeepers.commands.lib;
 
 /**
- *
- * An {@link ArgumentParseException} that indicates that a parsed argument got rejected, for example by an
+ * An {@link InvalidArgumentException} that indicates that a parsed argument got rejected, for example by an
  * {@link ArgumentFilter}.
  */
-public class ArgumentRejectedException extends ArgumentParseException {
+public class ArgumentRejectedException extends InvalidArgumentException {
 
 	private static final long serialVersionUID = 7271352558586958559L;
 

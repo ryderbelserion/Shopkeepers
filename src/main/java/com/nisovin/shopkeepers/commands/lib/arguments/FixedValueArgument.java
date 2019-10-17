@@ -8,25 +8,27 @@ import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.util.ConversionUtils;
 
-public class DoubleArgument extends CommandArgument<Double> {
+/**
+ * A {@link CommandArgument} that returns a fixed value without consuming any arguments.
+ */
+public class FixedValueArgument<T> extends CommandArgument<T> {
 
-	public DoubleArgument(String name) {
+	private final T fixedValue; // can be null
+
+	public FixedValueArgument(String name, T fixedValue) {
 		super(name);
+		this.fixedValue = fixedValue;
 	}
 
 	@Override
-	public Double parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-		if (!args.hasNext()) {
-			throw this.missingArgumentError();
-		}
-		String argument = args.next();
-		Double value = ConversionUtils.parseDouble(argument);
-		if (value == null) {
-			throw this.invalidArgumentError(argument);
-		}
-		return value;
+	public boolean isOptional() {
+		return true; // does not require user input
+	}
+
+	@Override
+	public T parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+		return fixedValue;
 	}
 
 	@Override

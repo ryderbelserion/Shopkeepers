@@ -4,22 +4,22 @@ import com.nisovin.shopkeepers.commands.lib.arguments.FallbackArgument;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
- * Used together with {@link FallbackArgument} to indicate to the processing command that the current command argument
- * wasn't able to parse the current argument, but that it may be able to provide a fallback in case none of the
- * following command arguments are able to parse it either.
+ * Used together with {@link FallbackArgument} to indicate to the processing command that the current
+ * {@link CommandArgument} wasn't able to parse the current argument, but that it may be able to provide a fallback in
+ * case that none of the following command arguments are able to parse it either.
  */
 public class FallbackArgumentException extends ArgumentParseException {
 
 	private static final long serialVersionUID = -2141058556443273342L;
 
-	private final FallbackArgument<?> argument; // not null
+	private final FallbackArgument<?> fallbackArgument; // not null
 	private final ArgumentParseException originalException; // not null
 
-	public FallbackArgumentException(FallbackArgument<?> argument, ArgumentParseException originalException) {
+	public FallbackArgumentException(FallbackArgument<?> fallbackArgument, ArgumentParseException originalException) {
 		super(Validate.notNull(originalException).getMessage(), originalException.getCause());
-		Validate.notNull(argument);
+		Validate.notNull(fallbackArgument);
+		this.fallbackArgument = fallbackArgument;
 		this.originalException = originalException;
-		this.argument = argument;
 	}
 
 	/**
@@ -27,8 +27,8 @@ public class FallbackArgumentException extends ArgumentParseException {
 	 * 
 	 * @return the fallback argument
 	 */
-	public FallbackArgument<?> getArgument() {
-		return argument;
+	public FallbackArgument<?> getFallbackArgument() {
+		return fallbackArgument;
 	}
 
 	/**

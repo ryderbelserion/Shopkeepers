@@ -264,6 +264,23 @@ public abstract class Command {
 	}
 
 	/**
+	 * Gets the argument with the specified name.
+	 * 
+	 * @param name
+	 *            the argument name
+	 * @return the argument, or <code>null</code> if there is no such argument
+	 */
+	public final CommandArgument<?> getArgument(String name) {
+		if (arguments == null) return null;
+		for (CommandArgument<?> argument : arguments) {
+			if (argument.getName().equals(name)) {
+				return argument;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Adds an {@link CommandArgument} to this command.
 	 * 
 	 * @param argument
@@ -271,7 +288,8 @@ public abstract class Command {
 	 */
 	protected final void addArgument(CommandArgument<?> argument) {
 		Validate.notNull(argument, "Argument is null!");
-		Validate.notNull(argument.getParent() != null, "Cannot add argument with parent!");
+		Validate.isTrue(this.getArgument(argument.getName()) == null, "There is already another argument with that name: " + argument.getName());
+		Validate.isTrue(argument.getParent() == null, "Cannot add argument with parent!");
 		// make sure that no parent can be set once the argument has been added:
 		argument.setParent(null); // parent can only be set once
 
@@ -425,7 +443,7 @@ public abstract class Command {
 			return;
 		}
 
-		// postponed ArgumentParseExceptions get only thrown if there are no other exceptions to throw
+		// postponed ArgumentParseException gets only thrown if there is no other exception to throw
 		PostponedArgumentParseException postponedException = null;
 
 		// keep track of fallbacks:
@@ -479,8 +497,8 @@ public abstract class Command {
 					}
 				}
 			} else {
-				// handle fallback(s) if parsing failed, if the current command argument was able to parse arguments, or
-				// if there are no more command arguments to parse:
+				// handle fallback(s) if parsing failed (without providing a fallback itself), if the current command
+				// argument was able to parse arguments, or if there are no more command arguments to parse:
 				boolean parsingFailed = (parseException != null);
 				boolean argumentsConsumed = (success && fallbackArgsIndex != args.getCurrentIndex());
 				boolean finalArgument = (currentArgumentIndex == (argumentsCount - 1));
@@ -488,6 +506,7 @@ public abstract class Command {
 				if (parsingFailed || argumentsConsumed || finalArgument) {
 					// handle pending fallback(s):
 
+					boolean parsingContextChanged = false;
 					// reset context to state before fallback:
 					activeContext = context;
 
@@ -496,6 +515,7 @@ public abstract class Command {
 						// use empty args for fallback(s), because some other command argument was able to parse the
 						// argument which triggered the first fallback:
 						activeArgs = CommandArgs.EMPTY;
+						parsingContextChanged = true;
 					} else {
 						// reset args, just in case:
 						args.setState(fallbackArgsState);
@@ -520,34 +540,87 @@ public abstract class Command {
 						FallbackArgumentException fallback = fallbacks[currentFallbackIndex];
 						if (fallback == null) continue;
 
+						FallbackArgumentException currentFallback = fallback;
 						boolean fallbackSuccess = false;
+						ArgumentParseException fallbackError = null;
+						boolean hasRemainingArgs = activeArgs.getRemainingSize() > 0;
 						int prevArgsIndex = activeArgs.getCurrentIndex();
 						while (true) { // evaluate recursive fallbacks
-							FallbackArgument<?> fallbackArgument = fallback.getArgument();
+							FallbackArgument<?> fallbackArgument = currentFallback.getFallbackArgument();
 							try {
-								fallbackArgument.parseFallback(input, activeContext, activeArgs, fallback);
+								fallbackArgument.parseFallback(input, activeContext, activeArgs, parsingContextChanged, currentFallback);
+								// fallback success:
 								fallbackSuccess = true;
-								break; // continue with next fallback
-							} catch (PostponedArgumentParseException fe) {
-								// keep track of the first postponed exception:
-								if (postponedException == null) {
-									postponedException = (PostponedArgumentParseException) fe;
-								}
-								break; // continue with next fallback
-							} catch (FallbackArgumentException fe) {
+								break;
+							} catch (FallbackArgumentException e) {
 								// got another fallback: evaluate it immediately in the next loop iteration
-								fallback = fe;
+								currentFallback = e;
 								continue;
-							} // else: any other exception gets forwarded and leads to parsing abort
+							} catch (ArgumentParseException e) {
+								// fallback error (possibly postponed):
+								fallbackError = e;
+								break;
+							}
 						}
+						assert fallbackSuccess ^ (fallbackError != null); // xor
 
-						if (fallbackSuccess && prevArgsIndex != activeArgs.getCurrentIndex()) {
-							// fallback did consume arguments: abort fallbacks and restart parsing from here
+						// fallbacks get aborted if some fallback is able to successfully parse something:
+						assert !fallbackConsumedArgs;
+						fallbackConsumedArgs = (prevArgsIndex != activeArgs.getCurrentIndex());
+						// assumption: args state got restored (no args consumed) if parsing failed
+						Validate.State.isTrue(fallbackSuccess || !fallbackConsumedArgs,
+								"Parsing argument fallback failed, but arguments did not get properly reset: "
+										+ fallback.getFallbackArgument().getName());
+
+						if (hasRemainingArgs && !fallbackConsumedArgs) {
+							// there are arguments remaining but the fallback did not consume any of them
+							// regardless of whether the fallback has been successful or not, abort parsing with the
+							// original root exception: TODO move into FallbackArgument?
+
+							// TODO There might be situations in which the following fallbacks may be able to parse
+							// these remaining args. But in the most common cases continuing would currently result in
+							// less good error messages for the user.
+							// Eg. "/list [player (default:self)] [page (default:1)]"
+							// "/list a": 'a' could either be an invalid player, or an invalid page, or an unexpected
+							// argument.
+							// "/list a 2": 'a' is an invalid player. The fallback would produce 'self' as the default
+							// value for the player argument but not consume the 'a'. Continuing with the next fallback
+							// would result in either an 'invalid page' or even (when continuing further) an 'unexpected
+							// argument' error. By aborting early with the original root excpetion, the player gets the
+							// expected 'invalid player' error in this case.
+
+							// TODO Solve these ambiguities, maybe by parsing all possible paths / argument bindings.
+							// Parsing succeeds if there is a single successful binding. If there are multiple
+							// successful bindings, print a warning regarding the ambiguity (requires some way for the
+							// user to resolve it). If there is no successful binding, somehow pick a likely relevant
+							// error message (ambiguous as well, if there are multiple different bindings producing
+							// different errors).
+							throw fallback.getRootException();
+						}
+						assert !hasRemainingArgs || fallbackConsumedArgs;
+
+						if (fallbackConsumedArgs) {
+							assert fallbackSuccess;
+							// The fallback did consume arguments: Abort fallbacks and restart parsing from here
 							// Note: This case can never occur if the active args are empty (if some later command
 							// argument was able to consume arguments)
-							fallbackConsumedArgs = true;
 							break;
-						} // else: continue with next fallback
+						} else if (fallbackError != null) {
+							if (fallbackError instanceof PostponedArgumentParseException) {
+								// keep track of the first postponed exception:
+								if (postponedException == null) {
+									postponedException = (PostponedArgumentParseException) fallbackError;
+								}
+								continue; // then continue with the next fallback
+							} else {
+								// abort parsing with the fallback error:
+								throw fallbackError;
+							}
+						} else {
+							assert fallbackSuccess;
+							// success, but no args consumed: continue with the next fallback
+							continue;
+						}
 					}
 
 					if (fallbackConsumedArgs) {
@@ -558,7 +631,8 @@ public abstract class Command {
 						fallbackIndex = -1; // no longer in fallback mode
 						continue;
 					} else {
-						// no arguments were consumed by the fallback(s), resulting in the same situation as before
+						// fallbacks were successfully evaluated, but no arguments were consumed by them, resulting in
+						// the same situation as before
 						// apply context changes that happened between the fallback and current argument:
 						fallbackContext.applyBuffer();
 						fallbackContext = null;
@@ -587,35 +661,41 @@ public abstract class Command {
 			}
 		}
 
-		if (args.getRemainingSize() > 0) {
-			// remaining, unexpected/unparsed arguments:
-			String firstUnparsedArg = args.peek();
-			if (!this.getChildCommands().getCommands().isEmpty()) {
-				// has child commands: throw an 'unknown command' exception
-				throw new ArgumentParseException(this.getUnknownCommandMessage(firstUnparsedArg));
-			} else {
-				// throw an 'invalid argument' exception for the first unparsed argument after the last parsed argument:
-				CommandArgument<?> firstUnparsedArgument = null;
-				for (CommandArgument<?> argument : Lists.reverse(this.getArguments())) {
-					if (!context.has(argument.getName())) {
-						firstUnparsedArgument = argument;
-					} else {
-						break; // stop at the first (from behind) found parsed argument
-					}
-				}
-				if (firstUnparsedArgument != null) {
-					throw firstUnparsedArgument.invalidArgument(firstUnparsedArg);
+		// handle unparsed arguments (if any):
+		this.handleUnparsedArguments(input, context, args);
+
+		// check if there has been a postponed argument parse exception:
+		if (postponedException != null) {
+			throw postponedException.getRootException();
+		} // else: parsing was successful
+	}
+
+	private void handleUnparsedArguments(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
+		if (args.getRemainingSize() == 0) return; // no unparsed arguments
+
+		// remaining unexpected/unparsed arguments:
+		String firstUnparsedArg = args.peek();
+		if (!this.getChildCommands().getCommands().isEmpty()) {
+			// has child commands: throw an 'unknown command' exception
+			// TODO only use this exception if no arguments got parsed by this command?
+			throw new ArgumentParseException(this.getUnknownCommandMessage(firstUnparsedArg));
+		} else {
+			// throw an 'invalid argument' exception for the first unparsed argument after the last parsed argument:
+			CommandArgument<?> firstUnparsedArgument = null;
+			for (CommandArgument<?> argument : Lists.reverse(this.getArguments())) {
+				if (!context.has(argument.getName())) {
+					firstUnparsedArgument = argument;
 				} else {
-					// throw an 'unexpected argument' exception:
-					throw new ArgumentParseException(TextUtils.replaceArgs(Settings.msgCommandArgumentUnexpected,
-							"{argument}", firstUnparsedArg));
+					break; // stop at the first (from behind) found parsed argument
 				}
 			}
-		}
-
-		// parsing was successful, except if there has been a postponed argument parse exception:
-		if (postponedException != null) {
-			throw postponedException;
+			if (firstUnparsedArgument != null) {
+				throw firstUnparsedArgument.invalidArgumentError(firstUnparsedArg);
+			} else {
+				// throw an 'unexpected argument' exception:
+				throw new ArgumentParseException(TextUtils.replaceArgs(Settings.msgCommandArgumentUnexpected,
+						"{argument}", firstUnparsedArg));
+			}
 		}
 	}
 
