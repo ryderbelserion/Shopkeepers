@@ -67,22 +67,24 @@ public class TradingHandler extends UIHandler {
 		 * The item offered by the player matching the first required item of the used trading recipe (not necessarily
 		 * the item in the first slot), not <code>null</code> or empty.
 		 * <p>
-		 * The type and durability equal those of the required item from the trading recipe. The metadata however can
-		 * differ, but still be accepted for the trade depending on the item matching rules of the used minecraft
-		 * version and the shopkeeper settings (ex. strict item comparison disabled).
+		 * The type equals that of the required item from the trading recipe. The metadata however can differ, but still
+		 * be accepted for the trade depending on the item matching rules of the used minecraft version and the
+		 * shopkeeper settings (ex. strict item comparison disabled).
 		 * <p>
-		 * Note: This is not a copy and might get modified once the trade gets applied!
+		 * Note: This is not a copy and might get modified once the trade gets applied! The stack size matches the
+		 * original stack size of the item used by the player.
 		 */
 		public ItemStack offeredItem1;
 		/**
 		 * The item offered by the player matching the second required item of the used trading recipe (not necessarily
 		 * the item in the second slot), can be <code>null</code>.
 		 * <p>
-		 * The type and durability equal those of the required item from the trading recipe. The metadata however can
-		 * differ, but still be accepted for the trade depending on the item matching rules of the used minecraft
-		 * version and the shopkeeper settings (ex. strict item comparison disabled).
+		 * The type equals that of the required item from the trading recipe. The metadata however can differ, but still
+		 * be accepted for the trade depending on the item matching rules of the used minecraft version and the
+		 * shopkeeper settings (ex. strict item comparison disabled).
 		 * <p>
-		 * Note: This is not a copy and might get modified once the trade gets applied!
+		 * Note: This is not a copy and might get modified once the trade gets applied! The stack size matches the
+		 * original stack size of the item used by the player.
 		 */
 		public ItemStack offeredItem2;
 		/**
@@ -543,8 +545,17 @@ public class TradingHandler extends UIHandler {
 		}
 
 		// call trade event, giving other plugins a chance to cancel the trade before it gets applied:
+		// prepare offered items for the event: clone and ensure stack sizes matching the trading recipe
+		ItemStack eventOfferedItem1 = tradeData.offeredItem1.clone();
+		ItemStack eventOfferedItem2 = ItemUtils.isEmpty(tradeData.offeredItem2) ? null : tradeData.offeredItem2.clone();
+		eventOfferedItem1.setAmount(tradeData.tradingRecipe.getItem1().getAmount());
+		if (eventOfferedItem2 != null) {
+			assert tradeData.tradingRecipe.getItem2() != null;
+			eventOfferedItem2.setAmount(tradeData.tradingRecipe.getItem2().getAmount());
+		}
+
 		ShopkeeperTradeEvent tradeEvent = new ShopkeeperTradeEvent(this.getShopkeeper(), tradeData.tradingPlayer,
-				tradeData.clickEvent, tradeData.tradingRecipe, tradeData.offeredItem1, tradeData.offeredItem2,
+				tradeData.clickEvent, tradeData.tradingRecipe, eventOfferedItem1, eventOfferedItem2,
 				tradeData.swappedItemOrder);
 		Bukkit.getPluginManager().callEvent(tradeEvent);
 		if (tradeEvent.isCancelled()) {

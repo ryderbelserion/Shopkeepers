@@ -11,6 +11,8 @@ Date format: (YYYY-MM-DD)
 * Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored now by the commands.
 * Fixed: Derived settings were not updated when loading messages from a separate language file.
 * Fixed: Improved thread-safety for asynchronous logging operations and settings access.
+* Fixed/API: NPE when accessing a non-existing second offered item from the ShopkeeperTradeEvent.
+* Fixed/API: The offered items inside the ShopkeeperTradeEvent are copies now and their stack sizes match those of the trading recipe.
 
 * Changed: Only printing the 'Config already loaded' message during startup if the debug mode is enabled.
 
