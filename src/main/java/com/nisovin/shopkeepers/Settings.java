@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.EntityType;
@@ -28,12 +29,51 @@ import com.nisovin.shopkeepers.util.Utils;
 public class Settings {
 
 	public static final class DebugOptions {
+		private DebugOptions() {
+		}
 
 		// Logs all events (spams!). Starts slightly delayed. Subsequent calls of the same event get combined into a
 		// single logging entry to slightly reduce spam.
 		public static final String logAllEvents = "log-all-events";
 		// Prints the registered listeners for the first call of each event.
 		public static final String printListeners = "print-listeners";
+	}
+
+	public static boolean isDebugging() {
+		return isDebugging(null);
+	}
+
+	public static boolean isDebugging(String option) {
+		if (Bukkit.isPrimaryThread()) {
+			return Settings.debug && (option == null || Settings.debugOptions.contains(option));
+		} else {
+			AsyncSettings async = Settings.async();
+			return async.debug && (option == null || async.debugOptions.contains(option));
+		}
+	}
+
+	// cached values for settings used asynchronously
+	public static final class AsyncSettings {
+
+		private static volatile AsyncSettings INSTANCE = new AsyncSettings();
+
+		private static void refresh() {
+			INSTANCE = new AsyncSettings();
+		}
+
+		public final boolean debug;
+		public final List<String> debugOptions;
+		public final String fileEncoding;
+
+		private AsyncSettings() {
+			this.debug = Settings.debug;
+			this.debugOptions = new ArrayList<String>(Settings.debugOptions);
+			this.fileEncoding = Settings.fileEncoding;
+		}
+	}
+
+	public static AsyncSettings async() {
+		return AsyncSettings.INSTANCE;
 	}
 
 	/*
@@ -675,6 +715,9 @@ public class Settings {
 	public static void onSettingsChanged() {
 		// prepare derived settings:
 		DerivedSettings.setup();
+
+		// refresh async settings cache:
+		AsyncSettings.refresh();
 	}
 
 	// item utilities:

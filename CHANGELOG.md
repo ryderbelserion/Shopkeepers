@@ -10,6 +10,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: The shop creation item can no longer be used from dispensers if regular use is disabled.
 * Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored now by the commands.
 * Fixed: Derived settings were not updated when loading messages from a separate language file.
+* Fixed: Improved thread-safety for asynchronous logging operations and settings access.
 * Various (mostly internal) changes to commands and argument parsing:  
   * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information. A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
   * Most optional arguments, default values and fallbacks were updated to use this new fallback mechanism, which should provide more relevant error messages in a few edge cases.
@@ -47,6 +48,7 @@ Date format: (YYYY-MM-DD)
 Other internal changes:  
 * Internal: Added Utils#concat() for arrays.
 * Internal: bstats gets shaded into the package '[..].libs.bstats' now.
+* Internal: Added Settings#isDebugging and Settings#isDebugging(option) to conveniently (and thread-safe) check for debugging options.
 
 New messages:  
 * msg-command-argument-requires-player

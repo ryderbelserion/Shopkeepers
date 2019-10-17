@@ -186,8 +186,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 	}
 
+	public SKShopkeepersPlugin() {
+		super();
+	}
+
 	@Override
 	public void onLoad() {
+		Log.setLogger(this.getLogger()); // setup logger early
 		// setting plugin reference early, so it is also available for any code running here:
 		plugin = this;
 		ShopkeepersAPI.enable(this);
@@ -221,6 +226,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	@Override
 	public void onEnable() {
+		assert Log.getLogger() != null; // log should already have been setup
 		// plugin instance and API might already have been set during onLoad:
 		boolean alreadySetup = true;
 		if (plugin == null) {

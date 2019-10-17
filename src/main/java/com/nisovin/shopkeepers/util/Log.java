@@ -4,15 +4,22 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 
 public final class Log {
 
 	private Log() {
 	}
 
+	// gets set early on plugin startup and then (ideally) never unset
+	// -> volatile is therefore not expected to be required
+	private static Logger logger = null;
+
+	public static void setLogger(Logger logger) {
+		Log.logger = logger;
+	}
+
 	public static Logger getLogger() {
-		return ShopkeepersPlugin.getInstance().getLogger();
+		return logger;
 	}
 
 	public static void info(String message) {
@@ -21,7 +28,7 @@ public final class Log {
 	}
 
 	public static void debug(String message) {
-		if (Settings.debug) {
+		if (Settings.isDebugging()) {
 			info(message);
 		}
 	}
