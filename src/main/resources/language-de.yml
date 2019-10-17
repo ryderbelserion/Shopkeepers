@@ -1,3 +1,5 @@
+# Language: de
+
 msg-shop-type-admin-regular: "Admin Shop"
 msg-shop-type-selling: "Verkäufer"
 msg-shop-type-buying: "Ankäufer"
@@ -46,11 +48,6 @@ msg-button-delete-lore:
 msg-button-hire: "&aAnheuern"
 msg-button-hire-lore:
 - Kaufe diesen Shop
-
-msg-button-type: "&aAussehen ändern"
-msg-button-type-lore:
-- Ändert das Aussehen
-- deines Verkäufers
 
 msg-button-sign-variant: "&aSchild-Variante ändern"
 msg-button-sign-variant-lore:
