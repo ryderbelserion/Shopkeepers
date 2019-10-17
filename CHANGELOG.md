@@ -15,6 +15,7 @@ Date format: (YYYY-MM-DD)
 * Fixed/API: The offered items inside the ShopkeeperTradeEvent are copies now and their stack sizes match those of the trading recipe.
 
 * Changed: Only printing the 'Config already loaded' message during startup if the debug mode is enabled.
+* API: Added ShopkeepersStartupEvent which can be used by plugins to make registrations during Shopkeepers' startup process (eg. to register custom shop types, object types, etc.). This event is marked as deprecated because custom shop types, object types, etc. are not yet officially supported as part of the API. Also, the event is called so early that the plugin (and thereby the API) are not yet fully setup and ready to be used, so this event is only of use for plugins which know what they are doing.
 
 * Various (mostly internal) changes to commands and argument parsing:  
   * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information. A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
@@ -54,6 +55,7 @@ Other internal changes:
 * Internal: Added Utils#concat() for arrays.
 * Internal: bstats gets shaded into the package '[..].libs.bstats' now.
 * Internal: Added Settings#isDebugging and Settings#isDebugging(option) to conveniently (and thread-safe) check for debugging options.
+* Internal: Default shop, object and ui types are getting registered early during onLoad now.
 
 New messages:  
 * msg-command-argument-requires-player

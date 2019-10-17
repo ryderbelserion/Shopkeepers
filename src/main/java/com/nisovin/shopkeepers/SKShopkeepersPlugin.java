@@ -24,6 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
+import com.nisovin.shopkeepers.api.events.ShopkeepersStartupEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -186,6 +187,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 	}
 
+	private void registerDefaults() {
+		Log.info("Registering defaults.");
+		uiRegistry.registerAll(defaultUITypes.getAllUITypes());
+		shopTypesRegistry.registerAll(defaultShopTypes.getAll());
+		shopObjectTypesRegistry.registerAll(defaultShopObjectTypes.getAll());
+	}
+
 	public SKShopkeepersPlugin() {
 		super();
 	}
@@ -222,6 +230,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		if (Settings.registerWorldGuardAllowShopFlag) {
 			WorldGuardHandler.registerAllowShopFlag();
 		}
+
+		// register defaults:
+		this.registerDefaults();
 	}
 
 	@Override
@@ -249,7 +260,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			return;
 		}
 
-		// load config (if it hasn't just been loaded already during onLoad):
+		// load config (if not already loaded during onLoad):
 		if (!alreadySetup) {
 			this.loadConfig();
 		} else {
@@ -264,9 +275,18 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			}
 		}
 
+		// register defaults (if not already setup during onLoad):
+		if (!alreadySetup) {
+			this.registerDefaults();
+		} else {
+			Log.debug("Defaults already registered.");
+		}
+
+		// call startup event so other plugins can make their registrations:
+		Bukkit.getPluginManager().callEvent(new ShopkeepersStartupEvent());
+
 		// inform ui registry (registers ui event handlers):
 		uiRegistry.onEnable();
-		uiRegistry.registerAll(defaultUITypes.getAllUITypes());
 
 		// enable ProtectedChests:
 		protectedChests.enable();
@@ -276,10 +296,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new TradingCountListener(this), this);
 		pm.registerEvents(new TradeFileLogger(this.getDataFolder()), this);
-
-		// DEFAULT SHOP TYPES
-
-		shopTypesRegistry.registerAll(defaultShopTypes.getAll());
 
 		// DEFAULT SHOP OBJECT TYPES
 
@@ -291,9 +307,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// enable citizens shops:
 		citizensShops.onEnable();
-
-		// register default shop object types:
-		shopObjectTypesRegistry.registerAll(defaultShopObjectTypes.getAll());
 
 		//
 

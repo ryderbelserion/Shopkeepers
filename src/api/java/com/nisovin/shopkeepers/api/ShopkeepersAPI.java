@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.api;
 import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -39,6 +40,19 @@ public final class ShopkeepersAPI {
 			throw new IllegalStateException("API is already disabled!");
 		}
 		ShopkeepersAPI.plugin = null;
+	}
+
+	/**
+	 * Checks whether the API has already been enabled.
+	 * <p>
+	 * If this is called early during plugin startup (eg. during the {@link Plugin#onLoad() loading phase} of plugins,
+	 * or while the Shopkeepers plugin itself is still getting enabled), the API may not yet be safe for use even if
+	 * this returns <code>true</code>.
+	 * 
+	 * @return <code>true</code> if enabled
+	 */
+	public static boolean isEnabled() {
+		return (plugin != null);
 	}
 
 	public static ShopkeepersPlugin getPlugin() {
