@@ -253,7 +253,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		if (!alreadySetup) {
 			this.loadConfig();
 		} else {
-			Log.info("Config already loaded.");
+			Log.debug("Config already loaded.");
 		}
 
 		// process additional permissions
