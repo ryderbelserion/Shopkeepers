@@ -260,7 +260,7 @@ msg-trade-setup-desc-book:
 
 msg-list-admin-shops-header: "&9Es gibt &e{shopsCount} &9Admin-Shops: &e(Seite {page} von {maxPage})"
 msg-list-player-shops-header: "&9Spieler '&e{player}&9' hat &e{shopsCount} &9Shops: &e(Seite {page} von {maxPage})"
-msg-list-shops-entry: "  &e{shopSessionId}) &7{shopName}&r&8an &7({location})&8, Typ: &7{shopType}&8, Objekt-Typ: &7{objectType}"
+msg-list-shops-entry: "  &e{shopId}) &7{shopName}&r&8an &7({location})&8, Typ: &7{shopType}&8, Objekt: &7{objectType}"
 
 msg-removed-admin-shops: "&aEs wurden &e{shopsCount} &aAdmin-Shops entfernt."
 msg-removed-player-shops: "&aEs wurden &e{shopsCount} &aShops von Spieler '&e{player}&a' entfernt."

@@ -13,6 +13,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: Improved thread-safety for asynchronous logging operations and settings access.
 * Fixed/API: NPE when accessing a non-existing second offered item from the ShopkeeperTradeEvent.
 * Fixed/API: The offered items inside the ShopkeeperTradeEvent are copies now and their stack sizes match those of the trading recipe.
+* Fixed: The internal default for message 'msg-list-shops-entry' (that gets used if the message is missing in the config) was not matching the message in the default config.
 
 * Changed: Only printing the 'Config already loaded' message during startup if the debug mode is enabled.
 * API: Added ShopkeepersStartupEvent which can be used by plugins to make registrations during Shopkeepers' startup process (eg. to register custom shop types, object types, etc.). This event is marked as deprecated because custom shop types, object types, etc. are not yet officially supported as part of the API. Also, the event is called so early that the plugin (and thereby the API) are not yet fully setup and ready to be used, so this event is only of use for plugins which know what they are doing.
@@ -56,6 +57,9 @@ Other internal changes:
 * Internal: bstats gets shaded into the package '[..].libs.bstats' now.
 * Internal: Added Settings#isDebugging and Settings#isDebugging(option) to conveniently (and thread-safe) check for debugging options.
 * Internal: Default shop, object and ui types are getting registered early during onLoad now.
+
+Changed messages (you will have to manually update those!):  
+* msg-list-shops-entry: 'object type' changed to 'object', and the arguments '{shopSessionId}' and '{shopId}' changed to '{shopId}' and '{shopUUID}' respectively. Argument '{shopSessionId}' still works but will likely get removed in the future.
 
 New messages:  
 * msg-command-argument-requires-player
