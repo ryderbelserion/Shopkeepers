@@ -45,6 +45,7 @@ Date format: (YYYY-MM-DD)
   
 Other internal changes:  
 * Internal: Added Utils#concat() for arrays.
+* Internal: bstats gets shaded into the package '[..].libs.bstats' now.
 
 New messages:  
 * msg-command-argument-requires-player

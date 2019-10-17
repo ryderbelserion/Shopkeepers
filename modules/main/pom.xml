@@ -85,7 +85,7 @@
 							<relocations>
 								<relocation>
 									<pattern>org.bstats.bukkit</pattern>
-									<shadedPattern>${project.groupId}.metrics.bstats</shadedPattern>
+									<shadedPattern>${project.groupId}.libs.bstats</shadedPattern>
 								</relocation>
 							</relocations>
 						</configuration>
