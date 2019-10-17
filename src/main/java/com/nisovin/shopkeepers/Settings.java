@@ -564,9 +564,7 @@ public class Settings {
 			taxRate = 100;
 		}
 
-		// prepare derived settings:
-		DerivedSettings.setup();
-
+		onSettingsChanged();
 		return configChanged;
 	}
 
@@ -670,6 +668,13 @@ public class Settings {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		onSettingsChanged();
+	}
+
+	public static void onSettingsChanged() {
+		// prepare derived settings:
+		DerivedSettings.setup();
 	}
 
 	// item utilities:

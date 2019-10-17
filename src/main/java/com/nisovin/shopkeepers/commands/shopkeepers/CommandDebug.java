@@ -29,6 +29,7 @@ class CommandDebug extends Command {
 
 		// toggle debug mode:
 		Settings.debug = !Settings.debug;
+		Settings.onSettingsChanged();
 		sender.sendMessage(ChatColor.GREEN + "Debug mode " + (Settings.debug ? "enabled" : "disabled"));
 	}
 }
