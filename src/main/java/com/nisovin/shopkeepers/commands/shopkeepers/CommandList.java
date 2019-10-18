@@ -143,8 +143,10 @@ class CommandList extends Command {
 			boolean hasName = shopName != null && !shopName.isEmpty();
 			TextUtils.sendMessage(sender, Settings.msgListShopsEntry,
 					"{shopIndex}", String.valueOf(index + 1),
-					"{shopId}", shopkeeper.getUniqueId().toString(),
+					"{shopUUID}", shopkeeper.getUniqueId().toString(),
+					// deprecated, use {shopId} instead; TODO remove at some point
 					"{shopSessionId}", String.valueOf(shopkeeper.getId()),
+					"{shopId}", String.valueOf(shopkeeper.getId()),
 					"{shopName}", (hasName ? (shopName + " ") : ""),
 					"{location}", shopkeeper.getPositionString(),
 					"{shopType}", shopkeeper.getType().getIdentifier(),
