@@ -199,10 +199,7 @@ public class ConversionUtils {
 		} else if (object instanceof Number) {
 			return ((Number) object).intValue();
 		} else if (object instanceof String) {
-			Integer integerValue = parseInt((String) object);
-			if (integerValue != null) {
-				return integerValue;
-			}
+			return parseInt((String) object);
 		}
 		return null;
 	}
@@ -213,10 +210,7 @@ public class ConversionUtils {
 		} else if (object instanceof Number) {
 			return ((Number) object).longValue();
 		} else if (object instanceof String) {
-			Long longValue = parseLong((String) object);
-			if (longValue != null) {
-				return longValue;
-			}
+			return parseLong((String) object);
 		}
 		return null;
 	}
@@ -227,10 +221,7 @@ public class ConversionUtils {
 		} else if (object instanceof Number) {
 			return ((Number) object).doubleValue();
 		} else if (object instanceof String) {
-			Double doubleValue = parseDouble((String) object);
-			if (doubleValue != null) {
-				return doubleValue;
-			}
+			return parseDouble((String) object);
 		}
 		return null;
 	}
@@ -241,10 +232,7 @@ public class ConversionUtils {
 		} else if (object instanceof Number) {
 			return ((Number) object).floatValue();
 		} else if (object instanceof String) {
-			Float floatValue = parseFloat((String) object);
-			if (floatValue != null) {
-				return floatValue;
-			}
+			return parseFloat((String) object);
 		}
 		return null;
 	}
