@@ -193,7 +193,8 @@ public abstract class CommandArgument<T> {
 			format = name;
 		}
 		return new String[] {
-
+				"{argumentName}", name,
+				"{argumentFormat}", format
 		};
 	}
 
