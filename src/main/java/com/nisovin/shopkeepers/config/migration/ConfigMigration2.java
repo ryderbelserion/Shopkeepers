@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
- * Migrate the config from version 1 to version 2.
+ * Migrates the config from version 1 to version 2.
  */
 public class ConfigMigration2 implements ConfigMigration {
 

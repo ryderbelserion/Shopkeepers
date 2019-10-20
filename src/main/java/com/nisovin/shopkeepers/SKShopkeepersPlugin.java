@@ -36,6 +36,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.chestprotection.ProtectedChests;
 import com.nisovin.shopkeepers.commands.Commands;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.config.ConfigLoadException;
 import com.nisovin.shopkeepers.metrics.CitizensChart;
 import com.nisovin.shopkeepers.metrics.FeaturesChart;
 import com.nisovin.shopkeepers.metrics.GringottsChart;
@@ -116,6 +117,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	private boolean outdatedServer = false;
 	private boolean incompatibleServer = false;
+	private ConfigLoadException configLoadError = null; // null on success
 
 	private void loadRequiredClasses() {
 		// making sure that certain classes, that are needed during shutdown, are loaded:
@@ -152,23 +154,35 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return (NMSManager.getProvider() != null);
 	}
 
-	private void loadConfig() {
+	// returns null on success, otherwise a severe issue prevented loading the config
+	private ConfigLoadException loadConfig() {
 		Log.info("Loading config.");
+
 		// save default config in case the config file doesn't exist
 		this.saveDefaultConfig();
 
 		// load config:
 		this.reloadConfig();
+		Configuration config = this.getConfig();
 
 		// load settings from config:
-		Configuration config = this.getConfig();
-		boolean configChanged = Settings.loadConfiguration(config);
+		boolean configChanged;
+		try {
+			configChanged = Settings.loadConfiguration(config);
+		} catch (ConfigLoadException e) {
+			// config loading failed with a severe issue:
+			return e;
+		}
+
 		if (configChanged) {
 			// if the config was modified (migrations, adding missing settings, ..), save it:
 			// TODO persist comments somehow
 			this.saveConfig();
 		}
+		return null; // config loaded successfully
+	}
 
+	private void loadLanguageFile() {
 		// load language config:
 		String lang = Settings.language;
 		String langFileName = "language-" + lang + ".yml";
@@ -176,13 +190,19 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		if (!langFile.exists() && this.getResource(langFileName) != null) {
 			this.saveResource(langFileName, false);
 		}
-		if (langFile.exists()) {
+
+		if (!langFile.exists()) {
+			if (lang.equals("en")) { // if not default // TODO don't hardcode
+				Log.warning("Could not find language file '" + langFile.getPath() + "'!");
+			} // else: ignore
+		} else {
+			Log.info("Loading language file: " + langFileName);
 			try {
 				YamlConfiguration langConfig = new YamlConfiguration();
 				langConfig.load(langFile);
 				Settings.loadLanguageConfiguration(langConfig);
 			} catch (Exception e) {
-				e.printStackTrace();
+				Log.warning("Could not load language file '" + langFile.getPath() + "'!", e);
 			}
 		}
 	}
@@ -223,7 +243,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 
 		// load config:
-		this.loadConfig();
+		this.configLoadError = this.loadConfig();
+		if (this.configLoadError != null) {
+			return;
+		}
+
+		// load language file:
+		this.loadLanguageFile();
 
 		// WorldGuard only allows registering flags before it gets enabled.
 		// Note: Changing the config setting has no effect until the next server restart or server reload.
@@ -262,9 +288,21 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// load config (if not already loaded during onLoad):
 		if (!alreadySetup) {
-			this.loadConfig();
+			this.configLoadError = this.loadConfig();
 		} else {
 			Log.debug("Config already loaded.");
+		}
+		if (this.configLoadError != null) {
+			Log.severe("Could not load the config!", configLoadError);
+			this.setEnabled(false); // also calls onDisable
+			return;
+		}
+
+		// load language file (if not already loaded during onLoad):
+		if (!alreadySetup) {
+			this.loadLanguageFile();
+		} else {
+			Log.debug("Language file already loaded.");
 		}
 
 		// process additional permissions

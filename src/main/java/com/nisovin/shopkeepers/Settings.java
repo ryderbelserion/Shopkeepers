@@ -15,6 +15,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.config.ConfigLoadException;
 import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
 import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ConversionUtils;
@@ -499,7 +500,7 @@ public class Settings {
 	}
 
 	// returns true, if the config misses values which need to be saved
-	public static boolean loadConfiguration(Configuration config) {
+	public static boolean loadConfiguration(Configuration config) throws ConfigLoadException {
 		boolean configChanged = false;
 
 		// perform config migrations:
@@ -552,7 +553,7 @@ public class Settings {
 				field.set(null, value);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ConfigLoadException("Error while loading config values!", e);
 		}
 
 		// validation:
@@ -684,7 +685,7 @@ public class Settings {
 		}
 	}
 
-	public static void loadLanguageConfiguration(Configuration config) {
+	public static void loadLanguageConfiguration(Configuration config) throws ConfigLoadException {
 		try {
 			Field[] fields = Settings.class.getDeclaredFields();
 			for (Field field : fields) {
@@ -706,7 +707,7 @@ public class Settings {
 				field.set(null, value);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ConfigLoadException("Error while loading messages from language file!", e);
 		}
 
 		onSettingsChanged();

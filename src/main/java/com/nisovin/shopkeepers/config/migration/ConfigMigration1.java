@@ -10,7 +10,7 @@ import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
 
 /**
- * Migrate the config from version &lt;= 0 to version 1.
+ * Migrates the config from version 0 (pre versioning) to version 1.
  */
 public class ConfigMigration1 implements ConfigMigration {
 
