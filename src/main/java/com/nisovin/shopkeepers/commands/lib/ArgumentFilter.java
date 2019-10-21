@@ -17,22 +17,22 @@ public interface ArgumentFilter<T> extends Predicate<T> {
 	}
 
 	/**
-	 * Gets an 'invalid argument' error message for the given parsed but declined value.
+	 * Gets the 'invalid argument' error message for the given parsed but declined value.
 	 * <p>
-	 * When overriding this method, consider using {@link CommandArgument#getRootArgument()} for the argument name and
-	 * format.
+	 * When overriding this method, consider using {@link CommandArgument#getDefaultErrorMsgArgs()} for the common
+	 * message arguments.
 	 * <p>
 	 * Consider using an {@link ArgumentRejectedException} when using this for an exception.
 	 * 
 	 * @param argument
 	 *            the argument using this filter
-	 * @param input
+	 * @param argumentInput
 	 *            the argument input
 	 * @param value
 	 *            the corresponding parsed but declined value
 	 * @return the error message
 	 */
-	public default String getInvalidArgumentErrorMsg(CommandArgument<T> argument, String input, T value) {
-		return argument.getInvalidArgumentErrorMsg(input);
+	public default String getInvalidArgumentErrorMsg(CommandArgument<T> argument, String argumentInput, T value) {
+		return argument.getInvalidArgumentErrorMsg(argumentInput);
 	}
 }

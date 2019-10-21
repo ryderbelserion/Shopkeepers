@@ -47,12 +47,12 @@ public class PlayerByNameArgument extends CommandArgument<Player> {
 			}
 
 			@Override
-			public String getInvalidArgumentErrorMsg(CommandArgument<String> argument, String input, String value) {
+			public String getInvalidArgumentErrorMsg(CommandArgument<String> argument, String argumentInput, String value) {
 				Player player = getPlayerByName(name);
 				if (player == null) {
-					return PlayerNameArgument.ACCEPT_ONLINE_PLAYERS.getInvalidArgumentErrorMsg(argument, input, value);
+					return PlayerNameArgument.ACCEPT_ONLINE_PLAYERS.getInvalidArgumentErrorMsg(argument, argumentInput, value);
 				} else {
-					return PlayerByNameArgument.this.filter.getInvalidArgumentErrorMsg(PlayerByNameArgument.this, input, player);
+					return PlayerByNameArgument.this.filter.getInvalidArgumentErrorMsg(PlayerByNameArgument.this, argumentInput, player);
 				}
 			}
 		};

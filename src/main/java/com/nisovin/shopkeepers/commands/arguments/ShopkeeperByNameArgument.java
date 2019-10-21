@@ -43,12 +43,12 @@ public class ShopkeeperByNameArgument extends CommandArgument<Shopkeeper> {
 			}
 
 			@Override
-			public String getInvalidArgumentErrorMsg(CommandArgument<String> argument, String input, String value) {
+			public String getInvalidArgumentErrorMsg(CommandArgument<String> argument, String argumentInput, String value) {
 				Shopkeeper shopkeeper = getShopkeeperByName(name);
 				if (shopkeeper == null) {
-					return ShopkeeperNameArgument.ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, input, value);
+					return ShopkeeperNameArgument.ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, argumentInput, value);
 				} else {
-					return ShopkeeperByNameArgument.this.filter.getInvalidArgumentErrorMsg(ShopkeeperByNameArgument.this, input, shopkeeper);
+					return ShopkeeperByNameArgument.this.filter.getInvalidArgumentErrorMsg(ShopkeeperByNameArgument.this, argumentInput, shopkeeper);
 				}
 			}
 		};

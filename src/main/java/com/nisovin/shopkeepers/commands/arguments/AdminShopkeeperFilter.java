@@ -17,11 +17,10 @@ public class AdminShopkeeperFilter implements ArgumentFilter<Shopkeeper> {
 	}
 
 	@Override
-	public String getInvalidArgumentErrorMsg(CommandArgument<Shopkeeper> argument, String input, Shopkeeper value) {
-		if (input == null) input = "";
+	public String getInvalidArgumentErrorMsg(CommandArgument<Shopkeeper> argument, String argumentInput, Shopkeeper value) {
+		if (argumentInput == null) argumentInput = "";
+		String[] defaultArgs = argument.getDefaultErrorMsgArgs();
 		return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoAdminShop,
-				"{argumentName}", argument.getRootArgument().getName(),
-				"{argumentFormat}", argument.getRootArgument().getFormat(),
-				"{argument}", input);
+				defaultArgs, "{argument}", argumentInput);
 	}
 }

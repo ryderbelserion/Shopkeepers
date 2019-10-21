@@ -18,7 +18,6 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.IntegerArgument;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
 public class ShopkeeperByIdArgument extends CommandArgument<Shopkeeper> {
 
@@ -41,7 +40,7 @@ public class ShopkeeperByIdArgument extends CommandArgument<Shopkeeper> {
 		if (argumentInput == null) argumentInput = "";
 		String[] defaultArgs = this.getDefaultErrorMsgArgs();
 		return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentInvalid,
-				Utils.concat(defaultArgs, "{argument}", argumentInput));
+				defaultArgs, "{argument}", argumentInput);
 	}
 
 	@Override

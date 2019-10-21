@@ -38,12 +38,11 @@ public class PlayerNameArgument extends ObjectNameArgument {
 		}
 
 		@Override
-		public String getInvalidArgumentErrorMsg(CommandArgument<String> argument, String input, String value) {
-			if (input == null) input = "";
+		public String getInvalidArgumentErrorMsg(CommandArgument<String> argument, String argumentInput, String value) {
+			if (argumentInput == null) argumentInput = "";
+			String[] defaultArgs = argument.getDefaultErrorMsgArgs();
 			return TextUtils.replaceArgs(Settings.msgCommandPlayerArgumentInvalid,
-					"{argumentName}", argument.getRootArgument().getName(),
-					"{argumentFormat}", argument.getRootArgument().getFormat(),
-					"{argument}", input);
+					defaultArgs, "{argument}", argumentInput);
 		}
 	};
 

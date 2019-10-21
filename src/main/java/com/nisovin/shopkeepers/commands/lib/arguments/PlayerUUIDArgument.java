@@ -24,12 +24,11 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 		}
 
 		@Override
-		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String input, UUID value) {
-			if (input == null) input = "";
+		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String argumentInput, UUID value) {
+			if (argumentInput == null) argumentInput = "";
+			String[] defaultArgs = argument.getDefaultErrorMsgArgs();
 			return TextUtils.replaceArgs(Settings.msgCommandPlayerArgumentInvalid,
-					"{argumentName}", argument.getRootArgument().getName(),
-					"{argumentFormat}", argument.getRootArgument().getFormat(),
-					"{argument}", input);
+					defaultArgs, "{argument}", argumentInput);
 		}
 	};
 

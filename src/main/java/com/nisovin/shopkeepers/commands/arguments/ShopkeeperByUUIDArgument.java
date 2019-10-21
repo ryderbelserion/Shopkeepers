@@ -40,12 +40,12 @@ public class ShopkeeperByUUIDArgument extends CommandArgument<Shopkeeper> {
 			}
 
 			@Override
-			public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String input, UUID value) {
+			public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String argumentInput, UUID value) {
 				Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByUniqueId(value);
 				if (shopkeeper == null) {
-					return ShopkeeperUUIDArgument.ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, input, value);
+					return ShopkeeperUUIDArgument.ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, argumentInput, value);
 				} else {
-					return ShopkeeperByUUIDArgument.this.filter.getInvalidArgumentErrorMsg(ShopkeeperByUUIDArgument.this, input, shopkeeper);
+					return ShopkeeperByUUIDArgument.this.filter.getInvalidArgumentErrorMsg(ShopkeeperByUUIDArgument.this, argumentInput, shopkeeper);
 				}
 			}
 		};

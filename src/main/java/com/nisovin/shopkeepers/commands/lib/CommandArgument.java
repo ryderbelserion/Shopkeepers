@@ -7,7 +7,6 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -184,7 +183,7 @@ public abstract class CommandArgument<T> {
 	 * 
 	 * @return the common default error message arguments
 	 */
-	protected final String[] getDefaultErrorMsgArgs() {
+	public final String[] getDefaultErrorMsgArgs() {
 		CommandArgument<?> rootArgument = this.getRootArgument();
 		String name = rootArgument.getName();
 		String format = rootArgument.getFormat();
@@ -255,7 +254,7 @@ public abstract class CommandArgument<T> {
 		if (argumentInput == null) argumentInput = "";
 		String[] defaultArgs = this.getDefaultErrorMsgArgs();
 		return TextUtils.replaceArgs(Settings.msgCommandArgumentInvalid,
-				Utils.concat(defaultArgs, "{argument}", argumentInput));
+				defaultArgs, "{argument}", argumentInput);
 	}
 
 	/**

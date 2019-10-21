@@ -27,12 +27,11 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 		}
 
 		@Override
-		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String input, UUID value) {
-			if (input == null) input = "";
+		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String argumentInput, UUID value) {
+			if (argumentInput == null) argumentInput = "";
+			String[] defaultArgs = argument.getDefaultErrorMsgArgs();
 			return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentInvalid,
-					"{argumentName}", argument.getRootArgument().getName(),
-					"{argumentFormat}", argument.getRootArgument().getFormat(),
-					"{argument}", input);
+					defaultArgs, "{argument}", argumentInput);
 		}
 	};
 
@@ -44,16 +43,15 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 		}
 
 		@Override
-		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String input, UUID value) {
-			if (input == null) input = "";
+		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String argumentInput, UUID value) {
+			if (argumentInput == null) argumentInput = "";
 			Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByUniqueId(value);
 			if (shopkeeper == null) {
-				return ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, input, value);
+				return ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, argumentInput, value);
 			} else {
+				String[] defaultArgs = argument.getDefaultErrorMsgArgs();
 				return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoAdminShop,
-						"{argumentName}", argument.getRootArgument().getName(),
-						"{argumentFormat}", argument.getRootArgument().getFormat(),
-						"{argument}", input);
+						defaultArgs, "{argument}", argumentInput);
 			}
 		}
 	};
@@ -66,16 +64,15 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 		}
 
 		@Override
-		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String input, UUID value) {
-			if (input == null) input = "";
+		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String argumentInput, UUID value) {
+			if (argumentInput == null) argumentInput = "";
 			Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByUniqueId(value);
 			if (shopkeeper == null) {
-				return ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, input, value);
+				return ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, argumentInput, value);
 			} else {
+				String[] defaultArgs = argument.getDefaultErrorMsgArgs();
 				return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoPlayerShop,
-						"{argumentName}", argument.getRootArgument().getName(),
-						"{argumentFormat}", argument.getRootArgument().getFormat(),
-						"{argument}", input);
+						defaultArgs, "{argument}", argumentInput);
 			}
 		}
 	};

@@ -15,7 +15,6 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
 public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 
@@ -28,7 +27,7 @@ public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 		if (argumentInput == null) argumentInput = "";
 		String[] defaultArgs = this.getDefaultErrorMsgArgs();
 		return TextUtils.replaceArgs(Settings.msgCommandShopTypeArgumentInvalid,
-				Utils.concat(defaultArgs, "{argument}", argumentInput));
+				defaultArgs, "{argument}", argumentInput);
 	}
 
 	@Override

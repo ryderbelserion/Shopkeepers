@@ -163,6 +163,23 @@ public class TextUtils {
 		return message;
 	}
 
+	public static String replaceArgs(String message, String[]... argSets) {
+		if (!StringUtils.isEmpty(message) && argSets != null) {
+			for (String[] argSet : argSets) {
+				message = replaceArgs(message, argSet);
+			}
+		}
+		return message;
+	}
+
+	public static String replaceArgs(String message, String[] argSet, String... moreArgs) {
+		if (!StringUtils.isEmpty(message)) {
+			message = replaceArgs(message, argSet);
+			message = replaceArgs(message, moreArgs);
+		}
+		return message;
+	}
+
 	public static List<String> replaceArgs(Collection<String> messages, String... args) {
 		List<String> replaced = new ArrayList<>(messages.size());
 		for (String message : messages) {

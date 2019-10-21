@@ -44,12 +44,12 @@ public class PlayerByUUIDArgument extends CommandArgument<Player> {
 			}
 
 			@Override
-			public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String input, UUID value) {
+			public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String argumentInput, UUID value) {
 				Player player = Bukkit.getPlayer(value);
 				if (player == null) {
-					return PlayerUUIDArgument.ACCEPT_ONLINE_PLAYERS.getInvalidArgumentErrorMsg(argument, input, value);
+					return PlayerUUIDArgument.ACCEPT_ONLINE_PLAYERS.getInvalidArgumentErrorMsg(argument, argumentInput, value);
 				} else {
-					return PlayerByUUIDArgument.this.filter.getInvalidArgumentErrorMsg(PlayerByUUIDArgument.this, input, player);
+					return PlayerByUUIDArgument.this.filter.getInvalidArgumentErrorMsg(PlayerByUUIDArgument.this, argumentInput, player);
 				}
 			}
 		};
