@@ -39,7 +39,7 @@ Date format: (YYYY-MM-DD)
   * Internal: CommandArgs no longer makes a copy of the passed arguments.
   * Internal: When resetting CommandArgs to a previous state they ensure now that the state got created from the same CommandArgs instance.
   * Internal: Added type parameter to CommandArgument.
-  * Internal: Added ArgumentRejectedException and PostponedArgumentParseException, which can be used to provide more relevant error messages.
+  * Internal: Added ArgumentRejectedException for when an argument got parsed, but rejected by a filter rule. This is used to provide more relevant error messages in FirstOf-arguments.
   * Internal: Added more general BoundedIntegerArgument. PositiveIntegerArgument makes use of it.
   * Internal: Moved ArgumentFilter into base commands lib package.
   * Internal: CommandArguments keep track of their parent argument now (if used internally by another argument) and use that for their error messages.

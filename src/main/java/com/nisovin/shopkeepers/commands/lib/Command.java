@@ -443,9 +443,6 @@ public abstract class Command {
 			return;
 		}
 
-		// postponed ArgumentParseException gets only thrown if there is no other exception to throw
-		PostponedArgumentParseException postponedException = null;
-
 		// keep track of fallbacks:
 		FallbackArgumentException[] fallbacks = null;
 		int fallbackIndex = -1;
@@ -486,15 +483,7 @@ public abstract class Command {
 
 			if (fallbackIndex == -1) { // no pending fallback(s)
 				if (parseException != null) {
-					if (parseException instanceof PostponedArgumentParseException) {
-						// keep track of the first postponed exception:
-						if (postponedException == null) {
-							postponedException = (PostponedArgumentParseException) parseException;
-						}
-						continue;
-					} else {
-						throw parseException; // parsing failed at the current argument
-					}
+					throw parseException; // parsing failed at the current argument
 				}
 			} else {
 				// handle fallback(s) if parsing failed (without providing a fallback itself), if the current command
@@ -557,7 +546,7 @@ public abstract class Command {
 								currentFallback = e;
 								continue;
 							} catch (ArgumentParseException e) {
-								// fallback error (possibly postponed):
+								// fallback error:
 								fallbackError = e;
 								break;
 							}
@@ -606,16 +595,8 @@ public abstract class Command {
 							// argument was able to consume arguments)
 							break;
 						} else if (fallbackError != null) {
-							if (fallbackError instanceof PostponedArgumentParseException) {
-								// keep track of the first postponed exception:
-								if (postponedException == null) {
-									postponedException = (PostponedArgumentParseException) fallbackError;
-								}
-								continue; // then continue with the next fallback
-							} else {
-								// abort parsing with the fallback error:
-								throw fallbackError;
-							}
+							// abort parsing with the fallback error:
+							throw fallbackError;
 						} else {
 							assert fallbackSuccess;
 							// success, but no args consumed: continue with the next fallback
@@ -641,17 +622,7 @@ public abstract class Command {
 						if (parsingFailed) {
 							assert parseException != null;
 							// the original situation lead to the current parsing exception:
-							if (parseException instanceof PostponedArgumentParseException) {
-								// keep track of the first postponed exception:
-								if (postponedException == null) {
-									postponedException = (PostponedArgumentParseException) parseException;
-								}
-
-								// continue parsing with the next argument, to see if another issue comes up:
-								continue;
-							} else {
-								throw parseException; // parsing failed at the current argument
-							}
+							throw parseException; // parsing failed at the current argument
 						} else {
 							// continue parsing with the next argument (if there is one, else parsing is over)
 							continue;
@@ -664,10 +635,7 @@ public abstract class Command {
 		// handle unparsed arguments (if any):
 		this.handleUnparsedArguments(input, context, args);
 
-		// check if there has been a postponed argument parse exception:
-		if (postponedException != null) {
-			throw postponedException.getRootException();
-		} // else: parsing was successful
+		// parsing was successful
 	}
 
 	private void handleUnparsedArguments(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
