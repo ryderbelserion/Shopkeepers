@@ -8,8 +8,8 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
-import com.nisovin.shopkeepers.commands.arguments.AdminShopkeeperFilter;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
+import com.nisovin.shopkeepers.commands.arguments.ShopkeeperFilter;
 import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
@@ -40,7 +40,7 @@ class CommandSetTradePerm extends Command {
 		this.setDescription(Settings.msgCommandDescriptionSettradeperm);
 
 		// arguments:
-		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, AdminShopkeeperFilter.INSTANCE), TargetShopkeeperFilter.ADMIN));
+		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.ADMIN), TargetShopkeeperFilter.ADMIN));
 		this.addArgument(new FirstOfArgument("permArg", Arrays.asList(
 				new DefaultValueFallback<>(new LiteralArgument(ARGUMENT_QUERY_PERMISSION), ARGUMENT_QUERY_PERMISSION),
 				new LiteralArgument(ARGUMENT_REMOVE_PERMISSION),

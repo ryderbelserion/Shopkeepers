@@ -53,6 +53,7 @@ Date format: (YYYY-MM-DD)
   * Internal: Added MissingArgumentException and InvalidArgumentException (which ArgumentRejectedException extends) which allows specifically handling those types of exceptions.
   * Internal: Renamed CommandArgument#missingArgument and #invalidArgument to #missingArgumentError and #invalidArgumentError.
   * Internal: Added CommandArgument#requiresPlayerError with a corresponding default message (msg-command-argument-requires-player) for arguments that require a player as executor.
+  * Internal: Moved default shopkeeper argument filters into ShopkeeperFilter class/namespace.
   
 Other internal changes:  
 * Internal: Added Utils#concat() for arrays.

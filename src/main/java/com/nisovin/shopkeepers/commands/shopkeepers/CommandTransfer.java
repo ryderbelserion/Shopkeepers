@@ -6,8 +6,8 @@ import org.bukkit.entity.Player;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
-import com.nisovin.shopkeepers.commands.arguments.PlayerShopkeeperFilter;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
+import com.nisovin.shopkeepers.commands.arguments.ShopkeeperFilter;
 import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandArgs;
@@ -34,7 +34,7 @@ class CommandTransfer extends Command {
 		this.setDescription(Settings.msgCommandDescriptionTransfer);
 
 		// arguments:
-		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, PlayerShopkeeperFilter.INSTANCE), TargetShopkeeperFilter.PLAYER));
+		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.PLAYER), TargetShopkeeperFilter.PLAYER));
 		this.addArgument(new PlayerArgument(ARGUMENT_NEW_OWNER)); // new owner has to be online
 		// TODO allow offline-player?
 	}
