@@ -55,7 +55,8 @@ class CommandCheck extends Command {
 		// arguments:
 		this.addArgument(new OptionalArgument<>(new FirstOfArgument("context", Arrays.asList(
 				new LiteralArgument(ARGUMENT_CHUNKS),
-				new LiteralArgument(ARGUMENT_ACTIVE)))));
+				new LiteralArgument(ARGUMENT_ACTIVE)),
+				true))); // join formats
 	}
 
 	@Override
