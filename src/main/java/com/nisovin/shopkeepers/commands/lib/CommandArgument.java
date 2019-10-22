@@ -290,7 +290,7 @@ public abstract class CommandArgument<T> {
 	 *             if unable to parse a value
 	 */
 	public T parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
-		Object state = args.getState();
+		CommandArgs.State state = args.getState();
 		T value;
 		try {
 			value = this.parseValue(input, args);

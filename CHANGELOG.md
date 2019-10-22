@@ -54,6 +54,9 @@ Date format: (YYYY-MM-DD)
   * Internal: Renamed CommandArgument#missingArgument and #invalidArgument to #missingArgumentError and #invalidArgumentError.
   * Internal: Added CommandArgument#requiresPlayerError with a corresponding default message (msg-command-argument-requires-player) for arguments that require a player as executor.
   * Internal: Moved default shopkeeper argument filters into ShopkeeperFilter class/namespace.
+  * Internal: Added CommandContext#copy() and made constructor CommandContext(otherContext) protected.
+  * Internal: Added CommandArgs#copy. Since the underlying arguments are expected to never change, they are not actually copied (only the parsing state is copied). Any captured CommandArgs states are applicable to the copy as well.
+  * Internal: Added marker interface for the CommandArgs state.
   
 Other internal changes:  
 * Internal: Added Utils#concat() for arrays.

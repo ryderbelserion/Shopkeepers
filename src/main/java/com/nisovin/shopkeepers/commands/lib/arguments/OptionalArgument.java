@@ -16,6 +16,11 @@ import com.nisovin.shopkeepers.util.Validate;
  */
 public class OptionalArgument<T> extends CommandArgument<T> {
 
+	// TODO implement as 'do-nothing'-fallback instead?
+	// if an invalid argument is specified, it gets currently forwarded to the next command argument, leading to a
+	// likely confusing/unrelated parsing error message
+	// fallback would jump back and throw the original parsing error if the following command argument can't parse it
+
 	protected final CommandArgument<T> argument;
 
 	public OptionalArgument(CommandArgument<T> argument) {
@@ -37,7 +42,7 @@ public class OptionalArgument<T> extends CommandArgument<T> {
 
 	@Override
 	public T parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
-		Object state = args.getState();
+		CommandArgs.State state = args.getState();
 		T value;
 		try {
 			// let the wrapped argument handle the parsing:

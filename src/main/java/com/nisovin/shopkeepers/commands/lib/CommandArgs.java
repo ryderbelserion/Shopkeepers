@@ -7,6 +7,9 @@ import java.util.NoSuchElementException;
 
 import com.nisovin.shopkeepers.util.Validate;
 
+/**
+ * The arguments passed during command invocation together with the current parsing state.
+ */
 public class CommandArgs {
 
 	public static final CommandArgs EMPTY = new CommandArgs(Collections.emptyList());
@@ -14,14 +17,34 @@ public class CommandArgs {
 	private final List<String> args; // unmodifiable
 	private int curIndex = -1;
 
+	// the args array is expected to not change during the lifetime of this CommandArgs
 	public CommandArgs(String[] args) {
 		this(args == null ? Collections.emptyList() : Arrays.asList(args));
 	}
 
+	// the args list is expected to not change during the lifetime of this CommandArgs
 	public CommandArgs(List<String> args) {
-		Validate.notNull(args, "Arguments cannot be null!");
+		Validate.notNull(args, "Arguments are null!");
 		Validate.isTrue(!args.contains(null), "Arguments contain null!");
+		// new object instance is important here, since its identity is used by #setState(State)
 		this.args = Collections.unmodifiableList(args);
+	}
+
+	/**
+	 * Creates a copy of the given {@link CommandArgs}.
+	 * <p>
+	 * Note: Since it is expected that the underlying arguments do not change during the lifetime of the
+	 * {@link CommandArgs}, it is sufficient to directly reference the arguments of the given {@link CommandArgs}
+	 * instead of actually copying them.
+	 * 
+	 * @param otherArgs
+	 *            the other command args
+	 */
+	protected CommandArgs(CommandArgs otherArgs) {
+		Validate.notNull(otherArgs, "The other CommandArgs is null!");
+		// directly references the parent's args, which are expected to not change
+		this.args = otherArgs.args;
+		this.curIndex = otherArgs.curIndex;
 	}
 
 	/**
@@ -192,15 +215,33 @@ public class CommandArgs {
 		curIndex = (nextIndex - 1);
 	}
 
+	/**
+	 * Creates a copy of this {@link CommandArgs}.
+	 * <p>
+	 * Note: The underlying arguments are expected to not change during the lifetime of both this {@link CommandArgs}
+	 * and the returned copy.
+	 * 
+	 * @return the copied command args
+	 */
+	public CommandArgs copy() {
+		return new CommandArgs(this);
+	}
+
 	// Get and set state: In case we ever add more state specific data, besides the index.
 
-	public static final class State {
+	/**
+	 * Marker interface for state objects.
+	 */
+	public interface State {
+	}
 
-		private final CommandArgs args;
-		private final int curIndex;
+	protected static final class StateImpl implements State {
 
-		private State(CommandArgs args, int curIndex) {
-			this.args = args;
+		protected final CommandArgs commandArgs;
+		protected final int curIndex;
+
+		private StateImpl(CommandArgs commandArgs, int curIndex) {
+			this.commandArgs = commandArgs;
 			this.curIndex = curIndex;
 		}
 	}
@@ -210,8 +251,8 @@ public class CommandArgs {
 	 * 
 	 * @return the current state
 	 */
-	public Object getState() {
-		return new State(this, curIndex);
+	public State getState() {
+		return new StateImpl(this, curIndex);
 	}
 
 	/**
@@ -220,10 +261,12 @@ public class CommandArgs {
 	 * @param stateObject
 	 *            the state to reset to
 	 */
-	public void setState(Object stateObject) {
-		Validate.isTrue(stateObject instanceof State, "Invalid state!");
-		State state = (State) stateObject;
-		Validate.isTrue(state.args == this, "The given state wasn't created from this CommandArgs instance!");
+	public void setState(State stateObject) {
+		Validate.isTrue(stateObject instanceof StateImpl, "Invalid state!");
+		StateImpl state = (StateImpl) stateObject;
+		// state is applicable to the original CommandArgs, as well as all its copies (if the underlying arguments are
+		// the same):
+		Validate.isTrue(state.commandArgs.args == this.args, "The given state is not applicable for this CommandArgs instance!");
 		this.curIndex = state.curIndex;
 	}
 }

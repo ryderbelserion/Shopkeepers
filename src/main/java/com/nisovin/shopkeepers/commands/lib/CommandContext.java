@@ -22,14 +22,15 @@ public class CommandContext {
 	}
 
 	/**
-	 * Creates a new {@link CommandContext} and fills it with the current values from the given {@link CommandContext}.
+	 * Creates a (shallow) copy of the given {@link CommandContext}.
 	 * 
 	 * @param otherContext
-	 *            another {@link CommandContext}
+	 *            the other command context
 	 */
-	public CommandContext(CommandContext otherContext) {
-		if (otherContext != null && otherContext.parsedArgs != null) {
-			this.parsedArgs = new LinkedHashMap<>(parsedArgs);
+	protected CommandContext(CommandContext otherContext) {
+		Validate.notNull(otherContext, "The other command context is null!");
+		if (otherContext.parsedArgs != null) {
+			this.parsedArgs = new LinkedHashMap<>(otherContext.parsedArgs);
 		}
 	}
 
@@ -119,9 +120,9 @@ public class CommandContext {
 	}
 
 	/**
-	 * Gets an unmodifiable map view on the command context.
+	 * Gets an unmodifiable map view on the contents of this command context.
 	 * 
-	 * @return an unmodifiable map view on the command context
+	 * @return an unmodifiable map view on the contents of this command context
 	 */
 	public Map<String, Object> getMapView() {
 		if (parsedArgs == null) {
@@ -129,6 +130,15 @@ public class CommandContext {
 		} else {
 			return Collections.unmodifiableMap(parsedArgs);
 		}
+	}
+
+	/**
+	 * Creates a (shallow) copy of this {@link CommandContext}.
+	 * 
+	 * @return the copied command context
+	 */
+	public CommandContext copy() {
+		return new CommandContext(this);
 	}
 
 	@Override

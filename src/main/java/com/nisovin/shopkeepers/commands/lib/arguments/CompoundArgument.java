@@ -125,7 +125,7 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 				// no argument left which could be completed:
 				break;
 			}
-			Object state = args.getState();
+			CommandArgs.State state = args.getState();
 			try {
 				argument.parse(input, localContext, args);
 				// successfully parsed:

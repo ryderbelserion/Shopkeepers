@@ -447,7 +447,7 @@ public abstract class Command {
 		FallbackArgumentException[] fallbacks = null;
 		int fallbackIndex = -1;
 		int fallbackArgsIndex = -1; // args index at time of first fallback
-		Object fallbackArgsState = null;
+		CommandArgs.State fallbackArgsState = null;
 		BufferedCommandContext fallbackContext = null;
 
 		// parse all arguments:
@@ -575,7 +575,7 @@ public abstract class Command {
 							// "/list a 2": 'a' is an invalid player. The fallback would produce 'self' as the default
 							// value for the player argument but not consume the 'a'. Continuing with the next fallback
 							// would result in either an 'invalid page' or even (when continuing further) an 'unexpected
-							// argument' error. By aborting early with the original root excpetion, the player gets the
+							// argument' error. By aborting early with the original root exception, the player gets the
 							// expected 'invalid player' error in this case.
 
 							// TODO Solve these ambiguities, maybe by parsing all possible paths / argument bindings.
@@ -774,7 +774,7 @@ public abstract class Command {
 					// no argument left which could be completed:
 					break;
 				}
-				Object state = args.getState();
+				CommandArgs.State state = args.getState();
 				try {
 					argument.parse(input, context, args);
 					// successfully parsed:

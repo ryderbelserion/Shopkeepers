@@ -75,7 +75,7 @@ public class FallbackArgument<T> extends CommandArgument<T> {
 
 	@Override
 	public T parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
-		Object state = args.getState();
+		CommandArgs.State state = args.getState();
 		try {
 			// TODO also use fallback if argument parses 'null' (eg. for optional arguments)?
 			// maybe then prefer null in case the fallback fails?
@@ -88,7 +88,7 @@ public class FallbackArgument<T> extends CommandArgument<T> {
 
 	@Override
 	public T parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-		Object state = args.getState();
+		CommandArgs.State state = args.getState();
 		try {
 			return argument.parseValue(input, args);
 		} catch (ArgumentParseException e) {
@@ -167,7 +167,7 @@ public class FallbackArgument<T> extends CommandArgument<T> {
 	@Override
 	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
 		// combine suggestions of the original and the fallback argument:
-		Object state = args.getState(); // keep track of the initial state
+		CommandArgs.State state = args.getState(); // keep track of the initial state
 		List<String> argumentSuggestions = argument.complete(input, context, args);
 		if (argumentSuggestions.size() >= MAX_SUGGESTIONS) return argumentSuggestions;
 

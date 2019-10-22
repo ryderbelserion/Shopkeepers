@@ -98,7 +98,7 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 
 	@Override
 	public Pair<CommandArgument<?>, Object> parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
-		Object state = args.getState();
+		CommandArgs.State state = args.getState();
 		Pair<CommandArgument<?>, Object> result;
 		try {
 			// with context, so that the child argument can store its value(s)
@@ -123,7 +123,7 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 	// context != null: use 'parse' rather than 'parseValue' in order to let the child argument store its parsed value
 	private Pair<CommandArgument<?>, Object> parseValue(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
 		// try one after the other:
-		Object state = args.getState();
+		CommandArgs.State state = args.getState();
 		Object value = null;
 		FallbackArgumentException fallbackException = null;
 		boolean nullParsed = false;
@@ -190,7 +190,7 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 	@Override
 	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
 		List<String> suggestions = new ArrayList<>();
-		Object state = args.getState(); // keep track of the initial state
+		CommandArgs.State state = args.getState(); // keep track of the initial state
 		for (CommandArgument<?> argument : arguments) {
 			int limit = (MAX_SUGGESTIONS - suggestions.size());
 			if (limit <= 0) break;
