@@ -30,6 +30,14 @@ Low priority:
     * Allow resolving ambiguities by explicitly binding arguments, eg. "/list player=blablubbabc page=3"
       * or '::' or ':=' or '!='? '=' might likely be used/useful in various arguments as well, and ':' alone is ambiguous because the use in namespaces
       * or "/list -player blablubbabc -page 2" ? or "/list !player=blablubbabc !page=2"?
+        * or "/list --player blablubbabc --page 2"
+      * but: requires users to know the exact argument name: issue when arguments can have alises? (eg. for literals, especially if the command format uses an alias instead of the actual argument name)
+      * also: what about sub-arguments? Is it required to be able to explicitly specify which sub-argument an arg is meant to bind to? sub-arguments are usually an implementation detail
+      * or: "/list '' '2'" (quotes contain the arg(s) that get bound to specific arguments; including marking empty arguments explicitly)
+      * or: use some separator that marks which arg(s) get bound to which arguments, eg.: "/list | | 2"
+      * or: use special character/marker to explicitly mark missing arguments: "/list ! 2", or "/list _ 2"
+        * However: Does not allow resolving all kinds of ambiguities! eg. if arguments parse multiple args: "/cmd [multiple args (here] and there)" ('here' may be the last arg of the first argument, or the first arg of the second argument)
+        * -> Special character marks 'end of current argument': Allows marking missing arguments, as well as using it as argument delimiter
       * Also allow for multi-part arguments: "/text text='some text'"
       * And empty/missing argument: "/list player='' 1" (player argument is optional)
       * Problem: FirstOf arguments with literals can internally have ambiguities as well, eg. "/list <'all'|player>" (with an existing player named 'all')
