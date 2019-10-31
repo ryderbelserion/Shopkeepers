@@ -10,8 +10,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
@@ -42,7 +41,7 @@ class CommandDebugCreateShops extends PlayerCommand {
 	}
 
 	@Override
-	protected void execute(CommandInput input, CommandContext context, CommandArgs args) throws CommandException {
+	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		assert (input.getSender() instanceof Player);
 		Player player = (Player) input.getSender();
 		int shopCount = context.get(ARGUMENT_SHOP_COUNT);

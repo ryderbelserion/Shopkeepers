@@ -15,8 +15,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.commands.lib.Command;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.AnyStringFallback;
@@ -68,7 +67,7 @@ class CommandList extends Command {
 	}
 
 	@Override
-	protected void execute(CommandInput input, CommandContext context, CommandArgs args) throws CommandException {
+	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 		int page = context.get(ARGUMENT_PAGE);
 		String targetPlayerName = context.get(ARGUMENT_PLAYER);

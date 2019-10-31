@@ -10,6 +10,9 @@ import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
+ * A command component responsible for parsing and providing completion suggestions for a portion of the command's input
+ * arguments.
+ * 
  * @param <T>
  *            the type of the parsed argument
  */
@@ -270,35 +273,29 @@ public abstract class CommandArgument<T> {
 	}
 
 	/**
-	 * Parses a value for this argument via {@link #parseValue(CommandInput, CommandArgs)} and stores it in the
-	 * {@link CommandContext} with the argument's name as key.
+	 * Parses a value for this argument and stores it in the {@link CommandContext} with the argument's name as key.
 	 * <p>
-	 * This moves the cursor of the {@link CommandArgs} forward for all successfully used-up arguments. If parsing
-	 * fails, the state of the {@link CommandArgs} gets restored.
+	 * This may also store other additional values inside the context, but it is recommended to use keys that don't
+	 * conflict with any other command arguments, such as keys prefixed with the argument's name:
+	 * <code>"{argumentName}:{key}"</code>.
 	 * <p>
-	 * If parsing returns <code>null</code> (i.e. for optional arguments), then nothing gets stored in the
-	 * {@link CommandContext}.
+	 * This moves the cursor of the {@link ArgumentsReader} forward for all used up arguments. If parsing fails, the
+	 * state of the {@link ArgumentsReader} is undefined (it is left to the caller to reset it if required).
+	 * <p>
+	 * By default this delegates the parsing to {@link #parseValue(CommandInput, CommandContextView, ArgumentsReader)}.
 	 * 
 	 * @param input
 	 *            the input
 	 * @param context
-	 *            the context which will store the parsed value
-	 * @param args
-	 *            the command arguments from which the value will get extracted from
-	 * @return the parsed value, or <code>null</code> if nothing was parsed
+	 *            the context which stores the parsed argument values
+	 * @param argsReader
+	 *            the arguments reader
+	 * @return the parsed value, or <code>null</code> if nothing was parsed (eg. for optional command arguments)
 	 * @throws ArgumentParseException
-	 *             if unable to parse a value
+	 *             if unable to parse a value for a non-optional command argument
 	 */
-	public T parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
-		CommandArgs.State state = args.getState();
-		T value;
-		try {
-			value = this.parseValue(input, args);
-		} catch (ArgumentParseException e) {
-			// restore previous args state:
-			args.setState(state);
-			throw e;
-		}
+	public T parse(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws ArgumentParseException {
+		T value = this.parseValue(input, context.getView(), argsReader); // throws an ArgumentParseException on failure
 		if (value != null) {
 			context.put(name, value);
 		}
@@ -306,22 +303,27 @@ public abstract class CommandArgument<T> {
 	}
 
 	/**
-	 * Parses a value for this argument from the given {@link CommandArgs} and moves its cursor forward for every
-	 * successfully used-up argument.
+	 * Parses a value for this argument from the given {@link ArgumentsReader} and moves its cursor forward for every
+	 * used-up argument.
+	 * <p>
+	 * The parsing may depend on contents of the passed {@link CommandContext}, but unlike
+	 * {@link #parse(CommandInput, CommandContext, ArgumentsReader)} this method is not allowed to modify the context.
 	 * 
 	 * @param input
 	 *            the input
-	 * @param args
-	 *            the command arguments
-	 * @return the parsed value, or <code>null</code> to indicate that nothing was parsed
+	 * @param context
+	 *            an unmodifiable view on the context storing the already parsed argument values
+	 * @param argsReader
+	 *            the arguments reader
+	 * @return the parsed value, or <code>null</code> if nothing was parsed (eg. for optional command arguments)
 	 * @throws ArgumentParseException
-	 *             if unable to parse a value
+	 *             if unable to parse a value for a non-optional command argument
 	 */
-	public abstract T parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException;
+	public abstract T parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException;
 
 	/**
-	 * This provides suggestions for the last argument, IF parsing this argument would use up the last argument of
-	 * the {@link CommandArgs}.
+	 * This provides completion suggestions for the last (possibly partial or empty) argument, IF parsing this argument
+	 * would use up the last argument of the {@link ArgumentsReader}. Otherwise this does nothing.
 	 * <p>
 	 * Don't expect the returned suggestions list to be mutable. However, <code>null</code> is not a valid return value,
 	 * neither for the suggestions list nor its contents.
@@ -329,11 +331,11 @@ public abstract class CommandArgument<T> {
 	 * @param input
 	 *            the input
 	 * @param context
-	 *            the command context
-	 * @param args
-	 *            the command arguments, including the final, possibly partial or empty argument
+	 *            an unmodifiable view on the context storing the already parsed argument values
+	 * @param argsReader
+	 *            the arguments reader
 	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions' (not
 	 *         <code>null</code> and not containing <code>null</code>)
 	 */
-	public abstract List<String> complete(CommandInput input, CommandContext context, CommandArgs args);
+	public abstract List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader);
 }

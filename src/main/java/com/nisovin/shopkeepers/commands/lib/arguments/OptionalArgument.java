@@ -3,9 +3,10 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 import java.util.List;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -41,28 +42,28 @@ public class OptionalArgument<T> extends CommandArgument<T> {
 	}
 
 	@Override
-	public T parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
-		CommandArgs.State state = args.getState();
+	public T parse(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws ArgumentParseException {
+		ArgumentsReader argsReaderState = argsReader.createSnapshot();
 		T value;
 		try {
 			// let the wrapped argument handle the parsing:
-			value = argument.parse(input, context, args);
+			value = argument.parse(input, context, argsReader);
 		} catch (ArgumentParseException e) {
 			assert this.isOptional();
 			value = null;
-			// restore previous args state:
-			args.setState(state);
+			// restore previous args reader state:
+			argsReader.setState(argsReaderState);
 		}
 		return value;
 	}
 
 	@Override
-	public T parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-		return argument.parseValue(input, args);
+	public T parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+		return argument.parseValue(input, context, argsReader);
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-		return argument.complete(input, context, args);
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		return argument.complete(input, context, argsReader);
 	}
 }

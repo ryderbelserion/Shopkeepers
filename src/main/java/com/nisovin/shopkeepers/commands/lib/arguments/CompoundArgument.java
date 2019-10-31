@@ -5,10 +5,12 @@ import java.util.Collections;
 import java.util.List;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.SimpleCommandContext;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -101,64 +103,65 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 	// compound-argument's exception instead.
 
 	@Override
-	public T parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public T parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		// parse requirements:
-		CommandContext localContext = new CommandContext();
+		CommandContext localContext = context.copy();
 		for (CommandArgument<?> argument : arguments) {
-			argument.parse(input, localContext, args);
+			argument.parse(input, localContext, argsReader);
 		}
 
 		// parse actual value for this compound argument:
-		return this.parseValue(input, localContext, args);
+		return this.parseCompoundValue(input, localContext.getView(), argsReader);
 	}
 
-	protected abstract T parseValue(CommandInput input, CommandContext localContext, CommandArgs args) throws ArgumentParseException;
+	protected abstract T parseCompoundValue(CommandInput input, CommandContextView localContext, ArgumentsReader args) throws ArgumentParseException;
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
 		List<String> suggestions = new ArrayList<>();
-		CommandContext localContext = new CommandContext();
+		CommandContext localContext = new SimpleCommandContext();
+		CommandContextView localContextView = localContext.getView();
 		// Similar to Command#handleTabCompletion
 		for (CommandArgument<?> argument : arguments) {
-			int remainingArgs = args.getRemainingSize();
+			int remainingArgs = argsReader.getRemainingSize();
 			if (remainingArgs == 0) {
 				// no argument left which could be completed:
 				break;
 			}
-			CommandArgs.State state = args.getState();
+			ArgumentsReader argsReaderState = argsReader.createSnapshot();
 			try {
-				argument.parse(input, localContext, args);
+				argument.parse(input, localContext, argsReader);
 				// successfully parsed:
-				if (!args.hasNext()) {
+				if (!argsReader.hasNext()) {
 					// this consumed the last argument:
 					// reset args and provide alternative completions for the last argument instead:
-					args.setState(state);
-					suggestions.addAll(argument.complete(input, localContext, args));
+					argsReader.setState(argsReaderState);
+					suggestions.addAll(argument.complete(input, localContextView, argsReader));
 					break;
-				} else if (args.getRemainingSize() == remainingArgs) {
+				} else if (argsReader.getRemainingSize() == remainingArgs) {
 					// no error during parsing, but none of the remaining args used up:
 					// -> this was an optional argument which got skipped
 					// include suggestions (if it has any), but continue:
-					suggestions.addAll(argument.complete(input, localContext, args));
+					suggestions.addAll(argument.complete(input, localContextView, argsReader));
 
 					// reset state (just in case), and then let the following arguments also try to complete the same
 					// arg(s):
-					args.setState(state);
+					argsReader.setState(argsReaderState);
 					continue;
 				}
 			} catch (ArgumentParseException e) {
-				if (args.getRemainingSize() == remainingArgs) {
+				if (argsReader.getRemainingSize() == remainingArgs) {
 					// error, but none of the remaining args were used up:
 					// -> this was a hidden argument that didn't consume any arguments
 					// -> skip and continue
 					// reset state (just in case):
-					args.setState(state);
+					argsReader.setState(argsReaderState);
 					continue;
 				} else {
 					// parsing might have failed because of an invalid partial last argument
 					// -> include suggestions in that case
-					args.setState(state);
-					suggestions.addAll(argument.complete(input, localContext, args));
+					argsReader.setState(argsReaderState);
+					suggestions.addAll(argument.complete(input, localContextView, argsReader));
 					// parsing might also have failed because of an invalid argument inside the sequence of arguments
 					// -> skip later arguments (current argument will not provide suggestions in that case, because it
 					// isn't using up the last argument)

@@ -11,9 +11,9 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.ArgumentRejectedException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.IntegerArgument;
 import com.nisovin.shopkeepers.util.ConversionUtils;
@@ -44,40 +44,40 @@ public class ShopkeeperByIdArgument extends CommandArgument<Shopkeeper> {
 	}
 
 	@Override
-	public Shopkeeper parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public Shopkeeper parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		// throws an exception if the argument is missing or not a valid integer
-		Integer shopId = idArgument.parseValue(input, args);
+		Integer shopId = idArgument.parseValue(input, context, argsReader);
 		Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperById(shopId);
 		if (shopkeeper == null) {
-			throw this.invalidArgumentError(args.current());
+			throw this.invalidArgumentError(argsReader.current());
 		} else if (!filter.test(shopkeeper)) {
-			throw new ArgumentRejectedException(filter.getInvalidArgumentErrorMsg(this, args.current(), shopkeeper));
+			throw new ArgumentRejectedException(filter.getInvalidArgumentErrorMsg(this, argsReader.current(), shopkeeper));
 		} else {
 			return shopkeeper;
 		}
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-		if (args.getRemainingSize() == 1) {
-			List<String> suggestions = new ArrayList<>();
-			String partialArg = args.next();
-			if (ConversionUtils.parseInt(partialArg) != null) {
-				// assert !partialArg.isEmpty() && partialArg is valid integer
-				// check for matching ids:
-				// TODO prefer short ids (eg. input "2", suggest "20", "21", "22",.. instead of "200", "201", "202",..)
-				Collection<? extends Shopkeeper> allShopkeepers = ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers();
-				for (Shopkeeper shopkeeper : allShopkeepers) {
-					if (suggestions.size() >= MAX_SUGGESTIONS) break;
-					if (!filter.test(shopkeeper)) continue; // filtered
-					String shopId = String.valueOf(shopkeeper.getId());
-					if (shopId.startsWith(partialArg)) {
-						suggestions.add(shopId);
-					}
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		if (argsReader.getRemainingSize() != 1) {
+			return Collections.emptyList();
+		}
+		List<String> suggestions = new ArrayList<>();
+		String partialArg = argsReader.next();
+		if (ConversionUtils.parseInt(partialArg) != null) {
+			// assert !partialArg.isEmpty() && partialArg is valid integer
+			// check for matching ids:
+			// TODO prefer short ids (eg. input "2", suggest "20", "21", "22",.. instead of "200", "201", "202",..)
+			Collection<? extends Shopkeeper> allShopkeepers = ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers();
+			for (Shopkeeper shopkeeper : allShopkeepers) {
+				if (suggestions.size() >= MAX_SUGGESTIONS) break;
+				if (!filter.test(shopkeeper)) continue; // filtered
+				String shopId = String.valueOf(shopkeeper.getId());
+				if (shopId.startsWith(partialArg)) {
+					suggestions.add(shopId);
 				}
 			}
-			return Collections.unmodifiableList(suggestions);
 		}
-		return Collections.emptyList();
+		return Collections.unmodifiableList(suggestions);
 	}
 }

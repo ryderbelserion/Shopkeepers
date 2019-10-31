@@ -7,9 +7,10 @@ import java.util.ListIterator;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.ArgumentRejectedException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
 import com.nisovin.shopkeepers.util.Pair;
@@ -97,17 +98,9 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 	}
 
 	@Override
-	public Pair<CommandArgument<?>, Object> parse(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
-		CommandArgs.State state = args.getState();
-		Pair<CommandArgument<?>, Object> result;
-		try {
-			// with context, so that the child argument can store its value(s)
-			result = this.parseValue(input, context, args);
-		} catch (ArgumentParseException e) {
-			// restore previous args state:
-			args.setState(state);
-			throw e;
-		}
+	public Pair<CommandArgument<?>, Object> parse(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws ArgumentParseException {
+		// with modifiable context, so that the child argument can store its value(s)
+		Pair<CommandArgument<?>, Object> result = this.parsePair(input, context, argsReader);
 		if (result != null) {
 			context.put(this.getName(), result);
 		}
@@ -116,14 +109,15 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 
 	// returns a pair with the argument and the parsed value, or null if nothing was parsed
 	@Override
-	public Pair<CommandArgument<?>, Object> parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-		return this.parseValue(input, null, args); // without context
+	public Pair<CommandArgument<?>, Object> parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+		return this.parsePair(input, context, argsReader); // with unmodifiable context view
 	}
 
-	// context != null: use 'parse' rather than 'parseValue' in order to let the child argument store its parsed value
-	private Pair<CommandArgument<?>, Object> parseValue(CommandInput input, CommandContext context, CommandArgs args) throws ArgumentParseException {
+	// context instanceof CommandContextView: use 'parseValue' rather than 'parse', which will let the child argument
+	// store its parsed value
+	private Pair<CommandArgument<?>, Object> parsePair(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws ArgumentParseException {
 		// try one after the other:
-		CommandArgs.State state = args.getState();
+		ArgumentsReader argsReaderState = argsReader.createSnapshot();
 		Object value = null;
 		FallbackArgumentException fallbackException = null;
 		boolean nullParsed = false;
@@ -131,10 +125,10 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 		ArgumentParseException firstParseException = null;
 		for (CommandArgument<?> argument : arguments) {
 			try {
-				if (context != null) {
-					value = argument.parse(input, context, args);
+				if (context instanceof CommandContextView) {
+					value = argument.parseValue(input, (CommandContextView) context, argsReader);
 				} else {
-					value = argument.parseValue(input, args);
+					value = argument.parse(input, context, argsReader);
 				}
 				if (value != null) {
 					// we successfully parsed something:
@@ -160,7 +154,7 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 				}
 			}
 			// reset state and continue:
-			args.setState(state);
+			argsReader.setState(argsReaderState);
 		}
 
 		if (fallbackException != null) {
@@ -188,17 +182,17 @@ public class FirstOfArgument extends CommandArgument<Pair<CommandArgument<?>, Ob
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
 		List<String> suggestions = new ArrayList<>();
-		CommandArgs.State state = args.getState(); // keep track of the initial state
+		ArgumentsReader argsReaderState = argsReader.createSnapshot();
 		for (CommandArgument<?> argument : arguments) {
 			int limit = (MAX_SUGGESTIONS - suggestions.size());
 			if (limit <= 0) break;
 
 			// reset args so that every argument has a chance to provide completions:
-			args.setState(state);
+			argsReader.setState(argsReaderState);
 
-			List<String> argumentSuggestions = argument.complete(input, context, args);
+			List<String> argumentSuggestions = argument.complete(input, context, argsReader);
 			if (argumentSuggestions.size() < limit) {
 				suggestions.addAll(argumentSuggestions);
 			} else {

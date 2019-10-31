@@ -7,9 +7,9 @@ import java.util.Locale;
 import java.util.Map;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -26,11 +26,11 @@ public class FixedValuesArgument extends CommandArgument<Object> {
 	}
 
 	@Override
-	public Object parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-		if (!args.hasNext()) {
+	public Object parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+		if (!argsReader.hasNext()) {
 			throw this.missingArgumentError();
 		}
-		String argument = args.next();
+		String argument = argsReader.next();
 		Object value = values.get(argument);
 		if (value == null) {
 			// try again with lower and upper case variants of the input:
@@ -46,10 +46,10 @@ public class FixedValuesArgument extends CommandArgument<Object> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-		if (args.getRemainingSize() == 1) {
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		if (argsReader.getRemainingSize() == 1) {
 			List<String> suggestions = new ArrayList<>();
-			String partialArg = args.next().toLowerCase(Locale.ROOT);
+			String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
 			for (String valueKey : values.keySet()) {
 				if (suggestions.size() >= MAX_SUGGESTIONS) break;
 				if (valueKey.toLowerCase(Locale.ROOT).startsWith(partialArg)) {

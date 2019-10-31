@@ -25,8 +25,7 @@ import com.nisovin.shopkeepers.commands.Confirmations;
 import com.nisovin.shopkeepers.commands.arguments.ShopObjectTypeArgument;
 import com.nisovin.shopkeepers.commands.arguments.ShopTypeArgument;
 import com.nisovin.shopkeepers.commands.lib.BaseCommand;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.CommandRegistry;
@@ -93,7 +92,7 @@ public class ShopkeepersCommand extends BaseCommand {
 	}
 
 	@Override
-	protected void execute(CommandInput input, CommandContext context, CommandArgs args) throws CommandException {
+	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 		if (!(input.getSender() instanceof Player)) {
 			throw PlayerCommand.createCommandSourceRejectedException(sender);

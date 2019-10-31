@@ -19,6 +19,7 @@ public class CommandRegistry {
 	// gets only initialized when used, sorted by insertion order:
 	private Set<Command> commands = null;
 	// normalized aliases:
+	// implementation detail (used by Command): all aliases for the same command are stored in succession
 	private Map<String, Command> commandsByAlias = null;
 
 	public CommandRegistry(Command parent) {

@@ -7,10 +7,10 @@ import java.util.List;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.ArgumentRejectedException;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.Command;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
@@ -64,14 +64,14 @@ public abstract class ObjectIdArgument<Id> extends CommandArgument<Id> {
 	protected abstract String normalize(String idString);
 
 	@Override
-	public Id parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public Id parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		// prefer this class's missing-argument exception over the id-argument's exception:
-		if (!args.hasNext()) {
+		if (!argsReader.hasNext()) {
 			throw this.missingArgumentError();
 		}
-		int startIndex = args.getCurrentIndex();
+		int startIndex = argsReader.getCursor();
 		// throws exceptions with appropriate messages if the id cannot be parsed:
-		Id id = idArgument.parseValue(input, args);
+		Id id = idArgument.parseValue(input, context, argsReader);
 
 		// check if the id matches a known id and then use that instead:
 		if (matchKnownIds) {
@@ -80,8 +80,8 @@ public abstract class ObjectIdArgument<Id> extends CommandArgument<Id> {
 
 		// check if id is accepted:
 		if (!filter.test(id)) {
-			int endIndex = args.getCurrentIndex();
-			List<String> parsedArgs = args.getArgs().subList(startIndex + 1, endIndex + 1);
+			int endIndex = argsReader.getCursor();
+			List<String> parsedArgs = argsReader.getArgs().subList(startIndex + 1, endIndex + 1);
 			String parsedArgsString = String.join(Command.ARGUMENTS_SEPARATOR, parsedArgs);
 			throw new ArgumentRejectedException(filter.getInvalidArgumentErrorMsg(this, parsedArgsString, id));
 		}
@@ -89,23 +89,23 @@ public abstract class ObjectIdArgument<Id> extends CommandArgument<Id> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
 		// Note: By default this also provides suggestions if there a no remaining args (empty partial input).
 		// Some types of id-arguments (eg. if there are lots of candidate ids) might want to limit their suggestions to
 		// the case that there is at least a minimum sized input (see minimalCompletionInput).
-		int startIndex = args.getCurrentIndex();
+		int startIndex = argsReader.getCursor();
 		// parse id as far as possible:
 		try {
-			idArgument.parseValue(input, args);
+			idArgument.parseValue(input, context, argsReader);
 		} catch (ArgumentParseException e) {
 		}
-		if (args.getRemainingSize() > 0) {
+		if (argsReader.getRemainingSize() > 0) {
 			// there are still arguments left, so this is not consuming the last argument
 			return Collections.emptyList();
 		}
 
-		int endIndex = args.getCurrentIndex();
-		List<String> parsedArgs = args.getArgs().subList(startIndex + 1, endIndex + 1);
+		int endIndex = argsReader.getCursor();
+		List<String> parsedArgs = argsReader.getArgs().subList(startIndex + 1, endIndex + 1);
 		String parsedArgsString = String.join(Command.ARGUMENTS_SEPARATOR, parsedArgs);
 		if (parsedArgsString.length() < minimalCompletionInput) {
 			// only provide suggestions if there is a minimal length input

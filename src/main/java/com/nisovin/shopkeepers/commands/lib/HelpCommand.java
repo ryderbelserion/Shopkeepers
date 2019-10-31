@@ -23,7 +23,7 @@ public class HelpCommand extends Command {
 	}
 
 	@Override
-	protected void execute(CommandInput input, CommandContext context, CommandArgs args) throws CommandException {
+	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		helpSource.sendHelp(input.getSender());
 	}
 }

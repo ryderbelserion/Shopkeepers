@@ -7,17 +7,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.RequiresPlayerArgumentException;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
  * A {@link FallbackArgument} that returns the sender if it is a player, without consuming any arguments.
  * <p>
- * If the sender is not a player, the parsing exception of the original argument is thrown (the original argument might
- * get reevaluated is some parsing context has changed).
+ * If the sender is not a player, a {@link RequiresPlayerArgumentException} is thrown.
  */
 public class SenderPlayerFallback extends FallbackArgument<Player> {
 
@@ -33,7 +33,7 @@ public class SenderPlayerFallback extends FallbackArgument<Player> {
 		}
 
 		@Override
-		public Player parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+		public Player parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 			CommandSender sender = input.getSender();
 			if (!(sender instanceof Player)) {
 				throw this.requiresPlayerError();
@@ -43,7 +43,7 @@ public class SenderPlayerFallback extends FallbackArgument<Player> {
 		}
 
 		@Override
-		public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
+		public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
 			return Collections.emptyList();
 		}
 	}

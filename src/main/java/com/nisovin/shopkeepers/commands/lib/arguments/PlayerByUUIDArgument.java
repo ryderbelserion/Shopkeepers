@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 
 /**
@@ -58,16 +58,16 @@ public class PlayerByUUIDArgument extends CommandArgument<Player> {
 	}
 
 	@Override
-	public Player parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public Player parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		// exceptions (and messages) are handled by the player-uuid argument
-		UUID uuid = playerUUIDArgument.parseValue(input, args);
+		UUID uuid = playerUUIDArgument.parseValue(input, context, argsReader);
 		Player player = Bukkit.getPlayer(uuid);
 		assert player != null; // already checked by the player-uuid argument
 		return player;
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-		return playerUUIDArgument.complete(input, context, args);
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		return playerUUIDArgument.complete(input, context, argsReader);
 	}
 }

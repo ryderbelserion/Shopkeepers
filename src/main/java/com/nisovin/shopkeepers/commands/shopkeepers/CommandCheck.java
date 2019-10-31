@@ -20,8 +20,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.commands.lib.Command;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
@@ -60,7 +59,7 @@ class CommandCheck extends Command {
 	}
 
 	@Override
-	protected void execute(CommandInput input, CommandContext context, CommandArgs args) throws CommandException {
+	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 		boolean isConsole = (sender instanceof ConsoleCommandSender);
 

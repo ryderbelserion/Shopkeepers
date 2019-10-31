@@ -1,7 +1,8 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -20,11 +21,11 @@ public class BoundedIntegerArgument extends IntegerArgument {
 	// TODO more descriptive error messages
 
 	@Override
-	public Integer parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-		Integer value = super.parseValue(input, args);
+	public Integer parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+		Integer value = super.parseValue(input, context, argsReader);
 		assert value != null;
 		if (value < min || value > max) {
-			throw this.invalidArgumentError(args.current());
+			throw this.invalidArgumentError(argsReader.current());
 		}
 		return value;
 	}

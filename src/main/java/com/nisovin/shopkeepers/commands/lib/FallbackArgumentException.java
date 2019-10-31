@@ -17,13 +17,13 @@ public class FallbackArgumentException extends ArgumentParseException {
 
 	public FallbackArgumentException(FallbackArgument<?> fallbackArgument, ArgumentParseException originalException) {
 		super(Validate.notNull(originalException).getMessage(), originalException.getCause());
-		Validate.notNull(fallbackArgument);
+		Validate.notNull(fallbackArgument, "Fallback argument is null!");
 		this.fallbackArgument = fallbackArgument;
 		this.originalException = originalException;
 	}
 
 	/**
-	 * Gets the {@link FallbackArgument} that may be able to provide a fallback.
+	 * Gets the {@link FallbackArgument} that threw this exception and may be able to provide a fallback.
 	 * 
 	 * @return the fallback argument
 	 */

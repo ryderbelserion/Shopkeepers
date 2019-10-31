@@ -7,9 +7,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.Pair;
 import com.nisovin.shopkeepers.util.PlayerUtils;
@@ -46,9 +46,9 @@ public class PlayerArgument extends CommandArgument<Player> {
 	}
 
 	@Override
-	public Player parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public Player parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		// also handles argument exceptions:
-		Pair<CommandArgument<?>, Object> result = firstOfArgument.parseValue(input, args);
+		Pair<CommandArgument<?>, Object> result = firstOfArgument.parseValue(input, context, argsReader);
 		return (result == null) ? null : (Player) result.getSecond();
 	}
 
@@ -66,7 +66,7 @@ public class PlayerArgument extends CommandArgument<Player> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-		return firstOfArgument.complete(input, context, args);
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		return firstOfArgument.complete(input, context, argsReader);
 	}
 }

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -57,12 +57,12 @@ public class AliasArgument<T> extends CommandArgument<T> {
 	}
 
 	@Override
-	public T parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-		return argument.parseValue(input, args);// delegate
+	public T parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+		return argument.parseValue(input, context, argsReader);// delegate
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-		return argument.complete(input, context, args); // delegate
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		return argument.complete(input, context, argsReader); // delegate
 	}
 }

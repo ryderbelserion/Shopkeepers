@@ -21,8 +21,10 @@ Date format: (YYYY-MM-DD)
 * API: Added ShopkeepersStartupEvent which can be used by plugins to make registrations during Shopkeepers' startup process (eg. to register custom shop types, object types, etc.). This event is marked as deprecated because custom shop types, object types, etc. are not yet officially supported as part of the API. Also, the event is called so early that the plugin (and thereby the API) are not yet fully setup and ready to be used, so this event is only of use for plugins which know what they are doing.
 
 * Various (mostly internal) changes to commands and argument parsing:  
-  * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information. A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
-  * Most optional arguments, default values and fallbacks were updated to use this new fallback mechanism, which should provide more relevant error messages in a few edge cases.
+  * Fallback mechanism:
+    * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information.
+    * A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
+    * Most optional arguments, default values and fallbacks were updated to use this new fallback mechanism, which should provide more relevant error messages in a few edge cases.
   * "list", "remove", "transfer" and "setTradePerm" commands can be used from console now. Command confirmations work for the console as well now (any command sender that is not a player is considered to be the 'console' for this purpose).
   * "setForHire" and "transfer" commands allow specifying the shopkeeper via argument now. Also: When targeting a chest that happens to be used by multiple shopkeepers (eg. due to manually modified save data..), it picks the first one now (instead of applying the command to all shops). In the future this will likely print an error message instead.
   * "debugCreateShops" command: Shop count per command invocation is limited to 1000 now.
@@ -57,6 +59,10 @@ Date format: (YYYY-MM-DD)
   * Internal: Added CommandContext#copy() and made constructor CommandContext(otherContext) protected.
   * Internal: Added CommandArgs#copy. Since the underlying arguments are expected to never change, they are not actually copied (only the parsing state is copied). Any captured CommandArgs states are applicable to the copy as well.
   * Internal: Added marker interface for the CommandArgs state.
+  * Internal: Replaced CommandArgs with ArgumentsReader: The arguments are now stored inside the CommandInput and the ArgumentsReader only references them from there.
+  * Internal: CommandContext is now an interface (with SimpleCommandContext as implementation). A new class CommandContextView was added that gets used anywhere where accessing the context is allowed, while modifying is not.
+  * Internal: Command and tab completion handling was moved from BaseCommand into Command.
+  * Internal: Resetting of the arguments reader if parsing of an command argument failed was moved from CommandArgument#parse into Command.
   
 Other internal changes:  
 * Internal: Added Utils#concat() for arrays.

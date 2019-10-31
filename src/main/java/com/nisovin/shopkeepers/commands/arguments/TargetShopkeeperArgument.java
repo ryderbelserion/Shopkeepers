@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils.TargetShopkeeperFilter;
@@ -41,7 +41,7 @@ public class TargetShopkeeperArgument extends CommandArgument<Shopkeeper> {
 	}
 
 	@Override
-	public Shopkeeper parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public Shopkeeper parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		CommandSender sender = input.getSender();
 		if (!(sender instanceof Player)) {
 			throw this.requiresPlayerError();
@@ -59,7 +59,7 @@ public class TargetShopkeeperArgument extends CommandArgument<Shopkeeper> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
 		return Collections.emptyList();
 	}
 }

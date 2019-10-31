@@ -6,9 +6,9 @@ import java.util.List;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
 import com.nisovin.shopkeepers.util.Pair;
@@ -64,14 +64,14 @@ public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 	}
 
 	@Override
-	public Shopkeeper parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public Shopkeeper parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		// also handles argument exceptions:
-		Pair<CommandArgument<?>, Object> result = firstOfArgument.parseValue(input, args);
+		Pair<CommandArgument<?>, Object> result = firstOfArgument.parseValue(input, context, argsReader);
 		return (result == null) ? null : (Shopkeeper) result.getSecond();
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-		return firstOfArgument.complete(input, context, args);
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		return firstOfArgument.complete(input, context, argsReader);
 	}
 }

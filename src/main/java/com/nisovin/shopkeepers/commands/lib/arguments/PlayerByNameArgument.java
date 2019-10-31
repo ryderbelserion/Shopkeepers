@@ -7,9 +7,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.PlayerUtils;
 
@@ -95,10 +95,10 @@ public class PlayerByNameArgument extends CommandArgument<Player> {
 	}
 
 	@Override
-	public Player parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
+	public Player parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		try {
 			// exceptions (and messages) are handled by the player-name argument
-			String name = playerNameArgument.parseValue(input, args);
+			String name = playerNameArgument.parseValue(input, context, argsReader);
 			// we found a matching and accepted player, otherwise the name argument and its filters would have thrown an
 			// exception
 			assert playerMatched && matchedPlayer != null && matchedPlayer.getName().equals(name) && filter.test(matchedPlayer);
@@ -111,7 +111,7 @@ public class PlayerByNameArgument extends CommandArgument<Player> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-		return playerNameArgument.complete(input, context, args);
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		return playerNameArgument.complete(input, context, argsReader);
 	}
 }

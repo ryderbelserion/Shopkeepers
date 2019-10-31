@@ -9,9 +9,9 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -31,11 +31,11 @@ public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 	}
 
 	@Override
-	public ShopType<?> parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-		if (!args.hasNext()) {
+	public ShopType<?> parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+		if (!argsReader.hasNext()) {
 			throw this.missingArgumentError();
 		}
-		String argument = args.next();
+		String argument = argsReader.next();
 		ShopType<?> value = ShopkeepersPlugin.getInstance().getShopTypeRegistry().match(argument);
 		if (value == null) {
 			throw this.invalidArgumentError(argument);
@@ -44,26 +44,26 @@ public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-		if (args.getRemainingSize() == 1) {
-			List<String> suggestions = new ArrayList<>();
-			String partialArg = StringUtils.normalize(args.next());
-			for (ShopType<?> shopType : ShopkeepersPlugin.getInstance().getShopTypeRegistry().getRegisteredTypes()) {
-				if (suggestions.size() >= MAX_SUGGESTIONS) break;
-				String displayName = shopType.getDisplayName();
-				displayName = StringUtils.normalizeKeepCase(displayName);
-				String displayNameNorm = displayName.toLowerCase(Locale.ROOT);
-				if (displayNameNorm.startsWith(partialArg)) {
-					suggestions.add(displayName);
-				} else {
-					String identifier = shopType.getIdentifier();
-					if (identifier.startsWith(partialArg)) {
-						suggestions.add(identifier);
-					}
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		if (argsReader.getRemainingSize() != 1) {
+			return Collections.emptyList();
+		}
+		List<String> suggestions = new ArrayList<>();
+		String partialArg = StringUtils.normalize(argsReader.next());
+		for (ShopType<?> shopType : ShopkeepersPlugin.getInstance().getShopTypeRegistry().getRegisteredTypes()) {
+			if (suggestions.size() >= MAX_SUGGESTIONS) break;
+			String displayName = shopType.getDisplayName();
+			displayName = StringUtils.normalizeKeepCase(displayName);
+			String displayNameNorm = displayName.toLowerCase(Locale.ROOT);
+			if (displayNameNorm.startsWith(partialArg)) {
+				suggestions.add(displayName);
+			} else {
+				String identifier = shopType.getIdentifier();
+				if (identifier.startsWith(partialArg)) {
+					suggestions.add(identifier);
 				}
 			}
-			return Collections.unmodifiableList(suggestions);
 		}
-		return Collections.emptyList();
+		return Collections.unmodifiableList(suggestions);
 	}
 }

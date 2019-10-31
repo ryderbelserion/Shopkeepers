@@ -1,55 +1,79 @@
 package com.nisovin.shopkeepers.commands.lib;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import org.bukkit.command.CommandSender;
 
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
- * Stores info about the original command input, excluding the arguments (as those get handled separately).
+ * General information about the command invocation.
  */
 public final class CommandInput {
 
 	private final CommandSender sender;
-	private final String commandName;
-	private final String usedAlias;
+	private final Command command;
+	private final String commandAlias;
+	private final List<String> arguments; // unmodifiable
 
-	public CommandInput(CommandSender sender, String commandName, String usedAlias) {
-		Validate.notNull(sender);
-		Validate.notEmpty(commandName);
-		Validate.notEmpty(usedAlias);
+	// the arguments are expected to not change during the command processing
+	public CommandInput(CommandSender sender, Command command, String commandAlias, String[] arguments) {
+		this(sender, command, commandAlias, (arguments == null) ? Collections.emptyList() : Arrays.asList(arguments));
+	}
+
+	// the arguments are expected to not change during the command processing
+	public CommandInput(CommandSender sender, Command command, String commandAlias, List<String> arguments) {
+		Validate.notNull(sender, "Sender is null!");
+		Validate.notNull(command, "Command is null!");
+		Validate.notEmpty(commandAlias, "Command alias is empty!");
+		Validate.notNull(arguments, "Arguments is null!");
+		Validate.isTrue(!arguments.contains(null), "Arguments contains null!");
 
 		this.sender = sender;
-		this.commandName = commandName;
-		this.usedAlias = usedAlias;
+		this.command = command;
+		this.commandAlias = commandAlias;
+		this.arguments = Collections.unmodifiableList(arguments);
 	}
 
 	/**
-	 * Gets the {@link CommandSender} executing the command.
+	 * Gets the {@link CommandSender} which is executing the command.
 	 * 
-	 * @return the command sender
+	 * @return the command sender, not <code>null</code>
 	 */
 	public CommandSender getSender() {
 		return sender;
 	}
 
 	/**
-	 * Gets the name of the executed command.
+	 * Gets the {@link Command} that is being executed.
 	 * 
-	 * @return the name of the command
+	 * @return the command, not <code>null</code>
 	 */
-	public String getCommandName() {
-		return commandName;
+	public Command getCommand() {
+		return command;
 	}
 
 	/**
-	 * Gets the alias that was used to call the command.
+	 * Gets the alias that was used to invoke the command.
 	 * <p>
-	 * Note: The server might allow the execution of the command with different / modified aliases (for example with the
-	 * plugin's name as prefix). Therefore this might not perfectly match any of the command's aliases.
+	 * Note: The server might allow the execution of the command via aliases that don't match any of the command's
+	 * {@link Command#getAliases() known aliases} (for example via the command's known aliases prefixed by the plugin's
+	 * name, or via custom aliases that were defined by the server admin).
 	 * 
-	 * @return the used alias
+	 * @return the used command alias, not <code>null</code> or empty
 	 */
-	public String getUsedAlias() {
-		return usedAlias;
+	public String getCommandAlias() {
+		return commandAlias;
+	}
+
+	/**
+	 * Gets the arguments that were specified during the command invocation.
+	 * 
+	 * @return an unmodifiable view on the arguments, not <code>null</code> but may be empty
+	 */
+	public List<String> getArguments() {
+		return arguments;
 	}
 }

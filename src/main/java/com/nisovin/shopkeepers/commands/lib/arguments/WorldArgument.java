@@ -8,9 +8,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 
@@ -21,11 +21,11 @@ public class WorldArgument extends CommandArgument<World> {
 	}
 
 	@Override
-	public World parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-		if (!args.hasNext()) {
+	public World parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+		if (!argsReader.hasNext()) {
 			throw this.missingArgumentError();
 		}
-		String argument = args.next();
+		String argument = argsReader.next();
 		World value = Bukkit.getWorld(argument);
 		if (value == null) {
 			// interpret input as world id:
@@ -41,7 +41,7 @@ public class WorldArgument extends CommandArgument<World> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
 		return Collections.emptyList();
 	}
 }

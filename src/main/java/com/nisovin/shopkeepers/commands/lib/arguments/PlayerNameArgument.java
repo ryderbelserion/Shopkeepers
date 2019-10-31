@@ -10,9 +10,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.PlayerUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -88,14 +88,14 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
 		// Note: Custom completion code for now to handle display names correctly (not suggesting both the name and
 		// display name for the same player).
-		if (args.getRemainingSize() != 1) {
+		if (argsReader.getRemainingSize() != 1) {
 			// there are no remaining arguments to complete, or we are not using up the final argument
 			return Collections.emptyList();
 		}
-		String nameArg = args.next(); // can be empty
+		String nameArg = argsReader.next(); // can be empty
 		if (nameArg.length() < minimalCompletionInput) {
 			// only provide suggestions if there is a minimal length input
 			return Collections.emptyList();

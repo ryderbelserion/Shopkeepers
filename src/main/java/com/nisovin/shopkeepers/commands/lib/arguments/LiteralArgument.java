@@ -5,9 +5,9 @@ import java.util.Collections;
 import java.util.List;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.CommandArgs;
+import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
@@ -46,12 +46,12 @@ public class LiteralArgument extends CommandArgument<String> {
 	}
 
 	@Override
-	public String parseValue(CommandInput input, CommandArgs args) throws ArgumentParseException {
-		if (!args.hasNext()) {
+	public String parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+		if (!argsReader.hasNext()) {
 			throw this.missingArgumentError();
 		}
 
-		String argument = args.next();
+		String argument = argsReader.next();
 		String value = null;
 		for (String literal : literals) {
 			if (argument.equalsIgnoreCase(literal)) {
@@ -66,10 +66,10 @@ public class LiteralArgument extends CommandArgument<String> {
 	}
 
 	@Override
-	public List<String> complete(CommandInput input, CommandContext context, CommandArgs args) {
-		if (args.getRemainingSize() == 1) {
+	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
+		if (argsReader.getRemainingSize() == 1) {
 			List<String> suggestions = new ArrayList<>();
-			String partialArg = args.next().toLowerCase();
+			String partialArg = argsReader.next().toLowerCase();
 			for (String literal : literals) {
 				if (suggestions.size() >= MAX_SUGGESTIONS) break;
 				if (literal.toLowerCase().startsWith(partialArg)) {
