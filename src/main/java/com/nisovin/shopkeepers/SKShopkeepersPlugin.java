@@ -192,7 +192,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 
 		if (!langFile.exists()) {
-			if (lang.equals("en")) { // if not default // TODO don't hardcode
+			if (!lang.equals("en")) { // if not default // TODO don't hardcode
 				Log.warning("Could not find language file '" + langFile.getPath() + "'!");
 			} // else: ignore
 		} else {
