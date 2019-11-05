@@ -42,6 +42,9 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 		this.arguments = Collections.unmodifiableList(argumentsList);
 		for (CommandArgument<?> argument : arguments) {
 			Validate.notNull(argument, "A contained argument is null!");
+			// TODO this also excludes optional arguments.. allow fallbacks and handle them somehow? Maybe evaluate
+			// fallbacks immediately?
+			Validate.isTrue(!(argument instanceof FallbackArgument), "Cannot use fallback arguments in compound argument!");
 			argument.setParent(this);
 			argumentsList.add(argument);
 		}

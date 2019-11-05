@@ -10,15 +10,14 @@ import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
-import com.nisovin.shopkeepers.util.Pair;
+import com.nisovin.shopkeepers.commands.lib.arguments.TypedFirstOfArgument;
 
 public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 
 	private final ShopkeeperByUUIDArgument shopUUIDArgument;
 	private final ShopkeeperByIdArgument shopIdArgument;
 	private final ShopkeeperByNameArgument shopNameArgument;
-	private final FirstOfArgument firstOfArgument;
+	private final TypedFirstOfArgument<Shopkeeper> firstOfArgument;
 
 	public ShopkeeperArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
@@ -46,7 +45,7 @@ public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 				return ShopkeeperArgument.this.matchShopkeeper(nameInput);
 			}
 		};
-		this.firstOfArgument = new FirstOfArgument(name + ":firstOf", Arrays.asList(shopUUIDArgument, shopIdArgument, shopNameArgument), false, false);
+		this.firstOfArgument = new TypedFirstOfArgument<>(name + ":firstOf", Arrays.asList(shopUUIDArgument, shopIdArgument, shopNameArgument), false, false);
 		firstOfArgument.setParent(this);
 	}
 
@@ -66,8 +65,7 @@ public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 	@Override
 	public Shopkeeper parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		// also handles argument exceptions:
-		Pair<CommandArgument<?>, Object> result = firstOfArgument.parseValue(input, context, argsReader);
-		return (result == null) ? null : (Shopkeeper) result.getSecond();
+		return firstOfArgument.parseValue(input, context, argsReader);
 	}
 
 	@Override

@@ -7,11 +7,11 @@ public class MissingArgumentException extends ArgumentParseException {
 
 	private static final long serialVersionUID = -3269722516077651284L;
 
-	public MissingArgumentException(String message) {
-		super(message);
+	public MissingArgumentException(CommandArgument<?> argument, String message) {
+		this(argument, message, null);
 	}
 
-	public MissingArgumentException(String message, Throwable cause) {
-		super(message, cause);
+	public MissingArgumentException(CommandArgument<?> argument, String message, Throwable cause) {
+		super(argument, message, cause);
 	}
 }

@@ -19,7 +19,7 @@ import com.nisovin.shopkeepers.util.Validate;
  * <p>
  * If the sender is not a player, a {@link RequiresPlayerArgumentException} is thrown.
  */
-public class SenderPlayerNameFallback extends FallbackArgument<String> {
+public class SenderPlayerNameFallback extends TypedFallbackArgument<String> {
 
 	public static class SenderPlayerNameArgument extends CommandArgument<String> {
 

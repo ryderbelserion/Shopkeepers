@@ -37,17 +37,18 @@ public class EnumArgument<T extends Enum<T>> extends CommandArgument<T> {
 
 	@Override
 	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
-		if (argsReader.getRemainingSize() == 1) {
-			List<String> suggestions = new ArrayList<>();
-			String partialArg = argsReader.next().toUpperCase();
-			for (T value : clazz.getEnumConstants()) {
-				if (suggestions.size() >= MAX_SUGGESTIONS) break;
-				if (value.name().toUpperCase().startsWith(partialArg)) {
-					suggestions.add(value.name());
-				}
-			}
-			return Collections.unmodifiableList(suggestions);
+		if (argsReader.getRemainingSize() != 1) {
+			return Collections.emptyList();
 		}
-		return Collections.emptyList();
+
+		List<String> suggestions = new ArrayList<>();
+		String partialArg = argsReader.next().toUpperCase();
+		for (T value : clazz.getEnumConstants()) {
+			if (suggestions.size() >= MAX_SUGGESTIONS) break;
+			if (value.name().toUpperCase().startsWith(partialArg)) {
+				suggestions.add(value.name());
+			}
+		}
+		return Collections.unmodifiableList(suggestions);
 	}
 }

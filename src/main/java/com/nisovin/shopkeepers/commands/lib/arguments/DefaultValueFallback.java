@@ -8,7 +8,7 @@ import com.nisovin.shopkeepers.util.Validate;
  * 
  * @see FixedValueArgument
  */
-public class DefaultValueFallback<T> extends FallbackArgument<T> {
+public class DefaultValueFallback<T> extends TypedFallbackArgument<T> {
 
 	public DefaultValueFallback(CommandArgument<T> argument, T defaultValue) {
 		super(argument, new FixedValueArgument<>(Validate.notNull(argument).getName(), defaultValue));

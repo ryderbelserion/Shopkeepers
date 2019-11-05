@@ -407,14 +407,43 @@ public abstract class Command {
 		ArgumentsReader argsReader = new ArgumentsReader(input);
 		try {
 			this.processCommand(input, context, argsReader);
+			Log.debug(Settings.DebugOptions.commands, () -> "Command succeeded. Context: " + context.toString());
 		} catch (CommandException e) {
 			TextUtils.sendMessage(sender, e.getMessage());
+			Log.debug(Settings.DebugOptions.commands, () -> {
+				StringBuilder sb = new StringBuilder();
+				sb.append("Command failed. Argument chain: ");
+				if (e instanceof ArgumentParseException) {
+					CommandArgument<?> argument = ((ArgumentParseException) e).getArgument();
+					sb.append(this.getArgumentChain(argument));
+				} else {
+					sb.append("-");
+				}
+				return sb.toString();
+			});
+			Log.debug(Settings.DebugOptions.commands, () -> "Context: " + context.toString());
+			Log.debug(Settings.DebugOptions.commands, () -> "Arguments reader: " + argsReader.toString());
 		} catch (Exception e) {
 			// an unexpected exception was caught:
 			TextUtils.sendMessage(sender, ChatColor.RED + "An error occurred during command handling! Check the console log.");
 			Log.severe("An error occurred during command handling!", e);
-			Log.severe(context.toString());
+			Log.severe("Context: " + context.toString());
 		}
+	}
+
+	private String getArgumentChain(CommandArgument<?> argument) {
+		String delimiter = " < ";
+		StringBuilder sb = new StringBuilder();
+		CommandArgument<?> currentArgument = argument;
+		while (currentArgument != null) {
+			sb.append(currentArgument.getClass().getName());
+			sb.append(" (");
+			sb.append(currentArgument.getName());
+			sb.append(")");
+			sb.append(delimiter);
+			currentArgument = currentArgument.getParent();
+		}
+		return sb.substring(0, sb.length() - delimiter.length());
 	}
 
 	/**
@@ -545,12 +574,12 @@ public abstract class Command {
 		}
 
 		/**
-		 * Gets the {@link FallbackArgument} that threw the exception and may be able to provide a fallback.
+		 * Gets the {@link FallbackArgument} that created the exception and may be able to provide a fallback.
 		 * 
 		 * @return the fallback argument
 		 */
 		public FallbackArgument<?> getFallbackArgument() {
-			return exception.getFallbackArgument();
+			return exception.getArgument();
 		}
 
 		/**
@@ -630,6 +659,7 @@ public abstract class Command {
 			// on success this stores any parsed values inside the context:
 			argument.parse(parsingContext.input, context, argsReader);
 		} catch (FallbackArgumentException e) {
+			Log.debug(Settings.DebugOptions.commands, () -> "Fallback for argument '" + argument.getName() + "': " + e.getMessage());
 			argsReader.setState(argsReaderState); // restore previous args reader state
 
 			// keep track of context changes while continuing with the pending fallback:
@@ -710,18 +740,17 @@ public abstract class Command {
 		ArgumentParseException fallbackError = null;
 		// hasRemainingArgs: only the case if args got reset and there were remaining args originally as well
 		boolean hasRemainingArgs = argsReader.hasNext();
-		int prevArgsReaderCursor = argsReader.getCursor();
 		ArgumentsReader argsReaderState = argsReader.createSnapshot();
 		try {
 			// on success this stores any parsed values inside the context:
 			fallbackArgument.parseFallback(parsingContext.input, parsingContext.context, argsReader, fallback.exception, parsingFailed);
 		} catch (FallbackArgumentException e) { // fallback is not allowed to throw another fallback exception here
-			Validate.State.error("Fallback argument '" + fallbackArgument.getName() + "' threw another FallbackArgumentException while parsing fallback: " + e);
+			Validate.State.error("Argument '" + fallbackArgument.getName() + "' threw another FallbackArgumentException while parsing fallback: " + e);
 		} catch (ArgumentParseException e) { // fallback failed
 			argsReader.setState(argsReaderState); // restore previous args reader state
 			fallbackError = e;
 		}
-		boolean fallbackConsumedArgs = (prevArgsReaderCursor != argsReader.getCursor());
+		boolean fallbackConsumedArgs = (argsReaderState.getCursor() != argsReader.getCursor());
 		// assumption: args state got restored (no args consumed) if parsing failed
 		assert (fallbackError == null) || !fallbackConsumedArgs;
 
@@ -741,6 +770,7 @@ public abstract class Command {
 			parsingContext.currentArgumentIndex = fallback.argumentIndex;
 			parsingContext.currentParseException = fallback.exception.getRootException();
 			this.handleFallbacks(parsingContext);
+			return;
 		}
 		assert !hasRemainingArgs || fallbackConsumedArgs;
 
@@ -782,7 +812,7 @@ public abstract class Command {
 		if (!this.getChildCommands().getCommands().isEmpty()) {
 			// has child commands: throw an 'unknown command' exception
 			// TODO only use this exception if no arguments got parsed by this command?
-			throw new ArgumentParseException(this.getUnknownCommandMessage(firstUnparsedArg));
+			throw new ArgumentParseException(null, this.getUnknownCommandMessage(firstUnparsedArg));
 		} else {
 			// throw an 'invalid argument' exception for the first unparsed argument after the last parsed argument:
 			CommandContext context = parsingContext.context;
@@ -800,7 +830,7 @@ public abstract class Command {
 				throw firstUnparsedArgument.invalidArgumentError(firstUnparsedArg);
 			} else {
 				// throw an 'unexpected argument' exception:
-				throw new ArgumentParseException(TextUtils.replaceArgs(Settings.msgCommandArgumentUnexpected,
+				throw new ArgumentParseException(null, TextUtils.replaceArgs(Settings.msgCommandArgumentUnexpected,
 						"{argument}", firstUnparsedArg));
 			}
 		}

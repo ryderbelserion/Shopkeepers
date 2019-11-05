@@ -8,6 +8,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -15,7 +16,7 @@ import com.nisovin.shopkeepers.util.Validate;
  * <p>
  * If no value can be parsed, no {@link ArgumentParseException} is thrown, but <code>null</code> is returned instead.
  */
-public class OptionalArgument<T> extends CommandArgument<T> {
+public class OptionalArgument<T> extends FallbackArgument<T> {
 
 	// TODO implement as 'do-nothing'-fallback instead?
 	// if an invalid argument is specified, it gets currently forwarded to the next command argument, leading to a
@@ -41,29 +42,45 @@ public class OptionalArgument<T> extends CommandArgument<T> {
 		return argument.getReducedFormat();
 	}
 
-	@Override
-	public T parse(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws ArgumentParseException {
+	@FunctionalInterface
+	private static interface Parser<T> {
+		public T parse() throws ArgumentParseException;
+	}
+
+	private T parseOrNull(Parser<T> parser, ArgumentsReader argsReader) throws FallbackArgumentException {
 		ArgumentsReader argsReaderState = argsReader.createSnapshot();
 		T value;
 		try {
-			// let the wrapped argument handle the parsing:
-			value = argument.parse(input, context, argsReader);
+			value = parser.parse();
+		} catch (FallbackArgumentException e) {
+			// wrap fallback exceptions so that we get informed:
+			throw new FallbackArgumentException(this, e);
 		} catch (ArgumentParseException e) {
-			assert this.isOptional();
-			value = null;
 			// restore previous args reader state:
 			argsReader.setState(argsReaderState);
+			value = null;
 		}
 		return value;
 	}
 
 	@Override
+	public T parse(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws ArgumentParseException {
+		return this.parseOrNull(() -> argument.parse(input, context, argsReader), argsReader);
+	}
+
+	@Override
 	public T parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
-		return argument.parseValue(input, context, argsReader);
+		return this.parseOrNull(() -> argument.parseValue(input, context, argsReader), argsReader);
 	}
 
 	@Override
 	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
 		return argument.complete(input, context, argsReader);
+	}
+
+	@Override
+	public T parseFallback(CommandInput input, CommandContext context, ArgumentsReader argsReader, FallbackArgumentException fallbackException, boolean parsingFailed) throws ArgumentParseException {
+		FallbackArgumentException originalFallback = (FallbackArgumentException) fallbackException.getOriginalException();
+		return this.parseOrNull(() -> ((FallbackArgument<T>) argument).parseFallback(input, context, argsReader, originalFallback, parsingFailed), argsReader);
 	}
 }

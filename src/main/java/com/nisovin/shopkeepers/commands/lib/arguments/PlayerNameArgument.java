@@ -95,6 +95,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 			// there are no remaining arguments to complete, or we are not using up the final argument
 			return Collections.emptyList();
 		}
+
 		String nameArg = argsReader.next(); // can be empty
 		if (nameArg.length() < minimalCompletionInput) {
 			// only provide suggestions if there is a minimal length input

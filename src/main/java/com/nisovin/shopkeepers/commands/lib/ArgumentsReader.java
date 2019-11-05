@@ -77,6 +77,11 @@ public class ArgumentsReader {
 	 */
 	public void setCursor(int cursor) {
 		Validate.isTrue(cursor >= -1 && cursor < args.size(), "Index out of bounds!");
+		this.internalSetCursor(cursor);
+	}
+
+	private void internalSetCursor(int cursor) {
+		assert cursor >= -1 && cursor < args.size();
 		this.cursor = cursor;
 	}
 
@@ -147,7 +152,8 @@ public class ArgumentsReader {
 	 */
 	public String next() throws NoSuchElementException {
 		this.checkHasNext();
-		return args.get(++cursor);
+		this.internalSetCursor(cursor + 1);
+		return args.get(cursor);
 	}
 
 	/**
@@ -159,7 +165,8 @@ public class ArgumentsReader {
 		if (!this.hasNext()) {
 			return null;
 		}
-		return args.get(++cursor);
+		this.internalSetCursor(cursor + 1);
+		return args.get(cursor);
 	}
 
 	/**
@@ -213,7 +220,7 @@ public class ArgumentsReader {
 		Validate.notNull(otherReader, "The other arguments reader is null!");
 		// only applicable if the readers reference the same arguments:
 		Validate.isTrue(otherReader.args == this.args, "The other arguments reader references different arguments!");
-		this.cursor = otherReader.cursor;
+		this.internalSetCursor(otherReader.cursor);
 	}
 
 	@Override

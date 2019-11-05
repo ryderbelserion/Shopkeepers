@@ -11,7 +11,6 @@ import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.util.Pair;
 import com.nisovin.shopkeepers.util.PlayerUtils;
 
 /**
@@ -22,7 +21,7 @@ public class PlayerArgument extends CommandArgument<Player> {
 
 	private final PlayerByNameArgument playerNameArgument;
 	private final PlayerByUUIDArgument playerUUIDArgument;
-	private final FirstOfArgument firstOfArgument;
+	private final TypedFirstOfArgument<Player> firstOfArgument;
 
 	public PlayerArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
@@ -41,15 +40,14 @@ public class PlayerArgument extends CommandArgument<Player> {
 			}
 		};
 		this.playerUUIDArgument = new PlayerByUUIDArgument(name + ":uuid", filter, minimalUUIDCompletionInput);
-		this.firstOfArgument = new FirstOfArgument(name + ":firstOf", Arrays.asList(playerNameArgument, playerUUIDArgument), false, false);
+		this.firstOfArgument = new TypedFirstOfArgument<>(name + ":firstOf", Arrays.asList(playerNameArgument, playerUUIDArgument), false, false);
 		firstOfArgument.setParent(this);
 	}
 
 	@Override
 	public Player parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		// also handles argument exceptions:
-		Pair<CommandArgument<?>, Object> result = firstOfArgument.parseValue(input, context, argsReader);
-		return (result == null) ? null : (Player) result.getSecond();
+		return firstOfArgument.parseValue(input, context, argsReader);
 	}
 
 	/**

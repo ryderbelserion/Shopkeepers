@@ -28,6 +28,7 @@ Date format: (YYYY-MM-DD)
   * "list", "remove", "transfer" and "setTradePerm" commands can be used from console now. Command confirmations work for the console as well now (any command sender that is not a player is considered to be the 'console' for this purpose).
   * "setForHire" and "transfer" commands allow specifying the shopkeeper via argument now. Also: When targeting a chest that happens to be used by multiple shopkeepers (eg. due to manually modified save data..), it picks the first one now (instead of applying the command to all shops). In the future this will likely print an error message instead.
   * "debugCreateShops" command: Shop count per command invocation is limited to 1000 now.
+  * Added debug option 'commands' and added various debug output when parsing and executing a command.
   * All argument suggestions are limited to 20 entries by default now.
   * Player arguments suggest matching uuids now. To avoid spamming the suggestions with uuids for the first few characters of input, suggestions are only provided after at least 3 characters of matching input.
   * Some commands (eg. "list") provide suggestions for names of online players now.
@@ -45,7 +46,7 @@ Date format: (YYYY-MM-DD)
   * Internal: Added more general BoundedIntegerArgument. PositiveIntegerArgument makes use of it.
   * Internal: Moved ArgumentFilter into base commands lib package.
   * Internal: CommandArguments keep track of their parent argument now (if used internally by another argument) and use that for their error messages.
-  * Internal: Added AliasArgument, that can be used to change the display name of an command argument (used in the command format). This may for example be useful in the presence of multiple, otherwise conflicting literal arguments.
+  * Internal: Added display name property to all command arguments that be used to change the name that is used to represent the argument in the command format. This is especially useful for conflicting literal arguments. Literal arguments will omit their actual argument name from the argument completions if a different display name has been set.
   * Internal: Minor changes to handling errors during command handling. Besides the stack trace, the plugin also logs the command context (parsed arguments) now.
   * Internal: Added map view and toString to CommandContext.
   * Internal: CommandArgument#parse now also returns the parsed value. This is useful when there is a chain of wrapped arguments and the parent needs to handle the value parsed by the child argument in some way.
@@ -63,6 +64,9 @@ Date format: (YYYY-MM-DD)
   * Internal: CommandContext is now an interface (with SimpleCommandContext as implementation). A new class CommandContextView was added that gets used anywhere where accessing the context is allowed, while modifying is not.
   * Internal: Command and tab completion handling was moved from BaseCommand into Command.
   * Internal: Resetting of the arguments reader if parsing of an command argument failed was moved from CommandArgument#parse into Command.
+  * Internal: Added TypedFirstOfArgument, a variant of FirstOfArgument that preserves the result type of its child arguments.
+  * Internal: Added NameArgument, which can be useful if there would otherwise be conflicts / ambiguities between arguments.
+  * Internal: ArgumentParseException provides the command argument that created it now. This is especially useful for debugging purposes.
   
 Other internal changes:  
 * Internal: Added Utils#concat() for arrays.

@@ -76,4 +76,19 @@ public final class CommandInput {
 	public List<String> getArguments() {
 		return arguments;
 	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CommandInput [sender=");
+		builder.append(sender.getName());
+		builder.append(", command=");
+		builder.append(command.getName());
+		builder.append(", commandAlias=");
+		builder.append(commandAlias);
+		builder.append(", arguments=");
+		builder.append(arguments);
+		builder.append("]");
+		return builder.toString();
+	}
 }

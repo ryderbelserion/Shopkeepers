@@ -17,7 +17,8 @@ public class LiteralArgument extends CommandArgument<String> {
 	public static final String FORMAT_PREFIX = "'";
 	public static final String FORMAT_SUFFIX = "'";
 
-	private final List<String> literals; // not null nor containing null or empty literals
+	// not null nor containing null or empty literals, combines the argument name and aliases:
+	private final List<String> literals;
 
 	public LiteralArgument(String name) {
 		this(name, null);
@@ -25,7 +26,6 @@ public class LiteralArgument extends CommandArgument<String> {
 
 	public LiteralArgument(String name, List<String> aliases) {
 		super(name);
-		Validate.isTrue(!StringUtils.containsWhitespace(name), "LiteralArgument name contains whitespace!");
 
 		// initialize literals:
 		this.literals = new ArrayList<>(1 + (aliases == null ? 0 : aliases.size()));
@@ -41,8 +41,16 @@ public class LiteralArgument extends CommandArgument<String> {
 	}
 
 	@Override
+	public CommandArgument<String> setDisplayName(String displayName) {
+		if (displayName != null) {
+			Validate.isTrue(this.literals.contains(displayName), "Display name doesn't match any of the literal argument's literals!");
+		}
+		return super.setDisplayName(displayName);
+	}
+
+	@Override
 	public String getReducedFormat() {
-		return FORMAT_PREFIX + this.getName() + FORMAT_SUFFIX;
+		return FORMAT_PREFIX + this.getDisplayName() + FORMAT_SUFFIX;
 	}
 
 	@Override
@@ -67,17 +75,21 @@ public class LiteralArgument extends CommandArgument<String> {
 
 	@Override
 	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
-		if (argsReader.getRemainingSize() == 1) {
-			List<String> suggestions = new ArrayList<>();
-			String partialArg = argsReader.next().toLowerCase();
-			for (String literal : literals) {
-				if (suggestions.size() >= MAX_SUGGESTIONS) break;
-				if (literal.toLowerCase().startsWith(partialArg)) {
-					suggestions.add(literal);
-				}
-			}
-			return Collections.unmodifiableList(suggestions);
+		if (argsReader.getRemainingSize() != 1) {
+			return Collections.emptyList();
 		}
-		return Collections.emptyList();
+
+		List<String> suggestions = new ArrayList<>();
+		String partialArg = argsReader.next().toLowerCase();
+		// hiding the argument name if a different display name is used:
+		boolean skipName = (!this.getName().equals(this.getDisplayName()));
+		for (String literal : literals) {
+			if (suggestions.size() >= MAX_SUGGESTIONS) break;
+			if (skipName && literal.equals(this.getName())) continue;
+			if (literal.toLowerCase().startsWith(partialArg)) {
+				suggestions.add(literal);
+			}
+		}
+		return Collections.unmodifiableList(suggestions);
 	}
 }

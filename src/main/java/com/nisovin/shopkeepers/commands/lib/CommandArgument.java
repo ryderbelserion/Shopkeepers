@@ -30,6 +30,7 @@ public abstract class CommandArgument<T> {
 	public static final String OPTIONAL_FORMAT_SUFFIX = "]";
 
 	private final String name;
+	private String displayName = null; // null to use default (name), not empty
 	private Optional<CommandArgument<?>> parent = null; // null if not yet set, empty if it has no parent
 
 	/**
@@ -37,14 +38,15 @@ public abstract class CommandArgument<T> {
 	 * <p>
 	 * The argument name can not contain any whitespace and has to be unique among all arguments of the same command.
 	 * <p>
-	 * Some compound arguments may delegate parsing to internal arguments. To avoid naming conflicts, the character
+	 * Some command arguments may delegate parsing to internal arguments. To avoid naming conflicts, the character
 	 * <code>:</code> is reserved for use by those internal arguments.
 	 * 
 	 * @param name
 	 *            the argument's name
 	 */
 	public CommandArgument(String name) {
-		Validate.notEmpty(StringUtils.removeWhitespace(name), "Invalid argument name!");
+		Validate.notEmpty(name, "Argument name is empty!");
+		Validate.isTrue(!StringUtils.containsWhitespace(name), "Argument name cannot contain whitespace!");
 		this.name = name;
 	}
 
@@ -55,6 +57,38 @@ public abstract class CommandArgument<T> {
 	 */
 	public final String getName() {
 		return name;
+	}
+
+	/**
+	 * Gets the argument's display name.
+	 * <p>
+	 * This is used when representing this argument inside the argument format. By default this matches the argument's
+	 * name.
+	 * 
+	 * @return the argument's display name
+	 */
+	public final String getDisplayName() {
+		return (displayName == null) ? name : displayName;
+	}
+
+	/**
+	 * Sets the argument's display name.
+	 * 
+	 * @param displayName
+	 *            the new display name, or <code>null</code> to use the default
+	 * @return this
+	 */
+	public CommandArgument<T> setDisplayName(String displayName) {
+		if (displayName != null) {
+			Validate.notEmpty(displayName, "Display name is empty!");
+			Validate.isTrue(!StringUtils.containsWhitespace(displayName), "Display name cannot contain whitespace!");
+		}
+		// normalize default display name to null:
+		if (this.getName().equals(displayName)) {
+			displayName = null;
+		}
+		this.displayName = displayName;
+		return this;
 	}
 
 	/**
@@ -168,7 +202,7 @@ public abstract class CommandArgument<T> {
 	 * @return the reduced format, not <code>null</code>, but may be empty for hidden arguments
 	 */
 	public String getReducedFormat() {
-		return name;
+		return this.getDisplayName();
 	}
 
 	// COMMON ERRORS
@@ -178,7 +212,7 @@ public abstract class CommandArgument<T> {
 	 * <p>
 	 * This includes:
 	 * <ul>
-	 * <li><code>{argumentName}</code>
+	 * <li><code>{argumentName}</code> (uses the argument's display name)
 	 * <li><code>{argumentFormat}</code>
 	 * </ul>
 	 * This uses the {@link #getRootArgument() root argument} for determining the argument name and format. If the
@@ -188,7 +222,7 @@ public abstract class CommandArgument<T> {
 	 */
 	public final String[] getDefaultErrorMsgArgs() {
 		CommandArgument<?> rootArgument = this.getRootArgument();
-		String name = rootArgument.getName();
+		String name = rootArgument.getDisplayName();
 		String format = rootArgument.getFormat();
 		// use the name in case the format is empty (eg. for hidden arguments):
 		if (format.isEmpty()) {
@@ -219,7 +253,7 @@ public abstract class CommandArgument<T> {
 	 * @see #getRequiresPlayerErrorMsg()
 	 */
 	protected final RequiresPlayerArgumentException requiresPlayerError() {
-		return new RequiresPlayerArgumentException(this.getRequiresPlayerErrorMsg());
+		return new RequiresPlayerArgumentException(this, this.getRequiresPlayerErrorMsg());
 	}
 
 	/**
@@ -241,7 +275,7 @@ public abstract class CommandArgument<T> {
 	 * @see #getMissingArgumentErrorMsg()
 	 */
 	protected final MissingArgumentException missingArgumentError() {
-		return new MissingArgumentException(this.getMissingArgumentErrorMsg());
+		return new MissingArgumentException(this, this.getMissingArgumentErrorMsg());
 	}
 
 	/**
@@ -269,7 +303,7 @@ public abstract class CommandArgument<T> {
 	 * @see #getInvalidArgumentErrorMsg(String)
 	 */
 	protected final InvalidArgumentException invalidArgumentError(String argumentInput) {
-		return new InvalidArgumentException(this.getInvalidArgumentErrorMsg(argumentInput));
+		return new InvalidArgumentException(this, this.getInvalidArgumentErrorMsg(argumentInput));
 	}
 
 	/**
@@ -285,7 +319,7 @@ public abstract class CommandArgument<T> {
 	 * By default this delegates the parsing to {@link #parseValue(CommandInput, CommandContextView, ArgumentsReader)}.
 	 * 
 	 * @param input
-	 *            the input
+	 *            the command input
 	 * @param context
 	 *            the context which stores the parsed argument values
 	 * @param argsReader
@@ -310,7 +344,7 @@ public abstract class CommandArgument<T> {
 	 * {@link #parse(CommandInput, CommandContext, ArgumentsReader)} this method is not allowed to modify the context.
 	 * 
 	 * @param input
-	 *            the input
+	 *            the command input
 	 * @param context
 	 *            an unmodifiable view on the context storing the already parsed argument values
 	 * @param argsReader
@@ -329,7 +363,7 @@ public abstract class CommandArgument<T> {
 	 * neither for the suggestions list nor its contents.
 	 * 
 	 * @param input
-	 *            the input
+	 *            the command input
 	 * @param context
 	 *            an unmodifiable view on the context storing the already parsed argument values
 	 * @param argsReader
@@ -338,4 +372,15 @@ public abstract class CommandArgument<T> {
 	 *         <code>null</code> and not containing <code>null</code>)
 	 */
 	public abstract List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader);
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("CommandArgument [name=");
+		builder.append(name);
+		builder.append("]");
+		return builder.toString();
+	}
+
+	// Note on hashCode and equals: CommandArguments are compared by identity
 }

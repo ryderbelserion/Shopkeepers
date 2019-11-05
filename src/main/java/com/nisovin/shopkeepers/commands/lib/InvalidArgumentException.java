@@ -7,11 +7,11 @@ public class InvalidArgumentException extends ArgumentParseException {
 
 	private static final long serialVersionUID = -5970457037035687469L;
 
-	public InvalidArgumentException(String message) {
-		super(message);
+	public InvalidArgumentException(CommandArgument<?> argument, String message) {
+		this(argument, message, null);
 	}
 
-	public InvalidArgumentException(String message, Throwable cause) {
-		super(message, cause);
+	public InvalidArgumentException(CommandArgument<?> argument, String message, Throwable cause) {
+		super(argument, message, cause);
 	}
 }

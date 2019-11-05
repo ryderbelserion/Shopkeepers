@@ -13,8 +13,7 @@ public class CommandException extends Exception {
 	private static final long serialVersionUID = 3021047528891246476L;
 
 	public CommandException(String message) {
-		super(message);
-		Validate.notEmpty(message, "No message specified!");
+		this(message, null);
 	}
 
 	public CommandException(String message, Throwable cause) {

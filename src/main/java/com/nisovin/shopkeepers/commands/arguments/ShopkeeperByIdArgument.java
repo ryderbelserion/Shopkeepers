@@ -51,7 +51,7 @@ public class ShopkeeperByIdArgument extends CommandArgument<Shopkeeper> {
 		if (shopkeeper == null) {
 			throw this.invalidArgumentError(argsReader.current());
 		} else if (!filter.test(shopkeeper)) {
-			throw new ArgumentRejectedException(filter.getInvalidArgumentErrorMsg(this, argsReader.current(), shopkeeper));
+			throw new ArgumentRejectedException(this, filter.getInvalidArgumentErrorMsg(this, argsReader.current(), shopkeeper));
 		} else {
 			return shopkeeper;
 		}
@@ -62,6 +62,7 @@ public class ShopkeeperByIdArgument extends CommandArgument<Shopkeeper> {
 		if (argsReader.getRemainingSize() != 1) {
 			return Collections.emptyList();
 		}
+
 		List<String> suggestions = new ArrayList<>();
 		String partialArg = argsReader.next();
 		if (ConversionUtils.parseInt(partialArg) != null) {

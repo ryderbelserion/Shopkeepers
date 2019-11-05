@@ -8,11 +8,11 @@ public class RequiresPlayerArgumentException extends ArgumentParseException {
 
 	private static final long serialVersionUID = 8158065171648348988L;
 
-	public RequiresPlayerArgumentException(String message) {
-		super(message);
+	public RequiresPlayerArgumentException(CommandArgument<?> argument, String message) {
+		this(argument, message, null);
 	}
 
-	public RequiresPlayerArgumentException(String message, Throwable cause) {
-		super(message, cause);
+	public RequiresPlayerArgumentException(CommandArgument<?> argument, String message, Throwable cause) {
+		super(argument, message, cause);
 	}
 }

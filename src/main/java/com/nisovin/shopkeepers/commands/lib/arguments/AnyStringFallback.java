@@ -8,7 +8,7 @@ import com.nisovin.shopkeepers.util.Validate;
  * 
  * @see StringArgument
  */
-public class AnyStringFallback extends FallbackArgument<String> {
+public class AnyStringFallback extends TypedFallbackArgument<String> {
 
 	public AnyStringFallback(CommandArgument<String> argument) {
 		this(argument, false);

@@ -38,6 +38,8 @@ public class Settings {
 		public static final String logAllEvents = "log-all-events";
 		// Prints the registered listeners for the first call of each event.
 		public static final String printListeners = "print-listeners";
+		// Enables additional commands related debugging output. 
+		public static final String commands = "commands";
 	}
 
 	public static boolean isDebugging() {

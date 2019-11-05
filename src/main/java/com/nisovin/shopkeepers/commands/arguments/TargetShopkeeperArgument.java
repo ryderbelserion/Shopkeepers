@@ -50,7 +50,7 @@ public class TargetShopkeeperArgument extends CommandArgument<Shopkeeper> {
 		Player player = (Player) sender;
 		TargetShopkeepersResult result = ShopkeeperUtils.getTargetedShopkeepers(player, filter);
 		if (!result.isSuccess()) {
-			throw new ArgumentParseException(result.getErrorMessage());
+			throw new ArgumentParseException(this, result.getErrorMessage());
 		} else {
 			assert !result.getShopkeepers().isEmpty();
 			// TODO print an error if result is ambiguous?

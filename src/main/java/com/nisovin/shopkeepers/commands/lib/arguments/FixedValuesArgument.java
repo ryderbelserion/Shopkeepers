@@ -47,17 +47,18 @@ public class FixedValuesArgument extends CommandArgument<Object> {
 
 	@Override
 	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
-		if (argsReader.getRemainingSize() == 1) {
-			List<String> suggestions = new ArrayList<>();
-			String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
-			for (String valueKey : values.keySet()) {
-				if (suggestions.size() >= MAX_SUGGESTIONS) break;
-				if (valueKey.toLowerCase(Locale.ROOT).startsWith(partialArg)) {
-					suggestions.add(valueKey);
-				}
-			}
-			return Collections.unmodifiableList(suggestions);
+		if (argsReader.getRemainingSize() != 1) {
+			return Collections.emptyList();
 		}
-		return Collections.emptyList();
+
+		List<String> suggestions = new ArrayList<>();
+		String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
+		for (String valueKey : values.keySet()) {
+			if (suggestions.size() >= MAX_SUGGESTIONS) break;
+			if (valueKey.toLowerCase(Locale.ROOT).startsWith(partialArg)) {
+				suggestions.add(valueKey);
+			}
+		}
+		return Collections.unmodifiableList(suggestions);
 	}
 }

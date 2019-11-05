@@ -4,31 +4,24 @@ import com.nisovin.shopkeepers.commands.lib.arguments.FallbackArgument;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
- * Used together with {@link FallbackArgument} to indicate to the processing command that the current
- * {@link CommandArgument} wasn't able to parse the current argument, but that it may be able to provide a fallback in
- * case that none of the following command arguments are able to parse it either.
+ * Used by {@link FallbackArgument} to indicate that it wasn't able to parse the current argument, but that it may be
+ * able to provide a fallback in case that none of the following command arguments are able to parse the remaining
+ * command input either.
  */
 public class FallbackArgumentException extends ArgumentParseException {
 
 	private static final long serialVersionUID = -2141058556443273342L;
 
-	private final FallbackArgument<?> fallbackArgument; // not null
 	private final ArgumentParseException originalException; // not null
 
-	public FallbackArgumentException(FallbackArgument<?> fallbackArgument, ArgumentParseException originalException) {
-		super(Validate.notNull(originalException).getMessage(), originalException.getCause());
-		Validate.notNull(fallbackArgument, "Fallback argument is null!");
-		this.fallbackArgument = fallbackArgument;
+	public FallbackArgumentException(FallbackArgument<?> argument, ArgumentParseException originalException) {
+		super(argument, Validate.notNull(originalException, "Original exception is null!").getMessage(), originalException.getCause());
 		this.originalException = originalException;
 	}
 
-	/**
-	 * Gets the {@link FallbackArgument} that threw this exception and may be able to provide a fallback.
-	 * 
-	 * @return the fallback argument
-	 */
-	public FallbackArgument<?> getFallbackArgument() {
-		return fallbackArgument;
+	@Override
+	public FallbackArgument<?> getArgument() {
+		return (FallbackArgument<?>) super.getArgument();
 	}
 
 	/**
@@ -44,7 +37,7 @@ public class FallbackArgumentException extends ArgumentParseException {
 	}
 
 	/**
-	 * Gets root parsing exception that caused the fallback(s) to jump in.
+	 * Gets root parsing exception that triggered the fallback(s).
 	 * <p>
 	 * This follows the chain of {@link #getOriginalException() original exceptions} until it find the first one that is
 	 * not a {@link FallbackArgumentException} itself.

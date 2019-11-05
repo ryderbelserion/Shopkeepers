@@ -8,11 +8,24 @@ public class ArgumentParseException extends CommandException {
 
 	private static final long serialVersionUID = -4968777515685479426L;
 
-	public ArgumentParseException(String message) {
-		super(message);
+	private final CommandArgument<?> argument; // can be null if not caused by any CommandArgument
+
+	public ArgumentParseException(CommandArgument<?> argument, String message) {
+		this(argument, message, null);
 	}
 
-	public ArgumentParseException(String message, Throwable cause) {
+	public ArgumentParseException(CommandArgument<?> argument, String message, Throwable cause) {
 		super(message, cause);
+		this.argument = argument;
+	}
+
+	/**
+	 * Gets the {@link CommandArgument} that created this exception.
+	 * 
+	 * @return the command argument, or <code>null</code> if this exception was not created by any command argument (but
+	 *         for example by the parsing {@link Command} itself)
+	 */
+	public CommandArgument<?> getArgument() {
+		return argument;
 	}
 }

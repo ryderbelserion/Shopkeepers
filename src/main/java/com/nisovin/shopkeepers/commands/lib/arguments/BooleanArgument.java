@@ -32,17 +32,18 @@ public class BooleanArgument extends CommandArgument<Boolean> {
 
 	@Override
 	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
-		if (argsReader.getRemainingSize() == 1) {
-			List<String> suggestions = new ArrayList<>();
-			String partialArg = argsReader.next().toLowerCase();
-			for (String value : ConversionUtils.BOOLEAN_VALUES.keySet()) {
-				if (suggestions.size() >= MAX_SUGGESTIONS) break;
-				if (value.toLowerCase().startsWith(partialArg)) {
-					suggestions.add(value);
-				}
-			}
-			return Collections.unmodifiableList(suggestions);
+		if (argsReader.getRemainingSize() != 1) {
+			return Collections.emptyList();
 		}
-		return Collections.emptyList();
+
+		List<String> suggestions = new ArrayList<>();
+		String partialArg = argsReader.next().toLowerCase();
+		for (String value : ConversionUtils.BOOLEAN_VALUES.keySet()) {
+			if (suggestions.size() >= MAX_SUGGESTIONS) break;
+			if (value.toLowerCase().startsWith(partialArg)) {
+				suggestions.add(value);
+			}
+		}
+		return Collections.unmodifiableList(suggestions);
 	}
 }

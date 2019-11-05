@@ -48,6 +48,7 @@ public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 		if (argsReader.getRemainingSize() != 1) {
 			return Collections.emptyList();
 		}
+
 		List<String> suggestions = new ArrayList<>();
 		String partialArg = StringUtils.normalize(argsReader.next());
 		for (ShopType<?> shopType : ShopkeepersPlugin.getInstance().getShopTypeRegistry().getRegisteredTypes()) {
