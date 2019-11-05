@@ -31,7 +31,9 @@ import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
 
 /**
- * Implementation notes:<br>
+ * Storage responsible for the shopkeepers data.
+ * <p>
+ * Implementation notes:
  * <ul>
  * <li>There can at most be one thread doing file IO at the same time.
  * <li>Saving preparation always happens on the server's main thread. There can at most be one save getting prepared at
@@ -74,7 +76,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// previously dirty shopkeepers which we currently attempt to save:
 	private final List<AbstractShopkeeper> savingShopkeepers = new ArrayList<>();
 	// buffer that holds the data that gets used by the current async save task:
-	// needs to be kept in sync with the save data, but cannot be modified during the async save is in progress
+	// needs to be kept in sync with the save data, but cannot be modified while the async save is in progress
 	private final FileConfiguration saveDataBuffer = new YamlConfiguration();
 	// the task which performs async file io during a save:
 	private int saveIOTask = -1;
@@ -710,6 +712,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private static final Object SAVING_IO_LOCK = new Object();
 
 	// can be run async and sync
+	// TODO saveToString on main thread and only do the actual file writing async?
+	// Because Bukkit's serialization API is not strictly thread-safe..
 	private void saveDataToFile(FileConfiguration config, Runnable callback) {
 		assert config != null;
 		// actual IO:
@@ -809,8 +813,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				if (!problem) {
 					PrintWriter writer = null;
 					try {
-						if (Settings.fileEncoding != null && !Settings.fileEncoding.isEmpty()) {
-							writer = new PrintWriter(tempSaveFile, Settings.fileEncoding);
+						String fileEncoding = Settings.async().fileEncoding;
+						if (fileEncoding != null && !fileEncoding.isEmpty()) {
+							writer = new PrintWriter(tempSaveFile, fileEncoding);
 							writer.write(config.saveToString());
 						} else {
 							config.save(tempSaveFile);
