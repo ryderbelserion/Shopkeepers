@@ -38,7 +38,7 @@ public class Settings {
 		public static final String logAllEvents = "log-all-events";
 		// Prints the registered listeners for the first call of each event.
 		public static final String printListeners = "print-listeners";
-		// Enables additional commands related debugging output. 
+		// Enables additional commands related debugging output.
 		public static final String commands = "commands";
 	}
 
@@ -513,9 +513,9 @@ public class Settings {
 
 		// exempt a few string / string list settings from color conversion:
 		List<String> noColorConversionKeys = Arrays.asList(
-				toConfigKey("fileEncoding"), toConfigKey("shopCreationItemSpawnEggEntityType"),
-				toConfigKey("maxShopsPermOptions"), toConfigKey("enabledLivingShops"),
-				toConfigKey("nameRegex"), toConfigKey("language"));
+				toConfigKey("debugOptions"), toConfigKey("fileEncoding"), toConfigKey("shopCreationItemSpawnEggEntityType"),
+				toConfigKey("maxShopsPermOptions"), toConfigKey("enabledLivingShops"), toConfigKey("nameRegex"),
+				toConfigKey("language"));
 		try {
 			Field[] fields = Settings.class.getDeclaredFields();
 			for (Field field : fields) {
