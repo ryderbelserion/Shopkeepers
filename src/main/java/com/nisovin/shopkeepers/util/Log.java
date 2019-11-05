@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.util;
 
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -23,13 +24,30 @@ public final class Log {
 	}
 
 	public static void info(String message) {
-		if (message == null || message.isEmpty()) return;
 		getLogger().info(message);
 	}
 
+	public static void info(Supplier<String> msgSupplier) {
+		getLogger().info(msgSupplier);
+	}
+
 	public static void debug(String message) {
-		if (Settings.isDebugging()) {
+		debug(null, message);
+	}
+
+	public static void debug(Supplier<String> msgSupplier) {
+		debug(null, msgSupplier);
+	}
+
+	public static void debug(String debugOption, String message) {
+		if (Settings.isDebugging(debugOption)) {
 			info(message);
+		}
+	}
+
+	public static void debug(String debugOption, Supplier<String> msgSupplier) {
+		if (Settings.isDebugging(debugOption)) {
+			info(msgSupplier);
 		}
 	}
 
@@ -37,15 +55,31 @@ public final class Log {
 		getLogger().warning(message);
 	}
 
+	public static void warning(Supplier<String> msgSupplier) {
+		getLogger().warning(msgSupplier);
+	}
+
 	public static void warning(String message, Throwable throwable) {
 		getLogger().log(Level.WARNING, message, throwable);
+	}
+
+	public static void warning(Throwable throwable, Supplier<String> msgSupplier) {
+		getLogger().log(Level.WARNING, throwable, msgSupplier);
 	}
 
 	public static void severe(String message) {
 		getLogger().severe(message);
 	}
 
+	public static void severe(Supplier<String> msgSupplier) {
+		getLogger().severe(msgSupplier);
+	}
+
 	public static void severe(String message, Throwable throwable) {
 		getLogger().log(Level.SEVERE, message, throwable);
+	}
+
+	public static void severe(Throwable throwable, Supplier<String> msgSupplier) {
+		getLogger().log(Level.SEVERE, throwable, msgSupplier);
 	}
 }

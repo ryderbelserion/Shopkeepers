@@ -12,6 +12,7 @@ debug: false
 # - 'log-all-events': Logs all events.
 # - 'print-listeners': Prints the registered listeners for the first call of
 #   each event.
+# - 'commands': Enables additional commands related debugging output.
 debug-options: []
 # Whether to report anonymous usage statistics to https://bStats.org
 # All reported information can be found here:
