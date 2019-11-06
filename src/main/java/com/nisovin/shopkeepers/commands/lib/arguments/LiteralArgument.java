@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
@@ -80,13 +81,13 @@ public class LiteralArgument extends CommandArgument<String> {
 		}
 
 		List<String> suggestions = new ArrayList<>();
-		String partialArg = argsReader.next().toLowerCase();
+		String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
 		// hiding the argument name if a different display name is used:
 		boolean skipName = (!this.getName().equals(this.getDisplayName()));
 		for (String literal : literals) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;
 			if (skipName && literal.equals(this.getName())) continue;
-			if (literal.toLowerCase().startsWith(partialArg)) {
+			if (literal.toLowerCase(Locale.ROOT).startsWith(partialArg)) {
 				suggestions.add(literal);
 			}
 		}

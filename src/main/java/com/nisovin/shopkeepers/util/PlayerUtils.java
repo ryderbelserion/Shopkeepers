@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.util;
 
+import java.util.Locale;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
@@ -32,12 +34,12 @@ public class PlayerUtils {
 				Player foundPlayer = Bukkit.getPlayerExact(input);
 				if (foundPlayer != null) return foundPlayer;
 
-				String playerNameLower = input.toLowerCase();
+				String playerNameLower = input.toLowerCase(Locale.ROOT);
 				int delta = Integer.MAX_VALUE;
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					// check name:
 					String playerName = player.getName();
-					if (playerName.toLowerCase().startsWith(playerNameLower)) {
+					if (playerName.toLowerCase(Locale.ROOT).startsWith(playerNameLower)) {
 						int currentDelta = Math.abs(playerName.length() - playerNameLower.length());
 						if (currentDelta < delta) {
 							foundPlayer = player;
@@ -48,7 +50,7 @@ public class PlayerUtils {
 
 					// check display name:
 					String displayName = ChatColor.stripColor(player.getDisplayName());
-					if (displayName.toLowerCase().startsWith(playerNameLower)) {
+					if (displayName.toLowerCase(Locale.ROOT).startsWith(playerNameLower)) {
 						int currentDelta = Math.abs(displayName.length() - playerNameLower.length());
 						if (currentDelta < delta) {
 							foundPlayer = player;
@@ -71,12 +73,12 @@ public class PlayerUtils {
 				Player foundPlayer = Bukkit.getPlayerExact(input);
 				if (foundPlayer != null) return foundPlayer;
 
-				String playerNameLower = input.toLowerCase();
+				String playerNameLower = input.toLowerCase(Locale.ROOT);
 				int delta = Integer.MAX_VALUE;
 				for (Player player : Bukkit.getOnlinePlayers()) {
 					// check name:
 					String playerName = player.getName();
-					if (playerName.toLowerCase().contains(playerNameLower)) {
+					if (playerName.toLowerCase(Locale.ROOT).contains(playerNameLower)) {
 						int currentDelta = Math.abs(playerName.length() - playerNameLower.length());
 						if (currentDelta < delta) {
 							foundPlayer = player;
@@ -87,7 +89,7 @@ public class PlayerUtils {
 
 					// check display name:
 					String displayName = player.getDisplayName();
-					if (displayName.toLowerCase().contains(playerNameLower)) {
+					if (displayName.toLowerCase(Locale.ROOT).contains(playerNameLower)) {
 						int currentDelta = Math.abs(displayName.length() - playerNameLower.length());
 						if (currentDelta < delta) {
 							foundPlayer = player;

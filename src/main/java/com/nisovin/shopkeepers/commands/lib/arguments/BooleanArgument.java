@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
@@ -37,10 +38,11 @@ public class BooleanArgument extends CommandArgument<Boolean> {
 		}
 
 		List<String> suggestions = new ArrayList<>();
-		String partialArg = argsReader.next().toLowerCase();
+		String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
 		for (String value : ConversionUtils.BOOLEAN_VALUES.keySet()) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;
-			if (value.toLowerCase().startsWith(partialArg)) {
+			// the boolean values are already lowercase:
+			if (value.startsWith(partialArg)) {
 				suggestions.add(value);
 			}
 		}

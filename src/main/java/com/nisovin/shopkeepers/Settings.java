@@ -498,7 +498,7 @@ public class Settings {
 	// /////
 
 	private static String toConfigKey(String fieldName) {
-		return fieldName.replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase();
+		return fieldName.replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase(Locale.ROOT);
 	}
 
 	// returns true, if the config misses values which need to be saved

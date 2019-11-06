@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.commands.arguments;
 
+import java.util.Locale;
+
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -139,6 +141,6 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 	protected String normalize(String idString) {
 		// normalize shopkeeper name for comparison in commands:
 		idString = this.toString(idString);
-		return idString.toLowerCase(); // uses default Locale
+		return idString.toLowerCase(Locale.ROOT);
 	}
 }

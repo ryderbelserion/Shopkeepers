@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
+import java.util.Locale;
+
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 
 /**
@@ -39,6 +41,6 @@ public abstract class ObjectNameArgument extends ObjectIdArgument<String> {
 
 	@Override
 	protected String normalize(String idString) {
-		return idString.toLowerCase(); // uses default Locale by default
+		return idString.toLowerCase(Locale.ROOT);
 	}
 }
