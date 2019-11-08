@@ -7,6 +7,10 @@ Date format: (YYYY-MM-DD)
 ## v2.8.2 (TBA)
 ### Supported MC versions: 1.14.4
 
+Migration notes:  
+* Removed the importing of old book offers (from late MC 1.12.2, see v1.83). When updating from an older version of Shopkeepers, you will have to first update to a version in-between.
+
+* Fixed: The book shopkeeper would not correctly store offers for books that have dots in their name.
 * Fixed: Some settings would not loaded correctly depending on the used locale. Also made all text comparisons locale independent.
 * Fixed: The shop creation item can no longer be used from dispensers if regular use is disabled.
 * Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored now by the commands.

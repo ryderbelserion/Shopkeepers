@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SKBookOffer implements BookOffer {
@@ -68,8 +69,12 @@ public class SKBookOffer implements BookOffer {
 
 	public static void saveToConfig(ConfigurationSection config, String node, Collection<? extends BookOffer> offers) {
 		ConfigurationSection offersSection = config.createSection(node);
+		int id = 1;
 		for (BookOffer offer : offers) {
-			offersSection.set(offer.getBookTitle(), offer.getPrice());
+			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
+			offerSection.set("book", offer.getBookTitle());
+			offerSection.set("price", offer.getPrice());
+			id++;
 		}
 	}
 
@@ -77,9 +82,26 @@ public class SKBookOffer implements BookOffer {
 		List<SKBookOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
+			for (String key : offersSection.getKeys(false)) {
+				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
+				if (offerSection == null) continue; // invalid offer: not a section
+				String bookTitle = offerSection.getString("book");
+				int price = offerSection.getInt("price");
+				if (StringUtils.isEmpty(bookTitle) || price <= 0) continue; // invalid offer
+				offers.add(new SKBookOffer(bookTitle, price));
+			}
+		}
+		return offers;
+	}
+
+	// TODO legacy, remove again at some point (changed during MC 1.14.4)
+	public static List<SKBookOffer> loadFromLegacyConfig(ConfigurationSection config, String node) {
+		List<SKBookOffer> offers = new ArrayList<>();
+		ConfigurationSection offersSection = config.getConfigurationSection(node);
+		if (offersSection != null) {
 			for (String bookTitle : offersSection.getKeys(false)) {
 				int price = offersSection.getInt(bookTitle);
-				if (bookTitle == null || price <= 0) continue; // invalid offer
+				if (StringUtils.isEmpty(bookTitle) || price <= 0) continue; // invalid offer
 				offers.add(new SKBookOffer(bookTitle, price));
 			}
 		}
