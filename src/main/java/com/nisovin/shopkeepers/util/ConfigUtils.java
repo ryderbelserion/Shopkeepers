@@ -10,6 +10,9 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public class ConfigUtils {
 
+	// shared YAML config that gets reused
+	private static final ThreadLocal<YamlConfiguration> YAML = ThreadLocal.withInitial(() -> new YamlConfiguration());
+
 	public static Material loadMaterial(ConfigurationSection config, String key) {
 		return loadMaterial(config, key, false);
 	}
@@ -55,14 +58,17 @@ public class ConfigUtils {
 		}
 	}
 
+	private static final String YAML_OUTPUT_KEY = "yaml-output";
+
 	public static String[] getYAMLOutput(ConfigurationSerializable serializable) {
 		return getYAMLOutput(serializable.serialize());
 	}
 
 	public static String[] getYAMLOutput(Object serializedObject) {
-		YamlConfiguration config = new YamlConfiguration();
-		config.set("yaml-output", serializedObject);
-		String configOutput = config.saveToString();
+		YamlConfiguration yaml = YAML.get(); // shared yaml config
+		yaml.set(YAML_OUTPUT_KEY, serializedObject);
+		String configOutput = yaml.saveToString();
+		yaml.set(YAML_OUTPUT_KEY, null);
 		return configOutput.split(yamlLineBreak());
 	}
 
