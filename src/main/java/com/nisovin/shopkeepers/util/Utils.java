@@ -199,6 +199,33 @@ public final class Utils {
 	}
 
 	/**
+	 * Gets the squared distance between the given location.
+	 * <p>
+	 * Both locations are required to have a valid (non-<code>null</code>) world. If the locations are located in
+	 * different worlds, this returns {@link Double#MAX_VALUE}.
+	 * 
+	 * @param location1
+	 *            the first location, not <code>null</code>
+	 * @param location2
+	 *            the second location, not <code>null</code>
+	 * @return the squared distance
+	 */
+	public static double getDistanceSquared(Location location1, Location location2) {
+		Validate.notNull(location1, "First location is null!");
+		Validate.notNull(location2, "Second location is null!");
+		World world1 = location1.getWorld();
+		World world2 = location2.getWorld();
+		Validate.notNull(world1, "World of first location is null!");
+		Validate.notNull(world2, "World of second location is null!");
+		if (world1 != world2) return Double.MAX_VALUE; // different worlds
+		// Note: Not using Location#distanceSquared to avoid redundant precondition checks.
+		double dx = location1.getX() - location2.getX();
+		double dy = location1.getY() - location2.getY();
+		double dz = location1.getZ() - location2.getZ();
+		return dx * dx + dy * dy + dz * dz;
+	}
+
+	/**
 	 * Gets the block's center location.
 	 * 
 	 * @param block

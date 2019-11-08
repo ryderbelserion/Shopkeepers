@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -36,6 +37,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.MathUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class EditorHandler extends UIHandler {
@@ -498,7 +500,17 @@ public abstract class EditorHandler extends UIHandler {
 						ItemStack shopCreationItem = Settings.createShopCreationItem();
 						Map<Integer, ItemStack> remaining = player.getInventory().addItem(shopCreationItem);
 						if (!remaining.isEmpty()) {
-							player.getWorld().dropItem(shopkeeper.getObjectLocation(), shopCreationItem);
+							Location playerLocation = player.getEyeLocation();
+							Location shopLocation = shopkeeper.getShopObject().getLocation();
+							// if within a certain range, drop the item at the shop's location:
+							if (shopLocation != null && Utils.getDistanceSquared(shopLocation, playerLocation) <= 100) {
+								playerLocation.getWorld().dropItem(shopLocation, shopCreationItem);
+							} else {
+								// else drop at player's location:
+								playerLocation.getWorld().dropItem(playerLocation, shopCreationItem);
+							}
+
+							player.getWorld().dropItem(shopkeeper.getShopObject().getLocation(), shopCreationItem);
 						}
 					}
 

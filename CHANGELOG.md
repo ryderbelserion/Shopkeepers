@@ -10,6 +10,7 @@ Date format: (YYYY-MM-DD)
 Migration notes:  
 * Removed the importing of old book offers (from late MC 1.12.2, see v1.83). When updating from an older version of Shopkeepers, you will have to first update to a version in-between.
 
+* Fixed: We would previously drop the shop-creation item returned on shop deletion at the shop's location, even if the shop got deleted via remote editing from far away (and is potentially not even loaded). If the player is further than 10 blocks away (or if the shop object is not loaded), it will drop the item at the player's location now.
 * Fixed: The book shopkeeper would not correctly store offers for books that have dots in their name.
 * Fixed: Some settings would not loaded correctly depending on the used locale. Also made all text comparisons locale independent.
 * Fixed: The shop creation item can no longer be used from dispensers if regular use is disabled.
