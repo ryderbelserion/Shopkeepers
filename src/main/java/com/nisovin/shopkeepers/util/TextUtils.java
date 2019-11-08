@@ -67,7 +67,7 @@ public class TextUtils {
 	}
 
 	public static String getPlayerAsString(String playerName, UUID uniqueId) {
-		return playerName + (uniqueId == null ? "" : "(" + uniqueId.toString() + ")");
+		return playerName + (uniqueId == null ? "" : " (" + uniqueId.toString() + ")");
 	}
 
 	private static final char COLOR_CHAR_ALTERNATIVE = '&';

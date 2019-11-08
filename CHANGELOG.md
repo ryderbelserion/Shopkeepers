@@ -24,6 +24,7 @@ Migration notes:
 * Changed: Only printing the 'Config already loaded' message during startup if the debug mode is enabled.
 * Changed: The plugin will now shutdown in case a severe issue prevents loading the config. This includes the case that the config version is invalid. Previously it would treat invalid and missing config versions the same and apply config migrations nevertheless.
 * Changed: Changed/Added a few information/warning messages related to config and language file loading.
+* Changed: Added more information to the message that gets logged when a shopkeeper gets removed for owner inactivity.
 * API: Added ShopkeepersStartupEvent which can be used by plugins to make registrations during Shopkeepers' startup process (eg. to register custom shop types, object types, etc.). This event is marked as deprecated because custom shop types, object types, etc. are not yet officially supported as part of the API. Also, the event is called so early that the plugin (and thereby the API) are not yet fully setup and ready to be used, so this event is only of use for plugins which know what they are doing.
 
 * Various (mostly internal) changes to commands and argument parsing:  
@@ -80,6 +81,7 @@ Other internal changes:
 * Internal: Added Settings#isDebugging and Settings#isDebugging(option) to conveniently (and thread-safe) check for debugging options.
 * Internal: Default shop, object and ui types are getting registered early during onLoad now.
 * Internal: Separated config and language file loading.
+* Internal: Slightly changed the text format that gets used at a few places to represent a player's name and uuid.
 
 
 Changed messages (you will have to manually update those!):  
