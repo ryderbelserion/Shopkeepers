@@ -104,8 +104,8 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 			return null;
 		}
 
-		Location spawnLocation = shopCreationData.getSpawnLocation();
-		BlockFace targetedBlockFace = shopCreationData.getTargetedBlockFace();
+		Location spawnLocation = shopCreationData.getSpawnLocation(); // can be null for virtual shops
+		BlockFace targetedBlockFace = shopCreationData.getTargetedBlockFace(); // can be null
 
 		// check if the shop can be placed there (enough space, etc.):
 		if (!shopObjectType.isValidSpawnLocation(spawnLocation, targetedBlockFace)) {
@@ -114,7 +114,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 			return null;
 		}
 
-		if (!shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
+		if (spawnLocation != null && !shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
 			// there is already a shopkeeper at that location:
 			TextUtils.sendMessage(creator, Settings.msgShopCreateFail);
 			return null;

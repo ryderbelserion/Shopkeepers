@@ -39,6 +39,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	protected UUID ownerUUID; // not null after successful initialization
 	protected String ownerName;
+	// TODO store chest world separately? currently it uses the shopkeeper world
+	// this would allow the chest and shopkeeper to be located in different worlds, and virtual player shops
 	protected int chestX;
 	protected int chestY;
 	protected int chestZ;

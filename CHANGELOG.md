@@ -21,6 +21,7 @@ Migration notes:
 * Fixed/API: The offered items inside the ShopkeeperTradeEvent are copies now and their stack sizes match those of the trading recipe.
 * Fixed: The internal default for message 'msg-list-shops-entry' (that gets used if the message is missing in the config) was not matching the message in the default config.
 
+* Changed: Explicitly checking for missing world names when loading shopkeepers.
 * Changed: Only printing the 'Config already loaded' message during startup if the debug mode is enabled.
 * Changed: The plugin will now shutdown in case a severe issue prevents loading the config. This includes the case that the config version is invalid. Previously it would treat invalid and missing config versions the same and apply config migrations nevertheless.
 * Changed: Changed/Added a few information/warning messages related to config and language file loading.
@@ -29,6 +30,7 @@ Migration notes:
 * API: Added ShopkeepersStartupEvent which can be used by plugins to make registrations during Shopkeepers' startup process (eg. to register custom shop types, object types, etc.). This event is marked as deprecated because custom shop types, object types, etc. are not yet officially supported as part of the API. Also, the event is called so early that the plugin (and thereby the API) are not yet fully setup and ready to be used, so this event is only of use for plugins which know what they are doing.
 * API: Removed various API methods from Shopkeeper which simply delegated to the corresponding shop object.
 * API: Moved ShopObjectType#needsSpawning into ShopObject.
+* API/Internal: Made some preparations to support virtual shopkeepers in the future (which are not located in any world). Various location related API methods may now return null.
 
 * Various (mostly internal) changes to commands and argument parsing:  
   * Fallback mechanism:

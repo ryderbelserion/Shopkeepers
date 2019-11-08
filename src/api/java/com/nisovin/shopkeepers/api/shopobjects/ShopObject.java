@@ -3,9 +3,13 @@ package com.nisovin.shopkeepers.api.shopobjects;
 import org.bukkit.Location;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObject;
 
 /**
  * Represents a {@link Shopkeeper} in the world.
+ * <p>
+ * A special case is {@link VirtualShopObject}, which gets used if the shopkeeper is not represented by any object in
+ * the world.
  */
 public interface ShopObject {
 
@@ -55,7 +59,8 @@ public interface ShopObject {
 	 * The returned location may only be valid while the shop object is active, might not match the location of the
 	 * corresponding {@link Shopkeeper}, and might change over time if the shop object is able to move.
 	 * 
-	 * @return the location of the shop object, or <code>null</code> of the shop object is not active currently
+	 * @return the location of the shop object, or <code>null</code> if the shop is virtual or if the shop object is not
+	 *         active currently
 	 */
 	public Location getLocation();
 

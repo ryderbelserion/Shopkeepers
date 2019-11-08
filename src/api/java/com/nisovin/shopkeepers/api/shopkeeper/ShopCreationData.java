@@ -9,6 +9,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
+import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObjectType;
 
 /**
  * Holds the different possible arguments needed for the creation of a shopkeeper of a certain type.
@@ -21,7 +22,7 @@ public abstract class ShopCreationData {
 	private final Player creator; // can be null
 	private final ShopType<?> shopType; // not null
 	private final ShopObjectType<?> shopObjectType; // not null
-	private final Location spawnLocation; // not null, modifiable
+	private Location spawnLocation; // modifiable, can be null for virtual shops
 	private BlockFace targetedBlockFace; // can be null, modifiable
 
 	private Map<String, Object> additionalData;
@@ -36,7 +37,7 @@ public abstract class ShopCreationData {
 	 * @param shopObjectType
 	 *            the shop object type, not <code>null</code>
 	 * @param spawnLocation
-	 *            the spawn location, not <code>null</code>
+	 *            the spawn location, can be <code>null</code> for virtual shops
 	 * @param targetedBlockFace
 	 *            the targeted block face, can be <code>null</code>
 	 */
@@ -44,12 +45,17 @@ public abstract class ShopCreationData {
 								Location spawnLocation, BlockFace targetedBlockFace) {
 		Validate.notNull(shopType, "Shop type is null!");
 		Validate.notNull(shopObjectType, "Shop object type is null!");
-		Validate.notNull(spawnLocation, "Spawn location is null!");
-		spawnLocation.checkFinite();
 		this.creator = creator;
 		this.shopType = shopType;
 		this.shopObjectType = shopObjectType;
-		this.spawnLocation = spawnLocation.clone();
+		if (spawnLocation != null) {
+			Validate.notNull(spawnLocation.getWorld(), "Spawn location is missing world!");
+			spawnLocation.checkFinite();
+			this.spawnLocation = spawnLocation.clone();
+		} else {
+			Validate.isTrue(shopObjectType instanceof VirtualShopObjectType, "Spawn location is null, but the shop object type is not virtual!");
+			this.spawnLocation = null;
+		}
 		this.targetedBlockFace = targetedBlockFace;
 	}
 
@@ -84,10 +90,10 @@ public abstract class ShopCreationData {
 	/**
 	 * The location the shopkeeper gets created at.
 	 * 
-	 * @return the spawn location, not <code>null</code>
+	 * @return the spawn location, can be <code>null</code> for virtual shops
 	 */
 	public Location getSpawnLocation() {
-		return spawnLocation.clone();
+		return (spawnLocation == null) ? null : spawnLocation.clone();
 	}
 
 	/**
@@ -99,14 +105,20 @@ public abstract class ShopCreationData {
 	 *            the new spawn location
 	 */
 	public void setSpawnLocation(Location newSpawnLocation) {
-		Validate.notNull(newSpawnLocation, "New spawn location is null!");
-		Validate.isTrue(spawnLocation.getWorld().equals(newSpawnLocation.getWorld()),
-				"Cannot set the spawn location to another world!");
-		spawnLocation.setX(newSpawnLocation.getX());
-		spawnLocation.setY(newSpawnLocation.getY());
-		spawnLocation.setZ(newSpawnLocation.getZ());
-		spawnLocation.setPitch(newSpawnLocation.getPitch());
-		spawnLocation.setYaw(newSpawnLocation.getYaw());
+		if (!(shopObjectType instanceof VirtualShopObjectType)) {
+			Validate.notNull(newSpawnLocation, "New spawn location is null, but the shop object type is not virtual!");
+		}
+		if (newSpawnLocation == null) {
+			this.spawnLocation = null;
+		} else {
+			Validate.notNull(newSpawnLocation.getWorld(), "New spawn location is missing world!");
+			newSpawnLocation.checkFinite();
+			if (this.spawnLocation != null) {
+				Validate.isTrue(this.spawnLocation.getWorld() == newSpawnLocation.getWorld(),
+						"Cannot set the spawn location to another world!");
+			}
+			this.spawnLocation = newSpawnLocation.clone();
+		}
 	}
 
 	/**

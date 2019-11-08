@@ -22,6 +22,8 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
+import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObject;
+import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObjectType;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIType;
@@ -54,14 +56,16 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public static final int MAX_NAME_LENGTH = 128;
 
 	private final int id;
-	private UUID uniqueId;
-	private AbstractShopObject shopObject;
-	private String worldName;
+	private UUID uniqueId; // not null after initialization
+	private AbstractShopObject shopObject; // not null after initialization
+	// TODO move location information into ShopObject?
+	// TODO store yaw?
+	private String worldName; // not empty, null for virtual shops
 	private int x;
 	private int y;
 	private int z;
-	private ChunkCoords chunkCoords;
-	private String name = "";
+	private ChunkCoords chunkCoords; // null for virtual shops
+	private String name = ""; // not null, can be empty
 
 	// has unsaved data changes:
 	private boolean dirty = false;
@@ -130,18 +134,28 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	protected void loadFromCreationData(ShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		assert shopCreationData != null;
 		this.uniqueId = UUID.randomUUID();
-		Location spawnLocation = shopCreationData.getSpawnLocation();
-		assert spawnLocation != null;
-		this.worldName = spawnLocation.getWorld().getName();
-		this.x = spawnLocation.getBlockX();
-		this.y = spawnLocation.getBlockY();
-		this.z = spawnLocation.getBlockZ();
-		this.updateChunkCoords();
 
 		ShopObjectType<?> shopObjectType = shopCreationData.getShopObjectType();
 		Validate.isTrue(shopObjectType instanceof AbstractShopObjectType,
 				"Expecting an AbstractShopObjectType, got " + shopObjectType.getClass().getName());
-		this.shopObject = ((AbstractShopObjectType<?>) shopObjectType).createObject(this, shopCreationData);
+
+		if (shopObjectType instanceof VirtualShopObjectType) {
+			// virtual shops ignore any potentially available spawn location:
+			this.worldName = null;
+			this.x = 0;
+			this.y = 0;
+			this.z = 0;
+		} else {
+			Location spawnLocation = shopCreationData.getSpawnLocation();
+			assert spawnLocation != null && spawnLocation.getWorld() != null;
+			this.worldName = spawnLocation.getWorld().getName();
+			this.x = spawnLocation.getBlockX();
+			this.y = spawnLocation.getBlockY();
+			this.z = spawnLocation.getBlockZ();
+		}
+		this.updateChunkCoords();
+
+		this.shopObject = this.createShopObject((AbstractShopObjectType<?>) shopObjectType, shopCreationData);
 
 		// automatically mark new shopkeepers as dirty:
 		this.markDirty();
@@ -196,11 +210,6 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		}
 
 		this.name = this.trimName(TextUtils.colorize(configSection.getString("name", "")));
-		this.worldName = configSection.getString("world");
-		this.x = configSection.getInt("x");
-		this.y = configSection.getInt("y");
-		this.z = configSection.getInt("z");
-		this.updateChunkCoords();
 
 		// shop object:
 		String objectTypeId;
@@ -263,9 +272,46 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 				throw new ShopkeeperCreateException("Invalid object type for shopkeeper '" + id + "': " + objectTypeId);
 			}
 		}
+		assert objectType != null;
 
-		this.shopObject = objectType.createObject(this, null);
+		// normalize empty world name to null:
+		String storedWorldName = StringUtils.getNotEmpty(configSection.getString("world"));
+		int storedX = configSection.getInt("x");
+		int storedY = configSection.getInt("y");
+		int storedZ = configSection.getInt("z");
+
+		if (objectType instanceof VirtualShopObjectType) {
+			if (storedWorldName != null || storedX != 0 || storedY != 0 || storedZ != 0) {
+				Log.warning("Ignoring stored world and coordinates ("
+						+ TextUtils.getLocationString(StringUtils.getNotNull(storedWorldName), storedX, storedY, storedZ)
+						+ ") for virtual shopkeeper '" + id + "'!");
+				this.markDirty();
+			}
+			this.worldName = null;
+			this.x = 0;
+			this.y = 0;
+			this.z = 0;
+		} else {
+			if (storedWorldName == null) {
+				throw new ShopkeeperCreateException("Missing world name for shopkeeper '" + id + "'!");
+			}
+			this.worldName = storedWorldName;
+			this.x = storedX;
+			this.y = storedY;
+			this.z = storedZ;
+		}
+		this.updateChunkCoords();
+
+		this.shopObject = this.createShopObject(objectType, null);
 		this.shopObject.load(objectSection);
+	}
+
+	// shopCreationData can be null if the shopkeeper is getting loaded
+	private AbstractShopObject createShopObject(AbstractShopObjectType<?> objectType, ShopCreationData shopCreationData) {
+		assert objectType != null;
+		AbstractShopObject shopObject = objectType.createObject(this, shopCreationData);
+		Validate.State.notNull(shopObject, "Shop object type '" + objectType.getIdentifier() + "' created null shop object for shopkeeper '" + id + "'!");
+		return shopObject;
 	}
 
 	/**
@@ -281,7 +327,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public void save(ConfigurationSection configSection) {
 		configSection.set("uniqueId", uniqueId.toString());
 		configSection.set("name", TextUtils.decolorize(name));
-		configSection.set("world", worldName);
+		// null world name gets stored as empty string:
+		configSection.set("world", StringUtils.getNotNull(worldName));
 		configSection.set("x", x);
 		configSection.set("y", y);
 		configSection.set("z", z);
@@ -406,6 +453,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public abstract AbstractShopType<?> getType();
 
 	@Override
+	public final boolean isVirtual() {
+		assert (worldName != null) ^ (shopObject instanceof VirtualShopObject); // xor
+		return (worldName == null);
+	}
+
+	@Override
 	public String getWorldName() {
 		return worldName;
 	}
@@ -427,11 +480,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public String getPositionString() {
+		if (worldName == null) return "[virtual]";
 		return TextUtils.getLocationString(worldName, x, y, z);
 	}
 
 	@Override
 	public Location getLocation() {
+		if (worldName == null) return null;
 		World world = Bukkit.getWorld(worldName);
 		if (world == null) return null;
 		return new Location(world, x, y, z);
@@ -447,13 +502,20 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the new stored location of this shopkeeper
 	 */
 	public void setLocation(Location location) {
-		this.markDirty();
+		Validate.isTrue(!this.isVirtual(), "Cannot set location of virtual shopkeeper!");
+		Validate.notNull(location, "Location is null!");
+		World world = location.getWorld();
+		Validate.notNull(world, "Location's world is null!");
+
 		ChunkCoords oldChunk = this.getChunkCoords();
+		// TODO changing the world is not safe (at least not for all types of shops)! consider for example player shops
+		// which currently use the worldname to locate their chest
+		worldName = world.getName();
 		x = location.getBlockX();
 		y = location.getBlockY();
 		z = location.getBlockZ();
-		worldName = location.getWorld().getName();
 		this.updateChunkCoords();
+		this.markDirty();
 
 		// update shopkeeper in chunk map:
 		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperMove(this, oldChunk);
@@ -465,7 +527,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	private void updateChunkCoords() {
-		this.chunkCoords = ChunkCoords.fromBlockPos(worldName, x, z);
+		this.chunkCoords = this.isVirtual() ? null : ChunkCoords.fromBlockPos(worldName, x, z);
 	}
 
 	// NAMING

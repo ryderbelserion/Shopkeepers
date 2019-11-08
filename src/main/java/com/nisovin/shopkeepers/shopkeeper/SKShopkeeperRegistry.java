@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -30,8 +31,10 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
+import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
@@ -51,7 +54,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// TODO add index by world, to speed up functions that only affect the shopkeepers of a certain world (eg. world
 	// save handling), maybe use a guava Table<String, ChunkCoords, List<AbstractShopkeeper>>
 	// temporary shortcut to speed up metrics:
+	// null world name stores count of virtual shops
 	private final Map<String, Integer> shopkeeperCountsByWorld = new HashMap<>();
+	// null key stores all virtual shops
 	private final Map<ChunkCoords, List<AbstractShopkeeper>> shopkeepersByChunk = new HashMap<>();
 	// unmodifiable entries:
 	private final Map<ChunkCoords, List<AbstractShopkeeper>> shopkeeperViewsByChunk = new HashMap<>();
@@ -242,7 +247,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		shopkeepersById.put(shopkeeper.getId(), shopkeeper);
 
 		// add shopkeeper to chunk:
-		ChunkCoords chunkCoords = shopkeeper.getChunkCoords();
+		ChunkCoords chunkCoords = shopkeeper.getChunkCoords(); // null for virtual shops
 		this.addShopkeeperToChunk(shopkeeper, chunkCoords);
 
 		// update player shop count:
@@ -260,7 +265,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		if (!shopkeeper.getShopObject().needsSpawning()) {
 			// activate shopkeeper once at registration:
 			this._activateShopkeeper(shopkeeper);
-		} else if (chunkCoords.isChunkLoaded()) {
+		} else if (chunkCoords != null && chunkCoords.isChunkLoaded()) {
 			// activate shopkeeper due to loaded chunk:
 			this.activateShopkeeper(shopkeeper);
 		}
@@ -283,7 +288,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		shopkeepersById.remove(shopkeeper.getId());
 
 		// remove shopkeeper from chunk:
-		ChunkCoords chunkCoords = shopkeeper.getChunkCoords();
+		ChunkCoords chunkCoords = shopkeeper.getChunkCoords(); // null for virtual shops
 		this.removeShopkeeperFromChunk(shopkeeper, chunkCoords);
 
 		// update player shop count:
@@ -318,6 +323,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 	}
 
+	// chunkCoords can be null for virtual shopkeepers
 	private void addShopkeeperToChunk(AbstractShopkeeper shopkeeper, ChunkCoords chunkCoords) {
 		List<AbstractShopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
 		if (byChunk == null) {
@@ -328,7 +334,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		byChunk.add(shopkeeper);
 
 		// update shopkeeper count by world:
-		String worldName = chunkCoords.getWorldName();
+		String worldName = (chunkCoords == null) ? null : chunkCoords.getWorldName();
 		Integer shopkeeperWorldCount = shopkeeperCountsByWorld.get(worldName);
 		int newShopkeeperWorldCount = (shopkeeperWorldCount == null ? 0 : shopkeeperWorldCount.intValue()) + 1;
 		if (newShopkeeperWorldCount > 0) {
@@ -338,6 +344,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 	}
 
+	// chunkCoords can be null for virtual shopkeepers
 	private void removeShopkeeperFromChunk(AbstractShopkeeper shopkeeper, ChunkCoords chunkCoords) {
 		List<AbstractShopkeeper> byChunk = shopkeepersByChunk.get(chunkCoords);
 		if (byChunk == null) return;
@@ -348,7 +355,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			}
 
 			// update shopkeeper count by world:
-			String worldName = chunkCoords.getWorldName();
+			String worldName = (chunkCoords == null) ? null : chunkCoords.getWorldName();
 			Integer shopkeeperWorldCount = shopkeeperCountsByWorld.get(worldName);
 			int newShopkeeperWorldCount = (shopkeeperWorldCount == null ? 0 : shopkeeperWorldCount.intValue()) - 1;
 			if (newShopkeeperWorldCount > 0) {
@@ -452,9 +459,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// SHOPKEEPERS BY CHUNK
 
 	public void onShopkeeperMove(AbstractShopkeeper shopkeeper, ChunkCoords oldChunk) {
-		assert oldChunk != null;
 		ChunkCoords newChunk = shopkeeper.getChunkCoords();
-		if (!oldChunk.equals(newChunk)) {
+		// old or new ChunkCoords might be null
+		if (!Objects.equals(oldChunk, newChunk)) {
 			// remove from old chunk:
 			this.removeShopkeeperFromChunk(shopkeeper, oldChunk);
 
@@ -733,15 +740,17 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	@Override
 	public List<AbstractShopkeeper> getShopkeepersAtLocation(Location location) {
 		Validate.notNull(location, "Location is null!");
-		Validate.notNull(location.getWorld(), "Location's world is null!");
-		String worldName = location.getWorld().getName();
+		World world = location.getWorld();
+		Validate.notNull(world, "Location's world is null!");
+		String worldName = world.getName();
 		int x = location.getBlockX();
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
 
 		List<AbstractShopkeeper> shopkeepers = new ArrayList<>();
 		for (AbstractShopkeeper shopkeeper : this.getAllShopkeepers()) {
-			if (shopkeeper.getWorldName().equals(worldName) && shopkeeper.getX() == x && shopkeeper.getY() == y && shopkeeper.getZ() == z) {
+			// note: shopkeeper's world name can be null
+			if (worldName.equals(shopkeeper.getWorldName()) && shopkeeper.getX() == x && shopkeeper.getY() == y && shopkeeper.getZ() == z) {
 				shopkeepers.add(shopkeeper);
 			}
 		}

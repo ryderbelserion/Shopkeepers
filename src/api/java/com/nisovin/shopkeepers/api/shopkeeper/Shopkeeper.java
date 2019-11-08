@@ -83,9 +83,18 @@ public interface Shopkeeper {
 	public ShopType<?> getType();
 
 	/**
-	 * Gets the name of the world this shopkeeper lives in.
+	 * Checks whether this shopkeeper is virtual.
+	 * <p>
+	 * Virtual shopkeepers are not located in any world.
 	 * 
-	 * @return the world name
+	 * @return <code>true</code> if the shopkeeper is virtual
+	 */
+	public boolean isVirtual();
+
+	/**
+	 * Gets the name of the world this shopkeeper is located in.
+	 * 
+	 * @return the world name, not empty, but <code>null</code> if the shopkeeper is {@link #isVirtual() virtual}
 	 */
 	public String getWorldName();
 
@@ -100,16 +109,18 @@ public interface Shopkeeper {
 	/**
 	 * Gets the shopkeeper's location.
 	 * <p>
-	 * This only works if the world is loaded.
+	 * This returns <code>null</code> if the shopkeeper is {@link #isVirtual() virtual} or if the world is not loaded.
 	 * 
-	 * @return the location of the shopkeeper, or <code>null</code> if the world isn't loaded
+	 * @return the location of the shopkeeper, or <code>null</code> if the shopkeeper is virtual or if the world isn't
+	 *         loaded
 	 */
 	public Location getLocation();
 
 	/**
 	 * Gets the {@link ChunkCoords} identifying the chunk this shopkeeper spawns in.
 	 * 
-	 * @return the chunk coordinates
+	 * @return the chunk coordinates, or <code>null</code> if this shopkeeper is virtual
+	 * @see #isVirtual()
 	 */
 	public ChunkCoords getChunkCoords();
 

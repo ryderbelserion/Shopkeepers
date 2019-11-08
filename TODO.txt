@@ -7,6 +7,8 @@ Mid priority:
 
 
 Low priority:
+* Make all config keys consistent: Avoid spaces (eg. 'owner uuid') and use hyphens rather than camelcase?
+
 * German translation:
   * Rename all occurrences of 'Shop/Shops' with 'Laden/Läden/Händler'?
 
