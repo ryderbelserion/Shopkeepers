@@ -34,11 +34,12 @@ import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
 
 	protected UUID ownerUUID; // not null after successful initialization
-	protected String ownerName;
+	protected String ownerName; // not null after successful initialization
 	// TODO store chest world separately? currently it uses the shopkeeper world
 	// this would allow the chest and shopkeeper to be located in different worlds, and virtual player shops
 	protected int chestX;
@@ -92,7 +93,12 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			// uuid invalid or non-existent:
 			throw new ShopkeeperCreateException("Missing owner uuid!");
 		}
-		ownerName = configSection.getString("owner", "unknown");
+		ownerName = configSection.getString("owner");
+		// TODO no longer using fallback name (since late 1.14.4); remove the "unknown"-check again in the future
+		// (as soon as possible, because it conflicts with any player actually named 'unknown')
+		if (ownerName == null || ownerName.isEmpty() || ownerName.equals("unknown")) {
+			throw new ShopkeeperCreateException("Missing owner name!");
+		}
 
 		if (!configSection.isInt("chestx") || !configSection.isInt("chesty") || !configSection.isInt("chestz")) {
 			throw new ShopkeeperCreateException("Missing chest coordinate(s)");
@@ -181,6 +187,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void setOwner(UUID ownerUUID, String ownerName) {
+		Validate.notNull(ownerUUID, "Owner uuid is null!");
+		Validate.notEmpty(ownerName, "Owner name is empty!");
 		this.markDirty();
 		this.ownerUUID = ownerUUID;
 		this.ownerName = ownerName;
@@ -205,8 +213,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public String getOwnerAsString() {
-		return TextUtils.getPlayerAsString(ownerName, ownerUUID);
+	public String getOwnerString() {
+		return TextUtils.getPlayerString(ownerName, ownerUUID);
 	}
 
 	@Override
@@ -290,7 +298,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		if (remainingPrice > 0) {
 			if (remainingPrice > Settings.currencyItem.getType().getMaxStackSize()) {
 				// cannot represent this price with the used currency items:
-				Log.warning("Shopkeeper at " + this.getPositionString() + " owned by " + ownerName + " has an invalid cost!");
+				Log.warning("Shopkeeper " + this.getIdString() + " at " + this.getPositionString()
+						+ " owned by " + this.getOwnerString() + " has an invalid cost!");
 				return null;
 			}
 
@@ -309,7 +318,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	protected TradingRecipe createBuyingRecipe(ItemStack itemBeingBought, int price, boolean outOfStock) {
 		if (price > Settings.currencyItem.getType().getMaxStackSize()) {
 			// cannot represent this price with the used currency items:
-			Log.warning("Shopkeeper at " + this.getPositionString() + " owned by " + ownerName + " has an invalid cost!");
+			Log.warning("Shopkeeper " + this.getIdString() + " at " + this.getPositionString()
+					+ " owned by " + this.getOwnerString() + " has an invalid cost!");
 			return null;
 		}
 		ItemStack currencyItem = Settings.createCurrencyItem(price);

@@ -62,11 +62,11 @@ public class TextUtils {
 		return worldName + "," + cx + "," + cz;
 	}
 
-	public static String getPlayerAsString(Player player) {
-		return getPlayerAsString(player.getName(), player.getUniqueId());
+	public static String getPlayerString(Player player) {
+		return getPlayerString(player.getName(), player.getUniqueId());
 	}
 
-	public static String getPlayerAsString(String playerName, UUID uniqueId) {
+	public static String getPlayerString(String playerName, UUID uniqueId) {
 		return playerName + (uniqueId == null ? "" : " (" + uniqueId.toString() + ")");
 	}
 

@@ -698,9 +698,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 				if (!forRemoval.isEmpty()) {
 					for (PlayerShopkeeper shopkeeper : forRemoval) {
 						shopkeeper.delete();
-						Log.info("Shopkeeper " + shopkeeper.getId() + " (" + shopkeeper.getUniqueId() + ") owned by "
-								+ shopkeeper.getOwnerAsString() + " at " + shopkeeper.getPositionString()
-								+ " has been removed for owner inactivity.");
+						Log.info("Shopkeeper " + shopkeeper.getIdString() + " at " + shopkeeper.getPositionString()
+								+ " owned by " + shopkeeper.getOwnerString() + " has been removed for owner inactivity.");
 					}
 
 					// save:

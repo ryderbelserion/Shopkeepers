@@ -27,14 +27,14 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	/**
 	 * Gets the uuid of the player who owns this shop.
 	 * 
-	 * @return the owners player uuid
+	 * @return the owner's player uuid, not <code>null</code>
 	 */
 	public UUID getOwnerUUID();
 
 	/**
 	 * Gets the last known name of the player who owns this shop.
 	 * 
-	 * @return the owners last known player name
+	 * @return the owner's last known name, not <code>null</code>
 	 */
 	public String getOwnerName();
 
@@ -45,7 +45,7 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	 * 
 	 * @return a string representing the the owner
 	 */
-	public String getOwnerAsString();
+	public String getOwnerString();
 
 	/**
 	 * Checks if the given owner is owning this shop.

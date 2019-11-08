@@ -450,6 +450,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
+	public String getIdString() {
+		return id + " (" + uniqueId.toString() + ")";
+	}
+
+	@Override
 	public abstract AbstractShopType<?> getType();
 
 	@Override

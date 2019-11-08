@@ -76,6 +76,13 @@ public interface Shopkeeper {
 	public UUID getUniqueId();
 
 	/**
+	 * Gets a String containing both the shopkeeper's id and unique id.
+	 * 
+	 * @return a string representation of this shopkeeper's id and unique id
+	 */
+	public String getIdString();
+
+	/**
 	 * Gets the type of this shopkeeper (ex: admin, selling player, buying player, trading player, etc.).
 	 * 
 	 * @return the shopkeeper type
