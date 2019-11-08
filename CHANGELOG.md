@@ -84,6 +84,13 @@ Other internal changes:
 Changed messages (you will have to manually update those!):  
 * msg-list-shops-entry: 'object type' changed to 'object', and the arguments '{shopSessionId}' and '{shopId}' changed to '{shopId}' and '{shopUUID}' respectively. Argument '{shopSessionId}' still works but will likely get removed in the future.
 * msg-villager-for-hire: The german translation was slightly changed.
+* Normalized the representation of various multi-line messages inside the default config:
+  * msg-creation-item-selected
+  * msg-shop-setup-desc-selling
+  * msg-shop-setup-desc-buying
+  * msg-shop-setup-desc-trading
+  * msg-shop-setup-desc-book
+  * msg-shop-setup-desc-admin-regular
 
 Removed messages:  
 * The default german translation contained a few no longer used messages: msg-button-type and msg-button-type-lore

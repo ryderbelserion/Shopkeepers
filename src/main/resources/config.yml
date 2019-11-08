@@ -386,12 +386,12 @@ msg-shop-object-type-npc: "npc"
 msg-selected-shop-type: "&aSelected shop type: &6{type} &7({description})"
 msg-selected-shop-object-type: "&aSelected object type: &6{type}"
 
-msg-creation-item-selected: |
-    &aShop creation:
-    &e  Left/Right-click to select the shop type.
-    &e  Sneak + left/right-click to select the object type.
-    &e  Right-click a chest to select it.
-    &e  Then right-click a block to place the shopkeeper.
+msg-creation-item-selected: |-
+  &aShop creation:
+  &e  Left/Right-click to select the shop type.
+  &e  Sneak + left/right-click to select the object type.
+  &e  Right-click a chest to select it.
+  &e  Then right-click a block to place the shopkeeper.
 
 msg-button-previous-page: "&6<- Previous page ({prev_page} of {max_page})"
 msg-button-previous-page-lore: []
@@ -569,20 +569,20 @@ msg-cant-trade-while-owner-online: "&7You cannot trade while the owner of this s
 
 msg-shopkeeper-created: "&aShopkeeper created: &6{type} &7({description})\n{setupDesc}"
 
-msg-shop-setup-desc-selling: |
-    &e  Add items you want to sell to your chest, then
-    &e  right-click the shop while sneaking to modify costs.
-msg-shop-setup-desc-buying: |
-    &e  Add one of each item you want to buy to your chest, then
-    &e  right-click the shop while sneaking to modify costs.
-msg-shop-setup-desc-trading: |
-    &e  Add items you want to sell to your chest, then
-    &e  right-click the shop while sneaking to modify costs.
-msg-shop-setup-desc-book: |
-    &e  Add written books and blank books to your chest, then
-    &e  right-click the shop while sneaking to modify costs.
-msg-shop-setup-desc-admin-regular: |
-    &e  Right-click the shop while sneaking to modify trades.
+msg-shop-setup-desc-selling: |-
+  &e  Add items you want to sell to your chest, then
+  &e  right-click the shop while sneaking to modify costs.
+msg-shop-setup-desc-buying: |-
+  &e  Add one of each item you want to buy to your chest, then
+  &e  right-click the shop while sneaking to modify costs.
+msg-shop-setup-desc-trading: |-
+  &e  Add items you want to sell to your chest, then
+  &e  right-click the shop while sneaking to modify costs.
+msg-shop-setup-desc-book: |-
+  &e  Add written books and blank books to your chest, then
+  &e  right-click the shop while sneaking to modify costs.
+msg-shop-setup-desc-admin-regular: |-
+  &e  Right-click the shop while sneaking to modify trades.
 
 msg-trade-setup-desc-header: '&6{shopType}'
 msg-trade-setup-desc-admin-regular:
