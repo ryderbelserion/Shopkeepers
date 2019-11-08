@@ -4,7 +4,7 @@ Date format: (YYYY-MM-DD)
 ## Next release
 ### Supported MC versions: xxx
 
-## v2.8.2 (TBA)
+## v2.9.0 (TBA)
 ### Supported MC versions: 1.14.4
 
 Migration notes:  
