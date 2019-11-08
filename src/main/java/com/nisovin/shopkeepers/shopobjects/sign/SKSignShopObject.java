@@ -155,6 +155,11 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	@Override
+	public boolean needsSpawning() {
+		return true; // despawn signs on chunk unload, and spawn them again on chunk load
+	}
+
+	@Override
 	public boolean spawn() {
 		Location signLocation = this.getLocation();
 		if (signLocation == null) {

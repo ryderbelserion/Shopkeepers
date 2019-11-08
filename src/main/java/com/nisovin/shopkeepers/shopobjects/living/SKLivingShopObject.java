@@ -95,6 +95,17 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		return this.getType().createObjectId(this.getEntity());
 	}
 
+	@Override
+	public boolean needsSpawning() {
+		return true; // despawn shop entities on chunk unload, and spawn them again on chunk load
+	}
+
+	@Override
+	public boolean despawnDuringWorldSaves() {
+		// spawned entities are non-persistent and therefore already skipped during world saves:
+		return false;
+	}
+
 	protected void assignShopkeeperMetadata(E entity) {
 		entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
 	}

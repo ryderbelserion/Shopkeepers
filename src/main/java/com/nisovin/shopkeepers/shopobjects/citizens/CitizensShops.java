@@ -210,7 +210,7 @@ public class CitizensShops {
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
 							+ ": No NPC existing with unique id '" + npcUniqueId + "'.");
-				} else if (shopkeeperRegistry.getActiveShopkeeper(shopkeeper.getObjectId()) != shopkeeper) {
+				} else if (shopkeeperRegistry.getActiveShopkeeper(shopkeeper.getShopObject().getId()) != shopkeeper) {
 					// there is already another citizens shopkeeper using this npc id:
 					citizensShop.setKeepNPCOnDeletion();
 					forRemoval.add(shopkeeper);

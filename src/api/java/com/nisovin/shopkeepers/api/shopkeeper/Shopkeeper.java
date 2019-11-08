@@ -113,6 +113,28 @@ public interface Shopkeeper {
 	 */
 	public ChunkCoords getChunkCoords();
 
+	// NAMING
+
+	/**
+	 * Gets the shopkeeper's name.
+	 * <p>
+	 * The name may include color codes.
+	 * 
+	 * @return the shopkeeper's name, not <code>null</code> but may be empty if not set
+	 */
+	public String getName();
+
+	public void setName(String name);
+
+	// SHOP OBJECT
+
+	/**
+	 * Gets the object representing this shopkeeper in the world.
+	 * 
+	 * @return the shop object, not <code>null</code>
+	 */
+	public ShopObject getShopObject();
+
 	// TRADING
 
 	/**
@@ -132,52 +154,6 @@ public interface Shopkeeper {
 	 * @return an unmodifiable view on the currently available trading recipes of this shopkeeper for the given player
 	 */
 	public List<TradingRecipe> getTradingRecipes(Player player);
-
-	// ACTIVATION
-
-	/**
-	 * Gets the object representing this shopkeeper in the world.
-	 * 
-	 * @return the shop object
-	 */
-	public ShopObject getShopObject();
-
-	/**
-	 * Whether or not this shopkeeper needs to be spawned and despawned with chunk load and unloads.
-	 * 
-	 * @return <code>true</code> if spawning is required
-	 */
-	public boolean needsSpawning();
-
-	/**
-	 * Checks if the shopkeeper is active (is present in the world).
-	 * 
-	 * @return <code>true</code> if the shopkeeper is active
-	 */
-	public boolean isActive();
-
-	/**
-	 * Gets the shopkeeper's object id.
-	 * <p>
-	 * This is can change when the shopkeeper object (ex. shopkeeper entity) respawns.
-	 * 
-	 * @return the object id, or <code>null</code> if the shopkeeper object is currently not active
-	 */
-	public String getObjectId();
-
-	public Location getObjectLocation();
-
-	/**
-	 * Spawns the shopkeeper into the world at its spawn location.
-	 * 
-	 * @return <code>true</code> on success
-	 */
-	public boolean spawn();
-
-	/**
-	 * Removes this shopkeeper from the world.
-	 */
-	public void despawn();
 
 	// SHOPKEEPER UIs
 
@@ -225,10 +201,4 @@ public interface Shopkeeper {
 	 * @return <code>true</code> if the interface was successfully opened for the player
 	 */
 	public boolean openTradingWindow(Player player);
-
-	// NAMING
-
-	public String getName();
-
-	public void setName(String name);
 }

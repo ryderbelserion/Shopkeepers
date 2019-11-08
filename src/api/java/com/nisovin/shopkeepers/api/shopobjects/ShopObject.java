@@ -13,6 +13,11 @@ public interface ShopObject {
 
 	// ACTIVATION
 
+	/**
+	 * Checks if this shop object is active (is currently present in the world).
+	 * 
+	 * @return <code>true</code> if the shopkeeper is active
+	 */
 	public boolean isActive();
 
 	/**
@@ -25,8 +30,23 @@ public interface ShopObject {
 	 */
 	public String getId();
 
+	/**
+	 * Whether or not this shop object gets spawned and despawned with chunk load and unloads.
+	 * 
+	 * @return <code>true</code> if this shop object gets spawned and despawned with chunk loads and unloads
+	 */
+	public boolean needsSpawning();
+
+	/**
+	 * Spawns the shop object into the world at its spawn location.
+	 * 
+	 * @return <code>true</code> on success
+	 */
 	public boolean spawn();
 
+	/**
+	 * Removes this shop object from the world.
+	 */
 	public void despawn();
 
 	/**

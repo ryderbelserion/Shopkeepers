@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
@@ -175,9 +176,10 @@ class CommandCheck extends Command {
 		if (isConsole && listActive) {
 			sender.sendMessage("All active shopkeepers:");
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getActiveShopkeepers()) {
-				if (shopkeeper.isActive()) {
-					Location loc = shopkeeper.getObjectLocation();
-					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": active (" + (loc != null ? loc.toString() : "maybe not?!?") + ")");
+				ShopObject shopObject = shopkeeper.getShopObject();
+				if (shopObject.isActive()) {
+					Location location = shopObject.getLocation();
+					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": active (" + (location != null ? location.toString() : "maybe not?!?") + ")");
 				} else {
 					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": INACTIVE!");
 				}

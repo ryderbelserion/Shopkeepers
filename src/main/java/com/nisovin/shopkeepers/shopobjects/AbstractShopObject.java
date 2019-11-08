@@ -22,7 +22,7 @@ import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
  */
 public abstract class AbstractShopObject implements ShopObject {
 
-	protected final AbstractShopkeeper shopkeeper;
+	protected final AbstractShopkeeper shopkeeper; // not null
 
 	// fresh creation
 	protected AbstractShopObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -93,6 +93,18 @@ public abstract class AbstractShopObject implements ShopObject {
 
 	@Override
 	public abstract String getId();
+
+	@Override
+	public abstract boolean needsSpawning();
+
+	/**
+	 * Whether or not this shop object gets despawned right before world saves and respawned afterwards.
+	 * 
+	 * @return <code>true</code> if this shop object gets despawned during world saves
+	 */
+	public boolean despawnDuringWorldSaves() {
+		return this.needsSpawning();
+	}
 
 	@Override
 	public abstract boolean spawn();

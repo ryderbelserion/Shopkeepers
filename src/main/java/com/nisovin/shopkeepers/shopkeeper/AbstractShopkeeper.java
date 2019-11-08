@@ -468,64 +468,52 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.chunkCoords = ChunkCoords.fromBlockPos(worldName, x, z);
 	}
 
-	// TRADING
+	// NAMING
 
 	@Override
-	public abstract List<TradingRecipe> getTradingRecipes(Player player);
+	public String getName() {
+		return name;
+	}
 
-	// ACTIVATION
+	@Override
+	public void setName(String newName) {
+		// prepare and apply new name:
+		String preparedName = newName;
+		if (preparedName == null) preparedName = "";
+		preparedName = TextUtils.colorize(preparedName);
+		preparedName = this.trimName(preparedName);
+		this.name = preparedName;
+
+		// update shop object:
+		shopObject.setName(preparedName);
+		this.markDirty(); // mark dirty
+	}
+
+	public boolean isValidName(String name) {
+		return (name != null && name.length() <= MAX_NAME_LENGTH && name.matches("^" + Settings.nameRegex + "$"));
+	}
+
+	private String trimName(String name) {
+		if (name.length() <= MAX_NAME_LENGTH) {
+			return name;
+		}
+		String trimmedName = name.substring(0, MAX_NAME_LENGTH);
+		Log.warning("Name of shopkeeper " + id + " is longer than " + MAX_NAME_LENGTH
+				+ ". Trimming name '" + name + "' to '" + trimmedName + "'.");
+		return trimmedName;
+	}
+
+	// SHOP OBJECT
 
 	@Override
 	public AbstractShopObject getShopObject() {
 		return shopObject;
 	}
 
-	@Override
-	public boolean needsSpawning() {
-		return shopObject.getType().needsSpawning();
-	}
+	// TRADING
 
 	@Override
-	public boolean isActive() {
-		return shopObject.isActive();
-	}
-
-	@Override
-	public String getObjectId() {
-		return shopObject.getId();
-	}
-
-	@Override
-	public Location getObjectLocation() {
-		return shopObject.getLocation();
-	}
-
-	@Override
-	public boolean spawn() {
-		return shopObject.spawn();
-	}
-
-	@Override
-	public void despawn() {
-		shopObject.despawn();
-	}
-
-	public void onChunkLoad(boolean worldSaving) {
-		shopObject.onChunkLoad(worldSaving);
-	}
-
-	public void onChunkUnload(boolean worldSaving) {
-		shopObject.onChunkUnload(worldSaving);
-	}
-
-	/**
-	 * See {@link AbstractShopObject#check()}.
-	 * 
-	 * @return <code>true</code> to if the shop object might no longer be active or its id has changed
-	 */
-	public boolean check() {
-		return shopObject.check();
-	}
+	public abstract List<TradingRecipe> getTradingRecipes(Player player);
 
 	// USER INTERFACES
 
@@ -589,41 +577,6 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	@Override
 	public boolean openTradingWindow(Player player) {
 		return this.openWindow(DefaultUITypes.TRADING(), player);
-	}
-
-	// NAMING:
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public void setName(String newName) {
-		// prepare and apply new name:
-		String preparedName = newName;
-		if (preparedName == null) preparedName = "";
-		preparedName = TextUtils.colorize(preparedName);
-		preparedName = this.trimName(preparedName);
-		this.name = preparedName;
-
-		// update shop object:
-		shopObject.setName(preparedName);
-		this.markDirty(); // mark dirty
-	}
-
-	public boolean isValidName(String name) {
-		return (name != null && name.length() <= MAX_NAME_LENGTH && name.matches("^" + Settings.nameRegex + "$"));
-	}
-
-	private String trimName(String name) {
-		if (name.length() <= MAX_NAME_LENGTH) {
-			return name;
-		}
-		String trimmedName = name.substring(0, MAX_NAME_LENGTH);
-		Log.warning("Name of shopkeeper " + id + " is longer than " + MAX_NAME_LENGTH
-				+ ". Trimming name '" + name + "' to '" + trimmedName + "'.");
-		return trimmedName;
 	}
 
 	// INTERACTION HANDLING

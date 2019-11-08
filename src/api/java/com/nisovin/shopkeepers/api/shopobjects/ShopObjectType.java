@@ -18,13 +18,6 @@ public interface ShopObjectType<T extends ShopObject> extends SelectableType {
 	public abstract String getDisplayName();
 
 	/**
-	 * Whether shop objects of this type get spawned with chunk loads and despawned with chunk unloads.
-	 * 
-	 * @return <code>true</code> if the shop objects of this type get spawned and despawned with chunk loads and unloads
-	 */
-	public boolean needsSpawning();
-
-	/**
 	 * Checks if the shopkeeper object can be spawned at the specified location.
 	 * 
 	 * @param spawnLocation

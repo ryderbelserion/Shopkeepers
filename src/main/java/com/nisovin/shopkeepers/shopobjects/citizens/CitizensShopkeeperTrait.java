@@ -27,7 +27,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	public static final String TRAIT_NAME = "shopkeeper";
 
 	// citizens shop object id
-	private String shopkeeperId = null;
+	private String shopObjectId = null;
 
 	public CitizensShopkeeperTrait() {
 		super("shopkeeper");
@@ -35,19 +35,19 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	@Override
 	public void load(DataKey key) {
-		this.shopkeeperId = key.getString("ShopkeeperId", null);
+		this.shopObjectId = key.getString("ShopkeeperId", null);
 	}
 
 	@Override
 	public void save(DataKey key) {
-		key.setString("ShopkeeperId", shopkeeperId);
+		key.setString("ShopkeeperId", shopObjectId);
 	}
 
 	public Shopkeeper getShopkeeper() {
-		if (shopkeeperId == null) return null;
+		if (shopObjectId == null) return null;
 		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
 		if (plugin == null) return null;
-		return plugin.getShopkeeperRegistry().getActiveShopkeeper(shopkeeperId);
+		return plugin.getShopkeeperRegistry().getActiveShopkeeper(shopObjectId);
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	void onShopkeeperRemove() {
 		Log.debug("Removing citizens trait due to shopkeeper removal for NPC " + CitizensShops.getNPCIdString(npc));
-		shopkeeperId = null;
+		shopObjectId = null;
 		this.getNPC().removeTrait(CitizensShopkeeperTrait.class);
 	}
 
@@ -176,10 +176,10 @@ public class CitizensShopkeeperTrait extends Trait {
 			}
 
 			if (shopkeeper != null) {
-				shopkeeperId = shopkeeper.getObjectId();
+				shopObjectId = shopkeeper.getShopObject().getId();
 			} else {
 				Log.warning("Shopkeeper creation via trait failed. Removing trait again.");
-				shopkeeperId = null;
+				shopObjectId = null;
 				Bukkit.getScheduler().runTask(plugin, () -> npc.removeTrait(CitizensShopkeeperTrait.class));
 			}
 		} else {

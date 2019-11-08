@@ -197,6 +197,11 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	}
 
 	@Override
+	public boolean needsSpawning() {
+		return false; // spawning and despawning is handled by citizens
+	}
+
+	@Override
 	public boolean spawn() {
 		return false; // handled by citizens
 	}
