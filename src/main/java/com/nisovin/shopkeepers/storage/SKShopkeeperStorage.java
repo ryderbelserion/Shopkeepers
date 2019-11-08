@@ -25,6 +25,7 @@ import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
@@ -219,17 +220,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// SHOPKEEPER DATA REMOVAL
 
 	private void clearSaveData() {
-		this.clearConfigSection(saveData);
-		this.clearConfigSection(saveDataBuffer);
+		ConfigUtils.clearConfigSection(saveData);
+		ConfigUtils.clearConfigSection(saveDataBuffer);
 		maxStoredShopkeeperId = 0;
 		nextShopkeeperId = 1;
-	}
-
-	private void clearConfigSection(ConfigurationSection configSection) {
-		assert configSection != null;
-		for (String key : configSection.getKeys(false)) {
-			configSection.set(key, null);
-		}
 	}
 
 	public void clearShopkeeperData(AbstractShopkeeper shopkeeper) {
@@ -373,7 +367,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		// create a copy of the save data's top level data structure:
-		this.clearConfigSection(saveDataBuffer);
+		ConfigUtils.clearConfigSection(saveDataBuffer);
 		// set data version first (at the top):
 		saveDataBuffer.set(DATA_VERSION_KEY, DATA_VERSION);
 		for (Entry<String, Object> entry : saveData.getValues(false).entrySet()) {

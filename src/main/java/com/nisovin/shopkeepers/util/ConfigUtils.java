@@ -66,6 +66,13 @@ public class ConfigUtils {
 		return configOutput.split(yamlLineBreak());
 	}
 
+	public static void clearConfigSection(ConfigurationSection configSection) {
+		if (configSection == null) return;
+		for (String key : configSection.getKeys(false)) {
+			configSection.set(key, null);
+		}
+	}
+
 	private ConfigUtils() {
 	}
 }
