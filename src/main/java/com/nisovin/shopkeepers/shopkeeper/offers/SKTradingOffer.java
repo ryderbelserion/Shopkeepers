@@ -61,7 +61,7 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 
 	public static void saveToConfig(ConfigurationSection config, String node, Collection<? extends TradingOffer> offers) {
 		ConfigurationSection offersSection = config.createSection(node);
-		int id = 0;
+		int id = 1;
 		for (TradingOffer offer : offers) {
 			// note: the items are clones
 			ItemStack item1 = offer.getItem1();

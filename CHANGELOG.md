@@ -70,11 +70,12 @@ Date format: (YYYY-MM-DD)
   * Internal: ArgumentParseException provides the command argument that created it now. This is especially useful for debugging purposes.
   
 Other internal changes:  
-* Internal: Added Utils#concat() for arrays.
+* Internal: The ids used for storing shopkeeper offers start at 1 now (instead of 0). This has no impact on the loading of save data, but makes it nicer to read.
 * Internal: bstats gets shaded into the package '[..].libs.bstats' now.
 * Internal: Added Settings#isDebugging and Settings#isDebugging(option) to conveniently (and thread-safe) check for debugging options.
 * Internal: Default shop, object and ui types are getting registered early during onLoad now.
 * Internal: Separated config and language file loading.
+
 
 Changed messages (you will have to manually update those!):  
 * msg-list-shops-entry: 'object type' changed to 'object', and the arguments '{shopSessionId}' and '{shopId}' changed to '{shopId}' and '{shopUUID}' respectively. Argument '{shopSessionId}' still works but will likely get removed in the future.

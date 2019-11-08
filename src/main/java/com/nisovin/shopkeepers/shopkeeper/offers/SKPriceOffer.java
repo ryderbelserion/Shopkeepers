@@ -70,7 +70,7 @@ public class SKPriceOffer implements PriceOffer {
 
 	public static void saveToConfig(ConfigurationSection config, String node, Collection<? extends PriceOffer> offers) {
 		ConfigurationSection offersSection = config.createSection(node);
-		int id = 0;
+		int id = 1;
 		for (PriceOffer offer : offers) {
 			ItemStack item = offer.getItem(); // is a clone
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
