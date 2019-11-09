@@ -84,6 +84,7 @@ Migration notes:
   * Internal: ArgumentParseException provides the command argument that created it now. This is especially useful for debugging purposes.
   
 Other internal changes:  
+* Internal: The regex pattern used to validate shopkeeper names gets precompiled now.
 * Internal: The ids used for storing shopkeeper offers start at 1 now (instead of 0). This has no impact on the loading of save data, but makes it nicer to read.
 * Internal: bstats gets shaded into the package '[..].libs.bstats' now.
 * Internal: Added Settings#isDebugging and Settings#isDebugging(option) to conveniently (and thread-safe) check for debugging options.

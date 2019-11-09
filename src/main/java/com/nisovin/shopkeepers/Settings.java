@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -736,6 +737,7 @@ public class Settings {
 		public static ItemData deleteButtonItem = new ItemData(Material.AIR);
 		public static ItemData hireButtonItem = new ItemData(Material.AIR);
 
+		public static Pattern shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
 		// gets called after the config has been loaded:
 		private static void setup() {
 			// ignore display name (which is used for specifying the new shopkeeper name):
@@ -746,6 +748,8 @@ public class Settings {
 			chestButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(chestItem.createItemStack(), msgButtonChest, msgButtonChestLore));
 			deleteButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), msgButtonDelete, msgButtonDeleteLore));
 			hireButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(hireItem.createItemStack(), msgButtonHire, msgButtonHireLore));
+
+			shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
 		}
 	}
 

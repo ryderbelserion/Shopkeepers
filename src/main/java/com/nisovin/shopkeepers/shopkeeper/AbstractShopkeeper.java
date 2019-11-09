@@ -557,7 +557,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	public boolean isValidName(String name) {
-		return (name != null && name.length() <= MAX_NAME_LENGTH && name.matches("^" + Settings.nameRegex + "$"));
+		return (name != null && name.length() <= MAX_NAME_LENGTH
+				&& Settings.DerivedSettings.shopNamePattern.matcher(name).matches());
 	}
 
 	private String trimName(String name) {
