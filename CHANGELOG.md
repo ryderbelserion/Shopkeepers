@@ -33,7 +33,7 @@ Migration notes:
 * API: Moved ShopObjectType#needsSpawning into ShopObject.
 * API: Renamed PlayerShopkeeper#getOwnerAsString to #getOwnerString.
 * API: Added Shopkeeper#getIdString.
-* API/Internal: Made some preparations to support virtual shopkeepers in the future (which are not located in any world). Various location related API methods may now return null.
+* API: Made some preparations to support virtual shopkeepers in the future (which are not located in any world). Various location related API methods may now return null. Added ShopkeeperRegistry#getVirtualShopkeepers().
 
 * Various (mostly internal) changes to commands and argument parsing:  
   * Fallback mechanism:

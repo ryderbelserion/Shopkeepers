@@ -142,8 +142,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			int count = 0;
 			boolean dirty = false;
 			for (Entry<ChunkCoords, List<AbstractShopkeeper>> chunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
-				ChunkCoords chunk = chunkEntry.getKey();
-				if (!chunk.isChunkLoaded()) continue;
+				ChunkCoords chunk = chunkEntry.getKey(); // null for virtual shops
+				if (chunk == null || !chunk.isChunkLoaded()) continue;
 
 				List<AbstractShopkeeper> shopkeepers = chunkEntry.getValue();
 				for (AbstractShopkeeper shopkeeper : shopkeepers) {
@@ -582,7 +582,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	 * Loads all shopkeepers in the given world.
 	 * 
 	 * @param world
-	 *            the world
+	 *            the world, not <code>null</code>
 	 * @param worldSaving
 	 *            whether the shopkeepers get loaded due to the world saving finished
 	 * @return the number of loaded shopkeepers
@@ -592,6 +592,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		int affectedShops = 0;
 		String worldName = world.getName();
 		for (ChunkCoords chunkCoords : this.getAllShopkeepersByChunks().keySet()) {
+			if (chunkCoords == null) continue; // null for virtual shops, skip them
 			if (!chunkCoords.getWorldName().equals(worldName)) continue; // different world
 			Chunk chunk = chunkCoords.getChunk();
 			if (chunk == null) continue; // not loaded
@@ -624,7 +625,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	 * Unloads all shopkeepers in the given world.
 	 * 
 	 * @param world
-	 *            the world
+	 *            the world, not <code>null</code>
 	 * @param worldSaving
 	 *            whether the shopkeepers get loaded due to the world saving
 	 * @return the number of unloaded shopkeepers
@@ -634,6 +635,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		int affectedShops = 0;
 		String worldName = world.getName();
 		for (ChunkCoords chunkCoords : this.getAllShopkeepersByChunks().keySet()) {
+			if (chunkCoords == null) continue; // null for virtual shops, skip them
 			if (!chunkCoords.getWorldName().equals(worldName)) continue; // different world
 			Chunk chunk = chunkCoords.getChunk();
 			if (chunk == null) continue; // not loaded
@@ -764,6 +766,12 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	@Override
 	public List<AbstractShopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords) {
+		Validate.notNull(chunkCoords, "ChunkCoords is null!");
+		return this._getShopkeepersInChunk(chunkCoords);
+	}
+
+	// chunkCoords can be null to retrieve the virtual shopkeepers:
+	private List<AbstractShopkeeper> _getShopkeepersInChunk(ChunkCoords chunkCoords) {
 		List<AbstractShopkeeper> byChunk = shopkeepersByChunkView.get(chunkCoords);
 		if (byChunk == null) return Collections.emptyList();
 		return byChunk; // unmodifiable already
@@ -776,11 +784,17 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		String worldName = world.getName();
 		for (Entry<ChunkCoords, List<AbstractShopkeeper>> byChunkEntry : this.getAllShopkeepersByChunks().entrySet()) {
 			ChunkCoords chunkCoords = byChunkEntry.getKey();
+			if (chunkCoords == null) continue; // null for virtual shops, skip them
 			if (!chunkCoords.getWorldName().equals(worldName)) continue; // different world
 			if (onlyLoadedChunks && !chunkCoords.isChunkLoaded()) continue; // not loaded
 			shopkeepersInWorld.addAll(byChunkEntry.getValue());
 		}
 		return Collections.unmodifiableList(shopkeepersInWorld);
+	}
+
+	@Override
+	public List<AbstractShopkeeper> getVirtualShopkeepers() {
+		return this._getShopkeepersInChunk(null);
 	}
 
 	public int countShopsOfPlayer(Player player) {

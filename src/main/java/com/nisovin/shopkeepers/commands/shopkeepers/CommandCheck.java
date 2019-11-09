@@ -67,16 +67,19 @@ class CommandCheck extends Command {
 		boolean listChunks = context.has(ARGUMENT_CHUNKS);
 		boolean listActive = context.has(ARGUMENT_ACTIVE);
 
-		Map<ChunkCoords, ? extends List<?>> shopsByChunk = shopkeeperRegistry.getAllShopkeepersByChunks();
 		LivingEntityAI livingEntityAI = plugin.getLivingShops().getLivingEntityAI();
+		Map<ChunkCoords, ? extends List<?>> shopsByChunk = shopkeeperRegistry.getAllShopkeepersByChunks();
+		int chunksWithShopkeepers = shopsByChunk.size();
+		if (shopsByChunk.containsKey(null)) chunksWithShopkeepers -= 1;
 
 		sender.sendMessage(ChatColor.YELLOW + "All shopkeepers:");
-		sender.sendMessage("  Total: " + shopkeeperRegistry.getAllShopkeepers().size());
+		sender.sendMessage("  Total: " + shopkeeperRegistry.getAllShopkeepers().size()
+				+ "  (Virtual: " + shopkeeperRegistry.getVirtualShopkeepers().size() + ")");
 		sender.sendMessage("  Unsaved dirty | deleted | dirty storage: "
 				+ plugin.getShopkeeperStorage().getDirtyCount()
 				+ " | " + plugin.getShopkeeperStorage().getUnsavedDeletedCount()
 				+ " | " + plugin.getShopkeeperStorage().isDirty());
-		sender.sendMessage("  Chunks with shopkeepers: " + shopsByChunk.size());
+		sender.sendMessage("  Chunks with shopkeepers: " + chunksWithShopkeepers);
 		sender.sendMessage("    With active AI: " + livingEntityAI.getActiveAIChunksCount());
 		sender.sendMessage("    With active gravity: " + livingEntityAI.getActiveGravityChunksCount());
 		sender.sendMessage("  Active shopkeepers: " + shopkeeperRegistry.getActiveShopkeepers().size());
@@ -111,52 +114,53 @@ class CommandCheck extends Command {
 
 		for (World world : Bukkit.getWorlds()) {
 			String worldName = world.getName();
-			Chunk[] loadedChunks = world.getLoadedChunks();
-			List<Entity> entities = world.getEntities();
-			int deadEntities = 0;
-			int invalidEntities = 0;
-			for (Entity entity : entities) {
-				if (entity.isDead()) ++deadEntities;
-				if (!entity.isValid()) ++invalidEntities;
+			Chunk[] worldLoadedChunks = world.getLoadedChunks();
+			List<Entity> worldEntities = world.getEntities();
+			int worldDeadEntities = 0;
+			int worldInvalidEntities = 0;
+			for (Entity entity : worldEntities) {
+				if (entity.isDead()) ++worldDeadEntities;
+				if (!entity.isValid()) ++worldInvalidEntities;
 			}
-			int deadEntitiesInChunks = 0;
-			int invalidEntitiesInChunks = 0;
-			for (Chunk chunk : loadedChunks) {
+			int worldDeadEntitiesInChunks = 0;
+			int worldInvalidEntitiesInChunks = 0;
+			for (Chunk chunk : worldLoadedChunks) {
 				for (Entity entity : chunk.getEntities()) {
-					if (entity.isDead()) ++deadEntitiesInChunks;
-					if (!entity.isValid()) ++invalidEntitiesInChunks;
+					if (entity.isDead()) ++worldDeadEntitiesInChunks;
+					if (!entity.isValid()) ++worldInvalidEntitiesInChunks;
 				}
 			}
 
-			int totalShopkeepers = 0;
-			int chunksWithShopkeepers = 0;
-			int loadedChunksWithShopkeepers = 0;
-			int shopkeepersInLoadedChunks = 0;
+			int worldTotalShopkeepers = 0;
+			int worldChunksWithShopkeepers = 0;
+			int worldLoadedChunksWithShopkeepers = 0;
+			int worldShopkeepersInLoadedChunks = 0;
 
 			for (Entry<ChunkCoords, ? extends List<?>> chunkEntry : shopsByChunk.entrySet()) {
 				ChunkCoords chunkCoords = chunkEntry.getKey();
-				if (!chunkCoords.getWorldName().equals(worldName)) continue;
+				if (chunkCoords == null) continue; // null for virtual shops
+				if (!worldName.equals(chunkCoords.getWorldName())) continue;
 				List<?> inChunk = chunkEntry.getValue();
-				chunksWithShopkeepers++;
-				totalShopkeepers += inChunk.size();
+				worldChunksWithShopkeepers++;
+				worldTotalShopkeepers += inChunk.size();
 				if (chunkCoords.isChunkLoaded()) {
-					loadedChunksWithShopkeepers++;
-					shopkeepersInLoadedChunks += inChunk.size();
+					worldLoadedChunksWithShopkeepers++;
+					worldShopkeepersInLoadedChunks += inChunk.size();
 				}
 			}
 
 			sender.sendMessage(ChatColor.YELLOW + "Shopkeepers in world '" + world.getName() + "':");
-			sender.sendMessage("  Total: " + totalShopkeepers);
-			sender.sendMessage("  Entities | invalid | dead: " + entities.size() + " | " + invalidEntities + " | " + deadEntities);
-			sender.sendMessage("  Entities in chunks (invalid | dead): " + invalidEntitiesInChunks + " | " + deadEntitiesInChunks);
-			sender.sendMessage("  Loaded chunks: " + loadedChunks.length);
-			if (totalShopkeepers > 0) {
-				sender.sendMessage("  Chunks with shopkeepers | loaded: " + chunksWithShopkeepers + " | " + loadedChunksWithShopkeepers);
-				sender.sendMessage("  Shopkeepers in loaded chunks: " + shopkeepersInLoadedChunks);
+			sender.sendMessage("  Total: " + worldTotalShopkeepers);
+			sender.sendMessage("  Entities | invalid | dead: " + worldEntities.size() + " | " + worldInvalidEntities + " | " + worldDeadEntities);
+			sender.sendMessage("  Entities in chunks (invalid | dead): " + worldInvalidEntitiesInChunks + " | " + worldDeadEntitiesInChunks);
+			sender.sendMessage("  Loaded chunks: " + worldLoadedChunks.length);
+			if (worldTotalShopkeepers > 0) {
+				sender.sendMessage("  Chunks with shopkeepers | loaded: " + worldChunksWithShopkeepers + " | " + worldLoadedChunksWithShopkeepers);
+				sender.sendMessage("  Shopkeepers in loaded chunks: " + worldShopkeepersInLoadedChunks);
 			}
 
 			// list all chunks containing shopkeepers:
-			if (isConsole && listChunks && totalShopkeepers > 0) {
+			if (isConsole && listChunks && worldTotalShopkeepers > 0) {
 				sender.sendMessage("  Listing of all chunks with shopkeepers:");
 				int line = 0;
 				for (Entry<ChunkCoords, ? extends List<?>> chunkEntry : shopsByChunk.entrySet()) {

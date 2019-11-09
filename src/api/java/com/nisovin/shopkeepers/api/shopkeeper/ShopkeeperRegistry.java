@@ -151,6 +151,13 @@ public interface ShopkeeperRegistry {
 	public List<? extends Shopkeeper> getShopkeepersInWorld(World world, boolean onlyLoadedChunks);
 
 	/**
+	 * Gets all {@link Shopkeeper#isVirtual() virtual} shopkeepers.
+	 * 
+	 * @return an unmodifiable view on the virtual shopkeepers
+	 */
+	public List<? extends Shopkeeper> getVirtualShopkeepers();
+
+	/**
 	 * Gets all shopkeepers.
 	 * 
 	 * @return an unmodifiable view on all shopkeepers
@@ -159,6 +166,8 @@ public interface ShopkeeperRegistry {
 
 	/**
 	 * Gets all shopkeepers grouped by the chunks they are in.
+	 * <p>
+	 * {@link Shopkeeper#isVirtual() Virtual} shopkeepers are stored with a key of <code>null</code>.
 	 * 
 	 * @return an unmodifiable view on all shopkeepers grouped by the chunks they are in
 	 */

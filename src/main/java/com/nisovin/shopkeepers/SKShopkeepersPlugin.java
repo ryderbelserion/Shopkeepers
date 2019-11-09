@@ -497,6 +497,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		metrics.addCustomChart(new PlayerShopsChart(shopkeeperRegistry));
 		metrics.addCustomChart(new FeaturesChart());
 		metrics.addCustomChart(new WorldsChart(shopkeeperRegistry));
+		// TODO add chart with number of virtual shops?
 	}
 
 	// PLAYER JOINING AND QUITTING
