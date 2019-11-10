@@ -195,8 +195,8 @@ public class TradingHandler extends UIHandler {
 	}
 
 	protected String getInventoryTitle() {
-		String title = this.getShopkeeper().getName();
-		if (title == null || title.isEmpty()) {
+		String title = this.getShopkeeper().getName(); // can be empty
+		if (title.isEmpty()) {
 			title = Settings.msgTradingTitleDefault;
 		}
 		return Settings.msgTradingTitlePrefix + title;

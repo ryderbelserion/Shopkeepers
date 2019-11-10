@@ -107,7 +107,7 @@ class CommandList extends Command {
 					PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
 					if (playerShop.getOwnerName().equals(targetPlayerName)) {
 						UUID shopOwnerUUID = playerShop.getOwnerUUID();
-						if (shopOwnerUUID == null || shopOwnerUUID.equals(listPlayerUUID) || listPlayerUUID == null) {
+						if (listPlayerUUID == null || shopOwnerUUID.equals(listPlayerUUID)) {
 							shops.add(playerShop);
 						}
 					}
@@ -138,15 +138,14 @@ class CommandList extends Command {
 		int endIndex = Math.min(startIndex + ENTRIES_PER_PAGE, shopsCount);
 		for (int index = startIndex; index < endIndex; index++) {
 			Shopkeeper shopkeeper = shops.get(index);
-			String shopName = shopkeeper.getName();
-			boolean hasName = shopName != null && !shopName.isEmpty();
+			String shopName = shopkeeper.getName(); // can be empty
 			TextUtils.sendMessage(sender, Settings.msgListShopsEntry,
 					"{shopIndex}", String.valueOf(index + 1),
 					"{shopUUID}", shopkeeper.getUniqueId().toString(),
 					// deprecated, use {shopId} instead; TODO remove at some point
 					"{shopSessionId}", String.valueOf(shopkeeper.getId()),
 					"{shopId}", String.valueOf(shopkeeper.getId()),
-					"{shopName}", (hasName ? (shopName + " ") : ""),
+					"{shopName}", (shopName.isEmpty() ? "" : (shopName + " ")),
 					"{location}", shopkeeper.getPositionString(),
 					"{shopType}", shopkeeper.getType().getIdentifier(),
 					"{objectType}", shopkeeper.getShopObject().getType().getIdentifier());

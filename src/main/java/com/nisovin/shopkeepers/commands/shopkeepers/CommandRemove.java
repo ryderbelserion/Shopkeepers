@@ -128,7 +128,7 @@ class CommandRemove extends Command {
 							// Problem?
 							// instead: output an error if the name is ambiguous and allow clarifying by specifying an
 							// uuid instead of player name
-							if (shopOwnerUUID == null || targetPlayerUUID == null || shopOwnerUUID.equals(targetPlayerUUID)) {
+							if (targetPlayerUUID == null || shopOwnerUUID.equals(targetPlayerUUID)) {
 								shops.add(playerShop);
 							}
 						}
