@@ -189,8 +189,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		AbstractShopkeeper shopkeeper = abstractShopType.createShopkeeper(id, creationData);
 		if (shopkeeper == null) {
 			// invalid shop type implementation..
-			throw new ShopkeeperCreateException("ShopType '" + abstractShopType.getClass().getName() + "' returned null shopkeeper!");
+			throw new ShopkeeperCreateException("ShopType '" + abstractShopType.getClass().getName() + "' created null shopkeeper!");
 		}
+
+		// validate unique id:
+		if (this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) != null) {
+			throw new ShopkeeperCreateException("There is already a shopkeeper existing with this unique id: " + shopkeeper.getUniqueId());
+		}
+
 		// success:
 		shopkeeperStorage.onShopkeeperIdUsed(id);
 		if (shopkeeper.isDirty()) shopkeeperStorage.markDirty();
@@ -220,8 +226,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		AbstractShopkeeper shopkeeper = abstractShopType.loadShopkeeper(id, configSection);
 		if (shopkeeper == null) {
 			// invalid shop type implementation..
-			throw new ShopkeeperCreateException("ShopType '" + abstractShopType.getClass().getName() + "' returned null shopkeeper!");
+			throw new ShopkeeperCreateException("ShopType '" + abstractShopType.getClass().getName() + "' loaded null shopkeeper!");
 		}
+
+		// validate unique id:
+		if (this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) != null) {
+			throw new ShopkeeperCreateException("There is already a shopkeeper existing with this unique id: " + shopkeeper.getUniqueId());
+		}
+
 		// success:
 		SKShopkeeperStorage shopkeeperStorage = this.getShopkeeperStorage();
 		shopkeeperStorage.onShopkeeperIdUsed(id);
@@ -241,6 +253,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	private void addShopkeeper(AbstractShopkeeper shopkeeper, ShopkeeperAddedEvent.Cause cause) {
 		assert shopkeeper != null && !shopkeeper.isValid();
+		assert !shopkeepersByUUID.containsKey(shopkeeper.getUniqueId());
+		assert !shopkeepersById.containsKey(shopkeeper.getId());
 
 		// store by unique ids:
 		shopkeepersByUUID.put(shopkeeper.getUniqueId(), shopkeeper);
