@@ -562,6 +562,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	private String trimName(String name) {
+		assert name != null;
 		if (name.length() <= MAX_NAME_LENGTH) {
 			return name;
 		}

@@ -262,12 +262,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		sign.setLine(0, Settings.signShopFirstLine);
 
 		// line 1: shop name
-		String name = shopkeeper.getName();
-		String line1 = "";
-		if (name != null) {
-			name = this.prepareName(name);
-			line1 = name;
-		}
+		String name = shopkeeper.getName(); // can be empty
+		name = this.prepareName(name);
+		String line1 = name;
 		sign.setLine(1, line1);
 
 		// line 2: owner name
