@@ -36,18 +36,17 @@ public class WorldGuardHandler {
 	// Note: WorldGuard only allows registering flags before it got enabled.
 	public static void registerAllowShopFlag() {
 		if (getPlugin() == null) return; // WorldGuard is not loaded
-		Link.registerAllowShopFlag();
+		Internal.registerAllowShopFlag();
 	}
 
 	public static boolean isShopAllowed(Player player, Location loc) {
 		Plugin wgPlugin = getPlugin();
 		if (wgPlugin == null || !wgPlugin.isEnabled()) return true;
-		return Link.isShopAllowed(wgPlugin, player, loc);
+		return Internal.isShopAllowed(wgPlugin, player, loc);
 	}
 
-	// Separate class that gets only accessed if WorldGuard is present. Avoids class loading issues for certain edge
-	// cases.
-	private static class Link {
+	// Separate class that gets only accessed if WorldGuard is present. Avoids class loading issues.
+	private static class Internal {
 
 		public static void registerAllowShopFlag() {
 			Log.info("Registering WorldGuard flag '" + FLAG_ALLOW_SHOP + "'.");
@@ -94,5 +93,11 @@ public class WorldGuardHandler {
 				return (allowShopFlag || query.testState(BukkitAdapter.adapt(loc), wgPlugin.wrapPlayer(player), Flags.BUILD));
 			}
 		}
+
+		private Internal() {
+		}
+	}
+
+	private WorldGuardHandler() {
 	}
 }

@@ -92,9 +92,10 @@
 
 	<!-- Main dependencies, placed in this parent so that the root eclipse project finds them -->
 	<dependencies>
+		<!-- Includes Bukkit, required for Spigot-specific (optional) features -->
 		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.bukkit</groupId>

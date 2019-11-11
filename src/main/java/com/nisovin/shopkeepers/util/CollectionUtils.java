@@ -8,6 +8,8 @@ public class CollectionUtils {
 	private CollectionUtils() {
 	}
 
+	// MAP UTILS
+
 	// shortcut map initializers:
 
 	// maximum capacity of a HashMap (largest power of two fitting into an int)
@@ -15,7 +17,8 @@ public class CollectionUtils {
 
 	// capacity for a HashMap with the specified expected size and a loading-factor of >= 0.75,
 	// that prevents the map from resizing
-	private static int capacity(int expectedSize) {
+	public static int getIdealHashMapCapacity(int expectedSize) {
+		Validate.isTrue(expectedSize >= 0, "Expected size cannot be negative!");
 		assert expectedSize >= 0;
 		if (expectedSize < 3) {
 			return expectedSize + 1;
@@ -27,20 +30,20 @@ public class CollectionUtils {
 	}
 
 	public static <K, V> Map<K, V> createMap(K key, V value) {
-		Map<K, V> map = new LinkedHashMap<>(capacity(1));
+		Map<K, V> map = new LinkedHashMap<>(getIdealHashMapCapacity(1));
 		map.put(key, value);
 		return map;
 	}
 
 	public static <K, V> Map<K, V> createMap(K key1, V value1, K key2, V value2) {
-		Map<K, V> map = new LinkedHashMap<>(capacity(2));
+		Map<K, V> map = new LinkedHashMap<>(getIdealHashMapCapacity(2));
 		map.put(key1, value1);
 		map.put(key2, value2);
 		return map;
 	}
 
 	public static <K, V> Map<K, V> createMap(K key1, V value1, K key2, V value2, K key3, V value3) {
-		Map<K, V> map = new LinkedHashMap<>(capacity(3));
+		Map<K, V> map = new LinkedHashMap<>(getIdealHashMapCapacity(3));
 		map.put(key1, value1);
 		map.put(key2, value2);
 		map.put(key3, value3);
@@ -48,7 +51,7 @@ public class CollectionUtils {
 	}
 
 	public static <K, V> Map<K, V> createMap(K key1, V value1, K key2, V value2, K key3, V value3, K key4, V value4) {
-		Map<K, V> map = new LinkedHashMap<>(capacity(4));
+		Map<K, V> map = new LinkedHashMap<>(getIdealHashMapCapacity(4));
 		map.put(key1, value1);
 		map.put(key2, value2);
 		map.put(key3, value3);
@@ -57,7 +60,7 @@ public class CollectionUtils {
 	}
 
 	public static <K, V> Map<K, V> createMap(K key1, V value1, K key2, V value2, K key3, V value3, K key4, V value4, K key5, V value5) {
-		Map<K, V> map = new LinkedHashMap<>(capacity(5));
+		Map<K, V> map = new LinkedHashMap<>(getIdealHashMapCapacity(5));
 		map.put(key1, value1);
 		map.put(key2, value2);
 		map.put(key3, value3);

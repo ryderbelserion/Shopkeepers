@@ -19,4 +19,7 @@ public class CitizensHandler {
 	public static boolean isNPC(Entity entity) {
 		return entity.hasMetadata("NPC");
 	}
+
+	private CitizensHandler() {
+	}
 }

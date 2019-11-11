@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftAbstractVillager;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftLivingEntity;
@@ -11,6 +12,7 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_14_R1.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftMerchant;
+import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -168,7 +170,23 @@ public final class NMSHandler implements NMSCallProvider {
 		// send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1: Novice, .., 5:
 		// Master), merchant total experience, is-regular-villager flag (false: hides some gui elements), can-restock
 		// flag (false: hides restock message if out of stock)
-		EntityPlayer nmsPlayer =  ((CraftPlayer) player).getHandle();
+		EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
 		nmsPlayer.openTrade(nmsPlayer.activeContainer.windowId, merchantRecipeList, merchantLevel, merchantExperience, regularVillager, canRestock);
+	}
+
+	@Override
+	public String getItemSNBT(ItemStack itemStack) {
+		if (itemStack == null) return null;
+		net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+		NBTTagCompound itemNBT = nmsItem.save(new NBTTagCompound());
+		return itemNBT.toString();
+	}
+
+	@Override
+	public String getItemTypeTranslationKey(Material material) {
+		if (material == null) return null;
+		net.minecraft.server.v1_14_R1.Item nmsItem = CraftMagicNumbers.getItem(material);
+		if (nmsItem == null) return null;
+		return nmsItem.getName();
 	}
 }

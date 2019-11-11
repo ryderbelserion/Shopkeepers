@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.compat;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
@@ -145,5 +146,15 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public void updateTrades(Player player) {
+	}
+
+	@Override
+	public String getItemSNBT(ItemStack itemStack) {
+		return null; // not supported
+	}
+
+	@Override
+	public String getItemTypeTranslationKey(Material material) {
+		return null; // not supported
 	}
 }

@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -66,8 +68,27 @@ public class TextUtils {
 		return getPlayerString(player.getName(), player.getUniqueId());
 	}
 
-	public static String getPlayerString(String playerName, UUID uniqueId) {
-		return playerName + (uniqueId == null ? "" : " (" + uniqueId.toString() + ")");
+	public static String getPlayerString(String playerName, UUID playerUUID) {
+		// either of them might be null
+		if (playerName != null) {
+			return playerName + (playerUUID == null ? "" : " (" + playerUUID.toString() + ")");
+		} else if (playerUUID != null) {
+			return playerUUID.toString();
+		} else {
+			return "[unknown]";
+		}
+	}
+
+	public static String getPlayerNameOrUUID(String playerName, UUID playerUUID) {
+		// either of them might be null
+		// prefer name, else use uuid
+		if (playerName != null) {
+			return playerName;
+		} else if (playerUUID != null) {
+			return playerUUID.toString();
+		} else {
+			return "[unknown]";
+		}
 	}
 
 	private static final char COLOR_CHAR_ALTERNATIVE = '&';
@@ -180,6 +201,24 @@ public class TextUtils {
 		return message;
 	}
 
+	public static <T> String replaceArgs(String message, Iterable<Map.Entry<String, T>> args) {
+		if (!StringUtils.isEmpty(message) && args != null) {
+			// replace arguments (key-value replacement):
+			for (Entry<String, ?> entry : args) {
+				if (entry == null) continue;
+				String key = entry.getKey();
+				String value = String.valueOf(entry.getValue());
+				if (key == null || value == null) continue; // skip invalid arguments
+				message = message.replace(key, value);
+			}
+		}
+		return message;
+	}
+
+	public static <T> String replaceArgs(String message, Map<String, T> args) {
+		return replaceArgs(message, (args == null) ? null : args.entrySet());
+	}
+
 	public static List<String> replaceArgs(Collection<String> messages, String... args) {
 		List<String> replaced = new ArrayList<>(messages.size());
 		for (String message : messages) {
@@ -188,17 +227,29 @@ public class TextUtils {
 		return replaced;
 	}
 
-	public static void sendMessage(CommandSender sender, String message, String... args) {
-		// replace message arguments:
-		message = replaceArgs(message, args);
-
+	public static void sendMessage(CommandSender sender, String message) {
 		// skip if sender is null or message is empty:
 		if (sender == null || StringUtils.isEmpty(message)) return;
 
-		// send message:
+		// send (potentially multiline) message:
 		String[] msgs = message.split("\n");
 		for (String msg : msgs) {
 			sender.sendMessage(msg);
 		}
+	}
+
+	public static void sendMessage(CommandSender sender, String message, String... args) {
+		// replace message arguments and then send:
+		sendMessage(sender, replaceArgs(message, args));
+	}
+
+	public static <T> void sendMessage(CommandSender sender, String message, Iterable<Map.Entry<String, T>> args) {
+		// replace message arguments and then send:
+		sendMessage(sender, replaceArgs(message, args));
+	}
+
+	public static <T> void sendMessage(CommandSender sender, String message, Map<String, T> args) {
+		// replace message arguments and then send:
+		sendMessage(sender, replaceArgs(message, args));
 	}
 }

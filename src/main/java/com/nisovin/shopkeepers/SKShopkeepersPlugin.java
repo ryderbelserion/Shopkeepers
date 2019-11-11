@@ -65,6 +65,7 @@ import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShops;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.sign.SignShops;
+import com.nisovin.shopkeepers.spigot.SpigotFeatures;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
@@ -313,6 +314,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			}
 		}
 
+		// inform about Spigot exclusive features:
+		if (SpigotFeatures.isSpigotAvailable()) {
+			Log.debug("Spigot-based server found: Enabling Spigot exclusive features.");
+		} else {
+			Log.info("No Spigot-based server found: Disabling Spigot exclusive features!");
+		}
+
 		// register defaults (if not already setup during onLoad):
 		if (!alreadySetup) {
 			this.registerDefaults();
@@ -498,6 +506,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		metrics.addCustomChart(new FeaturesChart());
 		metrics.addCustomChart(new WorldsChart(shopkeeperRegistry));
 		// TODO add chart with number of virtual shops?
+		// TODO add chart with the server variant used (CraftBukkit, Spigot, Paper, other..)
 	}
 
 	// PLAYER JOINING AND QUITTING

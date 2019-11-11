@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.compat.api;
 
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -47,4 +48,12 @@ public interface NMSCallProvider {
 	// crash the client. It's left to the caller to ensure that the number of recipes does not get reduced, for example
 	// by inserting dummy entries
 	public void updateTrades(Player player);
+
+	// for use in chat hover messages, null if not supported
+	public String getItemSNBT(ItemStack itemStack);
+
+	// for use in translatable item type names, null if not supported
+	// Note: This might not necessarily match an ItemStack's name (for example for certain items, such as different
+	// types of potions, skulls, etc.)
+	public String getItemTypeTranslationKey(Material material);
 }

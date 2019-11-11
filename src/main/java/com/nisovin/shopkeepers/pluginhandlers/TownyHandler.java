@@ -25,4 +25,7 @@ public class TownyHandler {
 		TownBlock townBlock = TownyUniverse.getTownBlock(location);
 		return (townBlock.getType() == TownBlockType.COMMERCIAL);
 	}
+
+	private TownyHandler() {
+	}
 }
