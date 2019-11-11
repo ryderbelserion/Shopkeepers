@@ -413,12 +413,11 @@ public abstract class Command {
 			Log.debug(Settings.DebugOptions.commands, () -> {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Command failed. Argument chain: ");
+				CommandArgument<?> argument = null;
 				if (e instanceof ArgumentParseException) {
-					CommandArgument<?> argument = ((ArgumentParseException) e).getArgument();
-					sb.append(this.getArgumentChain(argument));
-				} else {
-					sb.append("-");
+					argument = ((ArgumentParseException) e).getArgument();
 				}
+				sb.append(this.getArgumentChain(argument));
 				return sb.toString();
 			});
 			Log.debug(Settings.DebugOptions.commands, () -> "Context: " + context.toString());
@@ -432,6 +431,7 @@ public abstract class Command {
 	}
 
 	private String getArgumentChain(CommandArgument<?> argument) {
+		if (argument == null) return "-";
 		String delimiter = " < ";
 		StringBuilder sb = new StringBuilder();
 		CommandArgument<?> currentArgument = argument;
