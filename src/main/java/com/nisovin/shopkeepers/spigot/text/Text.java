@@ -1,11 +1,14 @@
 package com.nisovin.shopkeepers.spigot.text;
 
+import java.util.Arrays;
+
 import com.nisovin.shopkeepers.util.Validate;
 
 public class Text {
 
 	private final String text; // not null, can be empty
 	private String translationKey = null; // can be null
+	private Object[] translationArgs = null;
 	/**
 	 * When shift-clicked by the player, this text gets inserted into his chat input.
 	 * <p>
@@ -41,6 +44,23 @@ public class Text {
 	 */
 	public Text translationKey(String translationKey) {
 		this.translationKey = translationKey;
+		return this;
+	}
+
+	/**
+	 * @return the translationArgs, can be <code>null</code>
+	 */
+	public Object[] getTranslationArgs() {
+		return translationArgs;
+	}
+
+	/**
+	 * @param translationArgs
+	 *            the translationArgs to set
+	 * @return this
+	 */
+	public Text setTranslationArgs(Object... translationArgs) {
+		this.translationArgs = translationArgs;
 		return this;
 	}
 
@@ -98,10 +118,12 @@ public class Text {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("TextArgument [text=");
+		builder.append("Text [text=");
 		builder.append(text);
 		builder.append(", translationKey=");
 		builder.append(translationKey);
+		builder.append(", translationArgs=");
+		builder.append(Arrays.toString(translationArgs));
 		builder.append(", insertion=");
 		builder.append(insertion);
 		builder.append(", hoverEvent=");

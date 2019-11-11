@@ -80,6 +80,7 @@ public class SpigotText {
 					List<BaseComponent> newExtra = new ArrayList<>();
 
 					String translationKey = textArg.getTranslationKey(); // can be null
+					Object[] translationArgs = textArg.getTranslationArgs(); // can be null
 					String insertion = textArg.getInsertion(); // can be null
 					HoverEvent hoverEvent = textArg.getHoverEvent(); // can be null
 					ClickEvent clickEvent = textArg.getClickEvent(); // can be null
@@ -90,7 +91,7 @@ public class SpigotText {
 
 						// insert new component via extra:
 						if (translationKey != null) {
-							textArgComponent = new TranslatableComponent(translationKey);
+							textArgComponent = new TranslatableComponent(translationKey, translationArgs);
 						} else {
 							textArgComponent = new TextComponent(textArg.getText()); // uses legacy color codes
 						}
@@ -99,7 +100,7 @@ public class SpigotText {
 						if (translationKey != null) {
 							textComponent.setText(""); // clear original text
 							// insert new translatable component:
-							textArgComponent = new TranslatableComponent(translationKey);
+							textArgComponent = new TranslatableComponent(translationKey, translationArgs);
 							newExtra.add(textArgComponent);
 						} else {
 							// use original text component:
