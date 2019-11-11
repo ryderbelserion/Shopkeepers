@@ -29,6 +29,7 @@ Migration notes:
 * Changed: Added more information to the message that gets logged when a shopkeeper gets removed for owner inactivity.
 * Changed: Added validation that the unique id of loaded or freshly created shopkeepers is not yet used.
 * Changed: When replacing arguments in messages, we now abort the matching for an argument after the first match has been found. This assumes that for every message each argument is used at most once.
+* Changed: The msg-shop-creation-items-given message was using the player's display name. This was changed to use the player's regular name to be consistent with the rest of the plugin.
 
 * API: Added ShopkeepersStartupEvent which can be used by plugins to make registrations during Shopkeepers' startup process (eg. to register custom shop types, object types, etc.). This event is marked as deprecated because custom shop types, object types, etc. are not yet officially supported as part of the API. Also, the event is called so early that the plugin (and thereby the API) are not yet fully setup and ready to be used, so this event is only of use for plugins which know what they are doing.
 * API: Removed various API methods from Shopkeeper which simply delegated to the corresponding shop object.

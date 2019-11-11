@@ -63,7 +63,7 @@ class CommandGive extends Command {
 
 		// success:
 		TextUtils.sendMessage(sender, Settings.msgShopCreationItemsGiven,
-				"{player}", targetPlayer.getDisplayName(),
+				"{player}", targetPlayer.getName(),
 				"{amount}", String.valueOf(amount));
 	}
 }
