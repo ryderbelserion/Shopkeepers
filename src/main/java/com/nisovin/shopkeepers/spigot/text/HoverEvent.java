@@ -26,6 +26,11 @@ public class HoverEvent {
 	private final Action action; // not null
 	private final String value; // not null, can be empty, can include color codes and newlines
 
+	// shortcut for SHOW_TEXT
+	public HoverEvent(String value) {
+		this(Action.SHOW_TEXT, value);
+	}
+
 	public HoverEvent(Action action, String value) {
 		Validate.notNull(action, "Action is null!");
 		Validate.notNull(value, "Value is null!");

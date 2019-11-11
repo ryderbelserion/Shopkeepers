@@ -59,8 +59,23 @@ public class Text {
 	 *            the translationArgs to set
 	 * @return this
 	 */
-	public Text setTranslationArgs(Object... translationArgs) {
+	public Text translationArgs(Object... translationArgs) {
 		this.translationArgs = translationArgs;
+		return this;
+	}
+
+	/**
+	 * Shortcut for setting the translation key and translation arguments.
+	 * 
+	 * @param translationKey
+	 *            the translation key
+	 * @param translationArgs
+	 *            the translation arguments
+	 * @return this
+	 */
+	public Text translationKey(String translationKey, Object... translationArgs) {
+		this.translationKey(translationKey);
+		this.translationArgs(translationArgs);
 		return this;
 	}
 
@@ -99,6 +114,30 @@ public class Text {
 	}
 
 	/**
+	 * Shortcut for adding a hover event.
+	 * 
+	 * @param hoverEventAction
+	 *            the hover event action
+	 * @param hoverEventValue
+	 *            the hover event value
+	 * @return this
+	 */
+	public Text hoverEvent(HoverEvent.Action hoverEventAction, String hoverEventValue) {
+		return this.hoverEvent(new HoverEvent(hoverEventAction, hoverEventValue));
+	}
+
+	/**
+	 * Shortcut for add a simple text hover event.
+	 * 
+	 * @param hoverText
+	 *            the hover text
+	 * @return this
+	 */
+	public Text hoverEvent(String hoverText) {
+		return this.hoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, hoverText));
+	}
+
+	/**
 	 * @return the clickEvent, can be <code>null</code>
 	 */
 	public ClickEvent getClickEvent() {
@@ -113,6 +152,19 @@ public class Text {
 	public Text clickEvent(ClickEvent clickEvent) {
 		this.clickEvent = clickEvent;
 		return this;
+	}
+
+	/**
+	 * Shortcut for adding a click event.
+	 * 
+	 * @param clickEventAction
+	 *            the click event action
+	 * @param clickEventValue
+	 *            the click event value
+	 * @return this
+	 */
+	public Text clickEvent(ClickEvent.Action clickEventAction, String clickEventValue) {
+		return this.clickEvent(new ClickEvent(clickEventAction, clickEventValue));
 	}
 
 	@Override
