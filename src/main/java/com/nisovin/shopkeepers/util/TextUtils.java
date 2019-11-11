@@ -178,7 +178,8 @@ public class TextUtils {
 				key = args[i - 1];
 				value = args[i];
 				if (key == null || value == null) continue; // skip invalid arguments
-				message = message.replace(key, value);
+				// assumption: each key occurs at most once
+				message = StringUtils.replaceFirst(message, key, value);
 			}
 		}
 		return message;
@@ -209,7 +210,8 @@ public class TextUtils {
 				String key = entry.getKey();
 				String value = String.valueOf(entry.getValue());
 				if (key == null || value == null) continue; // skip invalid arguments
-				message = message.replace(key, value);
+				// assumption: each key occurs at most once
+				message = StringUtils.replaceFirst(message, key, value);
 			}
 		}
 		return message;

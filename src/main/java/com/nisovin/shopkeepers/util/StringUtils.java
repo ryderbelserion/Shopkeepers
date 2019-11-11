@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -135,5 +136,12 @@ public class StringUtils {
 			}
 		}
 		return builder.toString();
+	}
+
+	// Like String.replace(CharSequence, CharSequence), but aborts after the first match
+	// throws NPE if source, target, or replacement are null
+	public static String replaceFirst(String source, CharSequence target, CharSequence replacement) {
+		return Pattern.compile(target.toString(), Pattern.LITERAL).matcher(source)
+				.replaceFirst(Matcher.quoteReplacement(replacement.toString()));
 	}
 }
