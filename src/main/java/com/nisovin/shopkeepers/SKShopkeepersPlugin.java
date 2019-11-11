@@ -129,6 +129,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			Class.forName(SchedulerUtils.class.getName());
 			Class.forName(ShopkeeperRemoveEvent.class.getName());
 			Class.forName(ShopkeeperRemoveEvent.Cause.class.getName());
+			Class.forName("com.nisovin.shopkeepers.storage.SKShopkeeperStorage$SaveResult$State");
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		}
