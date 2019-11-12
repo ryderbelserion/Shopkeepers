@@ -94,6 +94,7 @@ Other internal changes:
 * Internal: Default shop, object and ui types are getting registered early during onLoad now.
 * Internal: Separated config and language file loading.
 * Internal: Slightly changed the text format that gets used at a few places to represent a player's name and uuid.
+* Internal: Renamed CollectionUtils to MapUtils.
 
 Changed messages (you will have to manually update those!):  
 * msg-list-shops-entry: 'object type' changed to 'object', and the arguments '{shopSessionId}' and '{shopId}' changed to '{shopId}' and '{shopUUID}' respectively. Argument '{shopSessionId}' still works but will likely get removed in the future.

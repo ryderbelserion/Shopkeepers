@@ -1,16 +1,13 @@
 package com.nisovin.shopkeepers.util;
 
+import java.util.AbstractMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class CollectionUtils {
+public class MapUtils {
 
-	private CollectionUtils() {
+	private MapUtils() {
 	}
-
-	// MAP UTILS
-
-	// shortcut map initializers:
 
 	// maximum capacity of a HashMap (largest power of two fitting into an int)
 	private static final int MAX_CAPACITY = (1 << 30);
@@ -28,6 +25,8 @@ public class CollectionUtils {
 		}
 		return Integer.MAX_VALUE;
 	}
+
+	// shortcut map initializers:
 
 	public static <K, V> Map<K, V> createMap(K key, V value) {
 		Map<K, V> map = new LinkedHashMap<>(getIdealHashMapCapacity(1));
@@ -67,5 +66,9 @@ public class CollectionUtils {
 		map.put(key4, value4);
 		map.put(key5, value5);
 		return map;
+	}
+
+	public static <K, V> Map.Entry<K, V> entry(K key, V value) {
+		return new AbstractMap.SimpleImmutableEntry<>(key, value);
 	}
 }
