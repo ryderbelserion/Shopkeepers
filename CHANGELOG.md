@@ -10,6 +10,8 @@ Date format: (YYYY-MM-DD)
 Migration notes:  
 * Removed the importing of old book offers (from late MC 1.12.2, see v1.83). When updating from an older version of Shopkeepers, you will have to first update to a version in-between.
 
+* Added: The give and transfer command show the player's uuid as hover text now and allow it to be copied into the chat input via shift clicking.
+
 * Fixed: We would previously drop the shop-creation item returned on shop deletion at the shop's location, even if the shop got deleted via remote editing from far away (and is potentially not even loaded). If the player is further than 10 blocks away (or if the shop object is not loaded), it will drop the item at the player's location now.
 * Fixed: The book shopkeeper would not correctly store offers for books that have dots in their name.
 * Fixed: Some settings would not loaded correctly depending on the used locale. Also made all text comparisons locale independent.

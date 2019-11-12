@@ -114,7 +114,6 @@ public class SpigotText {
 					textArgComponent.setInsertion(insertion);
 					setHoverEvent(textArgComponent, hoverEvent);
 					setClickEvent(textArgComponent, clickEvent);
-					newExtra.add(textArgComponent);
 
 					if (!suffix.isEmpty()) {
 						// insert suffix via extra component:

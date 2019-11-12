@@ -19,6 +19,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
+import com.nisovin.shopkeepers.spigot.text.Text;
 
 /**
  * Text and messaging utilities.
@@ -88,6 +89,30 @@ public class TextUtils {
 			return playerUUID.toString();
 		} else {
 			return "[unknown]";
+		}
+	}
+
+	public static Text getPlayerText(Player player) {
+		assert player != null;
+		String playerName = player.getName();
+		String playerUUIDString = player.getUniqueId().toString();
+		return new Text(playerName).insertion(playerUUIDString).hoverEvent(playerUUIDString);
+	}
+
+	public static Text getPlayerText(String playerName, UUID playerUUID) {
+		// either of them might be null
+		// prefer name, else use uuid
+		if (playerName != null) {
+			Text text = new Text(playerName);
+			if (playerUUID != null) {
+				String playerUUIDString = playerUUID.toString();
+				text.insertion(playerUUIDString).hoverEvent(playerUUIDString);
+			}
+			return text;
+		} else if (playerUUID != null) {
+			return new Text(playerUUID.toString());
+		} else {
+			return new Text("[unknown]");
 		}
 	}
 

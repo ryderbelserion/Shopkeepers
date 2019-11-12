@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
-import com.nisovin.shopkeepers.util.CollectionUtils;
+import com.nisovin.shopkeepers.util.MapUtils;
 
 /**
  * Reports usage of various features.
@@ -56,6 +56,6 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 
 	private static void addFeatureEntry(Map<String, Map<String, Integer>> allFeatures, String featureName, boolean featureActive) {
 		assert allFeatures != null && featureName != null;
-		allFeatures.put(featureName, (featureActive ? CollectionUtils.createMap("Yes", 1) : CollectionUtils.createMap("No", 1)));
+		allFeatures.put(featureName, (featureActive ? MapUtils.createMap("Yes", 1) : MapUtils.createMap("No", 1)));
 	}
 }
