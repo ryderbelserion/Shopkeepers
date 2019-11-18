@@ -392,8 +392,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			return;
 		}
 
-		// activate (spawn) shopkeepers in loaded chunks:
-		shopkeeperRegistry.loadShopkeepersInAllWorlds();
+		// activate (spawn) shopkeepers in loaded chunks of all loaded worlds:
+		shopkeeperRegistry.activateShopkeepersInAllWorlds();
 
 		Bukkit.getScheduler().runTaskLater(this, () -> {
 			// remove inactive player shopkeepers:
@@ -438,10 +438,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// inform ui registry about disable:
 		uiRegistry.onDisable();
 
-		// despawn all active shopkeepers:
-		// TODO really required here? maybe replace with deactivate all, and also prevent re-activation during disable
-		// (due to new chunk loads)?
-		shopkeeperRegistry.despawnAllShopkeepers();
+		// despawn all shopkeepers (prior to saving shopkeepers data and before unloading all shopkeepers):
+		shopkeeperRegistry.deactivateShopkeepersInAllWorlds();
 
 		// disable living entity shops:
 		livingShops.onDisable();
@@ -458,7 +456,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// disable protected chests:
 		protectedChests.disable();
 
-		// disable registry:
+		// disable shopkeeper registry: unloads all shopkeepers
 		shopkeeperRegistry.onDisable();
 
 		// disable storage:

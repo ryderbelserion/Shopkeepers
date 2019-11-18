@@ -110,7 +110,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			// check max shops limit:
 			maxShops = hireEvent.getMaxShopsLimit();
 			if (maxShops > 0) {
-				int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().countShopsOfPlayer(player);
+				int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getPlayerShopkeepersByOwner(player.getUniqueId()).size();
 				if (count >= maxShops) {
 					TextUtils.sendMessage(player, Settings.msgTooManyShops);
 					this.closeDelayed(player);

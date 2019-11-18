@@ -11,7 +11,7 @@ public class PlayerShopsChart extends Metrics.SimplePie {
 
 	public PlayerShopsChart(SKShopkeeperRegistry shopkeeperRegistry) {
 		super("uses_player_shops", () -> {
-			return (shopkeeperRegistry.getPlayerShopCount() > 0) ? "Yes" : "No";
+			return (shopkeeperRegistry.getAllPlayerShopkeepers().size() > 0) ? "Yes" : "No";
 		});
 	}
 }

@@ -666,4 +666,16 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.openTradingWindow(player);
 		}
 	}
+
+	// HASHCODE AND EQUALS
+
+	@Override
+	public final int hashCode() {
+		return System.identityHashCode(this);
+	}
+
+	@Override
+	public final boolean equals(Object obj) {
+		return (this == obj); // identity based comparison
+	}
 }

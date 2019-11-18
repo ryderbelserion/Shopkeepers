@@ -90,7 +90,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 
 		// count owned shops:
 		if (maxShopsLimit > 0) {
-			int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().countShopsOfPlayer(creator);
+			int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getPlayerShopkeepersByOwner(creator.getUniqueId()).size();
 			if (count >= maxShopsLimit) {
 				TextUtils.sendMessage(creator, Settings.msgTooManyShops);
 				return false;

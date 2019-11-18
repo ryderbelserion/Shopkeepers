@@ -53,6 +53,11 @@ public final class Utils {
 		}
 	}
 
+	// Note: The returned Iterable can only be iterated once!
+	public static <T> Iterable<T> toIterable(Stream<T> stream) {
+		return stream::iterator;
+	}
+
 	public static void printRegisteredListeners(Event event) {
 		HandlerList handlerList = event.getHandlers();
 		Log.info("Registered listeners for event " + event.getEventName() + ":");

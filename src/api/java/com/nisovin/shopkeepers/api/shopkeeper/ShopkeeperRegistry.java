@@ -1,17 +1,17 @@
 package com.nisovin.shopkeepers.api.shopkeeper;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Stream;
 
-import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 
 /**
@@ -41,7 +41,7 @@ public interface ShopkeeperRegistry {
 	 * @param shopType
 	 *            the shop type
 	 * @param id
-	 *            the shopkeepers id
+	 *            the shopkeeper id
 	 * @param configSection
 	 *            the config section to load the shopkeeper data from
 	 * @return the loaded shopkeeper
@@ -51,6 +51,20 @@ public interface ShopkeeperRegistry {
 	public Shopkeeper loadShopkeeper(ShopType<?> shopType, int id, ConfigurationSection configSection) throws ShopkeeperCreateException;
 
 	// QUERYING
+
+	/**
+	 * Gets all shopkeepers.
+	 * 
+	 * @return an unmodifiable view on all shopkeepers
+	 */
+	public Collection<? extends Shopkeeper> getAllShopkeepers();
+
+	/**
+	 * Gets all {@link Shopkeeper#isVirtual() virtual} shopkeepers.
+	 * 
+	 * @return an unmodifiable view on the virtual shopkeepers
+	 */
+	public Collection<? extends Shopkeeper> getVirtualShopkeepers();
 
 	/**
 	 * Gets the shopkeeper by its {@link Shopkeeper#getUniqueId() unique id}.
@@ -70,23 +84,163 @@ public interface ShopkeeperRegistry {
 	 */
 	public Shopkeeper getShopkeeperById(int shopkeeperId);
 
+	// PLAYER SHOPS
+
 	/**
-	 * Tries to find a shopkeeper with the given name.
+	 * Gets all player shopkeepers.
 	 * 
+	 * @return an unmodifiable view on all shopkeepers
+	 */
+	public Collection<? extends PlayerShopkeeper> getAllPlayerShopkeepers();
+
+	/**
+	 * Gets the player shopkeepers owned by the specified player.
+	 * 
+	 * @param ownerUUID
+	 *            the owner uuid
+	 * @return an unmodifiable view on the player shopkeepers
+	 */
+	public Collection<? extends PlayerShopkeeper> getPlayerShopkeepersByOwner(UUID ownerUUID);
+
+	// BY NAME
+
+	/**
+	 * Searches for shopkeepers whose names match the given name.
 	 * <p>
-	 * This search ignores colors and whitespace in the shop names.<br>
-	 * Note: Shop names are not unique!
+	 * The comparison of shop names ignores case, colors and normalizes whitespace.
+	 * <p>
+	 * Note that shopkeeper names are not unique.
+	 * <p>
+	 * The returned {@link Stream} may lazily search for only as many matching shopkeepers as required.
 	 * 
 	 * @param shopName
 	 *            the shop name
-	 * @return the shopkeeper, or <code>null</code>
+	 * @return a stream over the matching shopkeepers
 	 */
-	public Shopkeeper getShopkeeperByName(String shopName);
+	public Stream<? extends Shopkeeper> getShopkeepersByName(String shopName);
+
+	/**
+	 * Searches for shopkeepers whose names start with the specified prefix.
+	 * <p>
+	 * The comparison of shop names ignores case, colors and normalizes whitespace.
+	 * <p>
+	 * Note that shopkeeper names are not unique.
+	 * <p>
+	 * The returned {@link Stream} may lazily search for only as many matching shopkeepers as required.
+	 * 
+	 * @param shopNamePrefix
+	 *            the shop name prefix
+	 * @return a stream over the matching shopkeepers
+	 */
+	public Stream<? extends Shopkeeper> getShopkeepersByNamePrefix(String shopNamePrefix);
+
+	// BY WORLD
+
+	/**
+	 * Gets the names of all worlds that contain shopkeepers.
+	 * 
+	 * @return an unmodifiable view on the world names
+	 */
+	public Collection<String> getWorldsWithShopkeepers();
+
+	/**
+	 * Gets all shopkeepers in the specified world.
+	 * 
+	 * @param worldName
+	 *            the world name
+	 * @return an unmodifiable view on the shopkeepers, may be empty
+	 */
+	public Collection<? extends Shopkeeper> getShopkeepersInWorld(String worldName);
+
+	/**
+	 * Gets all shopkeepers in the specified world grouped by the chunks they are in.
+	 * 
+	 * @param worldName
+	 *            the world name
+	 * @return an unmodifiable view on the shopkeepers grouped by chunks
+	 */
+	public Map<ChunkCoords, ? extends Collection<? extends Shopkeeper>> getShopkeepersByChunks(String worldName);
+
+	// ACTIVE CHUNKS
+
+	/**
+	 * Gets the currently active chunks in the specified world.
+	 * <p>
+	 * Chunks get activated and deactivated when they get loaded and unloaded. During activation, the shopkeepers
+	 * located inside the chunk get spawned. However, to not spawn shopkeepers for chunks that stay loaded only briefly,
+	 * the activation of chunks may be deferred. Consequently this may not return chunks even if they are currently
+	 * already loaded.
+	 * 
+	 * @param worldName
+	 *            the world name
+	 * @return the active chunks
+	 */
+	public Collection<ChunkCoords> getActiveChunks(String worldName);
+
+	/**
+	 * Checks if the specified chunk is active.
+	 * 
+	 * @param chunkCoords
+	 *            the chunk
+	 * @return <code>true</code> if the chunk is active
+	 * @see #getActiveChunks(String)
+	 */
+	public boolean isChunkActive(ChunkCoords chunkCoords);
+
+	/**
+	 * Gets all shopkeepers in currently <b>active chunks</b> in the specified world.
+	 * <p>
+	 * Note: Since chunk activation may be deferred from chunk loading, this may not return shopkeepers even if their
+	 * chunk is currently already loaded.
+	 * <p>
+	 * Also note that the activation of some {@link ShopObject shop objects} may fail (eg. if spawning fails), while
+	 * others may not even need to be activated and rather stay active all the time. This is not reflected by this
+	 * method, which only considers the activation state of chunks as a whole. The actual activation state of the
+	 * individual {@link ShopObject shop objects} can be determined by {@link ShopObject#isActive()}.
+	 * 
+	 * @param worldName
+	 *            the world name
+	 * @return an unmodifiable view on the shopkeepers, may be empty
+	 * @see #getActiveChunks(String)
+	 */
+	public Collection<? extends Shopkeeper> getShopkeepersInActiveChunks(String worldName);
+
+	// BY CHUNK
+
+	/**
+	 * Gets all shopkeepers in the specified chunk.
+	 * 
+	 * @param chunkCoords
+	 *            the chunk
+	 * @return an unmodifiable view on the shopkeepers, may be empty
+	 */
+	public Collection<? extends Shopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords);
+
+	// BY LOCATION
+
+	/**
+	 * Gets all shopkeepers at the specified location.
+	 * 
+	 * @param location
+	 *            the location
+	 * @return an unmodifiable view on the shopkeepers, may be empty
+	 */
+	public Collection<? extends Shopkeeper> getShopkeepersAtLocation(Location location);
+
+	// BY SHOP OBJECT
+
+	/**
+	 * Gets all active shopkeepers. Some shopkeeper types might be always active (like sign shops),
+	 * others are only active as long as the chunk they are in is loaded.
+	 * 
+	 * @return an unmodifiable view on all active shopkeepers
+	 */
+	public Collection<? extends Shopkeeper> getActiveShopkeepers();
 
 	public Shopkeeper getActiveShopkeeper(String objectId);
 
 	/**
-	 * Gets the shopkeeper for a given entity.
+	 * Gets the shopkeeper that is being represented by the given entity.
 	 * 
 	 * @param entity
 	 *            the entity
@@ -95,16 +249,18 @@ public interface ShopkeeperRegistry {
 	public Shopkeeper getShopkeeperByEntity(Entity entity);
 
 	/**
-	 * Checks if a given entity is a Shopkeeper.
+	 * Checks if the given entity is a Shopkeeper.
 	 * 
 	 * @param entity
-	 *            the entity to check
+	 *            the entity
 	 * @return <code>true</code> if the entity is a Shopkeeper
 	 */
 	public boolean isShopkeeper(Entity entity);
 
 	/**
-	 * Gets the shopkeeper for a given block (ex: sign shops).
+	 * Gets the shopkeeper that is represented by the given block (ex: sign shops).
+	 * <p>
+	 * In order to get the shopkeepers at a specific location use {@link #getShopkeepersAtLocation(Location)} instead.
 	 * 
 	 * @param block
 	 *            the block
@@ -113,80 +269,11 @@ public interface ShopkeeperRegistry {
 	public Shopkeeper getShopkeeperByBlock(Block block);
 
 	/**
-	 * Checks if a given block is a Shopkeeper.
+	 * Checks if the given block is a Shopkeeper.
 	 * 
 	 * @param block
-	 *            the block to check
+	 *            the block
 	 * @return <code>true</code> if the block is a Shopkeeper
 	 */
 	public boolean isShopkeeper(Block block);
-
-	/**
-	 * Gets all shopkeepers for a given chunk.
-	 * 
-	 * @param chunk
-	 *            the chunk
-	 * @return an unmodifiable list of the shopkeepers in the specified chunk, empty if there are none
-	 */
-	public List<? extends Shopkeeper> getShopkeepersInChunk(Chunk chunk);
-
-	/**
-	 * Gets all shopkeepers for a given chunk.
-	 * 
-	 * @param chunkCoords
-	 *            specifies the chunk
-	 * @return an unmodifiable list of the shopkeepers in the specified chunk, empty if there are none
-	 */
-	public List<? extends Shopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords);
-
-	/**
-	 * Gets all shopkeepers in the specified world.
-	 * 
-	 * @param world
-	 *            the world
-	 * @param onlyLoadedChunks
-	 *            <code>true</code> to only include shopkeepers from loaded chunks
-	 * @return an unmodifiable view on the shopkeepers
-	 */
-	public List<? extends Shopkeeper> getShopkeepersInWorld(World world, boolean onlyLoadedChunks);
-
-	/**
-	 * Gets all {@link Shopkeeper#isVirtual() virtual} shopkeepers.
-	 * 
-	 * @return an unmodifiable view on the virtual shopkeepers
-	 */
-	public List<? extends Shopkeeper> getVirtualShopkeepers();
-
-	/**
-	 * Gets all shopkeepers.
-	 * 
-	 * @return an unmodifiable view on all shopkeepers
-	 */
-	public Collection<? extends Shopkeeper> getAllShopkeepers();
-
-	/**
-	 * Gets all shopkeepers grouped by the chunks they are in.
-	 * <p>
-	 * {@link Shopkeeper#isVirtual() Virtual} shopkeepers are stored with a key of <code>null</code>.
-	 * 
-	 * @return an unmodifiable view on all shopkeepers grouped by the chunks they are in
-	 */
-	public Map<ChunkCoords, ? extends List<? extends Shopkeeper>> getAllShopkeepersByChunks();
-
-	/**
-	 * Gets all active shopkeepers. Some shopkeeper types might be always active (like sign shops),
-	 * others are only active as long as their chunk they are in is loaded.
-	 * 
-	 * @return an unmodifiable view on all active shopkeepers
-	 */
-	public Collection<? extends Shopkeeper> getActiveShopkeepers();
-
-	/**
-	 * Gets all shopkeepers at the specified location.
-	 * 
-	 * @param location
-	 *            the location
-	 * @return all shopkeepers at the specified location
-	 */
-	public List<? extends Shopkeeper> getShopkeepersAtLocation(Location location);
 }

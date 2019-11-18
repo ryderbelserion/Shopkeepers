@@ -33,7 +33,7 @@ public final class ChunkCoords {
 	public ChunkCoords(Location location) {
 		Validate.notNull(location, "Location is null!");
 		World world = location.getWorld();
-		Validate.notNull(world);
+		Validate.notNull(world, "Location's world is null!");
 		this.worldName = world.getName();
 		this.chunkX = convertBlockCoord(location.getBlockX());
 		this.chunkZ = convertBlockCoord(location.getBlockZ());
@@ -42,7 +42,6 @@ public final class ChunkCoords {
 	public ChunkCoords(Block block) {
 		Validate.notNull(block, "Block is null!");
 		World world = block.getWorld();
-		Validate.notNull(world);
 		this.worldName = world.getName();
 		this.chunkX = convertBlockCoord(block.getX());
 		this.chunkZ = convertBlockCoord(block.getZ());

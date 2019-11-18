@@ -23,7 +23,7 @@ Migration notes:
 * Fixed/API: The offered items inside the ShopkeeperTradeEvent are copies now and their stack sizes match those of the trading recipe.
 * Fixed: The internal default for message 'msg-list-shops-entry' (that gets used if the message is missing in the config) was not matching the message in the default config.
 
-* Changed: Instead of using a fallback name ("unknown"),  player shops are required to always provide a valid owner name now.
+* Changed: Instead of using a fallback name ("unknown"), player shops are required to always provide a valid owner name now.
 * Changed: Explicitly checking for missing world names when loading shopkeepers.
 * Changed: Only printing the 'Config already loaded' message during startup if the debug mode is enabled.
 * Changed: The plugin will now shutdown in case a severe issue prevents loading the config. This includes the case that the config version is invalid. Previously it would treat invalid and missing config versions the same and apply config migrations nevertheless.
@@ -32,14 +32,43 @@ Migration notes:
 * Changed: Added validation that the unique id of loaded or freshly created shopkeepers is not yet used.
 * Changed: When replacing arguments in messages, we now abort the matching for an argument after the first match has been found. This assumes that for every message each argument is used at most once.
 * Changed: The msg-shop-creation-items-given message was using the player's display name. This was changed to use the player's regular name to be consistent with the rest of the plugin.
+* Various changes to the shopkeeper registry and shopkeeper activation:
+  * We keep track now which chunks have been activated. This avoids a few checks whether chunks are loaded.
+  * The delayed chunk activation tasks get cancelled now if the chunk gets unloaded again before it got activated. This resolves a few inconsistencies such as duplicate or out-of-order chunk activation and deactivation handling when chunks get loaded and unloaded very frequently.
+  * Similarly the respawn task on world saves gets cancelled now if the world gets unloaded.
+  * Shopkeeper spawning is skipped if there is a respawn pending due to a world save.
+  * Shopkeepers are now stored by world internally. This might speed up a few tasks which only affect the shopkeepers of a specific world.
+  * Config: Added debug option 'shopkeeper-activation'. Various debug output related to chunk/world loading/unloading/saving and spawning/despawning of shopkeepers was moved into this debug category.
+  * Debug messages are now created lazily only when they are actually required.
+  * Added/Debug: The "/shopkeepers check" command now outputs some additional information on active chunks.
+  * Internal: Moved all logic from WorldListener into SKShopkeeperRegistry.
+  * Internal: Various internally used methods are now hidden.
 
-* API: Added PlayerShopkeeper#getChestX/getChestY/getChestZ
-* API: Added ShopkeepersStartupEvent which can be used by plugins to make registrations during Shopkeepers' startup process (eg. to register custom shop types, object types, etc.). This event is marked as deprecated because custom shop types, object types, etc. are not yet officially supported as part of the API. Also, the event is called so early that the plugin (and thereby the API) are not yet fully setup and ready to be used, so this event is only of use for plugins which know what they are doing.
-* API: Removed various API methods from Shopkeeper which simply delegated to the corresponding shop object.
-* API: Moved ShopObjectType#needsSpawning into ShopObject.
-* API: Renamed PlayerShopkeeper#getOwnerAsString to #getOwnerString.
-* API: Added Shopkeeper#getIdString.
-* API: Made some preparations to support virtual shopkeepers in the future (which are not located in any world). Various location related API methods may now return null. Added ShopkeeperRegistry#getVirtualShopkeepers().
+API changes:  
+* Added: PlayerShopkeeper#getChestX/getChestY/getChestZ
+* Added: ShopkeepersStartupEvent which can be used by plugins to make registrations during Shopkeepers' startup process (eg. to register custom shop types, object types, etc.). This event is marked as deprecated because custom shop types, object types, etc. are not yet officially supported as part of the API. Also, the event is called so early that the plugin (and thereby the API) are not yet fully setup and ready to be used, so this event is only of use for plugins which know what they are doing.
+* Added: Shopkeeper#getIdString.
+* Removed: Various API methods from Shopkeeper which simply delegated to the corresponding shop object.
+* Changed: Moved ShopObjectType#needsSpawning into ShopObject.
+* Changed: Renamed PlayerShopkeeper#getOwnerAsString to #getOwnerString.
+* Changed: Made some preparations to support virtual shopkeepers in the future (which are not located in any world). Various location related API methods may now return null.
+* Various changes to ShopkeeperRegistry:
+  * Changed: Methods inside ShopkeeperRegistry now return Collections instead of Lists.
+  * Removed: ShopkeeperRegistry#getShopkeepersInWorld(world, onlyLoadedChunks)
+  * Removed: ShopkeeperRegistry#getShopkeepersInChunk(chunk)
+  * Removed: ShopkeeperRegistry#getAllShopkeepersByChunks
+  * Removed: ShopkeeperRegistry#getShopkeeperByName
+  * Added: ShopkeeperRegistry#getVirtualShopkeepers
+  * Added: ShopkeeperRegistry#getShopkeepersByName
+  * Added: ShopkeeperRegistry#getShopkeepersByNamePrefix
+  * Added: ShopkeeperRegistry#getAllPlayerShopkeepers
+  * Added: ShopkeeperRegistry#getPlayerShopkeepersByOwner(ownerUUID)
+  * Added: ShopkeeperRegistry#getWorldsWithShopkeepers
+  * Added: ShopkeeperRegistry#getShopkeepersInWorld(worldName)
+  * Added: ShopkeeperRegistry#getShopkeepersByChunks(worldName)
+  * Added: ShopkeeperRegistry#getActiveChunks(worldName)
+  * Added: ShopkeeperRegistry#isChunkActive(chunkCoords)
+  * Added: ShopkeeperRegistry#getShopkeepersInActiveChunks(worldName)
 
 * Various (mostly internal) changes to commands and argument parsing:  
   * Fallback mechanism:
@@ -88,16 +117,19 @@ Migration notes:
   * Internal: Added TypedFirstOfArgument, a variant of FirstOfArgument that preserves the result type of its child arguments.
   * Internal: Added NameArgument, which can be useful if there would otherwise be conflicts / ambiguities between arguments.
   * Internal: ArgumentParseException provides the command argument that created it now. This is especially useful for debugging purposes.
-  
+
 Other internal changes:  
 * Internal: The regex pattern used to validate shopkeeper names gets precompiled now.
-* Internal: The ids used for storing shopkeeper offers start at 1 now (instead of 0). This has no impact on the loading of save data, but makes it nicer to read.
 * Internal: bstats gets shaded into the package '[..].libs.bstats' now.
 * Internal: Added Settings#isDebugging and Settings#isDebugging(option) to conveniently (and thread-safe) check for debugging options.
 * Internal: Default shop, object and ui types are getting registered early during onLoad now.
 * Internal: Separated config and language file loading.
 * Internal: Slightly changed the text format that gets used at a few places to represent a player's name and uuid.
 * Internal: Renamed CollectionUtils to MapUtils.
+
+Save data format changes:  
+* The storage of book shopkeeper offers has changed.
+* The ids used for storing shopkeeper offers start at 1 now (instead of 0). This has no impact on the loading of save data (it still accepts any ids), but makes it nicer to read.
 
 Changed messages (you will have to manually update those!):  
 * msg-list-shops-entry: 'object type' changed to 'object', and the arguments '{shopSessionId}' and '{shopId}' changed to '{shopId}' and '{shopUUID}' respectively. Argument '{shopSessionId}' still works but will likely get removed in the future.

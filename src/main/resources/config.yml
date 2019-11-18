@@ -11,7 +11,9 @@ debug: false
 # Additional debugging options.
 # - 'log-all-events': Logs all events.
 # - 'print-listeners': Prints the registered listeners for the first call of
-#   each event.
+#    each event.
+# - 'shopkeeper-activation': Enables debugging output related to shopkeeper
+#    activation.
 # - 'commands': Enables additional commands related debugging output.
 debug-options: []
 # Whether to report anonymous usage statistics to https://bStats.org
