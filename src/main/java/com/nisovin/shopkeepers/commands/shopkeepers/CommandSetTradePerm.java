@@ -39,11 +39,15 @@ class CommandSetTradePerm extends Command {
 		this.setDescription(Settings.msgCommandDescriptionSettradeperm);
 
 		// arguments:
-		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.ADMIN), TargetShopkeeperFilter.ADMIN));
+		this.addArgument(new TargetShopkeeperFallback(
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.ADMIN),
+				TargetShopkeeperFilter.ADMIN
+		));
 		this.addArgument(new FirstOfArgument("permArg", Arrays.asList(
 				new DefaultValueFallback<>(new LiteralArgument(ARGUMENT_QUERY_PERMISSION), ARGUMENT_QUERY_PERMISSION),
 				new LiteralArgument(ARGUMENT_REMOVE_PERMISSION),
-				new StringArgument(ARGUMENT_NEW_PERMISSION)), true, true));
+				new StringArgument(ARGUMENT_NEW_PERMISSION)
+		), true, true));
 	}
 
 	@Override

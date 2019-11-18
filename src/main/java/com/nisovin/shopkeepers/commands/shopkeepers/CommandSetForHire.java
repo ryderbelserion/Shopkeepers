@@ -32,7 +32,10 @@ class CommandSetForHire extends PlayerCommand {
 		this.setDescription(Settings.msgCommandDescriptionSetforhire);
 
 		// arguments:
-		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.PLAYER), TargetShopkeeperFilter.PLAYER));
+		this.addArgument(new TargetShopkeeperFallback(
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.PLAYER),
+				TargetShopkeeperFilter.PLAYER)
+		);
 	}
 
 	@Override

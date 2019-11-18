@@ -37,7 +37,10 @@ class CommandTransfer extends Command {
 		this.setDescription(Settings.msgCommandDescriptionTransfer);
 
 		// arguments:
-		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.PLAYER), TargetShopkeeperFilter.PLAYER));
+		this.addArgument(new TargetShopkeeperFallback(
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.PLAYER),
+				TargetShopkeeperFilter.PLAYER
+		));
 		this.addArgument(new PlayerArgument(ARGUMENT_NEW_OWNER)); // new owner has to be online
 		// TODO allow offline-player?
 	}

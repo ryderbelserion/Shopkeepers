@@ -13,6 +13,9 @@ Low priority:
   * Rename all occurrences of 'Shop/Shops' with 'Laden/Läden/Händler'?
 
 * Command library revamp:
+  * Reverse the setup of arguments in parsing chains:
+    * Currently the parent argument delegates to child arguments, making the setup unnatural since fallbacks need to be specified first
+    * Instead, allow specifying the chain of arguments more naturally: argument.fallback(fallback).fallback(fallback) etc.
   * Support advanced text features (eg. in helps page)
   * Allow arguments to change the following arguments, similar to how subcommands have different chains of arguments
     * Eg. /shopkeeper info ['own'|'admin'|<player>] <shopkeeper>: Different suggestions/allowed arguments for the second argument depending on the first argument

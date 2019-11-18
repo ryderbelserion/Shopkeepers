@@ -29,7 +29,10 @@ class CommandRemote extends PlayerCommand {
 		this.setDescription(Settings.msgCommandDescriptionRemote);
 
 		// arguments:
-		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, true), TargetShopkeeperFilter.ANY));
+		this.addArgument(new TargetShopkeeperFallback(
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, true),
+				TargetShopkeeperFilter.ANY
+		));
 	}
 
 	@Override

@@ -27,7 +27,10 @@ class CommandEdit extends PlayerCommand {
 		this.setDescription(Settings.msgCommandDescriptionRemoteEdit);
 
 		// arguments:
-		this.addArgument(new TargetShopkeeperFallback(new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, true), TargetShopkeeperFilter.ANY));
+		this.addArgument(new TargetShopkeeperFallback(
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, true),
+				TargetShopkeeperFilter.ANY
+		));
 	}
 
 	@Override
