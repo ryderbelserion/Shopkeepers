@@ -87,6 +87,27 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	 */
 	public ItemStack getHireCost();
 
+	/**
+	 * Gets the chest's x coordinate.
+	 * 
+	 * @return the chest's x coordinate
+	 */
+	public int getChestX();
+
+	/**
+	 * Gets the chest's y coordinate.
+	 * 
+	 * @return the chest's y coordinate
+	 */
+	public int getChestY();
+
+	/**
+	 * Gets the chest's z coordinate.
+	 * 
+	 * @return the chest's z coordinate.
+	 */
+	public int getChestZ();
+
 	public void setChest(int chestX, int chestY, int chestZ);
 
 	public Block getChest();

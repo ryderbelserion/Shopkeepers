@@ -269,6 +269,21 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
+	public int getChestX() {
+		return chestX;
+	}
+
+	@Override
+	public int getChestY() {
+		return chestY;
+	}
+
+	@Override
+	public int getChestZ() {
+		return chestZ;
+	}
+
+	@Override
 	public void setChest(int chestX, int chestY, int chestZ) {
 		this._setChest(chestX, chestY, chestZ);
 		this.markDirty();
