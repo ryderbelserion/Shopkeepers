@@ -90,7 +90,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		int shopkeeperCount = 0;
 		BukkitTask worldSaveRespawnTask = null;
 
-		final Set<AbstractShopkeeper> shopkeepersView = Collections.unmodifiableSet(new AbstractSet<AbstractShopkeeper>() {
+		// note: already unmodifiable
+		final Set<AbstractShopkeeper> shopkeepersView = new AbstractSet<AbstractShopkeeper>() {
 			@Override
 			public Iterator<AbstractShopkeeper> iterator() {
 				return shopkeepersByChunk.values().stream()
@@ -102,8 +103,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			public int size() {
 				return shopkeeperCount;
 			}
-		});
-		final Set<ChunkCoords> activeChunksView = Collections.unmodifiableSet(new AbstractSet<ChunkCoords>() {
+		};
+		// note: already unmodifiable
+		final Set<ChunkCoords> activeChunksView = new AbstractSet<ChunkCoords>() {
 			@Override
 			public Iterator<ChunkCoords> iterator() {
 				return shopkeepersByChunk.values().stream()
@@ -119,8 +121,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 						.mapToInt(chunkEntry -> 1)
 						.sum();
 			}
-		});
-		final Set<AbstractShopkeeper> shopkeepersInActiveChunksView = Collections.unmodifiableSet(new AbstractSet<AbstractShopkeeper>() {
+		};
+		// note: already unmodifiable
+		final Set<AbstractShopkeeper> shopkeepersInActiveChunksView = new AbstractSet<AbstractShopkeeper>() {
 			@Override
 			public Iterator<AbstractShopkeeper> iterator() {
 				return shopkeepersByChunk.values().stream()
@@ -136,7 +139,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 						.mapToInt(chunkEntry -> chunkEntry.shopkeepers.size())
 						.sum();
 			}
-		});
+		};
 
 		WorldShopkeepers(String worldName) {
 			assert worldName != null;
@@ -214,7 +217,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	// player shopkeepers:
 	private int playerShopCount = 0;
-	private final Set<AbstractPlayerShopkeeper> allPlayerShopkeepersView = Collections.unmodifiableSet(new AbstractSet<AbstractPlayerShopkeeper>() {
+	// note: already unmodifiable
+	private final Set<AbstractPlayerShopkeeper> allPlayerShopkeepersView = new AbstractSet<AbstractPlayerShopkeeper>() {
 		@Override
 		public Iterator<AbstractPlayerShopkeeper> iterator() {
 			return getAllShopkeepers().stream()
@@ -227,7 +231,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		public int size() {
 			return playerShopCount;
 		}
-	});
+	};
 
 	// TODO this may become out-of-sync if shop objects get despawned or removed independently, problem? potential
 	// memory leak?
@@ -930,7 +934,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	public Collection<? extends AbstractPlayerShopkeeper> getPlayerShopkeepersByOwner(UUID ownerUUID) {
 		Validate.notNull(ownerUUID, "Owner UUID is null!");
 		// TODO improve? maybe keep an index of player shops? or even index by owner?
-		return Collections.unmodifiableSet(new AbstractSet<AbstractPlayerShopkeeper>() {
+		// note: already unmodifiable
+		return new AbstractSet<AbstractPlayerShopkeeper>() {
 			private Stream<AbstractPlayerShopkeeper> createStream() {
 				return getAllShopkeepers().stream()
 						.filter(shopkeeper -> shopkeeper instanceof PlayerShopkeeper)
@@ -947,7 +952,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			public int size() {
 				return this.createStream().mapToInt(shopkeeper -> 1).sum();
 			}
-		});
+		};
 	}
 
 	// BY NAME
