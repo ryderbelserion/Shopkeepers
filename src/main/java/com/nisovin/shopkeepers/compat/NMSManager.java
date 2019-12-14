@@ -24,8 +24,8 @@ public final class NMSManager {
 				throw new Exception("Nope");
 			}
 		} catch (Exception e) {
-			Log.severe("Potentially incompatible server version: " + cbVersion);
-			Log.severe("Shopkeepers is trying to run in 'compatibility mode'.");
+			Log.warning("Potentially incompatible server version: " + cbVersion);
+			Log.warning("Shopkeepers is trying to run in 'compatibility mode'.");
 			Log.info("Check for updates at: " + plugin.getDescription().getWebsite());
 
 			try {

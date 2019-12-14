@@ -146,6 +146,7 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public void updateTrades(Player player) {
+		// not supported
 	}
 
 	@Override

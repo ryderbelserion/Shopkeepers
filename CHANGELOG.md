@@ -32,6 +32,7 @@ Migration notes:
 * Changed: Added validation that the unique id of loaded or freshly created shopkeepers is not yet used.
 * Changed: When replacing arguments in messages, we now abort the matching for an argument after the first match has been found. This assumes that for every message each argument is used at most once.
 * Changed: The msg-shop-creation-items-given message was using the player's display name. This was changed to use the player's regular name to be consistent with the rest of the plugin.
+* Changed: The errors about a potentially incompatible server version and trying to run in compatibility mode are warnings now.
 * Various changes to the shopkeeper registry and shopkeeper activation:
   * We keep track now which chunks have been activated. This avoids a few checks whether chunks are loaded.
   * The delayed chunk activation tasks get cancelled now if the chunk gets unloaded again before it got activated. This resolves a few inconsistencies such as duplicate or out-of-order chunk activation and deactivation handling when chunks get loaded and unloaded very frequently.
