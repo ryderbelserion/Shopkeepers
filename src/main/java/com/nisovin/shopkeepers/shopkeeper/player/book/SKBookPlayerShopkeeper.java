@@ -153,7 +153,10 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	protected static Generation getBookGeneration(ItemStack item) {
 		BookMeta meta = getBookMeta(item);
 		if (meta == null) return null;
-		if (!meta.hasGeneration()) return null;
+		if (!meta.hasGeneration()) {
+			// if the generation is missing, minecraft treats the book as an original and so do we:
+			return Generation.ORIGINAL;
+		}
 		return meta.getGeneration(); // assert: not null
 	}
 
