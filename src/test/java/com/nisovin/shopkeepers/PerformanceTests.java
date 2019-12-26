@@ -9,7 +9,7 @@ import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Test;
 
-import com.nisovin.shopkeepers.testutil.AbstractTestBase;
+import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemDataTest;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
 
-public class PerformanceTests extends AbstractTestBase {
+public class PerformanceTests extends AbstractBukkitTest {
 
 	public static void testPerformance(String outputPrefix, String testName, int warmupCount, int testCount, Runnable function) {
 		ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();

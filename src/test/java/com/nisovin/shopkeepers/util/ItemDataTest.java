@@ -24,9 +24,9 @@ import org.bukkit.persistence.PersistentDataType;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.nisovin.shopkeepers.testutil.AbstractTestBase;
+import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 
-public class ItemDataTest extends AbstractTestBase {
+public class ItemDataTest extends AbstractBukkitTest {
 
 	private static void testDeserialization(ItemData originalItemData) {
 		YamlConfiguration config = new YamlConfiguration();
