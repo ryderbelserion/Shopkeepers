@@ -26,7 +26,7 @@ public abstract class HiringHandler extends UIHandler {
 		assert player != null;
 		// check for hire permission:
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.HIRE_PERMISSION)) {
-			Log.debug("Blocked hire window opening from " + player.getName() + ": missing hire permission");
+			Log.debug(() -> "Blocked hire window opening from " + player.getName() + ": Missing hire permission.");
 			TextUtils.sendMessage(player, Settings.msgMissingHirePerm);
 			return false;
 		}

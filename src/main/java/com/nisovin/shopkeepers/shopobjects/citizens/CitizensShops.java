@@ -117,7 +117,7 @@ public class CitizensShops {
 		try {
 			CitizensAPI.getTraitFactory().registerTrait(shopkeeperTrait);
 		} catch (Throwable ex) {
-			Log.debug("Shopkeeper trait registration error: " + ex.getMessage());
+			Log.debug(() -> "Shopkeeper trait registration error: " + ex.getMessage());
 			if (Settings.debug) {
 				ex.printStackTrace();
 			}
@@ -129,7 +129,7 @@ public class CitizensShops {
 			try {
 				CitizensAPI.getTraitFactory().deregisterTrait(shopkeeperTrait);
 			} catch (Throwable ex) {
-				Log.debug("Shopkeeper trait unregistration error: " + ex.getMessage());
+				Log.debug(() -> "Shopkeeper trait unregistration error: " + ex.getMessage());
 				if (Settings.debug) {
 					ex.printStackTrace();
 				}

@@ -140,6 +140,7 @@ Other internal changes:
 * Internal: Separated config and language file loading.
 * Internal: Slightly changed the text format that gets used at a few places to represent a player's name and uuid.
 * Internal: Renamed CollectionUtils to MapUtils.
+* Internal: All concatenated debug messages get lazily created only when actually required.
 
 Migration notes:  
 * Removed the importing of old book offers (from late MC 1.12.2, see v1.83). When updating from an older version of Shopkeepers, you will have to first update to a version in-between.

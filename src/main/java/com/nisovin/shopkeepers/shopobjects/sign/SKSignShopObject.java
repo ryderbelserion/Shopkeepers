@@ -169,7 +169,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		// if re-spawning fails due to the sign dropping for some reason (ex. attached block missing) this could be
 		// abused (sign drop farming), therefore we limit the number of spawn attempts:
 		if (System.currentTimeMillis() - lastFailedRespawnAttempt < 3 * 60 * 1000L) {
-			Log.debug("Shopkeeper sign at " + shopkeeper.getPositionString() + " is on spawn cooldown.");
+			Log.debug(() -> "Shopkeeper sign at " + shopkeeper.getPositionString() + " is on spawn cooldown.");
 			return false;
 		}
 
@@ -290,7 +290,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 		Block signBlock = this.getBlock();
 		if (signBlock == null) {
-			Log.debug("Shopkeeper sign at " + shopkeeper.getPositionString() + " is no longer existing! Attempting respawn now.");
+			Log.debug(() -> "Shopkeeper sign at " + shopkeeper.getPositionString() + " is no longer existing! Attempting respawn now.");
 			if (!this.spawn()) {
 				Log.warning("Shopkeeper sign at " + shopkeeper.getPositionString() + " could not be spawned!");
 			}

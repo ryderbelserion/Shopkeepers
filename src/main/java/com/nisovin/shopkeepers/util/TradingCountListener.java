@@ -98,12 +98,12 @@ public class TradingCountListener implements Listener {
 		// sanity checks:
 		int delta = (event.getNewValue() - event.getPreviousValue());
 		if (delta != 1) {
-			Log.debug("Non-shopkeeper trade detection: Expected trading statistic change of 1, but got " + delta);
+			Log.debug(() -> "Non-shopkeeper trade detection: Expected trading statistic change of 1, but got " + delta);
 			return;
 		}
 		Inventory inventory = player.getOpenInventory().getTopInventory();
 		if (!(inventory instanceof MerchantInventory)) {
-			Log.debug("Non-shopkeeper trade detection: Expected open merchant inventory, but got " + inventory.getType());
+			Log.debug(() -> "Non-shopkeeper trade detection: Expected open merchant inventory, but got " + inventory.getType());
 			return;
 		}
 
@@ -116,6 +116,6 @@ public class TradingCountListener implements Listener {
 		}
 
 		tradeCounter++;
-		Log.debug("Detected non-shopkeeper trade (#" + tradeCounter + "): " + ItemUtils.getSimpleRecipeInfo(usedRecipe));
+		Log.debug(() -> "Detected non-shopkeeper trade (#" + tradeCounter + "): " + ItemUtils.getSimpleRecipeInfo(usedRecipe));
 	}
 }

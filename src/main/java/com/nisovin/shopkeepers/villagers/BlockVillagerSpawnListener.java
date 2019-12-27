@@ -46,7 +46,7 @@ public class BlockVillagerSpawnListener implements Listener {
 		EntityType entityType = event.getEntityType();
 		// prevent spawning of villagers, wandering traders and their trader llamas:
 		if (this.isSpawningBlocked(entityType)) {
-			Log.debug("Preventing mob spawn of " + entityType + " at " + TextUtils.getLocationString(event.getLocation()));
+			Log.debug(() -> "Preventing mob spawn of " + entityType + " at " + TextUtils.getLocationString(event.getLocation()));
 			event.setCancelled(true);
 		}
 	}
@@ -59,7 +59,7 @@ public class BlockVillagerSpawnListener implements Listener {
 		for (Entity entity : event.getChunk().getEntities()) {
 			EntityType entityType = entity.getType();
 			if (this.isSpawningBlocked(entityType)) {
-				Log.debug("Preventing mob spawn (chunk-gen) of " + entityType + " at " + TextUtils.getLocationString(entity.getLocation()));
+				Log.debug(() -> "Preventing mob spawn (chunk-gen) of " + entityType + " at " + TextUtils.getLocationString(entity.getLocation()));
 				entity.remove();
 			}
 		}

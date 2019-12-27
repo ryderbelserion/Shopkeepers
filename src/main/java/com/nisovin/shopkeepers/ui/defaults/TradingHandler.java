@@ -127,7 +127,7 @@ public class TradingHandler extends UIHandler {
 	protected boolean canOpen(Player player) {
 		assert player != null;
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.TRADE_PERMISSION)) {
-			Log.debug("Blocked trade window opening from " + player.getName() + ": Missing trade permission.");
+			Log.debug(() -> "Blocked trade window opening from " + player.getName() + ": Missing trade permission.");
 			TextUtils.sendMessage(player, Settings.msgMissingTradePerm);
 			return false;
 		}
@@ -216,10 +216,10 @@ public class TradingHandler extends UIHandler {
 		List<TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
 		List<MerchantRecipe> newMerchantRecipes = this.createMerchantRecipes(recipes);
 		if (ShopkeeperUtils.areMerchantRecipesEqual(oldMerchantRecipes, newMerchantRecipes)) {
-			Log.debug("Trades are still up-to-date for player " + player.getName());
+			Log.debug(() -> "Trades are still up-to-date for player " + player.getName());
 			return; // recipes did not change
 		}
-		Log.debug("Updating trades for player " + player.getName());
+		Log.debug(() -> "Updating trades for player " + player.getName());
 
 		// it is not safe to reduce the number of trading recipes for the player, so we need to add dummy recipes:
 		// TODO check if this still applies in MC 1.14
@@ -257,7 +257,7 @@ public class TradingHandler extends UIHandler {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		String playerName = player.getName();
 		if (clickEvent.isCancelled()) {
-			Log.debug("Some plugin has cancelled the click in the trading window for "
+			Log.debug(() -> "Some plugin has cancelled the click in the trading window for "
 					+ playerName + " at " + shopkeeper.getPositionString() + ".");
 			return;
 		}
@@ -275,7 +275,7 @@ public class TradingHandler extends UIHandler {
 			// for now: only allowed if the item on the cursor and inside the result slot are different
 			// TODO maybe replicate the behavior of this inventory action, but limit its effect to the player's
 			// inventory?
-			Log.debug("Prevented unsupported special click in trading window by " + playerName
+			Log.debug(() -> "Prevented unsupported special click in trading window by " + playerName
 					+ " at " + shopkeeper.getPositionString() + ": " + action);
 			clickEvent.setCancelled(true);
 			ItemUtils.updateInventoryLater(player);
@@ -502,8 +502,8 @@ public class TradingHandler extends UIHandler {
 	}
 
 	protected final void debugPreventedTrade(Player player, String reason) {
-		Log.debug("Prevented trade by " + player.getName() + " with shopkeeper at " + this.getShopkeeper().getPositionString()
-				+ ": " + reason);
+		Log.debug(() -> "Prevented trade by " + player.getName() + " with shopkeeper at "
+				+ this.getShopkeeper().getPositionString() + ": " + reason);
 	}
 
 	/**
@@ -602,7 +602,7 @@ public class TradingHandler extends UIHandler {
 		this.onTradeApplied(tradeData);
 
 		// log trade:
-		Log.debug("Trade (#" + tradeCounter + ") by " + tradeData.tradingPlayer.getName() + " with shopkeeper at "
+		Log.debug(() -> "Trade (#" + tradeCounter + ") by " + tradeData.tradingPlayer.getName() + " with shopkeeper at "
 				+ this.getShopkeeper().getPositionString() + ": " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
 	}
 

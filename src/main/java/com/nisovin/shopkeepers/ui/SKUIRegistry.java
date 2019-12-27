@@ -59,20 +59,20 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		String uiIdentifier = uiType.getIdentifier();
 		UIHandler uiHandler = shopkeeper.getUIHandler(uiType);
 		if (uiHandler == null) {
-			Log.debug("Cannot open UI '" + uiIdentifier + "': This shopkeeper is not handling/supporting this type of user interface.");
+			Log.debug(() -> "Cannot open UI '" + uiIdentifier + "': This shopkeeper is not handling/supporting this type of user interface.");
 			return false;
 		}
 
 		String playerName = player.getName();
 		if (!uiHandler.canOpen(player)) {
-			Log.debug("The player '" + playerName + "' cannot open UI '" + uiIdentifier + "'.");
+			Log.debug(() -> "The player '" + playerName + "' cannot open UI '" + uiIdentifier + "'.");
 			return false;
 		}
 
 		SKUISession oldSession = this.getSession(player);
 		// filtering out duplicate open requests:
 		if (oldSession != null && oldSession.getShopkeeper().equals(shopkeeper) && oldSession.getUIHandler().equals(uiHandler)) {
-			Log.debug("UI '" + uiIdentifier + "'" + " is already open for '" + playerName + "'.");
+			Log.debug(() -> "UI '" + uiIdentifier + "'" + " is already open for '" + playerName + "'.");
 			return false;
 		}
 
@@ -80,7 +80,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		ShopkeeperOpenUIEvent openUIEvent = new ShopkeeperOpenUIEvent(shopkeeper, uiType, player);
 		Bukkit.getPluginManager().callEvent(openUIEvent);
 		if (openUIEvent.isCancelled()) {
-			Log.debug("Opening of UI '" + uiIdentifier + "' for player '" + playerName + "' got cancelled by a plugin.");
+			Log.debug(() -> "Opening of UI '" + uiIdentifier + "' for player '" + playerName + "' got cancelled by a plugin.");
 			return false;
 		}
 
@@ -89,11 +89,11 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		// doing inside openWindow
 		// closing previous window:
 		if (oldSession != null) {
-			Log.debug("Closing previous UI '" + uiIdentifier + "' for player '" + playerName + "'.");
+			Log.debug(() -> "Closing previous UI '" + uiIdentifier + "' for player '" + playerName + "'.");
 			player.closeInventory(); // this will call a PlayerCloseInventoryEvent
 		}
 
-		Log.debug("Opening UI '" + uiIdentifier + "' ...");
+		Log.debug(() -> "Opening UI '" + uiIdentifier + "' ...");
 		boolean isOpen = uiHandler.openWindow(player);
 		if (isOpen) {
 			assert playerSessions.get(player.getUniqueId()) == null;
@@ -102,7 +102,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 			this.onSessionStart(session);
 			return true;
 		} else {
-			Log.debug("UI '" + uiIdentifier + "' NOT opened!");
+			Log.debug(() -> "UI '" + uiIdentifier + "' NOT opened!");
 			return false;
 		}
 	}
@@ -126,7 +126,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		if (session == null) return;
 
 		UIHandler uiHandler = session.getUIHandler();
-		Log.debug("Player " + player.getName() + " closed UI '" + uiHandler.getUIType().getIdentifier() + "'.");
+		Log.debug(() -> "Player " + player.getName() + " closed UI '" + uiHandler.getUIType().getIdentifier() + "'.");
 		this.onSessionEnd(session, closeEvent);
 	}
 
@@ -137,12 +137,12 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	}
 
 	private void onSessionStart(SKUISession session) {
-		Log.debug("UI '" + session.getUIType().getIdentifier() + "' session started for player '" + session.getPlayer().getName() + "'.");
+		Log.debug(() -> "UI '" + session.getUIType().getIdentifier() + "' session started for player '" + session.getPlayer().getName() + "'.");
 	}
 
 	// closeEvent can be null
 	private void onSessionEnd(SKUISession session, InventoryCloseEvent closeEvent) {
-		Log.debug("UI '" + session.getUIType().getIdentifier() + "' session ended for player '" + session.getPlayer().getName() + "'.");
+		Log.debug(() -> "UI '" + session.getUIType().getIdentifier() + "' session ended for player '" + session.getPlayer().getName() + "'.");
 		session.getUIHandler().onInventoryClose(session.getPlayer(), closeEvent); // inform UI handler
 	}
 

@@ -76,7 +76,7 @@ class LivingEntityShopListener implements Listener {
 		LivingEntity shopEntity = (LivingEntity) event.getRightClicked();
 		Player player = event.getPlayer();
 		boolean isInteractAtEvent = (event instanceof PlayerInteractAtEntityEvent);
-		Log.debug("Player " + player.getName() + " is interacting (" + (event.getHand()) + ") "
+		Log.debug(() -> "Player " + player.getName() + " is interacting (" + (event.getHand()) + ") "
 				+ (isInteractAtEvent ? "at" : "with") + " entity at " + shopEntity.getLocation());
 
 		// also checks for citizens npc shopkeepers:
@@ -182,7 +182,7 @@ class LivingEntityShopListener implements Listener {
 	void onExplode(EntityExplodeEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
 			event.setCancelled(true);
-			Log.debug("Cancelled event for living shop: " + event.getEventName());
+			Log.debug(() -> "Cancelled event for living shop: " + event.getEventName());
 		}
 	}
 
@@ -268,7 +268,7 @@ class LivingEntityShopListener implements Listener {
 			}
 		}
 		// sleeping is only prevented due to nearby shopkeepers -> bypass and allow sleeping:
-		Log.debug("Allowing sleeping of player '" + event.getPlayer().getName() + "': The only nearby monsters are shopkeepers.");
+		Log.debug(() -> "Allowing sleeping of player '" + event.getPlayer().getName() + "': The only nearby monsters are shopkeepers.");
 		event.setUseBed(Result.ALLOW);
 	}
 

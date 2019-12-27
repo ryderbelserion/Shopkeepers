@@ -19,7 +19,7 @@ public class PermissionUtils {
 		assert permissible != null;
 		boolean hasPerm = permissible.hasPermission(permission);
 		if (!hasPerm && (permissible instanceof Player)) {
-			Log.debug("Player '" + ((Player) permissible).getName() + "' does not have permission '" + permission + "'.");
+			Log.debug(() -> "Player '" + ((Player) permissible).getName() + "' does not have permission '" + permission + "'.");
 		}
 		return hasPerm;
 	}

@@ -926,7 +926,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		public void printDebugInfo() {
-			Log.debug("Saved shopkeeper data (" + totalDuration + "ms (Data packing ("
+			Log.debug(() -> "Saved shopkeeper data (" + totalDuration + "ms (Data packing ("
 					+ dirtyShopkeepersCount + " dirty, " + deletedShopkeepersCount + " deleted): " + packingDuration + "ms, "
 					+ (async ? "AsyncTask delay: " + asyncTaskDelay + "ms, " : "")
 					+ ((ioLockAcquireDuration > 1) ? "IO lock delay: " + ioLockAcquireDuration + "ms, " : "")

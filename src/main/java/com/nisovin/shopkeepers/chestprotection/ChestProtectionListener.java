@@ -44,7 +44,7 @@ class ChestProtectionListener implements Listener {
 		Player player = event.getPlayer();
 		if (protectedChests.isProtectedChest(block, player)) {
 			// TODO always allow access to own shop chests, even if cancelled by other plugins?
-			Log.debug("Cancelled chest opening by '" + player.getName() + "' at '"
+			Log.debug(() -> "Cancelled chest opening by '" + player.getName() + "' at '"
 					+ TextUtils.getLocationString(block) + "': Protected chest");
 			event.setCancelled(true);
 		}
@@ -55,7 +55,7 @@ class ChestProtectionListener implements Listener {
 		Block block = event.getBlock();
 		Player player = event.getPlayer();
 		if (protectedChests.isProtectedChest(block, player)) {
-			Log.debug("Cancelled breaking of chest block by '" + player.getName() + "' at '"
+			Log.debug(() -> "Cancelled breaking of chest block by '" + player.getName() + "' at '"
 					+ TextUtils.getLocationString(block) + "': Protected chest");
 			event.setCancelled(true);
 		}
@@ -70,7 +70,7 @@ class ChestProtectionListener implements Listener {
 		if (ItemUtils.isChest(type)) {
 			// note: unconnected chests can be placed
 			if (protectedChests.isProtectedChest(block, player)) {
-				Log.debug("Cancelled placing of chest block by '" + player.getName() + "' at '"
+				Log.debug(() -> "Cancelled placing of chest block by '" + player.getName() + "' at '"
 						+ TextUtils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 			}
@@ -78,21 +78,21 @@ class ChestProtectionListener implements Listener {
 			// prevent placement of hoppers that could be used to extract or inject items from/into a protected chest:
 			Block upperBlock = block.getRelative(BlockFace.UP);
 			if (protectedChests.isProtectedChest(upperBlock, player) || protectedChests.isProtectedChest(this.getFacedBlock(block), player)) {
-				Log.debug("Cancelled placing of hopper block by '" + player.getName() + "' at '"
+				Log.debug(() -> "Cancelled placing of hopper block by '" + player.getName() + "' at '"
 						+ TextUtils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 			}
 		} else if (type == Material.DROPPER) {
 			// prevent placement of droppers that could be used to inject items into a protected chest:
 			if (protectedChests.isProtectedChest(this.getFacedBlock(block), player)) {
-				Log.debug("Cancelled placing of dropper block by '" + player.getName() + "' at '"
+				Log.debug(() -> "Cancelled placing of dropper block by '" + player.getName() + "' at '"
 						+ TextUtils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 			}
 		} else if (type == Material.RAIL || type == Material.POWERED_RAIL || type == Material.DETECTOR_RAIL || type == Material.ACTIVATOR_RAIL) {
 			Block upperBlock = block.getRelative(BlockFace.UP);
 			if (protectedChests.isProtectedChest(upperBlock, player)) {
-				Log.debug("Cancelled placing of rail block by '" + player.getName() + "' at '"
+				Log.debug(() -> "Cancelled placing of rail block by '" + player.getName() + "' at '"
 						+ TextUtils.getLocationString(block) + "': Protected chest nearby");
 				event.setCancelled(true);
 			}

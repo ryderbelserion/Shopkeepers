@@ -113,7 +113,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		if (npcLegacyId != null || npcUniqueId != null || !citizensShops.isEnabled()) return;
 
 		// create npc:
-		Log.debug("Creating citizens NPC for shopkeeper " + shopkeeper.getId());
+		Log.debug(() -> "Creating citizens NPC for shopkeeper " + shopkeeper.getId());
 
 		EntityType entityType;
 		String name;
@@ -147,7 +147,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 					// let the trait handle npc related cleanup:
 					npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperRemove();
 				} else {
-					Log.debug("Removing citizens NPC " + CitizensShops.getNPCIdString(npc) + " due to deletion of shopkeeper " + shopkeeper.getId());
+					Log.debug(() -> "Removing citizens NPC " + CitizensShops.getNPCIdString(npc) + " due to deletion of shopkeeper " + shopkeeper.getId());
 					npc.destroy(); // the npc was created by us, so we remove it again
 				}
 			} else {
@@ -227,10 +227,10 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			Location expectedLocation = this.getSpawnLocation();
 			if (currentLocation == null) {
 				npc.teleport(expectedLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
-				Log.debug("Shopkeeper NPC (" + shopkeeper.getPositionString() + ") had no location, teleported");
+				Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") had no location, teleported");
 			} else if (!currentLocation.getWorld().equals(expectedLocation.getWorld()) || currentLocation.distanceSquared(expectedLocation) > 1.0D) {
 				shopkeeper.setLocation(currentLocation);
-				Log.debug("Shopkeeper NPC (" + shopkeeper.getPositionString() + ") out of place, re-indexing");
+				Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") out of place, re-indexing");
 			}
 		}
 		return false;

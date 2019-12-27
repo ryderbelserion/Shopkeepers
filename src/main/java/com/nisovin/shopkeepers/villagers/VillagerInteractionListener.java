@@ -106,7 +106,7 @@ public class VillagerInteractionListener implements Listener {
 					Log.debug("  Villager hiring: the player has the needed amount of hiring items");
 					int inHandAmount = itemInMainHand.getAmount();
 					int remaining = inHandAmount - costs;
-					Log.debug("  Villager hiring: in hand=" + inHandAmount + " costs=" + costs + " remaining=" + remaining);
+					Log.debug(() -> "  Villager hiring: in hand=" + inHandAmount + " costs=" + costs + " remaining=" + remaining);
 					if (remaining > 0) {
 						itemInMainHand.setAmount(remaining);
 					} else { // remaining <= 0

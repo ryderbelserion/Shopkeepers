@@ -82,7 +82,7 @@ class CreateListener implements Listener {
 		}
 
 		Player player = event.getPlayer();
-		Log.debug("Player " + player.getName() + " is interacting with the shop creation item");
+		Log.debug(() -> "Player " + player.getName() + " is interacting with the shop creation item");
 
 		// ignore creative mode players:
 		if (player.getGameMode() == GameMode.CREATIVE) {
@@ -206,7 +206,7 @@ class CreateListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockDispense(BlockDispenseEvent event) {
 		if (Settings.preventShopCreationItemRegularUsage && Settings.isShopCreationItem(event.getItem())) {
-			Log.debug("Preventing dispensing of shop creation item at " + TextUtils.getLocationString(event.getBlock()));
+			Log.debug(() -> "Preventing dispensing of shop creation item at " + TextUtils.getLocationString(event.getBlock()));
 			event.setCancelled(true);
 			// TODO drop item instead
 			// TODO only prevent it for items that have a special dispense behavior

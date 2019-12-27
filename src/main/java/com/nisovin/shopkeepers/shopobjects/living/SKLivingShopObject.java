@@ -363,11 +363,13 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	@Override
 	public boolean check() {
 		if (!this.isActive()) {
-			Log.debug("Shopkeeper (" + shopkeeper.getPositionString() + ") missing, triggering respawn now");
+			Log.debug(() -> "Shopkeeper (" + shopkeeper.getPositionString() + ") missing, triggering respawn now");
 			if (entity != null && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
 				// the chunk was silently unloaded before:
-				Log.debug("  Chunk was silently unloaded before! (dead: " + entity.isDead() + ", valid: " + entity.isValid()
-						+ ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()) + ")");
+				Log.debug(
+						() -> "  Chunk got silently unloaded or mob got removed! (dead: " + entity.isDead() + ", valid: "
+								+ entity.isValid() + ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()) + ")"
+				);
 			}
 			boolean spawned = this.spawn(); // this will load the chunk if necessary
 			if (spawned) {
@@ -388,7 +390,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 				// teleport back:
 				entity.teleport(spawnLocation);
 				this.overwriteAI();
-				Log.debug("Shopkeeper (" + shopkeeper.getPositionString() + ") out of place, teleported back");
+				Log.debug(() -> "Shopkeeper (" + shopkeeper.getPositionString() + ") out of place, teleported back");
 			}
 
 			// remove potion effects:

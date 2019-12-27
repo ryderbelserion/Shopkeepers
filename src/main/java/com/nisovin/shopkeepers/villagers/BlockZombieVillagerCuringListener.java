@@ -38,7 +38,7 @@ public class BlockZombieVillagerCuringListener implements Listener {
 		}
 		if (itemInHand != null && itemInHand.getType() == Material.GOLDEN_APPLE) {
 			// prevent curing:
-			Log.debug("Preventing zombie villager curing at " + TextUtils.getLocationString(player.getLocation()));
+			Log.debug(() -> "Preventing zombie villager curing at " + TextUtils.getLocationString(player.getLocation()));
 			event.setCancelled(true);
 			TextUtils.sendMessage(player, Settings.msgZombieVillagerCuringDisabled);
 		}
@@ -50,7 +50,7 @@ public class BlockZombieVillagerCuringListener implements Listener {
 		if (!(event.getEntity() instanceof ZombieVillager)) return;
 
 		ZombieVillager zombieVillager = (ZombieVillager) event.getEntity();
-		Log.debug("Preventing zombie villager curing (transform) at " + TextUtils.getLocationString(zombieVillager.getLocation()));
+		Log.debug(() -> "Preventing zombie villager curing (transform) at " + TextUtils.getLocationString(zombieVillager.getLocation()));
 		event.setCancelled(true);
 
 		// inform the player who initiated the curing:

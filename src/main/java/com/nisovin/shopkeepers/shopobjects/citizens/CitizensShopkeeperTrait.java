@@ -57,7 +57,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	}
 
 	void onShopkeeperRemove() {
-		Log.debug("Removing citizens trait due to shopkeeper removal for NPC " + CitizensShops.getNPCIdString(npc));
+		Log.debug(() -> "Removing citizens trait due to shopkeeper removal for NPC " + CitizensShops.getNPCIdString(npc));
 		shopObjectId = null;
 		this.getNPC().removeTrait(CitizensShopkeeperTrait.class);
 	}
@@ -65,7 +65,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	public void onTraitDeletion() {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		if (shopkeeper != null) {
-			Log.debug("Removing shopkeeper " + shopkeeper.getId() + " due to citizens trait removal for NPC " + CitizensShops.getNPCIdString(npc));
+			Log.debug(() -> "Removing shopkeeper " + shopkeeper.getId() + " due to citizens trait removal for NPC " + CitizensShops.getNPCIdString(npc));
 			assert shopkeeper.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN();
 			SKCitizensShopObject shopObject = (SKCitizensShopObject) shopkeeper.getShopObject();
 			shopObject.setKeepNPCOnDeletion();
@@ -141,7 +141,7 @@ public class CitizensShopkeeperTrait extends Trait {
 		}
 
 		NPC npc = this.getNPC();
-		Log.debug("Creating shopkeeper for NPC " + CitizensShops.getNPCIdString(npc)
+		Log.debug(() -> "Creating shopkeeper for NPC " + CitizensShops.getNPCIdString(npc)
 				+ (creator != null ? " and player '" + creator.getName() + "'" : ""));
 
 		Location location = null;

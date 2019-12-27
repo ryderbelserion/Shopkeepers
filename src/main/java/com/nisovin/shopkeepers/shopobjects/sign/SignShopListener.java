@@ -88,7 +88,7 @@ class SignShopListener implements Listener {
 		if (!ItemUtils.isSign(block.getType())) return;
 
 		Player player = event.getPlayer();
-		Log.debug("Player " + player.getName() + " is interacting (" + (event.getHand()) + ") with sign at " + TextUtils.getLocationString(block));
+		Log.debug(() -> "Player " + player.getName() + " is interacting (" + (event.getHand()) + ") with sign at " + TextUtils.getLocationString(block));
 
 		AbstractShopkeeper shopkeeper = signShops.getSignShop(block);
 		if (shopkeeper == null) {

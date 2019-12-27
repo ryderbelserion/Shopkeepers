@@ -382,11 +382,11 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		// make sure the chest still exists
 		Block chest = this.getChest();
 		if (!ItemUtils.isChest(chest.getType())) {
-			Log.debug("Cannot open chest inventory for player '" + player.getName() + "': The block is no longer a chest!");
+			Log.debug(() -> "Cannot open chest inventory for player '" + player.getName() + "': The block is no longer a chest!");
 			return false;
 		}
 
-		Log.debug("Opening chest inventory for player '" + player.getName() + "'.");
+		Log.debug(() -> "Opening chest inventory for player '" + player.getName() + "'.");
 		// open the chest directly as the player (no need for a custom UI)
 		Inventory inv = ((Chest) chest.getState()).getInventory();
 		player.openInventory(inv);

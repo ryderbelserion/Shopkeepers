@@ -64,7 +64,7 @@ class UIListener implements Listener {
 		// validate open inventory:
 		if (!uiHandler.isWindow(view)) {
 			// the player probably has some other inventory open, but an active session.. let's close it:
-			Log.debug("Closing inventory of type " + view.getType() + " with title '" + view.getTitle()
+			Log.debug(() -> "Closing inventory of type " + view.getType() + " with title '" + view.getTitle()
 					+ "' for " + player.getName() + ", because a different open inventory was expected for '"
 					+ uiHandler.getUIType().getIdentifier() + "'.");
 			event.setCancelled(true);
@@ -77,7 +77,8 @@ class UIListener implements Listener {
 		// validate shopkeeper:
 		if (!session.getShopkeeper().isUIActive() || !session.getShopkeeper().isValid()) {
 			// shopkeeper deleted, or the UIs got deactivated: ignore this click
-			Log.debug("Inventory interaction by " + player.getName() + " ignored, because the window is about to get closed,"
+			Log.debug(() -> "Inventory interaction by " + player.getName()
+					+ " ignored, because the window is about to get closed,"
 					+ " or the shopkeeper got deleted.");
 			event.setCancelled(true);
 			return false;
@@ -105,6 +106,7 @@ class UIListener implements Listener {
 		SKUISession session = this.getUISession(event.getWhoClicked());
 		if (session != null) {
 			player = (Player) event.getWhoClicked();
+			Player finalPlayer = player;
 			assert player.equals(session.getPlayer());
 			// validate session:
 			if (this.validateSession(event, player, session)) {
@@ -112,7 +114,7 @@ class UIListener implements Listener {
 
 				// debug information:
 				InventoryView view = event.getView();
-				Log.debug("Inventory click: player=" + player.getName()
+				Log.debug(() -> "Inventory click: player=" + finalPlayer.getName()
 						+ ", view-type=" + view.getType() + ", view-title=" + view.getTitle()
 						+ ", raw-slot-id=" + event.getRawSlot() + ", slot-id=" + event.getSlot() + ", slot-type=" + event.getSlotType()
 						+ ", shift=" + event.isShiftClick() + ", hotbar key=" + event.getHotbarButton()
@@ -152,6 +154,7 @@ class UIListener implements Listener {
 		SKUISession session = this.getUISession(event.getWhoClicked());
 		if (session != null) {
 			player = (Player) event.getWhoClicked();
+			Player finalPlayer = player;
 			assert player.equals(session.getPlayer());
 			// validate session:
 			if (this.validateSession(event, player, session)) {
@@ -159,7 +162,7 @@ class UIListener implements Listener {
 
 				// debug information:
 				InventoryView view = event.getView();
-				Log.debug("Inventory dragging: player=" + player.getName()
+				Log.debug(() -> "Inventory dragging: player=" + finalPlayer.getName()
 						+ ", view-type=" + view.getType() + ", view-title=" + view.getTitle()
 						+ ", drag-type=" + event.getType());
 			}
