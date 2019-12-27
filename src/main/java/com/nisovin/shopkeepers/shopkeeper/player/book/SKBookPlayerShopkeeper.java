@@ -203,8 +203,8 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	protected ItemStack copyBook(ItemStack book) {
 		assert isCopyableBook(book);
-		BookMeta oldMeta = (BookMeta) book.getItemMeta();
-		Generation oldGeneration = oldMeta.getGeneration();
+		Generation oldGeneration = getBookGeneration(book);
+		assert oldGeneration != null;
 		Generation nextGeneration = getNextGeneration(oldGeneration);
 		assert nextGeneration != null;
 
