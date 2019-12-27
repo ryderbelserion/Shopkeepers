@@ -44,6 +44,8 @@ public class Settings {
 		public static final String shopkeeperActivation = "shopkeeper-activation";
 		// Enables additional commands related debugging output.
 		public static final String commands = "commands";
+		// Logs information when updating stored shop owner names.
+		public static final String ownerNameUpdates = "owner-name-updates";
 	}
 
 	public static boolean isDebugging() {

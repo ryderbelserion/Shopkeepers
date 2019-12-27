@@ -12,6 +12,7 @@ Date format: (YYYY-MM-DD)
 
 **Other changes:**  
 * Added: The give, transfer list and remove commands show the player's uuid as hover text now and allow it to be copied into the chat input via shift clicking.
+* Added: Debug option 'owner-name-updates' enables additional output whenever stored shop owner names get updated.
 * Fixed: The book shopkeeper was ignoring books with missing generation tag. These are now treated as 'original' books, just like Minecraft does.
 * Fixed: We would previously drop the shop-creation item returned on shop deletion at the shop's location, even if the shop got deleted via remote editing from far away (and is potentially not even loaded). If the player is further than 10 blocks away (or if the shop object is not loaded), it will drop the item at the player's location now.
 * Fixed: The book shopkeeper would not correctly store offers for books that have dots in their name.

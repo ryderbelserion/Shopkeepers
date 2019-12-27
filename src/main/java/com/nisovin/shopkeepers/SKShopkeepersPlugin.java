@@ -73,6 +73,7 @@ import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.util.DebugListener;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.TradingCountListener;
 import com.nisovin.shopkeepers.util.Validate;
 import com.nisovin.shopkeepers.villagers.BlockVillagerSpawnListener;
@@ -722,6 +723,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// updates owner names for the shopkeepers of the specified player:
 	private void updateShopkeepersForPlayer(UUID playerUUID, String playerName) {
+		Log.debug(Settings.DebugOptions.ownerNameUpdates,
+				() -> "Updating shopkeepers for: " + TextUtils.getPlayerString(playerName, playerUUID)
+		);
 		boolean dirty = false;
 		for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 			if (shopkeeper instanceof PlayerShopkeeper) {
@@ -732,13 +736,19 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 				if (ownerUUID.equals(playerUUID)) {
 					if (!ownerName.equals(playerName)) {
 						// update the stored name, because the player must have changed it:
+						Log.debug(Settings.DebugOptions.ownerNameUpdates,
+								() -> "  Updating owner name ('" + ownerName + "') of shopkeeper " + shopkeeper.getId() + "."
+						);
 						playerShop.setOwner(playerUUID, playerName);
 						dirty = true;
 					} else {
-						// The shop was already updated to uuid based identification and the player's name hasn't
-						// changed.
-						// If we assume that this is consistent among all shops of this player
-						// we can stop checking the other shops here:
+						// The stored owner name matches the player's current name.
+						// Assumption: The stored owner names among all shops are consistent.
+						// We can therefore abort checking the other shops here.
+						Log.debug(Settings.DebugOptions.ownerNameUpdates,
+								() -> "  The stored owner name of shopkeeper " + shopkeeper.getId()
+										+ " matches the current player name. Skipping checking of further shops."
+						);
 						return;
 					}
 				}
