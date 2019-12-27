@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
@@ -771,6 +772,7 @@ public class Settings {
 		public static ItemData hireButtonItem = new ItemData(Material.AIR);
 
 		public static Pattern shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
+
 		// gets called after the config has been loaded:
 		private static void setup() {
 			// ignore display name (which is used for specifying the new shopkeeper name):
@@ -782,7 +784,13 @@ public class Settings {
 			deleteButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), msgButtonDelete, msgButtonDeleteLore));
 			hireButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(hireItem.createItemStack(), msgButtonHire, msgButtonHireLore));
 
-			shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
+			try {
+				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
+			} catch (PatternSyntaxException e) {
+				Log.warning("Config: 'name-regex' is not a valid regular expression ('" + Settings.nameRegex + "'). Reverting to default.");
+				Settings.nameRegex = "[A-Za-z0-9 ]{3,32}";
+				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
+			}
 		}
 	}
 
