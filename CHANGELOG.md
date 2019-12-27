@@ -10,6 +10,7 @@ Date format: (YYYY-MM-DD)
 **Update for MC 1.15.1:**
 * Added bees to the by default enabled mob types. If you are migrating from a previous version, you will have to manually enable them in the config.
 
+**Other changes:**  
 * Added: The give, transfer list and remove commands show the player's uuid as hover text now and allow it to be copied into the chat input via shift clicking.
 * Fixed: The book shopkeeper was ignoring books with missing generation tag. These are now treated as 'original' books, just like Minecraft does.
 * Fixed: We would previously drop the shop-creation item returned on shop deletion at the shop's location, even if the shop got deleted via remote editing from far away (and is potentially not even loaded). If the player is further than 10 blocks away (or if the shop object is not loaded), it will drop the item at the player's location now.
@@ -22,7 +23,6 @@ Date format: (YYYY-MM-DD)
 * Fixed/API: NPE when accessing a non-existing second offered item from the ShopkeeperTradeEvent.
 * Fixed/API: The offered items inside the ShopkeeperTradeEvent are copies now and their stack sizes match those of the trading recipe.
 * Fixed: The internal default for message 'msg-list-shops-entry' (that gets used if the message is missing in the config) was not matching the message in the default config.
-
 * Changed: The always-show-nameplates setting seems to be working again (since MC 1.9 already). Updated the corresponding comment in the default config.
 * Changed: Instead of using a fallback name ("unknown"), player shops are required to always provide a valid owner name now.
 * Changed: Explicitly checking for missing world names when loading shopkeepers.
@@ -71,59 +71,59 @@ API changes:
   * Added: ShopkeeperRegistry#isChunkActive(chunkCoords)
   * Added: ShopkeeperRegistry#getShopkeepersInActiveChunks(worldName)
 
-* Various (mostly internal) changes to commands and argument parsing:  
-  * Fallback mechanism:
-    * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information.
-    * A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
-    * Most optional arguments, default values and fallbacks were updated to use this new fallback mechanism, which should provide more relevant error messages in a few edge cases.
-  * "list", "remove", "transfer" and "setTradePerm" commands can be used from console now. Command confirmations work for the console as well now (any command sender that is not a player is considered to be the 'console' for this purpose).
-  * "setForHire" and "transfer" commands allow specifying the shopkeeper via argument now. Also: When targeting a chest that happens to be used by multiple shopkeepers (eg. due to manually modified save data..), it picks the first one now (instead of applying the command to all shops). In the future this will likely print an error message instead.
-  * "debugCreateShops" command: Shop count per command invocation is limited to 1000 now.
-  * Added debug option 'commands' and added various debug output when parsing and executing a command.
-  * All argument suggestions are limited to 20 entries by default now.
-  * Player arguments suggest matching uuids now. To avoid spamming the suggestions with uuids for the first few characters of input, suggestions are only provided after at least 3 characters of matching input.
-  * Some commands (eg. "list") provide suggestions for names of online players now.
-  * The list and remove commands accept player uuids now and ignore the case when comparing player names.
-  * The list and remove commands handle ambiguous player names now: If there are shops of different players matching the given player name, an error message is shown and the player needs to be specified by uuid instead. The player names and uuids can be copied to the chat input via shift clicking. If a player with matching name is online, that player is used for the command (regardless of if the given player name is ambiguous).
-  * The shops affected by the remove command are now determined before asking for the users confirmation. This allows detecting ambiguous player names and missing player information before prompting the command executor for confirmation. A minor side effect of this is that any shops created after the command invocation are no longer affected by the remove command once it gets confirmed.
-  * Internal: Refactored name, uuid and id based parsing (and matching) of players and shopkeepers to allow for more code reuse. Added ObjectByIdArgument which contains most of the shared logic now.
-  * Internal: Added ShopkeeperIdArgument.
-  * Internal: Added TransformedArgument which allows transforming of parsed arguments.
-  * Internal: Minor refactoring to the targeting of shopkeepers.
-  * Internal: Changes to how targeting of shopkeepers is handled in case no shopkeeper can be parsed from the command input. This should result in more appropriate error messages when specifying an invalid shopkeeper.
-  * Internal: FirstOf-arguments reset the parsed arguments before every child argument's completion attempt, so that every child argument has a chance to provide completions.
-  * Internal: FirstOf-arguments now forward the exceptions of its child arguments (instead of using their own).
-  * Internal: Added the ability to define 'hidden' command arguments. These can for example be used to inject information into the command's execution context without requiring textual input from the user.
-  * Internal: CommandArgument#isOptional now only controls the formatting. The parsing behavior is left to the individual argument implementations.
-  * Internal: CommandArgs no longer makes a copy of the passed arguments.
-  * Internal: When resetting CommandArgs to a previous state they ensure now that the state got created from the same CommandArgs instance.
-  * Internal: Added type parameter to CommandArgument.
-  * Internal: Added ArgumentRejectedException for when an argument got parsed, but rejected by a filter rule. This is used to provide more relevant error messages in FirstOf-arguments.
-  * Internal: Added more general BoundedIntegerArgument. PositiveIntegerArgument makes use of it.
-  * Internal: Moved ArgumentFilter into base commands lib package.
-  * Internal: CommandArguments keep track of their parent argument now (if used internally by another argument) and use that for their error messages.
-  * Internal: Added display name property to all command arguments that be used to change the name that is used to represent the argument in the command format. This is especially useful for conflicting literal arguments. Literal arguments will omit their actual argument name from the argument completions if a different display name has been set.
-  * Internal: Minor changes to handling errors during command handling. Besides the stack trace, the plugin also logs the command context (parsed arguments) now.
-  * Internal: Added map view and toString to CommandContext.
-  * Internal: CommandArgument#parse now also returns the parsed value. This is useful when there is a chain of wrapped arguments and the parent needs to handle the value parsed by the child argument in some way.
-  * Internal/Fixed: Chains of FirstOfArguments should now be able to properly store all the values parsed by child arguments along the chain. Previously this only worked for a chain depth of 1.
-  * Internal: Clarified CommandArgument#isOptional javadoc.
-  * Internal: Validating that no arguments with the same name are added to the same command.
-  * Internal: Added MissingArgumentException and InvalidArgumentException (which ArgumentRejectedException extends) which allows specifically handling those types of exceptions.
-  * Internal: Renamed CommandArgument#missingArgument and #invalidArgument to #missingArgumentError and #invalidArgumentError.
-  * Internal: Added CommandArgument#requiresPlayerError with a corresponding default message (msg-command-argument-requires-player) for arguments that require a player as executor.
-  * Internal: Moved default shopkeeper argument filters into ShopkeeperFilter class/namespace.
-  * Internal: Added CommandContext#copy() and made constructor CommandContext(otherContext) protected.
-  * Internal: Added CommandArgs#copy. Since the underlying arguments are expected to never change, they are not actually copied (only the parsing state is copied). Any captured CommandArgs states are applicable to the copy as well.
-  * Internal: Added marker interface for the CommandArgs state.
-  * Internal: Replaced CommandArgs with ArgumentsReader: The arguments are now stored inside the CommandInput and the ArgumentsReader only references them from there.
-  * Internal: CommandContext is now an interface (with SimpleCommandContext as implementation). A new class CommandContextView was added that gets used anywhere where accessing the context is allowed, while modifying is not.
-  * Internal: Command and tab completion handling was moved from BaseCommand into Command.
-  * Internal: Resetting of the arguments reader if parsing of an command argument failed was moved from CommandArgument#parse into Command.
-  * Internal: Added TypedFirstOfArgument, a variant of FirstOfArgument that preserves the result type of its child arguments.
-  * Internal: Added NameArgument, which can be useful if there would otherwise be conflicts / ambiguities between arguments.
-  * Internal: ArgumentParseException provides the command argument that created it now. This is especially useful for debugging purposes.
-  * Internal: The commands library was updated to use the new text representation everywhere now, and thereby support text features such as hover events, click events, etc.
+Various (mostly internal) changes to commands and argument parsing:  
+* Fallback mechanism:
+  * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information.
+  * A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
+  * Most optional arguments, default values and fallbacks were updated to use this new fallback mechanism, which should provide more relevant error messages in a few edge cases.
+* "list", "remove", "transfer" and "setTradePerm" commands can be used from console now. Command confirmations work for the console as well now (any command sender that is not a player is considered to be the 'console' for this purpose).
+* "setForHire" and "transfer" commands allow specifying the shopkeeper via argument now. Also: When targeting a chest that happens to be used by multiple shopkeepers (eg. due to manually modified save data..), it picks the first one now (instead of applying the command to all shops). In the future this will likely print an error message instead.
+* "debugCreateShops" command: Shop count per command invocation is limited to 1000 now.
+* Added debug option 'commands' and added various debug output when parsing and executing a command.
+* All argument suggestions are limited to 20 entries by default now.
+* Player arguments suggest matching uuids now. To avoid spamming the suggestions with uuids for the first few characters of input, suggestions are only provided after at least 3 characters of matching input.
+* Some commands (eg. "list") provide suggestions for names of online players now.
+* The list and remove commands accept player uuids now and ignore the case when comparing player names.
+* The list and remove commands handle ambiguous player names now: If there are shops of different players matching the given player name, an error message is shown and the player needs to be specified by uuid instead. The player names and uuids can be copied to the chat input via shift clicking. If a player with matching name is online, that player is used for the command (regardless of if the given player name is ambiguous).
+* The shops affected by the remove command are now determined before asking for the users confirmation. This allows detecting ambiguous player names and missing player information before prompting the command executor for confirmation. A minor side effect of this is that any shops created after the command invocation are no longer affected by the remove command once it gets confirmed.
+* Internal: Refactored name, uuid and id based parsing (and matching) of players and shopkeepers to allow for more code reuse. Added ObjectByIdArgument which contains most of the shared logic now.
+* Internal: Added ShopkeeperIdArgument.
+* Internal: Added TransformedArgument which allows transforming of parsed arguments.
+* Internal: Minor refactoring to the targeting of shopkeepers.
+* Internal: Changes to how targeting of shopkeepers is handled in case no shopkeeper can be parsed from the command input. This should result in more appropriate error messages when specifying an invalid shopkeeper.
+* Internal: FirstOf-arguments reset the parsed arguments before every child argument's completion attempt, so that every child argument has a chance to provide completions.
+* Internal: FirstOf-arguments now forward the exceptions of its child arguments (instead of using their own).
+* Internal: Added the ability to define 'hidden' command arguments. These can for example be used to inject information into the command's execution context without requiring textual input from the user.
+* Internal: CommandArgument#isOptional now only controls the formatting. The parsing behavior is left to the individual argument implementations.
+* Internal: CommandArgs no longer makes a copy of the passed arguments.
+* Internal: When resetting CommandArgs to a previous state they ensure now that the state got created from the same CommandArgs instance.
+* Internal: Added type parameter to CommandArgument.
+* Internal: Added ArgumentRejectedException for when an argument got parsed, but rejected by a filter rule. This is used to provide more relevant error messages in FirstOf-arguments.
+* Internal: Added more general BoundedIntegerArgument. PositiveIntegerArgument makes use of it.
+* Internal: Moved ArgumentFilter into base commands lib package.
+* Internal: CommandArguments keep track of their parent argument now (if used internally by another argument) and use that for their error messages.
+* Internal: Added display name property to all command arguments that be used to change the name that is used to represent the argument in the command format. This is especially useful for conflicting literal arguments. Literal arguments will omit their actual argument name from the argument completions if a different display name has been set.
+* Internal: Minor changes to handling errors during command handling. Besides the stack trace, the plugin also logs the command context (parsed arguments) now.
+* Internal: Added map view and toString to CommandContext.
+* Internal: CommandArgument#parse now also returns the parsed value. This is useful when there is a chain of wrapped arguments and the parent needs to handle the value parsed by the child argument in some way.
+* Internal/Fixed: Chains of FirstOfArguments should now be able to properly store all the values parsed by child arguments along the chain. Previously this only worked for a chain depth of 1.
+* Internal: Clarified CommandArgument#isOptional javadoc.
+* Internal: Validating that no arguments with the same name are added to the same command.
+* Internal: Added MissingArgumentException and InvalidArgumentException (which ArgumentRejectedException extends) which allows specifically handling those types of exceptions.
+* Internal: Renamed CommandArgument#missingArgument and #invalidArgument to #missingArgumentError and #invalidArgumentError.
+* Internal: Added CommandArgument#requiresPlayerError with a corresponding default message (msg-command-argument-requires-player) for arguments that require a player as executor.
+* Internal: Moved default shopkeeper argument filters into ShopkeeperFilter class/namespace.
+* Internal: Added CommandContext#copy() and made constructor CommandContext(otherContext) protected.
+* Internal: Added CommandArgs#copy. Since the underlying arguments are expected to never change, they are not actually copied (only the parsing state is copied). Any captured CommandArgs states are applicable to the copy as well.
+* Internal: Added marker interface for the CommandArgs state.
+* Internal: Replaced CommandArgs with ArgumentsReader: The arguments are now stored inside the CommandInput and the ArgumentsReader only references them from there.
+* Internal: CommandContext is now an interface (with SimpleCommandContext as implementation). A new class CommandContextView was added that gets used anywhere where accessing the context is allowed, while modifying is not.
+* Internal: Command and tab completion handling was moved from BaseCommand into Command.
+* Internal: Resetting of the arguments reader if parsing of an command argument failed was moved from CommandArgument#parse into Command.
+* Internal: Added TypedFirstOfArgument, a variant of FirstOfArgument that preserves the result type of its child arguments.
+* Internal: Added NameArgument, which can be useful if there would otherwise be conflicts / ambiguities between arguments.
+* Internal: ArgumentParseException provides the command argument that created it now. This is especially useful for debugging purposes.
+* Internal: The commands library was updated to use the new text representation everywhere now, and thereby support text features such as hover events, click events, etc.
 
 Other internal changes:  
 * Internal: Made various changes in order to support Minecraft's text features such as hover events, click events, insertions, etc. Most texts are now stored in a new format internally.
