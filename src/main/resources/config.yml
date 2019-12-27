@@ -205,8 +205,7 @@ silence-living-shop-entities: true
 # Whether to show nameplates of mob shopkeepers.
 show-nameplates: true
 # Whether to always show nameplates. If disabled, nameplates will only be shown
-# when looking directly at the shopkeeper. Note: This might no longer work
-# since MC 1.8.
+# when looking directly at the shopkeeper.
 always-show-nameplates: false
 # The prefix for nameplates (to help distinguish them from players).
 nameplate-prefix: "&a"

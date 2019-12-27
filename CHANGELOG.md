@@ -23,6 +23,7 @@ Date format: (YYYY-MM-DD)
 * Fixed/API: The offered items inside the ShopkeeperTradeEvent are copies now and their stack sizes match those of the trading recipe.
 * Fixed: The internal default for message 'msg-list-shops-entry' (that gets used if the message is missing in the config) was not matching the message in the default config.
 
+* Changed: The always-show-nameplates setting seems to be working again (since MC 1.9 already). Updated the corresponding comment in the default config.
 * Changed: Instead of using a fallback name ("unknown"), player shops are required to always provide a valid owner name now.
 * Changed: Explicitly checking for missing world names when loading shopkeepers.
 * Changed: Only printing the 'Config already loaded' message during startup if the debug mode is enabled.
