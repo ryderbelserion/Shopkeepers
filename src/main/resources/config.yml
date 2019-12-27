@@ -182,6 +182,7 @@ enabled-living-shops:
 - TRADER_LLAMA
 - WANDERING_TRADER
 - FOX
+- BEE
 
 # With the old behavior the mobs can be pushed around and their AI and gravity
 # is handled by minecraft itself. With the new behavior all their vanilla AI is

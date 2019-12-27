@@ -191,7 +191,8 @@ public class Settings {
 			EntityType.LLAMA.name(), // MC 1.11
 			EntityType.TRADER_LLAMA.name(), // MC 1.14
 			EntityType.WANDERING_TRADER.name(), // MC 1.14
-			EntityType.FOX.name() // MC 1.14
+			EntityType.FOX.name(), // MC 1.14
+			"BEE" // MC 1.15
 	);
 
 	public static boolean useLegacyMobBehavior = false;

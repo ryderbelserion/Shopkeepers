@@ -100,7 +100,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * # 1.12
 	 * <li> ILLUSIONER: okay
 	 * <li> PARROT: okay, dances, spawns with random color
-	 * * # 1.13
+	 * # 1.13
 	 * <li> TURTLE: okay
 	 * <li> PHANTOM: okay, burns in sun
 	 * <li> COD: okay
@@ -109,7 +109,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> TROPICAL_FISH: okay
 	 * <li> DROWNED: okay
 	 * <li> DOLPHIN: okay, slightly gliding inside water
-	 * * # 1.14
+	 * # 1.14
 	 * <li> CAT: okay
 	 * <li> PANDA: okay
 	 * <li> PILLAGER: okay
@@ -117,6 +117,8 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> TRADER_LLAMA: okay
 	 * <li> WANDERING_VILLAGER: okay
 	 * <li> FOX: okay, randomly spawns with an item in its mouth (clearing its equipment doesn't work, yet)
+	 * # 1.15
+	 * <li> BEE: okay, turning towards nearby players is jerky (body rotation instead of head rotation), occasionally starts flapping its wings
 	 * </ul>
 	 */
 

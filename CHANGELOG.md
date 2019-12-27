@@ -5,13 +5,12 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: xxx
 
 ## v2.9.0 (TBA)
-### Supported MC versions: 1.14.4
+### Supported MC versions: 1.14.4, 1.15.1
 
-Migration notes:  
-* Removed the importing of old book offers (from late MC 1.12.2, see v1.83). When updating from an older version of Shopkeepers, you will have to first update to a version in-between.
+**Update for MC 1.15.1:**
+* Added bees to the by default enabled mob types. If you are migrating from a previous version, you will have to manually enable them in the config.
 
 * Added: The give, transfer list and remove commands show the player's uuid as hover text now and allow it to be copied into the chat input via shift clicking.
-
 * Fixed: The book shopkeeper was ignoring books with missing generation tag. These are now treated as 'original' books, just like Minecraft does.
 * Fixed: We would previously drop the shop-creation item returned on shop deletion at the shop's location, even if the shop got deleted via remote editing from far away (and is potentially not even loaded). If the player is further than 10 blocks away (or if the shop object is not loaded), it will drop the item at the player's location now.
 * Fixed: The book shopkeeper would not correctly store offers for books that have dots in their name.
@@ -138,6 +137,9 @@ Other internal changes:
 * Internal: Separated config and language file loading.
 * Internal: Slightly changed the text format that gets used at a few places to represent a player's name and uuid.
 * Internal: Renamed CollectionUtils to MapUtils.
+
+Migration notes:  
+* Removed the importing of old book offers (from late MC 1.12.2, see v1.83). When updating from an older version of Shopkeepers, you will have to first update to a version in-between.
 
 Save data format changes:  
 * The storage of book shopkeeper offers has changed.
