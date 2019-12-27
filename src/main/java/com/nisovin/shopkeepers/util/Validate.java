@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.util;
 
+import java.util.function.Predicate;
+
 public class Validate {
 
 	private Validate() {
@@ -33,14 +35,26 @@ public class Validate {
 		return string;
 	}
 
-	public static void isTrue(boolean expression) {
-		isTrue(expression, "The validated expression is false");
+	public static boolean isTrue(boolean expression) {
+		return isTrue(expression, "The validated expression is false");
 	}
 
-	public static void isTrue(boolean expression, String errorMessage) {
+	public static boolean isTrue(boolean expression, String errorMessage) {
 		if (!expression) {
 			error(errorMessage);
 		}
+		return expression;
+	}
+
+	public static <T> T isTrue(T value, Predicate<T> predicate) {
+		return isTrue(value, predicate, "The validated predicate is false");
+	}
+
+	public static <T> T isTrue(T value, Predicate<T> predicate, String errorMessage) {
+		if (!predicate.test(value)) {
+			error(errorMessage);
+		}
+		return value;
 	}
 
 	public static double isFinite(double value) {
@@ -87,11 +101,12 @@ public class Validate {
 		return value;
 	}
 
-	public static void noNullElements(Iterable<?> iterable, String errorMessage) {
+	public static <T extends Iterable<?>> T noNullElements(T iterable, String errorMessage) {
 		notNull(iterable, errorMessage);
 		for (Object object : iterable) {
 			notNull(object, errorMessage);
 		}
+		return iterable;
 	}
 
 	// STATE
@@ -127,14 +142,26 @@ public class Validate {
 			return string;
 		}
 
-		public static void isTrue(boolean expression) {
-			isTrue(expression, "The validated expression is false");
+		public static boolean isTrue(boolean expression) {
+			return isTrue(expression, "The validated expression is false");
 		}
 
-		public static void isTrue(boolean expression, String errorMessage) {
+		public static boolean isTrue(boolean expression, String errorMessage) {
 			if (!expression) {
 				error(errorMessage);
 			}
+			return expression;
+		}
+
+		public static <T> T isTrue(T value, Predicate<T> predicate) {
+			return isTrue(value, predicate, "The validated predicate is false");
+		}
+
+		public static <T> T isTrue(T value, Predicate<T> predicate, String errorMessage) {
+			if (!predicate.test(value)) {
+				error(errorMessage);
+			}
+			return value;
 		}
 
 		public static double isFinite(double value) {
@@ -179,6 +206,14 @@ public class Validate {
 				error(errorMessage);
 			}
 			return value;
+		}
+
+		public static <T extends Iterable<?>> T noNullElements(T iterable, String errorMessage) {
+			notNull(iterable, errorMessage);
+			for (Object object : iterable) {
+				notNull(object, errorMessage);
+			}
+			return iterable;
 		}
 	}
 }
