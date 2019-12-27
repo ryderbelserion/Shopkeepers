@@ -46,7 +46,7 @@ public class TradeFileLogger implements Listener {
 		}
 		Player player = event.getPlayer();
 		Shopkeeper shopkeeper = event.getShopkeeper();
-		String ownerString = (shopkeeper instanceof PlayerShopkeeper) ? ((PlayerShopkeeper) shopkeeper).getOwnerAsString() : "[Admin]";
+		String ownerString = (shopkeeper instanceof PlayerShopkeeper) ? ((PlayerShopkeeper) shopkeeper).getOwnerString() : "[Admin]";
 
 		TradingRecipe tradingRecipe = event.getTradingRecipe();
 		ItemStack resultItem = tradingRecipe.getResultItem();
@@ -68,7 +68,7 @@ public class TradeFileLogger implements Listener {
 		boolean isNew = !file.exists();
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
 			if (isNew) writer.append("TIME,PLAYER,SHOP ID,SHOP TYPE,SHOP POS,OWNER,ITEM TYPE,DATA,QUANTITY,CURRENCY 1,CURRENCY 1 AMOUNT,CURRENCY 2,CURRENCY 2 AMOUNT\n");
-			writer.append("\"" + TIME_FORMAT.format(now) + "\",\"" + TextUtils.getPlayerAsString(player) + "\",\"" + shopkeeper.getUniqueId()
+			writer.append("\"" + TIME_FORMAT.format(now) + "\",\"" + TextUtils.getPlayerString(player) + "\",\"" + shopkeeper.getUniqueId()
 					+ "\",\"" + shopkeeper.getType().getIdentifier() + "\",\"" + shopkeeper.getPositionString() + "\",\"" + ownerString
 					+ "\",\"" + resultItem.getType().name() + "\",\"" + ItemUtils.getDurability(resultItem) + "\",\"" + resultItem.getAmount()
 					+ "\",\"" + (usedItem1 != null ? usedItem1.getType().name() + ":" + ItemUtils.getDurability(usedItem1) : "")
