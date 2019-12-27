@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -34,15 +35,19 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	@Override
 	protected void onSelect(Player player) {
 		TextUtils.sendMessage(player, Settings.msgSelectedShopType,
-				"{type}", this.getDisplayName(),
-				"{description}", this.getDescription());
+				"type", this.getDisplayName(),
+				"description", this.getDescription()
+		);
 	}
 
-	protected String getCreatedMessage() {
-		return TextUtils.replaceArgs(Settings.msgShopkeeperCreated,
-				"{type}", this.getDisplayName(),
-				"{description}", this.getDescription(),
-				"{setupDesc}", this.getSetupDescription());
+	protected Text getCreatedMessage() {
+		Text text = Settings.msgShopkeeperCreated;
+		TextUtils.setPlaceholderArguments(text,
+				"type", this.getDisplayName(),
+				"description", this.getDescription(),
+				"setupDesc", this.getSetupDescription()
+		);
+		return text;
 	}
 
 	/**
@@ -90,7 +95,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 			return null;
 		}
 		if (!shopType.isEnabled()) {
-			TextUtils.sendMessage(creator, Settings.msgShopTypeDisabled, "{type}", shopType.getIdentifier());
+			TextUtils.sendMessage(creator, Settings.msgShopTypeDisabled, "type", shopType.getIdentifier());
 			return null;
 		}
 
@@ -100,7 +105,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 			return null;
 		}
 		if (!shopObjectType.isEnabled()) {
-			TextUtils.sendMessage(creator, Settings.msgShopObjectTypeDisabled, "{type}", shopObjectType.getIdentifier());
+			TextUtils.sendMessage(creator, Settings.msgShopObjectTypeDisabled, "type", shopObjectType.getIdentifier());
 			return null;
 		}
 
