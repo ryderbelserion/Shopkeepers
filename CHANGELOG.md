@@ -14,6 +14,7 @@ Date format: (YYYY-MM-DD)
 * Added: The give, transfer list and remove commands show the player's uuid as hover text now and allow it to be copied into the chat input via shift clicking.
 * Added: Debug option 'owner-name-updates' enables additional output whenever stored shop owner names get updated.
 * Added: Checking for invalid name-regex and then reverting back to default.
+* Fixed: The save file was missing the data-version when initially created. This caused subsequent reloads to always trigger a 'migration' / forced without actually being required.
 * Fixed: The book shopkeeper was ignoring books with missing generation tag. These are now treated as 'original' books, just like Minecraft does.
 * Fixed: We would previously drop the shop-creation item returned on shop deletion at the shop's location, even if the shop got deleted via remote editing from far away (and is potentially not even loaded). If the player is further than 10 blocks away (or if the shop object is not loaded), it will drop the item at the player's location now.
 * Fixed: The book shopkeeper would not correctly store offers for books that have dots in their name.
@@ -128,6 +129,7 @@ Various (mostly internal) changes to commands and argument parsing:
 * Internal: The commands library was updated to use the new text representation everywhere now, and thereby support text features such as hover events, click events, etc.
 
 Other internal changes:  
+* Internal: The save task was using a copy of the save data to protect against concurrent modifications while an async save is in progress. However, since the actual save data did not get modified during ongoing saves anyways, this copy is redundant and was therefore removed.
 * Internal: Made various changes in order to support Minecraft's text features such as hover events, click events, insertions, etc. Most texts are now stored in a new format internally.
 * Internal: Various changes to TextUtils and argument replacement.
   * Arguments can be arbitrary objects now and Suppliers can be used to dynamically lookup argument values.

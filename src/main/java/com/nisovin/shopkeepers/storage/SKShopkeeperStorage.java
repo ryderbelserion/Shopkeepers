@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
@@ -50,11 +49,17 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// this can be used to determine required migrations (that affect all shopkeepers or the save format as a whole)
 	// or force a save of all shopkeepers data:
 	private static final int DATA_VERSION = 1;
+	// the data version that indicates a missing (first) data version:
+	private static final int MISSING_DATA_VERSION = 0;
 	private static final String DATA_VERSION_KEY = "data-version";
 
 	private final SKShopkeepersPlugin plugin;
 
-	// data:
+	/*
+	 * Holds the data that gets used by the current/next (possibly async) save task.
+	 * This also contains any data of shopkeepers that could not be loaded correctly.
+	 * This cannot be modified while an async save is in progress.
+	 */
 	private final FileConfiguration saveData = new YamlConfiguration();
 	private int maxStoredShopkeeperId = 0;
 	private int nextShopkeeperId = 1;
@@ -76,9 +81,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private final SaveResult saveResult = new SaveResult();
 	// previously dirty shopkeepers which we currently attempt to save:
 	private final List<AbstractShopkeeper> savingShopkeepers = new ArrayList<>();
-	// buffer that holds the data that gets used by the current async save task:
-	// needs to be kept in sync with the save data, but cannot be modified while the async save is in progress
-	private final FileConfiguration saveDataBuffer = new YamlConfiguration();
 	// the task which performs async file io during a save:
 	private int saveIOTask = -1;
 	// the saving callback of the current save: may need to be run manually during plugin disable or save abortion
@@ -221,9 +223,15 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	private void clearSaveData() {
 		ConfigUtils.clearConfigSection(saveData);
-		ConfigUtils.clearConfigSection(saveDataBuffer);
 		maxStoredShopkeeperId = 0;
 		nextShopkeeperId = 1;
+
+		// Setup data version as first / top entry:
+		// Explicitly setting the 'missing data version' value here ensures that the data version will be the first
+		// entry in the save file, even if it is missing in the actual file currently (without having to move all loaded
+		// shopkeeper entries around later).
+		// It gets replaced with the actual data version during loading.
+		saveData.set(DATA_VERSION_KEY, MISSING_DATA_VERSION);
 	}
 
 	public void clearShopkeeperData(AbstractShopkeeper shopkeeper) {
@@ -234,7 +242,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		} else {
 			String key = String.valueOf(shopkeeper.getId());
 			saveData.set(key, null);
-			saveDataBuffer.set(key, null);
 			deletedShopkeepersCount++;
 		}
 	}
@@ -281,6 +288,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				saveFile = tempSaveFile;
 			} else {
 				// save file does not exist yet -> no shopkeeper data available
+				// silently setup data version and abort:
+				saveData.set(DATA_VERSION_KEY, DATA_VERSION);
 				return true;
 			}
 		}
@@ -302,10 +311,16 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		Set<String> keys = saveData.getKeys(false);
-		int shopkeepersCount = (keys.contains(DATA_VERSION_KEY) ? keys.size() - 1 : keys.size());
-		Log.info("Loading data of " + shopkeepersCount + " shopkeepers..");
+		assert keys.contains(DATA_VERSION_KEY); // contains at least the (missing) data-version entry
+		int shopkeepersCount = (keys.size() - 1);
+		if (shopkeepersCount == 0) {
+			// no shopkeeper data exists yet: silently setup/update data version and abort
+			saveData.set(DATA_VERSION_KEY, DATA_VERSION);
+			return true;
+		}
 
-		int dataVersion = saveData.getInt(DATA_VERSION_KEY);
+		Log.info("Loading data of " + shopkeepersCount + " shopkeepers..");
+		int dataVersion = saveData.getInt(DATA_VERSION_KEY, MISSING_DATA_VERSION);
 		boolean dataVersionChanged = (dataVersion != DATA_VERSION);
 		if (dataVersionChanged) {
 			Log.info("The data version has changed from '" + dataVersion + "' to '" + DATA_VERSION
@@ -365,17 +380,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				shopkeeper.markDirty();
 			}
 		}
-
-		// create a copy of the save data's top level data structure:
-		ConfigUtils.clearConfigSection(saveDataBuffer);
-		// set data version first (at the top):
-		saveDataBuffer.set(DATA_VERSION_KEY, DATA_VERSION);
-		for (Entry<String, Object> entry : saveData.getValues(false).entrySet()) {
-			String key = entry.getKey();
-			if (key.equals(DATA_VERSION_KEY)) continue;
-			saveDataBuffer.set(key, entry.getValue());
-		}
-
 		return true;
 	}
 
@@ -473,7 +477,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		synchronized (SAVING_IO_LOCK) {
 			// If the task has already been started (there is a worker thread for it already) but not taken the lock
 			// yet, we cannot cancel it and need to give up the lock again in order for it to be able to finish.
-			// We may be able request a quicker abort in this case. And if saving has already finished and only the
+			// We may be able to request a quicker abort in this case. And if saving has already finished and only the
 			// syncSavingCallback is still remaining to get run, this flag signalizes that we don't want any new saving
 			// requests (needs to be synchronized here to get correctly propagated):
 			abortSave = true;
@@ -545,7 +549,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 			String sectionKey = String.valueOf(shopkeeper.getId());
 			Object previousData = saveData.get(sectionKey);
-			ConfigurationSection newSection = saveData.createSection(sectionKey);
+			ConfigurationSection newSection = saveData.createSection(sectionKey); // replaces the previous section
 			try {
 				shopkeeper.save(newSection);
 			} catch (Exception e) {
@@ -558,8 +562,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				// saving might fail again anyways
 				continue;
 			}
-			// update save data buffer:
-			saveDataBuffer.set(sectionKey, newSection);
 
 			savingShopkeepers.add(shopkeeper);
 			shopkeeper.onSave();
@@ -665,7 +667,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		if (!async) {
 			// sync file io:
-			this.saveDataToFile(saveDataBuffer, savingCallback);
+			this.saveDataToFile(saveData, savingCallback);
 		} else {
 			// async file io:
 			final long asyncTaskSubmittedTime = System.currentTimeMillis();
@@ -683,7 +685,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 						// if aborted, the syncSavingCallback needs to be run manually
 					} else {
 						// actual saving IO:
-						this.saveDataToFile(saveDataBuffer, savingCallback);
+						this.saveDataToFile(saveData, savingCallback);
 						assert saveResult.state == SaveResult.State.SUCCESS || saveResult.state == SaveResult.State.FAILURE;
 					}
 					// async saving is over:
