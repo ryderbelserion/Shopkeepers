@@ -12,12 +12,12 @@ Migration notes:
 
 * Added: The give, transfer list and remove commands show the player's uuid as hover text now and allow it to be copied into the chat input via shift clicking.
 
-* Fixed: The book shopkeeper was ignoring books with missing generation tag. These are now treated as 'original' books, just like minecraft does.
+* Fixed: The book shopkeeper was ignoring books with missing generation tag. These are now treated as 'original' books, just like Minecraft does.
 * Fixed: We would previously drop the shop-creation item returned on shop deletion at the shop's location, even if the shop got deleted via remote editing from far away (and is potentially not even loaded). If the player is further than 10 blocks away (or if the shop object is not loaded), it will drop the item at the player's location now.
 * Fixed: The book shopkeeper would not correctly store offers for books that have dots in their name.
 * Fixed: Some settings would not loaded correctly depending on the used locale. Also made all text comparisons locale independent.
 * Fixed: The shop creation item can no longer be used from dispensers if regular use is disabled.
-* Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored now by the commands.
+* Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored by the commands now.
 * Fixed: Derived settings were not updated when loading messages from a separate language file.
 * Fixed: Improved thread-safety for asynchronous logging operations and settings access.
 * Fixed/API: NPE when accessing a non-existing second offered item from the ShopkeeperTradeEvent.
@@ -84,13 +84,13 @@ API changes:
   * Player arguments suggest matching uuids now. To avoid spamming the suggestions with uuids for the first few characters of input, suggestions are only provided after at least 3 characters of matching input.
   * Some commands (eg. "list") provide suggestions for names of online players now.
   * The list and remove commands accept player uuids now and ignore the case when comparing player names.
-  * The list and remove commands handle ambiguous player names now: If there are shops of different players matching the given player name, an error message is shown and the player needs to be specified by uuid instead. If a player with matching name is online, that player is used for the command (regardless of if the given player name is ambiguous).
+  * The list and remove commands handle ambiguous player names now: If there are shops of different players matching the given player name, an error message is shown and the player needs to be specified by uuid instead. The player names and uuids can be copied to the chat input via shift clicking. If a player with matching name is online, that player is used for the command (regardless of if the given player name is ambiguous).
   * The shops affected by the remove command are now determined before asking for the users confirmation. This allows detecting ambiguous player names and missing player information before prompting the command executor for confirmation. A minor side effect of this is that any shops created after the command invocation are no longer affected by the remove command once it gets confirmed.
   * Internal: Refactored name, uuid and id based parsing (and matching) of players and shopkeepers to allow for more code reuse. Added ObjectByIdArgument which contains most of the shared logic now.
   * Internal: Added ShopkeeperIdArgument.
   * Internal: Added TransformedArgument which allows transforming of parsed arguments.
   * Internal: Minor refactoring to the targeting of shopkeepers.
-  * Internal changes to how targeting of shopkeepers is handled in case no shopkeeper can be parsed from the command input. This should result in more appropriate error messages when specifying an invalid shopkeeper.
+  * Internal: Changes to how targeting of shopkeepers is handled in case no shopkeeper can be parsed from the command input. This should result in more appropriate error messages when specifying an invalid shopkeeper.
   * Internal: FirstOf-arguments reset the parsed arguments before every child argument's completion attempt, so that every child argument has a chance to provide completions.
   * Internal: FirstOf-arguments now forward the exceptions of its child arguments (instead of using their own).
   * Internal: Added the ability to define 'hidden' command arguments. These can for example be used to inject information into the command's execution context without requiring textual input from the user.
@@ -134,7 +134,7 @@ Other internal changes:
 * Internal: The regex pattern used to validate shopkeeper names gets precompiled now.
 * Internal: bstats gets shaded into the package '[..].libs.bstats' now.
 * Internal: Added Settings#isDebugging and Settings#isDebugging(option) to conveniently (and thread-safe) check for debugging options.
-* Internal: Default shop, object and ui types are getting registered early during onLoad now.
+* Internal: Default shop, object and UI types are getting registered early during onLoad now.
 * Internal: Separated config and language file loading.
 * Internal: Slightly changed the text format that gets used at a few places to represent a player's name and uuid.
 * Internal: Renamed CollectionUtils to MapUtils.
