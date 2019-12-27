@@ -26,6 +26,7 @@ Date format: (YYYY-MM-DD)
 * Fixed/API: NPE when accessing a non-existing second offered item from the ShopkeeperTradeEvent.
 * Fixed/API: The offered items inside the ShopkeeperTradeEvent are copies now and their stack sizes match those of the trading recipe.
 * Fixed: The internal default for message 'msg-list-shops-entry' (that gets used if the message is missing in the config) was not matching the message in the default config.
+* Fixed: Spigot seems to (internally) support books with empty titles now. The book shopkeepers were updated to ignore them, since supporting them would require fundamental changes to how book prices are stored and how books are identified. Those books can't be created in vanilla Minecraft, so this shouldn't be a severe limitation.
 * Changed: The debugCreateShops command prints the number of actually created shops now.
 * Changed: The always-show-nameplates setting seems to be working again (since MC 1.9 already). Updated the corresponding comment in the default config.
 * Changed: Instead of using a fallback name ("unknown"), player shops are required to always provide a valid owner name now.

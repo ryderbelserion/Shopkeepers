@@ -36,7 +36,7 @@ import com.nisovin.shopkeepers.util.Validate;
 public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements BookPlayerShopkeeper {
 
 	private static final Filter<ItemStack> ITEM_FILTER = (ItemStack item) -> {
-		return isCopyableBook(item);
+		return isCopyableBook(item) && (getBookTitle(item) != null);
 	};
 
 	// contains only one offer for a specific book (book title):
@@ -137,7 +137,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		for (ItemCount itemCount : itemCounts) {
 			if (itemCount == null) continue;
 			ItemStack item = itemCount.getItem(); // note: no additional copy
-			if (Objects.equals(getTitleOfBook(item), title)) {
+			if (Objects.equals(getBookTitle(item), title)) {
 				return item;
 			}
 		}
@@ -175,11 +175,15 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		return (generation == Generation.COPY_OF_ORIGINAL || generation == Generation.COPY_OF_COPY);
 	}
 
-	protected static String getTitleOfBook(ItemStack item) {
+	protected static String getBookTitle(ItemStack item) {
 		BookMeta meta = getBookMeta(item);
 		if (meta == null) return null;
 		if (!meta.hasTitle()) return null;
-		return meta.getTitle(); // assert: not null or empty
+		String title = meta.getTitle(); // not null, but can be empty!
+		// we ignore books with empty titles for now:
+		// TODO support them? they can't be created in vanilla
+		if (title.isEmpty()) return null;
+		return title;
 	}
 
 	protected boolean hasChestBlankBooks() {
@@ -237,7 +241,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	@Override
 	public BookOffer getOffer(ItemStack bookItem) {
-		String bookTitle = getTitleOfBook(bookItem);
+		String bookTitle = getBookTitle(bookItem);
 		return this.getOffer(bookTitle);
 	}
 

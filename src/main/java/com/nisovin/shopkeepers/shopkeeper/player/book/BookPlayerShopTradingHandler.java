@@ -34,7 +34,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		String bookTitle = SKBookPlayerShopkeeper.getTitleOfBook(bookItem);
+		String bookTitle = SKBookPlayerShopkeeper.getBookTitle(bookItem);
 		if (bookTitle == null) {
 			// this should not happen.. because the recipes were created based on the shopkeeper's offers
 			this.debugPreventedTrade(tradingPlayer, "Couldn't determine the book title of the traded item!");

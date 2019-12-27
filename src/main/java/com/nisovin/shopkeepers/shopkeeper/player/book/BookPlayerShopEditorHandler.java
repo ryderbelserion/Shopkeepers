@@ -51,7 +51,8 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			ItemCount itemCount = chestItems.get(chestItemIndex);
 			ItemStack itemFromChest = itemCount.getItem(); // this item is already a copy with amount 1
 
-			String bookTitle = SKBookPlayerShopkeeper.getTitleOfBook(itemFromChest);
+			String bookTitle = SKBookPlayerShopkeeper.getBookTitle(itemFromChest);
+			assert bookTitle != null; // we filtered those book items earlier
 			if (bookTitles.contains(bookTitle)) {
 				continue; // already added a recipe for a book with this name
 			}
@@ -77,7 +78,7 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		ItemStack bookItem = recipe.getResultItem();
 		if (!SKBookPlayerShopkeeper.isCopyableOrDummyBook(bookItem)) return;
 
-		String bookTitle = SKBookPlayerShopkeeper.getTitleOfBook(bookItem);
+		String bookTitle = SKBookPlayerShopkeeper.getBookTitle(bookItem);
 		if (bookTitle == null) return;
 
 		int price = this.getPrice(recipe);
