@@ -173,7 +173,7 @@ public class ConversionUtils {
 		if (object instanceof String) {
 			return (String) object;
 		} else {
-			return object != null ? object.toString() : null;
+			return (object != null) ? object.toString() : null;
 		}
 	}
 

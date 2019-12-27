@@ -10,7 +10,7 @@ Date format: (YYYY-MM-DD)
 Migration notes:  
 * Removed the importing of old book offers (from late MC 1.12.2, see v1.83). When updating from an older version of Shopkeepers, you will have to first update to a version in-between.
 
-* Added: The give and transfer command show the player's uuid as hover text now and allow it to be copied into the chat input via shift clicking.
+* Added: The give, transfer list and remove commands show the player's uuid as hover text now and allow it to be copied into the chat input via shift clicking.
 
 * Fixed: The book shopkeeper was ignoring books with missing generation tag. These are now treated as 'original' books, just like minecraft does.
 * Fixed: We would previously drop the shop-creation item returned on shop deletion at the shop's location, even if the shop got deleted via remote editing from far away (and is potentially not even loaded). If the player is further than 10 blocks away (or if the shop object is not loaded), it will drop the item at the player's location now.
@@ -31,7 +31,6 @@ Migration notes:
 * Changed: Changed/Added a few information/warning messages related to config and language file loading.
 * Changed: Added more information to the message that gets logged when a shopkeeper gets removed for owner inactivity.
 * Changed: Added validation that the unique id of loaded or freshly created shopkeepers is not yet used.
-* Changed: When replacing arguments in messages, we now abort the matching for an argument after the first match has been found. This assumes that for every message each argument is used at most once.
 * Changed: The msg-shop-creation-items-given message was using the player's display name. This was changed to use the player's regular name to be consistent with the rest of the plugin.
 * Changed: The errors about a potentially incompatible server version and trying to run in compatibility mode are warnings now.
 * Various changes to the shopkeeper registry and shopkeeper activation:
@@ -84,7 +83,12 @@ API changes:
   * All argument suggestions are limited to 20 entries by default now.
   * Player arguments suggest matching uuids now. To avoid spamming the suggestions with uuids for the first few characters of input, suggestions are only provided after at least 3 characters of matching input.
   * Some commands (eg. "list") provide suggestions for names of online players now.
-  * Internal: Refactored uuid and name based parsing of players and shopkeepers to allow for more code reuse.
+  * The list and remove commands accept player uuids now and ignore the case when comparing player names.
+  * The list and remove commands handle ambiguous player names now: If there are shops of different players matching the given player name, an error message is shown and the player needs to be specified by uuid instead. If a player with matching name is online, that player is used for the command (regardless of if the given player name is ambiguous).
+  * The shops affected by the remove command are now determined before asking for the users confirmation. This allows detecting ambiguous player names and missing player information before prompting the command executor for confirmation. A minor side effect of this is that any shops created after the command invocation are no longer affected by the remove command once it gets confirmed.
+  * Internal: Refactored name, uuid and id based parsing (and matching) of players and shopkeepers to allow for more code reuse. Added ObjectByIdArgument which contains most of the shared logic now.
+  * Internal: Added ShopkeeperIdArgument.
+  * Internal: Added TransformedArgument which allows transforming of parsed arguments.
   * Internal: Minor refactoring to the targeting of shopkeepers.
   * Internal changes to how targeting of shopkeepers is handled in case no shopkeeper can be parsed from the command input. This should result in more appropriate error messages when specifying an invalid shopkeeper.
   * Internal: FirstOf-arguments reset the parsed arguments before every child argument's completion attempt, so that every child argument has a chance to provide completions.
@@ -119,8 +123,14 @@ API changes:
   * Internal: Added TypedFirstOfArgument, a variant of FirstOfArgument that preserves the result type of its child arguments.
   * Internal: Added NameArgument, which can be useful if there would otherwise be conflicts / ambiguities between arguments.
   * Internal: ArgumentParseException provides the command argument that created it now. This is especially useful for debugging purposes.
+  * Internal: The commands library was updated to use the new text representation everywhere now, and thereby support text features such as hover events, click events, etc.
 
 Other internal changes:  
+* Internal: Made various changes in order to support Minecraft's text features such as hover events, click events, insertions, etc. Most texts are now stored in a new format internally.
+* Internal: Various changes to TextUtils and argument replacement.
+  * Arguments can be arbitrary objects now and Suppliers can be used to dynamically lookup argument values.
+  * Argument replacement uses a Map-based argument lookup now. Placeholder keys are specified without the surrounding braces now. Argument replacement for both plain Strings as well as the new text format should be faster now.
+* Internal: Moved newline pattern and splitting into StringUtils.
 * Internal: The regex pattern used to validate shopkeeper names gets precompiled now.
 * Internal: bstats gets shaded into the package '[..].libs.bstats' now.
 * Internal: Added Settings#isDebugging and Settings#isDebugging(option) to conveniently (and thread-safe) check for debugging options.
@@ -143,12 +153,20 @@ Changed messages (you will have to manually update those!):
   * msg-shop-setup-desc-trading
   * msg-shop-setup-desc-book
   * msg-shop-setup-desc-admin-regular
+* Added {shopsCount} argument to shop removal confirmation messages:
+  * msg-confirm-remove-admin-shops
+  * msg-confirm-remove-own-shops
+  * msg-confirm-remove-player-shops
+  * msg-confirm-remove-all-player-shops
 
 Removed messages:  
 * The default german translation contained a few no longer used messages: msg-button-type and msg-button-type-lore
 
 New messages:  
 * msg-command-argument-requires-player
+* msg-ambiguous-player-name
+* msg-ambiguous-player-name-entry
+* msg-ambiguous-player-name-more
 
 ## v2.8.1 (2019-08-23)
 ### Supported MC versions: 1.14.4

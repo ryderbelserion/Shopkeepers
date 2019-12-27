@@ -1,18 +1,12 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
-import java.util.Locale;
-
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 
 /**
- * Base class for arguments that accept a name when there is a limited set of known applicable names (eg. names
- * identifying a known set of objects).
+ * Base class for arguments that accept a name as identifier for some type of objects.
  * <p>
- * By default this argument actually accepts any String. But unlike {@link StringArgument} this class uses
- * {@link #getKnownIds()} to provide completions for partial inputs.
- * <p>
- * If the option <code>matchKnownNames</code> is used and a known name matches the given input (according to the used
- * matching function), that name will be returned instead of the input.
+ * By default this argument accepts any String. But unlike {@link StringArgument} this class uses
+ * {@link #getCompletionSuggestions(String)} to provide completions for partial inputs.
  */
 public abstract class ObjectNameArgument extends ObjectIdArgument<String> {
 
@@ -23,24 +17,15 @@ public abstract class ObjectNameArgument extends ObjectIdArgument<String> {
 	}
 
 	public ObjectNameArgument(String name, ArgumentFilter<String> filter) {
-		this(name, filter, true);
+		this(name, false, filter, DEFAULT_MINIMAL_COMPLETION_INPUT);
 	}
 
-	public ObjectNameArgument(String name, ArgumentFilter<String> filter, boolean matchKnownNames) {
-		this(name, false, filter, matchKnownNames, DEFAULT_MINIMAL_COMPLETION_INPUT);
-	}
-
-	public ObjectNameArgument(String name, boolean joinRemainingArgs, ArgumentFilter<String> filter, boolean matchKnownNames, int minimalCompletionInput) {
-		super(name, new StringArgument(name + ":string", joinRemainingArgs), filter, matchKnownNames, minimalCompletionInput);
+	public ObjectNameArgument(String name, boolean joinRemainingArgs, ArgumentFilter<String> filter, int minimalCompletionInput) {
+		super(name, new StringArgument(name + ":string", joinRemainingArgs), filter, minimalCompletionInput);
 	}
 
 	@Override
 	protected String toString(String id) {
 		return id; // already a String
-	}
-
-	@Override
-	protected String normalize(String idString) {
-		return idString.toLowerCase(Locale.ROOT);
 	}
 }

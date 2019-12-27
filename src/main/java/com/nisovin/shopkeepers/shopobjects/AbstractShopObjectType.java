@@ -27,8 +27,7 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 
 	@Override
 	protected void onSelect(Player player) {
-		TextUtils.sendMessage(player, Settings.msgSelectedShopObjectType,
-				"{type}", this.getDisplayName());
+		TextUtils.sendMessage(player, Settings.msgSelectedShopObjectType, "type", this.getDisplayName());
 	}
 
 	/**

@@ -1,12 +1,16 @@
 package com.nisovin.shopkeepers.commands.lib;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -207,31 +211,45 @@ public abstract class CommandArgument<T> {
 
 	// COMMON ERRORS
 
+	private final Map<String, Object> defaultErrorMsgArgs = Collections.unmodifiableMap(this.setupDefaultErrorMsgArgs());
+
+	private Map<String, Object> setupDefaultErrorMsgArgs() {
+		// dynamically resolve arguments:
+		Map<String, Object> args = new HashMap<>();
+		Supplier<?> argumentNameSupplier = () -> {
+			CommandArgument<?> rootArgument = this.getRootArgument();
+			return rootArgument.getDisplayName();
+		};
+		Supplier<?> argumentFormatSupplier = () -> {
+			CommandArgument<?> rootArgument = this.getRootArgument();
+			String format = rootArgument.getFormat();
+			if (!format.isEmpty()) {
+				// use the name in case the format is empty (eg. for hidden arguments):
+				return argumentNameSupplier.get();
+			} else {
+				return format;
+			}
+		};
+		args.put("argumentName", argumentNameSupplier);
+		args.put("argumentFormat", argumentFormatSupplier);
+		return args;
+	}
+
 	/**
 	 * Gets the common default error message arguments.
 	 * <p>
 	 * This includes:
 	 * <ul>
-	 * <li><code>{argumentName}</code> (uses the argument's display name)
-	 * <li><code>{argumentFormat}</code>
+	 * <li><code>argumentName</code> (uses the argument's display name)
+	 * <li><code>argumentFormat</code>
 	 * </ul>
 	 * This uses the {@link #getRootArgument() root argument} for determining the argument name and format. If the
 	 * format is empty (eg. for hidden arguments), the name is used instead.
 	 * 
 	 * @return the common default error message arguments
 	 */
-	public final String[] getDefaultErrorMsgArgs() {
-		CommandArgument<?> rootArgument = this.getRootArgument();
-		String name = rootArgument.getDisplayName();
-		String format = rootArgument.getFormat();
-		// use the name in case the format is empty (eg. for hidden arguments):
-		if (format.isEmpty()) {
-			format = name;
-		}
-		return new String[] {
-				"{argumentName}", name,
-				"{argumentFormat}", format
-		};
+	public final Map<String, Object> getDefaultErrorMsgArgs() {
+		return defaultErrorMsgArgs;
 	}
 
 	/**
@@ -241,9 +259,10 @@ public abstract class CommandArgument<T> {
 	 * 
 	 * @return the error message
 	 */
-	public String getRequiresPlayerErrorMsg() {
-		String[] defaultArgs = this.getDefaultErrorMsgArgs();
-		return TextUtils.replaceArgs(Settings.msgCommandArgumentRequiresPlayer, defaultArgs);
+	public Text getRequiresPlayerErrorMsg() {
+		Text text = Settings.msgCommandArgumentRequiresPlayer;
+		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
+		return text;
 	}
 
 	/**
@@ -263,9 +282,10 @@ public abstract class CommandArgument<T> {
 	 * 
 	 * @return the error message
 	 */
-	public String getMissingArgumentErrorMsg() {
-		String[] defaultArgs = this.getDefaultErrorMsgArgs();
-		return TextUtils.replaceArgs(Settings.msgCommandArgumentMissing, defaultArgs);
+	public Text getMissingArgumentErrorMsg() {
+		Text text = Settings.msgCommandArgumentInvalid;
+		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
+		return text;
 	}
 
 	/**
@@ -287,11 +307,12 @@ public abstract class CommandArgument<T> {
 	 *            the argument input
 	 * @return the error message
 	 */
-	public String getInvalidArgumentErrorMsg(String argumentInput) {
+	public Text getInvalidArgumentErrorMsg(String argumentInput) {
 		if (argumentInput == null) argumentInput = "";
-		String[] defaultArgs = this.getDefaultErrorMsgArgs();
-		return TextUtils.replaceArgs(Settings.msgCommandArgumentInvalid,
-				defaultArgs, "{argument}", argumentInput);
+		Text text = Settings.msgCommandArgumentInvalid;
+		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
+		text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
+		return text;
 	}
 
 	/**
@@ -357,7 +378,7 @@ public abstract class CommandArgument<T> {
 
 	/**
 	 * This provides completion suggestions for the last (possibly partial or empty) argument, IF parsing this argument
-	 * would use up the last argument of the {@link ArgumentsReader}. Otherwise this does nothing.
+	 * would use up the last argument of the {@link ArgumentsReader}.
 	 * <p>
 	 * Don't expect the returned suggestions list to be mutable. However, <code>null</code> is not a valid return value,
 	 * neither for the suggestions list nor its contents.

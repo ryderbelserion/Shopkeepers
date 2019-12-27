@@ -675,7 +675,6 @@ public final class ItemUtils {
 		return amount;
 	}
 
-	@SuppressWarnings("deprecation")
 	public static void updateInventoryLater(Player player) {
 		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> player.updateInventory());
 	}

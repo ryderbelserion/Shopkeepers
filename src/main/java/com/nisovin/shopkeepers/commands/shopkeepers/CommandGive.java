@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Arrays;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -17,10 +15,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
-import com.nisovin.shopkeepers.spigot.text.SpigotText;
-import com.nisovin.shopkeepers.spigot.text.Text;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.MapUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandGive extends Command {
@@ -68,9 +63,9 @@ class CommandGive extends Command {
 
 		// success:
 		// TODO show shop creation item via hover text?
-		SpigotText.sendMessage(sender, Settings.msgShopCreationItemsGiven, Arrays.asList(
-				MapUtils.entry("{player}", TextUtils.getPlayerText(targetPlayer)),
-				MapUtils.entry("{amount}", new Text(String.valueOf(amount)))
-		));
+		TextUtils.sendMessage(sender, Settings.msgShopCreationItemsGiven,
+				"player", TextUtils.getPlayerText(targetPlayer),
+				"amount", amount
+		);
 	}
 }

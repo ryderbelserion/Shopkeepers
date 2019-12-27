@@ -41,7 +41,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null) {
 				Log.debug("Blocked trade window opening from " + player.getName() + " because the owner is online");
-				TextUtils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
+				TextUtils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
 				return false;
 			}
 		}
@@ -64,7 +64,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		if (Settings.preventTradingWhileOwnerIsOnline && !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null && !shopkeeper.isOwner(tradingPlayer)) {
-				TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWhileOwnerOnline, "{owner}", ownerPlayer.getName());
+				TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
 				this.debugPreventedTrade(tradingPlayer, "Trading is not allowed while the shop owner is online.");
 				return false;
 			}

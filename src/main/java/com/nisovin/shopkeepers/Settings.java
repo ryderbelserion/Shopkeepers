@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -18,8 +19,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.config.ConfigLoadException;
 import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.ConfigUtils;
-import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -281,6 +282,7 @@ public class Settings {
 	 */
 	public static String language = "en";
 
+	// TODO replace all with Text? will require converting back to String, especially for texts used by items
 	public static String msgShopTypeAdminRegular = "Admin shop";
 	public static String msgShopTypeSelling = "Selling shop";
 	public static String msgShopTypeBuying = "Buying shop";
@@ -297,14 +299,14 @@ public class Settings {
 	public static String msgShopObjectTypeSign = "sign";
 	public static String msgShopObjectTypeNpc = "npc";
 
-	public static String msgSelectedShopType = "&aSelected shop type: &6{type} &7({description})";
-	public static String msgSelectedShopObjectType = "&aSelected object type: &6{type}";
+	public static Text msgSelectedShopType = Text.parse("&aSelected shop type: &6{type} &7({description})");
+	public static Text msgSelectedShopObjectType = Text.parse("&aSelected object type: &6{type}");
 
-	public static String msgCreationItemSelected = "&aShop creation:\n"
+	public static Text msgCreationItemSelected = Text.parse("&aShop creation:\n"
 			+ "&e  Left/Right-click to select the shop type.\n"
 			+ "&e  Sneak + left/right-click to select the object type.\n"
 			+ "&e  Right-click a chest to select it.\n"
-			+ "&e  Then right-click a block to place the shopkeeper.";
+			+ "&e  Then right-click a block to place the shopkeeper.");
 
 	public static String msgButtonPreviousPage = "&6<- Previous page ({prev_page} of {max_page})";
 	public static List<String> msgButtonPreviousPageLore = Arrays.asList();
@@ -378,59 +380,59 @@ public class Settings {
 	public static String msgTradingTitlePrefix = "&2";
 	public static String msgTradingTitleDefault = "Shopkeeper";
 
-	public static String msgSelectedChest = "&aChest selected! Right-click a block to place your shopkeeper.";
-	public static String msgMustSelectChest = "&7You must right-click a chest before placing your shopkeeper.";
-	public static String msgNoChestSelected = "&7The selected block is not a chest!";
-	public static String msgChestTooFar = "&7The shopkeeper's chest is too far away!";
-	public static String msgChestNotPlaced = "&7You must select a chest you have recently placed!";
-	public static String msgChestAlreadyInUse = "&7Another shopkeeper is already using the selected chest!";
-	public static String msgNoChestAccess = "&7You cannot access the selected chest!";
-	public static String msgTooManyShops = "&7You have too many shops!";
-	public static String msgNoAdminShopTypeSelected = "&7You have to select an admin shop type!";
-	public static String msgNoPlayerShopTypeSelected = "&7You have to select a player shop type!";
-	public static String msgShopCreateFail = "&7You cannot create a shopkeeper there.";
+	public static Text msgSelectedChest = Text.parse("&aChest selected! Right-click a block to place your shopkeeper.");
+	public static Text msgMustSelectChest = Text.parse("&7You must right-click a chest before placing your shopkeeper.");
+	public static Text msgNoChestSelected = Text.parse("&7The selected block is not a chest!");
+	public static Text msgChestTooFar = Text.parse("&7The shopkeeper's chest is too far away!");
+	public static Text msgChestNotPlaced = Text.parse("&7You must select a chest you have recently placed!");
+	public static Text msgChestAlreadyInUse = Text.parse("&7Another shopkeeper is already using the selected chest!");
+	public static Text msgNoChestAccess = Text.parse("&7You cannot access the selected chest!");
+	public static Text msgTooManyShops = Text.parse("&7You have too many shops!");
+	public static Text msgNoAdminShopTypeSelected = Text.parse("&7You have to select an admin shop type!");
+	public static Text msgNoPlayerShopTypeSelected = Text.parse("&7You have to select a player shop type!");
+	public static Text msgShopCreateFail = Text.parse("&7You cannot create a shopkeeper there.");
 
-	public static String msgTypeNewName = "&aPlease type the shop's name into the chat.\n"
-			+ "  &aType a dash (-) to remove the name.";
-	public static String msgNameSet = "&aThe shop's name has been set!";
-	public static String msgNameHasNotChanged = "&aThe shop's name has not changed.";
-	public static String msgNameInvalid = "&aThat name is not valid!";
+	public static Text msgTypeNewName = Text.parse("&aPlease type the shop's name into the chat.\n"
+			+ "  &aType a dash (-) to remove the name.");
+	public static Text msgNameSet = Text.parse("&aThe shop's name has been set!");
+	public static Text msgNameHasNotChanged = Text.parse("&aThe shop's name has not changed.");
+	public static Text msgNameInvalid = Text.parse("&aThat name is not valid!");
 
-	public static String msgShopTypeDisabled = "&7The shop type '&6{type}&7' is disabled.";
-	public static String msgShopObjectTypeDisabled = "&7The shop object type '&6{type}&7' is disabled.";
+	public static Text msgShopTypeDisabled = Text.parse("&7The shop type '&6{type}&7' is disabled.");
+	public static Text msgShopObjectTypeDisabled = Text.parse("&7The shop object type '&6{type}&7' is disabled.");
 
-	public static String msgMustTargetShop = "&7You have to target a shopkeeper.";
-	public static String msgMustTargetAdminShop = "&7You have to target an admin shopkeeper.";
-	public static String msgMustTargetPlayerShop = "&7You have to target a player shopkeeper.";
-	public static String msgTargetEntityIsNoShop = "&7The targeted entity is no shopkeeper.";
-	public static String msgTargetShopIsNoAdminShop = "&7The targeted shopkeeper is no admin shopkeeper.";
-	public static String msgTargetShopIsNoPlayerShop = "&7The targeted shopkeeper is no player shopkeeper.";
-	public static String msgUnusedChest = "&7No shopkeeper is using this chest.";
-	public static String msgNotOwner = "&7You are not the owner of this shopkeeper.";
+	public static Text msgMustTargetShop = Text.parse("&7You have to target a shopkeeper.");
+	public static Text msgMustTargetAdminShop = Text.parse("&7You have to target an admin shopkeeper.");
+	public static Text msgMustTargetPlayerShop = Text.parse("&7You have to target a player shopkeeper.");
+	public static Text msgTargetEntityIsNoShop = Text.parse("&7The targeted entity is no shopkeeper.");
+	public static Text msgTargetShopIsNoAdminShop = Text.parse("&7The targeted shopkeeper is no admin shopkeeper.");
+	public static Text msgTargetShopIsNoPlayerShop = Text.parse("&7The targeted shopkeeper is no player shopkeeper.");
+	public static Text msgUnusedChest = Text.parse("&7No shopkeeper is using this chest.");
+	public static Text msgNotOwner = Text.parse("&7You are not the owner of this shopkeeper.");
 	// placeholders: {owner} -> new owners name
-	public static String msgOwnerSet = "&aNew owner was set to &e{owner}";
-	public static String msgShopCreationItemsGiven = "&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!";
+	public static Text msgOwnerSet = Text.parse("&aNew owner was set to &e{owner}");
+	public static Text msgShopCreationItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!");
 	public static String msgUnknownBookAuthor = "Unknown";
 
-	public static String msgTradePermSet = "&aThe shop's trading permission has been set to '&e{perm}&a'!";
-	public static String msgTradePermRemoved = "&aThe shop's trading permission '&e{perm}&a' has been removed!";
-	public static String msgTradePermView = "&aThe shop's current trading permission is '&e{perm}&a'.";
+	public static Text msgTradePermSet = Text.parse("&aThe shop's trading permission has been set to '&e{perm}&a'!");
+	public static Text msgTradePermRemoved = Text.parse("&aThe shop's trading permission '&e{perm}&a' has been removed!");
+	public static Text msgTradePermView = Text.parse("&aThe shop's current trading permission is '&e{perm}&a'.");
 
-	public static String msgZombieVillagerCuringDisabled = "&7Curing of zombie villagers is disabled.";
-	public static String msgMustHoldHireItem = "&7You have to hold the required hire item in your hand.";
-	public static String msgSetForHire = "&aThe Shopkeeper was set for hire.";
-	public static String msgHired = "&aYou have hired this shopkeeper!";
-	public static String msgMissingHirePerm = "&7You do not have the permission to hire shopkeepers.";
-	public static String msgCantHire = "&aYou cannot afford to hire this shopkeeper.";
-	public static String msgCantHireShopType = "&7You do not have the permission to hire this type of shopkeeper.";
+	public static Text msgZombieVillagerCuringDisabled = Text.parse("&7Curing of zombie villagers is disabled.");
+	public static Text msgMustHoldHireItem = Text.parse("&7You have to hold the required hire item in your hand.");
+	public static Text msgSetForHire = Text.parse("&aThe Shopkeeper was set for hire.");
+	public static Text msgHired = Text.parse("&aYou have hired this shopkeeper!");
+	public static Text msgMissingHirePerm = Text.parse("&7You do not have the permission to hire shopkeepers.");
+	public static Text msgCantHire = Text.parse("&aYou cannot afford to hire this shopkeeper.");
+	public static Text msgCantHireShopType = Text.parse("&7You do not have the permission to hire this type of shopkeeper.");
 	// placeholders: {costs}, {hire-item}
-	public static String msgVillagerForHire = "&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a.";
+	public static Text msgVillagerForHire = Text.parse("&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a.");
 
-	public static String msgMissingTradePerm = "&7You do not have the permission to trade with this shop.";
-	public static String msgMissingCustomTradePerm = "&7You do not have the permission to trade with this shop.";
-	public static String msgCantTradeWhileOwnerOnline = "&7You cannot trade while the owner of this shop ('&e{owner}&7') is online.";
+	public static Text msgMissingTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
+	public static Text msgMissingCustomTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
+	public static Text msgCantTradeWhileOwnerOnline = Text.parse("&7You cannot trade while the owner of this shop ('&e{owner}&7') is online.");
 
-	public static String msgShopkeeperCreated = "&aShopkeeper created: &6{type} &7({description})\n{setupDesc}";
+	public static Text msgShopkeeperCreated = Text.parse("&aShopkeeper created: &6{type} &7({description})\n{setupDesc}");
 
 	public static String msgShopSetupDescSelling = "&e  Add items you want to sell to your chest, then\n"
 			+ "&e  right-click the shop while sneaking to modify costs.";
@@ -449,54 +451,58 @@ public class Settings {
 	public static List<String> msgTradeSetupDescTrading = Arrays.asList("Trades items.", "Pickup an item from your inventory", "and then click a slot to place it.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items");
 	public static List<String> msgTradeSetupDescBook = Arrays.asList("Sells book copies.", "Insert written and blank books", "into the chest.", "Left/Right click to adjust costs.", "Top row: Books being sold", "Bottom rows: Cost items");
 
-	public static String msgListAdminShopsHeader = "&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})";
-	public static String msgListPlayerShopsHeader = "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})";
-	public static String msgListShopsEntry = "  &e{shopId}) &7{shopName}&r&8at &7({location})&8, type: &7{shopType}&8, object: &7{objectType}";
+	public static Text msgListAdminShopsHeader = Text.parse("&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})");
+	public static Text msgListPlayerShopsHeader = Text.parse("&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})");
+	public static Text msgListShopsEntry = Text.parse("  &e{shopId}) &7{shopName}&r&8at &7({location})&8, type: &7{shopType}&8, object: &7{objectType}");
 
-	public static String msgRemovedAdminShops = "&e{shopsCount} &aadmin shops were removed.";
-	public static String msgRemovedPlayerShops = "&e{shopsCount} &ashops of player '&e{player}&a' were removed.";
-	public static String msgRemovedAllPlayerShops = "&aAll &e{shopsCount} &aplayer shops were removed.";
+	public static Text msgRemovedAdminShops = Text.parse("&e{shopsCount} &aadmin shops were removed.");
+	public static Text msgRemovedPlayerShops = Text.parse("&e{shopsCount} &ashops of player '&e{player}&a' were removed.");
+	public static Text msgRemovedAllPlayerShops = Text.parse("&aAll &e{shopsCount} &aplayer shops were removed.");
 
-	public static String msgConfirmRemoveAdminShops = "&cYou are about to irrevocable remove all admin shops!";
-	public static String msgConfirmRemoveOwnShops = "&cYou are about to irrevocable remove all your shops!";
-	public static String msgConfirmRemovePlayerShops = "&cYou are about to irrevocable remove all shops of player &6{player}&c!";
-	public static String msgConfirmRemoveAllPlayerShops = "&cYou are about to irrevocable remove all player shops of all players!";
+	public static Text msgConfirmRemoveAdminShops = Text.parse("&cYou are about to irrevocable remove all admin shops (&6{shopsCount}&c)!");
+	public static Text msgConfirmRemoveOwnShops = Text.parse("&cYou are about to irrevocable remove all your shops (&6{shopsCount}&c)!");
+	public static Text msgConfirmRemovePlayerShops = Text.parse("&cYou are about to irrevocable remove all shops of player &6{player}&c (&6{shopsCount}&c)!");
+	public static Text msgConfirmRemoveAllPlayerShops = Text.parse("&cYou are about to irrevocable remove all player shops of all players (&6{shopsCount}&c)!");
 
-	public static String msgConfirmationRequired = "&7Please confirm this action by typing &6/shopkeepers confirm";
-	public static String msgConfirmationExpired = "&cConfirmation expired.";
-	public static String msgNothingToConfirm = "&cThere is nothing to confirm currently.";
+	public static Text msgConfirmationRequired = Text.parse("&7Please confirm this action by typing &6/shopkeepers confirm");
+	public static Text msgConfirmationExpired = Text.parse("&cConfirmation expired.");
+	public static Text msgNothingToConfirm = Text.parse("&cThere is nothing to confirm currently.");
 
-	public static String msgNoPermission = "&cYou don't have the permission to do that.";
+	public static Text msgNoPermission = Text.parse("&cYou don't have the permission to do that.");
 
-	public static String msgCommandUnknown = "&cUnknown command '&e{command}&c'!";
-	public static String msgCommandArgumentUnexpected = "&cUnexpected argument '&e{argument}&c'.";
-	public static String msgCommandArgumentRequiresPlayer = "&cArgument '&e{argumentFormat}&c' requires a player to execute the command.";
-	public static String msgCommandArgumentMissing = "&cMissing argument '&e{argumentFormat}&c'.";
-	public static String msgCommandArgumentInvalid = "&cInvalid argument '&e{argument}&c'.";
-	public static String msgCommandPlayerArgumentMissing = "&cNo player specified for '&e{argumentFormat}&c'.";
-	public static String msgCommandPlayerArgumentInvalid = "&cNo player found for '&e{argument}&c'.";
-	public static String msgCommandShopTypeArgumentInvalid = "&cUnknown shop type '&e{argument}&c'.";
-	public static String msgCommandShopObjectTypeArgumentInvalid = "&cUnknown shop object type '&e{argument}&c'.";
-	public static String msgCommandShopkeeperArgumentInvalid = "&cNo shopkeeper found for '&e{argument}&c'.";
-	public static String msgCommandShopkeeperArgumentNoAdminShop = "&cShopkeeper '&e{argument}&c' is no admin shopkeeper.";
-	public static String msgCommandShopkeeperArgumentNoPlayerShop = "&cShopkeeper '&e{argument}&c' is no player shopkeeper.";
+	public static Text msgCommandUnknown = Text.parse("&cUnknown command '&e{command}&c'!");
+	public static Text msgCommandArgumentUnexpected = Text.parse("&cUnexpected argument '&e{argument}&c'.");
+	public static Text msgCommandArgumentRequiresPlayer = Text.parse("&cArgument '&e{argumentFormat}&c' requires a player to execute the command.");
+	public static Text msgCommandArgumentMissing = Text.parse("&cMissing argument '&e{argumentFormat}&c'.");
+	public static Text msgCommandArgumentInvalid = Text.parse("&cInvalid argument '&e{argument}&c'.");
+	public static Text msgCommandPlayerArgumentMissing = Text.parse("&cNo player specified for '&e{argumentFormat}&c'.");
+	public static Text msgCommandPlayerArgumentInvalid = Text.parse("&cNo player found for '&e{argument}&c'.");
+	public static Text msgCommandShopTypeArgumentInvalid = Text.parse("&cUnknown shop type '&e{argument}&c'.");
+	public static Text msgCommandShopObjectTypeArgumentInvalid = Text.parse("&cUnknown shop object type '&e{argument}&c'.");
+	public static Text msgCommandShopkeeperArgumentInvalid = Text.parse("&cNo shopkeeper found for '&e{argument}&c'.");
+	public static Text msgCommandShopkeeperArgumentNoAdminShop = Text.parse("&cShopkeeper '&e{argument}&c' is no admin shopkeeper.");
+	public static Text msgCommandShopkeeperArgumentNoPlayerShop = Text.parse("&cShopkeeper '&e{argument}&c' is no player shopkeeper.");
 
-	public static String msgCommandHelpTitle = "&9***** &8[&6Shopkeepers v{version}&8] &9*****";
-	public static String msgCommandHelpUsageFormat = "&e{usage}";
-	public static String msgCommandHelpDescriptionFormat = "&8 - &3{description}";
+	public static Text msgAmbiguousPlayerName = Text.parse("&cThere are multiple matches for the name '&e{name}&c'!");
+	public static Text msgAmbiguousPlayerNameEntry = Text.parse("&c  - '&e{name}&r&c' (&6{uuid}&c)");
+	public static Text msgAmbiguousPlayerNameMore = Text.parse("&c  ....");
 
-	public static String msgCommandDescriptionShopkeeper = "Creates a shopkeeper.";
-	public static String msgCommandDescriptionHelp = "Shows this help page.";
-	public static String msgCommandDescriptionReload = "Reloads this plugin.";
-	public static String msgCommandDescriptionDebug = "Toggles debug mode on and off.";
-	public static String msgCommandDescriptionList = "Lists all shops for the specified player, or all admin shops.";
-	public static String msgCommandDescriptionRemove = "Removes all shops for the specified player, all players, or all admin shops.";
-	public static String msgCommandDescriptionGive = "Gives shop creation item(s) to the specified player.";
-	public static String msgCommandDescriptionRemote = "Remotely opens a shop.";
-	public static String msgCommandDescriptionRemoteEdit = "Remotely edits a shop.";
-	public static String msgCommandDescriptionTransfer = "Transfers the ownership of a shop.";
-	public static String msgCommandDescriptionSettradeperm = "Sets, removes (-) or displays (?) the trading permission.";
-	public static String msgCommandDescriptionSetforhire = "Sets one of your shops for sale.";
+	public static Text msgCommandHelpTitle = Text.parse("&9***** &8[&6Shopkeepers v{version}&8] &9*****");
+	public static Text msgCommandHelpUsageFormat = Text.parse("&e{usage}");
+	public static Text msgCommandHelpDescriptionFormat = Text.parse("&8 - &3{description}");
+
+	public static Text msgCommandDescriptionShopkeeper = Text.parse("Creates a shopkeeper.");
+	public static Text msgCommandDescriptionHelp = Text.parse("Shows this help page.");
+	public static Text msgCommandDescriptionReload = Text.parse("Reloads this plugin.");
+	public static Text msgCommandDescriptionDebug = Text.parse("Toggles debug mode on and off.");
+	public static Text msgCommandDescriptionList = Text.parse("Lists all shops for the specified player, or all admin shops.");
+	public static Text msgCommandDescriptionRemove = Text.parse("Removes all shops for the specified player, all players, or all admin shops.");
+	public static Text msgCommandDescriptionGive = Text.parse("Gives shop creation item(s) to the specified player.");
+	public static Text msgCommandDescriptionRemote = Text.parse("Remotely opens a shop.");
+	public static Text msgCommandDescriptionRemoteEdit = Text.parse("Remotely edits a shop.");
+	public static Text msgCommandDescriptionTransfer = Text.parse("Transfers the ownership of a shop.");
+	public static Text msgCommandDescriptionSettradeperm = Text.parse("Sets, removes (-) or displays (?) the trading permission.");
+	public static Text msgCommandDescriptionSetforhire = Text.parse("Sets one of your shops for sale.");
 
 	// /////
 
@@ -615,13 +621,17 @@ public class Settings {
 	}
 
 	private static Object loadConfigValue(Configuration config, String configKey, List<String> noColorConversionKeys, Class<?> typeClass, Class<?> genericType) {
-		if (typeClass == String.class) {
+		if (typeClass == String.class || typeClass == Text.class) {
 			String string = config.getString(configKey);
 			// colorize, if not exempted:
 			if (!noColorConversionKeys.contains(configKey)) {
 				string = TextUtils.colorize(string);
 			}
-			return string;
+			if (typeClass == Text.class) {
+				return Text.parse(string);
+			} else {
+				return string;
+			}
 		} else if (typeClass == int.class) {
 			return config.getInt(configKey);
 		} else if (typeClass == short.class) {
@@ -649,13 +659,17 @@ public class Settings {
 			}
 			return itemData;
 		} else if (typeClass == List.class) {
-			if (genericType == String.class) {
+			if (genericType == String.class || genericType == Text.class) {
 				List<String> stringList = config.getStringList(configKey);
 				// colorize, if not exempted:
 				if (!noColorConversionKeys.contains(configKey)) {
 					stringList = TextUtils.colorize(stringList);
 				}
-				return stringList;
+				if (genericType == Text.class) {
+					return Text.parse(stringList);
+				} else {
+					return stringList;
+				}
 			} else {
 				return null; // not supported currently
 			}
@@ -665,22 +679,36 @@ public class Settings {
 
 	private static void setConfigValue(Configuration config, String configKey, List<String> noColorConversionKeys, Class<?> typeClass, Class<?> genericType, Object value) {
 		if (value == null) {
-			config.set(configKey, value); // removes value
+			// remove value:
+			config.set(configKey, null);
 			return;
 		}
 
 		if (typeClass == Material.class) {
 			config.set(configKey, ((Material) value).name());
-		} else if (typeClass == String.class) {
+		} else if (typeClass == String.class || typeClass == Text.class) {
+			String stringValue;
+			if (typeClass == Text.class) {
+				stringValue = ((Text) value).toPlainFormatText();
+			} else {
+				stringValue = (String) value;
+			}
 			// decolorize, if not exempted:
 			if (!noColorConversionKeys.contains(configKey)) {
-				value = TextUtils.decolorize((String) value);
+				value = TextUtils.decolorize(stringValue);
 			}
 			config.set(configKey, value);
-		} else if (typeClass == List.class && genericType == String.class) {
+		} else if (typeClass == List.class && (genericType == String.class || genericType == Text.class)) {
+			List<String> stringList;
+			if (genericType == Text.class) {
+				stringList = ((List<Text>) value).stream().map(Text::toPlainFormatText).collect(Collectors.toList());
+			} else {
+				stringList = (List<String>) value;
+			}
+
 			// decolorize, if not exempted:
 			if (!noColorConversionKeys.contains(configKey)) {
-				value = TextUtils.decolorize(ConversionUtils.toStringList((List<?>) value));
+				value = TextUtils.decolorize(stringList);
 			}
 			config.set(configKey, value);
 		} else if (typeClass == ItemData.class) {

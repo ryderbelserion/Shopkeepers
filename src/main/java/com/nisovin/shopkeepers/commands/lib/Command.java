@@ -2,17 +2,21 @@ package com.nisovin.shopkeepers.commands.lib;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Pattern;
+import java.util.function.Supplier;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.commands.lib.arguments.FallbackArgument;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.MapUtils;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -22,11 +26,29 @@ public abstract class Command {
 
 	public static final String COMMAND_PREFIX = "/";
 	public static final String ARGUMENTS_SEPARATOR = " ";
-	public static final Pattern WHITESPACE = Pattern.compile("\\s+");
+
+	private static final Text DEFAULT_HELP_TITLE_FORMAT = Text
+			.color(ChatColor.AQUA).text("-------[ ")
+			.color(ChatColor.DARK_GREEN).text("Command Help: ")
+			.color(ChatColor.GOLD).formatting(ChatColor.ITALIC)
+			.placeholder("command")
+			.color(ChatColor.AQUA).text(" ]-------")
+			.buildRoot();
+	private static final Text DEFAULT_HELP_USAGE_FORMAT = Text
+			.color(ChatColor.YELLOW).placeholder("usage")
+			.buildRoot();
+	private static final Text DEFAULT_HELP_DESC_FORMAT = Text
+			.color(ChatColor.DARK_GRAY).text(" - ")
+			.color(ChatColor.DARK_AQUA).placeholder("description")
+			.buildRoot();
+	private static final Text HELP_ENTRY_FORMAT = Text
+			.placeholder("usage") // the usage format
+			.placeholder("description") // the description format
+			.buildRoot();
 
 	private final String name;
 	private final List<String> aliases; // unmodifiable
-	private String description = "";
+	private Text description = Text.EMPTY;
 	// null if no permission is required:
 	private String permission = null;
 	private final List<CommandArgument<?>> arguments = new ArrayList<>();
@@ -39,12 +61,25 @@ public abstract class Command {
 	// makes the parent help content display this command's child commands:
 	private boolean includeChildsInParentHelp = false;
 
+	// common message arguments:
+	private final Map<String, Object> commonMessageArgs;
+	{
+		// dynamically evaluated:
+		Map<String, Object> commonMessageArgs = new HashMap<>();
+		commonMessageArgs.put("name", (Supplier<?>) () -> this.getName());
+		commonMessageArgs.put("description", (Supplier<?>) () -> this.getDescription());
+		commonMessageArgs.put("command", (Supplier<?>) () -> this.getCommandFormat());
+		commonMessageArgs.put("usage", (Supplier<?>) () -> this.getUsageFormat());
+		commonMessageArgs.put("arguments", (Supplier<?>) () -> this.getArgumentsFormat());
+		this.commonMessageArgs = Collections.unmodifiableMap(commonMessageArgs);
+	}
+
 	// formatting (null results in the parent's formatting to be used):
-	private String helpTitleFormat = null;
-	private String helpUsageFormat = null;
-	private String helpDescFormat = null;
-	private String helpChildUsageFormat = null;
-	private String helpChildDescFormat = null;
+	private Text helpTitleFormat = null;
+	private Text helpUsageFormat = null;
+	private Text helpDescFormat = null;
+	private Text helpChildUsageFormat = null;
+	private Text helpChildDescFormat = null;
 
 	public Command(String name) {
 		this(name, null);
@@ -98,9 +133,10 @@ public abstract class Command {
 	 * <p>
 	 * Might be used in command listings and the command help.
 	 * 
-	 * @return a short description, might be empty to indicate that no description is available
+	 * @return the short description, might be {@link Text#isPlainTextEmpty() empty} to indicate that no description is
+	 *         available
 	 */
-	public final String getDescription() {
+	public final Text getDescription() {
 		return description;
 	}
 
@@ -111,8 +147,8 @@ public abstract class Command {
 	 *            the description
 	 * @see #getDescription()
 	 */
-	protected final void setDescription(String description) {
-		this.description = description == null ? "" : description;
+	protected final void setDescription(Text description) {
+		this.description = (description == null) ? Text.EMPTY : description;
 	}
 
 	/**
@@ -219,6 +255,8 @@ public abstract class Command {
 		return true;
 	}
 
+	private static final Text MSG_COMMAND_SOURCE_DENIED = Text.of("You cannot execute this command here!");
+
 	/**
 	 * Checks whether the given type of {@link CommandSender} is accepted to execute this command.
 	 * <p>
@@ -233,7 +271,7 @@ public abstract class Command {
 	public void checkCommandSource(CommandSender sender) throws CommandSourceRejectedException {
 		Validate.notNull(sender);
 		if (!this.isAccepted(sender)) {
-			throw new CommandSourceRejectedException("You cannot execute this command here!");
+			throw new CommandSourceRejectedException(MSG_COMMAND_SOURCE_DENIED);
 		}
 	}
 
@@ -340,6 +378,24 @@ public abstract class Command {
 		return usageFormat;
 	}
 
+	/**
+	 * Gets the common message arguments for this {@link Command}.
+	 * <p>
+	 * This includes:
+	 * <ul>
+	 * <li>{name}: The command's {@link #getName() name}.
+	 * <li>{description}: The command's {@link #getDescription() description}.
+	 * <li>{command}: The command's {@link #getCommandFormat() format}.
+	 * <li>{usage}: The command's {@link #getUsageFormat() usage format}.
+	 * <li>{arguments}: The command's {@link #getArgumentsFormat() arguments format}.
+	 * </ul>
+	 * 
+	 * @return the common message arguments
+	 */
+	public final Map<String, Object> getCommonMessageArgs() {
+		return commonMessageArgs;
+	}
+
 	public final Command getParent() {
 		return parent;
 	}
@@ -409,7 +465,8 @@ public abstract class Command {
 			this.processCommand(input, context, argsReader);
 			Log.debug(Settings.DebugOptions.commands, () -> "Command succeeded. Context: " + context.toString());
 		} catch (CommandException e) {
-			TextUtils.sendMessage(sender, e.getMessage());
+			TextUtils.sendMessage(sender, e.getMessageText());
+
 			Log.debug(Settings.DebugOptions.commands, () -> {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Command failed. Argument chain: ");
@@ -424,7 +481,7 @@ public abstract class Command {
 			Log.debug(Settings.DebugOptions.commands, () -> "Arguments reader: " + argsReader.toString());
 		} catch (Exception e) {
 			// an unexpected exception was caught:
-			TextUtils.sendMessage(sender, ChatColor.RED + "An error occurred during command handling! Check the console log.");
+			TextUtils.sendMessage(sender, Text.color(ChatColor.RED).text("An error occurred during command handling! Check the console log."));
 			Log.severe("An error occurred during command handling!", e);
 			Log.severe("Context: " + context.toString());
 		}
@@ -830,14 +887,17 @@ public abstract class Command {
 				throw firstUnparsedArgument.invalidArgumentError(firstUnparsedArg);
 			} else {
 				// throw an 'unexpected argument' exception:
-				throw new ArgumentParseException(null, TextUtils.replaceArgs(Settings.msgCommandArgumentUnexpected,
-						"{argument}", firstUnparsedArg));
+				Text errorMsg = Settings.msgCommandArgumentUnexpected;
+				errorMsg.setPlaceholderArguments(Collections.singletonMap("argument", firstUnparsedArg));
+				throw new ArgumentParseException(null, errorMsg);
 			}
 		}
 	}
 
-	protected String getUnknownCommandMessage(String command) {
-		return TextUtils.replaceArgs(Settings.msgCommandUnknown, "{command}", command);
+	protected Text getUnknownCommandMessage(String command) {
+		Text text = Settings.msgCommandUnknown;
+		text.setPlaceholderArguments(Collections.singletonMap("command", command));
+		return text;
 	}
 
 	//
@@ -1083,60 +1143,64 @@ public abstract class Command {
 	/**
 	 * Sets the format to use for the title when sending the help via {@link #sendHelp(CommandSender)}.
 	 * <p>
-	 * Available placeholders are: <code>{command}, {usage}, {arguments}</code><br>
-	 * If the format is an empty String, no title will be used in the help pages.<br>
-	 * If the format is set to <code>null</code>, the format of the parent command gets used. If no parent is available
-	 * or the parent format is an empty String, a default format gets used.
+	 * See {@link #getCommonMessageArgs()} for the available placeholders.
+	 * <p>
+	 * If the format is {@link Text#isPlainTextEmpty() empty}, no title will be used in the help pages. If the format is
+	 * <code>null</code>, the format of the parent command gets used. If no parent is available or the parent
+	 * format is {@link Text#isPlainTextEmpty() empty}, a default format gets used.
 	 * 
 	 * @param helpTitleFormat
 	 *            the format
 	 */
-	protected void setHelpTitleFormat(String helpTitleFormat) {
+	protected void setHelpTitleFormat(Text helpTitleFormat) {
 		this.helpTitleFormat = helpTitleFormat;
 	}
 
 	/**
 	 * Sets the format to use for this command's usage when sending the help via {@link #sendHelp(CommandSender)}.
 	 * <p>
-	 * Available placeholders are: <code>{command}, {usage}, {arguments}</code><br>
-	 * If the format is an empty String, no command usage will be printed in the help pages.<br>
-	 * If the format is set to <code>null</code>, the format of the parent command gets used. If no parent is available
-	 * or the parent format is an empty String, a default format gets used.
+	 * See {@link #getCommonMessageArgs()} for the available placeholders.
+	 * <p>
+	 * If the format is {@link Text#isPlainTextEmpty() empty}, no command usage will be printed in the help pages. If
+	 * the format is <code>null</code>, the format of the parent command gets used. If no parent is available or the
+	 * parent format is {@link Text#isPlainTextEmpty() empty}, a default format gets used.
 	 * 
 	 * @param helpUsageFormat
 	 *            the format
 	 */
-	protected void setHelpUsageFormat(String helpUsageFormat) {
+	protected void setHelpUsageFormat(Text helpUsageFormat) {
 		this.helpUsageFormat = helpUsageFormat;
 	}
 
 	/**
 	 * Sets the format to use for this command's description when sending the help via {@link #sendHelp(CommandSender)}.
 	 * <p>
-	 * Available placeholders are: <code>{description}</code><br>
-	 * If the format is an empty String, no command description will be printed in the help pages.<br>
-	 * If the format is set to <code>null</code>, the format of the parent command gets used. If no parent is available
-	 * or the parent format is an empty String, a default format gets used.
+	 * See {@link #getCommonMessageArgs()} for the available placeholders.
+	 * <p>
+	 * If the format is {@link Text#isPlainTextEmpty() empty}, no command description will be printed in the help pages.
+	 * If the format is <code>null</code>, the format of the parent command gets used. If no parent is available or the
+	 * parent format is {@link Text#isPlainTextEmpty() empty}, a default format gets used.
 	 * 
 	 * @param helpDescFormat
 	 *            the format
 	 */
-	protected void setHelpDescFormat(String helpDescFormat) {
+	protected void setHelpDescFormat(Text helpDescFormat) {
 		this.helpDescFormat = helpDescFormat;
 	}
 
 	/**
 	 * Sets the format to use for a child-command's usage when sending the help via {@link #sendHelp(CommandSender)}.
 	 * <p>
-	 * Available placeholders are: <code>{command}, {usage}, {arguments}</code><br>
-	 * If the format is an empty String, no child commands will be included in the help pages.<br>
-	 * If the format is set to <code>null</code>, the format of the parent command gets used. If no parent is available
-	 * or the parent format is an empty String, a default format gets used.
+	 * See {@link #getCommonMessageArgs()} for the available placeholders.
+	 * <p>
+	 * If the format is {@link Text#isPlainTextEmpty() empty}, no child commands will be included in the help pages. If
+	 * the format is <code>null</code>, the format of the parent command gets used. If no parent is available or the
+	 * parent format is {@link Text#isPlainTextEmpty() empty}, a default format gets used.
 	 * 
 	 * @param helpChildUsageFormat
 	 *            the format
 	 */
-	protected void setHelpChildUsageFormat(String helpChildUsageFormat) {
+	protected void setHelpChildUsageFormat(Text helpChildUsageFormat) {
 		this.helpChildUsageFormat = helpChildUsageFormat;
 	}
 
@@ -1144,15 +1208,16 @@ public abstract class Command {
 	 * Sets the format to use for a child-command's description when sending the help via
 	 * {@link #sendHelp(CommandSender)}.
 	 * <p>
-	 * Available placeholders are: <code>{description}</code><br>
-	 * If the format is an empty String, no child command descriptions will be included in the help pages.<br>
-	 * If the format is set to <code>null</code>, the format of the parent command gets used. If no parent is available
-	 * or the parent format is an empty String, a default format gets used.
+	 * See {@link #getCommonMessageArgs()} for the available placeholders.
+	 * <p>
+	 * If the format is {@link Text#isPlainTextEmpty() empty}, no child command descriptions will be included in the
+	 * help pages. If the format is <code>null</code>, the format of the parent command gets used. If no parent is
+	 * available or the parent format is {@link Text#isPlainTextEmpty() empty}, a default format gets used.
 	 * 
 	 * @param helpChildDescFormat
 	 *            the format
 	 */
-	protected void setHelpChildDescFormat(String helpChildDescFormat) {
+	protected void setHelpChildDescFormat(Text helpChildDescFormat) {
 		this.helpChildDescFormat = helpChildDescFormat;
 	}
 
@@ -1160,23 +1225,18 @@ public abstract class Command {
 	 * Gets the format to use for the title when sending the help via {@link #sendHelp(CommandSender)}.
 	 * 
 	 * @return the format, not <code>null</code>
-	 * @see #setHelpTitleFormat(String)
+	 * @see #setHelpTitleFormat(Text)
 	 */
-	protected final String getHelpTitleFormat() {
-		String format = this.helpTitleFormat;
+	protected final Text getHelpTitleFormat() {
+		Text format = this.helpTitleFormat;
 		if (format == null) {
-			String parentFormat;
-			if (parent != null && !(parentFormat = parent.getHelpTitleFormat()).equals("")) {
+			Text parentFormat;
+			if (parent != null && !(parentFormat = parent.getHelpTitleFormat()).isPlainTextEmpty()) {
 				format = parentFormat;
 			} else {
 				// default:
-				String paddingStyle = ChatColor.AQUA.toString();
-				format = paddingStyle + "-------[ "
-						+ ChatColor.DARK_GREEN + "Command Help: "
-						+ ChatColor.GOLD + ChatColor.ITALIC + "{command}"
-						+ paddingStyle + " ]-------";
+				format = DEFAULT_HELP_TITLE_FORMAT;
 			}
-
 		}
 		assert format != null;
 		return format;
@@ -1186,17 +1246,17 @@ public abstract class Command {
 	 * Gets the format to use for this command's usage when sending the help via {@link #sendHelp(CommandSender)}.
 	 * 
 	 * @return the format, not <code>null</code>
-	 * @see #setHelpUsageFormat(String)
+	 * @see #setHelpUsageFormat(Text)
 	 */
-	protected final String getHelpUsageFormat() {
-		String format = this.helpUsageFormat;
+	protected final Text getHelpUsageFormat() {
+		Text format = this.helpUsageFormat;
 		if (format == null) {
-			String parentFormat;
-			if (parent != null && !(parentFormat = parent.getHelpUsageFormat()).equals("")) {
+			Text parentFormat;
+			if (parent != null && !(parentFormat = parent.getHelpUsageFormat()).isPlainTextEmpty()) {
 				format = parentFormat;
 			} else {
 				// default:
-				format = ChatColor.YELLOW + "{usage}";
+				format = DEFAULT_HELP_USAGE_FORMAT;
 			}
 		}
 		assert format != null;
@@ -1207,17 +1267,17 @@ public abstract class Command {
 	 * Gets the format to use for this command's description when sending the help via {@link #sendHelp(CommandSender)}.
 	 * 
 	 * @return the format, not <code>null</code>
-	 * @see #setHelpDescFormat(String)
+	 * @see #setHelpDescFormat(Text)
 	 */
-	protected final String getHelpDescFormat() {
-		String format = this.helpDescFormat;
+	protected final Text getHelpDescFormat() {
+		Text format = this.helpDescFormat;
 		if (format == null) {
-			String parentFormat;
-			if (parent != null && !(parentFormat = parent.getHelpDescFormat()).equals("")) {
+			Text parentFormat;
+			if (parent != null && !(parentFormat = parent.getHelpDescFormat()).isPlainTextEmpty()) {
 				format = parentFormat;
 			} else {
 				// default:
-				format = ChatColor.DARK_GRAY + " - " + ChatColor.DARK_AQUA + "{description}";
+				format = DEFAULT_HELP_DESC_FORMAT;
 			}
 		}
 		assert format != null;
@@ -1228,16 +1288,16 @@ public abstract class Command {
 	 * Gets the format to use for a child-command's usage when sending the help via {@link #sendHelp(CommandSender)}.
 	 * 
 	 * @return the format, not <code>null</code>
-	 * @see #setHelpChildUsageFormat(String)
+	 * @see #setHelpChildUsageFormat(Text)
 	 */
-	protected final String getHelpChildUsageFormat() {
-		String format = this.helpChildUsageFormat;
+	protected final Text getHelpChildUsageFormat() {
+		Text format = this.helpChildUsageFormat;
 		if (format == null) {
-			String parentFormat;
-			if (parent != null && !(parentFormat = parent.getHelpChildUsageFormat()).equals("")) {
+			Text parentFormat;
+			if (parent != null && !(parentFormat = parent.getHelpChildUsageFormat()).isPlainTextEmpty()) {
 				format = parentFormat;
 			} else {
-				// default:
+				// default: use this command's help usage format
 				format = this.getHelpUsageFormat();
 			}
 
@@ -1251,16 +1311,16 @@ public abstract class Command {
 	 * {@link #sendHelp(CommandSender)}.
 	 * 
 	 * @return the format, not <code>null</code>
-	 * @see #setHelpChildDescFormat(String)
+	 * @see #setHelpChildDescFormat(Text)
 	 */
-	protected final String getHelpChildDescFormat() {
-		String format = this.helpChildDescFormat;
+	protected final Text getHelpChildDescFormat() {
+		Text format = this.helpChildDescFormat;
 		if (format == null) {
-			String parentFormat;
-			if (parent != null && !(parentFormat = parent.getHelpChildDescFormat()).equals("")) {
+			Text parentFormat;
+			if (parent != null && !(parentFormat = parent.getHelpChildDescFormat()).isPlainTextEmpty()) {
 				format = parentFormat;
 			} else {
-				// default:
+				// default: use this command's help description format
 				format = this.getHelpDescFormat();
 			}
 		}
@@ -1301,89 +1361,84 @@ public abstract class Command {
 			throw this.noPermissionException();
 		}
 
-		// prepare common placeholders:
-		String[] placeholders = new String[] {
-				"{command}", this.getCommandFormat(),
-				"{usage}", this.getUsageFormat(),
-				"{arguments}", this.getArgumentsFormat()
-		};
+		Map<String, Object> commonMsgArgs = this.getCommonMessageArgs();
 
 		// title:
-		String titleFormat = this.getHelpTitleFormat();
+		Text titleFormat = this.getHelpTitleFormat();
 		assert titleFormat != null;
-		if (!titleFormat.isEmpty()) {
-			TextUtils.sendMessage(recipient, titleFormat, placeholders);
+		if (!titleFormat.isPlainTextEmpty()) {
+			TextUtils.sendMessage(recipient, titleFormat, commonMsgArgs);
 		}
 
 		// skip info about the command if it is hidden or the recipient does not have the required permission:
 		if (!this.isHiddenInOwnHelp() && this.testPermission(recipient)) {
-			String commandInfo = "";
-
 			// command usage:
-			String usageFormat = this.getHelpUsageFormat();
+			Text usageFormat = this.getHelpUsageFormat();
 			assert usageFormat != null;
-			if (!usageFormat.isEmpty()) {
-				String commandUsage = TextUtils.replaceArgs(usageFormat, placeholders);
-				commandInfo += commandUsage;
-			}
+			usageFormat.setPlaceholderArguments(commonMsgArgs);
 
 			// command description:
-			String descriptionFormat = this.getHelpDescFormat();
-			assert descriptionFormat != null;
-			if (!descriptionFormat.isEmpty()) {
-				String description = this.getDescription();
-				if (!description.isEmpty()) {
-					String commandDescription = TextUtils.replaceArgs(descriptionFormat, "{description}", description);
-					commandInfo += commandDescription;
-				}
+			Text descriptionFormat;
+			Text description = this.getDescription();
+			if (description.isPlainTextEmpty()) {
+				descriptionFormat = Text.EMPTY;
+			} else {
+				descriptionFormat = this.getHelpDescFormat();
+				assert descriptionFormat != null;
+				descriptionFormat.setPlaceholderArguments(commonMsgArgs);
 			}
 
-			if (!commandInfo.isEmpty()) {
-				TextUtils.sendMessage(recipient, commandInfo);
+			Text helpEntryFormat = HELP_ENTRY_FORMAT;
+			helpEntryFormat.setPlaceholderArguments(MapUtils.createMap(
+					"usage", usageFormat,
+					"description", descriptionFormat
+			));
+
+			// skip if both usage and description formats are empty:
+			if (!helpEntryFormat.isPlainTextEmpty()) {
+				TextUtils.sendMessage(recipient, helpEntryFormat);
 			}
 		}
 
 		// include child-commands help:
-		String childUsageFormat = this.getHelpChildUsageFormat();
-		String childDescFormat = this.getHelpChildDescFormat();
+		Text childUsageFormat = this.getHelpChildUsageFormat();
+		Text childDescFormat = this.getHelpChildDescFormat();
 		this.sendChildCommandsHelp(recipient, childUsageFormat, childDescFormat, this);
 	}
 
-	protected void sendChildCommandsHelp(CommandSender recipient, String childUsageFormat, String childDescFormat, Command command) {
+	protected void sendChildCommandsHelp(CommandSender recipient, Text childUsageFormat, Text childDescFormat, Command command) {
 		Validate.notNull(recipient);
-		if (childUsageFormat == null || childUsageFormat.isEmpty()) {
+		if (childUsageFormat == null || childUsageFormat.isPlainTextEmpty()) {
 			// not including child commands at all:
 			return;
 		}
+		boolean childDescFormatEmpty = (childDescFormat == null || childDescFormat.isPlainTextEmpty());
 
 		// print usage and description of child-commands:
 		for (Command childCommand : command.getChildCommands().getCommands()) {
 			// skip info about the command if it is hidden or the recipient does not have the required permission:
 			if (!childCommand.isHiddenInParentHelp() && childCommand.testPermission(recipient)) {
-				// prepare common placeholders:
-				String[] childPlaceholders = new String[] {
-						"{command}", childCommand.getCommandFormat(),
-						"{usage}", childCommand.getUsageFormat(),
-						"{arguments}", childCommand.getArgumentsFormat()
-				};
-
-				String commandInfo = "";
+				Map<String, Object> childCommonMsgArgs = childCommand.getCommonMessageArgs();
 
 				// command usage:
-				String childUsage = TextUtils.replaceArgs(childUsageFormat, childPlaceholders);
-				commandInfo += childUsage;
+				childUsageFormat.setPlaceholderArguments(childCommonMsgArgs);
 
 				// command description:
-				if (childDescFormat != null && !childDescFormat.isEmpty()) {
-					String childDescription = childCommand.getDescription();
-					if (!childDescription.isEmpty()) {
-						String childDescriptionFormat = TextUtils.replaceArgs(childDescFormat,
-								"{description}", childDescription);
-						commandInfo += childDescriptionFormat;
-					}
+				Text childDescriptionFormat = childDescFormat;
+				Text childDescription = childCommand.getDescription();
+				if (childDescFormatEmpty || childDescription.isPlainTextEmpty()) {
+					childDescriptionFormat = Text.EMPTY;
+				} else {
+					childDescriptionFormat.setPlaceholderArguments(childCommonMsgArgs);
 				}
 
-				TextUtils.sendMessage(recipient, commandInfo);
+				Text helpEntryFormat = HELP_ENTRY_FORMAT;
+				helpEntryFormat.setPlaceholderArguments(MapUtils.createMap(
+						"usage", childUsageFormat,
+						"description", childDescriptionFormat
+				));
+
+				TextUtils.sendMessage(recipient, helpEntryFormat);
 			}
 
 			// optionally include the child-command's child-commands in help content:

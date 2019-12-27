@@ -1,8 +1,8 @@
-package com.nisovin.shopkeepers.spigot.text;
+package com.nisovin.shopkeepers.text;
 
 import com.nisovin.shopkeepers.util.Validate;
 
-public class ClickEvent {
+public class ClickEventText extends TextBuilder {
 
 	public enum Action {
 		/**
@@ -37,35 +37,57 @@ public class ClickEvent {
 	private final Action action; // not null
 	private final String value; // not null, can be empty
 
-	public ClickEvent(Action action, String value) {
+	ClickEventText(Action action, String value) {
 		Validate.notNull(action, "Action is null!");
 		Validate.notNull(value, "Value is null!");
 		this.action = action;
 		this.value = value;
 	}
 
+	// CLICK EVENT
+
 	/**
-	 * @return the action
+	 * Gets the {@link ClickEventText.Action}.
+	 * 
+	 * @return the click event action, not <code>null</code>
 	 */
 	public Action getAction() {
 		return action;
 	}
 
 	/**
-	 * @return the value (hover text)
+	 * Gets the click event value.
+	 * 
+	 * @return the click event value, not <code>null</code>
 	 */
 	public String getValue() {
 		return value;
 	}
 
+	// PLAIN TEXT
+
 	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("ClickEvent [action=");
-		builder.append(action);
+	public boolean isPlainText() {
+		return false;
+	}
+
+	// COPY
+
+	@Override
+	public Text copy() {
+		ClickEventText copy = new ClickEventText(action, value);
+		copy.copy(this, true);
+		return copy.build();
+	}
+
+	// JAVA OBJECT
+
+	@Override
+	protected void appendToStringFeatures(StringBuilder builder) {
+		builder.append(", action=");
+		builder.append(this.getAction());
 		builder.append(", value=");
-		builder.append(value);
-		builder.append("]");
-		return builder.toString();
+		builder.append(this.getValue());
+		super.appendToStringFeatures(builder);
 	}
 }

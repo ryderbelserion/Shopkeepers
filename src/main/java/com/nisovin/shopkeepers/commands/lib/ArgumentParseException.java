@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.commands.lib;
 
+import com.nisovin.shopkeepers.text.Text;
+
 /**
  * This exception is thrown when an error occurs during command argument parsing, for example if an argument is of
  * invalid format.
@@ -10,11 +12,11 @@ public class ArgumentParseException extends CommandException {
 
 	private final CommandArgument<?> argument; // can be null if not caused by any CommandArgument
 
-	public ArgumentParseException(CommandArgument<?> argument, String message) {
+	public ArgumentParseException(CommandArgument<?> argument, Text message) {
 		this(argument, message, null);
 	}
 
-	public ArgumentParseException(CommandArgument<?> argument, String message, Throwable cause) {
+	public ArgumentParseException(CommandArgument<?> argument, Text message, Throwable cause) {
 		super(message, cause);
 		this.argument = argument;
 	}

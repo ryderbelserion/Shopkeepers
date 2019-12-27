@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -34,6 +35,6 @@ public abstract class PlayerCommand extends Command {
 	}
 
 	public static CommandSourceRejectedException createCommandSourceRejectedException(CommandSender sender) {
-		return new CommandSourceRejectedException("You must be a player in order to execute this command!");
+		return new CommandSourceRejectedException(Text.of("You must be a player in order to execute this command!"));
 	}
 }

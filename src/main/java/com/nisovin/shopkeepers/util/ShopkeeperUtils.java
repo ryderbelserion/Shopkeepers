@@ -3,8 +3,12 @@ package com.nisovin.shopkeepers.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
@@ -25,6 +29,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.text.Text;
 
 /**
  * Utility functions related to shopkeepers and trading.
@@ -91,7 +96,7 @@ public class ShopkeeperUtils {
 	public static final class TargetShopkeepersResult {
 
 		private final List<Shopkeeper> shopkeepers;
-		private final String errorMessage;
+		private final Text errorMessage;
 		// assert: !shopkeepers.isEmpty || errorMessage != null
 
 		private TargetShopkeepersResult(List<Shopkeeper> shopkeepers) {
@@ -100,8 +105,9 @@ public class ShopkeeperUtils {
 			this.errorMessage = null;
 		}
 
-		private TargetShopkeepersResult(String errorMessage) {
-			Validate.notEmpty(errorMessage);
+		private TargetShopkeepersResult(Text errorMessage) {
+			Validate.notNull(errorMessage);
+			Validate.isTrue(!errorMessage.isPlainTextEmpty());
 			this.errorMessage = errorMessage;
 			this.shopkeepers = Collections.emptyList();
 		}
@@ -114,7 +120,7 @@ public class ShopkeeperUtils {
 			return shopkeepers;
 		}
 
-		public String getErrorMessage() {
+		public Text getErrorMessage() {
 			return errorMessage;
 		}
 	}
@@ -128,13 +134,13 @@ public class ShopkeeperUtils {
 			}
 
 			@Override
-			public String getNoTargetErrorMsg() {
+			public Text getNoTargetErrorMsg() {
 				return Settings.msgMustTargetShop;
 			}
 
 			@Override
-			public String getInvalidTargetErrorMsg(Shopkeeper shopkeeper) {
-				return ""; // not used
+			public Text getInvalidTargetErrorMsg(Shopkeeper shopkeeper) {
+				return Text.EMPTY; // not used
 			}
 		};
 
@@ -145,12 +151,12 @@ public class ShopkeeperUtils {
 			}
 
 			@Override
-			public String getNoTargetErrorMsg() {
+			public Text getNoTargetErrorMsg() {
 				return Settings.msgMustTargetAdminShop;
 			}
 
 			@Override
-			public String getInvalidTargetErrorMsg(Shopkeeper shopkeeper) {
+			public Text getInvalidTargetErrorMsg(Shopkeeper shopkeeper) {
 				return Settings.msgTargetShopIsNoAdminShop;
 			}
 		};
@@ -162,19 +168,19 @@ public class ShopkeeperUtils {
 			}
 
 			@Override
-			public String getNoTargetErrorMsg() {
+			public Text getNoTargetErrorMsg() {
 				return Settings.msgMustTargetPlayerShop;
 			}
 
 			@Override
-			public String getInvalidTargetErrorMsg(Shopkeeper shopkeeper) {
+			public Text getInvalidTargetErrorMsg(Shopkeeper shopkeeper) {
 				return Settings.msgTargetShopIsNoPlayerShop;
 			}
 		};
 
-		public abstract String getNoTargetErrorMsg();
+		public abstract Text getNoTargetErrorMsg();
 
-		public abstract String getInvalidTargetErrorMsg(Shopkeeper shopkeeper);
+		public abstract Text getInvalidTargetErrorMsg(Shopkeeper shopkeeper);
 	}
 
 	// type is null to allow any shopkeeper type to be returned
@@ -241,5 +247,103 @@ public class ShopkeeperUtils {
 
 		// no targeted shopkeeper found:
 		return new TargetShopkeepersResult(shopkeeperFilter.getNoTargetErrorMsg());
+	}
+
+	public static class OwnedPlayerShopsResult {
+
+		private final UUID playerUUID; // can be null
+		private final String playerName; // can be null
+		// Stores the player uuids and names of all shop owners found that match the given target player name. If this
+		// contains more than one entry then the player name is ambiguous.
+		private final Map<UUID, String> matchingShopOwners; // not null, can be empty
+		private final List<? extends PlayerShopkeeper> shops; // not null, can be empty
+
+		public OwnedPlayerShopsResult(UUID playerUUID, String playerName, Map<UUID, String> matchingShopOwners, List<? extends PlayerShopkeeper> shops) {
+			Validate.isTrue(playerUUID != null || playerName != null, "The player uuid and name are both null!");
+			Validate.notNull(matchingShopOwners, "Matching shop owners map is null!");
+			this.playerUUID = playerUUID;
+			this.playerName = playerName;
+			this.matchingShopOwners = matchingShopOwners;
+			this.shops = shops;
+		}
+
+		public UUID getPlayerUUID() {
+			return playerUUID;
+		}
+
+		public String getPlayerName() {
+			return playerName;
+		}
+
+		public Map<UUID, String> getMatchingShopOwners() {
+			return matchingShopOwners;
+		}
+
+		public List<? extends PlayerShopkeeper> getShops() {
+			return shops;
+		}
+	}
+
+	// Searches for shops owned by the player specified by either uuid or name.
+	// If at least one matching shop is found, it is used to complete the available information about the target player
+	// (eg. missing uuid or name). The found player name may also differ in case.
+	// If shops are searched via target player name, a map of matching shop owners is returned, which stores the player
+	// uuids and names of all shop owners found that match the given target player name. If this contains more than one
+	// entry then the target player name is ambiguous. The result contains the shops of all those matching players then.
+	public static OwnedPlayerShopsResult getOwnedPlayerShops(UUID targetPlayerUUID, String targetPlayerName) {
+		Validate.isTrue(targetPlayerUUID != null || targetPlayerName != null, "The target player uuid and name are both null!");
+
+		// keep track if there are multiple shop owners with matching name:
+		Map<UUID, String> matchingShopOwners = new LinkedHashMap<>();
+
+		// search for shops owned by the specified player:
+		List<PlayerShopkeeper> shops = new ArrayList<>();
+		for (Shopkeeper shopkeeper : ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers()) {
+			if (shopkeeper instanceof PlayerShopkeeper) {
+				PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
+				UUID shopOwnerUUID = playerShop.getOwnerUUID(); // not null
+				String shopOwnerName = playerShop.getOwnerName(); // not null
+				if (targetPlayerUUID != null) {
+					// we search for shops with matching owner uuid:
+					if (targetPlayerUUID.equals(shopOwnerUUID)) {
+						shops.add(playerShop);
+
+						// The input target player name may be missing or differ in case.
+						// Keep track of the owner's actual name:
+						targetPlayerName = shopOwnerName;
+					}
+				} else {
+					assert targetPlayerName != null;
+					// check for matching name:
+					if (shopOwnerName.equalsIgnoreCase(targetPlayerName)) {
+						// Note: If there exist multiple players which match the given name, the result will include the
+						// shops of all of them.
+						shops.add(playerShop);
+
+						// The input target player name may differ in case.
+						// Keep track of the owner's actual name:
+						targetPlayerName = shopOwnerName;
+
+						// keep track of players with matching name:
+						matchingShopOwners.putIfAbsent(shopOwnerUUID, shopOwnerName);
+					}
+				}
+			}
+		}
+		return new OwnedPlayerShopsResult(targetPlayerUUID, targetPlayerName, matchingShopOwners, shops);
+	}
+
+	public static class ShopkeeperNameMatchers {
+
+		private ShopkeeperNameMatchers() {
+		}
+
+		public static final ObjectMatcher<Shopkeeper> DEFAULT = new ObjectMatcher<Shopkeeper>() {
+			@Override
+			public Stream<? extends Shopkeeper> match(String input) {
+				if (StringUtils.isEmpty(input)) return Stream.empty();
+				return ShopkeepersAPI.getShopkeeperRegistry().getShopkeepersByName(input);
+			}
+		};
 	}
 }

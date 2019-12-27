@@ -14,6 +14,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
 import com.nisovin.shopkeepers.commands.lib.MissingArgumentException;
 import com.nisovin.shopkeepers.commands.lib.RequiresPlayerArgumentException;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -63,12 +64,12 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 	}
 
 	@Override
-	public String getMissingArgumentErrorMsg() {
+	public Text getMissingArgumentErrorMsg() {
 		return argument.getMissingArgumentErrorMsg();
 	}
 
 	@Override
-	public String getInvalidArgumentErrorMsg(String argumentInput) {
+	public Text getInvalidArgumentErrorMsg(String argumentInput) {
 		return argument.getInvalidArgumentErrorMsg(argumentInput);
 	}
 

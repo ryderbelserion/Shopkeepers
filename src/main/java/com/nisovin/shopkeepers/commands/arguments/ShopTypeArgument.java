@@ -13,8 +13,8 @@ import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
 
 public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 
@@ -23,11 +23,12 @@ public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 	}
 
 	@Override
-	public String getInvalidArgumentErrorMsg(String argumentInput) {
+	public Text getInvalidArgumentErrorMsg(String argumentInput) {
 		if (argumentInput == null) argumentInput = "";
-		String[] defaultArgs = this.getDefaultErrorMsgArgs();
-		return TextUtils.replaceArgs(Settings.msgCommandShopTypeArgumentInvalid,
-				defaultArgs, "{argument}", argumentInput);
+		Text text = Settings.msgCommandShopTypeArgumentInvalid;
+		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
+		text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
+		return text;
 	}
 
 	@Override

@@ -345,10 +345,11 @@ public abstract class EditorHandler extends UIHandler {
 			prevPage = (page - 1);
 			prevPageText = String.valueOf(prevPage);
 		}
-		String itemName = TextUtils.replaceArgs(Settings.msgButtonPreviousPage,
-				"{prev_page}", prevPageText,
-				"{page}", String.valueOf(page),
-				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
+		String itemName = TextUtils.replaceArguments(Settings.msgButtonPreviousPage,
+				"prev_page", prevPageText,
+				"page", page,
+				"max_page", TRADES_MAX_PAGES
+		);
 		ItemStack item = Settings.previousPageItem.createItemStack();
 		// note: can exceed the item's natural max stack size
 		item.setAmount(MathUtils.trim(prevPage, 1, ItemUtils.MAX_STACK_SIZE));
@@ -362,10 +363,11 @@ public abstract class EditorHandler extends UIHandler {
 			nextPage = (page + 1);
 			nextPageText = String.valueOf(nextPage);
 		}
-		String itemName = TextUtils.replaceArgs(Settings.msgButtonNextPage,
-				"{next_page}", nextPageText,
-				"{page}", String.valueOf(page),
-				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
+		String itemName = TextUtils.replaceArguments(Settings.msgButtonNextPage,
+				"next_page", nextPageText,
+				"page", page,
+				"max_page", TRADES_MAX_PAGES
+		);
 		ItemStack item = Settings.nextPageItem.createItemStack();
 		// note: can exceed the item's natural max stack size
 		item.setAmount(MathUtils.trim(nextPage, 1, ItemUtils.MAX_STACK_SIZE));
@@ -373,9 +375,10 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	protected ItemStack createCurrentPageIcon(int page) {
-		String itemName = TextUtils.replaceArgs(Settings.msgButtonCurrentPage,
-				"{page}", String.valueOf(page),
-				"{max_page}", String.valueOf(TRADES_MAX_PAGES));
+		String itemName = TextUtils.replaceArguments(Settings.msgButtonCurrentPage,
+				"page", page,
+				"max_page", TRADES_MAX_PAGES
+		);
 		ItemStack item = Settings.currentPageItem.createItemStack();
 		// note: can exceed the item's natural max stack size
 		item.setAmount(MathUtils.trim(page, 1, ItemUtils.MAX_STACK_SIZE));
@@ -384,8 +387,7 @@ public abstract class EditorHandler extends UIHandler {
 
 	protected ItemStack createTradeSetupIcon() {
 		ShopType<?> shopType = this.getShopkeeper().getType();
-		String itemName = TextUtils.replaceArgs(Settings.msgTradeSetupDescHeader,
-				"{shopType}", shopType.getDisplayName());
+		String itemName = TextUtils.replaceArguments(Settings.msgTradeSetupDescHeader, "shopType", shopType.getDisplayName());
 		return ItemUtils.setItemStackNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, shopType.getTradeSetupDescription());
 	}
 

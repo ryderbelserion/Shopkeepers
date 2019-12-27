@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
+import java.util.Collections;
+
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -54,7 +56,9 @@ public class ShopkeepersCommand extends BaseCommand {
 		this.setDescription(Settings.msgCommandDescriptionShopkeeper);
 
 		// formatting:
-		this.setHelpTitleFormat(TextUtils.replaceArgs(Settings.msgCommandHelpTitle, "{version}", plugin.getDescription().getVersion()));
+		this.setHelpTitleFormat(Settings.msgCommandHelpTitle.setPlaceholderArguments(
+				Collections.singletonMap("version", plugin.getDescription().getVersion())
+		));
 		this.setHelpUsageFormat(Settings.msgCommandHelpUsageFormat);
 		this.setHelpDescFormat(Settings.msgCommandHelpDescriptionFormat);
 

@@ -630,10 +630,10 @@ msg-removed-admin-shops: "&e{shopsCount} &aadmin shops were removed."
 msg-removed-player-shops: "&e{shopsCount} &ashops of player '&e{player}&a' were removed."
 msg-removed-all-player-shops: "&aAll &e{shopsCount} &aplayer shops were removed."
 
-msg-confirm-remove-admin-shops: "&cYou are about to irrevocable remove all admin shops!"
-msg-confirm-remove-own-shops: "&cYou are about to irrevocable remove all your shops!"
-msg-confirm-remove-player-shops: "&cYou are about to irrevocable remove all shops of player &6{player}&c!"
-msg-confirm-remove-all-player-shops: "&cYou are about to irrevocable remove all player shops of all players!"
+msg-confirm-remove-admin-shops: "&cYou are about to irrevocable remove all admin shops (&6{shopsCount}&c)!"
+msg-confirm-remove-own-shops: "&cYou are about to irrevocable remove all your shops (&6{shopsCount}&c)!"
+msg-confirm-remove-player-shops: "&cYou are about to irrevocable remove all shops of player &6{player}&c (&6{shopsCount}&c)!"
+msg-confirm-remove-all-player-shops: "&cYou are about to irrevocable remove all player shops of all players (&6{shopsCount}&c)!"
 
 msg-confirmation-required: "&7Please confirm this action by typing &6/shopkeepers confirm"
 msg-confirmation-expired: "&cConfirmation expired."
@@ -653,6 +653,10 @@ msg-command-shop-object-type-argument-invalid: "&cUnknown shop object type '&e{a
 msg-command-shopkeeper-argument-invalid: "&cNo shopkeeper found for '&e{argument}&c'."
 msg-command-shopkeeper-argument-no-admin-shop: "&cShopkeeper '&e{argument}&c' is no admin shopkeeper."
 msg-command-shopkeeper-argument-no-player-shop: "&cShopkeeper '&e{argument}&c' is no player shopkeeper."
+
+msg-ambiguous-player-name: "&cThere are multiple matches for the name '&e{name}&c'!"
+msg-ambiguous-player-name-entry: "&c  - '&e{name}&r&c' (&6{uuid}&c)"
+msg-ambiguous-player-name-more: "&c  - ...."
 
 msg-command-help-title: "&9***** &8[&6Shopkeepers v{version}&8] &9*****"
 msg-command-help-usage-format: "&e{usage}"

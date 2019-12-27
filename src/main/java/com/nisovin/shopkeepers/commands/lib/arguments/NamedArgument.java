@@ -12,6 +12,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -35,17 +36,17 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 	}
 
 	@Override
-	public String getRequiresPlayerErrorMsg() {
+	public Text getRequiresPlayerErrorMsg() {
 		return argument.getRequiresPlayerErrorMsg();
 	}
 
 	@Override
-	public String getMissingArgumentErrorMsg() {
+	public Text getMissingArgumentErrorMsg() {
 		return argument.getMissingArgumentErrorMsg();
 	}
 
 	@Override
-	public String getInvalidArgumentErrorMsg(String argumentInput) {
+	public Text getInvalidArgumentErrorMsg(String argumentInput) {
 		return argument.getInvalidArgumentErrorMsg(argumentInput);
 	}
 

@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
+import com.nisovin.shopkeepers.text.Text;
 
 class CommandDebugCreateShops extends PlayerCommand {
 
@@ -31,7 +32,7 @@ class CommandDebugCreateShops extends PlayerCommand {
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
 		// set description:
-		this.setDescription("Creates lots of shopkeepers for stress testing.");
+		this.setDescription(Text.of("Creates lots of shopkeepers for stress testing."));
 
 		// hidden debugging command:
 		this.setHiddenInParentHelp(true);

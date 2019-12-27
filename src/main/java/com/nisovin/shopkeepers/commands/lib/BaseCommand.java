@@ -7,6 +7,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 
+import com.nisovin.shopkeepers.text.Text;
+
 /**
  * Implements the {@link CommandExecutor} and {@link TabCompleter} for a Bukkit {@link PluginCommand} by invoking our
  * command handling.
@@ -26,7 +28,7 @@ public abstract class BaseCommand extends Command implements org.bukkit.command.
 		super(bukkitCommand.getName(), bukkitCommand.getAliases());
 		String desc = bukkitCommand.getDescription();
 		if (desc != null && !desc.isEmpty()) {
-			this.setDescription(desc);
+			this.setDescription(Text.of(desc));
 		}
 		String permission = bukkitCommand.getPermission();
 		if (permission != null && !permission.isEmpty()) {

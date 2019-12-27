@@ -4,10 +4,10 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -19,7 +19,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
-import com.nisovin.shopkeepers.spigot.text.Text;
+import com.nisovin.shopkeepers.spigot.text.SpigotText;
+import com.nisovin.shopkeepers.text.Text;
 
 /**
  * Text and messaging utilities.
@@ -30,6 +31,12 @@ public class TextUtils {
 
 	private TextUtils() {
 	}
+
+	/*
+	 * PLAIN TEXT
+	 */
+
+	// FORMATTING AND CONVERSION
 
 	public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.US));
 	static {
@@ -92,31 +99,7 @@ public class TextUtils {
 		}
 	}
 
-	public static Text getPlayerText(Player player) {
-		assert player != null;
-		String playerName = player.getName();
-		String playerUUIDString = player.getUniqueId().toString();
-		return new Text(playerName).insertion(playerUUIDString).hoverEvent(playerUUIDString);
-	}
-
-	public static Text getPlayerText(String playerName, UUID playerUUID) {
-		// either of them might be null
-		// prefer name, else use uuid
-		if (playerName != null) {
-			Text text = new Text(playerName);
-			if (playerUUID != null) {
-				String playerUUIDString = playerUUID.toString();
-				text.insertion(playerUUIDString).hoverEvent(playerUUIDString);
-			}
-			return text;
-		} else if (playerUUID != null) {
-			return new Text(playerUUID.toString());
-		} else {
-			return new Text("[unknown]");
-		}
-	}
-
-	private static final char COLOR_CHAR_ALTERNATIVE = '&';
+	public static final char COLOR_CHAR_ALTERNATIVE = '&';
 	private static final Pattern STRIP_COLOR_ALTERNATIVE_PATTERN = Pattern.compile("(?i)" + String.valueOf(COLOR_CHAR_ALTERNATIVE) + "[0-9A-FK-OR]");
 
 	// reverse of ChatColor#translateAlternateColorCodes
@@ -132,14 +115,14 @@ public class TextUtils {
 	}
 
 	public static String stripColor(String colored) {
-		if (colored == null) return null;
+		if (colored == null || colored.isEmpty()) return colored;
 		String uncolored = ChatColor.stripColor(colored);
 		uncolored = STRIP_COLOR_ALTERNATIVE_PATTERN.matcher(uncolored).replaceAll("");
 		return uncolored;
 	}
 
 	public static String decolorize(String colored) {
-		if (colored == null) return null;
+		if (colored == null || colored.isEmpty()) return colored;
 		return translateColorCodesToAlternative(COLOR_CHAR_ALTERNATIVE, colored);
 	}
 
@@ -194,89 +177,149 @@ public class TextUtils {
 		return colored;
 	}
 
-	public static String replaceArgs(String message, String... args) {
-		if (!StringUtils.isEmpty(message) && args != null && args.length >= 2) {
-			// replace arguments (key-value replacement):
-			String key;
-			String value;
-			for (int i = 1; i < args.length; i += 2) {
-				key = args[i - 1];
-				value = args[i];
-				if (key == null || value == null) continue; // skip invalid arguments
-				// assumption: each key occurs at most once
-				message = StringUtils.replaceFirst(message, key, value);
-			}
+	// ARGUMENTS
+
+	private static final Map<String, Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
+
+	@SafeVarargs
+	private static <T> void addArguments(Map<String, Object> argumentsMap, T... arguments) {
+		if (arguments == null) return;
+		int argumentsKeyLimit = arguments.length - 1;
+		for (int i = 0; i < argumentsKeyLimit; i += 2) {
+			String key = (String) arguments[i];
+			Object value = arguments[i + 1];
+			argumentsMap.put(key, value);
 		}
-		return message;
 	}
 
-	public static String replaceArgs(String message, String[]... argSets) {
-		if (!StringUtils.isEmpty(message) && argSets != null) {
-			for (String[] argSet : argSets) {
-				message = replaceArgs(message, argSet);
-			}
+	@SafeVarargs
+	public static <T> String replaceArguments(String message, T... arguments) {
+		assert TEMP_ARGUMENTS_MAP.isEmpty();
+		try {
+			addArguments(TEMP_ARGUMENTS_MAP, arguments);
+			return replaceArguments(message, TEMP_ARGUMENTS_MAP);
+		} finally {
+			TEMP_ARGUMENTS_MAP.clear(); // reset
 		}
-		return message;
 	}
 
-	public static String replaceArgs(String message, String[] argSet, String... moreArgs) {
-		if (!StringUtils.isEmpty(message)) {
-			message = replaceArgs(message, argSet);
-			message = replaceArgs(message, moreArgs);
-		}
-		return message;
+	public static String replaceArguments(String message, Map<String, Object> arguments) {
+		Validate.notNull(message, "Message is null!");
+		// uses the default key format: {key}
+		return StringUtils.replaceArguments(message, arguments); // checks arguments
 	}
 
-	public static <T> String replaceArgs(String message, Iterable<Map.Entry<String, T>> args) {
-		if (!StringUtils.isEmpty(message) && args != null) {
-			// replace arguments (key-value replacement):
-			for (Entry<String, ?> entry : args) {
-				if (entry == null) continue;
-				String key = entry.getKey();
-				String value = String.valueOf(entry.getValue());
-				if (key == null || value == null) continue; // skip invalid arguments
-				// assumption: each key occurs at most once
-				message = StringUtils.replaceFirst(message, key, value);
-			}
-		}
-		return message;
-	}
-
-	public static <T> String replaceArgs(String message, Map<String, T> args) {
-		return replaceArgs(message, (args == null) ? null : args.entrySet());
-	}
-
-	public static List<String> replaceArgs(Collection<String> messages, String... args) {
+	// creates and returns a new List of messages
+	public static List<String> replaceArguments(Collection<String> messages, Map<String, Object> arguments) {
+		Validate.notNull(messages, "Messages is null!");
 		List<String> replaced = new ArrayList<>(messages.size());
 		for (String message : messages) {
-			replaced.add(replaceArgs(message, args));
+			replaced.add(replaceArguments(message, arguments)); // checks message and arguments
 		}
 		return replaced;
 	}
 
-	public static void sendMessage(CommandSender sender, String message) {
-		// skip if sender is null or message is empty:
-		if (sender == null || StringUtils.isEmpty(message)) return;
-
-		// send (potentially multiline) message:
-		String[] msgs = message.split("\n");
-		for (String msg : msgs) {
-			sender.sendMessage(msg);
+	public static List<String> replaceArguments(Collection<String> messages, Object... arguments) {
+		assert TEMP_ARGUMENTS_MAP.isEmpty();
+		try {
+			addArguments(TEMP_ARGUMENTS_MAP, arguments);
+			return replaceArguments(messages, TEMP_ARGUMENTS_MAP);
+		} finally {
+			TEMP_ARGUMENTS_MAP.clear(); // reset
 		}
 	}
 
-	public static void sendMessage(CommandSender sender, String message, String... args) {
-		// replace message arguments and then send:
-		sendMessage(sender, replaceArgs(message, args));
+	// SENDING
+
+	public static void sendMessage(CommandSender recipient, String message) {
+		Validate.notNull(recipient, "Recipient is null!");
+		Validate.notNull(message, "Message is null!");
+		// skip sending if message is empty: allows disabling of messages
+		if (message.isEmpty()) return;
+
+		// send (potentially multiline) message:
+		for (String line : StringUtils.splitLines(message)) {
+			recipient.sendMessage(line);
+		}
 	}
 
-	public static <T> void sendMessage(CommandSender sender, String message, Iterable<Map.Entry<String, T>> args) {
+	public static void sendMessage(CommandSender recipient, String message, Map<String, Object> arguments) {
 		// replace message arguments and then send:
-		sendMessage(sender, replaceArgs(message, args));
+		sendMessage(recipient, replaceArguments(message, arguments));
 	}
 
-	public static <T> void sendMessage(CommandSender sender, String message, Map<String, T> args) {
+	public static void sendMessage(CommandSender recipient, String message, Object... arguments) {
 		// replace message arguments and then send:
-		sendMessage(sender, replaceArgs(message, args));
+		sendMessage(recipient, replaceArguments(message, arguments));
+	}
+
+	/*
+	 * TEXT COMPONENTS
+	 */
+
+	public static Text getPlayerText(Player player) {
+		assert player != null;
+		String playerName = player.getName();
+		String playerUUIDString = player.getUniqueId().toString();
+		return Text.hoverEvent(Text.of(playerUUIDString))
+				.childInsertion(playerUUIDString)
+				.childText(playerName)
+				.buildRoot();
+	}
+
+	public static Text getPlayerText(String playerName, UUID playerUUID) {
+		// either of them might be null
+		// prefer name, else use uuid
+		if (playerName != null) {
+			if (playerUUID != null) {
+				String playerUUIDString = playerUUID.toString();
+				return Text.hoverEvent(Text.of(playerUUIDString))
+						.childInsertion(playerUUIDString)
+						.childText(playerName)
+						.buildRoot();
+			} else {
+				return Text.of(playerName);
+			}
+		} else if (playerUUID != null) {
+			return Text.of(playerUUID.toString());
+		} else {
+			return Text.of("[unknown]");
+		}
+	}
+
+	// ARGUMENTS
+
+	public static Text setPlaceholderArguments(Text text, Object... arguments) {
+		Validate.notNull(text, "Text is null!");
+		assert TEMP_ARGUMENTS_MAP.isEmpty();
+		try {
+			addArguments(TEMP_ARGUMENTS_MAP, arguments);
+			text.setPlaceholderArguments(TEMP_ARGUMENTS_MAP);
+			return text;
+		} finally {
+			TEMP_ARGUMENTS_MAP.clear(); // reset
+		}
+	}
+
+	// SENDING
+
+	public static void sendMessage(CommandSender recipient, Text message) {
+		SpigotText.sendMessage(recipient, message);
+	}
+
+	public static void sendMessage(CommandSender recipient, Text message, Map<String, Object> arguments) {
+		Validate.notNull(recipient, "Recipient is null!");
+		Validate.notNull(message, "Message is null!");
+		// assign arguments and then send:
+		message.setPlaceholderArguments(arguments);
+		sendMessage(recipient, message);
+	}
+
+	public static void sendMessage(CommandSender recipient, Text message, Object... arguments) {
+		Validate.notNull(recipient, "Recipient is null!");
+		Validate.notNull(message, "Message is null!");
+		// assign arguments and then send:
+		setPlaceholderArguments(message, arguments);
+		sendMessage(recipient, message);
 	}
 }

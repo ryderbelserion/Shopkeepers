@@ -11,6 +11,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -26,7 +27,7 @@ class CommandYaml extends PlayerCommand {
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
 		// set description:
-		this.setDescription("Prints the YAML representation of the held item.");
+		this.setDescription(Text.of("Prints the YAML representation of the held item."));
 
 		// hidden debugging command:
 		this.setHiddenInParentHelp(true);

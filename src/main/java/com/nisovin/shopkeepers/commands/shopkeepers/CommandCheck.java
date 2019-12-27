@@ -29,6 +29,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandCheck extends Command {
@@ -48,7 +49,7 @@ class CommandCheck extends Command {
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
 		// set description:
-		this.setDescription("Shows various debugging information.");
+		this.setDescription(Text.of("Shows various debugging information."));
 
 		// hidden debugging command:
 		this.setHiddenInParentHelp(true);

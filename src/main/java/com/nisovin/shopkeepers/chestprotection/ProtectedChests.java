@@ -78,7 +78,7 @@ public class ProtectedChests {
 		}
 		if (Settings.deleteShopkeeperOnBreakChest) {
 			Bukkit.getPluginManager().registerEvents(removeShopOnChestBreakListener, plugin);
-			// TODO let shopkeepers periodically check if there chest is still there, and otherwise delete themselves?
+			// TODO let shopkeepers periodically check if their chest is still there, and otherwise delete themselves?
 		}
 	}
 

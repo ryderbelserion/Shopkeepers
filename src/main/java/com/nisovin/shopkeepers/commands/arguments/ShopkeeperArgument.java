@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.commands.arguments;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
@@ -11,6 +13,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.TypedFirstOfArgument;
+import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 
 public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 
@@ -41,8 +44,8 @@ public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 		this.shopIdArgument = new ShopkeeperByIdArgument(name + ":id", filter);
 		this.shopNameArgument = new ShopkeeperByNameArgument(name + ":name", joinRemainingArgs, filter, minimalNameCompletionInput) {
 			@Override
-			public Shopkeeper matchShopkeeper(String nameInput) {
-				return ShopkeeperArgument.this.matchShopkeeper(nameInput);
+			public Shopkeeper getObject(String nameInput) throws ArgumentParseException {
+				return ShopkeeperArgument.this.getShopkeeper(nameInput);
 			}
 		};
 		this.firstOfArgument = new TypedFirstOfArgument<>(name + ":firstOf", Arrays.asList(shopUUIDArgument, shopIdArgument, shopNameArgument), false, false);
@@ -57,9 +60,14 @@ public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 	 * @param nameInput
 	 *            the raw name input
 	 * @return the matched shopkeeper, or <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if the id is ambiguous
 	 */
-	public Shopkeeper matchShopkeeper(String nameInput) {
-		return ShopkeeperNameArgument.ShopkeeperNameMatchers.DEFAULT.match(nameInput);
+	public Shopkeeper getShopkeeper(String nameInput) throws IllegalArgumentException {
+		Stream<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.ShopkeeperNameMatchers.DEFAULT.match(nameInput);
+		Optional<? extends Shopkeeper> shopkeeper = shopkeepers.findFirst();
+		return shopkeeper.orElse(null);
+		// TODO deal with ambiguities
 	}
 
 	@Override

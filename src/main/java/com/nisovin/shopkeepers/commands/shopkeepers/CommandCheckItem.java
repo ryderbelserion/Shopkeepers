@@ -10,6 +10,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 class CommandCheckItem extends PlayerCommand {
@@ -21,7 +22,7 @@ class CommandCheckItem extends PlayerCommand {
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
 		// set description:
-		this.setDescription("Shows debugging information for the currently held items.");
+		this.setDescription(Text.of("Shows debugging information for the currently held items."));
 
 		// hidden debugging command:
 		this.setHiddenInParentHelp(true);

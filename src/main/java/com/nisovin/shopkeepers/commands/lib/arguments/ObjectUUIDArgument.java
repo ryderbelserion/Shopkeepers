@@ -1,16 +1,14 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
-import java.util.Locale;
 import java.util.UUID;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 
 /**
- * Base class for arguments that accept an UUID when there is a limited set of known applicable UUIDs (eg. UUIDs
- * identifying a known set of objects).
+ * Base class for arguments that accept an UUID as identifier for some type of objects.
  * <p>
- * By default this argument actually accepts any UUID. But unlike {@link UUIDArgument} this class uses
- * {@link #getKnownIds()} to provide completions for partial inputs.
+ * By default this argument accepts any UUID. But unlike {@link UUIDArgument} this class uses
+ * {@link #getCompletionSuggestions(String)} to provide completions for partial inputs.
  */
 public abstract class ObjectUUIDArgument extends ObjectIdArgument<UUID> {
 
@@ -25,22 +23,11 @@ public abstract class ObjectUUIDArgument extends ObjectIdArgument<UUID> {
 	}
 
 	public ObjectUUIDArgument(String name, ArgumentFilter<UUID> filter, int minimalCompletionInput) {
-		// matching doesn't make much sense for UUIDs
-		super(name, new UUIDArgument(name + ":uuid"), filter, false, minimalCompletionInput);
-	}
-
-	@Override
-	protected UUID matchKnownId(UUID input) {
-		return input; // no matching for uuids
+		super(name, new UUIDArgument(name + ":uuid"), filter, minimalCompletionInput);
 	}
 
 	@Override
 	protected String toString(UUID id) {
 		return id.toString();
-	}
-
-	@Override
-	protected String normalize(String idString) {
-		return idString.toLowerCase(Locale.ROOT);
 	}
 }

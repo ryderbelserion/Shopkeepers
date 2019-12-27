@@ -1,16 +1,13 @@
 package com.nisovin.shopkeepers.commands.arguments;
 
+import java.util.Locale;
 import java.util.UUID;
+import java.util.function.Predicate;
 
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
-import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
-import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
-import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectUUIDArgument;
-import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
  * Provides suggestions for the UUIDs of existing shopkeepers.
@@ -19,63 +16,8 @@ import com.nisovin.shopkeepers.util.TextUtils;
  */
 public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 
-	public static final ArgumentFilter<UUID> ACCEPT_EXISTING_SHOPS = new ArgumentFilter<UUID>() {
-		@Override
-		public boolean test(UUID uuid) {
-			Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByUniqueId(uuid);
-			return (shopkeeper != null);
-		}
-
-		@Override
-		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String argumentInput, UUID value) {
-			if (argumentInput == null) argumentInput = "";
-			String[] defaultArgs = argument.getDefaultErrorMsgArgs();
-			return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentInvalid,
-					defaultArgs, "{argument}", argumentInput);
-		}
-	};
-
-	public static final ArgumentFilter<UUID> ACCEPT_ADMIN_SHOPS = new ArgumentFilter<UUID>() {
-		@Override
-		public boolean test(UUID uuid) {
-			Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByUniqueId(uuid);
-			return (shopkeeper instanceof AdminShopkeeper);
-		}
-
-		@Override
-		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String argumentInput, UUID value) {
-			if (argumentInput == null) argumentInput = "";
-			Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByUniqueId(value);
-			if (shopkeeper == null) {
-				return ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, argumentInput, value);
-			} else {
-				String[] defaultArgs = argument.getDefaultErrorMsgArgs();
-				return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoAdminShop,
-						defaultArgs, "{argument}", argumentInput);
-			}
-		}
-	};
-
-	public static final ArgumentFilter<UUID> ACCEPT_PLAYER_SHOPS = new ArgumentFilter<UUID>() {
-		@Override
-		public boolean test(UUID uuid) {
-			Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByUniqueId(uuid);
-			return (shopkeeper instanceof PlayerShopkeeper);
-		}
-
-		@Override
-		public String getInvalidArgumentErrorMsg(CommandArgument<UUID> argument, String argumentInput, UUID value) {
-			if (argumentInput == null) argumentInput = "";
-			Shopkeeper shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByUniqueId(value);
-			if (shopkeeper == null) {
-				return ACCEPT_EXISTING_SHOPS.getInvalidArgumentErrorMsg(argument, argumentInput, value);
-			} else {
-				String[] defaultArgs = argument.getDefaultErrorMsgArgs();
-				return TextUtils.replaceArgs(Settings.msgCommandShopkeeperArgumentNoPlayerShop,
-						defaultArgs, "{argument}", argumentInput);
-			}
-		}
-	};
+	// Note: Not providing default argument filters that only accept existing shops, admin shops, or player shops,
+	// because this can be achieved more efficiently by using ShopkeeperByUUIDArgument instead.
 
 	public ShopkeeperUUIDArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
@@ -89,14 +31,33 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 		super(name, filter, minimalCompletionInput);
 	}
 
-	// using regular 'missing argument' message
-	// using the regular 'invalid argument' message if the uuid is invalid
-	// using the filter's 'invalid shopkeeper' message if the uuid is not accepted
+	// using the regular 'missing argument' message
+	// using the uuid argument's 'invalid argument' message if the uuid is invalid
+	// using the filter's 'invalid argument' message if the uuid is not accepted
+
+	/**
+	 * Gets the default uuid completion suggestions.
+	 * 
+	 * @param uuidPrefix
+	 *            the uuid prefix, may be empty, not <code>null</code>
+	 * @param shopkeeperFilter
+	 *            only suggestions for shopkeepers accepted by this predicate get included
+	 * @return the shopkeeper uuid completion suggestions
+	 */
+	public static Iterable<UUID> getDefaultCompletionSuggestions(String uuidPrefix, Predicate<Shopkeeper> shopkeeperFilter) {
+		String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
+		// TODO improve by using a TreeMap for the prefix matching?
+		return ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers().stream()
+				.filter(shopkeeperFilter)
+				.map(shopkeeper -> shopkeeper.getUniqueId())
+				.filter(uuid -> {
+					// assumption: UUID#toString is already lowercase (normalized)
+					return uuid.toString().startsWith(normalizedUUIDPrefix);
+				})::iterator;
+	}
 
 	@Override
-	protected Iterable<UUID> getKnownIds() {
-		return ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers().stream().map((shopkeeper) -> {
-			return shopkeeper.getUniqueId();
-		})::iterator;
+	protected Iterable<UUID> getCompletionSuggestions(String idPrefix) {
+		return getDefaultCompletionSuggestions(idPrefix, (shopkeeper) -> true);
 	}
 }

@@ -5,6 +5,7 @@ import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.text.Text;
 
 class CommandConfirm extends Command {
 
@@ -15,7 +16,7 @@ class CommandConfirm extends Command {
 		this.confirmations = confirmations;
 
 		// set description:
-		this.setDescription("Confirms a potentially dangerous action.");
+		this.setDescription(Text.of("Confirms a potentially dangerous action."));
 
 		// hidden command:
 		this.setHiddenInParentHelp(true);

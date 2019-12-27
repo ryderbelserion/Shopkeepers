@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
@@ -12,71 +13,46 @@ import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
- * Base class for arguments that accept some form of identifier (eg. UUID or name) when there is a limited set of known
- * applicable identifiers.
+ * Base class for arguments that accept some form of object identifier (eg. UUID or name).
  * <p>
- * By default this argument actually accepts any identifier that can be parsed by the wrapped identifier argument.
- * However, the {@link #getKnownIds()} get used to provide suggestions for partial inputs.
+ * By default this argument accepts any identifier that can be parsed by the wrapped identifier argument.
  * <p>
- * If the option <code>matchKnownIds</code> is used and a known identifier matches the given input (according to the
- * used matching function), that identifier will be returned instead of the input.
+ * Sub-classes need to override {@link #getCompletionSuggestions(String)} and {@link #toString(Object)} to provide
+ * completion suggestions for partial inputs matching known ids.
  *
  * @param <I>
  *            the identifier type
  */
-public abstract class ObjectIdArgument<Id> extends CommandArgument<Id> {
+public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 
-	protected final CommandArgument<Id> idArgument;
-	protected final ArgumentFilter<Id> filter; // not null
-	protected final boolean matchKnownIds;
+	protected static final Pattern ARGUMENTS_SEPARATOR_PATTERN = Pattern.compile(Command.ARGUMENTS_SEPARATOR, Pattern.LITERAL);
+
+	protected final CommandArgument<I> idArgument;
+	protected final ArgumentFilter<I> filter; // not null
 	// completions are only provided after at least that many matching input characters:
 	protected final int minimalCompletionInput; // <= 0 to deactivate
 
-	public ObjectIdArgument(String name, CommandArgument<Id> idArgument, ArgumentFilter<Id> filter, boolean matchKnownIds, int minimalCompletionInput) {
+	public ObjectIdArgument(String name, CommandArgument<I> idArgument, ArgumentFilter<I> filter, int minimalCompletionInput) {
 		super(name);
-		Validate.notNull(idArgument, "Id-argument is null!");
+		Validate.notNull(idArgument, "Id argument is null!");
 		this.idArgument = idArgument;
 		idArgument.setParent(this);
 		this.filter = (filter == null) ? ArgumentFilter.acceptAny() : filter;
-		this.matchKnownIds = matchKnownIds;
 		this.minimalCompletionInput = minimalCompletionInput;
 	}
 
-	// gets used for the suggestions (after passing the id filter)
-	protected abstract Iterable<Id> getKnownIds();
-
-	protected final Iterable<Id> getFilteredIds() {
-		return Utils.stream(this.getKnownIds()).filter(filter)::iterator;
-	}
-
-	// returns the identifier to use (may be the input identifier, or a different but matching one)
-	// may for example be used to normalize the returned id if a matching id is known
-	protected abstract Id matchKnownId(Id input);
-
-	// toString(Id) and normalize(String) are used to match partial ids to the known ids when checking for completions
-	protected abstract String toString(Id id);
-
-	// idString is potentially partial
-	protected abstract String normalize(String idString);
-
 	@Override
-	public Id parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
+	public I parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		// prefer this class's missing-argument exception over the id-argument's exception:
 		if (!argsReader.hasNext()) {
 			throw this.missingArgumentError();
 		}
 		int startIndex = argsReader.getCursor();
 		// throws exceptions with appropriate messages if the id cannot be parsed:
-		Id id = idArgument.parseValue(input, context, argsReader);
-
-		// check if the id matches a known id and then use that instead:
-		if (matchKnownIds) {
-			id = this.matchKnownId(id);
-		}
+		I id = idArgument.parseValue(input, context, argsReader);
 
 		// check if id is accepted:
 		if (!filter.test(id)) {
@@ -88,42 +64,85 @@ public abstract class ObjectIdArgument<Id> extends CommandArgument<Id> {
 		return id;
 	}
 
+	/**
+	 * Gets the completion suggestions for the given id prefix.
+	 * <p>
+	 * Before these suggestions get actually used, they may first have to also pass the id filter used by this
+	 * {@link ObjectIdArgument}.
+	 * 
+	 * @param idPrefix
+	 *            the id prefix, may be empty, not <code>null</code>
+	 * @return the suggestions
+	 */
+	protected abstract Iterable<I> getCompletionSuggestions(String idPrefix);
+
+	// this gets applied to convert id completion suggestions to Strings
+	protected abstract String toString(I id);
+
 	@Override
 	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
-		// Note: By default this also provides suggestions if there a no remaining args (empty partial input).
-		// Some types of id-arguments (eg. if there are lots of candidate ids) might want to limit their suggestions to
-		// the case that there is at least a minimum sized input (see minimalCompletionInput).
-		int startIndex = argsReader.getCursor();
-		// parse id as far as possible:
-		try {
-			idArgument.parseValue(input, context, argsReader);
-		} catch (ArgumentParseException e) {
-		}
-		if (argsReader.getRemainingSize() > 0) {
-			// there are still arguments left, so this is not consuming the last argument
-			return Collections.emptyList();
+		if (argsReader.getRemainingSize() == 0) {
+			return Collections.emptyList(); // there are no remaining arguments to complete
 		}
 
-		int endIndex = argsReader.getCursor();
-		List<String> parsedArgs = argsReader.getArgs().subList(startIndex + 1, endIndex + 1);
-		String parsedArgsString = String.join(Command.ARGUMENTS_SEPARATOR, parsedArgs);
-		if (parsedArgsString.length() < minimalCompletionInput) {
+		// try to parse id:
+		int startIndex = argsReader.getCursor() + 1; // inclusive
+		try {
+			idArgument.parseValue(input, context, argsReader);
+			if (argsReader.getRemainingSize() > 0) {
+				// successfully parsed and there are still arguments left, so this is not consuming the last argument:
+				return Collections.emptyList();
+			}
+		} catch (ArgumentParseException e) {
+		}
+
+		// determine id prefix and args count:
+		List<String> args = argsReader.getArgs();
+		int endIndex = args.size(); // exclusive
+		// the partial id input may consist of multiple joined input arguments:
+		int argsCount = (endIndex - startIndex);
+		assert argsCount > 0; // otherwise we would have no remaining arguments in the first place
+
+		String idPrefix;
+		if (argsCount == 1) { // single argument
+			idPrefix = args.get(startIndex);
+		} else { // joined arguments:
+			List<String> parsedArgs = args.subList(startIndex, endIndex);
+			idPrefix = String.join(Command.ARGUMENTS_SEPARATOR, parsedArgs);
+		}
+
+		// get completion suggestions:
+		return this.complete(idPrefix, argsCount);
+	}
+
+	// argsCount: the number of arguments the id prefix consist of (>= 1)
+	protected List<String> complete(String idPrefix, int argsCount) {
+		// Some types of object id arguments may want to provide suggestions even if there are no remaining args (empty
+		// partial input), while others might want to limit their suggestions to the case that there is at least a
+		// minimum sized input (eg. if there are lots of candidate ids):
+		if (idPrefix.length() < minimalCompletionInput) {
 			// only provide suggestions if there is a minimal length input
 			return Collections.emptyList();
 		}
-		String partialIdString = this.normalize(parsedArgsString);
+
 		List<String> suggestions = new ArrayList<>();
-		// using the filtered ids, because we don't want to show suggestions that don't get accepted
-		// TODO support for aliases, that can be completed, but only include at most one of them in the suggestions
-		// see for eg. player's with name and display name
-		for (Id id : this.getFilteredIds()) {
+		for (I id : this.getCompletionSuggestions(idPrefix)) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;
+			if (!filter.test(id)) continue; // skip rejected ids
+
 			String idString = this.toString(id);
-			if (this.normalize(idString).startsWith(partialIdString)) {
-				// TODO only add the part of the name past the matching parts as suggestion (in case of joined remaining
-				// args)
-				suggestions.add(idString); // add the unnormalized id string
+			if (idString == null || idString.isEmpty()) continue; // skip invalid id string
+
+			// if the id prefix consists of multiple joined input arguments, we skip the first (matching) parts and only
+			// output the final part(s) of the completed id as completion suggestion:
+			if (argsCount > 1) {
+				String[] idStringParts = ARGUMENTS_SEPARATOR_PATTERN.split(idString, argsCount);
+				// this should usually be true for valid (consistent) argsCount and suggestions:
+				if (idStringParts.length == argsCount) {
+					idString = idStringParts[argsCount - 1];
+				} // else: fallback to using the complete idString
 			}
+			suggestions.add(idString);
 		}
 		return Collections.unmodifiableList(suggestions);
 	}

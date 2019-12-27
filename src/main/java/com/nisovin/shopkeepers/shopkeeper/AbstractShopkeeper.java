@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObject;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObjectType;
@@ -533,6 +534,23 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	private void updateChunkCoords() {
 		this.chunkCoords = this.isVirtual() ? null : ChunkCoords.fromBlockPos(worldName, x, z);
+	}
+
+	// TODO this has to be aware of sub types in order to replace arguments with empty strings
+	// -> move into Shop type and abstract shop type and let all registered types provide arguments
+	// TODO not yet used anywhere
+	public final Map<String, Object> getShopkeeperMsgArgs(Shopkeeper shopkeeper) {
+		Map<String, Object> msgArgs = new HashMap<>();
+		msgArgs.put("uuid", shopkeeper.getUniqueId().toString());
+		msgArgs.put("id", String.valueOf(shopkeeper.getId()));
+		msgArgs.put("name", shopkeeper.getName());
+		msgArgs.put("location", shopkeeper.getPositionString());
+		msgArgs.put("shopType", shopkeeper.getType().getIdentifier());
+		msgArgs.put("objectType", shopkeeper.getShopObject().getType().getIdentifier());
+		PlayerShopkeeper playerShop = (shopkeeper instanceof PlayerShopkeeper) ? (PlayerShopkeeper) shopkeeper : null;
+		msgArgs.put("ownerName", (playerShop == null) ? "" : playerShop.getOwnerName());
+		msgArgs.put("ownerUUID", (playerShop == null) ? "" : playerShop.getOwnerUUID().toString());
+		return msgArgs;
 	}
 
 	// NAMING

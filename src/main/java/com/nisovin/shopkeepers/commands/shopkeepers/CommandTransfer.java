@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Arrays;
-
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -16,8 +14,6 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
-import com.nisovin.shopkeepers.spigot.text.SpigotText;
-import com.nisovin.shopkeepers.util.MapUtils;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils.TargetShopkeeperFilter;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -65,9 +61,7 @@ class CommandTransfer extends Command {
 		shopkeeper.setOwner(newOwner);
 
 		// success:
-		SpigotText.sendMessage(player, Settings.msgOwnerSet, Arrays.asList(
-				MapUtils.entry("{owner}", TextUtils.getPlayerText(newOwner))
-		));
+		TextUtils.sendMessage(player, Settings.msgOwnerSet, "owner", TextUtils.getPlayerText(newOwner));
 
 		// save:
 		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();

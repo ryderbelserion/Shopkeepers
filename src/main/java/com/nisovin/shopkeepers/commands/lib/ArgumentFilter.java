@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.commands.lib;
 
 import java.util.function.Predicate;
 
+import com.nisovin.shopkeepers.text.Text;
+
 public interface ArgumentFilter<T> extends Predicate<T> {
 
 	public static final ArgumentFilter<Object> ACCEPT_ANY = new ArgumentFilter<Object>() {
@@ -32,7 +34,7 @@ public interface ArgumentFilter<T> extends Predicate<T> {
 	 *            the corresponding parsed but declined value
 	 * @return the error message
 	 */
-	public default String getInvalidArgumentErrorMsg(CommandArgument<T> argument, String argumentInput, T value) {
+	public default Text getInvalidArgumentErrorMsg(CommandArgument<T> argument, String argumentInput, T value) {
 		return argument.getInvalidArgumentErrorMsg(argumentInput);
 	}
 }

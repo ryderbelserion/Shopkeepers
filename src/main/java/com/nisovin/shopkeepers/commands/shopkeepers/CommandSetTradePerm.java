@@ -65,13 +65,13 @@ class CommandSetTradePerm extends Command {
 		if (removePerm) {
 			// remove trade permission:
 			assert newTradePerm == null;
-			TextUtils.sendMessage(sender, Settings.msgTradePermRemoved, "{perm}", currentTradePerm);
+			TextUtils.sendMessage(sender, Settings.msgTradePermRemoved, "perm", currentTradePerm);
 		} else if (newTradePerm != null) {
 			// set trade permission:
-			TextUtils.sendMessage(sender, Settings.msgTradePermSet, "{perm}", newTradePerm);
+			TextUtils.sendMessage(sender, Settings.msgTradePermSet, "perm", newTradePerm);
 		} else {
 			// display current trade permission:
-			TextUtils.sendMessage(sender, Settings.msgTradePermView, "{perm}", currentTradePerm);
+			TextUtils.sendMessage(sender, Settings.msgTradePermView, "perm", currentTradePerm);
 			return;
 		}
 

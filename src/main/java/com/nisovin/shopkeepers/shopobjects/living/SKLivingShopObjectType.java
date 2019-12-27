@@ -39,8 +39,7 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> ex
 	@Override
 	public String getDisplayName() {
 		// TODO translation support for the entity type name?
-		return TextUtils.replaceArgs(Settings.msgShopObjectTypeLiving,
-				"{type}", StringUtils.normalize(entityType.name()));
+		return TextUtils.replaceArguments(Settings.msgShopObjectTypeLiving, "type", StringUtils.normalize(entityType.name()));
 	}
 
 	@Override

@@ -68,6 +68,18 @@ public class MapUtils {
 		return map;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <K, V> Map<K, V> createMap(Object... keyValuePairs) {
+		Map<K, V> map = new LinkedHashMap<>(getIdealHashMapCapacity(keyValuePairs.length / 2));
+		final int keyLimit = keyValuePairs.length - 1;
+		for (int i = 0; i < keyLimit; i += 2) {
+			Object key = keyValuePairs[i];
+			Object value = keyValuePairs[i + 1];
+			map.put((K) key, (V) value); // errors if types don't match the expected ones
+		}
+		return map;
+	}
+
 	public static <K, V> Map.Entry<K, V> entry(K key, V value) {
 		return new AbstractMap.SimpleImmutableEntry<>(key, value);
 	}
