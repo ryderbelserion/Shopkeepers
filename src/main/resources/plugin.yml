@@ -28,6 +28,7 @@ permissions:
     shopkeeper.debug:
         description: Toggle debug mode and access debugging commands
         default: op
+
     shopkeeper.list.own:
         description: List your own player shops
         default: true
@@ -37,6 +38,7 @@ permissions:
     shopkeeper.list.admin:
         description: List the admin shops
         default: op
+
     shopkeeper.remove.own:
         description: Remove all your own player shops via command
         default: op
@@ -49,6 +51,7 @@ permissions:
     shopkeeper.remove.admin:
         description: Remove all admin shops via command
         default: op
+
     shopkeeper.give:
         description: Give shop creation items per command
         default: op

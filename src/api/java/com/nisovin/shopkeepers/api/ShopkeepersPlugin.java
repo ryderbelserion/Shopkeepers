@@ -31,13 +31,16 @@ public interface ShopkeepersPlugin extends Plugin {
 	public static final String TRADE_PERMISSION = "shopkeeper.trade";
 	public static final String RELOAD_PERMISSION = "shopkeeper.reload";
 	public static final String DEBUG_PERMISSION = "shopkeeper.debug";
+
 	public static final String LIST_OWN_PERMISSION = "shopkeeper.list.own";
 	public static final String LIST_OTHERS_PERMISSION = "shopkeeper.list.others";
 	public static final String LIST_ADMIN_PERMISSION = "shopkeeper.list.admin";
+
 	public static final String REMOVE_OWN_PERMISSION = "shopkeeper.remove.own";
 	public static final String REMOVE_OTHERS_PERMISSION = "shopkeeper.remove.others";
 	public static final String REMOVE_ALL_PERMISSION = "shopkeeper.remove.all";
 	public static final String REMOVE_ADMIN_PERMISSION = "shopkeeper.remove.admin";
+
 	public static final String GIVE_PERMISSION = "shopkeeper.give";
 	public static final String REMOTE_PERMISSION = "shopkeeper.remote";
 	public static final String REMOTE_EDIT_PERMISSION = "shopkeeper.remoteedit";
@@ -46,6 +49,7 @@ public interface ShopkeepersPlugin extends Plugin {
 	public static final String SET_FOR_HIRE_PERMISSION = "shopkeeper.setforhire";
 	public static final String HIRE_PERMISSION = "shopkeeper.hire";
 	public static final String BYPASS_PERMISSION = "shopkeeper.bypass";
+
 	public static final String ADMIN_PERMISSION = "shopkeeper.admin";
 	public static final String PLAYER_SELL_PERMISSION = "shopkeeper.player.sell";
 	public static final String PLAYER_BUY_PERMISSION = "shopkeeper.player.buy";
