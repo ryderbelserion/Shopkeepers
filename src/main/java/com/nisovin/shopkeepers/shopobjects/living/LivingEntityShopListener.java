@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.shopobjects.living;
 
 import java.util.Collection;
 
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -37,6 +38,8 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.projectiles.ProjectileSource;
 
 import com.nisovin.shopkeepers.Settings;
@@ -114,6 +117,16 @@ class LivingEntityShopListener implements Listener {
 			return;
 		}
 
+		// TODO Minecraft bug: https://bugs.mojang.com/browse/MC-141494
+		// Interacting with a villager while holding a written book in the main or off hand results in weird glitches
+		// and tricks the plugin into thinking that the editor or trading UI got opened even though the book got opened
+		// instead. We therefore ignore any interactions with shopkeeper mobs for now when the interacting player is
+		// holding a written book.
+		if (hasWrittenBookInHand(player)) {
+			Log.debug("  Ignoring interaction due to holding a written book in main or off hand. See Minecraft issue MC-141494.");
+			return;
+		}
+
 		// Check the entity interaction result by calling another interact event:
 		if (Settings.checkShopInteractionResult) {
 			if (!Utils.checkEntityInteract(player, shopEntity)) {
@@ -124,6 +137,16 @@ class LivingEntityShopListener implements Listener {
 
 		// handle interaction:
 		shopkeeper.onPlayerInteraction(player);
+	}
+
+	private static boolean hasWrittenBookInHand(Player player) {
+		assert player != null;
+		PlayerInventory inventory = player.getInventory();
+		return (isWrittenBook(inventory.getItemInMainHand()) || isWrittenBook(inventory.getItemInOffHand()));
+	}
+
+	private static boolean isWrittenBook(ItemStack itemStack) {
+		return (itemStack != null && itemStack.getType() == Material.WRITTEN_BOOK);
 	}
 
 	// This event gets sometimes called additionally to the PlayerInteractEntityEvent
