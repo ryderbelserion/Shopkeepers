@@ -7,6 +7,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Raider;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -211,6 +212,11 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 			// overwrite AI:
 			this.overwriteAI();
+
+			// prevent raider shopkeepers from participating in nearby raids:
+			if (entity instanceof Raider) {
+				NMSManager.getProvider().setCanJoinRaid((Raider) entity, false);
+			}
 
 			// apply sub type:
 			this.onSpawn(entity);
