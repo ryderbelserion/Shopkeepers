@@ -11,6 +11,7 @@ import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Raider;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
@@ -121,6 +122,11 @@ public final class FailedHandler implements NMSCallProvider {
 		} catch (Exception e) {
 			// this is optional, ignore if not possible for some reason
 		}
+	}
+
+	@Override
+	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
+		// not supported :( raider mobs might interfere with nearby raids TODO
 	}
 
 	@Override

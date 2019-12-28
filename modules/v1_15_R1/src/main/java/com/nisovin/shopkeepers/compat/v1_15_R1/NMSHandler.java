@@ -9,6 +9,7 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftAbstractVillager;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftRaider;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMerchant;
@@ -16,6 +17,7 @@ import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Raider;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -30,6 +32,7 @@ import net.minecraft.server.v1_15_R1.EntityHuman;
 import net.minecraft.server.v1_15_R1.EntityInsentient;
 import net.minecraft.server.v1_15_R1.EntityLiving;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
+import net.minecraft.server.v1_15_R1.EntityRaider;
 import net.minecraft.server.v1_15_R1.GameProfileSerializer;
 import net.minecraft.server.v1_15_R1.IMerchant;
 import net.minecraft.server.v1_15_R1.MerchantRecipeList;
@@ -117,6 +120,12 @@ public final class NMSHandler implements NMSCallProvider {
 		// this might not properly work for Vec, since those disable noclip again after their movement:
 		Entity mcEntity = ((CraftEntity) entity).getHandle();
 		mcEntity.noclip = true;
+	}
+
+	@Override
+	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
+		EntityRaider nmsRaider = ((CraftRaider) raider).getHandle();
+		nmsRaider.u(canJoinRaid); // CanJoinRaid
 	}
 
 	@Override

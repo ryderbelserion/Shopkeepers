@@ -13,9 +13,11 @@ import org.bukkit.craftbukkit.v1_14_R1.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftMerchant;
 import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_14_R1.entity.CraftRaider;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Raider;
 import org.bukkit.entity.Villager;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -37,6 +39,7 @@ import net.minecraft.server.v1_14_R1.NBTTagCompound;
 import net.minecraft.server.v1_14_R1.PathfinderGoalFloat;
 import net.minecraft.server.v1_14_R1.PathfinderGoalLookAtPlayer;
 import net.minecraft.server.v1_14_R1.PathfinderGoalSelector;
+import net.minecraft.server.v1_14_R1.EntityRaider;
 
 public final class NMSHandler implements NMSCallProvider {
 
@@ -117,6 +120,12 @@ public final class NMSHandler implements NMSCallProvider {
 		// this might not properly work for Vec, since those disable noclip again after their movement:
 		Entity mcEntity = ((CraftEntity) entity).getHandle();
 		mcEntity.noclip = true;
+	}
+
+	@Override
+	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
+		EntityRaider nmsRaider = ((CraftRaider) raider).getHandle();
+		nmsRaider.t(canJoinRaid); // CanJoinRaid
 	}
 
 	@Override

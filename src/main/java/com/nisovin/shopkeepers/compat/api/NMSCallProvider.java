@@ -4,6 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Raider;
 import org.bukkit.inventory.ItemStack;
 
 public interface NMSCallProvider {
@@ -27,6 +28,9 @@ public interface NMSCallProvider {
 	}
 
 	public void setNoclip(Entity entity);
+
+	// TODO replace this once there is a corresponding Bukkit API for this
+	public void setCanJoinRaid(Raider raider, boolean canJoinRaid);
 
 	/**
 	 * Checks if the <code>provided</code> itemstack fulfills the requirements of a trading recipe requiring the given
