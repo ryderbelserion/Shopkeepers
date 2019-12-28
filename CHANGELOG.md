@@ -1,57 +1,53 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## Next release
-### Supported MC versions: xxx
+## v2.9.1 (TBA)
+### Supported MC versions: 1.15.1, 1.14.4
 
-## v2.9.0 (TBA)
-### Supported MC versions: 1.14.4, 1.15.1
+
+## v2.9.0 (2019-12-28)
+### Supported MC versions: 1.15.1, 1.14.4
 
 **Update for MC 1.15.1:**
 * Added bees to the by default enabled mob types. If you are migrating from a previous version, you will have to manually enable them in the config.
 
 **Other changes:**  
-* Added: The give, transfer list and remove commands show the player's uuid as hover text now and allow it to be copied into the chat input via shift clicking.
-* Added: Debug option 'owner-name-updates' enables additional output whenever stored shop owner names get updated.
-* Added: Checking for invalid name-regex and then reverting back to default.
 * Fixed: Raider shopkeeper mobs were able to join and thereby interfere with nearby raids. This should no longer be the case.
-* Fixed: The save file was missing the data-version when initially created. This caused subsequent reloads to always trigger a 'migration' / forced without actually being required.
+* Fixed: The save file was missing the data-version when initially created. This caused subsequent reloads to always trigger a 'migration' / forced save without actually being required.
 * Fixed: The book shopkeeper was ignoring books with missing generation tag. These are now treated as 'original' books, just like Minecraft does.
-* Fixed: We would previously drop the shop-creation item returned on shop deletion at the shop's location, even if the shop got deleted via remote editing from far away (and is potentially not even loaded). If the player is further than 10 blocks away (or if the shop object is not loaded), it will drop the item at the player's location now.
-* Fixed: The book shopkeeper would not correctly store offers for books that have dots in their name.
-* Fixed: Some settings would not loaded correctly depending on the used locale. Also made all text comparisons locale independent.
-* Fixed: The shop creation item can no longer be used from dispensers if regular use is disabled.
-* Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored by the commands now.
-* Fixed: Derived settings were not updated when loading messages from a separate language file.
-* Fixed: Improved thread-safety for asynchronous logging operations and settings access.
-* Fixed/API: NPE when accessing a non-existing second offered item from the ShopkeeperTradeEvent.
-* Fixed/API: The offered items inside the ShopkeeperTradeEvent are copies now and their stack sizes match those of the trading recipe.
-* Fixed: The internal default for message 'msg-list-shops-entry' (that gets used if the message is missing in the config) was not matching the message in the default config.
 * Fixed: Spigot seems to (internally) support books with empty titles now. The book shopkeepers were updated to ignore them, since supporting them would require fundamental changes to how book prices are stored and how books are identified. Those books can't be created in vanilla Minecraft, so this shouldn't be a severe limitation.
 * Fixed: Due to a Minecraft bug (MC-141494) interacting with a villager while holding a written book in the main or off hand results in weird glitches and tricks the plugin into thinking that the editor or trading UI got opened even though the book got opened instead. We therefore ignore any interactions with shopkeeper mobs for now when the interacting player is holding a written book.
+* Fixed: The book shopkeeper would not correctly store offers for books that have dots in their name.
+* Fixed: We would previously drop the shop-creation item returned on shop deletion at the shop's location, even if the shop got deleted via remote editing from far away (and is potentially not even loaded). If the player is further than 10 blocks away (or if the shop object is not loaded), it will drop the item at the player's location now.
+* Fixed: The shop creation item can no longer be used from dispensers if regular use is disabled.
+* Config/Fixed: Derived settings were not updated when loading messages from a separate language file.
+* Config/Fixed: Some settings would not loaded correctly depending on the used locale. Also made all text comparisons locale independent.
+* Config/Fixed: In case the name-regex setting cannot be parsed, we now print a warning and revert to the default (instead of throwing an error).
+* API/Fixed: NPE when accessing a non-existing second offered item from the ShopkeeperTradeEvent.
+* API/Fixed: The offered items inside the ShopkeeperTradeEvent are copies now and their stack sizes match those of the trading recipe.
+* Messages/Fixed: The internal default for message 'msg-list-shops-entry' (that gets used if the message is missing in the config) was not matching the message in the default config.
+* Internal/Fixed: Improved thread-safety for asynchronous logging operations and settings access.
 * Changed: Villager shopkeepers get their experience set to 1 now. I wasn't able to reproduce this myself yet, but according to some reports villager shopkeepers would sometimes lose their profession. Setting their experience to something above 0 is an attempt to resolve this.
-* Changed: The debugCreateShops command prints the number of actually created shops now.
-* Changed: The always-show-nameplates setting seems to be working again (since MC 1.9 already). Updated the corresponding comment in the default config.
 * Changed: Instead of using a fallback name ("unknown"), player shops are required to always provide a valid owner name now.
 * Changed: Explicitly checking for missing world names when loading shopkeepers.
-* Changed: Only printing the 'Config already loaded' message during startup if the debug mode is enabled.
-* Changed: The plugin will now shutdown in case a severe issue prevents loading the config. This includes the case that the config version is invalid. Previously it would treat invalid and missing config versions the same and apply config migrations nevertheless.
-* Changed: Changed/Added a few information/warning messages related to config and language file loading.
-* Changed: Added more information to the message that gets logged when a shopkeeper gets removed for owner inactivity.
 * Changed: Added validation that the unique id of loaded or freshly created shopkeepers is not yet used.
-* Changed: The msg-shop-creation-items-given message was using the player's display name. This was changed to use the player's regular name to be consistent with the rest of the plugin.
+* Changed: Added more information to the message that gets logged when a shopkeeper gets removed for owner inactivity.
 * Changed: The errors about a potentially incompatible server version and trying to run in compatibility mode are warnings now.
+* Messages/Changed: The msg-shop-creation-items-given message was using the player's display name. This was changed to use the player's regular name to be consistent with the rest of the plugin.
+* Config/Changed: The plugin will now shutdown in case a severe issue prevents loading the config. This includes the case that the config version is invalid. Previously it would treat invalid and missing config versions the same and apply config migrations nevertheless.
+* Config/Changed: The always-show-nameplates setting seems to be working again (since MC 1.9 already). The corresponding comment in the default config was updated.
+* Config/Changed: Changed/Added a few information/warning messages related to config and language file loading.
+* Config/Changed: Only printing the 'Config already loaded' message during startup if the debug mode is enabled.
+* Debug: Debug option 'owner-name-updates' enables additional output whenever stored shop owner names get updated.
 * Various changes to the shopkeeper registry and shopkeeper activation:
   * We keep track now which chunks have been activated. This avoids a few checks whether chunks are loaded.
   * The delayed chunk activation tasks get cancelled now if the chunk gets unloaded again before it got activated. This resolves a few inconsistencies such as duplicate or out-of-order chunk activation and deactivation handling when chunks get loaded and unloaded very frequently.
   * Similarly the respawn task on world saves gets cancelled now if the world gets unloaded.
   * Shopkeeper spawning is skipped if there is a respawn pending due to a world save.
   * Shopkeepers are now stored by world internally. This might speed up a few tasks which only affect the shopkeepers of a specific world.
-  * Config: Added debug option 'shopkeeper-activation'. Various debug output related to chunk/world loading/unloading/saving and spawning/despawning of shopkeepers was moved into this debug category.
-  * Debug messages are now created lazily only when they are actually required.
-  * Added/Debug: The "/shopkeepers check" command now outputs some additional information on active chunks.
-  * Internal: Moved all logic from WorldListener into SKShopkeeperRegistry.
-  * Internal: Various internally used methods are now hidden.
+  * Debug: Added debug option 'shopkeeper-activation'. Various debug output related to chunk/world loading/unloading/saving and spawning/despawning of shopkeepers was moved into this debug category.
+  * Debug: The "/shopkeepers check" command now outputs some additional information about active chunks.
+  * Internal: Moved all logic from WorldListener into SKShopkeeperRegistry. Various internally used methods are now hidden.
 
 API changes:  
 * Added: PlayerShopkeeper#getChestX/getChestY/getChestZ
@@ -84,54 +80,52 @@ Various (mostly internal) changes to commands and argument parsing:
   * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information.
   * A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
   * Most optional arguments, default values and fallbacks were updated to use this new fallback mechanism, which should provide more relevant error messages in a few edge cases.
-* "list", "remove", "transfer" and "setTradePerm" commands can be used from console now. Command confirmations work for the console as well now (any command sender that is not a player is considered to be the 'console' for this purpose).
-* "setForHire" and "transfer" commands allow specifying the shopkeeper via argument now. Also: When targeting a chest that happens to be used by multiple shopkeepers (eg. due to manually modified save data..), it picks the first one now (instead of applying the command to all shops). In the future this will likely print an error message instead.
-* "debugCreateShops" command: Shop count per command invocation is limited to 1000 now.
-* Added debug option 'commands' and added various debug output when parsing and executing a command.
+* Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored by the commands now.
+* Added: The "give", "transfer", "list" and "remove" commands show the player's uuid as hover text now and allow it to be copied into the chat input via shift clicking.
+* The "list", "remove", "transfer" and "setTradePerm" commands can be used from console now. Command confirmations work for the console as well now (any command sender that is not a player is considered to be the 'console' for this purpose).
+* The "setForHire" and "transfer" commands allow specifying the shopkeeper via argument now. Also: When targeting a chest that happens to be used by multiple shopkeepers (eg. due to manually modified save data..), it picks the first one now (instead of applying the command to all shops). In the future this will likely print an error message instead.
+* The "debugCreateShops" command limits the shop count per command invocation to 1000 and prints the number of actually created shops now.
+* Added debug option 'commands' and added various debug output when parsing and executing commands.
 * All argument suggestions are limited to 20 entries by default now.
 * Player arguments suggest matching uuids now. To avoid spamming the suggestions with uuids for the first few characters of input, suggestions are only provided after at least 3 characters of matching input.
 * Some commands (eg. "list") provide suggestions for names of online players now.
-* The list and remove commands accept player uuids now and ignore the case when comparing player names.
-* The list and remove commands handle ambiguous player names now: If there are shops of different players matching the given player name, an error message is shown and the player needs to be specified by uuid instead. The player names and uuids can be copied to the chat input via shift clicking. If a player with matching name is online, that player is used for the command (regardless of if the given player name is ambiguous).
-* The shops affected by the remove command are now determined before asking for the users confirmation. This allows detecting ambiguous player names and missing player information before prompting the command executor for confirmation. A minor side effect of this is that any shops created after the command invocation are no longer affected by the remove command once it gets confirmed.
+* The "list" and "remove" commands accept player uuids now and ignore the case when comparing player names.
+* The "list" and "remove" commands handle ambiguous player names now: If there are shops of different players matching the given player name, an error message is shown and the player needs to be specified by uuid instead. The player names and uuids can be copied to the chat input via shift clicking. If a player with matching name is online, that player is used for the command (regardless of if the given player name is ambiguous).
+* The shops affected by the "remove" command are now determined before asking for the users confirmation. This allows detecting ambiguous player names and missing player information before prompting the command executor for confirmation. A minor side effect of this is that any shops created after the command invocation are no longer affected by the remove command once it gets confirmed.
 * Internal: Refactored name, uuid and id based parsing (and matching) of players and shopkeepers to allow for more code reuse. Added ObjectByIdArgument which contains most of the shared logic now.
 * Internal: Added ShopkeeperIdArgument.
 * Internal: Added TransformedArgument which allows transforming of parsed arguments.
-* Internal: Minor refactoring to the targeting of shopkeepers.
-* Internal: Changes to how targeting of shopkeepers is handled in case no shopkeeper can be parsed from the command input. This should result in more appropriate error messages when specifying an invalid shopkeeper.
+* Internal: Minor refactoring to the targeting of shopkeepers and changes to how targeting of shopkeepers is handled in case no shopkeeper can be parsed from the command input. This should result in more appropriate error messages when specifying an invalid shopkeeper.
 * Internal: FirstOf-arguments reset the parsed arguments before every child argument's completion attempt, so that every child argument has a chance to provide completions.
-* Internal: FirstOf-arguments now forward the exceptions of its child arguments (instead of using their own).
+* Internal: FirstOf-arguments now forward the exceptions of their child arguments (instead of using their own).
 * Internal: Added the ability to define 'hidden' command arguments. These can for example be used to inject information into the command's execution context without requiring textual input from the user.
 * Internal: CommandArgument#isOptional now only controls the formatting. The parsing behavior is left to the individual argument implementations.
-* Internal: CommandArgs no longer makes a copy of the passed arguments.
-* Internal: When resetting CommandArgs to a previous state they ensure now that the state got created from the same CommandArgs instance.
 * Internal: Added type parameter to CommandArgument.
 * Internal: Added ArgumentRejectedException for when an argument got parsed, but rejected by a filter rule. This is used to provide more relevant error messages in FirstOf-arguments.
-* Internal: Added more general BoundedIntegerArgument. PositiveIntegerArgument makes use of it.
-* Internal: Moved ArgumentFilter into base commands lib package.
-* Internal: CommandArguments keep track of their parent argument now (if used internally by another argument) and use that for their error messages.
-* Internal: Added display name property to all command arguments that be used to change the name that is used to represent the argument in the command format. This is especially useful for conflicting literal arguments. Literal arguments will omit their actual argument name from the argument completions if a different display name has been set.
-* Internal: Minor changes to handling errors during command handling. Besides the stack trace, the plugin also logs the command context (parsed arguments) now.
-* Internal: Added map view and toString to CommandContext.
-* Internal: CommandArgument#parse now also returns the parsed value. This is useful when there is a chain of wrapped arguments and the parent needs to handle the value parsed by the child argument in some way.
-* Internal/Fixed: Chains of FirstOfArguments should now be able to properly store all the values parsed by child arguments along the chain. Previously this only worked for a chain depth of 1.
-* Internal: Clarified CommandArgument#isOptional javadoc.
-* Internal: Validating that no arguments with the same name are added to the same command.
 * Internal: Added MissingArgumentException and InvalidArgumentException (which ArgumentRejectedException extends) which allows specifically handling those types of exceptions.
 * Internal: Renamed CommandArgument#missingArgument and #invalidArgument to #missingArgumentError and #invalidArgumentError.
 * Internal: Added CommandArgument#requiresPlayerError with a corresponding default message (msg-command-argument-requires-player) for arguments that require a player as executor.
+* Internal: Added more general BoundedIntegerArgument. PositiveIntegerArgument makes use of it.
+* Internal: Moved ArgumentFilter into base commands lib package.
+* Internal: Command arguments keep track of their parent argument now (if used internally by another argument) and use that for their error messages.
+* Internal: Added a display name property to all command arguments that can be used to change the name that is used to represent the argument in the command format. This is especially useful for conflicting literal arguments. Literal arguments will omit their actual argument name from the argument completions if a different display name has been set.
+* Internal: Minor changes to handling errors during command handling. Besides the stack trace, the plugin also logs the command context (parsed arguments) now.
+* Internal: CommandArgument#parse now also returns the parsed value. This is useful when there is a chain of wrapped arguments and the parent needs to handle the value parsed by the child argument in some way.
+* Internal/Fixed: Chains of FirstOfArguments should now be able to properly store all the values parsed by child arguments along the chain. Previously this only worked for a chain depth of 1.
+* Internal: Added validation that no arguments with the same name get added to the same command.
 * Internal: Moved default shopkeeper argument filters into ShopkeeperFilter class/namespace.
-* Internal: Added CommandContext#copy() and made constructor CommandContext(otherContext) protected.
+* Internal: Added map view, toString and copy to CommandContext and made constructor CommandContext(otherContext) protected.
+* Internal: CommandArgs no longer makes a copy of the passed arguments.
+* Internal: Added marker interface for the CommandArgs state. When resetting CommandArgs to a previous state they ensure now that the state got created from the same CommandArgs instance.
 * Internal: Added CommandArgs#copy. Since the underlying arguments are expected to never change, they are not actually copied (only the parsing state is copied). Any captured CommandArgs states are applicable to the copy as well.
-* Internal: Added marker interface for the CommandArgs state.
 * Internal: Replaced CommandArgs with ArgumentsReader: The arguments are now stored inside the CommandInput and the ArgumentsReader only references them from there.
 * Internal: CommandContext is now an interface (with SimpleCommandContext as implementation). A new class CommandContextView was added that gets used anywhere where accessing the context is allowed, while modifying is not.
 * Internal: Command and tab completion handling was moved from BaseCommand into Command.
-* Internal: Resetting of the arguments reader if parsing of an command argument failed was moved from CommandArgument#parse into Command.
+* Internal: Resetting of the arguments reader if parsing of a command argument failed was moved from CommandArgument#parse into Command.
 * Internal: Added TypedFirstOfArgument, a variant of FirstOfArgument that preserves the result type of its child arguments.
-* Internal: Added NameArgument, which can be useful if there would otherwise be conflicts / ambiguities between arguments.
+* Internal: Added NamedArgument, which can be useful if there would otherwise be conflicts / ambiguities between arguments.
 * Internal: ArgumentParseException provides the command argument that created it now. This is especially useful for debugging purposes.
-* Internal: The commands library was updated to use the new text representation everywhere now, and thereby support text features such as hover events, click events, etc.
+* Internal: The commands library was updated to use a new text representation everywhere now, and thereby support text features such as hover events, click events, etc.
 
 Other internal changes:  
 * Internal: The save task was using a copy of the save data to protect against concurrent modifications while an async save is in progress. However, since the actual save data did not get modified during ongoing saves anyways, this copy is redundant and was therefore removed.
