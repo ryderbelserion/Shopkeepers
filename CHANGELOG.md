@@ -49,7 +49,7 @@ Date format: (YYYY-MM-DD)
   * Debug: The "/shopkeepers check" command now outputs some additional information about active chunks.
   * Internal: Moved all logic from WorldListener into SKShopkeeperRegistry. Various internally used methods are now hidden.
 
-API changes:  
+**API changes:**  
 * Added: PlayerShopkeeper#getChestX/getChestY/getChestZ
 * Added: ShopkeepersStartupEvent which can be used by plugins to make registrations during Shopkeepers' startup process (eg. to register custom shop types, object types, etc.). This event is marked as deprecated because custom shop types, object types, etc. are not yet officially supported as part of the API. Also, the event is called so early that the plugin (and thereby the API) are not yet fully setup and ready to be used, so this event is only of use for plugins which know what they are doing.
 * Added: Shopkeeper#getIdString.
@@ -75,7 +75,7 @@ API changes:
   * Added: ShopkeeperRegistry#isChunkActive(chunkCoords)
   * Added: ShopkeeperRegistry#getShopkeepersInActiveChunks(worldName)
 
-Various (mostly internal) changes to commands and argument parsing:  
+**Various (mostly internal) changes to commands and argument parsing:**  
 * Fallback mechanism:
   * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information.
   * A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
