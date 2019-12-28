@@ -28,6 +28,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: The internal default for message 'msg-list-shops-entry' (that gets used if the message is missing in the config) was not matching the message in the default config.
 * Fixed: Spigot seems to (internally) support books with empty titles now. The book shopkeepers were updated to ignore them, since supporting them would require fundamental changes to how book prices are stored and how books are identified. Those books can't be created in vanilla Minecraft, so this shouldn't be a severe limitation.
 * Fixed: Due to a Minecraft bug (MC-141494) interacting with a villager while holding a written book in the main or off hand results in weird glitches and tricks the plugin into thinking that the editor or trading UI got opened even though the book got opened instead. We therefore ignore any interactions with shopkeeper mobs for now when the interacting player is holding a written book.
+* Changed: Villager shopkeepers get their experience set to 1 now. I wasn't able to reproduce this myself yet, but according to some reports villager shopkeepers would sometimes lose their profession. Setting their experience to something above 0 is an attempt to resolve this.
 * Changed: The debugCreateShops command prints the number of actually created shops now.
 * Changed: The always-show-nameplates setting seems to be working again (since MC 1.9 already). Updated the corresponding comment in the default config.
 * Changed: Instead of using a fallback name ("unknown"), player shops are required to always provide a valid owner name now.

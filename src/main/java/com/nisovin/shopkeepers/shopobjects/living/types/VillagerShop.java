@@ -93,6 +93,10 @@ public class VillagerShop extends BabyableShop<Villager> {
 	@Override
 	protected void onSpawn(Villager entity) {
 		super.onSpawn(entity);
+		// TODO I wasn't able to reproduce this myself yet, but according to some reports villager shopkeepers would
+		// sometimes lose their profession. Setting their experience to something above 0 is an attempt to resolve this.
+		// Related (but shouldn't apply here since we use NoAI mobs): https://hub.spigotmc.org/jira/browse/SPIGOT-4776
+		entity.setVillagerExperience(1);
 		this.applyProfession(entity);
 		this.applyVillagerType(entity);
 		this.applyVillagerLevel(entity);
