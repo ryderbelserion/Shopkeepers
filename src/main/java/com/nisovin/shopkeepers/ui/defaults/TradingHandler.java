@@ -271,6 +271,7 @@ public class TradingHandler extends UIHandler {
 
 		// prevent unsupported types of special clicks:
 		if (action == InventoryAction.COLLECT_TO_CURSOR && ItemUtils.isSimilar(resultItem, cursor)) {
+			// TODO might no longer be support in 1.14 and 1.15, see: https://bugs.mojang.com/browse/MC-148867
 			// weird behavior and buggy, see MC-129515
 			// for now: only allowed if the item on the cursor and inside the result slot are different
 			// TODO maybe replicate the behavior of this inventory action, but limit its effect to the player's
@@ -309,6 +310,8 @@ public class TradingHandler extends UIHandler {
 		boolean isCursorEmpty = ItemUtils.isEmpty(cursor);
 
 		// handle trade depending on used inventory action:
+		// TODO: In MC 1.15.1 PICKUP_ONE and PICKUP_SOME might get triggered when clicking the result slot (test again:
+		// left click, shift+left click, right click, middle click)
 		if (action == InventoryAction.PICKUP_ALL || action == InventoryAction.PICKUP_HALF) {
 			if (!isCursorEmpty && (!cursor.isSimilar(resultItem) || (cursor.getAmount() + resultItem.getAmount()) > cursor.getMaxStackSize())) {
 				Log.debug("Not handling trade: The cursor cannot carry the resulting items.");
