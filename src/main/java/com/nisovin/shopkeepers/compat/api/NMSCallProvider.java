@@ -29,7 +29,7 @@ public interface NMSCallProvider {
 
 	public void setNoclip(Entity entity);
 
-	// TODO replace this once there is a corresponding Bukkit API for this
+	// TODO replace this once only the latest versions of 1.15.1 and upwards are supported
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid);
 
 	/**

@@ -124,8 +124,14 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
-		EntityRaider nmsRaider = ((CraftRaider) raider).getHandle();
-		nmsRaider.u(canJoinRaid); // CanJoinRaid
+		try {
+			// only works in the latest versions of 1.15.1 and upwards:
+			raider.setCanJoinRaid(canJoinRaid);
+		} catch (Throwable t) {
+			// in case this is not supported by the current Bukkit version yet:
+			EntityRaider nmsRaider = ((CraftRaider) raider).getHandle();
+			nmsRaider.u(canJoinRaid); // CanJoinRaid
+		}
 	}
 
 	@Override

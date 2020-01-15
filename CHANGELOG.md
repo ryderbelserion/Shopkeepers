@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.9.1 (TBA)
 ### Supported MC versions: 1.15.1, 1.14.4
 
+* Changed: Replaced the NMS call for setting the CanJoinRaid property on MC 1.15.x with a corresponding Bukkit API call. This only works on the very latest versions of MC 1.15.1 and upwards.
 
 ## v2.9.0 (2019-12-28)
 ### Supported MC versions: 1.15.1, 1.14.4
