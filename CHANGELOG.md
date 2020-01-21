@@ -2,8 +2,9 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.9.1 (TBA)
-### Supported MC versions: 1.15.1, 1.14.4
+### Supported MC versions: 1.15.2, 1.14.4
 
+* Bumped CraftBukkit dependency for MC 1.15 to 1.15.2.
 * Changed: Replaced the NMS call for setting the CanJoinRaid property on MC 1.15.x with a corresponding Bukkit API call. This only works on the very latest versions of MC 1.15.1 and upwards.
 
 ## v2.9.0 (2019-12-28)

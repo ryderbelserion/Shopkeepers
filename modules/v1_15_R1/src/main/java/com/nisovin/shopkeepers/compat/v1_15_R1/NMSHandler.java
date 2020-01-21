@@ -9,7 +9,6 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftAbstractVillager;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftRaider;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftVillager;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMerchant;
@@ -32,7 +31,6 @@ import net.minecraft.server.v1_15_R1.EntityHuman;
 import net.minecraft.server.v1_15_R1.EntityInsentient;
 import net.minecraft.server.v1_15_R1.EntityLiving;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
-import net.minecraft.server.v1_15_R1.EntityRaider;
 import net.minecraft.server.v1_15_R1.GameProfileSerializer;
 import net.minecraft.server.v1_15_R1.IMerchant;
 import net.minecraft.server.v1_15_R1.MerchantRecipeList;
@@ -124,14 +122,8 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
-		try {
-			// only works in the latest versions of 1.15.1 and upwards:
-			raider.setCanJoinRaid(canJoinRaid);
-		} catch (Throwable t) {
-			// in case this is not supported by the current Bukkit version yet:
-			EntityRaider nmsRaider = ((CraftRaider) raider).getHandle();
-			nmsRaider.u(canJoinRaid); // CanJoinRaid
-		}
+		// only works in the latest versions of 1.15.1 and upwards:
+		raider.setCanJoinRaid(canJoinRaid);
 	}
 
 	@Override
