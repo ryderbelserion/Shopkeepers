@@ -11,7 +11,7 @@
 
 	<properties>
 		<!-- Shopkeepers version -->
-		<revision>2.9.1</revision>
+		<revision>2.9.2-SNAPSHOT</revision>
 		<root.relativePath>../..</root.relativePath>
 		<shopkeepers.version>${project.version}</shopkeepers.version>
 		<shopkeepers.dbo.url>https://dev.bukkit.org/projects/shopkeepers/</shopkeepers.dbo.url>
