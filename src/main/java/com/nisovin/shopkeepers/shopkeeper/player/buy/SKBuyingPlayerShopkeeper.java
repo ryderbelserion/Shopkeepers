@@ -76,7 +76,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
 		// load offers:
-		this._setOffers(SKPriceOffer.loadFromConfig(configSection, "offers"));
+		this._setOffers(SKPriceOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId()));
 	}
 
 	@Override

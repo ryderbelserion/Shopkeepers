@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -78,7 +79,7 @@ public class SKBookOffer implements BookOffer {
 		}
 	}
 
-	public static List<SKBookOffer> loadFromConfig(ConfigurationSection config, String node) {
+	public static List<SKBookOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
 		List<SKBookOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
@@ -87,7 +88,16 @@ public class SKBookOffer implements BookOffer {
 				if (offerSection == null) continue; // invalid offer: not a section
 				String bookTitle = offerSection.getString("book");
 				int price = offerSection.getInt("price");
-				if (StringUtils.isEmpty(bookTitle) || price <= 0) continue; // invalid offer
+				if (StringUtils.isEmpty(bookTitle)) {
+					// invalid offer
+					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer: book title is empty"));
+					continue;
+				}
+				if (price <= 0) {
+					// invalid offer
+					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer for '" + bookTitle + "': price has to be positive but is " + price));
+					continue;
+				}
 				offers.add(new SKBookOffer(bookTitle, price));
 			}
 		}
@@ -95,13 +105,22 @@ public class SKBookOffer implements BookOffer {
 	}
 
 	// TODO legacy, remove again at some point (changed during MC 1.14.4)
-	public static List<SKBookOffer> loadFromLegacyConfig(ConfigurationSection config, String node) {
+	public static List<SKBookOffer> loadFromLegacyConfig(ConfigurationSection config, String node, String errorContext) {
 		List<SKBookOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String bookTitle : offersSection.getKeys(false)) {
 				int price = offersSection.getInt(bookTitle);
-				if (StringUtils.isEmpty(bookTitle) || price <= 0) continue; // invalid offer
+				if (StringUtils.isEmpty(bookTitle)) {
+					// invalid offer
+					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer: bookTitle is empty"));
+					continue;
+				}
+				if (price <= 0) {
+					// invalid offer
+					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer for '" + bookTitle + "': price has to be positive but is " + price));
+					continue;
+				}
 				offers.add(new SKBookOffer(bookTitle, price));
 			}
 		}

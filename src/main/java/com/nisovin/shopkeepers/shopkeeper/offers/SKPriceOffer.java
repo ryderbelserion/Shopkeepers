@@ -9,6 +9,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SKPriceOffer implements PriceOffer {
@@ -80,7 +82,7 @@ public class SKPriceOffer implements PriceOffer {
 		}
 	}
 
-	public static List<SKPriceOffer> loadFromConfig(ConfigurationSection config, String node) {
+	public static List<SKPriceOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
 		List<SKPriceOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
@@ -89,7 +91,16 @@ public class SKPriceOffer implements PriceOffer {
 				if (offerSection == null) continue; // invalid offer: not a section
 				ItemStack item = offerSection.getItemStack("item");
 				int price = offerSection.getInt("price");
-				if (ItemUtils.isEmpty(item) || price <= 0) continue; // invalid offer
+				if (ItemUtils.isEmpty(item)) {
+					// invalid offer
+					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid price offer for " + id + ": item is empty"));
+					continue;
+				}
+				if (price <= 0) {
+					// invalid offer
+					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid price offer for " + id + ": price has to be positive but is " + price));
+					continue;
+				}
 				offers.add(new SKPriceOffer(item, price));
 			}
 		}

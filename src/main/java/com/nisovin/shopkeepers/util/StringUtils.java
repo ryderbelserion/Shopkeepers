@@ -171,6 +171,11 @@ public class StringUtils {
 		return NEWLINE_PATTERN.split(source, -1);
 	}
 
+	public static String prefix(String prefix, String delimiter, String message) {
+		if (StringUtils.isEmpty(prefix)) return message;
+		return prefix + (delimiter == null ? "" : delimiter) + message;
+	}
+
 	// ARGUMENTS REPLACEMENT
 
 	// throws NPE if source, target, or replacement are null

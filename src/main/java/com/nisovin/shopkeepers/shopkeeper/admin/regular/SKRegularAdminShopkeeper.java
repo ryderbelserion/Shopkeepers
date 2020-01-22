@@ -64,7 +64,7 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
 		// load offers:
-		this._setOffers(SKTradingOffer.loadFromConfig(configSection, "recipes"));
+		this._setOffers(SKTradingOffer.loadFromConfig(configSection, "recipes", "Shopkeeper " + this.getId()));
 	}
 
 	@Override
