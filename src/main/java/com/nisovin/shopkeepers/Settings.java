@@ -47,6 +47,8 @@ public class Settings {
 		public static final String commands = "commands";
 		// Logs information when updating stored shop owner names.
 		public static final String ownerNameUpdates = "owner-name-updates";
+		// Logs whenever a shopkeeper performs item migrations (eg. for trading offers).
+		public static final String itemMigrations = "item-migrations";
 	}
 
 	public static boolean isDebugging() {

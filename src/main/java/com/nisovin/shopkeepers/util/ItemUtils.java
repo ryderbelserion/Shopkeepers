@@ -10,6 +10,7 @@ import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -402,6 +403,25 @@ public final class ItemUtils {
 
 		// check if objects are equal:
 		return data.equals(target);
+	}
+
+	// ItemStack migration
+
+	private static Inventory DUMMY_INVENTORY = null;
+
+	// Use newItemStack.isSimilar(oldItemStack) to test whether the item was migrated.
+	public static ItemStack migrateItemStack(ItemStack itemStack) {
+		if (itemStack == null) return null;
+		if (DUMMY_INVENTORY == null) {
+			DUMMY_INVENTORY = Bukkit.createInventory(null, 9);
+		}
+
+		// Inserting an ItemStack into a minecraft inventory will convert it to a corresponding nms.ItemStack and
+		// thereby trigger any minecraft data migrations for that ItemStack.
+		DUMMY_INVENTORY.setItem(0, itemStack);
+		ItemStack convertedItemStack = DUMMY_INVENTORY.getItem(0);
+		DUMMY_INVENTORY.setItem(0, null);
+		return convertedItemStack;
 	}
 
 	//

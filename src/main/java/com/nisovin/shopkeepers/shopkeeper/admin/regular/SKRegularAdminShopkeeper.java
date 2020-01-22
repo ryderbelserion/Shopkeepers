@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
@@ -18,6 +19,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradingOffer;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements RegularAdminShopkeeper {
@@ -64,7 +66,15 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
 		// load offers:
-		this._setOffers(SKTradingOffer.loadFromConfig(configSection, "recipes", "Shopkeeper " + this.getId()));
+		List<SKTradingOffer> offers = SKTradingOffer.loadFromConfig(configSection, "recipes", "Shopkeeper " + this.getId());
+		List<SKTradingOffer> migratedOffers = SKTradingOffer.migrateItems(offers, "Shopkeeper " + this.getId());
+		if (offers != migratedOffers) {
+			Log.debug(Settings.DebugOptions.itemMigrations,
+					() -> "Shopkeeper " + this.getId() + ": Migrated trading offer items."
+			);
+			this.markDirty();
+		}
+		this._setOffers(migratedOffers);
 	}
 
 	@Override

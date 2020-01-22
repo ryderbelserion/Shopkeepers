@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implements SellingPlayerShopkeeper {
@@ -73,7 +74,15 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
 		// load offers:
-		this._setOffers(SKPriceOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId()));
+		List<SKPriceOffer> offers = SKPriceOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId());
+		List<SKPriceOffer> migratedOffers = SKPriceOffer.migrateItems(offers, "Shopkeeper " + this.getId());
+		if (offers != migratedOffers) {
+			Log.debug(Settings.DebugOptions.itemMigrations,
+					() -> "Shopkeeper " + this.getId() + ": Migrated trading offer items."
+			);
+			this.markDirty();
+		}
+		this._setOffers(migratedOffers);
 	}
 
 	@Override

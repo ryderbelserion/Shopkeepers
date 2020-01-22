@@ -114,6 +114,20 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			hireCost = null;
 			this.markDirty();
 		}
+		ItemStack migratedHireCost = ItemUtils.migrateItemStack(hireCost);
+		if (!ItemUtils.isSimilar(hireCost, migratedHireCost)) {
+			if (ItemUtils.isEmpty(migratedHireCost) && !ItemUtils.isEmpty(hireCost)) {
+				// migration failed:
+				Log.warning("Shopkeeper " + this.getId() + ": Hire cost item migration failed: " + hireCost.toString());
+				hireCost = null;
+			} else {
+				hireCost = migratedHireCost;
+				Log.debug(Settings.DebugOptions.itemMigrations,
+						() -> "Shopkeeper " + this.getId() + ": Migrated hire cost item."
+				);
+			}
+			this.markDirty();
+		}
 	}
 
 	@Override

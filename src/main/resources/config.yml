@@ -17,6 +17,8 @@ debug: false
 # - 'commands': Enables additional commands related debugging output.
 # - 'owner-name-updates': Logs information when updating stored shop owner
 #    names.
+# - 'item-migrations': Logs whenever a shopkeeper performs item migrations (eg.
+#    for trading offers).
 debug-options: []
 # Whether to report anonymous usage statistics to https://bStats.org
 # All reported information can be found here:

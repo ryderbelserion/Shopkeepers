@@ -106,4 +106,48 @@ public class SKPriceOffer implements PriceOffer {
 		}
 		return offers;
 	}
+
+	// Note: Returns the same list instance if no items were migrated.
+	public static List<SKPriceOffer> migrateItems(List<SKPriceOffer> offers, String errorContext) {
+		if (offers == null) return null;
+		List<SKPriceOffer> migratedOffers = null;
+		final int size = offers.size();
+		for (int i = 0; i < size; ++i) {
+			SKPriceOffer offer = offers.get(i);
+			if (offer == null) continue; // skip invalid entries
+
+			boolean itemsMigrated = false;
+			boolean migrationFailed = false;
+
+			ItemStack item = offer.getItem(); // note: is a clone
+			ItemStack migratedItem = ItemUtils.migrateItemStack(item);
+			if (!ItemUtils.isSimilar(item, migratedItem)) {
+				if (ItemUtils.isEmpty(migratedItem) && !ItemUtils.isEmpty(item)) {
+					migrationFailed = true;
+				}
+				item = migratedItem;
+				itemsMigrated = true;
+			}
+
+			if (itemsMigrated) {
+				if (migratedOffers == null) {
+					migratedOffers = new ArrayList<>(size);
+					for (int j = 0; j < i; ++j) {
+						SKPriceOffer oldOffer = offers.get(j);
+						if (oldOffer == null) continue; // skip invalid entries
+						migratedOffers.add(oldOffer);
+					}
+				}
+
+				if (migrationFailed) {
+					Log.warning(StringUtils.prefix(errorContext, ": ", "Trading offer item migration failed for offer "
+							+ (i + 1) + ": " + offer.toString()));
+					continue; // skip this offer
+				}
+				assert !ItemUtils.isEmpty(item);
+				migratedOffers.add(new SKPriceOffer(item, offer.getPrice()));
+			}
+		}
+		return (migratedOffers == null) ? offers : migratedOffers;
+	}
 }

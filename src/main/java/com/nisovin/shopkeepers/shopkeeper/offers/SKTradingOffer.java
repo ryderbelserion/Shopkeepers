@@ -100,6 +100,71 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 				offers.add(new SKTradingOffer(resultItem, item1, item2));
 			}
 		}
+
 		return offers;
+	}
+
+	// Note: Returns the same list instance if no items were migrated.
+	public static List<SKTradingOffer> migrateItems(List<SKTradingOffer> offers, String errorContext) {
+		if (offers == null) return null;
+		List<SKTradingOffer> migratedOffers = null;
+		final int size = offers.size();
+		for (int i = 0; i < size; ++i) {
+			SKTradingOffer offer = offers.get(i);
+			if (offer == null) continue; // skip invalid entries
+
+			boolean itemsMigrated = false;
+			boolean migrationFailed = false;
+
+			// note: the items are clones
+			ItemStack resultItem = offer.getResultItem();
+			ItemStack item1 = offer.getItem1();
+			ItemStack item2 = offer.getItem2();
+
+			ItemStack migratedResultItem = ItemUtils.migrateItemStack(resultItem);
+			if (!ItemUtils.isSimilar(resultItem, migratedResultItem)) {
+				if (ItemUtils.isEmpty(migratedResultItem) && !ItemUtils.isEmpty(resultItem)) {
+					migrationFailed = true;
+				}
+				resultItem = migratedResultItem;
+				itemsMigrated = true;
+			}
+			ItemStack migratedItem1 = ItemUtils.migrateItemStack(item1);
+			if (!ItemUtils.isSimilar(item1, migratedItem1)) {
+				if (ItemUtils.isEmpty(migratedItem1) && !ItemUtils.isEmpty(item1)) {
+					migrationFailed = true;
+				}
+				item1 = migratedItem1;
+				itemsMigrated = true;
+			}
+			ItemStack migratedItem2 = ItemUtils.migrateItemStack(item2);
+			if (!ItemUtils.isSimilar(item2, migratedItem2)) {
+				if (ItemUtils.isEmpty(migratedItem2) && !ItemUtils.isEmpty(item2)) {
+					migrationFailed = true;
+				}
+				item2 = migratedItem2;
+				itemsMigrated = true;
+			}
+
+			if (itemsMigrated) {
+				if (migratedOffers == null) {
+					migratedOffers = new ArrayList<>(size);
+					for (int j = 0; j < i; ++j) {
+						SKTradingOffer oldOffer = offers.get(j);
+						if (oldOffer == null) continue; // skip invalid entries
+						migratedOffers.add(oldOffer);
+					}
+				}
+
+				if (migrationFailed) {
+					Log.warning(StringUtils.prefix(errorContext, ": ", "Trading offer item migration failed for offer "
+							+ (i + 1) + ": " + offer.toString()));
+					continue; // skip this offer
+				}
+				assert !ItemUtils.isEmpty(resultItem) && !ItemUtils.isEmpty(item1);
+				migratedOffers.add(new SKTradingOffer(resultItem, item1, item2));
+			}
+		}
+		return (migratedOffers == null) ? offers : migratedOffers;
 	}
 }

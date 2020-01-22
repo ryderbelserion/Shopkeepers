@@ -8,6 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
@@ -21,6 +22,7 @@ import com.nisovin.shopkeepers.shopkeeper.offers.SKTradingOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implements TradingPlayerShopkeeper {
@@ -65,7 +67,15 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
 		// load offers:
-		this._setOffers(SKTradingOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId()));
+		List<SKTradingOffer> offers = SKTradingOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId());
+		List<SKTradingOffer> migratedOffers = SKTradingOffer.migrateItems(offers, "Shopkeeper " + this.getId());
+		if (offers != migratedOffers) {
+			Log.debug(Settings.DebugOptions.itemMigrations,
+					() -> "Shopkeeper " + this.getId() + ": Migrated trading offer items."
+			);
+			this.markDirty();
+		}
+		this._setOffers(migratedOffers);
 	}
 
 	@Override
