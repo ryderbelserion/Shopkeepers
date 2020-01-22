@@ -1,14 +1,25 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.9.1 (TBA)
+
+## v2.9.2 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+
+## v2.9.1 (2020-01-22)
+### Supported MC versions: 1.15.2, 1.14.4
+
+**Update for MC 1.15.2:**  
 * Bumped CraftBukkit dependency for MC 1.15 to 1.15.2.
-* Changed: Replaced the NMS call for setting the CanJoinRaid property on MC 1.15.x with a corresponding Bukkit API call. This only works on the very latest versions of MC 1.15.1 and upwards.
+* Changed: Replaced the NMS call for setting the CanJoinRaid property on MC 1.15.x with a corresponding Bukkit API call. This fixes compatibility with Spigot 1.15.2, but only works on the very latest versions of MC 1.15.1 and upwards.
+
+**Other changes:**  
 * Added: Warning messages when a trading offer cannot be loaded for some reason.
-* Changed: Trading offer and hire cost items get automatically migrated to the current data version now. This will typically occur with every (even minor) minecraft updates. A warning is logged if an offer could not be migrated.
-* Config/Debug: Added debug option 'item-migrations' to log whenever a shopkeeper performs item migrations.
+* Changed: Trading offer and hire cost items get automatically migrated to the current data version now.
+  * This will typically occur with every (even minor) minecraft updates.
+  * A warning is logged if an offer can not be migrated.
+  * Minecraft may log 'Unable to resolve BlockEntity for ItemStack ...' messages during ItemStack migrations. You can safely ignore these debug messages.
+  * Config/Debug: Added debug option 'item-migrations' to log whenever a shopkeeper performs item migrations.
 
 ## v2.9.0 (2019-12-28)
 ### Supported MC versions: 1.15.1, 1.14.4
