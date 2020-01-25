@@ -773,7 +773,7 @@ public class Settings {
 		public static ItemData deleteButtonItem = new ItemData(Material.AIR);
 		public static ItemData hireButtonItem = new ItemData(Material.AIR);
 
-		public static Pattern shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
+		public static Pattern shopNamePattern = Pattern.compile("^[A-Za-z0-9 ]{3,32}$");
 
 		// gets called after the config has been loaded:
 		private static void setup() {
