@@ -6,6 +6,7 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.15.2, 1.14.4
 
 * Fixed: The DerivedSettings use the default value for the name-regex setting during initialization now to properly catch user errors during the subsequent setup after the config has already been loaded.
+* Fixed: The selling and book shops attempted to convert currency items into high currency items even if the high currency got disabled.
 
 ## v2.9.1 (2020-01-22)
 ### Supported MC versions: 1.15.2, 1.14.4

@@ -80,7 +80,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		int amountAfterTaxes = this.getAmountAfterTaxes(offer.getPrice());
 		if (amountAfterTaxes > 0) {
 			int remaining = amountAfterTaxes;
-			if (Settings.isHighCurrencyEnabled() || remaining > Settings.highCurrencyMinCost) {
+			if (Settings.isHighCurrencyEnabled() && remaining > Settings.highCurrencyMinCost) {
 				int highCurrencyAmount = (remaining / Settings.highCurrencyValue);
 				if (highCurrencyAmount > 0) {
 					int remainingHighCurrency = ItemUtils.addItems(newChestContents, Settings.createHighCurrencyItem(highCurrencyAmount));
