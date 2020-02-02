@@ -40,7 +40,9 @@ public class RemoveShopOnChestBreak {
 		List<PlayerShopkeeper> shopkeepers = protectedChests.getShopkeepers(block);
 		if (shopkeepers.isEmpty()) return false;
 
-		for (PlayerShopkeeper shopkeeper : shopkeepers) {
+		// copy to deal with concurrent modifications:
+		for (PlayerShopkeeper shopkeeper : shopkeepers.toArray(new PlayerShopkeeper[shopkeepers.size()])) {
+			if (!shopkeeper.isValid()) continue; // skip if no longer valid
 			// return creation item for player shopkeepers:
 			if (Settings.deletingPlayerShopReturnsCreationItem) {
 				ItemStack shopCreationItem = Settings.createShopCreationItem();
