@@ -5,8 +5,14 @@ Date format: (YYYY-MM-DD)
 ## v2.9.2 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+* Added: If the setting 'delete-shopkeeper-on-break-chest' is enabled, player shopkeepers will now periodically (roughly once every 5 seconds) check if their chest is still present and otherwise delete themselves.
+  * This allows them to detect when other plugins, such as WorldEdit, remove the shop chest.
+  * The setting 'deleting-player-shop-returns-creation-item' applies to these checks as well and controls whether to drop a shop creation item for every removed shopkeeper.
 * Fixed: The DerivedSettings use the default value for the name-regex setting during initialization now to properly catch user errors during the subsequent setup after the config has already been loaded.
 * Fixed: The selling and book shops attempted to convert currency items into high currency items even if the high currency got disabled.
+
+Internal changes:  
+* Added AbstractShopkeeper#tick which gets invoked roughly once per second for all shopkeepers in currently active chunks.
 
 ## v2.9.1 (2020-01-22)
 ### Supported MC versions: 1.15.2, 1.14.4

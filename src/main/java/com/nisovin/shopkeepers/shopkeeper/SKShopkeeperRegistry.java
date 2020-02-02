@@ -236,6 +236,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// TODO this may become out-of-sync if shop objects get despawned or removed independently, problem? potential
 	// memory leak?
 	// -> gets cleaned up by 'teleporter' task currently which periodically checks all activeShopkeepers entries
+	// 'active': with active shop object (ie. after successful spawning)
 	private final Map<String, AbstractShopkeeper> activeShopkeepers = new HashMap<>();
 	private final Collection<AbstractShopkeeper> activeShopkeepersView = Collections.unmodifiableCollection(activeShopkeepers.values());
 
@@ -244,6 +245,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	public void onEnable() {
+		// start shopkeeper ticking task:
+		this.startShopkeeperTickTask();
+
 		// start teleporter task:
 		this.startTeleporterTask();
 
@@ -268,6 +272,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		activeShopkeepers.clear();
 		playerShopCount = 0;
 	}
+
+	// PERIODIC TASKS
 
 	private void startTeleporterTask() {
 		Bukkit.getScheduler().runTaskTimer(plugin, () -> {
@@ -302,6 +308,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	// TODO ideally this task should not be required..
+	// TODO: actually, the shops already get respawned as part of the teleporter task when missing
+	// -> remove this task and the corresponding setting?
 	private void startSpawnVerifierTask() {
 		Bukkit.getScheduler().runTaskTimer(plugin, () -> {
 			int count = 0;
@@ -339,6 +347,29 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 				}
 			}
 		}, 600, 1200); // 30,60 seconds
+	}
+
+	// TICKING
+
+	private void startShopkeeperTickTask() {
+		Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+			// prevents concurrent modification errors by making copies of the iterated data:
+			// the copies are required because the worlds, active chunks and chunk shopkeepers may change if shopkeepers
+			// get removed or chunks get loaded (which cannot be safely avoided)
+			boolean dirty = false;
+			for (String worldName : new ArrayList<>(this.getWorldsWithShopkeepers())) {
+				for (AbstractShopkeeper shopkeeper : new ArrayList<>(this.getShopkeepersInActiveChunks(worldName))) {
+					if (!shopkeeper.isValid()) continue; // skip if no longer valid
+					shopkeeper.tick();
+					if (shopkeeper.isDirty()) {
+						dirty = true;
+					}
+				}
+			}
+			if (dirty) {
+				this.getShopkeeperStorage().save();
+			}
+		}, 20L, 20L); // 1 second
 	}
 
 	// SHOPKEEPER CREATION

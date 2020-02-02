@@ -60,13 +60,11 @@ public class ProtectedChests {
 	private final SKShopkeepersPlugin plugin;
 	private final ChestProtectionListener chestProtectionListener = new ChestProtectionListener(this);
 	private final InventoryMoveItemListener inventoryMoveItemListener = new InventoryMoveItemListener(this);
-	private final RemoveShopOnChestBreakListener removeShopOnChestBreakListener;
 	// player shopkeepers by location key:
 	private final Map<String, List<PlayerShopkeeper>> protectedChests = new HashMap<>();
 
 	public ProtectedChests(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
-		removeShopOnChestBreakListener = new RemoveShopOnChestBreakListener(plugin, this);
 	}
 
 	public void enable() {
@@ -76,17 +74,12 @@ public class ProtectedChests {
 				Bukkit.getPluginManager().registerEvents(inventoryMoveItemListener, plugin);
 			}
 		}
-		if (Settings.deleteShopkeeperOnBreakChest) {
-			Bukkit.getPluginManager().registerEvents(removeShopOnChestBreakListener, plugin);
-			// TODO let shopkeepers periodically check if their chest is still there, and otherwise delete themselves?
-		}
 	}
 
 	public void disable() {
 		// cleanup:
 		HandlerList.unregisterAll(chestProtectionListener);
 		HandlerList.unregisterAll(inventoryMoveItemListener);
-		HandlerList.unregisterAll(removeShopOnChestBreakListener);
 		protectedChests.clear();
 	}
 

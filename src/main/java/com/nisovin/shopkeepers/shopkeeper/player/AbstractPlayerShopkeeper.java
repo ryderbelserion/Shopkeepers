@@ -38,6 +38,8 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
 
+	private static final int CHECK_CHEST_PERIOD_SECONDS = 5;
+
 	protected UUID ownerUUID; // not null after successful initialization
 	protected String ownerName; // not null after successful initialization
 	// TODO store chest world separately? currently it uses the shopkeeper world
@@ -46,6 +48,9 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	protected int chestY;
 	protected int chestZ;
 	protected ItemStack hireCost = null; // null if not for hire
+
+	// random shopkeeper-specific starting offset between [1, CHECK_CHEST_PERIOD_SECONDS]
+	private int remainingCheckChestSeconds = (int) (Math.random() * CHECK_CHEST_PERIOD_SECONDS) + 1;
 
 	/**
 	 * Creates a not yet initialized {@link AbstractPlayerShopkeeper} (for use in sub-classes).
@@ -405,5 +410,24 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		Inventory inv = ((Chest) chest.getState()).getInventory();
 		player.openInventory(inv);
 		return true;
+	}
+
+	// TICKING
+
+	@Override
+	public void tick() {
+		// delete the shopkeeper if the chest is no longer present (eg. if it got removed externally by another plugin,
+		// such as WorldEdit, etc.):
+		if (Settings.deleteShopkeeperOnBreakChest) {
+			remainingCheckChestSeconds--;
+			if (remainingCheckChestSeconds <= 0) {
+				remainingCheckChestSeconds = CHECK_CHEST_PERIOD_SECONDS;
+				// this checks if the block is still a chest:
+				Block chestBlock = this.getChest();
+				if (!ItemUtils.isChest(chestBlock.getType())) {
+					SKShopkeepersPlugin.getInstance().getRemoveShopOnChestBreak().handleBlockBreakage(chestBlock);
+				}
+			}
+		}
 	}
 }

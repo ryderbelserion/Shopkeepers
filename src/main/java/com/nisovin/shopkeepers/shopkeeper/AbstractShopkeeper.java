@@ -684,6 +684,24 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		}
 	}
 
+	// TICKING
+
+	/**
+	 * This is called periodically (roughly once per second) for shopkeepers in active chunks.
+	 * <p>
+	 * This can for example be used for checks that need to happen periodically, such as checking if the chest for a
+	 * player shop still exists.
+	 * <p>
+	 * If the check to perform is potentially heavy or not required to happen every second, the shopkeeper may decide to
+	 * only run it every X invocations.
+	 * <p>
+	 * If any of the ticked shopkeepers are marked as {@link Shopkeeper#isDirty() dirty}, a
+	 * {@link ShopkeeperStorage#save() save} will be triggered after all shopkeepers in active chunks have been ticked.
+	 */
+	public void tick() {
+		// nothing to do by default
+	}
+
 	// HASHCODE AND EQUALS
 
 	@Override
