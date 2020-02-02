@@ -85,13 +85,12 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			NPC npc = CitizensAPI.getNPCRegistry().getById(npcLegacyId);
 			if (npc != null) {
 				Log.info("Citizens shopkeeper id conversion: Mapping shopkeeper " + shopkeeper.getId() + " to NPC " + CitizensShops.getNPCIdString(npc));
-				String oldObjectId = this.getId();
 				npcUniqueId = npc.getUniqueId();
 				npcLegacyId = null;
 				shopkeeper.markDirty();
 
 				// re-activate by new object id:
-				SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperObjectIdChanged(shopkeeper, oldObjectId);
+				SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperObjectIdChanged(shopkeeper);
 			}
 		}
 	}

@@ -280,9 +280,10 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			List<AbstractShopkeeper> readd = new ArrayList<>();
 			Iterator<Map.Entry<String, AbstractShopkeeper>> iter = activeShopkeepers.entrySet().iterator();
 			while (iter.hasNext()) {
-				AbstractShopkeeper shopkeeper = iter.next().getValue();
+				Map.Entry<String, AbstractShopkeeper> entry = iter.next();
+				AbstractShopkeeper shopkeeper = entry.getValue();
 				boolean update = shopkeeper.getShopObject().check();
-				if (update) {
+				if (update) { // TODO remove return boolean and instead compare old with current object id?
 					// if the shopkeeper had to be respawned its shop id changed:
 					// this removes the entry which was stored with the old shop id and later adds back the
 					// shopkeeper with its new id
@@ -893,7 +894,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// returns false if some validation failed
 	private boolean _activateShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
-		String objectId = shopkeeper.getShopObject().getId();
+		String objectId = shopkeeper.getShopObject().getId(); // current object id
 		if (objectId == null) {
 			// currently only null is considered invalid,
 			// prints 'null' to log then:
@@ -903,32 +904,35 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			Log.warning("Detected shopkeepers with duplicate object id: " + objectId);
 			return false;
 		} else {
+			// deactivate by old id in case there is one:
+			this._deactivateShopkeeper(shopkeeper);
+			assert shopkeeper.getShopObject().getLastId() == null;
+
 			// activate shopkeeper:
 			activeShopkeepers.put(objectId, shopkeeper);
+			shopkeeper.getShopObject().setLastId(objectId); // remember object id
 			return true;
 		}
 	}
 
 	private boolean _deactivateShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
-		String objectId = shopkeeper.getShopObject().getId();
-		return this._deactivateShopkeeper(shopkeeper, objectId);
-	}
-
-	private boolean _deactivateShopkeeper(AbstractShopkeeper shopkeeper, String objectId) {
-		assert shopkeeper != null;
-		if (objectId != null && activeShopkeepers.get(objectId) == shopkeeper) {
-			activeShopkeepers.remove(objectId);
-			return true;
+		String objectId = shopkeeper.getShopObject().getLastId(); // can be null
+		if (objectId != null) {
+			shopkeeper.getShopObject().setLastId(null);
+			if (activeShopkeepers.get(objectId) == shopkeeper) {
+				activeShopkeepers.remove(objectId);
+				return true;
+			}
 		}
 		return false;
 	}
 
 	// this can be used if the shopkeeper's object id has changed for some reason
-	public void onShopkeeperObjectIdChanged(AbstractShopkeeper shopkeeper, String oldObjectId) {
-		// deactivate by old object id:
-		this._deactivateShopkeeper(shopkeeper, oldObjectId);
-		// re-activate by new / current object id:
+	public void onShopkeeperObjectIdChanged(AbstractShopkeeper shopkeeper) {
+		// deactivate by old (last) object id:
+		this._deactivateShopkeeper(shopkeeper);
+		// re-activate by new (current) object id:
 		this._activateShopkeeper(shopkeeper);
 	}
 

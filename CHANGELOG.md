@@ -9,6 +9,7 @@ Date format: (YYYY-MM-DD)
   * This allows them to detect when other plugins, such as WorldEdit, remove the shop chest.
   * The setting 'deleting-player-shop-returns-creation-item' applies to these checks as well and controls whether to drop a shop creation item for every removed shopkeeper.
 * Fixed a potential CME when shopkeepers get removed after their shop chest got deleted.
+* Fixed: The 'active shopkeepers' would not get properly cleaned up in some occasions (even on shopkeeper removal) if the shopkeeper mob got deleted or the shop object was no longer considered 'active' for some other reason. A side effect of this was that the shopkeeper entity would get respawned, even though it was not supposed to get spawned or even after the shopkeeper was already deleted.
 * Fixed: The DerivedSettings use the default value for the name-regex setting during initialization now to properly catch user errors during the subsequent setup after the config has already been loaded.
 * Fixed: The selling and book shops attempted to convert currency items into high currency items even if the high currency got disabled.
 

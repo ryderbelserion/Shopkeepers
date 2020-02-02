@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 public abstract class AbstractShopObject implements ShopObject {
 
 	protected final AbstractShopkeeper shopkeeper; // not null
+	private String lastId = null;
 
 	// fresh creation
 	protected AbstractShopObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -93,6 +94,25 @@ public abstract class AbstractShopObject implements ShopObject {
 
 	@Override
 	public abstract String getId();
+
+	/**
+	 * Gets the object id the shopkeeper is currently stored by inside the shopkeeper registry.
+	 * 
+	 * @return the object id, or <code>null</code>
+	 */
+	public final String getLastId() {
+		return lastId;
+	}
+
+	/**
+	 * Sets the object id the shopkeeper is currently stored by inside the shopkeeper registry.
+	 * 
+	 * @param lastId
+	 *            the object id, can be <code>null</code>
+	 */
+	public final void setLastId(String lastId) {
+		this.lastId = lastId; // can be null
+	}
 
 	@Override
 	public abstract boolean needsSpawning();
