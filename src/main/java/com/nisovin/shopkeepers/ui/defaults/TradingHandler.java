@@ -394,7 +394,7 @@ public class TradingHandler extends UIHandler {
 				Collections.reverse(contentsView);
 
 				// apply player inventory changes:
-				playerInventory.setStorageContents(newPlayerContents);
+				ItemUtils.setStorageContents(playerInventory, newPlayerContents);
 
 				// common apply trade:
 				this.commonApplyTrade(tradeData);

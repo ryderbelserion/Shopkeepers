@@ -55,7 +55,7 @@ class CommandGive extends Command {
 		PlayerInventory inventory = targetPlayer.getInventory();
 		ItemStack[] contents = inventory.getStorageContents();
 		int remaining = ItemUtils.addItems(contents, item);
-		inventory.setStorageContents(contents);
+		ItemUtils.setStorageContents(inventory, contents);
 		if (remaining > 0) {
 			item.setAmount(remaining);
 			targetPlayer.getWorld().dropItem(targetPlayer.getEyeLocation(), item);

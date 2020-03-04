@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -693,6 +694,30 @@ public final class ItemUtils {
 
 		if (removeAll) return 0;
 		return amount;
+	}
+
+	public static void setStorageContents(Inventory inventory, ItemStack[] contents) {
+		Validate.notNull(inventory);
+		Validate.notNull(contents);
+		final int length = contents.length;
+		for (int slot = 0; slot < length; ++slot) {
+			ItemStack newItem = contents[slot];
+			ItemStack currentItem = inventory.getItem(slot);
+			// Skip if the current item already equals the new item (similar
+			// and same stack sizes):
+			// This avoids sending the player a slot update if not required and
+			// it resolves a duplication bug in case the player is currently
+			// actively using an item, eg. charging a trident
+			// (see Shopkeepers-635 and SPIGOT-5608).
+			// TODO This only works if the active item is not affected by the
+			// inventory modification. Maybe better: Abort any active item
+			// action when a player interacts with a shop object (but there is
+			// no API for that yet).
+			if (Objects.equals(newItem, currentItem)) {
+				continue; // skip
+			}
+			inventory.setItem(slot, newItem);
+		}
 	}
 
 	public static void updateInventoryLater(Player player) {

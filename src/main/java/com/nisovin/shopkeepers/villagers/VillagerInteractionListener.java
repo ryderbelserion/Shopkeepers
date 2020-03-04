@@ -115,7 +115,7 @@ public class VillagerInteractionListener implements Listener {
 							// remove remaining costs from inventory:
 							ItemUtils.removeItems(storageContents, Settings.hireItem, -remaining);
 							// apply the change to the player's inventory:
-							playerInventory.setStorageContents(storageContents);
+							ItemUtils.setStorageContents(playerInventory, storageContents);
 						}
 					}
 				} else {
