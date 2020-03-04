@@ -193,7 +193,8 @@ class UIListener implements Listener {
 		uiHandler.onInventoryDragLate(event, player);
 	}
 
-	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	// Cannot ignore cancelled events here, because the cancellation state only considers useInteractedBlock
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		// ignore our own fake interact event:
 		if (event instanceof TestPlayerInteractEvent) return;
