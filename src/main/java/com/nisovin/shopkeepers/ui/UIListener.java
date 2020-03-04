@@ -14,10 +14,12 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
 
 class UIListener implements Listener {
 
@@ -189,5 +191,21 @@ class UIListener implements Listener {
 		// let the UIHandler handle the dragging:
 		Player player = (Player) event.getWhoClicked();
 		uiHandler.onInventoryDragLate(event, player);
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	void onPlayerInteract(PlayerInteractEvent event) {
+		// ignore our own fake interact event:
+		if (event instanceof TestPlayerInteractEvent) return;
+
+		// When a player interacts with a shopkeeper entity while holding an item in hand, we may first receive the
+		// entity interaction event, which starts an UI session, and then the interaction event for the item.
+		// To not start any item actions for the held item, we cancel any interaction events while an UI session is
+		// active.
+		Player player = event.getPlayer();
+		SKUISession session = this.getUISession(player);
+		if (session != null) {
+			event.setCancelled(true);
+		}
 	}
 }
