@@ -193,6 +193,7 @@ class UIListener implements Listener {
 		uiHandler.onInventoryDragLate(event, player);
 	}
 
+	// TODO SPIGOT-5610: The event is not firing under certain circumstances.
 	// Cannot ignore cancelled events here, because the cancellation state only considers useInteractedBlock
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
