@@ -14,7 +14,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: The selling and book shops attempted to convert currency items into high currency items even if the high currency got disabled.
 * Fixed: Trading via shift-clicking while the player is charging a trident would allow the player to duplicate the trident.
   * The issue is caused by the inventory getting updated while the trident is being charged (or any other usable item being used).
-  * We now prevent item actions to even start while interacting with a shopkeeper.
+  * We now prevent item actions to even start while interacting with a shopkeeper. Note: The client might currently still display the item action animation, even though it has been successfully stopped on the server.
   * Additionally, we only update those inventory slots that were actually changed by inventory manipulations. This also has the benefit of sending less inventory slot updates.
 
 Internal changes:  
