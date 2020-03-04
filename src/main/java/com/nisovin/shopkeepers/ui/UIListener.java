@@ -205,6 +205,7 @@ class UIListener implements Listener {
 		Player player = event.getPlayer();
 		SKUISession session = this.getUISession(player);
 		if (session != null) {
+			Log.debug(() -> "Canceling interaction of player '" + player.getName() + "' during active UI session.");
 			event.setCancelled(true);
 		}
 	}
