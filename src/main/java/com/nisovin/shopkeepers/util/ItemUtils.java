@@ -703,18 +703,12 @@ public final class ItemUtils {
 		for (int slot = 0; slot < length; ++slot) {
 			ItemStack newItem = contents[slot];
 			ItemStack currentItem = inventory.getItem(slot);
-			// Skip if the current item already equals the new item (similar
-			// and same stack sizes):
-			// This avoids sending the player a slot update if not required and
-			// it resolves a duplication bug in case the player is currently
-			// actively using an item, eg. charging a trident
-			// (see Shopkeepers-635 and SPIGOT-5608).
-			// TODO This only works if the active item is not affected by the
-			// inventory modification. Maybe better: Abort any active item
-			// action when a player interacts with a shop object (but there is
-			// no API for that yet).
+			// Only update slots that actually changed. This avoids sending the player slot update packets that are not
+			// required.
+			// We skip the slot if the current item already equals the new item (similar and same stack sizes). For
+			// unchanged items (CraftItemStack wrappers) and items with changed stack size this is quite performant.
 			if (Objects.equals(newItem, currentItem)) {
-				continue; // skip
+				continue;
 			}
 			inventory.setItem(slot, newItem);
 		}

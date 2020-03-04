@@ -12,7 +12,10 @@ Date format: (YYYY-MM-DD)
 * Fixed: The 'active shopkeepers' would not get properly cleaned up in some occasions (even on shopkeeper removal) if the shopkeeper mob got deleted or the shop object was no longer considered 'active' for some other reason. A side effect of this was that the shopkeeper entity would get respawned, even though it was not supposed to get spawned or even after the shopkeeper was already deleted.
 * Fixed: The DerivedSettings use the default value for the name-regex setting during initialization now to properly catch user errors during the subsequent setup after the config has already been loaded.
 * Fixed: The selling and book shops attempted to convert currency items into high currency items even if the high currency got disabled.
-* Fixed: Trading via shift-clicking while the player is charging a trident would allow the player to duplicate the trident. We now prevent any item actions to even start when interacting with a shopkeeper.
+* Fixed: Trading via shift-clicking while the player is charging a trident would allow the player to duplicate the trident.
+  * The issue is caused by the inventory getting updated while the trident is being charged (or any other usable item being used).
+  * We now prevent item actions to even start while interacting with a shopkeeper.
+  * Additionally, we only update those inventory slots that were actually changed by inventory manipulations. This also has the benefit of sending less inventory slot updates.
 
 Internal changes:  
 * Added AbstractShopkeeper#tick which gets invoked roughly once per second for all shopkeepers in currently active chunks.
