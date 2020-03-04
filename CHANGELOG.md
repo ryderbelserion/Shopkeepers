@@ -1,8 +1,10 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
+## v2.9.3 (TBA)
+### Supported MC versions: 1.15.2, 1.14.4
 
-## v2.9.2 (TBA)
+## v2.9.2 (2020-03-04)
 ### Supported MC versions: 1.15.2, 1.14.4
 
 * Added: If the setting 'delete-shopkeeper-on-break-chest' is enabled, player shopkeepers will now periodically (roughly once every 5 seconds) check if their chest is still present and otherwise delete themselves.
