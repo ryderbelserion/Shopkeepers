@@ -121,7 +121,8 @@ class UIListener implements Listener {
 						+ ", raw-slot-id=" + event.getRawSlot() + ", slot-id=" + event.getSlot() + ", slot-type=" + event.getSlotType()
 						+ ", shift=" + event.isShiftClick() + ", hotbar key=" + event.getHotbarButton()
 						+ ", left-or-right=" + (event.isLeftClick() ? "left" : (event.isRightClick() ? "right" : "unknown"))
-						+ ", click-type=" + event.getClick() + ", action=" + event.getAction());
+						+ ", click-type=" + event.getClick() + ", action=" + event.getAction()
+						+ ", time: " + (System.nanoTime() / 1000000L));
 			}
 		}
 
@@ -130,7 +131,7 @@ class UIListener implements Listener {
 
 		if (uiHandler != DUMMY_UI_HANDLER) {
 			// let the UIHandler handle the click:
-			uiHandler.onInventoryClickEarly(event, player);
+			uiHandler.informOnInventoryClickEarly(event, player);
 		}
 	}
 
@@ -145,7 +146,7 @@ class UIListener implements Listener {
 
 		// let the UIHandler handle the click:
 		Player player = (Player) event.getWhoClicked();
-		uiHandler.onInventoryClickLate(event, player);
+		uiHandler.informOnInventoryClickLate(event, player);
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
@@ -175,7 +176,7 @@ class UIListener implements Listener {
 
 		if (uiHandler != DUMMY_UI_HANDLER) {
 			// let the UIHandler handle the click:
-			uiHandler.onInventoryDragEarly(event, player);
+			uiHandler.informOnInventoryDragEarly(event, player);
 		}
 	}
 
@@ -190,7 +191,7 @@ class UIListener implements Listener {
 
 		// let the UIHandler handle the dragging:
 		Player player = (Player) event.getWhoClicked();
-		uiHandler.onInventoryDragLate(event, player);
+		uiHandler.informOnInventoryDragLate(event, player);
 	}
 
 	// TODO SPIGOT-5610: The event is not firing under certain circumstances.

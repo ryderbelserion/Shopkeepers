@@ -4,6 +4,10 @@ Date format: (YYYY-MM-DD)
 ## v2.9.3 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+* Partially fixed: When a player shift double left-clicks inside the editor view, Minecraft triggers shift left-clicks on all slots containing matching items. This causes the prices of other trades to unintentionally change. We heuristically assume that any shift left-clicks occurring within 250 ms on a slot different to the previously clicked were triggered automatically and ignore those clicks now.
+  * Unfortunately, we cannot use a lower time span, because the automatically triggered clicks may be received quite some time later (up to 150 ms on a local server and possibly more with network delay involved). This heuristic also does not work for automatic clicks on the same slot. Since the automatic clicks are received quite some time later we cannot differentiate them from regular fast clicking.
+* Debug: Added the current time in milliseconds to the debug output of click events.
+
 ## v2.9.2 (2020-03-04)
 ### Supported MC versions: 1.15.2, 1.14.4
 

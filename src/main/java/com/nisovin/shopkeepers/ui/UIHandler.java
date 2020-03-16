@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.ui;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -11,6 +12,7 @@ import org.bukkit.inventory.InventoryView;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.util.Log;
 
 /**
  * The component which handles one specific type of user interface window for one specific shopkeeper.
@@ -19,6 +21,12 @@ public abstract class UIHandler {
 
 	private final AbstractUIType uiType;
 	private final AbstractShopkeeper shopkeeper;
+
+	// heuristic detection of automatically triggered shift left-clicks:
+	private static final long AUTOMATIC_SHIFT_LEFT_CLICK_MS = 250L;
+	private long lastManualClick = 0L;
+	private int lastManualClickedSlotId = -1;
+	private boolean isAutomaticShiftLeftClick = false;
 
 	protected UIHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
 		this.uiType = uiType;
@@ -121,7 +129,53 @@ public abstract class UIHandler {
 	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
 	}
 
-	// handling of interface window interaction
+	// handling of interface window interactions
+
+	/**
+	 * Returns whether the currently handled inventory click is, according to our heuristic, an automatically triggered
+	 * shift left-click due to a shift double left-click by the player.
+	 * <p>
+	 * Shift double left-clicks are supposed to move all matching items to the other inventory. Minecraft implements
+	 * this by triggering a shift left-click with {@link InventoryAction#MOVE_TO_OTHER_INVENTORY} for all inventory
+	 * slots that contain a matching item. Plugins cannot differentiate between these automatically triggered clicks and
+	 * regular shift left-clicks by the player.
+	 * <p>
+	 * We use a heuristic to detect (and then possibly ignore) these automatically triggered clicks: We assume that any
+	 * shift left-clicks that occur within {@link UIHandler#AUTOMATIC_SHIFT_LEFT_CLICK_MS} on a slot different to the
+	 * previously clicked slot are automatically triggered.
+	 * <p>
+	 * Limitations (TODO): We cannot use a much lower time span (eg. limiting it to 1 or 2 ticks), because the
+	 * automatically triggered clicks may arrive quite some time later (up to 150 ms later on a local server and
+	 * possibly more with network delay involved). Also, this does not work for automatic clicks triggered for the same
+	 * slot. Since the automatically triggered clicks may arrive quite some time later, we cannot differentiate them
+	 * from manual fast clicking.
+	 * 
+	 * @return <code>true</code> if we detected an automatically triggered shift left-click
+	 */
+	protected boolean isAutomaticShiftLeftClick() {
+		return isAutomaticShiftLeftClick;
+	}
+
+	// Called by UIListener
+	void informOnInventoryClickEarly(InventoryClickEvent event, Player player) {
+		// heuristic detection of automatically triggered shift left-clicks:
+		isAutomaticShiftLeftClick = false; // reset
+		final long now = (System.nanoTime() / 1000000L);
+		if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+			if (event.getRawSlot() != lastManualClickedSlotId && (now - lastManualClick) < AUTOMATIC_SHIFT_LEFT_CLICK_MS) {
+				isAutomaticShiftLeftClick = true;
+				Log.debug("  Detected automatically triggered shift left-click! (on different slot)");
+			}
+		}
+		// Note: We reset these for all types of clicks, because when quickly switching between shift and non-shift
+		// clicking we sometimes receive non-shift clicks that are followed by the automatic shift-clicks:
+		if (!isAutomaticShiftLeftClick) {
+			lastManualClick = now;
+			lastManualClickedSlotId = event.getRawSlot();
+		}
+
+		this.onInventoryClickEarly(event, player);
+	}
 
 	/**
 	 * Called early ({@link EventPriority#LOW} for InventoryClickEvent's for inventories for which
@@ -139,6 +193,11 @@ public abstract class UIHandler {
 	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
 	}
 
+	// Called by UIListener
+	void informOnInventoryClickLate(InventoryClickEvent event, Player player) {
+		this.onInventoryClickLate(event, player);
+	}
+
 	/**
 	 * Called late ({@link EventPriority#HIGH} for InventoryClickEvent's for inventories for which
 	 * {@link #isWindow(InventoryView)} returned true.
@@ -150,6 +209,11 @@ public abstract class UIHandler {
 	 * @see #onInventoryClickEarly(InventoryClickEvent, Player)
 	 */
 	protected void onInventoryClickLate(InventoryClickEvent event, Player player) {
+	}
+
+	// Called by UIListener
+	void informOnInventoryDragEarly(InventoryDragEvent event, Player player) {
+		this.onInventoryDragEarly(event, player);
 	}
 
 	/**
@@ -166,6 +230,11 @@ public abstract class UIHandler {
 	 * @see #onInventoryDragLate(InventoryDragEvent, Player)
 	 */
 	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
+	}
+
+	// Called by UIListener
+	void informOnInventoryDragLate(InventoryDragEvent event, Player player) {
+		this.onInventoryDragLate(event, player);
 	}
 
 	/**

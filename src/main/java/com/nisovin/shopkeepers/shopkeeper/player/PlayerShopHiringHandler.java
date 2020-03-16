@@ -50,6 +50,11 @@ public class PlayerShopHiringHandler extends HiringHandler {
 	@Override
 	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
 		super.onInventoryClickEarly(event, player);
+		if (this.isAutomaticShiftLeftClick()) {
+			// ignore automatically triggered shift left-clicks:
+			return;
+		}
+
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 		int slot = event.getRawSlot();
 		if (slot == BUTTON_HIRE_1 || slot == BUTTON_HIRE_2) {

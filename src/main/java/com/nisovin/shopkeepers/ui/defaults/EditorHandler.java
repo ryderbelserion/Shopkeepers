@@ -774,6 +774,11 @@ public abstract class EditorHandler extends UIHandler {
 	@Override
 	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
+		if (this.isAutomaticShiftLeftClick()) {
+			// ignore automatically triggered shift left-clicks:
+			return;
+		}
+
 		Session session = this.getSession(player);
 		assert session != null;
 
