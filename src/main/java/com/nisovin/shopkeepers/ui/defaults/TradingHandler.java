@@ -246,6 +246,27 @@ public class TradingHandler extends UIHandler {
 
 	// TRADE PROCESSING
 
+	// TODO This doesn't work because the client will automatically update the result slot item whenever a slot is
+	// changed.
+	// @Override
+	// protected void onInventoryClickEarly(InventoryClickEvent clickEvent, Player player) {
+	// // Clear the result item slot if we use strict item comparison and there is no valid trade:
+	// // TODO We also need to do this when the player selects a trading recipe, because that will automatically insert
+	// the matching items into the trading view.
+	// if (!Settings.useStrictItemComparison) return;
+	// if (clickEvent.isCancelled()) return;
+	//
+	// // This needs to happen after the event has been handled, because Minecraft will set the result slot afterwards:
+	// SKUISession uiSession = SKShopkeepersPlugin.getInstance().getUIRegistry().getSession(player);
+	// Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+	// if (!uiSession.isValid()) return;
+	// if (clickEvent.isCancelled()) return;
+	//
+	// // Logs if it encounters items that are not strictly matching and then clears the result slot:
+	// this.checkForTrade(clickEvent, true, false, false);
+	// });
+	// }
+
 	// late processing, so that other plugins can cancel the trading without having to rely on Shopkeepers' API
 	@Override
 	protected void onInventoryClickLate(InventoryClickEvent clickEvent, Player player) {
@@ -421,11 +442,23 @@ public class TradingHandler extends UIHandler {
 		}
 	}
 
+	private void clearResultSlotForInvalidTrade(MerchantInventory merchantInventory) {
+		// TODO This is not working currently. The client updates the result slot contents whenever it receives a slot
+		// update from the server.
+		// merchantInventory.setItem(RESULT_ITEM_SLOT_ID, null);
+		// ItemUtils.updateInventoryLater(merchantInventory);
+		// Log.debug("Result slot cleared due to invalid trade.");
+	}
+
+	private TradeData checkForTrade(InventoryClickEvent clickEvent, boolean silent) {
+		return this.checkForTrade(clickEvent, silent, silent, true);
+	}
+
 	// checks for an available trade and does some preparation in case a trade is found,
 	// returns null if no trade could be prepared for some reason:
-	private TradeData checkForTrade(InventoryClickEvent clickEvent, boolean silent) {
+	private TradeData checkForTrade(InventoryClickEvent clickEvent, boolean silent, boolean slientStrictItemComparison, boolean tradingContext) {
 		Player player = (Player) clickEvent.getWhoClicked();
-		MerchantInventory merchantInventory = (MerchantInventory) clickEvent.getInventory();
+		MerchantInventory merchantInventory = (MerchantInventory) clickEvent.getView().getTopInventory();
 		ItemStack resultItem = merchantInventory.getItem(RESULT_ITEM_SLOT_ID);
 		if (ItemUtils.isEmpty(resultItem)) {
 			if (!silent) {
@@ -441,6 +474,7 @@ public class TradingHandler extends UIHandler {
 			if (!silent) {
 				Log.debug("Not handling trade: We couldn't find the used trading recipe!");
 			}
+			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
 		}
 		if (!tradingRecipe.getResultItem().equals(resultItem)) {
@@ -448,6 +482,7 @@ public class TradingHandler extends UIHandler {
 			if (!silent) {
 				Log.debug("Not handling trade: The trade result item doesn't match the expected item of the used trading recipe!");
 			}
+			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
 		}
 
@@ -478,6 +513,7 @@ public class TradingHandler extends UIHandler {
 			if (!silent) {
 				Log.debug("Not handling trade: Couldn't match the offered items to the used trading recipe!");
 			}
+			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
 		}
 		assert offeredItem1 != null;
@@ -486,12 +522,18 @@ public class TradingHandler extends UIHandler {
 			// verify the recipe items are perfectly matching (they can still be swapped though):
 			if (!ItemUtils.isSimilar(requiredItem1, offeredItem1) || !ItemUtils.isSimilar(requiredItem2, offeredItem2)) {
 				// additional check for the debug flag, so we don't do the item comparisons if not really needed
-				if (!silent && Settings.debug) {
-					this.debugPreventedTrade(player, "The offered items do not strictly match the required items.");
+				if (!slientStrictItemComparison && Settings.debug) {
+					String errorMsg = "The offered items do not strictly match the required items.";
+					if (tradingContext) {
+						this.debugPreventedTrade(player, errorMsg);
+					} else {
+						Log.debug(errorMsg);
+					}
 					Log.debug("Used trading recipe: " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
 					Log.debug("Recipe item 1: " + (ItemUtils.isSimilar(requiredItem1, offeredItem1) ? "similar" : "not similar"));
 					Log.debug("Recipe item 2: " + (ItemUtils.isSimilar(requiredItem2, offeredItem2) ? "similar" : "not similar"));
 				}
+				this.clearResultSlotForInvalidTrade(merchantInventory);
 				return null;
 			}
 		}
