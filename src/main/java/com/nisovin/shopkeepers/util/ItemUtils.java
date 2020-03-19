@@ -10,6 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -711,6 +712,14 @@ public final class ItemUtils {
 				continue;
 			}
 			inventory.setItem(slot, newItem);
+		}
+	}
+
+	public static void updateInventoryLater(Inventory inventory) {
+		for (HumanEntity viewer : inventory.getViewers()) {
+			if (viewer instanceof Player) {
+				ItemUtils.updateInventoryLater((Player) viewer);
+			}
 		}
 	}
 
