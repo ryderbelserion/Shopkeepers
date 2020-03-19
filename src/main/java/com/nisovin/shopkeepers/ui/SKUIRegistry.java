@@ -144,6 +144,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	private void onSessionEnd(SKUISession session, InventoryCloseEvent closeEvent) {
 		Log.debug(() -> "UI '" + session.getUIType().getIdentifier() + "' session ended for player '" + session.getPlayer().getName() + "'.");
 		session.getUIHandler().onInventoryClose(session.getPlayer(), closeEvent); // inform UI handler
+		session.onSessionEnd(); // inform session
 	}
 
 	@Override

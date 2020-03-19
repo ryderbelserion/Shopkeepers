@@ -12,6 +12,7 @@ public class SKUISession implements UISession {
 	private final AbstractShopkeeper shopkeeper;
 	private final UIHandler uiHandler;
 	private final Player player;
+	private boolean valid = true;
 
 	public SKUISession(AbstractShopkeeper shopkeeper, UIHandler handler, Player player) {
 		this.shopkeeper = shopkeeper;
@@ -35,5 +36,14 @@ public class SKUISession implements UISession {
 
 	public Player getPlayer() {
 		return player;
+	}
+
+	void onSessionEnd() {
+		valid = false;
+	}
+
+	@Override
+	public boolean isValid() {
+		return valid;
 	}
 }
