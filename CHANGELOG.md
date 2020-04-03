@@ -13,6 +13,7 @@ Date format: (YYYY-MM-DD)
 
 Changed messages (you will have to manually update those!):  
 * msg-command-description-remote: Adapted to the addition of the optional player argument.
+* msg-command-description-give: Slightly changed the german translation.
 
 ## v2.9.2 (2020-03-04)
 ### Supported MC versions: 1.15.2, 1.14.4
