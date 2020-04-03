@@ -56,7 +56,10 @@ permissions:
         description: Give shop creation items per command
         default: op
     shopkeeper.remote:
-        description: Remotely open admin shops via command
+        description: Remotely open shops via command
+        default: op
+    shopkeeper.remote.otherplayers:
+        description: Remotely open shops for other players
         default: op
     shopkeeper.remoteedit:
         description: Remotely edit shops via command

@@ -43,6 +43,7 @@ public interface ShopkeepersPlugin extends Plugin {
 
 	public static final String GIVE_PERMISSION = "shopkeeper.give";
 	public static final String REMOTE_PERMISSION = "shopkeeper.remote";
+	public static final String REMOTE_OTHER_PLAYERS_PERMISSION = "shopkeeper.remote.otherplayers";
 	public static final String REMOTE_EDIT_PERMISSION = "shopkeeper.remoteedit";
 	public static final String TRANSFER_PERMISSION = "shopkeeper.transfer";
 	public static final String SET_TRADE_PERM_PERMISSION = "shopkeeper.settradeperm";
