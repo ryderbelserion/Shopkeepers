@@ -1,9 +1,14 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.9.3 (TBA)
+## v2.9.4 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+
+## v2.9.3 (2020-04-12)
+### Supported MC versions: 1.15.2, 1.14.4
+
+* Fixed: If a trade required two matching item stacks of the same type but different sizes, it was possible to trade for less items when offering the items in reverse order.
 * Added: The `/shopkeeper remote` command can be used from console now and optionally accepts a player as argument. The shop will then be opened for the specified player.
   * Added permission: 'shopkeeper.remote.otherplayers' (default: op). This is required for opening shops for other players.
 * Partially fixed: When a player shift double left-clicks inside the editor view, Minecraft triggers shift left-clicks on all slots containing matching items. This causes the prices of other trades to unintentionally change. We heuristically assume that any shift left-clicks occurring within 250 ms on a slot different to the previously clicked were triggered automatically and ignore those clicks now.
