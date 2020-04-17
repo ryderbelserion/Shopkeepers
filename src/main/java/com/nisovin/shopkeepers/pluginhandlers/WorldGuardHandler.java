@@ -73,10 +73,10 @@ public class WorldGuardHandler {
 			if (shopFlag != null) {
 				// check if shop flag is set:
 				if (shopFlag instanceof StateFlag) {
-					allowShopFlag = query.testState(BukkitAdapter.adapt(loc), null, (StateFlag) shopFlag);
+					allowShopFlag = query.testState(BukkitAdapter.adapt(loc), wgPlugin.wrapPlayer(player), (StateFlag) shopFlag);
 				} else if (shopFlag instanceof BooleanFlag) {
 					// value might be null:
-					Boolean shopFlagValue = query.queryValue(BukkitAdapter.adapt(loc), null, (BooleanFlag) shopFlag);
+					Boolean shopFlagValue = query.queryValue(BukkitAdapter.adapt(loc), wgPlugin.wrapPlayer(player), (BooleanFlag) shopFlag);
 					allowShopFlag = (Boolean.TRUE.equals(shopFlagValue));
 				} else {
 					// unknown flag type, assume unset

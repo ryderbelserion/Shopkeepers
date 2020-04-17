@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.9.4 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+* Checking the WorldGuard allow-shop flag now takes into account the player for whom the flag is being queried.
 
 ## v2.9.3 (2020-04-12)
 ### Supported MC versions: 1.15.2, 1.14.4
