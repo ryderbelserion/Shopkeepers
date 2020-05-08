@@ -83,7 +83,7 @@ public interface Text {
 	 * <li>Placeholders
 	 * </ul>
 	 * <p>
-	 * The internal structure of the resulting {@link Text} is undefined anf may change across different versions.
+	 * The internal structure of the resulting {@link Text} is undefined and may change across different versions.
 	 * 
 	 * @param input
 	 *            the text to parse
