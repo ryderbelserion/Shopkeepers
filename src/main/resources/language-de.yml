@@ -260,12 +260,12 @@ msg-list-player-shops-header: "&9Spieler '&e{player}&9' hat &e{shopsCount} &9Sho
 msg-list-shops-entry: "  &e{shopId}) &7{shopName}&r&8an &7({location})&8, Typ: &7{shopType}&8, Objekt: &7{objectType}"
 
 msg-removed-admin-shops: "&aEs wurden &e{shopsCount} &aAdmin-Shops entfernt."
-msg-removed-player-shops: "&aEs wurden &e{shopsCount} &aShops von Spieler '&e{player}&a' entfernt."
-msg-removed-all-player-shops: "&aEs wurden alle &e{shopsCount} &aSpieler-Shops entfernt."
+msg-removed-shops-of-player: "&aEs wurden &e{shopsCount} &aShops von Spieler '&e{player}&a' entfernt."
+msg-removed-player-shops: "&aEs wurden &e{shopsCount} &aSpieler-Shops entfernt."
 
-msg-confirm-remove-admin-shops: "&cDu bist dabei alle Admin-Shops (&6{shopsCount}&c) unwiderruflich zu entfernen!"
-msg-confirm-remove-own-shops: "&cDu bist dabei alle deine Shops (&6{shopsCount}&c) unwiderruflich zu entfernen!"
-msg-confirm-remove-player-shops: "&cDu bist dabei alle Shops des Spielers &6{player}&c (&6{shopsCount}&c) unwiderruflich zu entfernen!"
+msg-confirm-remove-all-admin-shops: "&cDu bist dabei alle Admin-Shops (&6{shopsCount}&c) unwiderruflich zu entfernen!"
+msg-confirm-remove-all-own-shops: "&cDu bist dabei alle deine Shops (&6{shopsCount}&c) unwiderruflich zu entfernen!"
+msg-confirm-remove-all-shops-of-player: "&cDu bist dabei alle Shops des Spielers &6{player}&c (&6{shopsCount}&c) unwiderruflich zu entfernen!"
 msg-confirm-remove-all-player-shops: "&cDu bist dabei alle Spieler-Shops sämtlicher Spieler (&6{shopsCount}&c) unwiderruflich zu entfernen!"
 
 msg-confirmation-required: "&7Bitte bestätige diese Aktion mittels &6/shopkeepers confirm"

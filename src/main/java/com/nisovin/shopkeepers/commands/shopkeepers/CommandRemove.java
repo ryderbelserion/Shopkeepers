@@ -12,8 +12,10 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.commands.Confirmations;
 import com.nisovin.shopkeepers.commands.lib.Command;
@@ -25,6 +27,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerNameArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerUUIDArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerNameFallback;
+import com.nisovin.shopkeepers.event.ShopkeeperEventHelper;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.PlayerUtils;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils;
@@ -49,12 +52,12 @@ class CommandRemove extends Command {
 		this.shopkeeperRegistry = shopkeeperRegistry;
 		this.confirmations = confirmations;
 
-		// permission gets checked by testPermission and during execution
+		// Permission gets checked by testPermission and during execution
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionRemove);
 
-		// arguments: TODO allow specifying a single shopkeeper?
+		// Arguments: TODO allow specifying a single shopkeeper?
 		this.addArgument(new FirstOfArgument("target", Arrays.asList(
 				new LiteralArgument(ARGUMENT_ADMIN),
 				new LiteralArgument(ARGUMENT_ALL),
@@ -80,6 +83,7 @@ class CommandRemove extends Command {
 	@Override
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
+		Player senderPlayer = (sender instanceof Player) ? (Player) sender : null;
 		boolean all = context.has(ARGUMENT_ALL);
 		boolean admin = context.has(ARGUMENT_ADMIN);
 		UUID targetPlayerUUID = context.get(ARGUMENT_PLAYER_UUID); // can be null
@@ -88,20 +92,19 @@ class CommandRemove extends Command {
 
 		boolean targetOwnShops = false;
 		if (targetPlayerUUID != null || targetPlayerName != null) {
-			// check if the target matches the sender player:
-			Player senderPlayer = (sender instanceof Player) ? (Player) sender : null;
+			// Check if the target matches the sender player:
 			if (senderPlayer != null && (senderPlayer.getUniqueId().equals(targetPlayerUUID) || senderPlayer.getName().equalsIgnoreCase(targetPlayerName))) {
 				targetOwnShops = true;
-				// get missing / exact player information:
+				// Get missing / exact player information:
 				targetPlayerUUID = senderPlayer.getUniqueId();
 				targetPlayerName = senderPlayer.getName();
 			} else if (targetPlayerName != null) {
-				// check if the target matches an online player:
-				// if the name matches an online player, remove that player's shops (regardless of if the name is
+				// Check if the target matches an online player:
+				// If the name matches an online player, remove that player's shops (regardless of if the name is
 				// ambiguous / if there are shops of other players with matching name):
 				Player onlinePlayer = Bukkit.getPlayerExact(targetPlayerName); // note: case insensitive
 				if (onlinePlayer != null) {
-					// get missing / exact player information:
+					// Get missing / exact player information:
 					targetPlayerUUID = onlinePlayer.getUniqueId();
 					targetPlayerName = onlinePlayer.getName();
 				}
@@ -123,113 +126,124 @@ class CommandRemove extends Command {
 			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_OTHERS_PERMISSION);
 		}
 
-		// get the affected shops:
+		// Get the affected shops:
 		// Note: Doing this before prompting the command executor for confirmation allows us to detect ambiguous player
 		// names and missing player information (the player name/uuid if only the uuid/name is specified).
-		List<? extends Shopkeeper> shops;
+		List<? extends Shopkeeper> affectedShops;
 		if (admin) {
-			// search all admin shops:
+			// Search all admin shops:
 			List<Shopkeeper> adminShops = new ArrayList<>();
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
-				if (!(shopkeeper instanceof PlayerShopkeeper)) {
+				if (shopkeeper instanceof AdminShopkeeper) {
 					adminShops.add(shopkeeper);
 				}
 			}
-			shops = adminShops;
+			affectedShops = adminShops;
 		} else if (all) {
-			// search all player shops:
+			// Search all player shops:
 			List<Shopkeeper> playerShops = new ArrayList<>();
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 				if (shopkeeper instanceof PlayerShopkeeper) {
 					playerShops.add(shopkeeper);
 				}
 			}
-			shops = playerShops;
+			affectedShops = playerShops;
 		} else {
 			assert targetPlayerUUID != null ^ targetPlayerName != null;
-			// search for shops owned by the target player:
+			// Search for shops owned by the target player:
 			OwnedPlayerShopsResult ownedPlayerShopsResult = ShopkeeperUtils.getOwnedPlayerShops(targetPlayerUUID, targetPlayerName);
 			assert ownedPlayerShopsResult != null;
 
-			// if the input name is ambiguous, we print an error and require the player to be specified by uuid:
+			// If the input name is ambiguous, we print an error and require the player to be specified by uuid:
 			Map<UUID, String> matchingShopOwners = ownedPlayerShopsResult.getMatchingShopOwners();
 			assert matchingShopOwners != null;
 			if (PlayerUtils.handleAmbiguousPlayerName(sender, targetPlayerName, matchingShopOwners.entrySet())) {
 				return;
 			}
 
-			// get missing / exact player information:
+			// Get missing / exact player information:
 			targetPlayerUUID = ownedPlayerShopsResult.getPlayerUUID();
 			targetPlayerName = ownedPlayerShopsResult.getPlayerName();
 
-			// get found shops:
-			shops = ownedPlayerShopsResult.getShops();
+			// Get the found shops:
+			affectedShops = ownedPlayerShopsResult.getShops();
 		}
-		assert shops != null;
-		final int shopsCount = shops.size();
+		assert affectedShops != null;
 
 		UUID finalTargetPlayerUUID = targetPlayerUUID;
 		String finalTargetPlayerName = targetPlayerName;
-		// this is dangerous: let the sender first confirm this action
+		// This is dangerous: Let the sender first confirm this action.
 		confirmations.awaitConfirmation(sender, () -> {
-			// remove shops:
-			for (Shopkeeper shopkeeper : shops) {
-				// skip the shopkeeper if it no longer exists:
+			// Note: New shops might have been created in the meantime, but the command only affects the already
+			// determined affected shops.
+			// Remove shops:
+			int actualShopCount = 0;
+			for (Shopkeeper shopkeeper : affectedShops) {
+				// Skip the shopkeeper if it no longer exists:
 				if (!shopkeeper.isValid()) continue;
-				shopkeeper.delete();
-			}
-			// Note: We ignore 'shopsCount' ending up slightly outdated here in favor of not confusing the user of the
-			// command (due to changing shop counts before and after command confirmation).
 
-			// trigger save:
+				if (senderPlayer != null) {
+					// Call event:
+					PlayerDeleteShopkeeperEvent deleteEvent = ShopkeeperEventHelper.callPlayerDeleteShopkeeperEvent(shopkeeper, senderPlayer);
+					if (deleteEvent.isCancelled()) {
+						continue;
+					}
+				}
+
+				shopkeeper.delete(senderPlayer);
+				actualShopCount += 1;
+			}
+
+			// Trigger save:
 			plugin.getShopkeeperStorage().save();
 
-			// printing result message:
+			// Print the result message:
 			if (admin) {
-				// removed all admin shops:
+				// Removed all admin shops:
 				TextUtils.sendMessage(sender, Settings.msgRemovedAdminShops,
-						"shopsCount", shopsCount
+						"shopsCount", actualShopCount
 				);
 			} else if (all) {
-				// removed all player shops:
-				TextUtils.sendMessage(sender, Settings.msgRemovedAllPlayerShops,
-						"shopsCount", shopsCount
+				// Removed all player shops:
+				TextUtils.sendMessage(sender, Settings.msgRemovedPlayerShops,
+						"shopsCount", actualShopCount
 				);
 			} else {
-				// removed shops of specific player:
-				TextUtils.sendMessage(sender, Settings.msgRemovedPlayerShops,
+				// Removed all shops of the specified player:
+				TextUtils.sendMessage(sender, Settings.msgRemovedShopsOfPlayer,
 						"player", TextUtils.getPlayerText(finalTargetPlayerName, finalTargetPlayerUUID),
-						"shopsCount", shopsCount
+						"shopsCount", actualShopCount
 				);
 			}
 		});
 
 		// TODO print 'no shops found' if shop count is 0?
 
-		// inform player about required confirmation:
+		// Inform the sender about required confirmation:
+		int shopsCount = affectedShops.size();
 		if (admin) {
-			// removing all admin shops:
-			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveAdminShops,
+			// Removing all admin shops:
+			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveAllAdminShops,
 					"shopsCount", shopsCount
 			);
 		} else if (all) {
-			// removing all player shops:
+			// Removing all player shops:
 			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveAllPlayerShops,
 					"shopsCount", shopsCount
 			);
 		} else if (targetOwnShops) {
-			// removing own shops:
-			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveOwnShops,
+			// Removing own shops:
+			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveAllOwnShops,
 					"shopsCount", shopsCount
 			);
 		} else {
-			// removing shops of specific player:
-			TextUtils.sendMessage(sender, Settings.msgConfirmRemovePlayerShops,
+			// Removing shops of specific player:
+			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveAllShopsOfPlayer,
 					"player", TextUtils.getPlayerText(targetPlayerName, targetPlayerUUID),
 					"shopsCount", shopsCount
 			);
 		}
-		// inform player on how to confirm the action:
+		// Inform player on how to confirm the action:
 		// TODO add clickable command suggestion?
 		TextUtils.sendMessage(sender, Settings.msgConfirmationRequired);
 	}

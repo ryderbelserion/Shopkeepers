@@ -48,6 +48,8 @@ public class RemoveShopOnChestBreak {
 				ItemStack shopCreationItem = Settings.createShopCreationItem();
 				block.getWorld().dropItemNaturally(block.getLocation(), shopCreationItem);
 			}
+			// Note: We do not pass the player responsible for breaking the chest here, because we cannot determine the
+			// player in all situations anyways (eg. if a player indirectly breaks the chest by causing an explosion).
 			shopkeeper.delete();
 		}
 		return true;

@@ -631,12 +631,12 @@ msg-list-player-shops-header: "&9Player '&e{player}&9' has &e{shopsCount} &9shop
 msg-list-shops-entry: "  &e{shopId}) &7{shopName}&r&8at &7({location})&8, type: &7{shopType}&8, object: &7{objectType}"
 
 msg-removed-admin-shops: "&e{shopsCount} &aadmin shops were removed."
-msg-removed-player-shops: "&e{shopsCount} &ashops of player '&e{player}&a' were removed."
-msg-removed-all-player-shops: "&aAll &e{shopsCount} &aplayer shops were removed."
+msg-removed-shops-of-player: "&e{shopsCount} &ashops of player '&e{player}&a' were removed."
+msg-removed-player-shops: "&e{shopsCount} &aplayer shops were removed."
 
-msg-confirm-remove-admin-shops: "&cYou are about to irrevocable remove all admin shops (&6{shopsCount}&c)!"
-msg-confirm-remove-own-shops: "&cYou are about to irrevocable remove all your shops (&6{shopsCount}&c)!"
-msg-confirm-remove-player-shops: "&cYou are about to irrevocable remove all shops of player &6{player}&c (&6{shopsCount}&c)!"
+msg-confirm-remove-all-admin-shops: "&cYou are about to irrevocable remove all admin shops (&6{shopsCount}&c)!"
+msg-confirm-remove-all-own-shops: "&cYou are about to irrevocable remove all your shops (&6{shopsCount}&c)!"
+msg-confirm-remove-all-shops-of-player: "&cYou are about to irrevocable remove all shops of player &6{player}&c (&6{shopsCount}&c)!"
 msg-confirm-remove-all-player-shops: "&cYou are about to irrevocable remove all player shops of all players (&6{shopsCount}&c)!"
 
 msg-confirmation-required: "&7Please confirm this action by typing &6/shopkeepers confirm"

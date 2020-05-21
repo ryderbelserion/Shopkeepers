@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -29,15 +28,14 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.event.ShopkeeperEventHelper;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.MathUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class EditorHandler extends UIHandler {
@@ -61,6 +59,8 @@ public abstract class EditorHandler extends UIHandler {
 	protected static final int TRADES_SETUP_ICON = TRADES_PAGE_ICON - 1;
 
 	protected static final int BUTTONS_START = TRADES_PAGE_BAR_END + (COLUMNS_PER_ROW - TRADES_COLUMNS) + 1;
+	// TODO If there are more buttons than we can fit into two rows, move the excess buttons into a separate (paged)
+	// inventory view and add an editor button that opens it.
 	protected static final int BUTTON_MAX_ROWS = 2;
 
 	// slot = column + offset:
@@ -490,37 +490,14 @@ public abstract class EditorHandler extends UIHandler {
 
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// delete button - delete shopkeeper:
-				// call event:
-				PlayerDeleteShopkeeperEvent deleteEvent = new PlayerDeleteShopkeeperEvent(shopkeeper, player);
+				// Call event:
+				PlayerDeleteShopkeeperEvent deleteEvent = ShopkeeperEventHelper.callPlayerDeleteShopkeeperEvent(shopkeeper, player);
 				Bukkit.getPluginManager().callEvent(deleteEvent);
-				if (deleteEvent.isCancelled()) {
-					Log.debug("ShopkeeperDeleteEvent was cancelled!");
-				} else {
-					// return shop creation item for player shopkeepers:
-					if (Settings.deletingPlayerShopReturnsCreationItem && shopkeeper.getType() instanceof PlayerShopType) {
-						ItemStack shopCreationItem = Settings.createShopCreationItem();
-						Map<Integer, ItemStack> remaining = player.getInventory().addItem(shopCreationItem);
-						if (!remaining.isEmpty()) {
-							Location playerLocation = player.getEyeLocation();
-							Location shopLocation = shopkeeper.getShopObject().getLocation();
-							// if within a certain range, drop the item at the shop's location:
-							if (shopLocation != null && Utils.getDistanceSquared(shopLocation, playerLocation) <= 100) {
-								playerLocation.getWorld().dropItem(shopLocation, shopCreationItem);
-							} else {
-								// else drop at player's location:
-								playerLocation.getWorld().dropItem(playerLocation, shopCreationItem);
-							}
+				if (!deleteEvent.isCancelled()) {
+					// Delete shopkeeper:
+					shopkeeper.delete(player);
 
-							player.getWorld().dropItem(shopkeeper.getShopObject().getLocation(), shopCreationItem);
-						}
-					}
-
-					// delete shopkeeper:
-					// this also deactivates the ui and closes all open windows for this shopkeeper after a delay
-					shopkeeper.delete();
-
-					// save:
+					// Save:
 					shopkeeper.save();
 				}
 			}

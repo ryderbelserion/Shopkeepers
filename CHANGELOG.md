@@ -5,6 +5,25 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.15.2, 1.14.4
 
 * Checking the WorldGuard allow-shop flag now takes into account the player for whom the flag is being queried.
+* Fixed: The returned shop creation item would get dropped twice under certain conditions.
+* Fixed: The shop creation item is now also returned if a player deletes his own shops via command.
+* Fixed/API: The PlayerDeleteShopkeeperEvent is now also called when a player deletes shops via command.
+* Changed: The result message after deleting shops via command will now print the number of actually removed shops (which does not necessarily match the number of shops that were confirmed for removal).
+* Debug: Added some more information to the debug message that gets logged when the PlayerDeleteShopkeeperEvent has been cancelled.
+* API/Internal: Added Shopkeeper#delete(Player) which optionally passes the player responsible for the shopkeeper deletion. Note that the player is not passed if a player shop is deleted due to a player breaking the shop's chest.
+
+Internal changes:  
+* Moved most of the code responsible for returning the shop creation item for deleted player shops into the new PlayerShopkeeper#delete(Player) method.
+* Added ShopkeeperEventHelper class and moved the common code for calling and handling PlayerDeleteShopkeeperEvents there.
+* Minor formatting changes. Not applied to the whole code base yet.
+
+Changed messages (you will have to manually update those!):  
+* Renamed 'msg-removed-player-shops' to 'msg-removed-shops-of-player'.
+* Renamed 'msg-removed-all-player-shops' to 'msg-removed-player-shops'.
+* Renamed 'msg-confirm-remove-admin-shops' to 'msg-confirm-remove-all-admin-shops'.
+* Renamed 'msg-confirm-remove-own-shops' to 'msg-confirm-remove-all-own-shops'.
+* Renamed 'msg-confirm-remove-player-shops' to 'msg-confirm-remove-all-shops-of-player'.
+* The 'msg-removed-player-shops' message (previously 'msg-removed-all-player-shops') no longer mentions that 'all' shops got deleted (since this is not necessarily true).
 
 ## v2.9.3 (2020-04-12)
 ### Supported MC versions: 1.15.2, 1.14.4

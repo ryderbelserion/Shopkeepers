@@ -424,6 +424,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public void delete() {
+		this.delete(null);
+	}
+
+	@Override
+	public void delete(Player player) {
 		this.markDirty();
 		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().deleteShopkeeper(this);
 	}

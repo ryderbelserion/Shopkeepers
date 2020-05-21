@@ -52,6 +52,14 @@ public interface Shopkeeper {
 	 */
 	public void delete();
 
+	/**
+	 * Persistently removes this shopkeeper.
+	 * 
+	 * @param player
+	 *            the player responsible for the deletion, can be <code>null</code>
+	 */
+	public void delete(Player player);
+
 	// ATTRIBUTES
 
 	/**

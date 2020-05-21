@@ -462,12 +462,12 @@ public class Settings {
 	public static Text msgListShopsEntry = Text.parse("  &e{shopId}) &7{shopName}&r&8at &7({location})&8, type: &7{shopType}&8, object: &7{objectType}");
 
 	public static Text msgRemovedAdminShops = Text.parse("&e{shopsCount} &aadmin shops were removed.");
-	public static Text msgRemovedPlayerShops = Text.parse("&e{shopsCount} &ashops of player '&e{player}&a' were removed.");
-	public static Text msgRemovedAllPlayerShops = Text.parse("&aAll &e{shopsCount} &aplayer shops were removed.");
+	public static Text msgRemovedShopsOfPlayer = Text.parse("&e{shopsCount} &ashops of player '&e{player}&a' were removed.");
+	public static Text msgRemovedPlayerShops = Text.parse("&e{shopsCount} &aplayer shops were removed.");
 
-	public static Text msgConfirmRemoveAdminShops = Text.parse("&cYou are about to irrevocable remove all admin shops (&6{shopsCount}&c)!");
-	public static Text msgConfirmRemoveOwnShops = Text.parse("&cYou are about to irrevocable remove all your shops (&6{shopsCount}&c)!");
-	public static Text msgConfirmRemovePlayerShops = Text.parse("&cYou are about to irrevocable remove all shops of player &6{player}&c (&6{shopsCount}&c)!");
+	public static Text msgConfirmRemoveAllAdminShops = Text.parse("&cYou are about to irrevocable remove all admin shops (&6{shopsCount}&c)!");
+	public static Text msgConfirmRemoveAllOwnShops = Text.parse("&cYou are about to irrevocable remove all your shops (&6{shopsCount}&c)!");
+	public static Text msgConfirmRemoveAllShopsOfPlayer = Text.parse("&cYou are about to irrevocable remove all shops of player &6{player}&c (&6{shopsCount}&c)!");
 	public static Text msgConfirmRemoveAllPlayerShops = Text.parse("&cYou are about to irrevocable remove all player shops of all players (&6{shopsCount}&c)!");
 
 	public static Text msgConfirmationRequired = Text.parse("&7Please confirm this action by typing &6/shopkeepers confirm");

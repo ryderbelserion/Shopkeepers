@@ -1,9 +1,11 @@
 package com.nisovin.shopkeepers.shopkeeper.player;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
@@ -34,6 +36,7 @@ import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
@@ -162,6 +165,29 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 		// unregister previously protected chest:
 		SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(this.getWorldName(), chestX, chestY, chestZ, this);
+	}
+
+	@Override
+	public void delete(Player player) {
+		// Return the shop creation item:
+		if (Settings.deletingPlayerShopReturnsCreationItem && player != null && this.isOwner(player)) {
+			ItemStack shopCreationItem = Settings.createShopCreationItem();
+			Map<Integer, ItemStack> remaining = player.getInventory().addItem(shopCreationItem);
+			if (!remaining.isEmpty()) {
+				// Inventory is full, drop the item instead:
+				Location playerLocation = player.getEyeLocation();
+				Location shopLocation = this.getShopObject().getLocation();
+				// If within a certain range, drop the item at the shop's location, else drop at player's location:
+				Location dropLocation;
+				if (shopLocation != null && Utils.getDistanceSquared(shopLocation, playerLocation) <= 100) {
+					dropLocation = shopLocation;
+				} else {
+					dropLocation = playerLocation;
+				}
+				dropLocation.getWorld().dropItem(dropLocation, shopCreationItem);
+			}
+		}
+		super.delete(player);
 	}
 
 	@Override
