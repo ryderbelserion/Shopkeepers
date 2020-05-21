@@ -22,6 +22,8 @@ class ShopNamingListener implements Listener {
 
 	// SHOPKEEPER NAMING
 
+	// ignoreCancelled = false: We process the chat event in all cases (even if the player has been muted, etc.).
+	// Priority LOWEST: We intend to cancel the event as early as possible, so that other plugins can ignore it.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onChat(AsyncPlayerChatEvent event) {
 		Player player = event.getPlayer();
