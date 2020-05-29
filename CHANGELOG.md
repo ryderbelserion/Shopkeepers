@@ -11,6 +11,7 @@ Date format: (YYYY-MM-DD)
 * Changed: The result message after deleting shops via command will now print the number of actually removed shops (which does not necessarily match the number of shops that were confirmed for removal).
 * Debug: Added some more information to the debug message that gets logged when the PlayerDeleteShopkeeperEvent has been cancelled.
 * API/Internal: Added Shopkeeper#delete(Player) which optionally passes the player responsible for the shopkeeper deletion. Note that the player is not passed if a player shop is deleted due to a player breaking the shop's chest.
+* API: Added a note about the PlayerDeleteShopkeeperEvent not being called in all circumstances.
 
 Internal changes:  
 * Moved most of the code responsible for returning the shop creation item for deleted player shops into the new PlayerShopkeeper#delete(Player) method.
