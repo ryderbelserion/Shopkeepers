@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -207,9 +208,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// TODO TreeMaps for shopkeeper owners by name and uuid to speedup prefix matching?
 
 	// virtual shopkeepers:
-	// map: allows for quick removal
-	private final Map<UUID, AbstractShopkeeper> virtualShopkeepers = new LinkedHashMap<>();
-	private final Collection<AbstractShopkeeper> virtualShopkeepersView = Collections.unmodifiableCollection(virtualShopkeepers.values());
+	// Set: allows for quick removal
+	private final Set<AbstractShopkeeper> virtualShopkeepers = new LinkedHashSet<>();
+	private final Collection<AbstractShopkeeper> virtualShopkeepersView = Collections.unmodifiableCollection(virtualShopkeepers);
 
 	// by world name
 	private final Map<String, WorldShopkeepers> shopkeepersByWorld = new LinkedHashMap<>();
@@ -454,7 +455,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		if (chunkCoords == null) {
 			// virtual shopkeeper:
 			chunkEntry = null;
-			virtualShopkeepers.put(shopkeeperUniqueId, shopkeeper);
+			virtualShopkeepers.add(shopkeeper);
 		} else {
 			// add shopkeeper to chunk:
 			chunkEntry = this.addShopkeeperToChunk(shopkeeper, chunkCoords);
@@ -519,7 +520,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		ChunkCoords chunkCoords = shopkeeper.getChunkCoords(); // null for virtual shops
 		if (chunkCoords == null) {
 			// virtual shopkeeper:
-			virtualShopkeepers.remove(shopkeeperUniqueId);
+			virtualShopkeepers.remove(shopkeeper);
 		} else {
 			// remove shopkeeper from chunk:
 			this.removeShopkeeperFromChunk(shopkeeper, chunkCoords);
