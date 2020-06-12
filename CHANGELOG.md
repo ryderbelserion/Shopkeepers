@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.9.4 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+* Fixed: If regular item usage is disabled we also prevent any kind of entity interaction now while holding the shop creation item in hand. Players with the 'shopkeeper.bypass' permission are exempt from this restriction.
 * Checking the WorldGuard allow-shop flag now takes into account the player for whom the flag is being queried.
 * Fixed: The returned shop creation item would get dropped twice under certain conditions.
 * Fixed: The shop creation item is now also returned if a player deletes his own shops via command.

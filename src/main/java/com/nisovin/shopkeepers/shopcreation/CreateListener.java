@@ -12,6 +12,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
@@ -202,7 +204,7 @@ class CreateListener implements Listener {
 			}
 		}
 	}
-	
+
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockDispense(BlockDispenseEvent event) {
 		if (Settings.preventShopCreationItemRegularUsage && Settings.isShopCreationItem(event.getItem())) {
@@ -210,6 +212,35 @@ class CreateListener implements Listener {
 			event.setCancelled(true);
 			// TODO drop item instead
 			// TODO only prevent it for items that have a special dispense behavior
+		}
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+		this.handleEntityInteraction(event);
+	}
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	void onPlayerInteractAtEntity(PlayerInteractAtEntityEvent event) {
+		this.handleEntityInteraction(event);
+	}
+
+	private void handleEntityInteraction(PlayerInteractEntityEvent event) {
+		if (!Settings.preventShopCreationItemRegularUsage) return;
+		Player player = event.getPlayer();
+		ItemStack itemInHand = ItemUtils.getItem(player.getInventory(), event.getHand());
+		if (Settings.isShopCreationItem(itemInHand) && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+			// TODO Only prevent the entity interaction if the item actually has a special entity interaction behavior.
+			// The interaction result may also depend on the interacted entity. However, there is no Bukkit API yet to
+			// check for this.
+			Log.debug(() -> {
+				if (event instanceof PlayerInteractAtEntityEvent) {
+					return "Preventing interaction at entity with shop creation item for player " + TextUtils.getPlayerString(player);
+				} else {
+					return "Preventing entity interaction with shop creation item for player " + TextUtils.getPlayerString(player);
+				}
+			});
+			event.setCancelled(true);
 		}
 	}
 }

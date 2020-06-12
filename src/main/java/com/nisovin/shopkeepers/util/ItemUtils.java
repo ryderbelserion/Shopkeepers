@@ -12,8 +12,10 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -725,5 +727,27 @@ public final class ItemUtils {
 
 	public static void updateInventoryLater(Player player) {
 		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> player.updateInventory());
+	}
+
+	// TODO Replace this with the corresponding Bukkit API method added in late 1.15.2
+	// See https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/da9ef3c55fa3bce91f7fdcd77d50171be7297d7d
+	public static ItemStack getItem(PlayerInventory playerInventory, EquipmentSlot slot) {
+		if (playerInventory == null || slot == null) return null;
+		switch (slot) {
+			case HAND:
+				return playerInventory.getItemInMainHand();
+			case OFF_HAND:
+				return playerInventory.getItemInOffHand();
+			case FEET:
+				return playerInventory.getBoots();
+			case LEGS:
+				return playerInventory.getLeggings();
+			case CHEST:
+				return playerInventory.getChestplate();
+			case HEAD:
+				return playerInventory.getHelmet();
+			default:
+				return null;
+		}
 	}
 }
