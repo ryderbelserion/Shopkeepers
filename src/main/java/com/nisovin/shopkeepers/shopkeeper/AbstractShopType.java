@@ -42,7 +42,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 
 	protected Text getCreatedMessage() {
 		Text text = Settings.msgShopkeeperCreated;
-		TextUtils.setPlaceholderArguments(text,
+		text.setPlaceholderArguments(
 				"type", this.getDisplayName(),
 				"description", this.getDescription(),
 				"setupDesc", this.getSetupDescription()

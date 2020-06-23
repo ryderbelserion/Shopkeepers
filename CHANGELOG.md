@@ -17,6 +17,7 @@ Date format: (YYYY-MM-DD)
 Internal changes:  
 * Moved most of the code responsible for returning the shop creation item for deleted player shops into the new PlayerShopkeeper#delete(Player) method.
 * Added ShopkeeperEventHelper class and moved the common code for calling and handling PlayerDeleteShopkeeperEvents there.
+* Various minor refactorings related to the Text implementation.
 * Minor formatting changes. Not applied to the whole code base yet.
 
 Changed messages (you will have to manually update those!):  
