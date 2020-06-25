@@ -42,6 +42,7 @@ Changed messages (you will have to manually update those!):
 * The 'msg-removed-player-shops' message (previously 'msg-removed-all-player-shops') no longer mentions that 'all' shops got deleted (since this is not necessarily true).
 * Changed the 'msg-button-villager-level' and 'msg-button-villager-level-lore' messages to clarify that this option only changes the visual appearance of the villager's badge color. The included german translation has been updated accordingly as well.
 * Slightly changed the german translation of the 'msg-cant-trade-while-owner-online' message.
+* Removed the note about left and right clicking items to adjust amounts from the 'msg-trade-setup-desc-admin-regular' message, since this doesn't actually apply to admin shops.
 
 ## v2.9.3 (2020-04-12)
 ### Supported MC versions: 1.15.2, 1.14.4

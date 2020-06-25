@@ -600,7 +600,6 @@ msg-trade-setup-desc-header: '&6{shopType}'
 msg-trade-setup-desc-admin-regular:
 - Has unlimited stock.
 - Insert items from your inventory.
-- Left/Right click to adjust amounts.
 - 'Top row: Result items'
 - 'Bottom rows: Cost items'
 msg-trade-setup-desc-selling:

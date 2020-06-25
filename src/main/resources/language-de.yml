@@ -231,7 +231,6 @@ msg-trade-setup-desc-header: '&6{shopType}'
 msg-trade-setup-desc-admin-regular:
 - Hat unbegrenzten Vorrat.
 - Füge Items aus deinem Inventar ein.
-- Links/Rechts Klick zum Ändern der Mengen.
 - 'Obere Reihe: Ergebnis Items'
 - 'Untere Reihen: Kosten'
 msg-trade-setup-desc-selling:

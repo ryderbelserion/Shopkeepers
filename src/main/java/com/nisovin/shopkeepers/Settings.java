@@ -455,7 +455,7 @@ public class Settings {
 	public static String msgShopSetupDescAdminRegular = "&e  Right-click the shop while sneaking to modify trades.";
 
 	public static String msgTradeSetupDescHeader = "&6{shopType}";
-	public static List<String> msgTradeSetupDescAdminRegular = Arrays.asList("Has unlimited stock.", "Insert items from your inventory.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items");
+	public static List<String> msgTradeSetupDescAdminRegular = Arrays.asList("Has unlimited stock.", "Insert items from your inventory.", "Top row: Result items", "Bottom rows: Cost items");
 	public static List<String> msgTradeSetupDescSelling = Arrays.asList("Sells items.", "Insert items to sell into the chest.", "Left/Right click to adjust amounts.", "Top row: Items being sold", "Bottom rows: Cost items");
 	public static List<String> msgTradeSetupDescBuying = Arrays.asList("Buys items.", "Insert one of each item you want to", "buy and plenty of currency items", "into the chest.", "Left/Right click to adjust amounts.", "Top row: Cost items", "Bottom row: Items being bought");
 	public static List<String> msgTradeSetupDescTrading = Arrays.asList("Trades items.", "Pickup an item from your inventory", "and then click a slot to place it.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items");
