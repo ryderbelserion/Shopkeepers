@@ -4,13 +4,14 @@ Date format: (YYYY-MM-DD)
 ## v2.9.4 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+* Added: Added a header comment to the top of the save.yml file mentioning the risk of manually editing this file while the server is still running or without making a backup first.
 * Fixed: If regular item usage is disabled we also prevent any kind of entity interaction now while holding the shop creation item in hand. Players with the 'shopkeeper.bypass' permission are exempt from this restriction.
 * Fixed: Checking the WorldGuard allow-shop flag now takes into account the player for whom the flag is being queried.
 * Fixed: The returned shop creation item would get dropped twice under certain conditions.
 * Fixed: The shop creation item is now also returned if a player deletes his own shops via command.
 * Fixed/API: The PlayerDeleteShopkeeperEvent is now also called when a player deletes shops via command.
-* Added: Added a header comment to the top of the save.yml file mentioning the risk of manually editing this file while the server is still running or without making a backup first.
 * Changed: The result message after deleting shops via command will now print the number of actually removed shops (which does not necessarily match the number of shops that were confirmed for removal).
+* Changed: The item representing the black horse inside the editor is now slightly less black.
 * Debug: Added some more information to the debug message that gets logged when the PlayerDeleteShopkeeperEvent has been cancelled.
 * API/Internal: Added Shopkeeper#delete(Player) which optionally passes the player responsible for the shopkeeper deletion. Note that the player is not passed if a player shop is deleted due to a player breaking the shop's chest.
 * API: Added a note about the PlayerDeleteShopkeeperEvent not being called in all circumstances.

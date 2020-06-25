@@ -118,7 +118,7 @@ public class HorseShop extends BabyableShop<Horse> {
 		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
 		switch (color) {
 		case BLACK:
-			ItemUtils.setLeatherColor(iconItem, Color.BLACK);
+			ItemUtils.setLeatherColor(iconItem, Color.fromRGB(31, 31, 31));
 			break;
 		case BROWN:
 			ItemUtils.setLeatherColor(iconItem, Color.fromRGB(54, 25, 8));
