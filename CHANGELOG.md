@@ -9,7 +9,7 @@ Date format: (YYYY-MM-DD)
 * Changed: When checking if the player is able to bypass the restriction of not being able to trade with shops while their owner is online, we only check for the bypass permission now after checking if the shop owner is actually online currently.
 * Added: The variant of rabbit shopkeepers can now be changed. Any existing rabbit shopkeepers will use the brown variant (the default). This also resolves an issue with the rabbit type randomly changing whenever the shopkeeper is respawned.
 * Added: Added a header comment to the top of the save.yml file mentioning the risk of manually editing this file while the server is still running or without making a backup first.
-* Fixed: If regular item usage is disabled we also prevent any kind of entity interaction now while holding the shop creation item in hand. Players with the 'shopkeeper.bypass' permission are exempt from this restriction.
+* Fixed: If regular item usage is disabled we also prevent any kind of entity interaction now while holding the shop creation item in hand. Players in creative mode or with the 'shopkeeper.bypass' permission are exempt from this restriction.
 * Fixed: Checking the WorldGuard allow-shop flag now takes into account the player for whom the flag is being queried.
 * Fixed: The returned shop creation item would get dropped twice under certain conditions.
 * Fixed: The shop creation item is now also returned if a player deletes his own shops via command.
