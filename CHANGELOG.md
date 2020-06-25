@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.9.4 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+* Added: Added a link inside the config which points to the translations repository.
 * Added: Added feedback messages when a player cannot trade with a shop due to trading with own shops being disabled or if the shop's chest is missing.
 * Changed: The check for whether the player is able to bypass the restriction of not being able to trade with own shops was previously checking if the player is an operator. Instead we now check if the player has the bypass permission.
 * Changed: When checking if the player is able to bypass the restriction of not being able to trade with shops while their owner is online, we only check for the bypass permission now after checking if the shop owner is actually online currently.
