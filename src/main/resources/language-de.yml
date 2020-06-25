@@ -143,9 +143,9 @@ msg-button-villager-variant: "&aDorfbewohner-Variante ändern"
 msg-button-villager-variant-lore:
 - "Ändert das Aussehen"
 - "des Dorfbewohners"
-msg-button-villager-level: "&aErfahrungslevel ändern"
+msg-button-villager-level: "&aAbzeichenfarbe ändern"
 msg-button-villager-level-lore:
-- "Ändert das Erfahrungslevel"
+- "Ändert die Abzeichenfarbe"
 - "des Dorfbewohners"
 msg-button-zombie-villager-profession: "&aBeruf ändern"
 msg-button-zombie-villager-profession-lore:

@@ -378,8 +378,8 @@ public class Settings {
 	public static List<String> msgButtonVillagerProfessionLore = Arrays.asList("Changes the profession", "of the villager");
 	public static String msgButtonVillagerVariant = "&aChoose villager variant";
 	public static List<String> msgButtonVillagerVariantLore = Arrays.asList("Changes the look", "of the villager");
-	public static String msgButtonVillagerLevel = "&aChoose villager level";
-	public static List<String> msgButtonVillagerLevelLore = Arrays.asList("Changes the level", "of the villager");
+	public static String msgButtonVillagerLevel = "&aChoose villager badge color";
+	public static List<String> msgButtonVillagerLevelLore = Arrays.asList("Changes the badge color", "of the villager");
 	public static String msgButtonZombieVillagerProfession = "&aChoose villager profession";
 	public static List<String> msgButtonZombieVillagerProfessionLore = Arrays.asList("Changes the profession", "of the zombie villager");
 

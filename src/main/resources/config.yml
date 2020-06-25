@@ -512,9 +512,9 @@ msg-button-villager-variant: "&aChoose villager variant"
 msg-button-villager-variant-lore:
 - "Changes the look"
 - "of the villager"
-msg-button-villager-level: "&aChoose villager level"
+msg-button-villager-level: "&aChoose villager badge color"
 msg-button-villager-level-lore:
-- "Changes the level"
+- "Changes the badge color"
 - "of the villager"
 msg-button-zombie-villager-profession: "&aChoose villager profession"
 msg-button-zombie-villager-profession-lore:
