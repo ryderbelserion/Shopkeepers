@@ -32,6 +32,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.MooshroomShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PandaShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ParrotShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PigShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.RabbitShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SheepShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.WolfShop;
@@ -73,7 +74,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> WITHER: experimental: requires NoAI, shows boss bar
 	 * <li> WOLF: okay
 	 * <li> ZOMBIE: okay, spawns randomly as baby
-	 * <li> RABBIT: okay
+	 * <li> RABBIT: okay; the killer rabbit type requires some special handling because Minecraft resets the pathfinder goals and applies a custom name if the entity doesn't have one already
 	 * <li> ENDERMITE: seems to work, however it shows strange movement
 	 * <li> GUARDIAN: does not work, error when trying to apply common AI goals
 	 * <li> ARMOR_STAND: cannot be clicked / accessed yet
@@ -211,6 +212,14 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 				@Override
 				public CatShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new CatShop(livingShops, this, shopkeeper, creationData);
+				}
+			};
+			break;
+		case RABBIT:
+			objectType = new SKLivingShopObjectType<RabbitShop>(livingShops, entityType, aliases, typeName, permission) {
+				@Override
+				public RabbitShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new RabbitShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;

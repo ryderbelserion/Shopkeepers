@@ -437,6 +437,9 @@ msg-button-sitting-lore:
 msg-button-cat-variant: "&aChoose cat variant"
 msg-button-cat-variant-lore:
 - "Changes the cat's look"
+msg-button-rabbit-variant: "&aChoose rabbit variant"
+msg-button-rabbit-variant-lore:
+- "Changes the rabbit's look"
 msg-button-collar-color: "&aChoose collar color"
 msg-button-collar-color-lore:
 - "Changes the mob's"

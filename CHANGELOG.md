@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.9.4 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+* Added: The variant of rabbit shopkeepers can now be changed. Any existing rabbit shopkeepers will use the brown variant (the default). This also resolves an issue with the rabbit type randomly changing whenever the shopkeeper is respawned.
 * Added: Added a header comment to the top of the save.yml file mentioning the risk of manually editing this file while the server is still running or without making a backup first.
 * Fixed: If regular item usage is disabled we also prevent any kind of entity interaction now while holding the shop creation item in hand. Players with the 'shopkeeper.bypass' permission are exempt from this restriction.
 * Fixed: Checking the WorldGuard allow-shop flag now takes into account the player for whom the flag is being queried.
@@ -21,6 +22,10 @@ Internal changes:
 * Added ShopkeeperEventHelper class and moved the common code for calling and handling PlayerDeleteShopkeeperEvents there.
 * Various minor refactorings related to the Text implementation.
 * Minor formatting changes. Not applied to the whole code base yet.
+
+Added messages:  
+* msg-button-rabbit-variant
+* msg-button-rabbit-variant-lore
 
 Changed messages (you will have to manually update those!):  
 * Renamed 'msg-removed-player-shops' to 'msg-removed-shops-of-player'.

@@ -338,6 +338,8 @@ public class Settings {
 	public static List<String> msgButtonSittingLore = Arrays.asList("Toggles the mob's", "sitting pose");
 	public static String msgButtonCatVariant = "&aChoose cat variant";
 	public static List<String> msgButtonCatVariantLore = Arrays.asList("Changes the cat's look");
+	public static String msgButtonRabbitVariant = "&aChoose rabbit variant";
+	public static List<String> msgButtonRabbitVariantLore = Arrays.asList("Changes the rabbit's look");
 	public static String msgButtonCollarColor = "&aChoose collar color";
 	public static List<String> msgButtonCollarColorLore = Arrays.asList("Changes the mob's", "collar color");
 	public static String msgButtonWolfAngry = "&aToggle angry wolf";

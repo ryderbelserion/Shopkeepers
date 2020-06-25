@@ -64,6 +64,10 @@ msg-button-cat-variant: "&aKatzen-Variante ändern"
 msg-button-cat-variant-lore:
 - "Ändert das Aussehen"
 - "der Katze"
+msg-button-rabbit-variant: "&aKaninchen-Variante ändern"
+msg-button-rabbit-variant-lore:
+- "Ändert das Aussehen"
+- "des Kaninchens"
 msg-button-collar-color: "&aHalsband Farbe ändern"
 msg-button-collar-color-lore:
 - "Ändert die Farbe"
