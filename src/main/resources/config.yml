@@ -574,7 +574,9 @@ msg-villager-for-hire: "&aThe villager offered his services as a shopkeeper in e
 
 msg-missing-trade-perm: "&7You do not have the permission to trade with this shop."
 msg-missing-custom-trade-perm: "&7You do not have the permission to trade with this shop."
+msg-cant-trade-with-own-shop: "&7You cannot trade with your own shop."
 msg-cant-trade-while-owner-online: "&7You cannot trade while the owner of this shop ('&e{owner}&7') is online."
+msg-cant-trade-with-shop-missing-chest: "&7You cannot trade with this shop, because its chest is missing."
 
 msg-shopkeeper-created: "&aShopkeeper created: &6{type} &7({description})\n{setupDesc}"
 

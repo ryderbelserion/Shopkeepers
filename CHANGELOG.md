@@ -4,6 +4,9 @@ Date format: (YYYY-MM-DD)
 ## v2.9.4 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+* Added: Added feedback messages when a player cannot trade with a shop due to trading with own shops being disabled or if the shop's chest is missing.
+* Changed: The check for whether the player is able to bypass the restriction of not being able to trade with own shops was previously checking if the player is an operator. Instead we now check if the player has the bypass permission.
+* Changed: When checking if the player is able to bypass the restriction of not being able to trade with shops while their owner is online, we only check for the bypass permission now after checking if the shop owner is actually online currently.
 * Added: The variant of rabbit shopkeepers can now be changed. Any existing rabbit shopkeepers will use the brown variant (the default). This also resolves an issue with the rabbit type randomly changing whenever the shopkeeper is respawned.
 * Added: Added a header comment to the top of the save.yml file mentioning the risk of manually editing this file while the server is still running or without making a backup first.
 * Fixed: If regular item usage is disabled we also prevent any kind of entity interaction now while holding the shop creation item in hand. Players with the 'shopkeeper.bypass' permission are exempt from this restriction.
@@ -26,6 +29,8 @@ Internal changes:
 Added messages:  
 * msg-button-rabbit-variant
 * msg-button-rabbit-variant-lore
+* msg-cant-trade-with-own-shop
+* msg-cant-trade-with-shop-missing-chest
 
 Changed messages (you will have to manually update those!):  
 * Renamed 'msg-removed-player-shops' to 'msg-removed-shops-of-player'.
@@ -35,6 +40,7 @@ Changed messages (you will have to manually update those!):
 * Renamed 'msg-confirm-remove-player-shops' to 'msg-confirm-remove-all-shops-of-player'.
 * The 'msg-removed-player-shops' message (previously 'msg-removed-all-player-shops') no longer mentions that 'all' shops got deleted (since this is not necessarily true).
 * Changed the 'msg-button-villager-level' and 'msg-button-villager-level-lore' messages to clarify that this option only changes the visual appearance of the villager's badge color. The included german translation has been updated accordingly as well.
+* Slightly changed the german translation of the 'msg-cant-trade-while-owner-online' message.
 
 ## v2.9.3 (2020-04-12)
 ### Supported MC versions: 1.15.2, 1.14.4

@@ -206,7 +206,9 @@ msg-villager-for-hire: "&aDieser Dorfbewohner bietet dir im Tausch für &6{costs
 
 msg-missing-trade-perm: "&7Du hast nicht die nötige Befugnis, um mit diesem Shop zu handeln."
 msg-missing-custom-trade-perm: "&7Du hast nicht die nötige Befugnis, um mit diesem Shop zu handeln."
-msg-cant-trade-while-owner-online: "&7Du kannst nicht Handeln, während der Besitzer dieses Shops ('&e{owner}&7') online ist."
+msg-cant-trade-with-own-shop: "&7Du kannst nicht mit deinem eigenen Shop handeln."
+msg-cant-trade-while-owner-online: "&7Du kannst nicht handeln, während der Besitzer dieses Shops ('&e{owner}&7') online ist."
+msg-cant-trade-with-shop-missing-chest: "&7Du kannst nicht mit diesem Shop handeln, da seine Truhe fehlt."
 
 msg-shopkeeper-created: "&aShop erstellt: &6{type} &7({description})\n{setupDesc}"
 

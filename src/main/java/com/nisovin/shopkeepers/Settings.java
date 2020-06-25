@@ -438,7 +438,9 @@ public class Settings {
 
 	public static Text msgMissingTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
 	public static Text msgMissingCustomTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
+	public static Text msgCantTradeWithOwnShop = Text.parse("&7You cannot trade with your own shop.");
 	public static Text msgCantTradeWhileOwnerOnline = Text.parse("&7You cannot trade while the owner of this shop ('&e{owner}&7') is online.");
+	public static Text msgCantTradeWithShopMissingChest = Text.parse("&7You cannot trade with this shop, because its chest is missing.");
 
 	public static Text msgShopkeeperCreated = Text.parse("&aShopkeeper created: &6{type} &7({description})\n{setupDesc}");
 

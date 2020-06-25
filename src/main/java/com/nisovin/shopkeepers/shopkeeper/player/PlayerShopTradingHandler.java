@@ -55,15 +55,18 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		Player tradingPlayer = tradeData.tradingPlayer;
 
 		// no trading with own shop:
-		if (Settings.preventTradingWithOwnShop && shopkeeper.isOwner(tradingPlayer) && !tradingPlayer.isOp()) {
+		if (Settings.preventTradingWithOwnShop && shopkeeper.isOwner(tradingPlayer)
+				&& !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+			TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWithOwnShop);
 			this.debugPreventedTrade(tradingPlayer, "Trading with the own shop is not allowed.");
 			return false;
 		}
 
 		// no trading while shop owner is online:
-		if (Settings.preventTradingWhileOwnerIsOnline && !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
+		if (Settings.preventTradingWhileOwnerIsOnline) {
 			Player ownerPlayer = shopkeeper.getOwner();
-			if (ownerPlayer != null && !shopkeeper.isOwner(tradingPlayer)) {
+			if (ownerPlayer != null && !shopkeeper.isOwner(tradingPlayer)
+					&& !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 				TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
 				this.debugPreventedTrade(tradingPlayer, "Trading is not allowed while the shop owner is online.");
 				return false;
@@ -73,7 +76,8 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		// check for the shop's chest:
 		Block chest = shopkeeper.getChest();
 		if (!ItemUtils.isChest(chest.getType())) {
-			this.debugPreventedTrade(tradingPlayer, "Couldn't find the shop's chest.");
+			TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWithShopMissingChest, "owner", shopkeeper.getOwnerName());
+			this.debugPreventedTrade(tradingPlayer, "The shop's chest is missing.");
 			return false;
 		}
 
