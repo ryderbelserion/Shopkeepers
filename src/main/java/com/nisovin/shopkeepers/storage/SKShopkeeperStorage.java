@@ -53,6 +53,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private static final int MISSING_DATA_VERSION = 0;
 	private static final String DATA_VERSION_KEY = "data-version";
 
+	private static final String HEADER = "This file is not intended to be manually modified! If you want to manually edit this"
+			+ " file anyways, ensure that the server is not running currently and that you have prepared a backup of this file.";
+
 	private final SKShopkeepersPlugin plugin;
 
 	/*
@@ -221,6 +224,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	// SHOPKEEPER DATA REMOVAL
 
+	/**
+	 * Clears and sets up the empty save data file configuration.
+	 */
 	private void clearSaveData() {
 		ConfigUtils.clearConfigSection(saveData);
 		maxStoredShopkeeperId = 0;
@@ -538,6 +544,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		saveResult.reset();
 		saveResult.async = async;
 		saveResult.startTime = System.currentTimeMillis();
+
+		// Setup the file header:
+		// This replaces any previously existing and loaded header and thereby ensures that it is always up-to-date
+		// after we have saved the file.
+		saveData.options().header(HEADER);
 
 		// store data of dirty shopkeepers into memory configuration:
 		saveResult.dirtyShopkeepersCount = 0;
