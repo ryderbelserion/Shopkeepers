@@ -18,12 +18,16 @@ Date format: (YYYY-MM-DD)
 * Internal: Any internal references to the pig zombie mob type have been removed to prevent any kind of binary problems to arise.
 * Sign shops support the new crimson and warped sign variants.
 * Internal data format changes: Sign shops of type 'GENERIC' and 'REDWOOD' are migrated to 'OAK' and 'SPRUCE' respectively.
+* Note on the removal of item type 'ZOMBIE_PIGMAN_SPAWN_EGG' and its replacement with item type 'ZOMBIFIED_PIGLIN_SPAWN_EGG':
+  * If you are updating and your config contains an item of type 'ZOMBIE_PIGMAN_SPAWN_EGG' you will have to manually migrate this item to a 'ZOMBIFIED_PIGLIN_SPAWN_EGG'.
+  * Any items stored inside the shopkeepers (eg. for their trades or hire cost items) are automatically migrated.
 * Note on Minecraft's new RGB color codes and other new text related features: I have not yet looked into supporting those in the texts and messages of the Shopkeepers plugin.
 
 **Other migration notes:**
 * Removed: We no longer migrate items inside the config from legacy (pre MC 1.13) item types, data values and spawn eggs to corresponding item types in MC 1.13. Instead any unknown item types get migrated to their default now.
 
 **Other changes:**
+* Changed/Improved: We use a combination of our own 'Shopkeepers data version' (which has been bumped to 2) and Minecraft's data version for the data version stored inside the save.yml now. Minecraft's data version is incremented on every Minecraft release (including minor updates) and may indicate that new item migrations have been added. So whenever you update your server, we automatically trigger a full migration of all your shopkeepers data to ensure that your save.yml is always up-to-date.
 * Improved/Fixed: Some mobs randomly spawn with passengers. We remove those passengers now.
 * Fixed: The random equipment of certain mobs gets properly cleared now. For instance, this resolves the issues of foxes randomly carrying items inside their mouth.
 * Fixed: When a Citizens NPC, created without the 'shopkeeper' trait, is deleted, we immediately delete any corresponding shopkeeper now. Previously the corresponding shopkeeper would not get deleted right away, but only during the next plugin startup (when checking whether the corresponding NPC still exists). Any chest used by the shopkeeper would remain locked until then.

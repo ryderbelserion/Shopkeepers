@@ -46,17 +46,27 @@ import com.nisovin.shopkeepers.util.StringUtils;
  */
 public class SKShopkeeperStorage implements ShopkeeperStorage {
 
-	// this can be used to determine required migrations (that affect all shopkeepers or the save format as a whole)
-	// or force a save of all shopkeepers data:
-	private static final int DATA_VERSION = 1;
-	// the data version that indicates a missing (first) data version:
-	private static final int MISSING_DATA_VERSION = 0;
+	// Our stored 'data version' is a combination of two different data versions:
+	// - Our own 'shopkeepers data version', which we can use to determine our own required migrations or force a full
+	// save of all shopkeepers data after we have made changes to the storage format which affect all shopkeepers.
+	// - Minecraft's data version, which updates with every server update (even minor updates). Since these updates
+	// sometimes indicate item migrations done by Minecraft, they are also relevant for our stored item data.
+
+	// Our goal is to always keep the item data stored within the save.yml file up-to-date with the current server
+	// version to avoid ending up with very old items inside our save data that never got updated. For that reason we
+	// always trigger a full save of all shopkeepers data whenever one of the above mentioned data versions has changed.
+	// The stored and compared data version is a simple concatenation of these two data versions.
+
+	private static final int SHOPKEEPERS_DATA_VERSION = 2;
+	private static final String MISSING_DATA_VERSION = "-";
 	private static final String DATA_VERSION_KEY = "data-version";
 
 	private static final String HEADER = "This file is not intended to be manually modified! If you want to manually edit this"
 			+ " file anyways, ensure that the server is not running currently and that you have prepared a backup of this file.";
 
 	private final SKShopkeepersPlugin plugin;
+	private final int minecraftDataVersion;
+	private final DataVersion currentDataVersion;
 
 	/*
 	 * Holds the data that gets used by the current/next (possibly async) save task.
@@ -99,6 +109,17 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	public SKShopkeeperStorage(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
+		this.minecraftDataVersion = this.getMinecraftDataVersion();
+		this.currentDataVersion = new DataVersion(SHOPKEEPERS_DATA_VERSION, minecraftDataVersion);
+	}
+
+	private int getMinecraftDataVersion() {
+		try {
+			return Bukkit.getUnsafe().getDataVersion();
+		} catch (Exception e) {
+			Log.warning("Could not determine Minecraft's current data version!", e);
+			return 0;
+		}
 	}
 
 	public void onEnable() {
@@ -293,9 +314,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 				saveFile = tempSaveFile;
 			} else {
-				// save file does not exist yet -> no shopkeeper data available
-				// silently setup data version and abort:
-				saveData.set(DATA_VERSION_KEY, DATA_VERSION);
+				// The save file does not exist yet -> no shopkeeper data available.
+				// Silently the setup data version and abort:
+				saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombinded());
 				return true;
 			}
 		}
@@ -317,22 +338,23 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		Set<String> keys = saveData.getKeys(false);
-		assert keys.contains(DATA_VERSION_KEY); // contains at least the (missing) data-version entry
+		// Contains at least the (missing) data-version entry:
+		assert keys.contains(DATA_VERSION_KEY);
 		int shopkeepersCount = (keys.size() - 1);
 		if (shopkeepersCount == 0) {
-			// no shopkeeper data exists yet: silently setup/update data version and abort
-			saveData.set(DATA_VERSION_KEY, DATA_VERSION);
+			// No shopkeeper data exists yet. Silently setup/update data version and abort:
+			saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombinded());
 			return true;
 		}
 
 		Log.info("Loading data of " + shopkeepersCount + " shopkeepers..");
-		int dataVersion = saveData.getInt(DATA_VERSION_KEY, MISSING_DATA_VERSION);
-		boolean dataVersionChanged = (dataVersion != DATA_VERSION);
+		String dataVersion = saveData.getString(DATA_VERSION_KEY, MISSING_DATA_VERSION);
+		boolean dataVersionChanged = (!currentDataVersion.getCombinded().equals(dataVersion));
 		if (dataVersionChanged) {
-			Log.info("The data version has changed from '" + dataVersion + "' to '" + DATA_VERSION
-					+ "': Forcefully marking all loaded shopkeepers as dirty.");
-			// update data version:
-			saveData.set(DATA_VERSION_KEY, DATA_VERSION);
+			Log.info("The data version has changed from '" + dataVersion + "' to '" + currentDataVersion.getCombinded()
+					+ "': We update the saved data for all loaded shopkeepers.");
+			// Update the data version:
+			saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombinded());
 		}
 
 		for (String key : keys) {
@@ -381,7 +403,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				continue; // skip this shopkeeper
 			}
 
-			// if the shopkeeper got migrated or the data version has changed, mark as dirty:
+			// If the shopkeeper got migrated or the data version has changed, mark as dirty:
 			if (migrationResult == MigrationResult.MIGRATED || dataVersionChanged) {
 				shopkeeper.markDirty();
 			}
@@ -396,7 +418,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	}
 
 	// validates and performs migration of the save data
-	private MigrationResult migrateShopkeeperData(int id, ConfigurationSection shopkeeperSection, int dataVersion) {
+	private MigrationResult migrateShopkeeperData(int id, ConfigurationSection shopkeeperSection, String dataVersion) {
 		MigrationResult migrationResult = MigrationResult.NOTHING_MIGRATED;
 
 		// convert legacy shop type identifiers:
