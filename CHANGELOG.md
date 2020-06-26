@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.9.4 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+* Removed: We no longer migrate items inside the config from legacy (pre MC 1.13) item types, data values and spawn eggs to corresponding item types in MC 1.13. Instead any unknown item types get migrated to their default now.
 * Fixed: When a Citizens NPC, created without the 'shopkeeper' trait, is deleted, we immediately delete any corresponding shopkeeper now. Previously the corresponding shopkeeper would not get deleted right away, but only during the next plugin startup (when checking whether the corresponding NPC still exists). Any chest used by the shopkeeper would remain locked until then.
 * Improved: In order to determine the player who is setting up a shopkeeper via the 'shopkeeper' trait, we previously only took players into account which are adding the trait via the Citizens trait command (NPCTraitCommandAttachEvent). However, players are also able to add traits during NPC creation. We now also react to player's creating NPCs (PlayerCreateNPCEvent) and then (heuristically) assume that any directly following trait additions for the same NPC within one tick are caused by this player. This player will then be able to receive feedback message about the shopkeeper creation.
 * Improved: For any trait additions not directly associated with a player, we previously waited 5 ticks before the corresponding shopkeeper got created. One (minor) side effect of the above change is that we react to all trait additions within 1 tick now.

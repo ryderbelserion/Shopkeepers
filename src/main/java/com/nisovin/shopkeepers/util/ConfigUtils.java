@@ -14,18 +14,9 @@ public class ConfigUtils {
 	private static final ThreadLocal<YamlConfiguration> YAML = ThreadLocal.withInitial(() -> new YamlConfiguration());
 
 	public static Material loadMaterial(ConfigurationSection config, String key) {
-		return loadMaterial(config, key, false);
-	}
-
-	public static Material loadMaterial(ConfigurationSection config, String key, boolean checkLegacy) {
 		String materialName = config.getString(key); // note: takes defaults into account
 		if (materialName == null) return null;
-		Material material = Material.matchMaterial(materialName);
-		if (material == null && checkLegacy) {
-			// check for legacy material:
-			String legacyMaterialName = Material.LEGACY_PREFIX + materialName;
-			material = Material.matchMaterial(legacyMaterialName);
-		}
+		Material material = Material.matchMaterial(materialName); // can be null
 		return material;
 	}
 
