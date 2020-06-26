@@ -37,6 +37,8 @@ public class Settings {
 		private DebugOptions() {
 		}
 
+		// Logs details of the server version dependent capabilities.
+		public static final String capabilities = "capabilities";
 		// Logs all events (spams!). Starts slightly delayed. Subsequent calls of the same event get combined into a
 		// single logging entry to slightly reduce spam.
 		public static final String logAllEvents = "log-all-events";

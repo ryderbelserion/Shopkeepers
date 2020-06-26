@@ -36,6 +36,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.chestprotection.ProtectedChests;
 import com.nisovin.shopkeepers.chestprotection.RemoveShopOnChestBreak;
 import com.nisovin.shopkeepers.commands.Commands;
+import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.ConfigLoadException;
 import com.nisovin.shopkeepers.metrics.CitizensChart;
@@ -317,6 +318,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 				Bukkit.getPluginManager().addPermission(new Permission("shopkeeper.maxshops." + perm, PermissionDefault.FALSE));
 			}
 		}
+
+		// Check for and initialize version dependent utilities:
+		MC_1_16_Utils.init();
 
 		// inform about Spigot exclusive features:
 		if (SpigotFeatures.isSpigotAvailable()) {

@@ -6,7 +6,6 @@ import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.TreeSpecies;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
@@ -33,10 +32,10 @@ import com.nisovin.shopkeepers.util.Validate;
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
 
 	protected final SignShops signShops;
-	private TreeSpecies signType = TreeSpecies.GENERIC; // default oak
+	private SignType signType = SignType.OAK; // not null, not unsupported, default is oak
 	private boolean wallSign = true;
 	private BlockFace signFacing = BlockFace.SOUTH; // not null
-	// update the sign content at least once after plugin start, in case some settings have changed which affect the
+	// Update the sign content at least once after plugin start, in case some settings have changed which affect the
 	// sign content:
 	private boolean updateSign = true;
 	private long lastFailedRespawnAttempt = 0;
@@ -63,15 +62,34 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		// sign wood type:
+		// Sign (wood) type:
 		String signTypeName = configSection.getString("signType");
+		// Migration from TreeSpecies to SignType:
+		// TODO remove this again at some point
+		if ("GENERIC".equals(signTypeName)) {
+			Log.warning("Migrating sign type of shopkeeper '" + shopkeeper.getId() + "' from '" + signTypeName
+					+ "' to '" + SignType.OAK + "'.");
+			signTypeName = SignType.OAK.name();
+			shopkeeper.markDirty();
+		} else if ("REDWOOD".equals(signTypeName)) {
+			Log.warning("Migrating sign type of shopkeeper '" + shopkeeper.getId() + "' from '" + signTypeName
+					+ "' to '" + SignType.SPRUCE + "'.");
+			signTypeName = SignType.SPRUCE.name();
+			shopkeeper.markDirty();
+		}
+
 		try {
-			signType = TreeSpecies.valueOf(signTypeName);
+			signType = SignType.valueOf(signTypeName);
+			assert signType != null;
+			// Ensure that the loaded sign type is supported:
+			if (!signType.isSupported()) {
+				throw new RuntimeException("unsupported sign type");
+			}
 		} catch (Exception e) {
 			// fallback to default:
-			Log.warning("Missing or invalid sign type '" + signTypeName + "' for shopkeeper " + shopkeeper.getId()
-					+ "'. Using '" + TreeSpecies.GENERIC + "' now.");
-			this.signType = TreeSpecies.GENERIC;
+			Log.warning("Missing, invalid, or unsupported sign type '" + signTypeName + "' for shopkeeper "
+					+ shopkeeper.getId() + "'. Using '" + SignType.OAK + "' now.");
+			signType = SignType.OAK;
 			shopkeeper.markDirty();
 		}
 
@@ -198,7 +216,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	private BlockData createBlockData() {
-		Material signMaterial = getMaterial(signType, wallSign);
+		Material signMaterial = getSignMaterial(signType, wallSign);
 		assert ItemUtils.isSign(signMaterial);
 		BlockData signData = null;
 		if (wallSign) {
@@ -215,25 +233,10 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		return signData;
 	}
 
-	private static Material getMaterial(TreeSpecies treeSpecies, boolean wallSign) {
-		if (treeSpecies == null) {
-			treeSpecies = TreeSpecies.GENERIC; // default
-		}
-		switch (treeSpecies) {
-		case ACACIA:
-			return wallSign ? Material.ACACIA_WALL_SIGN : Material.ACACIA_SIGN;
-		case BIRCH:
-			return wallSign ? Material.BIRCH_WALL_SIGN : Material.BIRCH_SIGN;
-		case DARK_OAK:
-			return wallSign ? Material.DARK_OAK_WALL_SIGN : Material.DARK_OAK_SIGN;
-		case JUNGLE:
-			return wallSign ? Material.JUNGLE_WALL_SIGN : Material.JUNGLE_SIGN;
-		case REDWOOD: // spruce
-			return wallSign ? Material.SPRUCE_WALL_SIGN : Material.SPRUCE_SIGN;
-		case GENERIC: // oak
-		default:
-			return wallSign ? Material.OAK_WALL_SIGN : Material.OAK_SIGN;
-		}
+	private static Material getSignMaterial(SignType signType, boolean wallSign) {
+		assert signType != null && signType.isSupported();
+		if (wallSign) return signType.getWallSignMaterial();
+		else return signType.getSignMaterial();
 	}
 
 	@Override
@@ -347,8 +350,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	// SIGN TYPE
 
-	public void setSignType(TreeSpecies signType) {
-		Validate.notNull(signType, "Sign type is null!");
+	public void setSignType(SignType signType) {
+		Validate.notNull(signType, "signType is null");
+		Validate.isTrue(signType.isSupported(), "signType is not supported");
 		this.signType = signType;
 		shopkeeper.markDirty();
 		this.applySignType();
@@ -364,11 +368,11 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	public void cycleSignType(boolean backwards) {
-		this.setSignType(EnumUtils.cycleEnumConstant(TreeSpecies.class, signType, backwards));
+		this.setSignType(EnumUtils.cycleEnumConstant(SignType.class, signType, backwards, SignType.IS_SUPPORTED));
 	}
 
 	protected ItemStack getSignTypeEditorItem() {
-		ItemStack iconItem = new ItemStack(getMaterial(signType, false));
+		ItemStack iconItem = new ItemStack(signType.getSignMaterial());
 		return ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonSignVariant, Settings.msgButtonSignVariantLore);
 	}
 }

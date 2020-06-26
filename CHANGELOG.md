@@ -16,6 +16,9 @@ Date format: (YYYY-MM-DD)
 * The pig zombie mob type has been removed from the by default enabled mob types. If you are updating to MC 1.16, it will get automatically removed from your config. To prevent your config from losing its comments and formatting during this small migration, consider manually removing this mob type before your update.
 * If you are updating to MC 1.16, your pig zombie shopkeepers get automatically converted to zombified pigman shopkeepers.
 * Internal: Any internal references to the pig zombie mob type have been removed to prevent any kind of binary problems to arise.
+* Sign shops support the new crimson and warped sign variants.
+* Internal data format changes: Sign shops of type 'GENERIC' and 'REDWOOD' are migrated to 'OAK' and 'SPRUCE' respectively.
+* Note on Minecraft's new RGB color codes and other new text related features: I have not yet looked into supporting those in the texts and messages of the Shopkeepers plugin.
 
 **Other migration notes:**
 * Removed: We no longer migrate items inside the config from legacy (pre MC 1.13) item types, data values and spawn eggs to corresponding item types in MC 1.13. Instead any unknown item types get migrated to their default now.
@@ -39,6 +42,7 @@ Date format: (YYYY-MM-DD)
 * Fixed/API: The PlayerDeleteShopkeeperEvent is now also called when a player deletes shops via command.
 * Changed: The result message after deleting shops via command will now print the number of actually removed shops (which does not necessarily match the number of shops that were confirmed for removal).
 * Changed: The item representing the black horse inside the editor is now slightly less black.
+* Debug: Added the debug option 'capabilities', which logs additional details when the plugin checks for server version dependent capabilities.
 * Debug: Added some more information to the debug message that gets logged when the PlayerDeleteShopkeeperEvent has been cancelled.
 * Debug: Minor changes to some debug messages related to Citizens shopkeepers.
 * API/Internal: Added Shopkeeper#delete(Player) which optionally passes the player responsible for the shopkeeper deletion. Note that the player is not passed if a player shop is deleted due to a player breaking the shop's chest.
