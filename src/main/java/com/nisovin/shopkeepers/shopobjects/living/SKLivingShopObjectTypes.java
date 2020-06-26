@@ -117,7 +117,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> RAVAGER: okay
 	 * <li> TRADER_LLAMA: okay
 	 * <li> WANDERING_VILLAGER: okay
-	 * <li> FOX: okay, randomly spawns with an item in its mouth (clearing its equipment doesn't work, yet)
+	 * <li> FOX: okay, randomly spawns with an item in its mouth (gets cleared)
 	 * # 1.15
 	 * <li> BEE: okay, turning towards nearby players is jerky (body rotation instead of head rotation), occasionally starts flapping its wings
 	 * </ul>

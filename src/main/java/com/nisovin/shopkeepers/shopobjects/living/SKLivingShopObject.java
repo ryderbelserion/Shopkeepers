@@ -141,6 +141,12 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 		// apply name (if it has/uses one):
 		this.applyName(entity, shopkeeper.getName());
+
+		// Clear equipment:
+		// Doing this during entity preparation resolves some issue with the equipment not getting cleared (or at least
+		// not getting cleared visually).
+		EntityEquipment equipment = entity.getEquipment();
+		equipment.clear();
 	}
 
 	// Any clean up that needs to happen for the entity. The entity might not be fully setup yet.
@@ -200,10 +206,6 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 				ageable.setBreed(false);
 				ageable.setAgeLock(true);
 			}
-
-			// clear equipment:
-			EntityEquipment equipment = entity.getEquipment();
-			equipment.clear(); // TODO Does not work for foxes yet
 
 			// remove potion effects:
 			for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
