@@ -125,7 +125,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> PIGLIN: okay, spawns with random gear (gets cleared), TODO add baby property
 	 * <li> HOGLIN: okay
 	 * <li> ZOGLIN: okay, TODO add baby property
-	 * <li> STRIDER: okay, shakes outside the nether, randomly spawns with passenger (gets cleared), randomly spawns with saddle (TODO; clearing the passengers during entity preparation doesn't help with this)
+	 * <li> STRIDER: okay, shakes outside the nether, randomly spawns with passenger (gets cleared), randomly spawns with saddle (TODO)
 	 * </ul>
 	 */
 

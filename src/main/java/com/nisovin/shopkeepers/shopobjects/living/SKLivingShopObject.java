@@ -180,11 +180,12 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 		// spawn entity:
 		// TODO check if the block is passable before spawning there?
-		// try to bypass entity-spawn blocking plugins:
 		EntityType entityType = this.getEntityType();
-		livingShops.forceCreatureSpawn(spawnLocation, entityType);
-
 		entity = (E) world.spawn(spawnLocation, entityType.getEntityClass(), (entity) -> {
+			// Note: This callback is run after the entity has been prepared (this includes the creation of random
+			// equipment and the random spawning of passengers) and right before the entity gets added to the world
+			// (which triggers the corresponding CreatureSpawnEvent).
+
 			// debugging entity spawning:
 			if (entity.isDead()) {
 				Log.debug("Spawning shopkeeper entity is dead already!");
@@ -192,6 +193,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 			// prepare entity, before it gets spawned:
 			prepareEntity((E) entity);
+
+			// Try to bypass entity-spawn blocking plugins (right before this specific entity is about to get spawned):
+			livingShops.forceCreatureSpawn(spawnLocation, entityType);
 		});
 
 		if (this.isActive()) {
