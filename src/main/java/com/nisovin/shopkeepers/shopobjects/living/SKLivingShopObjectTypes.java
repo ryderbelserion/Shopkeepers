@@ -62,7 +62,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> MUSHROOM_COW: okay
 	 * <li> OCELOT: okay
 	 * <li> PIG: okay
-	 * <li> PIG_ZOMBIE: okay, spawns randomly as baby
+	 * <li> PIG_ZOMBIE: okay; replaced by ZOMBIFIED_PIGLIN in MC 1.16
 	 * <li> SHEEP: okay
 	 * <li> SILVERFISH: experimental, strange movement when the player is standing behind it -> NoAI for now
 	 * <li> SKELETON: okay
@@ -95,7 +95,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> DONKEY: same issues as horse
 	 * <li> MULE: same issues as horse
 	 * <li> EVOKER: okay
-	 * <li> VEX: starts gliding into the ground once spawned and occasionally,other than that it seems to work fine
+	 * <li> VEX: starts gliding into the ground once spawned and occasionally, other than that it seems to work fine
 	 * <li> VINDICATOR: okay
 	 * <li> LLAMA: okay
 	 * # 1.12
@@ -120,6 +120,12 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> FOX: okay, randomly spawns with an item in its mouth (gets cleared)
 	 * # 1.15
 	 * <li> BEE: okay, turning towards nearby players is jerky (body rotation instead of head rotation), occasionally starts flapping its wings
+	 * # 1.16
+	 * <li> ZOMBIFIED_PIGLIN: okay, replaces PIG_ZOMBIE
+	 * <li> PIGLIN: okay, spawns with random gear (gets cleared), TODO add baby property
+	 * <li> HOGLIN: okay
+	 * <li> ZOGLIN: okay, TODO add baby property
+	 * <li> STRIDER: okay, shakes outside the nether, randomly spawns with passenger (gets cleared), randomly spawns with saddle (TODO; clearing the passengers during entity preparation doesn't help with this)
 	 * </ul>
 	 */
 

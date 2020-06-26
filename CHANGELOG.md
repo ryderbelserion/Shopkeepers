@@ -1,10 +1,27 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.9.4 (TBA)
-### Supported MC versions: 1.15.2, 1.14.4
+## v2.10.1 (TBA)
+### Supported MC versions: 1.16.1, 1.15.2, 1.14.4
 
+## v2.10.0 (2020-06-26)
+### Supported MC versions: 1.16.1, 1.15.2, 1.14.4
+
+**Update for MC 1.16.1:**
+* Added zombified piglin, piglin, hoglin, zoglin and strider to the by default enabled mob types. If you are updating, you will have to manually add these to your config's 'enabled-living-shops' setting.
+* During my quick initial testing I did not encounter any major issues with these new mobs, but there are some oddities you might want to be aware of:
+  * We don't support changing the baby property of piglin and zoglin shopkeepers yet. However, we at least ensure that they always spawn as adult.
+  * The zombified piglin, hoglin and strider already support changing the baby property.
+  * The strider constantly shakes when being spawned outside the nether and randomly spawns with saddle.
+* The pig zombie mob type has been removed from the by default enabled mob types. If you are updating to MC 1.16, it will get automatically removed from your config. To prevent your config from losing its comments and formatting during this small migration, consider manually removing this mob type before your update.
+* If you are updating to MC 1.16, your pig zombie shopkeepers get automatically converted to zombified pigman shopkeepers.
+* Internal: Any internal references to the pig zombie mob type have been removed to prevent any kind of binary problems to arise.
+
+**Other migration notes:**
 * Removed: We no longer migrate items inside the config from legacy (pre MC 1.13) item types, data values and spawn eggs to corresponding item types in MC 1.13. Instead any unknown item types get migrated to their default now.
+
+**Other changes:**
+* Improved/Fixed: Some mobs randomly spawn with passengers. We remove those passengers now.
 * Fixed: The random equipment of certain mobs gets properly cleared now. For instance, this resolves the issues of foxes randomly carrying items inside their mouth.
 * Fixed: When a Citizens NPC, created without the 'shopkeeper' trait, is deleted, we immediately delete any corresponding shopkeeper now. Previously the corresponding shopkeeper would not get deleted right away, but only during the next plugin startup (when checking whether the corresponding NPC still exists). Any chest used by the shopkeeper would remain locked until then.
 * Improved: In order to determine the player who is setting up a shopkeeper via the 'shopkeeper' trait, we previously only took players into account which are adding the trait via the Citizens trait command (NPCTraitCommandAttachEvent). However, players are also able to add traits during NPC creation. We now also react to player's creating NPCs (PlayerCreateNPCEvent) and then (heuristically) assume that any directly following trait additions for the same NPC within one tick are caused by this player. This player will then be able to receive feedback message about the shopkeeper creation.

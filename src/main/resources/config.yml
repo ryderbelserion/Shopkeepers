@@ -154,7 +154,6 @@ enabled-living-shops:
 - ENDERMAN
 - ZOMBIE
 - ZOMBIE_VILLAGER
-- PIG_ZOMBIE
 - HUSK
 - GIANT
 - GHAST
@@ -188,6 +187,11 @@ enabled-living-shops:
 - WANDERING_TRADER
 - FOX
 - BEE
+- ZOMBIFIED_PIGLIN
+- PIGLIN
+- HOGLIN
+- ZOGLIN
+- STRIDER
 
 # With the old behavior the mobs can be pushed around and their AI and gravity
 # is handled by minecraft itself. With the new behavior all their vanilla AI is

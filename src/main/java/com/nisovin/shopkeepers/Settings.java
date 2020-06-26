@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
@@ -164,7 +165,6 @@ public class Settings {
 			EntityType.ENDERMAN.name(),
 			EntityType.ZOMBIE.name(),
 			EntityType.ZOMBIE_VILLAGER.name(), // MC 1.11
-			EntityType.PIG_ZOMBIE.name(),
 			EntityType.HUSK.name(), // MC 1.11
 			EntityType.GIANT.name(),
 			EntityType.GHAST.name(),
@@ -197,7 +197,12 @@ public class Settings {
 			EntityType.TRADER_LLAMA.name(), // MC 1.14
 			EntityType.WANDERING_TRADER.name(), // MC 1.14
 			EntityType.FOX.name(), // MC 1.14
-			"BEE" // MC 1.15
+			"BEE", // MC 1.15
+			"ZOMBIFIED_PIGLIN", // MC 1.16, replaced PIG_ZOMBIE
+			"PIGLIN", // MC 1.16
+			"HOGLIN", // MC 1.16
+			"ZOGLIN", // MC 1.16
+			"STRIDER" // MC 1.16
 	);
 
 	public static boolean useLegacyMobBehavior = false;
@@ -580,12 +585,24 @@ public class Settings {
 		// validation:
 
 		boolean foundInvalidEntityType = false;
+		boolean removePigZombie = false;
 		for (String entityTypeId : enabledLivingShops) {
 			EntityType entityType = matchEntityType(entityTypeId);
 			if (entityType == null || !entityType.isAlive() || !entityType.isSpawnable()) {
 				foundInvalidEntityType = true;
-				Log.warning("Config: Invalid living entity type name in 'enabled-living-shops': " + entityTypeId);
+				if ("PIG_ZOMBIE".equals(entityTypeId)) {
+					removePigZombie = true;
+				} else {
+					Log.warning("Config: Invalid living entity type name in 'enabled-living-shops': " + entityTypeId);
+				}
 			}
+		}
+		// Migration for MC 1.16 TODO remove this again at some point
+		if (removePigZombie) {
+			Log.warning("Config: The mob type 'PIG_ZOMBIE' no longer exist since MC 1.16 and has therefore been removed from the 'enabled-living-shops'. Consider replacing it with 'ZOMBIFIED_PIGLIN'.");
+			enabledLivingShops.removeIf(e -> Objects.equals(e, "PIG_ZOMBIE"));
+			config.set(toConfigKey("enabledLivingShops"), enabledLivingShops);
+			configChanged = true;
 		}
 		if (foundInvalidEntityType) {
 			Log.warning("Config: All existing entity type names can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html");

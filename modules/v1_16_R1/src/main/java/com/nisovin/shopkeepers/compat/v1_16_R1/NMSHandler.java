@@ -1,24 +1,25 @@
-package com.nisovin.shopkeepers.compat.v1_14_R1;
+package com.nisovin.shopkeepers.compat.v1_16_R1;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftAbstractVillager;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftRaider;
-import org.bukkit.craftbukkit.v1_14_R1.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
-import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftMerchant;
-import org.bukkit.craftbukkit.v1_14_R1.util.CraftMagicNumbers;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftAbstractVillager;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftMerchant;
+import org.bukkit.craftbukkit.v1_16_R1.util.CraftMagicNumbers;
 import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Piglin;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Raider;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.Zoglin;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
@@ -27,25 +28,24 @@ import org.bukkit.inventory.MerchantInventory;
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
-import net.minecraft.server.v1_14_R1.Entity;
-import net.minecraft.server.v1_14_R1.EntityHuman;
-import net.minecraft.server.v1_14_R1.EntityInsentient;
-import net.minecraft.server.v1_14_R1.EntityLiving;
-import net.minecraft.server.v1_14_R1.EntityPlayer;
-import net.minecraft.server.v1_14_R1.EntityRaider;
-import net.minecraft.server.v1_14_R1.GameProfileSerializer;
-import net.minecraft.server.v1_14_R1.IMerchant;
-import net.minecraft.server.v1_14_R1.MerchantRecipeList;
-import net.minecraft.server.v1_14_R1.NBTTagCompound;
-import net.minecraft.server.v1_14_R1.PathfinderGoalFloat;
-import net.minecraft.server.v1_14_R1.PathfinderGoalLookAtPlayer;
-import net.minecraft.server.v1_14_R1.PathfinderGoalSelector;
+import net.minecraft.server.v1_16_R1.Entity;
+import net.minecraft.server.v1_16_R1.EntityHuman;
+import net.minecraft.server.v1_16_R1.EntityInsentient;
+import net.minecraft.server.v1_16_R1.EntityLiving;
+import net.minecraft.server.v1_16_R1.EntityPlayer;
+import net.minecraft.server.v1_16_R1.GameProfileSerializer;
+import net.minecraft.server.v1_16_R1.IMerchant;
+import net.minecraft.server.v1_16_R1.MerchantRecipeList;
+import net.minecraft.server.v1_16_R1.NBTTagCompound;
+import net.minecraft.server.v1_16_R1.PathfinderGoalFloat;
+import net.minecraft.server.v1_16_R1.PathfinderGoalLookAtPlayer;
+import net.minecraft.server.v1_16_R1.PathfinderGoalSelector;
 
 public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public String getVersionId() {
-		return "1_14_R1";
+		return "1_16_R1";
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public void setOnGround(org.bukkit.entity.Entity entity, boolean onGround) {
 		Entity mcEntity = ((CraftEntity) entity).getHandle();
-		mcEntity.onGround = onGround;
+		mcEntity.c(onGround); // setOnGround
 	}
 
 	@Override
@@ -124,8 +124,17 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
-		EntityRaider nmsRaider = ((CraftRaider) raider).getHandle();
-		nmsRaider.t(canJoinRaid); // CanJoinRaid
+		// only works in the latest versions of 1.15.1 and upwards:
+		raider.setCanJoinRaid(canJoinRaid);
+	}
+
+	@Override
+	public void setExclusiveAdult(LivingEntity entity) {
+		if (entity instanceof Piglin) {
+			((Piglin) entity).setBaby(false);
+		} else if (entity instanceof Zoglin) {
+			((Zoglin) entity).setBaby(false);
+		}
 	}
 
 	@Override
@@ -135,8 +144,8 @@ public final class NMSHandler implements NMSCallProvider {
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
 		if (provided.getType() != required.getType()) return false;
-		net.minecraft.server.v1_14_R1.ItemStack nmsProvided = CraftItemStack.asNMSCopy(provided);
-		net.minecraft.server.v1_14_R1.ItemStack nmsRequired = CraftItemStack.asNMSCopy(required);
+		net.minecraft.server.v1_16_R1.ItemStack nmsProvided = CraftItemStack.asNMSCopy(provided);
+		net.minecraft.server.v1_16_R1.ItemStack nmsRequired = CraftItemStack.asNMSCopy(required);
 		NBTTagCompound providedTag = nmsProvided.getTag();
 		NBTTagCompound requiredTag = nmsRequired.getTag();
 		return GameProfileSerializer.a(requiredTag, providedTag, false); // compare tags
@@ -186,7 +195,7 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public String getItemSNBT(ItemStack itemStack) {
 		if (itemStack == null) return null;
-		net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+		net.minecraft.server.v1_16_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
 		NBTTagCompound itemNBT = nmsItem.save(new NBTTagCompound());
 		return itemNBT.toString();
 	}
@@ -194,7 +203,7 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public String getItemTypeTranslationKey(Material material) {
 		if (material == null) return null;
-		net.minecraft.server.v1_14_R1.Item nmsItem = CraftMagicNumbers.getItem(material);
+		net.minecraft.server.v1_16_R1.Item nmsItem = CraftMagicNumbers.getItem(material);
 		if (nmsItem == null) return null;
 		return nmsItem.getName();
 	}

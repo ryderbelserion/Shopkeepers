@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Ageable;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Raider;
@@ -195,6 +196,10 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 		if (this.isActive()) {
 			// further setup entity after it was successfully spawned:
+			// Some entities randomly spawn with passengers:
+			for (Entity passenger : entity.getPassengers()) {
+				passenger.remove();
+			}
 			entity.eject(); // some entities might automatically mount on nearby entities (like baby zombies on chicken)
 			entity.setRemoveWhenFarAway(false);
 			entity.setCanPickupItems(false);
@@ -206,6 +211,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 				ageable.setBreed(false);
 				ageable.setAgeLock(true);
 			}
+
+			// Set the entity to an adult if we don't support its baby property yet:
+			NMSManager.getProvider().setExclusiveAdult(entity);
 
 			// remove potion effects:
 			for (PotionEffect potionEffect : entity.getActivePotionEffects()) {

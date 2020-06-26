@@ -28,6 +28,7 @@ import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
+import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
@@ -258,6 +259,14 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 								+ "' to cat shopkeeper of type '" + catType + "'.");
 					}
 				} // else: stays ocelot
+			}
+
+			// MC 1.16:
+			// Convert pig-zombie to zombified-piglin (but only if we run on MC 1.16 or above):
+			if (MC_1_16_Utils.getZombifiedPiglin() != null && objectTypeId.equals("pig-zombie")) {
+				objectTypeId = "zombified-piglin";
+				Log.warning("Migrated object type of shopkeeper '" + id + "' from 'pig-zombie' to 'zombified-piglin'.");
+				this.markDirty();
 			}
 		}
 

@@ -32,6 +32,14 @@ public interface NMSCallProvider {
 	// TODO replace this once only the latest versions of 1.15.1 and upwards are supported
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid);
 
+	// Sets the entity as adult for mob types for which we don't support the baby property yet, i.e. because they are
+	// exclusive to the specific MC version:
+	// TODO Remove this once there are no exclusive mobs anymore to which this applies (currently, once we only support
+	// MC 1.16.1 upwards)
+	public default void setExclusiveAdult(LivingEntity entity) {
+		// no exclusive mobs by default
+	}
+
 	/**
 	 * Checks if the <code>provided</code> itemstack fulfills the requirements of a trading recipe requiring the given
 	 * <code>required</code> itemstack.
