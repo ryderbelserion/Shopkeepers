@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.10.1 (TBA)
 ### Supported MC versions: 1.16.1, 1.15.2, 1.14.4
 
+
 ## v2.10.0 (2020-06-26)
 ### Supported MC versions: 1.16.1, 1.15.2, 1.14.4
 
