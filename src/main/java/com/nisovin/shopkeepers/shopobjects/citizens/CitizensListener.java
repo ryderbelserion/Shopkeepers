@@ -218,6 +218,7 @@ class CitizensListener implements Listener {
 			return;
 		}
 		if (trait instanceof CitizensShopkeeperTrait) {
+			// The NPCTraitCommandAttachEvent is called right after the corresponding NPCAddTraitEvent.
 			assert trait == pendingTraitAddition.pendingTrait;
 			pendingTraitAddition.updateLastPlayer(npc, player);
 			// Note: Updating of the pendingTrait is only done by the NPCAddTraitEvent event handler.
