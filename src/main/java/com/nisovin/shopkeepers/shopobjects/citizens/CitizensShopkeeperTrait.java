@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.shopobjects.citizens;
 
-import java.util.UUID;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -15,7 +13,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
-import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.util.Log;
 
 import net.citizensnpcs.api.npc.NPC;
@@ -30,7 +27,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	private String shopObjectId = null;
 
 	public CitizensShopkeeperTrait() {
-		super("shopkeeper");
+		super(TRAIT_NAME);
 	}
 
 	@Override
@@ -56,37 +53,58 @@ public class CitizensShopkeeperTrait extends Trait {
 		// we detect trait removal by listening to specific citizens events
 	}
 
-	void onShopkeeperRemove() {
-		Log.debug(() -> "Removing citizens trait due to shopkeeper removal for NPC " + CitizensShops.getNPCIdString(npc));
+	void onShopkeeperDeletion(Shopkeeper shopkeeper) {
+		Log.debug(() -> "Removing the 'shopkeeper' trait from Citizens NPC " + CitizensShops.getNPCIdString(npc)
+				+ " due to the deletion of shopkeeper " + shopkeeper.getIdString());
 		shopObjectId = null;
 		this.getNPC().removeTrait(CitizensShopkeeperTrait.class);
 	}
 
-	public void onTraitDeletion() {
+	/**
+	 * Called whenever this trait got deleted from the NPC.
+	 * <p>
+	 * Unlike {@link #onTraitAdded(Player)}, which is also called on reloads of the NPC, this is only called if the
+	 * trait is permanently deleted.
+	 * 
+	 * @param player
+	 *            the player who deleted the trait, or <code>null</code> if not available
+	 */
+	public void onTraitDeleted(Player player) {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		if (shopkeeper != null) {
-			Log.debug(() -> "Removing shopkeeper " + shopkeeper.getId() + " due to citizens trait removal for NPC " + CitizensShops.getNPCIdString(npc));
+			Log.debug(() -> "Removing the shopkeeper " + shopkeeper.getId() + " due to the deletion of the 'shopkeeper' trait"
+					+ " from the Citizens NPC " + CitizensShops.getNPCIdString(npc));
 			assert shopkeeper.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN();
 			SKCitizensShopObject shopObject = (SKCitizensShopObject) shopkeeper.getShopObject();
 			shopObject.setKeepNPCOnDeletion();
 			// this should keep the citizens npc and only remove the shopkeeper data:
-			shopkeeper.delete();
+			shopkeeper.delete(player);
 			// save:
 			shopkeeper.save();
 		} else {
-			// TODO what if the trait gets removed and Shopkeepers is disabled?
-			// -> does a new npc get created when Shopkeepers enables again?
+			// TODO If the trait gets removed while the Shopkeepers plugin is not running, the shopkeeper does not get
+			// removed and will remain attached to the NPC until it gets removed via the shopkeeper editor or via
+			// command. Maybe always attach the 'shopkeeper' trait and check on startup if the trait is still present
+			// and otherwise delete the shopkeeper?
 		}
 	}
 
-	// if a player added the trait via command, this gets called shortly after the trait got attached
-	public void onTraitAddedByPlayer(Player player) {
-		// create a new shopkeeper (if there isn't one already for this npc), using the given player as creator:
+	/**
+	 * Called whenever this trait got added to a NPC.
+	 * <p>
+	 * This is also called whenever the NPC gets reloaded. This is called shortly after the trait got attached.
+	 * 
+	 * @param player
+	 *            the player who added the trait, can be <code>null</code> if not available
+	 */
+	void onTraitAdded(Player player) {
+		// Create a new shopkeeper (if there isn't one already for this NPC), using the given player as creator:
 		this.createShopkeeper(player);
 	}
 
 	@Override
 	public void onAttach() {
+		// TODO Is this still required? We already handle all trait additions via events now.
 		// note: this is also called whenever citizens gets reloaded
 		// Log.debug("Shopkeeper trait attached to NPC " + npc.getId());
 
@@ -99,7 +117,7 @@ public class CitizensShopkeeperTrait extends Trait {
 		// giving citizens some time to properly initialize the trait and npc:
 		// also: shopkeeper creation by a player is handled after trait attachment
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			// create a new shopkeeper if there isn't one already for this npc (with out creator):
+			// create a new shopkeeper if there isn't one already for this npc (without creator):
 			this.createShopkeeper(null);
 		}, 5L);
 	}
@@ -116,14 +134,12 @@ public class CitizensShopkeeperTrait extends Trait {
 			return false;
 		}
 
-		UUID npcUniqueId = npc.getUniqueId();
-		String shopObjectId = SKDefaultShopObjectTypes.CITIZEN().createObjectId(npcUniqueId);
-		if (plugin.getShopkeeperRegistry().getActiveShopkeeper(shopObjectId) != null) {
-			// there is already a shopkeeper for this npc:
-			// the trait was probably re-attached after a reload of citizens:
+		Shopkeeper shopkeeper = CitizensShops.getShopkeeper(npc);
+		if (shopkeeper != null) {
+			// There is already a shopkeeper for this NPC. The trait was probably re-attached after a reload of
+			// Citizens.
 			return false;
 		}
-
 		return true;
 	}
 
@@ -178,13 +194,13 @@ public class CitizensShopkeeperTrait extends Trait {
 			if (shopkeeper != null) {
 				shopObjectId = shopkeeper.getShopObject().getId();
 			} else {
-				Log.warning("Shopkeeper creation via trait failed. Removing trait again.");
+				Log.warning("Shopkeeper creation via trait failed. Removing the trait again.");
 				shopObjectId = null;
 				Bukkit.getScheduler().runTask(plugin, () -> npc.removeTrait(CitizensShopkeeperTrait.class));
 			}
 		} else {
 			// well.. no idea what to do in that case.. we cannot create a shopkeeper without a location, right?
-			Log.debug("Shopkeeper NPC Trait: Failed to create shopkeeper due to missing NPC location.");
+			Log.debug("Shopkeeper NPC Trait: Failed to create the shopkeeper due to missing NPC location.");
 		}
 	}
 }

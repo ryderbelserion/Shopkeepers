@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -20,6 +21,7 @@ import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
@@ -139,14 +141,16 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	@Override
 	public void delete() {
+		if (npcUniqueId == null) return; // there is no corresponding NPC (maybe already deleted)
 		if (destroyNPC) {
 			NPC npc = this.getNPC();
 			if (npc != null) {
 				if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
-					// let the trait handle npc related cleanup:
-					npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperRemove();
+					// Let the trait handle NPC related cleanup (i.e. we only remove the trait in this case):
+					npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperDeletion(shopkeeper);
 				} else {
-					Log.debug(() -> "Removing citizens NPC " + CitizensShops.getNPCIdString(npc) + " due to deletion of shopkeeper " + shopkeeper.getId());
+					Log.debug(() -> "Removing Citizens NPC " + CitizensShops.getNPCIdString(npc)
+							+ " due to deletion of shopkeeper " + shopkeeper.getIdString());
 					npc.destroy(); // the npc was created by us, so we remove it again
 				}
 			} else {
@@ -157,6 +161,21 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		}
 		npcUniqueId = null;
 		shopkeeper.markDirty();
+	}
+
+	/**
+	 * Called when the corresponding Citizens NPC is about to get deleted.
+	 * 
+	 * @param player
+	 *            the player who deleted the NPC, can be <code>null</code> if not available
+	 */
+	void onNPCDeleted(Player player) {
+		NPC npc = this.getNPC();
+		assert npc != null;
+		Log.debug(() -> "Removing shopkeeper " + shopkeeper.getIdString() + " due to the deletion of Citizens NPC "
+				+ CitizensShops.getNPCIdString(npc) + (player == null ? "" : " by player " + TextUtils.getPlayerString(player)));
+		this.setKeepNPCOnDeletion(); // The NPC is already getting deleted, so we don't need to delete it.
+		shopkeeper.delete(player);
 	}
 
 	// ACTIVATION

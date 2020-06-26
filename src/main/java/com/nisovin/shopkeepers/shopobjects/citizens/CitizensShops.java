@@ -14,9 +14,11 @@ import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.util.Log;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -24,18 +26,47 @@ import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.TraitInfo;
 import net.citizensnpcs.trait.LookClose;
 
+/**
+ * Citizens shopkeepers can be created in two ways:
+ * <ol>
+ * <li>By creating a shopkeeper of type 'npc' (alias 'citizen'), either via command, the shop creation item or by
+ * another plugin through the Shopkeepers API. This will create both the shopkeeper and the corresponding Citizens NPC.
+ * <li>By attaching the 'shopkeeper' trait to an already existing Citizens NPC. The trait can also be attached to a NPC
+ * for which there already exists a corresponding shopkeeper. No new shopkeeper will be created then.
+ * </ol>
+ * 
+ * Citizen shopkeepers can be removed again in the following ways:
+ * <ol>
+ * <li>The shopkeeper gets deleted, either due to a player removing it via command or via the editor option, or due the
+ * Shopkeepers plugin removing it due to reasons such owner inactivity or when the shopkeeper's chest is broken. If the
+ * corresponding Citizens NPC has the 'shopkeeper' trait attached, only this trait gets removed and the NPC remains
+ * existing. Otherwise, the Citizens NPC is removed.
+ * TODO Removing the Citizens NPC only works if the Citizens plugin is currently running.
+ * <li>The Citizens NPC gets deleted. This deletes the corresponding shopkeeper. If the Shopkeepers plugin is not
+ * running currently, the shopkeeper gets deleted during the next startup of the Shopkeepers plugin.
+ * <li>The 'shopkeeper' trait gets removed from the Citizens NPC. This deletes the corresponding shopkeeper but keeps
+ * the Citizens NPC alive.
+ * TODO Removing the shopkeeper only works if the Citizens plugin is currently running. Otherwise the shopkeeper will
+ * remain existing and attached to the NPC until it is removed directly (eg. via the editor or via command).
+ * <li>On plugin startup, if the Citizens plugin is running as well, we check for and remove invalid shopkeepers such as
+ * shopkeepers for which there is no corresponding Citizens NPC (anymore) or shopkeepers which have the same Citizens
+ * NPC assigned as another shopkeeper.
+ * </ol>
+ */
 public class CitizensShops {
 
 	private final SKShopkeepersPlugin plugin;
 	private final SKCitizensShopObjectType citizensShopObjectType = new SKCitizensShopObjectType(this);
 	private final PluginListener pluginListener = new PluginListener(this);
 
-	private final CitizensListener citizensListener = new CitizensListener();
+	private final CitizensListener citizensListener;
 	private boolean citizensShopsEnabled = false;
 	private TraitInfo shopkeeperTrait = null;
 
 	public CitizensShops(SKShopkeepersPlugin plugin) {
+		assert plugin != null;
 		this.plugin = plugin;
+		this.citizensListener = new CitizensListener(plugin);
 	}
 
 	public void onEnable() {
@@ -79,6 +110,7 @@ public class CitizensShops {
 
 		// register citizens listener:
 		Bukkit.getPluginManager().registerEvents(citizensListener, plugin);
+		citizensListener.onEnable();
 
 		// delayed to run after shopkeepers were loaded:
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -105,6 +137,7 @@ public class CitizensShops {
 		}
 
 		// unregister citizens listener:
+		citizensListener.onDisable();
 		HandlerList.unregisterAll(citizensListener);
 
 		// disabled:
@@ -241,5 +274,13 @@ public class CitizensShops {
 				npc.removeTrait(CitizensShopkeeperTrait.class);
 			}
 		}
+	}
+
+	public static Shopkeeper getShopkeeper(NPC npc) {
+		if (npc == null) return null;
+		assert ShopkeepersAPI.isEnabled();
+		UUID npcUniqueId = npc.getUniqueId();
+		String shopObjectId = SKDefaultShopObjectTypes.CITIZEN().createObjectId(npcUniqueId);
+		return ShopkeepersAPI.getShopkeeperRegistry().getActiveShopkeeper(shopObjectId);
 	}
 }

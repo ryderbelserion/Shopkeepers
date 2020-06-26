@@ -4,6 +4,9 @@ Date format: (YYYY-MM-DD)
 ## v2.9.4 (TBA)
 ### Supported MC versions: 1.15.2, 1.14.4
 
+* Fixed: When a Citizens NPC, created without the 'shopkeeper' trait, is deleted, we immediately delete any corresponding shopkeeper now. Previously the corresponding shopkeeper would not get deleted right away, but only during the next plugin startup (when checking whether the corresponding NPC still exists). Any chest used by the shopkeeper would remain locked until then.
+* Improved: In order to determine the player who is setting up a shopkeeper via the 'shopkeeper' trait, we previously only took players into account which are adding the trait via the Citizens trait command (NPCTraitCommandAttachEvent). However, players are also able to add traits during NPC creation. We now also react to player's creating NPCs (PlayerCreateNPCEvent) and then (heuristically) assume that any directly following trait additions for the same NPC within one tick are caused by this player. This player will then be able to receive feedback message about the shopkeeper creation.
+* Improved: For any trait additions not directly associated with a player, we previously waited 5 ticks before the corresponding shopkeeper got created. One (minor) side effect of the above change is that we react to all trait additions within 1 tick now.
 * Added: Added a link inside the config which points to the translations repository.
 * Added: Added feedback messages when a player cannot trade with a shop due to trading with own shops being disabled or if the shop's chest is missing.
 * Changed: The check for whether the player is able to bypass the restriction of not being able to trade with own shops was previously checking if the player is an operator. Instead we now check if the player has the bypass permission.
@@ -18,6 +21,7 @@ Date format: (YYYY-MM-DD)
 * Changed: The result message after deleting shops via command will now print the number of actually removed shops (which does not necessarily match the number of shops that were confirmed for removal).
 * Changed: The item representing the black horse inside the editor is now slightly less black.
 * Debug: Added some more information to the debug message that gets logged when the PlayerDeleteShopkeeperEvent has been cancelled.
+* Debug: Minor changes to some debug messages related to Citizens shopkeepers.
 * API/Internal: Added Shopkeeper#delete(Player) which optionally passes the player responsible for the shopkeeper deletion. Note that the player is not passed if a player shop is deleted due to a player breaking the shop's chest.
 * API: Added a note about the PlayerDeleteShopkeeperEvent not being called in all circumstances.
 
@@ -25,6 +29,7 @@ Internal changes:
 * Moved most of the code responsible for returning the shop creation item for deleted player shops into the new PlayerShopkeeper#delete(Player) method.
 * Added ShopkeeperEventHelper class and moved the common code for calling and handling PlayerDeleteShopkeeperEvents there.
 * Various minor refactorings related to the Text implementation.
+* Various minor refactorings related to Citizens shopkeepers.
 * Minor formatting changes. Not applied to the whole code base yet.
 
 Added messages:  
