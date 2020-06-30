@@ -234,6 +234,8 @@ public class Settings {
 	 */
 	public static String editorTitle = "Shopkeeper Editor";
 
+	public static int maxTradesPages = 5;
+
 	public static ItemData previousPageItem = new ItemData(Material.WRITABLE_BOOK);
 	public static ItemData nextPageItem = new ItemData(Material.WRITABLE_BOOK);
 	public static ItemData currentPageItem = new ItemData(Material.WRITABLE_BOOK);
@@ -636,6 +638,13 @@ public class Settings {
 				Log.warning("Config: 'name-item' can not be AIR if naming-of-player-shops-via-item is enabled!");
 				nameItem = nameItem.withType(Material.NAME_TAG);
 			}
+		}
+		if (maxTradesPages < 1) {
+			Log.warning("Config: 'max-trades-pages' can not be less than 1!");
+			maxTradesPages = 1;
+		} else if (maxTradesPages > 10) {
+			Log.warning("Config: 'max-trades-pages' can not be greater than 10!");
+			maxTradesPages = 10;
 		}
 		if (taxRate < 0) {
 			Log.warning("Config: 'tax-rate' can not be less than 0!");

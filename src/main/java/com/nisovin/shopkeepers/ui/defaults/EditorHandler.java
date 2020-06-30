@@ -51,8 +51,6 @@ public abstract class EditorHandler extends UIHandler {
 	protected static final int TRADES_ROW_3_START = TRADES_ROW_2_END + (COLUMNS_PER_ROW - TRADES_COLUMNS) + 1;
 	protected static final int TRADES_ROW_3_END = TRADES_ROW_3_START + TRADES_COLUMNS - 1;
 
-	// TODO: config setting?
-	protected static final int TRADES_MAX_PAGES = 5; // 45 trades, double chest can hold 54 different items
 	protected static final int TRADES_PAGE_BAR_START = TRADES_ROW_3_END + (COLUMNS_PER_ROW - TRADES_COLUMNS) + 1;
 	protected static final int TRADES_PAGE_BAR_END = TRADES_PAGE_BAR_START + TRADES_COLUMNS - 1;
 	protected static final int TRADES_PAGE_ICON = TRADES_PAGE_BAR_START + (TRADES_PAGE_BAR_END - TRADES_PAGE_BAR_START) / 2;
@@ -115,6 +113,11 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	// TRADES AREA
+
+	// assert: [1, 10].
+	protected int getMaxTradesPages() {
+		return Settings.maxTradesPages;
+	}
 
 	protected void setTradeColumn(Inventory inventory, int column, TradingRecipeDraft recipe) {
 		if (inventory == null) return;
@@ -287,7 +290,7 @@ public abstract class EditorHandler extends UIHandler {
 			@Override
 			public ItemStack getIcon(Session session) {
 				int page = session.currentPage;
-				if (page >= TRADES_MAX_PAGES) return null;
+				if (page >= getMaxTradesPages()) return null;
 				return createNextPageIcon(page);
 			}
 
@@ -302,7 +305,7 @@ public abstract class EditorHandler extends UIHandler {
 				saveEditorPage(session);
 
 				// update page:
-				session.setPage(Math.min(TRADES_MAX_PAGES, session.currentPage + 1));
+				session.setPage(Math.min(getMaxTradesPages(), session.currentPage + 1));
 				setupPage(player, session.currentPage);
 				player.updateInventory();
 			}
@@ -348,7 +351,7 @@ public abstract class EditorHandler extends UIHandler {
 		String itemName = TextUtils.replaceArguments(Settings.msgButtonPreviousPage,
 				"prev_page", prevPageText,
 				"page", page,
-				"max_page", TRADES_MAX_PAGES
+				"max_page", getMaxTradesPages()
 		);
 		ItemStack item = Settings.previousPageItem.createItemStack();
 		// note: can exceed the item's natural max stack size
@@ -359,14 +362,14 @@ public abstract class EditorHandler extends UIHandler {
 	protected ItemStack createNextPageIcon(int page) {
 		int nextPage = 1;
 		String nextPageText = "-";
-		if (page < TRADES_MAX_PAGES) {
+		if (page < getMaxTradesPages()) {
 			nextPage = (page + 1);
 			nextPageText = String.valueOf(nextPage);
 		}
 		String itemName = TextUtils.replaceArguments(Settings.msgButtonNextPage,
 				"next_page", nextPageText,
 				"page", page,
-				"max_page", TRADES_MAX_PAGES
+				"max_page", getMaxTradesPages()
 		);
 		ItemStack item = Settings.nextPageItem.createItemStack();
 		// note: can exceed the item's natural max stack size
@@ -377,7 +380,7 @@ public abstract class EditorHandler extends UIHandler {
 	protected ItemStack createCurrentPageIcon(int page) {
 		String itemName = TextUtils.replaceArguments(Settings.msgButtonCurrentPage,
 				"page", page,
-				"max_page", TRADES_MAX_PAGES
+				"max_page", getMaxTradesPages()
 		);
 		ItemStack item = Settings.currentPageItem.createItemStack();
 		// note: can exceed the item's natural max stack size

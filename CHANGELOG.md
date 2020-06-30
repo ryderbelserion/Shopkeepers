@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.10.1 (TBA)
 ### Supported MC versions: 1.16.1, 1.15.2, 1.14.4
 
+* Config: Added option 'max-trades-pages' (default: 5, min: 1, max: 10) which allows changing the number of pages that can be filled with trading options. This limit applies to all shopkeepers (there are no different settings for different types of shops or different permission levels so far). Note: The scroll bar rendered by the Minecraft client will only work nicely for up to 64 trades.
 
 ## v2.10.0 (2020-06-26)
 ### Supported MC versions: 1.16.1, 1.15.2, 1.14.4

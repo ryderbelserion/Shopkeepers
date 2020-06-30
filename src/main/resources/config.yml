@@ -258,6 +258,9 @@ allow-renaming-of-player-npc-shops: false
 # The window title of the shopkeeper editor menu.
 editor-title: "Shopkeeper Editor"
 
+# The number of pages that can be filled with trades. Max 10.
+max-trades-pages: 5
+
 # The items used for the buttons and icons in the trades page row.
 # The display name and lore of these items get set via the corresponding
 # messages and can therefore not be defined here.
