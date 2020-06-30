@@ -393,6 +393,10 @@ public class Settings {
 	public static List<String> msgButtonVillagerLevelLore = Arrays.asList("Changes the badge color", "of the villager");
 	public static String msgButtonZombieVillagerProfession = "&aChoose villager profession";
 	public static List<String> msgButtonZombieVillagerProfessionLore = Arrays.asList("Changes the profession", "of the zombie villager");
+	public static String msgButtonSlimeSize = "&aChoose slime size";
+	public static List<String> msgButtonSlimeSizeLore = Arrays.asList("Cycles the slime's size.", "Current size: &e{size}");
+	public static String msgButtonMagmaCubeSize = "&aChoose magma cube size";
+	public static List<String> msgButtonMagmaCubeSizeLore = Arrays.asList("Cycles the magma cube's size.", "Current size: &e{size}");
 
 	public static String msgTradingTitlePrefix = "&2";
 	public static String msgTradingTitleDefault = "Shopkeeper";

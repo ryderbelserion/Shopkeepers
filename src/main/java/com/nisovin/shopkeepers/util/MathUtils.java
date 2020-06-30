@@ -27,4 +27,14 @@ public class MathUtils {
 		}
 		return ((double) total / values.length);
 	}
+
+	// Brings the given value into the specified range via a modulo operation.
+	public static int rangeModulo(int value, int min, int max) {
+		assert min <= max; // Note: value can be outside the range.
+		int offset = min;
+		int range = max - min + 1;
+		int modulo = (value - offset) % range;
+		if (modulo < 0) modulo += range;
+		return offset + modulo;
+	}
 }

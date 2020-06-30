@@ -532,6 +532,14 @@ msg-button-zombie-villager-profession: "&aChoose villager profession"
 msg-button-zombie-villager-profession-lore:
 - "Changes the profession"
 - "of the zombie villager"
+msg-button-slime-size: "&aChoose slime size"
+msg-button-slime-size-lore:
+- "Cycles the slime's size."
+- "Current size: &e{size}"
+msg-button-magma-cube-size: "&aChoose magma cube size"
+msg-button-magma-cube-size-lore:
+- "Cycles the magma cube's size."
+- "Current size: &e{size}"
 
 msg-trading-title-prefix: "&2"
 msg-trading-title-default: "Shopkeeper"

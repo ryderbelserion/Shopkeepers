@@ -25,12 +25,10 @@ import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.MathUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class VillagerShop extends BabyableShop<Villager> {
-
-	private static final int MIN_VILLAGER_LEVEL = 1;
-	private static final int MAX_VILLAGER_LEVEL = 5;
 
 	private static final Property<Profession> PROPERTY_PROFESSION = new EnumProperty<Profession>(Profession.class, "profession", Profession.NONE) {
 		@Override
@@ -63,7 +61,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 		}
 	};
 	private static final Property<Villager.Type> PROPERTY_VILLAGER_TYPE = new EnumProperty<>(Villager.Type.class, "villagerType", Villager.Type.PLAINS);
-	private static final Property<Integer> PROPERTY_VILLAGER_LEVEL = new IntegerProperty("villagerLevel", 1, 5, 1);
+	private static final IntegerProperty PROPERTY_VILLAGER_LEVEL = new IntegerProperty("villagerLevel", 1, 5, 1);
 
 	private Profession profession = PROPERTY_PROFESSION.getDefaultValue();
 	private Villager.Type villagerType = PROPERTY_VILLAGER_TYPE.getDefaultValue();
@@ -269,7 +267,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	// VILLAGER LEVEL
 
 	public void setVillagerLevel(int villagerLevel) {
-		Validate.isTrue(villagerLevel >= MIN_VILLAGER_LEVEL && villagerLevel <= MAX_VILLAGER_LEVEL, "Invalid villager level: " + villagerLevel);
+		Validate.isTrue(PROPERTY_VILLAGER_LEVEL.isInBounds(villagerLevel), "villagerLevel is out of bounds: " + villagerLevel);
 		this.villagerLevel = villagerLevel;
 		shopkeeper.markDirty();
 		this.applyVillagerLevel(this.getEntity()); // null if not active
@@ -283,10 +281,11 @@ public class VillagerShop extends BabyableShop<Villager> {
 	public void cycleVillagerLevel(boolean backwards) {
 		int nextLevel;
 		if (backwards) {
-			nextLevel = (villagerLevel <= MIN_VILLAGER_LEVEL ? MAX_VILLAGER_LEVEL : villagerLevel - 1);
+			nextLevel = villagerLevel - 1;
 		} else {
-			nextLevel = (villagerLevel >= MAX_VILLAGER_LEVEL ? MIN_VILLAGER_LEVEL : villagerLevel + 1);
+			nextLevel = villagerLevel + 1;
 		}
+		nextLevel = MathUtils.rangeModulo(nextLevel, PROPERTY_VILLAGER_LEVEL.getMinValue(), PROPERTY_VILLAGER_LEVEL.getMaxValue());
 		this.setVillagerLevel(nextLevel);
 	}
 

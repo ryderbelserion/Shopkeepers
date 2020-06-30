@@ -5,6 +5,17 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.16.1, 1.15.2, 1.14.4
 
 * Config: Added option 'max-trades-pages' (default: 5, min: 1, max: 10) which allows changing the number of pages that can be filled with trading options. This limit applies to all shopkeepers (there are no different settings for different types of shops or different permission levels so far). Note: The scroll bar rendered by the Minecraft client will only work nicely for up to 64 trades.
+* Added: It is now possible to change the size of slimes and magma cubes. Their default size is 1 (tiny). Even though Minecraft theoretically allows sizes up to 256, we limit the max size to 10. This avoids running into issues such as related to rendering, performance and not being able to interact with the slime or magma cube. If you have market areas where players can create their own shops and they are able to create slime or magma cube shopkeepers, you might want to take this maximum slime/magma cube size into account when assigning shop areas to players.
+* Fixed: Slimes and magma cubes no longer spawn with random size whenever they are respawned.
+
+Internal changes:
+* Slightly changed how we cycle through the villager levels (badge colors).
+
+Added messages:  
+* msg-button-slime-size
+* msg-button-slime-size-lore
+* msg-button-magma-cube-size
+* msg-button-magma-cube-size-lore
 
 ## v2.10.0 (2020-06-26)
 ### Supported MC versions: 1.16.1, 1.15.2, 1.14.4

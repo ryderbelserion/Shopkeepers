@@ -28,12 +28,14 @@ import com.nisovin.shopkeepers.shopobjects.living.types.CreeperShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.FoxShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.HorseShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.LlamaShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.MagmaCubeShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.MooshroomShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PandaShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ParrotShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PigShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.RabbitShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SheepShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.SlimeShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.WolfShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieShop;
@@ -58,7 +60,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> GHAST: seems okay
 	 * <li> GIANT: seems okay
 	 * <li> IRON_GOLEM: okay
-	 * <li> MAGMA_CUBE: spawns with random size, weird behavior in water, seems okay
+	 * <li> MAGMA_CUBE: okay, would usually spawn with random size, weird behavior in water (no longer the case, maybe due to using NoAI)
 	 * <li> MUSHROOM_COW: okay
 	 * <li> OCELOT: okay
 	 * <li> PIG: okay
@@ -66,7 +68,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> SHEEP: okay
 	 * <li> SILVERFISH: experimental, strange movement when the player is standing behind it -> NoAI for now
 	 * <li> SKELETON: okay
-	 * <li> SLIME: spawns with random size, okay
+	 * <li> SLIME: okay, would usually spawn with random size
 	 * <li> SNOWMAN: okay
 	 * <li> SPIDER: okay
 	 * <li> SQUID: seems okay, slightly weird movement in water
@@ -314,6 +316,22 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 				@Override
 				public MooshroomShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new MooshroomShop(livingShops, this, shopkeeper, creationData);
+				}
+			};
+			break;
+		case SLIME:
+			objectType = new SKLivingShopObjectType<SlimeShop>(livingShops, entityType, aliases, typeName, permission) {
+				@Override
+				public SlimeShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new SlimeShop(livingShops, this, shopkeeper, creationData);
+				}
+			};
+			break;
+		case MAGMA_CUBE:
+			objectType = new SKLivingShopObjectType<MagmaCubeShop>(livingShops, entityType, aliases, typeName, permission) {
+				@Override
+				public MagmaCubeShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new MagmaCubeShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;
