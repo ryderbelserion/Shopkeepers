@@ -43,6 +43,7 @@ class CommandGive extends Command {
 
 		Player targetPlayer = context.get(ARGUMENT_PLAYER);
 		assert targetPlayer != null;
+		boolean targetSelf = (sender.equals(targetPlayer));
 
 		int amount = context.get(ARGUMENT_AMOUNT);
 		assert amount >= 1;
@@ -63,9 +64,16 @@ class CommandGive extends Command {
 
 		// success:
 		// TODO show shop creation item via hover text?
-		TextUtils.sendMessage(sender, Settings.msgShopCreationItemsGiven,
-				"player", TextUtils.getPlayerText(targetPlayer),
+		// Inform target player:
+		TextUtils.sendMessage(targetPlayer, Settings.msgShopCreationItemsReceived,
 				"amount", amount
 		);
+		if (!targetSelf) {
+			// Inform command executor:
+			TextUtils.sendMessage(sender, Settings.msgShopCreationItemsGiven,
+					"player", TextUtils.getPlayerText(targetPlayer),
+					"amount", amount
+			);
+		}
 	}
 }

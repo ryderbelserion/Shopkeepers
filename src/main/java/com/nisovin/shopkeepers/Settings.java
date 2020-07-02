@@ -433,8 +433,11 @@ public class Settings {
 	// placeholders: {owner} -> new owners name
 	public static Text msgOwnerSet = Text.parse("&aNew owner was set to &e{owner}");
 	public static Text msgShopCreationItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!");
+	public static Text msgShopCreationItemsReceived = Text.parse("&aYou have received &e{amount}&a shop creation item(s)!");
 	public static Text msgCurrencyItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a currency item(s)!");
+	public static Text msgCurrencyItemsReceived = Text.parse("&aYou have received &e{amount}&a currency item(s)!");
 	public static Text msgHighCurrencyItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a high currency item(s)!");
+	public static Text msgHighCurrencyItemsReceived = Text.parse("&aYou have received &e{amount}&a high currency item(s)!");
 	public static Text msgHighCurrencyDisabled = Text.parse("&cThe high currency is disabled!");
 	public static String msgUnknownBookAuthor = "Unknown";
 

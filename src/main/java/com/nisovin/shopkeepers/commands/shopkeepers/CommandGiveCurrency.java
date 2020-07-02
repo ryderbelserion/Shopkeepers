@@ -54,6 +54,7 @@ class CommandGiveCurrency extends Command {
 
 		Player targetPlayer = context.get(ARGUMENT_PLAYER);
 		assert targetPlayer != null;
+		boolean targetSelf = (sender.equals(targetPlayer));
 
 		String currencyType = context.get(ARGUMENT_CURRENCY_TYPE);
 		boolean lowCurrency;
@@ -93,15 +94,29 @@ class CommandGiveCurrency extends Command {
 		// success:
 		// TODO show currency item via hover text?
 		if (lowCurrency) {
-			TextUtils.sendMessage(sender, Settings.msgCurrencyItemsGiven,
-					"player", TextUtils.getPlayerText(targetPlayer),
+			// Inform target player:
+			TextUtils.sendMessage(targetPlayer, Settings.msgCurrencyItemsReceived,
 					"amount", amount
 			);
+			if (!targetSelf) {
+				// Inform command executor:
+				TextUtils.sendMessage(sender, Settings.msgCurrencyItemsGiven,
+						"player", TextUtils.getPlayerText(targetPlayer),
+						"amount", amount
+				);
+			}
 		} else {
-			TextUtils.sendMessage(sender, Settings.msgHighCurrencyItemsGiven,
-					"player", TextUtils.getPlayerText(targetPlayer),
+			// Inform target player:
+			TextUtils.sendMessage(targetPlayer, Settings.msgHighCurrencyItemsReceived,
 					"amount", amount
 			);
+			if (!targetSelf) {
+				// Inform command executor:
+				TextUtils.sendMessage(sender, Settings.msgHighCurrencyItemsGiven,
+						"player", TextUtils.getPlayerText(targetPlayer),
+						"amount", amount
+				);
+			}
 		}
 	}
 }
