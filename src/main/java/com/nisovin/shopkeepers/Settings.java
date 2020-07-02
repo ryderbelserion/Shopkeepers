@@ -433,6 +433,9 @@ public class Settings {
 	// placeholders: {owner} -> new owners name
 	public static Text msgOwnerSet = Text.parse("&aNew owner was set to &e{owner}");
 	public static Text msgShopCreationItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!");
+	public static Text msgCurrencyItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a currency item(s)!");
+	public static Text msgHighCurrencyItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a high currency item(s)!");
+	public static Text msgHighCurrencyDisabled = Text.parse("&cThe high currency is disabled!");
 	public static String msgUnknownBookAuthor = "Unknown";
 
 	public static Text msgTradePermSet = Text.parse("&aThe shop's trading permission has been set to '&e{perm}&a'!");
@@ -521,6 +524,7 @@ public class Settings {
 	public static Text msgCommandDescriptionList = Text.parse("Lists all shops for the specified player, or all admin shops.");
 	public static Text msgCommandDescriptionRemove = Text.parse("Removes all shops for the specified player, all players, or all admin shops.");
 	public static Text msgCommandDescriptionGive = Text.parse("Gives shop creation item(s) to the specified player.");
+	public static Text msgCommandDescriptionGiveCurrency = Text.parse("Gives currency item(s) to the specified player.");
 	public static Text msgCommandDescriptionRemote = Text.parse("Remotely opens a shop.");
 	public static Text msgCommandDescriptionRemoteEdit = Text.parse("Remotely edits a shop.");
 	public static Text msgCommandDescriptionTransfer = Text.parse("Transfers the ownership of a shop.");

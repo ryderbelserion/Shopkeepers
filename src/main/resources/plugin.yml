@@ -55,6 +55,9 @@ permissions:
     shopkeeper.give:
         description: Give shop creation items per command
         default: op
+    shopkeeper.givecurrency:
+        description: Give currency items per command
+        default: op
     shopkeeper.remote:
         description: Remotely open shops via command
         default: op
