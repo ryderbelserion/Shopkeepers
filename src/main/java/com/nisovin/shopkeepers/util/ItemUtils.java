@@ -778,20 +778,20 @@ public final class ItemUtils {
 	public static ItemStack getItem(PlayerInventory playerInventory, EquipmentSlot slot) {
 		if (playerInventory == null || slot == null) return null;
 		switch (slot) {
-			case HAND:
-				return playerInventory.getItemInMainHand();
-			case OFF_HAND:
-				return playerInventory.getItemInOffHand();
-			case FEET:
-				return playerInventory.getBoots();
-			case LEGS:
-				return playerInventory.getLeggings();
-			case CHEST:
-				return playerInventory.getChestplate();
-			case HEAD:
-				return playerInventory.getHelmet();
-			default:
-				return null;
+		case HAND:
+			return playerInventory.getItemInMainHand();
+		case OFF_HAND:
+			return playerInventory.getItemInOffHand();
+		case FEET:
+			return playerInventory.getBoots();
+		case LEGS:
+			return playerInventory.getLeggings();
+		case CHEST:
+			return playerInventory.getChestplate();
+		case HEAD:
+			return playerInventory.getHelmet();
+		default:
+			return null;
 		}
 	}
 }
