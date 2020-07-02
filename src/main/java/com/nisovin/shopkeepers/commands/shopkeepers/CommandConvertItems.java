@@ -1,0 +1,88 @@
+package com.nisovin.shopkeepers.commands.shopkeepers;
+
+import java.util.Arrays;
+
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+
+import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.commands.lib.Command;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.CommandException;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
+import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
+
+class CommandConvertItems extends Command {
+
+	private static final String ARGUMENT_PLAYER = "player";
+	private static final String ARGUMENT_ALL = "all";
+
+	CommandConvertItems() {
+		super("convertItems", Arrays.asList("convertItem", "convert"));
+
+		// set permission:
+		this.setPermission(ShopkeepersPlugin.CONVERT_ITEMS_PERMISSION);
+
+		// set description:
+		this.setDescription(Settings.msgCommandDescriptionConvertItems);
+
+		// arguments:
+		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
+		this.addArgument(new OptionalArgument<>(new LiteralArgument(ARGUMENT_ALL)));
+	}
+
+	@Override
+	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
+		CommandSender sender = input.getSender();
+
+		Player targetPlayer = context.get(ARGUMENT_PLAYER);
+		assert targetPlayer != null;
+		boolean targetSelf = (sender.equals(targetPlayer));
+
+		boolean convertAll = context.has(ARGUMENT_ALL);
+
+		PlayerInventory inventory = targetPlayer.getInventory();
+		int convertedStacks = 0;
+		if (convertAll) {
+			ItemStack[] contents = inventory.getStorageContents();
+			convertedStacks = ItemUtils.convertItems(contents, (item) -> true);
+			if (convertedStacks > 0) {
+				// Apply changes back to inventory:
+				ItemUtils.setStorageContents(inventory, contents);
+			}
+		} else {
+			// Convert held item:
+			ItemStack itemInHand = inventory.getItemInMainHand();
+			if (!ItemUtils.isEmpty(itemInHand)) {
+				ItemStack convertedItem = ItemUtils.convertItem(itemInHand);
+				if (!itemInHand.isSimilar(convertedItem)) {
+					convertedStacks = 1;
+					inventory.setItemInMainHand(convertedItem);
+				}
+			}
+		}
+
+		if (convertedStacks > 0) {
+			targetPlayer.updateInventory();
+		}
+
+		// Inform target player:
+		TextUtils.sendMessage(targetPlayer, Settings.msgItemsConverted,
+				"count", convertedStacks
+		);
+		if (!targetSelf) {
+			// Inform command executor:
+			TextUtils.sendMessage(sender, Settings.msgItemsConverted,
+					"count", convertedStacks
+			);
+		}
+	}
+}

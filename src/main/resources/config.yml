@@ -580,6 +580,7 @@ msg-currency-items-received: "&aYou have received &e{amount}&a currency item(s)!
 msg-high-currency-items-given: "&aPlayer &e{player}&a has received &e{amount}&a high currency item(s)!"
 msg-high-currency-items-received: "&aYou have received &e{amount}&a high currency item(s)!"
 msg-high-currency-disabled: "&cThe high currency is disabled!"
+msg-items-converted: "&aConverted &e{count}&a item stack(s)!"
 msg-unknown-book-author: "Unknown"
 
 msg-trade-perm-set: "&aThe shop's trading permission has been set to '&e{perm}&a'!"
@@ -701,6 +702,7 @@ msg-command-description-list: "Lists all shops for the specified player, or all 
 msg-command-description-remove: "Removes all shops for the specified player, all players, or all admin shops."
 msg-command-description-give: "Gives shop creation item(s) to the specified player."
 msg-command-description-give-currency: "Gives currency item(s) to the specified player."
+msg-command-description-convert-items: "Converts the held (or all) items to conform to Spigot's data format."
 msg-command-description-remote: "Remotely opens a shop (Optionally: For another player)."
 msg-command-description-remote-edit: "Remotely edits a shop."
 msg-command-description-transfer: "Transfers the ownership of a shop."

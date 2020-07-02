@@ -5,11 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -426,6 +428,48 @@ public final class ItemUtils {
 		ItemStack convertedItemStack = DUMMY_INVENTORY.getItem(0);
 		DUMMY_INVENTORY.setItem(0, null);
 		return convertedItemStack;
+	}
+
+	private static final YamlConfiguration YAML_CONFIG = new YamlConfiguration();
+	private static final String ITEM_KEY = "item";
+
+	// Converts the given ItemStack to conform to Spigot's internal data format by running it through Spigot's item
+	// de/serialization. Use oldItemStack.isSimilar(newItemStack) to test whether the item has changed.
+	public static ItemStack convertItem(ItemStack itemStack) {
+		if (itemStack == null) return null;
+		ItemStack convertedItemStack;
+		try {
+			YAML_CONFIG.set(ITEM_KEY, itemStack);
+			String serialized = YAML_CONFIG.saveToString();
+			YAML_CONFIG.set(ITEM_KEY, null);
+			YAML_CONFIG.loadFromString(serialized);
+			convertedItemStack = YAML_CONFIG.getItemStack(ITEM_KEY);
+		} catch (Exception e) {
+			e.printStackTrace();
+			// Return original ItemStack:
+			return itemStack;
+		} finally {
+			YAML_CONFIG.set(ITEM_KEY, null); // reset
+		}
+		return convertedItemStack;
+	}
+
+	public static int convertItems(ItemStack[] contents, Predicate<ItemStack> filter) {
+		Validate.notNull(contents, "contents is null");
+		if (filter == null) filter = (item) -> true;
+		int convertedStacks = 0;
+		for (int slot = 0; slot < contents.length; slot++) {
+			ItemStack slotItem = contents[slot];
+			if (isEmpty(slotItem)) continue;
+			if (!filter.test(slotItem)) continue;
+			// TODO Serialize and deserialize items in bulk instead of individually?
+			ItemStack convertedItem = convertItem(slotItem);
+			if (!slotItem.isSimilar(convertedItem)) {
+				contents[slot] = convertedItem;
+				convertedStacks += 1;
+			}
+		}
+		return convertedStacks;
 	}
 
 	//
