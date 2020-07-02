@@ -744,12 +744,22 @@ public final class ItemUtils {
 	}
 
 	public static void setStorageContents(Inventory inventory, ItemStack[] contents) {
-		Validate.notNull(inventory);
-		Validate.notNull(contents);
+		setContents(inventory, contents);
+	}
+
+	public static void setContents(Inventory inventory, ItemStack[] contents) {
+		setContents(inventory, 0, contents);
+	}
+
+	public static void setContents(Inventory inventory, int slotOffset, ItemStack[] contents) {
+		Validate.notNull(inventory, "inventory is null");
+		Validate.notNull(contents, "contents is null");
+		// assert: slotOffset is valid
 		final int length = contents.length;
 		for (int slot = 0; slot < length; ++slot) {
 			ItemStack newItem = contents[slot];
-			ItemStack currentItem = inventory.getItem(slot);
+			int inventorySlot = slotOffset + slot;
+			ItemStack currentItem = inventory.getItem(inventorySlot);
 			// Only update slots that actually changed. This avoids sending the player slot update packets that are not
 			// required.
 			// We skip the slot if the current item already equals the new item (similar and same stack sizes). For
@@ -757,7 +767,7 @@ public final class ItemUtils {
 			if (Objects.equals(newItem, currentItem)) {
 				continue;
 			}
-			inventory.setItem(slot, newItem);
+			inventory.setItem(inventorySlot, newItem);
 		}
 	}
 

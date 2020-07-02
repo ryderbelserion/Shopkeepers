@@ -52,11 +52,11 @@ class CommandConvertItems extends Command {
 		PlayerInventory inventory = targetPlayer.getInventory();
 		int convertedStacks = 0;
 		if (convertAll) {
-			ItemStack[] contents = inventory.getStorageContents();
+			ItemStack[] contents = inventory.getContents(); // includes armor and off hand slot
 			convertedStacks = ItemUtils.convertItems(contents, (item) -> true);
 			if (convertedStacks > 0) {
 				// Apply changes back to inventory:
-				ItemUtils.setStorageContents(inventory, contents);
+				ItemUtils.setContents(inventory, contents);
 			}
 		} else {
 			// Convert held item:
