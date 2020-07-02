@@ -9,6 +9,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -37,6 +38,26 @@ public class TypedFallbackArgument<T> extends FallbackArgument<T> {
 	@SuppressWarnings("unchecked")
 	public CommandArgument<T> getFallbackArgument() {
 		return (CommandArgument<T>) anyFallbackArgument.getFallbackArgument();
+	}
+
+	@Override
+	public String getReducedFormat() {
+		return anyFallbackArgument.getReducedFormat();
+	}
+
+	@Override
+	public boolean isOptional() {
+		return anyFallbackArgument.isOptional();
+	}
+
+	@Override
+	public Text getMissingArgumentErrorMsg() {
+		return anyFallbackArgument.getMissingArgumentErrorMsg();
+	}
+
+	@Override
+	public Text getInvalidArgumentErrorMsg(String argumentInput) {
+		return anyFallbackArgument.getInvalidArgumentErrorMsg(argumentInput);
 	}
 
 	@SuppressWarnings("unchecked")

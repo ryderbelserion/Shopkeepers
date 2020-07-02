@@ -96,6 +96,7 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 	// parsingFailed: Whether parsing the following command arguments failed. The arguments reader got reset to the
 	// original state in that case. Otherwise (if parsing succeeded) the arguments reader will have no remaining
 	// unparsed arguments.
+	@Override
 	public Object parseFallback(CommandInput input, CommandContext context, ArgumentsReader argsReader,
 								FallbackArgumentException fallbackException, boolean parsingFailed) throws ArgumentParseException {
 		// Fallback chaining: If the original exception was a fallback itself, try it first
