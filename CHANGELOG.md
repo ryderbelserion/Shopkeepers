@@ -4,9 +4,14 @@ Date format: (YYYY-MM-DD)
 ## v2.10.1 (TBA)
 ### Supported MC versions: 1.16.1, 1.15.2, 1.14.4
 
-* Added: New command `/shopkeeper givecurrency [player] ['low'|'high'] [amount]` and corresponding permission node `shopkeeper.givecurrency` (default: op). This command can be used to create and give the currency items which have been specified inside the config.
+* Added: New command `/shopkeeper givecurrency [player] ['low'|'high'] [amount]`.
+  * This command can be used to create and give the currency items which have been specified inside the config.
+  * Added corresponding permission node `shopkeeper.givecurrency` (default: op).
 * Added: When giving items via command to another player we now also inform the target player that he has received items. These newly added messages are also used now when giving items to yourself.
-* Added: New command `/shopkeeper convertItems [player] ['all']` and corresponding permission node `shopkeeper.convertitems` (default: op). This command can be used to convert the held (or all) items to conform to Spigot's internal data format. I.e. this runs the items through Spigot's item serialization and deserialization in the same way as it would happen when these items are used inside shopkeeper trades and the plugin gets reloaded.
+* Added: New command `/shopkeeper convertItems [player] ['all']`.
+  * This command can be used to convert the held (or all) items to conform to Spigot's internal data format. I.e. this runs the items through Spigot's item serialization and deserialization in the same way as it would happen when these items are used inside shopkeeper trades and the plugin gets reloaded.
+  * Added corresponding permission node `shopkeeper.convertitems.own` (default: op). This allows converting own items.
+  * Added corresponding permission node `shopkeeper.convertitems.others` (default: op). This allows converting items of other players.
 * Config: Added option 'max-trades-pages' (default: 5, min: 1, max: 10) which allows changing the number of pages that can be filled with trading options. This limit applies to all shopkeepers (there are no different settings for different types of shops or different permission levels so far). Note: The scroll bar rendered by the Minecraft client will only work nicely for up to 64 trades.
 * Added: It is now possible to change the size of slimes and magma cubes. Their default size is 1 (tiny). Even though Minecraft theoretically allows sizes up to 256, we limit the max size to 10. This avoids running into issues such as related to rendering, performance and not being able to interact with the slime or magma cube. If you have market areas where players can create their own shops and they are able to create slime or magma cube shopkeepers, you might want to take this maximum slime/magma cube size into account when assigning shop areas to players.
 * Fixed: Slimes and magma cubes no longer spawn with random size whenever they are respawned.

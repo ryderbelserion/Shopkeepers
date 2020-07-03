@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandConvertItems extends Command {
@@ -28,8 +29,7 @@ class CommandConvertItems extends Command {
 	CommandConvertItems() {
 		super("convertItems", Arrays.asList("convertItem", "convert"));
 
-		// set permission:
-		this.setPermission(ShopkeepersPlugin.CONVERT_ITEMS_PERMISSION);
+		// permission gets checked by testPermission and during execution
 
 		// set description:
 		this.setDescription(Settings.msgCommandDescriptionConvertItems);
@@ -37,6 +37,13 @@ class CommandConvertItems extends Command {
 		// arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
 		this.addArgument(new OptionalArgument<>(new LiteralArgument(ARGUMENT_ALL)));
+	}
+
+	@Override
+	public boolean testPermission(CommandSender sender) {
+		if (!super.testPermission(sender)) return false;
+		return PermissionUtils.hasPermission(sender, ShopkeepersPlugin.CONVERT_ITEMS_OWN_PERMISSION)
+				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.CONVERT_ITEMS_OTHERS_PERMISSION);
 	}
 
 	@Override
@@ -48,6 +55,13 @@ class CommandConvertItems extends Command {
 		boolean targetSelf = (sender.equals(targetPlayer));
 
 		boolean convertAll = context.has(ARGUMENT_ALL);
+
+		// Check permission:
+		if (targetSelf) {
+			this.checkPermission(sender, ShopkeepersPlugin.CONVERT_ITEMS_OWN_PERMISSION);
+		} else {
+			this.checkPermission(sender, ShopkeepersPlugin.CONVERT_ITEMS_OTHERS_PERMISSION);
+		}
 
 		PlayerInventory inventory = targetPlayer.getInventory();
 		int convertedStacks = 0;

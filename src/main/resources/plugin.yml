@@ -58,8 +58,11 @@ permissions:
     shopkeeper.givecurrency:
         description: Give currency items per command
         default: op
-    shopkeeper.convertitems:
-        description: Convert items via command
+    shopkeeper.convertitems.own:
+        description: Convert your own items via command
+        default: op
+    shopkeeper.convertitems.others:
+        description: Convert items of other players via command
         default: op
     shopkeeper.remote:
         description: Remotely open shops via command
