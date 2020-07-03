@@ -21,6 +21,9 @@ debug: false
 #    names.
 # - 'item-migrations': Logs whenever a shopkeeper performs item migrations (eg.
 #    for trading offers).
+# - 'item-conversions': Logs whenever we explicitly converted items to Spigot's
+#    data format. Note that this does not log when items get implicitly
+#    converted, which may happen under various circumstances.
 debug-options: []
 # Whether to report anonymous usage statistics to https://bStats.org
 # All reported information can be found here:

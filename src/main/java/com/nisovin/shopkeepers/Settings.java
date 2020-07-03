@@ -52,6 +52,9 @@ public class Settings {
 		public static final String ownerNameUpdates = "owner-name-updates";
 		// Logs whenever a shopkeeper performs item migrations (eg. for trading offers).
 		public static final String itemMigrations = "item-migrations";
+		// Logs whenever we explicitly converted items to Spigot's data format. Note that this does not log when items
+		// get implicitly converted, which may happen under various circumstances.
+		public static final String itemConversions = "item-conversions";
 	}
 
 	public static boolean isDebugging() {

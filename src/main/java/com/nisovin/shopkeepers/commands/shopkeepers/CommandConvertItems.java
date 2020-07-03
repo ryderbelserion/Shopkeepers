@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
@@ -65,27 +66,29 @@ class CommandConvertItems extends Command {
 
 		PlayerInventory inventory = targetPlayer.getInventory();
 		int convertedStacks = 0;
+		// Note: This command converts all items, regardless of the 'convert-player-items' and related settings.
 		if (convertAll) {
-			ItemStack[] contents = inventory.getContents(); // includes armor and off hand slot
-			convertedStacks = ItemUtils.convertItems(contents, (item) -> true);
-			if (convertedStacks > 0) {
-				// Apply changes back to inventory:
-				ItemUtils.setContents(inventory, contents);
-			}
+			// Handles content, armor and off hand items, cursor item, and inventory updating:
+			convertedStacks = ItemUtils.convertItems(inventory, (item) -> true, true);
+			final int finalConvertedStacks = convertedStacks;
+			Log.debug(Settings.DebugOptions.itemConversions,
+					() -> "Converted " + finalConvertedStacks + " item stacks in the inventory of player '"
+							+ targetPlayer.getName() + "'."
+			);
 		} else {
-			// Convert held item:
+			// Only convert the held item:
 			ItemStack itemInHand = inventory.getItemInMainHand();
 			if (!ItemUtils.isEmpty(itemInHand)) {
 				ItemStack convertedItem = ItemUtils.convertItem(itemInHand);
 				if (!itemInHand.isSimilar(convertedItem)) {
 					convertedStacks = 1;
 					inventory.setItemInMainHand(convertedItem);
+					targetPlayer.updateInventory();
+					Log.debug(Settings.DebugOptions.itemConversions,
+							() -> "Converted the held item stack of player '" + targetPlayer.getName() + "'."
+					);
 				}
 			}
-		}
-
-		if (convertedStacks > 0) {
-			targetPlayer.updateInventory();
 		}
 
 		// Inform target player:

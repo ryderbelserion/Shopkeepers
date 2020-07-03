@@ -472,6 +472,39 @@ public final class ItemUtils {
 		return convertedStacks;
 	}
 
+	public static int convertItems(Inventory inventory, Predicate<ItemStack> filter, boolean updateViewers) {
+		Validate.notNull(inventory, "inventory is null");
+		if (filter == null) filter = (item) -> true;
+
+		// Convert inventory contents (includes armor and off hand slots for player inventories):
+		ItemStack[] contents = inventory.getContents();
+		int convertedStacks = convertItems(contents, filter);
+		if (convertedStacks > 0) {
+			// Apply changes back to the inventory:
+			setContents(inventory, contents);
+		}
+
+		if (inventory instanceof PlayerInventory) {
+			// Also convert the item on the cursor:
+			Player player = (Player) ((PlayerInventory) inventory).getHolder();
+			ItemStack cursor = player.getItemOnCursor();
+			if (!ItemUtils.isEmpty(cursor) && filter.test(cursor)) {
+				ItemStack convertedCursor = ItemUtils.convertItem(cursor);
+				if (!cursor.isSimilar(convertedCursor)) {
+					convertedStacks += 1;
+				}
+			}
+		}
+
+		if (convertedStacks > 0 && updateViewers) {
+			// Update inventory viewers and owner:
+			if (updateViewers) {
+				updateInventoryLater(inventory);
+			}
+		}
+		return convertedStacks;
+	}
+
 	//
 
 	/**
@@ -772,9 +805,20 @@ public final class ItemUtils {
 	}
 
 	public static void updateInventoryLater(Inventory inventory) {
+		// If the inventory belongs to a player, always update it for that player:
+		Player owner = null;
+		if (inventory instanceof PlayerInventory) {
+			assert inventory.getHolder() instanceof Player;
+			owner = (Player) inventory.getHolder();
+			assert owner != null;
+			ItemUtils.updateInventoryLater(owner);
+		}
+		// If there are any (other) currently viewing players, update for those as well:
 		for (HumanEntity viewer : inventory.getViewers()) {
 			if (viewer instanceof Player) {
-				ItemUtils.updateInventoryLater((Player) viewer);
+				if (!viewer.equals(owner)) {
+					ItemUtils.updateInventoryLater((Player) viewer);
+				}
 			}
 		}
 	}
