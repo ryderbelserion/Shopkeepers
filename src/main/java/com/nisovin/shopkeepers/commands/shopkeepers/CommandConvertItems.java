@@ -47,6 +47,8 @@ class CommandConvertItems extends Command {
 				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.CONVERT_ITEMS_OTHERS_PERMISSION);
 	}
 
+	// TODO Add a per-player timeout to prevent command spamming? Because this command might be performance heavy.
+
 	@Override
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
