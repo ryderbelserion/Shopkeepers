@@ -69,25 +69,34 @@ class CommandConvertItems extends Command {
 		// Note: This command converts all items, regardless of the 'convert-player-items' and related settings.
 		if (convertAll) {
 			// Handles content, armor and off hand items, cursor item, and inventory updating:
+			long start = System.nanoTime();
 			convertedStacks = ItemUtils.convertItems(inventory, (item) -> true, true);
+			long durationMillis = (System.nanoTime() - start) / 1000000L;
 			final int finalConvertedStacks = convertedStacks;
+			// Note: The conversion always has some performance impact, even if no items got actually converted. We
+			// therefore always print the debug messages to allow debugging the item conversion times.
 			Log.debug(Settings.DebugOptions.itemConversions,
 					() -> "Converted " + finalConvertedStacks + " item stacks in the inventory of player '"
-							+ targetPlayer.getName() + "'."
+							+ targetPlayer.getName() + "' (took " + durationMillis + " ms)."
 			);
 		} else {
 			// Only convert the held item:
 			ItemStack itemInHand = inventory.getItemInMainHand();
 			if (!ItemUtils.isEmpty(itemInHand)) {
+				long start = System.nanoTime();
 				ItemStack convertedItem = ItemUtils.convertItem(itemInHand);
+				long durationMillis = (System.nanoTime() - start) / 1000000L;
 				if (!itemInHand.isSimilar(convertedItem)) {
 					convertedStacks = 1;
 					inventory.setItemInMainHand(convertedItem);
 					targetPlayer.updateInventory();
-					Log.debug(Settings.DebugOptions.itemConversions,
-							() -> "Converted the held item stack of player '" + targetPlayer.getName() + "'."
-					);
 				}
+				// Note: The conversion always has some performance impact, even if no items got actually converted. We
+				// therefore always print the debug messages to allow debugging the item conversion times.
+				Log.debug(Settings.DebugOptions.itemConversions,
+						() -> "Converted the held item stack of player '" + targetPlayer.getName()
+								+ "' (took " + durationMillis + " ms)."
+				);
 			}
 		}
 

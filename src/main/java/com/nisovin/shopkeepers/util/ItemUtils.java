@@ -11,7 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
@@ -430,27 +431,20 @@ public final class ItemUtils {
 		return convertedItemStack;
 	}
 
-	private static final YamlConfiguration YAML_CONFIG = new YamlConfiguration();
-	private static final String ITEM_KEY = "item";
-
 	// Converts the given ItemStack to conform to Spigot's internal data format by running it through Spigot's item
 	// de/serialization. Use oldItemStack.isSimilar(newItemStack) to test whether the item has changed.
+	// Note: This is performing much better compared to serializing and deserializing a YAML config containing the item.
 	public static ItemStack convertItem(ItemStack itemStack) {
 		if (itemStack == null) return null;
-		ItemStack convertedItemStack;
-		try {
-			YAML_CONFIG.set(ITEM_KEY, itemStack);
-			String serialized = YAML_CONFIG.saveToString();
-			YAML_CONFIG.set(ITEM_KEY, null);
-			YAML_CONFIG.loadFromString(serialized);
-			convertedItemStack = YAML_CONFIG.getItemStack(ITEM_KEY);
-		} catch (Exception e) {
-			e.printStackTrace();
-			// Return original ItemStack:
+		ItemMeta itemMeta = itemStack.getItemMeta(); // can be null
+		Map<String, Object> serializedItemMeta = serializeItemMeta(itemMeta); // can be null
+		if (serializedItemMeta == null) {
+			// Item has no ItemMeta that could get converted:
 			return itemStack;
-		} finally {
-			YAML_CONFIG.set(ITEM_KEY, null); // reset
 		}
+		ItemMeta deserializedItemMeta = deserializeItemMeta(serializedItemMeta); // can be null
+		ItemStack convertedItemStack = itemStack.clone();
+		convertedItemStack.setItemMeta(deserializedItemMeta);
 		return convertedItemStack;
 	}
 
@@ -462,7 +456,6 @@ public final class ItemUtils {
 			ItemStack slotItem = contents[slot];
 			if (isEmpty(slotItem)) continue;
 			if (!filter.test(slotItem)) continue;
-			// TODO Serialize and deserialize items in bulk instead of individually?
 			ItemStack convertedItem = convertItem(slotItem);
 			if (!slotItem.isSimilar(convertedItem)) {
 				contents[slot] = convertedItem;
@@ -847,5 +840,30 @@ public final class ItemUtils {
 		default:
 			return null;
 		}
+	}
+
+	// ItemStack serialization
+
+	private static final String ITEM_META_SERIALIZATION_KEY = "ItemMeta";
+
+	static Map<String, Object> serializeItemMeta(ItemMeta itemMeta) {
+		// Check whether ItemMeta is empty; equivalent to ItemStack#hasItemMeta
+		if (itemMeta != null && !Bukkit.getItemFactory().equals(itemMeta, null)) {
+			return itemMeta.serialize(); // assert: not null nor empty
+		} else {
+			return null;
+		}
+	}
+
+	static ItemMeta deserializeItemMeta(Map<String, Object> itemMetaData) {
+		if (itemMetaData == null) return null;
+		// Get the class CraftBukkit internally uses for the deserialization:
+		Class<? extends ConfigurationSerializable> serializableItemMetaClass = ConfigurationSerialization.getClassByAlias(ITEM_META_SERIALIZATION_KEY);
+		if (serializableItemMetaClass == null) {
+			throw new IllegalStateException("Missing ItemMeta ConfigurationSerializable class for key/alias '" + ITEM_META_SERIALIZATION_KEY + "'!");
+		}
+		// Can be null:
+		ItemMeta itemMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(itemMetaData, serializableItemMetaClass);
+		return itemMeta;
 	}
 }

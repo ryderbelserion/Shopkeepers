@@ -10,8 +10,6 @@ import java.util.function.Consumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -22,7 +20,6 @@ public class ItemData implements Cloneable {
 
 	private static final Consumer<String> SILENT_WARNING_HANDLER = (warning) -> {
 	};
-	private static final String ITEM_META_SERIALIZATION_KEY = "ItemMeta";
 	private static final String META_TYPE_KEY = "meta-type";
 	private static final String DISPLAY_NAME_KEY = "display-name";
 	private static final String LORE_KEY = "lore";
@@ -119,16 +116,10 @@ public class ItemData implements Cloneable {
 				dataMap.put(LORE_KEY, TextUtils.colorizeUnknown((List<?>) loreData));
 			}
 
-			// deserialize item meta:
-			// get the class CraftBukkit internally uses for the deserialization:
-			Class<? extends ConfigurationSerializable> serializableItemMetaClass = ConfigurationSerialization.getClassByAlias(ITEM_META_SERIALIZATION_KEY);
-			if (serializableItemMetaClass == null) {
-				throw new IllegalStateException("Missing ItemMeta ConfigurationSerializable class for key/alias '" + ITEM_META_SERIALIZATION_KEY + "'!");
-			}
-			// can be null:
-			ItemMeta itemMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(dataMap, serializableItemMetaClass);
+			// Deserialize ItemMeta:
+			ItemMeta itemMeta = ItemUtils.deserializeItemMeta(dataMap); // can be null
 
-			// apply item meta:
+			// Apply ItemMeta:
 			dataItem.setItemMeta(itemMeta);
 		}
 
@@ -174,11 +165,10 @@ public class ItemData implements Cloneable {
 		// lazily cache the serialized data:
 		if (serializedData == null) {
 			ItemMeta itemMeta = dataItem.getItemMeta();
-			// check whether itemMeta is empty; equivalent to ItemStack#hasItemMeta
-			if (itemMeta != null && !Bukkit.getItemFactory().equals(itemMeta, null)) {
-				serializedData = itemMeta.serialize(); // assert: not null nor empty
-			} else {
-				serializedData = Collections.emptyMap(); // ensure field is not null after initialization
+			serializedData = ItemUtils.serializeItemMeta(itemMeta);
+			if (serializedData == null) {
+				// Ensure that the field is not null after initialization:
+				serializedData = Collections.emptyMap();
 			}
 		}
 		assert serializedData != null;
