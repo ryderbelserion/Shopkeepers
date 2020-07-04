@@ -39,6 +39,7 @@ import com.nisovin.shopkeepers.commands.Commands;
 import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.ConfigLoadException;
+import com.nisovin.shopkeepers.itemconversion.ItemConversions;
 import com.nisovin.shopkeepers.metrics.CitizensChart;
 import com.nisovin.shopkeepers.metrics.FeaturesChart;
 import com.nisovin.shopkeepers.metrics.GringottsChart;
@@ -110,6 +111,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	// shopkeeper storage:
 	private final SKShopkeeperStorage shopkeeperStorage = new SKShopkeeperStorage(this);
 
+	private final ItemConversions itemConversions = new ItemConversions(this);
 	private final Commands commands = new Commands(this);
 	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(this);
 	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(this);
@@ -374,6 +376,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			pm.registerEvents(new BlockZombieVillagerCuringListener(), this);
 		}
 
+		// item conversions:
+		itemConversions.onEnable();
+
 		// enable commands:
 		commands.onEnable();
 
@@ -476,6 +481,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// disable commands:
 		commands.onDisable();
+
+		// item conversions:
+		itemConversions.onDisable();
 
 		shopkeeperNaming.onDisable();
 		shopkeeperCreation.onDisable();

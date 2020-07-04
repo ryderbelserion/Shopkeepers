@@ -109,6 +109,10 @@ public class Settings {
 	public static String fileEncoding = "UTF-8";
 	public static boolean saveInstantly = true;
 
+	public static boolean convertPlayerItems = false;
+	public static boolean convertAllPlayerItems = true;
+	public static List<ItemData> convertPlayerItemsExceptions = new ArrayList<>();
+
 	/*
 	 * Plugin Compatibility
 	 */
@@ -701,12 +705,7 @@ public class Settings {
 			}
 			return material;
 		} else if (typeClass == ItemData.class) {
-			ItemData itemData = ItemData.deserialize(config.get(configKey), (warning) -> {
-				Log.warning("Config: Couldn't load item data for config entry '" + configKey + "': " + warning);
-				if (warning.contains("Unknown item type")) { // TODO this is ugly
-					Log.warning("Config: All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
-				}
-			});
+			ItemData itemData = loadItemData(config.get(configKey), configKey);
 			// normalize to not null:
 			if (itemData == null) {
 				itemData = new ItemData(Material.AIR);
@@ -724,11 +723,33 @@ public class Settings {
 				} else {
 					return stringList;
 				}
+			} else if (genericType == ItemData.class) {
+				List<?> list = config.getList(configKey, Collections.emptyList());
+				List<ItemData> itemDataList = new ArrayList<>(list.size());
+				int index = 0;
+				for (Object entry : list) {
+					index += 1;
+					ItemData itemData = loadItemData(entry, configKey + "[" + index + "]");
+					if (itemData != null) {
+						itemDataList.add(itemData);
+					}
+				}
+				return itemDataList;
 			} else {
-				return null; // not supported currently
+				throw new IllegalStateException("Unsupported config setting list type: " + genericType.getName());
 			}
 		}
-		return null;
+		throw new IllegalStateException("Unsupported config setting type: " + typeClass.getName());
+	}
+
+	private static ItemData loadItemData(Object dataObject, String configEntryIdentifier) {
+		ItemData itemData = ItemData.deserialize(dataObject, (warning) -> {
+			Log.warning("Config: Couldn't load item data for config entry '" + configEntryIdentifier + "': " + warning);
+			if (warning.contains("Unknown item type")) { // TODO this is ugly
+				Log.warning("Config: All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
+			}
+		});
+		return itemData;
 	}
 
 	private static void setConfigValue(Configuration config, String configKey, List<String> noColorConversionKeys, Class<?> typeClass, Class<?> genericType, Object value) {

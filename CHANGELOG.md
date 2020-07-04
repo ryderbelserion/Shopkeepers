@@ -12,6 +12,10 @@ Date format: (YYYY-MM-DD)
   * This command can be used to convert the held (or all) items to conform to Spigot's internal data format. I.e. this runs the items through Spigot's item serialization and deserialization in the same way as it would happen when these items are used inside shopkeeper trades and the plugin gets reloaded.
   * Added corresponding permission node `shopkeeper.convertitems.own` (default: op). This allows converting own items.
   * Added corresponding permission node `shopkeeper.convertitems.others` (default: op). This allows converting items of other players.
+* Added config options for the automatic conversion of items inside the inventories of players and shop chests to Spigot's internal data format whenever a player is about to open a shopkeeper UI (eg. trading, editor, hiring, etc.).
+  * Added config option `convert-player-items` (default: false). This enables and disables the automatic item conversion.
+  * Added config options `convert-all-player-items` (default: true) and 'convert-player-items-exceptions' (default: []). These two settings allow limiting which items are affected or ignored by the automatic conversion.
+  * Note: Enabling this setting comes with a performance impact. You should generally try to avoid having to use this setting and instead search for alternative solutions. For more information, see the notes on this setting inside the default config.
 * Debug: Added debug option 'item-conversions' which logs whenever we explicitly convert items to Spigot's data format. Note that this does not log when items get implicitly converted, which may happen under various circumstances.
 * Config: Added option 'max-trades-pages' (default: 5, min: 1, max: 10) which allows changing the number of pages that can be filled with trading options. This limit applies to all shopkeepers (there are no different settings for different types of shops or different permission levels so far). Note: The scroll bar rendered by the Minecraft client will only work nicely for up to 64 trades.
 * Added: It is now possible to change the size of slimes and magma cubes. Their default size is 1 (tiny). Even though Minecraft theoretically allows sizes up to 256, we limit the max size to 10. This avoids running into issues such as related to rendering, performance and not being able to interact with the slime or magma cube. If you have market areas where players can create their own shops and they are able to create slime or magma cube shopkeepers, you might want to take this maximum slime/magma cube size into account when assigning shop areas to players.
@@ -20,6 +24,8 @@ Date format: (YYYY-MM-DD)
 
 Internal changes:
 * Slightly changed how we cycle through the villager levels (badge colors).
+* Added support for Lists of ItemData inside the config.
+* We throw an exception now when we encounter an unexpected / not yet handled config setting type.
 
 Added messages:  
 * msg-currency-items-given

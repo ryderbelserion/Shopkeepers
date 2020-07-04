@@ -412,6 +412,19 @@ public final class ItemUtils {
 		return data.equals(target);
 	}
 
+	public static Predicate<ItemStack> matchingItems(List<ItemData> itemDataList) {
+		Validate.notNull(itemDataList, "itemDataList is null");
+		return (item) -> {
+			if (isEmpty(item)) return false;
+			for (ItemData itemData : itemDataList) {
+				if (itemData != null && itemData.matches(item)) {
+					return true;
+				} // else: continue
+			}
+			return false;
+		};
+	}
+
 	// ItemStack migration
 
 	private static Inventory DUMMY_INVENTORY = null;

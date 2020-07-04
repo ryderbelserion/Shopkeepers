@@ -44,6 +44,38 @@ file-encoding: "UTF-8"
 # might be a good idea to disable this for performance reasons.
 save-instantly: true
 
+# Enables the automatic conversion of items inside the inventories of players
+# and shop chests whenever a player opens a shopkeeper UI (eg. trading, editor,
+# hiring, etc.) The items are converted to conform to Spigot's internal data
+# format.
+# This setting helps with issues related to items which have been created on
+# previous Spigot versions or via some Minecraft mechanism (eg. give command,
+# loot tables, etc.) no longer getting accepted when trading with shopkeepers.
+# In order for the items to get reliably accepted during trades, their data has
+# to match the internal format which Spigot uses when a plugin would create the
+# same items via the Spigot API. Spigot occasionally makes changes to this
+# internal data format. Any previously created items, or newly created items
+# which don't conform to this new format, may cause trading and item stacking
+# issues then.
+# This setting is intended to help with the portion of the issue affecting
+# shopkeeper trades. This setting will not reliably help you prevent item
+# stacking related issues!
+# Enabling this setting comes with a performance impact! Try to avoid using
+# this option and search for alternative solutions instead (eg. stick to
+# Spigot's data format when creating items via Minecraft mechanisms). Try to
+# only keep this setting enabled for as long as required (eg. until you assume
+# that most of your players' legacy items got converted by now).
+convert-player-items: false
+# If 'convert-player-items' is enabled, this setting toggles whether the
+# 'convert-player-items-exceptions' setting acts as black- or whitelist.
+# If enabled, all items inside the checked inventories will be converted except
+# those that match the items specified by 'convert-player-items-exceptions'.
+# If disabled, only items that match the items specified by
+# 'convert-player-items-exceptions' get converted.
+convert-all-player-items: true
+# Black- or whitelist of items affected by the 'convert-player-items' setting.
+convert-player-items-exceptions: []
+
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Plugin Compatibility
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
