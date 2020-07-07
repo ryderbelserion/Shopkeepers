@@ -122,6 +122,7 @@ class LivingEntityShopListener implements Listener {
 		// and tricks the plugin into thinking that the editor or trading UI got opened even though the book got opened
 		// instead. We therefore ignore any interactions with shopkeeper mobs for now when the interacting player is
 		// holding a written book.
+		// TODO This has been fixed in MC 1.16. Remove this check once we only support MC 1.16 and above.
 		if (hasWrittenBookInHand(player)) {
 			Log.debug("  Ignoring interaction due to holding a written book in main or off hand. See Minecraft issue MC-141494.");
 			return;

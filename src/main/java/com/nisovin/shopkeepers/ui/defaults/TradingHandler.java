@@ -292,7 +292,7 @@ public class TradingHandler extends UIHandler {
 
 		// prevent unsupported types of special clicks:
 		if (action == InventoryAction.COLLECT_TO_CURSOR && ItemUtils.isSimilar(resultItem, cursor)) {
-			// TODO might no longer be support in 1.14 and 1.15, see: https://bugs.mojang.com/browse/MC-148867
+			// TODO might no longer be supported in 1.14 and 1.15, see: https://bugs.mojang.com/browse/MC-148867
 			// weird behavior and buggy, see MC-129515
 			// for now: only allowed if the item on the cursor and inside the result slot are different
 			// TODO maybe replicate the behavior of this inventory action, but limit its effect to the player's
