@@ -9,7 +9,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
@@ -128,7 +127,9 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		}
 
 		// create npc:
-		Location spawnLocation = this.getSpawnLocation();
+		// Note: The spawn location can be null if the world is not loaded currently. We can still create the NPC, but
+		// spawning will happen later once the world is loaded.
+		Location spawnLocation = this.getSpawnLocation(); // can be null
 		npcUniqueId = citizensShops.createNPC(spawnLocation, entityType, name);
 		shopkeeper.markDirty();
 	}
@@ -210,7 +211,9 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	}
 
 	private Location getSpawnLocation() {
+		assert shopkeeper.getWorldName() != null;
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
+		if (world == null) return null; // world not loaded currently
 		return new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
 	}
 
@@ -240,16 +243,31 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		NPC npc = this.getNPC();
 		if (npc == null) {
 			// Not going to force Citizens creation, this seems like it could go really wrong.
-		} else {
-			Location currentLocation = npc.getStoredLocation();
-			Location expectedLocation = this.getSpawnLocation();
-			if (currentLocation == null) {
-				npc.teleport(expectedLocation, PlayerTeleportEvent.TeleportCause.PLUGIN);
-				Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") had no location, teleported");
-			} else if (!currentLocation.getWorld().equals(expectedLocation.getWorld()) || currentLocation.distanceSquared(expectedLocation) > 1.0D) {
-				shopkeeper.setLocation(currentLocation);
-				Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") out of place, re-indexing");
-			}
+			return false;
+		}
+
+		Location expectedLocation = this.getSpawnLocation();
+		if (expectedLocation == null) {
+			// The spawn location's world is not loaded currently.
+			return false;
+		}
+		assert expectedLocation.getWorld() != null;
+
+		Location currentLocation = npc.getStoredLocation();
+		if (currentLocation == null) {
+			assert !npc.isSpawned();
+			// This will log a debug message from Citizens if it cannot spawn the NPC currently, but will then later
+			// attempt to spawn it when the chunk gets loaded:
+			npc.spawn(expectedLocation);
+			Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") had no location, attempted spawn");
+			return false;
+		}
+		assert currentLocation.getWorld() != null; // Citizens will return a null Location in this case
+
+		if (!expectedLocation.getWorld().equals(currentLocation.getWorld()) || expectedLocation.distanceSquared(currentLocation) > 1.0D) {
+			shopkeeper.setLocation(currentLocation);
+			Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") out of place, re-indexing");
+			return false;
 		}
 		return false;
 	}

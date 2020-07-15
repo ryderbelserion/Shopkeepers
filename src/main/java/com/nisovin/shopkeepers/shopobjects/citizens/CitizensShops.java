@@ -193,10 +193,14 @@ public class CitizensShops {
 		if (npc == null) return null;
 		// look towards near players:
 		npc.getTrait(LookClose.class).lookClose(true);
-		// this will log a debug message from citizens if it currently cannot spawn this npc,
-		// but will then later attempt to spawn it when the chunk is loaded:
-		npc.spawn(location);
-		// npc.teleport(loc, PlayerTeleportEvent.TeleportCause.PLUGIN);
+		if (location != null) {
+			// This will log a debug message from Citizens if it cannot spawn the NPC currently, but will then later
+			// attempt to spawn it when the chunk gets loaded:
+			npc.spawn(location);
+		} else {
+			// Our teleport task will periodically call SKCitizensShopObject#check(), which spawns the NPC if this has
+			// not yet happened (if it has no location assigned yet).
+		}
 		return npc.getUniqueId();
 	}
 

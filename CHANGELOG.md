@@ -21,6 +21,8 @@ Date format: (YYYY-MM-DD)
 * Added: It is now possible to change the size of slimes and magma cubes. Their default size is 1 (tiny). Even though Minecraft theoretically allows sizes up to 256, we limit the max size to 10. This avoids running into issues such as related to rendering, performance and not being able to interact with the slime or magma cube. If you have market areas where players can create their own shops and they are able to create slime or magma cube shopkeepers, you might want to take this maximum slime/magma cube size into account when assigning shop areas to players.
 * Fixed: Slimes and magma cubes no longer spawn with random size whenever they are respawned.
 * Fixed: Various optional (context dependent) command arguments were shown to be required inside the Shopkeepers command help.
+* Fixed: We no longer attempt to spawn Citizens NPCs when creating or loading Citizens shopkeepers if the spawn location's world is not loaded currently.
+* Fixed: Some versions of Citizens would produce an error when we try to teleport a NPC which has no location and is therefore not spawned currently. The teleport attempt has been replaced with an attempt to spawn the NPC.
 
 Internal changes:
 * Slightly changed how we cycle through the villager levels (badge colors).
