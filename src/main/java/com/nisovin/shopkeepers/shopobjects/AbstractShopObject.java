@@ -141,7 +141,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * It makes sure that everything is still alright with the shop object.<br>
 	 * Ex: Attempts to respawn shop entities, teleports them back into place, informs about their removal.
 	 * 
-	 * @return <code>true</code> to if the shop object might no longer be active or its id has changed
+	 * @return <code>true</code> if the shop object might no longer be active or its id has changed
 	 */
 	public abstract boolean check();
 
