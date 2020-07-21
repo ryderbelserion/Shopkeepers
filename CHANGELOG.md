@@ -1,7 +1,7 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.10.1 (TBA)
+## v2.11.0 (TBA)
 ### Supported MC versions: 1.16.1, 1.15.2, 1.14.4
 
 * Added: New command `/shopkeeper givecurrency [player] ['low'|'high'] [amount]`.
