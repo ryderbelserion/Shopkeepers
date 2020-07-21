@@ -50,7 +50,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <ul>
 	 * <li> VILLAGER: okay, default, MC 1.14: shake their head when clicked (TODO might be a upstream bug)
 	 * <li> BAT: experimental: requires NoAI, sleeping by default, but starts flying when 'hit'
-	 * <li> BLAZE: experimental: starts flying upwards -> NoAI for now, seems okay
+	 * <li> BLAZE: experimental: starts flying upwards -> requires NoAI, seems okay
 	 * <li> CAVE_SPIDER: okay
 	 * <li> CHICKEN: might still lays eggs (TODO re-check: this might no longer be the case), seems okay
 	 * <li> COW: okay
@@ -66,7 +66,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> PIG: okay
 	 * <li> PIG_ZOMBIE: okay; replaced by ZOMBIFIED_PIGLIN in MC 1.16
 	 * <li> SHEEP: okay
-	 * <li> SILVERFISH: experimental, strange movement when the player is standing behind it -> NoAI for now
+	 * <li> SILVERFISH: experimental, strange movement when the player is standing behind it -> requires NoAI
 	 * <li> SKELETON: okay
 	 * <li> SLIME: okay, would usually spawn with random size
 	 * <li> SNOWMAN: okay

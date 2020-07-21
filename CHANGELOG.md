@@ -36,6 +36,7 @@ Internal changes:
 Config changes:  
 * The default value of the `prevent-shop-creation-item-regular-usage` setting was changed to `true`.
 * The default value of the `shop-creation-item` setting was changed to a villager spawn egg with display name `&aShopkeeper`. You can give yourself this item in game via the `/shopkeeper give` command.
+* The `use-legacy-mob-behavior` setting was broken since MC 1.14 and has been removed now. All shopkeeper entities always use the NoAI flag now.
 
 Added messages:  
 * msg-currency-items-given

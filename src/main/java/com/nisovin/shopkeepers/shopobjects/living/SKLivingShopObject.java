@@ -293,33 +293,17 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		// nothing to do by default
 	}
 
-	// some mobs will always get their AI disabled in order to properly work:
-	protected boolean isNoAIMobType() {
-		switch (livingObjectType.getEntityType()) {
-		case BAT:
-		case ENDER_DRAGON:
-		case ENDERMAN:
-		case WITHER:
-		case SILVERFISH:
-		case BLAZE:
-			return true;
-		default:
-			return false;
-		}
-	}
-
 	protected void overwriteAI() {
-		// setting the entity non-collidable:
+		// Setting the entity non-collidable:
 		entity.setCollidable(false);
+		// TODO Only required to handle the 'look-at-nearby-player' behavior. Maybe replace this with something own?
 		NMSManager.getProvider().overwriteLivingEntityAI(entity);
 
-		if (!Settings.useLegacyMobBehavior) {
-			// disable AI (also disables gravity) and replace it with our own handling:
-			this.setNoAI(entity);
+		// Disable AI (also disables gravity) and replace it with our own handling:
+		this.setNoAI(entity);
 
-			if (NMSManager.getProvider().supportsCustomMobAI()) {
-				livingShops.getLivingEntityAI().addEntity(entity);
-			}
+		if (NMSManager.getProvider().supportsCustomMobAI()) {
+			livingShops.getLivingEntityAI().addEntity(entity);
 		}
 
 		if (Settings.silenceLivingShopEntities) {
@@ -327,18 +311,20 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		}
 		if (Settings.disableGravity) {
 			this.setNoGravity(entity);
-			// when gravity gets disabled, we might be able to also disable collisions/pushing of mobs via noclip:
+			// When gravity gets disabled, we might be able to also disable collisions/pushing of mobs via noclip:
+			// TODO Still required? Bukkit's setCollidable API might actually work now.
 			NMSManager.getProvider().setNoclip(entity);
-		}
-
-		// set the NoAI tag always for certain entity types:
-		if (this.isNoAIMobType()) {
-			this.setNoAI(entity);
 		}
 	}
 
 	protected final void setNoAI(E entity) {
 		entity.setAI(false);
+		// Note on Bukkit's 'isAware' flag added in MC 1.15: Disables the AI logic similarly to NoAI, but the mob can
+		// still move when being pushed around or due to gravity.
+		// TODO The collidable API has been reworked to actually work now. Together with the isAware flag this could be
+		// an alternative to using NoAI and then having to handle gravity on our own.
+		// However, for now we prefer using NoAI. This might be safer in regards to potential future issues and also
+		// automatically handles other cases, like players pushing entities around by hitting them.
 
 		// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes that
 		// it is currently falling:

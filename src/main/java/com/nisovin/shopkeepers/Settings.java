@@ -214,7 +214,6 @@ public class Settings {
 			"STRIDER" // MC 1.16
 	);
 
-	public static boolean useLegacyMobBehavior = false;
 	public static boolean disableGravity = false;
 	public static int gravityChunkRange = 4;
 	public static boolean silenceLivingShopEntities = true;

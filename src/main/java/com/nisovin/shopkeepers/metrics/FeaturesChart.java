@@ -31,7 +31,6 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 			addFeatureEntry(allFeatures, "enable-citizen-shops", Settings.enableCitizenShops && CitizensHandler.isPluginEnabled());
 
 			// mob behavior features:
-			addFeatureEntry(allFeatures, "use-legacy-mob-behavior", Settings.useLegacyMobBehavior);
 			addFeatureEntry(allFeatures, "disable-gravity", Settings.disableGravity);
 			addFeatureEntry(allFeatures, "increased gravity chunk range", Settings.gravityChunkRange > 4);
 			addFeatureEntry(allFeatures, "decreased gravity chunk range", Settings.gravityChunkRange < 4);
