@@ -179,13 +179,17 @@ permissions:
             shopkeeper.remove.all: true
             shopkeeper.remove.admin: true
             shopkeeper.give: true
+            shopkeeper.givecurrency: true
+            shopkeeper.convertitems.own: true
+            shopkeeper.convertitems.others: true
             shopkeeper.remote: true
+            shopkeeper.remote.otherplayers: true
             shopkeeper.remoteedit: true
             shopkeeper.transfer: true
             shopkeeper.settradeperm: true
             shopkeeper.setforhire: true
-            shopkeeper.hire: true
             shopkeeper.trade: true
+            shopkeeper.hire: true
             shopkeeper.bypass: true
             shopkeeper.admin: true
             shopkeeper.player: true
