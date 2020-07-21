@@ -20,7 +20,7 @@ commands:
 permissions:
     # Command permissions:
     shopkeeper.help:
-        description: Display command help
+        description: Display the command help
         default: true
     shopkeeper.reload:
         description: Reload the plugin
@@ -131,37 +131,15 @@ permissions:
         description: Create citizens (npc) shopkeepers
         default: op
     shopkeeper.entity.*:
-        description: Create shopkeepers of any entity types
-        default: op
+        description: Create shopkeepers of any mob type
+        default: true
     # Dynamic mob type permissions:
     # You can find all entity type names here:
     # https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html
     # The permissions use the lower case entity type name.
     # shopkeeper.entity.<mob-type>:
-    #   description: Create shopkeepers of the specified mob type
+    #   description: Create shopkeepers of the specific mob type
     #   default: false
-
-    # Legacy permissions:
-    shopkeeper.player.normal:
-        description: Create and modify selling player shopkeepers
-        default: true
-        children:
-            shopkeeper.player.sell: true
-    shopkeeper.villager:
-        description: Create villager shopkeepers
-        default: true
-        children:
-            shopkeeper.entity.villager: true
-    shopkeeper.witch:
-        description: Create witch shopkeepers
-        default: true
-        children:
-            shopkeeper.entity.witch: true
-    shopkeeper.creeper:
-        description: Create creeper shopkeepers
-        default: true
-        children:
-            shopkeeper.entity.creeper: true
 
     # Star notation: Includes all other permissions
     shopkeeper.*:

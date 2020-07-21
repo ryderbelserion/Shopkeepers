@@ -24,6 +24,8 @@ Date format: (YYYY-MM-DD)
 * Fixed: We no longer attempt to spawn Citizens NPCs when creating or loading Citizens shopkeepers if the spawn location's world is not loaded currently.
 * Fixed: Some versions of Citizens would produce an error when we try to teleport a NPC which has no location and is therefore not spawned currently. The teleport attempt has been replaced with an attempt to spawn the NPC.
 * Fixed: The `shopkeeper.*` permission was missing some child permissions.
+* Removed: The legacy permissions `shopkeeper.player.normal`, `shopkeeper.villager`, `shopkeeper.witch` and `shopkeeper.creeper` have been removed. Use the corresponding replacement permissions instead.
+* Changed: All players have access to all mob types (permission `shopkeeper.entity.*`) by default now.
 
 Internal changes:
 * Slightly changed how we cycle through the villager levels (badge colors).
