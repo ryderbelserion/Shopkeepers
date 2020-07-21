@@ -23,7 +23,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeepersStartupEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
@@ -73,6 +72,7 @@ import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
+import com.nisovin.shopkeepers.util.ClassUtils;
 import com.nisovin.shopkeepers.util.DebugListener;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
@@ -126,18 +126,21 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private boolean incompatibleServer = false;
 	private ConfigLoadException configLoadError = null; // null on success
 
-	private void loadRequiredClasses() {
-		// making sure that certain classes, that are needed during shutdown, are loaded:
-		// this helps for hot reloads (when the plugin gets disabled, but the original jar got replaced and is therefore
-		// no longer available)
-		// TODO pre-load all classes?
-		try {
-			Class.forName(SchedulerUtils.class.getName());
-			Class.forName(ShopkeeperRemoveEvent.class.getName());
-			Class.forName(ShopkeeperRemoveEvent.Cause.class.getName());
-			Class.forName("com.nisovin.shopkeepers.storage.SKShopkeeperStorage$SaveResult$State");
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+	private void loadAllPluginClasses() {
+		File pluginJarFile = this.getFile();
+		long start = System.nanoTime();
+		boolean success = ClassUtils.loadAllClassesFromJar(pluginJarFile, className -> {
+			// Skip version dependent classes:
+			if (className.startsWith("com.nisovin.shopkeepers.compat.")) return false;
+			// Skip classes which interact with optional dependencies:
+			if (className.equals("com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler$Internal")) return false;
+			if (className.equals("com.nisovin.shopkeepers.shopobjects.citizens.CitizensShopkeeperTrait")) return false;
+			if (className.equals("com.nisovin.shopkeepers.spigot.text.SpigotText$Internal")) return false;
+			return true;
+		});
+		if (success) {
+			long durationMillis = (System.nanoTime() - start) / 1000000L;
+			Log.info("Loaded all plugin classes (" + durationMillis + " ms)");
 		}
 	}
 
@@ -233,10 +236,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		plugin = this;
 		ShopkeepersAPI.enable(this);
 
-		// making sure that certain classes, that are needed during shutdown, are loaded:
-		// this helps for hot reloads (when the plugin gets disabled, but the original jar got replaced and is therefore
-		// no longer available)
-		this.loadRequiredClasses();
+		// Loading all plugin classes up front ensures that we don't run into missing classes (usually during shutdown)
+		// when the plugin jar gets replaced during runtime (eg. for hot reloads):
+		this.loadAllPluginClasses();
 
 		// validate that this server is running a minimum required version:
 		this.outdatedServer = this.isOutdatedServerVersion();

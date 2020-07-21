@@ -28,6 +28,7 @@ Internal changes:
 * Slightly changed how we cycle through the villager levels (badge colors).
 * Added support for Lists of ItemData inside the config.
 * We throw an exception now when we encounter an unexpected / not yet handled config setting type.
+* We load all plugin classes up front now. This should avoid issues when the plugin jar gets replaced during runtime (eg. for hot reloads).
 
 Added messages:  
 * msg-currency-items-given
