@@ -30,6 +30,10 @@ Internal changes:
 * We throw an exception now when we encounter an unexpected / not yet handled config setting type.
 * We load all plugin classes up front now. This should avoid issues when the plugin jar gets replaced during runtime (eg. for hot reloads).
 
+Config changes:  
+* The default value of the `prevent-shop-creation-item-regular-usage` setting was changed to `true`.
+* The default value of the `shop-creation-item` setting was changed to a villager spawn egg with display name `&aShopkeeper`. You can give yourself this item in game via the `/shopkeeper give` command.
+
 Added messages:  
 * msg-currency-items-given
 * msg-high-currency-items-given

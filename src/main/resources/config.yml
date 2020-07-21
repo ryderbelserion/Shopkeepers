@@ -116,11 +116,14 @@ enable-towny-restrictions: false
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
 # The item used to create player shops.
-shop-creation-item: VILLAGER_SPAWN_EGG
+# Use the '/shopkeeper give' command to give yourself this item in-game.
+shop-creation-item:
+  type: VILLAGER_SPAWN_EGG
+  display-name: "&aShopkeeper"
 
 # Whether to prevent normal usage of the shop-creation item. Players with the
 # bypass permission (usually admins) can bypass this.
-prevent-shop-creation-item-regular-usage: false
+prevent-shop-creation-item-regular-usage: true
 # Whether deleting (or destroying) a player shopkeeper returns (drops) the
 # shop-creation item.
 deleting-player-shop-returns-creation-item: false
