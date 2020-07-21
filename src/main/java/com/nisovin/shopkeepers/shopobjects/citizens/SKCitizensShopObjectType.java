@@ -49,6 +49,6 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 
 	@Override
 	public boolean isEnabled() {
-		return Settings.enableCitizenShops && citizensShops.isEnabled();
+		return citizensShops.isEnabled();
 	}
 }

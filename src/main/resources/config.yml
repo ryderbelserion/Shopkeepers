@@ -254,7 +254,7 @@ always-show-nameplates: false
 nameplate-prefix: "&a"
 
 # Whether to allow citizen (npc) shops. Requires the plugin Citizens.
-enable-citizen-shops: false
+enable-citizen-shops: true
 
 # Whether to allow sign shops.
 enable-sign-shops: true

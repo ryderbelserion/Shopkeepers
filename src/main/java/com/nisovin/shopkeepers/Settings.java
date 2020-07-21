@@ -222,7 +222,7 @@ public class Settings {
 	public static boolean alwaysShowNameplates = false;
 	public static String nameplatePrefix = "&a";
 
-	public static boolean enableCitizenShops = false;
+	public static boolean enableCitizenShops = true;
 
 	public static boolean enableSignShops = true;
 	public static boolean enableSignPostShops = true;

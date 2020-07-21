@@ -100,7 +100,7 @@ public class CitizensShops {
 
 		if (!Settings.enableCitizenShops) return; // feature disabled
 		if (!CitizensHandler.isPluginEnabled()) {
-			Log.warning("Citizens Shops enabled, but Citizens plugin not found or disabled.");
+			Log.debug("Citizen shops enabled, but Citizens plugin not found or disabled.");
 			return;
 		}
 		Log.info("Citizens found, enabling NPC shopkeepers.");
