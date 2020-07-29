@@ -35,18 +35,18 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			recipes.add(recipe);
 		}
 
-		// add empty offers for items from the chest:
-		List<ItemCount> chestItems = shopkeeper.getItemsFromChest();
-		for (int chestItemIndex = 0; chestItemIndex < chestItems.size(); chestItemIndex++) {
-			ItemCount itemCount = chestItems.get(chestItemIndex);
-			ItemStack itemFromChest = itemCount.getItem(); // this item is already a copy with amount 1
+		// add empty offers for items from the container:
+		List<ItemCount> containerItems = shopkeeper.getItemsFromContainer();
+		for (int containerItemIndex = 0; containerItemIndex < containerItems.size(); containerItemIndex++) {
+			ItemCount itemCount = containerItems.get(containerItemIndex);
+			ItemStack itemFromContainer = itemCount.getItem(); // this item is already a copy with amount 1
 
-			if (shopkeeper.getOffer(itemFromChest) != null) {
+			if (shopkeeper.getOffer(itemFromContainer) != null) {
 				continue; // already added
 			}
 
 			// add recipe:
-			TradingRecipeDraft recipe = this.createTradingRecipeDraft(itemFromChest, 0);
+			TradingRecipeDraft recipe = this.createTradingRecipeDraft(itemFromContainer, 0);
 			recipes.add(recipe);
 		}
 

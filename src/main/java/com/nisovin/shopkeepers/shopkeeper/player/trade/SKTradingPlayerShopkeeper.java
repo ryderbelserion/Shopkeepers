@@ -93,16 +93,16 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	@Override
 	public List<TradingRecipe> getTradingRecipes(Player player) {
 		List<TradingRecipe> recipes = new ArrayList<>();
-		List<ItemCount> chestItems = this.getItemsFromChest();
+		List<ItemCount> containerItems = this.getItemsFromContainer();
 		for (TradingOffer offer : this.getOffers()) {
 			ItemStack resultItem = offer.getResultItem();
 			assert !ItemUtils.isEmpty(resultItem);
-			int itemAmountInChest = 0;
-			ItemCount itemCount = ItemCount.findSimilar(chestItems, resultItem);
+			int itemAmountInContainer = 0;
+			ItemCount itemCount = ItemCount.findSimilar(containerItems, resultItem);
 			if (itemCount != null) {
-				itemAmountInChest = itemCount.getAmount();
+				itemAmountInContainer = itemCount.getAmount();
 			}
-			boolean outOfStock = (itemAmountInChest < resultItem.getAmount());
+			boolean outOfStock = (itemAmountInContainer < resultItem.getAmount());
 			TradingRecipe recipe = ShopkeepersAPI.createTradingRecipe(resultItem, offer.getItem1(), offer.getItem2(), outOfStock);
 			if (recipe != null) {
 				recipes.add(recipe);
@@ -111,8 +111,8 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 		return Collections.unmodifiableList(recipes);
 	}
 
-	protected List<ItemCount> getItemsFromChest() {
-		return this.getItemsFromChest(null);
+	protected List<ItemCount> getItemsFromContainer() {
+		return this.getItemsFromContainer(null);
 	}
 
 	// OFFERS:

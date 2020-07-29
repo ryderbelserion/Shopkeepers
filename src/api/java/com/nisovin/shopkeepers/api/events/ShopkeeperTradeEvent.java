@@ -19,8 +19,8 @@ import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
  * All other preconditions regarding the trade have already been checked before this event gets called. So if this event
  * does not get cancelled you can assume that the trade is going to get applied.
  * <p>
- * DO NOT modify the corresponding {@link InventoryClickEvent}, any affected inventories (player, merchant, chest, ..),
- * or any other state which might be affected by the trade during the handling of this event!
+ * DO NOT modify the corresponding {@link InventoryClickEvent}, any affected inventories (player, merchant, shop
+ * container, ..), or any other state which might be affected by the trade during the handling of this event!
  */
 public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable {
 

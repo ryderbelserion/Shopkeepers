@@ -8,7 +8,6 @@ import java.util.Objects;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -23,6 +22,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.book.BookPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
@@ -106,8 +106,8 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	@Override
 	public List<TradingRecipe> getTradingRecipes(Player player) {
 		List<TradingRecipe> recipes = new ArrayList<>();
-		boolean hasBlankBooks = this.hasChestBlankBooks();
-		List<ItemCount> bookItems = this.getCopyableBooksFromChest();
+		boolean hasBlankBooks = this.hasContainerBlankBooks();
+		List<ItemCount> bookItems = this.getCopyableBooksFromContainer();
 		for (BookOffer offer : this.getOffers()) {
 			String bookTitle = offer.getBookTitle();
 			ItemStack bookItem = this.getBookItem(bookItems, bookTitle);
@@ -128,8 +128,8 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		return Collections.unmodifiableList(recipes);
 	}
 
-	protected List<ItemCount> getCopyableBooksFromChest() {
-		return this.getItemsFromChest(ITEM_FILTER);
+	protected List<ItemCount> getCopyableBooksFromContainer() {
+		return this.getItemsFromContainer(ITEM_FILTER);
 	}
 
 	protected ItemStack getBookItem(List<ItemCount> itemCounts, String title) {
@@ -186,11 +186,11 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		return title;
 	}
 
-	protected boolean hasChestBlankBooks() {
-		Block chest = this.getChest();
-		if (ItemUtils.isChest(chest.getType())) {
-			Inventory chestInventory = ((Chest) chest.getState()).getInventory();
-			return chestInventory.contains(Material.WRITABLE_BOOK);
+	protected boolean hasContainerBlankBooks() {
+		Block container = this.getContainer();
+		if (ShopContainers.isSupportedContainer(container.getType())) {
+			Inventory inventory = ShopContainers.getInventory(container);
+			return inventory.contains(Material.WRITABLE_BOOK);
 		}
 		return false;
 	}

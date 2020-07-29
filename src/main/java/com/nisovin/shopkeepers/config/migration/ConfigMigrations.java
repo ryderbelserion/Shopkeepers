@@ -15,7 +15,11 @@ public class ConfigMigrations {
 	private static final int FIRST_VERSION = 0; // also applies if the config version is missing
 
 	// each index corresponds to a source config version and its migration to the next version
-	private static final List<ConfigMigration> migrations = Arrays.asList(new ConfigMigration1(), new ConfigMigration2());
+	private static final List<ConfigMigration> migrations = Arrays.asList(
+			new ConfigMigration1(),
+			new ConfigMigration2(),
+			new ConfigMigration3()
+	);
 
 	public static int getLatestVersion() {
 		return migrations.size();

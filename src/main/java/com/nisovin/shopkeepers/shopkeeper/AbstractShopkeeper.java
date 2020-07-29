@@ -527,8 +527,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		Validate.notNull(world, "Location's world is null!");
 
 		ChunkCoords oldChunk = this.getChunkCoords();
-		// TODO changing the world is not safe (at least not for all types of shops)! consider for example player shops
-		// which currently use the worldname to locate their chest
+		// TODO Changing the world is not safe (at least not for all types of shops)! Consider for example player shops
+		// which currently use the world name to locate their container
 		worldName = world.getName();
 		x = location.getBlockX();
 		y = location.getBlockY();
@@ -703,7 +703,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * This is called periodically (roughly once per second) for shopkeepers in active chunks.
 	 * <p>
-	 * This can for example be used for checks that need to happen periodically, such as checking if the chest for a
+	 * This can for example be used for checks that need to happen periodically, such as checking if the container of a
 	 * player shop still exists.
 	 * <p>
 	 * If the check to perform is potentially heavy or not required to happen every second, the shopkeeper may decide to

@@ -13,97 +13,98 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class ShopkeeperCreation {
 
 	private final SKShopkeepersPlugin plugin;
-	private final Map<String, List<String>> recentlyPlacedChests = new HashMap<>();
-	private final Map<String, Block> selectedChest = new HashMap<>();
+	private final Map<String, List<String>> recentlyPlacedContainers = new HashMap<>();
+	private final Map<String, Block> selectedContainer = new HashMap<>();
 
 	public ShopkeeperCreation(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
 
 	public void onEnable() {
-		Bukkit.getPluginManager().registerEvents(new RecentlyPlacedChestsListener(this), plugin);
+		Bukkit.getPluginManager().registerEvents(new RecentlyPlacedContainersListener(this), plugin);
 		Bukkit.getPluginManager().registerEvents(new CreateListener(plugin, this), plugin);
 	}
 
 	public void onDisable() {
-		selectedChest.clear();
-		// note: recentlyPlacedChests does not get cleared here to persist across plugin reloads
+		selectedContainer.clear();
+		// Note: recentlyPlacedContainers does not get cleared here to persist across plugin reloads.
 	}
 
 	public void onPlayerQuit(Player player) {
 		assert player != null;
 		String playerName = player.getName();
-		selectedChest.remove(playerName);
-		recentlyPlacedChests.remove(playerName);
+		selectedContainer.remove(playerName);
+		recentlyPlacedContainers.remove(playerName);
 	}
 
-	// RECENTLY PLACED CHESTS
+	// RECENTLY PLACED CONTAINERS
 
-	public void addRecentlyPlacedChest(Player player, Block chest) {
-		assert player != null && chest != null;
+	public void addRecentlyPlacedContainer(Player player, Block container) {
+		assert player != null && container != null;
 		String playerName = player.getName();
-		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
+		List<String> recentlyPlaced = recentlyPlacedContainers.get(playerName);
 		if (recentlyPlaced == null) {
 			recentlyPlaced = new LinkedList<>();
-			recentlyPlacedChests.put(playerName, recentlyPlaced);
+			recentlyPlacedContainers.put(playerName, recentlyPlaced);
 		}
-		recentlyPlaced.add(TextUtils.getLocationString(chest));
+		recentlyPlaced.add(TextUtils.getLocationString(container));
 		if (recentlyPlaced.size() > 5) {
 			recentlyPlaced.remove(0);
 		}
 	}
 
-	public boolean isRecentlyPlacedChest(Player player, Block chest) {
-		assert player != null && chest != null;
+	public boolean isRecentlyPlacedContainer(Player player, Block container) {
+		assert player != null && container != null;
 		String playerName = player.getName();
-		List<String> recentlyPlaced = recentlyPlacedChests.get(playerName);
-		return recentlyPlaced != null && recentlyPlaced.contains(TextUtils.getLocationString(chest));
+		List<String> recentlyPlaced = recentlyPlacedContainers.get(playerName);
+		return recentlyPlaced != null && recentlyPlaced.contains(TextUtils.getLocationString(container));
 	}
 
-	// SELECTED CHEST
+	// SELECTED CONTAINER
 
-	public void selectChest(Player player, Block chest) {
+	public void selectContainer(Player player, Block container) {
 		assert player != null;
 		String playerName = player.getName();
-		if (chest == null) selectedChest.remove(playerName);
-		else {
-			assert ItemUtils.isChest(chest.getType());
-			selectedChest.put(playerName, chest);
+		if (container == null) {
+			selectedContainer.remove(playerName);
+		} else {
+			assert ShopContainers.isSupportedContainer(container.getType());
+			selectedContainer.put(playerName, container);
 		}
 	}
 
-	public Block getSelectedChest(Player player) {
+	public Block getSelectedContainer(Player player) {
 		assert player != null;
-		return selectedChest.get(player.getName());
+		return selectedContainer.get(player.getName());
 	}
 
 	// SHOPKEEPER CREATION
 
-	// checks if the player can use the given chest for a player shopkeeper:
-	public boolean handleCheckChest(Player player, Block chestBlock) {
-		// check if this chest is already used by some other shopkeeper:
-		if (SKShopkeepersPlugin.getInstance().getProtectedChests().isChestProtected(chestBlock, null)) {
-			TextUtils.sendMessage(player, Settings.msgChestAlreadyInUse);
+	// Checks if the player can use the given container for a player shopkeeper:
+	public boolean handleCheckContainer(Player player, Block containerBlock) {
+		// Check if the container is already used by some other shopkeeper:
+		if (SKShopkeepersPlugin.getInstance().getProtectedContainers().isContainerProtected(containerBlock, null)) {
+			TextUtils.sendMessage(player, Settings.msgContainerAlreadyInUse);
 			return false;
 		}
 
 		// check for recently placed:
-		if (Settings.requireChestRecentlyPlaced && !plugin.getShopkeeperCreation().isRecentlyPlacedChest(player, chestBlock)) {
-			// chest was not recently placed:
-			TextUtils.sendMessage(player, Settings.msgChestNotPlaced);
+		if (Settings.requireContainerRecentlyPlaced && !plugin.getShopkeeperCreation().isRecentlyPlacedContainer(player, containerBlock)) {
+			// Container was not recently placed:
+			TextUtils.sendMessage(player, Settings.msgContainerNotPlaced);
 			return false;
 		}
 
-		// check if the player can access the chest:
-		if (!Utils.checkBlockInteract(player, chestBlock)) { // checks access via dummy interact event
-			TextUtils.sendMessage(player, Settings.msgNoChestAccess);
+		// Check if the player can access the container:
+		if (!Utils.checkBlockInteract(player, containerBlock)) { // checks access via dummy interact event
+			TextUtils.sendMessage(player, Settings.msgNoContainerAccess);
 			return false;
 		}
 		return true;

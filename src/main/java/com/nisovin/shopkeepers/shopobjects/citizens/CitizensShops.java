@@ -38,8 +38,8 @@ import net.citizensnpcs.trait.LookClose;
  * Citizen shopkeepers can be removed again in the following ways:
  * <ol>
  * <li>The shopkeeper gets deleted, either due to a player removing it via command or via the editor option, or due the
- * Shopkeepers plugin removing it due to reasons such owner inactivity or when the shopkeeper's chest is broken. If the
- * corresponding Citizens NPC has the 'shopkeeper' trait attached, only this trait gets removed and the NPC remains
+ * Shopkeepers plugin removing it due to reasons such owner inactivity or when the shopkeeper's container is broken. If
+ * the corresponding Citizens NPC has the 'shopkeeper' trait attached, only this trait gets removed and the NPC remains
  * existing. Otherwise, the Citizens NPC is removed.
  * TODO Removing the Citizens NPC only works if the Citizens plugin is currently running.
  * <li>The Citizens NPC gets deleted. This deletes the corresponding shopkeeper. If the Shopkeepers plugin is not

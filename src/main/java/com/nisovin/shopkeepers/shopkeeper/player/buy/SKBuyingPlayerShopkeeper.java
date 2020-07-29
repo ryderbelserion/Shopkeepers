@@ -103,10 +103,10 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	@Override
 	public List<TradingRecipe> getTradingRecipes(Player player) {
 		List<TradingRecipe> recipes = new ArrayList<>();
-		int currencyInChest = this.getCurrencyInChest();
+		int currencyInContainer = this.getCurrencyInContainer();
 		for (PriceOffer offer : this.getOffers()) {
 			ItemStack tradedItem = offer.getItem();
-			boolean outOfStock = (currencyInChest < offer.getPrice());
+			boolean outOfStock = (currencyInContainer < offer.getPrice());
 			TradingRecipe recipe = this.createBuyingRecipe(tradedItem, offer.getPrice(), outOfStock);
 			if (recipe != null) {
 				recipes.add(recipe);
@@ -115,8 +115,8 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 		return Collections.unmodifiableList(recipes);
 	}
 
-	protected List<ItemCount> getItemsFromChest() {
-		return this.getItemsFromChest(ITEM_FILTER);
+	protected List<ItemCount> getItemsFromContainer() {
+		return this.getItemsFromContainer(ITEM_FILTER);
 	}
 
 	// OFFERS:

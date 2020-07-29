@@ -13,10 +13,10 @@ import com.nisovin.shopkeepers.api.events.PlayerCreatePlayerShopkeeperEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
+import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
-import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
@@ -41,23 +41,23 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 
 		Location spawnLocation = shopCreationData.getSpawnLocation();
 
-		// validate chest block:
-		Block chestBlock = playerShopCreationData.getShopChest();
-		if (!ItemUtils.isChest(chestBlock.getType())) {
-			// the block is not / no longer a chest:
-			TextUtils.sendMessage(creator, Settings.msgNoChestSelected);
+		// Validate container block:
+		Block containerBlock = playerShopCreationData.getShopContainer();
+		if (!ShopContainers.isSupportedContainer(containerBlock.getType())) {
+			// The block is not / no longer a supported container:
+			TextUtils.sendMessage(creator, Settings.msgInvalidContainer);
 			return false;
 		}
 
-		// check for selected chest being too far away:
-		if (!chestBlock.getWorld().equals(spawnLocation.getWorld())
-				|| (int) chestBlock.getLocation().distanceSquared(spawnLocation) > (Settings.maxChestDistance * Settings.maxChestDistance)) {
-			TextUtils.sendMessage(creator, Settings.msgChestTooFar);
+		// Check if the selected container is too far away:
+		if (!containerBlock.getWorld().equals(spawnLocation.getWorld())
+				|| (int) containerBlock.getLocation().distanceSquared(spawnLocation) > (Settings.maxContainerDistance * Settings.maxContainerDistance)) {
+			TextUtils.sendMessage(creator, Settings.msgContainerTooFarAway);
 			return false;
 		}
 
-		// check selected chest:
-		if (!SKShopkeepersPlugin.getInstance().getShopkeeperCreation().handleCheckChest(creator, chestBlock)) {
+		// Check selected container:
+		if (!SKShopkeepersPlugin.getInstance().getShopkeeperCreation().handleCheckContainer(creator, containerBlock)) {
 			return false;
 		}
 

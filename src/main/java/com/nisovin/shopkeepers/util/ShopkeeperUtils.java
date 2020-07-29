@@ -29,6 +29,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.text.Text;
 
 /**
@@ -204,22 +205,22 @@ public class ShopkeeperUtils {
 				// get shopkeeper by targeted block:
 				shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByBlock(targetBlock);
 				if (shopkeeper == null) {
-					// get player shopkeepers by targeted chest:
-					if (ItemUtils.isChest(targetBlock.getType())) {
-						List<PlayerShopkeeper> shopsUsingChest = SKShopkeepersPlugin.getInstance().getProtectedChests().getShopkeepersUsingChest(targetBlock);
-						if (shopsUsingChest.isEmpty()) {
-							return new TargetShopkeepersResult(Settings.msgUnusedChest);
-						} else {
+					// Get player shopkeepers by targeted container:
+					if (ShopContainers.isSupportedContainer(targetBlock.getType())) {
+						List<PlayerShopkeeper> shopsUsingContainer = SKShopkeepersPlugin.getInstance().getProtectedContainers().getShopkeepersUsingContainer(targetBlock);
+						if (shopsUsingContainer.isEmpty()) {
+							return new TargetShopkeepersResult(Settings.msgUnusedContainer);
+					} else {
 							// filter shops:
 							List<Shopkeeper> acceptedShops = new ArrayList<>();
-							for (Shopkeeper shopUsingChest : shopsUsingChest) {
-								if (shopkeeperFilter.test(shopUsingChest)) {
-									acceptedShops.add(shopUsingChest);
+							for (Shopkeeper shopUsingContainer : shopsUsingContainer) {
+								if (shopkeeperFilter.test(shopUsingContainer)) {
+									acceptedShops.add(shopUsingContainer);
 								}
 							}
 							if (acceptedShops.isEmpty()) {
-								// use the first shopkeeper using the chest for the error message:
-								return new TargetShopkeepersResult(shopkeeperFilter.getInvalidTargetErrorMsg(shopsUsingChest.get(0)));
+								// Use the first shopkeeper using the container for the error message:
+								return new TargetShopkeepersResult(shopkeeperFilter.getInvalidTargetErrorMsg(shopsUsingContainer.get(0)));
 							} else {
 								return new TargetShopkeepersResult(acceptedShops);
 							}

@@ -670,7 +670,7 @@ public class TradingHandler extends UIHandler {
 	 * inventory action multiple successive trades (even using different trading recipes) might get triggered by a
 	 * single inventory action.
 	 * <p>
-	 * There should be no changes of the corresponding click event and the involved inventories (player, chest) have to
+	 * There should be no changes of the corresponding click event and the involved inventories (player, container) to
 	 * be expected between this phase of the trade handling and the actual application of the trade.
 	 * 
 	 * @param tradeData

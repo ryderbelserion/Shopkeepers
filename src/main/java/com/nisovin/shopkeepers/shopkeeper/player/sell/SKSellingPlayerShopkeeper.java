@@ -100,15 +100,15 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	@Override
 	public List<TradingRecipe> getTradingRecipes(Player player) {
 		List<TradingRecipe> recipes = new ArrayList<>();
-		List<ItemCount> chestItems = this.getItemsFromChest();
+		List<ItemCount> containerItems = this.getItemsFromContainer();
 		for (PriceOffer offer : this.getOffers()) {
 			ItemStack tradedItem = offer.getItem();
-			int itemAmountInChest = 0;
-			ItemCount itemCount = ItemCount.findSimilar(chestItems, tradedItem);
+			int itemAmountInContainer = 0;
+			ItemCount itemCount = ItemCount.findSimilar(containerItems, tradedItem);
 			if (itemCount != null) {
-				itemAmountInChest = itemCount.getAmount();
+				itemAmountInContainer = itemCount.getAmount();
 			}
-			boolean outOfStock = (itemAmountInChest < tradedItem.getAmount());
+			boolean outOfStock = (itemAmountInContainer < tradedItem.getAmount());
 			TradingRecipe recipe = this.createSellingRecipe(tradedItem, offer.getPrice(), outOfStock);
 			if (recipe != null) {
 				recipes.add(recipe);
@@ -117,8 +117,8 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 		return Collections.unmodifiableList(recipes);
 	}
 
-	protected List<ItemCount> getItemsFromChest() {
-		return this.getItemsFromChest(ITEM_FILTER);
+	protected List<ItemCount> getItemsFromContainer() {
+		return this.getItemsFromContainer(ITEM_FILTER);
 	}
 
 	// OFFERS:

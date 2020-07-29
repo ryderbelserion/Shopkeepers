@@ -32,12 +32,12 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
-import com.nisovin.shopkeepers.chestprotection.ProtectedChests;
-import com.nisovin.shopkeepers.chestprotection.RemoveShopOnChestBreak;
 import com.nisovin.shopkeepers.commands.Commands;
 import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.ConfigLoadException;
+import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
+import com.nisovin.shopkeepers.container.protection.RemoveShopOnContainerBreak;
 import com.nisovin.shopkeepers.itemconversion.ItemConversions;
 import com.nisovin.shopkeepers.metrics.CitizensChart;
 import com.nisovin.shopkeepers.metrics.FeaturesChart;
@@ -116,8 +116,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(this);
 	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(this);
 
-	private final ProtectedChests protectedChests = new ProtectedChests(this);
-	private final RemoveShopOnChestBreak removeShopOnChestBreak = new RemoveShopOnChestBreak(this, protectedChests);
+	private final ProtectedContainers protectedContainers = new ProtectedContainers(this);
+	private final RemoveShopOnContainerBreak removeShopOnContainerBreak = new RemoveShopOnContainerBreak(this, protectedContainers);
 	private final LivingShops livingShops = new LivingShops(this);
 	private final SignShops signShops = new SignShops(this);
 	private final CitizensShops citizensShops = new CitizensShops(this);
@@ -346,9 +346,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// inform ui registry (registers ui event handlers):
 		uiRegistry.onEnable();
 
-		// enable ProtectedChests:
-		protectedChests.enable();
-		removeShopOnChestBreak.onEnable();
+		// enable container protection:
+		protectedContainers.enable();
+		removeShopOnContainerBreak.onEnable();
 
 		// register events:
 		PluginManager pm = Bukkit.getPluginManager();
@@ -468,9 +468,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// save shopkeepers:
 		shopkeeperStorage.saveImmediateIfDirty();
 
-		// disable protected chests:
-		protectedChests.disable();
-		removeShopOnChestBreak.onDisable();
+		// disable protected containers:
+		protectedContainers.disable();
+		removeShopOnContainerBreak.onDisable();
 
 		// disable shopkeeper registry: unloads all shopkeepers
 		shopkeeperRegistry.onDisable();
@@ -576,16 +576,16 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return defaultUITypes;
 	}
 
-	// PROTECTED CHESTS:
+	// PROTECTED CONTAINERS
 
-	public ProtectedChests getProtectedChests() {
-		return protectedChests;
+	public ProtectedContainers getProtectedContainers() {
+		return protectedContainers;
 	}
 
-	// SHOPKEEPR REMOVAL ON CHEST BREAKING
+	// SHOPKEEPR REMOVAL ON CONTAINER BREAKING
 
-	public RemoveShopOnChestBreak getRemoveShopOnChestBreak() {
-		return removeShopOnChestBreak;
+	public RemoveShopOnContainerBreak getRemoveShopOnContainerBreak() {
+		return removeShopOnContainerBreak;
 	}
 
 	// LIVING ENTITY SHOPS

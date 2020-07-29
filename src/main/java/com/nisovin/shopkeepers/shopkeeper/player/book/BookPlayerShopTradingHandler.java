@@ -49,47 +49,47 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		assert chestInventory != null & newChestContents != null;
+		assert containerInventory != null & newContainerContents != null;
 
-		// remove blank book from chest contents:
+		// remove blank book from container contents:
 		boolean removed = false;
-		for (int slot = 0; slot < newChestContents.length; slot++) {
-			ItemStack itemStack = newChestContents[slot];
+		for (int slot = 0; slot < newContainerContents.length; slot++) {
+			ItemStack itemStack = newContainerContents[slot];
 			if (ItemUtils.isEmpty(itemStack)) continue;
 			if (itemStack.getType() != Material.WRITABLE_BOOK) continue;
 
 			int newAmount = itemStack.getAmount() - 1;
 			assert newAmount >= 0;
 			if (newAmount == 0) {
-				newChestContents[slot] = null;
+				newContainerContents[slot] = null;
 			} else {
 				// copy the item before modifying it:
 				itemStack = itemStack.clone();
-				newChestContents[slot] = itemStack;
+				newContainerContents[slot] = itemStack;
 				itemStack.setAmount(newAmount);
 			}
 			removed = true;
 			break;
 		}
 		if (!removed) {
-			this.debugPreventedTrade(tradingPlayer, "The shop's chest doesn't contain any book-and-quill items.");
+			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain any writable (book-and-quill) items.");
 			return false;
 		}
 
-		// add earnings to chest contents:
+		// add earnings to container contents:
 		int amountAfterTaxes = this.getAmountAfterTaxes(offer.getPrice());
 		if (amountAfterTaxes > 0) {
 			int remaining = amountAfterTaxes;
 			if (Settings.isHighCurrencyEnabled() && remaining > Settings.highCurrencyMinCost) {
 				int highCurrencyAmount = (remaining / Settings.highCurrencyValue);
 				if (highCurrencyAmount > 0) {
-					int remainingHighCurrency = ItemUtils.addItems(newChestContents, Settings.createHighCurrencyItem(highCurrencyAmount));
+					int remainingHighCurrency = ItemUtils.addItems(newContainerContents, Settings.createHighCurrencyItem(highCurrencyAmount));
 					remaining -= ((highCurrencyAmount - remainingHighCurrency) * Settings.highCurrencyValue);
 				}
 			}
 			if (remaining > 0) {
-				if (ItemUtils.addItems(newChestContents, Settings.createCurrencyItem(remaining)) != 0) {
-					this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
+				if (ItemUtils.addItems(newContainerContents, Settings.createCurrencyItem(remaining)) != 0) {
+					this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 					return false;
 				}
 			}

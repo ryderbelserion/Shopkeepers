@@ -6,21 +6,21 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.container.ShopContainers;
 
-class RecentlyPlacedChestsListener implements Listener {
+class RecentlyPlacedContainersListener implements Listener {
 
 	private final ShopkeeperCreation shopkeeperCreation;
 
-	RecentlyPlacedChestsListener(ShopkeeperCreation shopkeeperCreation) {
+	RecentlyPlacedContainersListener(ShopkeeperCreation shopkeeperCreation) {
 		this.shopkeeperCreation = shopkeeperCreation;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
-		if (ItemUtils.isChest(block.getType())) {
-			shopkeeperCreation.addRecentlyPlacedChest(event.getPlayer(), block);
+		if (ShopContainers.isSupportedContainer(block.getType())) {
+			shopkeeperCreation.addRecentlyPlacedContainer(event.getPlayer(), block);
 		}
 	}
 }

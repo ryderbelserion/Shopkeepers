@@ -44,15 +44,15 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		assert chestInventory != null & newChestContents != null;
+		assert containerInventory != null & newContainerContents != null;
 
-		// remove result items from chest contents:
-		if (ItemUtils.removeItems(newChestContents, soldItem) != 0) {
-			this.debugPreventedTrade(tradingPlayer, "The shop's chest doesn't contain the required items.");
+		// remove result items from container contents:
+		if (ItemUtils.removeItems(newContainerContents, soldItem) != 0) {
+			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain the required items.");
 			return false;
 		}
 
-		// add earnings to chest contents:
+		// add earnings to container contents:
 		// TODO maybe add the actual items the trading player gave, instead of creating new currency items?
 		int amountAfterTaxes = this.getAmountAfterTaxes(offer.getPrice());
 		if (amountAfterTaxes > 0) {
@@ -62,13 +62,13 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			if (Settings.isHighCurrencyEnabled() && remaining > Settings.highCurrencyMinCost) {
 				int highCurrencyAmount = (remaining / Settings.highCurrencyValue);
 				if (highCurrencyAmount > 0) {
-					int remainingHighCurrency = ItemUtils.addItems(newChestContents, Settings.createHighCurrencyItem(highCurrencyAmount));
+					int remainingHighCurrency = ItemUtils.addItems(newContainerContents, Settings.createHighCurrencyItem(highCurrencyAmount));
 					remaining -= ((highCurrencyAmount - remainingHighCurrency) * Settings.highCurrencyValue);
 				}
 			}
 			if (remaining > 0) {
-				if (ItemUtils.addItems(newChestContents, Settings.createCurrencyItem(remaining)) != 0) {
-					this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
+				if (ItemUtils.addItems(newContainerContents, Settings.createCurrencyItem(remaining)) != 0) {
+					this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 					return false;
 				}
 			}

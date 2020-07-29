@@ -27,18 +27,31 @@ Date format: (YYYY-MM-DD)
 * Removed: The legacy permissions `shopkeeper.player.normal`, `shopkeeper.villager`, `shopkeeper.witch` and `shopkeeper.creeper` have been removed. Use the corresponding replacement permissions instead.
 * Changed: All players have access to all mob types (permission `shopkeeper.entity.*`) by default now.
 * Added: The new 'all' argument for the `/shopkeeper list` command will list all shops now (admin and player shops). (Thanks to Mippy, PR 669)
+* Added: It is possible to use barrels and shulker boxes as containers for player shops now.
+* Added a message (msg-unsupported-container) when a player tries to select a type of container which is not supported by shopkeepers (i.e. hopper, dropper, dispenser, brewing stand, ender chest, or a type of furnace).
+* API: Deprecated PlayerShopkeeper#getChestX/Y/Z, #get/setChest, #getCurrencyInChest, #openChestWindow and PlayerShopCreationData#getShopChest and added corresponding replacements methods with more general names.
 
 Internal changes:
 * Slightly changed how we cycle through the villager levels (badge colors).
 * Added support for Lists of ItemData inside the config.
 * We throw an exception now when we encounter an unexpected / not yet handled config setting type.
 * We load all plugin classes up front now. This should avoid issues when the plugin jar gets replaced during runtime (eg. for hot reloads).
+* Various internal renaming related to shop containers.
+* Various internal formatting of code comments.
 
 Config changes:  
 * The default value of the `prevent-shop-creation-item-regular-usage` setting was changed to `true`.
 * The default value of the `shop-creation-item` setting was changed to a villager spawn egg with display name `&aShopkeeper`. You can give yourself this item in game via the `/shopkeeper give` command.
 * The `use-legacy-mob-behavior` setting was broken since MC 1.14 and has been removed now. All shopkeeper entities always use the NoAI flag now.
 * The default value of the `enable-citizen-shops` setting was changed to `true`.
+* Changed a few comments inside the default config related to the shop container changes.
+* Bumped config version to '3'. A few settings were renamed which get automatically migrated:
+  * `require-chest-recently-placed` (now `require-container-recently-placed`)
+  * `max-chest-distance` (now `max-container-distance`)
+  * `protect-chests` (now `protect-containers`)
+  * `delete-shopkeeper-on-break-chest` (now `delete-shopkeeper-on-break-container`)
+  * `enable-chest-option-on-player-shop` (now `enable-container-option-on-player-shop`)
+  * `chest-item` (now `container-item`)
 
 Added messages:  
 * msg-currency-items-given
@@ -54,6 +67,29 @@ Added messages:
 * msg-button-slime-size-lore
 * msg-button-magma-cube-size
 * msg-button-magma-cube-size-lore
+* msg-unsupported-container
+
+Changed messages:  
+* Some message settings were renamed. If you don't use a custom / separate language file, they get automatically migrated as part of the config migration to version 3. However, most of these messages also had changes to their default contents which need to be applied manually.
+  * msg-button-chest (now msg-button-container)
+  * msg-button-chest-lore (now msg-button-container-lore)
+  * msg-selected-chest (now msg-container-selected)
+  * msg-must-select-chest (now msg-must-select-container)
+  * msg-no-chest-selected (now msg-invalid-container)
+  * msg-chest-too-far (now msg-container-too-far-away)
+  * msg-chest-not-placed (now msg-container-not-placed)
+  * msg-chest-already-in-use (now msg-container-already-in-use)
+  * msg-no-chest-access (now msg-no-container-access)
+  * msg-unused-chest (now msg-unused-container)
+  * msg-cant-trade-with-shop-missing-chest (now msg-cant-trade-with-shop-missing-container)
+* msg-creation-item-selected
+* msg-shop-setup-desc-selling
+* msg-shop-setup-desc-buying
+* msg-shop-setup-desc-trading
+* msg-shop-setup-desc-book
+* msg-trade-setup-desc-selling
+* msg-trade-setup-desc-buying
+* msg-trade-setup-desc-book
 
 ## v2.10.0 (2020-06-26)
 ### Supported MC versions: 1.16.1, 1.15.2, 1.14.4

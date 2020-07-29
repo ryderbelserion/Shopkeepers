@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.chestprotection;
+package com.nisovin.shopkeepers.container.protection;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -8,22 +8,22 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryMoveItemEvent;
 import org.bukkit.inventory.Inventory;
 
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.container.ShopContainers;
 
 /**
- * Prevents item movement from/to protected shop chests. Can be disabled via a config setting.
+ * Prevents item movement from/to protected containers. Can be disabled via a config setting.
  */
 class InventoryMoveItemListener implements Listener {
 
-	private final ProtectedChests protectedChests;
+	private final ProtectedContainers protectedContainers;
 
-	InventoryMoveItemListener(ProtectedChests protectedChests) {
-		this.protectedChests = protectedChests;
+	InventoryMoveItemListener(ProtectedContainers protectedContainers) {
+		this.protectedContainers = protectedContainers;
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onInventoryMoveItem(InventoryMoveItemEvent event) {
-		// source and destination inventories are not null
+		assert event.getSource() != null && event.getDestination() != null;
 		if (this.isProtectedInventory(event.getSource()) || this.isProtectedInventory(event.getDestination())) {
 			event.setCancelled(true);
 		}
@@ -31,12 +31,13 @@ class InventoryMoveItemListener implements Listener {
 
 	private boolean isProtectedInventory(Inventory inventory) {
 		assert inventory != null;
-		// Note: We are avoiding calling Inventory#getHolder here for performance reasons
+		// Note: We avoid calling Inventory#getHolder here for performance reasons. For block inventories this creates a
+		// snapshot of the block's BlockState.
 		Location inventoryLocation = inventory.getLocation(); // can be null
 		if (inventoryLocation == null) return false;
 		Block block = inventoryLocation.getBlock(); // not null
-		if (!ItemUtils.isChest(block.getType())) return false;
-		// also checks for protected connected chests (double chests):
-		return protectedChests.isChestProtected(block, null);
+		if (!ShopContainers.isSupportedContainer(block.getType())) return false;
+		// Also checks for protected connected chests (double chests):
+		return protectedContainers.isContainerProtected(block, null);
 	}
 }

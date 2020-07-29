@@ -480,7 +480,7 @@ public abstract class EditorHandler extends UIHandler {
 		AbstractShopkeeper shopkeeper = this.getShopkeeper();
 		this.addButtonOrIgnore(this.createDeleteButton(shopkeeper));
 		this.addButtonOrIgnore(this.createNamingButton(shopkeeper));
-		this.addButtonOrIgnore(this.createChestButton(shopkeeper));
+		this.addButtonOrIgnore(this.createContainerButton(shopkeeper));
 		this.addButtonsOrIgnore(shopkeeper.getShopObject().getEditorButtons());
 	}
 
@@ -542,23 +542,23 @@ public abstract class EditorHandler extends UIHandler {
 		};
 	}
 
-	protected Button createChestButton(Shopkeeper shopkeeper) {
-		if (!Settings.enableChestOptionOnPlayerShop || !(shopkeeper.getType() instanceof PlayerShopType)) {
+	protected Button createContainerButton(Shopkeeper shopkeeper) {
+		if (!Settings.enableContainerOptionOnPlayerShop || !(shopkeeper.getType() instanceof PlayerShopType)) {
 			return null;
 		}
 		return new Button(shopkeeper) {
 			@Override
 			public ItemStack getIcon(Session session) {
-				return Settings.createChestButtonItem();
+				return Settings.createContainerButtonItem();
 			}
 
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// chest inventory button:
+				// Container inventory button:
 				closeEditorAndRunTask(player, () -> {
-					// open chest inventory:
+					// Open the shop container inventory:
 					if (!player.isValid()) return;
-					((PlayerShopkeeper) shopkeeper).openChestWindow(player);
+					((PlayerShopkeeper) shopkeeper).openContainerWindow(player);
 				});
 			}
 		};

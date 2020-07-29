@@ -97,7 +97,7 @@ public class Settings {
 	/*
 	 * General Settings
 	 */
-	public static int configVersion = 2;
+	public static int configVersion = 3;
 	public static boolean debug = false;
 	// See DebugOptions for all available options.
 	public static List<String> debugOptions = new ArrayList<>(0);
@@ -135,14 +135,14 @@ public class Settings {
 
 	public static boolean createPlayerShopWithCommand = false;
 
-	public static boolean requireChestRecentlyPlaced = true;
-	public static int maxChestDistance = 15;
+	public static boolean requireContainerRecentlyPlaced = true;
+	public static int maxContainerDistance = 15;
 	public static int maxShopsPerPlayer = 0;
 	public static String maxShopsPermOptions = "10,15,25";
 
-	public static boolean protectChests = true;
+	public static boolean protectContainers = true;
 	public static boolean preventItemMovement = true;
-	public static boolean deleteShopkeeperOnBreakChest = false;
+	public static boolean deleteShopkeeperOnBreakContainer = false;
 
 	public static int playerShopkeeperInactiveDays = 0;
 
@@ -249,8 +249,8 @@ public class Settings {
 
 	public static ItemData nameItem = new ItemData(Material.NAME_TAG);
 
-	public static boolean enableChestOptionOnPlayerShop = true;
-	public static ItemData chestItem = new ItemData(Material.CHEST);
+	public static boolean enableContainerOptionOnPlayerShop = true;
+	public static ItemData containerItem = new ItemData(Material.CHEST);
 
 	public static ItemData deleteItem = new ItemData(Material.BONE);
 
@@ -326,7 +326,7 @@ public class Settings {
 	public static Text msgCreationItemSelected = Text.parse("&aShop creation:\n"
 			+ "&e  Left/Right-click to select the shop type.\n"
 			+ "&e  Sneak + left/right-click to select the object type.\n"
-			+ "&e  Right-click a chest to select it.\n"
+			+ "&e  Right-click a container to select it.\n"
 			+ "&e  Then right-click a block to place the shopkeeper.");
 
 	public static String msgButtonPreviousPage = "&6<- Previous page ({prev_page} of {max_page})";
@@ -338,8 +338,8 @@ public class Settings {
 
 	public static String msgButtonName = "&aSet shop name";
 	public static List<String> msgButtonNameLore = Arrays.asList("Lets you rename", "your shopkeeper");
-	public static String msgButtonChest = "&aView chest inventory";
-	public static List<String> msgButtonChestLore = Arrays.asList("Lets you view the inventory", " your shopkeeper is using");
+	public static String msgButtonContainer = "&aView shop inventory";
+	public static List<String> msgButtonContainerLore = Arrays.asList("Lets you view the inventory", " your shopkeeper is using");
 	public static String msgButtonDelete = "&4Delete";
 	public static List<String> msgButtonDeleteLore = Arrays.asList("Closes and removes", "this shopkeeper");
 	public static String msgButtonHire = "&aHire";
@@ -407,13 +407,14 @@ public class Settings {
 	public static String msgTradingTitlePrefix = "&2";
 	public static String msgTradingTitleDefault = "Shopkeeper";
 
-	public static Text msgSelectedChest = Text.parse("&aChest selected! Right-click a block to place your shopkeeper.");
-	public static Text msgMustSelectChest = Text.parse("&7You must right-click a chest before placing your shopkeeper.");
-	public static Text msgNoChestSelected = Text.parse("&7The selected block is not a chest!");
-	public static Text msgChestTooFar = Text.parse("&7The shopkeeper's chest is too far away!");
-	public static Text msgChestNotPlaced = Text.parse("&7You must select a chest you have recently placed!");
-	public static Text msgChestAlreadyInUse = Text.parse("&7Another shopkeeper is already using the selected chest!");
-	public static Text msgNoChestAccess = Text.parse("&7You cannot access the selected chest!");
+	public static Text msgContainerSelected = Text.parse("&aContainer selected! Right-click a block to place your shopkeeper.");
+	public static Text msgUnsupportedContainer = Text.parse("&7This type of container cannot be used for shops.");
+	public static Text msgMustSelectContainer = Text.parse("&7You must right-click a container before placing your shopkeeper.");
+	public static Text msgInvalidContainer = Text.parse("&7The selected block is not a valid container!");
+	public static Text msgContainerTooFarAway = Text.parse("&7The shopkeeper's container is too far away!");
+	public static Text msgContainerNotPlaced = Text.parse("&7You must select a container you have recently placed!");
+	public static Text msgContainerAlreadyInUse = Text.parse("&7Another shopkeeper is already using the selected container!");
+	public static Text msgNoContainerAccess = Text.parse("&7You cannot access the selected container!");
 	public static Text msgTooManyShops = Text.parse("&7You have too many shops!");
 	public static Text msgNoAdminShopTypeSelected = Text.parse("&7You have to select an admin shop type!");
 	public static Text msgNoPlayerShopTypeSelected = Text.parse("&7You have to select a player shop type!");
@@ -434,7 +435,7 @@ public class Settings {
 	public static Text msgTargetEntityIsNoShop = Text.parse("&7The targeted entity is no shopkeeper.");
 	public static Text msgTargetShopIsNoAdminShop = Text.parse("&7The targeted shopkeeper is no admin shopkeeper.");
 	public static Text msgTargetShopIsNoPlayerShop = Text.parse("&7The targeted shopkeeper is no player shopkeeper.");
-	public static Text msgUnusedChest = Text.parse("&7No shopkeeper is using this chest.");
+	public static Text msgUnusedContainer = Text.parse("&7No shopkeeper is using this container.");
 	public static Text msgNotOwner = Text.parse("&7You are not the owner of this shopkeeper.");
 	// placeholders: {owner} -> new owners name
 	public static Text msgOwnerSet = Text.parse("&aNew owner was set to &e{owner}");
@@ -466,26 +467,26 @@ public class Settings {
 	public static Text msgMissingCustomTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
 	public static Text msgCantTradeWithOwnShop = Text.parse("&7You cannot trade with your own shop.");
 	public static Text msgCantTradeWhileOwnerOnline = Text.parse("&7You cannot trade while the owner of this shop ('&e{owner}&7') is online.");
-	public static Text msgCantTradeWithShopMissingChest = Text.parse("&7You cannot trade with this shop, because its chest is missing.");
+	public static Text msgCantTradeWithShopMissingContainer = Text.parse("&7You cannot trade with this shop, because its container is missing.");
 
 	public static Text msgShopkeeperCreated = Text.parse("&aShopkeeper created: &6{type} &7({description})\n{setupDesc}");
 
-	public static String msgShopSetupDescSelling = "&e  Add items you want to sell to your chest, then\n"
+	public static String msgShopSetupDescSelling = "&e  Add items you want to sell to your container, then\n"
 			+ "&e  right-click the shop while sneaking to modify costs.";
-	public static String msgShopSetupDescBuying = "&e  Add one of each item you want to buy to your chest, then\n"
+	public static String msgShopSetupDescBuying = "&e  Add one of each item you want to buy to your container,\n"
+			+ "&e  then right-click the shop while sneaking to modify costs.";
+	public static String msgShopSetupDescTrading = "&e  Add items you want to sell to your container, then\n"
 			+ "&e  right-click the shop while sneaking to modify costs.";
-	public static String msgShopSetupDescTrading = "&e  Add items you want to sell to your chest, then\n"
-			+ "&e  right-click the shop while sneaking to modify costs.";
-	public static String msgShopSetupDescBook = "&e  Add written books and blank books to your chest, then\n"
+	public static String msgShopSetupDescBook = "&e  Add written books and blank books to your container, then\n"
 			+ "&e  right-click the shop while sneaking to modify costs.";
 	public static String msgShopSetupDescAdminRegular = "&e  Right-click the shop while sneaking to modify trades.";
 
 	public static String msgTradeSetupDescHeader = "&6{shopType}";
 	public static List<String> msgTradeSetupDescAdminRegular = Arrays.asList("Has unlimited stock.", "Insert items from your inventory.", "Top row: Result items", "Bottom rows: Cost items");
-	public static List<String> msgTradeSetupDescSelling = Arrays.asList("Sells items.", "Insert items to sell into the chest.", "Left/Right click to adjust amounts.", "Top row: Items being sold", "Bottom rows: Cost items");
-	public static List<String> msgTradeSetupDescBuying = Arrays.asList("Buys items.", "Insert one of each item you want to", "buy and plenty of currency items", "into the chest.", "Left/Right click to adjust amounts.", "Top row: Cost items", "Bottom row: Items being bought");
+	public static List<String> msgTradeSetupDescSelling = Arrays.asList("Sells items.", "Insert items to sell into the container.", "Left/Right click to adjust amounts.", "Top row: Items being sold", "Bottom rows: Cost items");
+	public static List<String> msgTradeSetupDescBuying = Arrays.asList("Buys items.", "Insert one of each item you want to", "buy and plenty of currency items", "into the container.", "Left/Right click to adjust amounts.", "Top row: Cost items", "Bottom row: Items being bought");
 	public static List<String> msgTradeSetupDescTrading = Arrays.asList("Trades items.", "Pickup an item from your inventory", "and then click a slot to place it.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items");
-	public static List<String> msgTradeSetupDescBook = Arrays.asList("Sells book copies.", "Insert written and blank books", "into the chest.", "Left/Right click to adjust costs.", "Top row: Books being sold", "Bottom rows: Cost items");
+	public static List<String> msgTradeSetupDescBook = Arrays.asList("Sells book copies.", "Insert written and blank books", "into the container.", "Left/Right click to adjust costs.", "Top row: Books being sold", "Bottom rows: Cost items");
 
 	public static Text msgListAdminShopsHeader = Text.parse("&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})");
 	public static Text msgListAllShopsHeader = Text.parse("&9There are &e{shopsCount} &9shops in total: &e(Page {page} of {maxPage})");
@@ -632,9 +633,9 @@ public class Settings {
 			Log.warning("Config: All existing entity type names can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html");
 		}
 
-		if (maxChestDistance > 50) {
-			Log.warning("Config: 'max-chest-distance' can be at most 50.");
-			maxChestDistance = 50;
+		if (maxContainerDistance > 50) {
+			Log.warning("Config: 'max-container-distance' can be at most 50.");
+			maxContainerDistance = 50;
 		}
 		if (gravityChunkRange < 0) {
 			Log.warning("Config: 'gravity-chunk-range' cannot be negative.");
@@ -838,7 +839,7 @@ public class Settings {
 
 		// button items:
 		public static ItemData nameButtonItem = new ItemData(Material.AIR);
-		public static ItemData chestButtonItem = new ItemData(Material.AIR);
+		public static ItemData containerButtonItem = new ItemData(Material.AIR);
 		public static ItemData deleteButtonItem = new ItemData(Material.AIR);
 		public static ItemData hireButtonItem = new ItemData(Material.AIR);
 
@@ -851,7 +852,7 @@ public class Settings {
 
 			// button items:
 			nameButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(nameItem.createItemStack(), msgButtonName, msgButtonNameLore));
-			chestButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(chestItem.createItemStack(), msgButtonChest, msgButtonChestLore));
+			containerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), msgButtonContainer, msgButtonContainerLore));
 			deleteButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), msgButtonDelete, msgButtonDeleteLore));
 			hireButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(hireItem.createItemStack(), msgButtonHire, msgButtonHireLore));
 
@@ -883,9 +884,9 @@ public class Settings {
 		return DerivedSettings.nameButtonItem.createItemStack();
 	}
 
-	// chest button:
-	public static ItemStack createChestButtonItem() {
-		return DerivedSettings.chestButtonItem.createItemStack();
+	// Container button:
+	public static ItemStack createContainerButtonItem() {
+		return DerivedSettings.containerButtonItem.createItemStack();
 	}
 
 	// delete button:

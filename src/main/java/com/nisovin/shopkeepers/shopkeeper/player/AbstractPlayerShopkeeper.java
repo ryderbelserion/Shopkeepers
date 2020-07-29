@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -28,6 +27,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.citizens.SKCitizensShopObject;
 import com.nisovin.shopkeepers.shopobjects.sign.SKSignShopObject;
@@ -41,19 +41,19 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
 
-	private static final int CHECK_CHEST_PERIOD_SECONDS = 5;
+	private static final int CHECK_CONTAINER_PERIOD_SECONDS = 5;
 
 	protected UUID ownerUUID; // not null after successful initialization
 	protected String ownerName; // not null after successful initialization
-	// TODO store chest world separately? currently it uses the shopkeeper world
-	// this would allow the chest and shopkeeper to be located in different worlds, and virtual player shops
-	protected int chestX;
-	protected int chestY;
-	protected int chestZ;
+	// TODO Store container world separately? Currently it uses the shopkeeper world.
+	// This would allow the container and shopkeeper to be located in different worlds, and virtual player shops.
+	protected int containerX;
+	protected int containerY;
+	protected int containerZ;
 	protected ItemStack hireCost = null; // null if not for hire
 
-	// random shopkeeper-specific starting offset between [1, CHECK_CHEST_PERIOD_SECONDS]
-	private int remainingCheckChestSeconds = (int) (Math.random() * CHECK_CHEST_PERIOD_SECONDS) + 1;
+	// Random shopkeeper-specific starting offset between [1, CHECK_CONTAINER_PERIOD_SECONDS]
+	private int remainingCheckContainerSeconds = (int) (Math.random() * CHECK_CONTAINER_PERIOD_SECONDS) + 1;
 
 	/**
 	 * Creates a not yet initialized {@link AbstractPlayerShopkeeper} (for use in sub-classes).
@@ -75,13 +75,13 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		super.loadFromCreationData(shopCreationData);
 		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) shopCreationData;
 		Player owner = playerShopCreationData.getCreator();
-		Block chest = playerShopCreationData.getShopChest();
+		Block container = playerShopCreationData.getShopContainer();
 		assert owner != null;
-		assert chest != null;
+		assert container != null;
 
 		this.ownerUUID = owner.getUniqueId();
 		this.ownerName = owner.getName();
-		this._setChest(chest.getX(), chest.getY(), chest.getZ());
+		this._setContainer(container.getX(), container.getY(), container.getZ());
 	}
 
 	@Override
@@ -109,11 +109,12 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		}
 
 		if (!configSection.isInt("chestx") || !configSection.isInt("chesty") || !configSection.isInt("chestz")) {
-			throw new ShopkeeperCreateException("Missing chest coordinate(s)");
+			throw new ShopkeeperCreateException("Missing container coordinate(s)");
 		}
 
-		// update chest:
-		this._setChest(configSection.getInt("chestx"), configSection.getInt("chesty"), configSection.getInt("chestz"));
+		// Update container:
+		// TODO Rename to storage keys to containerx/y/z?
+		this._setContainer(configSection.getInt("chestx"), configSection.getInt("chesty"), configSection.getInt("chestz"));
 
 		hireCost = configSection.getItemStack("hirecost");
 		// hire cost itemstack is not null, but empty -> normalize to null:
@@ -143,9 +144,9 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		super.save(configSection);
 		configSection.set("owner uuid", ownerUUID.toString());
 		configSection.set("owner", ownerName);
-		configSection.set("chestx", chestX);
-		configSection.set("chesty", chestY);
-		configSection.set("chestz", chestZ);
+		configSection.set("chestx", containerX);
+		configSection.set("chesty", containerY);
+		configSection.set("chestz", containerZ);
 		if (hireCost != null) {
 			configSection.set("hirecost", hireCost);
 		}
@@ -155,16 +156,16 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	protected void onAdded(ShopkeeperAddedEvent.Cause cause) {
 		super.onAdded(cause);
 
-		// register protected chest:
-		SKShopkeepersPlugin.getInstance().getProtectedChests().addChest(this.getWorldName(), chestX, chestY, chestZ, this);
+		// Register protected container:
+		SKShopkeepersPlugin.getInstance().getProtectedContainers().addContainer(this.getWorldName(), containerX, containerY, containerZ, this);
 	}
 
 	@Override
 	protected void onRemoval(ShopkeeperRemoveEvent.Cause cause) {
 		super.onRemoval(cause);
 
-		// unregister previously protected chest:
-		SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(this.getWorldName(), chestX, chestY, chestZ, this);
+		// Unregister previously protected container:
+		SKShopkeepersPlugin.getInstance().getProtectedContainers().removeContainer(this.getWorldName(), containerX, containerY, containerZ, this);
 	}
 
 	@Override
@@ -296,47 +297,72 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return (this.isForHire() ? hireCost.clone() : null);
 	}
 
-	protected void _setChest(int chestX, int chestY, int chestZ) {
+	protected void _setContainer(int containerX, int containerY, int containerZ) {
 		if (this.isValid()) {
-			// unregister previously protected chest:
-			SKShopkeepersPlugin.getInstance().getProtectedChests().removeChest(this.getWorldName(), chestX, chestY, chestZ, this);
+			// Unregister previously protected container:
+			SKShopkeepersPlugin.getInstance().getProtectedContainers().removeContainer(this.getWorldName(), containerX, containerY, containerZ, this);
 		}
 
-		// update chest:
-		this.chestX = chestX;
-		this.chestY = chestY;
-		this.chestZ = chestZ;
+		// Update container:
+		this.containerX = containerX;
+		this.containerY = containerY;
+		this.containerZ = containerZ;
 
 		if (this.isValid()) {
-			// register new protected chest:
-			SKShopkeepersPlugin.getInstance().getProtectedChests().addChest(this.getWorldName(), chestX, chestY, chestZ, this);
+			// Register new protected container:
+			SKShopkeepersPlugin.getInstance().getProtectedContainers().addContainer(this.getWorldName(), containerX, containerY, containerZ, this);
 		}
 	}
 
 	@Override
 	public int getChestX() {
-		return chestX;
+		return this.getContainerX();
 	}
 
 	@Override
 	public int getChestY() {
-		return chestY;
+		return this.getContainerY();
 	}
 
 	@Override
 	public int getChestZ() {
-		return chestZ;
+		return this.getContainerZ();
 	}
 
 	@Override
-	public void setChest(int chestX, int chestY, int chestZ) {
-		this._setChest(chestX, chestY, chestZ);
+	public int getContainerX() {
+		return containerX;
+	}
+
+	@Override
+	public int getContainerY() {
+		return containerY;
+	}
+
+	@Override
+	public int getContainerZ() {
+		return containerZ;
+	}
+
+	@Override
+	public void setChest(int containerX, int containerY, int containerZ) {
+		this.setContainer(containerX, containerY, containerZ);
+	}
+
+	@Override
+	public void setContainer(int containerX, int containerY, int containerZ) {
+		this._setContainer(containerX, containerY, containerZ);
 		this.markDirty();
 	}
 
 	@Override
 	public Block getChest() {
-		return Bukkit.getWorld(this.getWorldName()).getBlockAt(chestX, chestY, chestZ);
+		return this.getContainer();
+	}
+
+	@Override
+	public Block getContainer() {
+		return Bukkit.getWorld(this.getWorldName()).getBlockAt(containerX, containerY, containerZ);
 	}
 
 	// returns null (and logs a warning) if the price cannot be represented correctly by currency items
@@ -388,13 +414,20 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public int getCurrencyInChest() {
-		Block chest = this.getChest();
-		if (!ItemUtils.isChest(chest.getType())) return 0;
+		return this.getCurrencyInContainer();
+	}
+
+	@Override
+	public int getCurrencyInContainer() {
+		Block container = this.getContainer();
+		if (!ShopContainers.isSupportedContainer(container.getType())) {
+			return 0;
+		}
 
 		int totalCurrency = 0;
-		Inventory chestInventory = ((Chest) chest.getState()).getInventory();
-		ItemStack[] chestContents = chestInventory.getContents();
-		for (ItemStack itemStack : chestContents) {
+		Inventory inventory = ShopContainers.getInventory(container);
+		ItemStack[] contents = inventory.getContents();
+		for (ItemStack itemStack : contents) {
 			if (Settings.isCurrencyItem(itemStack)) {
 				totalCurrency += itemStack.getAmount();
 			} else if (Settings.isHighCurrencyItem(itemStack)) {
@@ -404,15 +437,15 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return totalCurrency;
 	}
 
-	protected List<ItemCount> getItemsFromChest(Filter<ItemStack> filter) {
-		ItemStack[] chestContents = null;
-		Block chest = this.getChest();
-		if (ItemUtils.isChest(chest.getType())) {
-			Inventory chestInventory = ((Chest) chest.getState()).getInventory();
-			chestContents = chestInventory.getContents();
+	protected List<ItemCount> getItemsFromContainer(Filter<ItemStack> filter) {
+		ItemStack[] contents = null;
+		Block container = this.getContainer();
+		if (ShopContainers.isSupportedContainer(container.getType())) {
+			Inventory inventory = ShopContainers.getInventory(container);
+			contents = inventory.getContents();
 		}
-		// returns an empty list if the chest couldn't be found:
-		return ItemUtils.countItems(chestContents, filter);
+		// Returns an empty list if the container could not be found:
+		return ItemUtils.countItems(contents, filter);
 	}
 
 	// SHOPKEEPER UIs - shortcuts for common UI types:
@@ -424,17 +457,23 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public boolean openChestWindow(Player player) {
-		// make sure the chest still exists
-		Block chest = this.getChest();
-		if (!ItemUtils.isChest(chest.getType())) {
-			Log.debug(() -> "Cannot open chest inventory for player '" + player.getName() + "': The block is no longer a chest!");
+		return this.openContainerWindow(player);
+	}
+
+	@Override
+	public boolean openContainerWindow(Player player) {
+		// Check if the container still exists:
+		Block container = this.getContainer();
+		if (!ShopContainers.isSupportedContainer(container.getType())) {
+			Log.debug(() -> "Cannot open container inventory for player '" + player.getName()
+					+ "': The block is no longer a valid container!");
 			return false;
 		}
 
-		Log.debug(() -> "Opening chest inventory for player '" + player.getName() + "'.");
-		// open the chest directly as the player (no need for a custom UI)
-		Inventory inv = ((Chest) chest.getState()).getInventory();
-		player.openInventory(inv);
+		Log.debug(() -> "Opening container inventory for player '" + player.getName() + "'.");
+		// Open the container directly for the player (no need for a custom UI):
+		Inventory inventory = ShopContainers.getInventory(container);
+		player.openInventory(inventory);
 		return true;
 	}
 
@@ -442,16 +481,16 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void tick() {
-		// delete the shopkeeper if the chest is no longer present (eg. if it got removed externally by another plugin,
-		// such as WorldEdit, etc.):
-		if (Settings.deleteShopkeeperOnBreakChest) {
-			remainingCheckChestSeconds--;
-			if (remainingCheckChestSeconds <= 0) {
-				remainingCheckChestSeconds = CHECK_CHEST_PERIOD_SECONDS;
-				// this checks if the block is still a chest:
-				Block chestBlock = this.getChest();
-				if (!ItemUtils.isChest(chestBlock.getType())) {
-					SKShopkeepersPlugin.getInstance().getRemoveShopOnChestBreak().handleBlockBreakage(chestBlock);
+		// Delete the shopkeeper if the container is no longer present (eg. if it got removed externally by another
+		// plugin, such as WorldEdit, etc.):
+		if (Settings.deleteShopkeeperOnBreakContainer) {
+			remainingCheckContainerSeconds--;
+			if (remainingCheckContainerSeconds <= 0) {
+				remainingCheckContainerSeconds = CHECK_CONTAINER_PERIOD_SECONDS;
+				// This checks if the block is still a valid container:
+				Block containerBlock = this.getContainer();
+				if (!ShopContainers.isSupportedContainer(containerBlock.getType())) {
+					SKShopkeepersPlugin.getInstance().getRemoveShopOnContainerBreak().handleBlockBreakage(containerBlock);
 				}
 			}
 		}

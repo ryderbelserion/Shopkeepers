@@ -34,11 +34,11 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		Set<String> bookTitles = new HashSet<>();
 
 		// add the shopkeeper's offers:
-		List<ItemCount> chestItems = shopkeeper.getCopyableBooksFromChest();
+		List<ItemCount> containerItems = shopkeeper.getCopyableBooksFromContainer();
 		for (BookOffer offer : shopkeeper.getOffers()) {
 			String bookTitle = offer.getBookTitle();
 			bookTitles.add(bookTitle);
-			ItemStack bookItem = shopkeeper.getBookItem(chestItems, bookTitle);
+			ItemStack bookItem = shopkeeper.getBookItem(containerItems, bookTitle);
 			if (bookItem == null) {
 				bookItem = shopkeeper.createDummyBook(bookTitle);
 			}
@@ -46,12 +46,12 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			recipes.add(recipe);
 		}
 
-		// add empty offers for items from the chest:
-		for (int chestItemIndex = 0; chestItemIndex < chestItems.size(); chestItemIndex++) {
-			ItemCount itemCount = chestItems.get(chestItemIndex);
-			ItemStack itemFromChest = itemCount.getItem(); // this item is already a copy with amount 1
+		// add empty offers for items from the container:
+		for (int containerItemIndex = 0; containerItemIndex < containerItems.size(); containerItemIndex++) {
+			ItemCount itemCount = containerItems.get(containerItemIndex);
+			ItemStack itemFromContainer = itemCount.getItem(); // this item is already a copy with amount 1
 
-			String bookTitle = SKBookPlayerShopkeeper.getBookTitle(itemFromChest);
+			String bookTitle = SKBookPlayerShopkeeper.getBookTitle(itemFromContainer);
 			assert bookTitle != null; // we filtered those book items earlier
 			if (bookTitles.contains(bookTitle)) {
 				continue; // already added a recipe for a book with this name
@@ -59,7 +59,7 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			bookTitles.add(bookTitle);
 
 			// add recipe:
-			TradingRecipeDraft recipe = this.createTradingRecipeDraft(itemFromChest, 0);
+			TradingRecipeDraft recipe = this.createTradingRecipeDraft(itemFromContainer, 0);
 			recipes.add(recipe);
 		}
 

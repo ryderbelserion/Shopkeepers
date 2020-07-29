@@ -34,20 +34,20 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		assert chestInventory != null & newChestContents != null;
+		assert containerInventory != null & newContainerContents != null;
 
-		// remove result items from chest contents:
+		// remove result items from container contents:
 		ItemStack resultItem = tradingRecipe.getResultItem();
 		assert resultItem != null;
-		if (ItemUtils.removeItems(newChestContents, resultItem) != 0) {
-			this.debugPreventedTrade(tradingPlayer, "The shop's chest doesn't contain the required items.");
+		if (ItemUtils.removeItems(newContainerContents, resultItem) != 0) {
+			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain the required items.");
 			return false;
 		}
 
-		// add traded items to chest contents:
-		if (!this.addItems(newChestContents, tradingRecipe.getItem1(), tradeData.offeredItem1)
-				|| !this.addItems(newChestContents, tradingRecipe.getItem2(), tradeData.offeredItem2)) {
-			this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
+		// add traded items to container contents:
+		if (!this.addItems(newContainerContents, tradingRecipe.getItem1(), tradeData.offeredItem1)
+				|| !this.addItems(newContainerContents, tradingRecipe.getItem2(), tradeData.offeredItem2)) {
+			this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 			return false;
 		}
 		return true;

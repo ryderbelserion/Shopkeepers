@@ -9,8 +9,8 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
 /**
- * A shopkeeper that is managed by a player. This shopkeeper draws its supplies from a chest and will deposit earnings
- * back into that chest.
+ * A shopkeeper that is managed by a player. This shopkeeper draws its supplies from a container and will deposit
+ * earnings back into that container.
  */
 public interface PlayerShopkeeper extends Shopkeeper {
 
@@ -88,31 +88,94 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	public ItemStack getHireCost();
 
 	/**
-	 * Gets the chest's x coordinate.
+	 * Gets the container's x coordinate.
 	 * 
-	 * @return the chest's x coordinate
+	 * @return the container's x coordinate
+	 * @deprecated Use {@link #getContainerX()}
 	 */
 	public int getChestX();
 
 	/**
-	 * Gets the chest's y coordinate.
+	 * Gets the container's y coordinate.
 	 * 
-	 * @return the chest's y coordinate
+	 * @return the container's y coordinate
+	 * @deprecated Use {@link #getContainerY()}
 	 */
 	public int getChestY();
 
 	/**
-	 * Gets the chest's z coordinate.
+	 * Gets the container's z coordinate.
 	 * 
-	 * @return the chest's z coordinate.
+	 * @return the container's z coordinate.
+	 * @deprecated Use {@link #getContainerZ()}
 	 */
 	public int getChestZ();
 
-	public void setChest(int chestX, int chestY, int chestZ);
+	/**
+	 * @param containerX
+	 * @param containerY
+	 * @param containerZ
+	 * @deprecated Use {@link #setContainer(int, int, int)}
+	 */
+	public void setChest(int containerX, int containerY, int containerZ);
 
+	/**
+	 * 
+	 * @return
+	 * @deprecated Use {@link #getContainer()}
+	 */
 	public Block getChest();
 
+	/**
+	 * 
+	 * @return
+	 * @deprecated Use {@link #getCurrencyInContainer()}
+	 */
 	public int getCurrencyInChest();
+
+	/**
+	 * Gets the container's x coordinate.
+	 * 
+	 * @return the container's x coordinate
+	 */
+	public int getContainerX();
+
+	/**
+	 * Gets the container's y coordinate.
+	 * 
+	 * @return the container's y coordinate
+	 */
+	public int getContainerY();
+
+	/**
+	 * Gets the container's z coordinate.
+	 * 
+	 * @return the container's z coordinate.
+	 */
+	public int getContainerZ();
+
+	public void setContainer(int containerX, int containerY, int containerZ);
+
+	/**
+	 * Gets the block of the shop's container.
+	 * <p>
+	 * This does not necessarily have to be a chest, but could be another type of supported shop container as well.
+	 * <p>
+	 * The block might not actually be a valid container type currently (for example if something has broken or changed
+	 * the type of the block in the meantime).
+	 * 
+	 * @return the shop's container block
+	 */
+	public Block getContainer();
+
+	/**
+	 * Gets the amount of currency stored inside the shop's container.
+	 * <p>
+	 * Returns <code>0</code> if the container does not exist currently.
+	 * 
+	 * @return the amount of currency inside the shop's container
+	 */
+	public int getCurrencyInContainer();
 
 	// SHOPKEEPER UIs - shortcuts for common UI types:
 
@@ -122,17 +185,27 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	 * Fails if this shopkeeper type doesn't support hiring (ex. admin shops).
 	 * 
 	 * @param player
-	 *            the player requesting the hiring interface
-	 * @return <code>true</code> if the interface was successfully opened for the player
+	 *            the player
+	 * @return <code>true</code> if the interface was successfully opened
 	 */
 	public boolean openHireWindow(Player player);
 
 	/**
-	 * Attempts to open the chest inventory of this shopkeeper for the specified player.
+	 * Attempts to open the container inventory of this shopkeeper for the specified player.
 	 * 
 	 * @param player
-	 *            the player requesting the chest inventory window
-	 * @return <code>true</code> if the interface was successfully opened for the player
+	 *            the player
+	 * @return <code>true</code> if the interface was successfully opened
+	 * @deprecated {@link #openContainerWindow(Player)}
 	 */
 	public boolean openChestWindow(Player player);
+
+	/**
+	 * Attempts to open the container inventory of this shopkeeper for the specified player.
+	 * 
+	 * @param player
+	 *            the player
+	 * @return <code>true</code> if the interface was successfully opened
+	 */
+	public boolean openContainerWindow(Player player);
 }

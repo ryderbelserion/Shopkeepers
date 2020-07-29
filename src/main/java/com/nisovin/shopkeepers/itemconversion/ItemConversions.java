@@ -4,7 +4,6 @@ import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
@@ -14,6 +13,7 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -68,24 +68,26 @@ public class ItemConversions {
 		// Convert player items:
 		int convertedStacks = convertAffectedPlayerItems(player);
 
-		// Convert shop chest items:
+		// Convert shop container items:
 		if (shopkeeper instanceof PlayerShopkeeper) {
 			PlayerShopkeeper playerShopkeeper = (PlayerShopkeeper) shopkeeper;
-			Block chestBlock = playerShopkeeper.getChest();
-			assert chestBlock != null;
-			if (ItemUtils.isChest(chestBlock.getType())) {
+			Block containerBlock = playerShopkeeper.getContainer();
+			assert containerBlock != null;
+			if (ShopContainers.isSupportedContainer(containerBlock.getType())) {
 				long start = System.nanoTime();
-				Chest chest = (Chest) chestBlock.getState();
-				int convertedChestStacks = convertAffectedChestItems(chest);
+				// Note: Returns the complete inventory for double chests.
+				Inventory containerInventory = ShopContainers.getInventory(containerBlock);
+				int convertedContainerStacks = convertAffectedItems(containerInventory);
+				// Note: Inventory changes are directly reflected by the container block in the world.
 				long durationMillis = (System.nanoTime() - start) / 1000000L;
 				// Note: The conversion always has some performance impact, even if no items got actually converted. We
 				// therefore always print the debug messages to allow debugging the item conversion times.
 				Log.debug(Settings.DebugOptions.itemConversions,
-						() -> "Converted " + convertedChestStacks + " affected item stacks in the chest of shopkeeper "
+						() -> "Converted " + convertedContainerStacks + " affected item stacks in the container of shopkeeper "
 								+ shopkeeper.getId() + ", triggered by player '" + player.getName()
 								+ "' (took " + durationMillis + " ms)."
 				);
-				convertedStacks += convertedChestStacks;
+				convertedStacks += convertedContainerStacks;
 			}
 		}
 
@@ -111,15 +113,6 @@ public class ItemConversions {
 				() -> "Converted " + convertedStacks + " affected item stacks in the inventory of player '"
 						+ player.getName() + "' (took " + durationMillis + " ms)."
 		);
-		return convertedStacks;
-	}
-
-	private static int convertAffectedChestItems(Chest chest) {
-		Validate.notNull(chest, "chest is null");
-		Inventory inventory = chest.getInventory(); // the complete inventory for double chests
-		int convertedStacks = convertAffectedItems(inventory);
-		// Note: We don't need to apply the block state, because the used inventory is backed directly by the chest in
-		// the world.
 		return convertedStacks;
 	}
 

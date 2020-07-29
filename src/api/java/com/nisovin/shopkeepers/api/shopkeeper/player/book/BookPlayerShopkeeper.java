@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
  * Sells copies of written books in exchange for currency items.
  * <p>
  * Books are identified solely based on their title. There exists at most one offer for a certain book. If there are
- * multiple books with the same title in the chest, the shopkeeper uses only the first book it finds.
+ * multiple books with the same title in the shop's container, the shopkeeper uses only the first book it finds.
  */
 public interface BookPlayerShopkeeper extends PlayerShopkeeper {
 

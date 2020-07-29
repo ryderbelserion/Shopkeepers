@@ -38,9 +38,9 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 			// others:
 			addFeatureEntry(allFeatures, "save-instantly", Settings.saveInstantly);
 			addFeatureEntry(allFeatures, "colored names allowed", Settings.nameRegex.contains("&"));
-			addFeatureEntry(allFeatures, "protect-chests", Settings.protectChests);
+			addFeatureEntry(allFeatures, "protect-containers", Settings.protectContainers);
 			addFeatureEntry(allFeatures, "prevent-item-movement", Settings.preventItemMovement);
-			addFeatureEntry(allFeatures, "delete-shopkeeper-on-break-chest", Settings.deleteShopkeeperOnBreakChest);
+			addFeatureEntry(allFeatures, "delete-shopkeeper-on-break-container", Settings.deleteShopkeeperOnBreakContainer);
 			addFeatureEntry(allFeatures, "player-shopkeeper-inactive-days", Settings.playerShopkeeperInactiveDays > 0);
 			addFeatureEntry(allFeatures, "tax-rate", Settings.taxRate > 0);
 			addFeatureEntry(allFeatures, "use-strict-item-comparison", Settings.useStrictItemComparison);

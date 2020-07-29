@@ -6,7 +6,7 @@
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
 # Determines the required config migrations. Do not edit manually!
-config-version: 2
+config-version: 3
 # The initial debugging state of the plugin.
 debug: false
 # Additional debugging options.
@@ -45,9 +45,9 @@ file-encoding: "UTF-8"
 save-instantly: true
 
 # Enables the automatic conversion of items inside the inventories of players
-# and shop chests whenever a player opens a shopkeeper UI (eg. trading, editor,
-# hiring, etc.) The items are converted to conform to Spigot's internal data
-# format.
+# and shop containers whenever a player opens a shopkeeper UI (eg. trading,
+# editor, hiring, etc.) The items are converted to conform to Spigot's internal
+# data format.
 # This setting helps with issues related to items which have been created on
 # previous Spigot versions or via some Minecraft mechanism (eg. give command,
 # loot tables, etc.) no longer getting accepted when trading with shopkeepers.
@@ -97,9 +97,10 @@ enable-world-guard-restrictions: false
 # If enabled (additionally to the enable-world-guard-restrictions setting),
 # players will only be able to place shopkeepers in regions where the
 # 'allow-shop' flag is set, but nowhere else. However, players will still
-# require chest access for shop setup to work. And in case they can't place
-# chests in the affected region, shop chests need to be pre-setup by someone
-# else and the require-chest-recently-placed setting needs to be disabled.
+# require container access to setup shops. And in case they can't place
+# containers in the affected region, shop containers need to be pre-setup by
+# someone else and the require-container-recently-placed setting needs to be
+# disabled.
 require-world-guard-allow-shop-flag: false
 # Whether to register the allow-shop flag with WorldGuard (if no other plugin
 # has registered it yet). Usually there should be no need to disable this.
@@ -131,12 +132,12 @@ deleting-player-shop-returns-creation-item: false
 # Whether to allow creating player shops with the /shopkeeper command.
 create-player-shop-with-command: false
 
-# Whether the selected chest must have been recently placed by the player
-# attempting to create the shopkeeper.
-require-chest-recently-placed: true
+# Whether the selected container must have been recently placed by the player
+# who is attempting to create the shopkeeper.
+require-container-recently-placed: true
 # The maximum distance a player shopkeeper can be placed from its backing
-# chest. This cannot be set to a value greater than 50.
-max-chest-distance: 15
+# container. This cannot be set to a value greater than 50.
+max-container-distance: 15
 # The default maximum number of shops a player can have. Set to 0 to allow any
 # number of shops.
 max-shops-per-player: 0
@@ -145,15 +146,15 @@ max-shops-per-player: 0
 # shopkeeper.maxshops.<count> permission node pattern to use this feature.
 max-shops-perm-options: 5,15,25
 
-# Whether to protect player shop chests from being accessed or broken. Usually
-# it is recommended to keep this enabled.
-protect-chests: true
-# Whether to prevent item movement from and to protected shop chests (via
-# hoppers, droppers, etc.). Item movement will always be allowed if the chest
-# protection is disabled.
+# Whether to protect player shop containers from being accessed or broken. It
+# is usually recommended to keep this enabled.
+protect-containers: true
+# Whether to prevent item movements from and to protected shop containers (via
+# hoppers, droppers, etc.). Item movement will always be allowed if the
+# container protection is disabled.
 prevent-item-movement: true
-# Whether to delete player shopkeepers when their backing chest is broken.
-delete-shopkeeper-on-break-chest: false
+# Whether to delete player shopkeepers when their container is broken.
+delete-shopkeeper-on-break-container: false
 
 # If enabled (set to a value greater than 0), Shopkeepers will check for and
 # remove the shops of inactive players once every plugin start. This setting
@@ -305,11 +306,11 @@ trade-setup-item: PAPER
 # The item used for the set-name button, and the naming item (if enabled).
 name-item: NAME_TAG
 
-# Whether the editor menu of player shops contains an options to open the
-# shop's chest.
-enable-chest-option-on-player-shop: true
-# The item used for the open-chest button.
-chest-item: CHEST
+# Whether the editor menu of player shops contains an option to open the shop's
+# container.
+enable-container-option-on-player-shop: true
+# The item used for the 'open container' editor button.
+container-item: CHEST
 
 # The item used for the delete button.
 delete-item: BONE
@@ -438,7 +439,7 @@ msg-creation-item-selected: |-
   &aShop creation:
   &e  Left/Right-click to select the shop type.
   &e  Sneak + left/right-click to select the object type.
-  &e  Right-click a chest to select it.
+  &e  Right-click a container to select it.
   &e  Then right-click a block to place the shopkeeper.
 
 msg-button-previous-page: "&6<- Previous page ({prev_page} of {max_page})"
@@ -452,8 +453,8 @@ msg-button-name: "&aSet shop name"
 msg-button-name-lore:
 - Lets you rename
 - your shopkeeper
-msg-button-chest: "&aView chest inventory"
-msg-button-chest-lore:
+msg-button-container: "&aView shop inventory"
+msg-button-container-lore:
 - Lets you view the inventory
 - your shopkeeper is using
 msg-button-delete: "&4Delete"
@@ -577,13 +578,14 @@ msg-button-magma-cube-size-lore:
 msg-trading-title-prefix: "&2"
 msg-trading-title-default: "Shopkeeper"
 
-msg-selected-chest: "&aChest selected! Right-click a block to place your shopkeeper."
-msg-must-select-chest: "&7You must right-click a chest before placing your shopkeeper."
-msg-no-chest-selected: "&7The selected block is not a chest!"
-msg-chest-too-far: "&7The shopkeeper's chest is too far away!"
-msg-chest-not-placed: "&7You must select a chest you have recently placed!"
-msg-chest-already-in-use: "&7Another shopkeeper is already using the selected chest!"
-msg-no-chest-access: "&7You cannot access the selected chest!"
+msg-container-selected: "&aContainer selected! Right-click a block to place your shopkeeper."
+msg-unsupported-container: "&7This type of container cannot be used for shops."
+msg-must-select-container: "&7You must right-click a container before placing your shopkeeper."
+msg-invalid-container: "&7The selected block is not a valid container!"
+msg-container-too-far-away: "&7The shopkeeper's container is too far away!"
+msg-container-not-placed: "&7You must select a container you have recently placed!"
+msg-container-already-in-use: "&7Another shopkeeper is already using the selected container!"
+msg-no-container-access: "&7You cannot access the selected container!"
 msg-too-many-shops: "&7You have too many shops!"
 msg-no-admin-shop-type-selected: "&7You have to select an admin shop type!"
 msg-no-player-shop-type-selected: "&7You have to select a player shop type!"
@@ -603,7 +605,7 @@ msg-must-target-player-shop: "&7You have to target a player shopkeeper."
 msg-target-entity-is-no-shop: "&7The targeted entity is no shopkeeper."
 msg-target-shop-is-no-admin-shop: "&7The targeted shopkeeper is no admin shopkeeper."
 msg-target-shop-is-no-player-shop: "&7The targeted shopkeeper is no player shopkeeper."
-msg-unused-chest: "&7No shopkeeper is using this chest."
+msg-unused-container: "&7No shopkeeper is using this container."
 msg-not-owner: "&7You are not the owner of this shopkeeper."
 msg-owner-set: "&aNew owner was set to &e{owner}"
 msg-shop-creation-items-given: "&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!"
@@ -633,21 +635,21 @@ msg-missing-trade-perm: "&7You do not have the permission to trade with this sho
 msg-missing-custom-trade-perm: "&7You do not have the permission to trade with this shop."
 msg-cant-trade-with-own-shop: "&7You cannot trade with your own shop."
 msg-cant-trade-while-owner-online: "&7You cannot trade while the owner of this shop ('&e{owner}&7') is online."
-msg-cant-trade-with-shop-missing-chest: "&7You cannot trade with this shop, because its chest is missing."
+msg-cant-trade-with-shop-missing-container: "&7You cannot trade with this shop, because its container is missing."
 
 msg-shopkeeper-created: "&aShopkeeper created: &6{type} &7({description})\n{setupDesc}"
 
 msg-shop-setup-desc-selling: |-
-  &e  Add items you want to sell to your chest, then
+  &e  Add items you want to sell to your container, then
   &e  right-click the shop while sneaking to modify costs.
 msg-shop-setup-desc-buying: |-
-  &e  Add one of each item you want to buy to your chest, then
-  &e  right-click the shop while sneaking to modify costs.
+  &e  Add one of each item you want to buy to your container,
+  &e  then right-click the shop while sneaking to modify costs.
 msg-shop-setup-desc-trading: |-
-  &e  Add items you want to sell to your chest, then
+  &e  Add items you want to sell to your container, then
   &e  right-click the shop while sneaking to modify costs.
 msg-shop-setup-desc-book: |-
-  &e  Add written books and blank books to your chest, then
+  &e  Add written and blank books to your container, then
   &e  right-click the shop while sneaking to modify costs.
 msg-shop-setup-desc-admin-regular: |-
   &e  Right-click the shop while sneaking to modify trades.
@@ -660,7 +662,7 @@ msg-trade-setup-desc-admin-regular:
 - 'Bottom rows: Cost items'
 msg-trade-setup-desc-selling:
 - Sells items to players.
-- Insert items to sell into the chest.
+- Insert items to sell into the container.
 - Left/Right click to adjust amounts.
 - 'Top row: Items being sold'
 - 'Bottom rows: Cost items'
@@ -668,7 +670,7 @@ msg-trade-setup-desc-buying:
 - Buys items from players.
 - Insert one of each item you want to
 - buy and plenty of currency items
-- into the chest.
+- into the container.
 - Left/Right click to adjust amounts.
 - 'Top row: Cost items'
 - 'Bottom row: Items being bought'
@@ -682,7 +684,7 @@ msg-trade-setup-desc-trading:
 msg-trade-setup-desc-book:
 - Sells book copies.
 - Insert written and blank books
-- into the chest.
+- into the container.
 - Left/Right click to adjust costs.
 - 'Top row: Books being sold'
 - 'Bottom rows: Cost items'

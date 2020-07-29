@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shopkeeper.player;
 
 import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -9,9 +8,9 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
-import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -19,8 +18,8 @@ import com.nisovin.shopkeepers.util.TextUtils;
 public abstract class PlayerShopTradingHandler extends TradingHandler {
 
 	// state related to the currently handled trade:
-	protected Inventory chestInventory = null;
-	protected ItemStack[] newChestContents = null;
+	protected Inventory containerInventory = null;
+	protected ItemStack[] newContainerContents = null;
 
 	protected PlayerShopTradingHandler(AbstractPlayerShopkeeper shopkeeper) {
 		super(SKDefaultUITypes.TRADING(), shopkeeper);
@@ -73,17 +72,17 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 			}
 		}
 
-		// check for the shop's chest:
-		Block chest = shopkeeper.getChest();
-		if (!ItemUtils.isChest(chest.getType())) {
-			TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWithShopMissingChest, "owner", shopkeeper.getOwnerName());
-			this.debugPreventedTrade(tradingPlayer, "The shop's chest is missing.");
+		// Check for the shop's container:
+		Block container = shopkeeper.getContainer();
+		if (!ShopContainers.isSupportedContainer(container.getType())) {
+			TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWithShopMissingContainer, "owner", shopkeeper.getOwnerName());
+			this.debugPreventedTrade(tradingPlayer, "The shop's container is missing.");
 			return false;
 		}
 
 		// setup common state information for handling this trade:
-		this.chestInventory = ((Chest) chest.getState()).getInventory();
-		this.newChestContents = chestInventory.getContents();
+		this.containerInventory = ShopContainers.getInventory(container);
+		this.newContainerContents = containerInventory.getContents();
 
 		return true;
 	}
@@ -92,9 +91,9 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 	protected void onTradeApplied(TradeData tradeData) {
 		super.onTradeApplied(tradeData);
 
-		// apply chest content changes:
-		if (chestInventory != null && newChestContents != null) {
-			chestInventory.setContents(newChestContents);
+		// Apply container content changes:
+		if (containerInventory != null && newContainerContents != null) {
+			containerInventory.setContents(newContainerContents);
 		}
 
 		// reset trade related state information:
@@ -108,7 +107,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 	}
 
 	protected void resetTradeState() {
-		chestInventory = null;
-		newChestContents = null;
+		containerInventory = null;
+		newContainerContents = null;
 	}
 }

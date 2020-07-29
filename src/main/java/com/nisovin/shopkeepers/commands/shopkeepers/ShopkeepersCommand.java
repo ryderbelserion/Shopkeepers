@@ -33,7 +33,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.CommandRegistry;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
@@ -123,7 +123,7 @@ public class ShopkeepersCommand extends BaseCommand {
 		ShopType<?> shopType = context.get(ARGUMENT_SHOP_TYPE);
 		ShopObjectType<?> shopObjType = context.get(ARGUMENT_OBJECT_TYPE);
 
-		boolean createPlayerShop = (Settings.createPlayerShopWithCommand && ItemUtils.isChest(targetBlock.getType()));
+		boolean createPlayerShop = (Settings.createPlayerShopWithCommand && ShopContainers.isSupportedContainer(targetBlock.getType()));
 		if (createPlayerShop) {
 			// create player shopkeeper:
 

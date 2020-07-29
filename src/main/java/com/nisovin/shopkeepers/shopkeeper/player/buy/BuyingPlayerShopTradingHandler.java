@@ -45,27 +45,27 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		assert chestInventory != null & newChestContents != null;
+		assert containerInventory != null & newContainerContents != null;
 
-		// remove currency items from chest contents:
-		int remaining = this.removeCurrency(newChestContents, offer.getPrice());
+		// remove currency items from container contents:
+		int remaining = this.removeCurrency(newContainerContents, offer.getPrice());
 		if (remaining > 0) {
-			this.debugPreventedTrade(tradingPlayer, "The shop's chest doesn't contain enough currency.");
+			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain enough currency.");
 			return false;
 		} else if (remaining < 0) {
-			this.debugPreventedTrade(tradingPlayer, "The shop's chest does not have enough space to split large currency items.");
+			this.debugPreventedTrade(tradingPlayer, "The shop's container does not have enough space to split large currency items.");
 			return false;
 		}
 
-		// add bought items to chest contents:
+		// add bought items to container contents:
 		int amountAfterTaxes = this.getAmountAfterTaxes(expectedBoughtItemAmount);
 		if (amountAfterTaxes > 0) {
 			// the item the trading player gave might slightly differ from the required item,
 			// but is still accepted, depending on the used item comparison logic and settings:
 			ItemStack receivedItem = tradeData.offeredItem1.clone(); // create a copy, just in case
 			receivedItem.setAmount(amountAfterTaxes);
-			if (ItemUtils.addItems(newChestContents, receivedItem) != 0) {
-				this.debugPreventedTrade(tradingPlayer, "The shop's chest cannot hold the traded items.");
+			if (ItemUtils.addItems(newContainerContents, receivedItem) != 0) {
+				this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 				return false;
 			}
 		}
@@ -73,7 +73,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 	}
 
 	// TODO simplify this? Maybe by separating into different, general utility functions
-	// TODO support iterating in reverse order, for nicer looking chest contents?
+	// TODO support iterating in reverse order, for nicer looking container contents?
 	// returns the amount of currency that couldn't be removed, 0 on full success, negative if too much was removed
 	protected int removeCurrency(ItemStack[] contents, int amount) {
 		Validate.notNull(contents);

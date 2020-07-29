@@ -6,7 +6,7 @@ Shopkeepers [![Build Status](https://travis-ci.com/Shopkeepers/Shopkeepers.svg?b
 ===========
 
 Shopkeepers is a Bukkit plugin which allows you to set up custom villager shopkeepers that sell exactly what you want them to sell and for what price. 
-You can set up admin shops, which have infinite supply, and you can also set up player shops, which pull supply from a chest.
+You can set up admin shops, which have infinite supply, and you can also set up player shops, which pull supply from a container.
 
 **BukkitDev Page**: https://dev.bukkit.org/projects/shopkeepers  
 **Wiki**: https://github.com/Shopkeepers/Shopkeepers-Wiki/wiki  

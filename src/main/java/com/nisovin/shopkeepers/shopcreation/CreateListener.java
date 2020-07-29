@@ -28,6 +28,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
+import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.PermissionUtils;
@@ -65,8 +66,8 @@ class CreateListener implements Listener {
 		TextUtils.sendMessage(player, Settings.msgCreationItemSelected);
 	}
 
-	// Since this might check chest access by calling another dummy interaction event, we handle (cancel) this event as
-	// early as possible, so that other plugins (eg. protection plugins) can ignore it and don't handle it twice. In
+	// Since this might check container access by calling another dummy interaction event, we handle (cancel) this event
+	// as early as possible, so that other plugins (eg. protection plugins) can ignore it and don't handle it twice. In
 	// case some other event handler managed to already cancel the event on LOWEST priority, we ignore the interaction.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
@@ -151,29 +152,39 @@ class CreateListener implements Listener {
 		} else if (action == Action.RIGHT_CLICK_BLOCK) {
 			Block clickedBlock = event.getClickedBlock();
 
-			Block selectedChest = shopkeeperCreation.getSelectedChest(player);
-			// validate old selected chest:
-			if (selectedChest != null && !ItemUtils.isChest(selectedChest.getType())) {
-				shopkeeperCreation.selectChest(player, null);
-				selectedChest = null;
+			Block selectedContainer = shopkeeperCreation.getSelectedContainer(player);
+			// Validate old selected container:
+			if (selectedContainer != null && !ShopContainers.isSupportedContainer(selectedContainer.getType())) {
+				shopkeeperCreation.selectContainer(player, null);
+				selectedContainer = null;
 			}
 
-			// handle chest selection:
-			if (ItemUtils.isChest(clickedBlock.getType()) && !clickedBlock.equals(selectedChest)) {
-				// check if the chest can be used for a shop:
-				if (shopkeeperCreation.handleCheckChest(player, clickedBlock)) {
-					// select chest:
-					shopkeeperCreation.selectChest(player, clickedBlock);
-					TextUtils.sendMessage(player, Settings.msgSelectedChest);
+			// Handle container selection:
+			boolean isContainerSelection = false;
+			if (!clickedBlock.equals(selectedContainer)) {
+				if (ShopContainers.isSupportedContainer(clickedBlock.getType())) {
+					isContainerSelection = true;
+					// Check if the container can be used for a shop:
+					if (shopkeeperCreation.handleCheckContainer(player, clickedBlock)) {
+						// Select container:
+						shopkeeperCreation.selectContainer(player, clickedBlock);
+						TextUtils.sendMessage(player, Settings.msgContainerSelected);
+					}
+				} else if (ItemUtils.isContainer(clickedBlock.getType())) {
+					// Player clicked a type of container which cannot be used for shops:
+					isContainerSelection = true;
+					TextUtils.sendMessage(player, Settings.msgUnsupportedContainer);
 				}
-			} else {
-				// player shop creation:
-				if (selectedChest == null) {
-					// clicked a location without having a chest selected:
-					TextUtils.sendMessage(player, Settings.msgMustSelectChest);
+			}
+
+			if (!isContainerSelection) {
+				// Player shop creation:
+				if (selectedContainer == null) {
+					// Clicked a location without having a container selected:
+					TextUtils.sendMessage(player, Settings.msgMustSelectContainer);
 					return;
 				}
-				assert ItemUtils.isChest(selectedChest.getType()); // we have checked that above already
+				assert ShopContainers.isSupportedContainer(selectedContainer.getType()); // Checked above already
 
 				// validate the selected shop type:
 				if (!(shopType instanceof PlayerShopType)) {
@@ -187,13 +198,13 @@ class CreateListener implements Listener {
 				Location spawnLocation = shopkeeperCreation.determineSpawnLocation(player, clickedBlock, clickedBlockFace);
 
 				// create player shopkeeper:
-				ShopCreationData creationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, clickedBlockFace, selectedChest);
+				ShopCreationData creationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, clickedBlockFace, selectedContainer);
 				Shopkeeper shopkeeper = plugin.handleShopkeeperCreation(creationData);
 				if (shopkeeper != null) {
 					// shopkeeper creation was successful:
 
-					// reset selected chest:
-					shopkeeperCreation.selectChest(player, null);
+					// Reset selected container:
+					shopkeeperCreation.selectContainer(player, null);
 
 					// manually remove creation item from player's hand after this event is processed:
 					Bukkit.getScheduler().runTask(plugin, () -> {

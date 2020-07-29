@@ -10,8 +10,8 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
  * This event is called whenever a player is about to (explicitly) delete a {@link Shopkeeper}.
  * <p>
  * Note: This event may not be called for all actions a player is able to take which may result in the deletion of a
- * shopkeeper. For instance, this event is not called when a player shopkeeper is deleted due to the shop's chest being
- * broken, or when a Citizens shopkeeper is deleted to a player deleting the corresponding Citizens NPC or trait.
+ * shopkeeper. For instance, this event is not called when a player shopkeeper is deleted due to the shop's container
+ * being broken, or when a Citizens shopkeeper is deleted to a player deleting the corresponding Citizens NPC or trait.
  * <p>
  * If you want to react to all shopkeeper deletions, take a look at {@link ShopkeeperRemoveEvent}.
  */

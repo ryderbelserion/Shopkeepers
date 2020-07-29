@@ -166,8 +166,8 @@ public interface Shopkeeper {
 	/**
 	 * Gets the shopkeeper's currently available trading recipes for the given player.
 	 * <p>
-	 * Depending on the type of shopkeeper this might access the world data to determine available stock (chest
-	 * contents).<br>
+	 * Depending on the type of shopkeeper this might access the world data to determine the available stock (shop
+	 * container contents).<br>
 	 * Managing (adding, removing, editing, validating) the overall available trading recipes of this shopkeeper might
 	 * differ between different shopkeeper types and is therefore in their responsibility.
 	 * <p>

@@ -38,13 +38,80 @@ public final class ItemUtils {
 
 	// material utilities:
 
+	/**
+	 * Checks if the given material is a container.
+	 * 
+	 * @param material
+	 *            the material
+	 * @return <code>true</code> if the material is a container
+	 */
+	public static boolean isContainer(Material material) {
+		// TODO This list of container materials needs to be updated with each MC update.
+		if (material == null) return false;
+		if (isChest(material)) return true; // Includes trapped chest
+		if (isShulkerBox(material)) return true;
+		switch (material) {
+		case BARREL:
+		case BREWING_STAND:
+		case DISPENSER:
+		case DROPPER:
+		case HOPPER:
+		case FURNACE:
+		case BLAST_FURNACE:
+		case SMOKER:
+		case ENDER_CHEST: // Note: Has no BlockState of type Container.
+			return true;
+		default:
+			return false;
+		}
+	}
+
 	public static boolean isChest(Material material) {
 		return material == Material.CHEST || material == Material.TRAPPED_CHEST;
+	}
+
+	public static boolean isShulkerBox(Material material) {
+		if (material == null) return false;
+		switch (material) {
+		case SHULKER_BOX:
+		case WHITE_SHULKER_BOX:
+		case ORANGE_SHULKER_BOX:
+		case MAGENTA_SHULKER_BOX:
+		case LIGHT_BLUE_SHULKER_BOX:
+		case YELLOW_SHULKER_BOX:
+		case LIME_SHULKER_BOX:
+		case PINK_SHULKER_BOX:
+		case GRAY_SHULKER_BOX:
+		case LIGHT_GRAY_SHULKER_BOX:
+		case CYAN_SHULKER_BOX:
+		case PURPLE_SHULKER_BOX:
+		case BLUE_SHULKER_BOX:
+		case BROWN_SHULKER_BOX:
+		case GREEN_SHULKER_BOX:
+		case RED_SHULKER_BOX:
+		case BLACK_SHULKER_BOX:
+			return true;
+		default:
+			return false;
+		}
 	}
 
 	public static boolean isSign(Material material) {
 		if (material == null) return false;
 		return material.data == org.bukkit.block.data.type.Sign.class || material.data == org.bukkit.block.data.type.WallSign.class;
+	}
+
+	public static boolean isRail(Material material) {
+		if (material == null) return false;
+		switch (material) {
+		case RAIL:
+		case POWERED_RAIL:
+		case DETECTOR_RAIL:
+		case ACTIVATOR_RAIL:
+			return true;
+		default:
+			return false;
+		}
 	}
 
 	// itemstack utilities:
