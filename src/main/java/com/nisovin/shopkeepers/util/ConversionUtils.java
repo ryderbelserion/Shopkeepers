@@ -14,7 +14,7 @@ public class ConversionUtils {
 	public static final Map<String, Boolean> BOOLEAN_VALUES;
 
 	static {
-		// initialize boolean values:
+		// Initialize boolean values:
 		Map<String, Boolean> booleanValues = new HashMap<>();
 		booleanValues.put("true", true);
 		booleanValues.put("t", true);
@@ -77,7 +77,7 @@ public class ConversionUtils {
 	public static UUID parseUUID(String string) {
 		if (string == null) return null;
 		if (string.length() == 32) {
-			// possibly flat uuid, insert '-':
+			// Possibly flat uuid, insert '-':
 			string = string.substring(0, 8)
 					+ "-"
 					+ string.substring(8, 12)
@@ -92,7 +92,7 @@ public class ConversionUtils {
 			try {
 				return UUID.fromString(string);
 			} catch (IllegalArgumentException e) {
-				// not a valid uuid
+				// Not a valid uuid.
 			}
 		}
 		return null;
@@ -104,7 +104,7 @@ public class ConversionUtils {
 		try {
 			return Enum.valueOf(clazz, string);
 		} catch (Exception e) {
-			// attempt with upper case input:
+			// Attempt with upper case input:
 			try {
 				return Enum.valueOf(clazz, string.toUpperCase(Locale.ROOT));
 			} catch (Exception e2) {

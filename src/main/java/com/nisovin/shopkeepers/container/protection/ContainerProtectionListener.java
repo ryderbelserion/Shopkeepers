@@ -42,7 +42,7 @@ class ContainerProtectionListener implements Listener {
 		Block block = event.getClickedBlock();
 		Player player = event.getPlayer();
 		if (protectedContainers.isProtectedContainer(block, player)) {
-			// TODO always allow access to own shop containers, even if cancelled by other plugins?
+			// TODO Always allow access to own shop containers, even if cancelled by other plugins?
 			Log.debug(() -> "Cancelled container opening by '" + player.getName() + "' at '"
 					+ TextUtils.getLocationString(block) + "': Protected container.");
 			event.setCancelled(true);
@@ -116,7 +116,7 @@ class ContainerProtectionListener implements Listener {
 		this.removeProtectedChests(event.blockList());
 	}
 
-	// block list has to be modifiable
+	// Block list has to be modifiable.
 	private void removeProtectedChests(List<Block> blockList) {
 		Iterator<Block> iterator = blockList.iterator();
 		while (iterator.hasNext()) {

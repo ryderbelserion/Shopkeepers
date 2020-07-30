@@ -95,7 +95,7 @@ public class ShopkeeperCreation {
 			return false;
 		}
 
-		// check for recently placed:
+		// Check for recently placed:
 		if (Settings.requireContainerRecentlyPlaced && !plugin.getShopkeeperCreation().isRecentlyPlacedContainer(player, containerBlock)) {
 			// Container was not recently placed:
 			TextUtils.sendMessage(player, Settings.msgContainerNotPlaced);
@@ -112,7 +112,7 @@ public class ShopkeeperCreation {
 
 	public Location determineSpawnLocation(Player player, Block targetBlock, BlockFace targetBlockFace) {
 		assert player != null && targetBlock != null && targetBlockFace != null;
-		// if the target block is passable, spawn there, otherwise shift according to target block face:
+		// If the target block is passable, spawn there, otherwise shift according to target block face:
 		Block spawnBlock;
 		if (targetBlock.isPassable()) {
 			spawnBlock = targetBlock;
@@ -120,7 +120,7 @@ public class ShopkeeperCreation {
 			spawnBlock = targetBlock.getRelative(targetBlockFace);
 		}
 		Location spawnLocation = Utils.getBlockCenterLocation(spawnBlock);
-		// face towards player:
+		// Face towards player:
 		spawnLocation.setDirection(player.getEyeLocation().subtract(spawnLocation).toVector());
 		return spawnLocation;
 	}

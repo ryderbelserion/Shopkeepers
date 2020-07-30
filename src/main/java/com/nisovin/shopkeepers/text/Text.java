@@ -138,7 +138,7 @@ public interface Text {
 		if (object instanceof Supplier) {
 			object = ((Supplier<?>) object).get();
 		}
-		// testing this explicitly since this might be a common usage error:
+		// Testing this explicitly since this might be a common usage error:
 		Validate.isTrue(!(object instanceof Text), "The given object is already a Text!");
 		return text(String.valueOf(object));
 	}

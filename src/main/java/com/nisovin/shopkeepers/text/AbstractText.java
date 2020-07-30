@@ -16,15 +16,15 @@ public abstract class AbstractText implements Text {
 	// Reused among all Text instances:
 	private static final Map<String, Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
 
-	// TODO remove parent reference?
-	// would allow less mutable state, which simplifies reuse of Text instances
+	// TODO Remove parent reference?
+	// Would allow less mutable state, which simplifies reuse of Text instances.
 	private Text parent = null;
 
 	private Text child = null;
 	private Text next = null;
 
-	// TODO cache plain text? requires childs to inform parents on changes to their translation or placeholder arguments
-	// -> might not even be worth it in the presence of dynamic arguments
+	// TODO Cache plain text? Requires childs to inform parents on changes to their translation or placeholder
+	// arguments. -> Might not even be worth it in the presence of dynamic arguments.
 
 	protected AbstractText() {
 	}
@@ -34,8 +34,8 @@ public abstract class AbstractText implements Text {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Text> T getParent() {
-		// note: allows the caller to conveniently cast the result to the expected Text type (eg. to TextBuilder in a
-		// fluently built Text)
+		// Note: Allows the caller to conveniently cast the result to the expected Text type (eg. to TextBuilder in a
+		// fluently built Text).
 		return (T) parent;
 	}
 
@@ -87,7 +87,7 @@ public abstract class AbstractText implements Text {
 		if (this.child != null) {
 			((AbstractText) this.child).setParent(null);
 		}
-		this.child = child; // can be null
+		this.child = child; // Can be null
 	}
 
 	// NEXT
@@ -114,7 +114,7 @@ public abstract class AbstractText implements Text {
 		if (this.next != null) {
 			((AbstractText) this.next).setParent(null);
 		}
-		this.next = next; // can be null
+		this.next = next; // Can be null
 	}
 
 	// PLACEHOLDER ARGUMENTS
@@ -123,13 +123,13 @@ public abstract class AbstractText implements Text {
 	public Text setPlaceholderArguments(Map<String, ?> arguments) {
 		Validate.notNull(arguments, "arguments is null");
 
-		// delegate to childs:
+		// Delegate to childs:
 		Text child = this.getChild();
 		if (child != null) {
 			child.setPlaceholderArguments(arguments);
 		}
 
-		// delegate to next:
+		// Delegate to next:
 		Text next = this.getNext();
 		if (next != null) {
 			next.setPlaceholderArguments(arguments);
@@ -144,19 +144,19 @@ public abstract class AbstractText implements Text {
 			TextUtils.addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
 			return this.setPlaceholderArguments(TEMP_ARGUMENTS_MAP);
 		} finally {
-			TEMP_ARGUMENTS_MAP.clear(); // reset
+			TEMP_ARGUMENTS_MAP.clear(); // Reset
 		}
 	}
 
 	@Override
 	public Text clearPlaceholderArguments() {
-		// delegate to childs:
+		// Delegate to childs:
 		Text child = this.getChild();
 		if (child != null) {
 			child.clearPlaceholderArguments();
 		}
 
-		// delegate to next:
+		// Delegate to next:
 		Text next = this.getNext();
 		if (next != null) {
 			next.clearPlaceholderArguments();
@@ -181,13 +181,13 @@ public abstract class AbstractText implements Text {
 	}
 
 	protected void appendPlainText(StringBuilder builder, boolean formatText) {
-		// child:
+		// Child:
 		Text child = this.getChild();
 		if (child != null) {
 			((AbstractText) child).appendPlainText(builder, formatText);
 		}
 
-		// next:
+		// Next:
 		Text next = this.getNext();
 		if (next != null) {
 			((AbstractText) next).appendPlainText(builder, formatText);
@@ -196,13 +196,13 @@ public abstract class AbstractText implements Text {
 
 	@Override
 	public boolean isPlainText() {
-		// child:
+		// Child:
 		Text child = this.getChild();
 		if (child != null && !child.isPlainText()) {
 			return false;
 		}
 
-		// next:
+		// Next:
 		Text next = this.getNext();
 		if (next != null && !next.isPlainText()) {
 			return false;
@@ -212,13 +212,13 @@ public abstract class AbstractText implements Text {
 
 	@Override
 	public boolean isPlainTextEmpty() {
-		// child:
+		// Child:
 		Text child = this.getChild();
 		if (child != null && !child.isPlainTextEmpty()) {
 			return false;
 		}
 
-		// next:
+		// Next:
 		Text next = this.getNext();
 		if (next != null && !next.isPlainTextEmpty()) {
 			return false;

@@ -72,19 +72,19 @@ public class TradingCountListener implements Listener {
 		if (!(event.getInventory() instanceof MerchantInventory)) return;
 		Player player = (Player) event.getWhoClicked();
 		UIType uiType = plugin.getUIRegistry().getOpenUIType(player);
-		if (uiType == DefaultUITypes.TRADING()) return; // trading with a shopkeeper, which handles trades on its own
+		if (uiType == DefaultUITypes.TRADING()) return; // Trading with a shopkeeper, which handles trades on its own
 
 		MerchantInventory inventory = (MerchantInventory) event.getInventory();
 		ItemStack resultItem = inventory.getItem(2);
 		if (ItemUtils.isEmpty(resultItem)) {
-			return; // no trade available, ignoring
+			return; // No trade available, ignoring
 		}
 		TradingRecipe usedRecipe = ShopkeeperUtils.getSelectedTradingRecipe(inventory);
 		if (usedRecipe == null) {
-			return; // no used recipe found, ignoring
+			return; // No used recipe found, ignoring
 		}
 
-		// start detecting trades:
+		// Start detecting trades:
 		this.startListeningForTrades(player);
 	}
 
@@ -95,7 +95,7 @@ public class TradingCountListener implements Listener {
 		Player player = event.getPlayer();
 		if (!player.equals(tradingPlayer)) return;
 
-		// sanity checks:
+		// Sanity checks:
 		int delta = (event.getNewValue() - event.getPreviousValue());
 		if (delta != 1) {
 			Log.debug(() -> "Non-shopkeeper trade detection: Expected trading statistic change of 1, but got " + delta);
@@ -108,7 +108,7 @@ public class TradingCountListener implements Listener {
 		}
 
 		MerchantInventory merchantInventory = (MerchantInventory) inventory;
-		// find the recipe minecraft is using for the trade (the active recipe gets updated after the statistic change):
+		// Find the recipe Minecraft is using for the trade (the active recipe gets updated after the statistic change):
 		TradingRecipe usedRecipe = ShopkeeperUtils.getSelectedTradingRecipe(merchantInventory);
 		if (usedRecipe == null) {
 			Log.debug("Non-shopkeeper trade detection: Couldn't find the used trading recipe.");

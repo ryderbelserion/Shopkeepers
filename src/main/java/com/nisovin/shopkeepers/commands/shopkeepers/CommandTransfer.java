@@ -26,19 +26,19 @@ class CommandTransfer extends Command {
 	CommandTransfer() {
 		super("transfer");
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.TRANSFER_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionTransfer);
 
-		// arguments:
+		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.PLAYER),
 				TargetShopkeeperFilter.PLAYER
 		));
-		this.addArgument(new PlayerArgument(ARGUMENT_NEW_OWNER)); // new owner has to be online
-		// TODO allow offline-player?
+		this.addArgument(new PlayerArgument(ARGUMENT_NEW_OWNER)); // New owner has to be online
+		// TODO Allow offline player?
 	}
 
 	@Override
@@ -50,20 +50,20 @@ class CommandTransfer extends Command {
 		Player newOwner = context.get(ARGUMENT_NEW_OWNER);
 		assert newOwner != null;
 
-		// check that the shop is owned by the executing player:
+		// Check that the shop is owned by the executing player:
 		Player player = (sender instanceof Player) ? (Player) sender : null;
 		if ((player == null || !shopkeeper.isOwner(player)) && !PermissionUtils.hasPermission(sender, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			TextUtils.sendMessage(sender, Settings.msgNotOwner);
 			return;
 		}
 
-		// set new owner:
+		// Set new owner:
 		shopkeeper.setOwner(newOwner);
 
-		// success:
+		// Success:
 		TextUtils.sendMessage(player, Settings.msgOwnerSet, "owner", TextUtils.getPlayerText(newOwner));
 
-		// save:
+		// Save:
 		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 	}
 }

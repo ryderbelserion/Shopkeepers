@@ -35,8 +35,8 @@ public class Confirmations {
 	public static final int DEFAULT_CONFIRMATION_TICKS = 25 * 20; // 25 seconds
 
 	private final Plugin plugin;
-	// player name -> confirmation data
-	// null name is used for console confirmations
+	// Player name -> confirmation data
+	// Null name is used for console confirmations.
 	private final Map<String, ConfirmEntry> confirming = new HashMap<>();
 
 	public Confirmations(Plugin plugin) {
@@ -52,9 +52,9 @@ public class Confirmations {
 
 	private String getSenderKey(CommandSender sender) {
 		if (sender instanceof Player) {
-			return sender.getName(); // player's name
+			return sender.getName(); // Player's name
 		} else {
-			// any other command sender, such as console:
+			// Any other command sender, such as console:
 			return null;
 		}
 	}
@@ -80,20 +80,20 @@ public class Confirmations {
 
 		ConfirmEntry oldEntry = confirming.put(this.getSenderKey(sender), new ConfirmEntry(action, taskId));
 		if (oldEntry != null) {
-			// end old confirmation task:
+			// End old confirmation task:
 			Bukkit.getScheduler().cancelTask(oldEntry.getTaskId());
 		}
 	}
 
-	// returns the action that was awaiting confirmation
+	// Returns the action that was awaiting confirmation
 	public Runnable endConfirmation(CommandSender sender) {
 		Validate.notNull(sender, "Sender is null!");
 		ConfirmEntry entry = confirming.remove(this.getSenderKey(sender));
 		if (entry != null) {
-			// end confirmation task:
+			// End confirmation task:
 			Bukkit.getScheduler().cancelTask(entry.getTaskId());
 
-			// return action:
+			// Return action:
 			return entry.getAction();
 		}
 		return null;
@@ -103,7 +103,7 @@ public class Confirmations {
 		Validate.notNull(sender, "Sender is null!");
 		Runnable action = this.endConfirmation(sender);
 		if (action != null) {
-			// execute confirmed action:
+			// Execute confirmed action:
 			action.run();
 		} else {
 			TextUtils.sendMessage(sender, Settings.msgNothingToConfirm);

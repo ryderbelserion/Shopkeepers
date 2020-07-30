@@ -21,9 +21,9 @@ public class HoverEventText extends TextBuilder {
 		SHOW_ENTITY;
 	}
 
-	private final Action action; // not null
-	// can be unbuilt, gets built if the containing Text gets built
-	private final Text value; // not null, can be empty
+	private final Action action; // Not null
+	// Can be unbuilt, gets built if the containing Text gets built:
+	private final Text value; // Not null, can be empty
 
 	HoverEventText(Action action, Text value) {
 		Validate.notNull(action, "Action is null!");
@@ -37,7 +37,7 @@ public class HoverEventText extends TextBuilder {
 	@Override
 	public Text build() {
 		super.build();
-		// delegate to hover text:
+		// Delegate to hover text:
 		buildIfRequired(value);
 		return this;
 	}
@@ -67,7 +67,7 @@ public class HoverEventText extends TextBuilder {
 	@Override
 	public Text setPlaceholderArguments(Map<String, ?> arguments) {
 		super.setPlaceholderArguments(arguments);
-		// delegate to hover text:
+		// Delegate to hover text:
 		value.setPlaceholderArguments(arguments);
 		return this;
 	}
@@ -75,7 +75,7 @@ public class HoverEventText extends TextBuilder {
 	@Override
 	public Text clearPlaceholderArguments() {
 		super.clearPlaceholderArguments();
-		// delegate to hover text:
+		// Delegate to hover text:
 		value.clearPlaceholderArguments();
 		return this;
 	}

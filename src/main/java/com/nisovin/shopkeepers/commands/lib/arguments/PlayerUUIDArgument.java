@@ -40,8 +40,8 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 		return text;
 	}
 
-	// using the uuid argument's 'invalid argument' message if the uuid is invalid
-	// using the filter's 'invalid argument' message if the uuid is not accepted
+	// Using the uuid argument's 'invalid argument' message if the uuid is invalid.
+	// Using the filter's 'invalid argument' message if the uuid is not accepted.
 
 	/**
 	 * Gets the default uuid completion suggestions.
@@ -58,7 +58,7 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 				.filter(playerFilter)
 				.map(player -> player.getUniqueId())
 				.filter(uuid -> {
-					// assumption: UUID#toString is already lowercase (normalized)
+					// Assumption: UUID#toString is already lowercase (normalized).
 					return uuid.toString().startsWith(normalizedUUIDPrefix);
 				})::iterator;
 	}

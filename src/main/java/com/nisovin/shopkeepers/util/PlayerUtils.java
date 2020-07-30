@@ -44,8 +44,8 @@ public class PlayerUtils {
 			@Override
 			public Stream<Player> match(String input) {
 				if (StringUtils.isEmpty(input)) return Stream.empty();
-				// note: this is case insensitive
-				// assumption: player names are unique regardless of case
+				// Note: This is case insensitive.
+				// Assumption: Player names are unique regardless of case.
 				Player exactMatch = Bukkit.getPlayerExact(input);
 				return (exactMatch != null) ? Stream.of(exactMatch) : Stream.empty();
 			}
@@ -56,11 +56,12 @@ public class PlayerUtils {
 			}
 		};
 
-		// includes matching display names
+		// Includes matching display names.
 		public static final PlayerNameMatcher EXACT = new AbstractPlayerNameMatcher() {
 			@Override
 			protected boolean checkExactMatchFirst() {
-				return false; // we check for exact matches later anyways so we can avoid this
+				// We check for exact matches later anyways so we can avoid this.
+				return false;
 			}
 
 			@Override
@@ -96,7 +97,7 @@ public class PlayerUtils {
 
 			// Check for an exact match first:
 			if (this.checkExactMatchFirst()) {
-				Player exactMatch = Bukkit.getPlayerExact(input); // case insensitive
+				Player exactMatch = Bukkit.getPlayerExact(input); // Case insensitive
 				if (exactMatch != null) return Stream.of(exactMatch);
 			}
 
@@ -104,21 +105,21 @@ public class PlayerUtils {
 			List<Player> matchingPlayers = new ArrayList<>();
 			boolean[] onlyPerfectMatches = new boolean[] { false };
 			for (Player player : Bukkit.getOnlinePlayers()) {
-				// check name:
+				// Check name:
 				String playerName = player.getName();
 				String normalizedPlayerName = StringUtils.normalize(playerName);
 
 				boolean matched = this.match(normalizedInput, player, normalizedPlayerName, matchingPlayers, onlyPerfectMatches);
 				if (matched) {
 					if (onlyPerfectMatches[0]) {
-						// we found an exact player name match, return that player:
-						// note: this can usually only occur with checkExactMatchFirst disabled
+						// We found an exact player name match, return that player:
+						// Note: This can usually only occur with checkExactMatchFirst disabled.
 						return Stream.of(player);
 					}
-					continue; // add player at most once -> skip display name check
+					continue; // Add player at most once. -> Skip display name check.
 				}
 
-				// check display name:
+				// Check display name:
 				String displayName = player.getDisplayName();
 				String normalizedDisplayName = StringUtils.normalize(TextUtils.stripColor(displayName));
 				this.match(normalizedInput, player, normalizedDisplayName, matchingPlayers, onlyPerfectMatches);
@@ -139,22 +140,22 @@ public class PlayerUtils {
 								List<Player> matchingPlayers, boolean[] onlyPerfectMatches) {
 			if (this.matches(normalizedInput, normalizedName)) {
 				if (normalizedName.length() == normalizedInput.length()) {
-					// perfect match of normalized names:
+					// Perfect match of normalized names:
 					if (!onlyPerfectMatches[0]) {
-						// the previous matches were not perfect matches, disregard them:
+						// The previous matches were not perfect matches, disregard them:
 						matchingPlayers.clear();
 					}
-					onlyPerfectMatches[0] = true; // only accepting other perfect matches now
+					onlyPerfectMatches[0] = true; // Only accepting other perfect matches now
 					matchingPlayers.add(player);
 					return true;
 				} else {
 					if (!onlyPerfectMatches[0]) {
 						matchingPlayers.add(player);
 						return true;
-					} // else: only accepting perfect matches
+					} // Else: Only accepting perfect matches.
 				}
 			}
-			return false; // no match
+			return false; // No match
 		}
 
 		protected abstract boolean matches(String normalizedInputName, String normalizedName);
@@ -162,14 +163,14 @@ public class PlayerUtils {
 
 	private static final int DEFAULT_AMBIGUOUS_PLAYER_NAME_MAX_ENTRIES = 5;
 
-	// Note: Iterable is only iterated once
-	// true if there are multiple matches
+	// Note: Iterable is only iterated once.
+	// true if there are multiple matches.
 	public static boolean handleAmbiguousPlayerName(CommandSender sender, String name, Iterable<Map.Entry<UUID, String>> matches) {
 		return handleAmbiguousPlayerName(sender, name, matches, DEFAULT_AMBIGUOUS_PLAYER_NAME_MAX_ENTRIES);
 	}
 
-	// Note: Iterable is only iterated once
-	// true if there are multiple matches
+	// Note: Iterable is only iterated once.
+	// true if there are multiple matches.
 	public static boolean handleAmbiguousPlayerName(CommandSender sender, String name, Iterable<Map.Entry<UUID, String>> matches, int maxEntries) {
 		return CommandUtils.handleAmbiguousInput(sender, name, matches, maxEntries,
 				() -> {

@@ -45,20 +45,20 @@ class CommandCheck extends Command {
 		this.plugin = plugin;
 		this.shopkeeperRegistry = plugin.getShopkeeperRegistry();
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Text.of("Shows various debugging information."));
 
-		// hidden debugging command:
+		// Hidden debugging command:
 		this.setHiddenInParentHelp(true);
 
 		// arguments:
 		this.addArgument(new OptionalArgument<>(new FirstOfArgument("context", Arrays.asList(
 				new LiteralArgument(ARGUMENT_CHUNKS),
 				new LiteralArgument(ARGUMENT_ACTIVE)
-		), true))); // join formats
+		), true))); // Join formats
 	}
 
 	@Override
@@ -97,7 +97,7 @@ class CommandCheck extends Command {
 				+ TextUtils.DECIMAL_FORMAT.format(avgTotalAITimings) + " ms" + " | "
 				+ TextUtils.DECIMAL_FORMAT.format(maxTotalAITiming) + " ms");
 
-		// note: these are per activation, which happens only every 20 ticks (not per tick)
+		// Note: These are per activation, which happens only every 20 ticks (not per tick).
 		double avgAIActivationTimings = livingEntityAI.getActivationTimings().getAverageTimeMillis();
 		double maxAIActivationTiming = livingEntityAI.getActivationTimings().getMaxTimeMillis();
 		sender.sendMessage("    AI activation timings (per " + LivingEntityAI.AI_ACTIVATION_TICK_RATE + " ticks) (avg | max): "
@@ -166,7 +166,7 @@ class CommandCheck extends Command {
 				sender.sendMessage("  Shopkeepers in chunks (loaded | active): " + worldShopkeepersInLoadedChunks + " | " + worldShopkeepersInActiveChunks);
 			}
 
-			// list all chunks containing shopkeepers:
+			// List all chunks containing shopkeepers:
 			if (isConsole && listChunks && worldTotalShopkeepers > 0) {
 				sender.sendMessage("  Listing of all chunks with shopkeepers:");
 				int line = 0;
@@ -185,7 +185,7 @@ class CommandCheck extends Command {
 			}
 		}
 
-		// list all active shopkeepers:
+		// List all active shopkeepers:
 		if (isConsole && listActive) {
 			sender.sendMessage("All active shopkeepers:");
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getActiveShopkeepers()) {

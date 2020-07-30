@@ -31,8 +31,8 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 		super(name, joinRemainingArgs, filter, minimalCompletionInput);
 	}
 
-	// using the regular 'missing argument' message
-	// using the filter's 'invalid argument' message if the name is not accepted
+	// Using the regular 'missing argument' message.
+	// Using the filter's 'invalid argument' message if the name is not accepted.
 
 	/**
 	 * Gets the default name completion suggestions.
@@ -44,9 +44,9 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 	 * @return the shopkeeper name completion suggestions
 	 */
 	public static Iterable<String> getDefaultCompletionSuggestions(String namePrefix, Predicate<Shopkeeper> shopkeeperFilter) {
-		// strips color, normalizes whitespace, converts to lowercase:
+		// Strips color, normalizes whitespace, converts to lowercase:
 		String normalizedNamePrefix = StringUtils.normalize(TextUtils.stripColor(namePrefix));
-		// TODO improve by using a TreeMap for the prefix matching?
+		// TODO Improve by using a TreeMap for the prefix matching?
 		return ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers().stream()
 				.filter(shopkeeperFilter)
 				.map(shopkeeper -> {

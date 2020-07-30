@@ -27,7 +27,7 @@ public class EventDebugListener<E extends Event> implements Listener {
 		assert eventClass != null && eventHandler != null;
 		this.eventClass = eventClass;
 
-		// create event executors for every event priority:
+		// Create event executors for every event priority:
 		for (EventPriority priority : EventPriority.values()) {
 			executors.put(priority, new EventExecutor() {
 				@SuppressWarnings("unchecked")

@@ -20,13 +20,13 @@ class CommandEdit extends PlayerCommand {
 	CommandEdit() {
 		super("edit");
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.REMOTE_EDIT_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionRemoteEdit);
 
-		// arguments:
+		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, true),
 				TargetShopkeeperFilter.ANY
@@ -41,7 +41,7 @@ class CommandEdit extends PlayerCommand {
 		Shopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
 		assert shopkeeper != null;
 
-		// open shop trading window:
+		// Open shop trading window:
 		shopkeeper.openEditorWindow(player);
 	}
 }

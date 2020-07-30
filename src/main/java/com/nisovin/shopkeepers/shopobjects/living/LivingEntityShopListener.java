@@ -72,7 +72,7 @@ class LivingEntityShopListener implements Listener {
 	// with the entity is denied).
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onEntityInteract(PlayerInteractEntityEvent event) {
-		// ignore our own fake interact event:
+		// Ignore our own fake interact event:
 		if (event instanceof TestPlayerInteractEntityEvent) return;
 		if (!(event.getRightClicked() instanceof LivingEntity)) return;
 
@@ -82,7 +82,7 @@ class LivingEntityShopListener implements Listener {
 		Log.debug(() -> "Player " + player.getName() + " is interacting (" + (event.getHand()) + ") "
 				+ (isInteractAtEvent ? "at" : "with") + " entity at " + shopEntity.getLocation());
 
-		// also checks for citizens npc shopkeepers:
+		// Also checks for Citizens NPC shopkeepers:
 		AbstractShopkeeper shopkeeper = shopkeeperRegistry.getShopkeeperByEntity(shopEntity);
 		if (shopkeeper == null) {
 			Log.debug("  Non-shopkeeper");
@@ -95,12 +95,12 @@ class LivingEntityShopListener implements Listener {
 			return;
 		}
 
-		// if citizens npc: don't cancel the event, let Citizens perform other actions as appropriate
+		// If Citizens NPC: Don't cancel the event, let Citizens perform other actions as appropriate.
 		if (shopkeeper.getShopObject().getType() != DefaultShopObjectTypes.CITIZEN()) {
-			// always cancel interactions with shopkeepers, to prevent any default behavior:
+			// Always cancel interactions with shopkeepers, to prevent any default behavior:
 			Log.debug("  Cancelling entity interaction");
 			event.setCancelled(true);
-			// update inventory in case the interaction would trigger an item action normally (such as animal feeding):
+			// Update inventory in case the interaction would trigger an item action normally (such as animal feeding):
 			player.updateInventory();
 		}
 
@@ -111,7 +111,7 @@ class LivingEntityShopListener implements Listener {
 			return;
 		}
 
-		// only trigger shopkeeper interaction for main-hand events:
+		// Only trigger shopkeeper interaction for main-hand events:
 		if (event.getHand() != EquipmentSlot.HAND) {
 			Log.debug("  Ignoring off-hand interaction");
 			return;
@@ -136,7 +136,7 @@ class LivingEntityShopListener implements Listener {
 			}
 		}
 
-		// handle interaction:
+		// Handle interaction:
 		shopkeeper.onPlayerInteraction(player);
 	}
 
@@ -156,8 +156,8 @@ class LivingEntityShopListener implements Listener {
 		this.onEntityInteract(event);
 	}
 
-	// TODO many of those behaviors might no longer be active, once all entities use noAI (once legacy mob behavior is
-	// no longer supported)
+	// TODO Many of those behaviors might no longer be active, once all entities use NoAI (once legacy mob behavior is
+	// no longer supported).
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityTarget(EntityTargetEvent event) {
@@ -171,13 +171,13 @@ class LivingEntityShopListener implements Listener {
 		Entity entity = event.getEntity();
 		if (!shopkeeperRegistry.isShopkeeper(entity)) return;
 
-		// block damaging of shopkeepers
+		// Block damaging of shopkeepers
 		event.setCancelled(true);
 		if (event instanceof EntityDamageByEntityEvent) {
 			EntityDamageByEntityEvent evt = (EntityDamageByEntityEvent) event;
 			if (evt.getDamager() instanceof Monster) {
 				Monster monster = (Monster) evt.getDamager();
-				// reset target, future targeting should get prevented somewhere else:
+				// Reset target, future targeting should get prevented somewhere else:
 				if (entity.equals(monster.getTarget())) {
 					monster.setTarget(null);
 				}
@@ -193,7 +193,7 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	// ex: creepers
+	// Example: Creepers.
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onExplodePrime(ExplosionPrimeEvent event) {
@@ -217,7 +217,7 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	// ex: enderman
+	// Example: Enderman.
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityChangeBlock(EntityChangeBlockEvent event) {
@@ -254,7 +254,7 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	// handles all kinds of events, such as for example villagers struck by lightning turning into witches
+	// Handles all kinds of events, such as for example villagers struck by lightning turning into witches.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityTransform(EntityTransformEvent event) {
 		if (shopkeeperRegistry.isShopkeeper(event.getEntity())) {
@@ -271,32 +271,32 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	// allow sleeping if the only nearby monsters are shopkeepers:
-	// note: cancellation state also reflects default behavior
+	// Allow sleeping if the only nearby monsters are shopkeepers:
+	// Note: Cancellation state also reflects default behavior.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	void onPlayerEnterBed(PlayerBedEnterEvent event) {
-		// bed entering prevented due to nearby monsters?
+		// Bed entering prevented due to nearby monsters?
 		if (event.getBedEnterResult() != BedEnterResult.NOT_SAFE) return;
 
-		// find nearby monsters that prevent bed entering (see MC EntityHuman):
+		// Find nearby monsters that prevent bed entering (see MC EntityHuman):
 		Block bedBlock = event.getBed();
 		Collection<Entity> monsters = bedBlock.getWorld().getNearbyEntities(bedBlock.getLocation(), 8.0D, 5.0D, 8.0D, (entity) -> {
-			// TODO bukkit API to check if monster prevents sleeping? ie. pigzombies only prevent sleeping if angered
+			// TODO Bukkit API to check if monster prevents sleeping? ie. pigzombies only prevent sleeping if angered
 			return (entity instanceof Monster) && (!(entity instanceof PigZombie) || ((PigZombie) entity).isAngry());
 		});
 
 		for (Entity entity : monsters) {
 			if (!shopkeeperRegistry.isShopkeeper(entity)) {
-				// found non-shopkeeper entity: do nothing (keep bed entering prevented)
+				// Found non-shopkeeper entity. Do nothing (keep bed entering prevented):
 				return;
 			}
 		}
-		// sleeping is only prevented due to nearby shopkeepers -> bypass and allow sleeping:
+		// Sleeping is only prevented due to nearby shopkeepers. -> Bypass and allow sleeping:
 		Log.debug(() -> "Allowing sleeping of player '" + event.getPlayer().getName() + "': The only nearby monsters are shopkeepers.");
 		event.setUseBed(Result.ALLOW);
 	}
 
-	// ex: blazes or skeletons
+	// Example: Blazes or skeletons.
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityLaunchProjectile(ProjectileLaunchEvent event) {
@@ -306,7 +306,7 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	// ex: snowmans
+	// Example: Snowmans.
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityBlockForm(EntityBlockFormEvent event) {
@@ -315,7 +315,7 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	// ex: chicken laying eggs
+	// Example: Chicken laying eggs.
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityDropItem(EntityDropItemEvent event) {
@@ -324,7 +324,7 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	// prevent shopkeeper entities from being affected by potion effects
+	// Prevent shopkeeper entities from being affected by potion effects:
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityPotionEffectEvent(EntityPotionEffectEvent event) {
 		if (event.getAction() == Action.ADDED && shopkeeperRegistry.isShopkeeper(event.getEntity())) {

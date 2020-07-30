@@ -31,9 +31,9 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 		super(name, filter, minimalCompletionInput);
 	}
 
-	// using the regular 'missing argument' message
-	// using the uuid argument's 'invalid argument' message if the uuid is invalid
-	// using the filter's 'invalid argument' message if the uuid is not accepted
+	// Using the regular 'missing argument' message.
+	// Using the uuid argument's 'invalid argument' message if the uuid is invalid.
+	// Using the filter's 'invalid argument' message if the uuid is not accepted.
 
 	/**
 	 * Gets the default uuid completion suggestions.
@@ -46,12 +46,12 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 	 */
 	public static Iterable<UUID> getDefaultCompletionSuggestions(String uuidPrefix, Predicate<Shopkeeper> shopkeeperFilter) {
 		String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
-		// TODO improve by using a TreeMap for the prefix matching?
+		// TODO Improve by using a TreeMap for the prefix matching?
 		return ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers().stream()
 				.filter(shopkeeperFilter)
 				.map(shopkeeper -> shopkeeper.getUniqueId())
 				.filter(uuid -> {
-					// assumption: UUID#toString is already lowercase (normalized)
+					// Assumption: UUID#toString is already lowercase (normalized)
 					return uuid.toString().startsWith(normalizedUUIDPrefix);
 				})::iterator;
 	}

@@ -18,7 +18,7 @@ public abstract class AbstractAdminShopType<T extends AbstractAdminShopkeeper> e
 		super(identifier, aliases, permission);
 	}
 
-	// common functions that might be useful for sub-classes:
+	// Common functions that might be useful for sub-classes:
 
 	@Override
 	protected void validateCreationData(ShopCreationData shopCreationData) {

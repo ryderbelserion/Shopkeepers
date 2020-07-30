@@ -87,7 +87,7 @@ public abstract class CommandArgument<T> {
 			Validate.notEmpty(displayName, "Display name is empty!");
 			Validate.isTrue(!StringUtils.containsWhitespace(displayName), "Display name cannot contain whitespace!");
 		}
-		// normalize default display name to null:
+		// Normalize default display name to null:
 		if (this.getName().equals(displayName)) {
 			displayName = null;
 		}
@@ -160,7 +160,7 @@ public abstract class CommandArgument<T> {
 		return false;
 	}
 
-	// TODO somehow allow the translation of argument names (for displaying purposes inside the command help)?
+	// TODO Somehow allow the translation of argument names (for displaying purposes inside the command help)?
 	/**
 	 * Gets the usage format for this argument.
 	 * <p>
@@ -214,7 +214,7 @@ public abstract class CommandArgument<T> {
 	private final Map<String, Object> defaultErrorMsgArgs = Collections.unmodifiableMap(this.setupDefaultErrorMsgArgs());
 
 	private Map<String, Object> setupDefaultErrorMsgArgs() {
-		// dynamically resolve arguments:
+		// Dynamically resolve arguments:
 		Map<String, Object> args = new HashMap<>();
 		Supplier<?> argumentNameSupplier = () -> {
 			CommandArgument<?> rootArgument = this.getRootArgument();
@@ -224,7 +224,7 @@ public abstract class CommandArgument<T> {
 			CommandArgument<?> rootArgument = this.getRootArgument();
 			String format = rootArgument.getFormat();
 			if (!format.isEmpty()) {
-				// use the name in case the format is empty (eg. for hidden arguments):
+				// Use the name in case the format is empty (eg. for hidden arguments):
 				return argumentNameSupplier.get();
 			} else {
 				return format;
@@ -403,5 +403,5 @@ public abstract class CommandArgument<T> {
 		return builder.toString();
 	}
 
-	// Note on hashCode and equals: CommandArguments are compared by identity
+	// Note on hashCode and equals: CommandArguments are compared by identity.
 }

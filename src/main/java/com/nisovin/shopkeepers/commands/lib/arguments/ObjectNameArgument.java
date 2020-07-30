@@ -26,6 +26,6 @@ public abstract class ObjectNameArgument extends ObjectIdArgument<String> {
 
 	@Override
 	protected String toString(String id) {
-		return id; // already a String
+		return id; // Already a String
 	}
 }

@@ -17,7 +17,7 @@ public class VaultEconomyChart extends Metrics.SimplePie {
 
 	public VaultEconomyChart() {
 		super("vault_economy", () -> {
-			// check if Vault's Economy class is present (independently from the Vault plugin itself):
+			// Check if Vault's Economy class is present (independently from the Vault plugin itself):
 			Class<?> economyClass = null;
 			try {
 				economyClass = Class.forName(ECONOMY_SERVICE_CLASS_NAME);
@@ -25,7 +25,7 @@ public class VaultEconomyChart extends Metrics.SimplePie {
 			}
 			String economyName = null;
 			if (economyClass != null) {
-				// get the economy name, if an economy is present:
+				// Get the economy name, if an economy is present:
 				RegisteredServiceProvider<Economy> registration = Bukkit.getServicesManager().getRegistration(Economy.class);
 				Economy economy = (registration != null ? registration.getProvider() : null);
 				if (economy != null) {

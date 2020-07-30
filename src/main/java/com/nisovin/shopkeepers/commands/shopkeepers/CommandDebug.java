@@ -15,10 +15,10 @@ class CommandDebug extends Command {
 	CommandDebug() {
 		super("debug");
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionDebug);
 	}
 
@@ -26,7 +26,7 @@ class CommandDebug extends Command {
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 
-		// toggle debug mode:
+		// Toggle debug mode:
 		Settings.debug = !Settings.debug;
 		Settings.onSettingsChanged();
 		sender.sendMessage(ChatColor.GREEN + "Debug mode " + (Settings.debug ? "enabled" : "disabled"));

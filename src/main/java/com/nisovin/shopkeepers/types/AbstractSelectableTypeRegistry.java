@@ -69,7 +69,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 
 		int count = this.getRegisteredTypes().size();
 		while (count > 0) {
-			// automatically selects the first type, if next is null or if next is the last type
+			// Automatically selects the first type, if next is null or if next is the last type:
 			next = this.getNext(next);
 			if (this.canBeSelected(player, next)) {
 				break;
@@ -77,10 +77,10 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 			count--;
 		}
 
-		// use the currently selected type (can be null) after it went through all types and didn't find one the player
+		// Use the currently selected type (can be null) after it went through all types and didn't find one the player
 		// can use:
 		if (count == 0) {
-			// check if the currently selected type can still be used by this player:
+			// Check if the currently selected type can still be used by this player:
 			if (current != null && !this.canBeSelected(player, current)) current = null;
 			next = current;
 		}
@@ -93,7 +93,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 
 		int count = this.getRegisteredTypes().size();
 		while (count > 0) {
-			// automatically selects the first type if prev is null, or the last type if prev is the first type
+			// Automatically selects the first type if prev is null, or the last type if prev is the first type:
 			prev = this.getPrevious(prev);
 			if (this.canBeSelected(player, prev)) {
 				break;
@@ -101,10 +101,10 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 			count--;
 		}
 
-		// use the currently selected type (can be null) after it went through all types and didn't find one the player
+		// Use the currently selected type (can be null) after it went through all types and didn't find one the player
 		// can use:
 		if (count == 0) {
-			// check if the currently selected type can still be used by this player:
+			// Check if the currently selected type can still be used by this player:
 			if (current != null && !this.canBeSelected(player, current)) current = null;
 			prev = current;
 		}
@@ -113,7 +113,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 
 	// SELECTION MANAGEMENT
 
-	// player name -> selected type
+	// Player name -> selected type
 	protected final Map<String, T> selections = new HashMap<>();
 
 	@Override
@@ -126,9 +126,9 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 		Validate.notNull(player);
 		String playerName = player.getName();
 		T current = selections.get(playerName);
-		// if none is currently selected, let's search for the first type this player can use:
+		// If none is currently selected, let's search for the first type this player can use:
 		if (current == null || !this.canBeSelected(player, current)) current = this.getNext(player, current);
-		return current; // returns null if the player can use no type at all
+		return current; // Returns null if the player can use no type at all
 	}
 
 	@Override
@@ -141,7 +141,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 			selections.put(playerName, next);
 			this.onSelect(next, player);
 		} else {
-			// for now remember the current selection
+			// For now remember the current selection.
 			// selections.remove(playerName);
 		}
 		return next;
@@ -157,14 +157,14 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 			selections.put(playerName, prev);
 			this.onSelect(prev, player);
 		} else {
-			// for now remember the current selection
+			// For now remember the current selection.
 			// selections.remove(playerName);
 		}
 		return prev;
 	}
 
 	protected void onSelect(T type, Player selectedBy) {
-		// inform type:
+		// Inform type:
 		type.onSelect(selectedBy);
 	}
 

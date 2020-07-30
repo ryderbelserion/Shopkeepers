@@ -51,26 +51,26 @@ public class PlayerShopHiringHandler extends HiringHandler {
 	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
 		super.onInventoryClickEarly(event, player);
 		if (this.isAutomaticShiftLeftClick()) {
-			// ignore automatically triggered shift left-clicks:
+			// Ignore automatically triggered shift left-clicks:
 			return;
 		}
 
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 		int slot = event.getRawSlot();
 		if (slot == BUTTON_HIRE_1 || slot == BUTTON_HIRE_2) {
-			// TODO prevent hiring own shops?
-			// actually: this feature was originally meant for admins to set up pre-existing shops
-			// handle hiring:
-			// check if the player can hire (create) this type of shopkeeper:
+			// TODO Prevent hiring own shops?
+			// Actually: This feature was originally meant for admins to set up pre-existing shops.
+			// Handle hiring:
+			// Check if the player can hire (create) this type of shopkeeper:
 			if (Settings.hireRequireCreationPermission && (!this.getShopkeeper().getType().hasPermission(player)
 					|| !this.getShopkeeper().getShopObject().getType().hasPermission(player))) {
-				// missing permission to hire this type of shopkeeper:
+				// Missing permission to hire this type of shopkeeper:
 				TextUtils.sendMessage(player, Settings.msgCantHireShopType);
 				this.closeDelayed(player);
 				return;
 			}
 
-			// check if the player can afford it and calculate the resulting player inventory:
+			// Check if the player can afford it and calculate the resulting player inventory:
 			ItemStack[] newPlayerInventoryContents = player.getInventory().getContents();
 			ItemStack hireCost = shopkeeper.getHireCost();
 			for (int i = 0; i < newPlayerInventoryContents.length; i++) {
@@ -94,25 +94,25 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			}
 
 			if (hireCost.getAmount() != 0) {
-				// not enough money:
+				// Not enough money:
 				TextUtils.sendMessage(player, Settings.msgCantHire);
-				// close window for this player:
+				// Close window for this player:
 				this.closeDelayed(player);
 				return;
 			}
 
-			// call event:
+			// Call event:
 			int maxShops = Settings.getMaxShops(player);
 			PlayerShopkeeperHireEvent hireEvent = new PlayerShopkeeperHireEvent(shopkeeper, player, newPlayerInventoryContents, maxShops);
 			Bukkit.getPluginManager().callEvent(hireEvent);
 			if (hireEvent.isCancelled()) {
 				Log.debug("PlayerShopkeeperHireEvent was cancelled!");
-				// close window for this player:
+				// Close window for this player:
 				this.closeDelayed(player);
 				return;
 			}
 
-			// check max shops limit:
+			// Check max shops limit:
 			maxShops = hireEvent.getMaxShopsLimit();
 			if (maxShops > 0) {
 				int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getPlayerShopkeepersByOwner(player.getUniqueId()).size();
@@ -123,14 +123,14 @@ public class PlayerShopHiringHandler extends HiringHandler {
 				}
 			}
 
-			// hire the shopkeeper:
-			player.getInventory().setContents(newPlayerInventoryContents); // apply inventory changes
+			// Hire the shopkeeper:
+			player.getInventory().setContents(newPlayerInventoryContents); // Apply inventory changes
 			shopkeeper.setForHire(null);
 			shopkeeper.setOwner(player);
 			shopkeeper.save();
 			TextUtils.sendMessage(player, Settings.msgHired);
 
-			// close all open windows for this shopkeeper:
+			// Close all open windows for this shopkeeper:
 			shopkeeper.closeAllOpenWindows();
 		}
 	}

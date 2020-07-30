@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.util.ConversionUtils;
  */
 public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 
-	// we don't show suggestions for empty input (would simply list a bunch of random ids)
+	// We don't show suggestions for empty input (would simply list a bunch of random ids).
 	public static final int DEFAULT_MINIMAL_COMPLETION_INPUT = 1;
 
 	// Note: Not providing default argument filters that only accept existing shops, admin shops, or player shops,
@@ -35,9 +35,9 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 		super(name, new IntegerArgument(name + ":id"), filter, minimalCompletionInput);
 	}
 
-	// using the regular 'missing argument' message
-	// using the integer argument's 'invalid argument' message if the id is invalid
-	// using the filter's 'invalid argument' message if the id is not accepted
+	// Using the regular 'missing argument' message.
+	// Using the integer argument's 'invalid argument' message if the id is invalid.
+	// Using the filter's 'invalid argument' message if the id is not accepted.
 
 	@Override
 	protected String toString(Integer id) {
@@ -54,14 +54,14 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 	 * @return the shopkeeper id completion suggestions
 	 */
 	public static Iterable<Integer> getDefaultCompletionSuggestions(String idPrefix, Predicate<Shopkeeper> shopkeeperFilter) {
-		// if idPrefix is not a valid number, we can skip checking all shopkeepers:
-		// note: empty check is required to not abort in case there is empty partial input but the used
+		// If idPrefix is not a valid number, we can skip checking all shopkeepers:
+		// Note: Empty check is required to not abort in case there is empty partial input but the used
 		// minimalCompletionInput parameter is 0
 		if (!idPrefix.isEmpty() && ConversionUtils.parseInt(idPrefix) == null) {
 			return Collections.emptyList();
 		}
-		// note: no normalization required
-		// TODO prefer short ids (eg. input "2", suggest "20", "21", "22",.. instead of "200", "201", "202",..)
+		// Note: No normalization required.
+		// TODO Prefer short ids (eg. input "2", suggest "20", "21", "22",.. instead of "200", "201", "202",..)
 		return ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers().stream()
 				.filter(shopkeeperFilter)
 				.map(shopkeeper -> shopkeeper.getId())

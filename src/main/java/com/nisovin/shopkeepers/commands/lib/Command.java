@@ -49,22 +49,22 @@ public abstract class Command {
 	private final String name;
 	private final List<String> aliases; // unmodifiable
 	private Text description = Text.EMPTY;
-	// null if no permission is required:
+	// Null if no permission is required:
 	private String permission = null;
 	private final List<CommandArgument<?>> arguments = new ArrayList<>();
 	private Command parent = null;
 	private final CommandRegistry childCommands = new CommandRegistry(this);
 
-	// hides this command from the help page:
+	// Hides this command from the help page:
 	private boolean hiddenInParentHelp = false;
 	private boolean hiddenInOwnHelp = false;
-	// makes the parent help content display this command's child commands:
+	// Makes the parent help content display this command's child commands:
 	private boolean includeChildsInParentHelp = false;
 
-	// common message arguments:
+	// Common message arguments:
 	private final Map<String, Object> commonMessageArgs;
 	{
-		// dynamically evaluated:
+		// Dynamically evaluated:
 		Map<String, Object> commonMessageArgs = new HashMap<>();
 		commonMessageArgs.put("name", (Supplier<?>) () -> this.getName());
 		commonMessageArgs.put("description", (Supplier<?>) () -> this.getDescription());
@@ -74,7 +74,7 @@ public abstract class Command {
 		this.commonMessageArgs = Collections.unmodifiableMap(commonMessageArgs);
 	}
 
-	// formatting (null results in the parent's formatting to be used):
+	// Formatting (null results in the parent's formatting to be used):
 	private Text helpTitleFormat = null;
 	private Text helpUsageFormat = null;
 	private Text helpDescFormat = null;
@@ -89,12 +89,12 @@ public abstract class Command {
 		Validate.notEmpty(name, "Command name is empty!");
 		this.name = name;
 
-		// validate and copy aliases:
+		// Validate and copy aliases:
 		if (aliases == null || aliases.isEmpty()) {
 			this.aliases = Collections.emptyList();
 		} else {
 			List<String> aliasesCopy = new ArrayList<>(aliases);
-			// validate aliases:
+			// Validate aliases:
 			for (String alias : aliasesCopy) {
 				Validate.notEmpty(alias, "Command contains empty alias!");
 				Validate.isTrue(!StringUtils.containsWhitespace(alias), "Command contains alias with whitespace!");
@@ -251,7 +251,7 @@ public abstract class Command {
 	 */
 	public boolean isAccepted(CommandSender sender) {
 		Validate.notNull(sender);
-		// by default all command senders are accepted:
+		// By default all command senders are accepted:
 		return true;
 	}
 
@@ -285,10 +285,10 @@ public abstract class Command {
 	 */
 	public final String getCommandFormat() {
 		if (parent == null) {
-			// this is a base command:
+			// This is a base command:
 			return COMMAND_PREFIX + this.getName();
 		} else {
-			// append primary alias to the format of the parent:
+			// Append primary alias to the format of the parent:
 			return parent.getCommandFormat() + ARGUMENTS_SEPARATOR + this.getName();
 		}
 	}
@@ -328,8 +328,8 @@ public abstract class Command {
 		Validate.notNull(argument, "Argument is null!");
 		Validate.isTrue(this.getArgument(argument.getName()) == null, "There is already another argument with that name: " + argument.getName());
 		Validate.isTrue(argument.getParent() == null, "Cannot add argument with parent!");
-		// make sure that no parent can be set once the argument has been added:
-		argument.setParent(null); // parent can only be set once
+		// Make sure that no parent can be set once the argument has been added:
+		argument.setParent(null); // Parent can only be set once
 		arguments.add(argument);
 	}
 
@@ -370,7 +370,7 @@ public abstract class Command {
 	 */
 	public final String getUsageFormat() {
 		String usageFormat = this.getCommandFormat();
-		// append arguments:
+		// Append arguments:
 		String argsFormat = this.getArgumentsFormat();
 		if (!argsFormat.isEmpty()) {
 			usageFormat += ARGUMENTS_SEPARATOR + argsFormat;
@@ -400,7 +400,7 @@ public abstract class Command {
 		return parent;
 	}
 
-	// gets set by the parent command during registration of this command as child-command:
+	// Gets set by the parent command during registration of this command as child-command:
 	final void setParent(Command parent) {
 		this.parent = parent;
 	}
@@ -436,12 +436,12 @@ public abstract class Command {
 		if (childCommandAlias != null) {
 			Command childcommand = this.getChildCommands().getCommand(childCommandAlias);
 			if (childcommand != null) {
-				// move cursor forward for the successfully used-up argument:
+				// Move cursor forward for the successfully used-up argument:
 				argsReader.next();
 				return childcommand;
 			}
 		}
-		// no matching child-command command was found:
+		// No matching child-command command was found:
 		return null;
 	}
 
@@ -480,7 +480,7 @@ public abstract class Command {
 			Log.debug(Settings.DebugOptions.commands, () -> "Context: " + context.toString());
 			Log.debug(Settings.DebugOptions.commands, () -> "Arguments reader: " + argsReader.toString());
 		} catch (Exception e) {
-			// an unexpected exception was caught:
+			// An unexpected exception was caught:
 			TextUtils.sendMessage(sender, Text.color(ChatColor.RED).text("An error occurred during command handling! Check the console log."));
 			Log.severe("An error occurred during command handling!", e);
 			Log.severe("Context: " + context.toString());
@@ -539,26 +539,26 @@ public abstract class Command {
 	 */
 	protected void processCommand(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws CommandException {
 		assert input != null && context != null && argsReader != null;
-		assert (input.getCommand() == this.getRootCommand()); // input is meant for this command
-		assert (argsReader.getArgs() != input.getArguments()); // arguments reader is consistent with input
+		assert (input.getCommand() == this.getRootCommand()); // Input is meant for this command
+		assert (argsReader.getArgs() != input.getArguments()); // Arguments reader is consistent with input
 
-		// search for matching child-command:
+		// Search for matching child-command:
 		Command childCommand = this.getChildCommand(argsReader);
 		if (childCommand != null) {
-			// delegate to child-command:
+			// Delegate to child-command:
 			childCommand.processCommand(input, context, argsReader);
-		} else { // no applicable child-command was found
+		} else { // No applicable child-command was found.
 			CommandSender sender = input.getSender();
-			// check if this type of command sender supported:
+			// Check if this type of command sender supported:
 			this.checkCommandSource(sender);
 
-			// check if the command sender has the required permission to proceed:
+			// Check if the command sender has the required permission to proceed:
 			this.checkPermission(sender);
 
-			// parse arguments:
+			// Parse arguments:
 			this.parseArguments(input, context, argsReader);
 
-			// execute this command:
+			// Execute this command:
 			this.execute(input, context.getView());
 		}
 	}
@@ -571,7 +571,7 @@ public abstract class Command {
 	protected static class ParsingContext {
 
 		public final CommandInput input;
-		public CommandContext context; // the currently active context
+		public CommandContext context; // The currently active context
 		public final ArgumentsReader argsReader;
 		public final int argumentsCount;
 
@@ -609,7 +609,7 @@ public abstract class Command {
 
 		private final FallbackArgumentException exception;
 		private final BufferedCommandContext bufferedContext;
-		private final ArgumentsReader originalArgsReader; // snapshot from before the fallback
+		private final ArgumentsReader originalArgsReader; // Snapshot from before the fallback
 
 		protected Fallback(	Fallback previousPendingFallback, int argumentIndex, FallbackArgumentException exception,
 							BufferedCommandContext bufferedContext, ArgumentsReader originalArgsReader) {
@@ -685,25 +685,25 @@ public abstract class Command {
 	 *             if a required argument cannot be parsed or there are unparsed remaining arguments
 	 */
 	protected void parseArguments(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws ArgumentParseException {
-		// setup parsing context:
+		// Setup parsing context:
 		int argumentsCount = arguments.size();
 		ParsingContext parsingContext = new ParsingContext(input, context, argsReader, argumentsCount);
 
-		// parse all arguments:
+		// Parse all arguments:
 		for (; parsingContext.currentArgumentIndex < argumentsCount; ++parsingContext.currentArgumentIndex) {
 			CommandArgument<?> argument = arguments.get(parsingContext.currentArgumentIndex);
 
-			// parse argument:
+			// Parse argument:
 			this.parseArgument(argument, parsingContext);
 
-			// handle fallback(s) (if any):
+			// Handle fallback(s) (if any):
 			this.handleFallbacks(parsingContext);
 		}
 
-		// handle unparsed arguments (if any):
+		// Handle unparsed arguments (if any):
 		this.handleUnparsedArguments(parsingContext);
 
-		// parsing succeeded
+		// Parsing succeeded.
 	}
 
 	protected void parseArgument(CommandArgument<?> argument, ParsingContext parsingContext) {
@@ -713,25 +713,25 @@ public abstract class Command {
 		ArgumentsReader argsReaderState = argsReader.createSnapshot();
 		ArgumentParseException parseException = null;
 		try {
-			// on success this stores any parsed values inside the context:
+			// On success this stores any parsed values inside the context:
 			argument.parse(parsingContext.input, context, argsReader);
 		} catch (FallbackArgumentException e) {
 			Log.debug(Settings.DebugOptions.commands, () -> "Fallback for argument '" + argument.getName() + "': " + e.getMessage());
-			argsReader.setState(argsReaderState); // restore previous args reader state
+			argsReader.setState(argsReaderState); // Restore previous args reader state
 
-			// keep track of context changes while continuing with the pending fallback:
+			// Keep track of context changes while continuing with the pending fallback:
 			BufferedCommandContext bufferedContext = new BufferedCommandContext(context);
 			parsingContext.context = bufferedContext;
 
-			// set pending fallback (also remembers the previous pending fallback):
+			// Set pending fallback (also remembers the previous pending fallback):
 			Fallback fallback = new Fallback(parsingContext.pendingFallback, parsingContext.currentArgumentIndex, e, bufferedContext, argsReaderState);
 			parsingContext.pendingFallback = fallback;
-		} catch (ArgumentParseException e) { // parsing failed
-			argsReader.setState(argsReaderState); // restore previous args reader state
+		} catch (ArgumentParseException e) { // Parsing failed
+			argsReader.setState(argsReaderState); // Restore previous args reader state
 			parseException = e;
 		}
 		assert !(parseException instanceof FallbackArgumentException);
-		parsingContext.currentParseException = parseException; // resets to null on success or fallback
+		parsingContext.currentParseException = parseException; // Resets to null on success or fallback
 	}
 
 	protected void handleFallbacks(ParsingContext parsingContext) throws ArgumentParseException {
@@ -739,11 +739,11 @@ public abstract class Command {
 		assert !(parseException instanceof FallbackArgumentException);
 
 		Fallback fallback = parsingContext.getPendingFallback();
-		if (fallback == null) { // no pending fallback(s)
+		if (fallback == null) { // No pending fallback(s)
 			if (parseException != null) {
-				throw parseException; // parsing failed at the current argument
+				throw parseException; // Parsing failed at the current argument
 			} else {
-				return; // parsing successful, continue with the next argument (if any)
+				return; // Parsing successful, continue with the next argument (if any)
 			}
 		}
 
@@ -765,19 +765,19 @@ public abstract class Command {
 		boolean currentParsingFailed = (parseException != null);
 		boolean hasUnparsedCommandArguments = parsingContext.hasUnparsedCommandArguments();
 		if (!currentParsingFailed && hasUnparsedCommandArguments) {
-			return; // continue parsing the next argument
-		} // else: continue here, evaluating the pending fallback
+			return; // Continue parsing the next argument
+		} // Else: Continue here, evaluating the pending fallback.
 		assert currentParsingFailed || !hasUnparsedCommandArguments;
 
-		// parsing past the fallback failed if either the current command argument failed, or if there are unparsed
+		// Parsing past the fallback failed if either the current command argument failed, or if there are unparsed
 		// remaining arguments:
 		ArgumentsReader argsReader = parsingContext.argsReader;
 		boolean parsingFailed = (currentParsingFailed || argsReader.hasNext());
 
-		// update pending fallback (null if there are no more pending fallbacks):
+		// Update pending fallback (null if there are no more pending fallbacks):
 		parsingContext.pendingFallback = fallback.previousPendingFallback;
 
-		// reset context to state before fallback:
+		// Reset context to state before fallback:
 		parsingContext.context = fallback.getOriginalContext();
 
 		// Note: If some command argument after the fallback was able to parse something, the args reader might no
@@ -787,28 +787,28 @@ public abstract class Command {
 		if (parsingFailed) {
 			argsReader.setState(fallback.getOriginalArgsReader());
 		} else {
-			// parsing past the fallback succeeded -> there are no remaining arguments for the fallback argument to
-			// consume
+			// Parsing past the fallback succeeded. -> There are no remaining arguments for the fallback argument to
+			// consume.
 			assert !currentParsingFailed && !hasUnparsedCommandArguments && !argsReader.hasNext();
 		}
 
-		// parse fallback:
+		// Parse fallback:
 		FallbackArgument<?> fallbackArgument = fallback.getFallbackArgument();
 		ArgumentParseException fallbackError = null;
-		// hasRemainingArgs: only the case if args got reset and there were remaining args originally as well
+		// hasRemainingArgs: Only the case if args got reset and there were remaining args originally as well.
 		boolean hasRemainingArgs = argsReader.hasNext();
 		ArgumentsReader argsReaderState = argsReader.createSnapshot();
 		try {
-			// on success this stores any parsed values inside the context:
+			// On success this stores any parsed values inside the context:
 			fallbackArgument.parseFallback(parsingContext.input, parsingContext.context, argsReader, fallback.exception, parsingFailed);
-		} catch (FallbackArgumentException e) { // fallback is not allowed to throw another fallback exception here
+		} catch (FallbackArgumentException e) { // Fallback is not allowed to throw another fallback exception here
 			Validate.State.error("Argument '" + fallbackArgument.getName() + "' threw another FallbackArgumentException while parsing fallback: " + e);
-		} catch (ArgumentParseException e) { // fallback failed
-			argsReader.setState(argsReaderState); // restore previous args reader state
+		} catch (ArgumentParseException e) { // Fallback failed
+			argsReader.setState(argsReaderState); // Restore previous args reader state
 			fallbackError = e;
 		}
 		boolean fallbackConsumedArgs = (argsReaderState.getCursor() != argsReader.getCursor());
-		// assumption: args state got restored (no args consumed) if parsing failed
+		// Assumption: args state got restored (no args consumed) if parsing failed.
 		assert (fallbackError == null) || !fallbackConsumedArgs;
 
 		if (hasRemainingArgs && !fallbackConsumedArgs) {
@@ -832,7 +832,7 @@ public abstract class Command {
 		assert !hasRemainingArgs || fallbackConsumedArgs;
 
 		if (fallbackError != null) {
-			// fallback argument failed:
+			// Fallback argument failed:
 			parsingContext.currentArgumentIndex = fallback.argumentIndex;
 			parsingContext.currentParseException = fallbackError;
 			// If there is another pending fallback, evaluate it (otherwise parsing fails with this fallback error):
@@ -862,16 +862,16 @@ public abstract class Command {
 
 	private void handleUnparsedArguments(ParsingContext parsingContext) throws ArgumentParseException {
 		ArgumentsReader argsReader = parsingContext.argsReader;
-		if (argsReader.getRemainingSize() == 0) return; // no unparsed arguments
+		if (argsReader.getRemainingSize() == 0) return; // No unparsed arguments
 
-		// remaining unexpected/unparsed arguments:
+		// Remaining unexpected/unparsed arguments:
 		String firstUnparsedArg = argsReader.peek();
 		if (!this.getChildCommands().getCommands().isEmpty()) {
-			// has child commands: throw an 'unknown command' exception
-			// TODO only use this exception if no arguments got parsed by this command?
+			// Has child commands: Throw an 'unknown command' exception.
+			// TODO Only use this exception if no arguments got parsed by this command?
 			throw new ArgumentParseException(null, this.getUnknownCommandMessage(firstUnparsedArg));
 		} else {
-			// throw an 'invalid argument' exception for the first unparsed argument after the last parsed argument:
+			// Throw an 'invalid argument' exception for the first unparsed argument after the last parsed argument:
 			CommandContext context = parsingContext.context;
 			CommandArgument<?> firstUnparsedArgument = null;
 			ListIterator<CommandArgument<?>> argumentsIter = arguments.listIterator(arguments.size());
@@ -880,13 +880,13 @@ public abstract class Command {
 				if (!context.has(argument.getName())) {
 					firstUnparsedArgument = argument;
 				} else {
-					break; // stop at the first (from behind) found parsed argument
+					break; // Stop at the first (from behind) found parsed argument.
 				}
 			}
 			if (firstUnparsedArgument != null) {
 				throw firstUnparsedArgument.invalidArgumentError(firstUnparsedArg);
 			} else {
-				// throw an 'unexpected argument' exception:
+				// Throw an 'unexpected argument' exception:
 				Text errorMsg = Settings.msgCommandArgumentUnexpected;
 				errorMsg.setPlaceholderArguments(Collections.singletonMap("argument", firstUnparsedArg));
 				throw new ArgumentParseException(null, errorMsg);
@@ -916,7 +916,7 @@ public abstract class Command {
 	 *             if command execution failed
 	 */
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
-		// default command behavior: print command help information
+		// Default command behavior: Print command help information.
 		this.sendHelp(input.getSender());
 	}
 
@@ -951,114 +951,114 @@ public abstract class Command {
 	 */
 	protected List<String> handleTabCompletion(CommandInput input, CommandContext context, ArgumentsReader argsReader) {
 		assert input != null && context != null && argsReader != null;
-		assert (input.getCommand() == this.getRootCommand()); // input is meant for this command
-		assert (argsReader.getArgs() != input.getArguments()); // arguments reader is consistent with input
+		assert (input.getCommand() == this.getRootCommand()); // Input is meant for this command
+		assert (argsReader.getArgs() != input.getArguments()); // Arguments reader is consistent with input
 
-		// search for matching child-command:
+		// Search for matching child-command:
 		Command childCommand = this.getChildCommand(argsReader);
 		if (childCommand != null) {
-			// delegate to child-command:
+			// Delegate to child-command:
 			return childCommand.handleTabCompletion(input, context, argsReader);
 		}
 
-		// no applicable child-command was found:
+		// No applicable child-command was found:
 		CommandSender sender = input.getSender();
-		// check if this type of command sender supported:
+		// Check if this type of command sender supported:
 		if (!this.isAccepted(sender)) {
-			// not supported type of command sender:
+			// Not supported type of command sender:
 			return Collections.emptyList();
 		}
 
-		// check if this command sender has the required permission to proceed:
+		// Check if this command sender has the required permission to proceed:
 		if (!this.testPermission(sender)) {
-			// command sender not allowed:
+			// Command sender not allowed:
 			return Collections.emptyList();
 		}
 
 		List<String> suggestions = new ArrayList<>();
 		if (argsReader.getRemainingSize() == 1) {
 			String finalArgument = CommandUtils.normalize(argsReader.peek());
-			// include matching child-command aliases (max one per command):
-			// asserts that the aliases-map provides all aliases for the same command in succession
+			// Include matching child-command aliases (max one per command):
+			// Asserts that the aliases-map provides all aliases for the same command in succession.
 			Command lastMatchingCommand = null;
 			for (Entry<String, Command> aliasEntry : this.getChildCommands().getAliasesMap().entrySet()) {
 				String alias = aliasEntry.getKey(); // normalized
 				Command aliasCommand = aliasEntry.getValue();
 				if (lastMatchingCommand != null && lastMatchingCommand == aliasCommand) {
-					// we have already included a suggestion for this child command, skip:
+					// We have already included a suggestion for this child command, skip:
 					continue;
 				}
-				// we have reached an alias for a new child command:
+				// We have reached an alias for a new child command:
 				lastMatchingCommand = null;
 
-				// does the alias match the input?
+				// Does the alias match the input?
 				if (alias.startsWith(finalArgument)) {
-					// exclude further aliases for this command:
+					// Exclude further aliases for this command:
 					lastMatchingCommand = aliasCommand;
 
-					// check if recipient even has required permission for this command:
+					// Check if recipient even has required permission for this command:
 					if (!aliasCommand.testPermission(sender)) {
-						// missing permission for this command, skip:
+						// Missing permission for this command, skip:
 						continue;
 					}
 
-					// add this alias to the suggestions:
-					// TODO maybe use the original alias here, and not the normalized one?
+					// Add this alias to the suggestions:
+					// TODO Maybe use the original alias here, and not the normalized one?
 					suggestions.add(alias);
 				}
 			}
 		}
 
-		// parse and complete arguments:
+		// Parse and complete arguments:
 		CommandContextView contextView = context.getView();
 		for (CommandArgument<?> argument : arguments) {
 			int remainingArgs = argsReader.getRemainingSize();
 			if (remainingArgs == 0) {
-				// no argument left which could be completed:
+				// No argument left which could be completed:
 				break;
 			}
 			ArgumentsReader argsReaderState = argsReader.createSnapshot();
 			try {
 				argument.parse(input, context, argsReader);
-				// successfully parsed:
+				// Successfully parsed:
 				if (!argsReader.hasNext()) {
-					// this consumed the last argument:
-					// reset args reader and provide alternative completions for the last argument instead:
+					// This consumed the last argument:
+					// Reset args reader and provide alternative completions for the last argument instead:
 					argsReader.setState(argsReaderState);
 					suggestions.addAll(argument.complete(input, contextView, argsReader));
 					break;
 				} else if (argsReader.getRemainingSize() == remainingArgs) {
-					// no error during parsing, but none of the remaining args used up:
-					// -> this was an optional argument which got skipped
-					// include suggestions (if it has any), but continue:
+					// No error during parsing, but none of the remaining args used up:
+					// -> This was an optional argument which got skipped.
+					// Include suggestions (if it has any), but continue:
 					suggestions.addAll(argument.complete(input, contextView, argsReader));
 
-					// reset args reader and then let the following arguments also try to complete the same arg(s):
+					// Reset args reader and then let the following arguments also try to complete the same arg(s):
 					argsReader.setState(argsReaderState);
 					continue;
 				}
 			} catch (FallbackArgumentException e) {
-				// parsing failed, but registered a fallback:
-				// check for completions, but continue parsing
+				// Parsing failed, but registered a fallback:
+				// Check for completions, but continue parsing.
 				argsReader.setState(argsReaderState);
 				suggestions.addAll(argument.complete(input, contextView, argsReader));
 				argsReader.setState(argsReaderState);
 				continue;
 			} catch (ArgumentParseException e) {
 				if (argument.getReducedFormat().isEmpty()) {
-					// argument is hidden, check for completions but continue parsing:
+					// Argument is hidden, check for completions but continue parsing:
 					argsReader.setState(argsReaderState);
 					suggestions.addAll(argument.complete(input, contextView, argsReader));
 					argsReader.setState(argsReaderState);
 					continue;
 				} else {
-					// parsing might have failed because of an invalid partial last argument
-					// -> check for and include suggestions
+					// Parsing might have failed because of an invalid partial last argument.
+					// -> Check for and include suggestions.
 					argsReader.setState(argsReaderState);
 					suggestions.addAll(argument.complete(input, contextView, argsReader));
-					// parsing might also have failed because of an invalid argument inside the sequence of arguments
-					// -> skip later arguments (current argument will not provide suggestions in that case, because
-					// it isn't using up the last argument)
+					// Parsing might also have failed because of an invalid argument inside the sequence of arguments.
+					// -> Skip later arguments (current argument will not provide suggestions in that case, because
+					// it isn't using up the last argument).
 					break;
 				}
 			}
@@ -1067,7 +1067,7 @@ public abstract class Command {
 		return Collections.unmodifiableList(suggestions);
 	}
 
-	// help page related:
+	// Help page related:
 
 	/**
 	 * Checks whether the child-commands of this {@link Command} are included in the parent's help content.
@@ -1138,7 +1138,7 @@ public abstract class Command {
 		this.hiddenInOwnHelp = hiddenInOwnHelp;
 	}
 
-	// help page formatting:
+	// Help page formatting:
 
 	/**
 	 * Sets the format to use for the title when sending the help via {@link #sendHelp(CommandSender)}.
@@ -1234,7 +1234,7 @@ public abstract class Command {
 			if (parent != null && !(parentFormat = parent.getHelpTitleFormat()).isPlainTextEmpty()) {
 				format = parentFormat;
 			} else {
-				// default:
+				// Default:
 				format = DEFAULT_HELP_TITLE_FORMAT;
 			}
 		}
@@ -1255,7 +1255,7 @@ public abstract class Command {
 			if (parent != null && !(parentFormat = parent.getHelpUsageFormat()).isPlainTextEmpty()) {
 				format = parentFormat;
 			} else {
-				// default:
+				// Default:
 				format = DEFAULT_HELP_USAGE_FORMAT;
 			}
 		}
@@ -1276,7 +1276,7 @@ public abstract class Command {
 			if (parent != null && !(parentFormat = parent.getHelpDescFormat()).isPlainTextEmpty()) {
 				format = parentFormat;
 			} else {
-				// default:
+				// Default:
 				format = DEFAULT_HELP_DESC_FORMAT;
 			}
 		}
@@ -1297,7 +1297,7 @@ public abstract class Command {
 			if (parent != null && !(parentFormat = parent.getHelpChildUsageFormat()).isPlainTextEmpty()) {
 				format = parentFormat;
 			} else {
-				// default: use this command's help usage format
+				// Default: Use this command's help usage format.
 				format = this.getHelpUsageFormat();
 			}
 
@@ -1320,7 +1320,7 @@ public abstract class Command {
 			if (parent != null && !(parentFormat = parent.getHelpChildDescFormat()).isPlainTextEmpty()) {
 				format = parentFormat;
 			} else {
-				// default: use this command's help description format
+				// Default: Use this command's help description format.
 				format = this.getHelpDescFormat();
 			}
 		}
@@ -1356,28 +1356,28 @@ public abstract class Command {
 	public void sendHelp(CommandSender recipient) throws NoPermissionException {
 		Validate.notNull(recipient);
 
-		// make sure the recipient has the required permission:
+		// Make sure the recipient has the required permission:
 		if (!this.hasHelpPermission(recipient)) {
 			throw this.noPermissionException();
 		}
 
 		Map<String, Object> commonMsgArgs = this.getCommonMessageArgs();
 
-		// title:
+		// Title:
 		Text titleFormat = this.getHelpTitleFormat();
 		assert titleFormat != null;
 		if (!titleFormat.isPlainTextEmpty()) {
 			TextUtils.sendMessage(recipient, titleFormat, commonMsgArgs);
 		}
 
-		// skip info about the command if it is hidden or the recipient does not have the required permission:
+		// Skip info about the command if it is hidden or the recipient does not have the required permission:
 		if (!this.isHiddenInOwnHelp() && this.testPermission(recipient)) {
-			// command usage:
+			// Command usage:
 			Text usageFormat = this.getHelpUsageFormat();
 			assert usageFormat != null;
 			usageFormat.setPlaceholderArguments(commonMsgArgs);
 
-			// command description:
+			// Command description:
 			Text descriptionFormat;
 			Text description = this.getDescription();
 			if (description.isPlainTextEmpty()) {
@@ -1394,13 +1394,13 @@ public abstract class Command {
 					"description", descriptionFormat
 			));
 
-			// skip if both usage and description formats are empty:
+			// Skip if both usage and description formats are empty:
 			if (!helpEntryFormat.isPlainTextEmpty()) {
 				TextUtils.sendMessage(recipient, helpEntryFormat);
 			}
 		}
 
-		// include child-commands help:
+		// Include child-commands help:
 		Text childUsageFormat = this.getHelpChildUsageFormat();
 		Text childDescFormat = this.getHelpChildDescFormat();
 		this.sendChildCommandsHelp(recipient, childUsageFormat, childDescFormat, this);
@@ -1409,21 +1409,21 @@ public abstract class Command {
 	protected void sendChildCommandsHelp(CommandSender recipient, Text childUsageFormat, Text childDescFormat, Command command) {
 		Validate.notNull(recipient);
 		if (childUsageFormat == null || childUsageFormat.isPlainTextEmpty()) {
-			// not including child commands at all:
+			// Not including child commands at all:
 			return;
 		}
 		boolean childDescFormatEmpty = (childDescFormat == null || childDescFormat.isPlainTextEmpty());
 
-		// print usage and description of child-commands:
+		// Print usage and description of child-commands:
 		for (Command childCommand : command.getChildCommands().getCommands()) {
-			// skip info about the command if it is hidden or the recipient does not have the required permission:
+			// Skip info about the command if it is hidden or the recipient does not have the required permission:
 			if (!childCommand.isHiddenInParentHelp() && childCommand.testPermission(recipient)) {
 				Map<String, Object> childCommonMsgArgs = childCommand.getCommonMessageArgs();
 
-				// command usage:
+				// Command usage:
 				childUsageFormat.setPlaceholderArguments(childCommonMsgArgs);
 
-				// command description:
+				// Command description:
 				Text childDescriptionFormat = childDescFormat;
 				Text childDescription = childCommand.getDescription();
 				if (childDescFormatEmpty || childDescription.isPlainTextEmpty()) {
@@ -1441,7 +1441,7 @@ public abstract class Command {
 				TextUtils.sendMessage(recipient, helpEntryFormat);
 			}
 
-			// optionally include the child-command's child-commands in help content:
+			// Optionally include the child-command's child-commands in help content:
 			if (childCommand.isIncludeChildsInParentHelp()) {
 				this.sendChildCommandsHelp(recipient, childUsageFormat, childDescFormat, childCommand);
 			}

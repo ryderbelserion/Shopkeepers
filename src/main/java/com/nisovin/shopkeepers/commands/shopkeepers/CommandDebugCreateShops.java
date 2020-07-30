@@ -29,16 +29,16 @@ class CommandDebugCreateShops extends PlayerCommand {
 		super("debugCreateShops");
 		this.plugin = plugin;
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Text.of("Creates lots of shopkeepers for stress testing."));
 
-		// hidden debugging command:
+		// Hidden debugging command:
 		this.setHiddenInParentHelp(true);
 
-		// arguments:
+		// Arguments:
 		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_SHOP_COUNT), 10));
 	}
 
@@ -47,7 +47,7 @@ class CommandDebugCreateShops extends PlayerCommand {
 		assert (input.getSender() instanceof Player);
 		Player player = (Player) input.getSender();
 		int shopCount = context.get(ARGUMENT_SHOP_COUNT);
-		// not using BoundedIntegerArgument for now due to missing descriptive error messages TODO use in future
+		// Not using BoundedIntegerArgument for now due to missing descriptive error messages. TODO Use in the future.
 		if (shopCount > 1000) {
 			player.sendMessage(ChatColor.RED + "Shopkeeper count to high, limiting to 1000!");
 			shopCount = 1000;

@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
  */
 public class FixedValueArgument<T> extends CommandArgument<T> {
 
-	private final T fixedValue; // can be null
+	private final T fixedValue; // Can be null
 
 	public FixedValueArgument(String name, T fixedValue) {
 		super(name);
@@ -23,7 +23,7 @@ public class FixedValueArgument<T> extends CommandArgument<T> {
 
 	@Override
 	public boolean isOptional() {
-		return true; // does not require user input
+		return true; // Does not require user input
 	}
 
 	@Override

@@ -70,12 +70,12 @@ public final class SchedulerUtils {
 
 	public static BukkitTask runTaskLaterOrOmit(Plugin plugin, Runnable task, long delay) {
 		validatePluginTask(plugin, task);
-		// tasks can only be registered while enabled:
+		// Tasks can only be registered while enabled:
 		if (plugin.isEnabled()) {
 			try {
 				return Bukkit.getScheduler().runTaskLater(plugin, task, delay);
 			} catch (IllegalPluginAccessException e) {
-				// couldn't register task: the plugin got disabled just now
+				// Couldn't register task: The plugin got disabled just now.
 			}
 		}
 		return null;
@@ -87,12 +87,12 @@ public final class SchedulerUtils {
 
 	public static BukkitTask runAsyncTaskLaterOrOmit(Plugin plugin, Runnable task, long delay) {
 		validatePluginTask(plugin, task);
-		// tasks can only be registered while enabled:
+		// Tasks can only be registered while enabled:
 		if (plugin.isEnabled()) {
 			try {
 				return Bukkit.getScheduler().runTaskLaterAsynchronously(plugin, task, delay);
 			} catch (IllegalPluginAccessException e) {
-				// couldn't register task: the plugin got disabled just now
+				// Couldn't register task: The plugin got disabled just now.
 			}
 		}
 		return null;
@@ -127,20 +127,20 @@ public final class SchedulerUtils {
 			final long waitingStart = System.nanoTime();
 			long waitingDurationMillis = 0;
 			do {
-				// checking again every 5 milliseconds:
+				// Checking again every 5 milliseconds:
 				try {
 					Thread.sleep(5);
 				} catch (InterruptedException e) {
-					// ignore, but reset interrupt flag:
+					// Ignore, but reset interrupt flag:
 					Thread.currentThread().interrupt();
 				}
-				// update the number of active async task before breaking from loop:
+				// Update the number of active async task before breaking from loop:
 				activeAsyncTasks = getActiveAsyncTasks(plugin);
 
-				// update waiting duration and compare to timeout:
+				// Update waiting duration and compare to timeout:
 				waitingDurationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - waitingStart);
 				if (waitingDurationMillis > asyncTasksTimeoutMillis) {
-					// timeout reached, abort waiting..
+					// Timeout reached, abort waiting..
 					break;
 				}
 			} while (activeAsyncTasks > 0);
@@ -151,7 +151,7 @@ public final class SchedulerUtils {
 		}
 
 		if (activeAsyncTasks > 0 && logger != null) {
-			// severe, since this can potentially result in data loss, depending on what the tasks are doing:
+			// Severe, since this can potentially result in data loss, depending on what the tasks are doing:
 			logger.severe("There are still " + activeAsyncTasks + " remaining async tasks active! Disabling anyways now ..");
 		}
 		return activeAsyncTasks;

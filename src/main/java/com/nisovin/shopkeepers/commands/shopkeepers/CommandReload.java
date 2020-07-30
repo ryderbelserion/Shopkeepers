@@ -19,10 +19,10 @@ class CommandReload extends Command {
 		super("reload");
 		this.plugin = plugin;
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.RELOAD_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionReload);
 	}
 
@@ -30,7 +30,7 @@ class CommandReload extends Command {
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 
-		// reload plugin:
+		// Reload plugin:
 		plugin.reload();
 		sender.sendMessage(ChatColor.GREEN + "Shopkeepers plugin reloaded!");
 	}

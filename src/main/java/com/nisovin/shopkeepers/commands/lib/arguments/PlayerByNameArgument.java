@@ -50,7 +50,7 @@ public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 
 	@Override
 	public Player getObject(String nameInput) throws ArgumentParseException {
-		// name input may be both player name or display name:
+		// Name input may be both player name or display name:
 		Stream<Player> players = PlayerUtils.PlayerNameMatcher.EXACT.match(nameInput);
 		Optional<Player> player = players.findFirst();
 		return player.orElse(null);

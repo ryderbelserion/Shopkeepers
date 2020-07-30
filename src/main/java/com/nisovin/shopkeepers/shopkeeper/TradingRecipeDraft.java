@@ -39,7 +39,7 @@ public class TradingRecipeDraft {
 		this.resultItem = ItemUtils.getNullIfEmpty(resultItem);
 		item1 = ItemUtils.getNullIfEmpty(item1);
 		item2 = ItemUtils.getNullIfEmpty(item2);
-		// swap items if item1 is empty:
+		// Swap items if item1 is empty:
 		if (item1 == null) {
 			item1 = item2;
 			item2 = null;
@@ -121,8 +121,8 @@ public class TradingRecipeDraft {
 	public boolean areItemsEqual(TradingRecipe otherRecipe) {
 		if (otherRecipe == null) return false;
 		if (otherRecipe instanceof TradingRecipeDraft) {
-			// this is true for TradingRecipes based on SKTradingRecipe
-			return this.areItemsEqual((TradingRecipeDraft) otherRecipe); // avoids copying the items
+			// This is true for TradingRecipes based on SKTradingRecipe:
+			return this.areItemsEqual((TradingRecipeDraft) otherRecipe); // Avoids copying the items
 		} else {
 			return this.areItemsEqual(otherRecipe.getResultItem(), otherRecipe.getItem1(), otherRecipe.getItem2());
 		}

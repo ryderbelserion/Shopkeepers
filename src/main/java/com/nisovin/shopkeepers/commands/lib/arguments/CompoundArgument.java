@@ -42,7 +42,7 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 		this.arguments = Collections.unmodifiableList(argumentsList);
 		for (CommandArgument<?> argument : arguments) {
 			Validate.notNull(argument, "A contained argument is null!");
-			// TODO this also excludes optional arguments.. allow fallbacks and handle them somehow? Maybe evaluate
+			// TODO This also excludes optional arguments.. allow fallbacks and handle them somehow? Maybe evaluate
 			// fallbacks immediately?
 			Validate.isTrue(!(argument instanceof FallbackArgument), "Cannot use fallback arguments in compound argument!");
 			argument.setParent(this);
@@ -50,14 +50,14 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 		}
 		Validate.isTrue(this.arguments.size() != 0, "No arguments given!");
 
-		// format:
-		// the reduced format can only be used in conjunction with joinFormats:
+		// Format:
+		// The reduced format can only be used in conjunction with joinFormats:
 		this.useReducedFormat = joinFormats ? useReducedFormat : false;
 		if (joinFormats) {
 			String delimiter = FORMAT_DELIMITER;
 			StringBuilder format = new StringBuilder();
 			for (CommandArgument<?> argument : this.arguments) {
-				// appending full format for child-arguments here:
+				// Appending full format for child-arguments here:
 				String argumentFormat = argument.getFormat();
 				if (!argumentFormat.isEmpty()) {
 					format.append(argumentFormat).append(delimiter);
@@ -69,7 +69,7 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 				this.reducedFormat = format.substring(0, format.length() - delimiter.length());
 			}
 		} else {
-			// using the default format:
+			// Using the default format:
 			this.reducedFormat = super.getReducedFormat();
 		}
 	}
@@ -80,7 +80,7 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 
 	@Override
 	public boolean isOptional() {
-		// this argument is optional, if all child-arguments are optional:
+		// This argument is optional, if all child-arguments are optional:
 		for (CommandArgument<?> argument : arguments) {
 			if (!argument.isOptional()) {
 				return false;
@@ -107,13 +107,13 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 
 	@Override
 	public T parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
-		// parse requirements:
+		// Parse requirements:
 		CommandContext localContext = context.copy();
 		for (CommandArgument<?> argument : arguments) {
 			argument.parse(input, localContext, argsReader);
 		}
 
-		// parse actual value for this compound argument:
+		// Parse actual value for this compound argument:
 		return this.parseCompoundValue(input, localContext.getView(), argsReader);
 	}
 
@@ -128,46 +128,46 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 		for (CommandArgument<?> argument : arguments) {
 			int remainingArgs = argsReader.getRemainingSize();
 			if (remainingArgs == 0) {
-				// no argument left which could be completed:
+				// No argument left which could be completed:
 				break;
 			}
 			ArgumentsReader argsReaderState = argsReader.createSnapshot();
 			try {
 				argument.parse(input, localContext, argsReader);
-				// successfully parsed:
+				// Successfully parsed:
 				if (!argsReader.hasNext()) {
-					// this consumed the last argument:
-					// reset args and provide alternative completions for the last argument instead:
+					// This consumed the last argument:
+					// Reset args and provide alternative completions for the last argument instead:
 					argsReader.setState(argsReaderState);
 					suggestions.addAll(argument.complete(input, localContextView, argsReader));
 					break;
 				} else if (argsReader.getRemainingSize() == remainingArgs) {
-					// no error during parsing, but none of the remaining args used up:
-					// -> this was an optional argument which got skipped
-					// include suggestions (if it has any), but continue:
+					// No error during parsing, but none of the remaining args used up:
+					// -> This was an optional argument which got skipped.
+					// Include suggestions (if it has any), but continue:
 					suggestions.addAll(argument.complete(input, localContextView, argsReader));
 
-					// reset state (just in case), and then let the following arguments also try to complete the same
+					// Reset state (just in case), and then let the following arguments also try to complete the same
 					// arg(s):
 					argsReader.setState(argsReaderState);
 					continue;
 				}
 			} catch (ArgumentParseException e) {
 				if (argsReader.getRemainingSize() == remainingArgs) {
-					// error, but none of the remaining args were used up:
-					// -> this was a hidden argument that didn't consume any arguments
-					// -> skip and continue
-					// reset state (just in case):
+					// Error, but none of the remaining args were used up:
+					// -> This was a hidden argument that didn't consume any arguments.
+					// -> Skip and continue.
+					// Reset state (just in case):
 					argsReader.setState(argsReaderState);
 					continue;
 				} else {
-					// parsing might have failed because of an invalid partial last argument
-					// -> include suggestions in that case
+					// Parsing might have failed because of an invalid partial last argument.
+					// -> Include suggestions in that case.
 					argsReader.setState(argsReaderState);
 					suggestions.addAll(argument.complete(input, localContextView, argsReader));
-					// parsing might also have failed because of an invalid argument inside the sequence of arguments
-					// -> skip later arguments (current argument will not provide suggestions in that case, because it
-					// isn't using up the last argument)
+					// Parsing might also have failed because of an invalid argument inside the sequence of arguments.
+					// -> Skip later arguments (current argument will not provide suggestions in that case, because it
+					// isn't using up the last argument).
 					break;
 				}
 			}

@@ -10,7 +10,7 @@ import com.nisovin.shopkeepers.util.Validate;
  */
 public class ArgumentsReader {
 
-	// directly references to the underlying (unmodifiable) input arguments:
+	// Directly references to the underlying (unmodifiable) input arguments:
 	private final List<String> args;
 	private int cursor = -1; // 0 points to the first argument
 
@@ -234,13 +234,13 @@ public class ArgumentsReader {
 		return builder.toString();
 	}
 
-	// Comparisons use the identity of the args list: This should be quick and sufficient for our needs
+	// Comparisons use the identity of the args list: This should be quick and sufficient for our needs.
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + System.identityHashCode(args); // also handles null
+		result = prime * result + System.identityHashCode(args); // Also handles null
 		result = prime * result + cursor;
 		return result;
 	}

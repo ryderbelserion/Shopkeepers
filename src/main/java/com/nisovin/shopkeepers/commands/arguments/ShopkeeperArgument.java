@@ -72,7 +72,7 @@ public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 
 	@Override
 	public Shopkeeper parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
-		// also handles argument exceptions:
+		// Also handles argument exceptions:
 		return firstOfArgument.parseValue(input, context, argsReader);
 	}
 

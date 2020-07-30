@@ -24,7 +24,7 @@ import com.nisovin.shopkeepers.util.Validate;
 public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implements UIRegistry<AbstractUIType> {
 
 	private final ShopkeepersPlugin plugin;
-	// player id -> ui session
+	// Player id -> UI session
 	private final Map<UUID, SKUISession> playerSessions = new HashMap<>();
 	private UIListener uiListener = null;
 
@@ -40,7 +40,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 
 	public void onDisable() {
 		assert uiListener != null;
-		// close all open UIs:
+		// Close all open UIs:
 		this.closeAll();
 		HandlerList.unregisterAll(uiListener);
 		uiListener = null;
@@ -70,13 +70,13 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		}
 
 		SKUISession oldSession = this.getSession(player);
-		// filtering out duplicate open requests:
+		// Filter out duplicate open requests:
 		if (oldSession != null && oldSession.getShopkeeper().equals(shopkeeper) && oldSession.getUIHandler().equals(uiHandler)) {
 			Log.debug(() -> "UI '" + uiIdentifier + "'" + " is already open for '" + playerName + "'.");
 			return false;
 		}
 
-		// call event:
+		// Call event:
 		ShopkeeperOpenUIEvent openUIEvent = new ShopkeeperOpenUIEvent(shopkeeper, uiType, player);
 		Bukkit.getPluginManager().callEvent(openUIEvent);
 		if (openUIEvent.isCancelled()) {
@@ -84,13 +84,13 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 			return false;
 		}
 
-		// opening a window should automatically trigger a close of the previous window
-		// however, we do this manually here just in case, because we cannot be sure what the UI handler is actually
-		// doing inside openWindow
-		// closing previous window:
+		// Opening a window should automatically trigger a close of the previous window.
+		// However, we do this manually here just in case, because we cannot be sure what the UI handler is actually
+		// doing inside openWindow.
+		// Close previous window:
 		if (oldSession != null) {
 			Log.debug(() -> "Closing previous UI '" + uiIdentifier + "' for player '" + playerName + "'.");
-			player.closeInventory(); // this will call a PlayerCloseInventoryEvent
+			player.closeInventory(); // This will call a PlayerCloseInventoryEvent
 		}
 
 		Log.debug(() -> "Opening UI '" + uiIdentifier + "' ...");
@@ -119,7 +119,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		return (session != null ? session.getUIType() : null);
 	}
 
-	// closeEvent might be null
+	// closeEvent might be null.
 	void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
 		assert player != null;
 		SKUISession session = playerSessions.remove(player.getUniqueId());
@@ -131,7 +131,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	}
 
 	public void onPlayerQuit(Player player) {
-		// TODO this might have no effect, because CraftBukkit triggers an inventory close event prior to the player
+		// TODO This might have no effect, because CraftBukkit triggers an inventory close event prior to the player
 		// quitting
 		this.onInventoryClose(player, null);
 	}
@@ -140,11 +140,11 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		Log.debug(() -> "UI '" + session.getUIType().getIdentifier() + "' session started for player '" + session.getPlayer().getName() + "'.");
 	}
 
-	// closeEvent can be null
+	// closeEvent can be null.
 	private void onSessionEnd(SKUISession session, InventoryCloseEvent closeEvent) {
 		Log.debug(() -> "UI '" + session.getUIType().getIdentifier() + "' session ended for player '" + session.getPlayer().getName() + "'.");
-		session.getUIHandler().onInventoryClose(session.getPlayer(), closeEvent); // inform UI handler
-		session.onSessionEnd(); // inform session
+		session.getUIHandler().onInventoryClose(session.getPlayer(), closeEvent); // Inform UI handler
+		session.onSessionEnd(); // Inform session
 	}
 
 	@Override
@@ -166,17 +166,17 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 
 	@Override
 	public void closeAllDelayed(Shopkeeper shopkeeper) {
-		// ignore during disable: all UIs get closed anyways already
+		// Ignore during disable: All UIs get closed anyways already.
 		if (shopkeeper == null || !plugin.isEnabled()) return;
 
-		// deactivate currently active UIs:
+		// Deactivate currently active UIs:
 		shopkeeper.deactivateUI();
 
-		// delayed because this is/was originally called from inside the PlayerCloseInventoryEvent
+		// Delayed because this is/was originally called from inside the PlayerCloseInventoryEvent:
 		Bukkit.getScheduler().runTask(plugin, () -> {
 			this.closeAll(shopkeeper);
 
-			// reactivate UIs:
+			// Reactivate UIs:
 			shopkeeper.activateUI();
 		});
 	}
@@ -192,6 +192,6 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 			Player player = session.getPlayer();
 			player.closeInventory();
 		}
-		playerSessions.clear(); // just in case
+		playerSessions.clear(); // Just in case
 	}
 }

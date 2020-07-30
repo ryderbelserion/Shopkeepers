@@ -43,14 +43,14 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	private static final int CHECK_CONTAINER_PERIOD_SECONDS = 5;
 
-	protected UUID ownerUUID; // not null after successful initialization
-	protected String ownerName; // not null after successful initialization
+	protected UUID ownerUUID; // Not null after successful initialization
+	protected String ownerName; // Not null after successful initialization
 	// TODO Store container world separately? Currently it uses the shopkeeper world.
 	// This would allow the container and shopkeeper to be located in different worlds, and virtual player shops.
 	protected int containerX;
 	protected int containerY;
 	protected int containerZ;
-	protected ItemStack hireCost = null; // null if not for hire
+	protected ItemStack hireCost = null; // Null if not for hire
 
 	// Random shopkeeper-specific starting offset between [1, CHECK_CONTAINER_PERIOD_SECONDS]
 	private int remainingCheckContainerSeconds = (int) (Math.random() * CHECK_CONTAINER_PERIOD_SECONDS) + 1;
@@ -98,12 +98,12 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		try {
 			ownerUUID = UUID.fromString(configSection.getString("owner uuid"));
 		} catch (Exception e) {
-			// uuid invalid or non-existent:
+			// UUID is invalid or non-existent:
 			throw new ShopkeeperCreateException("Missing owner uuid!");
 		}
 		ownerName = configSection.getString("owner");
-		// TODO no longer using fallback name (since late 1.14.4); remove the "unknown"-check again in the future
-		// (as soon as possible, because it conflicts with any player actually named 'unknown')
+		// TODO We no longer use the fallback name (since late 1.14.4). Remove the "unknown"-check again in the future
+		// (as soon as possible, because it conflicts with any player actually named 'unknown').
 		if (ownerName == null || ownerName.isEmpty() || ownerName.equals("unknown")) {
 			throw new ShopkeeperCreateException("Missing owner name!");
 		}
@@ -117,7 +117,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		this._setContainer(configSection.getInt("chestx"), configSection.getInt("chesty"), configSection.getInt("chestz"));
 
 		hireCost = configSection.getItemStack("hirecost");
-		// hire cost itemstack is not null, but empty -> normalize to null:
+		// Hire cost ItemStack is not null, but empty. -> Normalize to null:
 		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
 			Log.warning("Invalid (empty) hire cost! Disabling 'for hire' for shopkeeper at " + this.getPositionString());
 			hireCost = null;
@@ -126,7 +126,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		ItemStack migratedHireCost = ItemUtils.migrateItemStack(hireCost);
 		if (!ItemUtils.isSimilar(hireCost, migratedHireCost)) {
 			if (ItemUtils.isEmpty(migratedHireCost) && !ItemUtils.isEmpty(hireCost)) {
-				// migration failed:
+				// Migration failed:
 				Log.warning("Shopkeeper " + this.getId() + ": Hire cost item migration failed: " + hireCost.toString());
 				hireCost = null;
 			} else {
@@ -193,21 +193,21 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void onPlayerInteraction(Player player) {
-		// naming via item:
+		// Naming via item:
 		PlayerInventory playerInventory = player.getInventory();
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
 		if (Settings.namingOfPlayerShopsViaItem && Settings.isNamingItem(itemInMainHand)) {
-			// check if player can edit this shopkeeper:
+			// Check if player can edit this shopkeeper:
 			PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUITypes.EDITOR());
 			if (editorHandler.canOpen(player)) {
-				// rename with the player's item in hand:
-				ItemMeta itemMeta = itemInMainHand.getItemMeta(); // can be null
+				// Rename with the player's item in hand:
+				ItemMeta itemMeta = itemInMainHand.getItemMeta(); // Can be null
 				String newName = (itemMeta != null && itemMeta.hasDisplayName()) ? itemMeta.getDisplayName() : "";
 				assert newName != null; // ItemMeta#getDisplayName returns non-null in all cases
 
-				// handled name changing:
+				// Handled name changing:
 				if (SKShopkeepersPlugin.getInstance().getShopkeeperNaming().requestNameChange(player, this, newName)) {
-					// manually remove rename item from player's hand after this event is processed:
+					// Manually remove rename item from player's hand after this event is processed:
 					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
 						ItemStack newItemInMainHand = ItemUtils.descreaseItemAmount(itemInMainHand, 1);
 						playerInventory.setItemInMainHand(newItemInMainHand);
@@ -218,10 +218,10 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		}
 
 		if (!player.isSneaking() && this.isForHire()) {
-			// open hiring window:
+			// Open hiring window:
 			this.openHireWindow(player);
 		} else {
-			// open editor or trading window:
+			// Open editor or trading window:
 			super.onPlayerInteraction(player);
 		}
 	}
@@ -238,12 +238,12 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		this.markDirty();
 		this.ownerUUID = ownerUUID;
 		this.ownerName = ownerName;
-		// TODO do this in a more abstract way
+		// TODO Do this in a more abstract way.
 		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN()) {
-			// update the npc's name:
+			// Update the NPC's name:
 			((SKCitizensShopObject) this.getShopObject()).setName(ownerName);
 		} else if (this.getShopObject().getType() == DefaultShopObjectTypes.SIGN()) {
-			// update sign:
+			// Update sign:
 			((SKSignShopObject) this.getShopObject()).updateSign();
 		}
 	}
@@ -282,11 +282,11 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	public void setForHire(ItemStack hireCost) {
 		this.markDirty();
 		if (ItemUtils.isEmpty(hireCost)) {
-			// disable hiring:
+			// Disable hiring:
 			this.hireCost = null;
 			this.setName("");
 		} else {
-			// set for hire:
+			// Set for hire:
 			this.hireCost = hireCost.clone();
 			this.setName(Settings.forHireTitle);
 		}
@@ -365,7 +365,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return Bukkit.getWorld(this.getWorldName()).getBlockAt(containerX, containerY, containerZ);
 	}
 
-	// returns null (and logs a warning) if the price cannot be represented correctly by currency items
+	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
 	protected TradingRecipe createSellingRecipe(ItemStack itemBeingSold, int price, boolean outOfStock) {
 		int remainingPrice = price;
 
@@ -377,13 +377,13 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			if (highCurrencyAmount > 0) {
 				remainingPrice -= (highCurrencyAmount * Settings.highCurrencyValue);
 				ItemStack highCurrencyItem = Settings.createHighCurrencyItem(highCurrencyAmount);
-				item1 = highCurrencyItem; // using the first slot
+				item1 = highCurrencyItem; // Using the first slot
 			}
 		}
 
 		if (remainingPrice > 0) {
 			if (remainingPrice > Settings.currencyItem.getType().getMaxStackSize()) {
-				// cannot represent this price with the used currency items:
+				// Cannot represent this price with the used currency items:
 				Log.warning("Shopkeeper " + this.getIdString() + " at " + this.getPositionString()
 						+ " owned by " + this.getOwnerString() + " has an invalid cost!");
 				return null;
@@ -393,17 +393,17 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			if (item1 == null) {
 				item1 = currencyItem;
 			} else {
-				// the first item of the trading recipe is already used by the high currency item:
+				// The first item of the trading recipe is already used by the high currency item:
 				item2 = currencyItem;
 			}
 		}
 		return ShopkeepersAPI.createTradingRecipe(itemBeingSold, item1, item2, outOfStock);
 	}
 
-	// returns null (and logs a warning) if the price cannot be represented correctly by currency items
+	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
 	protected TradingRecipe createBuyingRecipe(ItemStack itemBeingBought, int price, boolean outOfStock) {
 		if (price > Settings.currencyItem.getType().getMaxStackSize()) {
-			// cannot represent this price with the used currency items:
+			// Cannot represent this price with the used currency items:
 			Log.warning("Shopkeeper " + this.getIdString() + " at " + this.getPositionString()
 					+ " owned by " + this.getOwnerString() + " has an invalid cost!");
 			return null;
@@ -448,7 +448,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return ItemUtils.countItems(contents, filter);
 	}
 
-	// SHOPKEEPER UIs - shortcuts for common UI types:
+	// SHOPKEEPER UIs - Shortcuts for common UI types:
 
 	@Override
 	public boolean openHireWindow(Player player) {

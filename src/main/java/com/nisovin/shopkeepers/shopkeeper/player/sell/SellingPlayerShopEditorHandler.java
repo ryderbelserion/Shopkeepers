@@ -29,23 +29,23 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		SKSellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
-		// add the shopkeeper's offers:
+		// Add the shopkeeper's offers:
 		for (PriceOffer offer : shopkeeper.getOffers()) {
 			TradingRecipeDraft recipe = this.createTradingRecipeDraft(offer.getItem(), offer.getPrice());
 			recipes.add(recipe);
 		}
 
-		// add empty offers for items from the container:
+		// Add empty offers for items from the container:
 		List<ItemCount> containerItems = shopkeeper.getItemsFromContainer();
 		for (int containerItemIndex = 0; containerItemIndex < containerItems.size(); containerItemIndex++) {
 			ItemCount itemCount = containerItems.get(containerItemIndex);
-			ItemStack itemFromContainer = itemCount.getItem(); // this item is already a copy with amount 1
+			ItemStack itemFromContainer = itemCount.getItem(); // This item is already a copy with amount 1
 
 			if (shopkeeper.getOffer(itemFromContainer) != null) {
-				continue; // already added
+				continue; // Already added
 			}
 
-			// add recipe:
+			// Add recipe:
 			TradingRecipeDraft recipe = this.createTradingRecipeDraft(itemFromContainer, 0);
 			recipes.add(recipe);
 		}
@@ -74,7 +74,7 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		assert this.isTradesArea(event.getRawSlot());
 		int rawSlot = event.getRawSlot();
 		if (this.isResultRow(rawSlot)) {
-			// handle changing sell stack size:
+			// Handle changing sell stack size:
 			this.handleUpdateItemAmountOnClick(event, 1);
 		} else {
 			super.handleTradesClick(session, event);

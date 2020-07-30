@@ -84,11 +84,11 @@ class CitizensListener implements Listener {
 
 		private void handlePendingTrait() {
 			if (pendingTrait != null) {
-				assert lastPlayerId == null; // otherwise the pending trait would have been handled already
+				assert lastPlayerId == null; // Otherwise the pending trait would have been handled already.
 				CitizensShopkeeperTrait trait = pendingTrait;
 				pendingTrait = null;
 				this.reset();
-				this.handleTrait(trait, null); // handle without player
+				this.handleTrait(trait, null); // Handle without player
 			}
 		}
 
@@ -98,7 +98,7 @@ class CitizensListener implements Listener {
 
 			if (lastPlayerId != null) {
 				assert pendingTrait == null;
-				this.reset(); // resets any currently active pendingTraitTask
+				this.reset(); // Resets any currently active pendingTraitTask
 			}
 
 			// Set the last encountered player:
@@ -112,17 +112,17 @@ class CitizensListener implements Listener {
 			// Check if we have all the information available to associate the trait with a specific player:
 			if (lastPlayerId != null && pendingTrait != null) {
 				CitizensShopkeeperTrait trait = pendingTrait;
-				Player player = Bukkit.getPlayer(lastPlayerId); // can be null (eg. if player is no longer online)
+				Player player = Bukkit.getPlayer(lastPlayerId); // Can be null (eg. if player is no longer online)
 				pendingTrait = null;
 				this.reset();
-				this.handleTrait(trait, player); // handle with player (can be null though)
+				this.handleTrait(trait, player); // Handle with player (can be null though)
 			} else {
 				// The task should get reset before we reach this state. We check for this anyways just in case.
 				assert pendingTraitTask == null;
 				if (pendingTraitTask == null || pendingTraitTask.isCancelled()) {
 					pendingTraitTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
-						pendingTraitTask = null; // reset
-						reset(); // handles any currently pending trait
+						pendingTraitTask = null; // Reset
+						reset(); // Handles any currently pending trait
 					}, 1L);
 				} // Else: There is already an active task which will handle the pending trait later.
 			}
@@ -141,7 +141,7 @@ class CitizensListener implements Listener {
 			}
 		}
 
-		// the player can be null
+		// The player can be null.
 		protected abstract void handleTrait(CitizensShopkeeperTrait trait, Player player);
 	}
 
@@ -161,7 +161,7 @@ class CitizensListener implements Listener {
 	}
 
 	void onDisable() {
-		pendingTraitAddition.reset(); // handles any currently pending trait
+		pendingTraitAddition.reset(); // Handles any currently pending trait.
 	}
 
 	// null if the NPC does not contain the specified trait
@@ -246,16 +246,16 @@ class CitizensListener implements Listener {
 	// Called right before the NPC gets deleted.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onNPCRemoved(NPCRemoveEvent event) {
-		pendingTraitAddition.reset(); // handles any currently pending trait
+		pendingTraitAddition.reset(); // Handles any currently pending trait
 		NPC npc = event.getNPC();
 		if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
 			CitizensShopkeeperTrait shopkeeperTrait = npc.getTrait(CitizensShopkeeperTrait.class);
-			shopkeeperTrait.onTraitDeleted(null); // handle without player
+			shopkeeperTrait.onTraitDeleted(null); // Handle without player
 		} else {
 			Shopkeeper shopkeeper = CitizensShops.getShopkeeper(npc);
 			if (shopkeeper != null) {
 				assert shopkeeper.getShopObject() instanceof SKCitizensShopObject;
-				((SKCitizensShopObject) shopkeeper.getShopObject()).onNPCDeleted(null); // handle without player
+				((SKCitizensShopObject) shopkeeper.getShopObject()).onNPCDeleted(null); // Handle without player
 			}
 		}
 	}

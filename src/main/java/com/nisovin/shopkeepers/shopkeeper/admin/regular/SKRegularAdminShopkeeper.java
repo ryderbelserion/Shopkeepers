@@ -24,11 +24,11 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements RegularAdminShopkeeper {
 
-	// can contain multiple offers for a specific type of item:
+	// Can contain multiple offers for a specific type of item:
 	private final List<TradingOffer> offers = new ArrayList<>();
 	private final List<TradingOffer> offersView = Collections.unmodifiableList(offers);
 
-	// kept in sync with offers:
+	// Kept in sync with offers:
 	private final List<TradingRecipe> recipes = new ArrayList<>();
 	private final List<TradingRecipe> recipesView = Collections.unmodifiableList(recipes);
 
@@ -65,7 +65,7 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	@Override
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
-		// load offers:
+		// Load offers:
 		List<SKTradingOffer> offers = SKTradingOffer.loadFromConfig(configSection, "recipes", "Shopkeeper " + this.getId());
 		List<SKTradingOffer> migratedOffers = SKTradingOffer.migrateItems(offers, "Shopkeeper " + this.getId());
 		if (offers != migratedOffers) {
@@ -80,7 +80,7 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		// save offers:
+		// Save offers:
 		SKTradingOffer.saveToConfig(configSection, "recipes", this.getOffers());
 	}
 
@@ -137,7 +137,7 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 		assert offer != null;
 		offers.add(offer);
 		if (offer instanceof TradingRecipe) {
-			// SKTradingOffer extends SKTradingRecipe and reports to not be out-of-stock
+			// SKTradingOffer extends SKTradingRecipe and reports to not be out-of-stock.
 			recipes.add((TradingRecipe) offer);
 		} else {
 			recipes.add(ShopkeepersAPI.createTradingRecipe(offer.getResultItem(), offer.getItem1(), offer.getItem2(), false));

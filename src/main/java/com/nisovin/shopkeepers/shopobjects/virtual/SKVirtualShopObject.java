@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 
-// TODO not yet used
+// TODO Not yet used.
 public class SKVirtualShopObject extends AbstractShopObject implements VirtualShopObject {
 
 	protected final VirtualShops virtualShops;
@@ -41,7 +41,7 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 
 	@Override
 	public boolean isActive() {
-		return true; // always active
+		return true; // Always active
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 
 	@Override
 	public boolean needsSpawning() {
-		return false; // does not need to be spawned and despawned
+		return false; // Does not need to be spawned and despawned
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 
 	@Override
 	public boolean check() {
-		return false; // everything alright
+		return false; // Everything alright
 	}
 
 	// NAMING

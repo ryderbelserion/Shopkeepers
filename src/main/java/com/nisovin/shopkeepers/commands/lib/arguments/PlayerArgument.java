@@ -61,7 +61,7 @@ public class PlayerArgument extends CommandArgument<Player> {
 
 	@Override
 	public Player parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
-		// also handles argument exceptions:
+		// Also handles argument exceptions:
 		return firstOfArgument.parseValue(input, context, argsReader);
 	}
 
@@ -83,7 +83,7 @@ public class PlayerArgument extends CommandArgument<Player> {
 	 *             if the id is ambiguous
 	 */
 	public Player getPlayerByName(String nameInput) throws IllegalArgumentException {
-		// name input may be both player name or display name:
+		// Name input may be both player name or display name:
 		Stream<Player> players = PlayerUtils.PlayerNameMatcher.EXACT.match(nameInput);
 		Optional<Player> player = players.findFirst();
 		return player.orElse(null);

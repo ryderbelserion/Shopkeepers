@@ -30,7 +30,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 		this(name, filter, DEFAULT_MINIMAL_COMPLETION_INPUT);
 	}
 
-	// joining remaining args doesn't make much sense for player names (and we normalize whitespace in display names)
+	// Joining remaining args doesn't make much sense for player names (and we normalize whitespace in display names).
 	public PlayerNameArgument(String name, ArgumentFilter<String> filter, int minimalCompletionInput) {
 		super(name, false, filter, minimalCompletionInput);
 	}
@@ -42,7 +42,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 		return text;
 	}
 
-	// using the filter's 'invalid argument' message if the name is not accepted
+	// Using the filter's 'invalid argument' message if the name is not accepted.
 
 	/**
 	 * Gets the default name completion suggestions.
@@ -56,8 +56,8 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	 * @return the player name completion suggestions
 	 */
 	public static Iterable<String> getDefaultCompletionSuggestions(String namePrefix, Predicate<Player> playerFilter, boolean includeDisplayNames) {
-		// assumption: id prefix does not contain color codes (users are not expected to specify color codes)
-		// normalizes whitespace and converts to lowercase:
+		// Assumption: Name prefix does not contain color codes (users are not expected to specify color codes).
+		// Normalizes whitespace and converts to lowercase:
 		String normalizedNamePrefix = StringUtils.normalize(namePrefix);
 		return Bukkit.getOnlinePlayers().stream()
 				.filter(playerFilter)

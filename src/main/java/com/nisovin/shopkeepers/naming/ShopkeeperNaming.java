@@ -60,38 +60,38 @@ public class ShopkeeperNaming {
 		if (player == null) return false;
 		if (!shopkeeper.isValid()) return false;
 
-		// update name:
+		// Update name:
 		if (newName.isEmpty() || newName.equals("-")) {
-			// remove name:
+			// Remove name:
 			newName = "";
 		} else {
-			// validate name:
+			// Validate name:
 			if (!((AbstractShopkeeper) shopkeeper).isValidName(newName)) {
 				TextUtils.sendMessage(player, Settings.msgNameInvalid);
 				return false;
 			}
 		}
 
-		// apply new name:
+		// Apply new name:
 		String oldName = shopkeeper.getName();
 		shopkeeper.setName(newName);
 
-		// compare to previous name:
+		// Compare to previous name:
 		if (oldName.equals(shopkeeper.getName())) {
 			TextUtils.sendMessage(player, Settings.msgNameHasNotChanged);
 			return false;
 		}
 
-		// inform player:
+		// Inform player:
 		TextUtils.sendMessage(player, Settings.msgNameSet);
 
-		// close all open windows:
-		shopkeeper.closeAllOpenWindows(); // TODO really needed?
+		// Close all open windows:
+		shopkeeper.closeAllOpenWindows(); // TODO Really needed?
 
-		// call event:
+		// Call event:
 		Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
 
-		// save:
+		// Save:
 		shopkeeper.save();
 
 		return true;

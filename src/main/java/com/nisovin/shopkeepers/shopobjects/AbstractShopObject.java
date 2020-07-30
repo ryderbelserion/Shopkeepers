@@ -22,10 +22,10 @@ import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
  */
 public abstract class AbstractShopObject implements ShopObject {
 
-	protected final AbstractShopkeeper shopkeeper; // not null
+	protected final AbstractShopkeeper shopkeeper; // Not null
 	private String lastId = null;
 
-	// fresh creation
+	// Fresh creation
 	protected AbstractShopObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		assert shopkeeper != null;
 		this.shopkeeper = shopkeeper;
@@ -155,7 +155,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	@Override
 	public String prepareName(String name) {
 		if (name == null) return null;
-		// trim to max name length:
+		// Trim to max name length:
 		int lengthLimit = this.getNameLengthLimit();
 		if (name.length() > lengthLimit) name = name.substring(0, lengthLimit);
 		return name;
@@ -170,6 +170,6 @@ public abstract class AbstractShopObject implements ShopObject {
 	// EDITOR ACTIONS
 
 	public List<EditorHandler.Button> getEditorButtons() {
-		return Collections.emptyList(); // none by default
+		return Collections.emptyList(); // None by default
 	}
 }

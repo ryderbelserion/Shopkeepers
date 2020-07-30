@@ -24,7 +24,7 @@ public abstract class HiringHandler extends UIHandler {
 	@Override
 	protected boolean canOpen(Player player) {
 		assert player != null;
-		// check for hire permission:
+		// Check for hire permission:
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.HIRE_PERMISSION)) {
 			Log.debug(() -> "Blocked hire window opening from " + player.getName() + ": Missing hire permission.");
 			TextUtils.sendMessage(player, Settings.msgMissingHirePerm);
@@ -40,7 +40,7 @@ public abstract class HiringHandler extends UIHandler {
 
 	@Override
 	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
-		// nothing to do by default
+		// Nothing to do by default.
 	}
 
 	@Override

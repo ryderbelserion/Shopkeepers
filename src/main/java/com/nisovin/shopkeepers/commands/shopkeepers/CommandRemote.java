@@ -26,13 +26,13 @@ class CommandRemote extends Command {
 	CommandRemote() {
 		super("remote", Arrays.asList("open"));
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.REMOTE_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionRemote);
 
-		// arguments:
+		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, true),
 				TargetShopkeeperFilter.ANY
@@ -53,7 +53,7 @@ class CommandRemote extends Command {
 			this.checkPermission(sender, ShopkeepersPlugin.REMOTE_OTHER_PLAYERS_PERMISSION);
 		}
 
-		// open shop trading window:
+		// Open shop trading window:
 		shopkeeper.openTradingWindow(targetPlayer);
 	}
 }

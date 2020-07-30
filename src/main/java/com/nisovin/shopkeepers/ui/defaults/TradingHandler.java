@@ -36,7 +36,7 @@ import com.nisovin.shopkeepers.util.TextUtils;
 
 public class TradingHandler extends UIHandler {
 
-	// TODO move into protected variables instead?
+	// TODO Move into protected variables instead?
 	/**
 	 * Holds gathered information about the currently handled trade.
 	 */
@@ -96,7 +96,7 @@ public class TradingHandler extends UIHandler {
 		protected TradeData() {
 		}
 
-		// separate from constructor to allow evolution without affecting sub-classes
+		// Separate from constructor to allow evolution without affecting sub-classes
 		private void setup(	InventoryClickEvent clickEvent, MerchantInventory merchantInventory, Player tradingPlayer,
 							TradingRecipe tradingRecipe, ItemStack offeredItem1, ItemStack offeredItem2, boolean swappedItemOrder) {
 			this.clickEvent = clickEvent;
@@ -110,13 +110,13 @@ public class TradingHandler extends UIHandler {
 		}
 	}
 
-	// those slot ids match both raw slot id and regular slot id for the merchant inventory view with the merchant
+	// Those slot ids match both raw slot ids and regular slot ids for the merchant inventory view with the merchant
 	// inventory at the top:
 	protected static final int BUY_ITEM_1_SLOT_ID = 0;
 	protected static final int BUY_ITEM_2_SLOT_ID = 1;
 	protected static final int RESULT_ITEM_SLOT_ID = 2;
 
-	// counts the trades triggered by the last click-event:
+	// Counts the trades triggered by the last click-event:
 	protected int tradeCounter = 0;
 
 	public TradingHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
@@ -136,7 +136,7 @@ public class TradingHandler extends UIHandler {
 
 	@Override
 	protected boolean openWindow(Player player) {
-		// create and open trading window:
+		// Create and open trading window:
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		String title = this.getInventoryTitle();
 		List<TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
@@ -144,29 +144,29 @@ public class TradingHandler extends UIHandler {
 	}
 
 	protected boolean openTradeWindow(String title, List<TradingRecipe> recipes, Player player) {
-		// setup merchant:
+		// Setup merchant:
 		Merchant merchant = this.setupMerchant(title, recipes);
 
-		// increment 'talked-to-villager' statistic when opening trading menu:
+		// Increment 'talked-to-villager' statistic when opening trading menu:
 		if (Settings.incrementVillagerStatistics) {
 			player.incrementStatistic(Statistic.TALKED_TO_VILLAGER);
 		}
 
-		// open merchant:
+		// Open merchant:
 		return (player.openMerchant(merchant, true) != null);
 	}
 
 	protected Merchant setupMerchant(String title, List<TradingRecipe> recipes) {
-		// setup merchant:
+		// Setup merchant:
 		Merchant merchant = Bukkit.createMerchant(title);
 		this.setupMerchantRecipes(merchant, recipes);
 		return merchant;
 	}
 
 	protected void setupMerchantRecipes(Merchant merchant, List<TradingRecipe> recipes) {
-		// create list of merchant recipes:
+		// Create list of merchant recipes:
 		List<MerchantRecipe> merchantRecipes = this.createMerchantRecipes(recipes);
-		// set merchant's recipes:
+		// Set merchant's recipes:
 		merchant.setRecipes(merchantRecipes);
 	}
 
@@ -184,9 +184,9 @@ public class TradingHandler extends UIHandler {
 		ItemStack sellingItem = recipe.getResultItem();
 		assert !ItemUtils.isEmpty(sellingItem) && !ItemUtils.isEmpty(buyItem1);
 
-		MerchantRecipe merchantRecipe = new MerchantRecipe(sellingItem, 10000); // no max-uses limit
+		MerchantRecipe merchantRecipe = new MerchantRecipe(sellingItem, 10000); // No max-uses limit
 		if (recipe.isOutOfStock()) merchantRecipe.setUses(10000); // .. except if it is out of stock
-		merchantRecipe.setExperienceReward(false); // no experience rewards
+		merchantRecipe.setExperienceReward(false); // No experience rewards
 		merchantRecipe.addIngredient(buyItem1);
 		if (!ItemUtils.isEmpty(buyItem2)) {
 			merchantRecipe.addIngredient(buyItem2);
@@ -195,7 +195,7 @@ public class TradingHandler extends UIHandler {
 	}
 
 	protected String getInventoryTitle() {
-		String title = this.getShopkeeper().getName(); // can be empty
+		String title = this.getShopkeeper().getName(); // Can be empty
 		if (title.isEmpty()) {
 			title = Settings.msgTradingTitleDefault;
 		}
@@ -203,7 +203,7 @@ public class TradingHandler extends UIHandler {
 	}
 
 	protected void updateTrades(Player player) {
-		// check if the currently open inventory still corresponds to this UI:
+		// Check if the currently open inventory still corresponds to this UI:
 		if (!this.isOpen(player)) return;
 
 		InventoryView openInventory = player.getOpenInventory();
@@ -217,21 +217,21 @@ public class TradingHandler extends UIHandler {
 		List<MerchantRecipe> newMerchantRecipes = this.createMerchantRecipes(recipes);
 		if (ShopkeeperUtils.areMerchantRecipesEqual(oldMerchantRecipes, newMerchantRecipes)) {
 			Log.debug(() -> "Trades are still up-to-date for player " + player.getName());
-			return; // recipes did not change
+			return; // Recipes did not change
 		}
 		Log.debug(() -> "Updating trades for player " + player.getName());
 
-		// it is not safe to reduce the number of trading recipes for the player, so we need to add dummy recipes:
-		// TODO check if this still applies in MC 1.14
+		// It is not safe to reduce the number of trading recipes for the player, so we need to add dummy recipes:
+		// TODO Check if this still applies in MC 1.14
 		for (int i = recipes.size(); i < oldMerchantRecipes.size(); ++i) {
 			// TODO API doesn't expect null here (but works).. use something else?
 			MerchantRecipe merchantRecipe = new MerchantRecipe(null, 0, 0, false);
 			newMerchantRecipes.add(merchantRecipe);
 		}
-		// set merchant's recipes:
+		// Set merchant's recipes:
 		merchant.setRecipes(newMerchantRecipes);
 
-		// update recipes for the client:
+		// Update recipes for the client:
 		NMSManager.getProvider().updateTrades(player);
 	}
 
@@ -267,12 +267,12 @@ public class TradingHandler extends UIHandler {
 	// });
 	// }
 
-	// late processing, so that other plugins can cancel the trading without having to rely on Shopkeepers' API
+	// Late processing, so that other plugins can cancel the trading without having to rely on Shopkeepers' API.
 	@Override
 	protected void onInventoryClickLate(InventoryClickEvent clickEvent, Player player) {
 		assert clickEvent != null && player != null;
-		// note: this expects that there are no other click-events while this event is getting processed
-		// reset trade counter:
+		// Note: This expects that there are no other click-events while this event is getting processed.
+		// Reset trade counter:
 		tradeCounter = 0;
 
 		Shopkeeper shopkeeper = this.getShopkeeper();
@@ -290,12 +290,12 @@ public class TradingHandler extends UIHandler {
 		ItemStack resultItem = merchantInventory.getItem(RESULT_ITEM_SLOT_ID);
 		ItemStack cursor = clickEvent.getCursor();
 
-		// prevent unsupported types of special clicks:
+		// Prevent unsupported types of special clicks:
 		if (action == InventoryAction.COLLECT_TO_CURSOR && ItemUtils.isSimilar(resultItem, cursor)) {
-			// TODO might no longer be supported in 1.14 and 1.15, see: https://bugs.mojang.com/browse/MC-148867
-			// weird behavior and buggy, see MC-129515
-			// for now: only allowed if the item on the cursor and inside the result slot are different
-			// TODO maybe replicate the behavior of this inventory action, but limit its effect to the player's
+			// TODO Might no longer be supported in 1.14 and 1.15, see: https://bugs.mojang.com/browse/MC-148867
+			// Weird behavior and buggy, see MC-129515
+			// For now: Only allowed if the item on the cursor and inside the result slot are different.
+			// TODO Maybe replicate the behavior of this inventory action, but limit its effect to the player's
 			// inventory?
 			Log.debug(() -> "Prevented unsupported special click in trading window by " + playerName
 					+ " at " + shopkeeper.getPositionString() + ": " + action);
@@ -304,25 +304,25 @@ public class TradingHandler extends UIHandler {
 			return;
 		}
 
-		// all currently supported inventory actions that might trigger trades involve a click of the result slot:
+		// All currently supported inventory actions that might trigger trades involve a click of the result slot:
 		if (rawSlot != RESULT_ITEM_SLOT_ID) {
-			// not canceling the event to allow regular inventory interaction inside the player's inventory
+			// Not canceling the event to allow regular inventory interaction inside the player's inventory.
 			return;
 		}
 
-		// some clicks on the result slot don't trigger trades:
+		// Some clicks on the result slot don't trigger trades:
 		if (action == InventoryAction.CLONE_STACK) {
 			return;
 		}
 
-		// we are handling all types of clicks which might trigger a trade ourselves:
+		// We are handling all types of clicks which might trigger a trade ourselves:
 		clickEvent.setCancelled(true);
 		ItemUtils.updateInventoryLater(player);
 
-		// check for a trade and prepare trade data:
+		// Check for a trade and prepare trade data:
 		TradeData tradeData = this.checkForTrade(clickEvent, false);
 		if (tradeData == null) {
-			// no trade available
+			// No trade available.
 			return;
 		}
 		assert tradeData.tradingRecipe.getResultItem().isSimilar(resultItem);
@@ -330,42 +330,42 @@ public class TradingHandler extends UIHandler {
 		PlayerInventory playerInventory = player.getInventory();
 		boolean isCursorEmpty = ItemUtils.isEmpty(cursor);
 
-		// handle trade depending on used inventory action:
+		// Handle trade depending on used inventory action:
 		// TODO: In MC 1.15.1 PICKUP_ONE and PICKUP_SOME might get triggered when clicking the result slot (test again:
-		// left click, shift+left click, right click, middle click)
+		// left click, shift+left click, right click, middle click).
 		if (action == InventoryAction.PICKUP_ALL || action == InventoryAction.PICKUP_HALF) {
 			if (!isCursorEmpty && (!cursor.isSimilar(resultItem) || (cursor.getAmount() + resultItem.getAmount()) > cursor.getMaxStackSize())) {
 				Log.debug("Not handling trade: The cursor cannot carry the resulting items.");
 				return;
 			} else {
 				if (this.handleTrade(tradeData)) {
-					// add result items to cursor:
+					// Add result items to cursor:
 					ItemStack resultCursor;
 					if (isCursorEmpty) {
-						resultCursor = resultItem; // no item copy required here
+						resultCursor = resultItem; // No item copy required here
 					} else {
 						resultCursor = ItemUtils.increaseItemAmount(cursor, resultItem.getAmount());
 					}
 					player.setItemOnCursor(resultCursor);
 
-					// common apply trade:
+					// Common apply trade:
 					this.commonApplyTrade(tradeData);
 				}
 				this.updateTrades(player);
 			}
 		} else if (action == InventoryAction.DROP_ONE_SLOT || action == InventoryAction.DROP_ALL_SLOT) {
-			// not supported for now, since this might be tricky to accurately reproduce
+			// Not supported for now, since this might be tricky to accurately reproduce.
 			// dropItemNaturally is not equivalent to the player himself dropping the item
-			// and inventoryView.setItem(-999, item) deosn't set the item's thrower
-			// (and there is no API to set that, nor does the inventoryView return a reference to the dropped item)
+			// and inventoryView.setItem(-999, item) doesn't set the item's thrower (and there is no API to set that,
+			// nor does the inventoryView return a reference to the dropped item).
 			/*if (isCursorEmpty) {
 				if (this.handleTrade(tradeData)) {
-					// drop result items:
-					ItemStack droppedItem = resultItem.clone(); // todo copy required?
-					// todo call drop event first
+					// Drop result items:
+					ItemStack droppedItem = resultItem.clone(); // todo Copy required?
+					// todo Call drop event first
 					player.getWorld().dropItemNaturally(player.getEyeLocation(), droppedItem);
 				
-					// common apply trade:
+					// Common apply trade:
 					this.commonApplyTrade(tradeData);
 				}
 			}*/
@@ -373,72 +373,72 @@ public class TradingHandler extends UIHandler {
 			int hotbarButton = clickEvent.getHotbarButton();
 			if (hotbarButton >= 0 && hotbarButton <= 8 && ItemUtils.isEmpty(playerInventory.getItem(hotbarButton))) {
 				if (this.handleTrade(tradeData)) {
-					// set result items to hotbar slot:
-					playerInventory.setItem(hotbarButton, resultItem); // no item copy required here
+					// Set result items to hotbar slot:
+					playerInventory.setItem(hotbarButton, resultItem); // No item copy required here
 
-					// common apply trade:
+					// Common apply trade:
 					this.commonApplyTrade(tradeData);
 				}
 				this.updateTrades(player);
 			}
 		} else if (action == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-			// trades as often as possible (depending on offered items and inventory space) for the current result item:
-			// if the current trading recipe is no longer fulfilled, and the currently selected recipe index is 0,
+			// Trades as often as possible (depending on offered items and inventory space) for the current result item:
+			// If the current trading recipe is no longer fulfilled, and the currently selected recipe index is 0,
 			// it will switch to the next applicable trading recipe, and continue the trading if the new result item is
-			// equal to the previous result item
+			// equal to the previous result item.
 			while (true) {
-				// check if there is enough space in the player's inventory:
+				// Check if there is enough space in the player's inventory:
 				ItemStack[] newPlayerContents = playerInventory.getStorageContents();
 
-				// minecraft is adding items in reverse container order (starting with hotbar slot 9),
+				// Minecraft is adding items in reverse container order (starting with hotbar slot 9),
 				// so we reverse the player contents accordingly before adding items:
-				// changes write through to the original array:
+				// Changes write through to the original array.
 				List<ItemStack> listView = Arrays.asList(newPlayerContents);
 				List<ItemStack> hotbarView = listView.subList(0, 9);
 				List<ItemStack> contentsView = listView.subList(9, 36);
 				Collections.reverse(hotbarView);
 				Collections.reverse(contentsView);
 
-				// no item copy required here
+				// No item copy required here:
 				if (ItemUtils.addItems(newPlayerContents, resultItem) != 0) {
-					// not enough inventory space, abort trading:
+					// Not enough inventory space, abort trading:
 					break;
 				}
 
 				if (!this.handleTrade(tradeData)) {
-					// trade was aborted:
+					// Trade was aborted:
 					break;
 				}
 
-				// revert previous reverse:
+				// Revert previous reverse:
 				Collections.reverse(hotbarView);
 				Collections.reverse(contentsView);
 
-				// apply player inventory changes:
+				// Apply player inventory changes:
 				ItemUtils.setStorageContents(playerInventory, newPlayerContents);
 
-				// common apply trade:
+				// Common apply trade:
 				this.commonApplyTrade(tradeData);
 
-				// check if we might continue trading:
-				tradeData = this.checkForTrade(clickEvent, true); // silent
+				// Check if we might continue trading:
+				tradeData = this.checkForTrade(clickEvent, true); // Silent
 				if (tradeData == null) {
-					// no trade available:
+					// No trade available:
 					break;
 				}
-				// compare result items:
+				// Compare result items:
 				ItemStack newResultItem = tradeData.tradingRecipe.getResultItem();
 				if (!resultItem.isSimilar(newResultItem)) {
-					// new result item doesn't match previous result item, abort trading (mimics minecraft behavior):
+					// New result item doesn't match previous result item, abort trading (mimics Minecraft behavior):
 					break;
 				}
-				// update result item:
+				// Update result item:
 				resultItem = newResultItem;
 			}
 			this.updateTrades(player);
 		} else {
-			// the inventory action involves the result slot, but doesn't trigger a trade usually, or isn't supported
-			// yet
+			// The inventory action involves the result slot, but doesn't trigger a trade usually, or isn't supported
+			// yet.
 		}
 	}
 
@@ -454,8 +454,8 @@ public class TradingHandler extends UIHandler {
 		return this.checkForTrade(clickEvent, silent, silent, true);
 	}
 
-	// checks for an available trade and does some preparation in case a trade is found,
-	// returns null if no trade could be prepared for some reason:
+	// Checks for an available trade and does some preparation in case a trade is found.
+	// Returns null if no trade could be prepared for some reason.
 	private TradeData checkForTrade(InventoryClickEvent clickEvent, boolean silent, boolean slientStrictItemComparison, boolean tradingContext) {
 		Player player = (Player) clickEvent.getWhoClicked();
 		MerchantInventory merchantInventory = (MerchantInventory) clickEvent.getView().getTopInventory();
@@ -464,13 +464,13 @@ public class TradingHandler extends UIHandler {
 			if (!silent) {
 				Log.debug("Not handling trade: There is no item in the clicked result slot (no trade available).");
 			}
-			return null; // no trade available
+			return null; // No trade available
 		}
 
-		// find (and validate) the recipe minecraft is using for the trade:
+		// Find (and validate) the recipe Minecraft is using for the trade:
 		TradingRecipe tradingRecipe = ShopkeeperUtils.getSelectedTradingRecipe(merchantInventory);
 		if (tradingRecipe == null) {
-			// this shouldn't happen..
+			// This should not happen..
 			if (!silent) {
 				Log.debug("Not handling trade: We couldn't find the used trading recipe!");
 			}
@@ -478,7 +478,7 @@ public class TradingHandler extends UIHandler {
 			return null;
 		}
 		if (!tradingRecipe.getResultItem().equals(resultItem)) {
-			// this shouldn't happen..
+			// This should not happen..
 			if (!silent) {
 				Log.debug("Not handling trade: The trade result item doesn't match the expected item of the used trading recipe!");
 			}
@@ -490,7 +490,7 @@ public class TradingHandler extends UIHandler {
 		ItemStack requiredItem2 = tradingRecipe.getItem2();
 		assert !ItemUtils.isEmpty(requiredItem1);
 
-		// use null here instead of air for consistent behavior with previous versions:
+		// Use null here instead of air for consistent behavior with previous versions:
 		ItemStack offeredItem1 = ItemUtils.getNullIfEmpty(merchantInventory.getItem(BUY_ITEM_1_SLOT_ID));
 		ItemStack offeredItem2 = ItemUtils.getNullIfEmpty(merchantInventory.getItem(BUY_ITEM_2_SLOT_ID));
 		boolean swappedItemOrder = false;
@@ -498,18 +498,18 @@ public class TradingHandler extends UIHandler {
 		// Minecraft checks both combinations (item1, item2) and (item2, item1) when determining if a trading recipe
 		// matches, so we need to determine the used item order for the currently used trading recipe:
 		if (matches(offeredItem1, offeredItem2, requiredItem1, requiredItem2)) {
-			// order is as-is
+			// Order is as-is.
 		} else if (matches(offeredItem1, offeredItem2, requiredItem2, requiredItem1)) {
-			// swapped order:
+			// Swapped order:
 			swappedItemOrder = true;
 			ItemStack temp = offeredItem1;
 			offeredItem1 = offeredItem2;
 			offeredItem2 = temp;
 		} else {
-			// the used item order couldn't be determined
-			// this shouldn't happen..
-			// but this might for example happen if the FailedHandler#matches implementation falls back to using
-			// the stricter isSimilar for the item comparison and the involved items are not strictly similar
+			// The used item order couldn't be determined.
+			// This should not happen..
+			// But this might for example happen if the FailedHandler#matches implementation falls back to using
+			// the stricter isSimilar for the item comparison and the involved items are not strictly similar.
 			if (!silent) {
 				Log.debug("Not handling trade: Couldn't match the offered items to the used trading recipe!");
 			}
@@ -519,9 +519,9 @@ public class TradingHandler extends UIHandler {
 		assert offeredItem1 != null;
 
 		if (Settings.useStrictItemComparison) {
-			// verify the recipe items are perfectly matching (they can still be swapped though):
+			// Verify the recipe items are perfectly matching (they can still be swapped though):
 			if (!ItemUtils.isSimilar(requiredItem1, offeredItem1) || !ItemUtils.isSimilar(requiredItem2, offeredItem2)) {
-				// additional check for the debug flag, so we don't do the item comparisons if not really needed
+				// Additional check for the debug flag, so we don't do the item comparisons if not really needed:
 				if (!slientStrictItemComparison && Settings.debug) {
 					String errorMsg = "The offered items do not strictly match the required items.";
 					if (tradingContext) {
@@ -538,10 +538,10 @@ public class TradingHandler extends UIHandler {
 			}
 		}
 
-		// setup trade data:
+		// Setup trade data:
 		TradeData tradeData = this.createTradeData();
 		tradeData.setup(clickEvent, merchantInventory, player, tradingRecipe, offeredItem1, offeredItem2, swappedItemOrder);
-		// custom setup by sub-classes:
+		// Custom setup by sub-classes:
 		this.setupTradeData(tradeData, clickEvent);
 		return tradeData;
 	}
@@ -587,21 +587,21 @@ public class TradingHandler extends UIHandler {
 	protected void setupTradeData(TradeData tradeData, InventoryClickEvent clickEvent) {
 	}
 
-	// returns true if the trade was not aborted and is now supposed to get applied
+	// Returns true if the trade was not aborted and is now supposed to get applied.
 	private boolean handleTrade(TradeData tradeData) {
 		assert tradeData != null;
-		// increase trade counter:
+		// Increase trade counter:
 		tradeCounter++;
 
-		// check and prepare the trade:
+		// Check and prepare the trade:
 		if (!this.prepareTrade(tradeData)) {
-			// the trade got cancelled for some shopkeeper-specific reason:
+			// The trade got cancelled for some shopkeeper-specific reason:
 			this.onTradeAborted(tradeData);
 			return false;
 		}
 
-		// call trade event, giving other plugins a chance to cancel the trade before it gets applied:
-		// prepare offered items for the event: clone and ensure stack sizes matching the trading recipe
+		// Call trade event, giving other plugins a chance to cancel the trade before it gets applied:
+		// Prepare offered items for the event: Clone and ensure stack sizes matching the trading recipe.
 		ItemStack eventOfferedItem1 = tradeData.offeredItem1.clone();
 		ItemStack eventOfferedItem2 = ItemUtils.isEmpty(tradeData.offeredItem2) ? null : tradeData.offeredItem2.clone();
 		eventOfferedItem1.setAmount(tradeData.tradingRecipe.getItem1().getAmount());
@@ -619,45 +619,45 @@ public class TradingHandler extends UIHandler {
 			this.onTradeAborted(tradeData);
 			return false;
 		}
-		// making sure that the click event is still cancelled:
+		// Making sure that the click event is still cancelled:
 		if (!tradeData.clickEvent.isCancelled()) {
 			Log.warning("Some plugin tried to uncancel the click event during trade handling!");
 			tradeData.clickEvent.setCancelled(true);
 		}
 
-		// assert: the click event and the affected inventories should not get modified during the event!
+		// Assert: The click event and the affected inventories should not get modified during the event!
 
-		// we are going to apply the trade now:
+		// We are going to apply the trade now:
 		this.preApplyTrade(tradeData);
 		return true;
 	}
 
 	private void commonApplyTrade(TradeData tradeData) {
-		// update merchant inventory contents:
+		// Update merchant inventory contents:
 		MerchantInventory merchantInventory = tradeData.merchantInventory;
-		merchantInventory.setItem(RESULT_ITEM_SLOT_ID, null); // clear result slot, just in case
+		merchantInventory.setItem(RESULT_ITEM_SLOT_ID, null); // Clear result slot, just in case
 
 		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 		ItemStack newOfferedItem1 = ItemUtils.descreaseItemAmount(tradeData.offeredItem1, ItemUtils.getItemStackAmount(tradingRecipe.getItem1()));
 		ItemStack newOfferedItem2 = ItemUtils.descreaseItemAmount(tradeData.offeredItem2, ItemUtils.getItemStackAmount(tradingRecipe.getItem2()));
-		// inform the merchant inventory about the change (updates the active trading recipe and result item):
+		// Inform the merchant inventory about the change (updates the active trading recipe and result item):
 		merchantInventory.setItem(tradeData.swappedItemOrder ? BUY_ITEM_2_SLOT_ID : BUY_ITEM_1_SLOT_ID, newOfferedItem1);
 		merchantInventory.setItem(tradeData.swappedItemOrder ? BUY_ITEM_1_SLOT_ID : BUY_ITEM_2_SLOT_ID, newOfferedItem2);
 
-		// TODO increase uses of corresponding MerchanRecipe?
-		// TODO add support for exp-rewards?
-		// TODO support modifications to the MerchantRecipe's maxUses?
+		// TODO Increase uses of corresponding MerchanRecipe?
+		// TODO Add support for exp-rewards?
+		// TODO Support modifications to the MerchantRecipe's maxUses?
 
-		// increment 'traded-with-villager' statistic for every trade:
+		// Increment 'traded-with-villager' statistic for every trade:
 		if (Settings.incrementVillagerStatistics) {
 			Player player = tradeData.tradingPlayer;
 			player.incrementStatistic(Statistic.TRADED_WITH_VILLAGER);
 		}
 
-		// shopkeeper-specific application of the trade:
+		// Shopkeeper-specific application of the trade:
 		this.onTradeApplied(tradeData);
 
-		// log trade:
+		// Log trade:
 		Log.debug(() -> "Trade (#" + tradeCounter + ") by " + tradeData.tradingPlayer.getName() + " with shopkeeper at "
 				+ this.getShopkeeper().getPositionString() + ": " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
 	}
@@ -724,7 +724,7 @@ public class TradingHandler extends UIHandler {
 	protected void onTradeApplied(TradeData tradeData) {
 	}
 
-	// returns a value >= 0 and <= amount
+	// Returns a value >= 0 and <= amount.
 	protected int getAmountAfterTaxes(int amount) {
 		assert amount >= 0;
 		if (Settings.taxRate == 0) return amount;

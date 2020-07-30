@@ -28,7 +28,7 @@ public class WorldArgument extends CommandArgument<World> {
 		String argument = argsReader.next();
 		World value = Bukkit.getWorld(argument);
 		if (value == null) {
-			// interpret input as world id:
+			// Interpret input as world id:
 			UUID uuid = ConversionUtils.parseUUID(argument);
 			if (uuid != null) {
 				value = Bukkit.getWorld(uuid);

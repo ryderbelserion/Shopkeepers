@@ -22,7 +22,7 @@ public class CreatureForceSpawnListener implements Listener {
 		if (event.getEntityType() == nextEntityType && Utils.isEqualPosition(nextSpawnLocation, event.getLocation())) {
 			event.setCancelled(false);
 		} else {
-			// this shouldn't normally be reached..
+			// This shouldn't normally be reached..
 			Log.debug(() -> "Shopkeeper entity-spawning seems to be out of sync: spawn-force was activated for an entity of type "
 					+ nextEntityType.name() + " at location " + nextSpawnLocation.toString() + ", but a (different) entity of type "
 					+ event.getEntityType().name() + " was spawned at location " + event.getLocation().toString() + ".");

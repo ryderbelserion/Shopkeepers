@@ -26,13 +26,13 @@ class CommandGive extends Command {
 	CommandGive() {
 		super("give");
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.GIVE_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionGive);
 
-		// arguments:
+		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
 		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_AMOUNT), 1));
 	}
@@ -47,7 +47,7 @@ class CommandGive extends Command {
 
 		int amount = context.get(ARGUMENT_AMOUNT);
 		assert amount >= 1;
-		// upper limit to avoid accidental misuse: TODO use BoundedIntegerArgument in the future?
+		// Upper limit to avoid accidental misuse: TODO Use BoundedIntegerArgument in the future?
 		if (amount > 1024) amount = 1024;
 
 		ItemStack item = Settings.createShopCreationItem();
@@ -62,8 +62,8 @@ class CommandGive extends Command {
 			targetPlayer.getWorld().dropItem(targetPlayer.getEyeLocation(), item);
 		}
 
-		// success:
-		// TODO show shop creation item via hover text?
+		// Success:
+		// TODO Show shop creation item via hover text?
 		// Inform target player:
 		TextUtils.sendMessage(targetPlayer, Settings.msgShopCreationItemsReceived,
 				"amount", amount

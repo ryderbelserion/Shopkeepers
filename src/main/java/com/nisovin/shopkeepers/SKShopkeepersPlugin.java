@@ -93,22 +93,22 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return plugin;
 	}
 
-	// shop types and shop object types registry:
+	// Shop types and shop object types registry:
 	private final SKShopTypesRegistry shopTypesRegistry = new SKShopTypesRegistry();
 	private final SKShopObjectTypesRegistry shopObjectTypesRegistry = new SKShopObjectTypesRegistry();
 
-	// default shop and shop object types:
+	// Default shop and shop object types:
 	private final SKDefaultShopTypes defaultShopTypes = new SKDefaultShopTypes();
 	private final SKDefaultShopObjectTypes defaultShopObjectTypes = new SKDefaultShopObjectTypes(this);
 
-	// ui registry:
+	// UI registry:
 	private final SKUIRegistry uiRegistry = new SKUIRegistry(this);
 	private final SKDefaultUITypes defaultUITypes = new SKDefaultUITypes();
 
-	// shopkeeper registry:
+	// Shopkeeper registry:
 	private final SKShopkeeperRegistry shopkeeperRegistry = new SKShopkeeperRegistry(this);
 
-	// shopkeeper storage:
+	// Shopkeeper storage:
 	private final SKShopkeeperStorage shopkeeperStorage = new SKShopkeeperStorage(this);
 
 	private final ItemConversions itemConversions = new ItemConversions(this);
@@ -144,14 +144,14 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 	}
 
-	// returns true if server is outdated
+	// Returns true if server is outdated.
 	private boolean isOutdatedServerVersion() {
-		// validate that this server is running a minimum required version:
-		// TODO add proper version parsing
+		// Validate that this server is running a minimum required version:
+		// TODO Add proper version parsing.
 		/*String cbVersion = Utils.getServerCBVersion(); // eg. 1_13_R2
 		String bukkitVersion = Bukkit.getBukkitVersion(); // eg. 1.13.1-R0.1-SNAPSHOT*/
 		try {
-			// this has been added with the recent changes to PlayerBedEnterEvent: TODO outdated
+			// This has been added with the recent changes to PlayerBedEnterEvent: TODO outdated
 			Class.forName("org.bukkit.event.player.PlayerBedEnterEvent$BedEnterResult");
 			return false;
 		} catch (ClassNotFoundException e) {
@@ -159,42 +159,42 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 	}
 
-	// returns false if no compatible NMS version, nor the fallback handler could be setup
+	// Returns false if no compatible NMS version, nor the fallback handler could be setup.
 	private boolean setupNMS() {
 		NMSManager.load(this);
 		return (NMSManager.getProvider() != null);
 	}
 
-	// returns null on success, otherwise a severe issue prevented loading the config
+	// Returns null on success, otherwise a severe issue prevented loading the config.
 	private ConfigLoadException loadConfig() {
 		Log.info("Loading config.");
 
-		// save default config in case the config file doesn't exist
+		// Save default config in case the config file doesn't exist:
 		this.saveDefaultConfig();
 
-		// load config:
+		// Load config:
 		this.reloadConfig();
 		Configuration config = this.getConfig();
 
-		// load settings from config:
+		// Load settings from config:
 		boolean configChanged;
 		try {
 			configChanged = Settings.loadConfiguration(config);
 		} catch (ConfigLoadException e) {
-			// config loading failed with a severe issue:
+			// Config loading failed with a severe issue:
 			return e;
 		}
 
 		if (configChanged) {
-			// if the config was modified (migrations, adding missing settings, ..), save it:
-			// TODO persist comments somehow
+			// If the config was modified (migrations, adding missing settings, ..), save it:
+			// TODO Persist comments somehow.
 			this.saveConfig();
 		}
-		return null; // config loaded successfully
+		return null; // Config loaded successfully
 	}
 
 	private void loadLanguageFile() {
-		// load language config:
+		// Load language config:
 		String lang = Settings.language;
 		String langFileName = "language-" + lang + ".yml";
 		File langFile = new File(this.getDataFolder(), langFileName);
@@ -203,9 +203,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 
 		if (!langFile.exists()) {
-			if (!lang.equals("en")) { // if not default // TODO don't hardcode
+			if (!lang.equals("en")) { // If not default // TODO Don't hardcode
 				Log.warning("Could not find language file '" + langFile.getPath() + "'!");
-			} // else: ignore
+			} // Else: Ignore.
 		} else {
 			Log.info("Loading language file: " + langFileName);
 			try {
@@ -231,8 +231,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	@Override
 	public void onLoad() {
-		Log.setLogger(this.getLogger()); // setup logger early
-		// setting plugin reference early, so it is also available for any code running here:
+		Log.setLogger(this.getLogger()); // Setup logger early
+		// Setting plugin reference early, so it is also available for any code running here:
 		plugin = this;
 		ShopkeepersAPI.enable(this);
 
@@ -240,25 +240,25 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// when the plugin jar gets replaced during runtime (eg. for hot reloads):
 		this.loadAllPluginClasses();
 
-		// validate that this server is running a minimum required version:
+		// Validate that this server is running a minimum required version:
 		this.outdatedServer = this.isOutdatedServerVersion();
 		if (this.outdatedServer) {
 			return;
 		}
 
-		// try to load suitable NMS (or fallback) code:
+		// Try to load suitable NMS (or fallback) code:
 		this.incompatibleServer = !this.setupNMS();
 		if (this.incompatibleServer) {
 			return;
 		}
 
-		// load config:
+		// Load config:
 		this.configLoadError = this.loadConfig();
 		if (this.configLoadError != null) {
 			return;
 		}
 
-		// load language file:
+		// Load language file:
 		this.loadLanguageFile();
 
 		// WorldGuard only allows registering flags before it gets enabled.
@@ -267,14 +267,14 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			WorldGuardHandler.registerAllowShopFlag();
 		}
 
-		// register defaults:
+		// Register defaults:
 		this.registerDefaults();
 	}
 
 	@Override
 	public void onEnable() {
-		assert Log.getLogger() != null; // log should already have been setup
-		// plugin instance and API might already have been set during onLoad:
+		assert Log.getLogger() != null; // Log should already have been setup
+		// Plugin instance and API might already have been set during onLoad:
 		boolean alreadySetup = true;
 		if (plugin == null) {
 			alreadySetup = false;
@@ -282,21 +282,21 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			ShopkeepersAPI.enable(this);
 		}
 
-		// validate that this server is running a minimum required version:
+		// Validate that this server is running a minimum required version:
 		if (this.outdatedServer) {
 			Log.severe("Outdated server version (" + Bukkit.getVersion() + "): Shopkeepers cannot be enabled. Please update your server!");
 			this.setEnabled(false); // also calls onDisable
 			return;
 		}
 
-		// check if the server version is incompatible:
+		// Check if the server version is incompatible:
 		if (this.incompatibleServer) {
 			Log.severe("Incompatible server version: Shopkeepers cannot be enabled.");
-			this.setEnabled(false); // also calls onDisable
+			this.setEnabled(false); // Also calls onDisable
 			return;
 		}
 
-		// load config (if not already loaded during onLoad):
+		// Load config (if not already loaded during onLoad):
 		if (!alreadySetup) {
 			this.configLoadError = this.loadConfig();
 		} else {
@@ -304,18 +304,18 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 		if (this.configLoadError != null) {
 			Log.severe("Could not load the config!", configLoadError);
-			this.setEnabled(false); // also calls onDisable
+			this.setEnabled(false); // Also calls onDisable
 			return;
 		}
 
-		// load language file (if not already loaded during onLoad):
+		// Load language file (if not already loaded during onLoad):
 		if (!alreadySetup) {
 			this.loadLanguageFile();
 		} else {
 			Log.debug("Language file already loaded.");
 		}
 
-		// process additional permissions
+		// Process additional permissions:
 		String[] perms = Settings.maxShopsPermOptions.replace(" ", "").split(",");
 		for (String perm : perms) {
 			if (Bukkit.getPluginManager().getPermission("shopkeeper.maxshops." + perm) == null) {
@@ -326,31 +326,31 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// Check for and initialize version dependent utilities:
 		MC_1_16_Utils.init();
 
-		// inform about Spigot exclusive features:
+		// Inform about Spigot exclusive features:
 		if (SpigotFeatures.isSpigotAvailable()) {
 			Log.debug("Spigot-based server found: Enabling Spigot exclusive features.");
 		} else {
 			Log.info("No Spigot-based server found: Disabling Spigot exclusive features!");
 		}
 
-		// register defaults (if not already setup during onLoad):
+		// Register defaults (if not already setup during onLoad):
 		if (!alreadySetup) {
 			this.registerDefaults();
 		} else {
 			Log.debug("Defaults already registered.");
 		}
 
-		// call startup event so other plugins can make their registrations:
+		// Call startup event so other plugins can make their registrations:
 		Bukkit.getPluginManager().callEvent(new ShopkeepersStartupEvent());
 
-		// inform ui registry (registers ui event handlers):
+		// Inform UI registry (registers UI event handlers):
 		uiRegistry.onEnable();
 
-		// enable container protection:
+		// Enable container protection:
 		protectedContainers.enable();
 		removeShopOnContainerBreak.onEnable();
 
-		// register events:
+		// Register events:
 		PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new TradingCountListener(this), this);
@@ -358,18 +358,18 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// DEFAULT SHOP OBJECT TYPES
 
-		// enable living entity shops:
+		// Enable living entity shops:
 		livingShops.onEnable();
 
-		// enable sign shops:
+		// Enable sign shops:
 		signShops.onEnable();
 
-		// enable citizens shops:
+		// Enable citizens shops:
 		citizensShops.onEnable();
 
 		//
 
-		// handling of regular villagers:
+		// Handling of regular villagers:
 		pm.registerEvents(new VillagerInteractionListener(this), this);
 		if (Settings.blockVillagerSpawns || Settings.blockWanderingTraderSpawns) {
 			pm.registerEvents(new BlockVillagerSpawnListener(), this);
@@ -378,63 +378,63 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			pm.registerEvents(new BlockZombieVillagerCuringListener(), this);
 		}
 
-		// item conversions:
+		// Item conversions:
 		itemConversions.onEnable();
 
-		// enable commands:
+		// Enable commands:
 		commands.onEnable();
 
-		// enable shopkeeper naming:
+		// Enable shopkeeper naming:
 		shopkeeperNaming.onEnable();
 
-		// enable shopkeeper creation:
+		// Enable shopkeeper creation:
 		shopkeeperCreation.onEnable();
 
-		// enable shopkeeper storage:
+		// Enable shopkeeper storage:
 		shopkeeperStorage.onEnable();
 
-		// enable shopkeeper registry:
+		// Enable shopkeeper registry:
 		shopkeeperRegistry.onEnable();
 
-		// load shopkeepers from saved data:
+		// Load shopkeepers from saved data:
 		boolean loadingSuccessful = shopkeeperStorage.reload();
 		if (!loadingSuccessful) {
-			// detected an issue during loading
-			// disabling the plugin without saving, to prevent loss of shopkeeper data:
+			// Detected an issue during loading.
+			// Disabling the plugin without saving, to prevent loss of shopkeeper data:
 			Log.severe("Detected an issue during the loading of the shopkeepers data! Disabling the plugin!");
 			shopkeeperStorage.disableSaving();
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;
 		}
 
-		// activate (spawn) shopkeepers in loaded chunks of all loaded worlds:
+		// Activate (spawn) shopkeepers in loaded chunks of all loaded worlds:
 		shopkeeperRegistry.activateShopkeepersInAllWorlds();
 
 		Bukkit.getScheduler().runTaskLater(this, () -> {
-			// remove inactive player shopkeepers:
+			// Remove inactive player shopkeepers:
 			this.removeInactivePlayerShops();
 		}, 5L);
 
-		// let's update the shopkeepers for all already online players:
+		// Let's update the shopkeepers for all already online players:
 		for (Player player : Bukkit.getOnlinePlayers()) {
 			if (CitizensHandler.isNPC(player)) continue;
 			this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
 		}
 
-		// write back all updated data:
+		// Write back all updated data:
 		if (shopkeeperStorage.isDirty()) {
 			shopkeeperStorage.saveNow();
 		}
 
-		// setup metrics:
+		// Setup metrics:
 		if (Settings.enableMetrics) {
 			this.setupMetrics();
 		}
 
-		// debugging tools:
+		// Debugging tools:
 		if (Settings.debug) {
-			// register debug listener:
-			// run delayed to also catch events / event listeners of other plugins:
+			// Register debug listener:
+			// Run delayed to also catch events / event listeners of other plugins.
 			Bukkit.getScheduler().runTaskLater(this, () -> {
 				boolean logAllEvent = Settings.debugOptions.contains(Settings.DebugOptions.logAllEvents);
 				boolean printListeners = Settings.debugOptions.contains(Settings.DebugOptions.printListeners);
@@ -447,50 +447,50 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	@Override
 	public void onDisable() {
-		// wait for async tasks to complete:
+		// Wait for async tasks to complete:
 		SchedulerUtils.awaitAsyncTasksCompletion(this, ASYNC_TASKS_TIMEOUT_SECONDS, this.getLogger());
 
-		// inform ui registry about disable:
+		// Inform UI registry about disable:
 		uiRegistry.onDisable();
 
-		// despawn all shopkeepers (prior to saving shopkeepers data and before unloading all shopkeepers):
+		// Despawn all shopkeepers (prior to saving shopkeepers data and before unloading all shopkeepers):
 		shopkeeperRegistry.deactivateShopkeepersInAllWorlds();
 
-		// disable living entity shops:
+		// Disable living entity shops:
 		livingShops.onDisable();
 
-		// disable sign shops:
+		// Disable sign shops:
 		signShops.onDisable();
 
-		// disable citizens shops:
+		// Disable citizens shops:
 		citizensShops.onDisable();
 
-		// save shopkeepers:
+		// Save shopkeepers:
 		shopkeeperStorage.saveImmediateIfDirty();
 
-		// disable protected containers:
+		// Disable protected containers:
 		protectedContainers.disable();
 		removeShopOnContainerBreak.onDisable();
 
-		// disable shopkeeper registry: unloads all shopkeepers
+		// Disable shopkeeper registry: unloads all shopkeepers
 		shopkeeperRegistry.onDisable();
 
-		// disable storage:
+		// Disable storage:
 		shopkeeperStorage.onDisable();
 
 		shopTypesRegistry.clearAllSelections();
 		shopObjectTypesRegistry.clearAllSelections();
 
-		// disable commands:
+		// Disable commands:
 		commands.onDisable();
 
-		// item conversions:
+		// Item conversions:
 		itemConversions.onDisable();
 
 		shopkeeperNaming.onDisable();
 		shopkeeperCreation.onDisable();
 
-		// clear all types of registers:
+		// Clear all types of registers:
 		shopTypesRegistry.clearAll();
 		shopObjectTypesRegistry.clearAll();
 		uiRegistry.clearAll();
@@ -523,8 +523,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		metrics.addCustomChart(new PlayerShopsChart(shopkeeperRegistry));
 		metrics.addCustomChart(new FeaturesChart());
 		metrics.addCustomChart(new WorldsChart(shopkeeperRegistry));
-		// TODO add chart with number of virtual shops?
-		// TODO add chart with the server variant used (CraftBukkit, Spigot, Paper, other..)
+		// TODO Add chart with number of virtual shops?
+		// TODO Add chart with the server variant used (CraftBukkit, Spigot, Paper, other..).
 	}
 
 	// PLAYER JOINING AND QUITTING
@@ -534,7 +534,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	}
 
 	void onPlayerQuit(Player player) {
-		// player cleanup:
+		// Player cleanup:
 		shopTypesRegistry.clearSelection(player);
 		shopObjectTypesRegistry.clearSelection(player);
 		uiRegistry.onPlayerQuit(player);
@@ -640,7 +640,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	 * @return the default shop object type
 	 */
 	public AbstractShopObjectType<?> getDefaultShopObjectType() {
-		// default: villager entity shop object type:
+		// Default: Villager entity shop object type.
 		return this.getDefaultShopObjectTypes().getLivingShopObjectTypes().get(EntityType.VILLAGER);
 	}
 
@@ -669,7 +669,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		Validate.isTrue(rawShopType instanceof AbstractShopType,
 				"Expecting an AbstractShopType, got " + rawShopType.getClass().getName());
 		AbstractShopType<?> shopType = (AbstractShopType<?>) rawShopType;
-		// forward to shop type:
+		// Forward to shop type:
 		return shopType.handleShopkeeperCreation(shopCreationData);
 	}
 
@@ -686,11 +686,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			}
 		}
 		if (playerUUIDs.isEmpty()) {
-			// no player shops found:
+			// No player shops found:
 			return;
 		}
 
-		// fetch OfflinePlayers async:
+		// Fetch OfflinePlayers async:
 		int playerShopkeeperInactiveDays = Settings.playerShopkeeperInactiveDays;
 		Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
 			List<OfflinePlayer> inactivePlayers = new ArrayList<>();
@@ -706,15 +706,15 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			}
 
 			if (inactivePlayers.isEmpty()) {
-				// no inactive players found:
+				// No inactive players found:
 				return;
 			}
 
-			// continue in main thread:
+			// Continue in main thread:
 			SchedulerUtils.runTaskOrOmit(SKShopkeepersPlugin.this, () -> {
 				List<PlayerShopkeeper> forRemoval = new ArrayList<>();
 				for (OfflinePlayer inactivePlayer : inactivePlayers) {
-					// remove all shops of this inactive player:
+					// Remove all shops of this inactive player:
 					UUID playerUUID = inactivePlayer.getUniqueId();
 
 					for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
@@ -728,7 +728,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 					}
 				}
 
-				// remove those shopkeepers:
+				// Remove those shopkeepers:
 				if (!forRemoval.isEmpty()) {
 					for (PlayerShopkeeper shopkeeper : forRemoval) {
 						shopkeeper.delete();
@@ -745,7 +745,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// HANDLING PLAYER NAME CHANGES:
 
-	// updates owner names for the shopkeepers of the specified player:
+	// Updates owner names for the shopkeepers of the specified player:
 	private void updateShopkeepersForPlayer(UUID playerUUID, String playerName) {
 		Log.debug(Settings.DebugOptions.ownerNameUpdates,
 				() -> "Updating shopkeepers for: " + TextUtils.getPlayerString(playerName, playerUUID)
@@ -759,7 +759,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 				if (ownerUUID.equals(playerUUID)) {
 					if (!ownerName.equals(playerName)) {
-						// update the stored name, because the player must have changed it:
+						// Update the stored name, because the player must have changed it:
 						Log.debug(Settings.DebugOptions.ownerNameUpdates,
 								() -> "  Updating owner name ('" + ownerName + "') of shopkeeper " + shopkeeper.getId() + "."
 						);

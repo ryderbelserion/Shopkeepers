@@ -17,9 +17,9 @@ public class ConfigMigration1 implements ConfigMigration {
 
 	@Override
 	public void apply(Configuration config) {
-		// pre 1.13 to 1.13:
+		// Pre 1.13 to 1.13:
 
-		// shop creation item:
+		// Shop creation item:
 		// The conversion of spawn egg types is no longer supported.
 		if (config.isSet("shop-creation-item-spawn-egg-entity-type")) {
 			Log.info("  Migration of 'shop-creation-item-spawn-egg-entity-type' is no longer supported.");
@@ -27,28 +27,28 @@ public class ConfigMigration1 implements ConfigMigration {
 		}
 		migrateLegacyItemData(config, "shop-creation-item", "shop-creation-item-data", Material.VILLAGER_SPAWN_EGG);
 
-		// name item:
+		// Name item:
 		migrateLegacyItemData(config, "name-item", "name-item-data", Material.NAME_TAG);
 
-		// chest item:
+		// Chest item:
 		migrateLegacyItemData(config, "chest-item", "chest-item-data", Material.CHEST);
 
-		// delete item:
+		// Delete item:
 		migrateLegacyItemData(config, "delete-item", "delete-item-data", Material.BONE);
 
-		// hire item:
+		// Hire item:
 		migrateLegacyItemData(config, "hire-item", "hire-item-data", Material.EMERALD);
 
-		// currency item:
+		// Currency item:
 		migrateLegacyItemData(config, "currency-item", "currency-item-data", Material.EMERALD);
 
-		// zero currency item:
+		// Zero currency item:
 		migrateLegacyItemData(config, "zero-currency-item", "zero-currency-item-data", Material.BARRIER);
 
-		// high currency item:
+		// High currency item:
 		migrateLegacyItemData(config, "high-currency-item", "high-currency-item-data", Material.EMERALD_BLOCK);
 
-		// high zero currency item:
+		// High zero currency item:
 		migrateLegacyItemData(config, "high-zero-currency-item", "high-zero-currency-item-data", Material.BARRIER);
 	}
 

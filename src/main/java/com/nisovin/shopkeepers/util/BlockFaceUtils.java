@@ -13,7 +13,7 @@ public class BlockFaceUtils {
 	}
 
 	public enum BlockFaceDirections {
-		// order matters for operations like yaw to block face
+		// Order matters for operations like yaw to block face.
 		CARDINAL(Arrays.asList(BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST)),
 		INTERCARDINAL(Arrays.asList(BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST)),
 		SECONDARY_INTERCARDINAL(
@@ -108,8 +108,8 @@ public class BlockFaceUtils {
 		if (xAbs >= zAbs) {
 			if (xAbs >= yAbs) {
 				if (modX >= 0.0D) {
-					// EAST/WEST and NORTH/SOUTH values were switched in some past bukkit version:
-					// with this additional checks it should work across different versions
+					// EAST/WEST and NORTH/SOUTH values were switched in some past Bukkit version.
+					// With these additional checks it should work across different versions.
 					if (BlockFace.EAST.getModX() == 1) {
 						return BlockFace.EAST;
 					} else {

@@ -56,7 +56,7 @@ public class CommandContextView implements CommandContext {
 
 	@Override
 	public CommandContextView getView() {
-		return this; // already an unmodifiable view
+		return this; // Already an unmodifiable view.
 	}
 
 	@Override

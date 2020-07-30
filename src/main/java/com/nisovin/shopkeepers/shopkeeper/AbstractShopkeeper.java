@@ -51,31 +51,31 @@ import com.nisovin.shopkeepers.util.Validate;
  */
 public abstract class AbstractShopkeeper implements Shopkeeper {
 
-	// the maximum supported name length:
-	// the actual maximum name length that can be used might be lower depending on config settings
-	// and on shop object specific limits
+	// The maximum supported name length:
+	// The actual maximum name length that can be used might be lower depending on config settings
+	// and on shop object specific limits.
 	public static final int MAX_NAME_LENGTH = 128;
 
 	private final int id;
-	private UUID uniqueId; // not null after initialization
-	private AbstractShopObject shopObject; // not null after initialization
-	// TODO move location information into ShopObject?
-	// TODO store yaw?
-	private String worldName; // not empty, null for virtual shops
+	private UUID uniqueId; // Not null after initialization
+	private AbstractShopObject shopObject; // Not null after initialization
+	// TODO Move location information into ShopObject?
+	// TODO Store yaw?
+	private String worldName; // Not empty, null for virtual shops
 	private int x;
 	private int y;
 	private int z;
-	private ChunkCoords chunkCoords; // null for virtual shops
-	private String name = ""; // not null, can be empty
+	private ChunkCoords chunkCoords; // Null for virtual shops
+	private String name = ""; // Not null, can be empty
 
-	// has unsaved data changes:
+	// Has unsaved data changes:
 	private boolean dirty = false;
-	// is currently registered:
+	// Is currently registered:
 	private boolean valid = false;
 
-	// ui type identifier -> ui handler
+	// UI type identifier -> ui handler
 	private final Map<String, UIHandler> uiHandlers = new HashMap<>();
-	private boolean uiActive = true; // can be used to deactivate UIs for this shopkeeper
+	private boolean uiActive = true; // Can be used to deactivate UIs for this shopkeeper
 
 	// CONSTRUCTION AND SETUP
 
@@ -141,7 +141,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 				"Expecting an AbstractShopObjectType, got " + shopObjectType.getClass().getName());
 
 		if (shopObjectType instanceof VirtualShopObjectType) {
-			// virtual shops ignore any potentially available spawn location:
+			// Virtual shops ignore any potentially available spawn location:
 			this.worldName = null;
 			this.x = 0;
 			this.y = 0;
@@ -158,7 +158,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		this.shopObject = this.createShopObject((AbstractShopObjectType<?>) shopObjectType, shopCreationData);
 
-		// automatically mark new shopkeepers as dirty:
+		// Automatically mark new shopkeepers as dirty:
 		this.markDirty();
 	}
 
@@ -173,7 +173,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * components that have already been setup by further sub-classes.
 	 */
 	protected void setup() {
-		// add a default trading handler, if none is provided:
+		// Add a default trading handler, if none is provided:
 		if (this.getUIHandler(DefaultUITypes.TRADING()) == null) {
 			this.registerUIHandler(new TradingHandler(SKDefaultUITypes.TRADING(), this));
 		}
@@ -184,7 +184,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * happen last.
 	 */
 	protected void postSetup() {
-		// inform shop object:
+		// Inform shop object:
 		this.getShopObject().setup();
 	}
 
@@ -212,12 +212,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		this.name = this.trimName(TextUtils.colorize(configSection.getString("name", "")));
 
-		// shop object:
+		// Shop object:
 		String objectTypeId;
 		ConfigurationSection objectSection = configSection.getConfigurationSection("object");
 		if (objectSection == null) {
-			// load from legacy data:
-			// TODO remove again at some point
+			// Load from legacy data:
+			// TODO Remove again at some point.
 			objectTypeId = configSection.getString("object");
 			objectSection = configSection;
 			this.markDirty();
@@ -225,7 +225,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			objectTypeId = objectSection.getString("type");
 		}
 
-		// convert legacy object identifiers:
+		// Convert legacy object identifiers:
 		if (objectTypeId != null) {
 			// 'block' -> 'sign'
 			if (objectTypeId.equalsIgnoreCase("block")) {
@@ -233,7 +233,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 				this.markDirty();
 			}
 
-			// normalize:
+			// Normalize:
 			String normalizedOjectTypeId = StringUtils.normalize(objectTypeId);
 			if (!normalizedOjectTypeId.equals(objectTypeId)) {
 				objectTypeId = normalizedOjectTypeId;
@@ -241,16 +241,16 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			}
 
 			// MC 1.14:
-			// convert ocelots to cats:
+			// Convert ocelots to cats:
 			if (objectTypeId.equals("ocelot")) {
 				String ocelotType = objectSection.getString("catType");
 				if (ocelotType != null) {
 					if (ocelotType.equals("WILD_OCELOT")) {
-						// stays an ocelot, but remove cat type data:
+						// Stays an ocelot, but remove cat type data:
 						objectSection.set("catType", null);
 						this.markDirty();
 					} else {
-						// convert to cat:
+						// Convert to cat:
 						objectTypeId = "cat";
 						String catType = CatShop.fromOcelotType(ocelotType).name();
 						objectSection.set("catType", catType);
@@ -258,7 +258,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 						Log.warning("Migrated ocelot shopkeeper '" + id + "' of type '" + ocelotType
 								+ "' to cat shopkeeper of type '" + catType + "'.");
 					}
-				} // else: stays ocelot
+				} // Else: Stays ocelot.
 			}
 
 			// MC 1.16:
@@ -272,10 +272,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		AbstractShopObjectType<?> objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(objectTypeId);
 		if (objectType == null) {
-			// couldn't find object type by id, try to find object type via matching:
+			// Couldn't find object type by id, try to find object type via matching:
 			objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().match(objectTypeId);
 			if (objectType != null) {
-				// mark dirty, so the correct id gets saved:
+				// Mark dirty, so the correct id gets saved:
 				this.markDirty();
 			} else {
 				throw new ShopkeeperCreateException("Invalid object type for shopkeeper '" + id + "': " + objectTypeId);
@@ -283,7 +283,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		}
 		assert objectType != null;
 
-		// normalize empty world name to null:
+		// Normalize empty world name to null:
 		String storedWorldName = StringUtils.getNotEmpty(configSection.getString("world"));
 		int storedX = configSection.getInt("x");
 		int storedY = configSection.getInt("y");
@@ -315,7 +315,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.shopObject.load(objectSection);
 	}
 
-	// shopCreationData can be null if the shopkeeper is getting loaded
+	// shopCreationData can be null if the shopkeeper is getting loaded.
 	private AbstractShopObject createShopObject(AbstractShopObjectType<?> objectType, ShopCreationData shopCreationData) {
 		assert objectType != null;
 		AbstractShopObject shopObject = objectType.createObject(this, shopCreationData);
@@ -336,14 +336,14 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public void save(ConfigurationSection configSection) {
 		configSection.set("uniqueId", uniqueId.toString());
 		configSection.set("name", TextUtils.decolorize(name));
-		// null world name gets stored as empty string:
+		// Null world name gets stored as empty string:
 		configSection.set("world", StringUtils.getNotNull(worldName));
 		configSection.set("x", x);
 		configSection.set("y", y);
 		configSection.set("z", z);
 		configSection.set("type", this.getType().getIdentifier());
 
-		// shop object:
+		// Shop object:
 		ConfigurationSection objectSection = configSection.createSection("object");
 		shopObject.save(objectSection);
 	}
@@ -368,10 +368,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 */
 	public void markDirty() {
 		dirty = true;
-		// inform the storage that there are dirty shopkeepers:
+		// Inform the storage that there are dirty shopkeepers:
 		if (this.isValid()) {
-			// if the shopkeeper gets marked dirty during creation or loading (while it is not yet valid),
-			// the storage gets marked dirty by the shopkeeper registry after the creation/loading was successful
+			// If the shopkeeper gets marked as dirty during creation or loading (while it is not yet valid), the
+			// storage gets marked as dirty by the shopkeeper registry after the creation/loading was successful.
 			SKShopkeepersPlugin.getInstance().getShopkeeperStorage().markDirty();
 		}
 	}
@@ -381,7 +381,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		return dirty;
 	}
 
-	// called by shopkeeper storage once the shopkeeper data gets saved
+	// Called by shopkeeper storage once the shopkeeper data gets saved.
 	public void onSave() {
 		dirty = false;
 	}
@@ -528,7 +528,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		ChunkCoords oldChunk = this.getChunkCoords();
 		// TODO Changing the world is not safe (at least not for all types of shops)! Consider for example player shops
-		// which currently use the world name to locate their container
+		// which currently use the world name to locate their container,
 		worldName = world.getName();
 		x = location.getBlockX();
 		y = location.getBlockY();
@@ -536,7 +536,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.updateChunkCoords();
 		this.markDirty();
 
-		// update shopkeeper in chunk map:
+		// Update shopkeeper in chunk map:
 		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperMove(this, oldChunk);
 	}
 
@@ -549,9 +549,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.chunkCoords = this.isVirtual() ? null : ChunkCoords.fromBlockPos(worldName, x, z);
 	}
 
-	// TODO this has to be aware of sub types in order to replace arguments with empty strings
-	// -> move into Shop type and abstract shop type and let all registered types provide arguments
-	// TODO not yet used anywhere
+	// TODO This has to be aware of sub types in order to replace arguments with empty strings.
+	// -> Move into Shop type and abstract shop type and let all registered types provide arguments.
+	// TODO Not yet used anywhere.
 	/*public final Map<String, Object> getShopkeeperMsgArgs(Shopkeeper shopkeeper) {
 		Map<String, Object> msgArgs = new HashMap<>();
 		msgArgs.put("uuid", shopkeeper.getUniqueId().toString());
@@ -575,16 +575,16 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public void setName(String newName) {
-		// prepare and apply new name:
+		// Prepare and apply new name:
 		String preparedName = newName;
 		if (preparedName == null) preparedName = "";
 		preparedName = TextUtils.colorize(preparedName);
 		preparedName = this.trimName(preparedName);
 		this.name = preparedName;
 
-		// update shop object:
+		// Update shop object:
 		shopObject.setName(preparedName);
-		this.markDirty(); // mark dirty
+		this.markDirty(); // Mark dirty
 	}
 
 	public boolean isValidName(String name) {
@@ -667,7 +667,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		return SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(uiType, this, player);
 	}
 
-	// shortcuts for the default UI types:
+	// Shortcuts for the default UI types:
 
 	@Override
 	public boolean openEditorWindow(Player player) {
@@ -690,10 +690,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public void onPlayerInteraction(Player player) {
 		assert player != null;
 		if (player.isSneaking()) {
-			// open editor window:
+			// Open editor window:
 			this.openEditorWindow(player);
 		} else {
-			// open trading window:
+			// Open trading window:
 			this.openTradingWindow(player);
 		}
 	}
@@ -713,7 +713,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * {@link ShopkeeperStorage#save() save} will be triggered after all shopkeepers in active chunks have been ticked.
 	 */
 	public void tick() {
-		// nothing to do by default
+		// Nothing to do by default.
 	}
 
 	// HASHCODE AND EQUALS
@@ -725,6 +725,6 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public final boolean equals(Object obj) {
-		return (this == obj); // identity based comparison
+		return (this == obj); // Identity based comparison
 	}
 }

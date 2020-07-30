@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
 
-// shares its implementation with TradingRecipe, but always reports to not be out of stock
+// Shares its implementation with TradingRecipe, but always reports to not be out of stock.
 public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 
 	public SKTradingOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
@@ -65,7 +65,7 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 		ConfigurationSection offersSection = config.createSection(node);
 		int id = 1;
 		for (TradingOffer offer : offers) {
-			// note: the items are clones
+			// Note: The items are clones.
 			ItemStack item1 = offer.getItem1();
 			ItemStack item2 = offer.getItem2();
 			ItemStack resultItem = offer.getResultItem();
@@ -85,7 +85,7 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 			for (String key : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
 				if (offerSection == null) {
-					// invalid offer: not a section
+					// Invalid offer: Not a section.
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid trading offer section for " + key));
 					continue;
 				}
@@ -93,7 +93,7 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 				ItemStack item1 = offerSection.getItemStack("item1");
 				ItemStack item2 = offerSection.getItemStack("item2");
 				if (ItemUtils.isEmpty(resultItem) || ItemUtils.isEmpty(item1)) {
-					// invalid offer
+					// Invalid offer.
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid trading offer for " + key + ": item1 or resultItem is empty"));
 					continue;
 				}
@@ -111,12 +111,12 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 		final int size = offers.size();
 		for (int i = 0; i < size; ++i) {
 			SKTradingOffer offer = offers.get(i);
-			if (offer == null) continue; // skip invalid entries
+			if (offer == null) continue; // Skip invalid entries
 
 			boolean itemsMigrated = false;
 			boolean migrationFailed = false;
 
-			// note: the items are clones
+			// Note: The items are clones.
 			ItemStack resultItem = offer.getResultItem();
 			ItemStack item1 = offer.getItem1();
 			ItemStack item2 = offer.getItem2();
@@ -151,7 +151,7 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 					migratedOffers = new ArrayList<>(size);
 					for (int j = 0; j < i; ++j) {
 						SKTradingOffer oldOffer = offers.get(j);
-						if (oldOffer == null) continue; // skip invalid entries
+						if (oldOffer == null) continue; // Skip invalid entries
 						migratedOffers.add(oldOffer);
 					}
 				}
@@ -159,7 +159,7 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 				if (migrationFailed) {
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Trading offer item migration failed for offer "
 							+ (i + 1) + ": " + offer.toString()));
-					continue; // skip this offer
+					continue; // Skip this offer
 				}
 				assert !ItemUtils.isEmpty(resultItem) && !ItemUtils.isEmpty(item1);
 				migratedOffers.add(new SKTradingOffer(resultItem, item1, item2));

@@ -70,7 +70,7 @@ public class Settings {
 		}
 	}
 
-	// cached values for settings used asynchronously
+	// Cached values for settings which are used asynchronously.
 	public static final class AsyncSettings {
 
 		private static volatile AsyncSettings INSTANCE = new AsyncSettings();
@@ -294,7 +294,7 @@ public class Settings {
 	public static ItemData highCurrencyItem = new ItemData(Material.EMERALD_BLOCK);
 	public static ItemData zeroHighCurrencyItem = new ItemData(Material.BARRIER);
 
-	// note: this can in general be larger than 64!
+	// Note: This can in general be larger than 64!
 	public static int highCurrencyValue = 9;
 	public static int highCurrencyMinCost = 20;
 
@@ -303,7 +303,7 @@ public class Settings {
 	 */
 	public static String language = "en";
 
-	// TODO replace all with Text? will require converting back to String, especially for texts used by items
+	// TODO Replace all with Text? Will require converting back to String, especially for texts used by items.
 	public static String msgShopTypeAdminRegular = "Admin shop";
 	public static String msgShopTypeSelling = "Selling shop";
 	public static String msgShopTypeBuying = "Buying shop";
@@ -437,7 +437,7 @@ public class Settings {
 	public static Text msgTargetShopIsNoPlayerShop = Text.parse("&7The targeted shopkeeper is no player shopkeeper.");
 	public static Text msgUnusedContainer = Text.parse("&7No shopkeeper is using this container.");
 	public static Text msgNotOwner = Text.parse("&7You are not the owner of this shopkeeper.");
-	// placeholders: {owner} -> new owners name
+	// Placeholders: {owner} -> new owners name
 	public static Text msgOwnerSet = Text.parse("&aNew owner was set to &e{owner}");
 	public static Text msgShopCreationItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!");
 	public static Text msgShopCreationItemsReceived = Text.parse("&aYou have received &e{amount}&a shop creation item(s)!");
@@ -460,7 +460,7 @@ public class Settings {
 	public static Text msgMissingHirePerm = Text.parse("&7You do not have the permission to hire shopkeepers.");
 	public static Text msgCantHire = Text.parse("&aYou cannot afford to hire this shopkeeper.");
 	public static Text msgCantHireShopType = Text.parse("&7You do not have the permission to hire this type of shopkeeper.");
-	// placeholders: {costs}, {hire-item}
+	// Placeholders: {costs}, {hire-item}
 	public static Text msgVillagerForHire = Text.parse("&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a.");
 
 	public static Text msgMissingTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
@@ -550,17 +550,17 @@ public class Settings {
 		return fieldName.replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase(Locale.ROOT);
 	}
 
-	// returns true, if the config misses values which need to be saved
+	// Returns true, if the config misses values which need to be saved
 	public static boolean loadConfiguration(Configuration config) throws ConfigLoadException {
 		boolean configChanged = false;
 
-		// perform config migrations:
+		// Perform config migrations:
 		boolean migrated = ConfigMigrations.applyMigrations(config);
 		if (migrated) {
 			configChanged = true;
 		}
 
-		// exempt a few string / string list settings from color conversion:
+		// Exempt a few string / string list settings from color conversion:
 		List<String> noColorConversionKeys = Arrays.asList(
 				toConfigKey("debugOptions"), toConfigKey("fileEncoding"), toConfigKey("shopCreationItemSpawnEggEntityType"),
 				toConfigKey("maxShopsPermOptions"), toConfigKey("enabledLivingShops"), toConfigKey("nameRegex"),
@@ -576,15 +576,15 @@ public class Settings {
 				}
 				String configKey = toConfigKey(field.getName());
 
-				// initialize the setting with the default value, if it is missing in the config
+				// Initialize the setting with the default value, if it is missing in the config
 				if (!config.isSet(configKey)) {
 					Log.warning("Config: Inserting default value for missing config entry: " + configKey);
 
-					// determine default value:
+					// Determine default value:
 					Configuration defaults = config.getDefaults();
 					Object defaultValue = loadConfigValue(defaults, configKey, noColorConversionKeys, typeClass, genericType);
 
-					// validate default value:
+					// Validate default value:
 					if (defaultValue == null) {
 						Log.warning("Config: Missing default value for missing config entry: " + configKey);
 						continue;
@@ -594,12 +594,12 @@ public class Settings {
 						continue;
 					}
 
-					// set default value:
+					// Set default value:
 					setConfigValue(config, configKey, noColorConversionKeys, typeClass, genericType, defaultValue);
 					configChanged = true;
 				}
 
-				// load value:
+				// Load value:
 				Object value = loadConfigValue(config, configKey, noColorConversionKeys, typeClass, genericType);
 				field.set(null, value);
 			}
@@ -641,7 +641,7 @@ public class Settings {
 			Log.warning("Config: 'gravity-chunk-range' cannot be negative.");
 			gravityChunkRange = 0;
 		}
-		// certain items cannot be of type AIR:
+		// Certain items cannot be of type AIR:
 		if (shopCreationItem.getType() == Material.AIR) {
 			Log.warning("Config: 'shop-creation-item' can not be AIR.");
 			shopCreationItem = shopCreationItem.withType(Material.VILLAGER_SPAWN_EGG);
@@ -682,7 +682,7 @@ public class Settings {
 	private static Object loadConfigValue(Configuration config, String configKey, List<String> noColorConversionKeys, Class<?> typeClass, Class<?> genericType) {
 		if (typeClass == String.class || typeClass == Text.class) {
 			String string = config.getString(configKey);
-			// colorize, if not exempted:
+			// Colorize, if not exempted:
 			if (!noColorConversionKeys.contains(configKey)) {
 				string = TextUtils.colorize(string);
 			}
@@ -698,7 +698,7 @@ public class Settings {
 		} else if (typeClass == boolean.class) {
 			return config.getBoolean(configKey);
 		} else if (typeClass == Material.class) {
-			// this assumes that legacy item conversion has already been performed
+			// This assumes that legacy item conversion has already been performed
 			Material material = ConfigUtils.loadMaterial(config, configKey);
 			if (material == null) {
 				Log.warning("Config: Unknown material for config entry '" + configKey + "': " + config.get(configKey));
@@ -707,7 +707,7 @@ public class Settings {
 			return material;
 		} else if (typeClass == ItemData.class) {
 			ItemData itemData = loadItemData(config.get(configKey), configKey);
-			// normalize to not null:
+			// Normalize to not null:
 			if (itemData == null) {
 				itemData = new ItemData(Material.AIR);
 			}
@@ -715,7 +715,7 @@ public class Settings {
 		} else if (typeClass == List.class) {
 			if (genericType == String.class || genericType == Text.class) {
 				List<String> stringList = config.getStringList(configKey);
-				// colorize, if not exempted:
+				// Colorize, if not exempted:
 				if (!noColorConversionKeys.contains(configKey)) {
 					stringList = TextUtils.colorize(stringList);
 				}
@@ -755,7 +755,7 @@ public class Settings {
 
 	private static void setConfigValue(Configuration config, String configKey, List<String> noColorConversionKeys, Class<?> typeClass, Class<?> genericType, Object value) {
 		if (value == null) {
-			// remove value:
+			// Remove value:
 			config.set(configKey, null);
 			return;
 		}
@@ -769,7 +769,7 @@ public class Settings {
 			} else {
 				stringValue = (String) value;
 			}
-			// decolorize, if not exempted:
+			// Decolorize, if not exempted:
 			if (!noColorConversionKeys.contains(configKey)) {
 				value = TextUtils.decolorize(stringValue);
 			}
@@ -782,7 +782,7 @@ public class Settings {
 				stringList = (List<String>) value;
 			}
 
-			// decolorize, if not exempted:
+			// Decolorize, if not exempted:
 			if (!noColorConversionKeys.contains(configKey)) {
 				value = TextUtils.decolorize(stringList);
 			}
@@ -806,12 +806,12 @@ public class Settings {
 				}
 				String configKey = toConfigKey(field.getName());
 				if (!config.isSet(configKey)) {
-					continue; // skip, keeps default
+					continue; // Skip, keeps default
 				}
 
 				Object value = loadConfigValue(config, configKey, Collections.emptyList(), typeClass, genericType);
 				if (value == null) {
-					continue; // skip, keeps default
+					continue; // Skip, keeps default
 				}
 				field.set(null, value);
 			}
@@ -823,21 +823,21 @@ public class Settings {
 	}
 
 	public static void onSettingsChanged() {
-		// prepare derived settings:
+		// Prepare derived settings:
 		DerivedSettings.setup();
 
-		// refresh async settings cache:
+		// Refresh async settings cache:
 		AsyncSettings.refresh();
 	}
 
-	// item utilities:
+	// Item utilities:
 
-	// stores derived settings that get setup after loading the config
+	// Stores derived settings which get setup after loading the config.
 	public static class DerivedSettings {
 
 		public static ItemData namingItemData = new ItemData(Material.AIR);
 
-		// button items:
+		// Button items:
 		public static ItemData nameButtonItem = new ItemData(Material.AIR);
 		public static ItemData containerButtonItem = new ItemData(Material.AIR);
 		public static ItemData deleteButtonItem = new ItemData(Material.AIR);
@@ -845,12 +845,12 @@ public class Settings {
 
 		public static Pattern shopNamePattern = Pattern.compile("^[A-Za-z0-9 ]{3,32}$");
 
-		// gets called after the config has been loaded:
+		// Gets called after the config has been loaded:
 		private static void setup() {
-			// ignore display name (which is used for specifying the new shopkeeper name):
+			// Ignore display name (which is used for specifying the new shopkeeper name):
 			namingItemData = new ItemData(ItemUtils.setItemStackName(nameItem.createItemStack(), null));
 
-			// button items:
+			// Button items:
 			nameButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(nameItem.createItemStack(), msgButtonName, msgButtonNameLore));
 			containerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), msgButtonContainer, msgButtonContainerLore));
 			deleteButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), msgButtonDelete, msgButtonDeleteLore));
@@ -866,7 +866,7 @@ public class Settings {
 		}
 	}
 
-	// creation item:
+	// Shop creation item:
 	public static ItemStack createShopCreationItem() {
 		return shopCreationItem.createItemStack();
 	}
@@ -875,7 +875,7 @@ public class Settings {
 		return shopCreationItem.matches(item);
 	}
 
-	// naming item:
+	// Naming item:
 	public static boolean isNamingItem(ItemStack item) {
 		return DerivedSettings.namingItemData.matches(item);
 	}
@@ -889,12 +889,12 @@ public class Settings {
 		return DerivedSettings.containerButtonItem.createItemStack();
 	}
 
-	// delete button:
+	// Delete button:
 	public static ItemStack createDeleteButtonItem() {
 		return DerivedSettings.deleteButtonItem.createItemStack();
 	}
 
-	// hire item:
+	// Hire item:
 	public static ItemStack createHireButtonItem() {
 		return DerivedSettings.hireButtonItem.createItemStack();
 	}
@@ -905,7 +905,7 @@ public class Settings {
 
 	// CURRENCY
 
-	// currency item:
+	// Currency item:
 	public static ItemStack createCurrencyItem(int amount) {
 		return currencyItem.createItemStack(amount);
 	}
@@ -914,7 +914,7 @@ public class Settings {
 		return currencyItem.matches(item);
 	}
 
-	// high currency item:
+	// High currency item:
 	public static boolean isHighCurrencyEnabled() {
 		return (highCurrencyValue > 0 && highCurrencyItem.getType() != Material.AIR);
 	}
@@ -929,7 +929,7 @@ public class Settings {
 		return highCurrencyItem.matches(item);
 	}
 
-	// zero currency item:
+	// Zero currency item:
 	public static ItemStack createZeroCurrencyItem() {
 		if (zeroCurrencyItem.getType() == Material.AIR) return null;
 		return zeroCurrencyItem.createItemStack();
@@ -942,7 +942,7 @@ public class Settings {
 		return zeroCurrencyItem.matches(item);
 	}
 
-	// high zero currency item:
+	// Zero high currency item:
 	public static ItemStack createZeroHighCurrencyItem() {
 		if (zeroHighCurrencyItem.getType() == Material.AIR) return null;
 		return zeroHighCurrencyItem.createItemStack();
@@ -970,12 +970,12 @@ public class Settings {
 
 	public static EntityType matchEntityType(String entityTypeId) {
 		if (StringUtils.isEmpty(entityTypeId)) return null;
-		// get by bukkit id:
+		// Get by Bukkit id:
 		String normalizedEntityTypeId = entityTypeId.trim().toUpperCase(Locale.ROOT).replace('-', '_').replace(' ', '_');
 		try {
 			return EntityType.valueOf(normalizedEntityTypeId);
 		} catch (IllegalArgumentException e) {
-			// unknown entity type:
+			// Unknown entity type:
 			return null;
 		}
 	}

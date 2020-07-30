@@ -29,7 +29,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	private static final Property<DyeColor> PROPERTY_CARPET_COLOR = new EnumProperty<DyeColor>(DyeColor.class, "carpetColor", null) {
 		@Override
 		public boolean isNullable() {
-			// null to indicate 'no carpet'
+			// Null to indicate 'no carpet':
 			return true;
 		}
 	};
@@ -77,7 +77,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	public void setColor(Llama.Color color) {
 		this.color = color;
 		shopkeeper.markDirty();
-		this.applyColor(this.getEntity()); // null if not active
+		this.applyColor(this.getEntity()); // Null if not active
 	}
 
 	private void applyColor(E entity) {
@@ -131,7 +131,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	public void setCarpetColor(DyeColor carpetColor) {
 		this.carpetColor = carpetColor;
 		shopkeeper.markDirty();
-		this.applyCarpetColor(this.getEntity()); // null if not active
+		this.applyCarpetColor(this.getEntity()); // Null if not active
 	}
 
 	private void applyCarpetColor(E entity) {

@@ -40,7 +40,7 @@ public class IntegerProperty extends Property<Integer> {
 		if (intValue == null) {
 			throw this.invalidValueError(shopkeeper, value);
 		} else {
-			// check bounds:
+			// Check bounds:
 			if (!this.isInBounds(intValue)) {
 				throw this.invalidValueError(shopkeeper, intValue);
 			}

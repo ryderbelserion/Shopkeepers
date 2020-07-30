@@ -37,14 +37,14 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	protected final CitizensShops citizensShops;
 	private UUID npcUniqueId = null;
 	private Integer npcLegacyId = null;
-	// if false, this will not remove the npc on deletion:
+	// If false, this will not remove the NPC on deletion:
 	private boolean destroyNPC = true;
 
 	protected SKCitizensShopObject(CitizensShops citizensShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
 		this.citizensShops = citizensShops;
 		if (creationData != null) {
-			// can be null here, as currently only NPC shopkeepers created by the shopkeeper trait provide the npc's
+			// Can be null here, as currently only NPC shopkeepers created by the shopkeeper trait provide the NPC's
 			// unique id via the creation data:
 			this.npcUniqueId = creationData.getValue(CREATION_DATA_NPC_UUID_KEY);
 		}
@@ -55,7 +55,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		return SKDefaultShopObjectTypes.CITIZEN();
 	}
 
-	// can be null if not set yet
+	// Can be null if not set yet.
 	public UUID getNPCUniqueId() {
 		return npcUniqueId;
 	}
@@ -64,8 +64,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
 		if (configSection.contains("npcId")) {
-			// legacy conversion from integer ids
-			// TODO remove again at some point
+			// Legacy conversion from integer ids
+			// TODO Remove again at some point.
 			if (configSection.isInt("npcId")) {
 				npcLegacyId = configSection.getInt("npcId");
 			} else {
@@ -78,8 +78,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		}
 	}
 
-	// TODO remove again at some point
-	// gets called from CitizensShops
+	// TODO Remove again at some point.
+	// Gets called from CitizensShops.
 	void convertLegacyId() {
 		if (npcLegacyId != null && citizensShops.isEnabled()) {
 			assert npcUniqueId == null;
@@ -90,7 +90,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 				npcLegacyId = null;
 				shopkeeper.markDirty();
 
-				// re-activate by new object id:
+				// Re-activate by new object id:
 				SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperObjectIdChanged(shopkeeper);
 			}
 		}
@@ -102,7 +102,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		if (npcUniqueId != null) {
 			configSection.set("npcId", npcUniqueId.toString());
 		} else if (npcLegacyId != null) {
-			// TODO remove again at some point
+			// TODO Remove again at some point.
 			configSection.set("npcId", npcLegacyId);
 		}
 	}
@@ -112,13 +112,13 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		super.setup();
 		if (npcLegacyId != null || npcUniqueId != null || !citizensShops.isEnabled()) return;
 
-		// create npc:
+		// Create NPC:
 		Log.debug(() -> "Creating citizens NPC for shopkeeper " + shopkeeper.getId());
 
 		EntityType entityType;
 		String name;
 		if (shopkeeper instanceof PlayerShopkeeper) {
-			// player shops will use a player npc:
+			// Player shops will use a player NPC:
 			entityType = EntityType.PLAYER;
 			name = ((PlayerShopkeeper) shopkeeper).getOwnerName();
 		} else {
@@ -126,10 +126,10 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			name = "Shopkeeper";
 		}
 
-		// create npc:
+		// Create NPC:
 		// Note: The spawn location can be null if the world is not loaded currently. We can still create the NPC, but
 		// spawning will happen later once the world is loaded.
-		Location spawnLocation = this.getSpawnLocation(); // can be null
+		Location spawnLocation = this.getSpawnLocation(); // Can be null
 		npcUniqueId = citizensShops.createNPC(spawnLocation, entityType, name);
 		shopkeeper.markDirty();
 	}
@@ -142,7 +142,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	@Override
 	public void delete() {
-		if (npcUniqueId == null) return; // there is no corresponding NPC (maybe already deleted)
+		if (npcUniqueId == null) return; // There is no corresponding NPC (maybe already deleted)
 		if (destroyNPC) {
 			NPC npc = this.getNPC();
 			if (npc != null) {
@@ -152,12 +152,12 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 				} else {
 					Log.debug(() -> "Removing Citizens NPC " + CitizensShops.getNPCIdString(npc)
 							+ " due to deletion of shopkeeper " + shopkeeper.getIdString());
-					npc.destroy(); // the npc was created by us, so we remove it again
+					npc.destroy(); // The NPC was created by us, so we remove it again
 				}
 			} else {
-				// TODO: npc not yet loaded or citizens not enabled: how to remove the citizens npc later?
-				// usually not a problem, because players cannot delete citizens shopkeepers if the corresponding
-				// citizens npc isn't present in the world (exception: deletion via commands..)
+				// TODO: NPC not yet loaded or citizens not enabled: How to remove the citizens npc later?
+				// Usually not a problem, because players cannot delete citizens shopkeepers if the corresponding
+				// citizens NPC isn't present in the world (exception: deletion via commands..).
 			}
 		}
 		npcUniqueId = null;
@@ -213,23 +213,23 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	private Location getSpawnLocation() {
 		assert shopkeeper.getWorldName() != null;
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		if (world == null) return null; // world not loaded currently
+		if (world == null) return null; // World not loaded currently
 		return new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
 	}
 
 	@Override
 	public boolean needsSpawning() {
-		return false; // spawning and despawning is handled by citizens
+		return false; // Spawning and despawning is handled by Citizens.
 	}
 
 	@Override
 	public boolean spawn() {
-		return false; // handled by citizens
+		return false; // Handled by Citizens.
 	}
 
 	@Override
 	public void despawn() {
-		// handled by citizens
+		// Handled by Citizens.
 	}
 
 	@Override
@@ -242,7 +242,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	public boolean check() {
 		NPC npc = this.getNPC();
 		if (npc == null) {
-			// Not going to force Citizens creation, this seems like it could go really wrong.
+			// Not going to force NPC creation, as this seems like it could go really wrong.
 			return false;
 		}
 
@@ -276,8 +276,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	@Override
 	public int getNameLengthLimit() {
-		// Citizens uses different limits depending on the npc type (64 for mobs, 46 for players)
-		// Citizens might dynamically truncate the name of the corresponding npc, and will then print a warning
+		// Citizens uses different limits depending on the npc type (64 for mobs, 46 for players).
+		// Citizens might dynamically truncate the name of the corresponding npc, and will then print a warning.
 		NPC npc = this.getNPC();
 		if (npc != null && npc.getTrait(MobType.class).getType() == EntityType.PLAYER) return 46;
 		return 64;
@@ -293,11 +293,11 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 				name = Settings.nameplatePrefix + name;
 			}
 			name = this.prepareName(name);
-			// set entity name plate:
+			// Set entity name plate:
 			npc.setName(name);
 			// this.entity.setCustomNameVisible(Settings.alwaysShowNameplates);
 		} else {
-			// remove name plate:
+			// Remove name plate:
 			npc.setName("");
 			// this.entity.setCustomNameVisible(false);
 		}
@@ -312,6 +312,6 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	// EDITOR ACTIONS
 
-	// TODO: Support sub types? A menu of entity types here would be cool
+	// TODO: Support sub types? A menu of entity types here would be cool.
 	// TODO: Support equipping items? Is there a generic Citizens API for this?
 }

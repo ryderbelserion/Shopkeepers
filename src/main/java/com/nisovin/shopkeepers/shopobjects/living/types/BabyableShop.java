@@ -32,9 +32,9 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
 	}
 
-	// TODO remove special case once this is resolved differently
+	// TODO Remove special case once this is resolved differently.
 	protected boolean isBabyable() {
-		// some mobs (parrots) don't support the baby variant even though they are Ageable
+		// Some mobs (parrots) don't support the baby variant even though they are Ageable.
 		return true;
 	}
 
@@ -79,7 +79,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 		if (!this.isBabyable()) return;
 		this.baby = baby;
 		shopkeeper.markDirty();
-		this.applyBaby(this.getEntity()); // null if not active
+		this.applyBaby(this.getEntity()); // Null if not active
 	}
 
 	private void applyBaby(E entity) {
@@ -89,7 +89,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 			entity.setBaby();
 		} else {
 			entity.setAdult();
-			// TODO: MC-9568: growing up mobs get moved
+			// TODO: MC-9568: Growing up mobs get moved.
 			this.teleportBack();
 		}
 	}

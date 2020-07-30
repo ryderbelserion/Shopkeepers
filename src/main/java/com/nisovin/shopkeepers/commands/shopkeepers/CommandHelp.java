@@ -12,10 +12,10 @@ class CommandHelp extends HelpCommand {
 	CommandHelp(Command helpSource) {
 		super("help", Arrays.asList("?"), helpSource);
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.HELP_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionHelp);
 	}
 }

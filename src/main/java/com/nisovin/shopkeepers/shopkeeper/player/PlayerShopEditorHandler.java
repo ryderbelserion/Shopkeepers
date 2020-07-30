@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.util.PermissionUtils;
 
 public abstract class PlayerShopEditorHandler extends EditorHandler {
 
-	// Note: In the edtior item1 is representing the low cost item and item2 the high cost item, but in the
+	// Note: In the editor item1 is representing the low cost item and item2 the high cost item, but in the
 	// corresponding trading recipe they will be swapped if they are both present.
 
 	protected PlayerShopEditorHandler(AbstractPlayerShopkeeper shopkeeper) {
@@ -34,17 +34,17 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 
 	@Override
 	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
-		// cancel all inventory clicks and handle everything on our own:
-		// TODO maybe allow certain inventory actions which only affect the player's inventory?
+		// Cancel all inventory clicks and handle everything on our own:
+		// TODO Maybe allow certain inventory actions which only affect the player's inventory?
 		event.setCancelled(true);
 		super.onInventoryDragEarly(event, player);
 	}
 
 	@Override
 	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
-		// cancel all inventory clicks and handle everything on our own:
-		// TODO maybe allow certain inventory actions which only affect the player's inventory?
-		// (like moving items around)
+		// Cancel all inventory clicks and handle everything on our own:
+		// TODO Maybe allow certain inventory actions which only affect the player's inventory (like moving items
+		// around)?
 		event.setCancelled(true);
 		super.onInventoryClickEarly(event, player);
 	}
@@ -54,13 +54,13 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		super.handleTradesClick(session, event);
 		int rawSlot = event.getRawSlot();
 		if (this.isItem1Row(rawSlot)) {
-			// change low cost:
+			// Change low cost:
 			int column = rawSlot - ITEM_1_OFFSET;
 			ItemStack item = event.getInventory().getItem(column);
 			if (ItemUtils.isEmpty(item)) return;
 			this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
 		} else if (this.isItem2Row(rawSlot)) {
-			// change high cost:
+			// Change high cost:
 			int column = rawSlot - ITEM_2_OFFSET;
 			ItemStack item = event.getInventory().getItem(column);
 			if (ItemUtils.isEmpty(item)) return;
@@ -70,20 +70,20 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 
 	protected void handleUpdateItemAmountOnClick(InventoryClickEvent event, int minAmount) {
 		assert event.isCancelled();
-		// ignore in certain situations:
+		// Ignore in certain situations:
 		ItemStack clickedItem = event.getCurrentItem();
 		if (ItemUtils.isEmpty(clickedItem)) return;
 
-		// get new item amount:
+		// Get new item amount:
 		int currentItemAmount = clickedItem.getAmount();
 		if (minAmount <= 0) minAmount = 0;
 		int newItemAmount = this.getNewAmountAfterEditorClick(event, currentItemAmount, minAmount, clickedItem.getMaxStackSize());
 		assert newItemAmount >= minAmount;
 		assert newItemAmount <= clickedItem.getMaxStackSize();
 
-		// update item in inventory:
+		// Update item in inventory:
 		if (newItemAmount == 0) {
-			// empty item slot:
+			// Empty item slot:
 			event.setCurrentItem(null);
 		} else {
 			clickedItem.setAmount(newItemAmount);
@@ -92,11 +92,11 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 
 	protected void handleUpdateTradeCostItemOnClick(InventoryClickEvent event, ItemStack currencyItem, ItemStack zeroCurrencyItem) {
 		assert event.isCancelled();
-		// ignore in certain situations:
+		// Ignore in certain situations:
 		if (ItemUtils.isEmpty(currencyItem)) return;
 
-		// get new item amount:
-		ItemStack clickedItem = event.getCurrentItem(); // can be null
+		// Get new item amount:
+		ItemStack clickedItem = event.getCurrentItem(); // Can be null
 		int currentItemAmount = 0;
 		boolean isCurrencyItem = ItemUtils.isSimilar(clickedItem, currencyItem);
 		if (isCurrencyItem) {
@@ -107,24 +107,24 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		assert newItemAmount >= 0;
 		assert newItemAmount <= currencyItem.getMaxStackSize();
 
-		// update item in inventory:
+		// Update item in inventory:
 		if (newItemAmount == 0) {
-			// place zero-currency item:
+			// Place zero-currency item:
 			event.setCurrentItem(zeroCurrencyItem);
 		} else {
 			if (isCurrencyItem) {
-				// only update item amount of already existing currency item:
+				// Only update item amount of already existing currency item:
 				clickedItem.setAmount(newItemAmount);
 			} else {
-				// place currency item with new amount:
+				// Place currency item with new amount:
 				currencyItem.setAmount(newItemAmount);
 				event.setCurrentItem(currencyItem);
 			}
 		}
 	}
 
-	// note: in case the cost is too large to represent, it sets the cost to zero
-	// (so opening and closing the editor window will remove the offer, instead of setting the costs to a lower
+	// Note: In case the cost is too large to represent, it sets the cost to zero.
+	// (So opening and closing the editor window will remove the offer, instead of setting the costs to a lower
 	// value than what was previously somehow specified)
 	protected TradingRecipeDraft createTradingRecipeDraft(ItemStack resultItem, int cost) {
 		ItemStack highCostItem = null;
@@ -147,7 +147,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 			if (remainingCost <= Settings.currencyItem.getType().getMaxStackSize()) {
 				lowCostItem = Settings.createCurrencyItem(remainingCost);
 			} else {
-				// cost is to large to represent: reset cost to zero:
+				// Cost is to large to represent: reset cost to zero:
 				lowCostItem = Settings.createZeroCurrencyItem();
 				if (Settings.isHighCurrencyEnabled()) {
 					highCostItem = Settings.createZeroHighCurrencyItem();

@@ -27,11 +27,11 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		Player tradingPlayer = tradeData.tradingPlayer;
 		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
-		// get offer for this type of item:
+		// Get offer for this type of item:
 		ItemStack soldItem = tradingRecipe.getResultItem();
 		PriceOffer offer = shopkeeper.getOffer(soldItem);
 		if (offer == null) {
-			// this should not happen.. because the recipes were created based on the shopkeeper's offers
+			// This should not happen.. because the recipes were created based on the shopkeeper's offers.
 			this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
 			return false;
 		}
@@ -39,24 +39,24 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		// validate the found offer:
 		int expectedSoldItemAmount = offer.getItem().getAmount();
 		if (expectedSoldItemAmount != soldItem.getAmount()) {
-			// this shouldn't happen .. because the recipe was created based on this offer
+			// This should not happen .. because the recipe was created based on this offer.
 			this.debugPreventedTrade(tradingPlayer, "The offer doesn't match the trading recipe!");
 			return false;
 		}
 
 		assert containerInventory != null & newContainerContents != null;
 
-		// remove result items from container contents:
+		// Remove result items from container contents:
 		if (ItemUtils.removeItems(newContainerContents, soldItem) != 0) {
 			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain the required items.");
 			return false;
 		}
 
-		// add earnings to container contents:
-		// TODO maybe add the actual items the trading player gave, instead of creating new currency items?
+		// Add earnings to container contents:
+		// TODO Maybe add the actual items the trading player gave, instead of creating new currency items?
 		int amountAfterTaxes = this.getAmountAfterTaxes(offer.getPrice());
 		if (amountAfterTaxes > 0) {
-			// TODO always store the currency in the most compressed form possible, regardless of
+			// TODO Always store the currency in the most compressed form possible, regardless of
 			// 'highCurrencyMinCost'?
 			int remaining = amountAfterTaxes;
 			if (Settings.isHighCurrencyEnabled() && remaining > Settings.highCurrencyMinCost) {

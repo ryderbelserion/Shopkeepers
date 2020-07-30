@@ -33,7 +33,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	private static final Property<HorseArmor> PROPERTY_ARMOR = new EnumProperty<HorseArmor>(HorseArmor.class, "armor", null) {
 		@Override
 		public boolean isNullable() {
-			return true; // null indicates 'no armor'
+			return true; // Null indicates 'no armor'
 		}
 	};
 
@@ -102,7 +102,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	public void setColor(Horse.Color color) {
 		this.color = color;
 		shopkeeper.markDirty();
-		this.applyColor(this.getEntity()); // null if not active
+		this.applyColor(this.getEntity()); // Null if not active
 	}
 
 	private void applyColor(Horse entity) {
@@ -165,7 +165,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	public void setStyle(Horse.Style style) {
 		this.style = style;
 		shopkeeper.markDirty();
-		this.applyStyle(this.getEntity()); // null if not active
+		this.applyStyle(this.getEntity()); // Null if not active
 	}
 
 	private void applyStyle(Horse entity) {
@@ -209,7 +209,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	public void setArmor(HorseArmor armor) {
 		this.armor = armor;
 		shopkeeper.markDirty();
-		this.applyArmor(this.getEntity()); // null if not active
+		this.applyArmor(this.getEntity()); // Null if not active
 	}
 
 	private void applyArmor(Horse entity) {

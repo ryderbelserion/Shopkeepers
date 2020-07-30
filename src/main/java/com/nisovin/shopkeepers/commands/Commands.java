@@ -18,7 +18,7 @@ public class Commands {
 
 	public void onEnable() {
 		confirmations.onEnable();
-		// register command executor:
+		// Register command executor:
 		shopkeepersCommand = new ShopkeepersCommand(plugin, plugin.getCommand("shopkeeper"), confirmations);
 	}
 

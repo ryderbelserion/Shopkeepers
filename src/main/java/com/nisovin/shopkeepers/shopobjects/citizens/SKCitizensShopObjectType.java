@@ -37,7 +37,7 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 		return this.getIdentifier() + ":" + npcUniqueId;
 	}
 
-	// TODO remove again at some point
+	// TODO Remove again at some point.
 	public String createObjectId(int npcLegacyId) {
 		return this.getIdentifier() + ":" + npcLegacyId;
 	}

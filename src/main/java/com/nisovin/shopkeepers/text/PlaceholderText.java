@@ -18,11 +18,11 @@ public class PlaceholderText extends TextBuilder {
 	public static final char PLACEHOLDER_PREFIX_CHAR = '{';
 	public static final char PLACEHOLDER_SUFFIX_CHAR = '}';
 
-	private final String placeholderKey; // not null or empty
-	private final String formattedPlaceholderKey; // not null or empty
-	private Text placeholderArgument = null; // can be null, not unbuilt
+	private final String placeholderKey; // Not null or empty
+	private final String formattedPlaceholderKey; // Not null or empty
+	private Text placeholderArgument = null; // Can be null, not unbuilt
 
-	// not intended for public use, use Text.placeholder(String) instead
+	// Not intended for public use, use Text.placeholder(String) instead.
 	PlaceholderText(String placeholderKey) {
 		Validate.notEmpty(placeholderKey, "Placeholder key is null or empty!");
 		this.placeholderKey = placeholderKey;
@@ -96,36 +96,36 @@ public class PlaceholderText extends TextBuilder {
 			placeholderArgumentText = Text.of(placeholderArgument);
 			Validate.isTrue(placeholderArgumentText.getParent() == null, "Cannot use non-root Text as placeholder argument!");
 
-			// build unbuilt argument:
+			// Build unbuilt argument:
 			buildIfRequired(placeholderArgumentText);
 
-			// TODO set parent?
-			// not setting the parent allows reusing the same placeholder argument Text instances more easily
-			// setting the parent would currently block the Text from being used as placeholder argument in more than
-			// one Text at once
+			// TODO Set parent?
+			// Not setting the parent allows reusing the same placeholder argument Text instances more easily.
+			// Setting the parent would currently block the Text from being used as placeholder argument in more than
+			// one Text at once.
 		}
-		this.placeholderArgument = placeholderArgumentText; // can be null
+		this.placeholderArgument = placeholderArgumentText; // Can be null
 	}
 
 	// PLACEHOLDER ARGUMENTS
 
 	@Override
 	public Text setPlaceholderArguments(Map<String, ?> arguments) {
-		// temporarily clear placeholder argument (if any) to not delegate to it via child delegation:
+		// Temporarily clear placeholder argument (if any) to not delegate to it via child delegation:
 		Text prevArgument = this.getPlaceholderArgument();
 		this.setPlaceholderArgument(null);
 
 		try {
-			// handles validation and delegation:
+			// Handles validation and delegation:
 			super.setPlaceholderArguments(arguments);
 
-			Object argument = arguments.get(placeholderKey); // can be null
+			Object argument = arguments.get(placeholderKey); // Can be null
 			if (argument != null) {
 				this.setPlaceholderArgument(argument);
-				prevArgument = null; // don't restore previous argument
-			} // else retain currently assigned argument if any
+				prevArgument = null; // Don't restore previous argument
+			} // Else retain currently assigned argument if any
 		} finally {
-			// restore previous placeholder argument:
+			// Restore previous placeholder argument:
 			if (prevArgument != null) {
 				this.setPlaceholderArgument(prevArgument);
 			}
@@ -135,10 +135,10 @@ public class PlaceholderText extends TextBuilder {
 
 	@Override
 	public Text clearPlaceholderArguments() {
-		// clear first to not delegate to it via child delegation:
+		// Clear first to not delegate to it via child delegation:
 		this.setPlaceholderArgument(null);
 
-		// handles delegation:
+		// Handles delegation:
 		super.clearPlaceholderArguments();
 		return this;
 	}
@@ -147,7 +147,7 @@ public class PlaceholderText extends TextBuilder {
 
 	@Override
 	public Text getChild() {
-		return placeholderArgument; // can be null
+		return placeholderArgument; // Can be null
 	}
 
 	@Override
@@ -160,17 +160,17 @@ public class PlaceholderText extends TextBuilder {
 	@Override
 	protected void appendPlainText(StringBuilder builder, boolean formatText) {
 		if (formatText || !this.hasPlaceholderArgument()) {
-			// temporarily clear placeholder argument (if any) to not append it via child delegation:
+			// Temporarily clear placeholder argument (if any) to not append it via child delegation:
 			Text prevArgument = this.getPlaceholderArgument();
 			this.setPlaceholderArgument(null);
 
-			// append formatted placeholder key:
+			// Append formatted placeholder key:
 			builder.append(this.getFormattedPlaceholderKey());
 
 			try {
 				super.appendPlainText(builder, formatText);
 			} finally {
-				// restore previous placeholder argument:
+				// Restore previous placeholder argument:
 				if (prevArgument != null) {
 					this.setPlaceholderArgument(prevArgument);
 				}
@@ -201,7 +201,7 @@ public class PlaceholderText extends TextBuilder {
 
 	@Override
 	protected void copyChild(Text sourceText) {
-		return; // not copying child
+		return; // Not copying child
 	}
 
 	protected void copyPlaceholderArgument(Text sourceText) {
@@ -218,7 +218,7 @@ public class PlaceholderText extends TextBuilder {
 	protected void appendToStringFeatures(StringBuilder builder) {
 		builder.append(", placeholderKey=");
 		builder.append(placeholderKey);
-		// note: placeholder argument gets already appended as 'child'
+		// Note: Placeholder argument gets already appended as 'child'.
 		super.appendToStringFeatures(builder);
 	}
 }

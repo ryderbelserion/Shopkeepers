@@ -38,7 +38,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	private E entity;
 	private int respawnAttempts = 0;
 	private boolean debuggingSpawn = false;
-	private static long lastSpawnDebugging = 0; // shared among all living shopkeepers to prevent spam
+	private static long lastSpawnDebugging = 0; // Shared among all living shopkeepers to prevent spam
 
 	protected SKLivingShopObject(	LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
 									AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -60,9 +60,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		// check for legacy uuid entry:
+		// Check for legacy uuid entry:
 		if (configSection.contains("uuid")) {
-			// mark dirty to remove this entry with the next save:
+			// Mark dirty to remove this entry with the next save:
 			shopkeeper.markDirty();
 		}
 	}
@@ -76,11 +76,11 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	@Override
 	public E getEntity() {
-		// is-active check:
-		// note: some spigot versions didn't check the isDead flag inside isValid:
-		// note: isValid-flag gets set at the tick after handling all queued chunk unloads, so isChunkLoaded check is
+		// Is-active check:
+		// Note: Some Spigot versions didn't check the isDead flag inside isValid.
+		// Note: isValid-flag gets set at the tick after handling all queued chunk unloads, so isChunkLoaded check is
 		// needed if we check during chunk unloads and the entity in question might be in another chunk than the
-		// currently unloaded one
+		// currently unloaded one. TODO Entity#isValid might already be doing the is-chunk-loaded check now.
 		if (entity != null && !entity.isDead() && entity.isValid() && ChunkCoords.isChunkLoaded(entity.getLocation())) {
 			return entity;
 		}
@@ -99,12 +99,12 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	@Override
 	public boolean needsSpawning() {
-		return true; // despawn shop entities on chunk unload, and spawn them again on chunk load
+		return true; // Despawn shop entities on chunk unload, and spawn them again on chunk load.
 	}
 
 	@Override
 	public boolean despawnDuringWorldSaves() {
-		// spawned entities are non-persistent and therefore already skipped during world saves:
+		// Spawned entities are non-persistent and therefore already skipped during world saves:
 		return false;
 	}
 
@@ -116,31 +116,31 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		entity.removeMetadata("shopkeeper", ShopkeepersPlugin.getInstance());
 	}
 
-	// places the entity at the exact location it would fall to, within a range of at most 1 block below the spawn block
-	// (because shopkeepers might have been placed 1 block above passable or non-full blocks)
+	// Places the entity at the exact location it would fall to, within a range of at most 1 block below the spawn block
+	// (because shopkeepers might have been placed 1 block above passable or non-full blocks).
 	private Location getSpawnLocation() {
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
 		if (world == null) return null; // world not loaded
 		Location spawnLocation = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + SPAWN_LOCATION_OFFSET, shopkeeper.getZ() + 0.5D);
 		double distanceToGround = Utils.getCollisionDistanceToGround(spawnLocation, SPAWN_LOCATION_RANGE);
 		if (distanceToGround == SPAWN_LOCATION_RANGE) {
-			// no collision within the checked range, remove offset from spawn location:
+			// No collision within the checked range, remove offset from spawn location:
 			distanceToGround = SPAWN_LOCATION_OFFSET;
 		}
-		// adjust spawn location:
+		// Adjust spawn location:
 		spawnLocation.add(0.0D, -distanceToGround, 0.0D);
 		return spawnLocation;
 	}
 
 	// Any preparation that needs to be done before spawning. Might only allow limited operations.
 	protected void prepareEntity(E entity) {
-		// assign metadata for easy identification by other plugins:
+		// Assign metadata for easy identification by other plugins:
 		this.assignShopkeeperMetadata(entity);
 
-		// don't save the entity to the world data:
+		// Don't save the entity to the world data:
 		entity.setPersistent(false);
 
-		// apply name (if it has/uses one):
+		// Apply name (if it has/uses one):
 		this.applyName(entity, shopkeeper.getName());
 
 		// Clear equipment:
@@ -152,46 +152,46 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	// Any clean up that needs to happen for the entity. The entity might not be fully setup yet.
 	protected void cleanUpEntity(E entity) {
-		// disable AI:
+		// Disable AI:
 		this.cleanupAI();
 
-		// remove metadata again:
+		// Remove metadata again:
 		this.removeShopkeeperMetadata(entity);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean spawn() {
-		// check if our current old entity is still valid:
+		// Check if our current old entity is still valid:
 		if (this.isActive()) return true;
 		if (entity != null) {
-			// perform cleanup before replacing the currently stored entity with a new one:
+			// Perform cleanup before replacing the currently stored entity with a new one:
 			this.cleanUpEntity(entity);
-			entity = null; // reset
+			entity = null; // Reset
 		}
 
-		// prepare spawn location:
+		// Prepare spawn location:
 		Location spawnLocation = this.getSpawnLocation();
 		if (spawnLocation == null) {
-			return false; // world not loaded
+			return false; // World not loaded
 		}
 		World world = spawnLocation.getWorld();
 		assert world != null;
 
-		// spawn entity:
-		// TODO check if the block is passable before spawning there?
+		// Spawn entity:
+		// TODO Check if the block is passable before spawning there?
 		EntityType entityType = this.getEntityType();
 		entity = (E) world.spawn(spawnLocation, entityType.getEntityClass(), (entity) -> {
 			// Note: This callback is run after the entity has been prepared (this includes the creation of random
 			// equipment and the random spawning of passengers) and right before the entity gets added to the world
 			// (which triggers the corresponding CreatureSpawnEvent).
 
-			// debugging entity spawning:
+			// Debugging entity spawning:
 			if (entity.isDead()) {
 				Log.debug("Spawning shopkeeper entity is dead already!");
 			}
 
-			// prepare entity, before it gets spawned:
+			// Prepare entity, before it gets spawned:
 			prepareEntity((E) entity);
 
 			// Try to bypass entity-spawn blocking plugins (right before this specific entity is about to get spawned):
@@ -199,16 +199,16 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		});
 
 		if (this.isActive()) {
-			// further setup entity after it was successfully spawned:
+			// Further setup entity after it was successfully spawned:
 			// Some entities randomly spawn with passengers:
 			for (Entity passenger : entity.getPassengers()) {
 				passenger.remove();
 			}
-			entity.eject(); // some entities might automatically mount on nearby entities (like baby zombies on chicken)
+			entity.eject(); // Some entities might automatically mount on nearby entities (like baby zombies on chicken)
 			entity.setRemoveWhenFarAway(false);
 			entity.setCanPickupItems(false);
 
-			// disable breeding:
+			// Disable breeding:
 			if (entity instanceof Ageable) {
 				Ageable ageable = ((Ageable) entity);
 				ageable.setAdult();
@@ -219,40 +219,43 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			// Set the entity to an adult if we don't support its baby property yet:
 			NMSManager.getProvider().setExclusiveAdult(entity);
 
-			// remove potion effects:
+			// Remove potion effects:
 			for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
 				entity.removePotionEffect(potionEffect.getType());
 			}
 
-			// overwrite AI:
+			// Overwrite AI:
 			this.overwriteAI();
 
-			// prevent raider shopkeepers from participating in nearby raids:
+			// Prevent raider shopkeepers from participating in nearby raids:
 			if (entity instanceof Raider) {
 				NMSManager.getProvider().setCanJoinRaid((Raider) entity, false);
 			}
 
-			// apply sub type:
+			// Apply sub type:
 			this.onSpawn(entity);
 
-			// success:
+			// Success:
 			return true;
 		} else {
-			// failure:
+			// Failure:
 			E localEntity = this.entity;
-			this.entity = null; // reset
+			this.entity = null; // Reset
 
 			if (localEntity == null) {
 				Log.warning("Failed to spawn shopkeeper entity: Entity is null");
 			} else {
-				// debug, if not already debugging and cooldown over:
+				// TODO Config option to delete the shopkeeper on failed spawn attempt? Check for this during shop
+				// creation?
+
+				// Debug, if not already debugging and cooldown is over:
 				boolean debug = (Settings.debug && !debuggingSpawn && (System.currentTimeMillis() - lastSpawnDebugging) > (5 * 60 * 1000)
 						&& localEntity.isDead() && ChunkCoords.isChunkLoaded(localEntity.getLocation()));
 
 				Log.warning("Failed to spawn shopkeeper entity: Entity dead: " + localEntity.isDead() + ", entity valid: " + localEntity.isValid()
 						+ ", chunk loaded: " + ChunkCoords.isChunkLoaded(localEntity.getLocation()) + ", debug -> " + debug);
 
-				// debug entity spawning:
+				// Debug entity spawning:
 				if (debug) {
 					// Print chunk's entity counts:
 					EntityUtils.printEntityCounts(spawnLocation.getChunk());
@@ -262,20 +265,20 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 					lastSpawnDebugging = System.currentTimeMillis();
 					Log.info("Trying again and logging event activity ..");
 
-					// log all events occurring during spawning, and their registered listeners:
+					// Log all events occurring during spawning, and their registered listeners:
 					DebugListener debugListener = DebugListener.register(true, true);
 
-					// log creature spawn handling:
+					// Log creature spawn handling:
 					EventDebugListener<CreatureSpawnEvent> spawnListener = new EventDebugListener<>(CreatureSpawnEvent.class, (priority, event) -> {
 						LivingEntity spawnedEntity = event.getEntity();
 						Log.info("  CreatureSpawnEvent (" + priority + "): " + "cancelled: " + event.isCancelled() + ", dead: " + spawnedEntity.isDead()
 								+ ", valid: " + spawnedEntity.isValid() + ", chunk loaded: " + ChunkCoords.isChunkLoaded(spawnedEntity.getLocation()));
 					});
 
-					// try to spawn entity again:
+					// Try to spawn entity again:
 					boolean result = this.spawn();
 
-					// unregister listeners again:
+					// Unregister listeners again:
 					debugListener.unregister();
 					spawnListener.unregister();
 					debuggingSpawn = false;
@@ -288,9 +291,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		}
 	}
 
-	// gets called after the entity was spawned; can be used to apply any additionally configured mob-specific setup
+	// Gets called after the entity was spawned. Can be used to apply any additionally configured mob-specific setup.
 	protected void onSpawn(E entity) {
-		// nothing to do by default
+		// Nothing to do by default.
 	}
 
 	protected void overwriteAI() {
@@ -326,22 +329,22 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		// However, for now we prefer using NoAI. This might be safer in regards to potential future issues and also
 		// automatically handles other cases, like players pushing entities around by hitting them.
 
-		// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes that
+		// Making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes that
 		// it is currently falling:
-		// TODO this can be removed once spigot ignores NoAI entities
+		// TODO This can be removed once Spigot ignores NoAI entities.
 		NMSManager.getProvider().setOnGround(entity, true);
 	}
 
 	protected final void setNoGravity(E entity) {
 		entity.setGravity(false);
 
-		// making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes
+		// Making sure that Spigot's entity activation range does not keep this entity ticking, because it assumes
 		// that it is currently falling:
 		NMSManager.getProvider().setOnGround(entity, true);
 	}
 
 	protected void cleanupAI() {
-		// disable AI:
+		// Disable AI:
 		livingShops.getLivingEntityAI().removeEntity(entity);
 	}
 
@@ -349,10 +352,10 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	public void despawn() {
 		if (entity == null) return;
 
-		// clean up entity:
+		// Clean up entity:
 		this.cleanUpEntity(entity);
 
-		// remove entity:
+		// Remove entity:
 		entity.remove();
 		entity = null;
 	}
@@ -371,35 +374,35 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		if (!this.isActive()) {
 			Log.debug(() -> "Shopkeeper (" + shopkeeper.getPositionString() + ") missing, triggering respawn now");
 			if (entity != null && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
-				// the chunk was silently unloaded before:
+				// The chunk was silently unloaded before:
 				Log.debug(
 						() -> "  Chunk got silently unloaded or mob got removed! (dead: " + entity.isDead() + ", valid: "
 								+ entity.isValid() + ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()) + ")"
 				);
 			}
-			boolean spawned = this.spawn(); // this will load the chunk if necessary
+			boolean spawned = this.spawn(); // This will load the chunk if necessary
 			if (spawned) {
 				respawnAttempts = 0;
 				return true;
 			} else {
-				// TODO maybe add a setting to remove shopkeeper if it can't be spawned a certain amount of times?
+				// TODO Maybe add a setting to remove shopkeeper if it can't be spawned a certain amount of times?
 				Log.debug("  Respawn failed");
 				return (++respawnAttempts > 5);
 			}
 		} else {
 			Location entityLoc = entity.getLocation();
 			Location spawnLocation = this.getSpawnLocation();
-			assert spawnLocation != null; // since entity is active
+			assert spawnLocation != null; // Since entity is active
 			spawnLocation.setYaw(entityLoc.getYaw());
 			spawnLocation.setPitch(entityLoc.getPitch());
 			if (!entityLoc.getWorld().equals(spawnLocation.getWorld()) || entityLoc.distanceSquared(spawnLocation) > 0.4D) {
-				// teleport back:
+				// Teleport back:
 				entity.teleport(spawnLocation);
 				this.overwriteAI();
 				Log.debug(() -> "Shopkeeper (" + shopkeeper.getPositionString() + ") out of place, teleported back");
 			}
 
-			// remove potion effects:
+			// Remove potion effects:
 			for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
 				entity.removePotionEffect(potionEffect.getType());
 			}
@@ -408,11 +411,11 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	}
 
 	public void teleportBack() {
-		E entity = this.getEntity(); // null if not active
+		E entity = this.getEntity(); // Null if not active
 		if (entity == null) return;
 
 		Location spawnLocation = this.getSpawnLocation();
-		assert spawnLocation != null; // since entity is active
+		assert spawnLocation != null; // Since entity is active
 		Location entityLoc = entity.getLocation();
 		spawnLocation.setYaw(entityLoc.getYaw());
 		spawnLocation.setPitch(entityLoc.getPitch());
@@ -433,11 +436,11 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 				name = Settings.nameplatePrefix + name;
 			}
 			name = this.prepareName(name);
-			// set entity name plate:
+			// Set entity name plate:
 			entity.setCustomName(name);
 			entity.setCustomNameVisible(Settings.alwaysShowNameplates);
 		} else {
-			// remove name plate:
+			// Remove name plate:
 			entity.setCustomName(null);
 			entity.setCustomNameVisible(false);
 		}
@@ -451,5 +454,5 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	// EDITOR ACTIONS
 
-	// no default actions
+	// No default actions.
 }

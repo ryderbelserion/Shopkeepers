@@ -33,13 +33,13 @@ class CommandGiveCurrency extends Command {
 	CommandGiveCurrency() {
 		super("givecurrency", Arrays.asList("currency"));
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.GIVE_CURRENCY_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionGiveCurrency);
 
-		// arguments:
+		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
 		this.addArgument(new DefaultValueFallback<String>(new TypedFirstOfArgument<>(ARGUMENT_CURRENCY_TYPE, Arrays.asList(
 				new LiteralArgument(ARGUMENT_CURRENCY_LOW),
@@ -71,7 +71,7 @@ class CommandGiveCurrency extends Command {
 
 		int amount = context.get(ARGUMENT_AMOUNT);
 		assert amount >= 1;
-		// upper limit to avoid accidental misuse: TODO use BoundedIntegerArgument in the future?
+		// Upper limit to avoid accidental misuse: TODO Use BoundedIntegerArgument in the future?
 		if (amount > 1024) amount = 1024;
 
 		ItemStack item;
@@ -91,8 +91,8 @@ class CommandGiveCurrency extends Command {
 			targetPlayer.getWorld().dropItem(targetPlayer.getEyeLocation(), item);
 		}
 
-		// success:
-		// TODO show currency item via hover text?
+		// Success:
+		// TODO Show currency item via hover text?
 		if (lowCurrency) {
 			// Inform target player:
 			TextUtils.sendMessage(targetPlayer, Settings.msgCurrencyItemsReceived,

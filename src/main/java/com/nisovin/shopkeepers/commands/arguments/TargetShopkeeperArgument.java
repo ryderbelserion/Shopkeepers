@@ -37,7 +37,7 @@ public class TargetShopkeeperArgument extends CommandArgument<Shopkeeper> {
 
 	@Override
 	public boolean isOptional() {
-		return true; // does not require user input
+		return true; // Does not require user input
 	}
 
 	@Override
@@ -53,7 +53,7 @@ public class TargetShopkeeperArgument extends CommandArgument<Shopkeeper> {
 			throw new ArgumentParseException(this, result.getErrorMessage());
 		} else {
 			assert !result.getShopkeepers().isEmpty();
-			// TODO print an error if result is ambiguous?
+			// TODO Print an error if result is ambiguous?
 			return result.getShopkeepers().get(0);
 		}
 	}

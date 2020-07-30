@@ -33,7 +33,7 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 		protected boolean canOpen(Player player) {
 			if (!super.canOpen(player)) return false;
 
-			// check trading permission:
+			// Check trading permission:
 			String tradePermission = this.getShopkeeper().getTradePremission();
 			if (tradePermission != null && !PermissionUtils.hasPermission(player, tradePermission)) {
 				Log.debug(() -> "Blocked trading UI opening for " + player.getName() + ": Missing custom trade permission '" + tradePermission + "'.");
@@ -44,7 +44,7 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 		}
 	}
 
-	// null indicates that no additional permission is required:
+	// Null indicates that no additional permission is required:
 	protected String tradePermission = null;
 
 	/**
@@ -78,14 +78,14 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	@Override
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
-		// load trade permission:
+		// Load trade permission:
 		tradePermission = configSection.getString("tradePerm", null);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		// save trade permission:
+		// Save trade permission:
 		configSection.set("tradePerm", tradePermission);
 	}
 

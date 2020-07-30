@@ -32,9 +32,9 @@ import com.nisovin.shopkeepers.util.Validate;
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
 
 	protected final SignShops signShops;
-	private SignType signType = SignType.OAK; // not null, not unsupported, default is oak
+	private SignType signType = SignType.OAK; // Not null, not unsupported, default is OAK.
 	private boolean wallSign = true;
-	private BlockFace signFacing = BlockFace.SOUTH; // not null
+	private BlockFace signFacing = BlockFace.SOUTH; // Not null
 	// Update the sign content at least once after plugin start, in case some settings have changed which affect the
 	// sign content:
 	private boolean updateSign = true;
@@ -65,7 +65,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		// Sign (wood) type:
 		String signTypeName = configSection.getString("signType");
 		// Migration from TreeSpecies to SignType:
-		// TODO remove this again at some point
+		// TODO Remove this again at some point.
 		if ("GENERIC".equals(signTypeName)) {
 			Log.warning("Migrating sign type of shopkeeper '" + shopkeeper.getId() + "' from '" + signTypeName
 					+ "' to '" + SignType.OAK + "'.");
@@ -86,22 +86,22 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 				throw new RuntimeException("unsupported sign type");
 			}
 		} catch (Exception e) {
-			// fallback to default:
+			// Fallback to default:
 			Log.warning("Missing, invalid, or unsupported sign type '" + signTypeName + "' for shopkeeper "
 					+ shopkeeper.getId() + "'. Using '" + SignType.OAK + "' now.");
 			signType = SignType.OAK;
 			shopkeeper.markDirty();
 		}
 
-		// wall sign vs sign post:
+		// Wall sign vs sign post:
 		if (!configSection.isBoolean("wallSign")) {
-			// missing value:
+			// Missing value:
 			shopkeeper.markDirty();
 		}
 		wallSign = configSection.getBoolean("wallSign", true);
 
-		// sign facing:
-		signFacing = BlockFace.SOUTH; // default
+		// Sign facing:
+		signFacing = BlockFace.SOUTH; // Default
 		String signFacingName = configSection.getString("signFacing");
 		if (signFacingName == null) {
 			Log.warning("Missing sign facing for shopkeeper " + shopkeeper.getId());
@@ -115,7 +115,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			}
 			if (wallSign ? !BlockFaceUtils.isWallSignFace(signFacing) : !BlockFaceUtils.isSignPostFacing(signFacing)) {
 				Log.warning("Invalid sign facing for shopkeeper " + shopkeeper.getId() + ": " + signFacingName);
-				signFacing = BlockFace.SOUTH; // fallback to default
+				signFacing = BlockFace.SOUTH; // Fallback to default
 				shopkeeper.markDirty();
 			}
 		}
@@ -125,13 +125,13 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
 
-		// sign type:
+		// Sign type:
 		configSection.set("signType", signType.name());
 
-		// wall sign vs sign post:
+		// Wall sign vs sign post:
 		configSection.set("wallSign", wallSign);
 
-		// sign facing:
+		// Sign facing:
 		configSection.set("signFacing", signFacing.name());
 	}
 
@@ -148,10 +148,10 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	@Override
 	public Block getBlock() {
 		Location signLocation = this.getLocation();
-		if (signLocation == null) return null; // world not loaded
-		if (!shopkeeper.getChunkCoords().isChunkLoaded()) return null; // chunk not loaded
+		if (signLocation == null) return null; // World not loaded
+		if (!shopkeeper.getChunkCoords().isChunkLoaded()) return null; // Chunk not loaded
 		Block signBlock = signLocation.getBlock();
-		if (!ItemUtils.isSign(signBlock.getType())) return null; // not a sign
+		if (!ItemUtils.isSign(signBlock.getType())) return null; // Not a sign
 		return signBlock;
 	}
 
@@ -174,7 +174,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	@Override
 	public boolean needsSpawning() {
-		return true; // despawn signs on chunk unload, and spawn them again on chunk load
+		return true; // Despawn signs on chunk unload, and spawn them again on chunk load
 	}
 
 	@Override
@@ -184,31 +184,31 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			return false;
 		}
 
-		// if re-spawning fails due to the sign dropping for some reason (ex. attached block missing) this could be
+		// If re-spawning fails due to the sign dropping for some reason (ex. attached block missing) this could be
 		// abused (sign drop farming), therefore we limit the number of spawn attempts:
 		if (System.currentTimeMillis() - lastFailedRespawnAttempt < 3 * 60 * 1000L) {
 			Log.debug(() -> "Shopkeeper sign at " + shopkeeper.getPositionString() + " is on spawn cooldown.");
 			return false;
 		}
 
-		// place sign:
+		// Place sign:
 		Block signBlock = signLocation.getBlock();
 		BlockData signData = this.createBlockData();
 		assert signData != null;
 
-		// cancel block physics for this placed sign if needed:
+		// Cancel block physics for this placed sign if needed:
 		signShops.cancelNextBlockPhysics(signBlock);
-		signBlock.setBlockData(signData, false); // skip physics update
-		// cleanup state if no block physics were triggered:
+		signBlock.setBlockData(signData, false); // Skip physics update
+		// Cleanup state if no block physics were triggered:
 		signShops.cancelNextBlockPhysics(null);
 
-		// in case sign placement has failed for some reason:
+		// In case sign placement has failed for some reason:
 		if (!ItemUtils.isSign(signBlock.getType())) {
 			lastFailedRespawnAttempt = System.currentTimeMillis();
 			return false;
 		}
 
-		// init sign content:
+		// Init sign content:
 		updateSign = false;
 		this.updateSign();
 
@@ -220,12 +220,12 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		assert ItemUtils.isSign(signMaterial);
 		BlockData signData = null;
 		if (wallSign) {
-			// wall sign:
+			// Wall sign:
 			WallSign wallSignData = (WallSign) Bukkit.createBlockData(signMaterial);
 			wallSignData.setFacing(signFacing);
 			signData = wallSignData;
 		} else {
-			// sign post:
+			// Sign post:
 			org.bukkit.block.data.type.Sign signPostData = (org.bukkit.block.data.type.Sign) Bukkit.createBlockData(signMaterial);
 			signPostData.setRotation(signFacing);
 			signData = signPostData;
@@ -244,7 +244,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		Block signBlock = this.getBlock();
 		if (signBlock != null) {
 			assert ItemUtils.isSign(signBlock.getType());
-			// remove sign:
+			// Remove sign:
 			signBlock.setType(Material.AIR, false);
 		}
 	}
@@ -257,37 +257,37 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	public void updateSign() {
 		Sign sign = this.getSign();
 		if (sign == null) {
-			updateSign = true; // request update, once the sign is available again
+			updateSign = true; // Request update, once the sign is available again
 			return;
 		}
 
-		// line 0: header
+		// Line 0: Header
 		sign.setLine(0, Settings.signShopFirstLine);
 
-		// line 1: shop name
-		String name = shopkeeper.getName(); // can be empty
+		// Line 1: Shop name
+		String name = shopkeeper.getName(); // Can be empty
 		name = this.prepareName(name);
 		String line1 = name;
 		sign.setLine(1, line1);
 
-		// line 2: owner name
+		// Line 2: Owner name
 		String line2 = "";
 		if (shopkeeper instanceof PlayerShopkeeper) {
 			line2 = ((PlayerShopkeeper) shopkeeper).getOwnerName();
 		}
 		sign.setLine(2, line2);
 
-		// line 3: empty
+		// Line 3: Empty
 		sign.setLine(3, "");
 
-		// apply sign changes:
+		// Apply sign changes:
 		sign.update(false, false);
 	}
 
 	@Override
 	public boolean check() {
 		if (!shopkeeper.getChunkCoords().isChunkLoaded()) {
-			// only verify sign, if the chunk is currently loaded:
+			// Only verify sign, if the chunk is currently loaded:
 			return false;
 		}
 
@@ -300,7 +300,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			return true;
 		}
 
-		// update sign content if requested:
+		// Update sign content if requested:
 		if (updateSign) {
 			updateSign = false;
 			this.updateSign();
@@ -313,9 +313,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	@Override
 	public void setName(String name) {
-		// the name gets set during sign update, which always uses the name of the shopkeeper:
-		// TODO allow changing only the name? Currently this restriction allows to not have to store
-		// custom names inside this sign shop object
+		// The name gets set during sign update, which always uses the name of the shopkeeper:
+		// TODO Allow changing only the name? Currently this restriction allows to not have to store
+		// custom names inside this sign shop object.
 		this.updateSign();
 	}
 
@@ -362,8 +362,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		Sign sign = this.getSign();
 		if (sign != null) {
 			BlockData signData = this.createBlockData();
-			sign.setBlockData(signData); // keeps sign data (text) the same
-			sign.update(true, false); // force: material has changed, skip physics update
+			sign.setBlockData(signData); // Keeps sign data (text) the same
+			sign.update(true, false); // Force: Material has changed, skip physics update.
 		}
 	}
 

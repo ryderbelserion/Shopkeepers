@@ -18,13 +18,13 @@ class CommandCheckItem extends PlayerCommand {
 	CommandCheckItem() {
 		super("checkitem");
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Text.of("Shows debugging information for the currently held items."));
 
-		// hidden debugging command:
+		// Hidden debugging command:
 		this.setHiddenInParentHelp(true);
 	}
 

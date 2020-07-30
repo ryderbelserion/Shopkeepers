@@ -44,7 +44,7 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 		return idArgument.getMissingArgumentErrorMsg();
 	}
 
-	// implementation note: consider overriding #getInvalidArgumentErrorMsg
+	// Implementation note: Consider overriding #getInvalidArgumentErrorMsg
 
 	/**
 	 * Gets the object corresponding to the given id.
@@ -59,15 +59,15 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 
 	@Override
 	public O parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
-		// parse id: this deals with invalid and missing input
+		// Parse id: This deals with invalid and missing input.
 		I id = idArgument.parseValue(input, context, argsReader);
 		O object = this.getObject(id);
 		if (object == null) {
-			// no corresponding object found:
+			// No corresponding object found:
 			throw this.invalidArgumentError(idArgument.toString(id));
 		}
 		if (!filter.test(object)) {
-			// rejected by filter:
+			// Rejected by filter:
 			throw new ArgumentRejectedException(this, filter.getInvalidArgumentErrorMsg(this, idArgument.toString(id), object));
 		}
 		return object;

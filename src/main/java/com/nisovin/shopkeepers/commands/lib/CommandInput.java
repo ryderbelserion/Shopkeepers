@@ -18,12 +18,12 @@ public final class CommandInput {
 	private final String commandAlias;
 	private final List<String> arguments; // unmodifiable
 
-	// the arguments are expected to not change during the command processing
+	// The arguments are expected to not change during the command processing.
 	public CommandInput(CommandSender sender, Command command, String commandAlias, String[] arguments) {
 		this(sender, command, commandAlias, (arguments == null) ? Collections.emptyList() : Arrays.asList(arguments));
 	}
 
-	// the arguments are expected to not change during the command processing
+	// The arguments are expected to not change during the command processing.
 	public CommandInput(CommandSender sender, Command command, String commandAlias, List<String> arguments) {
 		Validate.notNull(sender, "Sender is null!");
 		Validate.notNull(command, "Command is null!");

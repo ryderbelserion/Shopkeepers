@@ -53,13 +53,13 @@ public class EntityUtils {
 				Chunk chunk = world.getChunkAt(chunkX, chunkZ);
 				for (Entity entity : chunk.getEntities()) {
 					Location entityLoc = entity.getLocation();
-					// TODO: this is a workaround: for some yet unknown reason entities sometimes report to be in a
+					// TODO This is a workaround: For some yet unknown reason entities sometimes report to be in a
 					// different world..
 					if (!entityLoc.getWorld().equals(world)) {
 						Log.debug(() -> "Found an entity which reports to be in a different world than the chunk we got it from: "
 								+ "Location=" + location + ", Chunk=" + chunk + ", ChunkWorld=" + chunk.getWorld()
 								+ ", entityType=" + entity.getType() + ", entityLocation=" + entityLoc);
-						continue; // skip this entity
+						continue; // Skip this entity
 					}
 
 					if (entityLoc.distanceSquared(location) <= radius2) {
@@ -90,13 +90,13 @@ public class EntityUtils {
 				Chunk currentChunk = world.getChunkAt(chunkX, chunkZ);
 				for (Entity entity : currentChunk.getEntities()) {
 					Location entityLoc = entity.getLocation();
-					// TODO: this is a workaround: for some yet unknown reason entities sometimes report to be in a
+					// TODO This is a workaround: For some yet unknown reason entities sometimes report to be in a
 					// different world..
 					if (!entityLoc.getWorld().equals(world)) {
 						Log.debug(() -> "Found an entity which reports to be in a different world than the chunk we got it from: "
 								+ "Chunk=" + currentChunk + ", ChunkWorld=" + currentChunk.getWorld()
 								+ ", entityType=" + entity.getType() + ", entityLocation=" + entityLoc);
-						continue; // skip this entity
+						continue; // Skip this entity
 					}
 
 					if (typesList.isEmpty() || typesList.contains(entity.getType())) {

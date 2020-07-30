@@ -62,7 +62,7 @@ public class PigShop extends BabyableShop<Pig> {
 	public void setSaddle(boolean saddle) {
 		this.saddle = saddle;
 		shopkeeper.markDirty();
-		this.applySaddle(this.getEntity()); // null if not active
+		this.applySaddle(this.getEntity()); // Null if not active
 	}
 
 	private void applySaddle(Pig entity) {

@@ -33,7 +33,7 @@ public class FixedValuesArgument extends CommandArgument<Object> {
 		String argument = argsReader.next();
 		Object value = values.get(argument);
 		if (value == null) {
-			// try again with lower and upper case variants of the input:
+			// Try again with lower and upper case variants of the input:
 			value = values.get(argument.toLowerCase(Locale.ROOT));
 			if (value == null) {
 				value = values.get(argument.toUpperCase(Locale.ROOT));

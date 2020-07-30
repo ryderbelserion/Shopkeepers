@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.util.Validate;
 public final class BufferedCommandContext extends SimpleCommandContext {
 
 	private final CommandContext context;
-	// the super context's values get used for the buffer
+	// The super context's values get used for the buffer.
 
 	/**
 	 * Creates a new and empty {@link BufferedCommandContext}.
@@ -60,13 +60,13 @@ public final class BufferedCommandContext extends SimpleCommandContext {
 
 	@Override
 	public <T> T get(String key) {
-		T value = super.get(key); // check buffer
-		return (value != null) ? value : context.get(key); // else check parent context
+		T value = super.get(key); // Check buffer
+		return (value != null) ? value : context.get(key); // Else check parent context
 	}
 
 	@Override
 	public boolean has(String key) {
-		// check both buffer and parent context:
+		// Check both buffer and parent context:
 		return super.has(key) || context.has(key);
 	}
 
@@ -78,7 +78,7 @@ public final class BufferedCommandContext extends SimpleCommandContext {
 		} else {
 			// combine maps:
 			Map<String, Object> combinedMap = new LinkedHashMap<>(context.getMapView());
-			combinedMap.putAll(super.values); // replaces existing entries for duplicate keys
+			combinedMap.putAll(super.values); // Replaces existing entries for duplicate keys
 			return Collections.unmodifiableMap(combinedMap);
 		}
 	}
@@ -90,7 +90,7 @@ public final class BufferedCommandContext extends SimpleCommandContext {
 
 	@Override
 	public CommandContext copy() {
-		// Note: #copy() creates a copy of the combined command context contents by using #getMapView()
+		// Note: #copy() creates a copy of the combined command context contents by using #getMapView().
 		return super.copy();
 	}
 

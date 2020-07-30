@@ -52,23 +52,23 @@ class CommandRemove extends Command {
 		this.shopkeeperRegistry = shopkeeperRegistry;
 		this.confirmations = confirmations;
 
-		// Permission gets checked by testPermission and during execution
+		// Permission gets checked by testPermission and during execution.
 
 		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionRemove);
 
-		// Arguments: TODO allow specifying a single shopkeeper?
+		// Arguments: TODO Allow specifying a single shopkeeper?
 		this.addArgument(new FirstOfArgument("target", Arrays.asList(
 				new LiteralArgument(ARGUMENT_ADMIN),
 				new LiteralArgument(ARGUMENT_ALL),
 				new FirstOfArgument(ARGUMENT_PLAYER, Arrays.asList(
-						// TODO provide completions for known shop owners?
+						// TODO Provide completions for known shop owners?
 						new PlayerUUIDArgument(ARGUMENT_PLAYER_UUID), // accepts any uuid
-						// accepts any name, falls back to sender if no name is specified
-						// TODO add alias 'own'?
+						// Accepts any name, falls back to sender if no name is specified.
+						// TODO Add alias 'own'?
 						new SenderPlayerNameFallback(new PlayerNameArgument(ARGUMENT_PLAYER_NAME))
-				), false) // don't join formats
-		), true, true)); // join and reverse formats
+				), false) // Don't join formats
+		), true, true)); // Join and reverse formats
 	}
 
 	@Override
@@ -111,18 +111,18 @@ class CommandRemove extends Command {
 			}
 		}
 
-		// permission checks:
+		// Permission checks:
 		if (admin) {
-			// remove all admin shopkeepers:
+			// Remove all admin shopkeepers:
 			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_ADMIN_PERMISSION);
 		} else if (all) {
-			// remove all player shopkeepers:
+			// Remove all player shopkeepers:
 			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_ALL_PERMISSION);
 		} else if (targetOwnShops) {
-			// remove own player shopkeepers:
+			// Remove own player shopkeepers:
 			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_OWN_PERMISSION);
 		} else {
-			// remove other player's shopkeepers:
+			// Remove other player's shopkeepers:
 			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_OTHERS_PERMISSION);
 		}
 
@@ -217,7 +217,7 @@ class CommandRemove extends Command {
 			}
 		});
 
-		// TODO print 'no shops found' if shop count is 0?
+		// TODO Print 'no shops found' if shop count is 0?
 
 		// Inform the sender about required confirmation:
 		int shopsCount = affectedShops.size();
@@ -244,7 +244,7 @@ class CommandRemove extends Command {
 			);
 		}
 		// Inform player on how to confirm the action:
-		// TODO add clickable command suggestion?
+		// TODO Add clickable command suggestion?
 		TextUtils.sendMessage(sender, Settings.msgConfirmationRequired);
 	}
 }

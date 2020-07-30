@@ -65,7 +65,7 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 		Validate.notNull(variant, "Variant is null!");
 		this.variant = variant;
 		shopkeeper.markDirty();
-		this.applyVariant(this.getEntity()); // null if not active
+		this.applyVariant(this.getEntity()); // Null if not active
 	}
 
 	private void applyVariant(MushroomCow entity) {

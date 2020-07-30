@@ -28,9 +28,9 @@ public class CommandException extends Exception {
 
 	public CommandException(Text message, Throwable cause) {
 		super(validateMessage(message), cause);
-		// TODO can this copy be avoided?
-		// required since placeholder and translation arguments may dynamically change while the exception is kept
-		// around
+		// TODO Can this copy be avoided?
+		// Required since placeholder and translation arguments may dynamically change while the exception is kept
+		// around.
 		this.messageText = message.copy();
 	}
 

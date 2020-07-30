@@ -24,7 +24,7 @@ public class LivingShops {
 
 	public void onEnable() {
 		Bukkit.getPluginManager().registerEvents(livingEntityShopListener, plugin);
-		// register force-creature-spawn event handler:
+		// Register force-creature-spawn event handler:
 		if (Settings.bypassSpawnBlocking) {
 			Bukkit.getPluginManager().registerEvents(creatureForceSpawnListener, plugin);
 		}
@@ -33,12 +33,12 @@ public class LivingShops {
 	public void onDisable() {
 		HandlerList.unregisterAll(livingEntityShopListener);
 		HandlerList.unregisterAll(creatureForceSpawnListener);
-		// reset force spawning:
+		// Reset force spawning:
 		creatureForceSpawnListener.forceCreatureSpawn(null, null);
 
-		// stop living entity AI:
+		// Stop living entity AI:
 		livingEntityAI.stop();
-		livingEntityAI.reset(); // cleanup, reset timings, etc.
+		livingEntityAI.reset(); // Cleanup, reset timings, etc.
 	}
 
 	public SKLivingShopObjectTypes getLivingEntityObjectTypes() {
@@ -49,7 +49,7 @@ public class LivingShops {
 		return livingEntityAI;
 	}
 
-	// bypassing creature spawn blocking plugins ('region protection' plugins):
+	// Bypassing creature spawn blocking plugins ('region protection' plugins):
 	void forceCreatureSpawn(Location location, EntityType entityType) {
 		if (Settings.bypassSpawnBlocking) {
 			creatureForceSpawnListener.forceCreatureSpawn(location, entityType);

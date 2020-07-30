@@ -45,7 +45,7 @@ public class FoxShop extends SittableShop<Fox> {
 		this.foxType = PROPERTY_FOX_TYPE.load(shopkeeper, configSection);
 		this.sleeping = PROPERTY_SLEEPING.load(shopkeeper, configSection);
 		this.crouching = PROPERTY_CROUCHING.load(shopkeeper, configSection);
-		// incompatible with each other:
+		// Incompatible with each other:
 		if (sleeping && crouching) {
 			this.setCrouching(false);
 		}
@@ -83,7 +83,7 @@ public class FoxShop extends SittableShop<Fox> {
 		Validate.notNull(foxType, "Fox type is null!");
 		this.foxType = foxType;
 		shopkeeper.markDirty();
-		this.applyFoxType(this.getEntity()); // null if not active
+		this.applyFoxType(this.getEntity()); // Null if not active
 	}
 
 	private void applyFoxType(Fox entity) {
@@ -131,12 +131,12 @@ public class FoxShop extends SittableShop<Fox> {
 	public void setSleeping(boolean sleeping) {
 		Validate.notNull(sleeping, "Sleeping is null!");
 		this.sleeping = sleeping;
-		// incompatible with crouching:
+		// Incompatible with crouching:
 		if (sleeping && crouching) {
 			this.setCrouching(false);
 		}
 		shopkeeper.markDirty();
-		this.applySleeping(this.getEntity()); // null if not active
+		this.applySleeping(this.getEntity()); // Null if not active
 	}
 
 	private void applySleeping(Fox entity) {
@@ -164,7 +164,7 @@ public class FoxShop extends SittableShop<Fox> {
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				cycleSleeping();
-				this.updateAllIcons(); // required if crouching got disabled
+				this.updateAllIcons(); // Required if crouching got disabled
 				return true;
 			}
 		};
@@ -175,12 +175,12 @@ public class FoxShop extends SittableShop<Fox> {
 	public void setCrouching(boolean crouching) {
 		Validate.notNull(crouching, "Crouching is null!");
 		this.crouching = crouching;
-		// incompatible with sleeping:
+		// Incompatible with sleeping:
 		if (crouching && sleeping) {
 			this.setSleeping(false);
 		}
 		shopkeeper.markDirty();
-		this.applyCrouching(this.getEntity()); // null if not active
+		this.applyCrouching(this.getEntity()); // Null if not active
 	}
 
 	private void applyCrouching(Fox entity) {
@@ -208,7 +208,7 @@ public class FoxShop extends SittableShop<Fox> {
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				cycleCrouching();
-				this.updateAllIcons(); // required if sleeping got disabled
+				this.updateAllIcons(); // Required if sleeping got disabled
 				return true;
 			}
 		};

@@ -131,7 +131,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * </ul>
 	 */
 
-	private static final Map<EntityType, List<String>> ALIASES; // deeply unmodifiable
+	private static final Map<EntityType, List<String>> ALIASES; // Deeply unmodifiable
 
 	private static List<String> prepareAliases(List<String> aliases) {
 		return Collections.unmodifiableList(StringUtils.normalize(aliases));
@@ -144,25 +144,25 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	}
 
 	private final LivingShops livingShops;
-	// order is specified by the 'enabled-living-shops' config setting:
+	// Order is specified by the 'enabled-living-shops' config setting:
 	private final Map<EntityType, SKLivingShopObjectType<?>> objectTypes = new LinkedHashMap<>();
 	private final Collection<SKLivingShopObjectType<?>> objectTypesView = Collections.unmodifiableCollection(objectTypes.values());
 
 	public SKLivingShopObjectTypes(LivingShops livingShops) {
 		this.livingShops = livingShops;
-		// first, create the enabled living object types, in the same order as specified in the config:
+		// First, create the enabled living object types, in the same order as specified in the config:
 		for (String entityTypeId : Settings.enabledLivingShops) {
 			EntityType entityType = Settings.matchEntityType(entityTypeId);
 			if (entityType != null && entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType)) {
-				// not using aliases (yet?)
+				// Not using aliases (yet?)
 				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, this.getAliases(entityType)));
 			}
 		}
 
-		// register object types for all other remaining living entity types:
+		// Register object types for all other remaining living entity types:
 		for (EntityType entityType : EntityType.values()) {
 			if (entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType)) {
-				// not using aliases (yet?)
+				// Not using aliases (yet?).
 				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, this.getAliases(entityType)));
 			}
 		}
@@ -185,7 +185,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	}
 
 	private SKLivingShopObjectType<?> createLivingEntityObjectType(EntityType entityType, List<String> aliases) {
-		// this determines the permission name, the actual used type name will be further normalized however:
+		// This determines the permission name, the actual used type name will be further normalized however:
 		String typeName = entityType.name().toLowerCase(Locale.ROOT);
 		String permission = "shopkeeper.entity." + typeName;
 
@@ -352,7 +352,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 					}
 				};
 			} else if (Ageable.class.isAssignableFrom(entityType.getEntityClass()) && entityType != EntityType.WANDERING_TRADER) {
-				// baby state is not supported for the wandering trader:
+				// Baby state is not supported for the wandering trader:
 				objectType = new SKLivingShopObjectType<BabyableShop<Ageable>>(livingShops, entityType, aliases, typeName, permission) {
 					@Override
 					public BabyableShop<Ageable> createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {

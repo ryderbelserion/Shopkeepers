@@ -50,23 +50,23 @@ public class ShopkeepersCommand extends BaseCommand {
 		this.plugin = plugin;
 		this.shopkeeperRegistry = plugin.getShopkeeperRegistry();
 
-		// permission gets checked by testPermission and during execution
+		// Permission gets checked by testPermission and during execution.
 
-		// description:
+		// Description:
 		this.setDescription(Settings.msgCommandDescriptionShopkeeper);
 
-		// formatting:
+		// Formatting:
 		this.setHelpTitleFormat(Settings.msgCommandHelpTitle.setPlaceholderArguments(
 				Collections.singletonMap("version", plugin.getDescription().getVersion())
 		));
 		this.setHelpUsageFormat(Settings.msgCommandHelpUsageFormat);
 		this.setHelpDescFormat(Settings.msgCommandHelpDescriptionFormat);
 
-		// arguments for shopkeeper creation:
+		// Arguments for shopkeeper creation:
 		this.addArgument(new OptionalArgument<>(new ShopTypeArgument(ARGUMENT_SHOP_TYPE)));
 		this.addArgument(new OptionalArgument<>(new ShopObjectTypeArgument(ARGUMENT_OBJECT_TYPE)));
 
-		// register child commands:
+		// Register child commands:
 		CommandRegistry childCommands = this.getChildCommands();
 		childCommands.register(new CommandHelp(this));
 		childCommands.register(new CommandReload(plugin));
@@ -81,16 +81,16 @@ public class ShopkeepersCommand extends BaseCommand {
 		childCommands.register(new CommandTransfer());
 		childCommands.register(new CommandSetTradePerm());
 		childCommands.register(new CommandSetForHire());
-		// hidden commands:
+		// Hidden commands:
 		childCommands.register(new CommandConfirm(confirmations));
-		// hidden debugging commands:
+		// Hidden debugging commands:
 		childCommands.register(new CommandCheck(plugin));
 		childCommands.register(new CommandCheckItem());
 		childCommands.register(new CommandYaml());
 		childCommands.register(new CommandDebugCreateShops(plugin));
 	}
 
-	// also responsible for hiding the command from the help page, if shop creation via command is disabled
+	// Also responsible for hiding the command from the help page, if shop creation via command is disabled:
 	@Override
 	public boolean testPermission(CommandSender sender) {
 		if (!super.testPermission(sender)) return false;
@@ -105,12 +105,12 @@ public class ShopkeepersCommand extends BaseCommand {
 		}
 		Player player = (Player) sender;
 
-		// creating new shopkeeper:
+		// Creating new shopkeeper:
 
-		// get targeted block information:
+		// Get targeted block information:
 		RayTraceResult targetBlockInfo = player.rayTraceBlocks(10.0D, FluidCollisionMode.NEVER);
 
-		// check for valid targeted block:
+		// Check for valid targeted block:
 		if (targetBlockInfo == null) {
 			TextUtils.sendMessage(player, Settings.msgShopCreateFail);
 			return;
@@ -125,9 +125,9 @@ public class ShopkeepersCommand extends BaseCommand {
 
 		boolean createPlayerShop = (Settings.createPlayerShopWithCommand && ShopContainers.isSupportedContainer(targetBlock.getType()));
 		if (createPlayerShop) {
-			// create player shopkeeper:
+			// Create player shopkeeper:
 
-			// default shop type and shop object type: first use-able player shop type and shop object type
+			// Default shop type and shop object type: First useable player shop type and shop object type.
 			if (shopType == null) {
 				shopType = plugin.getShopTypeRegistry().getDefaultSelection(player);
 			}
@@ -136,27 +136,27 @@ public class ShopkeepersCommand extends BaseCommand {
 			}
 
 			if (shopType == null || shopObjType == null) {
-				// the player cannot create shops at all:
+				// The player cannot create shops at all:
 				TextUtils.sendMessage(player, Settings.msgNoPermission);
 				return;
 			}
 
-			// validate the selected shop type:
+			// Validate the selected shop type:
 			if (!(shopType instanceof PlayerShopType)) {
-				// only player shop types are allowed here:
+				// Only player shop types are allowed here:
 				TextUtils.sendMessage(player, Settings.msgNoPlayerShopTypeSelected);
 				return;
 			}
 		} else {
-			// create admin shopkeeper:
+			// Create admin shopkeeper:
 
-			// check permission:
+			// Check permission:
 			if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.ADMIN_PERMISSION)) {
 				TextUtils.sendMessage(sender, Settings.msgNoPermission);
 				return;
 			}
 
-			// default shop type and shop object type:
+			// Default shop type and shop object type:
 			if (shopType == null) {
 				shopType = DefaultShopTypes.ADMIN();
 			}
@@ -165,30 +165,30 @@ public class ShopkeepersCommand extends BaseCommand {
 			}
 			assert shopType != null && shopObjType != null;
 
-			// validate the selected shop type:
+			// Validate the selected shop type:
 			if (!(shopType instanceof AdminShopType)) {
-				// only admin shop types are allowed here:
+				// Only admin shop types are allowed here:
 				TextUtils.sendMessage(player, Settings.msgNoAdminShopTypeSelected);
 				return;
 			}
 		}
 		assert shopType != null && shopObjType != null;
 
-		// determine spawn location:
+		// Determine spawn location:
 		Location spawnLocation = plugin.getShopkeeperCreation().determineSpawnLocation(player, targetBlock, targetBlockFace);
 
-		// shop creation data:
+		// Shop creation data:
 		ShopCreationData shopCreationData;
 		if (createPlayerShop) {
-			// create player shopkeeper:
+			// Create player shopkeeper:
 			shopCreationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace, targetBlock);
 		} else {
-			// create admin shopkeeper:
+			// Create admin shopkeeper:
 			shopCreationData = AdminShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace);
 		}
 		assert shopCreationData != null;
 
-		// handle shopkeeper creation:
+		// Handle shopkeeper creation:
 		plugin.handleShopkeeperCreation(shopCreationData);
 	}
 }

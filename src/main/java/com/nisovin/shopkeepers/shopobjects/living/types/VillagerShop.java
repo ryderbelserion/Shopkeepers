@@ -33,7 +33,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	private static final Property<Profession> PROPERTY_PROFESSION = new EnumProperty<Profession>(Profession.class, "profession", Profession.NONE) {
 		@Override
 		protected void migrate(AbstractShopkeeper shopkeeper, ConfigurationSection configSection) {
-			// migration from 'prof' key: TODO added with 1.14 update, remove again at some point
+			// Migration from 'prof' key: TODO Added with 1.14 update, remove again at some point.
 			String professionName = configSection.getString("prof");
 			if (professionName != null) {
 				Log.warning("Shopkeeper " + shopkeeper.getId() + ": Migrated villager profession from key 'prof' to key 'profession'.");
@@ -116,7 +116,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 		Validate.notNull(profession, "Profession is null!");
 		this.profession = profession;
 		shopkeeper.markDirty();
-		this.applyProfession(this.getEntity()); // null if not active
+		this.applyProfession(this.getEntity()); // Null if not active
 	}
 
 	private void applyProfession(Villager entity) {
@@ -144,16 +144,16 @@ public class VillagerShop extends BabyableShop<Villager> {
 			iconItem = new ItemStack(Material.BREWING_STAND);
 			break;
 		case FARMER:
-			iconItem = new ItemStack(Material.WHEAT); // instead of COMPOSTER
+			iconItem = new ItemStack(Material.WHEAT); // Instead of COMPOSTER
 			break;
 		case FISHERMAN:
-			iconItem = new ItemStack(Material.FISHING_ROD); // instead of BARREL
+			iconItem = new ItemStack(Material.FISHING_ROD); // Instead of BARREL
 			break;
 		case FLETCHER:
 			iconItem = new ItemStack(Material.FLETCHING_TABLE);
 			break;
 		case LEATHERWORKER:
-			iconItem = new ItemStack(Material.LEATHER); // instead of CAULDRON
+			iconItem = new ItemStack(Material.LEATHER); // Instead of CAULDRON
 			break;
 		case LIBRARIAN:
 			iconItem = new ItemStack(Material.LECTERN);
@@ -206,7 +206,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 		Validate.notNull(villagerType, "Villager type is null!");
 		this.villagerType = villagerType;
 		shopkeeper.markDirty();
-		this.applyVillagerType(this.getEntity()); // null if not active
+		this.applyVillagerType(this.getEntity()); // Null if not active
 	}
 
 	private void applyVillagerType(Villager entity) {
@@ -223,7 +223,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 		switch (villagerType) {
 		default:
 		case PLAINS:
-			// default brown color
+			// Default brown color:
 			break;
 		case DESERT:
 			ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
@@ -270,7 +270,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 		Validate.isTrue(PROPERTY_VILLAGER_LEVEL.isInBounds(villagerLevel), "villagerLevel is out of bounds: " + villagerLevel);
 		this.villagerLevel = villagerLevel;
 		shopkeeper.markDirty();
-		this.applyVillagerLevel(this.getEntity()); // null if not active
+		this.applyVillagerLevel(this.getEntity()); // Null if not active
 	}
 
 	private void applyVillagerLevel(Villager entity) {

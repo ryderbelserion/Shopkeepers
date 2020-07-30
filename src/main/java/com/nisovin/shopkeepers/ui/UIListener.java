@@ -28,7 +28,7 @@ class UIListener implements Listener {
 
 	// The relation between early and late event handling are maintained via stacks, in case something (a plugin) is
 	// calling these inventory interaction events recursively from within an event handler. The DUMMY_UI_HANDLER on the
-	// stack indicates that the event is not being processed by any ui handler.
+	// stack indicates that the event is not being processed by any UI handler.
 	private static final UIHandler DUMMY_UI_HANDLER = new UIHandler(null, null) {
 		@Override
 		protected boolean openWindow(Player player) {
@@ -63,9 +63,9 @@ class UIListener implements Listener {
 		InventoryView view = event.getView();
 		UIHandler uiHandler = session.getUIHandler();
 
-		// validate open inventory:
+		// Validate open inventory:
 		if (!uiHandler.isWindow(view)) {
-			// the player probably has some other inventory open, but an active session.. let's close it:
+			// The player probably has some other inventory open, but an active session.. let's close it:
 			Log.debug(() -> "Closing inventory of type " + view.getType() + " with title '" + view.getTitle()
 					+ "' for " + player.getName() + ", because a different open inventory was expected for '"
 					+ uiHandler.getUIType().getIdentifier() + "'.");
@@ -76,9 +76,9 @@ class UIListener implements Listener {
 			return false;
 		}
 
-		// validate shopkeeper:
+		// Validate shopkeeper:
 		if (!session.getShopkeeper().isUIActive() || !session.getShopkeeper().isValid()) {
-			// shopkeeper deleted, or the UIs got deactivated: ignore this click
+			// Shopkeeper deleted, or the UIs got deactivated: ignore this click.
 			Log.debug(() -> "Inventory interaction by " + player.getName()
 					+ " ignored, because the window is about to get closed,"
 					+ " or the shopkeeper got deleted.");
@@ -96,25 +96,25 @@ class UIListener implements Listener {
 		}
 		Player player = (Player) event.getPlayer();
 
-		// inform ui registry so that it can cleanup session data:
+		// Inform UI registry so that it can cleanup session data:
 		uiRegistry.onInventoryClose(player, event);
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	void onInventoryEarly(InventoryClickEvent event) {
-		// the ui handler processing this click, or DUMMY_UI_HANDLER if none is processing the event
+		// The UI handler processing this click, or DUMMY_UI_HANDLER if none is processing the event:
 		UIHandler uiHandler = DUMMY_UI_HANDLER;
-		Player player = null; // the player, or null if there is no session
+		Player player = null; // The player, or null if there is no session
 		SKUISession session = this.getUISession(event.getWhoClicked());
 		if (session != null) {
 			player = (Player) event.getWhoClicked();
 			Player finalPlayer = player;
 			assert player.equals(session.getPlayer());
-			// validate session:
+			// Validate session:
 			if (this.validateSession(event, player, session)) {
 				uiHandler = session.getUIHandler();
 
-				// debug information:
+				// Debug information:
 				InventoryView view = event.getView();
 				Log.debug(() -> "Inventory click: player=" + finalPlayer.getName()
 						+ ", view-type=" + view.getType() + ", view-title=" + view.getTitle()
@@ -126,44 +126,44 @@ class UIListener implements Listener {
 			}
 		}
 
-		// keep track of the processing ui handler (can be dummy):
+		// Keep track of the processing UI handler (can be dummy):
 		clickHandlerStack.push(uiHandler);
 
 		if (uiHandler != DUMMY_UI_HANDLER) {
-			// let the UIHandler handle the click:
+			// Let the UIHandler handle the click:
 			uiHandler.informOnInventoryClickEarly(event, player);
 		}
 	}
 
-	// priority HIGH instead of HIGHEST, since we might cancel the event and other plugins might want to react to that
-	// (see TradingHandler)
+	// Priority HIGH instead of HIGHEST, since we might cancel the event and other plugins might want to react to that
+	// (see TradingHandler).
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
 	void onInventoryClickLate(InventoryClickEvent event) {
-		UIHandler uiHandler = clickHandlerStack.pop(); // not expected to be empty
-		if (uiHandler == DUMMY_UI_HANDLER) return; // ignore
+		UIHandler uiHandler = clickHandlerStack.pop(); // Not expected to be empty
+		if (uiHandler == DUMMY_UI_HANDLER) return; // Ignore
 		// It is expected that the session and UI handler determined at the beginning of the event processing are still
 		// valid at this point.
 
-		// let the UIHandler handle the click:
+		// Let the UIHandler handle the click:
 		Player player = (Player) event.getWhoClicked();
 		uiHandler.informOnInventoryClickLate(event, player);
 	}
 
 	@EventHandler(priority = EventPriority.LOW)
 	void onInventoryDragEarly(InventoryDragEvent event) {
-		// the ui handler processing this click, or DUMMY_UI_HANDLER if none is processing the event
+		// The UI handler processing this click, or DUMMY_UI_HANDLER if none is processing the event:
 		UIHandler uiHandler = DUMMY_UI_HANDLER;
-		Player player = null; // the player, or null if there is no session
+		Player player = null; // The player, or null if there is no session
 		SKUISession session = this.getUISession(event.getWhoClicked());
 		if (session != null) {
 			player = (Player) event.getWhoClicked();
 			Player finalPlayer = player;
 			assert player.equals(session.getPlayer());
-			// validate session:
+			// Validate session:
 			if (this.validateSession(event, player, session)) {
 				uiHandler = session.getUIHandler();
 
-				// debug information:
+				// Debug information:
 				InventoryView view = event.getView();
 				Log.debug(() -> "Inventory dragging: player=" + finalPlayer.getName()
 						+ ", view-type=" + view.getType() + ", view-title=" + view.getTitle()
@@ -171,34 +171,34 @@ class UIListener implements Listener {
 			}
 		}
 
-		// keep track of the processing ui handler (can be dummy):
+		// Keep track of the processing UI handler (can be dummy):
 		dragHandlerStack.push(uiHandler);
 
 		if (uiHandler != DUMMY_UI_HANDLER) {
-			// let the UIHandler handle the click:
+			// Let the UIHandler handle the click:
 			uiHandler.informOnInventoryDragEarly(event, player);
 		}
 	}
 
-	// priority HIGH instead of HIGHEST, since we might cancel the event and other plugins might want to react to that
-	// (see TradingHandler)
+	// Priority HIGH instead of HIGHEST, since we might cancel the event and other plugins might want to react to that
+	// (see TradingHandler).
 	@EventHandler(priority = EventPriority.HIGH)
 	void onInventoryDragLate(InventoryDragEvent event) {
-		UIHandler uiHandler = dragHandlerStack.pop(); // not expected to be empty
-		if (uiHandler == DUMMY_UI_HANDLER) return; // ignore
+		UIHandler uiHandler = dragHandlerStack.pop(); // Not expected to be empty
+		if (uiHandler == DUMMY_UI_HANDLER) return; // Ignore
 		// It is expected that the session and UI handler determined at the beginning of the event processing are still
 		// valid at this point.
 
-		// let the UIHandler handle the dragging:
+		// Let the UIHandler handle the dragging:
 		Player player = (Player) event.getWhoClicked();
 		uiHandler.informOnInventoryDragLate(event, player);
 	}
 
 	// TODO SPIGOT-5610: The event is not firing under certain circumstances.
-	// Cannot ignore cancelled events here, because the cancellation state only considers useInteractedBlock
+	// Cannot ignore cancelled events here, because the cancellation state only considers useInteractedBlock.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
-		// ignore our own fake interact event:
+		// Ignore our own fake interact event:
 		if (event instanceof TestPlayerInteractEvent) return;
 
 		// When a player interacts with a shopkeeper entity while holding an item in hand, we may first receive the

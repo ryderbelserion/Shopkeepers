@@ -67,7 +67,7 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 		Validate.notNull(profession, "Profession is null!");
 		this.profession = profession;
 		shopkeeper.markDirty();
-		this.applyProfession(this.getEntity()); // null if not active
+		this.applyProfession(this.getEntity()); // Null if not active
 	}
 
 	private void applyProfession(ZombieVillager entity) {
@@ -95,16 +95,16 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 			iconItem = new ItemStack(Material.BREWING_STAND);
 			break;
 		case FARMER:
-			iconItem = new ItemStack(Material.WHEAT); // instead of COMPOSTER
+			iconItem = new ItemStack(Material.WHEAT); // Instead of COMPOSTER
 			break;
 		case FISHERMAN:
-			iconItem = new ItemStack(Material.FISHING_ROD); // instead of BARREL
+			iconItem = new ItemStack(Material.FISHING_ROD); // Instead of BARREL
 			break;
 		case FLETCHER:
 			iconItem = new ItemStack(Material.FLETCHING_TABLE);
 			break;
 		case LEATHERWORKER:
-			iconItem = new ItemStack(Material.LEATHER); // instead of CAULDRON
+			iconItem = new ItemStack(Material.LEATHER); // Instead of CAULDRON
 			break;
 		case LIBRARIAN:
 			iconItem = new ItemStack(Material.LECTERN);

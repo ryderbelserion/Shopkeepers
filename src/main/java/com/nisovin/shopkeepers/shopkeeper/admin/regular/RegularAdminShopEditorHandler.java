@@ -35,7 +35,7 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 		SKRegularAdminShopkeeper shopkeeper = this.getShopkeeper();
 		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
-		// add the shopkeeper's offers:
+		// Add the shopkeeper's offers:
 		for (TradingOffer offer : shopkeeper.getOffers()) {
 			TradingRecipeDraft recipe = new TradingRecipeDraft(offer.getResultItem(), offer.getItem1(), offer.getItem2());
 			recipes.add(recipe);
@@ -60,7 +60,7 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 	protected void handleInvalidRecipeDraft(Player player, TradingRecipeDraft recipe) {
 		super.handleInvalidRecipeDraft(player, recipe);
 
-		// return unused items to inventory:
+		// Return unused items to inventory:
 		ItemStack resultItem = recipe.getResultItem();
 		ItemStack item1 = recipe.getItem1();
 		ItemStack item2 = recipe.getItem2();

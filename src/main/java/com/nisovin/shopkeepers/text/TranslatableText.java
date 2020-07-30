@@ -17,9 +17,9 @@ import com.nisovin.shopkeepers.util.Validate;
  */
 public class TranslatableText extends TextBuilder {
 
-	private final String translationKey; // not null or empty
-	// only contains already built Texts:
-	private List<Text> translationArguments = Collections.emptyList(); // not null, can be empty, unmodifiable view
+	private final String translationKey; // Not null or empty
+	// Only contains already built Texts:
+	private List<Text> translationArguments = Collections.emptyList(); // Not null, can be empty, unmodifiable view
 
 	TranslatableText(String translationKey) {
 		Validate.notEmpty(translationKey, "Translation key is empty!");
@@ -61,7 +61,7 @@ public class TranslatableText extends TextBuilder {
 	 */
 	public TranslatableText setTranslationArguments(List<?> translationArguments) {
 		if (translationArguments == null || translationArguments.isEmpty()) {
-			this.translationArguments = Collections.emptyList(); // resetting is always allowed
+			this.translationArguments = Collections.emptyList(); // Resetting is always allowed
 		} else {
 			List<Text> translationTextArguments = new ArrayList<>(translationArguments.size());
 			for (Object argument : translationArguments) {
@@ -73,7 +73,7 @@ public class TranslatableText extends TextBuilder {
 				translationTextArguments.add(argumentText);
 			}
 
-			// build all unbuilt arguments:
+			// Build all unbuilt arguments:
 			for (Text argument : translationTextArguments) {
 				buildIfRequired(argument);
 			}

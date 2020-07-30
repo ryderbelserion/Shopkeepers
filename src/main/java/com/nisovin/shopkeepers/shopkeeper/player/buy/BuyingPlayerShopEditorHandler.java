@@ -31,24 +31,24 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
-		// add the shopkeeper's offers:
+		// Add the shopkeeper's offers:
 		for (PriceOffer offer : shopkeeper.getOffers()) {
 			ItemStack currencyItem = Settings.createCurrencyItem(offer.getPrice());
 			TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, offer.getItem(), null);
 			recipes.add(recipe);
 		}
 
-		// add empty offers for items from the container:
+		// Add empty offers for items from the container:
 		List<ItemCount> containerItems = shopkeeper.getItemsFromContainer();
 		for (int containerItemIndex = 0; containerItemIndex < containerItems.size(); containerItemIndex++) {
 			ItemCount itemCount = containerItems.get(containerItemIndex);
-			ItemStack itemFromContainer = itemCount.getItem(); // this item is already a copy with amount 1
+			ItemStack itemFromContainer = itemCount.getItem(); // This item is already a copy with amount 1
 
 			if (shopkeeper.getOffer(itemFromContainer) != null) {
-				continue; // already added
+				continue; // Already added
 			}
 
-			// add recipe:
+			// Add recipe:
 			ItemStack currencyItem = Settings.createZeroCurrencyItem();
 			TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, itemFromContainer, null);
 			recipes.add(recipe);
@@ -73,7 +73,7 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 		ItemStack priceItem = recipe.getResultItem();
 		assert priceItem != null;
-		if (priceItem.getType() != Settings.currencyItem.getType()) return; // checking this just in case
+		if (priceItem.getType() != Settings.currencyItem.getType()) return; // Checking this just in case
 		assert priceItem.getAmount() > 0;
 
 		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
@@ -85,16 +85,16 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		assert this.isTradesArea(event.getRawSlot());
 		int rawSlot = event.getRawSlot();
 		if (this.isResultRow(rawSlot)) {
-			// modifying cost:
+			// Modifying cost:
 			int column = rawSlot - RESULT_ITEM_OFFSET;
 			ItemStack tradedItem = event.getInventory().getItem(column + ITEM_1_OFFSET);
 			if (ItemUtils.isEmpty(tradedItem)) return;
 			this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
 		} else if (this.isItem1Row(rawSlot)) {
-			// modifying bought item quantity:
+			// Modifying bought item quantity:
 			this.handleUpdateItemAmountOnClick(event, 1);
 		} else if (this.isItem2Row(rawSlot)) {
-			// not used by the buying shopkeeper
+			// Not used by the buying shopkeeper.
 		}
 	}
 }

@@ -69,7 +69,7 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 		Validate.isTrue(PROPERTY_SLIME_SIZE.isInBounds(slimeSize), "slimeSize is out of bounds: " + slimeSize);
 		this.slimeSize = slimeSize;
 		shopkeeper.markDirty();
-		this.applySlimeSize(this.getEntity()); // null if not active
+		this.applySlimeSize(this.getEntity()); // Null if not active
 	}
 
 	private void applySlimeSize(Slime entity) {

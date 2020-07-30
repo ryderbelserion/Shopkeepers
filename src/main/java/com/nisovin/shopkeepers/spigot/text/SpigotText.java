@@ -25,18 +25,18 @@ import net.md_5.bungee.api.chat.TranslatableComponent;
 
 public class SpigotText {
 
-	// Note: This is not intended to be called directly, but only via TextUtils
+	// Note: This is not intended to be called directly, but only via TextUtils.
 	public static void sendMessage(CommandSender recipient, Text message) {
 		Validate.notNull(recipient, "Recipient is null!");
 		Validate.notNull(message, "Message is null!");
-		// skip sending if the (plain) message is empty: allows disabling of messages
+		// Skip sending if the (plain) message is empty: Allows disabling of messages.
 		if (message.isPlainTextEmpty()) return;
 
 		if (SpigotFeatures.isSpigotAvailable()) {
-			// send message with additional text features:
+			// Send message with additional text features:
 			Internal.sendMessage(recipient, message);
 		} else {
-			// fallback: send message as plain text:
+			// Fallback: Send message as plain text.
 			String plainMessage = message.toPlainText();
 			TextUtils.sendMessage(recipient, plainMessage);
 		}
@@ -131,7 +131,7 @@ public class SpigotText {
 		private static BaseComponent toSpigot(Text text, TextComponent current, BaseComponent parent, TextStyle textStyle) {
 			assert text != null && parent != null && textStyle != null;
 
-			// conversion depending on type of Text and whether it can be combined with the current component or a new
+			// Conversion depending on type of Text and whether it can be combined with the current component or a new
 			// one is required:
 			BaseComponent component;
 			if (text instanceof FormattingText) {
@@ -166,7 +166,7 @@ public class SpigotText {
 			} else if (text instanceof PlaceholderText) {
 				PlaceholderText placeholderText = (PlaceholderText) text;
 				if (placeholderText.hasPlaceholderArgument()) {
-					// gets handled below when handling the child
+					// Gets handled below when handling the child
 					if (current == null) {
 						current = newTextComponent(parent, textStyle);
 					}
@@ -196,12 +196,12 @@ public class SpigotText {
 				current.setInsertion(((InsertionText) text).getInsertion());
 				component = current;
 			} else if (text instanceof TranslatableText) {
-				// create new translatable component:
+				// Create new translatable component:
 				TranslatableText translatableText = (TranslatableText) text;
 				String translationKey = translatableText.getTranslationKey();
 				assert translationKey != null;
 
-				// convert translation arguments:
+				// Convert translation arguments:
 				Object[] translationArgsArray = null;
 				List<Text> translationArgs = translatableText.getTranslationArguments();
 				assert translationArgs != null;
@@ -219,14 +219,14 @@ public class SpigotText {
 			}
 			assert component != null;
 
-			// child: add as child to current component, to inherit its features
+			// Child: Add as child to current component, to inherit its features.
 			Text child = text.getChild();
 			if (child != null) {
-				// this modifies the passed TextStyle to contain the last encountered style:
+				// This modifies the passed TextStyle to contain the last encountered style:
 				toSpigot(child, current, component, textStyle);
 			}
 
-			// next: add as child to parent component to not inherit the features of the current component
+			// Next: Add as child to parent component to not inherit the features of the current component.
 			Text next = text.getNext();
 			if (next != null) {
 				toSpigot(next, current, parent, textStyle);

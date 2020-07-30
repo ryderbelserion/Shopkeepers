@@ -279,7 +279,7 @@ public class ProtectedContainers {
 			case LEFT:
 				return BlockFace.EAST;
 			default:
-				return null; // not connected
+				return null; // Not connected
 			}
 		case EAST:
 			switch (chestType) {
@@ -288,7 +288,7 @@ public class ProtectedContainers {
 			case LEFT:
 				return BlockFace.SOUTH;
 			default:
-				return null; // not connected
+				return null; // Not connected
 			}
 		case SOUTH:
 			switch (chestType) {
@@ -297,7 +297,7 @@ public class ProtectedContainers {
 			case LEFT:
 				return BlockFace.WEST;
 			default:
-				return null; // not connected
+				return null; // Not connected
 			}
 		case WEST:
 			switch (chestType) {
@@ -306,10 +306,10 @@ public class ProtectedContainers {
 			case LEFT:
 				return BlockFace.NORTH;
 			default:
-				return null; // not connected
+				return null; // Not connected
 			}
 		default:
-			return null; // invalid chest facing
+			return null; // Invalid chest facing
 		}
 	}
 }

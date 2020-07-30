@@ -74,7 +74,7 @@ public class SKPriceOffer implements PriceOffer {
 		ConfigurationSection offersSection = config.createSection(node);
 		int id = 1;
 		for (PriceOffer offer : offers) {
-			ItemStack item = offer.getItem(); // is a clone
+			ItemStack item = offer.getItem(); // Is a clone.
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
 			offerSection.set("item", item);
 			offerSection.set("price", offer.getPrice());
@@ -88,16 +88,16 @@ public class SKPriceOffer implements PriceOffer {
 		if (offersSection != null) {
 			for (String id : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(id);
-				if (offerSection == null) continue; // invalid offer: not a section
+				if (offerSection == null) continue; // Invalid offer: Not a section.
 				ItemStack item = offerSection.getItemStack("item");
 				int price = offerSection.getInt("price");
 				if (ItemUtils.isEmpty(item)) {
-					// invalid offer
+					// Invalid offer.
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid price offer for " + id + ": item is empty"));
 					continue;
 				}
 				if (price <= 0) {
-					// invalid offer
+					// Invalid offer.
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid price offer for " + id + ": price has to be positive but is " + price));
 					continue;
 				}
@@ -114,12 +114,12 @@ public class SKPriceOffer implements PriceOffer {
 		final int size = offers.size();
 		for (int i = 0; i < size; ++i) {
 			SKPriceOffer offer = offers.get(i);
-			if (offer == null) continue; // skip invalid entries
+			if (offer == null) continue; // Skip invalid entries
 
 			boolean itemsMigrated = false;
 			boolean migrationFailed = false;
 
-			ItemStack item = offer.getItem(); // note: is a clone
+			ItemStack item = offer.getItem(); // Note: Is a clone.
 			ItemStack migratedItem = ItemUtils.migrateItemStack(item);
 			if (!ItemUtils.isSimilar(item, migratedItem)) {
 				if (ItemUtils.isEmpty(migratedItem) && !ItemUtils.isEmpty(item)) {
@@ -134,7 +134,7 @@ public class SKPriceOffer implements PriceOffer {
 					migratedOffers = new ArrayList<>(size);
 					for (int j = 0; j < i; ++j) {
 						SKPriceOffer oldOffer = offers.get(j);
-						if (oldOffer == null) continue; // skip invalid entries
+						if (oldOffer == null) continue; // Skip invalid entries
 						migratedOffers.add(oldOffer);
 					}
 				}
@@ -142,7 +142,7 @@ public class SKPriceOffer implements PriceOffer {
 				if (migrationFailed) {
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Trading offer item migration failed for offer "
 							+ (i + 1) + ": " + offer.toString()));
-					continue; // skip this offer
+					continue; // Skip this offer
 				}
 				assert !ItemUtils.isEmpty(item);
 				migratedOffers.add(new SKPriceOffer(item, offer.getPrice()));

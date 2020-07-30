@@ -43,7 +43,7 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 
 	@Override
 	public boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
-		// TODO check actual object size?
+		// TODO Check actual object size?
 		if (spawnLocation == null || spawnLocation.getWorld() == null) return false;
 		Block spawnBlock = spawnLocation.getBlock();
 		if (!spawnBlock.isPassable()) return false;

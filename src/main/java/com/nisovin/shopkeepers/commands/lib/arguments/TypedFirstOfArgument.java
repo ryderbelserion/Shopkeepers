@@ -18,7 +18,7 @@ import com.nisovin.shopkeepers.util.Pair;
  */
 public class TypedFirstOfArgument<T> extends FallbackArgument<T> {
 
-	// reusing the implementation of FirstOfArgument:
+	// Reusing the implementation of FirstOfArgument:
 	private final FirstOfArgument firstOfArgument;
 
 	public TypedFirstOfArgument(String name, List<? extends CommandArgument<T>> arguments) {

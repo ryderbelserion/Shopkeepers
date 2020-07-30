@@ -15,10 +15,10 @@ class CommandConfirm extends Command {
 		super("confirm");
 		this.confirmations = confirmations;
 
-		// set description:
+		// Set description:
 		this.setDescription(Text.of("Confirms a potentially dangerous action."));
 
-		// hidden command:
+		// Hidden command:
 		this.setHiddenInParentHelp(true);
 	}
 

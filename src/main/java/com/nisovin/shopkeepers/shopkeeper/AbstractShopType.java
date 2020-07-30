@@ -76,20 +76,20 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 */
 	public abstract T createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException;
 
-	// handles of shopkeeper creation by players
-	// return null in case of failure
+	// Handles of shopkeeper creation by players.
+	// Returns null in case of failure.
 	public T handleShopkeeperCreation(ShopCreationData shopCreationData) {
 		this.validateCreationData(shopCreationData);
 		SKShopkeeperRegistry shopkeeperRegistry = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry();
 
-		// the creator, can not be null when creating a shopkeeper via this method:
+		// The creator, can not be null when creating a shopkeeper via this method:
 		Player creator = shopCreationData.getCreator();
 		Validate.notNull(creator, "Creator cannot be null!");
 
 		ShopType<?> shopType = shopCreationData.getShopType();
 		ShopObjectType<?> shopObjectType = shopCreationData.getShopObjectType();
 
-		// can the selected shop type be used?
+		// Can the selected shop type be used?
 		if (!shopType.hasPermission(creator)) {
 			TextUtils.sendMessage(creator, Settings.msgNoPermission);
 			return null;
@@ -99,7 +99,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 			return null;
 		}
 
-		// can the selected shop object type be used?
+		// Can the selected shop object type be used?
 		if (!shopObjectType.hasPermission(creator)) {
 			TextUtils.sendMessage(creator, Settings.msgNoPermission);
 			return null;
@@ -109,52 +109,52 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 			return null;
 		}
 
-		Location spawnLocation = shopCreationData.getSpawnLocation(); // can be null for virtual shops
-		BlockFace targetedBlockFace = shopCreationData.getTargetedBlockFace(); // can be null
+		Location spawnLocation = shopCreationData.getSpawnLocation(); // Can be null for virtual shops
+		BlockFace targetedBlockFace = shopCreationData.getTargetedBlockFace(); // Can be null
 
-		// check if the shop can be placed there (enough space, etc.):
+		// Check if the shop can be placed there (enough space, etc.):
 		if (!shopObjectType.isValidSpawnLocation(spawnLocation, targetedBlockFace)) {
-			// invalid spawn location or targeted block face:
+			// Invalid spawn location or targeted block face:
 			TextUtils.sendMessage(creator, Settings.msgShopCreateFail);
 			return null;
 		}
 
 		if (spawnLocation != null && !shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
-			// there is already a shopkeeper at that location:
+			// There is already a shopkeeper at that location:
 			TextUtils.sendMessage(creator, Settings.msgShopCreateFail);
 			return null;
 		}
 
 		try {
-			// shop type specific handling:
+			// Shop type specific handling:
 			if (!this.handleSpecificShopkeeperCreation(shopCreationData)) {
 				return null;
 			}
 
-			// create and spawn the shopkeeper:
+			// Create and spawn the shopkeeper:
 			@SuppressWarnings("unchecked")
 			T shopkeeper = (T) shopkeeperRegistry.createShopkeeper(shopCreationData);
 			assert shopkeeper != null;
 
-			// send creation message to creator:
+			// Send creation message to creator:
 			TextUtils.sendMessage(creator, this.getCreatedMessage());
 
-			// save:
+			// Save:
 			shopkeeper.save();
 
 			return shopkeeper;
 		} catch (ShopkeeperCreateException e) {
-			// some issue identified during shopkeeper creation (possibly hinting to a bug):
-			// TODO translation?
+			// Some issue identified during shopkeeper creation (possibly hinting to a bug):
+			// TODO Translation?
 			TextUtils.sendMessage(creator, ChatColor.RED + "Shopkeeper creation failed: " + e.getMessage());
 			return null;
 		}
 	}
 
-	// shop type specific handling of shopkeeper creation by players
-	// return null in case of failure
+	// Shop type specific handling of shopkeeper creation by players.
+	// Returns null in case of failure.
 	protected boolean handleSpecificShopkeeperCreation(ShopCreationData creationData) {
-		// call event:
+		// Call event:
 		PlayerCreateShopkeeperEvent createEvent = new PlayerCreateShopkeeperEvent(creationData);
 		Bukkit.getPluginManager().callEvent(createEvent);
 		if (createEvent.isCancelled()) {
@@ -164,7 +164,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		return true;
 	}
 
-	// common functions that might be useful for sub-classes:
+	// Common functions that might be useful for sub-classes:
 
 	protected void validateCreationData(ShopCreationData shopCreationData) {
 		Validate.notNull(shopCreationData, "ShopCreationData is null!");

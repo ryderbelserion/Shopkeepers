@@ -77,34 +77,34 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private int maxStoredShopkeeperId = 0;
 	private int nextShopkeeperId = 1;
 
-	// flag to (temporary) turn off saving
+	// Flag to (temporary) turn off saving:
 	private boolean savingDisabled = false;
 	private long lastSavingErrorMsgTimestamp = 0L;
-	// there might be shopkeepers with unsaved data, or we got an explicit save request:
+	// There might be shopkeepers with unsaved data, or we got an explicit save request:
 	private boolean dirty = false;
 	private int delayedSaveTaskId = -1;
 
-	// current loading:
+	// Current loading:
 	private boolean currentlyLoading = false;
 
-	// current saving:
-	// indicates if we are currently processing a save (gets reset to false once the save has been processed on the main
+	// Current saving:
+	// Indicates if we are currently processing a save (gets reset to false once the save has been processed on the main
 	// thread, or handed over to the async IO task):
 	private boolean currentlyProcessingSave = false;
 	private final SaveResult saveResult = new SaveResult();
-	// previously dirty shopkeepers which we currently attempt to save:
+	// Previously dirty shopkeepers which we currently attempt to save:
 	private final List<AbstractShopkeeper> savingShopkeepers = new ArrayList<>();
-	// the task which performs async file io during a save:
+	// The task which performs async file io during a save:
 	private int saveIOTask = -1;
-	// the saving callback of the current save: may need to be run manually during plugin disable or save abortion
+	// The saving callback of the current save: may need to be run manually during plugin disable or save abortion
 	private Runnable syncSavingCallback = null;
-	// whether there was an abort request for the last async save:
+	// Whether there was an abort request for the last async save:
 	private boolean abortSave = false;
-	// determines if there was another saveReal-request while the saveIOTask was still in progress
+	// Determines if there was another saveReal-request while the saveIOTask was still in progress
 	private boolean saveAgain = false;
-	// shopkeepers that got deleted during the last async save:
+	// Shopkeepers that got deleted during the last async save:
 	private final List<AbstractShopkeeper> shopkeepersToDelete = new ArrayList<>();
-	// number of shopkeepers whose data got removed since the last save:
+	// Number of shopkeepers whose data got removed since the last save:
 	private int deletedShopkeepersCount = 0;
 
 	public SKShopkeeperStorage(SKShopkeepersPlugin plugin) {
@@ -123,14 +123,14 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	}
 
 	public void onEnable() {
-		// start save task:
+		// Start save task:
 		if (!Settings.saveInstantly) {
 			this.startSaveTask();
 		}
 	}
 
 	public void onDisable() {
-		// reset a few things:
+		// Reset a few things:
 		this.clearSaveData();
 		savingShopkeepers.clear();
 		savingDisabled = false;
@@ -190,12 +190,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	// SHOPKEEPER IDs
 
-	// does not increment the shopkeeper id counter on its own (we don't want to increment it in case the shopkeeper
-	// creation fails)
+	// Does not increment the shopkeeper id counter on its own (we don't want to increment it in case the shopkeeper
+	// creation fails).
 	public int getNextShopkeeperId() {
-		int nextId = nextShopkeeperId; // can end up negative after increments due to overflows
+		int nextId = nextShopkeeperId; // Can end up negative after increments due to overflows
 		if (nextId <= 0 || !this.isUnusedId(nextId)) {
-			// try to use an id larger than the max currently used id:
+			// Try to use an id larger than the max currently used id:
 			int maxId = maxStoredShopkeeperId;
 			for (Shopkeeper shopkeeper : this.getShopkeeperRegistry().getAllShopkeepers()) {
 				int id = shopkeeper.getId();
@@ -207,24 +207,24 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			if (maxId < Integer.MAX_VALUE) {
 				nextId = maxId + 1;
 			} else {
-				// find the first unused id:
+				// Find the first unused id:
 				nextId = 1;
 				while (!this.isUnusedId(nextId)) {
 					nextId++;
 					if (nextId <= 0) {
-						// overflow, all ids are in use..:
+						// Overflow, all ids are in use..:
 						throw new IllegalStateException("No unused shopkeeper ids available!");
 					}
 				}
 				assert nextId > 0;
 			}
-			// remember the found next id:
+			// Remember the found next id:
 			nextShopkeeperId = nextId;
 		}
 		return nextId;
 	}
 
-	// also takes ids of stored shopkeepers in account that couldn't be loaded for some reason
+	// Also takes ids of stored shopkeepers in account that couldn't be loaded for some reason.
 	private boolean isUnusedId(int id) {
 		return (!saveData.contains(String.valueOf(id)) && this.getShopkeeperRegistry().getShopkeeperById(id) == null);
 	}
@@ -254,7 +254,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	public void clearShopkeeperData(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		if (this.isCurrentlySavingAsync()) {
-			// remember to remove the data after the current async save has finished:
+			// Remember to remove the data after the current async save has finished:
 			shopkeepersToDelete.add(shopkeeper);
 		} else {
 			String key = String.valueOf(shopkeeper.getId());
@@ -265,7 +265,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	// LOADING
 
-	// returns true on success, and false if there was some severe issue during loading
+	// Returns true on success, and false if there was some severe issue during loading.
 	public boolean reload() {
 		if (currentlyLoading) {
 			throw new IllegalStateException("Already loading right now!");
@@ -273,22 +273,22 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		currentlyLoading = true;
 		boolean result;
 
-		// no concurrent access of the save file:
+		// No concurrent access of the save file:
 		synchronized (SAVING_IO_LOCK) {
 			try {
 				result = this.doReload();
 			} catch (Exception e) {
 				Log.severe("Something completely unexpected went wrong during the loading of the saved shopkeepers data!", e);
-				result = false; // error
+				result = false; // Error
 			}
 		}
 		currentlyLoading = false;
 		return result;
 	}
 
-	// returns true on success, and false if there was some severe issue during loading
+	// Returns true on success, and false if there was some severe issue during loading.
 	private boolean doReload() {
-		// unload all currently loaded shopkeepers:
+		// Unload all currently loaded shopkeepers:
 		SKShopkeeperRegistry shopkeeperRegistry = this.getShopkeeperRegistry();
 		shopkeeperRegistry.unloadAllShopkeepers();
 		this.clearSaveData();
@@ -297,7 +297,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		if (!saveFile.exists()) {
 			File tempSaveFile = this.getTempSaveFile();
 			if (tempSaveFile.exists()) {
-				// load from temporary save file instead:
+				// Load from temporary save file instead:
 				Log.warning("Found no save file, but an existing temporary save file! (" + tempSaveFile.getName() + ")");
 				Log.warning("This might indicate an issue during a previous saving attempt!");
 				Log.warning("Trying to load the shopkeepers data from this temporary save file instead!");
@@ -313,18 +313,18 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		try {
 			if (!StringUtils.isEmpty(Settings.fileEncoding)) {
-				// load with specified charset:
+				// Load with specified charset:
 				try (	FileInputStream stream = new FileInputStream(saveFile);
 						InputStreamReader reader = new InputStreamReader(stream, Settings.fileEncoding)) {
 					saveData.load(reader);
 				}
 			} else {
-				// load with default charset handling:
+				// Load with default charset handling:
 				saveData.load(saveFile);
 			}
 		} catch (Exception e) {
 			Log.severe("Failed to load save file!", e);
-			return false; // disable without save
+			return false; // Disable without save
 		}
 
 		Set<String> keys = saveData.getKeys(false);
@@ -363,13 +363,13 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			ConfigurationSection shopkeeperSection = saveData.getConfigurationSection(key);
 			if (shopkeeperSection == null) {
 				Log.warning("Failed to load shopkeeper '" + key + "': Invalid config section!");
-				continue; // skip this shopkeeper
+				continue; // Skip this shopkeeper
 			}
 
-			// perform common migrations:
+			// Perform common migrations:
 			MigrationResult migrationResult = this.migrateShopkeeperData(id, shopkeeperSection, dataVersion);
 			if (migrationResult == MigrationResult.FAILED) {
-				// migration failed, skip this skopkeeper
+				// Migration failed, skip this shopkeeper
 				continue;
 			}
 
@@ -377,20 +377,20 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			AbstractShopType<?> shopType = plugin.getShopTypeRegistry().get(shopTypeString);
 			if (shopType == null) {
 				Log.warning("Failed to load shopkeeper '" + key + "': Unknown shop type: " + shopTypeString);
-				continue; // skip this shopkeeper
+				continue; // Skip this shopkeeper
 			}
 
-			// load shopkeeper:
+			// Load shopkeeper:
 			AbstractShopkeeper shopkeeper;
 			try {
 				shopkeeper = shopkeeperRegistry.loadShopkeeper(shopType, id, shopkeeperSection);
 				assert shopkeeper != null && shopkeeper.isValid();
 			} catch (ShopkeeperCreateException e) {
 				Log.warning("Failed to load shopkeeper '" + key + "': " + e.getMessage());
-				continue; // skip this shopkeeper
+				continue; // Skip this shopkeeper
 			} catch (Exception e) {
 				Log.warning("Failed to load shopkeeper '" + key + "'", e);
-				continue; // skip this shopkeeper
+				continue; // Skip this shopkeeper
 			}
 
 			// If the shopkeeper got migrated or the data version has changed, mark as dirty:
@@ -407,11 +407,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		FAILED,
 	}
 
-	// validates and performs migration of the save data
+	// Validates and performs migration of the save data.
 	private MigrationResult migrateShopkeeperData(int id, ConfigurationSection shopkeeperSection, String dataVersion) {
 		MigrationResult migrationResult = MigrationResult.NOTHING_MIGRATED;
 
-		// convert legacy shop type identifiers:
+		// Convert legacy shop type identifiers:
 		String shopTypeString = shopkeeperSection.getString("type");
 		if (shopTypeString != null && shopTypeString.equalsIgnoreCase("player")) {
 			Log.info("Migrating type of shopkeeper '" + id + "' from 'player' to 'sell'.");
@@ -464,12 +464,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	}
 
 	public void saveImmediateIfDirty() {
-		// wait for any async saving to finish:
+		// Wait for any async saving to finish:
 		this.waitOrAbortAsyncSave();
 
-		// save if dirty:
+		// Save if dirty:
 		if (this.isDirty()) {
-			this.saveImmediate(); // not async here
+			this.saveImmediate(); // Not async here
 		}
 	}
 
@@ -477,11 +477,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		return (saveIOTask != -1);
 	}
 
-	// gets run from the main thread
-	// makes sure that after this method returns there is no saving going on anymore
-	// if an async save has been scheduled already, but not started yet, the save will get aborted,
-	// otherwise this will wait for the async save to finish
-	// in either case there might be unsaved data or unhandled save requests
+	// Gets run from the main thread.
+	// Makes sure that after this method returns there is no saving going on anymore.
+	// If an async save has been scheduled already, but not started yet, the save will get aborted,
+	// otherwise this will wait for the async save to finish.
+	// In either case there might be unsaved data or unhandled save requests.
 	private void waitOrAbortAsyncSave() {
 		assert Bukkit.isPrimaryThread();
 
@@ -491,7 +491,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			Bukkit.getScheduler().cancelTask(saveIOTask);
 		}
 
-		// if the saving is currently in progress, acquiring the lock will wait for it to finish:
+		// If the saving is currently in progress, acquiring the lock will wait for it to finish:
 		synchronized (SAVING_IO_LOCK) {
 			// If the task has already been started (there is a worker thread for it already) but not taken the lock
 			// yet, we cannot cancel it and need to give up the lock again in order for it to be able to finish.
@@ -501,23 +501,23 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			abortSave = true;
 			while (saveResult.state == SaveResult.State.NOT_YET_STARTED && Bukkit.getScheduler().isCurrentlyRunning(saveIOTask)) {
 				try {
-					// release the lock, for the async task to be able to operate,
-					// the async task has to notify us once it has finished:
+					// Release the lock, for the async task to be able to operate.
+					// The async task has to notify us once it has finished.
 					SAVING_IO_LOCK.wait();
 				} catch (InterruptedException e) {
-					// we are not interruptible, but we restore the interruption status:
+					// We are not interruptible, but we restore the interruption status:
 					Thread.currentThread().interrupt();
 				}
 			}
-			// at this point the async task was successfully cancelled or has finished execution
+			// At this point the async task was successfully cancelled or has finished execution.
 		}
 
-		// manually run the callback of the previous save here, to complete the previous save before continuing:
+		// Manually run the callback of the previous save here, to complete the previous save before continuing:
 		if (syncSavingCallback != null) {
 			syncSavingCallback.run();
 		}
 
-		// reset abort flag:
+		// Reset abort flag:
 		abortSave = false;
 	}
 
@@ -533,26 +533,26 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 		currentlyProcessingSave = true;
 
-		// stop current delayed save task:
+		// Dtop current delayed save task:
 		if (delayedSaveTaskId != -1) {
 			Bukkit.getScheduler().cancelTask(delayedSaveTaskId);
 			delayedSaveTaskId = -1;
 		}
 
-		// is another async save task already running?
+		// Is another async save task already running?
 		if (this.isCurrentlySavingAsync()) {
 			if (async) {
-				// set flag which triggers a new save once that current task is done:
+				// Set flag which triggers a new save once that current task is done:
 				saveAgain = true;
 				currentlyProcessingSave = false;
 				return;
 			} else {
-				// wait for any async saving to finish:
+				// Wait for any async saving to finish:
 				this.waitOrAbortAsyncSave();
 			}
 		}
 
-		// keep track of statistics and information about this saving attempt:
+		// Keep track of statistics and information about this saving attempt:
 		saveResult.reset();
 		saveResult.async = async;
 		saveResult.startTime = System.currentTimeMillis();
@@ -562,27 +562,27 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		// after we have saved the file.
 		saveData.options().header(HEADER);
 
-		// store data of dirty shopkeepers into memory configuration:
+		// Store data of dirty shopkeepers into memory configuration:
 		saveResult.dirtyShopkeepersCount = 0;
 		for (AbstractShopkeeper shopkeeper : this.getShopkeeperRegistry().getAllShopkeepers()) {
 			if (!shopkeeper.isDirty()) {
-				continue; // assume storage data is still up-to-date
+				continue; // Assume storage data is still up-to-date
 			}
 			saveResult.dirtyShopkeepersCount++;
 
 			String sectionKey = String.valueOf(shopkeeper.getId());
 			Object previousData = saveData.get(sectionKey);
-			ConfigurationSection newSection = saveData.createSection(sectionKey); // replaces the previous section
+			ConfigurationSection newSection = saveData.createSection(sectionKey); // Replaces the previous section
 			try {
 				shopkeeper.save(newSection);
 			} catch (Exception e) {
-				// error while saving shopkeeper data:
-				// restore previous shopkeeper data and then skip this shopkeeper:
+				// Error while saving shopkeeper data:
+				// Restore previous shopkeeper data and then skip this shopkeeper.
 				saveData.set(sectionKey, previousData);
 				Log.warning("Couldn't save shopkeeper '" + shopkeeper.getId() + "'!", e);
-				// the shopkeeper stays marked as dirty, so we attempt to save it again the next time we save all shops
-				// however, we won't automatically initiate a new save for this shopkeeper as the risk is high that
-				// saving might fail again anyways
+				// The shopkeeper stays marked as dirty, so we attempt to save it again the next time we save all shops.
+				// However, we won't automatically initiate a new save for this shopkeeper as the risk is high that
+				// saving might fail again anyways.
 				continue;
 			}
 
@@ -590,71 +590,71 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			shopkeeper.onSave();
 		}
 
-		// store number of deleted shopkeepers (for debugging purposes):
+		// Store number of deleted shopkeepers (for debugging purposes):
 		saveResult.deletedShopkeepersCount = deletedShopkeepersCount;
 		deletedShopkeepersCount = 0;
 
-		// time to store shopkeeper data in memory configuration:
+		// Time to store shopkeeper data in memory configuration:
 		saveResult.packingDuration = System.currentTimeMillis() - saveResult.startTime;
 
-		// note: the dirty flag might get reverted again after saving, if saving failed
-		// however, the flag gets reset here (and not just after successful saving), so that any saving requests that
+		// Note: The dirty flag might get reverted again after saving, if saving failed.
+		// However, the flag gets reset here (and not just after successful saving), so that any saving requests that
 		// arrive in the meantime get noticed and can cause another save later:
 		dirty = false;
 
-		// gets run on the main thread after the save has been completed or aborted (counts as failure):
-		// note: this needs to be a new runnable (cannot be a lambda), in order to be able to reliable use the objects
-		// identify to identify whether the callback has already been run
+		// Gets run on the main thread after the save has been completed or aborted (counts as failure):
+		// Note: This needs to be a new runnable (cannot be a lambda), in order to be able to reliable use the objects
+		// identity to identify whether the callback has already been run.
 		syncSavingCallback = new Runnable() {
 			@Override
 			public void run() {
-				// abort if this callback has already been run manually (ex. when waiting for saving to finish):
-				// checking identify instead of null here, because if the callback has already been run manually,
-				// another save might have been prepared already while this task was still pending to get run
+				// Abort if this callback has already been run manually (ex. when waiting for saving to finish):
+				// Checking identity instead of null here, because if the callback has already been run manually,
+				// another save might have been prepared already while this task was still pending to get run.
 				if (syncSavingCallback != this) {
 					return;
 				}
 				syncSavingCallback = null;
 
-				// reset save task id:
-				// it's important that this gets reset inside this sync task, otherwise other save request might get
-				// prepared before this save has been fully handled
+				// Reset save task id:
+				// It is important that this gets reset inside this sync task. Otherwise another save request might get
+				// prepared before this save has been fully handled.
 				saveIOTask = -1;
 
-				// note: the save result state might still be NOT_YET_STARTED, if the saving task got cancelled before
-				// it could run
+				// Note: The save result state might still be NOT_YET_STARTED, if the saving task got cancelled before
+				// it could run.
 
-				// mark all shopkeepers as dirty again, whose data we were not able to save:
-				if (saveResult.state != SaveResult.State.SUCCESS) { // failure or aborted or cancelled
+				// Mark all shopkeepers as dirty again, whose data we were not able to save:
+				if (saveResult.state != SaveResult.State.SUCCESS) { // Failure or aborted or cancelled
 					if (!savingShopkeepers.isEmpty()) {
 						for (AbstractShopkeeper shopkeeper : savingShopkeepers) {
 							shopkeeper.markDirty();
 						}
-						// request another delayed save (if there isn't an abort request):
+						// Request another delayed save (if there isn't an abort request):
 						if (!abortSave) {
 							saveDelayed();
 						}
 					}
 
-					// restore number of deleted shopkeepers:
+					// Restore number of deleted shopkeepers:
 					deletedShopkeepersCount = saveResult.deletedShopkeepersCount;
 				}
 				savingShopkeepers.clear();
 
-				// remove data of shopkeepers that have been deleted during the save:
+				// Remove data of shopkeepers that have been deleted during the save:
 				for (AbstractShopkeeper deletedShopkeeper : shopkeepersToDelete) {
 					clearShopkeeperData(deletedShopkeeper);
 				}
 				shopkeepersToDelete.clear();
 
-				// if not aborted / cancelled:
+				// If not aborted / cancelled:
 				if (saveResult.state == SaveResult.State.SUCCESS || saveResult.state == SaveResult.State.FAILURE) {
-					// print debug info:
+					// Print debug info:
 					saveResult.printDebugInfo();
 
 					// saving failed?
 					if (saveResult.state != SaveResult.State.SUCCESS) {
-						// inform admins about saving issue:
+						// Inform admins about saving issue:
 						// 4 min error message throttle (slightly less than the saving interval)
 						if (Math.abs(System.currentTimeMillis() - lastSavingErrorMsgTimestamp) > (4 * 60 * 1000L)) {
 							lastSavingErrorMsgTimestamp = System.currentTimeMillis();
@@ -669,10 +669,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				}
 
 				if (async) {
-					// did we get another saveReal-request in the meantime?
+					// Did we get another saveReal-request in the meantime?
 					if (saveAgain) {
 						saveAgain = false;
-						// trigger another save with the latest data (if there isn't an abort request):
+						// Trigger another save with the latest data (if there isn't an abort request):
 						if (!abortSave) {
 							saveNow();
 						}
@@ -680,44 +680,44 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				}
 			}
 		};
-		// called possibly async:
+		// Called possibly async:
 		Runnable savingCallback = () -> {
-			// ensure that we continue on main thread:
-			// this gets omitted here if the plugin has been disabled during an async save,
-			// in which case the callback gets manually run from the onDisable handling on the main thread
+			// Ensure that we continue on main thread:
+			// This gets omitted here if the plugin has been disabled during an async save, in which case the callback
+			// gets manually run from the onDisable handling on the main thread.
 			SchedulerUtils.runOnMainThreadOrOmit(plugin, syncSavingCallback);
 		};
 
 		if (!async) {
-			// sync file io:
+			// Sync file IO:
 			this.saveDataToFile(saveData, savingCallback);
 		} else {
-			// async file io:
+			// Async file IO:
 			final long asyncTaskSubmittedTime = System.currentTimeMillis();
 			saveIOTask = Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-				// note: if the task gets cancelled, this never gets run (everything that always needs to happen, has to
-				// be placed or copied into the callback as well)
+				// Note: If the task gets cancelled, this never gets run (everything that always needs to happen, has to
+				// be placed or copied into the callback as well).
 				saveResult.asyncTaskDelay = System.currentTimeMillis() - asyncTaskSubmittedTime;
-				// synchronization, so that only one thread at a time attempts to mess with the save files
+				// Synchronization, so that only one thread at a time attempts to mess with the save files:
 				final long ioLockStartTime = System.currentTimeMillis();
 				synchronized (SAVING_IO_LOCK) {
 					saveResult.ioLockAcquireDuration = System.currentTimeMillis() - ioLockStartTime;
-					// did we get an abort request? -> skip saving:
+					// Did we get an abort request? -> Skip saving:
 					if (abortSave) {
 						saveResult.state = SaveResult.State.ABORTED;
-						// if aborted, the syncSavingCallback needs to be run manually
+						// If aborted, the syncSavingCallback needs to be run manually.
 					} else {
-						// actual saving IO:
+						// Actual saving IO:
 						this.saveDataToFile(saveData, savingCallback);
 						assert saveResult.state == SaveResult.State.SUCCESS || saveResult.state == SaveResult.State.FAILURE;
 					}
-					// async saving is over:
-					// it's important that the save result state gets set before the lock is released, because otherwise
-					// we cannot differentiate between whether the running task has already finished or is still going
-					// to acquire the lock
+					// Async saving is over:
+					// It is important that the save result state gets set before the lock is released, because
+					// otherwise we cannot differentiate between whether the running task has already finished or is
+					// still going to acquire the lock.
 					assert saveResult.state != SaveResult.State.NOT_YET_STARTED;
 
-					// notify all possibly waiting threads:
+					// Notify all possibly waiting threads:
 					SAVING_IO_LOCK.notifyAll();
 				}
 			}).getTaskId();
@@ -725,32 +725,32 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		currentlyProcessingSave = false;
 	}
 
-	// max total delay: 500ms
+	// Max total delay: 500ms
 	private static final int SAVING_MAX_ATTEMPTS = 20;
 	private static final long SAVING_ATTEMPTS_DELAY_MILLIS = 25;
 	private static final Object SAVING_IO_LOCK = new Object();
 
-	// can be run async and sync
+	// Can be run async and sync.
 	// TODO saveToString on main thread and only do the actual file writing async?
 	// Because Bukkit's serialization API is not strictly thread-safe..
 	private void saveDataToFile(FileConfiguration config, Runnable callback) {
 		assert config != null;
-		// actual IO:
+		// Actual IO:
 		final long ioStartTime = System.currentTimeMillis();
 
 		File saveFile = this.getSaveFile();
 		File tempSaveFile = this.getTempSaveFile();
 
-		// saving procedure:
-		// inside a retry-loop:
-		// * if there is a temporary save file:
-		// * * if there is no save file: rename temporary save file to save file
-		// * * else: remove temporary save file
-		// * create parent directories
-		// * create new temporary save file
-		// * save data to temporary save file
-		// * remove old save file
-		// * rename temporary save file to save file
+		// Saving procedure:
+		// Inside a retry-loop:
+		// * If there is a temporary save file:
+		// * * If there is no save file: Rename temporary save file to save file.
+		// * * Else: Remove temporary save file.
+		// * Create parent directories.
+		// * Create new temporary save file.
+		// * Save data to temporary save file.
+		// * Remove old save file.
+		// * Rename temporary save file to save file.
 
 		int savingAttempt = 0;
 		boolean problem = false;
@@ -759,16 +759,16 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		boolean printStacktrace = true;
 
 		while (++savingAttempt <= SAVING_MAX_ATTEMPTS) {
-			// reset problem variables:
+			// Reset problem variables:
 			problem = false;
 			error = null;
 			exception = null;
 
 			try {
-				// handle already existing temporary save file:
+				// Handle already existing temporary save file:
 				if (!problem) {
 					if (tempSaveFile.exists()) {
-						// check write permission:
+						// Check write permission:
 						if (!tempSaveFile.canWrite()) {
 							error = "Cannot write to temporary save file! (" + tempSaveFile.getName() + ")";
 							problem = true;
@@ -776,27 +776,25 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 						if (!problem) {
 							if (!saveFile.exists()) {
-								// if only the temporary file exists, but the actual save file does not, this might
-								// indicate, that a previous saving attempt saved to the temporary file and removed
-								// the
+								// If only the temporary file exists, but the actual save file does not, this might
+								// indicate, that a previous saving attempt saved to the temporary file and removed the
 								// actual save file, but wasn't able to then rename the temporary file to the actual
-								// save file
-								// -> the temporary file might contain the only backup of saved data, don't remove
-								// it!
-								// -> instead we try to rename it to make it the new 'actual save file' and then
+								// save file.
+								// -> The temporary file might contain the only backup of saved data, don't remove it!
+								// -> Instead we try to rename it to make it the new 'actual save file' and then
 								// continue the saving procedure
 
 								Log.warning("Found an already existing temporary save file, but no old save file! (" + tempSaveFile.getName() + ")");
 								Log.warning("This might indicate an issue during a previous saving attempt!");
 								Log.warning("Trying to rename the temporary save file to use it as 'existing old save data', and then continue the saving!");
 
-								// rename temporary save file:
+								// Rename temporary save file:
 								if (!tempSaveFile.renameTo(saveFile)) {
 									error = "Couldn't rename temporary save file! (" + tempSaveFile.getName() + " to " + saveFile.getName() + ")";
 									problem = true;
 								}
 							} else {
-								// remove old temporary save file:
+								// Remove old temporary save file:
 								if (!tempSaveFile.delete()) {
 									error = "Couldn't delete existing temporary save file! (" + tempSaveFile.getName() + ")";
 									problem = true;
@@ -806,7 +804,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 					}
 				}
 
-				// make sure that the parent directories exist:
+				// Make sure that the parent directories exist:
 				if (!problem) {
 					File parentDir = tempSaveFile.getParentFile();
 					if (parentDir != null && !parentDir.exists()) {
@@ -817,7 +815,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 					}
 				}
 
-				// create new temporary save file:
+				// Create new temporary save file:
 				if (!problem) {
 					try {
 						tempSaveFile.createNewFile();
@@ -828,7 +826,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 					}
 				}
 
-				// write shopkeeper data to temporary save file:
+				// Write shopkeeper data to temporary save file:
 				if (!problem) {
 					PrintWriter writer = null;
 					try {
@@ -850,15 +848,15 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 					}
 				}
 
-				// delete old save file:
+				// Delete old save file:
 				if (!problem) {
 					if (saveFile.exists()) {
-						// check write permission:
+						// Check write permission:
 						if (!saveFile.canWrite()) {
 							error = "Cannot write to save file! (" + saveFile.getName() + ")";
 							problem = true;
 						} else {
-							// delete old save file:
+							// Delete old save file:
 							if (!saveFile.delete()) {
 								error = "Couldn't delete existing old save file! (" + saveFile.getName() + ")";
 								problem = true;
@@ -867,7 +865,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 					}
 				}
 
-				// rename temporary save file:
+				// Rename temporary save file:
 				if (!problem) {
 					if (!tempSaveFile.renameTo(saveFile)) {
 						error = "Couldn't rename temporary save file! (" + tempSaveFile.getName() + " to " + saveFile.getName() + ")";
@@ -875,15 +873,15 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 					}
 				}
 			} catch (Exception e) {
-				// catching any exceptions not explicitly caught above already:
+				// Catching any exceptions not explicitly caught above already:
 				error = e.getMessage();
 				exception = e;
 				problem = true;
 			}
 
-			// handle problem situation:
+			// Handle problem situation:
 			if (problem) {
-				// don't spam with errors and stacktraces, only print them once for the first saving attempt:
+				// Don't spam with errors and stacktraces, only print them once for the first saving attempt:
 				if (exception != null && printStacktrace) {
 					printStacktrace = false;
 					exception.printStackTrace();
@@ -891,31 +889,31 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				Log.severe("Saving attempt " + savingAttempt + " failed: " + (error != null ? error : "Unknown error"));
 
 				if (savingAttempt < SAVING_MAX_ATTEMPTS) {
-					// try again after a small delay:
+					// Try again after a small delay:
 					try {
 						Thread.sleep(SAVING_ATTEMPTS_DELAY_MILLIS);
 					} catch (InterruptedException e) {
 					}
 				} else {
-					// saving failed even after a bunch of retries:
+					// Saving failed even after a bunch of retries:
 					saveResult.state = SaveResult.State.FAILURE;
 					Log.severe("Saving failed! Save data might be lost! :(");
 					break;
 				}
 			} else {
-				// saving was successful:
+				// Saving was successful:
 				saveResult.state = SaveResult.State.SUCCESS;
 				break;
 			}
 		}
 
 		final long now = System.currentTimeMillis();
-		saveResult.ioDuration = now - ioStartTime; // time for pure io
-		saveResult.totalDuration = now - saveResult.startTime; // time from saveReal() call to finished save
+		saveResult.ioDuration = now - ioStartTime; // Time for pure io
+		saveResult.totalDuration = now - saveResult.startTime; // Time from saveReal() call to finished save
 
-		// file IO over
+		// File IO is over.
 
-		// run callback:
+		// Run callback:
 		if (callback != null) {
 			callback.run();
 		}
@@ -923,9 +921,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	private static class SaveResult {
 
-		// note: synchronization for those values is not needed, because they get synchronized externally before getting
+		// Note: Synchronization for those values is not needed, because they get synchronized externally before getting
 		// used, either by the bukkit scheduler (when starting the async task and when going back to the main thread by
-		// starting a sync task), or via synchronization of the SAVING_IO_LOCK
+		// starting a sync task), or via synchronization of the SAVING_IO_LOCK.
 
 		public enum State {
 			NOT_YET_STARTED,
@@ -947,7 +945,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		public void reset() {
 			state = State.NOT_YET_STARTED;
-			// all other attributes get set appropriately before getting used
+			// All other attributes get set appropriately before getting used.
 		}
 
 		public void printDebugInfo() {

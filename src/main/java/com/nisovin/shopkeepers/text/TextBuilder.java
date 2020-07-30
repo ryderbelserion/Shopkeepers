@@ -46,10 +46,10 @@ public abstract class TextBuilder extends AbstractText {
 	 * @return this as built Text
 	 */
 	public Text build() {
-		if (this.isBuilt()) return this; // already built
+		if (this.isBuilt()) return this; // Already built
 		built = true;
 
-		// delegate:
+		// Delegate:
 		buildIfRequired(this.getChild());
 		buildIfRequired(this.getNext());
 		return this;
@@ -67,8 +67,8 @@ public abstract class TextBuilder extends AbstractText {
 	}
 
 	protected static void buildIfRequired(Object text) {
-		if (text instanceof TextBuilder) { // also checks for null
-			((TextBuilder) text).build(); // no effect if already built
+		if (text instanceof TextBuilder) { // Also checks for null
+			((TextBuilder) text).build(); // No effect if already built
 		}
 	}
 
@@ -466,7 +466,7 @@ public abstract class TextBuilder extends AbstractText {
 		return this;
 	}
 
-	// implemented in separate methods to allow for individual overriding:
+	// Implemented in separate methods to allow for individual overriding:
 
 	protected void copyChild(Text sourceText) {
 		Text sourceChild = sourceText.getChild();
@@ -484,7 +484,7 @@ public abstract class TextBuilder extends AbstractText {
 
 	// JAVA OBJECT
 
-	// allows for easier extension in subclasses
+	// Allows for easier extension in subclasses.
 	protected void appendToStringFeatures(StringBuilder builder) {
 		builder.append(", child=");
 		builder.append(this.getChild());
@@ -497,7 +497,7 @@ public abstract class TextBuilder extends AbstractText {
 		StringBuilder builder = new StringBuilder();
 		builder.append(this.getClass().getSimpleName());
 		builder.append(" [");
-		// built property is always appended first (and without the comma):
+		// Built property is always appended first (and without the comma):
 		builder.append("built=");
 		builder.append(this.isBuilt());
 		this.appendToStringFeatures(builder);

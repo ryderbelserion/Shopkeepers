@@ -14,7 +14,7 @@ public class Validate {
 		throw new IllegalArgumentException(errorMessage);
 	}
 
-	// note: throws a NPE if the supplier is null, similar to how Logger throws a NPE
+	// Note: Throws a NPE if the supplier is null, similar to how Logger throws a NPE.
 	public static void error(Supplier<String> errorMessageSupplier) {
 		throw new IllegalArgumentException(errorMessageSupplier.get());
 	}
@@ -190,7 +190,7 @@ public class Validate {
 			throw new IllegalStateException(errorMessage);
 		}
 
-		// note: throws a NPE if the supplier is null, similar to how Logger throws a NPE
+		// Note: Throws a NPE if the supplier is null, similar to how Logger throws a NPE.
 		public static void error(Supplier<String> errorMessageSupplier) {
 			throw new IllegalStateException(errorMessageSupplier.get());
 		}

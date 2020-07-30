@@ -147,7 +147,7 @@ public class StringUtils {
 		}
 		int sourceLength = source.length();
 		StringBuilder builder = new StringBuilder(sourceLength);
-		boolean capitalizeNext = true; // capitalize first letter
+		boolean capitalizeNext = true; // Capitalize first letter
 		for (int i = 0; i < sourceLength; i++) {
 			char currentChar = source.charAt(i);
 			if (Character.isWhitespace(currentChar)) {
@@ -163,10 +163,10 @@ public class StringUtils {
 		return builder.toString();
 	}
 
-	// matches windows and unix line endings, and literal newlines
+	// Matches windows and unix line endings, and literal newlines:
 	private static final Pattern NEWLINE_PATTERN = Pattern.compile("(\\r?\\n)|\\\\n");
 
-	// includes empty and trailing empty lines
+	// Includes empty and trailing empty lines:
 	public static String[] splitLines(String source) {
 		return NEWLINE_PATTERN.split(source, -1);
 	}
@@ -178,43 +178,43 @@ public class StringUtils {
 
 	// ARGUMENTS REPLACEMENT
 
-	// throws NPE if source, target, or replacement are null
-	// returns the source String (same instance) if there is no match
-	// performance is okay for replacing a single argument, but for multiple arguments prefer using replaceArguments
-	// rather than invoking this multiple times
+	// Throws NPE if source, target, or replacement are null.
+	// Returns the source String (same instance) if there is no match.
+	// Performance is okay for replacing a single argument, but for multiple arguments prefer using replaceArguments
+	// rather than invoking this multiple times.
 	public static String replaceFirst(String source, String target, CharSequence replacement) {
 		int index = source.indexOf(target);
-		if (index == -1) return source; // no match
+		if (index == -1) return source; // No match
 
 		int sourceLength = source.length();
 		int targetLength = target.length();
 		int increase = replacement.length() - targetLength;
 
 		StringBuilder result = new StringBuilder(sourceLength + increase);
-		result.append(source, 0, index); // prefix
-		result.append(replacement); // replacement
-		result.append(source, index + targetLength, sourceLength); // suffix
+		result.append(source, 0, index); // Prefix
+		result.append(replacement); // Replacement
+		result.append(source, index + targetLength, sourceLength); // Suffix
 		return result.toString();
 	}
 
-	private static final ArgumentsReplacer ARGUMENTS_REPLACER = new ArgumentsReplacer(); // singleton for reuse
+	private static final ArgumentsReplacer ARGUMENTS_REPLACER = new ArgumentsReplacer(); // Singleton for reuse
 
-	// uses the String representation of the given arguments
-	// if an argument is a Supplier, it gets invoked to obtain the actual argument
+	// Uses the String representation of the given arguments.
+	// If an argument is a Supplier, it gets invoked to obtain the actual argument.
 	public static String replaceArguments(String source, Map<String, Object> arguments) {
 		return ARGUMENTS_REPLACER.replaceArguments(source, arguments);
 	}
 
-	// faster than regex/matcher and StringBuilder#replace in a loop
-	// argument's map: faster than iterating and comparing
-	// arguments may occur more than once
-	// arguments inside arguments are not replaced
-	// TODO add support for argument options (eg.: formatting options, etc.)
-	// TODO allow escaping, eg. via "\{key\}"?
-	// TODO improve handling of inner braces: "{some{key}", "{some{inner}key}"
+	// Faster than regex/matcher and StringBuilder#replace in a loop.
+	// Argument's map: Faster than iterating and comparing.
+	// Arguments may occur more than once.
+	// Arguments inside arguments are not replaced.
+	// TODO Add support for argument options (eg.: formatting options, etc.).
+	// TODO Allow escaping, eg. via "\{key\}"?
+	// TODO Improve handling of inner braces: "{some{key}", "{some{inner}key}"
 	public static class ArgumentsReplacer {
 
-		// default key format: {key}
+		// Default key format: {key}
 		public static final char DEFAULT_KEY_PREFIX_CHAR = '{';
 		public static final char DEFAULT_KEY_SUFFIX_CHAR = '}';
 
@@ -224,18 +224,18 @@ public class StringUtils {
 		private char keySuffixChar;
 		private Map<String, Object> arguments;
 
-		// current search state:
-		private int searchPos = 0; // index of where to start the search for the next key in the source String
-		private int keyPrefixIndex = -1; // index of last found key prefix char
-		private int keySuffixIndex = -1; // index of last found key suffix char
-		private int keyStartIndex = -1; // inclusive: points to first key char (after prefix char)
-		private int keyEndIndex = -1; // exclusive (= keySuffixIndex)
-		protected String key = null; // the current key
-		protected Object argument = null; // the current argument
+		// Current search state:
+		private int searchPos = 0; // Index of where to start the search for the next key in the source String
+		private int keyPrefixIndex = -1; // Index of last found key prefix char
+		private int keySuffixIndex = -1; // Index of last found key suffix char
+		private int keyStartIndex = -1; // Inclusive: points to first key char (after prefix char)
+		private int keyEndIndex = -1; // Exclusive (= keySuffixIndex)
+		protected String key = null; // The current key
+		protected Object argument = null; // The current argument
 
-		// current result state:
+		// Current result state:
 		protected StringBuilder resultBuilder = null;
-		// start index of remaining source text that still needs to be included in the result:
+		// Start index of remaining source text that still needs to be included in the result:
 		private int resultSourcePos = 0;
 		private String result = null;
 
@@ -247,19 +247,19 @@ public class StringUtils {
 		}
 
 		public String replaceArguments(String source, char keyPrefixChar, char keySuffixChar, Map<String, Object> arguments) {
-			// setup:
-			this.setup(source, keyPrefixChar, keySuffixChar, arguments); // validates input
+			// Setup:
+			this.setup(source, keyPrefixChar, keySuffixChar, arguments); // Validates input
 
-			// replace arguments:
+			// Replace arguments:
 			this.replaceArguments();
 
-			// capture result:
+			// Capture result:
 			String result = this.result;
 
-			// clean up (avoids accidental memory leaks in case this ArgumentReplacer is kept around for later reuse):
+			// Clean up (avoids accidental memory leaks in case this ArgumentReplacer is kept around for later reuse):
 			this.cleanUp();
 
-			// return result:
+			// Return result:
 			return result;
 		}
 
@@ -273,7 +273,7 @@ public class StringUtils {
 			this.keySuffixChar = keySuffixChar;
 			this.arguments = arguments;
 
-			// current search state:
+			// Current search state:
 			searchPos = 0;
 			keyPrefixIndex = -1;
 			keySuffixIndex = -1;
@@ -282,21 +282,21 @@ public class StringUtils {
 			key = null;
 			argument = null;
 
-			// current result state:
+			// Current result state:
 			result = null;
 			if (resultBuilder != null) {
-				resultBuilder.setLength(0); // we reuse the previous StringBuilder (note: keeps the current capacity)
+				resultBuilder.setLength(0); // We reuse the previous StringBuilder (note: keeps the current capacity)
 			}
-			resultSourcePos = 0; // start index of remaining source text that still needs to be included in the result
+			resultSourcePos = 0; // Start index of remaining source text that still needs to be included in the result
 
-			// initial:
+			// Initial:
 			if (sourceLength <= 2) {
-				// source is not large enough to contain any key: end the search right away
+				// Source is not large enough to contain any key: End the search right away.
 				searchPos = sourceLength;
 			}
 		}
 
-		// clears any Object references that are no longer required after operation
+		// Clears any Object references that are no longer required after operation.
 		protected void cleanUp() {
 			source = null;
 			arguments = null;
@@ -304,99 +304,99 @@ public class StringUtils {
 			argument = null;
 			result = null;
 			if (resultBuilder != null) {
-				resultBuilder.setLength(0); // we reuse the previous StringBuilder (note: keeps the current capacity)
+				resultBuilder.setLength(0); // We reuse the previous StringBuilder (Note: Keeps the current capacity)
 			}
 		}
 
 		private void replaceArguments() {
-			assert result == null; // we don't have a result yet
+			assert result == null; // We don't have a result yet
 			while (this.findNextKey()) {
-				// find replacement argument for the current key:
+				// Find replacement argument for the current key:
 				argument = this.resolveArgument(key);
 
-				// append replacement:
+				// Append replacement:
 				if (argument != null) {
 					this.appendPrefix();
 					this.appendArgument();
-				} // else: no argument found for the current key -> continue the search for the next key
+				} // Else: No argument found for the current key. -> Continue the search for the next key.
 			}
 
-			// append remaining suffix (if any):
+			// Append remaining suffix (if any):
 			if (resultSourcePos <= 0) {
-				// there has been no argument replacement, otherwise we would have included a prefix to the result
-				// already -> the 'suffix' matches the complete source String
-				// we skip copying the suffix to the result builder and instead use the source directly as result
+				// There has been no argument replacement, otherwise we would have included a prefix to the result
+				// already. -> The 'suffix' matches the complete source String.
+				// We skip copying the suffix to the result builder and instead use the source directly as result.
 				result = source;
-				resultSourcePos = sourceLength; // update resultSourcePos
+				resultSourcePos = sourceLength; // Update resultSourcePos
 				return;
 			}
 
 			if (resultSourcePos < sourceLength) {
 				this.appendSuffix();
-			} // else: remaining suffix is empty
+			} // Else: Remaining suffix is empty.
 
-			// prepare result:
+			// Prepare result:
 			this.prepareResult();
 		}
 
-		// returns true if a next key has been found
+		// Returns true if a next key has been found.
 		private boolean findNextKey() {
-			if (searchPos >= sourceLength) return false; // we already searched through the whole source String
+			if (searchPos >= sourceLength) return false; // We already searched through the whole source String
 
-			// search key prefix character:
+			// Search key prefix character:
 			keyPrefixIndex = source.indexOf(keyPrefixChar, searchPos);
 			if (keyPrefixIndex < 0) {
-				return false; // no prefix char found -> no more keys
+				return false; // No prefix char found. -> No more keys.
 			}
 			keyStartIndex = keyPrefixIndex + 1;
 
 			// search key suffix character:
 			keySuffixIndex = source.indexOf(keySuffixChar, keyStartIndex);
 			if (keySuffixIndex < 0) {
-				return false; // no suffix char found -> no more keys
+				return false; // No suffix char found. -> No more keys.
 			}
 			keyEndIndex = keySuffixIndex;
 			key = source.substring(keyStartIndex, keyEndIndex);
 
-			// the search for the next key starts after the current key:
+			// The search for the next key starts after the current key:
 			searchPos = keySuffixIndex + 1;
 			return true;
 		}
 
-		// the argument to replace the current key
+		// The argument to replace the current key:
 		protected Object resolveArgument(String key) {
 			Object argument = arguments.get(key);
 			if (argument instanceof Supplier) {
-				return ((Supplier<?>) argument).get(); // can be null
+				return ((Supplier<?>) argument).get(); // Can be null
 			} else {
-				return argument; // can be null
+				return argument; // Can be null
 			}
 		}
 
 		protected void appendPrefix() {
-			// initialize result StringBuilder:
+			// Initialize result StringBuilder:
 			if (resultBuilder == null) {
-				// heuristic: expecting at most 25% increase in size
+				// Heuristic: Expecting at most 25% increase in size.
 				resultBuilder = new StringBuilder(sourceLength + sourceLength / 4);
 			}
 
-			// append prefix (not yet included chars in front of key):
+			// Append prefix (not yet included chars in front of key):
 			resultBuilder.append(source, resultSourcePos, keyPrefixIndex);
-			resultSourcePos = keySuffixIndex + 1; // update resultSourcePos
+			resultSourcePos = keySuffixIndex + 1; // Update resultSourcePos
 		}
 
 		protected void appendArgument() {
-			assert resultBuilder != null; // we have already appended the prefix
+			assert resultBuilder != null; // We have already appended the prefix
 			assert argument != null;
-			// append argument:
+			// Append argument:
 			String argumentString = argument.toString();
 			resultBuilder.append(argumentString);
 		}
 
 		protected void appendSuffix() {
 			assert resultSourcePos > 0 && resultSourcePos < sourceLength && resultBuilder != null;
-			resultBuilder.append(source, resultSourcePos, sourceLength); // append suffix
-			resultSourcePos = sourceLength; // update resultSourcePos
+			resultBuilder.append(source, resultSourcePos, sourceLength); // Append suffix
+			resultSourcePos = sourceLength; // Update resultSourcePos
 		}
 
 		protected void prepareResult() {

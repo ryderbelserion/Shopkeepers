@@ -12,9 +12,9 @@ import com.nisovin.shopkeepers.util.Log;
 public class ConfigMigrations {
 
 	private static final String CONFIG_VERSION_KEY = "config-version";
-	private static final int FIRST_VERSION = 0; // also applies if the config version is missing
+	private static final int FIRST_VERSION = 0; // Also applies if the config version is missing
 
-	// each index corresponds to a source config version and its migration to the next version
+	// Each index corresponds to a source config version and its migration to the next version
 	private static final List<ConfigMigration> migrations = Arrays.asList(
 			new ConfigMigration1(),
 			new ConfigMigration2(),
@@ -25,27 +25,27 @@ public class ConfigMigrations {
 		return migrations.size();
 	}
 
-	// returns true if any migrations got applied (if the config has potentially been modified)
+	// Returns true if any migrations got applied (if the config has potentially been modified)
 	public static boolean applyMigrations(Configuration config) throws ConfigLoadException {
-		// no migrations are required if the config is empty (missing entries will get generated from defaults):
+		// No migrations are required if the config is empty (missing entries will get generated from defaults):
 		if (config.getKeys(false).isEmpty()) return false;
 
-		// parse config version:
+		// Parse config version:
 		int configVersion;
-		Object rawConfigVersion = config.get(CONFIG_VERSION_KEY, null); // explicit default is important here
+		Object rawConfigVersion = config.get(CONFIG_VERSION_KEY, null); // Explicit default is important here
 		if (rawConfigVersion == null) {
 			Log.info("Missing config version. Assuming version '" + FIRST_VERSION + "'.");
 			configVersion = FIRST_VERSION;
 		} else {
 			Integer configVersionI = ConversionUtils.toInteger(rawConfigVersion);
-			if (configVersionI == null) { // parsing failed
+			if (configVersionI == null) { // Parsing failed
 				throw new ConfigLoadException("Could not parse config version: " + rawConfigVersion);
 			} else {
 				configVersion = configVersionI.intValue();
 			}
 		}
 
-		// check bounds:
+		// Check bounds:
 		if (configVersion < FIRST_VERSION) {
 			throw new ConfigLoadException("Invalid config version: " + rawConfigVersion);
 		}
@@ -53,7 +53,7 @@ public class ConfigMigrations {
 			throw new ConfigLoadException("Invalid config version: " + configVersion + " (the latest version is " + getLatestVersion() + ")");
 		}
 
-		// apply required migrations:
+		// Apply required migrations:
 		boolean migrated = false;
 		for (int version = configVersion; version < migrations.size(); ++version) {
 			int nextVersion = (version + 1);
@@ -66,7 +66,7 @@ public class ConfigMigrations {
 					throw new ConfigLoadException("Config migration failed with an error!", e);
 				}
 			}
-			// update config version:
+			// Update config version:
 			config.set(CONFIG_VERSION_KEY, nextVersion);
 			migrated = true;
 			Log.info("Config migrated to version " + nextVersion + "." + (migration == null ? " (no changes)" : ""));

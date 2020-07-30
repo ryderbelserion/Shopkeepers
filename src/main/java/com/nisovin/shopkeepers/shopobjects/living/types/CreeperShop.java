@@ -63,7 +63,7 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 	public void setPowered(boolean powered) {
 		this.powered = powered;
 		shopkeeper.markDirty();
-		this.applyPowered(this.getEntity()); // null if not active
+		this.applyPowered(this.getEntity()); // Null if not active
 	}
 
 	private void applyPowered(Creeper entity) {

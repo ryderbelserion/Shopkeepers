@@ -54,8 +54,8 @@ public class WorldGuardHandler {
 				StateFlag allowShopFlag = new StateFlag(FLAG_ALLOW_SHOP, false);
 				WorldGuard.getInstance().getFlagRegistry().register(allowShopFlag);
 			} catch (FlagConflictException | IllegalStateException e) {
-				// another plugin has probably already registered this flag,
-				// or this plugin got hard reloaded by some plugin manager plugin
+				// Another plugin has probably already registered this flag,
+				// or this plugin got hard reloaded by some plugin manager plugin.
 				Log.info("Couldn't register WorldGuard flag '" + FLAG_ALLOW_SHOP + "': " + e.getMessage());
 			}
 		}
@@ -65,31 +65,31 @@ public class WorldGuardHandler {
 			WorldGuardPlugin wgPlugin = (WorldGuardPlugin) worldGuardPlugin;
 			RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
-			// check if shop flag is set:
+			// Check if shop flag is set:
 			boolean allowShopFlag = false; // false if unset or disallowed
 
-			// get shop flag:
+			// Get shop flag:
 			Flag<?> shopFlag = WorldGuard.getInstance().getFlagRegistry().get(FLAG_ALLOW_SHOP);
 			if (shopFlag != null) {
-				// check if shop flag is set:
+				// Check if shop flag is set:
 				if (shopFlag instanceof StateFlag) {
 					allowShopFlag = query.testState(BukkitAdapter.adapt(loc), wgPlugin.wrapPlayer(player), (StateFlag) shopFlag);
 				} else if (shopFlag instanceof BooleanFlag) {
-					// value might be null:
+					// Value might be null:
 					Boolean shopFlagValue = query.queryValue(BukkitAdapter.adapt(loc), wgPlugin.wrapPlayer(player), (BooleanFlag) shopFlag);
 					allowShopFlag = (Boolean.TRUE.equals(shopFlagValue));
 				} else {
-					// unknown flag type, assume unset
+					// Unknown flag type, assume unset.
 				}
 			} else {
-				// shop flag doesn't exist, assume unset
+				// Shop flag doesn't exist, assume unset.
 			}
 
 			if (Settings.requireWorldGuardAllowShopFlag) {
-				// allow shops ONLY in regions with the shop flag set:
+				// Allow shops ONLY in regions with the shop flag set:
 				return allowShopFlag;
 			} else {
-				// allow shops in regions where the shop flag is set OR the player can build:
+				// Allow shops in regions where the shop flag is set OR the player can build:
 				return (allowShopFlag || query.testState(BukkitAdapter.adapt(loc), wgPlugin.wrapPlayer(player), Flags.BUILD));
 			}
 		}

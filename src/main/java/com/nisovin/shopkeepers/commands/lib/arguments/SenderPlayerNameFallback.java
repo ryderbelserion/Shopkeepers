@@ -29,7 +29,7 @@ public class SenderPlayerNameFallback extends TypedFallbackArgument<String> {
 
 		@Override
 		public boolean isOptional() {
-			return true; // does not require user input
+			return true; // Does not require user input
 		}
 
 		@Override

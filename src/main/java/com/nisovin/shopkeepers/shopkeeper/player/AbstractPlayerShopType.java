@@ -33,10 +33,10 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 
 	@Override
 	protected boolean handleSpecificShopkeeperCreation(ShopCreationData shopCreationData) {
-		assert shopCreationData instanceof PlayerShopCreationData; // shop creation data gets validated first
+		assert shopCreationData instanceof PlayerShopCreationData; // Shop creation data gets validated first
 		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) shopCreationData;
 
-		// the creator, not null here:
+		// The creator, not null here:
 		Player creator = shopCreationData.getCreator();
 
 		Location spawnLocation = shopCreationData.getSpawnLocation();
@@ -61,7 +61,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 			return false;
 		}
 
-		// check worldguard:
+		// Check worldguard:
 		if (Settings.enableWorldGuardRestrictions) {
 			if (!WorldGuardHandler.isShopAllowed(creator, spawnLocation)) {
 				TextUtils.sendMessage(creator, Settings.msgShopCreateFail);
@@ -69,7 +69,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 			}
 		}
 
-		// check towny:
+		// Check towny:
 		if (Settings.enableTownyRestrictions) {
 			if (!TownyHandler.isCommercialArea(spawnLocation)) {
 				TextUtils.sendMessage(creator, Settings.msgShopCreateFail);
@@ -78,7 +78,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		}
 
 		int maxShopsLimit = Settings.getMaxShops(creator);
-		// call event:
+		// Call event:
 		PlayerCreatePlayerShopkeeperEvent createEvent = new PlayerCreatePlayerShopkeeperEvent(shopCreationData, maxShopsLimit);
 		Bukkit.getPluginManager().callEvent(createEvent);
 		if (createEvent.isCancelled()) {
@@ -88,7 +88,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 			maxShopsLimit = createEvent.getMaxShopsLimit();
 		}
 
-		// count owned shops:
+		// Count owned shops:
 		if (maxShopsLimit > 0) {
 			int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getPlayerShopkeepersByOwner(creator.getUniqueId()).size();
 			if (count >= maxShopsLimit) {
@@ -99,7 +99,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		return true;
 	}
 
-	// common functions that might be useful for sub-classes:
+	// Common functions that might be useful for sub-classes:
 
 	@Override
 	protected void validateCreationData(ShopCreationData shopCreationData) {

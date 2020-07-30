@@ -16,10 +16,10 @@ public class CommandRegistry {
 
 	private final Command parent;
 
-	// gets only initialized when used, sorted by insertion order:
+	// Gets only initialized when used, sorted by insertion order:
 	private Set<Command> commands = null;
-	// normalized aliases:
-	// implementation detail (used by Command): all aliases for the same command are stored in succession
+	// Normalized aliases:
+	// Implementation detail (used by Command): All aliases for the same command are stored in succession.
 	private Map<String, Command> commandsByAlias = null;
 
 	public CommandRegistry(Command parent) {
@@ -35,7 +35,7 @@ public class CommandRegistry {
 		Validate.notNull(command, "Command is null!");
 		Validate.isTrue(command.getParent() == null, "The given command is already registered somewhere!");
 
-		// lazy initialization:
+		// Lazy initialization:
 		if (commands == null) {
 			commands = new LinkedHashSet<>();
 			commandsByAlias = new LinkedHashMap<>();
@@ -43,22 +43,22 @@ public class CommandRegistry {
 
 		Validate.isTrue(!commands.contains(command), "The given command is already registered!");
 
-		// register command by name:
+		// Register command by name:
 		String name = CommandUtils.normalize(command.getName());
 		Validate.isTrue(!commandsByAlias.containsKey(name), "Another command is already registered for '" + name + "'!");
 		commandsByAlias.put(name, command);
 
-		// register command aliases:
+		// Register command aliases:
 		for (String alias : command.getAliases()) {
 			alias = CommandUtils.normalize(alias);
-			// only register the alias, if it is not yet mapped to another command:
+			// Only register the alias, if it is not yet mapped to another command:
 			commandsByAlias.putIfAbsent(alias, command);
 		}
 
-		// register command:
+		// Register command:
 		commands.add(command);
 
-		// set parent command:
+		// Set parent command:
 		command.setParent(parent);
 	}
 
@@ -71,22 +71,22 @@ public class CommandRegistry {
 		Validate.isTrue(command.getParent() == parent, "The given command is not registered here!");
 		Validate.isTrue(commands.contains(command), "The given command is not registered here!");
 
-		// unregister by name:
+		// Unregister by name:
 		String name = CommandUtils.normalize(command.getName());
 		assert commandsByAlias.get(name) == command;
 		commandsByAlias.remove(name);
 
-		// unregister aliases:
+		// Unregister aliases:
 		for (String alias : command.getAliases()) {
 			alias = CommandUtils.normalize(alias);
-			// only remove the mapping, if the alias is currently mapped to this command:
+			// Only remove the mapping, if the alias is currently mapped to this command:
 			commandsByAlias.remove(alias, command);
 		}
 
-		// unregister command:
+		// Unregister command:
 		commands.remove(command);
 
-		// unset parent command:
+		// Unset parent command:
 		command.setParent(null);
 	}
 

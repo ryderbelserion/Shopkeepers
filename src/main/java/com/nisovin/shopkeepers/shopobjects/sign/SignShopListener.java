@@ -32,22 +32,22 @@ import com.nisovin.shopkeepers.util.Utils;
 
 class SignShopListener implements Listener {
 
-	// local copy as array (allows very performant iteration):
+	// Local copy as array (allows for very performant iteration):
 	private static final BlockFace[] BLOCK_SIDES = BlockFaceUtils.getBlockSides().toArray(new BlockFace[0]);
 
 	private final SignShops signShops;
 
 	private static class ModifiableBlockPos {
 
-		private UUID worldId = null; // null indicates clear block pos
+		private UUID worldId = null; // Null indicates cleared block pos
 		private int x;
 		private int y;
 		private int z;
 
-		// null to clear
+		// Null to clear
 		public void set(Block block) {
 			if (block == null) {
-				// clear:
+				// Clear:
 				worldId = null;
 			} else {
 				worldId = block.getWorld().getUID();
@@ -72,16 +72,16 @@ class SignShopListener implements Listener {
 	}
 
 	void cancelNextBlockPhysics(Block block) {
-		cancelNextBlockPhysics.set(block); // null to clear
+		cancelNextBlockPhysics.set(block); // Null to clear
 	}
 
 	// See LivingEntityShopListener for a reasoning behind using event priority LOWEST.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
-		// ignore our own fake interact event:
+		// Ignore our own fake interact event:
 		if (event instanceof TestPlayerInteractEvent) return;
 
-		// check for sign shop interaction:
+		// Check for sign shop interaction:
 		if (event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
 		Block block = event.getClickedBlock();
@@ -96,12 +96,12 @@ class SignShopListener implements Listener {
 			return;
 		}
 
-		// keep track of the previous interaction result:
+		// Keep track of the previous interaction result:
 		boolean useInteractedBlock = (event.useInteractedBlock() != Result.DENY);
 
-		// always cancel interactions with shopkeepers, to prevent any default behavior:
-		event.setCancelled(true); // also cancels the item interaction
-		// update inventory in case the interaction would trigger an item action normally:
+		// Always cancel interactions with shopkeepers, to prevent any default behavior:
+		event.setCancelled(true); // Also cancels the item interaction
+		// Update inventory in case the interaction would trigger an item action normally:
 		player.updateInventory();
 
 		// Ignore if already cancelled. Resolves conflicts with other event handlers running at LOWEST priority (eg.
@@ -111,7 +111,7 @@ class SignShopListener implements Listener {
 			return;
 		}
 
-		// only trigger shopkeeper interaction for main-hand events:
+		// Only trigger shopkeeper interaction for main-hand events:
 		if (event.getHand() != EquipmentSlot.HAND) {
 			Log.debug("  Ignoring off-hand interaction");
 			return;
@@ -125,14 +125,14 @@ class SignShopListener implements Listener {
 			}
 		}
 
-		// handle interaction:
+		// Handle interaction:
 		shopkeeper.onPlayerInteraction(player);
 	}
 
-	// protect sign block:
+	// Protect sign block:
 
 	private boolean isProtectedBlock(Block block) {
-		// not protected if the sign shop is not active (if the block is not a sign currently):
+		// Not protected if the sign shop is not active (if the block is not a sign currently):
 		if (ItemUtils.isSign(block.getType()) && signShops.isSignShop(block)) {
 			return true;
 		}
@@ -141,12 +141,12 @@ class SignShopListener implements Listener {
 			Shopkeeper shopkeeper = signShops.getSignShop(adjacentBlock);
 			if (shopkeeper != null) {
 				SKSignShopObject signObject = (SKSignShopObject) shopkeeper.getShopObject();
-				BlockFace attachedFace = BlockFace.UP; // in case of sign post
+				BlockFace attachedFace = BlockFace.UP; // In case of sign post
 				if (signObject.isWallSign()) {
 					attachedFace = signObject.getSignFacing();
 				}
 				if (blockFace == attachedFace) {
-					// sign is (supposed to be) / might be attached to the given block:
+					// Sign is (supposed to be) / might be attached to the given block:
 					return true;
 				}
 			}

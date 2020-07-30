@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.util.Validate;
  */
 public class PlainText extends TextBuilder {
 
-	private final String text; // not null, can be empty
+	private final String text; // Not null, can be empty
 
 	PlainText(String text) {
 		Validate.notNull(text, "text is null");

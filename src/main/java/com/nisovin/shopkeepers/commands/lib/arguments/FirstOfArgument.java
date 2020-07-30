@@ -25,7 +25,7 @@ import com.nisovin.shopkeepers.util.Validate;
  * parses a non-null value.
  */
 public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgument<?>, ?>> {
-	// extending FallbackArgument because we might forward FallbackArgumentExceptions of our child arguments
+	// Extending FallbackArgument because we might forward FallbackArgumentExceptions of our child arguments.
 
 	public static final String FORMAT_DELIMITER = "|";
 
@@ -43,7 +43,7 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 	public FirstOfArgument(String name, List<? extends CommandArgument<?>> arguments, boolean joinFormats, boolean reverseFormat) {
 		super(name);
 
-		// arguments:
+		// Arguments:
 		Validate.notNull(arguments, "Arguments is null!");
 		List<CommandArgument<?>> argumentsList = new ArrayList<>(arguments.size());
 		this.arguments = Collections.unmodifiableList(argumentsList);
@@ -54,14 +54,14 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 		}
 		Validate.isTrue(this.arguments.size() != 0, "No arguments given!");
 
-		// format:
+		// Format:
 		if (joinFormats) {
 			String delimiter = FORMAT_DELIMITER;
 			StringBuilder format = new StringBuilder();
 			ListIterator<? extends CommandArgument<?>> iterator = this.arguments.listIterator(reverseFormat ? this.arguments.size() : 0);
 			while (reverseFormat ? iterator.hasPrevious() : iterator.hasNext()) {
 				CommandArgument<?> argument = (reverseFormat ? iterator.previous() : iterator.next());
-				// appending reduced format for child-arguments here:
+				// Appending reduced format for child-arguments here:
 				String argumentFormat = argument.getReducedFormat();
 				if (!argumentFormat.isEmpty()) {
 					format.append(argumentFormat).append(delimiter);
@@ -73,14 +73,14 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 				this.reducedFormat = format.substring(0, format.length() - delimiter.length());
 			}
 		} else {
-			// using the default format:
+			// Using the default format:
 			this.reducedFormat = super.getReducedFormat();
 		}
 	}
 
 	@Override
 	public boolean isOptional() {
-		// this argument is optional, if at least one child-argument is optional:
+		// This argument is optional, if at least one child-argument is optional:
 		for (CommandArgument<?> argument : arguments) {
 			if (argument.isOptional()) {
 				return true;
@@ -99,7 +99,7 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 		public Pair<? extends CommandArgument<?>, ?> parse(I input) throws ArgumentParseException;
 	}
 
-	// returns a pair with the argument and the parsed value, or null if nothing was parsed
+	// Returns a pair with the argument and the parsed value, or null if nothing was parsed.
 	private <I> Pair<? extends CommandArgument<?>, ?> parseFirstOf(	Iterable<I> inputs, Parser<I> parser, ArgumentsReader argsReader,
 																	boolean parsingFallbacks) throws ArgumentParseException {
 		// try one after the other:
@@ -112,38 +112,38 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 			try {
 				Pair<? extends CommandArgument<?>, ?> result = parser.parse(input);
 				if (result != null) {
-					// we successfully parsed something:
+					// We successfully parsed something:
 					return result;
 				} else {
 					nullParsed = true;
-					// continue: maybe some other argument can parse something more useful..
+					// Continue: Maybe some other argument can parse something more useful..
 				}
 			} catch (FallbackArgumentException e) {
 				if (!parsingFallbacks) {
-					// ignore, but keep track of all fallback exceptions:
+					// Ignore, but keep track of all fallback exceptions:
 					assert fallbacks != null;
 					fallbacks.add(e);
 				} else {
 					Validate.State.error("Argument '" + e.getArgument().getName() + "' threw another FallbackArgumentException while parsing fallback: " + e);
 				}
 			} catch (ArgumentRejectedException e) {
-				// ignore, but keep track of the first argument-rejected exception:
+				// Ignore, but keep track of the first argument-rejected exception:
 				if (rejectedException == null) {
 					rejectedException = e;
 				}
 			} catch (ArgumentParseException e) {
-				// ignore, but keep track of the first exception:
+				// Ignore, but keep track of the first exception:
 				if (firstParseException == null) {
 					firstParseException = e;
 				}
 			}
-			// reset state and continue:
+			// Reset state and continue:
 			argsReader.setState(argsReaderState);
 		}
 
 		if (fallbacks != null && !fallbacks.isEmpty()) {
 			// If some argument might be able to provide a fallback, prefer following that path:
-			// TODO but if the fallbacks fail, we might want to prefer null, rejected or first exception
+			// TODO But if the fallbacks fail, we might want to prefer null, rejected or first exception
 			// We throw our own custom FallbackArgumentException so that:
 			// * We get informed when the fallbacks get evaluated (so that we can store the result)
 			// * We can evaluate all the fallbacks we captured (in case there are multiple applicable fallbacks)
@@ -151,7 +151,7 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 		}
 
 		if (nullParsed) {
-			// if one argument did return null as parsing result, and did not throw an exception (like optional
+			// If one argument did return null as parsing result, and did not throw an exception (like optional
 			// arguments tend to do), we don't throw an exception here either:
 			return null;
 		}
@@ -162,8 +162,8 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 			throw rejectedException;
 		}
 
-		// invalid argument for all of them:
-		assert firstParseException != null; // otherwise we would have parsed something (or null)
+		// Invalid argument for all of them:
+		assert firstParseException != null; // Otherwise we would have parsed something (or null)
 		throw firstParseException;
 	}
 
@@ -174,12 +174,12 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 
 	@Override
 	public Pair<? extends CommandArgument<?>, ?> parse(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws ArgumentParseException {
-		// with modifiable context, so that the child argument can store its value(s)
+		// With modifiable context, so that the child argument can store its value(s):
 		Pair<? extends CommandArgument<?>, ?> result = this.parseFirstOf(arguments, (argument) -> {
 			return this.toPair(argument, argument.parse(input, context, argsReader));
 		}, argsReader, false);
 
-		// store result in context:
+		// Store result in context:
 		if (result != null) {
 			context.put(this.getName(), result);
 		}
@@ -188,7 +188,7 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 
 	@Override
 	public Pair<? extends CommandArgument<?>, ?> parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
-		// with unmodifiable context view:
+		// With unmodifiable context view:
 		return this.parseFirstOf(arguments, (argument) -> {
 			return this.toPair(argument, argument.parseValue(input, context, argsReader));
 		}, argsReader, false);
@@ -202,7 +202,7 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 			int limit = (MAX_SUGGESTIONS - suggestions.size());
 			if (limit <= 0) break;
 
-			// reset args so that every argument has a chance to provide completions:
+			// Reset args so that every argument has a chance to provide completions:
 			argsReader.setState(argsReaderState);
 
 			List<String> argumentSuggestions = argument.complete(input, context, argsReader);
@@ -236,7 +236,7 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 	@Override
 	public Pair<? extends CommandArgument<?>, ?> parseFallback(	CommandInput input, CommandContext context, ArgumentsReader argsReader,
 																FallbackArgumentException fallbackException, boolean parsingFailed) throws ArgumentParseException {
-		// delegate the fallback parsing to the child arguments that threw the original FallbackArgumentExceptions:
+		// Delegate the fallback parsing to the child arguments that threw the original FallbackArgumentExceptions:
 		FirstOfFallbackException firstOfFallback = (FirstOfFallbackException) fallbackException;
 		List<FallbackArgumentException> originalFallbacks = firstOfFallback.getOriginalFallbacks();
 
@@ -246,7 +246,7 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 			return this.toPair(argument, value);
 		}, argsReader, true);
 
-		// store result in context:
+		// Store result in context:
 		if (result != null) {
 			context.put(this.getName(), result);
 		}

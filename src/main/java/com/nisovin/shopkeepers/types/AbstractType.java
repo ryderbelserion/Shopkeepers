@@ -23,9 +23,9 @@ public abstract class AbstractType implements Type {
 	 * This could for example be used inside save/configuration files, so it should not contain any characters which
 	 * could cause problems with that.
 	 */
-	protected final String identifier; // not null or empty
-	protected final List<String> aliases; // unmodifiable, not null, can be empty, normalized
-	protected final String permission; // can be null
+	protected final String identifier; // Not null or empty
+	protected final List<String> aliases; // Unmodifiable, not null, can be empty, normalized
+	protected final String permission; // Can be null
 
 	protected AbstractType(String identifier, String permission) {
 		this(identifier, null, permission);
@@ -82,5 +82,5 @@ public abstract class AbstractType implements Type {
 		return identifier.equals(displayName);
 	}
 
-	// not overriding equals and hashCode: only the exact same type instance is considered equal
+	// Not overriding equals and hashCode: Only the exact same type instance is considered equal.
 }

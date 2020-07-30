@@ -6,9 +6,9 @@ class TextParser {
 
 	private static final TextParser INSTANCE = new TextParser();
 
-	// non-public, use Text#parse(String)
+	// Non-public, use Text#parse(String)
 	// Note: Unlike Spigot, this does not take into account clickable URLs. URLs need to be made clickable manually
-	// where required. TODO include url parsing?
+	// where required. TODO Include URL parsing?
 	static Text parse(String input) {
 		return INSTANCE._parse(input);
 	}
@@ -37,7 +37,7 @@ class TextParser {
 	}
 
 	private Text _parse(String input) {
-		// assert: already reset
+		// Assert: Already reset.
 		if (input == null) return null;
 		if (input.isEmpty()) return Text.EMPTY;
 
@@ -45,69 +45,69 @@ class TextParser {
 		for (int i = 0; i < length; ++i) {
 			char c = input.charAt(i);
 
-			// color codes:
+			// Color codes:
 			ChatColor color = null;
 			if (c == ChatColor.COLOR_CHAR && i + 1 < length) {
 				char colorChar = Character.toLowerCase(input.charAt(i + 1));
 				color = ChatColor.getByChar(colorChar);
 			}
 			if (color != null) {
-				// append formatting:
+				// Append formatting:
 				next(Text.formatting(color));
 
-				i += 1; // skip color character
+				i += 1; // Skip color character
 				continue;
-			} // else: continue and treat as regular character
+			} // Else: Continue and treat as regular character.
 
-			// placeholder:
+			// Placeholder:
 			if (c == PlaceholderText.PLACEHOLDER_PREFIX_CHAR) {
 				int placeholderEnd = input.indexOf(PlaceholderText.PLACEHOLDER_SUFFIX_CHAR, i + 1);
 				if (placeholderEnd != -1) {
 					String placeholderKey = input.substring(i + 1, placeholderEnd);
 					if (!placeholderKey.isEmpty()) {
-						// append placeholder:
+						// Append placeholder:
 						next(Text.placeholder(placeholderKey));
 
-						i = placeholderEnd; // skip the characters involved in the placeholder
+						i = placeholderEnd; // Skip the characters involved in the placeholder
 						continue;
 					}
 				}
-				// else: continue and treat as regular character
+				// Else: Continue and treat as regular character.
 			}
 
-			// regular text:
+			// Regular text:
 			stringBuilder.append(c);
 		}
 
-		// append any remaining pending text:
+		// Append any remaining pending text:
 		this.appendCurrentText();
 
-		assert root != null; // expecting at least one Text since we checked for empty input
+		assert root != null; // Expecting at least one Text since we checked for empty input
 		Text result = root.build();
-		// assert: all Texts in the chain are built
+		// Assert: All Texts in the chain are built.
 
-		this.reset(); // reset for later reuse
+		this.reset(); // Reset for later reuse
 		return result;
 	}
 
 	private void appendCurrentText() {
 		if (stringBuilder.length() > 0) {
 			String text = stringBuilder.toString();
-			stringBuilder.setLength(0); // reset StringBuilder
+			stringBuilder.setLength(0); // Reset StringBuilder
 			next(Text.text(text));
 		}
 	}
 
 	private <T extends TextBuilder> T next(T next) {
 		assert next != null;
-		// append any pending text:
+		// Append any pending text:
 		this.appendCurrentText();
 
 		if (root == null) {
-			// this is our first Text:
+			// This is our first Text:
 			root = next;
 		} else {
-			// link to previous Text:
+			// Link to previous Text:
 			assert last != null;
 			last.next(next);
 		}

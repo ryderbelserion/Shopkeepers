@@ -39,7 +39,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		return isCopyableBook(item) && (getBookTitle(item) != null);
 	};
 
-	// contains only one offer for a specific book (book title):
+	// Contains only one offer for a specific book (book title):
 	private final List<BookOffer> offers = new ArrayList<>();
 	private final List<BookOffer> offersView = Collections.unmodifiableList(offers);
 
@@ -79,9 +79,9 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	@Override
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
-		// load offers:
+		// Load offers:
 		this._clearOffers();
-		// TODO remove legacy: load offers from old format (bookTitle -> price mapping) (since late MC 1.14.4)
+		// TODO Remove legacy: Load offers from old format (bookTitle -> price mapping) (since late MC 1.14.4).
 		List<SKBookOffer> legacyOffers = SKBookOffer.loadFromLegacyConfig(configSection, "offers", "Shopkeeper " + this.getId());
 		if (!legacyOffers.isEmpty()) {
 			Log.info("Shopkeeper " + this.getId() + ": Importing old book offers.");
@@ -94,7 +94,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		// save offers:
+		// Save offers:
 		SKBookOffer.saveToConfig(configSection, "offers", this.getOffers());
 	}
 
@@ -116,7 +116,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 				outOfStock = true;
 				bookItem = this.createDummyBook(bookTitle);
 			} else {
-				// create copy:
+				// Create copy:
 				bookItem = this.copyBook(bookItem);
 			}
 
@@ -136,7 +136,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		if (itemCounts == null) return null;
 		for (ItemCount itemCount : itemCounts) {
 			if (itemCount == null) continue;
-			ItemStack item = itemCount.getItem(); // note: no additional copy
+			ItemStack item = itemCount.getItem(); // Note: No additional copy.
 			if (Objects.equals(getBookTitle(item), title)) {
 				return item;
 			}
@@ -147,14 +147,14 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	protected static BookMeta getBookMeta(ItemStack item) {
 		if (ItemUtils.isEmpty(item)) return null;
 		if (item.getType() != Material.WRITTEN_BOOK) return null;
-		return (BookMeta) item.getItemMeta(); // can be null
+		return (BookMeta) item.getItemMeta(); // Can be null
 	}
 
 	protected static Generation getBookGeneration(ItemStack item) {
 		BookMeta meta = getBookMeta(item);
 		if (meta == null) return null;
 		if (!meta.hasGeneration()) {
-			// if the generation is missing, minecraft treats the book as an original and so do we:
+			// If the generation is missing, Minecraft treats the book as an original and so do we:
 			return Generation.ORIGINAL;
 		}
 		return meta.getGeneration(); // assert: not null
@@ -179,9 +179,9 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		BookMeta meta = getBookMeta(item);
 		if (meta == null) return null;
 		if (!meta.hasTitle()) return null;
-		String title = meta.getTitle(); // not null, but can be empty!
-		// we ignore books with empty titles for now:
-		// TODO support them? they can't be created in vanilla
+		String title = meta.getTitle(); // Not null, but can be empty!
+		// We ignore books with empty titles for now:
+		// TODO Support them? They can't be created in vanilla.
 		if (title.isEmpty()) return null;
 		return title;
 	}
@@ -227,7 +227,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		case COPY_OF_ORIGINAL:
 			return Generation.COPY_OF_COPY;
 		default:
-			// all other books cannot be copied
+			// All other books cannot be copied:
 			return null;
 		}
 	}
@@ -300,7 +300,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	private void _addOffer(BookOffer offer) {
 		assert offer != null;
-		// remove previous offer for the same book:
+		// Remove previous offer for the same book:
 		this.removeOffer(offer.getBookTitle());
 		offers.add(offer);
 	}
@@ -317,7 +317,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		assert offers != null && !offers.contains(null);
 		for (BookOffer offer : offers) {
 			assert offer != null;
-			// add new offer; replaces any previous offer for the same book:
+			// Add new offer: This replaces any previous offer for the same book.
 			this._addOffer(offer);
 		}
 	}

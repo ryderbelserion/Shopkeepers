@@ -62,7 +62,7 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 	public void setCarryingChest(boolean carryingChest) {
 		this.carryingChest = carryingChest;
 		shopkeeper.markDirty();
-		this.applyCarryingChest(this.getEntity()); // null if not active
+		this.applyCarryingChest(this.getEntity()); // Null if not active
 	}
 
 	private void applyCarryingChest(E entity) {

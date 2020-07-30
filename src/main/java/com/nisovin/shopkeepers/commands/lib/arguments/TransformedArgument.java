@@ -53,7 +53,7 @@ public class TransformedArgument<T, R> extends FallbackArgument<R> {
 		try {
 			fromValue = fromArgument.parseValue(input, context, argsReader);
 		} catch (FallbackArgumentException e) {
-			// wrap and rethrow so that we get informed on fallback evaluation:
+			// Wrap and rethrow so that we get informed on fallback evaluation:
 			throw new FallbackArgumentException(this, e);
 		}
 		return transformer.apply(fromValue);

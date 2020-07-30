@@ -32,11 +32,11 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	private static final Filter<ItemStack> ITEM_FILTER = (ItemStack item) -> {
 		if (Settings.isCurrencyItem(item) || Settings.isHighCurrencyItem(item)) return false;
 		if (item.getType() == Material.WRITTEN_BOOK) return false;
-		if (!item.getEnchantments().isEmpty()) return false; // TODO why don't allow buying of enchanted items?
+		if (!item.getEnchantments().isEmpty()) return false; // TODO Why don't allow buying of enchanted items?
 		return true;
 	};
 
-	// contains only one offer for a specific type of item:
+	// Contains only one offer for a specific type of item:
 	private final List<PriceOffer> offers = new ArrayList<>();
 	private final List<PriceOffer> offersView = Collections.unmodifiableList(offers);
 
@@ -76,7 +76,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	@Override
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
-		// load offers:
+		// Load offers:
 		List<SKPriceOffer> offers = SKPriceOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId());
 		List<SKPriceOffer> migratedOffers = SKPriceOffer.migrateItems(offers, "Shopkeeper " + this.getId());
 		if (offers != migratedOffers) {
@@ -91,7 +91,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		// save offers:
+		// Save offers:
 		SKPriceOffer.saveToConfig(configSection, "offers", this.getOffers());
 	}
 
@@ -181,7 +181,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 
 	private void _addOffer(PriceOffer offer) {
 		assert offer != null;
-		// remove previous offer for the same item:
+		// Remove previous offer for the same item:
 		this.removeOffer(offer.getItem());
 		offers.add(offer);
 	}
@@ -198,7 +198,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 		assert offers != null && !offers.contains(null);
 		for (PriceOffer offer : offers) {
 			assert offer != null;
-			// add new offer; replaces any previous offer for the same item:
+			// Add new offer: This replaces any previous offer for the same item.
 			this._addOffer(offer);
 		}
 	}

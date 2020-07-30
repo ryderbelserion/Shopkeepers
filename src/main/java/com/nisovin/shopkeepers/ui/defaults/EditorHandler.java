@@ -103,7 +103,7 @@ public abstract class EditorHandler extends UIHandler {
 		return rawSlot >= BUTTONS_START && rawSlot <= this.getButtonsEnd();
 	}
 
-	// depends on the number of buttons rows currently used
+	// Depends on the number of buttons rows currently used:
 	protected int getButtonsEnd() {
 		return BUTTONS_START + (this.getButtonRows() * COLUMNS_PER_ROW) - 1;
 	}
@@ -164,8 +164,8 @@ public abstract class EditorHandler extends UIHandler {
 
 		public abstract ItemStack getIcon(Session session);
 
-		// updates the icon in all sessions
-		// note: cannot deal with changes to the registered buttons (the button's slot) while the inventory is open
+		// Updates the icon in all sessions.
+		// Note: Cannot deal with changes to the registered buttons (the button's slot) while the inventory is open.
 		protected final void updateIcon() {
 			if (slot != NO_SLOT && editorHandler != null) {
 				for (Session session : editorHandler.sessions.values()) {
@@ -175,7 +175,7 @@ public abstract class EditorHandler extends UIHandler {
 			}
 		}
 
-		// updates all icons in all sessions
+		// Updates all icons in all sessions.
 		protected final void updateAllIcons() {
 			if (editorHandler != null) {
 				for (Session session : editorHandler.sessions.values()) {
@@ -188,7 +188,7 @@ public abstract class EditorHandler extends UIHandler {
 		protected abstract void onClick(InventoryClickEvent clickEvent, Player player);
 	}
 
-	// for simple one-click actions
+	// For simple one-click actions:
 	public static abstract class ActionButton extends Button {
 
 		public ActionButton(Shopkeeper shopkeeper) {
@@ -203,21 +203,21 @@ public abstract class EditorHandler extends UIHandler {
 		protected final void onClick(InventoryClickEvent clickEvent, Player player) {
 			if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return; // ignore double clicks
 
-			// run action:
+			// Run action:
 			boolean success = this.runAction(clickEvent, player);
 			if (!success) return;
 
-			// icon might have changed:
+			// Icon might have changed:
 			this.updateIcon();
 
-			// call event:
+			// Call event:
 			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
 
-			// save:
+			// Save:
 			shopkeeper.save();
 		}
 
-		// returns true on success
+		// Returns true on success:
 		protected abstract boolean runAction(InventoryClickEvent clickEvent, Player player);
 	}
 
@@ -269,15 +269,15 @@ public abstract class EditorHandler extends UIHandler {
 
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// previous page button:
-				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return; // ignore double clicks
+				// Previous page button:
+				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return; // Ignore double clicks
 				Session session = getSession(player);
 				if (session == null) return;
 
-				// save current page:
+				// Save current page:
 				saveEditorPage(session);
 
-				// update page:
+				// Update page:
 				session.setPage(Math.max(1, session.currentPage - 1));
 				setupPage(player, session.currentPage);
 				player.updateInventory();
@@ -296,15 +296,15 @@ public abstract class EditorHandler extends UIHandler {
 
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// next page button:
-				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return; // ignore double clicks
+				// Next page button:
+				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return; // Ignore double clicks
 				Session session = getSession(player);
 				if (session == null) return;
 
-				// save current page:
+				// Save current page:
 				saveEditorPage(session);
 
-				// update page:
+				// Update page:
 				session.setPage(Math.min(getMaxTradesPages(), session.currentPage + 1));
 				setupPage(player, session.currentPage);
 				player.updateInventory();
@@ -322,7 +322,7 @@ public abstract class EditorHandler extends UIHandler {
 
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// current page button: doing nothing
+				// Current page button: Does nothing.
 			}
 		};
 	}
@@ -336,7 +336,7 @@ public abstract class EditorHandler extends UIHandler {
 
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// trade setup button: doing nothing
+				// Trade setup button: Does nothing.
 			}
 		};
 	}
@@ -354,7 +354,7 @@ public abstract class EditorHandler extends UIHandler {
 				"max_page", getMaxTradesPages()
 		);
 		ItemStack item = Settings.previousPageItem.createItemStack();
-		// note: can exceed the item's natural max stack size
+		// Note: Can exceed the item's natural max stack size.
 		item.setAmount(MathUtils.trim(prevPage, 1, ItemUtils.MAX_STACK_SIZE));
 		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonPreviousPageLore);
 	}
@@ -372,7 +372,7 @@ public abstract class EditorHandler extends UIHandler {
 				"max_page", getMaxTradesPages()
 		);
 		ItemStack item = Settings.nextPageItem.createItemStack();
-		// note: can exceed the item's natural max stack size
+		// Note: Can exceed the item's natural max stack size.
 		item.setAmount(MathUtils.trim(nextPage, 1, ItemUtils.MAX_STACK_SIZE));
 		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonNextPageLore);
 	}
@@ -383,7 +383,7 @@ public abstract class EditorHandler extends UIHandler {
 				"max_page", getMaxTradesPages()
 		);
 		ItemStack item = Settings.currentPageItem.createItemStack();
-		// note: can exceed the item's natural max stack size
+		// Note: Can exceed the item's natural max stack size.
 		item.setAmount(MathUtils.trim(page, 1, ItemUtils.MAX_STACK_SIZE));
 		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonCurrentPageLore);
 	}
@@ -402,17 +402,17 @@ public abstract class EditorHandler extends UIHandler {
 	private void bakeButtons() {
 		if (!dirtyButtons) return;
 
-		// reset buttons:
+		// Reset buttons:
 		for (Button button : buttons) {
 			button.slot = Button.NO_SLOT;
 		}
 
-		// clear array:
+		// Clear array:
 		for (int i = 0; i < bakedButtons.length; ++i) {
 			bakedButtons[i] = null;
 		}
 
-		// insert buttons:
+		// Insert buttons:
 		int frontIndex = 0;
 		this.buttonRows = Math.min(BUTTON_MAX_ROWS, ((buttons.size() - 1) / COLUMNS_PER_ROW) + 1);
 		int endIndex = buttonRows * COLUMNS_PER_ROW - 1;
@@ -427,7 +427,7 @@ public abstract class EditorHandler extends UIHandler {
 				frontIndex++;
 			}
 			if (bakedButtons[buttonIndex] != null) {
-				// there is not enough space for the remaining buttons
+				// There is not enough space for the remaining buttons.
 				break;
 			}
 			bakedButtons[buttonIndex] = button;
@@ -459,13 +459,13 @@ public abstract class EditorHandler extends UIHandler {
 
 	public void addButton(Button button) {
 		Validate.notNull(button, "Button is null");
-		button.setEditorHandler(this); // validates that the button isn't used elsewhere yet
+		button.setEditorHandler(this); // Validates that the button isn't used elsewhere yet
 		buttons.add(button);
 		dirtyButtons = true;
 	}
 
 	protected void addButtonOrIgnore(Button button) {
-		if (button == null) return; // ignore
+		if (button == null) return; // Ignore
 		this.addButton(button);
 	}
 
@@ -510,13 +510,13 @@ public abstract class EditorHandler extends UIHandler {
 	protected Button createNamingButton(Shopkeeper shopkeeper) {
 		boolean useNamingButton = true;
 		if (shopkeeper.getType() instanceof PlayerShopType) {
-			// naming via button enabled?
+			// Naming via button enabled?
 			if (Settings.namingOfPlayerShopsViaItem) {
 				useNamingButton = false;
 			} else {
-				// no naming button for citizens player shops if renaming is disabled for those
-				// TODO restructure this to allow for dynamic editor buttons depending on shop (object) types and
-				// settings
+				// No naming button for Citizens player shops if renaming is disabled for those.
+				// TODO Restructure this to allow for dynamic editor buttons depending on shop (object) types and
+				// settings.
 				if (!Settings.allowRenamingOfPlayerNpcShops && shopkeeper.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN()) {
 					useNamingButton = false;
 				}
@@ -532,10 +532,10 @@ public abstract class EditorHandler extends UIHandler {
 
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// naming button:
+				// Naming button:
 				closeEditorAndRunTask(player, null);
 
-				// start naming:
+				// Start naming:
 				SKShopkeepersPlugin.getInstance().getShopkeeperNaming().startNaming(player, shopkeeper);
 				TextUtils.sendMessage(player, Settings.msgTypeNewName);
 			}
@@ -567,19 +567,19 @@ public abstract class EditorHandler extends UIHandler {
 	protected void closeEditorAndRunTask(Player player, Runnable task) {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 
-		// ignore other click events for this shopkeeper in the same tick:
+		// Ignore other click events for this shopkeeper in the same tick:
 		shopkeeper.deactivateUI();
 
-		// close editor window delayed and run task afterwards:
+		// Close editor window delayed and run task afterwards:
 		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-			// this triggers closing and saving of the editor state (if this inventory didn't get closed for other
-			// reasons in the meantime already)
+			// This triggers closing and saving of the editor state (if this inventory didn't get closed for other
+			// reasons in the meantime already):
 			player.closeInventory();
 
-			// reactivate ui for this shopkeeper:
+			// Reactivate ui for this shopkeeper:
 			shopkeeper.activateUI();
 
-			// run task:
+			// Run task:
 			if (task != null) {
 				task.run();
 			}
@@ -605,7 +605,7 @@ public abstract class EditorHandler extends UIHandler {
 			return player;
 		}
 
-		// starts at 1
+		// Starts at 1.
 		public final int getCurrentPage() {
 			return currentPage;
 		}
@@ -630,14 +630,14 @@ public abstract class EditorHandler extends UIHandler {
 
 	@Override
 	public boolean openWindow(Player player) {
-		// setup session:
+		// Setup session:
 		List<TradingRecipeDraft> recipes = this.getTradingRecipes();
-		// create inventory:
+		// Create inventory:
 		Inventory inventory = Bukkit.createInventory(player, this.getInventorySize(), Settings.editorTitle);
 		Session session = new Session(player, recipes, inventory);
 		sessions.put(player.getUniqueId(), session);
 
-		// setup and open first page:
+		// Setup and open first page:
 		this.setupPage(player, 1);
 		player.openInventory(session.inventory);
 		return true;
@@ -645,9 +645,9 @@ public abstract class EditorHandler extends UIHandler {
 
 	protected void setupPage(Player player, int page) {
 		Session session = this.getSession(player);
-		if (session == null) return; // expecting a valid session
+		if (session == null) return; // Expecting a valid session
 
-		// setup inventory:
+		// Setup inventory:
 		this.setupTradeColumns(session);
 		this.setupTradesPageBar(session);
 		this.setupButtons(session);
@@ -668,7 +668,7 @@ public abstract class EditorHandler extends UIHandler {
 			inventory.setItem(i, null);
 		}
 
-		// insert trades:
+		// Insert trades:
 		int page = session.currentPage;
 		assert page >= 1;
 		List<TradingRecipeDraft> recipes = session.recipes;
@@ -683,12 +683,12 @@ public abstract class EditorHandler extends UIHandler {
 	protected void setupTradesPageBar(Session session) {
 		assert session != null;
 		Inventory inventory = session.inventory;
-		// clear page bar area:
+		// Clear page bar area:
 		for (int i = TRADES_PAGE_BAR_START; i <= TRADES_PAGE_BAR_END; ++i) {
 			inventory.setItem(i, null);
 		}
 
-		// insert buttons:
+		// Insert buttons:
 		Button[] buttons = this.getTradesPageBarButtons();
 		for (int i = 0; i < buttons.length; ++i) {
 			Button button = buttons[i];
@@ -699,26 +699,26 @@ public abstract class EditorHandler extends UIHandler {
 		}
 	}
 
-	// note: this cannot deal with new button rows being required due to newly added buttons (which would require
-	// creating and freshly open a new inventory, resulting in flicker)
+	// Note: This cannot deal with new button rows being required due to newly added buttons (which would require
+	// creating and freshly open a new inventory, resulting in flicker).
 	protected void updateButtons(Session session) {
 		this.setupButtons(session);
 	}
 
-	// also used to refresh all button icons in an already open inventory
+	// Also used to refresh all button icons in an already open inventory.
 	protected void setupButtons(Session session) {
 		Inventory inventory = session.inventory;
 		final int inventorySize = inventory.getSize();
 		Button[] buttons = this.getBakedButtons();
 		for (int buttonIndex = 0; buttonIndex < buttons.length; ++buttonIndex) {
 			int slot = BUTTONS_START + buttonIndex;
-			if (slot >= inventorySize) break; // this can be reached if called on a previously setup inventory
+			if (slot >= inventorySize) break; // This can be reached if called on a previously setup inventory
 			ItemStack icon = null;
 			Button button = buttons[buttonIndex];
 			if (button != null) {
 				icon = button.getIcon(session);
 			}
-			// null will clear the slot (required if this is called to refresh the buttons in an already setup
+			// Null will clear the slot (required if this is called to refresh the buttons in an already setup
 			// inventory):
 			inventory.setItem(slot, icon);
 		}
@@ -727,8 +727,8 @@ public abstract class EditorHandler extends UIHandler {
 	@Override
 	protected boolean canOpen(Player player) {
 		assert player != null;
-		// permission for the type of shopkeeper is checked in the AdminShopkeeper specific EditorHandler
-		// owner is checked in the PlayerShopkeeper specific EditorHandler
+		// Permission for the type of shopkeeper is checked in the AdminShopkeeper specific EditorHandler.
+		// Owner is checked in the PlayerShopkeeper specific EditorHandler.
 		return true;
 	}
 
@@ -739,8 +739,8 @@ public abstract class EditorHandler extends UIHandler {
 
 	@Override
 	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
-		// dragging is allowed by default only inside the player inventory and the trades area:
-		if (event.isCancelled()) return; // already cancelled
+		// Dragging is allowed by default only inside the player inventory and the trades area:
+		if (event.isCancelled()) return; // Already cancelled
 		InventoryView view = event.getView();
 		Set<Integer> slots = event.getRawSlots();
 		for (Integer slot : slots) {
@@ -755,7 +755,7 @@ public abstract class EditorHandler extends UIHandler {
 	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
 		assert event != null && player != null;
 		if (this.isAutomaticShiftLeftClick()) {
-			// ignore automatically triggered shift left-clicks:
+			// Ignore automatically triggered shift left-clicks:
 			return;
 		}
 
@@ -764,16 +764,16 @@ public abstract class EditorHandler extends UIHandler {
 
 		int rawSlot = event.getRawSlot();
 		if (this.isTradesArea(rawSlot)) {
-			// trades area:
+			// Trades area:
 			this.handleTradesClick(session, event);
 		} else if (this.isTradesPageBar(rawSlot)) {
-			// trades page bar:
+			// Trades page bar:
 			this.handleTradesPageBarClick(session, event);
 		} else if (this.isButtonArea(rawSlot)) {
-			// editor buttons:
+			// Editor buttons:
 			this.handleButtonClick(session, event);
 		} else if (this.isPlayerInventory(event.getView(), event.getSlotType(), rawSlot)) {
-			// player inventory:
+			// Player inventory:
 			this.handlePlayerInventoryClick(session, event);
 		}
 	}
@@ -809,9 +809,9 @@ public abstract class EditorHandler extends UIHandler {
 	}
 
 	protected int getNewAmountAfterEditorClick(InventoryClickEvent event, int currentAmount, int minAmount, int maxAmount) {
-		// validate bounds:
-		if (minAmount > maxAmount) return currentAmount; // no valid value possible
-		if (minAmount == maxAmount) return minAmount; // only one valid value possible
+		// Validate bounds:
+		if (minAmount > maxAmount) return currentAmount; // No valid value possible
+		if (minAmount == maxAmount) return minAmount; // Only one valid value possible
 
 		int newAmount = currentAmount;
 		ClickType clickType = event.getClick();
@@ -838,7 +838,7 @@ public abstract class EditorHandler extends UIHandler {
 		default:
 			break;
 		}
-		// bounds:
+		// Bounds:
 		if (newAmount < minAmount) newAmount = minAmount;
 		if (newAmount > maxAmount) newAmount = maxAmount;
 		return newAmount;
@@ -846,14 +846,14 @@ public abstract class EditorHandler extends UIHandler {
 
 	@Override
 	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
-		// cleanup session:
+		// Cleanup session:
 		Session session = sessions.remove(player.getUniqueId());
 
 		if (closeEvent != null) {
-			// only saving if caused by an inventory close event:
+			// Only saving if caused by an inventory close event:
 			this.saveEditor(session);
 
-			// call event:
+			// Call event:
 			Shopkeeper shopkeeper = this.getShopkeeper();
 			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
 
@@ -870,7 +870,7 @@ public abstract class EditorHandler extends UIHandler {
 	 */
 	protected void saveEditorPage(Session session) {
 		assert session != null;
-		// if (!session.dirtyPage) return; // skip if not dirty
+		// if (!session.dirtyPage) return; // Skip if not dirty
 		Inventory inventory = session.inventory;
 		int page = session.currentPage;
 		assert page >= 1;
@@ -879,12 +879,12 @@ public abstract class EditorHandler extends UIHandler {
 		int recipesPerPage = COLUMNS_PER_ROW;
 		int startIndex = (page - 1) * recipesPerPage;
 		int endIndex = startIndex + TRADES_COLUMNS - 1;
-		// add empty recipes to support the recipes of the current page:
+		// Add empty recipes to support the recipes of the current page:
 		for (int i = recipes.size(); i <= endIndex; ++i) {
 			recipes.add(TradingRecipeDraft.EMPTY);
 		}
 
-		// replace recipes:
+		// Replace recipes:
 		for (int column = 0; column < TRADES_COLUMNS; column++) {
 			TradingRecipeDraft recipeDraft = this.getTradingRecipe(inventory, column);
 			int recipeIndex = startIndex + column;
@@ -900,10 +900,10 @@ public abstract class EditorHandler extends UIHandler {
 	 */
 	protected void saveEditor(Session session) {
 		assert session != null;
-		// save current page:
+		// Save current page:
 		this.saveEditorPage(session);
 
-		// save recipes:
+		// Save recipes:
 		Player player = session.player;
 		this.clearRecipes();
 		for (TradingRecipeDraft recipe : session.recipes) {
@@ -915,7 +915,7 @@ public abstract class EditorHandler extends UIHandler {
 		}
 	}
 
-	// called for every recipe draft that is not valid:
+	// Called for every recipe draft that is not valid:
 	protected void handleInvalidRecipeDraft(Player player, TradingRecipeDraft recipe) {
 	}
 

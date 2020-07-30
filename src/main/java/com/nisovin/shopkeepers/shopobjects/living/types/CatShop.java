@@ -30,13 +30,13 @@ public class CatShop extends SittableShop<Cat> {
 	private static final Property<DyeColor> PROPERTY_COLLAR_COLOR = new EnumProperty<DyeColor>(DyeColor.class, "collarColor", null) {
 		@Override
 		public boolean isNullable() {
-			// null to indicate 'no collar / untamed'
+			// Null to indicate 'no collar / untamed':
 			return true;
 		}
 	};
 
 	private Cat.Type catType = PROPERTY_CAT_TYPE.getDefaultValue();
-	private DyeColor collarColor = PROPERTY_COLLAR_COLOR.getDefaultValue(); // can be null
+	private DyeColor collarColor = PROPERTY_COLLAR_COLOR.getDefaultValue(); // Can be null
 
 	public CatShop(	LivingShops livingShops, SKLivingShopObjectType<CatShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -75,19 +75,19 @@ public class CatShop extends SittableShop<Cat> {
 
 	// CAT TYPE
 
-	// MC 1.14: conversion from ocelot types to similar cat types:
+	// MC 1.14: Conversion from ocelot types to similar cat types:
 	public static Cat.Type fromOcelotType(String ocelotType) {
-		if (ocelotType == null) ocelotType = "WILD_OCELOT"; // default ocelot type
+		if (ocelotType == null) ocelotType = "WILD_OCELOT"; // Default ocelot type
 		switch (ocelotType) {
 		case "BLACK_CAT":
 			return Cat.Type.BLACK;
 		case "RED_CAT":
-		case "WILD_OCELOT": // there is no equivalent, RED seems to visually match the best
+		case "WILD_OCELOT": // There is no equivalent, RED seems to visually match the best
 			return Cat.Type.RED;
 		case "SIAMESE_CAT":
 			return Cat.Type.SIAMESE;
 		default:
-			return PROPERTY_CAT_TYPE.getDefaultValue(); // fallback to default
+			return PROPERTY_CAT_TYPE.getDefaultValue(); // Fallback to default
 		}
 	}
 
@@ -95,7 +95,7 @@ public class CatShop extends SittableShop<Cat> {
 		Validate.notNull(catType, "Cat type is null!");
 		this.catType = catType;
 		shopkeeper.markDirty();
-		this.applyCatType(this.getEntity()); // null if not active
+		this.applyCatType(this.getEntity()); // Null if not active
 	}
 
 	private void applyCatType(Cat entity) {
@@ -144,7 +144,7 @@ public class CatShop extends SittableShop<Cat> {
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE);
 			break;
 		default:
-			// unknown type:
+			// Unknown type:
 			ItemUtils.setLeatherColor(iconItem, Color.PURPLE);
 			break;
 		}
@@ -173,16 +173,16 @@ public class CatShop extends SittableShop<Cat> {
 	public void setCollarColor(DyeColor collarColor) {
 		this.collarColor = collarColor;
 		shopkeeper.markDirty();
-		this.applyCollarColor(this.getEntity()); // null if not active
+		this.applyCollarColor(this.getEntity()); // Null if not active
 	}
 
 	private void applyCollarColor(Cat entity) {
 		if (entity == null) return;
 		if (collarColor == null) {
-			// no collar / untamed:
+			// No collar / untamed:
 			entity.setTamed(false);
 		} else {
-			entity.setTamed(true); // only tamed cats will show the collar
+			entity.setTamed(true); // Only tamed cats will show the collar
 			entity.setCollarColor(collarColor);
 		}
 	}

@@ -51,30 +51,30 @@ class CommandList extends Command {
 		super("list");
 		this.shopkeeperRegistry = shopkeeperRegistry;
 
-		// permission gets checked by testPermission and during execution
+		// Permission gets checked by testPermission and during execution.
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionList);
 
-		// arguments:
+		// Arguments:
 		this.addArgument(new FirstOfArgument("target", Arrays.asList(
 				new LiteralArgument(ARGUMENT_ALL),
 				new LiteralArgument(ARGUMENT_ADMIN),
 				new FirstOfArgument(ARGUMENT_PLAYER, Arrays.asList(
-						// TODO provide completions for known shop owners?
-						new PlayerUUIDArgument(ARGUMENT_PLAYER_UUID), // accepts any uuid
-						// only accepts names of online players initially, but falls back to any given name or the
+						// TODO Provide completions for known shop owners?
+						new PlayerUUIDArgument(ARGUMENT_PLAYER_UUID), // Accepts any uuid
+						// Only accepts names of online players initially, but falls back to any given name or the
 						// sender's name (using a fallback to give the following page argument a chance to parse the
 						// input first)
-						// TODO add alias 'own'?
+						// TODO Add alias 'own'?
 						new SenderPlayerNameFallback(new AnyStringFallback(
 								new TransformedArgument<>(
 										new PlayerByNameArgument(ARGUMENT_PLAYER_NAME),
 										(player) -> player.getName()
 								)
 						))
-				), false) // don't join formats
-		), true, true)); // join and reverse formats
+				), false) // Don't join formats
+		), true, true)); // Join and reverse formats
 		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_PAGE), 1));
 	}
 
@@ -98,16 +98,16 @@ class CommandList extends Command {
 
 		List<? extends Shopkeeper> shops;
 		if (listAllShops) {
-			// permission check:
+			// Permission check:
 			this.checkPermission(sender, ShopkeepersPlugin.LIST_ADMIN_PERMISSION);
 			this.checkPermission(sender, ShopkeepersPlugin.LIST_OTHERS_PERMISSION);
-	
+
 			shops = new ArrayList<>(shopkeeperRegistry.getAllShopkeepers());
 		} else if (listAdminShops) {
-			// permission check:
+			// Permission check:
 			this.checkPermission(sender, ShopkeepersPlugin.LIST_ADMIN_PERMISSION);
 
-			// searching admin shops:
+			// Searching admin shops:
 			List<Shopkeeper> adminShops = new ArrayList<>();
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 				if (!(shopkeeper instanceof PlayerShopkeeper)) {
@@ -116,51 +116,51 @@ class CommandList extends Command {
 			}
 			shops = adminShops;
 		} else {
-			// check if the target matches the sender player:
+			// Check if the target matches the sender player:
 			boolean targetOwnShops = false;
 			Player senderPlayer = (sender instanceof Player) ? (Player) sender : null;
 			if (senderPlayer != null && (senderPlayer.getUniqueId().equals(targetPlayerUUID) || senderPlayer.getName().equalsIgnoreCase(targetPlayerName))) {
 				targetOwnShops = true;
-				// get missing / exact player information:
+				// Cet missing / exact player information:
 				targetPlayerUUID = senderPlayer.getUniqueId();
 				targetPlayerName = senderPlayer.getName();
 			} else if (targetPlayerName != null) {
-				// check if the target matches an online player:
-				// if the name matches an online player, list that player's shops (regardless of if the name is
+				// Check if the target matches an online player:
+				// If the name matches an online player, list that player's shops (regardless of if the name is
 				// ambiguous / if there are shops of other players with matching name):
-				Player onlinePlayer = Bukkit.getPlayerExact(targetPlayerName); // note: case insensitive
+				Player onlinePlayer = Bukkit.getPlayerExact(targetPlayerName); // Note: Case insensitive.
 				if (onlinePlayer != null) {
-					// get missing / exact player information:
+					// Get missing / exact player information:
 					targetPlayerUUID = onlinePlayer.getUniqueId();
 					targetPlayerName = onlinePlayer.getName();
 				}
 			}
 
-			// permission check:
+			// Permission check:
 			if (targetOwnShops) {
-				// list own player shopkeepers:
+				// List own player shopkeepers:
 				this.checkPermission(sender, ShopkeepersPlugin.LIST_OWN_PERMISSION);
 			} else {
-				// list other player shopkeepers:
+				// List other player shopkeepers:
 				this.checkPermission(sender, ShopkeepersPlugin.LIST_OTHERS_PERMISSION);
 			}
 
-			// search for shops owned by the target player:
+			// Search for shops owned by the target player:
 			OwnedPlayerShopsResult ownedPlayerShopsResult = ShopkeeperUtils.getOwnedPlayerShops(targetPlayerUUID, targetPlayerName);
 			assert ownedPlayerShopsResult != null;
 
-			// if the input name is ambiguous, we print an error and require the player to be specified by uuid:
+			// If the input name is ambiguous, we print an error and require the player to be specified by uuid:
 			Map<UUID, String> matchingShopOwners = ownedPlayerShopsResult.getMatchingShopOwners();
 			assert matchingShopOwners != null;
 			if (PlayerUtils.handleAmbiguousPlayerName(sender, targetPlayerName, matchingShopOwners.entrySet())) {
 				return;
 			}
 
-			// get missing / exact player information:
+			// Get missing / exact player information:
 			targetPlayerUUID = ownedPlayerShopsResult.getPlayerUUID();
 			targetPlayerName = ownedPlayerShopsResult.getPlayerName();
 
-			// get found shops:
+			// Get found shops:
 			shops = ownedPlayerShopsResult.getShops();
 		}
 		assert shops != null;
@@ -170,21 +170,21 @@ class CommandList extends Command {
 		page = Math.max(1, Math.min(page, maxPage));
 
 		if (listAllShops) {
-			// listing all shops:
+			// Listing all shops:
 			TextUtils.sendMessage(sender, Settings.msgListAllShopsHeader,
 					"shopsCount", shopsCount,
 					"page", page,
 					"maxPage", maxPage
 			);
 		} else if (listAdminShops) {
-			// listing admin shops:
+			// Listing admin shops:
 			TextUtils.sendMessage(sender, Settings.msgListAdminShopsHeader,
 					"shopsCount", shopsCount,
 					"page", page,
 					"maxPage", maxPage
 			);
 		} else {
-			// listing player shops:
+			// Listing player shops:
 			TextUtils.sendMessage(sender, Settings.msgListPlayerShopsHeader,
 					"player", TextUtils.getPlayerText(targetPlayerName, targetPlayerUUID),
 					"shopsCount", shopsCount,
@@ -197,18 +197,18 @@ class CommandList extends Command {
 		int endIndex = Math.min(startIndex + ENTRIES_PER_PAGE, shopsCount);
 		for (int index = startIndex; index < endIndex; index++) {
 			Shopkeeper shopkeeper = shops.get(index);
-			String shopName = shopkeeper.getName(); // can be empty
-			// TODO add shop info as hover text
-			// TODO add owner name/uuid as message arguments?
-			// TODO move into shopkeeper
+			String shopName = shopkeeper.getName(); // Can be empty
+			// TODO Add shop info as hover text.
+			// TODO Add owner name/uuid as message arguments?
+			// TODO Move into shopkeeper.
 			TextUtils.sendMessage(sender, Settings.msgListShopsEntry,
 					"shopIndex", (index + 1),
 					"shopUUID", shopkeeper.getUniqueId().toString(),
-					// deprecated, use {shopId} instead; TODO remove at some point
+					// deprecated, use {shopId} instead; TODO Remove at some point
 					"shopSessionId", shopkeeper.getId(),
 					"shopId", shopkeeper.getId(),
-					// TODO find a better solution for this special cae, since this is specific to the used format
-					// maybe by supporting conditional prefixes/suffixes for placeholders inside the format Strings?
+					// TODO Find a better solution for this special case, since this is specific to the used format.
+					// Maybe by supporting conditional prefixes/suffixes for placeholders inside the format Strings?
 					"shopName", (shopName.isEmpty() ? "" : (shopName + " ")),
 					"location", shopkeeper.getPositionString(),
 					"shopType", shopkeeper.getType().getIdentifier(),

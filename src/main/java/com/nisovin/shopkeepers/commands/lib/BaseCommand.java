@@ -35,9 +35,9 @@ public abstract class BaseCommand extends Command implements org.bukkit.command.
 			this.setPermission(permission);
 		}
 
-		// register command executor:
+		// Register command executor:
 		bukkitCommand.setExecutor(this);
-		// register tab completer:
+		// Register tab completer:
 		bukkitCommand.setTabCompleter(this);
 	}
 
@@ -45,7 +45,7 @@ public abstract class BaseCommand extends Command implements org.bukkit.command.
 	public boolean onCommand(CommandSender sender, org.bukkit.command.Command bukkitCommand, String commandAlias, String[] args) {
 		CommandInput input = new CommandInput(sender, this, commandAlias, args);
 		this.handleCommand(input);
-		// we completely handle the command, including printing usage or help on syntax failure:
+		// We completely handle the command, including printing usage or help on syntax failure:
 		return true;
 	}
 

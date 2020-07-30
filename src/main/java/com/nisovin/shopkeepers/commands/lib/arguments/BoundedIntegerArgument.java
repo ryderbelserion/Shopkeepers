@@ -18,7 +18,7 @@ public class BoundedIntegerArgument extends IntegerArgument {
 		this.max = max;
 	}
 
-	// TODO more descriptive error messages
+	// TODO More descriptive error messages
 
 	@Override
 	public Integer parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {

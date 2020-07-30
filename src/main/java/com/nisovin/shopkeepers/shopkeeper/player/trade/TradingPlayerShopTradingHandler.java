@@ -26,17 +26,17 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		Player tradingPlayer = tradeData.tradingPlayer;
 		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
-		// find offer:
+		// Find offer:
 		TradingOffer offer = shopkeeper.getOffer(tradingRecipe);
 		if (offer == null) {
-			// this might happen if the trades got modified while the player was trading:
+			// This might happen if the trades got modified while the player was trading:
 			this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
 			return false;
 		}
 
 		assert containerInventory != null & newContainerContents != null;
 
-		// remove result items from container contents:
+		// Remove result items from container contents:
 		ItemStack resultItem = tradingRecipe.getResultItem();
 		assert resultItem != null;
 		if (ItemUtils.removeItems(newContainerContents, resultItem) != 0) {
@@ -44,7 +44,7 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		// add traded items to container contents:
+		// Add traded items to container contents:
 		if (!this.addItems(newContainerContents, tradingRecipe.getItem1(), tradeData.offeredItem1)
 				|| !this.addItems(newContainerContents, tradingRecipe.getItem2(), tradeData.offeredItem2)) {
 			this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
@@ -61,10 +61,10 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		if (ItemUtils.isEmpty(requiredItem)) return true;
 		int amountAfterTaxes = this.getAmountAfterTaxes(requiredItem.getAmount());
 		if (amountAfterTaxes > 0) {
-			ItemStack receivedItem = offeredItem.clone(); // create a copy, just in case
+			ItemStack receivedItem = offeredItem.clone(); // Create a copy, just in case
 			receivedItem.setAmount(amountAfterTaxes);
 			if (ItemUtils.addItems(contents, receivedItem) != 0) {
-				// couldn't add all items to the contents:
+				// Couldn't add all items to the contents:
 				return false;
 			}
 		}

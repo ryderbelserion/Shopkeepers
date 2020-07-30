@@ -24,7 +24,7 @@ public abstract class AbstractBlockShopObjectType<T extends AbstractBlockShopObj
 
 	public String createObjectId(String worldName, int blockX, int blockY, int blockZ) {
 		if (worldName == null) return null;
-		// inline for performance:
+		// Inline for performance:
 		return this.getIdentifier() + ":" + worldName + "," + blockX + "," + blockY + "," + blockZ;
 	}
 }

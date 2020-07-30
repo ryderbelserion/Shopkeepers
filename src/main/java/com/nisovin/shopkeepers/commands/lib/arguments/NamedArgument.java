@@ -78,7 +78,7 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 			throw this.invalidArgumentError(arg);
 		}
 
-		// strip the naming prefix from the input argument:
+		// Strip the naming prefix from the input argument:
 		String namelessArg = arg.substring(argPrefix.length());
 		List<String> adjustedArgs = new ArrayList<>(input.getArguments());
 		for (int i = 0; i < adjustedArgs.size(); ++i) {
@@ -93,10 +93,10 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 
 		try {
 			R value = parser.parse(adjustedInput, adjustedArgsReader);
-			argsReader.setCursor(adjustedArgsReader.getCursor()); // mirror args reader changes
+			argsReader.setCursor(adjustedArgsReader.getCursor()); // Mirror args reader changes
 			return value;
 		} catch (FallbackArgumentException e) {
-			// wrap into our own fallback exception, so that we get informed:
+			// Wrap into our own fallback exception, so that we get informed:
 			throw new FallbackArgumentException(this, e);
 		}
 	}
@@ -123,7 +123,7 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 		}
 
 		String argPrefix = this.getArgumentPrefix();
-		// prefix might be partially given:
+		// Prefix might be partially given:
 		String prefix = (argPrefix.startsWith(arg) ? arg : argPrefix);
 		try {
 			return this.parseNamedArgument(input, argsReader, prefix, (adjustedInput, adjustedArgsReader) -> {

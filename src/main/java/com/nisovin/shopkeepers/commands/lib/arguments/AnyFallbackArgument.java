@@ -44,7 +44,7 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 		fallbackArgument.setParent(this);
 	}
 
-	// may itself by a FallbackArgument
+	// May itself by a FallbackArgument.
 	public CommandArgument<?> getOriginalArgument() {
 		return argument;
 	}
@@ -78,7 +78,7 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 		try {
 			return argument.parse(input, context, argsReader);
 		} catch (ArgumentParseException e) {
-			// Note: Caller is responsible for resetting the args reader if required
+			// Note: Caller is responsible for resetting the args reader if required.
 			throw new FallbackArgumentException(this, e); // throw fallback exception
 		}
 	}
@@ -88,7 +88,7 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 		try {
 			return argument.parseValue(input, context, argsReader);
 		} catch (ArgumentParseException e) {
-			// Note: Caller is responsible for resetting the args reader if required
+			// Note: Caller is responsible for resetting the args reader if required.
 			throw new FallbackArgumentException(this, e); // throw fallback exception
 		}
 	}
@@ -99,13 +99,13 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 	@Override
 	public Object parseFallback(CommandInput input, CommandContext context, ArgumentsReader argsReader,
 								FallbackArgumentException fallbackException, boolean parsingFailed) throws ArgumentParseException {
-		// Fallback chaining: If the original exception was a fallback itself, try it first
+		// Fallback chaining: If the original exception was a fallback itself, try it first.
 		Optional<?> originalFallbackValue = this.parseOriginalFallback(input, context, argsReader, fallbackException, parsingFailed);
 		if (originalFallbackValue != null) {
 			return originalFallbackValue.orElse(null);
 		}
 
-		// try to parse fallback argument:
+		// Try to parse fallback argument:
 		try {
 			return fallbackArgument.parse(input, context, argsReader);
 		} catch (MissingArgumentException | RequiresPlayerArgumentException e) {
@@ -125,16 +125,16 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 				// therefore we can't simple throw a 'missing argument'/'requires player' exception in its name here.
 				try {
 					return argument.parse(input, context, argsReader);
-					// unexpected, but in case the original argument succeeds now, use the parsed value
+					// Unexpected, but in case the original argument succeeds now, use the parsed value.
 				} catch (FallbackArgumentException fe) {
-					// in case we are inside a chain of fallbacks, use the original (root) exception:
+					// In case we are inside a chain of fallbacks, use the original (root) exception:
 					throw fe.getRootException();
-				} // forward any other type of parsing exception
+				} // Forward any other type of parsing exception.
 			}
 		}
 	}
 
-	// returns null if no original fallback was able to parse a fallback value
+	// Returns null if no original fallback was able to parse a fallback value
 	protected final Optional<?> parseOriginalFallback(	CommandInput input, CommandContext context, ArgumentsReader argsReader,
 														FallbackArgumentException fallbackException, boolean parsingFailed) {
 		ArgumentParseException originalException = fallbackException.getOriginalException();
@@ -142,15 +142,15 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 			FallbackArgumentException originalFallback = (FallbackArgumentException) originalException;
 			FallbackArgument<?> originalFallbackArgument = originalFallback.getArgument();
 			try {
-				// if the original fallback succeeds, skip our fallback:
-				// the result may be empty (null)
-				// the original fallback is expected to be of the same type
+				// If the original fallback succeeds, skip our fallback:
+				// The result may be empty (null).
+				// The original fallback is expected to be of the same type.
 				return Optional.ofNullable(originalFallbackArgument.parseFallback(input, context, argsReader, originalFallback, parsingFailed));
-			} catch (FallbackArgumentException e) { // fallback is not allowed to throw another fallback exception here
+			} catch (FallbackArgumentException e) { // Fallback is not allowed to throw another fallback exception here.
 				Validate.State.error("Original fallback argument '" + originalFallbackArgument.getName()
 						+ "' threw another FallbackArgumentException while parsing fallback: " + e);
 			} catch (ArgumentParseException e) {
-				// the original fallback failed: ignore and return null
+				// The original fallback failed: Ignore and return null.
 			}
 		}
 		return null;
@@ -158,8 +158,8 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 
 	@Override
 	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
-		// combine suggestions of the original and the fallback argument:
-		ArgumentsReader argsReaderState = argsReader.createSnapshot(); // keep track of the initial state
+		// Combine suggestions of the original and the fallback argument:
+		ArgumentsReader argsReaderState = argsReader.createSnapshot(); // Keep track of the initial state
 		List<String> argumentSuggestions = argument.complete(input, context, argsReader);
 		if (argumentSuggestions.size() >= MAX_SUGGESTIONS) return argumentSuggestions;
 
@@ -167,7 +167,7 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 		int limit = (MAX_SUGGESTIONS - suggestions.size());
 		assert limit > 0;
 
-		// reset args so that the fallback argument has a chance to provide different completions:
+		// Reset args so that the fallback argument has a chance to provide different completions:
 		argsReader.setState(argsReaderState);
 		List<String> fallbackSuggestions = fallbackArgument.complete(input, context, argsReader);
 

@@ -28,7 +28,7 @@ public enum SignType {
 	private SignType(Material signMaterial, Material wallSignMaterial) {
 		this.signMaterial = signMaterial;
 		this.wallSignMaterial = wallSignMaterial;
-		// Assert: Either both a null or both a non-null:
+		// Assert: Either both are null or both are non-null.
 		assert signMaterial != null ^ wallSignMaterial == null;
 	}
 

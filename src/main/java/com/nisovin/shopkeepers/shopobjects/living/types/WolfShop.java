@@ -29,13 +29,13 @@ public class WolfShop extends SittableShop<Wolf> {
 	private static final Property<DyeColor> PROPERTY_COLLAR_COLOR = new EnumProperty<DyeColor>(DyeColor.class, "collarColor", null) {
 		@Override
 		public boolean isNullable() {
-			// null to indicate 'no collar / untamed'
+			// Null to indicate 'no collar / untamed':
 			return true;
 		}
 	};
 
 	private boolean angry = PROPERTY_ANGRY.getDefaultValue();
-	private DyeColor collarColor = PROPERTY_COLLAR_COLOR.getDefaultValue(); // can be null
+	private DyeColor collarColor = PROPERTY_COLLAR_COLOR.getDefaultValue(); // Can be null
 
 	public WolfShop(LivingShops livingShops, SKLivingShopObjectType<WolfShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -77,7 +77,7 @@ public class WolfShop extends SittableShop<Wolf> {
 	public void setAngry(boolean angry) {
 		this.angry = angry;
 		shopkeeper.markDirty();
-		this.applyAngry(this.getEntity()); // null if not active
+		this.applyAngry(this.getEntity()); // Null if not active
 	}
 
 	private void applyAngry(Wolf entity) {
@@ -115,16 +115,16 @@ public class WolfShop extends SittableShop<Wolf> {
 	public void setCollarColor(DyeColor collarColor) {
 		this.collarColor = collarColor;
 		shopkeeper.markDirty();
-		this.applyCollarColor(this.getEntity()); // null if not active
+		this.applyCollarColor(this.getEntity()); // Null if not active
 	}
 
 	private void applyCollarColor(Wolf entity) {
 		if (entity == null) return;
 		if (collarColor == null) {
-			// no collar / untamed:
+			// No collar / untamed:
 			entity.setTamed(false);
 		} else {
-			entity.setTamed(true); // only tamed cats will show the collar
+			entity.setTamed(true); // Only tamed cats will show the collar
 			entity.setCollarColor(collarColor);
 		}
 	}

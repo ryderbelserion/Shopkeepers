@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.util.Validate;
  */
 public class InsertionText extends TextBuilder {
 
-	private final String insertion; // not null or empty
+	private final String insertion; // Not null or empty
 
 	InsertionText(String insertion) {
 		Validate.notEmpty(insertion, "Insertion is null or empty!");

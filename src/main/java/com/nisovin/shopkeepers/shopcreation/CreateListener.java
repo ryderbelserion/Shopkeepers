@@ -36,7 +36,7 @@ import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
- * Handling usage of the creation item.
+ * Handles the usage of the shop creation item.
  */
 class CreateListener implements Listener {
 
@@ -58,11 +58,11 @@ class CreateListener implements Listener {
 		}
 
 		if (!plugin.hasCreatePermission(player)) {
-			// player cannot create any shopkeeper at all
+			// The player cannot create any shopkeepers at all.
 			return;
 		}
 
-		// print info message about usage:
+		// Print info message about usage:
 		TextUtils.sendMessage(player, Settings.msgCreationItemSelected);
 	}
 
@@ -71,14 +71,14 @@ class CreateListener implements Listener {
 	// case some other event handler managed to already cancel the event on LOWEST priority, we ignore the interaction.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
-		// ignore our own fake interact event:
+		// Ignore our own fake interact event:
 		if (event instanceof TestPlayerInteractEvent) return;
 
-		// ignore if the player isn't right-clicking, or left-clicking air:
+		// Ignore if the player isn't right-clicking, or left-clicking air:
 		Action action = event.getAction();
 		if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_AIR) return;
 
-		// make sure the item used is the shop creation item:
+		// Make sure that the used item is the shop creation item:
 		ItemStack itemInHand = event.getItem();
 		if (!Settings.isShopCreationItem(itemInHand)) {
 			return;
@@ -87,25 +87,25 @@ class CreateListener implements Listener {
 		Player player = event.getPlayer();
 		Log.debug(() -> "Player " + player.getName() + " is interacting with the shop creation item");
 
-		// ignore creative mode players:
+		// Ignore creative mode players:
 		if (player.getGameMode() == GameMode.CREATIVE) {
 			Log.debug("  Ignoring creative mode player");
 			return;
 		}
 
-		// capture event's cancellation state:
+		// Capture event's cancellation state:
 		Result useItemInHand = event.useItemInHand();
 
-		// prevent regular usage:
-		// TODO are there items which would require canceling the event for all left clicks or physical interaction as
+		// Prevent regular usage:
+		// TODO Are there items which would require canceling the event for all left clicks or physical interaction as
 		// well?
 		if (Settings.preventShopCreationItemRegularUsage && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Log.debug("  Preventing normal shop creation item usage");
 			event.setCancelled(true);
 		}
 
-		// ignore off-hand interactions from this point on:
-		// -> the item will only act as shop creation item if it is held in the main hand
+		// Ignore off-hand interactions from this point on:
+		// -> The item will only act as shop creation item if it is held in the main hand.
 		if (event.getHand() != EquipmentSlot.HAND) {
 			Log.debug("  Ignoring off-hand interaction");
 			return;
@@ -118,35 +118,35 @@ class CreateListener implements Listener {
 			return;
 		}
 
-		// cancel interactions with our custom shop creation item:
+		// Cancel interactions with our custom shop creation item:
 		event.setCancelled(true);
 
-		// get shop type:
+		// Get shop type:
 		ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);
-		// get shop object type:
+		// Get shop object type:
 		ShopObjectType<?> shopObjType = plugin.getShopObjectTypeRegistry().getSelection(player);
 
 		if (shopType == null || shopObjType == null) {
-			// the player cannot create shops at all:
+			// The player cannot create any shops at all:
 			TextUtils.sendMessage(player, Settings.msgNoPermission);
 			return;
 		}
 
-		// check what the player is doing with the shop creation item in hand:
+		// Check what the player is doing with the shop creation item in hand:
 		if (action == Action.RIGHT_CLICK_AIR) {
 			if (player.isSneaking()) {
-				// cycle shop objects:
+				// Cycle shop objects:
 				plugin.getShopObjectTypeRegistry().selectNext(player);
 			} else {
-				// cycle shopkeeper types:
+				// Cycle shopkeeper types:
 				plugin.getShopTypeRegistry().selectNext(player);
 			}
 		} else if (action == Action.LEFT_CLICK_AIR) {
 			if (player.isSneaking()) {
-				// cycle shop objects backwards:
+				// Cycle shop objects backwards:
 				plugin.getShopObjectTypeRegistry().selectPrevious(player);
 			} else {
-				// cycle shopkeeper types backwards:
+				// Cycle shopkeeper types backwards:
 				plugin.getShopTypeRegistry().selectPrevious(player);
 			}
 		} else if (action == Action.RIGHT_CLICK_BLOCK) {
@@ -186,27 +186,27 @@ class CreateListener implements Listener {
 				}
 				assert ShopContainers.isSupportedContainer(selectedContainer.getType()); // Checked above already
 
-				// validate the selected shop type:
+				// Validate the selected shop type:
 				if (!(shopType instanceof PlayerShopType)) {
-					// only player shop types are allowed here:
+					// Only player shop types are allowed here:
 					TextUtils.sendMessage(player, Settings.msgNoPlayerShopTypeSelected);
 					return;
 				}
 
-				// determine spawn location:
+				// Determine spawn location:
 				BlockFace clickedBlockFace = event.getBlockFace();
 				Location spawnLocation = shopkeeperCreation.determineSpawnLocation(player, clickedBlock, clickedBlockFace);
 
-				// create player shopkeeper:
+				// Create player shopkeeper:
 				ShopCreationData creationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, clickedBlockFace, selectedContainer);
 				Shopkeeper shopkeeper = plugin.handleShopkeeperCreation(creationData);
 				if (shopkeeper != null) {
-					// shopkeeper creation was successful:
+					// Shopkeeper creation was successful:
 
 					// Reset selected container:
 					shopkeeperCreation.selectContainer(player, null);
 
-					// manually remove creation item from player's hand after this event is processed:
+					// Manually remove creation item from player's hand after this event is processed:
 					Bukkit.getScheduler().runTask(plugin, () -> {
 						ItemStack newItemInMainHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
 						player.getInventory().setItemInMainHand(newItemInMainHand);
@@ -221,8 +221,8 @@ class CreateListener implements Listener {
 		if (Settings.preventShopCreationItemRegularUsage && Settings.isShopCreationItem(event.getItem())) {
 			Log.debug(() -> "Preventing dispensing of shop creation item at " + TextUtils.getLocationString(event.getBlock()));
 			event.setCancelled(true);
-			// TODO drop item instead
-			// TODO only prevent it for items that have a special dispense behavior
+			// TODO Drop item instead.
+			// TODO Only prevent it for items that have a special dispense behavior.
 		}
 	}
 
@@ -239,7 +239,7 @@ class CreateListener implements Listener {
 	private void handleEntityInteraction(PlayerInteractEntityEvent event) {
 		if (!Settings.preventShopCreationItemRegularUsage) return;
 		Player player = event.getPlayer();
-		if (player.getGameMode() == GameMode.CREATIVE) return; // creative mode players are ignored
+		if (player.getGameMode() == GameMode.CREATIVE) return; // Creative mode players are ignored
 		// We check the permission first since this check is fast:
 		if (PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) return;
 		ItemStack itemInHand = ItemUtils.getItem(player.getInventory(), event.getHand());

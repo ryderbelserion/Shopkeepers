@@ -22,7 +22,7 @@ public abstract class UIHandler {
 	private final AbstractUIType uiType;
 	private final AbstractShopkeeper shopkeeper;
 
-	// heuristic detection of automatically triggered shift left-clicks:
+	// Heuristic detection of automatically triggered shift left-clicks:
 	private static final long AUTOMATIC_SHIFT_LEFT_CLICK_MS = 250L;
 	private long lastManualClick = 0L;
 	private int lastManualClickedSlotId = -1;
@@ -54,12 +54,12 @@ public abstract class UIHandler {
 	 *            the player
 	 */
 	protected void closeDelayed(Player player) {
-		// temporary deactivate ui and close open window delayed for this player:
+		// Temporary deactivate UI and close open window delayed for this player:
 		shopkeeper.deactivateUI();
 		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
 			player.closeInventory();
 
-			// reactivate ui:
+			// Reactivate UI:
 			shopkeeper.activateUI();
 		});
 	}
@@ -129,7 +129,7 @@ public abstract class UIHandler {
 	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
 	}
 
-	// handling of interface window interactions
+	// Handling of interface window interactions
 
 	/**
 	 * Returns whether the currently handled inventory click is, according to our heuristic, an automatically triggered
@@ -156,9 +156,9 @@ public abstract class UIHandler {
 		return isAutomaticShiftLeftClick;
 	}
 
-	// Called by UIListener
+	// Called by UIListener.
 	void informOnInventoryClickEarly(InventoryClickEvent event, Player player) {
-		// heuristic detection of automatically triggered shift left-clicks:
+		// Heuristic detection of automatically triggered shift left-clicks:
 		isAutomaticShiftLeftClick = false; // reset
 		final long now = (System.nanoTime() / 1000000L);
 		if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
@@ -193,7 +193,7 @@ public abstract class UIHandler {
 	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
 	}
 
-	// Called by UIListener
+	// Called by UIListener.
 	void informOnInventoryClickLate(InventoryClickEvent event, Player player) {
 		this.onInventoryClickLate(event, player);
 	}
@@ -211,7 +211,7 @@ public abstract class UIHandler {
 	protected void onInventoryClickLate(InventoryClickEvent event, Player player) {
 	}
 
-	// Called by UIListener
+	// Called by UIListener.
 	void informOnInventoryDragEarly(InventoryDragEvent event, Player player) {
 		this.onInventoryDragEarly(event, player);
 	}
@@ -232,7 +232,7 @@ public abstract class UIHandler {
 	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
 	}
 
-	// Called by UIListener
+	// Called by UIListener.
 	void informOnInventoryDragLate(InventoryDragEvent event, Player player) {
 		this.onInventoryDragLate(event, player);
 	}

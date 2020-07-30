@@ -2,12 +2,12 @@ package com.nisovin.shopkeepers.spigot;
 
 public class SpigotFeatures {
 
-	// null if not yet checked:
+	// Null if not yet checked:
 	private static Boolean SPIGOT_AVAILABLE = null;
 
 	public static boolean isSpigotAvailable() {
 		if (SPIGOT_AVAILABLE == null) {
-			// not yet checked:
+			// Not yet checked:
 			try {
 				Class.forName("org.bukkit.Server$Spigot");
 				SPIGOT_AVAILABLE = true;

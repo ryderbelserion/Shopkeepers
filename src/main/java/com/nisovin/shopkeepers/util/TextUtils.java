@@ -51,7 +51,7 @@ public class TextUtils {
 		return getLocationString(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
 	}
 
-	// more performant variant if coordinates are integers:
+	// More performant variant if coordinates are integers:
 	public static String getLocationString(String worldName, int x, int y, int z) {
 		return worldName + "," + x + "," + y + "," + z;
 	}
@@ -77,7 +77,7 @@ public class TextUtils {
 	}
 
 	public static String getPlayerString(String playerName, UUID playerUUID) {
-		// either of them might be null
+		// Either of them might be null.
 		if (playerName != null) {
 			return playerName + (playerUUID == null ? "" : " (" + playerUUID.toString() + ")");
 		} else if (playerUUID != null) {
@@ -88,8 +88,8 @@ public class TextUtils {
 	}
 
 	public static String getPlayerNameOrUUID(String playerName, UUID playerUUID) {
-		// either of them might be null
-		// prefer name, else use uuid
+		// Either of them might be null.
+		// Prefer name, else use uuid.
 		if (playerName != null) {
 			return playerName;
 		} else if (playerUUID != null) {
@@ -102,7 +102,7 @@ public class TextUtils {
 	public static final char COLOR_CHAR_ALTERNATIVE = '&';
 	private static final Pattern STRIP_COLOR_ALTERNATIVE_PATTERN = Pattern.compile("(?i)" + String.valueOf(COLOR_CHAR_ALTERNATIVE) + "[0-9A-FK-OR]");
 
-	// reverse of ChatColor#translateAlternateColorCodes
+	// Reverse of ChatColor#translateAlternateColorCodes:
 	public static String translateColorCodesToAlternative(char altColorChar, String textToTranslate) {
 		char[] b = textToTranslate.toCharArray();
 		for (int i = 0; i < b.length - 1; i++) {
@@ -135,7 +135,7 @@ public class TextUtils {
 		return decolored;
 	}
 
-	// decolorizes string entries, otherwise adopts them as they are
+	// Decolorizes String entries, otherwise adopts them as they are:
 	public static List<Object> decolorizeUnknown(List<?> colored) {
 		if (colored == null) return null;
 		List<Object> decolored = new ArrayList<>(colored.size());
@@ -163,7 +163,7 @@ public class TextUtils {
 		return colored;
 	}
 
-	// colorizes string entries, otherwise adopts them as they are
+	// Colorizes String entries, otherwise adopts them as they are:
 	public static List<Object> colorizeUnknown(List<?> uncolored) {
 		if (uncolored == null) return null;
 		List<Object> colored = new ArrayList<>(uncolored.size());
@@ -207,16 +207,16 @@ public class TextUtils {
 
 	public static String replaceArguments(String message, Map<String, Object> arguments) {
 		Validate.notNull(message, "Message is null!");
-		// uses the default key format: {key}
-		return StringUtils.replaceArguments(message, arguments); // checks arguments
+		// Uses the default key format: {key}
+		return StringUtils.replaceArguments(message, arguments); // Checks arguments
 	}
 
-	// creates and returns a new List of messages
+	// Creates and returns a new List of messages:
 	public static List<String> replaceArguments(Collection<String> messages, Map<String, Object> arguments) {
 		Validate.notNull(messages, "Messages is null!");
 		List<String> replaced = new ArrayList<>(messages.size());
 		for (String message : messages) {
-			replaced.add(replaceArguments(message, arguments)); // checks message and arguments
+			replaced.add(replaceArguments(message, arguments)); // Checks message and arguments
 		}
 		return replaced;
 	}
@@ -227,7 +227,7 @@ public class TextUtils {
 			addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
 			return replaceArguments(messages, TEMP_ARGUMENTS_MAP);
 		} finally {
-			TEMP_ARGUMENTS_MAP.clear(); // reset
+			TEMP_ARGUMENTS_MAP.clear(); // Reset
 		}
 	}
 
@@ -236,22 +236,22 @@ public class TextUtils {
 	public static void sendMessage(CommandSender recipient, String message) {
 		Validate.notNull(recipient, "Recipient is null!");
 		Validate.notNull(message, "Message is null!");
-		// skip sending if message is empty: allows disabling of messages
+		// Skip sending if message is empty: Allows disabling of messages.
 		if (message.isEmpty()) return;
 
-		// send (potentially multiline) message:
+		// Send (potentially multi-line) message:
 		for (String line : StringUtils.splitLines(message)) {
 			recipient.sendMessage(line);
 		}
 	}
 
 	public static void sendMessage(CommandSender recipient, String message, Map<String, Object> arguments) {
-		// replace message arguments and then send:
+		// Replace message arguments and then send:
 		sendMessage(recipient, replaceArguments(message, arguments));
 	}
 
 	public static void sendMessage(CommandSender recipient, String message, Object... argumentPairs) {
-		// replace message arguments and then send:
+		// Replace message arguments and then send:
 		sendMessage(recipient, replaceArguments(message, argumentPairs));
 	}
 
@@ -270,8 +270,8 @@ public class TextUtils {
 	}
 
 	public static Text getPlayerText(String playerName, UUID playerUUID) {
-		// either of them might be null
-		// prefer name, else use uuid
+		// Either of them might be null.
+		// Prefer name, else use uuid.
 		if (playerName != null) {
 			if (playerUUID != null) {
 				String playerUUIDString = playerUUID.toString();
@@ -298,7 +298,7 @@ public class TextUtils {
 	public static void sendMessage(CommandSender recipient, Text message, Map<String, Object> arguments) {
 		Validate.notNull(recipient, "Recipient is null!");
 		Validate.notNull(message, "Message is null!");
-		// assign arguments and then send:
+		// Assign arguments and then send:
 		message.setPlaceholderArguments(arguments);
 		sendMessage(recipient, message);
 	}
@@ -306,7 +306,7 @@ public class TextUtils {
 	public static void sendMessage(CommandSender recipient, Text message, Object... argumentPairs) {
 		Validate.notNull(recipient, "Recipient is null!");
 		Validate.notNull(message, "Message is null!");
-		// assign arguments and then send:
+		// Assign arguments and then send:
 		message.setPlaceholderArguments(argumentPairs);
 		sendMessage(recipient, message);
 	}

@@ -35,7 +35,7 @@ public class ParrotShop extends SittableShop<Parrot> {
 
 	@Override
 	protected boolean isBabyable() {
-		return false; // baby parrots don't seem to work
+		return false; // Baby parrots do not seem to work
 	}
 
 	@Override
@@ -70,7 +70,7 @@ public class ParrotShop extends SittableShop<Parrot> {
 		Validate.notNull(parrotVariant, "Parrot variant is null!");
 		this.parrotVariant = parrotVariant;
 		shopkeeper.markDirty();
-		this.applyParrotVariant(this.getEntity()); // null if not active
+		this.applyParrotVariant(this.getEntity()); // Null if not active
 	}
 
 	private void applyParrotVariant(Parrot entity) {

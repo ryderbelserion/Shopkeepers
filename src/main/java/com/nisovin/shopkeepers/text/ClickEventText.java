@@ -34,8 +34,8 @@ public class ClickEventText extends TextBuilder {
 		CHANGE_PAGE
 	}
 
-	private final Action action; // not null
-	private final String value; // not null, can be empty
+	private final Action action; // Not null
+	private final String value; // Not null, can be empty
 
 	ClickEventText(Action action, String value) {
 		Validate.notNull(action, "Action is null!");

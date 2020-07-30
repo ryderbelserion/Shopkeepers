@@ -38,7 +38,7 @@ public abstract class FallbackArgument<T> extends CommandArgument<T> {
 	// TODO Integrate into CommandArgument? Some arguments with child arguments are only supposed to 'be' fallback
 	// arguments if their child arguments are fallback arguments. This leads to them having to always extend
 	// FallbackArgument anyways, regardless of whether they actually use fallbacks or not.
-	// TODO avoid wrapping FallbackArgumentsExceptions of child arguments? Delegate fallback parsing to parent/root
+	// TODO Avoid wrapping FallbackArgumentsExceptions of child arguments? Delegate fallback parsing to parent/root
 	// argument inside Command?
 
 	public FallbackArgument(String name) {

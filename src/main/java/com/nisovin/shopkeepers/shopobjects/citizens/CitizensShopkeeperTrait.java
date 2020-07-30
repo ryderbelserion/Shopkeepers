@@ -23,7 +23,7 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	public static final String TRAIT_NAME = "shopkeeper";
 
-	// citizens shop object id
+	// Citizens shop object id:
 	private String shopObjectId = null;
 
 	public CitizensShopkeeperTrait() {
@@ -49,8 +49,8 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	@Override
 	public void onRemove() {
-		// this was also called when citizens reloads or disables in the past..
-		// we detect trait removal by listening to specific citizens events
+		// This was also called when citizens reloads or disables in the past..
+		// We detect trait removal by listening to specific citizens events.
 	}
 
 	void onShopkeeperDeletion(Shopkeeper shopkeeper) {
@@ -77,9 +77,9 @@ public class CitizensShopkeeperTrait extends Trait {
 			assert shopkeeper.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN();
 			SKCitizensShopObject shopObject = (SKCitizensShopObject) shopkeeper.getShopObject();
 			shopObject.setKeepNPCOnDeletion();
-			// this should keep the citizens npc and only remove the shopkeeper data:
+			// This should keep the citizens npc and only remove the shopkeeper data:
 			shopkeeper.delete(player);
-			// save:
+			// Save:
 			shopkeeper.save();
 		} else {
 			// TODO If the trait gets removed while the Shopkeepers plugin is not running, the shopkeeper does not get
@@ -105,19 +105,19 @@ public class CitizensShopkeeperTrait extends Trait {
 	@Override
 	public void onAttach() {
 		// TODO Is this still required? We already handle all trait additions via events now.
-		// note: this is also called whenever citizens gets reloaded
+		// Note: This is also called whenever citizens gets reloaded.
 		// Log.debug("Shopkeeper trait attached to NPC " + npc.getId());
 
 		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
 		if (plugin == null) {
-			// shopkeepers is not running:
+			// Shopkeepers is not running:
 			return;
 		}
 
-		// giving citizens some time to properly initialize the trait and npc:
-		// also: shopkeeper creation by a player is handled after trait attachment
+		// Giving citizens some time to properly initialize the trait and NPC:
+		// Also: Shopkeeper creation by a player is handled after trait attachment.
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			// create a new shopkeeper if there isn't one already for this npc (without creator):
+			// Create a new shopkeeper if there isn't one already for this NPC (without creator):
 			this.createShopkeeper(null);
 		}, 5L);
 	}
@@ -125,12 +125,12 @@ public class CitizensShopkeeperTrait extends Trait {
 	private boolean isMissingShopkeeper() {
 		NPC npc = this.getNPC();
 		if (npc == null || !npc.hasTrait(CitizensShopkeeperTrait.class)) {
-			// citizens not running or trait got already removed again?
+			// Citizens not running or trait got already removed again?
 			return false;
 		}
 		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
 		if (plugin == null) {
-			// shopkeepers not running:
+			// Shopkeepers not running:
 			return false;
 		}
 
@@ -143,15 +143,15 @@ public class CitizensShopkeeperTrait extends Trait {
 		return true;
 	}
 
-	// creator can be null
+	// Creator can be null.
 	private void createShopkeeper(Player creator) {
 		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
 		if (plugin == null) {
-			// shopkeepers is not running:
+			// Shopkeepers is not running:
 			return;
 		}
 
-		// create a new shopkeeper (if there isn't one already for this npc):
+		// Create a new shopkeeper (if there isn't one already for this NPC):
 		if (!this.isMissingShopkeeper()) {
 			return;
 		}
@@ -174,19 +174,19 @@ public class CitizensShopkeeperTrait extends Trait {
 
 			Shopkeeper shopkeeper = null;
 			if (creator != null) {
-				// handle shopkeeper creation by player:
+				// Handle shopkeeper creation by player:
 				shopkeeper = plugin.handleShopkeeperCreation(creationData);
 			} else {
-				// create shopkeeper directly (without available creator):
+				// Create shopkeeper directly (without available creator):
 				ShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
 				try {
 					shopkeeper = shopkeeperRegistry.createShopkeeper(creationData);
 					assert shopkeeper != null;
 
-					// save:
+					// Save:
 					shopkeeper.save();
 				} catch (ShopkeeperCreateException e) {
-					// some issue identified during shopkeeper creation (possibly hinting to a bug):
+					// Some issue identified during shopkeeper creation (possibly hinting to a bug):
 					Log.warning("Shopkeeper creation failed!", e);
 				}
 			}
@@ -199,7 +199,7 @@ public class CitizensShopkeeperTrait extends Trait {
 				Bukkit.getScheduler().runTask(plugin, () -> npc.removeTrait(CitizensShopkeeperTrait.class));
 			}
 		} else {
-			// well.. no idea what to do in that case.. we cannot create a shopkeeper without a location, right?
+			// Well.. no idea what to do in that case.. we cannot create a shopkeeper without a location, right?
 			Log.debug("Shopkeeper NPC Trait: Failed to create the shopkeeper due to missing NPC location.");
 		}
 	}

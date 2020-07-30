@@ -61,7 +61,7 @@ public abstract class AbstractTypeRegistry<T extends AbstractType> implements Ty
 	@Override
 	public T match(String identifier) {
 		if (identifier == null || identifier.isEmpty()) return null;
-		// normalizing the identifier beforehand might slightly improve performance of this loop:
+		// Normalizing the identifier beforehand might slightly improve performance of this loop:
 		identifier = StringUtils.normalize(identifier);
 		for (T type : registeredTypesView) {
 			if (type.matches(identifier)) {

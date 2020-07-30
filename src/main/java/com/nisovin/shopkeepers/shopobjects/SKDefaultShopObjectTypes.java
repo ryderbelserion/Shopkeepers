@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.shopobjects.sign.SKSignShopObjectType;
 
 public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 
-	// TODO maybe change object type permissions to 'shopkeeper.object.<type>'?
+	// TODO Maybe change object type permissions to 'shopkeeper.object.<type>'?
 
 	private final SKShopkeepersPlugin plugin;
 

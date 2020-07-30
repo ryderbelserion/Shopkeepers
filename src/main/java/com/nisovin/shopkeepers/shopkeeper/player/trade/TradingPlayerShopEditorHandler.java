@@ -36,23 +36,23 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		SKTradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
-		// add the shopkeeper's offers:
+		// Add the shopkeeper's offers:
 		for (TradingOffer offer : shopkeeper.getOffers()) {
 			TradingRecipeDraft recipe = new TradingRecipeDraft(offer.getResultItem(), offer.getItem1(), offer.getItem2());
 			recipes.add(recipe);
 		}
 
-		// add empty offers for items from the container:
+		// Add empty offers for items from the container:
 		List<ItemCount> containerItems = shopkeeper.getItemsFromContainer();
 		for (int containerItemIndex = 0; containerItemIndex < containerItems.size(); containerItemIndex++) {
 			ItemCount itemCount = containerItems.get(containerItemIndex);
-			ItemStack itemFromContainer = itemCount.getItem(); // this item is already a copy with amount 1
+			ItemStack itemFromContainer = itemCount.getItem(); // This item is already a copy with amount 1
 
 			if (shopkeeper.getOffer(itemFromContainer) != null) {
-				continue; // already added
+				continue; // Already added
 			}
 
-			// add recipe:
+			// Add recipe:
 			TradingRecipeDraft recipe = new TradingRecipeDraft(itemFromContainer, null, null);
 			recipes.add(recipe);
 		}
@@ -75,22 +75,22 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 	@Override
 	protected void handlePlayerInventoryClick(Session session, InventoryClickEvent event) {
-		// assert: event cancelled
-		// clicking in player inventory:
-		if (event.isShiftClick()) return; // ignoring shift clicks
+		// Assert: Event cancelled.
+		// Clicking in player inventory:
+		if (event.isShiftClick()) return; // Ignoring shift clicks
 
 		ItemStack cursor = event.getCursor();
 		ItemStack current = event.getCurrentItem();
 		if (!ItemUtils.isEmpty(cursor)) {
 			if (ItemUtils.isEmpty(current)) {
-				// place item from cursor:
+				// Place item from cursor:
 				event.setCurrentItem(cursor);
-				event.getView().setCursor(null); // requires the event to be cancelled
+				event.getView().setCursor(null); // Requires the event to be cancelled
 			}
 		} else if (!ItemUtils.isEmpty(current)) {
-			// pick up item to cursor:
+			// Pick up item to cursor:
 			event.setCurrentItem(null);
-			event.getView().setCursor(current); // requires the event to be cancelled
+			event.getView().setCursor(current); // Requires the event to be cancelled
 		}
 	}
 
@@ -102,7 +102,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 		ItemStack cursor = event.getCursor();
 		if (!ItemUtils.isEmpty(cursor)) {
-			// place item from cursor:
+			// Place item from cursor:
 			Inventory inventory = event.getInventory();
 			ItemStack cursorClone = cursor.clone();
 			cursorClone.setAmount(1);
@@ -110,7 +110,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 				inventory.setItem(rawSlot, cursorClone);
 			});
 		} else {
-			// changing stack size of clicked item:
+			// Changing stack size of clicked item:
 			boolean resultRow = this.isResultRow(rawSlot);
 			this.handleUpdateItemAmountOnClick(event, resultRow ? 1 : 0);
 		}
@@ -120,7 +120,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
 		event.setCancelled(true);
 		ItemStack cursor = event.getOldCursor();
-		// assert: cursor item is already a clone
+		// Assert: Cursor item is already a clone.
 		if (ItemUtils.isEmpty(cursor)) return;
 
 		Set<Integer> rawSlots = event.getRawSlots();
@@ -128,7 +128,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 		int rawSlot = rawSlots.iterator().next();
 		if (this.isResultRow(rawSlot) || this.isItem1Row(rawSlot) || this.isItem2Row(rawSlot)) {
-			// place item from cursor:
+			// Place item from cursor:
 			Inventory inventory = event.getInventory();
 			cursor.setAmount(1);
 			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
@@ -137,15 +137,15 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		} else {
 			InventoryView view = event.getView();
 			if (this.isPlayerInventory(view, view.getSlotType(rawSlot), rawSlot)) {
-				// clicking in player inventory:
-				// the cancelled drag event resets the cursor afterwards, so we need this delay:
+				// Clicking in player inventory:
+				// The cancelled drag event resets the cursor afterwards, so we need this delay:
 				Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-					// freshly get and check cursor to make sure that players don't abuse this delay:
+					// Freshly get and check cursor to make sure that players don't abuse this delay:
 					ItemStack cursorCurrent = view.getCursor();
 					if (ItemUtils.isEmpty(cursorCurrent)) return;
 					ItemStack current = view.getItem(rawSlot);
 					if (ItemUtils.isEmpty(current)) {
-						// place item from cursor:
+						// Place item from cursor:
 						view.setItem(rawSlot, cursorCurrent);
 						view.setCursor(null);
 					}

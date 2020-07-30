@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 public class DebugListener implements Listener {
 
 	public static DebugListener register(boolean logAllEvents, boolean printListeners) {
-		// TODO might only log events whose classes got loaded yet (eg. with registered listeners).
+		// TODO Might only log events whose classes got loaded yet (eg. with registered listeners).
 		Log.info("Registering DebugListener.");
 		DebugListener debugListener = new DebugListener(logAllEvents, printListeners);
 		List<HandlerList> allHandlerLists = HandlerList.getHandlerLists();
@@ -60,9 +60,9 @@ public class DebugListener implements Listener {
 			eventData.put(eventName, data);
 		}
 
-		// event logging:
+		// Event logging:
 		if (logAllEvents) {
-			// combine subsequent calls of the same event into single output that gets printed with the next event:
+			// Combine subsequent calls of the same event into single output that gets printed with the next event:
 			if (eventName.equals(lastLoggedEvent)) {
 				lastLoggedEventCounter++;
 			} else {
@@ -76,7 +76,7 @@ public class DebugListener implements Listener {
 			}
 		}
 
-		// print listeners, once:
+		// Print listeners, once:
 		if (printListeners && !data.printedListeners) {
 			data.printedListeners = true;
 			Utils.printRegisteredListeners(event);

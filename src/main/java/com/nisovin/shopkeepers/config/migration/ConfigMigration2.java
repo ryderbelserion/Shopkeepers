@@ -64,19 +64,19 @@ public class ConfigMigration2 implements ConfigMigration {
 		msgBuilder.append(" to new format at '" + newItemKey + "'.");
 		Log.info(msgBuilder.toString());
 
-		// item type:
+		// Item type:
 		Material itemType = ConfigUtils.loadMaterial(config, itemTypeKey);
 		if (itemType == null) {
 			Log.warning("    Skipping migration for item '" + itemTypeKey + "'! Unknown material: " + config.get(itemTypeKey));
 			return;
 		}
 
-		// display name:
+		// Display name:
 		String displayName = null;
 		if (displayNameKey != null) {
 			displayName = TextUtils.colorize(config.getString(displayNameKey));
 			if (StringUtils.isEmpty(displayName)) {
-				displayName = null; // normalize empty display name to null
+				displayName = null; // Normalize empty display name to null
 			}
 		}
 		// lore:
@@ -84,15 +84,15 @@ public class ConfigMigration2 implements ConfigMigration {
 		if (loreKey != null) {
 			lore = TextUtils.colorize(config.getStringList(loreKey));
 			if (lore == null || lore.isEmpty()) {
-				lore = null; // normalize empty lore to null
+				lore = null; // Normalize empty lore to null
 			}
 		}
 
-		// create ItemData:
+		// Create ItemData:
 		ItemData itemData = new ItemData(itemType, displayName, lore);
 
-		// remove old data:
-		// if old and new key are the same, try to persist the position of the setting inside the config
+		// Remove old data:
+		// If old and new key are the same, try to persist the position of the setting inside the config.
 		if (!itemTypeKey.equals(newItemKey)) {
 			config.set(itemTypeKey, null);
 		}
@@ -103,7 +103,7 @@ public class ConfigMigration2 implements ConfigMigration {
 			config.set(loreKey, null);
 		}
 
-		// save new data (under potentially new key):
+		// Save new data (under potentially new key):
 		config.set(newItemKey, itemData.serialize());
 	}
 }

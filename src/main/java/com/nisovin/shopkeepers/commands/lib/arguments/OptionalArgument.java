@@ -18,10 +18,10 @@ import com.nisovin.shopkeepers.util.Validate;
  */
 public class OptionalArgument<T> extends FallbackArgument<T> {
 
-	// TODO implement as 'do-nothing'-fallback instead?
-	// if an invalid argument is specified, it gets currently forwarded to the next command argument, leading to a
-	// likely confusing/unrelated parsing error message
-	// fallback would jump back and throw the original parsing error if the following command argument can't parse it
+	// TODO Implement as 'do-nothing'-fallback instead?
+	// If an invalid argument is specified, it gets currently forwarded to the next command argument, leading to a
+	// likely confusing/unrelated parsing error message.
+	// Fallback would jump back and throw the original parsing error if the following command argument can't parse it.
 
 	protected final CommandArgument<T> argument;
 
@@ -53,10 +53,10 @@ public class OptionalArgument<T> extends FallbackArgument<T> {
 		try {
 			value = parser.parse();
 		} catch (FallbackArgumentException e) {
-			// wrap fallback exceptions so that we get informed:
+			// Wrap fallback exceptions so that we get informed:
 			throw new FallbackArgumentException(this, e);
 		} catch (ArgumentParseException e) {
-			// restore previous args reader state:
+			// Restore previous args reader state:
 			argsReader.setState(argsReaderState);
 			value = null;
 		}

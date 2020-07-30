@@ -32,13 +32,13 @@ class CommandSetTradePerm extends Command {
 	CommandSetTradePerm() {
 		super("setTradePerm");
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.SET_TRADE_PERM_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionSettradeperm);
 
-		// arguments:
+		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.ADMIN),
 				TargetShopkeeperFilter.ADMIN
@@ -63,22 +63,22 @@ class CommandSetTradePerm extends Command {
 		if (currentTradePerm == null) currentTradePerm = "-";
 
 		if (removePerm) {
-			// remove trade permission:
+			// Remove trade permission:
 			assert newTradePerm == null;
 			TextUtils.sendMessage(sender, Settings.msgTradePermRemoved, "perm", currentTradePerm);
 		} else if (newTradePerm != null) {
-			// set trade permission:
+			// Set trade permission:
 			TextUtils.sendMessage(sender, Settings.msgTradePermSet, "perm", newTradePerm);
 		} else {
-			// display current trade permission:
+			// Display current trade permission:
 			TextUtils.sendMessage(sender, Settings.msgTradePermView, "perm", currentTradePerm);
 			return;
 		}
 
-		// set trade permission:
+		// Set trade permission:
 		((AdminShopkeeper) shopkeeper).setTradePermission(newTradePerm);
 
-		// save:
+		// Save:
 		shopkeeper.save();
 	}
 }

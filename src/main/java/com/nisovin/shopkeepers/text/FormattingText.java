@@ -6,7 +6,7 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class FormattingText extends TextBuilder {
 
-	private final ChatColor formatting; // not null
+	private final ChatColor formatting; // Not null
 
 	FormattingText(ChatColor formatting) {
 		Validate.notNull(formatting, "Formatting is null!");

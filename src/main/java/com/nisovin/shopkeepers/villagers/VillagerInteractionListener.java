@@ -21,7 +21,9 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 
-// Handles prevention of trading and hiring of other villagers (including wandering traders)
+/**
+ * Handles prevention of trading and hiring of other villagers (including wandering traders).
+ */
 public class VillagerInteractionListener implements Listener {
 
 	private final ShopkeepersPlugin plugin;
@@ -38,48 +40,48 @@ public class VillagerInteractionListener implements Listener {
 		AbstractVillager villager = (AbstractVillager) event.getRightClicked();
 		boolean isVillager = (villager instanceof Villager);
 		boolean isWanderingTrader = (!isVillager && villager instanceof WanderingTrader);
-		if (!isVillager && !isWanderingTrader) return; // unknown villager sub-type
+		if (!isVillager && !isWanderingTrader) return; // Unknown villager sub-type
 
 		if (plugin.getShopkeeperRegistry().isShopkeeper(villager)) {
-			// shopkeeper interaction is handled elsewhere
+			// Shopkeeper interaction is handled elsewhere
 			return;
 		}
 		Log.debug("Interaction with non-shopkeeper villager ..");
 
 		if (CitizensHandler.isNPC(villager)) {
-			// ignore any interaction with citizens2 NPCs
-			Log.debug("  ignoring (probably citizens2) NPC");
+			// Ignore any interaction with Citizens NPCs
+			Log.debug("  ignoring (probably Citizens) NPC");
 			return;
 		}
 
 		if ((isVillager && Settings.disableOtherVillagers) || (isWanderingTrader && Settings.disableWanderingTraders)) {
-			// prevent trading with non-shopkeeper villagers:
+			// Prevent trading with non-shopkeeper villagers:
 			event.setCancelled(true);
 			Log.debug("  trading prevented");
 		}
 
-		// only trigger hiring for main-hand events:
+		// Only trigger hiring for main-hand events:
 		if (event.getHand() != EquipmentSlot.HAND) return;
 
 		if ((isVillager && Settings.hireOtherVillagers) || (isWanderingTrader && Settings.hireWanderingTraders)) {
 			Player player = event.getPlayer();
-			// allow hiring of other villagers
+			// Allow hiring of other villagers
 			Log.debug("  possible hire ..");
 			if (this.handleHireOtherVillager(player, villager)) {
-				// hiring was successful -> prevent normal trading
+				// Hiring was successful. -> Prevent normal trading.
 				Log.debug("    ..success (normal trading prevented)");
 				event.setCancelled(true);
 			} else {
-				// hiring was not successful -> no preventing of normal villager trading
+				// Hiring was not successful. -> No preventing of normal villager trading.
 				Log.debug("    ..failed");
 			}
 		}
 	}
 
-	// returns false, if the player wasn't able to hire this villager
+	// Returns false, if the player wasn't able to hire this villager.
 	private boolean handleHireOtherVillager(Player player, AbstractVillager villager) {
-		// check if the player is allowed to remove (attack) the entity (in case the entity is protected by another
-		// plugin)
+		// Check if the player is allowed to remove (attack) the entity (in case the entity is protected by another
+		// plugin).
 		Log.debug("    checking villager access ..");
 		TestEntityDamageByEntityEvent fakeDamageEvent = new TestEntityDamageByEntityEvent(player, villager);
 		plugin.getServer().getPluginManager().callEvent(fakeDamageEvent);
@@ -87,18 +89,18 @@ public class VillagerInteractionListener implements Listener {
 			Log.debug("    no permission to remove villager");
 			return false;
 		}
-		// hire him if holding his hiring item
+		// Hire him if holding his hiring item.
 		PlayerInventory playerInventory = player.getInventory();
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
 		if (!Settings.isHireItem(itemInMainHand)) {
-			// TODO show hire item via hover event?
+			// TODO Show hire item via hover event?
 			TextUtils.sendMessage(player, Settings.msgVillagerForHire,
 					"costs", Settings.hireOtherVillagersCosts,
 					"hire-item", Settings.hireItem.getType().name()
-			); // TODO also print required hire item name and lore?
+			); // TODO Also print required hire item name and lore?
 			return false;
 		} else {
-			// check if the player has enough of those hiring items
+			// Check if the player has enough of those hiring items:
 			int costs = Settings.hireOtherVillagersCosts;
 			if (costs > 0) {
 				ItemStack[] storageContents = playerInventory.getStorageContents();
@@ -110,11 +112,11 @@ public class VillagerInteractionListener implements Listener {
 					if (remaining > 0) {
 						itemInMainHand.setAmount(remaining);
 					} else { // remaining <= 0
-						playerInventory.setItemInMainHand(null); // remove item in hand
+						playerInventory.setItemInMainHand(null); // Remove item in hand
 						if (remaining < 0) {
-							// remove remaining costs from inventory:
+							// Remove remaining costs from inventory:
 							ItemUtils.removeItems(storageContents, Settings.hireItem, -remaining);
-							// apply the change to the player's inventory:
+							// Apply the change to the player's inventory:
 							ItemUtils.setStorageContents(playerInventory, storageContents);
 						}
 					}
@@ -124,18 +126,18 @@ public class VillagerInteractionListener implements Listener {
 				}
 			}
 
-			// give player the shop creation item
+			// Give player the shop creation item
 			ItemStack shopCreationItem = Settings.createShopCreationItem();
 			Map<Integer, ItemStack> remaining = playerInventory.addItem(shopCreationItem);
 			if (!remaining.isEmpty()) {
 				villager.getWorld().dropItem(villager.getLocation(), shopCreationItem);
 			}
 
-			// remove the entity:
-			// note: the leashed trader llamas for the wandering trader will break and the llamas will remain
+			// Remove the entity:
+			// Note: The leashed trader llamas for the wandering trader will break and the llamas will remain.
 			villager.remove();
 
-			// update client's inventory
+			// Update client's inventory:
 			player.updateInventory();
 
 			TextUtils.sendMessage(player, Settings.msgHired);

@@ -18,7 +18,7 @@ public class LiteralArgument extends CommandArgument<String> {
 	public static final String FORMAT_PREFIX = "'";
 	public static final String FORMAT_SUFFIX = "'";
 
-	// not null nor containing null or empty literals, combines the argument name and aliases:
+	// Not null nor containing null or empty literals, combines the argument name and aliases:
 	private final List<String> literals;
 
 	public LiteralArgument(String name) {
@@ -28,7 +28,7 @@ public class LiteralArgument extends CommandArgument<String> {
 	public LiteralArgument(String name, List<String> aliases) {
 		super(name);
 
-		// initialize literals:
+		// Initialize literals:
 		this.literals = new ArrayList<>(1 + (aliases == null ? 0 : aliases.size()));
 		literals.add(name);
 		if (aliases != null) {
@@ -82,7 +82,7 @@ public class LiteralArgument extends CommandArgument<String> {
 
 		List<String> suggestions = new ArrayList<>();
 		String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
-		// hiding the argument name if a different display name is used:
+		// Hiding the argument name if a different display name is used:
 		boolean skipName = (!this.getName().equals(this.getDisplayName()));
 		for (String literal : literals) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;

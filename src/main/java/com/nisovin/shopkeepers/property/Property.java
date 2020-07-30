@@ -44,7 +44,7 @@ public abstract class Property<T> {
 	}
 
 	protected void migrate(AbstractShopkeeper shopkeeper, ConfigurationSection configSection) {
-		// nothing by default
+		// Nothing by default.
 	}
 
 	public T load(AbstractShopkeeper shopkeeper, ConfigurationSection configSection) {
@@ -62,13 +62,13 @@ public abstract class Property<T> {
 		}
 	}
 
-	// null is considered a valid value by this method
+	// Null is considered a valid value by this method.
 	protected abstract T loadValue(AbstractShopkeeper shopkeeper, ConfigurationSection configSection) throws InvalidValueException;
 
 	public void save(AbstractShopkeeper shopkeeper, ConfigurationSection configSection, T value) {
 		this.saveValue(shopkeeper, configSection, value);
 	}
 
-	// value can be null
+	// Value can be null.
 	protected abstract void saveValue(AbstractShopkeeper shopkeeper, ConfigurationSection configSection, T value);
 }

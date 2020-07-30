@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.util.TextUtils;
 
 public abstract class PlayerShopTradingHandler extends TradingHandler {
 
-	// state related to the currently handled trade:
+	// State related to the currently handled trade:
 	protected Inventory containerInventory = null;
 	protected ItemStack[] newContainerContents = null;
 
@@ -35,7 +35,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		if (!super.canOpen(player)) return false;
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 
-		// stop opening if trading shall be prevented while the owner is offline:
+		// Stop opening if trading shall be prevented while the owner is offline:
 		if (Settings.preventTradingWhileOwnerIsOnline && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null) {
@@ -53,7 +53,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Player tradingPlayer = tradeData.tradingPlayer;
 
-		// no trading with own shop:
+		// No trading with own shop:
 		if (Settings.preventTradingWithOwnShop && shopkeeper.isOwner(tradingPlayer)
 				&& !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWithOwnShop);
@@ -61,7 +61,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 			return false;
 		}
 
-		// no trading while shop owner is online:
+		// No trading while shop owner is online:
 		if (Settings.preventTradingWhileOwnerIsOnline) {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null && !shopkeeper.isOwner(tradingPlayer)
@@ -80,7 +80,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 			return false;
 		}
 
-		// setup common state information for handling this trade:
+		// Setup common state information for handling this trade:
 		this.containerInventory = ShopContainers.getInventory(container);
 		this.newContainerContents = containerInventory.getContents();
 
@@ -96,7 +96,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 			containerInventory.setContents(newContainerContents);
 		}
 
-		// reset trade related state information:
+		// Reset trade related state information:
 		this.resetTradeState();
 	}
 

@@ -13,7 +13,7 @@ public interface NMSCallProvider {
 
 	public void overwriteLivingEntityAI(LivingEntity entity);
 
-	// whether tickAI and getCollisionDistance are supported
+	// Whether tickAI and getCollisionDistance are supported.
 	public default boolean supportsCustomMobAI() {
 		return true;
 	}
@@ -22,22 +22,22 @@ public interface NMSCallProvider {
 
 	public void setOnGround(Entity entity, boolean onGround);
 
-	// on some MC versions (ex. MC 1.9, 1.10) NoAI only disables AI
+	// On some MC versions (ex. MC 1.9, 1.10) NoAI only disables AI.
 	public default boolean isNoAIDisablingGravity() {
 		return true;
 	}
 
 	public void setNoclip(Entity entity);
 
-	// TODO replace this once only the latest versions of 1.15.1 and upwards are supported
+	// TODO Replace this once only the latest versions of 1.15.1 and upwards are supported.
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid);
 
 	// Sets the entity as adult for mob types for which we don't support the baby property yet, i.e. because they are
 	// exclusive to the specific MC version:
 	// TODO Remove this once there are no exclusive mobs anymore to which this applies (currently, once we only support
-	// MC 1.16.1 upwards)
+	// MC 1.16.1. upwards)
 	public default void setExclusiveAdult(LivingEntity entity) {
-		// no exclusive mobs by default
+		// No exclusive mobs by default.
 	}
 
 	/**
@@ -58,14 +58,14 @@ public interface NMSCallProvider {
 
 	// Note: It is not safe to reduce the number of trading recipes! Reducing the size below the selected index can
 	// crash the client. It's left to the caller to ensure that the number of recipes does not get reduced, for example
-	// by inserting dummy entries
+	// by inserting dummy entries.
 	public void updateTrades(Player player);
 
-	// for use in chat hover messages, null if not supported
+	// For use in chat hover messages, null if not supported.
 	public String getItemSNBT(ItemStack itemStack);
 
-	// for use in translatable item type names, null if not supported
+	// For use in translatable item type names, null if not supported.
 	// Note: This might not necessarily match an ItemStack's name (for example for certain items, such as different
-	// types of potions, skulls, etc.)
+	// types of potions, skulls, etc.).
 	public String getItemTypeTranslationKey(Material material);
 }

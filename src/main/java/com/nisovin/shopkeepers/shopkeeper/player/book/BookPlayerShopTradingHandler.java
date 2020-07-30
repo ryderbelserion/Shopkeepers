@@ -36,22 +36,22 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
 		String bookTitle = SKBookPlayerShopkeeper.getBookTitle(bookItem);
 		if (bookTitle == null) {
-			// this should not happen.. because the recipes were created based on the shopkeeper's offers
+			// This should not happen.. because the recipes were created based on the shopkeeper's offers.
 			this.debugPreventedTrade(tradingPlayer, "Couldn't determine the book title of the traded item!");
 			return false;
 		}
 
-		// get offer for this type of item:
+		// Get offer for this type of item:
 		BookOffer offer = shopkeeper.getOffer(bookTitle);
 		if (offer == null) {
-			// this might happen if the trades got modified while the player was trading:
+			// This might happen if the trades got modified while the player was trading:
 			this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
 			return false;
 		}
 
 		assert containerInventory != null & newContainerContents != null;
 
-		// remove blank book from container contents:
+		// Remove blank book from container contents:
 		boolean removed = false;
 		for (int slot = 0; slot < newContainerContents.length; slot++) {
 			ItemStack itemStack = newContainerContents[slot];
@@ -63,7 +63,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			if (newAmount == 0) {
 				newContainerContents[slot] = null;
 			} else {
-				// copy the item before modifying it:
+				// Copy the item before modifying it:
 				itemStack = itemStack.clone();
 				newContainerContents[slot] = itemStack;
 				itemStack.setAmount(newAmount);
@@ -76,7 +76,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		// add earnings to container contents:
+		// Add earnings to container contents:
 		int amountAfterTaxes = this.getAmountAfterTaxes(offer.getPrice());
 		if (amountAfterTaxes > 0) {
 			int remaining = amountAfterTaxes;

@@ -9,11 +9,11 @@ public class MapUtils {
 	private MapUtils() {
 	}
 
-	// maximum capacity of a HashMap (largest power of two fitting into an int)
+	// Maximum capacity of a HashMap (largest power of two fitting into an int):
 	private static final int MAX_CAPACITY = (1 << 30);
 
-	// capacity for a HashMap with the specified expected size and a loading-factor of >= 0.75,
-	// that prevents the map from resizing
+	// Capacity for a HashMap with the specified expected size and a loading-factor of >= 0.75,
+	// that prevents the map from resizing.
 	public static int getIdealHashMapCapacity(int expectedSize) {
 		Validate.isTrue(expectedSize >= 0, "Expected size cannot be negative!");
 		assert expectedSize >= 0;
@@ -26,7 +26,7 @@ public class MapUtils {
 		return Integer.MAX_VALUE;
 	}
 
-	// shortcut map initializers:
+	// Shortcut map initializers:
 
 	public static <K, V> Map<K, V> createMap(K key, V value) {
 		Map<K, V> map = new LinkedHashMap<>(getIdealHashMapCapacity(1));
@@ -75,7 +75,7 @@ public class MapUtils {
 		for (int i = 0; i < keyLimit; i += 2) {
 			Object key = keyValuePairs[i];
 			Object value = keyValuePairs[i + 1];
-			map.put((K) key, (V) value); // errors if types don't match the expected ones
+			map.put((K) key, (V) value); // Errors if types don't match the expected ones
 		}
 		return map;
 	}

@@ -66,7 +66,7 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	@Override
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
-		// load offers:
+		// Load offers:
 		List<SKTradingOffer> offers = SKTradingOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId());
 		List<SKTradingOffer> migratedOffers = SKTradingOffer.migrateItems(offers, "Shopkeeper " + this.getId());
 		if (offers != migratedOffers) {
@@ -81,7 +81,7 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		// save offers:
+		// Save offers:
 		SKTradingOffer.saveToConfig(configSection, "offers", this.getOffers());
 	}
 
@@ -122,7 +122,7 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 		return offersView;
 	}
 
-	// note: there might be multiple offers involving this item, this only returns the first one it finds
+	// Note: There might be multiple offers involving this item, this only returns the first one it finds.
 	public TradingOffer getOffer(ItemStack tradedItem) {
 		for (TradingOffer offer : this.getOffers()) {
 			if (ItemUtils.isSimilar(offer.getResultItem(), tradedItem)) {

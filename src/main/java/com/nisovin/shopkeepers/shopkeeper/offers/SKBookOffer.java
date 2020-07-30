@@ -85,16 +85,16 @@ public class SKBookOffer implements BookOffer {
 		if (offersSection != null) {
 			for (String key : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
-				if (offerSection == null) continue; // invalid offer: not a section
+				if (offerSection == null) continue; // Invalid offer: Not a section.
 				String bookTitle = offerSection.getString("book");
 				int price = offerSection.getInt("price");
 				if (StringUtils.isEmpty(bookTitle)) {
-					// invalid offer
+					// Invalid offer.
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer: book title is empty"));
 					continue;
 				}
 				if (price <= 0) {
-					// invalid offer
+					// Invalid offer.
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer for '" + bookTitle + "': price has to be positive but is " + price));
 					continue;
 				}
@@ -104,7 +104,7 @@ public class SKBookOffer implements BookOffer {
 		return offers;
 	}
 
-	// TODO legacy, remove again at some point (changed during MC 1.14.4)
+	// TODO Legacy, remove again at some point (changed during MC 1.14.4).
 	public static List<SKBookOffer> loadFromLegacyConfig(ConfigurationSection config, String node, String errorContext) {
 		List<SKBookOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
@@ -112,12 +112,12 @@ public class SKBookOffer implements BookOffer {
 			for (String bookTitle : offersSection.getKeys(false)) {
 				int price = offersSection.getInt(bookTitle);
 				if (StringUtils.isEmpty(bookTitle)) {
-					// invalid offer
+					// Invalid offer.
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer: bookTitle is empty"));
 					continue;
 				}
 				if (price <= 0) {
-					// invalid offer
+					// Invalid offer.
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer for '" + bookTitle + "': price has to be positive but is " + price));
 					continue;
 				}

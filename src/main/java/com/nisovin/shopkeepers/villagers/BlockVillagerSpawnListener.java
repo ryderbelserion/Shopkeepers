@@ -13,7 +13,9 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 
-// Prevents spawning of regular villagers (including wandering traders)
+/**
+ * Prevents spawning of regular villagers (including wandering traders).
+ */
 public class BlockVillagerSpawnListener implements Listener {
 
 	public BlockVillagerSpawnListener() {
@@ -21,11 +23,11 @@ public class BlockVillagerSpawnListener implements Listener {
 
 	private boolean isSpawnBlockingBypassed(SpawnReason spawnReason) {
 		switch (spawnReason) {
-		case CUSTOM: // plugins
+		case CUSTOM: // Plugins
 		case SPAWNER_EGG:
-			// not obtainable in vanilla minecraft, regular item usage of shopkeeper creation item is handled separately
-		case SPAWNER: // not obtainable in vanilla minecraft
-		case CURED: // handled separately
+			// Not obtainable in vanilla Minecraft, regular item usage of shopkeeper creation item is handled separately.
+		case SPAWNER: // Not obtainable in vanilla Minecraft
+		case CURED: // Handled separately
 			return true;
 		default:
 			return false;
@@ -44,17 +46,17 @@ public class BlockVillagerSpawnListener implements Listener {
 		if (this.isSpawnBlockingBypassed(spawnReason)) return;
 
 		EntityType entityType = event.getEntityType();
-		// prevent spawning of villagers, wandering traders and their trader llamas:
+		// Prevent spawning of villagers, wandering traders and their trader llamas:
 		if (this.isSpawningBlocked(entityType)) {
 			Log.debug(() -> "Preventing mob spawn of " + entityType + " at " + TextUtils.getLocationString(event.getLocation()));
 			event.setCancelled(true);
 		}
 	}
 
-	// LOW priority so that other plugins don't have to process those meant-to-be-removed entities
+	// LOW priority so that other plugins don't have to process those meant-to-be-removed entities.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onChunkLoad(ChunkLoadEvent event) {
-		// remove villagers that got spawned as part of chunk generation:
+		// Remove villagers that got spawned as part of chunk generation:
 		if (!event.isNewChunk()) return;
 		for (Entity entity : event.getChunk().getEntities()) {
 			EntityType entityType = entity.getType();

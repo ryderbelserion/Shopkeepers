@@ -10,7 +10,7 @@ public class ArgumentParseException extends CommandException {
 
 	private static final long serialVersionUID = -4968777515685479426L;
 
-	private final CommandArgument<?> argument; // can be null if not caused by any CommandArgument
+	private final CommandArgument<?> argument; // Can be null if not caused by any CommandArgument
 
 	public ArgumentParseException(CommandArgument<?> argument, Text message) {
 		this(argument, message, null);

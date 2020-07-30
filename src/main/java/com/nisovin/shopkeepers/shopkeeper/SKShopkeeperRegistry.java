@@ -51,8 +51,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		final WorldShopkeepers worldEntry;
 		final ChunkCoords chunkCoords;
-		// list instead of set or map: we don't expect there to be excessive amounts of shopkeepers inside a single
-		// chunk, so removal from the list should be sufficiently fast
+		// List instead of set or map: We don't expect there to be excessive amounts of shopkeepers inside a single
+		// chunk, so removal from the list should be sufficiently fast.
 		final List<AbstractShopkeeper> shopkeepers = new ArrayList<>();
 		// Note: The chunk stays marked as active during the temporary despawning of shopkeepers during world saves.
 		boolean active;
@@ -70,7 +70,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 
 		void cancelActivationTask() {
-			if (activationTask == null) return; // no activation pending
+			if (activationTask == null) return; // No activation pending
 			activationTask.cancel();
 			activationTask = null;
 		}
@@ -84,14 +84,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		final String worldName;
 		final Map<ChunkCoords, ChunkShopkeepers> shopkeepersByChunk = new HashMap<>();
-		// unmodifiable entries:
+		// Unmodifiable entries:
 		final Map<ChunkCoords, List<AbstractShopkeeper>> shopkeeperViewsByChunk = new HashMap<>();
-		// unmodifiable map with unmodifiable entries:
+		// Unmodifiable map with unmodifiable entries:
 		final Map<ChunkCoords, List<AbstractShopkeeper>> shopkeepersByChunkView = Collections.unmodifiableMap(shopkeeperViewsByChunk);
 		int shopkeeperCount = 0;
 		BukkitTask worldSaveRespawnTask = null;
 
-		// note: already unmodifiable
+		// Note: Already unmodifiable.
 		final Set<AbstractShopkeeper> shopkeepersView = new AbstractSet<AbstractShopkeeper>() {
 			@Override
 			public Iterator<AbstractShopkeeper> iterator() {
@@ -105,7 +105,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 				return shopkeeperCount;
 			}
 		};
-		// note: already unmodifiable
+		// Note: Already unmodifiable.
 		final Set<ChunkCoords> activeChunksView = new AbstractSet<ChunkCoords>() {
 			@Override
 			public Iterator<ChunkCoords> iterator() {
@@ -123,7 +123,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 						.sum();
 			}
 		};
-		// note: already unmodifiable
+		// Note: Already unmodifiable.
 		final Set<AbstractShopkeeper> shopkeepersInActiveChunksView = new AbstractSet<AbstractShopkeeper>() {
 			@Override
 			public Iterator<AbstractShopkeeper> iterator() {
@@ -149,11 +149,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		ChunkShopkeepers addShopkeeper(AbstractShopkeeper shopkeeper, ChunkCoords chunkCoords) {
 			assert shopkeeper != null && chunkCoords != null;
-			// assert: world name matches this world entry
-			// assert shopkeeper is not yet contained
+			// Assert: World name matches this world entry.
+			// Assert: Shopkeeper is not yet contained.
 			ChunkShopkeepers chunkEntry = shopkeepersByChunk.get(chunkCoords);
 			if (chunkEntry == null) {
-				// if the chunk is currently loaded, the chunk entry gets initialized as active:
+				// If the chunk is currently loaded, the chunk entry gets initialized as active:
 				boolean chunkLoaded = chunkCoords.isChunkLoaded();
 				chunkEntry = new ChunkShopkeepers(this, chunkCoords, chunkLoaded);
 				shopkeepersByChunk.put(chunkCoords, chunkEntry);
@@ -166,9 +166,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		ChunkShopkeepers removeShopkeeper(AbstractShopkeeper shopkeeper, ChunkCoords chunkCoords) {
 			assert shopkeeper != null && chunkCoords != null;
-			// assert: world name matches this world entry
+			// Assert: World name matches this world entry.
 			ChunkShopkeepers chunkEntry = shopkeepersByChunk.get(chunkCoords);
-			if (chunkEntry == null) return null; // could not find shopkeeper
+			if (chunkEntry == null) return null; // Could not find shopkeeper
 			if (chunkEntry.shopkeepers.remove(shopkeeper)) {
 				shopkeeperCount -= 1;
 				if (chunkEntry.shopkeepers.isEmpty()) {
@@ -199,26 +199,26 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	private final SKShopkeepersPlugin plugin;
 
-	// all shopkeepers:
+	// All shopkeepers:
 	private final Map<UUID, AbstractShopkeeper> shopkeepersByUUID = new LinkedHashMap<>();
 	private final Collection<AbstractShopkeeper> allShopkeepersView = Collections.unmodifiableCollection(shopkeepersByUUID.values());
 	private final Map<Integer, AbstractShopkeeper> shopkeepersById = new HashMap<>();
 
-	// TODO shopkeepers by name TreeMap to speedup name lookups and prefix matching?
+	// TODO Shopkeepers by name TreeMap to speedup name lookups and prefix matching?
 	// TODO TreeMaps for shopkeeper owners by name and uuid to speedup prefix matching?
 
-	// virtual shopkeepers:
-	// Set: allows for quick removal
+	// Virtual shopkeepers:
+	// Set: Allows for fast removal.
 	private final Set<AbstractShopkeeper> virtualShopkeepers = new LinkedHashSet<>();
 	private final Collection<AbstractShopkeeper> virtualShopkeepersView = Collections.unmodifiableCollection(virtualShopkeepers);
 
-	// by world name
+	// By world name:
 	private final Map<String, WorldShopkeepers> shopkeepersByWorld = new LinkedHashMap<>();
 	private final Set<String> shopkeeperWorldsView = Collections.unmodifiableSet(shopkeepersByWorld.keySet());
 
-	// player shopkeepers:
+	// Player shopkeepers:
 	private int playerShopCount = 0;
-	// note: already unmodifiable
+	// Note: Already unmodifiable.
 	private final Set<AbstractPlayerShopkeeper> allPlayerShopkeepersView = new AbstractSet<AbstractPlayerShopkeeper>() {
 		@Override
 		public Iterator<AbstractPlayerShopkeeper> iterator() {
@@ -234,10 +234,10 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 	};
 
-	// TODO this may become out-of-sync if shop objects get despawned or removed independently, problem? potential
+	// TODO This may become out-of-sync if shop objects get despawned or removed independently, problem? potential
 	// memory leak?
-	// -> gets cleaned up by 'teleporter' task currently which periodically checks all activeShopkeepers entries
-	// 'active': with active shop object (ie. after successful spawning)
+	// -> Gets cleaned up by 'teleporter' task currently which periodically checks all activeShopkeepers entries.
+	// 'active': With active shop object (i.e. after successful spawning).
 	private final Map<String, AbstractShopkeeper> activeShopkeepers = new HashMap<>();
 	private final Collection<AbstractShopkeeper> activeShopkeepersView = Collections.unmodifiableCollection(activeShopkeepers.values());
 
@@ -246,13 +246,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	public void onEnable() {
-		// start shopkeeper ticking task:
+		// Start shopkeeper ticking task:
 		this.startShopkeeperTickTask();
 
-		// start teleporter task:
+		// Start teleporter task:
 		this.startTeleporterTask();
 
-		// start verifier task:
+		// Start verifier task:
 		if (Settings.enableSpawnVerifier) {
 			this.startSpawnVerifierTask();
 		}
@@ -261,11 +261,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	public void onDisable() {
-		// unload all shopkeepers:
+		// Unload all shopkeepers:
 		this.unloadAllShopkeepers();
 		assert this.getAllShopkeepers().isEmpty();
 
-		// reset, clearing (just in case):
+		// Reset, clearing (just in case):
 		shopkeepersByUUID.clear();
 		shopkeepersById.clear();
 		shopkeepersByWorld.clear();
@@ -284,10 +284,10 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 				Map.Entry<String, AbstractShopkeeper> entry = iter.next();
 				AbstractShopkeeper shopkeeper = entry.getValue();
 				boolean update = shopkeeper.getShopObject().check();
-				if (update) { // TODO remove return boolean and instead compare old with current object id?
-					// if the shopkeeper had to be respawned its shop id changed:
-					// this removes the entry which was stored with the old shop id and later adds back the
-					// shopkeeper with its new id
+				if (update) { // TODO Remove return boolean and instead compare old with current object id?
+					// If the shopkeeper had to be respawned its shop id changed.
+					// This removes the entry which was stored with the old shop id and later adds back the
+					// shopkeeper with its new id.
 					readd.add(shopkeeper);
 					iter.remove();
 				}
@@ -301,7 +301,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 					if (shopkeeper.isDirty()) dirty = true;
 				}
 
-				// shop objects might have been removed or respawned, request a save:
+				// Shop objects might have been removed or respawned, request a save:
 				if (dirty) {
 					this.getShopkeeperStorage().save();
 				}
@@ -309,9 +309,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}, 200, 200); // 10 seconds
 	}
 
-	// TODO ideally this task should not be required..
-	// TODO: actually, the shops already get respawned as part of the teleporter task when missing
-	// -> remove this task and the corresponding setting?
+	// TODO Ideally this task should not be required..
+	// TODO Actually, the shops get already respawned as part of the teleporter task when missing.
+	// -> Remove this task and the corresponding setting?
 	private void startSpawnVerifierTask() {
 		Bukkit.getScheduler().runTaskTimer(plugin, () -> {
 			int count = 0;
@@ -325,15 +325,15 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 						ShopObject shopObject = shopkeeper.getShopObject();
 						if (!shopObject.needsSpawning() || shopObject.isActive()) continue;
 
-						// deactivate by old object id:
+						// Deactivate by old object id:
 						this._deactivateShopkeeper(shopkeeper);
-						// respawn:
+						// Respawn:
 						boolean spawned = shopObject.spawn();
 						if (!spawned) {
 							Log.debug(() -> "Spawn verifier: Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 							continue;
 						}
-						// activate with new object id:
+						// Activate with new object id:
 						this._activateShopkeeper(shopkeeper);
 						count++;
 						if (shopkeeper.isDirty()) dirty = true;
@@ -355,13 +355,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	private void startShopkeeperTickTask() {
 		Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-			// prevents concurrent modification errors by making copies of the iterated data:
-			// the copies are required because the worlds, active chunks and chunk shopkeepers may change if shopkeepers
-			// get removed or chunks get loaded (which cannot be safely avoided)
+			// Prevents concurrent modification errors by making copies of the iterated data:
+			// The copies are required because the worlds, active chunks and chunk shopkeepers may change if shopkeepers
+			// get removed or chunks get loaded (which cannot be safely avoided).
 			boolean dirty = false;
 			for (String worldName : new ArrayList<>(this.getWorldsWithShopkeepers())) {
 				for (AbstractShopkeeper shopkeeper : new ArrayList<>(this.getShopkeepersInActiveChunks(worldName))) {
-					if (!shopkeeper.isValid()) continue; // skip if no longer valid
+					if (!shopkeeper.isValid()) continue; // Skip if no longer valid
 					shopkeeper.tick();
 					if (shopkeeper.isDirty()) {
 						dirty = true;
@@ -389,16 +389,16 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		int id = shopkeeperStorage.getNextShopkeeperId();
 		AbstractShopkeeper shopkeeper = abstractShopType.createShopkeeper(id, creationData);
 		if (shopkeeper == null) {
-			// invalid shop type implementation..
+			// Invalid shop type implementation..
 			throw new ShopkeeperCreateException("ShopType '" + abstractShopType.getClass().getName() + "' created null shopkeeper!");
 		}
 
-		// validate unique id:
+		// Validate unique id:
 		if (this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) != null) {
 			throw new ShopkeeperCreateException("There is already a shopkeeper existing with this unique id: " + shopkeeper.getUniqueId());
 		}
 
-		// success:
+		// Success:
 		shopkeeperStorage.onShopkeeperIdUsed(id);
 		if (shopkeeper.isDirty()) shopkeeperStorage.markDirty();
 		this.addShopkeeper(shopkeeper, ShopkeeperAddedEvent.Cause.CREATED);
@@ -414,16 +414,16 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		AbstractShopkeeper shopkeeper = abstractShopType.loadShopkeeper(id, configSection);
 		if (shopkeeper == null) {
-			// invalid shop type implementation..
+			// Invalid shop type implementation..
 			throw new ShopkeeperCreateException("ShopType '" + abstractShopType.getClass().getName() + "' loaded null shopkeeper!");
 		}
 
-		// validate unique id:
+		// Validate unique id:
 		if (this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) != null) {
 			throw new ShopkeeperCreateException("There is already a shopkeeper existing with this unique id: " + shopkeeper.getUniqueId());
 		}
 
-		// success:
+		// Success:
 		SKShopkeeperStorage shopkeeperStorage = this.getShopkeeperStorage();
 		shopkeeperStorage.onShopkeeperIdUsed(id);
 		if (shopkeeper.isDirty()) shopkeeperStorage.markDirty();
@@ -445,40 +445,40 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		assert !shopkeepersByUUID.containsKey(shopkeeper.getUniqueId());
 		assert !shopkeepersById.containsKey(shopkeeper.getId());
 
-		// store by unique id and session id:
+		// Store by unique id and session id:
 		UUID shopkeeperUniqueId = shopkeeper.getUniqueId();
 		shopkeepersByUUID.put(shopkeeperUniqueId, shopkeeper);
 		shopkeepersById.put(shopkeeper.getId(), shopkeeper);
 
-		ChunkCoords chunkCoords = shopkeeper.getChunkCoords(); // null for virtual shops
+		ChunkCoords chunkCoords = shopkeeper.getChunkCoords(); // Null for virtual shops
 		ChunkShopkeepers chunkEntry;
 		if (chunkCoords == null) {
-			// virtual shopkeeper:
+			// Virtual shopkeeper:
 			chunkEntry = null;
 			virtualShopkeepers.add(shopkeeper);
 		} else {
-			// add shopkeeper to chunk:
+			// Add shopkeeper to chunk:
 			chunkEntry = this.addShopkeeperToChunk(shopkeeper, chunkCoords);
 		}
 
-		// update player shop count:
+		// Update player shop count:
 		if (shopkeeper instanceof PlayerShopkeeper) {
 			playerShopCount++;
 		}
 
-		// inform shopkeeper:
+		// Inform shopkeeper:
 		shopkeeper.informAdded(cause);
 
-		// call event:
+		// Call event:
 		Bukkit.getPluginManager().callEvent(new ShopkeeperAddedEvent(shopkeeper, cause));
 
-		// activate shopkeeper:
+		// Activate shopkeeper:
 		if (!shopkeeper.getShopObject().needsSpawning()) {
-			// activate shopkeeper once at registration:
+			// Activate shopkeeper once at registration:
 			this._activateShopkeeper(shopkeeper);
 		} else if (chunkEntry != null && chunkEntry.active) {
 			if (!chunkEntry.worldEntry.isWorldSaveRespawnPending()) {
-				// spawn shopkeeper in active chunk:
+				// Spawn shopkeeper in active chunk:
 				this.spawnShopkeeper(shopkeeper);
 			} else {
 				Log.debug(Settings.DebugOptions.shopkeeperActivation,
@@ -488,7 +488,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 	}
 
-	// only called for non-virtual shopkeepers
+	// Only called for non-virtual shopkeepers
 	private ChunkShopkeepers addShopkeeperToChunk(AbstractShopkeeper shopkeeper, ChunkCoords chunkCoords) {
 		assert shopkeeper != null && chunkCoords != null;
 		String worldName = chunkCoords.getWorldName();
@@ -497,51 +497,51 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			worldEntry = new WorldShopkeepers(worldName);
 			shopkeepersByWorld.put(worldName, worldEntry);
 		}
-		return worldEntry.addShopkeeper(shopkeeper, chunkCoords); // add to chunk
+		return worldEntry.addShopkeeper(shopkeeper, chunkCoords); // Add to chunk
 	}
 
 	private void removeShopkeeper(AbstractShopkeeper shopkeeper, ShopkeeperRemoveEvent.Cause cause) {
 		assert shopkeeper != null && shopkeeper.isValid() && cause != null;
 
-		// despawn shopkeeper:
+		// Despawn shopkeeper:
 		this.despawnShopkeeper(shopkeeper, true);
 
-		// call event:
+		// Call event:
 		Bukkit.getPluginManager().callEvent(new ShopkeeperRemoveEvent(shopkeeper, cause));
 
-		// inform shopkeeper:
+		// Inform shopkeeper:
 		shopkeeper.informRemoval(cause);
 
-		// remove shopkeeper by unique id and session id:
+		// Remove shopkeeper by unique id and session id:
 		UUID shopkeeperUniqueId = shopkeeper.getUniqueId();
 		shopkeepersByUUID.remove(shopkeeperUniqueId);
 		shopkeepersById.remove(shopkeeper.getId());
 
-		ChunkCoords chunkCoords = shopkeeper.getChunkCoords(); // null for virtual shops
+		ChunkCoords chunkCoords = shopkeeper.getChunkCoords(); // Null for virtual shops
 		if (chunkCoords == null) {
-			// virtual shopkeeper:
+			// Virtual shopkeeper:
 			virtualShopkeepers.remove(shopkeeper);
 		} else {
-			// remove shopkeeper from chunk:
+			// Remove shopkeeper from chunk:
 			this.removeShopkeeperFromChunk(shopkeeper, chunkCoords);
 		}
 
-		// update player shop count:
+		// Update player shop count:
 		if (shopkeeper instanceof PlayerShopkeeper) {
 			playerShopCount--;
 		}
 
-		// remove shopkeeper from storage:
+		// Remove shopkeeper from storage:
 		this.getShopkeeperStorage().clearShopkeeperData(shopkeeper);
 	}
 
-	// only called for non-virtual shopkeepers
+	// Only called for non-virtual shopkeepers.
 	private void removeShopkeeperFromChunk(AbstractShopkeeper shopkeeper, ChunkCoords chunkCoords) {
 		assert shopkeeper != null && chunkCoords != null;
 		String worldName = chunkCoords.getWorldName();
 		WorldShopkeepers worldEntry = shopkeepersByWorld.get(worldName);
-		if (worldEntry == null) return; // could not find shopkeeper
-		worldEntry.removeShopkeeper(shopkeeper, chunkCoords); // remove from chunk
+		if (worldEntry == null) return; // Could not find shopkeeper
+		worldEntry.removeShopkeeper(shopkeeper, chunkCoords); // Remove from chunk
 		if (worldEntry.shopkeeperCount <= 0) {
 			worldEntry.cleanUp();
 			shopkeepersByWorld.remove(worldName);
@@ -571,16 +571,16 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 	}
 
-	// this does not get called for virtual shopkeepers
+	// This does not get called for virtual shopkeepers.
 	public void onShopkeeperMove(AbstractShopkeeper shopkeeper, ChunkCoords oldChunk) {
 		assert shopkeeper != null && oldChunk != null;
 		ChunkCoords newChunk = shopkeeper.getChunkCoords();
 		assert newChunk != null;
 		if (!newChunk.equals(oldChunk)) {
-			// remove from old chunk:
+			// Remove from old chunk:
 			this.removeShopkeeperFromChunk(shopkeeper, oldChunk);
 
-			// add to new chunk:
+			// Add to new chunk:
 			this.addShopkeeperToChunk(shopkeeper, newChunk);
 		}
 	}
@@ -591,7 +591,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		if (chunkCoords == null) return null;
 		String worldName = chunkCoords.getWorldName();
 		WorldShopkeepers worldEntry = shopkeepersByWorld.get(worldName);
-		if (worldEntry == null) return null; // there are no shopkeepers in this world
+		if (worldEntry == null) return null; // There are no shopkeepers in this world
 		return worldEntry.shopkeepersByChunk.get(chunkCoords);
 	}
 
@@ -599,9 +599,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		assert chunk != null;
 		ChunkCoords chunkCoords = new ChunkCoords(chunk);
 		ChunkShopkeepers chunkEntry = this.getChunkEntry(chunkCoords);
-		if (chunkEntry == null) return; // there are no shopkeepers in this chunk
+		if (chunkEntry == null) return; // There are no shopkeepers in this chunk
 
-		// chunk is not expected to already be active or pending activation (if chunk loading and unloading events are
+		// Chunk is not expected to already be active or pending activation (if chunk loading and unloading events are
 		// consistently ordered and correctly handled by us):
 		if (chunkEntry.active) {
 			Log.debug(Settings.DebugOptions.shopkeeperActivation,
@@ -615,9 +615,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			return;
 		}
 
-		// defer activation to not activate shopkeepers for only briefly loaded chunks:
+		// Defer activation to not activate shopkeepers for only briefly loaded chunks:
 		chunkEntry.activationTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			assert chunkCoords.isChunkLoaded(); // we stop the task on chunk unloads
+			assert chunkCoords.isChunkLoaded(); // We stop the task on chunk unloads
 			chunkEntry.activationTask = null;
 			this.activateChunk(chunkEntry);
 		}, CHUNK_ACTIVATION_DELAY_TICKS);
@@ -625,19 +625,19 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	private void activateChunk(ChunkShopkeepers chunkEntry) {
 		assert chunkEntry != null && chunkEntry.chunkCoords.isChunkLoaded();
-		if (chunkEntry.active) { // already active
+		if (chunkEntry.active) { // Already active
 			assert !chunkEntry.isActivationPending();
 			return;
 		}
-		chunkEntry.cancelActivationTask(); // stop pending activation if any
-		chunkEntry.active = true; // mark chunk active
+		chunkEntry.cancelActivationTask(); // Stop pending activation if any
+		chunkEntry.active = true; // Mark chunk active
 
-		// inform shopkeepers:
+		// Inform shopkeepers:
 		for (AbstractShopkeeper shopkeeper : chunkEntry.shopkeepers) {
 			shopkeeper.getShopObject().onChunkActivation();
 		}
 
-		// spawn shopkeepers:
+		// Spawn shopkeepers:
 		this.spawnShopkeepers(chunkEntry, false);
 	}
 
@@ -661,7 +661,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		boolean dirty = false;
 		for (AbstractShopkeeper shopkeeper : shopkeepers) {
-			// spawn shopkeeper:
+			// Spawn shopkeeper:
 			this.spawnShopkeeper(shopkeeper);
 			if (shopkeeper.isDirty()) {
 				dirty = true;
@@ -669,7 +669,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 
 		if (dirty) {
-			// save delayed:
+			// Save delayed:
 			plugin.getShopkeeperStorage().saveDelayed();
 		}
 	}
@@ -680,30 +680,30 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		assert chunk != null;
 		ChunkCoords chunkCoords = new ChunkCoords(chunk);
 		ChunkShopkeepers chunkEntry = this.getChunkEntry(chunkCoords);
-		if (chunkEntry == null) return; // there are no shopkeepers in this chunk
+		if (chunkEntry == null) return; // There are no shopkeepers in this chunk
 
 		this.deactivateChunk(chunkEntry);
 	}
 
 	private void deactivateChunk(ChunkShopkeepers chunkEntry) {
 		assert chunkEntry != null;
-		if (!chunkEntry.active) { // already inactive
-			chunkEntry.cancelActivationTask(); // stop pending activation if any
+		if (!chunkEntry.active) { // Already inactive
+			chunkEntry.cancelActivationTask(); // Stop pending activation if any
 			return;
 		}
 		assert !chunkEntry.isActivationPending();
-		chunkEntry.active = false; // mark chunk inactive
+		chunkEntry.active = false; // Mark chunk inactive
 
-		// inform shopkeepers:
+		// Inform shopkeepers:
 		for (AbstractShopkeeper shopkeeper : chunkEntry.shopkeepers) {
 			shopkeeper.getShopObject().onChunkDeactivation();
 		}
 
-		// despawn shopkeepers:
+		// Despawn shopkeepers:
 		this.despawnShopkeepers(chunkEntry, false);
 	}
 
-	// chunk might already be marked inactive when this is called
+	// Chunk might already be marked inactive when this is called.
 	private void despawnShopkeepers(ChunkShopkeepers chunkEntry, boolean worldSaving) {
 		assert chunkEntry != null;
 		Collection<? extends AbstractShopkeeper> shopkeepers = chunkEntry.shopkeepers;
@@ -716,24 +716,24 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		for (AbstractShopkeeper shopkeeper : shopkeepers) {
 			AbstractShopObject shopObject = shopkeeper.getShopObject();
-			// skip shopkeepers which are kept active all the time:
+			// Skip shopkeepers which are kept active all the time:
 			if (!shopObject.needsSpawning()) continue;
-			// if world save: skip shopkeepers that do not need to be despawned:
+			// If world save: Skip shopkeepers that do not need to be despawned.
 			if (worldSaving && !shopObject.despawnDuringWorldSaves()) {
 				continue;
 			}
 
-			// despawn shopkeeper:
+			// Despawn shopkeeper:
 			this.despawnShopkeeper(shopkeeper, false);
 		}
 	}
 
 	// WORLD LOAD
 
-	// TODO this might not be needed, because chunk entries for loaded chunks get activated automatically when the first
-	// shopkeeper gets added
+	// TODO This might not be needed, because chunk entries for loaded chunks get activated automatically when the first
+	// shopkeeper gets added.
 	public void activateShopkeepersInAllWorlds() {
-		// activate (spawn) shopkeepers in loaded chunks of all loaded worlds:
+		// Activate (spawn) shopkeepers in loaded chunks of all loaded worlds:
 		for (World world : Bukkit.getWorlds()) {
 			this.activateChunks(world);
 		}
@@ -744,25 +744,25 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		this.activateChunks(world);
 	}
 
-	// activates all loaded chunks of the given world
+	// Activates all loaded chunks of the given world.
 	private void activateChunks(World world) {
 		assert world != null;
 		String worldName = world.getName();
 		WorldShopkeepers worldEntry = shopkeepersByWorld.get(worldName);
-		if (worldEntry == null) return; // there are no shopkeepers in this world
+		if (worldEntry == null) return; // There are no shopkeepers in this world
 
 		Log.debug(Settings.DebugOptions.shopkeeperActivation,
 				() -> "Spawning " + worldEntry.shopkeeperCount + " shopkeepers in world '" + worldName + "'"
 		);
 
-		// activate loaded chunks:
+		// Activate loaded chunks:
 		for (ChunkShopkeepers chunkEntry : worldEntry.shopkeepersByChunk.values()) {
-			// check if already active or activation pending (avoids unnecessary isChunkLoaded calls):
+			// Check if already active or activation pending (avoids unnecessary isChunkLoaded calls):
 			if (chunkEntry.active || chunkEntry.isActivationPending()) {
 				continue;
 			}
 			if (!chunkEntry.chunkCoords.isChunkLoaded()) {
-				continue; // chunk is not loaded
+				continue; // Chunk is not loaded
 			}
 			this.activateChunk(chunkEntry);
 		}
@@ -771,7 +771,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// WORLD UNLOAD
 
 	public void deactivateShopkeepersInAllWorlds() {
-		// deactivate (despawn) shopkeepers in all loaded worlds:
+		// Deactivate (despawn) shopkeepers in all loaded worlds:
 		for (World world : Bukkit.getWorlds()) {
 			this.deactivateChunks(world);
 		}
@@ -786,16 +786,16 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		assert world != null;
 		String worldName = world.getName();
 		WorldShopkeepers worldEntry = shopkeepersByWorld.get(worldName);
-		if (worldEntry == null) return; // there are no shopkeepers in this world
+		if (worldEntry == null) return; // There are no shopkeepers in this world
 
 		Log.debug(Settings.DebugOptions.shopkeeperActivation,
 				() -> "Despawning " + worldEntry.shopkeeperCount + " shopkeepers in world '" + worldName + "'"
 		);
 
-		// cancel world save respawn task:
+		// Cancel world save respawn task:
 		worldEntry.cancelWorldSaveRespawnTask();
 
-		// deactivate chunks:
+		// Deactivate chunks:
 		for (ChunkShopkeepers chunkEntry : worldEntry.shopkeepersByChunk.values()) {
 			this.deactivateChunk(chunkEntry);
 		}
@@ -806,10 +806,10 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	void onWorldSave(World world) {
 		String worldName = world.getName();
 		WorldShopkeepers worldEntry = shopkeepersByWorld.get(worldName);
-		if (worldEntry == null) return; // there are no shopkeepers in this world
+		if (worldEntry == null) return; // There are no shopkeepers in this world
 
 		if (worldEntry.isWorldSaveRespawnPending()) {
-			// already despawned the shopkeepers due to another world save just recently
+			// Already despawned the shopkeepers due to another world save just recently.
 			Log.debug(Settings.DebugOptions.shopkeeperActivation,
 					() -> "Detected another world save while shopkeepers were already despawned due to a previous world save: " + worldName
 			);
@@ -818,8 +818,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		this.despawnShopkeepersInWorld(worldEntry, true);
 		worldEntry.worldSaveRespawnTask = Bukkit.getScheduler().runTask(plugin, () -> {
-			// assert: world is still loaded and world entry is still valid (the task gets cancelled on world unload and
-			// world entry cleanup)
+			// Assert: World is still loaded and world entry is still valid (the task gets cancelled on world unload and
+			// world entry cleanup).
 			worldEntry.worldSaveRespawnTask = null;
 			this.spawnShopkeepersInWorld(worldEntry, true);
 		});
@@ -859,24 +859,24 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		if (!shopObject.needsSpawning()) return;
 
 		boolean activate = false;
-		// spawn if not yet active:
+		// Spawn if not yet active:
 		if (!shopObject.isActive()) {
-			// deactivate shopkeeper by old shop object id, in case there is one:
+			// Deactivate shopkeeper by old shop object id, in case there is one:
 			this._deactivateShopkeeper(shopkeeper);
 
 			boolean spawned = shopObject.spawn();
 			if (spawned) {
-				// activate with new object id:
+				// Activate with new object id:
 				activate = true;
 			} else {
 				Log.warning("Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
 			}
 		} else if (this.getActiveShopkeeper(shopObject.getId()) == null) {
-			// already active but missing activation, activate with current object id:
+			// Already active but missing activation, activate with current object id:
 			activate = true;
 		}
 		if (activate) {
-			// activate with current object id:
+			// Activate with current object id:
 			this._activateShopkeeper(shopkeeper);
 		}
 	}
@@ -884,41 +884,41 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	private void despawnShopkeeper(AbstractShopkeeper shopkeeper, boolean closeWindows) {
 		assert shopkeeper != null;
 		if (closeWindows) {
-			// delayed closing of all open windows:
+			// Delayed closing of all open windows:
 			shopkeeper.closeAllOpenWindows();
 		}
 		this._deactivateShopkeeper(shopkeeper);
 		shopkeeper.getShopObject().despawn();
 	}
 
-	// performs some validation before actually activating a shopkeeper:
-	// returns false if some validation failed
+	// Performs some validation before actually activating a shopkeeper.
+	// Returns false if some validation failed.
 	private boolean _activateShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
-		String objectId = shopkeeper.getShopObject().getId(); // current object id
+		String objectId = shopkeeper.getShopObject().getId(); // Current object id
 		if (objectId == null) {
-			// currently only null is considered invalid,
-			// prints 'null' to log then:
+			// Currently only null is considered invalid.
+			// Prints 'null' to log then:
 			Log.warning("Detected shopkeeper with invalid object id: " + objectId);
 			return false;
 		} else if (activeShopkeepers.containsKey(objectId)) {
 			Log.warning("Detected shopkeepers with duplicate object id: " + objectId);
 			return false;
 		} else {
-			// deactivate by old id in case there is one:
+			// Deactivate by old id in case there is one:
 			this._deactivateShopkeeper(shopkeeper);
 			assert shopkeeper.getShopObject().getLastId() == null;
 
 			// activate shopkeeper:
 			activeShopkeepers.put(objectId, shopkeeper);
-			shopkeeper.getShopObject().setLastId(objectId); // remember object id
+			shopkeeper.getShopObject().setLastId(objectId); // Remember object id
 			return true;
 		}
 	}
 
 	private boolean _deactivateShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
-		String objectId = shopkeeper.getShopObject().getLastId(); // can be null
+		String objectId = shopkeeper.getShopObject().getLastId(); // Can be null
 		if (objectId != null) {
 			shopkeeper.getShopObject().setLastId(null);
 			if (activeShopkeepers.get(objectId) == shopkeeper) {
@@ -929,11 +929,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		return false;
 	}
 
-	// this can be used if the shopkeeper's object id has changed for some reason
+	// This can be used if the shopkeeper's object id has changed for some reason.
 	public void onShopkeeperObjectIdChanged(AbstractShopkeeper shopkeeper) {
-		// deactivate by old (last) object id:
+		// Deactivate by old (last) object id:
 		this._deactivateShopkeeper(shopkeeper);
-		// re-activate by new (current) object id:
+		// Re-activate by new (current) object id:
 		this._activateShopkeeper(shopkeeper);
 	}
 
@@ -969,8 +969,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	@Override
 	public Collection<? extends AbstractPlayerShopkeeper> getPlayerShopkeepersByOwner(UUID ownerUUID) {
 		Validate.notNull(ownerUUID, "Owner UUID is null!");
-		// TODO improve? maybe keep an index of player shops? or even index by owner?
-		// note: already unmodifiable
+		// TODO Improve? Maybe keep an index of player shops? or even index by owner?
+		// Note: Already unmodifiable.
 		return new AbstractSet<AbstractPlayerShopkeeper>() {
 			private Stream<AbstractPlayerShopkeeper> createStream() {
 				return getAllShopkeepers().stream()
@@ -998,14 +998,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		String normalizedShopName = StringUtils.normalize(TextUtils.stripColor(shopName));
 		if (StringUtils.isEmpty(normalizedShopName)) return Stream.empty();
 
-		// TODO improve via (Tree)Map?
+		// TODO Improve via (Tree)Map?
 		return this.getAllShopkeepers().stream().filter(shopkeeper -> {
-			String shopkeeperName = shopkeeper.getName(); // can be empty
-			if (shopkeeperName.isEmpty()) return false; // has no name, filter
+			String shopkeeperName = shopkeeper.getName(); // Can be empty
+			if (shopkeeperName.isEmpty()) return false; // Has no name, filter
 
 			shopkeeperName = TextUtils.stripColor(shopkeeperName);
 			shopkeeperName = StringUtils.normalize(shopkeeperName);
-			return (shopkeeperName.equals(normalizedShopName)); // include shopkeeper if name matches
+			return (shopkeeperName.equals(normalizedShopName)); // Include shopkeeper if name matches
 		});
 	}
 
@@ -1014,14 +1014,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		String normalizedShopNamePrefix = StringUtils.normalize(TextUtils.stripColor(shopNamePrefix));
 		if (StringUtils.isEmpty(normalizedShopNamePrefix)) return Stream.empty();
 
-		// TODO improve via TreeMap?
+		// TODO Improve via TreeMap?
 		return this.getAllShopkeepers().stream().filter(shopkeeper -> {
-			String shopkeeperName = shopkeeper.getName(); // can be empty
-			if (shopkeeperName.isEmpty()) return false; // has no name, filter
+			String shopkeeperName = shopkeeper.getName(); // Can be empty
+			if (shopkeeperName.isEmpty()) return false; // Has no name, filter
 
 			shopkeeperName = TextUtils.stripColor(shopkeeperName);
 			shopkeeperName = StringUtils.normalize(shopkeeperName);
-			return (shopkeeperName.startsWith(normalizedShopNamePrefix)); // include shopkeeper if name matches
+			return (shopkeeperName.startsWith(normalizedShopNamePrefix)); // Include shopkeeper if name matches
 		});
 	}
 
@@ -1079,7 +1079,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		if (worldEntry == null) return Collections.emptySet();
 		List<AbstractShopkeeper> shopkeepersInChunkView = worldEntry.shopkeepersByChunkView.get(chunkCoords);
 		if (shopkeepersInChunkView == null) return Collections.emptySet();
-		return shopkeepersInChunkView; // unmodifiable already
+		return shopkeepersInChunkView; // Unmodifiable already
 	}
 
 	// BY LOCATION

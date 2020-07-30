@@ -94,29 +94,29 @@ public class CitizensShops {
 
 	void enable() {
 		if (this.isEnabled()) {
-			// disable first, to perform cleanup if needed:
+			// Disable first, to perform cleanup if needed:
 			this.disable();
 		}
 
-		if (!Settings.enableCitizenShops) return; // feature disabled
+		if (!Settings.enableCitizenShops) return; // Feature disabled
 		if (!CitizensHandler.isPluginEnabled()) {
 			Log.debug("Citizen shops enabled, but Citizens plugin not found or disabled.");
 			return;
 		}
 		Log.info("Citizens found, enabling NPC shopkeepers.");
 
-		// register shopkeeper trait:
+		// Register shopkeeper trait:
 		this.registerShopkeeperTrait();
 
-		// register citizens listener:
+		// Register citizens listener:
 		Bukkit.getPluginManager().registerEvents(citizensListener, plugin);
 		citizensListener.onEnable();
 
-		// delayed to run after shopkeepers were loaded:
+		// Delayed to run after shopkeepers were loaded:
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			// run legacy id conversion: // TODO remove again at some point
+			// Run legacy id conversion: // TODO Remove again at some point.
 			this.convertLegacyNPCIds();
-			// remove invalid citizens shopkeepers:
+			// Remove invalid citizens shopkeepers:
 			this.removeInvalidCitizensShopkeepers();
 		}, 3L);
 
@@ -126,21 +126,21 @@ public class CitizensShops {
 
 	void disable() {
 		if (!this.isEnabled()) {
-			// already disabled
+			// Already disabled
 			return;
 		}
 
 		Plugin citizensPlugin = CitizensHandler.getPlugin();
 		if (citizensPlugin != null) {
-			// unregister shopkeeper trait:
+			// Unregister shopkeeper trait:
 			this.unregisterShopkeeperTrait();
 		}
 
-		// unregister citizens listener:
+		// Unregister citizens listener:
 		citizensListener.onDisable();
 		HandlerList.unregisterAll(citizensListener);
 
-		// disabled:
+		// Disabled:
 		citizensShopsEnabled = false;
 	}
 
@@ -176,7 +176,7 @@ public class CitizensShops {
 		return npc.getId() + " (" + npc.getUniqueId() + ")";
 	}
 
-	// returns null if this entity is no citizens npc (or citizens or citizens shops are disabled)
+	// Returns null if this entity is no citizens NPC (or citizens or citizens shops are disabled).
 	public UUID getNPCUniqueId(Entity entity) {
 		if (this.isEnabled()) {
 			NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
@@ -186,12 +186,12 @@ public class CitizensShops {
 		}
 	}
 
-	// returns the uuid of the created npc, or null
+	// Returns the uuid of the created NPC, or null.
 	public UUID createNPC(Location location, EntityType entityType, String name) {
 		if (!this.isEnabled()) return null;
 		NPC npc = CitizensAPI.getNPCRegistry().createNPC(entityType, name);
 		if (npc == null) return null;
-		// look towards near players:
+		// Look towards near players:
 		npc.getTrait(LookClose.class).lookClose(true);
 		if (location != null) {
 			// This will log a debug message from Citizens if it cannot spawn the NPC currently, but will then later
@@ -206,7 +206,7 @@ public class CitizensShops {
 
 	private void convertLegacyNPCIds() {
 		if (!this.isEnabled()) {
-			// cannot determine backing npcs if citizens isn't running:
+			// Cannot determine backing NPCs if citizens isn't running:
 			return;
 		}
 		ShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
@@ -220,14 +220,14 @@ public class CitizensShops {
 		}
 
 		if (dirty) {
-			// save:
+			// Save:
 			plugin.getShopkeeperStorage().save();
 		}
 	}
 
 	public void removeInvalidCitizensShopkeepers() {
 		if (!this.isEnabled()) {
-			// cannot determine which shopkeepers have a backing npc if citizens isn't running:
+			// Cannot determine which shopkeepers have a backing NPC if Citizens isn't running:
 			return;
 		}
 		ShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
@@ -237,18 +237,18 @@ public class CitizensShops {
 				SKCitizensShopObject citizensShop = (SKCitizensShopObject) shopkeeper.getShopObject();
 				UUID npcUniqueId = citizensShop.getNPCUniqueId();
 				if (npcUniqueId == null) {
-					// npc wasn't created yet, which is only the case if a shopkeeper got somehow created without
+					// NPC wasn't created yet, which is only the case if a shopkeeper got somehow created without
 					// citizens being enabled:
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
 							+ ": NPC has not been created.");
 				} else if (CitizensAPI.getNPCRegistry().getByUniqueId(npcUniqueId) == null) {
-					// there is no npc with the stored unique id:
+					// There is no NPC with the stored unique id:
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
 							+ ": No NPC existing with unique id '" + npcUniqueId + "'.");
 				} else if (shopkeeperRegistry.getActiveShopkeeper(shopkeeper.getShopObject().getId()) != shopkeeper) {
-					// there is already another citizens shopkeeper using this npc id:
+					// There is already another citizens shopkeeper using this NPC id:
 					citizensShop.setKeepNPCOnDeletion();
 					forRemoval.add(shopkeeper);
 					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
@@ -257,18 +257,18 @@ public class CitizensShops {
 			}
 		}
 
-		// remove those shopkeepers:
+		// Remove those shopkeepers:
 		if (!forRemoval.isEmpty()) {
 			for (Shopkeeper shopkeeper : forRemoval) {
 				shopkeeper.delete();
 			}
 
-			// save:
+			// Save:
 			plugin.getShopkeeperStorage().save();
 		}
 	}
 
-	// unused
+	// Unused
 	public void removeShopkeeperTraits() {
 		if (!this.isEnabled()) return;
 		Iterator<NPC> npcs = CitizensAPI.getNPCRegistry().iterator();

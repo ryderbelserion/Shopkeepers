@@ -32,7 +32,7 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 
 	protected final CommandArgument<I> idArgument;
 	protected final ArgumentFilter<I> filter; // not null
-	// completions are only provided after at least that many matching input characters:
+	// Completions are only provided after at least that many matching input characters:
 	protected final int minimalCompletionInput; // <= 0 to deactivate
 
 	public ObjectIdArgument(String name, CommandArgument<I> idArgument, ArgumentFilter<I> filter, int minimalCompletionInput) {
@@ -46,15 +46,15 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 
 	@Override
 	public I parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
-		// prefer this class's missing-argument exception over the id-argument's exception:
+		// Prefer this class's missing-argument exception over the id-argument's exception:
 		if (!argsReader.hasNext()) {
 			throw this.missingArgumentError();
 		}
 		int startIndex = argsReader.getCursor();
-		// throws exceptions with appropriate messages if the id cannot be parsed:
+		// Throws exceptions with appropriate messages if the id cannot be parsed:
 		I id = idArgument.parseValue(input, context, argsReader);
 
-		// check if id is accepted:
+		// Check if id is accepted:
 		if (!filter.test(id)) {
 			int endIndex = argsReader.getCursor();
 			List<String> parsedArgs = argsReader.getArgs().subList(startIndex + 1, endIndex + 1);
@@ -76,13 +76,14 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 	 */
 	protected abstract Iterable<I> getCompletionSuggestions(String idPrefix);
 
-	// this gets applied to convert id completion suggestions to Strings
+	// This gets applied to convert id completion suggestions to Strings.
 	protected abstract String toString(I id);
 
 	@Override
 	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {
 		if (argsReader.getRemainingSize() == 0) {
-			return Collections.emptyList(); // there are no remaining arguments to complete
+			// There are no remaining arguments to complete.
+			return Collections.emptyList();
 		}
 
 		// try to parse id:
@@ -90,38 +91,38 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 		try {
 			idArgument.parseValue(input, context, argsReader);
 			if (argsReader.getRemainingSize() > 0) {
-				// successfully parsed and there are still arguments left, so this is not consuming the last argument:
+				// Successfully parsed and there are still arguments left, so this is not consuming the last argument:
 				return Collections.emptyList();
 			}
 		} catch (ArgumentParseException e) {
 		}
 
-		// determine id prefix and args count:
+		// Determine id prefix and args count:
 		List<String> args = argsReader.getArgs();
 		int endIndex = args.size(); // exclusive
-		// the partial id input may consist of multiple joined input arguments:
+		// The partial id input may consist of multiple joined input arguments:
 		int argsCount = (endIndex - startIndex);
-		assert argsCount > 0; // otherwise we would have no remaining arguments in the first place
+		assert argsCount > 0; // Otherwise we would have no remaining arguments in the first place.
 
 		String idPrefix;
-		if (argsCount == 1) { // single argument
+		if (argsCount == 1) { // Single argument
 			idPrefix = args.get(startIndex);
-		} else { // joined arguments:
+		} else { // Joined arguments:
 			List<String> parsedArgs = args.subList(startIndex, endIndex);
 			idPrefix = String.join(Command.ARGUMENTS_SEPARATOR, parsedArgs);
 		}
 
-		// get completion suggestions:
+		// Get completion suggestions:
 		return this.complete(idPrefix, argsCount);
 	}
 
-	// argsCount: the number of arguments the id prefix consist of (>= 1)
+	// argsCount: The number of arguments the id prefix consist of (>= 1).
 	protected List<String> complete(String idPrefix, int argsCount) {
 		// Some types of object id arguments may want to provide suggestions even if there are no remaining args (empty
 		// partial input), while others might want to limit their suggestions to the case that there is at least a
 		// minimum sized input (eg. if there are lots of candidate ids):
 		if (idPrefix.length() < minimalCompletionInput) {
-			// only provide suggestions if there is a minimal length input
+			// Only provide suggestions if there is a minimal length input.
 			return Collections.emptyList();
 		}
 
@@ -131,16 +132,16 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 			if (!filter.test(id)) continue; // skip rejected ids
 
 			String idString = this.toString(id);
-			if (idString == null || idString.isEmpty()) continue; // skip invalid id string
+			if (idString == null || idString.isEmpty()) continue; // Skip invalid id string
 
-			// if the id prefix consists of multiple joined input arguments, we skip the first (matching) parts and only
+			// If the id prefix consists of multiple joined input arguments, we skip the first (matching) parts and only
 			// output the final part(s) of the completed id as completion suggestion:
 			if (argsCount > 1) {
 				String[] idStringParts = ARGUMENTS_SEPARATOR_PATTERN.split(idString, argsCount);
-				// this should usually be true for valid (consistent) argsCount and suggestions:
+				// This should usually be true for valid (consistent) argsCount and suggestions:
 				if (idStringParts.length == argsCount) {
 					idString = idStringParts[argsCount - 1];
-				} // else: fallback to using the complete idString
+				} // Else: Fallback to using the complete idString.
 			}
 			suggestions.add(idString);
 		}

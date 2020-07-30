@@ -17,20 +17,22 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 
-// Prevents curing of zombie villagers
+/**
+ * Prevents curing of zombie villagers.
+ */
 public class BlockZombieVillagerCuringListener implements Listener {
 
 	public BlockZombieVillagerCuringListener() {
 	}
 
-	// Try to prevent curing as early as possible, so that the player doesn't waste his golden apple
+	// Try to prevent curing as early as possible, so that the player doesn't waste his golden apple.
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onZombieVillagerCureStarted(PlayerInteractEntityEvent event) {
 		if (!(event.getRightClicked() instanceof ZombieVillager)) return;
 		Player player = event.getPlayer();
 		ItemStack itemInHand = ItemUtils.getItem(player.getInventory(), event.getHand());
 		if (itemInHand != null && itemInHand.getType() == Material.GOLDEN_APPLE) {
-			// prevent curing:
+			// Prevent curing:
 			Log.debug(() -> "Preventing zombie villager curing at " + TextUtils.getLocationString(player.getLocation()));
 			event.setCancelled(true);
 			TextUtils.sendMessage(player, Settings.msgZombieVillagerCuringDisabled);
@@ -46,7 +48,7 @@ public class BlockZombieVillagerCuringListener implements Listener {
 		Log.debug(() -> "Preventing zombie villager curing (transform) at " + TextUtils.getLocationString(zombieVillager.getLocation()));
 		event.setCancelled(true);
 
-		// inform the player who initiated the curing:
+		// Inform the player who initiated the curing:
 		OfflinePlayer conversionOfflinePlayer = zombieVillager.getConversionPlayer();
 		Player conversionPlayer = (conversionOfflinePlayer == null) ? null : conversionOfflinePlayer.getPlayer();
 		if (conversionPlayer != null) {

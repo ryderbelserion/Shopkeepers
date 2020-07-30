@@ -32,7 +32,7 @@ public final class Utils {
 	private Utils() {
 	}
 
-	// note: doesn't work for primitive arrays
+	// Note: Doesn't work for primitive arrays.
 	@SafeVarargs
 	public static <T> T[] concat(T[] array1, T... array2) {
 		if (array1 == null) return array2;
@@ -83,8 +83,8 @@ public final class Utils {
 	 * @return <code>true</code> if no plugin denied block interaction
 	 */
 	public static boolean checkBlockInteract(Player player, Block block) {
-		// simulating right click on the block to check if access is denied:
-		// making sure that block access is really denied, and that the event is not cancelled because of denying
+		// Simulating right click on the block to check if access is denied:
+		// Making sure that block access is really denied, and that the event is not cancelled because of denying
 		// usage with the items in hands:
 		PlayerInventory playerInventory = player.getInventory();
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
@@ -96,7 +96,7 @@ public final class Utils {
 		Bukkit.getPluginManager().callEvent(dummyInteractEvent);
 		boolean canAccessBlock = (dummyInteractEvent.useInteractedBlock() != Result.DENY);
 
-		// resetting items in main and off hand:
+		// Resetting items in main and off hand:
 		playerInventory.setItemInMainHand(itemInMainHand);
 		playerInventory.setItemInOffHand(itemInOffHand);
 		return canAccessBlock;
@@ -119,8 +119,8 @@ public final class Utils {
 	 * @return <code>true</code> if no plugin denied interaction
 	 */
 	public static boolean checkEntityInteract(Player player, Entity entity) {
-		// simulating right click on the entity to check if access is denied:
-		// making sure that entity access is really denied, and that the event is not cancelled because of denying usage
+		// Simulating right click on the entity to check if access is denied:
+		// Making sure that entity access is really denied, and that the event is not cancelled because of denying usage
 		// with the items in hands:
 		PlayerInventory playerInventory = player.getInventory();
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
@@ -132,7 +132,7 @@ public final class Utils {
 		Bukkit.getPluginManager().callEvent(dummyInteractEvent);
 		boolean canAccessEntity = !dummyInteractEvent.isCancelled();
 
-		// resetting items in main and off hand:
+		// Resetting items in main and off hand:
 		playerInventory.setItemInMainHand(itemInMainHand);
 		playerInventory.setItemInOffHand(itemInOffHand);
 		return canAccessEntity;
@@ -186,7 +186,7 @@ public final class Utils {
 	 * @return <code>true</code> if the locations correspond to the same position
 	 */
 	public static boolean isEqualPosition(Location location1, Location location2) {
-		if (location1 == location2) return true; // also handles both being null
+		if (location1 == location2) return true; // Also handles both being null
 		if (location1 == null || location2 == null) return false;
 		if (!Objects.equals(location1.getWorld(), location2.getWorld())) {
 			return false;
@@ -222,7 +222,7 @@ public final class Utils {
 		World world2 = location2.getWorld();
 		Validate.notNull(world1, "World of first location is null!");
 		Validate.notNull(world2, "World of second location is null!");
-		if (world1 != world2) return Double.MAX_VALUE; // different worlds
+		if (world1 != world2) return Double.MAX_VALUE; // Different worlds
 		// Note: Not using Location#distanceSquared to avoid redundant precondition checks.
 		double dx = location1.getX() - location2.getX();
 		double dy = location1.getY() - location2.getY();
@@ -242,7 +242,7 @@ public final class Utils {
 		return block.getLocation().add(0.5D, 0.5D, 0.5D);
 	}
 
-	// temporary objects getting re-used during ray tracing:
+	// Temporary objects getting re-used during ray tracing:
 	private static final Location TEMP_START_LOCATION = new Location(null, 0, 0, 0);
 	private static final Vector TEMP_START_POSITION = new Vector();
 	private static final Vector DOWN_DIRECTION = new Vector(0.0D, -1.0D, 0.0D);
@@ -267,27 +267,27 @@ public final class Utils {
 	public static double getCollisionDistanceToGround(Location startLocation, double maxDistance) {
 		World world = startLocation.getWorld();
 		assert world != null;
-		// setup re-used offset start location:
+		// Setup re-used offset start location:
 		TEMP_START_LOCATION.setWorld(world);
 		TEMP_START_LOCATION.setX(startLocation.getX());
 		TEMP_START_LOCATION.setY(startLocation.getY() + RAY_TRACE_OFFSET);
 		TEMP_START_LOCATION.setZ(startLocation.getZ());
 
-		// considers block collision boxes, ignoring fluids and passable blocks:
+		// Considers block collision boxes, ignoring fluids and passable blocks:
 		RayTraceResult rayTraceResult = world.rayTraceBlocks(TEMP_START_LOCATION, DOWN_DIRECTION, maxDistance + RAY_TRACE_OFFSET, FluidCollisionMode.NEVER, true);
-		TEMP_START_LOCATION.setWorld(null); // cleanup temporarily used start location
+		TEMP_START_LOCATION.setWorld(null); // Cleanup temporarily used start location
 
 		double distanceToGround;
 		if (rayTraceResult == null) {
-			// no collision with the range:
+			// No collision with the range:
 			distanceToGround = maxDistance;
 		} else {
 			TEMP_START_POSITION.setX(TEMP_START_LOCATION.getX());
 			TEMP_START_POSITION.setY(TEMP_START_LOCATION.getY());
 			TEMP_START_POSITION.setZ(TEMP_START_LOCATION.getZ());
 			distanceToGround = TEMP_START_POSITION.distance(rayTraceResult.getHitPosition()) - RAY_TRACE_OFFSET;
-			// might be negative if the hit is between the start location and the offset start location, we ignore it
-			// then:
+			// Might be negative if the hit is between the start location and the offset start location.
+			// We ignore it then.
 			if (distanceToGround < 0.0D) distanceToGround = 0.0D;
 		}
 		return distanceToGround;

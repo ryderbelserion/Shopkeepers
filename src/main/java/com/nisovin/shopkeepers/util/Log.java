@@ -11,8 +11,8 @@ public final class Log {
 	private Log() {
 	}
 
-	// gets set early on plugin startup and then (ideally) never unset
-	// -> volatile is therefore not expected to be required
+	// Gets set early on plugin startup and then (ideally) never unset.
+	// -> Volatile is therefore not expected to be required.
 	private static Logger logger = null;
 
 	public static void setLogger(Logger logger) {

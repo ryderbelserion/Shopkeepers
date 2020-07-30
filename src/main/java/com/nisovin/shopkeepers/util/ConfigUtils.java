@@ -10,22 +10,22 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public class ConfigUtils {
 
-	// shared YAML config that gets reused
+	// Shared YAML config that gets reused:
 	private static final ThreadLocal<YamlConfiguration> YAML = ThreadLocal.withInitial(() -> new YamlConfiguration());
 
 	public static Material loadMaterial(ConfigurationSection config, String key) {
-		String materialName = config.getString(key); // note: takes defaults into account
+		String materialName = config.getString(key); // Note: Takes defaults into account.
 		if (materialName == null) return null;
-		Material material = Material.matchMaterial(materialName); // can be null
+		Material material = Material.matchMaterial(materialName); // Can be null
 		return material;
 	}
 
-	// the given top section itself does not get converted
+	// The given top section itself does not get converted.
 	public static void convertSectionsToMaps(ConfigurationSection section) {
 		for (Entry<String, Object> entry : section.getValues(false).entrySet()) {
 			Object value = entry.getValue();
 			if (value instanceof ConfigurationSection) {
-				// recursively replace sections with maps:
+				// Recursively replace sections with maps:
 				Map<String, Object> innerSectionMap = ((ConfigurationSection) value).getValues(false);
 				section.set(entry.getKey(), innerSectionMap);
 				convertSectionsToMaps(innerSectionMap);
@@ -41,7 +41,7 @@ public class ConfigUtils {
 		for (Entry<String, Object> entry : sectionMap.entrySet()) {
 			Object value = entry.getValue();
 			if (value instanceof ConfigurationSection) {
-				// recursively replace sections with maps:
+				// Recursively replace sections with maps:
 				Map<String, Object> innerSectionMap = ((ConfigurationSection) value).getValues(false);
 				entry.setValue(innerSectionMap);
 				convertSectionsToMaps(innerSectionMap);
@@ -56,7 +56,7 @@ public class ConfigUtils {
 	}
 
 	public static String[] getYAMLOutput(Object serializedObject) {
-		YamlConfiguration yaml = YAML.get(); // shared yaml config
+		YamlConfiguration yaml = YAML.get(); // Shared yaml config
 		yaml.set(YAML_OUTPUT_KEY, serializedObject);
 		String configOutput = yaml.saveToString();
 		yaml.set(YAML_OUTPUT_KEY, null);

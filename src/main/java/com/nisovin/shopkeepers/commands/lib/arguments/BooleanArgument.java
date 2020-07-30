@@ -41,7 +41,7 @@ public class BooleanArgument extends CommandArgument<Boolean> {
 		String partialArg = argsReader.next().toLowerCase(Locale.ROOT);
 		for (String value : ConversionUtils.BOOLEAN_VALUES.keySet()) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;
-			// the boolean values are already lowercase:
+			// The boolean values are already lowercase:
 			if (value.startsWith(partialArg)) {
 				suggestions.add(value);
 			}

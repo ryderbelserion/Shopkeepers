@@ -25,13 +25,13 @@ class CommandSetForHire extends PlayerCommand {
 	CommandSetForHire() {
 		super("setForHire");
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.SET_FOR_HIRE_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionSetforhire);
 
-		// arguments:
+		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, ShopkeeperFilter.PLAYER),
 				TargetShopkeeperFilter.PLAYER)
@@ -48,25 +48,25 @@ class CommandSetForHire extends PlayerCommand {
 
 		ItemStack hireCost = player.getInventory().getItemInMainHand();
 		if (ItemUtils.isEmpty(hireCost)) {
-			// TODO allow disabling hiring again, with empty hand
-			// TODO show hire item via hover event?
+			// TODO Allow disabling hiring again, maybe with empty hand?
+			// TODO Show hire item via hover event?
 			TextUtils.sendMessage(player, Settings.msgMustHoldHireItem);
 			return;
 		}
 
-		// check that the shop is owned by the executing player:
+		// Check that the shop is owned by the executing player:
 		if (!shopkeeper.isOwner(player) && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			TextUtils.sendMessage(player, Settings.msgNotOwner);
 			return;
 		} else {
-			// set for hire:
+			// Set for hire:
 			shopkeeper.setForHire(hireCost);
 		}
 
-		// success:
+		// Success:
 		TextUtils.sendMessage(player, Settings.msgSetForHire);
 
-		// save:
+		// Save:
 		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 	}
 }

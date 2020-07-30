@@ -81,10 +81,10 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public void overwriteLivingEntityAI(LivingEntity entity) {
-		// workaround to make mobs stationary:
+		// Workaround to make mobs stationary:
 		AttributeInstance attributeInstance = entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
 		if (attributeInstance != null) {
-			// remove first, in case the entity already has this modifier:
+			// Remove first, in case the entity already has this modifier:
 			attributeInstance.removeModifier(movementSpeedModifier);
 			attributeInstance.addModifier(movementSpeedModifier);
 		}
@@ -92,14 +92,14 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public boolean supportsCustomMobAI() {
-		// not supported, uses the regular mob AI and gravity
-		// relies on overwriteLivingEntityAI being able to make the entities stationary
+		// Not supported, uses the regular mob AI and gravity.
+		// Relies on overwriteLivingEntityAI being able to make the entities stationary.
 		return false;
 	}
 
 	@Override
 	public void tickAI(LivingEntity entity) {
-		// not supported
+		// Not supported.
 	}
 
 	@Override
@@ -108,31 +108,31 @@ public final class FailedHandler implements NMSCallProvider {
 			Object mcEntity = obcGetHandleMethod.invoke(entity);
 			nmsOnGroundField.set(mcEntity, onGround);
 		} catch (Exception e) {
-			// ignoring, since this is not that important if it doesn't work
+			// Ignoring, since this is not that important if it doesn't work.
 		}
 	}
 
 	@Override
 	public void setNoclip(Entity entity) {
 		try {
-			// when gravity gets disabled, we are able to also disable collisions/pushing of mobs via the noclip flag:
-			// this might not properly work for Vec, since those disable noclip again after their movement:
+			// When gravity gets disabled, we are able to also disable collisions/pushing of mobs via the noclip flag.
+			// This might not properly work for Vex, since they disable noclip again after their movement.
 			Object mcEntity = obcGetHandleMethod.invoke(entity);
 			nmsNoclipField.set(mcEntity, true);
 		} catch (Exception e) {
-			// this is optional, ignore if not possible for some reason
+			// This is optional, ignore if not possible for some reason.
 		}
 	}
 
 	@Override
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
-		// not supported :( raider mobs might interfere with nearby raids TODO
+		// Not supported :( Raider mobs might interfere with nearby raids TODO
 	}
 
 	@Override
 	public boolean matches(ItemStack provided, ItemStack required) {
 		if (provided == required) return true;
-		// if the required item is empty, then the provided item has to be empty as well:
+		// If the required item is empty, then the provided item has to be empty as well:
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
 		if (provided.getType() != required.getType()) return false;
@@ -143,8 +143,8 @@ public final class FailedHandler implements NMSCallProvider {
 			Object requiredTag = nmsGetTagMethod.invoke(nmsRequired);
 			return (Boolean) nmsAreNBTMatchingMethod.invoke(null, requiredTag, providedTag, false);
 		} catch (Exception e) {
-			// fallback: checking for metadata equality
-			// note: in this case the behavior of this method is no longer equivalent to minecraft's item comparison
+			// Fallback: Checking for metadata equality.
+			// Note: In this case the behavior of this method is no longer equivalent to minecraft's item comparison
 			// behavior!
 			return provided.isSimilar(required);
 		}
@@ -152,16 +152,16 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public void updateTrades(Player player) {
-		// not supported
+		// Not supported.
 	}
 
 	@Override
 	public String getItemSNBT(ItemStack itemStack) {
-		return null; // not supported
+		return null; // Not supported.
 	}
 
 	@Override
 	public String getItemTypeTranslationKey(Material material) {
-		return null; // not supported
+		return null; // Not supported.
 	}
 }

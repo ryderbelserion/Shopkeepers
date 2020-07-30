@@ -24,7 +24,7 @@ public class ItemData implements Cloneable {
 	private static final String DISPLAY_NAME_KEY = "display-name";
 	private static final String LORE_KEY = "lore";
 
-	// special case: omitting 'blockMaterial' for empty TILE_ENTITY item meta
+	// Special case: Omitting 'blockMaterial' for empty TILE_ENTITY item meta.
 	private static final String TILE_ENTITY_BLOCK_MATERIAL_KEY = "blockMaterial";
 
 	public static ItemData deserialize(Object dataObject) {
@@ -33,21 +33,21 @@ public class ItemData implements Cloneable {
 
 	public static ItemData deserialize(Object dataObject, Consumer<String> warningHandler) {
 		if (warningHandler == null) {
-			warningHandler = SILENT_WARNING_HANDLER; // ignore all warnings
+			warningHandler = SILENT_WARNING_HANDLER; // Ignore all warnings
 		}
 		if (dataObject == null) return null;
 
 		String typeName = null;
 		Map<String, Object> dataMap = null;
 		if (dataObject instanceof String) {
-			// load from compact representation (no additional item data):
+			// Load from compact representation (no additional item data):
 			typeName = (String) dataObject;
 			assert typeName != null;
 		} else {
 			if (dataObject instanceof ConfigurationSection) {
-				dataMap = ((ConfigurationSection) dataObject).getValues(false); // returns a (shallow) copy
+				dataMap = ((ConfigurationSection) dataObject).getValues(false); // Returns a (shallow) copy
 			} else if (dataObject instanceof Map) {
-				// make a (shallow) copy of the map, since we will later insert missing data and don't want to modify
+				// Make a (shallow) copy of the map, since we will later insert missing data and don't want to modify
 				// the original data from the config:
 				dataMap = new LinkedHashMap<>();
 				for (Entry<?, ?> entry : ((Map<?, ?>) dataObject).entrySet()) {
@@ -57,73 +57,73 @@ public class ItemData implements Cloneable {
 				warningHandler.accept("Unknown item data: " + dataObject);
 				return null;
 			}
-			assert dataMap != null; // assert: dataMap is a (shallow) copy
+			assert dataMap != null; // Assert: dataMap is a (shallow) copy
 
 			Object typeData = dataMap.get("type");
 			if (typeData != null) {
 				typeName = typeData.toString();
 			}
 			if (typeName == null) {
-				// missing item type information:
+				// Missing item type information:
 				warningHandler.accept("Missing item type");
 				return null;
 			}
 			assert typeName != null;
 
-			// skip meta data loading if no further data (besides item type) is given:
+			// Skip meta data loading if no further data (besides item type) is given:
 			if (dataMap.size() <= 1) {
 				dataMap = null;
 			}
 		}
 		assert typeName != null;
 
-		// assuming up-to-date material name (performs no conversions besides basic formatting):
+		// Assuming up-to-date material name (performs no conversions besides basic formatting):
 		Material type = Material.matchMaterial(typeName);
 		if (type == null) {
-			// unknown item type:
+			// Unknown item type:
 			warningHandler.accept("Unknown item type: " + typeName);
 			return null;
 		}
 
-		// create item stack (still misses meta data):
+		// Create item stack (still misses meta data):
 		ItemStack dataItem = new ItemStack(type);
 
-		// load additional meta data:
+		// Load additional meta data:
 		if (dataMap != null) {
-			// prepare for meta data deserialization (assumes dataMap is modifiable):
-			// note: additional information does not need to be removed, but simply gets ignored (eg. item type)
+			// Prepare for meta data deserialization (assumes dataMap is modifiable):
+			// Note: Additional information does not need to be removed, but simply gets ignored (eg. item type).
 
-			// recursively replace all config sections with maps, since ItemMeta deserialization expects Maps:
+			// Recursively replace all config sections with maps, since ItemMeta deserialization expects Maps:
 			ConfigUtils.convertSectionsToMaps(dataMap);
 
-			// determine meta type by creating the serialization of a dummy item meta:
+			// Determine meta type by creating the serialization of a dummy item meta:
 			ItemMeta dummyItemMeta = dataItem.getItemMeta();
-			dummyItemMeta.setDisplayName("dummy name"); // ensure item meta is not empty
+			dummyItemMeta.setDisplayName("dummy name"); // Ensure item meta is not empty
 			Object metaType = dummyItemMeta.serialize().get(META_TYPE_KEY);
 			if (metaType == null) {
 				throw new IllegalStateException("Couldn't determine meta type with key '" + META_TYPE_KEY + "'!");
 			}
-			// insert meta type:
+			// Insert meta type:
 			dataMap.put(META_TYPE_KEY, metaType);
 
-			// convert color codes for display name and lore:
+			// Convert color codes for display name and lore:
 			Object displayNameData = dataMap.get(DISPLAY_NAME_KEY);
-			if (displayNameData instanceof String) { // also checks for null
+			if (displayNameData instanceof String) { // Also checks for null
 				dataMap.put(DISPLAY_NAME_KEY, TextUtils.colorize((String) displayNameData));
 			}
 			Object loreData = dataMap.get(LORE_KEY);
-			if (loreData instanceof List) { // also checks for null
+			if (loreData instanceof List) { // Also checks for null
 				dataMap.put(LORE_KEY, TextUtils.colorizeUnknown((List<?>) loreData));
 			}
 
 			// Deserialize ItemMeta:
-			ItemMeta itemMeta = ItemUtils.deserializeItemMeta(dataMap); // can be null
+			ItemMeta itemMeta = ItemUtils.deserializeItemMeta(dataMap); // Can be null
 
 			// Apply ItemMeta:
 			dataItem.setItemMeta(itemMeta);
 		}
 
-		// create ItemData:
+		// Create ItemData:
 		ItemData itemData = new ItemData(dataItem);
 		return itemData;
 	}
@@ -131,8 +131,8 @@ public class ItemData implements Cloneable {
 	/////
 
 	private final ItemStack dataItem;
-	// cache serialized item meta data, to avoid doing it again for every comparison:
-	private Map<String, Object> serializedData = null; // gets lazily initialized (only when actually needed)
+	// Cache serialized item meta data, to avoid doing it again for every comparison:
+	private Map<String, Object> serializedData = null; // Gets lazily initialized (only when actually needed)
 
 	public ItemData(Material type) {
 		this(new ItemStack(type));
@@ -160,9 +160,9 @@ public class ItemData implements Cloneable {
 		return new ItemData(newDataItem);
 	}
 
-	// not null
+	// Not null.
 	private Map<String, Object> getSerializedData() {
-		// lazily cache the serialized data:
+		// Lazily cache the serialized data:
 		if (serializedData == null) {
 			ItemMeta itemMeta = dataItem.getItemMeta();
 			serializedData = ItemUtils.serializeItemMeta(itemMeta);
@@ -176,11 +176,11 @@ public class ItemData implements Cloneable {
 	}
 
 	public boolean hasItemMeta() {
-		return !this.getSerializedData().isEmpty(); // equivalent to dataItem.hasItemMeta()
+		return !this.getSerializedData().isEmpty(); // Equivalent to dataItem.hasItemMeta()
 	}
 
 	public ItemMeta getItemMeta() {
-		// returns a copy, therefore cannot modify the original data:
+		// Returns a copy, therefore cannot modify the original data:
 		return dataItem.getItemMeta();
 	}
 
@@ -200,19 +200,19 @@ public class ItemData implements Cloneable {
 	}
 
 	public boolean matches(ItemStack item) {
-		return this.matches(item, false); // not matching partial lists
+		return this.matches(item, false); // Not matching partial lists
 	}
 
 	public boolean matches(ItemStack item, boolean matchPartialLists) {
-		// same type and matching data:
+		// Same type and matching data:
 		return ItemUtils.matchesData(item, this.getType(), this.getSerializedData(), matchPartialLists);
 	}
 
 	public boolean matches(ItemData itemData) {
-		return this.matches(itemData, false); // not matching partial lists
+		return this.matches(itemData, false); // Not matching partial lists
 	}
 
-	// given ItemData is of same type and has data matching this ItemData
+	// Given ItemData is of same type and has data matching this ItemData.
 	public boolean matches(ItemData itemData, boolean matchPartialLists) {
 		if (itemData == null) return false;
 		if (itemData.getType() != this.getType()) return false;
@@ -248,13 +248,13 @@ public class ItemData implements Cloneable {
 
 	@Override
 	public ItemData clone() {
-		return new ItemData(dataItem); // clones the item internally
+		return new ItemData(dataItem); // Clones the item internally
 	}
 
 	public Object serialize() {
 		Map<String, Object> serializedData = this.getSerializedData();
 		if (serializedData.isEmpty()) {
-			// use a more compact representation if there is no additional item data:
+			// Use a more compact representation if there is no additional item data:
 			return dataItem.getType().name();
 		}
 
@@ -265,22 +265,22 @@ public class ItemData implements Cloneable {
 			String key = entry.getKey();
 			Object value = entry.getValue();
 
-			// omitting any data which can be easily restored during deserialization:
-			// omit meta type key:
+			// Omitting any data which can be easily restored during deserialization:
+			// Omit meta type key:
 			if (META_TYPE_KEY.equals(key)) continue;
 
-			// omit 'blockMaterial' for empty TILE_ENTITY item meta:
+			// Omit 'blockMaterial' for empty TILE_ENTITY item meta:
 			if (TILE_ENTITY_BLOCK_MATERIAL_KEY.equals(key)) {
-				// check if specific meta type only contains unspecific meta data:
+				// Check if specific meta type only contains unspecific meta data:
 				ItemMeta specificItemMeta = dataItem.getItemMeta();
-				// TODO relies on some material with unspecific item meta
+				// TODO Relies on some material with unspecific item meta.
 				ItemMeta unspecificItemMeta = Bukkit.getItemFactory().asMetaFor(specificItemMeta, Material.STONE);
 				if (Bukkit.getItemFactory().equals(unspecificItemMeta, specificItemMeta)) {
-					continue; // skip 'blockMaterial' entry
+					continue; // Skip 'blockMaterial' entry
 				}
 			}
 
-			// use alternative color codes for display name and lore:
+			// Use alternative color codes for display name and lore:
 			if (DISPLAY_NAME_KEY.equals(key)) {
 				if (value instanceof String) {
 					value = TextUtils.decolorize((String) value);
@@ -291,7 +291,7 @@ public class ItemData implements Cloneable {
 				}
 			}
 
-			// move into data map: avoiding a deep copy, since it is assumed to not be needed
+			// Move into data map: Avoiding a deep copy, since it is assumed to not be needed.
 			dataMap.put(key, value);
 		}
 		return dataMap;

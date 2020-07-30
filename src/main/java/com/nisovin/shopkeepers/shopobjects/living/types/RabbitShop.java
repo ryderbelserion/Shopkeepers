@@ -66,7 +66,7 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 		Validate.notNull(rabbitType, "rabbitType is null");
 		this.rabbitType = rabbitType;
 		shopkeeper.markDirty();
-		this.applyRabbitType(this.getEntity()); // null if not active
+		this.applyRabbitType(this.getEntity()); // Null if not active
 	}
 
 	private void applyRabbitType(Rabbit entity) {
@@ -76,9 +76,9 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 			// If the entity's custom name is not empty, Minecraft applies the 'The Killer Rabbit' name. We therefore
 			// temporarily set the custom name to something non-empty:
 			String customName = entity.getCustomName(); // can be null
-			entity.setCustomName(" "); // non-empty
+			entity.setCustomName(" "); // Non-empty
 			entity.setRabbitType(rabbitType);
-			entity.setCustomName(customName); // reset previous name
+			entity.setCustomName(customName); // Reset previous name
 			// CraftBukkit and Minecraft reset the rabbit's pathfinder goals, so we clear them again:
 			this.overwriteAI();
 			// Minecraft also sets the rabbit's armor attribute, but this doesn't affect us.
@@ -116,7 +116,7 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 			ItemUtils.setLeatherColor(iconItem, Color.fromRGB(142, 11, 28));
 			break;
 		default:
-			// unknown type:
+			// Unknown type:
 			ItemUtils.setLeatherColor(iconItem, Color.PURPLE);
 			break;
 		}

@@ -30,10 +30,10 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		SKBookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
-		// only adding one recipe per book title:
+		// Only adding one recipe per book title:
 		Set<String> bookTitles = new HashSet<>();
 
-		// add the shopkeeper's offers:
+		// Add the shopkeeper's offers:
 		List<ItemCount> containerItems = shopkeeper.getCopyableBooksFromContainer();
 		for (BookOffer offer : shopkeeper.getOffers()) {
 			String bookTitle = offer.getBookTitle();
@@ -46,19 +46,19 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			recipes.add(recipe);
 		}
 
-		// add empty offers for items from the container:
+		// Add empty offers for items from the container:
 		for (int containerItemIndex = 0; containerItemIndex < containerItems.size(); containerItemIndex++) {
 			ItemCount itemCount = containerItems.get(containerItemIndex);
-			ItemStack itemFromContainer = itemCount.getItem(); // this item is already a copy with amount 1
+			ItemStack itemFromContainer = itemCount.getItem(); // This item is already a copy with amount 1
 
 			String bookTitle = SKBookPlayerShopkeeper.getBookTitle(itemFromContainer);
-			assert bookTitle != null; // we filtered those book items earlier
+			assert bookTitle != null; // We filtered those book items earlier
 			if (bookTitles.contains(bookTitle)) {
-				continue; // already added a recipe for a book with this name
+				continue; // Already added a recipe for a book with this name
 			}
 			bookTitles.add(bookTitle);
 
-			// add recipe:
+			// Add recipe:
 			TradingRecipeDraft recipe = this.createTradingRecipeDraft(itemFromContainer, 0);
 			recipes.add(recipe);
 		}

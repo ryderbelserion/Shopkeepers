@@ -23,13 +23,13 @@ class CommandYaml extends PlayerCommand {
 	CommandYaml() {
 		super("yaml");
 
-		// set permission:
+		// Set permission:
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
-		// set description:
+		// Set description:
 		this.setDescription(Text.of("Prints the YAML representation of the held item."));
 
-		// hidden debugging command:
+		// Hidden debugging command:
 		this.setHiddenInParentHelp(true);
 	}
 
@@ -44,11 +44,11 @@ class CommandYaml extends PlayerCommand {
 			return;
 		}
 
-		// serialized ItemStack and ItemData:
+		// Serialized ItemStack and ItemData:
 		String[] serializedItemStack = ConfigUtils.getYAMLOutput(itemInHand);
 		String[] serializedItemData = ConfigUtils.getYAMLOutput(new ItemData(itemInHand).serialize());
 
-		// print to player:
+		// Print to player:
 		player.sendMessage(ChatColor.YELLOW + "Serialized ItemStack:");
 		if (serializedItemStack.length > MAX_OUTPUT_LENGTH) {
 			player.sendMessage(ChatColor.GRAY + "The output is too large for the chat.");
@@ -69,9 +69,9 @@ class CommandYaml extends PlayerCommand {
 
 		player.sendMessage(ChatColor.GRAY + "Note: The output gets also logged to the console for easier copying.");
 
-		// print to console:
+		// Print to console:
 		PrintStream stream = System.out;
-		synchronized (stream) { // assumes the implementation synchronizes on itself
+		synchronized (stream) { // Assumes the implementation synchronizes on itself.
 			stream.println("Serialized ItemStack:");
 			for (String line : serializedItemStack) {
 				stream.println(line);

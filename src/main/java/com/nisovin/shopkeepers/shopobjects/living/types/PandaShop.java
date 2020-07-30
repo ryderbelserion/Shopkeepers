@@ -22,7 +22,7 @@ import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
-// TODO pose (laying, sitting, eating, worried)
+// TODO Pose (laying, sitting, eating, worried).
 public class PandaShop extends BabyableShop<Panda> {
 
 	private static final Property<Panda.Gene> PROPERTY_GENE = new EnumProperty<>(Panda.Gene.class, "gene", Panda.Gene.NORMAL);
@@ -66,7 +66,7 @@ public class PandaShop extends BabyableShop<Panda> {
 		Validate.notNull(gene, "Gene is null!");
 		this.gene = gene;
 		shopkeeper.markDirty();
-		this.applyGene(this.getEntity()); // null if not active
+		this.applyGene(this.getEntity()); // Null if not active
 	}
 
 	private void applyGene(Panda entity) {

@@ -7,8 +7,8 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 
 public class SKUISession implements UISession {
 
-	// reference shopkeeper directly and not by id, because the id might change or currently be invalid
-	// (for inactive shopkeepers).. especially important for remotely opened windows
+	// Reference shopkeeper directly and not by id, because the id might change or currently be invalid
+	// (for inactive shopkeepers).. especially important for remotely opened windows.
 	private final AbstractShopkeeper shopkeeper;
 	private final UIHandler uiHandler;
 	private final Player player;

@@ -30,12 +30,12 @@ class CommandConvertItems extends Command {
 	CommandConvertItems() {
 		super("convertItems", Arrays.asList("convertItem", "convert"));
 
-		// permission gets checked by testPermission and during execution
+		// Permission gets checked by testPermission and during execution.
 
-		// set description:
+		// Set description:
 		this.setDescription(Settings.msgCommandDescriptionConvertItems);
 
-		// arguments:
+		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
 		this.addArgument(new OptionalArgument<>(new LiteralArgument(ARGUMENT_ALL)));
 	}

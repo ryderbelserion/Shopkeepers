@@ -21,7 +21,7 @@ import com.nisovin.shopkeepers.util.Validate;
  */
 public class TypedFallbackArgument<T> extends FallbackArgument<T> {
 
-	// reusing the implementation of AnyFallbackArgument:
+	// Reusing the implementation of AnyFallbackArgument:
 	private final AnyFallbackArgument anyFallbackArgument;
 
 	public TypedFallbackArgument(CommandArgument<T> argument, CommandArgument<T> fallbackArgument) {

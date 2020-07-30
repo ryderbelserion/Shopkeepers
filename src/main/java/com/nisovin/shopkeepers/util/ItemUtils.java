@@ -36,7 +36,7 @@ public final class ItemUtils {
 
 	public static int MAX_STACK_SIZE = 64;
 
-	// material utilities:
+	// Material utilities:
 
 	/**
 	 * Checks if the given material is a container.
@@ -114,7 +114,7 @@ public final class ItemUtils {
 		}
 	}
 
-	// itemstack utilities:
+	// ItemStack utilities:
 
 	public static boolean isEmpty(ItemStack item) {
 		return item == null || item.getType() == Material.AIR || item.getAmount() <= 0;
@@ -146,13 +146,13 @@ public final class ItemUtils {
 		return trimItemAmount(item.getType(), amount);
 	}
 
-	// trims the amount between 1 and the item's max-stack-size
+	// Trims the amount between 1 and the item's max-stack-size.
 	public static int trimItemAmount(Material itemType, int amount) {
 		return MathUtils.trim(amount, 1, itemType.getMaxStackSize());
 	}
 
 	public static ItemStack createItemStack(Material type, int amount, String displayName, List<String> lore) {
-		// TODO return null in case of type AIR?
+		// TODO Return null in case of type AIR?
 		ItemStack itemStack = new ItemStack(type, amount);
 		return ItemUtils.setItemStackNameAndLore(itemStack, displayName, lore);
 	}
@@ -172,7 +172,7 @@ public final class ItemUtils {
 		return item;
 	}
 
-	// null to remove display name
+	// Null to remove display name.
 	public static ItemStack setItemStackName(ItemStack itemStack, String displayName) {
 		if (itemStack == null) return null;
 		ItemMeta itemMeta = itemStack.getItemMeta();
@@ -180,7 +180,7 @@ public final class ItemUtils {
 		if (displayName == null && !itemMeta.hasDisplayName()) {
 			return itemStack;
 		}
-		itemMeta.setDisplayName(displayName); // null will clear the display name
+		itemMeta.setDisplayName(displayName); // Null will clear the display name
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;
 	}
@@ -206,7 +206,7 @@ public final class ItemUtils {
 		return leatherArmorItem;
 	}
 
-	// TODO this can be removed once bukkit provides a non-deprecated mapping itself
+	// TODO This can be removed once Bukkit provides a non-deprecated mapping itself.
 	public static Material getWoolType(DyeColor dyeColor) {
 		switch (dyeColor) {
 		case ORANGE:
@@ -295,7 +295,7 @@ public final class ItemUtils {
 	public static int getDurability(ItemStack itemStack) {
 		assert itemStack != null;
 		ItemMeta itemMeta = itemStack.getItemMeta();
-		if (!(itemMeta instanceof Damageable)) return 0; // also checks for null ItemMeta
+		if (!(itemMeta instanceof Damageable)) return 0; // Also checks for null ItemMeta
 		return ((Damageable) itemMeta).getDamage();
 	}
 
@@ -354,14 +354,14 @@ public final class ItemUtils {
 		ItemMeta itemMeta = item.getItemMeta();
 		if (itemMeta == null) return false;
 
-		// compare display name:
+		// Compare display name:
 		if (checkDisplayName) {
 			if (!itemMeta.hasDisplayName() || !displayName.equals(itemMeta.getDisplayName())) {
 				return false;
 			}
 		}
 
-		// compare lore:
+		// Compare lore:
 		if (checkLore) {
 			if (!itemMeta.hasLore() || !lore.equals(itemMeta.getLore())) {
 				return false;
@@ -374,18 +374,18 @@ public final class ItemUtils {
 	// ITEM DATA MATCHING
 
 	public static boolean matchesData(ItemStack item, ItemStack data) {
-		return matchesData(item, data, false); // not matching partial lists
+		return matchesData(item, data, false); // Not matching partial lists
 	}
 
-	// same type and contains data
+	// Same type and contains data.
 	public static boolean matchesData(ItemStack item, ItemStack data, boolean matchPartialLists) {
 		if (item == data) return true;
 		if (data == null) return true;
 		if (item == null) return false;
-		// compare item types:
+		// Compare item types:
 		if (item.getType() != data.getType()) return false;
 
-		// check if meta data is contained in item:
+		// Check if meta data is contained in item:
 		return matchesData(item.getItemMeta(), data.getItemMeta(), matchPartialLists);
 	}
 
@@ -411,7 +411,7 @@ public final class ItemUtils {
 		if (dataMetaData == null) return true;
 		if (itemMetaData == null) return false;
 
-		// TODO maybe there is a better way of doing this in the future..
+		// TODO Maybe there is a better way of doing this in the future..
 		Map<String, Object> itemMetaDataMap = itemMetaData.serialize();
 		Map<String, Object> dataMetaDataMap = dataMetaData.serialize();
 		return matchesData(itemMetaDataMap, dataMetaDataMap, matchPartialLists);
@@ -433,7 +433,7 @@ public final class ItemUtils {
 		if (data == null) return true;
 		if (target == null) return false;
 
-		// check if map contains given data:
+		// Check if map contains given data:
 		if (data instanceof Map) {
 			if (!(target instanceof Map)) return false;
 			Map<?, ?> targetMap = (Map<?, ?>) target;
@@ -447,12 +447,12 @@ public final class ItemUtils {
 			return true;
 		}
 
-		// check if list contains given data:
+		// Check if list contains given data:
 		if (matchPartialLists && data instanceof List) {
 			if (!(target instanceof List)) return false;
 			List<?> targetList = (List<?>) target;
 			List<?> dataList = (List<?>) data;
-			// if empty list is explicitly specified, then target list has to be empty as well:
+			// If empty list is explicitly specified, then target list has to be empty as well:
 			/*if (dataList.isEmpty()) {
 				return targetList.isEmpty();
 			}*/
@@ -475,7 +475,7 @@ public final class ItemUtils {
 			return true;
 		}
 
-		// check if objects are equal:
+		// Check if objects are equal:
 		return data.equals(target);
 	}
 
@@ -486,7 +486,7 @@ public final class ItemUtils {
 			for (ItemData itemData : itemDataList) {
 				if (itemData != null && itemData.matches(item)) {
 					return true;
-				} // else: continue
+				} // Else: Continue.
 			}
 			return false;
 		};
@@ -503,8 +503,8 @@ public final class ItemUtils {
 			DUMMY_INVENTORY = Bukkit.createInventory(null, 9);
 		}
 
-		// Inserting an ItemStack into a minecraft inventory will convert it to a corresponding nms.ItemStack and
-		// thereby trigger any minecraft data migrations for that ItemStack.
+		// Inserting an ItemStack into a Minecraft inventory will convert it to a corresponding nms.ItemStack and
+		// thereby trigger any Minecraft data migrations for that ItemStack.
 		DUMMY_INVENTORY.setItem(0, itemStack);
 		ItemStack convertedItemStack = DUMMY_INVENTORY.getItem(0);
 		DUMMY_INVENTORY.setItem(0, null);
@@ -517,12 +517,12 @@ public final class ItemUtils {
 	public static ItemStack convertItem(ItemStack itemStack) {
 		if (itemStack == null) return null;
 		ItemMeta itemMeta = itemStack.getItemMeta(); // can be null
-		Map<String, Object> serializedItemMeta = serializeItemMeta(itemMeta); // can be null
+		Map<String, Object> serializedItemMeta = serializeItemMeta(itemMeta); // Can be null
 		if (serializedItemMeta == null) {
 			// Item has no ItemMeta that could get converted:
 			return itemStack;
 		}
-		ItemMeta deserializedItemMeta = deserializeItemMeta(serializedItemMeta); // can be null
+		ItemMeta deserializedItemMeta = deserializeItemMeta(serializedItemMeta); // Can be null
 		ItemStack convertedItemStack = itemStack.clone();
 		convertedItemStack.setItemMeta(deserializedItemMeta);
 		return convertedItemStack;
@@ -627,7 +627,7 @@ public final class ItemUtils {
 		return (isEmpty(itemStack) ? 0 : itemStack.getAmount());
 	}
 
-	// inventory utilities:
+	// Inventory utilities:
 
 	public static List<ItemCount> countItems(ItemStack[] contents, Filter<ItemStack> filter) {
 		List<ItemCount> itemCounts = new ArrayList<>();
@@ -636,13 +636,13 @@ public final class ItemUtils {
 			if (isEmpty(item)) continue;
 			if (filter != null && !filter.accept(item)) continue;
 
-			// check if we already have a counter for this type of item:
+			// Check if we already have a counter for this type of item:
 			ItemCount itemCount = ItemCount.findSimilar(itemCounts, item);
 			if (itemCount != null) {
-				// increase item count:
+				// Increase item count:
 				itemCount.addAmount(item.getAmount());
 			} else {
-				// add new item entry:
+				// Add new item entry:
 				itemCounts.add(new ItemCount(item, item.getAmount()));
 			}
 		}
@@ -663,7 +663,7 @@ public final class ItemUtils {
 	 */
 	public static boolean containsAtLeast(ItemStack[] contents, ItemData itemData, int amount) {
 		if (contents == null) return false;
-		if (itemData == null) return false; // consider null to match no item here
+		if (itemData == null) return false; // Consider null to match no item here
 		int remainingAmount = amount;
 		for (ItemStack itemStack : contents) {
 			if (!itemData.matches(itemStack)) continue;
@@ -733,31 +733,31 @@ public final class ItemUtils {
 		Validate.isTrue(amount >= 0);
 		if (amount == 0) return 0;
 
-		// search for partially fitting item stacks:
+		// Search for partially fitting item stacks:
 		int maxStackSize = item.getMaxStackSize();
 		int size = contents.length;
 		for (int slot = 0; slot < size; slot++) {
 			ItemStack slotItem = contents[slot];
 
-			// slot empty? - skip, because we are currently filling existing item stacks up
+			// Slot empty? - Skip, because we are currently filling existing item stacks up.
 			if (isEmpty(slotItem)) continue;
 
-			// slot already full?
+			// Slot already full?
 			int slotAmount = slotItem.getAmount();
 			if (slotAmount >= maxStackSize) continue;
 
 			if (slotItem.isSimilar(item)) {
-				// copy itemstack, so we don't modify the original itemstack:
+				// Copy ItemStack, so we don't modify the original ItemStack:
 				slotItem = slotItem.clone();
 				contents[slot] = slotItem;
 
 				int newAmount = slotAmount + amount;
 				if (newAmount <= maxStackSize) {
-					// remaining amount did fully fit into this stack:
+					// Remaining amount did fully fit into this stack:
 					slotItem.setAmount(newAmount);
 					return 0;
 				} else {
-					// did not fully fit:
+					// Did not fully fit:
 					slotItem.setAmount(maxStackSize);
 					amount -= (maxStackSize - slotAmount);
 					assert amount != 0;
@@ -765,31 +765,31 @@ public final class ItemUtils {
 			}
 		}
 
-		// we have items remaining:
+		// We have items remaining:
 		assert amount > 0;
 
-		// search for empty slots:
+		// Search for empty slots:
 		for (int slot = 0; slot < size; slot++) {
 			ItemStack slotItem = contents[slot];
 			if (isEmpty(slotItem)) {
-				// found empty slot:
+				// Found empty slot:
 				if (amount > maxStackSize) {
-					// add full stack:
+					// Add full stack:
 					ItemStack stack = item.clone();
 					stack.setAmount(maxStackSize);
 					contents[slot] = stack;
 					amount -= maxStackSize;
 				} else {
-					// completely fits:
-					ItemStack stack = item.clone(); // create a copy, just in case
-					stack.setAmount(amount); // stack of remaining amount
+					// Completely fits:
+					ItemStack stack = item.clone(); // Create a copy, just in case
+					stack.setAmount(amount); // Stack of remaining amount
 					contents[slot] = stack;
 					return 0;
 				}
 			}
 		}
 
-		// not all items did fit into the inventory:
+		// Not all items did fit into the inventory:
 		return amount;
 	}
 
@@ -827,17 +827,17 @@ public final class ItemUtils {
 				} else {
 					int newAmount = slotItem.getAmount() - amount;
 					if (newAmount > 0) {
-						// copy itemstack, so we don't modify the original itemstack:
+						// Copy ItemStack, so we don't modify the original ItemStack:
 						slotItem = slotItem.clone();
 						contents[slot] = slotItem;
 						slotItem.setAmount(newAmount);
-						// all items were removed:
+						// All items were removed:
 						return 0;
 					} else {
 						contents[slot] = null;
 						amount = -newAmount;
 						if (amount == 0) {
-							// all items were removed:
+							// All items were removed:
 							return 0;
 						}
 					}
@@ -860,7 +860,7 @@ public final class ItemUtils {
 	public static void setContents(Inventory inventory, int slotOffset, ItemStack[] contents) {
 		Validate.notNull(inventory, "inventory is null");
 		Validate.notNull(contents, "contents is null");
-		// assert: slotOffset is valid
+		// Assert: slotOffset is valid.
 		final int length = contents.length;
 		for (int slot = 0; slot < length; ++slot) {
 			ItemStack newItem = contents[slot];
