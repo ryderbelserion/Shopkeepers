@@ -123,16 +123,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	}
 
 	public void onEnable() {
-		// making sure that certain classes, that are needed during shutdown, are loaded:
-		// this helps for hot reloads (when the plugin gets disabled, but the original jar got replaced and is therefore
-		// no longer available)
-		try {
-			Class.forName(SaveResult.class.getName());
-			Class.forName(SaveResult.State.class.getName());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-
 		// start save task:
 		if (!Settings.saveInstantly) {
 			this.startSaveTask();
