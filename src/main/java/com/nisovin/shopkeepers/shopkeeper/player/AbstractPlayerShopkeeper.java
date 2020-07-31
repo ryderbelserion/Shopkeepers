@@ -314,16 +314,19 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		}
 	}
 
+	@Deprecated
 	@Override
 	public int getChestX() {
 		return this.getContainerX();
 	}
 
+	@Deprecated
 	@Override
 	public int getChestY() {
 		return this.getContainerY();
 	}
 
+	@Deprecated
 	@Override
 	public int getChestZ() {
 		return this.getContainerZ();
@@ -344,6 +347,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return containerZ;
 	}
 
+	@Deprecated
 	@Override
 	public void setChest(int containerX, int containerY, int containerZ) {
 		this.setContainer(containerX, containerY, containerZ);
@@ -355,6 +359,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		this.markDirty();
 	}
 
+	@Deprecated
 	@Override
 	public Block getChest() {
 		return this.getContainer();
@@ -412,6 +417,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return ShopkeepersAPI.createTradingRecipe(currencyItem, itemBeingBought, null, outOfStock);
 	}
 
+	@Deprecated
 	@Override
 	public int getCurrencyInChest() {
 		return this.getCurrencyInContainer();
@@ -455,6 +461,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return this.openWindow(DefaultUITypes.HIRING(), player);
 	}
 
+	@Deprecated
 	@Override
 	public boolean openChestWindow(Player player) {
 		return this.openContainerWindow(player);
