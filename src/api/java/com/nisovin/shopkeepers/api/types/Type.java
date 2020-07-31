@@ -4,6 +4,9 @@ import java.util.Collection;
 
 import org.bukkit.entity.Player;
 
+/**
+ * Represents a type of something.
+ */
 public interface Type {
 
 	/**

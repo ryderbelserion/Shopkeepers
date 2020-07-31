@@ -11,16 +11,17 @@ import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.api.ui.UISession;
+import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.Validate;
 
 /**
- * The component which handles one specific type of user interface window for one specific shopkeeper.
+ * Handles one specific type of user interface window.
  */
 public abstract class UIHandler {
 
 	private final AbstractUIType uiType;
-	private final AbstractShopkeeper shopkeeper;
 
 	// Heuristic detection of automatically triggered shift left-clicks:
 	private static final long AUTOMATIC_SHIFT_LEFT_CLICK_MS = 250L;
@@ -28,59 +29,69 @@ public abstract class UIHandler {
 	private int lastManualClickedSlotId = -1;
 	private boolean isAutomaticShiftLeftClick = false;
 
-	protected UIHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
+	protected UIHandler(AbstractUIType uiType) {
+		Validate.notNull(uiType, "uiType is null");
 		this.uiType = uiType;
-		this.shopkeeper = shopkeeper;
 	}
 
+	/**
+	 * Gets the {@link UIType}.
+	 * 
+	 * @return the UI type
+	 */
 	public AbstractUIType getUIType() {
 		return uiType;
 	}
 
 	/**
-	 * Gets the shopkeeper for which this object is handling the specific interface type for.
-	 * 
-	 * @return the shopkeeper
-	 */
-	public AbstractShopkeeper getShopkeeper() {
-		return shopkeeper;
-	}
-
-	/**
-	 * Temporary deactivates UIs for the affected shopkeeper and closes the window (inventory) for the given player
-	 * after a tiny delay.
+	 * Deactivates the UI for the given player and closes the inventory window after a short delay.
 	 * 
 	 * @param player
 	 *            the player
 	 */
 	protected void closeDelayed(Player player) {
-		// Temporary deactivate UI and close open window delayed for this player:
-		shopkeeper.deactivateUI();
+		this.closeDelayedAndRunTask(player, null);
+	}
+
+	/**
+	 * Deactivates the UI for the given player, closes the inventory window after a short delay and then runs the given
+	 * task.
+	 * 
+	 * @param player
+	 *            the player
+	 * @param task
+	 *            the task, or <code>null</code>
+	 */
+	protected void closeDelayedAndRunTask(Player player, Runnable task) {
+		UISession uiSession = ShopkeepersPlugin.getInstance().getUIRegistry().getSession(player);
+		if (uiSession == null) return; // No active UI session
+
+		uiSession.deactivateUI();
 		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
 			player.closeInventory();
-
-			// Reactivate UI:
-			shopkeeper.activateUI();
+			if (task != null) {
+				task.run();
+			}
 		});
 	}
 
 	/**
-	 * Checks whether or not the given player can open the handled interface for this shopkeeper.
+	 * Checks whether or not the given player can open this interface.
 	 * <p>
-	 * This for example gets called when a player requests the interface for this shopkeeper. It should perform the
-	 * necessary permission checks.
+	 * This gets for example called when a player requests this interface. It should perform the necessary permission
+	 * checks.
 	 * 
 	 * @param player
 	 *            a player
-	 * @return <code>true</code> if the given player is allowed to open the interface window type this class is handling
+	 * @return <code>true</code> if the given player is allowed to open this interface
 	 */
 	protected abstract boolean canOpen(Player player);
 
 	/**
-	 * This method should open the interface window for the given player.
+	 * Opens the interface window for the given player.
 	 * <p>
-	 * Generally {@link #canOpen(Player) canOpen} should be checked before this method gets called, however this method
-	 * should not rely on that.
+	 * Generally {@link #canOpen(Player)} should be checked before calling this method. However, this method should not
+	 * rely on that.
 	 * 
 	 * @param player
 	 *            a player
@@ -89,10 +100,9 @@ public abstract class UIHandler {
 	protected abstract boolean openWindow(Player player);
 
 	/**
-	 * Checks whether or not the given inventory view is a custom inventory created by this handler (for example by
-	 * comparing the titles).
+	 * Checks whether or not the given inventory view is a custom inventory created by this handler.
 	 * <p>
-	 * The UI registry already keeps track of players' currently open UI. This is an additional check that aims to
+	 * The UI registry already keeps track of players' currently open UIs. This is an additional check that aims to
 	 * verify that the inventory the player is interacting with actually corresponds to the expected UI. The result of
 	 * this method gets checked before any inventory events are passed through to this handler.
 	 * 

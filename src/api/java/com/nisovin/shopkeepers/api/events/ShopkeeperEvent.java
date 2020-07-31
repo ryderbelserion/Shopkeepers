@@ -5,7 +5,9 @@ import org.bukkit.event.Event;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
 /**
- * Represents an event involving a shopkeeper.
+ * Base class for events involving a shopkeeper.
+ * <p>
+ * Note: Not all events involving a shopkeeper may actually inherit from this class.
  */
 public abstract class ShopkeeperEvent extends Event {
 
@@ -18,7 +20,7 @@ public abstract class ShopkeeperEvent extends Event {
 	/**
 	 * Gets the shopkeeper involved in this event.
 	 * 
-	 * @return the shopkeeper
+	 * @return the shopkeeper, not <code>null</code>
 	 */
 	public Shopkeeper getShopkeeper() {
 		return shopkeeper;

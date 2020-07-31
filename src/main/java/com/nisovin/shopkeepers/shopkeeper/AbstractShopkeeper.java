@@ -73,9 +73,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// Is currently registered:
 	private boolean valid = false;
 
-	// UI type identifier -> ui handler
+	// UI type identifier -> UI handler
 	private final Map<String, UIHandler> uiHandlers = new HashMap<>();
-	private boolean uiActive = true; // Can be used to deactivate UIs for this shopkeeper
 
 	// CONSTRUCTION AND SETUP
 
@@ -616,21 +615,6 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public abstract List<TradingRecipe> getTradingRecipes(Player player);
 
 	// USER INTERFACES
-
-	@Override
-	public boolean isUIActive() {
-		return uiActive;
-	}
-
-	@Override
-	public void deactivateUI() {
-		uiActive = false;
-	}
-
-	@Override
-	public void activateUI() {
-		uiActive = true;
-	}
 
 	@Override
 	public void closeAllOpenWindows() {

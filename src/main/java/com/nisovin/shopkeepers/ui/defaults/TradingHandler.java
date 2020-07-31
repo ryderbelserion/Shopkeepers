@@ -27,14 +27,14 @@ import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
-import com.nisovin.shopkeepers.ui.UIHandler;
+import com.nisovin.shopkeepers.ui.ShopkeeperUIHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
-public class TradingHandler extends UIHandler {
+public class TradingHandler extends ShopkeeperUIHandler {
 
 	// TODO Move into protected variables instead?
 	/**

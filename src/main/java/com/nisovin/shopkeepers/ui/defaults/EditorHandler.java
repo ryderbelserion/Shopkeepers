@@ -20,7 +20,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
-import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
@@ -32,13 +31,13 @@ import com.nisovin.shopkeepers.event.ShopkeeperEventHelper;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
-import com.nisovin.shopkeepers.ui.UIHandler;
+import com.nisovin.shopkeepers.ui.ShopkeeperUIHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.MathUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
-public abstract class EditorHandler extends UIHandler {
+public abstract class EditorHandler extends ShopkeeperUIHandler {
 
 	protected static final int COLUMNS_PER_ROW = 9;
 	// 9 columns, column = [0,8]
@@ -533,7 +532,7 @@ public abstract class EditorHandler extends UIHandler {
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
 				// Naming button:
-				closeEditorAndRunTask(player, null);
+				closeDelayed(player);
 
 				// Start naming:
 				SKShopkeepersPlugin.getInstance().getShopkeeperNaming().startNaming(player, shopkeeper);
@@ -555,35 +554,13 @@ public abstract class EditorHandler extends UIHandler {
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
 				// Container inventory button:
-				closeEditorAndRunTask(player, () -> {
+				closeDelayedAndRunTask(player, () -> {
 					// Open the shop container inventory:
 					if (!player.isValid()) return;
 					((PlayerShopkeeper) shopkeeper).openContainerWindow(player);
 				});
 			}
 		};
-	}
-
-	protected void closeEditorAndRunTask(Player player, Runnable task) {
-		Shopkeeper shopkeeper = this.getShopkeeper();
-
-		// Ignore other click events for this shopkeeper in the same tick:
-		shopkeeper.deactivateUI();
-
-		// Close editor window delayed and run task afterwards:
-		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-			// This triggers closing and saving of the editor state (if this inventory didn't get closed for other
-			// reasons in the meantime already):
-			player.closeInventory();
-
-			// Reactivate ui for this shopkeeper:
-			shopkeeper.activateUI();
-
-			// Run task:
-			if (task != null) {
-				task.run();
-			}
-		});
 	}
 
 	// PLAYER SESSIONS
@@ -857,6 +834,7 @@ public abstract class EditorHandler extends UIHandler {
 			Shopkeeper shopkeeper = this.getShopkeeper();
 			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
 
+			// TODO Only close open windows if there has actually been some change.
 			shopkeeper.closeAllOpenWindows();
 			shopkeeper.save();
 		}

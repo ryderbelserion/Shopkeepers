@@ -183,12 +183,6 @@ public interface Shopkeeper {
 
 	// SHOPKEEPER UIs
 
-	public boolean isUIActive();
-
-	public void deactivateUI();
-
-	public void activateUI();
-
 	/**
 	 * Deactivates all currently open UIs (purchasing, editing, hiring, etc.) and closes them 1 tick later.
 	 */
@@ -201,14 +195,14 @@ public interface Shopkeeper {
 	 * interface type for this shopkeeper (for example because of missing permissions), or if something else goes wrong.
 	 * 
 	 * @param uiType
-	 *            the requested ui type
+	 *            the requested UI type
 	 * @param player
 	 *            the player requesting the interface
 	 * @return <code>true</code> the player's request was successful and the interface was opened, false otherwise
 	 */
 	public boolean openWindow(UIType uiType, Player player);
 
-	// shortcuts for the default UI types:
+	// Shortcuts for the default UI types:
 
 	/**
 	 * Attempts to open the editor interface of this shopkeeper for the specified player.

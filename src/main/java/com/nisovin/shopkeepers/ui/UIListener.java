@@ -18,6 +18,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
 
@@ -29,7 +30,7 @@ class UIListener implements Listener {
 	// The relation between early and late event handling are maintained via stacks, in case something (a plugin) is
 	// calling these inventory interaction events recursively from within an event handler. The DUMMY_UI_HANDLER on the
 	// stack indicates that the event is not being processed by any UI handler.
-	private static final UIHandler DUMMY_UI_HANDLER = new UIHandler(null, null) {
+	private static final UIHandler DUMMY_UI_HANDLER = new UIHandler(null) {
 		@Override
 		protected boolean openWindow(Player player) {
 			return false;
@@ -63,7 +64,24 @@ class UIListener implements Listener {
 		InventoryView view = event.getView();
 		UIHandler uiHandler = session.getUIHandler();
 
-		// Validate open inventory:
+		// Check if the UI got deactivated:
+		if (!session.isUIActive()) {
+			Log.debug(() -> "Ignroing inventory interaction by " + player.getName()
+					+ ": The UI got deactivated (UI is probably about to get closed).");
+			event.setCancelled(true);
+			return false;
+		}
+
+		// Check if the shopkeeper still exists:
+		Shopkeeper shopkeeper = session.getShopkeeper();
+		if (shopkeeper != null && !shopkeeper.isValid()) {
+			Log.debug(() -> "Ignroing inventory interaction by " + player.getName()
+					+ ": The associated shopkeeper got deleted.");
+			event.setCancelled(true);
+			return false;
+		}
+
+		// Check if the inventory view matches the expected view:
 		if (!uiHandler.isWindow(view)) {
 			// The player probably has some other inventory open, but an active session.. let's close it:
 			Log.debug(() -> "Closing inventory of type " + view.getType() + " with title '" + view.getTitle()
@@ -73,16 +91,6 @@ class UIListener implements Listener {
 			Bukkit.getScheduler().runTask(plugin, () -> {
 				player.closeInventory();
 			});
-			return false;
-		}
-
-		// Validate shopkeeper:
-		if (!session.getShopkeeper().isUIActive() || !session.getShopkeeper().isValid()) {
-			// Shopkeeper deleted, or the UIs got deactivated: ignore this click.
-			Log.debug(() -> "Inventory interaction by " + player.getName()
-					+ " ignored, because the window is about to get closed,"
-					+ " or the shopkeeper got deleted.");
-			event.setCancelled(true);
 			return false;
 		}
 

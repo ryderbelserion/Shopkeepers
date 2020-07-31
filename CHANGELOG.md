@@ -30,6 +30,10 @@ Date format: (YYYY-MM-DD)
 * Added: It is possible to use barrels and shulker boxes as containers for player shops now.
 * Added a message (msg-unsupported-container) when a player tries to select a type of container which is not supported by shopkeepers (i.e. hopper, dropper, dispenser, brewing stand, ender chest, or a type of furnace).
 * API: Deprecated PlayerShopkeeper#getChestX/Y/Z, #get/setChest, #getCurrencyInChest, #openChestWindow and PlayerShopCreationData#getShopChest and added corresponding replacements methods with more general names.
+* API: It is now possible to create and open UIs that are not associated with any shopkeeper. UISession#getShopkeeper may return null now.
+* API: Added PlayerOpenUIEvent.
+* API: The ShopkeeperOpenUIEvent no longer extends ShopkeeperEvent, but the newly added PlayerOpenUIEvent instead.
+* API: Removed Shopkeeper#isUIActive, #deactivateUI, #activateUI. This is now part of the UISession.
 
 Internal changes:
 * Slightly changed how we cycle through the villager levels (badge colors).
@@ -37,6 +41,8 @@ Internal changes:
 * We throw an exception now when we encounter an unexpected / not yet handled config setting type.
 * We load all plugin classes up front now. This should avoid issues when the plugin jar gets replaced during runtime (eg. for hot reloads).
 * Various internal renaming related to shop containers.
+* Replaced EditorHandler#closeEditorAndRunTask with UIHandler#closeDelayedAndRunTask.
+* Moved UIHandler#getShopkeeper into a separate ShopkeeperUIHandler class. The existing editor, trading and hiring UIs extend from that now.
 * Various internal formatting of code comments.
 
 Config changes:  
