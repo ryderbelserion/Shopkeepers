@@ -111,7 +111,7 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	private EditorHandler.Button getFoxTypeEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getFoxTypeEditorItem();
@@ -155,7 +155,7 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	private EditorHandler.Button getSleepingEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getSleepingEditorItem();
@@ -199,7 +199,7 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	private EditorHandler.Button getCrouchingEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getCrouchingEditorItem();

@@ -43,6 +43,23 @@ Date format: (YYYY-MM-DD)
   * API: Deprecated UIRegistry#getOpenUIType(Player).
   * API: Deprecated UIRegistry#closeAll(), #closeAll(Shopkeeper) and #closeAllDelayed(Shopkeeper) and added replacements #abortUISessions(), #abortUISessions(Shopkeeper) and #abortUISessionsDelayed(Shopkeeper).
 * Minor fix: We check if the shopkeeper is still valid before attempting to open its container now.
+* Minor fix: If the second buy item of a trading recipe is empty, the corresponding created merchant recipe stores that as an empty second ingredient now. This should help when checking if the existing merchant recipes still match the newly created merchant recipes and thereby cause less recipe updates that are not actually required.
+* Added editor for regular villagers and wandering traders:
+  * Any villagers and wandering traders which are not Citizens NPC or shopkeepers are considered 'regular'.
+  * The editor supports editing the villager trades, similar to how editing works for admin shopkeepers. Note that trades created or edited via the editor will have infinite uses, no xp rewards, no price multipliers and the current uses counter gets reset to 0 (there are currently no options to edit or persist these attributes).
+  * To not accidentally edit all original trades whenever the editor is opened and closed (and thereby change the above mentioned trade attributes), we compare the trades from the editor with the villager's current trades before applying the trades from the editor: If the items of a trade are still the same, we keep the original trade without changes. A message indicates how many trades have been modified.
+  * Since villagers may change their trades whenever they change their profession, we set the villager's xp to at least 1 whenever the villager's trades or profession have been modified via the editor.
+  * If the villager is killed or gets unloaded while editing, any changes in the editor will have no effect.
+  * Other supported villager editor options are:
+    * Deleting the villager entity.
+    * Opening a copy of the villager's inventory. Note that any changes to the opened inventory are not reflected in the villager's inventory currently (i.e. you can view, but not modify the villager inventory with this).
+    * Changing the villager profession. Changing the profession via the editor will keep the current trades.
+    * Changing the villager type (i.e. the biome specific outfit).
+    * Changing the villager level (i.e. the badge color). This also affects which level is displayed and whether the villager's xp is shown within the villager's trading UI.
+    * Toggling the villager's AI on and off. This is useful to make the villager stationary while editing it. Otherwise it may wander away.
+  * Permissions: Added `shopkeeper.edit-villagers` and `shopkeeper.edit-wandering-traders` (default: `op`). These are required to edit regular villagers or wandering traders respectively.
+  * Added command `/shopkeeper editVillager [villager]`. This opens an editor to edit the specified villager / wandering trader. The villager / wandering trader can either be specified by uuid or by looking at it.
+  * Config: Added settings `edit-regular-villagers` and `edit-regular-wandering-traders` (default: `true`). With these settings enabled the villager editor can be opened by simply sneaking and right-clicking a regular villager (similar to how editing works for shopkeepers).
 
 Internal changes:
 * Slightly changed how we cycle through the villager levels (badge colors).
@@ -57,6 +74,15 @@ Internal changes:
 * Various minor refactoring inside SKUIRegistry.
 * Delayed closing of UIs uses the SchedulerUtils now, which guards against issues during plugin shutdown.
 * The created villager trading recipes use a 'max-uses' limit of the maximum integer value now (instead of 10000). If the trade is 'out of stock' both the 'max-uses' and the 'uses' are set to 0. This change should probably not affect anyone though.
+* Added new command arguments to specify an entity by uuid.
+* Added new command arguments to select a targeted entity.
+* Moved and added some merchant and trading recipe related utilities into MerchantUtils.
+* Minor changes to the comparison of merchant recipes.
+* Moved the shopkeeper metadata key constant into ShopkeeperUtils.
+* Added ItemUtils#getOrEmpty(ItemStack).
+* ShopkeeperUIHandler is an interface now. This allows for more flexibility in the class hierarchy of UI handlers. Added a basic implementation 'AbstractShopkeeperUIHandler'.
+* Removed the unused SKDefaultUITypes#register() method.
+* Various refactoring related to the editor UI. There is now a separate base class for the shared implementation of the shopkeeper editor and the new villager editor UI. Any shopkeeper references had to be removed from the base class. All existing shopkeeper editor buttons had to be slightly adapted to this change.
 
 Config changes:  
 * The default value of the `prevent-shop-creation-item-regular-usage` setting was changed to `true`.
@@ -87,6 +113,25 @@ Added messages:
 * msg-button-magma-cube-size
 * msg-button-magma-cube-size-lore
 * msg-unsupported-container
+* msg-missing-edit-villagers-perm
+* msg-missing-edit-wandering-traders-perm:
+* msg-must-target-entity
+* msg-must-target-villager
+* msg-target-entity-is-no-villager
+* msg-villager-editor-title
+* msg-villager-editor-description-header
+* msg-villager-editor-description
+* msg-button-delete-villager
+* msg-button-delete-villager-lore
+* msg-button-villager-inventory
+* msg-button-villager-inventory-lore
+* msg-button-mob-ai
+* msg-button-mob-ai-lore
+* msg-villager-inventory-title
+* msg-set-villager-xp
+* msg-no-villager-trades-changed
+* msg-villager-trades-changed
+* msg-command-description-edit-villager
 
 Changed messages:  
 * Some message settings were renamed. If you don't use a custom / separate language file, they get automatically migrated as part of the config migration to version 3. However, most of these messages also had changes to their default contents which need to be applied manually.

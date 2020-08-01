@@ -266,6 +266,9 @@ public class Settings {
 	public static boolean blockWanderingTraderSpawns = false;
 	public static boolean hireWanderingTraders = false;
 
+	public static boolean editRegularVillagers = true;
+	public static boolean editRegularWanderingTraders = true;
+
 	/*
 	 * Hiring
 	 */
@@ -488,6 +491,36 @@ public class Settings {
 	public static List<String> msgTradeSetupDescTrading = Arrays.asList("Trades items.", "Pickup an item from your inventory", "and then click a slot to place it.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items");
 	public static List<String> msgTradeSetupDescBook = Arrays.asList("Sells book copies.", "Insert written and blank books", "into the container.", "Left/Right click to adjust costs.", "Top row: Books being sold", "Bottom rows: Cost items");
 
+	public static Text msgMissingEditVillagersPerm = Text.parse("&7You do not have the permission to edit villagers.");
+	public static Text msgMissingEditWanderingTradersPerm = Text.parse("&7You do not have the permission to edit wandering traders.");
+	public static Text msgMustTargetEntity = Text.parse("&7You have to target an entity.");
+	public static Text msgMustTargetVillager = Text.parse("&7You have to target a villager.");
+	public static Text msgTargetEntityIsNoVillager = Text.parse("&7The targeted entity is no regular villager.");
+
+	public static String msgVillagerEditorTitle = "&aVillager Editor: &e{villagerName}";
+	public static String msgVillagerEditorDescriptionHeader = "&6Villager Editor";
+	public static List<String> msgVillagerEditorDescription = Arrays.asList(
+			"Top row: Result items",
+			"Bottom rows: Cost items",
+			"Edited trades have infinite",
+			"uses and no XP rewards."
+	);
+
+	public static String msgButtonDeleteVillager = "&4Delete";
+	public static List<String> msgButtonDeleteVillagerLore = Arrays.asList("Deletes the villager");
+	public static String msgButtonVillagerInventory = "&aView villager inventory";
+	public static List<String> msgButtonVillagerInventoryLore = Arrays.asList(
+			"Lets you view a copy of",
+			"the villager's inventory"
+	);
+	public static String msgButtonMobAi = "&aToggle mob AI";
+	public static List<String> msgButtonMobAiLore = Arrays.asList("Toggles the mob's AI");
+
+	public static String msgVillagerInventoryTitle = "Villager inventory (copy)";
+	public static String msgSetVillagerXp = "&aSet the villager's XP to &e{xp}";
+	public static String msgNoVillagerTradesChanged = "&aNo trades have been changed.";
+	public static String msgVillagerTradesChanged = "&e{changedTrades}&a trades have been changed.";
+
 	public static Text msgListAdminShopsHeader = Text.parse("&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})");
 	public static Text msgListAllShopsHeader = Text.parse("&9There are &e{shopsCount} &9shops in total: &e(Page {page} of {maxPage})");
 	public static Text msgListPlayerShopsHeader = Text.parse("&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})");
@@ -543,6 +576,7 @@ public class Settings {
 	public static Text msgCommandDescriptionTransfer = Text.parse("Transfers the ownership of a shop.");
 	public static Text msgCommandDescriptionSettradeperm = Text.parse("Sets, removes (-) or displays (?) the trading permission.");
 	public static Text msgCommandDescriptionSetforhire = Text.parse("Sets one of your shops for sale.");
+	public static Text msgCommandDescriptionEditVillager = Text.parse("Opens the editor for the target villager.");
 
 	// /////
 
@@ -843,6 +877,9 @@ public class Settings {
 		public static ItemData deleteButtonItem = new ItemData(Material.AIR);
 		public static ItemData hireButtonItem = new ItemData(Material.AIR);
 
+		public static ItemData deleteVillagerButtonItem = new ItemData(Material.AIR);
+		public static ItemData villagerInventoryButtonItem = new ItemData(Material.AIR);
+
 		public static Pattern shopNamePattern = Pattern.compile("^[A-Za-z0-9 ]{3,32}$");
 
 		// Gets called after the config has been loaded:
@@ -855,6 +892,10 @@ public class Settings {
 			containerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), msgButtonContainer, msgButtonContainerLore));
 			deleteButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), msgButtonDelete, msgButtonDeleteLore));
 			hireButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(hireItem.createItemStack(), msgButtonHire, msgButtonHireLore));
+
+			// Note: These use the same item types as the corresponding shopkeeper buttons.
+			deleteVillagerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), msgButtonDeleteVillager, msgButtonDeleteVillagerLore));
+			villagerInventoryButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), msgButtonVillagerInventory, msgButtonVillagerInventoryLore));
 
 			try {
 				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");

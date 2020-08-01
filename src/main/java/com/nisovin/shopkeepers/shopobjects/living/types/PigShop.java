@@ -81,7 +81,7 @@ public class PigShop extends BabyableShop<Pig> {
 	}
 
 	private EditorHandler.Button getSaddleEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getSaddleEditorItem();

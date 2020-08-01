@@ -332,7 +332,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	public List<EditorHandler.Button> getEditorButtons() {
 		List<EditorHandler.Button> editorButtons = new ArrayList<EditorHandler.Button>();
 		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(new EditorHandler.ActionButton(shopkeeper) {
+		editorButtons.add(new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getSignTypeEditorItem();

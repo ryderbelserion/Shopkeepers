@@ -26,6 +26,7 @@ import com.nisovin.shopkeepers.util.DebugListener;
 import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.EventDebugListener;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntityShopObject implements LivingShopObject {
@@ -109,11 +110,11 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	}
 
 	protected void assignShopkeeperMetadata(E entity) {
-		entity.setMetadata("shopkeeper", new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
+		entity.setMetadata(ShopkeeperUtils.SHOPKEEPER_METADATA_KEY, new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
 	}
 
 	protected void removeShopkeeperMetadata(E entity) {
-		entity.removeMetadata("shopkeeper", ShopkeepersPlugin.getInstance());
+		entity.removeMetadata(ShopkeeperUtils.SHOPKEEPER_METADATA_KEY, ShopkeepersPlugin.getInstance());
 	}
 
 	// Places the entity at the exact location it would fall to, within a range of at most 1 block below the spawn block

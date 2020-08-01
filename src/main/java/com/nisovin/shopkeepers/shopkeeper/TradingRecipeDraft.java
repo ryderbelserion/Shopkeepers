@@ -26,7 +26,7 @@ public class TradingRecipeDraft {
 	/**
 	 * Creates a TradingRecipe.
 	 * <p>
-	 * If <code>item1</code> is empty, item2 will take its place.
+	 * If <code>item1</code> is empty, <code>item2</code> will take its place.
 	 * 
 	 * @param resultItem
 	 *            the result item

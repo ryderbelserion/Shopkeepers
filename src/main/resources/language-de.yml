@@ -276,6 +276,37 @@ msg-trade-setup-desc-book:
 - 'Obere Reihe: Verkaufte Bücher'
 - 'Untere Reihen: Kosten'
 
+msg-missing-edit-villagers-perm: "&7Dir fehlt die nötige Berechtigung, um Dorfbewohner zu editieren."
+msg-missing-edit-wandering-traders-perm: "&7Dir fehlt die nötige Berechtigung, um wandernde Händler zu editieren."
+msg-must-target-entity: "&7Du musst ein Objekt anvisieren."
+msg-must-target-villager: "&7Du musst einen Dorfbewohner anvisieren."
+msg-target-entity-is-no-villager: "&7Das anvisierte Objekt ist kein normaler Dorfbewohner."
+
+msg-villager-editor-title: "&aDorfbewohner Editor: &e{villagerName}"
+msg-villager-editor-description-header: "&6Dorfbewohner Editor"
+msg-villager-editor-description:
+- 'Obere Reihe: Ergebnis Items'
+- 'Untere Reihen: Kosten'
+- 'Bearbeitete Angebote können unendlich oft'
+- 'genutzt werden und haben keine XP Belohnungen'
+
+msg-button-delete-villager: "&4Entfernen"
+msg-button-delete-villager-lore:
+- Entfernt den Dorfbewohner
+msg-button-villager-inventory: "&aDorfbewohner Inventar"
+msg-button-villager-inventory-lore:
+- Zeigt dir eine Kopie des
+- Inventars des Dorfbewohners
+msg-button-mob-ai: "&aKI umschalten"
+msg-button-mob-ai-lore:
+- "Schaltet die KI der"
+- "Kreatur an oder aus"
+
+msg-villager-inventory-title: "Dorfbewohner Inventar (Kopie)"
+msg-set-villager-xp: "&aDie XP des Dorfbewohners wurde auf &e{xp}&a gesetzt."
+msg-no-villager-trades-changed: "&aEs wurden keine Angebote geändert."
+msg-villager-trades-changed: "&aEs wurden &e{changedTrades}&a Angebote geändert."
+
 msg-list-admin-shops-header: "&9Es gibt &e{shopsCount} &9Admin-Shops: &e(Seite {page} von {maxPage})"
 msg-list-all-shops-header: "&9Es gibt insgesamt &e{shopsCount} &9Shops: &e(Seite {page} von {maxPage})"
 msg-list-player-shops-header: "&9Spieler '&e{player}&9' hat &e{shopsCount} &9Shops: &e(Seite {page} von {maxPage})"
@@ -331,3 +362,4 @@ msg-command-description-remote-edit: "Editiert einen Shop aus der Ferne."
 msg-command-description-transfer: "Ändert den Besitzer eines Shops."
 msg-command-description-settradeperm: "Setzt, entfernt (-) oder zeigt (?) die Handel-Permission an."
 msg-command-description-setforhire: "Gibt einen deiner Shops zum Verkauf frei."
+msg-command-description-edit-villager: "Öffnet den Editor für den ausgewählten Dorfbewohner."

@@ -111,7 +111,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	}
 
 	private EditorHandler.Button getColorEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getColorEditorItem();
@@ -150,7 +150,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	}
 
 	private EditorHandler.Button getCarpetColorEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getCarpetColorEditorItem();

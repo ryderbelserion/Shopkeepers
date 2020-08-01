@@ -16,9 +16,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.MerchantInventory;
-import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -26,102 +23,26 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
-import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.text.Text;
 
 /**
- * Utility functions related to shopkeepers and trading.
+ * Utility functions related to shopkeepers.
  */
 public class ShopkeeperUtils {
 
 	private ShopkeeperUtils() {
 	}
 
+	public static final String SHOPKEEPER_METADATA_KEY = "shopkeeper";
+
+	public static boolean isShopkeeper(Entity entity) {
+		return entity.hasMetadata(SHOPKEEPER_METADATA_KEY);
+	}
+
 	private static final int SHOPKEEPER_TARGET_RANGE = 10;
-
-	public static TradingRecipe getSelectedTradingRecipe(MerchantInventory merchantInventory) {
-		MerchantRecipe merchantRecipe = merchantInventory.getSelectedRecipe();
-		return createTradingRecipe(merchantRecipe);
-	}
-
-	public static TradingRecipe createTradingRecipe(MerchantRecipe merchantRecipe) {
-		if (merchantRecipe == null) return null;
-		List<ItemStack> ingredients = merchantRecipe.getIngredients();
-		ItemStack item1 = ingredients.get(0);
-		ItemStack item2 = null;
-		if (ingredients.size() > 1) {
-			ItemStack buyItem2 = ingredients.get(1);
-			if (!ItemUtils.isEmpty(buyItem2)) {
-				item2 = buyItem2;
-			}
-		}
-		ItemStack resultItem = merchantRecipe.getResult();
-		return ShopkeepersAPI.createTradingRecipe(resultItem, item1, item2);
-	}
-
-	public static MerchantRecipe createMerchantRecipe(TradingRecipe recipe) {
-		if (recipe == null) return null;
-		ItemStack buyItem1 = recipe.getItem1();
-		ItemStack buyItem2 = recipe.getItem2();
-		ItemStack sellingItem = recipe.getResultItem();
-		assert !ItemUtils.isEmpty(sellingItem) && !ItemUtils.isEmpty(buyItem1);
-
-		MerchantRecipe merchantRecipe = new MerchantRecipe(sellingItem, Integer.MAX_VALUE); // No max-uses limit
-		if (recipe.isOutOfStock()) {
-			// .. Except if out of stock:
-			// 'uses' is 0 by default as well, so the trade shows as blocked.
-			merchantRecipe.setMaxUses(0);
-		}
-		merchantRecipe.setExperienceReward(false); // No experience rewards
-		merchantRecipe.addIngredient(buyItem1);
-		if (!ItemUtils.isEmpty(buyItem2)) {
-			merchantRecipe.addIngredient(buyItem2);
-		}
-		return merchantRecipe;
-	}
-
-	public static List<MerchantRecipe> createMerchantRecipes(List<TradingRecipe> recipes) {
-		List<MerchantRecipe> merchantRecipes = new ArrayList<>();
-		for (TradingRecipe recipe : recipes) {
-			merchantRecipes.add(createMerchantRecipe(recipe));
-		}
-		return merchantRecipes;
-	}
-
-	// Note: This method considers the recipes equal even if their uses and max uses don't match.
-	public static boolean areMerchantRecipesEqual(MerchantRecipe recipe1, MerchantRecipe recipe2) {
-		if (recipe1 == recipe2) return true;
-		if (recipe1 == null) return false;
-		if (recipe2 == null) return false;
-
-		if (!recipe1.getResult().equals(recipe2.getResult())) return false;
-		boolean outOfStock1 = (recipe1.getUses() >= recipe1.getMaxUses());
-		boolean outOfStock2 = (recipe2.getUses() >= recipe2.getMaxUses());
-		if (outOfStock1 != outOfStock2) return false;
-		if (recipe1.hasExperienceReward() != recipe2.hasExperienceReward()) return false;
-		if (!recipe1.getIngredients().equals(recipe2.getIngredients())) return false;
-		return true;
-	}
-
-	// Note: This method considers the recipes equal even if their uses and max uses don't match.
-	public static boolean areMerchantRecipesEqual(List<MerchantRecipe> recipes1, List<MerchantRecipe> recipes2) {
-		if (recipes1 == recipes2) return true;
-		if (recipes1 == null) return false;
-		if (recipes2 == null) return false;
-
-		if (recipes1.size() != recipes2.size()) return false;
-		for (int i = 0; i < recipes1.size(); ++i) {
-			MerchantRecipe recipe1 = recipes1.get(i);
-			MerchantRecipe recipe2 = recipes2.get(i);
-			if (!areMerchantRecipesEqual(recipe1, recipe2)) {
-				return false;
-			}
-		}
-		return true;
-	}
 
 	public static final class TargetShopkeepersResult {
 

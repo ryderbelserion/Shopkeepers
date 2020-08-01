@@ -125,7 +125,7 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 	}
 
 	private EditorHandler.Button getRabbitTypeEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getRabbitTypeEditorItem();

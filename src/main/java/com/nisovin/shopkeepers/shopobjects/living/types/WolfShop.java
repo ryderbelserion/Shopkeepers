@@ -96,7 +96,7 @@ public class WolfShop extends SittableShop<Wolf> {
 	}
 
 	private EditorHandler.Button getAngryEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getAngryEditorItem();
@@ -145,7 +145,7 @@ public class WolfShop extends SittableShop<Wolf> {
 	}
 
 	private EditorHandler.Button getCollarColorEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getCollarColorEditorItem();

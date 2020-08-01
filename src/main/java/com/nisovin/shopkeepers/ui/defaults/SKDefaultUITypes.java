@@ -12,12 +12,9 @@ public class SKDefaultUITypes implements DefaultUITypes {
 	private final EditorUIType editorUIType = new EditorUIType();
 	private final TradingUIType tradingUIType = new TradingUIType();
 	private final HiringUIType hiringUIType = new HiringUIType();
+	private final VillagerEditorUIType villagerEditorUIType = new VillagerEditorUIType();
 
 	public SKDefaultUITypes() {
-	}
-
-	public void register() {
-		SKShopkeepersPlugin.getInstance().getUIRegistry().registerAll(this.getAllUITypes());
 	}
 
 	@Override
@@ -26,6 +23,7 @@ public class SKDefaultUITypes implements DefaultUITypes {
 		defaults.add(editorUIType);
 		defaults.add(tradingUIType);
 		defaults.add(hiringUIType);
+		defaults.add(villagerEditorUIType);
 		return defaults;
 	}
 
@@ -44,6 +42,11 @@ public class SKDefaultUITypes implements DefaultUITypes {
 		return hiringUIType;
 	}
 
+	// Internal.
+	public VillagerEditorUIType getVillagerEditorUIType() {
+		return villagerEditorUIType;
+	}
+
 	// STATICS (for convenience):
 
 	public static SKDefaultUITypes getInstance() {
@@ -60,5 +63,9 @@ public class SKDefaultUITypes implements DefaultUITypes {
 
 	public static HiringUIType HIRING() {
 		return getInstance().getHiringUIType();
+	}
+
+	public static VillagerEditorUIType VILLAGER_EDITOR() {
+		return getInstance().getVillagerEditorUIType();
 	}
 }

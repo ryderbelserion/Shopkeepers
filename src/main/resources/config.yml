@@ -339,6 +339,12 @@ block-wandering-trader-spawns: false
 # Whether non-shopkeeper wandering traders can be hired.
 hire-wandering-traders: false
 
+# Whether regular villagers can be edited by sneaking and right-clicking.
+edit-regular-villagers: true
+# Whether regular wandering traders can be edited by sneaking and
+# right-clicking.
+edit-regular-wandering-traders: true
+
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Hiring
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
@@ -689,6 +695,36 @@ msg-trade-setup-desc-book:
 - 'Top row: Books being sold'
 - 'Bottom rows: Cost items'
 
+msg-missing-edit-villagers-perm: "&7You do not have the permission to edit villagers."
+msg-missing-edit-wandering-traders-perm: "&7You do not have the permission to edit wandering traders."
+msg-must-target-entity: "&7You have to target an entity."
+msg-must-target-villager: "&7You have to target a villager."
+msg-target-entity-is-no-villager: "&7The targeted entity is no regular villager."
+
+msg-villager-editor-title: "&aVillager Editor: &e{villagerName}"
+msg-villager-editor-description-header: "&6Villager Editor"
+msg-villager-editor-description:
+- 'Top row: Result items'
+- 'Bottom rows: Cost items'
+- 'Edited trades have infinite'
+- 'uses and no XP rewards.'
+
+msg-button-delete-villager: "&4Delete"
+msg-button-delete-villager-lore:
+- Deletes the villager
+msg-button-villager-inventory: "&aView villager inventory"
+msg-button-villager-inventory-lore:
+- Lets you view a copy of
+- the villager's inventory
+msg-button-mob-ai: "&aToggle mob AI"
+msg-button-mob-ai-lore:
+- "Toggles the mob's AI"
+
+msg-villager-inventory-title: "Villager inventory (copy)"
+msg-set-villager-xp: "&aSet the villager's XP to &e{xp}"
+msg-no-villager-trades-changed: "&aNo trades have been changed."
+msg-villager-trades-changed: "&e{changedTrades}&a trades have been changed."
+
 msg-list-admin-shops-header: "&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})"
 msg-list-all-shops-header: "&9There are &e{shopsCount} &9shops in total: &e(Page {page} of {maxPage})"
 msg-list-player-shops-header: "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})"
@@ -744,3 +780,4 @@ msg-command-description-remote-edit: "Remotely edits a shop."
 msg-command-description-transfer: "Transfers the ownership of a shop."
 msg-command-description-settradeperm: "Sets, removes (-) or displays (?) the trading permission."
 msg-command-description-setforhire: "Sets one of your shops for sale."
+msg-command-description-edit-villager: "Opens the editor for the target villager."

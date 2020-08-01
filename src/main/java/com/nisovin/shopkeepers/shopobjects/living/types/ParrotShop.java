@@ -107,7 +107,7 @@ public class ParrotShop extends SittableShop<Parrot> {
 	}
 
 	private EditorHandler.Button getParrotVariantEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getParrotVariantEditorItem();

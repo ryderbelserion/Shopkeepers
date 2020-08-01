@@ -81,7 +81,7 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 	}
 
 	private EditorHandler.Button getCarryingChestEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getCarryingChestEditorItem();

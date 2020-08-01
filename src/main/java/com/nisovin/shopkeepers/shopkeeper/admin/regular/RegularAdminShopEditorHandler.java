@@ -56,6 +56,8 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 		shopkeeper.addOffer(ShopkeepersAPI.createTradingOffer(recipe.getResultItem(), recipe.getItem1(), recipe.getItem2()));
 	}
 
+	// TODO Remove this? Maybe handle the trades setup similar to the player trading shop: Copying the selected items
+	// into the editor.
 	@Override
 	protected void handleInvalidRecipeDraft(Player player, TradingRecipeDraft recipe) {
 		super.handleInvalidRecipeDraft(player, recipe);

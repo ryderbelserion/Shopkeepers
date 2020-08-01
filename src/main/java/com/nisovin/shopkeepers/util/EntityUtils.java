@@ -8,10 +8,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Chunk;
+import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.util.RayTraceResult;
+import org.bukkit.util.Vector;
 
 public class EntityUtils {
 
@@ -106,5 +110,23 @@ public class EntityUtils {
 			}
 		}
 		return entities;
+	}
+
+	private static final int ENTITY_TARGET_RANGE = 10;
+
+	public static Entity getTargetedEntity(Player player) {
+		Location playerLoc = player.getEyeLocation();
+		World world = playerLoc.getWorld();
+		Vector viewDirection = playerLoc.getDirection();
+
+		// Ray trace to check for the closest block and entity collision:
+		// We ignore passable blocks to make the targeting easier.
+		RayTraceResult rayTraceResult = world.rayTrace(playerLoc, viewDirection, ENTITY_TARGET_RANGE, FluidCollisionMode.NEVER, true, 0.0D, (entity) -> {
+			return !entity.isDead() && !entity.equals(player); // TODO SPIGOT-5228: Filtering dead entities.
+		});
+		if (rayTraceResult != null) {
+			return rayTraceResult.getHitEntity(); // Can be null
+		}
+		return null;
 	}
 }

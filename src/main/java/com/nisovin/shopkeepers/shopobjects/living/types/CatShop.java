@@ -153,7 +153,7 @@ public class CatShop extends SittableShop<Cat> {
 	}
 
 	private EditorHandler.Button getCatTypeEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getCatTypeEditorItem();
@@ -203,7 +203,7 @@ public class CatShop extends SittableShop<Cat> {
 	}
 
 	private EditorHandler.Button getCollarColorEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getCollarColorEditorItem();

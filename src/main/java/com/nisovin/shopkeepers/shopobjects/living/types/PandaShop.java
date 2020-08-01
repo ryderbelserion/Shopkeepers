@@ -86,7 +86,7 @@ public class PandaShop extends BabyableShop<Panda> {
 	}
 
 	private EditorHandler.Button getGeneEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getGeneEditorItem();

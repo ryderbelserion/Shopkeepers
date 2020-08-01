@@ -145,7 +145,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	private EditorHandler.Button getColorEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getColorEditorItem();
@@ -189,7 +189,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	private EditorHandler.Button getStyleEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getStyleEditorItem();
@@ -228,7 +228,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	private EditorHandler.Button getArmorEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getArmorEditorItem();

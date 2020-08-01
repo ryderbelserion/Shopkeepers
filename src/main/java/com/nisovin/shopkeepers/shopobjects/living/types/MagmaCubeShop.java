@@ -98,7 +98,7 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 	}
 
 	private EditorHandler.Button getMagmaCubeSizeEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getMagmaCubeSizeEditorItem();

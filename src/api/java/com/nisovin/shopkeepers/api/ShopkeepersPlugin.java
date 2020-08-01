@@ -52,6 +52,8 @@ public interface ShopkeepersPlugin extends Plugin {
 	public static final String SET_TRADE_PERM_PERMISSION = "shopkeeper.settradeperm";
 	public static final String SET_FOR_HIRE_PERMISSION = "shopkeeper.setforhire";
 	public static final String HIRE_PERMISSION = "shopkeeper.hire";
+	public static final String EDIT_VILLAGERS_PERMISSION = "shopkeeper.edit-villagers";
+	public static final String EDIT_WANDERING_TRADERS_PERMISSION = "shopkeeper.edit-wandering-traders";
 	public static final String BYPASS_PERMISSION = "shopkeeper.bypass";
 
 	public static final String ADMIN_PERMISSION = "shopkeeper.admin";

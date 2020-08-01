@@ -87,7 +87,7 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 	}
 
 	private EditorHandler.Button getPoweredEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getPoweredEditorItem();

@@ -14,15 +14,17 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.ui.defaults.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
- * Handles prevention of trading and hiring of other villagers (including wandering traders).
+ * Handles prevention of trading, hiring and editing of regular villagers (including wandering traders).
  */
 public class VillagerInteractionListener implements Listener {
 
@@ -33,7 +35,7 @@ public class VillagerInteractionListener implements Listener {
 	}
 
 	// HIGH, since we don't want to handle hiring if another plugin has cancelled the event.
-	// But not HIGHEST, so that other plugins can still react to us cancelling the event.
+	// But not HIGHEST, so that other plugins can still react to us canceling the event.
 	@EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
 	void onEntityInteract(PlayerInteractEntityEvent event) {
 		if (!(event.getRightClicked() instanceof AbstractVillager)) return;
@@ -60,11 +62,19 @@ public class VillagerInteractionListener implements Listener {
 			Log.debug("  trading prevented");
 		}
 
-		// Only trigger hiring for main-hand events:
+		// Only react to main hand events:
 		if (event.getHand() != EquipmentSlot.HAND) return;
 
-		if ((isVillager && Settings.hireOtherVillagers) || (isWanderingTrader && Settings.hireWanderingTraders)) {
-			Player player = event.getPlayer();
+		Player player = event.getPlayer();
+		if (player.isSneaking()
+				&& ((isVillager && Settings.editRegularVillagers) || (isWanderingTrader && Settings.editRegularWanderingTraders))) {
+			// Open the villager editor:
+			// Note: This will check if the player has the permission to edit villagers.
+			event.setCancelled(true);
+			Log.debug("  requesting villager editor.");
+			VillagerEditorHandler villagerEditor = new VillagerEditorHandler(villager);
+			SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(villagerEditor, player);
+		} else if ((isVillager && Settings.hireOtherVillagers) || (isWanderingTrader && Settings.hireWanderingTraders)) {
 			// Allow hiring of other villagers
 			Log.debug("  possible hire ..");
 			if (this.handleHireOtherVillager(player, villager)) {

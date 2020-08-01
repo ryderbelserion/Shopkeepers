@@ -92,7 +92,7 @@ public class SheepShop extends BabyableShop<Sheep> {
 	}
 
 	private EditorHandler.Button getColorEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getColorEditorItem();
@@ -131,7 +131,7 @@ public class SheepShop extends BabyableShop<Sheep> {
 	}
 
 	private EditorHandler.Button getShearedEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getShearedEditorItem();

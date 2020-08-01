@@ -185,7 +185,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	private EditorHandler.Button getProfessionEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getProfessionEditorItem();
@@ -249,7 +249,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	private EditorHandler.Button getVillagerTypeEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getVillagerTypeEditorItem();
@@ -315,7 +315,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	private EditorHandler.Button getVillagerLevelEditorButton() {
-		return new EditorHandler.ActionButton(shopkeeper) {
+		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
 				return getVillagerLevelEditorItem();

@@ -82,6 +82,12 @@ permissions:
     shopkeeper.setforhire:
         description: Set a shopkeeper to be for hire
         default: op
+    shopkeeper.edit-villagers:
+        description: Edit regular villagers
+        default: op
+    shopkeeper.edit-wandering-traders:
+        description: Edit regular wandering traders
+        default: op
 
     # General permissions
     shopkeeper.trade:

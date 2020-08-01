@@ -26,15 +26,15 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
-import com.nisovin.shopkeepers.ui.ShopkeeperUIHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.MerchantUtils;
 import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
-public class TradingHandler extends ShopkeeperUIHandler {
+public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 	// TODO Move into protected variables instead?
 	/**
@@ -179,7 +179,7 @@ public class TradingHandler extends ShopkeeperUIHandler {
 	}
 
 	protected MerchantRecipe createMerchantRecipe(TradingRecipe recipe) {
-		return ShopkeeperUtils.createMerchantRecipe(recipe); // Default
+		return MerchantUtils.createMerchantRecipe(recipe); // Default
 	}
 
 	protected String getInventoryTitle() {
@@ -203,7 +203,7 @@ public class TradingHandler extends ShopkeeperUIHandler {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		List<TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
 		List<MerchantRecipe> newMerchantRecipes = this.createMerchantRecipes(recipes);
-		if (ShopkeeperUtils.areMerchantRecipesEqual(oldMerchantRecipes, newMerchantRecipes)) {
+		if (MerchantUtils.MERCHANT_RECIPES_EQUAL_IGNORING_USES.equals(oldMerchantRecipes, newMerchantRecipes)) {
 			Log.debug(() -> "Trades are still up-to-date for player " + player.getName());
 			return; // Recipes did not change
 		}
@@ -456,7 +456,7 @@ public class TradingHandler extends ShopkeeperUIHandler {
 		}
 
 		// Find (and validate) the recipe Minecraft is using for the trade:
-		TradingRecipe tradingRecipe = ShopkeeperUtils.getSelectedTradingRecipe(merchantInventory);
+		TradingRecipe tradingRecipe = MerchantUtils.getSelectedTradingRecipe(merchantInventory);
 		if (tradingRecipe == null) {
 			// This should not happen..
 			if (!silent) {

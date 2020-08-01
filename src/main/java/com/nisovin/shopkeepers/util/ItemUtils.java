@@ -124,6 +124,12 @@ public final class ItemUtils {
 		return isEmpty(item) ? null : item;
 	}
 
+	public static ItemStack getOrEmpty(ItemStack item) {
+		if (!isEmpty(item)) return item;
+		if (item != null && item.getType() == Material.AIR) return item;
+		return new ItemStack(Material.AIR);
+	}
+
 	public static ItemStack cloneOrNullIfEmpty(ItemStack item) {
 		return isEmpty(item) ? null : item.clone();
 	}
