@@ -885,7 +885,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		assert shopkeeper != null;
 		if (closeWindows) {
 			// Delayed closing of all open windows:
-			shopkeeper.closeAllOpenWindows();
+			shopkeeper.abortUISessionsDelayed();
 		}
 		this._deactivateShopkeeper(shopkeeper);
 		shopkeeper.getShopObject().despawn();

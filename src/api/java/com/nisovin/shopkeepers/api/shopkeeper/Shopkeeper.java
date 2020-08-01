@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.api.shopkeeper;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,6 +9,8 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
+import com.nisovin.shopkeepers.api.ui.UIRegistry;
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 
@@ -184,7 +187,35 @@ public interface Shopkeeper {
 	// SHOPKEEPER UIs
 
 	/**
-	 * Deactivates all currently open UIs (purchasing, editing, hiring, etc.) and closes them 1 tick later.
+	 * Gets all currently active {@link UISession UI sessions} involving this shopkeeper.
+	 * 
+	 * @return an unmodifiable view on the current UI sessions
+	 * @see UIRegistry#getUISessions(Shopkeeper)
+	 */
+	public Collection<? extends UISession> getUISessions();
+
+	/**
+	 * Gets all currently active {@link UISession UI sessions} involving this shopkeeper and the specified
+	 * {@link UIType}.
+	 * 
+	 * @param uiType
+	 *            the UI type
+	 * @return an unmodifiable view on the current UI sessions
+	 * @see UIRegistry#getUISessions(Shopkeeper, UIType)
+	 */
+	public Collection<? extends UISession> getUISessions(UIType uiType);
+
+	/**
+	 * {@link UISession#deactivateUI() Deactivates} all currently active UIs (trading, editing, hiring, etc.) involving
+	 * this shopkeeper and {@link UISession#abort() aborts} them within the next tick.
+	 */
+	public void abortUISessionsDelayed();
+
+	/**
+	 * {@link UISession#deactivateUI() Deactivates} all currently active UIs (trading, editing, hiring, etc.) involving
+	 * this shopkeeper and {@link UISession#abort() aborts} them within the next tick.
+	 * 
+	 * @deprecated Use {@link #abortUISessionsDelayed()}
 	 */
 	public void closeAllOpenWindows();
 

@@ -34,6 +34,14 @@ Date format: (YYYY-MM-DD)
 * API: Added PlayerOpenUIEvent.
 * API: The ShopkeeperOpenUIEvent no longer extends ShopkeeperEvent, but the newly added PlayerOpenUIEvent instead.
 * API: Removed Shopkeeper#isUIActive, #deactivateUI, #activateUI. This is now part of the UISession.
+* API: Added UISession#close(), #closeDelayed(), #closeDelayedAndRunTask(Runnable), #abort(), #abortDelayed(), #abortDelayedAndRunTask(Runnable).
+* API: Added Shopkeeper#getUISessions() and #getUISessions(UIType).
+* API: Deprecated Shopkeeper#closeAllOpenWindows() and replaced it with #abortUISessionsDelayed().
+* API: Added UIRegistry#getUISessions(), #getUISessions(Shopkeeper), #getUISessions(Shopkeeper, UIType), #getUISessions(UIType).
+* API: Deprecated UIRegistry#getSession(Player) and added replacement #getUISession(Player).
+* API: Deprecated UIRegistry#getOpenUIType(Player).
+* API: Deprecated UIRegistry#closeAll(), #closeAll(Shopkeeper) and #closeAllDelayed(Shopkeeper) and added replacements #abortUISessions(), #abortUISessions(Shopkeeper) and #abortUISessionsDelayed(Shopkeeper).
+* Minor fix: We check if the shopkeeper is still valid before attempting to open its container now.
 
 Internal changes:
 * Slightly changed how we cycle through the villager levels (badge colors).
@@ -44,6 +52,9 @@ Internal changes:
 * Replaced EditorHandler#closeEditorAndRunTask with UIHandler#closeDelayedAndRunTask.
 * Moved UIHandler#getShopkeeper into a separate ShopkeeperUIHandler class. The existing editor, trading and hiring UIs extend from that now.
 * Various internal formatting of code comments.
+* Removed UIHandler#closeDelayedAndRunTask and replaced it with using the new methods inside UISession.
+* Various minor refactoring inside SKUIRegistry.
+* Delayed closing of UIs uses the SchedulerUtils now, which guards against issues during plugin shutdown.
 
 Config changes:  
 * The default value of the `prevent-shop-creation-item-regular-usage` setting was changed to `true`.

@@ -1,9 +1,11 @@
 package com.nisovin.shopkeepers.ui;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -16,35 +18,36 @@ import com.nisovin.shopkeepers.api.events.PlayerOpenUIEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperOpenUIEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.types.AbstractTypeRegistry;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implements UIRegistry<AbstractUIType> {
 
 	private final ShopkeepersPlugin plugin;
+	private final UIListener uiListener;
+
 	// Player id -> UI session
-	private final Map<UUID, SKUISession> playerSessions = new HashMap<>();
-	private UIListener uiListener = null;
+	private final Map<UUID, SKUISession> uiSessions = new HashMap<>();
+	private final Collection<SKUISession> uiSessionsView = Collections.unmodifiableCollection(uiSessions.values());
 
 	public SKUIRegistry(ShopkeepersPlugin plugin) {
 		this.plugin = plugin;
+		this.uiListener = new UIListener(this);
 	}
 
 	public void onEnable() {
-		assert uiListener == null;
-		uiListener = new UIListener(plugin, this);
 		Bukkit.getPluginManager().registerEvents(uiListener, plugin);
 	}
 
 	public void onDisable() {
-		assert uiListener != null;
 		// Close all open UIs:
-		this.closeAll();
+		this.abortUISessions();
 		HandlerList.unregisterAll(uiListener);
-		uiListener = null;
 	}
 
 	@Override
@@ -82,7 +85,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 			return false;
 		}
 
-		SKUISession oldSession = this.getSession(player);
+		SKUISession oldSession = this.getUISession(player);
 		// Filter out duplicate open requests:
 		if (oldSession != null && oldSession.getUIHandler().equals(uiHandler)) {
 			Log.debug(() -> "UI '" + uiIdentifier + "'" + " is already open for '" + playerName + "'.");
@@ -114,9 +117,9 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		Log.debug(() -> "Opening UI '" + uiIdentifier + "' ...");
 		boolean isOpen = uiHandler.openWindow(player);
 		if (isOpen) {
-			assert playerSessions.get(player.getUniqueId()) == null;
+			assert uiSessions.get(player.getUniqueId()) == null;
 			SKUISession session = new SKUISession(uiHandler, player, shopkeeper);
-			playerSessions.put(player.getUniqueId(), session);
+			uiSessions.put(player.getUniqueId(), session);
 			this.onSessionStart(session);
 			return true;
 		} else {
@@ -126,32 +129,88 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	}
 
 	@Override
-	public SKUISession getSession(Player player) {
-		Validate.notNull(player, "Player is null!");
-		return playerSessions.get(player.getUniqueId());
+	public Collection<? extends SKUISession> getUISessions() {
+		return uiSessionsView;
 	}
 
 	@Override
-	public AbstractUIType getOpenUIType(Player player) {
-		SKUISession session = this.getSession(player);
-		return (session != null ? session.getUIType() : null);
+	public Collection<? extends SKUISession> getUISessions(Shopkeeper shopkeeper) {
+		Validate.notNull(shopkeeper, "shopkeeper is null");
+		List<SKUISession> sessions = new ArrayList<>();
+		for (SKUISession session : uiSessionsView) {
+			if (session.getShopkeeper() == shopkeeper) {
+				sessions.add(session);
+			}
+		}
+		return sessions;
 	}
 
-	// closeEvent might be null.
+	@Override
+	public Collection<? extends SKUISession> getUISessions(Shopkeeper shopkeeper, UIType uiType) {
+		Validate.notNull(shopkeeper, "shopkeeper is null");
+		Validate.notNull(uiType, "uiType is null");
+		List<SKUISession> sessions = new ArrayList<>();
+		for (SKUISession session : uiSessionsView) {
+			if (session.getShopkeeper() == shopkeeper && session.getUIType() == uiType) {
+				sessions.add(session);
+			}
+		}
+		return sessions;
+	}
+
+	@Override
+	public Collection<? extends UISession> getUISessions(UIType uiType) {
+		Validate.notNull(uiType, "uiType is null");
+		List<SKUISession> sessions = new ArrayList<>();
+		for (SKUISession session : uiSessionsView) {
+			if (session.getUIType() == uiType) {
+				sessions.add(session);
+			}
+		}
+		return sessions;
+	}
+
+	@Override
+	public SKUISession getUISession(Player player) {
+		Validate.notNull(player, "player is null");
+		return uiSessions.get(player.getUniqueId());
+	}
+
+	@Deprecated
+	@Override
+	public SKUISession getSession(Player player) {
+		return this.getUISession(player);
+	}
+
+	@Deprecated
+	@Override
+	public AbstractUIType getOpenUIType(Player player) {
+		SKUISession session = this.getUISession(player);
+		return (session != null) ? session.getUIType() : null;
+	}
+
 	void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
 		assert player != null;
-		SKUISession session = playerSessions.remove(player.getUniqueId());
+		UISession session = this.getUISession(player);
 		if (session == null) return;
 
-		UIHandler uiHandler = session.getUIHandler();
-		Log.debug(() -> "Player " + player.getName() + " closed UI '" + uiHandler.getUIType().getIdentifier() + "'.");
-		this.onSessionEnd(session, closeEvent);
+		Log.debug(() -> "Player " + player.getName() + " closed UI '" + session.getUIType().getIdentifier() + "'.");
+		this.endUISession(player, closeEvent);
 	}
 
 	public void onPlayerQuit(Player player) {
 		// TODO This might have no effect, because CraftBukkit triggers an inventory close event prior to the player
-		// quitting
-		this.onInventoryClose(player, null);
+		// quitting.
+		this.endUISession(player, null);
+	}
+
+	// closeEvent might be null.
+	void endUISession(Player player, InventoryCloseEvent closeEvent) {
+		assert player != null;
+		SKUISession session = uiSessions.remove(player.getUniqueId());
+		if (session == null) return;
+
+		this.onSessionEnd(session, closeEvent);
 	}
 
 	private void onSessionStart(SKUISession session) {
@@ -165,56 +224,68 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		session.onSessionEnd(); // Inform session
 	}
 
+	// Called by SKUISession.
+	void abort(SKUISession uiSession) {
+		assert uiSession != null;
+		if (!uiSession.isValid()) return;
+		Player player = uiSession.getPlayer();
+		this.endUISession(player, null);
+		player.closeInventory();
+	}
+
 	@Override
-	public void closeAll(Shopkeeper shopkeeper) {
-		if (shopkeeper == null) return;
-		assert shopkeeper != null;
-		Iterator<Entry<UUID, SKUISession>> iterator = playerSessions.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Entry<UUID, SKUISession> entry = iterator.next();
-			SKUISession session = entry.getValue();
-			if (session.getShopkeeper() == shopkeeper) {
-				iterator.remove();
-				this.onSessionEnd(session, null);
-				Player player = session.getPlayer();
-				player.closeInventory();
-			}
+	public void abortUISessions() {
+		// Copy to prevent concurrent modifications:
+		for (UISession session : new ArrayList<>(this.getUISessions())) {
+			session.abort();
+		}
+		assert uiSessions.isEmpty();
+	}
+
+	@Override
+	public void abortUISessions(Shopkeeper shopkeeper) {
+		// Note: The returned collection is already a copy.
+		for (UISession session : this.getUISessions(shopkeeper)) {
+			session.abort();
 		}
 	}
 
 	@Override
-	public void closeAllDelayed(Shopkeeper shopkeeper) {
-		// Ignore during disable: All UIs get closed anyways already.
-		if (shopkeeper == null || !plugin.isEnabled()) return;
+	public void abortUISessionsDelayed(Shopkeeper shopkeeper) {
+		Validate.notNull(shopkeeper, "shopkeeper is null");
 
 		// Deactivate currently active UIs for this shopkeeper:
 		this.deactivateUIs(shopkeeper);
 
-		// Delayed because this may get called from within inventory events:
-		Bukkit.getScheduler().runTask(plugin, () -> {
-			this.closeAll(shopkeeper);
+		SchedulerUtils.runTaskOrOmit(plugin, () -> {
+			this.abortUISessions(shopkeeper);
 		});
 	}
 
 	private void deactivateUIs(Shopkeeper shopkeeper) {
-		for (SKUISession session : playerSessions.values()) {
+		assert shopkeeper != null;
+		for (SKUISession session : uiSessionsView) {
 			if (session.getShopkeeper() == shopkeeper) {
 				session.deactivateUI();
 			}
 		}
 	}
 
+	@Deprecated
+	@Override
+	public void closeAll(Shopkeeper shopkeeper) {
+		this.abortUISessions(shopkeeper);
+	}
+
+	@Deprecated
+	@Override
+	public void closeAllDelayed(Shopkeeper shopkeeper) {
+		this.abortUISessionsDelayed(shopkeeper);
+	}
+
+	@Deprecated
 	@Override
 	public void closeAll() {
-		Iterator<Entry<UUID, SKUISession>> iterator = playerSessions.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Entry<UUID, SKUISession> entry = iterator.next();
-			SKUISession session = entry.getValue();
-			iterator.remove();
-			this.onSessionEnd(session, null);
-			Player player = session.getPlayer();
-			player.closeInventory();
-		}
-		playerSessions.clear(); // Just in case
+		this.abortUISessions();
 	}
 }

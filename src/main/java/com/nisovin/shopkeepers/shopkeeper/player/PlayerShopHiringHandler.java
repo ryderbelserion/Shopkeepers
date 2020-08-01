@@ -66,7 +66,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 					|| !this.getShopkeeper().getShopObject().getType().hasPermission(player))) {
 				// Missing permission to hire this type of shopkeeper:
 				TextUtils.sendMessage(player, Settings.msgCantHireShopType);
-				this.closeDelayed(player);
+				this.getUISession(player).abortDelayed();
 				return;
 			}
 
@@ -97,7 +97,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 				// Not enough money:
 				TextUtils.sendMessage(player, Settings.msgCantHire);
 				// Close window for this player:
-				this.closeDelayed(player);
+				this.getUISession(player).abortDelayed();
 				return;
 			}
 
@@ -108,7 +108,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			if (hireEvent.isCancelled()) {
 				Log.debug("PlayerShopkeeperHireEvent was cancelled!");
 				// Close window for this player:
-				this.closeDelayed(player);
+				this.getUISession(player).abortDelayed();
 				return;
 			}
 
@@ -118,7 +118,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 				int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getPlayerShopkeepersByOwner(player.getUniqueId()).size();
 				if (count >= maxShops) {
 					TextUtils.sendMessage(player, Settings.msgTooManyShops);
-					this.closeDelayed(player);
+					this.getUISession(player).abortDelayed();
 					return;
 				}
 			}
@@ -131,7 +131,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			TextUtils.sendMessage(player, Settings.msgHired);
 
 			// Close all open windows for this shopkeeper:
-			shopkeeper.closeAllOpenWindows();
+			shopkeeper.abortUISessionsDelayed();
 		}
 	}
 }

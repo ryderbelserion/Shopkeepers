@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopkeeper;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObject;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObjectType;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
@@ -617,8 +619,24 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// USER INTERFACES
 
 	@Override
+	public Collection<? extends UISession> getUISessions() {
+		return ShopkeepersPlugin.getInstance().getUIRegistry().getUISessions(this);
+	}
+
+	@Override
+	public Collection<? extends UISession> getUISessions(UIType uiType) {
+		return ShopkeepersPlugin.getInstance().getUIRegistry().getUISessions(this, uiType);
+	}
+
+	@Override
+	public void abortUISessionsDelayed() {
+		ShopkeepersPlugin.getInstance().getUIRegistry().abortUISessionsDelayed(this);
+	}
+
+	@Deprecated
+	@Override
 	public void closeAllOpenWindows() {
-		ShopkeepersPlugin.getInstance().getUIRegistry().closeAllDelayed(this);
+		this.abortUISessionsDelayed();
 	}
 
 	/**
@@ -627,7 +645,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * This replaces any {@link UIHandler} which has been previously registered for the same {@link UIType}.
 	 * 
 	 * @param uiHandler
-	 *            the ui handler
+	 *            the UI handler
 	 */
 	public void registerUIHandler(UIHandler uiHandler) {
 		Validate.notNull(uiHandler, "UI handler is null!");
@@ -638,8 +656,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * Gets the {@link UIHandler} this shopkeeper is using for the specified {@link UIType}.
 	 * 
 	 * @param uiType
-	 *            the ui type
-	 * @return the ui handler, or <code>null</code> if none is available
+	 *            the UI type
+	 * @return the UI handler, or <code>null</code> if none is available
 	 */
 	public UIHandler getUIHandler(UIType uiType) {
 		Validate.notNull(uiType, "UI type is null!");

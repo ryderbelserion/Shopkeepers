@@ -86,7 +86,7 @@ public class ShopkeeperNaming {
 		TextUtils.sendMessage(player, Settings.msgNameSet);
 
 		// Close all open windows:
-		shopkeeper.closeAllOpenWindows(); // TODO Really needed?
+		shopkeeper.abortUISessionsDelayed(); // TODO Really needed?
 
 		// Call event:
 		Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));

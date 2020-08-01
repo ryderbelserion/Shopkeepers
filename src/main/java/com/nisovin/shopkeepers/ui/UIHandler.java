@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.ui;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryAction;
@@ -11,6 +10,7 @@ import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ui.UIRegistry;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.util.Log;
@@ -44,35 +44,15 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Deactivates the UI for the given player and closes the inventory window after a short delay.
+	 * A shortcut for getting the given player's current UI session.
 	 * 
 	 * @param player
 	 *            the player
+	 * @return the UI session, or <code>null</code> if there is none
+	 * @see UIRegistry#getUISession(Player)
 	 */
-	protected void closeDelayed(Player player) {
-		this.closeDelayedAndRunTask(player, null);
-	}
-
-	/**
-	 * Deactivates the UI for the given player, closes the inventory window after a short delay and then runs the given
-	 * task.
-	 * 
-	 * @param player
-	 *            the player
-	 * @param task
-	 *            the task, or <code>null</code>
-	 */
-	protected void closeDelayedAndRunTask(Player player, Runnable task) {
-		UISession uiSession = ShopkeepersPlugin.getInstance().getUIRegistry().getSession(player);
-		if (uiSession == null) return; // No active UI session
-
-		uiSession.deactivateUI();
-		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-			player.closeInventory();
-			if (task != null) {
-				task.run();
-			}
-		});
+	protected final UISession getUISession(Player player) {
+		return ShopkeepersPlugin.getInstance().getUIRegistry().getUISession(player);
 	}
 
 	/**
@@ -121,15 +101,15 @@ public abstract class UIHandler {
 	 * @return <code>true</code> if this UI is open currently
 	 */
 	protected final boolean isOpen(Player player) {
-		SKUISession session = SKShopkeepersPlugin.getInstance().getUIRegistry().getSession(player);
+		SKUISession session = SKShopkeepersPlugin.getInstance().getUIRegistry().getUISession(player);
 		return (session != null && session.getUIHandler() == this && this.isWindow(player.getOpenInventory()));
 	}
 
 	/**
 	 * Gets called when this UI gets closed for a player.
 	 * <p>
-	 * The corresponding inventory close event might be <code>null</code> if the UI session gets ended for a different
-	 * reason.
+	 * The corresponding inventory close event might be <code>null</code> if the UI session is ended for a different
+	 * reason (eg. due to an {@link UISession#abort()}).
 	 * 
 	 * @param player
 	 *            the player

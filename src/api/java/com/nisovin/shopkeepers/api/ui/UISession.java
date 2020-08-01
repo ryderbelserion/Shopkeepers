@@ -65,4 +65,54 @@ public interface UISession {
 	 * @return <code>true</code> if the session is still valid
 	 */
 	public boolean isValid();
+
+	/**
+	 * Closes this UI session.
+	 * <p>
+	 * The closing is handled similarly as if the player closed the UI manually (or a plugin or the server called
+	 * {@link Player#closeInventory()}).
+	 * <p>
+	 * This may not be safe to call during UI / inventory events.
+	 */
+	public void close();
+
+	/**
+	 * {@link #deactivateUI() Deactivates} the UI and {@link #close() closes} this UI session after a short delay
+	 * (within the next tick).
+	 */
+	public void closeDelayed();
+
+	/**
+	 * {@link #deactivateUI() Deactivates} the UI, {@link #close() closes} this UI session after a short delay (within
+	 * the next tick) and then runs the given task.
+	 * 
+	 * @param task
+	 *            the task, or <code>null</code>
+	 */
+	public void closeDelayedAndRunTask(Runnable task);
+
+	/**
+	 * Aborts this UI session.
+	 * <p>
+	 * Unlike {@link #close()} this has the semantic of the UI being forcefully closed without the player's intent. Some
+	 * types of UI might handle this differently, eg. by not saving any not yet applied changes.
+	 * <p>
+	 * This may not be safe to call during UI / inventory events.
+	 */
+	public void abort();
+
+	/**
+	 * {@link #deactivateUI() Deactivates} the UI and {@link #abort() aborts} this UI session after a short delay
+	 * (within the next tick).
+	 */
+	public void abortDelayed();
+
+	/**
+	 * {@link #deactivateUI() Deactivates} the UI, {@link #abort() aborts} this UI session after a short delay (within
+	 * the next tick) and then runs the given task.
+	 * 
+	 * @param task
+	 *            the task, or <code>null</code>
+	 */
+	public void abortDelayedAndRunTask(Runnable task);
 }

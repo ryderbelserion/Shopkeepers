@@ -18,10 +18,11 @@ import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 
 /**
- * Tries to accurately detect individual trades handled by minecraft by listening to corresponding changes of the
+ * Tries to accurately detect individual trades handled by Minecraft by listening to corresponding changes of the
  * TRADED_WITH_VILLAGER statistic for a short period of time right after a player has clicked inside the merchant
  * inventory view.
  * <p>
@@ -71,7 +72,8 @@ public class TradingCountListener implements Listener {
 		if (event.getWhoClicked().getType() != EntityType.PLAYER) return;
 		if (!(event.getInventory() instanceof MerchantInventory)) return;
 		Player player = (Player) event.getWhoClicked();
-		UIType uiType = plugin.getUIRegistry().getOpenUIType(player);
+		UISession uiSession = plugin.getUIRegistry().getUISession(player);
+		UIType uiType = (uiSession != null) ? uiSession.getUIType() : null;
 		if (uiType == DefaultUITypes.TRADING()) return; // Trading with a shopkeeper, which handles trades on its own
 
 		MerchantInventory inventory = (MerchantInventory) event.getInventory();

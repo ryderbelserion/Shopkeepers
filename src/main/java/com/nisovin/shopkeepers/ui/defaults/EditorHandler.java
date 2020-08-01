@@ -531,8 +531,8 @@ public abstract class EditorHandler extends ShopkeeperUIHandler {
 
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// Naming button:
-				closeDelayed(player);
+				// Also triggers save:
+				getUISession(player).closeDelayed();
 
 				// Start naming:
 				SKShopkeepersPlugin.getInstance().getShopkeeperNaming().startNaming(player, shopkeeper);
@@ -553,10 +553,10 @@ public abstract class EditorHandler extends ShopkeeperUIHandler {
 
 			@Override
 			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// Container inventory button:
-				closeDelayedAndRunTask(player, () -> {
+				// Also triggers save:
+				getUISession(player).closeDelayedAndRunTask(() -> {
 					// Open the shop container inventory:
-					if (!player.isValid()) return;
+					if (!player.isValid() || !shopkeeper.isValid()) return;
 					((PlayerShopkeeper) shopkeeper).openContainerWindow(player);
 				});
 			}
@@ -827,7 +827,7 @@ public abstract class EditorHandler extends ShopkeeperUIHandler {
 		Session session = sessions.remove(player.getUniqueId());
 
 		if (closeEvent != null) {
-			// Only saving if caused by an inventory close event:
+			// Only save if caused by an inventory close event:
 			this.saveEditor(session);
 
 			// Call event:
@@ -835,7 +835,7 @@ public abstract class EditorHandler extends ShopkeeperUIHandler {
 			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
 
 			// TODO Only close open windows if there has actually been some change.
-			shopkeeper.closeAllOpenWindows();
+			shopkeeper.abortUISessionsDelayed();
 			shopkeeper.save();
 		}
 	}

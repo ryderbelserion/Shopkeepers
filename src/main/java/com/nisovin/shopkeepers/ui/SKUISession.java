@@ -2,8 +2,11 @@ package com.nisovin.shopkeepers.ui;
 
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public final class SKUISession implements UISession {
@@ -64,5 +67,57 @@ public final class SKUISession implements UISession {
 	@Override
 	public final boolean isValid() {
 		return valid;
+	}
+
+	@Override
+	public void close() {
+		if (!this.isValid()) return;
+		// This triggers an InventoryCloseEvent which ends the UI session:
+		player.closeInventory();
+	}
+
+	@Override
+	public void closeDelayed() {
+		this.closeDelayedAndRunTask(null);
+	}
+
+	@Override
+	public void closeDelayedAndRunTask(Runnable task) {
+		if (!this.isValid()) return;
+
+		this.deactivateUI();
+		// This fails during plugin disable. However, all UIs will be closed anyways.
+		SchedulerUtils.runTaskOrOmit(ShopkeepersPlugin.getInstance(), () -> {
+			if (!this.isValid()) return;
+			close();
+			if (task != null) {
+				task.run();
+			}
+		});
+	}
+
+	@Override
+	public void abort() {
+		SKShopkeepersPlugin.getInstance().getUIRegistry().abort(this);
+	}
+
+	@Override
+	public void abortDelayed() {
+		this.abortDelayedAndRunTask(null);
+	}
+
+	@Override
+	public void abortDelayedAndRunTask(Runnable task) {
+		if (!this.isValid()) return;
+
+		this.deactivateUI();
+		// This fails during plugin disable. However, all UIs will be closed anyways.
+		SchedulerUtils.runTaskOrOmit(ShopkeepersPlugin.getInstance(), () -> {
+			if (!this.isValid()) return;
+			abort();
+			if (task != null) {
+				task.run();
+			}
+		});
 	}
 }

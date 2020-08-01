@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.ui;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -17,14 +16,12 @@ import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryView;
 
-import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
 
 class UIListener implements Listener {
 
-	private final ShopkeepersPlugin plugin;
 	private final SKUIRegistry uiRegistry;
 
 	// The relation between early and late event handling are maintained via stacks, in case something (a plugin) is
@@ -49,15 +46,14 @@ class UIListener implements Listener {
 	private final Deque<UIHandler> clickHandlerStack = new ArrayDeque<>();
 	private final Deque<UIHandler> dragHandlerStack = new ArrayDeque<>();
 
-	UIListener(ShopkeepersPlugin plugin, SKUIRegistry uiRegistry) {
-		this.plugin = plugin;
+	UIListener(SKUIRegistry uiRegistry) {
 		this.uiRegistry = uiRegistry;
 	}
 
 	private SKUISession getUISession(HumanEntity human) {
 		if (human.getType() != EntityType.PLAYER) return null;
 		Player player = (Player) human;
-		return uiRegistry.getSession(player);
+		return uiRegistry.getUISession(player);
 	}
 
 	private boolean validateSession(InventoryInteractEvent event, Player player, SKUISession session) {
@@ -66,7 +62,7 @@ class UIListener implements Listener {
 
 		// Check if the UI got deactivated:
 		if (!session.isUIActive()) {
-			Log.debug(() -> "Ignroing inventory interaction by " + player.getName()
+			Log.debug(() -> "Ignoring inventory interaction by " + player.getName()
 					+ ": The UI got deactivated (UI is probably about to get closed).");
 			event.setCancelled(true);
 			return false;
@@ -75,7 +71,7 @@ class UIListener implements Listener {
 		// Check if the shopkeeper still exists:
 		Shopkeeper shopkeeper = session.getShopkeeper();
 		if (shopkeeper != null && !shopkeeper.isValid()) {
-			Log.debug(() -> "Ignroing inventory interaction by " + player.getName()
+			Log.debug(() -> "Ignoring inventory interaction by " + player.getName()
 					+ ": The associated shopkeeper got deleted.");
 			event.setCancelled(true);
 			return false;
@@ -88,9 +84,7 @@ class UIListener implements Listener {
 					+ "' for " + player.getName() + ", because a different open inventory was expected for '"
 					+ uiHandler.getUIType().getIdentifier() + "'.");
 			event.setCancelled(true);
-			Bukkit.getScheduler().runTask(plugin, () -> {
-				player.closeInventory();
-			});
+			session.abortDelayed();
 			return false;
 		}
 
