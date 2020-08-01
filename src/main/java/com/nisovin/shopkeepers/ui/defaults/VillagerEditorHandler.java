@@ -100,7 +100,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	protected void setupButtons() {
 		super.setupButtons();
 		this.addButtonOrIgnore(this.createDeleteButton());
-		// TODO Villager renaming
+		// TODO Villager renaming? Players can simply use a nametag for this as well.
+		// Note: Wandering traders have an inventory as well, but it is usually always empty.
 		this.addButtonOrIgnore(this.createContainerButton());
 		if (villager instanceof Villager) {
 			// The wandering trader does not support the baby state (even though it is ageable).
@@ -111,6 +112,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		this.addButtonOrIgnore(this.getVillagerLevelEditorButton());
 		this.addButtonOrIgnore(this.getAIButton());
 		// TODO Equipment?
+		// TODO Option to generate random vanilla trades? Maybe when changing the profession and/or level and there are
+		// no trades currently?
 	}
 
 	protected Button createDeleteButton() {
@@ -348,6 +351,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					break;
 				}
 				assert iconItem != null;
+				// TODO Change the default message back to mention the villager level, instead of just the badge color?
 				ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonVillagerLevel, Settings.msgButtonVillagerLevelLore);
 				return iconItem;
 			}
