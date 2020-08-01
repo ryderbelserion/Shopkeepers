@@ -37,7 +37,7 @@ public abstract class UIHandler {
 	/**
 	 * Gets the {@link UIType}.
 	 * 
-	 * @return the UI type
+	 * @return the UI type, not <code>null</code>
 	 */
 	public AbstractUIType getUIType() {
 		return uiType;

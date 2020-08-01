@@ -27,7 +27,9 @@ class UIListener implements Listener {
 	// The relation between early and late event handling are maintained via stacks, in case something (a plugin) is
 	// calling these inventory interaction events recursively from within an event handler. The DUMMY_UI_HANDLER on the
 	// stack indicates that the event is not being processed by any UI handler.
-	private static final UIHandler DUMMY_UI_HANDLER = new UIHandler(null) {
+	private static final AbstractUIType DUMMY_UI_TYPE = new AbstractUIType("dummy", null) {
+	};
+	private static final UIHandler DUMMY_UI_HANDLER = new UIHandler(DUMMY_UI_TYPE) {
 		@Override
 		protected boolean openWindow(Player player) {
 			return false;
