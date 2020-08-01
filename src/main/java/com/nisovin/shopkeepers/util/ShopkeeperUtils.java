@@ -62,6 +62,35 @@ public class ShopkeeperUtils {
 		return ShopkeepersAPI.createTradingRecipe(resultItem, item1, item2);
 	}
 
+	public static MerchantRecipe createMerchantRecipe(TradingRecipe recipe) {
+		if (recipe == null) return null;
+		ItemStack buyItem1 = recipe.getItem1();
+		ItemStack buyItem2 = recipe.getItem2();
+		ItemStack sellingItem = recipe.getResultItem();
+		assert !ItemUtils.isEmpty(sellingItem) && !ItemUtils.isEmpty(buyItem1);
+
+		MerchantRecipe merchantRecipe = new MerchantRecipe(sellingItem, Integer.MAX_VALUE); // No max-uses limit
+		if (recipe.isOutOfStock()) {
+			// .. Except if out of stock:
+			// 'uses' is 0 by default as well, so the trade shows as blocked.
+			merchantRecipe.setMaxUses(0);
+		}
+		merchantRecipe.setExperienceReward(false); // No experience rewards
+		merchantRecipe.addIngredient(buyItem1);
+		if (!ItemUtils.isEmpty(buyItem2)) {
+			merchantRecipe.addIngredient(buyItem2);
+		}
+		return merchantRecipe;
+	}
+
+	public static List<MerchantRecipe> createMerchantRecipes(List<TradingRecipe> recipes) {
+		List<MerchantRecipe> merchantRecipes = new ArrayList<>();
+		for (TradingRecipe recipe : recipes) {
+			merchantRecipes.add(createMerchantRecipe(recipe));
+		}
+		return merchantRecipes;
+	}
+
 	// Note: This method considers the recipes equal even if their uses and max uses don't match.
 	public static boolean areMerchantRecipesEqual(MerchantRecipe recipe1, MerchantRecipe recipe2) {
 		if (recipe1 == recipe2) return true;

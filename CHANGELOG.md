@@ -56,6 +56,7 @@ Internal changes:
 * Removed UIHandler#closeDelayedAndRunTask and replaced it with using the new methods inside UISession.
 * Various minor refactoring inside SKUIRegistry.
 * Delayed closing of UIs uses the SchedulerUtils now, which guards against issues during plugin shutdown.
+* The created villager trading recipes use a 'max-uses' limit of the maximum integer value now (instead of 10000). If the trade is 'out of stock' both the 'max-uses' and the 'uses' are set to 0. This change should probably not affect anyone though.
 
 Config changes:  
 * The default value of the `prevent-shop-creation-item-regular-usage` setting was changed to `true`.

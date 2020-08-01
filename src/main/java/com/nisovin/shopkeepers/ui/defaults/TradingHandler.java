@@ -179,19 +179,7 @@ public class TradingHandler extends ShopkeeperUIHandler {
 	}
 
 	protected MerchantRecipe createMerchantRecipe(TradingRecipe recipe) {
-		ItemStack buyItem1 = recipe.getItem1();
-		ItemStack buyItem2 = recipe.getItem2();
-		ItemStack sellingItem = recipe.getResultItem();
-		assert !ItemUtils.isEmpty(sellingItem) && !ItemUtils.isEmpty(buyItem1);
-
-		MerchantRecipe merchantRecipe = new MerchantRecipe(sellingItem, 10000); // No max-uses limit
-		if (recipe.isOutOfStock()) merchantRecipe.setUses(10000); // .. except if it is out of stock
-		merchantRecipe.setExperienceReward(false); // No experience rewards
-		merchantRecipe.addIngredient(buyItem1);
-		if (!ItemUtils.isEmpty(buyItem2)) {
-			merchantRecipe.addIngredient(buyItem2);
-		}
-		return merchantRecipe;
+		return ShopkeeperUtils.createMerchantRecipe(recipe); // Default
 	}
 
 	protected String getInventoryTitle() {
