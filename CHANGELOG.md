@@ -30,17 +30,18 @@ Date format: (YYYY-MM-DD)
 * Added: It is possible to use barrels and shulker boxes as containers for player shops now.
 * Added a message (msg-unsupported-container) when a player tries to select a type of container which is not supported by shopkeepers (i.e. hopper, dropper, dispenser, brewing stand, ender chest, or a type of furnace).
 * API: Deprecated PlayerShopkeeper#getChestX/Y/Z, #get/setChest, #getCurrencyInChest, #openChestWindow and PlayerShopCreationData#getShopChest and added corresponding replacements methods with more general names.
-* API: It is now possible to create and open UIs that are not associated with any shopkeeper. UISession#getShopkeeper may return null now.
-* API: Added PlayerOpenUIEvent.
-* API: The ShopkeeperOpenUIEvent no longer extends ShopkeeperEvent, but the newly added PlayerOpenUIEvent instead.
-* API: Removed Shopkeeper#isUIActive, #deactivateUI, #activateUI. This is now part of the UISession.
-* API: Added UISession#close(), #closeDelayed(), #closeDelayedAndRunTask(Runnable), #abort(), #abortDelayed(), #abortDelayedAndRunTask(Runnable).
-* API: Added Shopkeeper#getUISessions() and #getUISessions(UIType).
-* API: Deprecated Shopkeeper#closeAllOpenWindows() and replaced it with #abortUISessionsDelayed().
-* API: Added UIRegistry#getUISessions(), #getUISessions(Shopkeeper), #getUISessions(Shopkeeper, UIType), #getUISessions(UIType).
-* API: Deprecated UIRegistry#getSession(Player) and added replacement #getUISession(Player).
-* API: Deprecated UIRegistry#getOpenUIType(Player).
-* API: Deprecated UIRegistry#closeAll(), #closeAll(Shopkeeper) and #closeAllDelayed(Shopkeeper) and added replacements #abortUISessions(), #abortUISessions(Shopkeeper) and #abortUISessionsDelayed(Shopkeeper).
+* Various UI related changes:
+  * API: It is now possible to create and open UIs that are not associated with any shopkeeper. UISession#getShopkeeper may return null now.
+  * API: Added PlayerOpenUIEvent.
+  * API: The ShopkeeperOpenUIEvent no longer extends ShopkeeperEvent, but the newly added PlayerOpenUIEvent instead.
+  * API: Removed Shopkeeper#isUIActive, #deactivateUI, #activateUI. This is now part of the UISession.
+  * API: Added UISession#close(), #closeDelayed(), #closeDelayedAndRunTask(Runnable), #abort(), #abortDelayed(), #abortDelayedAndRunTask(Runnable).
+  * API: Added Shopkeeper#getUISessions() and #getUISessions(UIType).
+  * API: Deprecated Shopkeeper#closeAllOpenWindows() and replaced it with #abortUISessionsDelayed().
+  * API: Added UIRegistry#getUISessions(), #getUISessions(Shopkeeper), #getUISessions(Shopkeeper, UIType), #getUISessions(UIType).
+  * API: Deprecated UIRegistry#getSession(Player) and added replacement #getUISession(Player).
+  * API: Deprecated UIRegistry#getOpenUIType(Player).
+  * API: Deprecated UIRegistry#closeAll(), #closeAll(Shopkeeper) and #closeAllDelayed(Shopkeeper) and added replacements #abortUISessions(), #abortUISessions(Shopkeeper) and #abortUISessionsDelayed(Shopkeeper).
 * Minor fix: We check if the shopkeeper is still valid before attempting to open its container now.
 
 Internal changes:
