@@ -210,7 +210,7 @@ public class ShopkeeperUtils {
 						List<PlayerShopkeeper> shopsUsingContainer = SKShopkeepersPlugin.getInstance().getProtectedContainers().getShopkeepersUsingContainer(targetBlock);
 						if (shopsUsingContainer.isEmpty()) {
 							return new TargetShopkeepersResult(Settings.msgUnusedContainer);
-					} else {
+						} else {
 							// Filter shops:
 							List<Shopkeeper> acceptedShops = new ArrayList<>();
 							for (Shopkeeper shopUsingContainer : shopsUsingContainer) {
