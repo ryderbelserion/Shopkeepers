@@ -83,6 +83,7 @@ Internal changes:
 * ShopkeeperUIHandler is an interface now. This allows for more flexibility in the class hierarchy of UI handlers. Added a basic implementation 'AbstractShopkeeperUIHandler'.
 * Removed the unused SKDefaultUITypes#register() method.
 * Various refactoring related to the editor UI. There is now a separate base class for the shared implementation of the shopkeeper editor and the new villager editor UI. Any shopkeeper references had to be removed from the base class. All existing shopkeeper editor buttons had to be slightly adapted to this change.
+* Minor refactoring related to the handling of wandering traders not supporting the baby state.
 
 Config changes:  
 * The default value of the `prevent-shop-creation-item-regular-usage` setting was changed to `true`.

@@ -34,8 +34,14 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 
 	// TODO Remove special case once this is resolved differently.
 	protected boolean isBabyable() {
-		// Some mobs (parrots) don't support the baby variant even though they are Ageable.
-		return true;
+		// Some mobs don't support the baby variant even though they are Ageable.
+		switch (this.getEntityType()) {
+		case PARROT:
+		case WANDERING_TRADER:
+			return false;
+		default:
+			return true;
+		}
 	}
 
 	@Override

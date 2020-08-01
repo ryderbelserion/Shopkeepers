@@ -351,8 +351,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 						return new ZombieShop<Zombie>(livingShops, this, shopkeeper, creationData);
 					}
 				};
-			} else if (Ageable.class.isAssignableFrom(entityType.getEntityClass()) && entityType != EntityType.WANDERING_TRADER) {
-				// Baby state is not supported for the wandering trader:
+			} else if (Ageable.class.isAssignableFrom(entityType.getEntityClass())) {
 				objectType = new SKLivingShopObjectType<BabyableShop<Ageable>>(livingShops, entityType, aliases, typeName, permission) {
 					@Override
 					public BabyableShop<Ageable> createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {

@@ -34,11 +34,6 @@ public class ParrotShop extends SittableShop<Parrot> {
 	}
 
 	@Override
-	protected boolean isBabyable() {
-		return false; // Baby parrots do not seem to work
-	}
-
-	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
 		this.parrotVariant = PROPERTY_PARROT_VARIANT.load(shopkeeper, configSection);

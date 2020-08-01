@@ -102,7 +102,10 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		this.addButtonOrIgnore(this.createDeleteButton());
 		// TODO Villager renaming
 		this.addButtonOrIgnore(this.createContainerButton());
-		this.addButtonOrIgnore(this.getBabyEditorButton());
+		if (villager instanceof Villager) {
+			// The wandering trader does not support the baby state (even though it is ageable).
+			this.addButtonOrIgnore(this.getBabyEditorButton());
+		}
 		this.addButtonOrIgnore(this.getProfessionEditorButton());
 		this.addButtonOrIgnore(this.getVillagerTypeEditorButton());
 		this.addButtonOrIgnore(this.getVillagerLevelEditorButton());
