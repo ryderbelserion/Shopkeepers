@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.shopobjects.living;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Ageable;
@@ -9,8 +10,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Raider;
+import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 
@@ -149,6 +153,14 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		// not getting cleared visually).
 		EntityEquipment equipment = entity.getEquipment();
 		equipment.clear();
+
+		// We give entities which would usually burn in sunlight an indestructible item as helmet. This results in less
+		// EntityCombustEvents that need to be processed.
+		if (entity instanceof Zombie || entity instanceof Skeleton) {
+			// Note: Phantoms also burn in sunlight, but setting an helmet has no effect for them.
+			// Note: Buttons are small enough to not be visible inside the entity's head (even for their baby variants).
+			equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
+		}
 	}
 
 	// Any clean up that needs to happen for the entity. The entity might not be fully setup yet.

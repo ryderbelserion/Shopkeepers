@@ -17,6 +17,8 @@ import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
 import org.bukkit.event.entity.CreeperPowerEvent.PowerCause;
 import org.bukkit.event.entity.EntityChangeBlockEvent;
+import org.bukkit.event.entity.EntityCombustByBlockEvent;
+import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDropItemEvent;
@@ -328,6 +330,18 @@ class LivingEntityShopListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityPotionEffectEvent(EntityPotionEffectEvent event) {
 		if (event.getAction() == Action.ADDED && shopkeeperRegistry.isShopkeeper(event.getEntity())) {
+			event.setCancelled(true);
+		}
+	}
+
+	// Prevent shopkeeper entities from getting set on fire (eg. monsters in daylight).
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	void onEntityCombustEvent(EntityCombustEvent event) {
+		// If the entity is standing in lava, fire, etc., we ignore the event.
+		if (event instanceof EntityCombustByBlockEvent) return;
+
+		Entity entity = event.getEntity();
+		if (shopkeeperRegistry.isShopkeeper(entity)) {
 			event.setCancelled(true);
 		}
 	}

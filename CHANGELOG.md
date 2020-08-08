@@ -60,6 +60,9 @@ Date format: (YYYY-MM-DD)
   * Permissions: Added `shopkeeper.edit-villagers` and `shopkeeper.edit-wandering-traders` (default: `op`). These are required to edit regular villagers or wandering traders respectively.
   * Added command `/shopkeeper editVillager [villager]`. This opens an editor to edit the specified villager / wandering trader. The villager / wandering trader can either be specified by uuid or by looking at it.
   * Config: Added settings `edit-regular-villagers` and `edit-regular-wandering-traders` (default: `true`). With these settings enabled the villager editor can be opened by simply sneaking and right-clicking a regular villager (similar to how editing works for shopkeepers).
+* Fixed: Monster shopkeepers no longer burn when standing in sunlight.
+  * Monsters usually get set on fire quite frequently when standing in sunlight. We therefore give zombies and skeletons a stone button as helmet now. This prevents them from getting set on fire in sunlight, by which we have to process less EntityCombustEvents. The stone button is also small enough to not be visible inside their head.
+  * Entities standing in lava or fire are still set on fire as before.
 
 Internal changes:
 * Slightly changed how we cycle through the villager levels (badge colors).
