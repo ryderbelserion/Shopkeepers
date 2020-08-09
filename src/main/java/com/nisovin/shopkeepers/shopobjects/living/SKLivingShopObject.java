@@ -93,16 +93,6 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	}
 
 	@Override
-	public boolean isActive() {
-		return (this.getEntity() != null);
-	}
-
-	@Override
-	public String getId() {
-		return this.getType().createObjectId(this.getEntity());
-	}
-
-	@Override
 	public boolean needsSpawning() {
 		return true; // Despawn shop entities on chunk unload, and spawn them again on chunk load.
 	}

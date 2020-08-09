@@ -17,8 +17,11 @@ public abstract class AbstractEntityShopObjectType<T extends AbstractEntityShopO
 		super(identifier, aliases, permission);
 	}
 
+	public boolean usesDefaultObjectIds() {
+		return true;
+	}
+
 	public String createObjectId(Entity entity) {
-		if (entity == null) return null;
-		return this.getIdentifier() + ":" + entity.getUniqueId();
+		return DefaultEntityShopObjectIds.getObjectId(entity);
 	}
 }

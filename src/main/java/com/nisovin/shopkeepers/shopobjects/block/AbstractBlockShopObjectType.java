@@ -17,14 +17,15 @@ public abstract class AbstractBlockShopObjectType<T extends AbstractBlockShopObj
 		super(identifier, aliases, permission);
 	}
 
+	public boolean usesDefaultObjectIds() {
+		return true;
+	}
+
 	public String createObjectId(Block block) {
-		if (block == null) return null;
-		return this.createObjectId(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+		return DefaultBlockShopObjectIds.getObjectId(block);
 	}
 
 	public String createObjectId(String worldName, int blockX, int blockY, int blockZ) {
-		if (worldName == null) return null;
-		// Inline for performance:
-		return this.getIdentifier() + ":" + worldName + "," + blockX + "," + blockY + "," + blockZ;
+		return DefaultBlockShopObjectIds.getObjectId(worldName, blockX, blockY, blockZ);
 	}
 }

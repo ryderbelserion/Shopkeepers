@@ -38,7 +38,9 @@ import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.block.DefaultBlockShopObjectIds;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.entity.DefaultEntityShopObjectIds;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -1139,10 +1141,18 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	@Override
 	public AbstractShopkeeper getShopkeeperByEntity(Entity entity) {
 		if (entity == null) return null;
+		// Check by default object id first:
+		String objectId = DefaultEntityShopObjectIds.getObjectId(entity);
+		AbstractShopkeeper shopkeeper = this.getActiveShopkeeper(objectId);
+		if (shopkeeper != null) return shopkeeper;
+
+		// Check for entity shop object types which use non-default object ids:
 		for (ShopObjectType<?> shopObjectType : plugin.getShopObjectTypeRegistry().getRegisteredTypes()) {
 			if (shopObjectType instanceof AbstractEntityShopObjectType) {
-				String objectId = ((AbstractEntityShopObjectType<?>) shopObjectType).createObjectId(entity);
-				AbstractShopkeeper shopkeeper = this.getActiveShopkeeper(objectId);
+				AbstractEntityShopObjectType<?> entityShopObjectType = (AbstractEntityShopObjectType<?>) shopObjectType;
+				if (entityShopObjectType.usesDefaultObjectIds()) continue;
+				objectId = entityShopObjectType.createObjectId(entity);
+				shopkeeper = this.getActiveShopkeeper(objectId);
 				if (shopkeeper != null) return shopkeeper;
 			}
 		}
@@ -1157,10 +1167,18 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	@Override
 	public AbstractShopkeeper getShopkeeperByBlock(Block block) {
 		if (block == null) return null;
+		// Check by default object id first:
+		String objectId = DefaultBlockShopObjectIds.getObjectId(block);
+		AbstractShopkeeper shopkeeper = this.getActiveShopkeeper(objectId);
+		if (shopkeeper != null) return shopkeeper;
+
+		// Check for block shop object types which use non-default object ids:
 		for (ShopObjectType<?> shopObjectType : plugin.getShopObjectTypeRegistry().getRegisteredTypes()) {
 			if (shopObjectType instanceof AbstractBlockShopObjectType) {
-				String objectId = ((AbstractBlockShopObjectType<?>) shopObjectType).createObjectId(block);
-				AbstractShopkeeper shopkeeper = this.getActiveShopkeeper(objectId);
+				AbstractBlockShopObjectType<?> blockShopObjectType = (AbstractBlockShopObjectType<?>) shopObjectType;
+				if (blockShopObjectType.usesDefaultObjectIds()) continue;
+				objectId = blockShopObjectType.createObjectId(block);
+				shopkeeper = this.getActiveShopkeeper(objectId);
 				if (shopkeeper != null) return shopkeeper;
 			}
 		}

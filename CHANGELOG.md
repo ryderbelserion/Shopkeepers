@@ -88,6 +88,7 @@ Internal changes:
 * Various refactoring related to the editor UI. There is now a separate base class for the shared implementation of the shopkeeper editor and the new villager editor UI. Any shopkeeper references had to be removed from the base class. All existing shopkeeper editor buttons had to be slightly adapted to this change.
 * Minor refactoring related to the handling of wandering traders not supporting the baby state.
 * Minor: All type registries (shop types, shop object types, UI types, ..) remember the order of their registered types now. This should have no noticeable effect, other than maybe on the order of command argument completion suggestions.
+* Most block and entity shop object types share the same object ids now. The idea is that this might allow for optimization when doing shopkeeper lookups.
 
 Config changes:  
 * The default value of the `prevent-shop-creation-item-regular-usage` setting was changed to `true`.

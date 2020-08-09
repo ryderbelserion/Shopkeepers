@@ -10,4 +10,18 @@ public abstract class AbstractEntityShopObject extends AbstractShopObject implem
 	protected AbstractEntityShopObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
 	}
+
+	@Override
+	public abstract AbstractEntityShopObjectType<?> getType();
+
+	@Override
+	public boolean isActive() {
+		return (this.getEntity() != null);
+	}
+
+	@Override
+	public String getId() {
+		// Returns null if the entity is null:
+		return this.getType().createObjectId(this.getEntity());
+	}
 }

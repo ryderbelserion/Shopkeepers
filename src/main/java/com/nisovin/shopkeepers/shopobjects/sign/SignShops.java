@@ -34,11 +34,18 @@ public class SignShops {
 	}
 
 	public AbstractShopkeeper getSignShop(Block block) {
-		return plugin.getShopkeeperRegistry().getActiveShopkeeper(signShopObjectType.createObjectId(block));
+		if (block == null) return null;
+		return this.getSignShop(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
 	}
 
 	AbstractShopkeeper getSignShop(String worldName, int blockX, int blockY, int blockZ) {
-		return plugin.getShopkeeperRegistry().getActiveShopkeeper(signShopObjectType.createObjectId(worldName, blockX, blockY, blockZ));
+		String objectId = signShopObjectType.createObjectId(worldName, blockX, blockY, blockZ);
+		AbstractShopkeeper shopkeeper = plugin.getShopkeeperRegistry().getActiveShopkeeper(objectId);
+		if (shopkeeper != null && shopkeeper.getShopObject() instanceof SKSignShopObject) {
+			return shopkeeper;
+		} else {
+			return null;
+		}
 	}
 
 	public boolean isSignShop(Block block) {

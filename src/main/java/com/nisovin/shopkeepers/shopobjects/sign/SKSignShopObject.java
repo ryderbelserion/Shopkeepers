@@ -163,16 +163,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	@Override
-	public boolean isActive() {
-		return (this.getBlock() != null);
-	}
-
-	@Override
-	public String getId() {
-		return this.getType().createObjectId(this.getBlock());
-	}
-
-	@Override
 	public boolean needsSpawning() {
 		return true; // Despawn signs on chunk unload, and spawn them again on chunk load
 	}

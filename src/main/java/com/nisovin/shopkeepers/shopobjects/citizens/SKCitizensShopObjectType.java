@@ -26,6 +26,12 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 	}
 
 	@Override
+	public boolean usesDefaultObjectIds() {
+		// Uses NPC rather than entity specific ids.
+		return false;
+	}
+
+	@Override
 	public String createObjectId(Entity entity) {
 		if (entity == null) return null;
 		UUID npcUniqueId = citizensShops.getNPCUniqueId(entity);
