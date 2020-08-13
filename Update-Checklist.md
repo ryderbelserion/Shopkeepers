@@ -3,13 +3,16 @@
 ## Minecraft update
 
 * Add a new Maven module for the new Minecraft version:
-	* Copy an existing module: Both the package folder, as well as inside the pom (artifactId and name).
-	* Update the CraftBukkit dependency inside the pom.
+	* Copy an existing module and rename: Module folder, package folder and inside the pom (artifactId and name).
+	* Update the CraftBukkit dependency inside the pom of the new module.
 	* Add the module in the root pom.
+	* Add a dependency entry for the new module in the pom of the dist module.
 	* Update the NMSHandler class:
-		* Update all NMS version specific references.
+		* Package name.
+		* Output of #getVersionId.
+		* Update all NMS version specific imports and references.
 		* Check all NMS version specific code:
-			* Methods or fields might no longer exist or might have been renamed. 
+			* Methods or fields might no longer exist or might have been renamed.
 
 * Add a new build entry in '.travis.yml'.
 
