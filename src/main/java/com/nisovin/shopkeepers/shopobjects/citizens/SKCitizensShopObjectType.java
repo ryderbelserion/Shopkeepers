@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.shopobjects.citizens;
 import java.util.Arrays;
 import java.util.UUID;
 
+import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 
 import com.nisovin.shopkeepers.Settings;
@@ -56,5 +58,12 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 	@Override
 	public boolean isEnabled() {
 		return citizensShops.isEnabled();
+	}
+
+	@Override
+	public boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
+		// A reduced set of checks, compared to the default:
+		if (spawnLocation == null || spawnLocation.getWorld() == null) return false;
+		return true;
 	}
 }

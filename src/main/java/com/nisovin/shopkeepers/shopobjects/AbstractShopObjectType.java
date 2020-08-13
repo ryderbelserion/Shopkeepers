@@ -48,6 +48,8 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 		Block spawnBlock = spawnLocation.getBlock();
 		if (!spawnBlock.isPassable()) return false;
 		if (targetedBlockFace != null) {
+			// TODO DOWN might be a valid block face for some shop types (in the future). However, it certainly is not
+			// for sign and entity shops (the current by default available types).
 			if (targetedBlockFace == BlockFace.DOWN || !BlockFaceUtils.isBlockSide(targetedBlockFace)) {
 				return false;
 			}
