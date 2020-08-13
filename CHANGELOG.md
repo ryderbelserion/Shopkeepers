@@ -2,8 +2,10 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.11.0 (TBA)
-### Supported MC versions: 1.16.1, 1.15.2, 1.14.4
+### Supported MC versions: 1.16.1, 1.16.1, 1.15.2, 1.14.4
 
+* Updated for MC 1.16.2.
+  * Config: Added piglin brute to the by default enabled mob types. If you are updating, you will have to manually enable this yourself.
 * Added: New command `/shopkeeper givecurrency [player] ['low'|'high'] [amount]`.
   * This command can be used to create and give the currency items which have been specified inside the config.
   * Added corresponding permission node `shopkeeper.givecurrency` (default: op).

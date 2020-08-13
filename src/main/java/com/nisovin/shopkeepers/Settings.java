@@ -211,7 +211,8 @@ public class Settings {
 			"PIGLIN", // MC 1.16
 			"HOGLIN", // MC 1.16
 			"ZOGLIN", // MC 1.16
-			"STRIDER" // MC 1.16
+			"STRIDER", // MC 1.16
+			"PIGLIN_BRUTE" // MC 1.16.2
 	);
 
 	public static boolean disableGravity = false;
