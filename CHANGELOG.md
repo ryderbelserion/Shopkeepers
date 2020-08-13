@@ -8,8 +8,10 @@ Date format: (YYYY-MM-DD)
 ## v2.11.0 (2020-08-13)
 ### Supported MC versions: 1.16.1, 1.16.1, 1.15.2, 1.14.4
 
-* Updated for MC 1.16.2.
-  * Config: Added piglin brute to the by default enabled mob types. If you are updating, you will have to manually enable this yourself.
+Update for MC 1.16.2:  
+* Config: Added piglin brute to the by default enabled mob types. If you are updating, you will have to manually enable this yourself.
+
+Other changes:  
 * Added: New command `/shopkeeper givecurrency [player] ['low'|'high'] [amount]`.
   * This command can be used to create and give the currency items which have been specified inside the config.
   * Added corresponding permission node `shopkeeper.givecurrency` (default: op).
@@ -50,27 +52,28 @@ Date format: (YYYY-MM-DD)
   * API: Deprecated UIRegistry#closeAll(), #closeAll(Shopkeeper) and #closeAllDelayed(Shopkeeper) and added replacements #abortUISessions(), #abortUISessions(Shopkeeper) and #abortUISessionsDelayed(Shopkeeper).
 * Minor fix: We check if the shopkeeper is still valid before attempting to open its container now.
 * Minor fix: If the second buy item of a trading recipe is empty, the corresponding created merchant recipe stores that as an empty second ingredient now. This should help when checking if the existing merchant recipes still match the newly created merchant recipes and thereby cause less recipe updates that are not actually required.
-* Added editor for regular villagers and wandering traders:
-  * Any villagers and wandering traders which are not Citizens NPC or shopkeepers are considered 'regular'.
-  * The editor supports editing the villager trades, similar to how editing works for admin shopkeepers. Note that trades created or edited via the editor will have infinite uses, no xp rewards, no price multipliers and the current uses counter gets reset to 0 (there are currently no options to edit or persist these attributes).
-  * To not accidentally edit all original trades whenever the editor is opened and closed (and thereby change the above mentioned trade attributes), we compare the trades from the editor with the villager's current trades before applying the trades from the editor: If the items of a trade are still the same, we keep the original trade without changes. A message indicates how many trades have been modified.
-  * Since villagers may change their trades whenever they change their profession, we set the villager's xp to at least 1 whenever the villager's trades or profession have been modified via the editor.
-  * If the villager is killed or gets unloaded while editing, any changes in the editor will have no effect.
-  * Other supported villager editor options are:
-    * Deleting the villager entity.
-    * Opening a copy of the villager's inventory. Note that any changes to the opened inventory are not reflected in the villager's inventory currently (i.e. you can view, but not modify the villager inventory with this).
-    * Changing the villager profession. Changing the profession via the editor will keep the current trades.
-    * Changing the villager type (i.e. the biome specific outfit).
-    * Changing the villager level (i.e. the badge color). This also affects which level is displayed and whether the villager's xp is shown within the villager's trading UI.
-    * Toggling the villager's AI on and off. This is useful to make the villager stationary while editing it. Otherwise it may wander away.
-  * Permissions: Added `shopkeeper.edit-villagers` and `shopkeeper.edit-wandering-traders` (default: `op`). These are required to edit regular villagers or wandering traders respectively.
-  * Added command `/shopkeeper editVillager [villager]`. This opens an editor to edit the specified villager / wandering trader. The villager / wandering trader can either be specified by uuid or by looking at it.
-  * Config: Added settings `edit-regular-villagers` and `edit-regular-wandering-traders` (default: `true`). With these settings enabled the villager editor can be opened by simply sneaking and right-clicking a regular villager (similar to how editing works for shopkeepers).
 * Fixed: Monster shopkeepers no longer burn when standing in sunlight.
   * Monsters usually get set on fire quite frequently when standing in sunlight. We therefore give zombies and skeletons a stone button as helmet now. This prevents them from getting set on fire in sunlight, by which we have to process less EntityCombustEvents. The stone button is also small enough to not be visible inside their head.
   * Entities standing in lava or fire are still set on fire as before.
 
-Internal changes:
+Added editor for regular villagers and wandering traders:  
+* Any villagers and wandering traders which are not Citizens NPC or shopkeepers are considered 'regular'.
+* The editor supports editing the villager trades, similar to how editing works for admin shopkeepers. Note that trades created or edited via the editor will have infinite uses, no xp rewards, no price multipliers and the current uses counter gets reset to 0 (there are currently no options to edit or persist these attributes).
+* To not accidentally edit all original trades whenever the editor is opened and closed (and thereby change the above mentioned trade attributes), we compare the trades from the editor with the villager's current trades before applying the trades from the editor: If the items of a trade are still the same, we keep the original trade without changes. A message indicates how many trades have been modified.
+* Since villagers may change their trades whenever they change their profession, we set the villager's xp to at least 1 whenever the villager's trades or profession have been modified via the editor.
+* If the villager is killed or gets unloaded while editing, any changes in the editor will have no effect.
+* Other supported villager editor options are:
+  * Deleting the villager entity.
+  * Opening a copy of the villager's inventory. Note that any changes to the opened inventory are not reflected in the villager's inventory currently (i.e. you can view, but not modify the villager inventory with this).
+  * Changing the villager profession. Changing the profession via the editor will keep the current trades.
+  * Changing the villager type (i.e. the biome specific outfit).
+  * Changing the villager level (i.e. the badge color). This also affects which level is displayed and whether the villager's xp is shown within the villager's trading UI.
+  * Toggling the villager's AI on and off. This is useful to make the villager stationary while editing it. Otherwise it may wander away.
+* Permissions: Added `shopkeeper.edit-villagers` and `shopkeeper.edit-wandering-traders` (default: `op`). These are required to edit regular villagers or wandering traders respectively.
+* Added command `/shopkeeper editVillager [villager]`. This opens an editor to edit the specified villager / wandering trader. The villager / wandering trader can either be specified by uuid or by looking at it.
+* Config: Added settings `edit-regular-villagers` and `edit-regular-wandering-traders` (default: `true`). With these settings enabled the villager editor can be opened by simply sneaking and right-clicking a regular villager (similar to how editing works for shopkeepers).
+
+Internal changes:  
 * Slightly changed how we cycle through the villager levels (badge colors).
 * Added support for Lists of ItemData inside the config.
 * We throw an exception now when we encounter an unexpected / not yet handled config setting type.
@@ -126,7 +129,7 @@ Added messages:
 * msg-button-magma-cube-size-lore
 * msg-unsupported-container
 * msg-missing-edit-villagers-perm
-* msg-missing-edit-wandering-traders-perm:
+* msg-missing-edit-wandering-traders-perm
 * msg-must-target-entity
 * msg-must-target-villager
 * msg-target-entity-is-no-villager
