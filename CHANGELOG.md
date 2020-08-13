@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.11.1 (TBA)
 ### Supported MC versions: 1.16.1, 1.16.1, 1.15.2, 1.14.4
 
+* Minor changes to handling failures when trying to create a shopkeeper via Citizens trait. We always inform the player (if there is one), log a warning and delete the trait again now.
 
 ## v2.11.0 (2020-08-13)
 ### Supported MC versions: 1.16.1, 1.16.1, 1.15.2, 1.14.4

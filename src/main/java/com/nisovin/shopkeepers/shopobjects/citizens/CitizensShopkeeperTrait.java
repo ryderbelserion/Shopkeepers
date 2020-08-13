@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.citizens;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -14,6 +15,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.Trait;
@@ -168,6 +170,7 @@ public class CitizensShopkeeperTrait extends Trait {
 			location = npc.getStoredLocation();
 		}
 
+		String shopkeeperCreationError = null; // Null indicates success
 		if (location != null) {
 			ShopCreationData creationData = AdminShopCreationData.create(creator, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
 			creationData.setValue(SKCitizensShopObject.CREATION_DATA_NPC_UUID_KEY, npc.getUniqueId());
@@ -194,13 +197,25 @@ public class CitizensShopkeeperTrait extends Trait {
 			if (shopkeeper != null) {
 				shopObjectId = shopkeeper.getShopObject().getId();
 			} else {
-				Log.warning("Shopkeeper creation via trait failed. Removing the trait again.");
-				shopObjectId = null;
-				Bukkit.getScheduler().runTask(plugin, () -> npc.removeTrait(CitizensShopkeeperTrait.class));
+				// Shopkeeper creation failed:
+				// TODO Translation?
+				shopkeeperCreationError = "Shopkeeper creation via trait failed. Removing the trait again.";
 			}
 		} else {
-			// Well.. no idea what to do in that case.. we cannot create a shopkeeper without a location, right?
-			Log.debug("Shopkeeper NPC Trait: Failed to create the shopkeeper due to missing NPC location.");
+			// NPC did not provide any location. We cannot create a shopkeeper without location.
+			// TODO Translation?
+			shopkeeperCreationError = "Shopkeeper creation via trait failed due to missing NPC location. Removing the trait again.";
+		}
+
+		if (shopkeeperCreationError != null) {
+			// Shopkeeper creation failed:
+			Log.warning(shopkeeperCreationError);
+			if (creator != null) {
+				TextUtils.sendMessage(creator, ChatColor.RED + shopkeeperCreationError);
+			}
+
+			shopObjectId = null;
+			Bukkit.getScheduler().runTask(plugin, () -> npc.removeTrait(CitizensShopkeeperTrait.class));
 		}
 	}
 }
