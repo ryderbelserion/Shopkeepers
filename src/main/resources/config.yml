@@ -283,7 +283,7 @@ sign-shop-first-line: "[SHOP]"
 # * "(?=X)": The name has to match "X" (X can be another embedded expression),
 # but the name is not consumed and has to also match the following expressions.
 # * "(?!.*X).*": The name is not allowed to contain anything that matches "X".
-# * "(?i)(?=[a-z0-9 ]{3,32})(?!.*bitch|dick|ass).*": Filters bad words.
+# * "(?i)(?=[a-z0-9 ]{3,25})(?!.*bitch|dick|ass).*": Filters bad words.
 name-regex: "[A-Za-z0-9 ]{3,25}"
 # Whether player shops get named via item. This will hide the naming option
 # from the editor menu.
