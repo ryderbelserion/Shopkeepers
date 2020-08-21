@@ -269,14 +269,21 @@ sign-shop-first-line: "[SHOP]"
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
 # A regular expression used to validate shopkeeper names. For detailed
-# information on the regular expression format see the java documentation:
-# https://docs.oracle.com/javase/9/docs/api/java/util/regex/Pattern.html
+# information on regular expressions the following documentations are helpful:
+# * https://docs.oracle.com/javase/9/docs/api/java/util/regex/Pattern.html
+# * http://www.regular-expressions.info/tutorial.html
 # Here are a few examples:
 # * "[A-Za-z0-9 ]{3,25}": The default. Allows letters and numbers, from 3 to 25
 # characters long.
-# * "[A-Za-z0-9& ]{3,25}": Same as the default, but allows the ampersand
+# * "[A-Za-z0-9& ]{3,25}": Same as the default, but also allows the ampersand
 # character which enables color codes.
-# * ".*": Allows everything.
+# * "\p{L}": Matches any letter, regardless of language.
+# * ".*": Matches everything.
+# * Adding "(?i)" at the front enables case insensitive matching.
+# * "(?=X)": The name has to match "X" (X can be another embedded expression),
+# but the name is not consumed and has to also match the following expressions.
+# * "(?!.*X).*": The name is not allowed to contain anything that matches "X".
+# * "(?i)(?=[a-z0-9 ]{3,32})(?!.*bitch|dick|ass).*": Filters bad words.
 name-regex: "[A-Za-z0-9 ]{3,25}"
 # Whether player shops get named via item. This will hide the naming option
 # from the editor menu.
