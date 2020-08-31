@@ -26,9 +26,9 @@ See [Contributing](CONTRIBUTING.md)
 Build with Maven
 ----------------
 
-This is the recommended and easy way to compile the plugin yourself and/or help to contribute to it.
-Just check out the project to your machine and import it in Eclipse with **Import > Maven > Existing Maven Project**.
-Then make sure that you have all Spigot and CraftBukkit dependencies installed in your local Maven repository. The simplest way to do this is to run the included **./installSpigotDependencies.sh** script.
+This is the recommended and easy way to compile the plugin yourself and/or help to contribute to it.  
+Just check out the project to your machine and import it in Eclipse with **Import > Maven > Existing Maven Project**.  
+Then make sure that you have all Spigot and CraftBukkit dependencies installed in your local Maven repository. The simplest way to do this is to run the included **./installSpigotDependencies.sh** script.  
 Afterwards just right click the imported project and select **Run As > Maven install**.
 
 Build without Maven
