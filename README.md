@@ -18,6 +18,9 @@ You can set up admin shops, which have infinite supply, and you can also set up 
 Maven repository for releases: https://nexus.lichtspiele.org/repository/releases/  
 Maven repository for dev builds (snapshots): https://nexus.lichtspiele.org/repository/snapshots/  
 
+If the above Maven repository is not available, you can alternatively also use Jitpack: https://jitpack.io/#Shopkeepers/Shopkeepers/  
+Maven Jitpack snapshots: https://jitpack.io/#Shopkeepers/Shopkeepers/master-SNAPSHOT  
+
 Pull Requests & Contributing
 ----------
 
