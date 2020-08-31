@@ -88,6 +88,10 @@
 			<url>http://nexus.hc.to/content/repositories/pub_releases</url>
 		</repository>
 		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+		<repository>
 			<id>bstats-repo</id>
 			<url>https://repo.codemc.org/repository/maven-public</url>
 		</repository>
@@ -122,9 +126,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.palmergames.bukkit.towny</groupId>
+			<groupId>com.github.TownyAdvanced</groupId>
 			<artifactId>Towny</artifactId>
-			<version>0.84.0</version>
+			<version>0.96.2.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
