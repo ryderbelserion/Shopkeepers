@@ -12,6 +12,7 @@ Date format: (YYYY-MM-DD)
 Internal:  
 * Moved the installation of Spigot dependencies into a separate script.
 * Added support for building with Jitpack. This uses a Maven wrapper with a fixed version, because Jitpack uses a buggy Maven version currently (3.6.1).
+* Updated building instructions in readme.
 
 ## v2.11.0 (2020-08-13)
 ### Supported MC versions: 1.16.2, 1.16.1, 1.15.2, 1.14.4
