@@ -124,11 +124,13 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	@Override
-	protected boolean canOpen(Player player) {
+	protected boolean canOpen(Player player, boolean silent) {
 		assert player != null;
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.TRADE_PERMISSION)) {
-			Log.debug(() -> "Blocked trade window opening from " + player.getName() + ": Missing trade permission.");
-			TextUtils.sendMessage(player, Settings.msgMissingTradePerm);
+			if (!silent) {
+				Log.debug(() -> "Blocked trade window opening for " + player.getName() + ": Missing trade permission.");
+				TextUtils.sendMessage(player, Settings.msgMissingTradePerm);
+			}
 			return false;
 		}
 		return true;

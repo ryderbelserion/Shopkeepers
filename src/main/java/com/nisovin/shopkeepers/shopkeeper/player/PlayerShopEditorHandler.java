@@ -28,8 +28,9 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 	}
 
 	@Override
-	protected boolean canOpen(Player player) {
-		return super.canOpen(player) && (this.getShopkeeper().isOwner(player) || PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION));
+	protected boolean canOpen(Player player, boolean silent) {
+		if (!super.canOpen(player, silent)) return false;
+		return (this.getShopkeeper().isOwner(player) || PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION));
 	}
 
 	@Override

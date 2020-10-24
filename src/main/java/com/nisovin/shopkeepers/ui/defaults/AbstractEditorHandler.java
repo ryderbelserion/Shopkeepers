@@ -628,7 +628,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	@Override
-	protected boolean canOpen(Player player) {
+	protected boolean canOpen(Player player, boolean silent) {
 		assert player != null;
 		// Permission for the type of shopkeeper is checked in the AdminShopkeeper specific EditorHandler.
 		// Owner is checked in the PlayerShopkeeper specific EditorHandler.

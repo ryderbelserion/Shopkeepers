@@ -25,9 +25,9 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 	}
 
 	@Override
-	protected boolean canOpen(Player player) {
-		assert player != null;
-		return super.canOpen(player) && this.getShopkeeper().getType().hasPermission(player);
+	protected boolean canOpen(Player player, boolean silent) {
+		if (!super.canOpen(player, silent)) return false;
+		return this.getShopkeeper().getType().hasPermission(player);
 	}
 
 	@Override

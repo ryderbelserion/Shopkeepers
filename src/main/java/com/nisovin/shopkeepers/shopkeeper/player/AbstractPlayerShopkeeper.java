@@ -199,7 +199,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		if (Settings.namingOfPlayerShopsViaItem && Settings.isNamingItem(itemInMainHand)) {
 			// Check if player can edit this shopkeeper:
 			PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUITypes.EDITOR());
-			if (editorHandler.canOpen(player)) {
+			if (editorHandler.canOpen(player, false)) {
 				// Rename with the player's item in hand:
 				ItemMeta itemMeta = itemInMainHand.getItemMeta(); // Can be null
 				String newName = (itemMeta != null && itemMeta.hasDisplayName()) ? itemMeta.getDisplayName() : "";

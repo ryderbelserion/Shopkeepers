@@ -80,7 +80,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		}
 
 		String playerName = player.getName();
-		if (!uiHandler.canOpen(player)) {
+		if (!uiHandler.canOpen(player, false)) {
 			Log.debug(() -> "The player '" + playerName + "' cannot open UI '" + uiIdentifier + "'.");
 			return false;
 		}

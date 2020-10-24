@@ -58,20 +58,23 @@ public abstract class UIHandler {
 	/**
 	 * Checks whether or not the given player can open this interface.
 	 * <p>
-	 * This gets for example called when a player requests this interface. It should perform the necessary permission
-	 * checks.
+	 * This may for example perform any necessary permission checks.
+	 * <p>
+	 * This gets for example called when a player requests this interface.
 	 * 
 	 * @param player
-	 *            a player
+	 *            the player
+	 * @param silent
+	 *            <code>false</code> to inform the player when the access is denied
 	 * @return <code>true</code> if the given player is allowed to open this interface
 	 */
-	protected abstract boolean canOpen(Player player);
+	protected abstract boolean canOpen(Player player, boolean silent);
 
 	/**
 	 * Opens the interface window for the given player.
 	 * <p>
-	 * Generally {@link #canOpen(Player)} should be checked before calling this method. However, this method should not
-	 * rely on that.
+	 * Generally {@link #canOpen(Player, boolean)} should be checked before calling this method. However, this method
+	 * should not rely on that.
 	 * 
 	 * @param player
 	 *            a player

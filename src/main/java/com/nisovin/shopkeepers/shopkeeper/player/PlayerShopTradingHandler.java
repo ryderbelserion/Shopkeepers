@@ -31,16 +31,18 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 	}
 
 	@Override
-	protected boolean canOpen(Player player) {
-		if (!super.canOpen(player)) return false;
+	protected boolean canOpen(Player player, boolean silent) {
+		if (!super.canOpen(player, silent)) return false;
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 
 		// Stop opening if trading shall be prevented while the owner is offline:
 		if (Settings.preventTradingWhileOwnerIsOnline && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null) {
-				Log.debug(() -> "Blocked trade window opening from " + player.getName() + " because the owner is online.");
-				TextUtils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
+				if (!silent) {
+					Log.debug(() -> "Blocked trade window opening for " + player.getName() + ", because the shop owner is online.");
+					TextUtils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
+				}
 				return false;
 			}
 		}

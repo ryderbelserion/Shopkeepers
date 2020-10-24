@@ -10,6 +10,9 @@ Date format: (YYYY-MM-DD)
 * Config: Added some more examples for the 'name-regex' setting to the default config.
 
 Internal:  
+* Internal API: UIHandler#canOpen has an additional 'silent' flag now.
+
+Internal:  
 * Moved the installation of Spigot dependencies into a separate script.
 * Added support for building with Jitpack. This uses a Maven wrapper with a fixed version, because Jitpack uses a buggy Maven version currently (3.6.1).
 * Updated building instructions in readme.

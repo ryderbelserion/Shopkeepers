@@ -30,14 +30,16 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 		}
 
 		@Override
-		protected boolean canOpen(Player player) {
-			if (!super.canOpen(player)) return false;
+		protected boolean canOpen(Player player, boolean silent) {
+			if (!super.canOpen(player, silent)) return false;
 
 			// Check trading permission:
 			String tradePermission = this.getShopkeeper().getTradePremission();
 			if (tradePermission != null && !PermissionUtils.hasPermission(player, tradePermission)) {
-				Log.debug(() -> "Blocked trading UI opening for " + player.getName() + ": Missing custom trade permission '" + tradePermission + "'.");
-				TextUtils.sendMessage(player, Settings.msgMissingCustomTradePerm);
+				if (!silent) {
+					Log.debug(() -> "Blocked trading UI opening for " + player.getName() + ": Missing custom trade permission '" + tradePermission + "'.");
+					TextUtils.sendMessage(player, Settings.msgMissingCustomTradePerm);
+				}
 				return false;
 			}
 			return true;

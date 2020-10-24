@@ -62,21 +62,25 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	}
 
 	@Override
-	protected boolean canOpen(Player player) {
+	protected boolean canOpen(Player player, boolean silent) {
 		assert player != null;
 		// Check permission:
 		if (villager instanceof WanderingTrader) {
 			if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.EDIT_WANDERING_TRADERS_PERMISSION)) {
-				Log.debug(() -> "Blocked villager editor from opening for " + player.getName()
-						+ ": Missing edit-wandering-traders permission.");
-				TextUtils.sendMessage(player, Settings.msgMissingEditWanderingTradersPerm);
+				if (!silent) {
+					Log.debug(() -> "Blocked villager editor from opening for " + player.getName()
+							+ ": Missing edit-wandering-traders permission.");
+					TextUtils.sendMessage(player, Settings.msgMissingEditWanderingTradersPerm);
+				}
 				return false;
 			}
 		} else { // Regular villager
 			if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.EDIT_VILLAGERS_PERMISSION)) {
-				Log.debug(() -> "Blocked villager editor from opening for " + player.getName()
-						+ ": Missing edit-villagers permission.");
-				TextUtils.sendMessage(player, Settings.msgMissingEditVillagersPerm);
+				if (!silent) {
+					Log.debug(() -> "Blocked villager editor from opening for " + player.getName()
+							+ ": Missing edit-villagers permission.");
+					TextUtils.sendMessage(player, Settings.msgMissingEditVillagersPerm);
+				}
 				return false;
 			}
 		}
