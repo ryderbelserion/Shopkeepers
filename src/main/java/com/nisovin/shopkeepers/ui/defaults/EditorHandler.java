@@ -33,8 +33,6 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 		super(uiType);
 		Validate.notNull(shopkeeper, "shopkeeper is null");
 		this.shopkeeper = shopkeeper;
-
-		this.setup();
 	}
 
 	@Override

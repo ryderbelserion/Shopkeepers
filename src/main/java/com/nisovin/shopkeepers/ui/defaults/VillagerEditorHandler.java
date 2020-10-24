@@ -48,8 +48,6 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		this.villager = villager;
 		String villagerName = villager.getName(); // Not null
 		this.title = TextUtils.replaceArguments(Settings.msgVillagerEditorTitle, "villagerName", villagerName);
-
-		this.setup();
 	}
 
 	public AbstractVillager getVillager() {

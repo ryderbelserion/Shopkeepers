@@ -11,6 +11,7 @@ Date format: (YYYY-MM-DD)
 
 Internal:  
 * Internal API: UIHandler#canOpen has an additional 'silent' flag now.
+* Editor UIs are setup lazily now, only when required for the first time.
 
 Internal:  
 * Moved the installation of Spigot dependencies into a separate script.

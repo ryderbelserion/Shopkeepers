@@ -60,14 +60,29 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected static final int ITEM_1_OFFSET = TRADES_ROW_3_START;
 	protected static final int ITEM_2_OFFSET = TRADES_ROW_2_START;
 
+	private final Button[] tradesPageBarButtons = new Button[TRADES_PAGE_BAR_END - TRADES_PAGE_BAR_START + 1];
+	private final List<Button> buttons = new ArrayList<>();
+	private int buttonRows = 1;
+	private final Button[] bakedButtons = new Button[BUTTON_MAX_ROWS * COLUMNS_PER_ROW];
+	private boolean dirtyButtons = false;
+	private boolean setup = false; // lazy setup
+
+	private final Map<UUID, Session> sessions = new HashMap<>();
+
 	protected AbstractEditorHandler(AbstractUIType uiType) {
 		super(uiType);
 	}
 
 	/**
-	 * Has to be called by sub-classes right after construction.
+	 * Performs any setup that has to happen once for this UI.
+	 * <p>
+	 * This may for example setup the UI contents, such as registering buttons.
+	 * <p>
+	 * Setup is performed lazily, before the first time the UI is opened.
 	 */
-	protected void setup() {
+	private void setup() {
+		if (setup) return;
+		setup = true;
 		this.setupTradesPageBarButtons();
 		this.setupButtons();
 	}
@@ -225,8 +240,6 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		// Returns true on success:
 		protected abstract boolean runAction(InventoryClickEvent clickEvent, Player player);
 	}
-
-	private final Button[] tradesPageBarButtons = new Button[TRADES_PAGE_BAR_END - TRADES_PAGE_BAR_START + 1];
 
 	private Button[] getTradesPageBarButtons() {
 		this.setupTradesPageBarButtons();
@@ -393,11 +406,6 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	protected abstract ItemStack createTradeSetupIcon();
 
-	private final List<Button> buttons = new ArrayList<>();
-	private int buttonRows = 1;
-	private final Button[] bakedButtons = new Button[BUTTON_MAX_ROWS * COLUMNS_PER_ROW];
-	private boolean dirtyButtons = false;
-
 	private void bakeButtons() {
 		if (!dirtyButtons) return;
 
@@ -516,8 +524,6 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		}
 	}
 
-	private final Map<UUID, Session> sessions = new HashMap<>();
-
 	protected Session createSession(Player player, List<TradingRecipeDraft> recipes, Inventory inventory) {
 		return new Session(player, recipes, inventory);
 	}
@@ -531,8 +537,12 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	@Override
 	public boolean openWindow(Player player) {
+		// Lazy setup:
+		this.setup();
+
 		// Setup session:
 		List<TradingRecipeDraft> recipes = this.getTradingRecipes();
+
 		// Create inventory:
 		Inventory inventory = Bukkit.createInventory(player, this.getInventorySize(), this.getEditorTitle());
 		Session session = this.createSession(player, recipes, inventory);
