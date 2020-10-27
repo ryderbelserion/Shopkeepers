@@ -8,6 +8,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: Creating shopkeepers via Citizens trait failed previously if the block at the spawn location is not passable (eg. when the Citizens NPC stands on a non-full block such as carpet).
 * Minor changes to handling failures when trying to create a shopkeeper via Citizens trait. We always inform the player (if there is one), log a warning and delete the trait again now.
 * Config: Added some more examples for the 'name-regex' setting to the default config.
+* Fixed: Some messages would print an empty line when set to an empty text, instead of being disabled.
 
 Internal:  
 * Internal API: UIHandler#canOpen has an additional 'silent' flag now.

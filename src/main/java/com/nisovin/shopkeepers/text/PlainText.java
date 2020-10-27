@@ -40,7 +40,7 @@ public class PlainText extends TextBuilder {
 
 	@Override
 	public boolean isPlainTextEmpty() {
-		return false;
+		return text.isEmpty();
 	}
 
 	// COPY
