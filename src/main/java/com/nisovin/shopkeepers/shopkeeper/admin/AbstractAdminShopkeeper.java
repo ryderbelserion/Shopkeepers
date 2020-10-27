@@ -30,7 +30,7 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 		}
 
 		@Override
-		protected boolean canOpen(Player player, boolean silent) {
+		public boolean canOpen(Player player, boolean silent) {
 			if (!super.canOpen(player, silent)) return false;
 
 			// Check trading permission:

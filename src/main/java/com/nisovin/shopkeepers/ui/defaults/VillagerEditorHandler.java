@@ -60,7 +60,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	}
 
 	@Override
-	protected boolean canOpen(Player player, boolean silent) {
+	public boolean canOpen(Player player, boolean silent) {
 		assert player != null;
 		// Check permission:
 		if (villager instanceof WanderingTrader) {

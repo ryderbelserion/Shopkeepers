@@ -68,7 +68,7 @@ public abstract class UIHandler {
 	 *            <code>false</code> to inform the player when the access is denied
 	 * @return <code>true</code> if the given player is allowed to open this interface
 	 */
-	protected abstract boolean canOpen(Player player, boolean silent);
+	public abstract boolean canOpen(Player player, boolean silent);
 
 	/**
 	 * Opens the interface window for the given player.

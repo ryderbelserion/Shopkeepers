@@ -11,7 +11,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: Some messages would print an empty line when set to an empty text, instead of being disabled.
 
 Internal:  
-* Internal API: UIHandler#canOpen has an additional 'silent' flag now.
+* Internal API: UIHandler#canOpen is public and has an additional 'silent' flag now.
 * Editor UIs are setup lazily now, only when required for the first time.
 
 Internal:  

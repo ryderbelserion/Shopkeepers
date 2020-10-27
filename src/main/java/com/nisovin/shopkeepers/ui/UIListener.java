@@ -41,7 +41,7 @@ class UIListener implements Listener {
 		}
 
 		@Override
-		protected boolean canOpen(Player player, boolean silent) {
+		public boolean canOpen(Player player, boolean silent) {
 			return false;
 		}
 	};

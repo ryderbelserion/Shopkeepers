@@ -124,7 +124,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	@Override
-	protected boolean canOpen(Player player, boolean silent) {
+	public boolean canOpen(Player player, boolean silent) {
 		assert player != null;
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.TRADE_PERMISSION)) {
 			if (!silent) {
