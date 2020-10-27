@@ -19,11 +19,13 @@ public class PlayerOpenUIEvent extends Event implements Cancellable {
 
 	private final UIType uiType;
 	private final Player player;
+	private final boolean silentRequest;
 	private boolean cancelled = false;
 
-	public PlayerOpenUIEvent(UIType uiType, Player player) {
+	public PlayerOpenUIEvent(UIType uiType, Player player, boolean silentRequest) {
 		this.uiType = uiType;
 		this.player = player;
+		this.silentRequest = silentRequest;
 	}
 
 	/**
@@ -45,7 +47,23 @@ public class PlayerOpenUIEvent extends Event implements Cancellable {
 	}
 
 	/**
-	 * If cancelled the UI won't open.
+	 * Checks if this UI request is silent.
+	 * <p>
+	 * A silent request is not supposed to produce any output if it fails. For example, the player is not supposed to
+	 * receive a 'You do not have the permission to access this UI'-message if access is denied due to a missing
+	 * permission.
+	 * <p>
+	 * Silent UI requests may for example be used if there is a default fallback behavior that is supposed to be used
+	 * for players which do not have access to a specific type of UI.
+	 * 
+	 * @return <code>true</code> if this is a silent UI request
+	 */
+	public boolean isSilentRequest() {
+		return silentRequest;
+	}
+
+	/**
+	 * If cancelled, the UI won't open.
 	 */
 	@Override
 	public boolean isCancelled() {

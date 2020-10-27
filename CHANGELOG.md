@@ -10,14 +10,16 @@ Date format: (YYYY-MM-DD)
 * Config: Added some more examples for the 'name-regex' setting to the default config.
 * Fixed: Some messages would print an empty line when set to an empty text, instead of being disabled.
 
-Internal:  
-* Internal API: UIHandler#canOpen is public and has an additional 'silent' flag now.
-* Editor UIs are setup lazily now, only when required for the first time.
+API:  
+* PlayerOpenUIEvent indicates whether the UI request has been silent now.
 
 Internal:  
 * Moved the installation of Spigot dependencies into a separate script.
 * Added support for building with Jitpack. This uses a Maven wrapper with a fixed version, because Jitpack uses a buggy Maven version currently (3.6.1).
 * Updated building instructions in readme.
+* Internal API: UIHandler#canOpen is public and has an additional 'silent' flag now.
+* Internal API: UI requests can be silent now.
+* Editor UIs are setup lazily now, only when required for the first time.
 
 ## v2.11.0 (2020-08-13)
 ### Supported MC versions: 1.16.2, 1.16.1, 1.15.2, 1.14.4

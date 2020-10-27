@@ -12,8 +12,8 @@ public class ShopkeeperOpenUIEvent extends PlayerOpenUIEvent {
 
 	private final Shopkeeper shopkeeper;
 
-	public ShopkeeperOpenUIEvent(Shopkeeper shopkeeper, UIType uiType, Player player) {
-		super(uiType, player);
+	public ShopkeeperOpenUIEvent(Shopkeeper shopkeeper, UIType uiType, Player player, boolean silentRequest) {
+		super(uiType, player, silentRequest);
 		this.shopkeeper = shopkeeper;
 	}
 

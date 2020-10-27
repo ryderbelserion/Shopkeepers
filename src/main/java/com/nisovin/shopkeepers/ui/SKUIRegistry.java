@@ -70,6 +70,10 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	}
 
 	public boolean requestUI(UIHandler uiHandler, Player player) {
+		return this.requestUI(uiHandler, player, false);
+	}
+
+	public boolean requestUI(UIHandler uiHandler, Player player, boolean silentRequest) {
 		Validate.notNull(uiHandler, "uiHandler is null");
 		Validate.notNull(player, "player is null");
 		UIType uiType = uiHandler.getUIType();
@@ -80,7 +84,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		}
 
 		String playerName = player.getName();
-		if (!uiHandler.canOpen(player, false)) {
+		if (!uiHandler.canOpen(player, silentRequest)) {
 			Log.debug(() -> "The player '" + playerName + "' cannot open UI '" + uiIdentifier + "'.");
 			return false;
 		}
@@ -95,9 +99,9 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		// Call event:
 		PlayerOpenUIEvent openUIEvent;
 		if (shopkeeper == null) {
-			openUIEvent = new PlayerOpenUIEvent(uiType, player);
+			openUIEvent = new PlayerOpenUIEvent(uiType, player, silentRequest);
 		} else {
-			openUIEvent = new ShopkeeperOpenUIEvent(shopkeeper, uiType, player);
+			openUIEvent = new ShopkeeperOpenUIEvent(shopkeeper, uiType, player, silentRequest);
 		}
 		Bukkit.getPluginManager().callEvent(openUIEvent);
 		if (openUIEvent.isCancelled()) {
