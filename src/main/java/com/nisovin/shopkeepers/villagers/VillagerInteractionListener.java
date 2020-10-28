@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.villagers;
 import java.util.Map;
 
 import org.bukkit.entity.AbstractVillager;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.WanderingTrader;
@@ -66,39 +67,55 @@ public class VillagerInteractionListener implements Listener {
 		if (event.getHand() != EquipmentSlot.HAND) return;
 
 		Player player = event.getPlayer();
-		if (player.isSneaking()
-				&& ((isVillager && Settings.editRegularVillagers) || (isWanderingTrader && Settings.editRegularWanderingTraders))) {
-			// Open the villager editor:
-			// Note: This will check if the player has the permission to edit villagers.
+		boolean overrideTrading = false;
+		if (this.handleEditRegularVillager(player, villager)) {
+			// Villager editor for regular villagers.
+			overrideTrading = true;
+		} else if (this.handleHireOtherVillager(player, villager)) {
+			// Hiring of regular villagers.
+			overrideTrading = true;
+		}
+
+		if (overrideTrading) {
+			// The villager interaction resulted in some action that overrides the default trading behavior:
 			event.setCancelled(true);
-			Log.debug("  requesting villager editor.");
+		}
+	}
+
+	private boolean handleEditRegularVillager(Player player, AbstractVillager villager) {
+		if (!player.isSneaking()) return false;
+		if ((Settings.editRegularVillagers && villager instanceof Villager)
+				|| (Settings.editRegularWanderingTraders && villager instanceof WanderingTrader)) {
+			Log.debug("  possible villager editor request ..");
+			// Open the villager editor:
+			// Silent request (fails if the player is missing the permission):
 			VillagerEditorHandler villagerEditor = new VillagerEditorHandler(villager);
-			SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(villagerEditor, player);
-		} else if ((isVillager && Settings.hireOtherVillagers) || (isWanderingTrader && Settings.hireWanderingTraders)) {
-			// Allow hiring of other villagers
-			Log.debug("  possible hire ..");
-			if (this.handleHireOtherVillager(player, villager)) {
-				// Hiring was successful. -> Prevent normal trading.
-				Log.debug("    ..success (normal trading prevented)");
-				event.setCancelled(true);
+			if (SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(villagerEditor, player, true)) {
+				Log.debug("    ..success (normal trading prevented).");
+				return true;
 			} else {
-				// Hiring was not successful. -> No preventing of normal villager trading.
-				Log.debug("    ..failed");
+				Log.debug("    ..no access (probably missing permission).");
 			}
 		}
+		return false;
 	}
 
 	// Returns false, if the player wasn't able to hire this villager.
 	private boolean handleHireOtherVillager(Player player, AbstractVillager villager) {
-		// Check if the player is allowed to remove (attack) the entity (in case the entity is protected by another
-		// plugin).
-		Log.debug("    checking villager access ..");
-		TestEntityDamageByEntityEvent fakeDamageEvent = new TestEntityDamageByEntityEvent(player, villager);
-		plugin.getServer().getPluginManager().callEvent(fakeDamageEvent);
-		if (fakeDamageEvent.isCancelled()) {
-			Log.debug("    no permission to remove villager");
+		if (!(Settings.hireOtherVillagers && villager instanceof Villager)
+				&& !(Settings.hireWanderingTraders && villager instanceof WanderingTrader)) {
 			return false;
 		}
+		Log.debug("  possible hire ..");
+
+		// Check if the player is allowed to remove (attack) the entity (in case the entity is protected by another
+		// plugin).
+		Log.debug("    checking villager access.");
+		if (!this.checkEntityAccess(player, villager)) {
+			Log.debug("    ..no permission to remove villager.");
+			return false;
+		}
+
 		// Hire him if holding his hiring item.
 		PlayerInventory playerInventory = player.getInventory();
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
@@ -108,50 +125,60 @@ public class VillagerInteractionListener implements Listener {
 					"costs", Settings.hireOtherVillagersCosts,
 					"hire-item", Settings.hireItem.getType().name()
 			); // TODO Also print required hire item name and lore?
+			Log.debug("    ..not holding hire item.");
 			return false;
-		} else {
-			// Check if the player has enough of those hiring items:
-			int costs = Settings.hireOtherVillagersCosts;
-			if (costs > 0) {
-				ItemStack[] storageContents = playerInventory.getStorageContents();
-				if (ItemUtils.containsAtLeast(storageContents, Settings.hireItem, costs)) {
-					Log.debug("  Villager hiring: the player has the needed amount of hiring items");
-					int inHandAmount = itemInMainHand.getAmount();
-					int remaining = inHandAmount - costs;
-					Log.debug(() -> "  Villager hiring: in hand=" + inHandAmount + " costs=" + costs + " remaining=" + remaining);
-					if (remaining > 0) {
-						itemInMainHand.setAmount(remaining);
-					} else { // remaining <= 0
-						playerInventory.setItemInMainHand(null); // Remove item in hand
-						if (remaining < 0) {
-							// Remove remaining costs from inventory:
-							ItemUtils.removeItems(storageContents, Settings.hireItem, -remaining);
-							// Apply the change to the player's inventory:
-							ItemUtils.setStorageContents(playerInventory, storageContents);
-						}
-					}
-				} else {
-					TextUtils.sendMessage(player, Settings.msgCantHire);
-					return false;
+		}
+
+		// Check if the player has enough of those hiring items:
+		final int costs = Settings.hireOtherVillagersCosts;
+		if (costs > 0) {
+			ItemStack[] storageContents = playerInventory.getStorageContents();
+			if (!ItemUtils.containsAtLeast(storageContents, Settings.hireItem, costs)) {
+				TextUtils.sendMessage(player, Settings.msgCantHire);
+				Log.debug("    ..not holding enough hire items.");
+				return false;
+			}
+
+			Log.debug("  Villager hiring: The player has the needed amount of hiring items.");
+			int inHandAmount = itemInMainHand.getAmount();
+			int remaining = inHandAmount - costs;
+			Log.debug(() -> "  Villager hiring: in hand=" + inHandAmount + " costs=" + costs + " remaining=" + remaining);
+			if (remaining > 0) {
+				itemInMainHand.setAmount(remaining);
+			} else { // remaining <= 0
+				playerInventory.setItemInMainHand(null); // Remove item in hand
+				if (remaining < 0) {
+					// Remove remaining costs from inventory:
+					ItemUtils.removeItems(storageContents, Settings.hireItem, -remaining);
+					// Apply the change to the player's inventory:
+					ItemUtils.setStorageContents(playerInventory, storageContents);
 				}
 			}
-
-			// Give player the shop creation item
-			ItemStack shopCreationItem = Settings.createShopCreationItem();
-			Map<Integer, ItemStack> remaining = playerInventory.addItem(shopCreationItem);
-			if (!remaining.isEmpty()) {
-				villager.getWorld().dropItem(villager.getLocation(), shopCreationItem);
-			}
-
-			// Remove the entity:
-			// Note: The leashed trader llamas for the wandering trader will break and the llamas will remain.
-			villager.remove();
-
-			// Update client's inventory:
-			player.updateInventory();
-
-			TextUtils.sendMessage(player, Settings.msgHired);
-			return true;
 		}
+
+		// Give player the shop creation item
+		ItemStack shopCreationItem = Settings.createShopCreationItem();
+		Map<Integer, ItemStack> remaining = playerInventory.addItem(shopCreationItem);
+		if (!remaining.isEmpty()) {
+			villager.getWorld().dropItem(villager.getLocation(), shopCreationItem);
+		}
+
+		// Remove the entity:
+		// Note: The leashed trader llamas for the wandering trader will break and the llamas will remain.
+		villager.remove();
+
+		// Update client's inventory:
+		player.updateInventory();
+
+		TextUtils.sendMessage(player, Settings.msgHired);
+		Log.debug("    ..success (normal trading prevented).");
+		return true;
+	}
+
+	// Returns true if the player can access (remove / attack) this entity.
+	private boolean checkEntityAccess(Player player, Entity entity) {
+		TestEntityDamageByEntityEvent fakeDamageEvent = new TestEntityDamageByEntityEvent(player, entity);
+		plugin.getServer().getPluginManager().callEvent(fakeDamageEvent);
+		return !fakeDamageEvent.isCancelled();
 	}
 }

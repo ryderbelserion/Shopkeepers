@@ -9,6 +9,7 @@ Date format: (YYYY-MM-DD)
 * Minor changes to handling failures when trying to create a shopkeeper via Citizens trait. We always inform the player (if there is one), log a warning and delete the trait again now.
 * Config: Added some more examples for the 'name-regex' setting to the default config.
 * Fixed: Some messages would print an empty line when set to an empty text, instead of being disabled.
+* Changed: Players without the permission to edit regular villagers will silently access the regular trading interface now when they sneak and right-click a regular villager.
 
 API:  
 * PlayerOpenUIEvent indicates whether the UI request has been silent now.
