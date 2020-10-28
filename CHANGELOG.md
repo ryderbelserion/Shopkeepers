@@ -10,6 +10,7 @@ Date format: (YYYY-MM-DD)
 * Config: Added some more examples for the 'name-regex' setting to the default config.
 * Fixed: Some messages would print an empty line when set to an empty text, instead of being disabled.
 * Changed: Players without the permission to edit regular villagers will silently access the regular trading interface now when they sneak and right-click a regular villager.
+* Fixed: The Towny integration could run into a NPE when checking if a location is within a commercial area.
 
 API:  
 * PlayerOpenUIEvent indicates whether the UI request has been silent now.

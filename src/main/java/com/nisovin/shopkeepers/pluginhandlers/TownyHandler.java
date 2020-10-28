@@ -4,9 +4,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.plugin.Plugin;
 
+import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownBlockType;
-import com.palmergames.bukkit.towny.object.TownyUniverse;
 
 public class TownyHandler {
 
@@ -22,8 +22,8 @@ public class TownyHandler {
 
 	public static boolean isCommercialArea(Location location) {
 		if (!isPluginEnabled()) return false;
-		TownBlock townBlock = TownyUniverse.getTownBlock(location);
-		return (townBlock.getType() == TownBlockType.COMMERCIAL);
+		TownBlock townBlock = TownyAPI.getInstance().getTownBlock(location);
+		return (townBlock != null && townBlock.getType() == TownBlockType.COMMERCIAL);
 	}
 
 	private TownyHandler() {
