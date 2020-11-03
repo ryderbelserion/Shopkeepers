@@ -65,6 +65,7 @@
 		<module>modules/v1_15_R1</module>
 		<module>modules/v1_16_R1</module>
 		<module>modules/v1_16_R2</module>
+		<module>modules/v1_16_R3</module>
 		<module>modules/dist</module>
 	</modules>
 

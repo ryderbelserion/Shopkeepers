@@ -115,6 +115,13 @@
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>sk-v1_16_R3</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+			<scope>provided</scope>
+		</dependency>
 		<!-- Includes the API -->
 		<dependency>
 			<groupId>${project.groupId}</groupId>

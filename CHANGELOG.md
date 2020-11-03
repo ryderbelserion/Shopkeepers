@@ -1,9 +1,14 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.11.1 (TBA)
-### Supported MC versions: 1.16.2, 1.16.1, 1.15.2, 1.14.4
+## v2.12.1 (TBA)
+### Supported MC versions: 1.16.4, 1.16.3, 1.16.2, 1.16.1, 1.15.2, 1.14.4
 
+
+## v2.12.0 (2020-11-04)
+### Supported MC versions: 1.16.4, 1.16.3, 1.16.2, 1.16.1, 1.15.2, 1.14.4
+
+* Updated for MC 1.16.4.
 * Bumped Towny dependency to 0.96.2.0 and using Jitpack repository for it now.
 * Fixed: Creating shopkeepers via Citizens trait failed previously if the block at the spawn location is not passable (eg. when the Citizens NPC stands on a non-full block such as carpet).
 * Minor changes to handling failures when trying to create a shopkeeper via Citizens trait. We always inform the player (if there is one), log a warning and delete the trait again now.
@@ -24,7 +29,7 @@ Internal:
 * Editor UIs are setup lazily now, only when required for the first time.
 
 ## v2.11.0 (2020-08-13)
-### Supported MC versions: 1.16.2, 1.16.1, 1.15.2, 1.14.4
+### Supported MC versions: 1.16.3, 1.16.2, 1.16.1, 1.15.2, 1.14.4
 
 Update for MC 1.16.2:  
 * Config: Added piglin brute to the by default enabled mob types. If you are updating, you will have to manually enable this yourself.
