@@ -2,8 +2,10 @@ package com.nisovin.shopkeepers.storage;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -180,7 +182,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	}
 
 	private File getSaveFile() {
-		return new File(plugin.getDataFolder(), "save.yml");
+		return new File(plugin.getSKDataFolder(), "save.yml");
 	}
 
 	private File getTempSaveFile() {
@@ -265,6 +267,50 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	// LOADING
 
+	// We previously stored the save file within the plugin's root folder. If no save file exist at the expected
+	// location, we check the old save file location and migrate the save file if it is found.
+	private File getOldSaveFile() {
+		return new File(plugin.getDataFolder(), "save.yml");
+	}
+
+	private File getOldTempSaveFile() {
+		File saveFile = this.getOldSaveFile();
+		return new File(saveFile.getParentFile(), saveFile.getName() + ".temp");
+	}
+
+	// Returns false if the migration failed.
+	// Returns true if the migration succeeded or there is no old save file to migrate.
+	private boolean migrateOldSaveFile() {
+		File oldSaveFile = this.getOldSaveFile();
+		if (!oldSaveFile.exists()) {
+			File oldTempSaveFile = this.getOldTempSaveFile();
+			if (oldTempSaveFile.exists()) {
+				// Load from old temporary save file instead:
+				Log.warning("Found no old save file, but an existing old temporary save file! (" + oldTempSaveFile.getName() + ")");
+				Log.warning("This might indicate an issue during a previous saving attempt!");
+				Log.warning("We try to migrate this temporary save file instead!");
+
+				oldSaveFile = oldTempSaveFile;
+			} else {
+				// No save file found that needs to be migrated.
+				return true;
+			}
+		}
+
+		// Move old save file to new location:
+		File saveFile = this.getSaveFile();
+		Log.info("Migrating old save file (" + oldSaveFile.getName() + ") to new location ("
+				+ saveFile.getParentFile().getName() + "/" + saveFile.getName() + ")!");
+		try {
+			Files.move(oldSaveFile.toPath(), saveFile.toPath());
+		} catch (IOException e) {
+			Log.severe("Failed to migrate old save file! (" + oldSaveFile.getName() + ")", e);
+			return false;
+		}
+		// Migration succeeded:
+		return true;
+	}
+
 	// Returns true on success, and false if there was some severe issue during loading.
 	public boolean reload() {
 		if (currentlyLoading) {
@@ -300,12 +346,16 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				// Load from temporary save file instead:
 				Log.warning("Found no save file, but an existing temporary save file! (" + tempSaveFile.getName() + ")");
 				Log.warning("This might indicate an issue during a previous saving attempt!");
-				Log.warning("Trying to load the shopkeepers data from this temporary save file instead!");
+				Log.warning("We try to load the Shopkeepers data from this temporary save file instead!");
 
 				saveFile = tempSaveFile;
-			} else {
-				// The save file does not exist yet -> no shopkeeper data available.
-				// Silently the setup data version and abort:
+			} else if (!this.migrateOldSaveFile()) {
+				// Migration of old save file failed:
+				return false; // Disable without save
+			} else if (!saveFile.exists()) {
+				// No save file exists yet (even after checking for it again, after the migration) -> No shopkeeper data
+				// available.
+				// We silently setup the data version and abort:
 				saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombinded());
 				return true;
 			}

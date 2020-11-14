@@ -4,6 +4,12 @@ Date format: (YYYY-MM-DD)
 ## v2.12.1 (TBA)
 ### Supported MC versions: 1.16.4, 1.16.3, 1.16.2, 1.16.1, 1.15.2, 1.14.4
 
+Migration notes:  
+* The folder structure has changed:
+  * The save file and trading logs (if enabled) are stored inside a new 'data' folder now.
+  * If no save file exists at the new location and a previous save file is found at the old location, it is automatically moved.
+  * Custom language files need to be located inside a new 'lang' folder now.
+  * Existing custom language files need to be manually moved!
 
 ## v2.12.0 (2020-11-04)
 ### Supported MC versions: 1.16.4, 1.16.3, 1.16.2, 1.16.1, 1.15.2, 1.14.4

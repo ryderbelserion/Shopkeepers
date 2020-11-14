@@ -86,6 +86,8 @@ import com.nisovin.shopkeepers.villagers.VillagerInteractionListener;
 public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin {
 
 	private static final int ASYNC_TASKS_TIMEOUT_SECONDS = 10;
+	private static final String dataFolder = "data";
+	private static final String langFolder = "lang";
 
 	private static SKShopkeepersPlugin plugin;
 
@@ -197,7 +199,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// Load language config:
 		String lang = Settings.language;
 		String langFileName = "language-" + lang + ".yml";
-		File langFile = new File(this.getDataFolder(), langFileName);
+		File langFile = new File(this.getSKLangFolder(), langFileName);
 		if (!langFile.exists() && this.getResource(langFileName) != null) {
 			this.saveResource(langFileName, false);
 		}
@@ -258,6 +260,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			return;
 		}
 
+		// Create folder structure:
+		this.createFolderStructure();
+
 		// Load language file:
 		this.loadLanguageFile();
 
@@ -308,6 +313,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			return;
 		}
 
+		// Create folder structure (if not already done during onLoad):
+		if (!alreadySetup) {
+			this.createFolderStructure();
+		}
+
 		// Load language file (if not already loaded during onLoad):
 		if (!alreadySetup) {
 			this.loadLanguageFile();
@@ -354,7 +364,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new TradingCountListener(this), this);
-		pm.registerEvents(new TradeFileLogger(this.getDataFolder()), this);
+		pm.registerEvents(new TradeFileLogger(this.getSKDataFolder()), this);
 
 		// DEFAULT SHOP OBJECT TYPES
 
@@ -542,6 +552,21 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopkeeperNaming.onPlayerQuit(player);
 		shopkeeperCreation.onPlayerQuit(player);
 		commands.onPlayerQuit(player);
+	}
+
+	// FOLDER STRUCTURE
+
+	public File getSKDataFolder() {
+		return new File(this.getDataFolder(), dataFolder);
+	}
+
+	public File getSKLangFolder() {
+		return new File(this.getDataFolder(), langFolder);
+	}
+
+	private void createFolderStructure() {
+		this.getSKDataFolder().mkdirs();
+		this.getSKLangFolder().mkdirs();
 	}
 
 	// SHOPKEEPER REGISTRY
