@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -363,6 +364,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	protected ItemStack getSignTypeEditorItem() {
 		ItemStack iconItem = new ItemStack(signType.getSignMaterial());
-		return ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonSignVariant, Settings.msgButtonSignVariantLore);
+		return ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonSignVariant, Messages.buttonSignVariantLore);
 	}
 }

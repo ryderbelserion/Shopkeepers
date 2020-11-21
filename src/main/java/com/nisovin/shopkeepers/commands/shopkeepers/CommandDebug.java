@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.commands.shopkeepers;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.Command;
@@ -19,7 +20,7 @@ class CommandDebug extends Command {
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
 		// Set description:
-		this.setDescription(Settings.msgCommandDescriptionDebug);
+		this.setDescription(Messages.commandDescriptionDebug);
 	}
 
 	@Override

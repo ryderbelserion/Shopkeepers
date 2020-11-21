@@ -9,6 +9,7 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -93,7 +94,7 @@ public class ItemConversions {
 
 		// Inform player:
 		if (convertedStacks > 0 && informPlayer) {
-			TextUtils.sendMessage(player, Settings.msgItemsConverted,
+			TextUtils.sendMessage(player, Messages.itemsConverted,
 					"count", convertedStacks
 			);
 		}

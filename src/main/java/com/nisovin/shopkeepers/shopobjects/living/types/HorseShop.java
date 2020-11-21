@@ -15,7 +15,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.Property;
@@ -140,7 +140,7 @@ public class HorseShop extends BabyableShop<Horse> {
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE);
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonHorseColor, Settings.msgButtonHorseColorLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonHorseColor, Messages.buttonHorseColorLore);
 		return iconItem;
 	}
 
@@ -184,7 +184,7 @@ public class HorseShop extends BabyableShop<Horse> {
 		meta.addPattern(new Pattern(DyeColor.BROWN, PatternType.TRIANGLES_BOTTOM));
 		meta.addPattern(new Pattern(DyeColor.BROWN, PatternType.TRIANGLES_TOP));
 		iconItem.setItemMeta(meta);
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonHorseStyle, Settings.msgButtonHorseStyleLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonHorseStyle, Messages.buttonHorseStyleLore);
 		return iconItem;
 	}
 
@@ -223,7 +223,7 @@ public class HorseShop extends BabyableShop<Horse> {
 
 	private ItemStack getArmorEditorItem() {
 		ItemStack iconItem = new ItemStack(armor == null ? Material.BARRIER : armor.getMaterial());
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonHorseArmor, Settings.msgButtonHorseArmorLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonHorseArmor, Messages.buttonHorseArmorLore);
 		return iconItem;
 	}
 

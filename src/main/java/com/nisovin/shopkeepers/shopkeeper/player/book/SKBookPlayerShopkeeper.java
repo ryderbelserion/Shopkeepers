@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
@@ -199,7 +199,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		ItemStack item = new ItemStack(Material.WRITTEN_BOOK, 1);
 		BookMeta meta = (BookMeta) item.getItemMeta();
 		meta.setTitle(title);
-		meta.setAuthor(Settings.msgUnknownBookAuthor);
+		meta.setAuthor(Messages.unknownBookAuthor);
 		meta.setGeneration(Generation.TATTERED);
 		item.setItemMeta(meta);
 		return item;

@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -75,7 +75,7 @@ public class Confirmations {
 
 		int taskId = Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			this.endConfirmation(sender);
-			TextUtils.sendMessage(sender, Settings.msgConfirmationExpired);
+			TextUtils.sendMessage(sender, Messages.confirmationExpired);
 		}, timeoutTicks).getTaskId();
 
 		ConfirmEntry oldEntry = confirming.put(this.getSenderKey(sender), new ConfirmEntry(action, taskId));
@@ -106,7 +106,7 @@ public class Confirmations {
 			// Execute confirmed action:
 			action.run();
 		} else {
-			TextUtils.sendMessage(sender, Settings.msgNothingToConfirm);
+			TextUtils.sendMessage(sender, Messages.nothingToConfirm);
 		}
 	}
 }

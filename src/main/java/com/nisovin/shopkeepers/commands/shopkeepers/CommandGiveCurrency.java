@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.Command;
@@ -37,7 +38,7 @@ class CommandGiveCurrency extends Command {
 		this.setPermission(ShopkeepersPlugin.GIVE_CURRENCY_PERMISSION);
 
 		// Set description:
-		this.setDescription(Settings.msgCommandDescriptionGiveCurrency);
+		this.setDescription(Messages.commandDescriptionGiveCurrency);
 
 		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
@@ -64,7 +65,7 @@ class CommandGiveCurrency extends Command {
 			assert ARGUMENT_CURRENCY_HIGH.equals(currencyType);
 			lowCurrency = false;
 			if (!Settings.isHighCurrencyEnabled()) {
-				TextUtils.sendMessage(sender, Settings.msgHighCurrencyDisabled);
+				TextUtils.sendMessage(sender, Messages.highCurrencyDisabled);
 				return;
 			}
 		}
@@ -95,24 +96,24 @@ class CommandGiveCurrency extends Command {
 		// TODO Show currency item via hover text?
 		if (lowCurrency) {
 			// Inform target player:
-			TextUtils.sendMessage(targetPlayer, Settings.msgCurrencyItemsReceived,
+			TextUtils.sendMessage(targetPlayer, Messages.currencyItemsReceived,
 					"amount", amount
 			);
 			if (!targetSelf) {
 				// Inform command executor:
-				TextUtils.sendMessage(sender, Settings.msgCurrencyItemsGiven,
+				TextUtils.sendMessage(sender, Messages.currencyItemsGiven,
 						"player", TextUtils.getPlayerText(targetPlayer),
 						"amount", amount
 				);
 			}
 		} else {
 			// Inform target player:
-			TextUtils.sendMessage(targetPlayer, Settings.msgHighCurrencyItemsReceived,
+			TextUtils.sendMessage(targetPlayer, Messages.highCurrencyItemsReceived,
 					"amount", amount
 			);
 			if (!targetSelf) {
 				// Inform command executor:
-				TextUtils.sendMessage(sender, Settings.msgHighCurrencyItemsGiven,
+				TextUtils.sendMessage(sender, Messages.highCurrencyItemsGiven,
 						"player", TextUtils.getPlayerText(targetPlayer),
 						"amount", amount
 				);

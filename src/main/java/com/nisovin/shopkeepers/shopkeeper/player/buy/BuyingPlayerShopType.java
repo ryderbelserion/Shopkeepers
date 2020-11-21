@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
@@ -20,22 +20,22 @@ public class BuyingPlayerShopType extends AbstractPlayerShopType<SKBuyingPlayerS
 
 	@Override
 	public String getDisplayName() {
-		return Settings.msgShopTypeBuying;
+		return Messages.shopTypeBuying;
 	}
 
 	@Override
 	public String getDescription() {
-		return Settings.msgShopTypeDescBuying;
+		return Messages.shopTypeDescBuying;
 	}
 
 	@Override
 	public String getSetupDescription() {
-		return Settings.msgShopSetupDescBuying;
+		return Messages.shopSetupDescBuying;
 	}
 
 	@Override
 	public List<String> getTradeSetupDescription() {
-		return Settings.msgTradeSetupDescBuying;
+		return Messages.tradeSetupDescBuying;
 	}
 
 	@Override

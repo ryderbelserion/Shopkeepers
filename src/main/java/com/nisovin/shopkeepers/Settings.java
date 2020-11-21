@@ -1,16 +1,21 @@
 package com.nisovin.shopkeepers;
 
+import static com.nisovin.shopkeepers.config.ConfigHelper.loadConfigValue;
+import static com.nisovin.shopkeepers.config.ConfigHelper.setConfigValue;
+import static com.nisovin.shopkeepers.config.ConfigHelper.toConfigKey;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -21,14 +26,11 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.config.ConfigLoadException;
 import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
-import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class Settings {
@@ -97,7 +99,7 @@ public class Settings {
 	/*
 	 * General Settings
 	 */
-	public static int configVersion = 3;
+	public static int configVersion = 4;
 	public static boolean debug = false;
 	// See DebugOptions for all available options.
 	public static List<String> debugOptions = new ArrayList<>(0);
@@ -305,285 +307,15 @@ public class Settings {
 	/*
 	 * Messages
 	 */
-	public static String language = "en";
-
-	// TODO Replace all with Text? Will require converting back to String, especially for texts used by items.
-	public static String msgShopTypeAdminRegular = "Admin shop";
-	public static String msgShopTypeSelling = "Selling shop";
-	public static String msgShopTypeBuying = "Buying shop";
-	public static String msgShopTypeTrading = "Trading shop";
-	public static String msgShopTypeBook = "Book shop";
-
-	public static String msgShopTypeDescAdminRegular = "has unlimited stock";
-	public static String msgShopTypeDescSelling = "sells items to players";
-	public static String msgShopTypeDescBuying = "buys items from players";
-	public static String msgShopTypeDescTrading = "trades items with players";
-	public static String msgShopTypeDescBook = "sells book copies";
-
-	public static String msgShopObjectTypeLiving = "{type}";
-	public static String msgShopObjectTypeSign = "sign";
-	public static String msgShopObjectTypeNpc = "npc";
-
-	public static Text msgSelectedShopType = Text.parse("&aSelected shop type: &6{type} &7({description})");
-	public static Text msgSelectedShopObjectType = Text.parse("&aSelected object type: &6{type}");
-
-	public static Text msgCreationItemSelected = Text.parse("&aShop creation:\n"
-			+ "&e  Left/Right-click to select the shop type.\n"
-			+ "&e  Sneak + left/right-click to select the object type.\n"
-			+ "&e  Right-click a container to select it.\n"
-			+ "&e  Then right-click a block to place the shopkeeper.");
-
-	public static String msgButtonPreviousPage = "&6<- Previous page ({prev_page} of {max_page})";
-	public static List<String> msgButtonPreviousPageLore = Arrays.asList();
-	public static String msgButtonNextPage = "&6Next page ({next_page} of {max_page}) ->";
-	public static List<String> msgButtonNextPageLore = Arrays.asList();
-	public static String msgButtonCurrentPage = "&6Page {page} of {max_page}";
-	public static List<String> msgButtonCurrentPageLore = Arrays.asList();
-
-	public static String msgButtonName = "&aSet shop name";
-	public static List<String> msgButtonNameLore = Arrays.asList("Lets you rename", "your shopkeeper");
-	public static String msgButtonContainer = "&aView shop inventory";
-	public static List<String> msgButtonContainerLore = Arrays.asList("Lets you view the inventory", " your shopkeeper is using");
-	public static String msgButtonDelete = "&4Delete";
-	public static List<String> msgButtonDeleteLore = Arrays.asList("Closes and removes", "this shopkeeper");
-	public static String msgButtonHire = "&aHire";
-	public static List<String> msgButtonHireLore = Arrays.asList("Buy this shop");
-
-	public static String msgButtonSignVariant = "&aChoose sign variant";
-	public static List<String> msgButtonSignVariantLore = Arrays.asList("Changes the sign's", "wood type");
-	public static String msgButtonBaby = "&aToggle baby variant";
-	public static List<String> msgButtonBabyLore = Arrays.asList("Toggles between the mob's", "baby and adult variant");
-	public static String msgButtonSitting = "&aToggle sitting pose";
-	public static List<String> msgButtonSittingLore = Arrays.asList("Toggles the mob's", "sitting pose");
-	public static String msgButtonCatVariant = "&aChoose cat variant";
-	public static List<String> msgButtonCatVariantLore = Arrays.asList("Changes the cat's look");
-	public static String msgButtonRabbitVariant = "&aChoose rabbit variant";
-	public static List<String> msgButtonRabbitVariantLore = Arrays.asList("Changes the rabbit's look");
-	public static String msgButtonCollarColor = "&aChoose collar color";
-	public static List<String> msgButtonCollarColorLore = Arrays.asList("Changes the mob's", "collar color");
-	public static String msgButtonWolfAngry = "&aToggle angry wolf";
-	public static List<String> msgButtonWolfAngryLore = Arrays.asList("Toggles the wolf's", "angry state");
-	public static String msgButtonCarryingChest = "&aToggle carrying chest";
-	public static List<String> msgButtonCarryingChestLore = Arrays.asList("Toggles whether the mob", "is carrying a chest");
-	public static String msgButtonHorseColor = "&aChoose horse color";
-	public static List<String> msgButtonHorseColorLore = Arrays.asList("Changes the color", "of the horse");
-	public static String msgButtonHorseStyle = "&aChoose horse style";
-	public static List<String> msgButtonHorseStyleLore = Arrays.asList("Changes the coat pattern", "of the horse");
-	public static String msgButtonHorseArmor = "&aChoose horse armor";
-	public static List<String> msgButtonHorseArmorLore = Arrays.asList("Changes the armor", "of the horse");
-	public static String msgButtonLlamaVariant = "&aChoose llama variant";
-	public static List<String> msgButtonLlamaVariantLore = Arrays.asList("Changes the llama's look");
-	public static String msgButtonLlamaCarpetColor = "&aLlama carpet color";
-	public static List<String> msgButtonLlamaCarpetColorLore = Arrays.asList("Changes the llama's", "carpet color");
-	public static String msgButtonCreeperCharged = "&aToggle charged creeper";
-	public static List<String> msgButtonCreeperChargedLore = Arrays.asList("Toggles the creeper's", "charged state");
-	public static String msgButtonFoxVariant = "&aChoose fox variant";
-	public static List<String> msgButtonFoxVariantLore = Arrays.asList("Changes the fox's look");
-	public static String msgButtonFoxCrouching = "&aToggle crouching pose";
-	public static List<String> msgButtonFoxCrouchingLore = Arrays.asList("Toggles the fox's", "crouching pose");
-	public static String msgButtonFoxSleeping = "&aToggle sleeping pose";
-	public static List<String> msgButtonFoxSleepingLore = Arrays.asList("Toggles the fox's", "sleeping pose");
-	public static String msgButtonMooshroomVariant = "&aChoose mooshroom variant";
-	public static List<String> msgButtonMooshroomVariantLore = Arrays.asList("Changes the look", "of the mooshroom");
-	public static String msgButtonPandaVariant = "&aChoose panda variant";
-	public static List<String> msgButtonPandaVariantLore = Arrays.asList("Changes the panda's look");
-	public static String msgButtonParrotVariant = "&aChoose parrot variant";
-	public static List<String> msgButtonParrotVariantLore = Arrays.asList("Changes the parrot's look");
-	public static String msgButtonPigSaddle = "&aToggle pig saddle";
-	public static List<String> msgButtonPigSaddleLore = Arrays.asList("Toggles the pig's saddle");
-	public static String msgButtonSheepColor = "&aChoose sheep color";
-	public static List<String> msgButtonSheepColorLore = Arrays.asList("Changes the sheep's", "wool color");
-	public static String msgButtonSheepSheared = "&aToggle sheared sheep";
-	public static List<String> msgButtonSheepShearedLore = Arrays.asList("Toggles the sheep's", "sheared state");
-	public static String msgButtonVillagerProfession = "&aChoose villager profession";
-	public static List<String> msgButtonVillagerProfessionLore = Arrays.asList("Changes the profession", "of the villager");
-	public static String msgButtonVillagerVariant = "&aChoose villager variant";
-	public static List<String> msgButtonVillagerVariantLore = Arrays.asList("Changes the look", "of the villager");
-	public static String msgButtonVillagerLevel = "&aChoose villager badge color";
-	public static List<String> msgButtonVillagerLevelLore = Arrays.asList("Changes the badge color", "of the villager");
-	public static String msgButtonZombieVillagerProfession = "&aChoose villager profession";
-	public static List<String> msgButtonZombieVillagerProfessionLore = Arrays.asList("Changes the profession", "of the zombie villager");
-	public static String msgButtonSlimeSize = "&aChoose slime size";
-	public static List<String> msgButtonSlimeSizeLore = Arrays.asList("Cycles the slime's size.", "Current size: &e{size}");
-	public static String msgButtonMagmaCubeSize = "&aChoose magma cube size";
-	public static List<String> msgButtonMagmaCubeSizeLore = Arrays.asList("Cycles the magma cube's size.", "Current size: &e{size}");
-
-	public static String msgTradingTitlePrefix = "&2";
-	public static String msgTradingTitleDefault = "Shopkeeper";
-
-	public static Text msgContainerSelected = Text.parse("&aContainer selected! Right-click a block to place your shopkeeper.");
-	public static Text msgUnsupportedContainer = Text.parse("&7This type of container cannot be used for shops.");
-	public static Text msgMustSelectContainer = Text.parse("&7You must right-click a container before placing your shopkeeper.");
-	public static Text msgInvalidContainer = Text.parse("&7The selected block is not a valid container!");
-	public static Text msgContainerTooFarAway = Text.parse("&7The shopkeeper's container is too far away!");
-	public static Text msgContainerNotPlaced = Text.parse("&7You must select a container you have recently placed!");
-	public static Text msgContainerAlreadyInUse = Text.parse("&7Another shopkeeper is already using the selected container!");
-	public static Text msgNoContainerAccess = Text.parse("&7You cannot access the selected container!");
-	public static Text msgTooManyShops = Text.parse("&7You have too many shops!");
-	public static Text msgNoAdminShopTypeSelected = Text.parse("&7You have to select an admin shop type!");
-	public static Text msgNoPlayerShopTypeSelected = Text.parse("&7You have to select a player shop type!");
-	public static Text msgShopCreateFail = Text.parse("&7You cannot create a shopkeeper there.");
-
-	public static Text msgTypeNewName = Text.parse("&aPlease type the shop's name into the chat.\n"
-			+ "  &aType a dash (-) to remove the name.");
-	public static Text msgNameSet = Text.parse("&aThe shop's name has been set!");
-	public static Text msgNameHasNotChanged = Text.parse("&aThe shop's name has not changed.");
-	public static Text msgNameInvalid = Text.parse("&aThat name is not valid!");
-
-	public static Text msgShopTypeDisabled = Text.parse("&7The shop type '&6{type}&7' is disabled.");
-	public static Text msgShopObjectTypeDisabled = Text.parse("&7The shop object type '&6{type}&7' is disabled.");
-
-	public static Text msgMustTargetShop = Text.parse("&7You have to target a shopkeeper.");
-	public static Text msgMustTargetAdminShop = Text.parse("&7You have to target an admin shopkeeper.");
-	public static Text msgMustTargetPlayerShop = Text.parse("&7You have to target a player shopkeeper.");
-	public static Text msgTargetEntityIsNoShop = Text.parse("&7The targeted entity is no shopkeeper.");
-	public static Text msgTargetShopIsNoAdminShop = Text.parse("&7The targeted shopkeeper is no admin shopkeeper.");
-	public static Text msgTargetShopIsNoPlayerShop = Text.parse("&7The targeted shopkeeper is no player shopkeeper.");
-	public static Text msgUnusedContainer = Text.parse("&7No shopkeeper is using this container.");
-	public static Text msgNotOwner = Text.parse("&7You are not the owner of this shopkeeper.");
-	// Placeholders: {owner} -> new owners name
-	public static Text msgOwnerSet = Text.parse("&aNew owner was set to &e{owner}");
-	public static Text msgShopCreationItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!");
-	public static Text msgShopCreationItemsReceived = Text.parse("&aYou have received &e{amount}&a shop creation item(s)!");
-	public static Text msgCurrencyItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a currency item(s)!");
-	public static Text msgCurrencyItemsReceived = Text.parse("&aYou have received &e{amount}&a currency item(s)!");
-	public static Text msgHighCurrencyItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a high currency item(s)!");
-	public static Text msgHighCurrencyItemsReceived = Text.parse("&aYou have received &e{amount}&a high currency item(s)!");
-	public static Text msgHighCurrencyDisabled = Text.parse("&cThe high currency is disabled!");
-	public static Text msgItemsConverted = Text.parse("&aConverted &e{count}&a item stack(s)!");
-	public static String msgUnknownBookAuthor = "Unknown";
-
-	public static Text msgTradePermSet = Text.parse("&aThe shop's trading permission has been set to '&e{perm}&a'!");
-	public static Text msgTradePermRemoved = Text.parse("&aThe shop's trading permission '&e{perm}&a' has been removed!");
-	public static Text msgTradePermView = Text.parse("&aThe shop's current trading permission is '&e{perm}&a'.");
-
-	public static Text msgZombieVillagerCuringDisabled = Text.parse("&7Curing of zombie villagers is disabled.");
-	public static Text msgMustHoldHireItem = Text.parse("&7You have to hold the required hire item in your hand.");
-	public static Text msgSetForHire = Text.parse("&aThe Shopkeeper was set for hire.");
-	public static Text msgHired = Text.parse("&aYou have hired this shopkeeper!");
-	public static Text msgMissingHirePerm = Text.parse("&7You do not have the permission to hire shopkeepers.");
-	public static Text msgCantHire = Text.parse("&aYou cannot afford to hire this shopkeeper.");
-	public static Text msgCantHireShopType = Text.parse("&7You do not have the permission to hire this type of shopkeeper.");
-	// Placeholders: {costs}, {hire-item}
-	public static Text msgVillagerForHire = Text.parse("&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a.");
-
-	public static Text msgMissingTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
-	public static Text msgMissingCustomTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
-	public static Text msgCantTradeWithOwnShop = Text.parse("&7You cannot trade with your own shop.");
-	public static Text msgCantTradeWhileOwnerOnline = Text.parse("&7You cannot trade while the owner of this shop ('&e{owner}&7') is online.");
-	public static Text msgCantTradeWithShopMissingContainer = Text.parse("&7You cannot trade with this shop, because its container is missing.");
-
-	public static Text msgShopkeeperCreated = Text.parse("&aShopkeeper created: &6{type} &7({description})\n{setupDesc}");
-
-	public static String msgShopSetupDescSelling = "&e  Add items you want to sell to your container, then\n"
-			+ "&e  right-click the shop while sneaking to modify costs.";
-	public static String msgShopSetupDescBuying = "&e  Add one of each item you want to buy to your container,\n"
-			+ "&e  then right-click the shop while sneaking to modify costs.";
-	public static String msgShopSetupDescTrading = "&e  Add items you want to sell to your container, then\n"
-			+ "&e  right-click the shop while sneaking to modify costs.";
-	public static String msgShopSetupDescBook = "&e  Add written books and blank books to your container, then\n"
-			+ "&e  right-click the shop while sneaking to modify costs.";
-	public static String msgShopSetupDescAdminRegular = "&e  Right-click the shop while sneaking to modify trades.";
-
-	public static String msgTradeSetupDescHeader = "&6{shopType}";
-	public static List<String> msgTradeSetupDescAdminRegular = Arrays.asList("Has unlimited stock.", "Insert items from your inventory.", "Top row: Result items", "Bottom rows: Cost items");
-	public static List<String> msgTradeSetupDescSelling = Arrays.asList("Sells items.", "Insert items to sell into the container.", "Left/Right click to adjust amounts.", "Top row: Items being sold", "Bottom rows: Cost items");
-	public static List<String> msgTradeSetupDescBuying = Arrays.asList("Buys items.", "Insert one of each item you want to", "buy and plenty of currency items", "into the container.", "Left/Right click to adjust amounts.", "Top row: Cost items", "Bottom row: Items being bought");
-	public static List<String> msgTradeSetupDescTrading = Arrays.asList("Trades items.", "Pickup an item from your inventory", "and then click a slot to place it.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items");
-	public static List<String> msgTradeSetupDescBook = Arrays.asList("Sells book copies.", "Insert written and blank books", "into the container.", "Left/Right click to adjust costs.", "Top row: Books being sold", "Bottom rows: Cost items");
-
-	public static Text msgMissingEditVillagersPerm = Text.parse("&7You do not have the permission to edit villagers.");
-	public static Text msgMissingEditWanderingTradersPerm = Text.parse("&7You do not have the permission to edit wandering traders.");
-	public static Text msgMustTargetEntity = Text.parse("&7You have to target an entity.");
-	public static Text msgMustTargetVillager = Text.parse("&7You have to target a villager.");
-	public static Text msgTargetEntityIsNoVillager = Text.parse("&7The targeted entity is no regular villager.");
-
-	public static String msgVillagerEditorTitle = "&aVillager Editor: &e{villagerName}";
-	public static String msgVillagerEditorDescriptionHeader = "&6Villager Editor";
-	public static List<String> msgVillagerEditorDescription = Arrays.asList(
-			"Top row: Result items",
-			"Bottom rows: Cost items",
-			"Edited trades have infinite",
-			"uses and no XP rewards."
-	);
-
-	public static String msgButtonDeleteVillager = "&4Delete";
-	public static List<String> msgButtonDeleteVillagerLore = Arrays.asList("Deletes the villager");
-	public static String msgButtonVillagerInventory = "&aView villager inventory";
-	public static List<String> msgButtonVillagerInventoryLore = Arrays.asList(
-			"Lets you view a copy of",
-			"the villager's inventory"
-	);
-	public static String msgButtonMobAi = "&aToggle mob AI";
-	public static List<String> msgButtonMobAiLore = Arrays.asList("Toggles the mob's AI");
-
-	public static String msgVillagerInventoryTitle = "Villager inventory (copy)";
-	public static String msgSetVillagerXp = "&aSet the villager's XP to &e{xp}";
-	public static String msgNoVillagerTradesChanged = "&aNo trades have been changed.";
-	public static String msgVillagerTradesChanged = "&e{changedTrades}&a trades have been changed.";
-
-	public static Text msgListAdminShopsHeader = Text.parse("&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})");
-	public static Text msgListAllShopsHeader = Text.parse("&9There are &e{shopsCount} &9shops in total: &e(Page {page} of {maxPage})");
-	public static Text msgListPlayerShopsHeader = Text.parse("&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})");
-	public static Text msgListShopsEntry = Text.parse("  &e{shopId}) &7{shopName}&r&8at &7({location})&8, type: &7{shopType}&8, object: &7{objectType}");
-
-	public static Text msgRemovedAdminShops = Text.parse("&e{shopsCount} &aadmin shops were removed.");
-	public static Text msgRemovedShopsOfPlayer = Text.parse("&e{shopsCount} &ashops of player '&e{player}&a' were removed.");
-	public static Text msgRemovedPlayerShops = Text.parse("&e{shopsCount} &aplayer shops were removed.");
-
-	public static Text msgConfirmRemoveAllAdminShops = Text.parse("&cYou are about to irrevocable remove all admin shops (&6{shopsCount}&c)!");
-	public static Text msgConfirmRemoveAllOwnShops = Text.parse("&cYou are about to irrevocable remove all your shops (&6{shopsCount}&c)!");
-	public static Text msgConfirmRemoveAllShopsOfPlayer = Text.parse("&cYou are about to irrevocable remove all shops of player &6{player}&c (&6{shopsCount}&c)!");
-	public static Text msgConfirmRemoveAllPlayerShops = Text.parse("&cYou are about to irrevocable remove all player shops of all players (&6{shopsCount}&c)!");
-
-	public static Text msgConfirmationRequired = Text.parse("&7Please confirm this action by typing &6/shopkeepers confirm");
-	public static Text msgConfirmationExpired = Text.parse("&cConfirmation expired.");
-	public static Text msgNothingToConfirm = Text.parse("&cThere is nothing to confirm currently.");
-
-	public static Text msgNoPermission = Text.parse("&cYou don't have the permission to do that.");
-
-	public static Text msgCommandUnknown = Text.parse("&cUnknown command '&e{command}&c'!");
-	public static Text msgCommandArgumentUnexpected = Text.parse("&cUnexpected argument '&e{argument}&c'.");
-	public static Text msgCommandArgumentRequiresPlayer = Text.parse("&cArgument '&e{argumentFormat}&c' requires a player to execute the command.");
-	public static Text msgCommandArgumentMissing = Text.parse("&cMissing argument '&e{argumentFormat}&c'.");
-	public static Text msgCommandArgumentInvalid = Text.parse("&cInvalid argument '&e{argument}&c'.");
-	public static Text msgCommandPlayerArgumentMissing = Text.parse("&cNo player specified for '&e{argumentFormat}&c'.");
-	public static Text msgCommandPlayerArgumentInvalid = Text.parse("&cNo player found for '&e{argument}&c'.");
-	public static Text msgCommandShopTypeArgumentInvalid = Text.parse("&cUnknown shop type '&e{argument}&c'.");
-	public static Text msgCommandShopObjectTypeArgumentInvalid = Text.parse("&cUnknown shop object type '&e{argument}&c'.");
-	public static Text msgCommandShopkeeperArgumentInvalid = Text.parse("&cNo shopkeeper found for '&e{argument}&c'.");
-	public static Text msgCommandShopkeeperArgumentNoAdminShop = Text.parse("&cShopkeeper '&e{argument}&c' is no admin shopkeeper.");
-	public static Text msgCommandShopkeeperArgumentNoPlayerShop = Text.parse("&cShopkeeper '&e{argument}&c' is no player shopkeeper.");
-
-	public static Text msgAmbiguousPlayerName = Text.parse("&cThere are multiple matches for the name '&e{name}&c'!");
-	public static Text msgAmbiguousPlayerNameEntry = Text.parse("&c  - '&e{name}&r&c' (&6{uuid}&c)");
-	public static Text msgAmbiguousPlayerNameMore = Text.parse("&c  ....");
-
-	public static Text msgCommandHelpTitle = Text.parse("&9***** &8[&6Shopkeepers v{version}&8] &9*****");
-	public static Text msgCommandHelpUsageFormat = Text.parse("&e{usage}");
-	public static Text msgCommandHelpDescriptionFormat = Text.parse("&8 - &3{description}");
-
-	public static Text msgCommandDescriptionShopkeeper = Text.parse("Creates a shopkeeper.");
-	public static Text msgCommandDescriptionHelp = Text.parse("Shows this help page.");
-	public static Text msgCommandDescriptionReload = Text.parse("Reloads this plugin.");
-	public static Text msgCommandDescriptionDebug = Text.parse("Toggles debug mode on and off.");
-	public static Text msgCommandDescriptionList = Text.parse("Lists all shops for the specified player, or all admin shops.");
-	public static Text msgCommandDescriptionRemove = Text.parse("Removes all shops for the specified player, all players, or all admin shops.");
-	public static Text msgCommandDescriptionGive = Text.parse("Gives shop creation item(s) to the specified player.");
-	public static Text msgCommandDescriptionGiveCurrency = Text.parse("Gives currency item(s) to the specified player.");
-	public static Text msgCommandDescriptionConvertItems = Text.parse("Converts the held (or all) items to conform to Spigot's data format.");
-	public static Text msgCommandDescriptionRemote = Text.parse("Remotely opens a shop.");
-	public static Text msgCommandDescriptionRemoteEdit = Text.parse("Remotely edits a shop.");
-	public static Text msgCommandDescriptionTransfer = Text.parse("Transfers the ownership of a shop.");
-	public static Text msgCommandDescriptionSettradeperm = Text.parse("Sets, removes (-) or displays (?) the trading permission.");
-	public static Text msgCommandDescriptionSetforhire = Text.parse("Sets one of your shops for sale.");
-	public static Text msgCommandDescriptionEditVillager = Text.parse("Opens the editor for the target villager.");
+	public static String language = "en-default";
 
 	// /////
 
-	private static String toConfigKey(String fieldName) {
-		return fieldName.replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase(Locale.ROOT);
-	}
+	// These String / String list settings are exempt from color conversion:
+	private static final Set<String> noColorConversionKeys = new HashSet<>(Arrays.asList(
+			toConfigKey("debugOptions"), toConfigKey("fileEncoding"), toConfigKey("shopCreationItemSpawnEggEntityType"),
+			toConfigKey("maxShopsPermOptions"), toConfigKey("enabledLivingShops"), toConfigKey("nameRegex"),
+			toConfigKey("language")));
 
 	// Returns true, if the config misses values which need to be saved
 	public static boolean loadConfiguration(Configuration config) throws ConfigLoadException {
@@ -595,15 +327,13 @@ public class Settings {
 			configChanged = true;
 		}
 
-		// Exempt a few string / string list settings from color conversion:
-		List<String> noColorConversionKeys = Arrays.asList(
-				toConfigKey("debugOptions"), toConfigKey("fileEncoding"), toConfigKey("shopCreationItemSpawnEggEntityType"),
-				toConfigKey("maxShopsPermOptions"), toConfigKey("enabledLivingShops"), toConfigKey("nameRegex"),
-				toConfigKey("language"));
 		try {
 			Field[] fields = Settings.class.getDeclaredFields();
 			for (Field field : fields) {
 				if (field.isSynthetic()) continue;
+				if (!Modifier.isPublic(field.getModifiers())) {
+					continue;
+				}
 				Class<?> typeClass = field.getType();
 				Class<?> genericType = null;
 				if (typeClass == List.class) {
@@ -642,7 +372,7 @@ public class Settings {
 			throw new ConfigLoadException("Error while loading config values!", e);
 		}
 
-		// validation:
+		// Validation:
 
 		boolean foundInvalidEntityType = false;
 		boolean removePigZombie = false;
@@ -714,149 +444,6 @@ public class Settings {
 		return configChanged;
 	}
 
-	private static Object loadConfigValue(Configuration config, String configKey, List<String> noColorConversionKeys, Class<?> typeClass, Class<?> genericType) {
-		if (typeClass == String.class || typeClass == Text.class) {
-			String string = config.getString(configKey);
-			// Colorize, if not exempted:
-			if (!noColorConversionKeys.contains(configKey)) {
-				string = TextUtils.colorize(string);
-			}
-			if (typeClass == Text.class) {
-				return Text.parse(string);
-			} else {
-				return string;
-			}
-		} else if (typeClass == int.class) {
-			return config.getInt(configKey);
-		} else if (typeClass == short.class) {
-			return (short) config.getInt(configKey);
-		} else if (typeClass == boolean.class) {
-			return config.getBoolean(configKey);
-		} else if (typeClass == Material.class) {
-			// This assumes that legacy item conversion has already been performed
-			Material material = ConfigUtils.loadMaterial(config, configKey);
-			if (material == null) {
-				Log.warning("Config: Unknown material for config entry '" + configKey + "': " + config.get(configKey));
-				Log.warning("Config: All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
-			}
-			return material;
-		} else if (typeClass == ItemData.class) {
-			ItemData itemData = loadItemData(config.get(configKey), configKey);
-			// Normalize to not null:
-			if (itemData == null) {
-				itemData = new ItemData(Material.AIR);
-			}
-			return itemData;
-		} else if (typeClass == List.class) {
-			if (genericType == String.class || genericType == Text.class) {
-				List<String> stringList = config.getStringList(configKey);
-				// Colorize, if not exempted:
-				if (!noColorConversionKeys.contains(configKey)) {
-					stringList = TextUtils.colorize(stringList);
-				}
-				if (genericType == Text.class) {
-					return Text.parse(stringList);
-				} else {
-					return stringList;
-				}
-			} else if (genericType == ItemData.class) {
-				List<?> list = config.getList(configKey, Collections.emptyList());
-				List<ItemData> itemDataList = new ArrayList<>(list.size());
-				int index = 0;
-				for (Object entry : list) {
-					index += 1;
-					ItemData itemData = loadItemData(entry, configKey + "[" + index + "]");
-					if (itemData != null) {
-						itemDataList.add(itemData);
-					}
-				}
-				return itemDataList;
-			} else {
-				throw new IllegalStateException("Unsupported config setting list type: " + genericType.getName());
-			}
-		}
-		throw new IllegalStateException("Unsupported config setting type: " + typeClass.getName());
-	}
-
-	private static ItemData loadItemData(Object dataObject, String configEntryIdentifier) {
-		ItemData itemData = ItemData.deserialize(dataObject, (warning) -> {
-			Log.warning("Config: Couldn't load item data for config entry '" + configEntryIdentifier + "': " + warning);
-			if (warning.contains("Unknown item type")) { // TODO this is ugly
-				Log.warning("Config: All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
-			}
-		});
-		return itemData;
-	}
-
-	private static void setConfigValue(Configuration config, String configKey, List<String> noColorConversionKeys, Class<?> typeClass, Class<?> genericType, Object value) {
-		if (value == null) {
-			// Remove value:
-			config.set(configKey, null);
-			return;
-		}
-
-		if (typeClass == Material.class) {
-			config.set(configKey, ((Material) value).name());
-		} else if (typeClass == String.class || typeClass == Text.class) {
-			String stringValue;
-			if (typeClass == Text.class) {
-				stringValue = ((Text) value).toPlainFormatText();
-			} else {
-				stringValue = (String) value;
-			}
-			// Decolorize, if not exempted:
-			if (!noColorConversionKeys.contains(configKey)) {
-				value = TextUtils.decolorize(stringValue);
-			}
-			config.set(configKey, value);
-		} else if (typeClass == List.class && (genericType == String.class || genericType == Text.class)) {
-			List<String> stringList;
-			if (genericType == Text.class) {
-				stringList = ((List<Text>) value).stream().map(Text::toPlainFormatText).collect(Collectors.toList());
-			} else {
-				stringList = (List<String>) value;
-			}
-
-			// Decolorize, if not exempted:
-			if (!noColorConversionKeys.contains(configKey)) {
-				value = TextUtils.decolorize(stringList);
-			}
-			config.set(configKey, value);
-		} else if (typeClass == ItemData.class) {
-			config.set(configKey, ((ItemData) value).serialize());
-		} else {
-			config.set(configKey, value);
-		}
-	}
-
-	public static void loadLanguageConfiguration(Configuration config) throws ConfigLoadException {
-		try {
-			Field[] fields = Settings.class.getDeclaredFields();
-			for (Field field : fields) {
-				if (!field.getName().startsWith("msg")) continue;
-				Class<?> typeClass = field.getType();
-				Class<?> genericType = null;
-				if (typeClass == List.class) {
-					genericType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-				}
-				String configKey = toConfigKey(field.getName());
-				if (!config.isSet(configKey)) {
-					continue; // Skip, keeps default
-				}
-
-				Object value = loadConfigValue(config, configKey, Collections.emptyList(), typeClass, genericType);
-				if (value == null) {
-					continue; // Skip, keeps default
-				}
-				field.set(null, value);
-			}
-		} catch (Exception e) {
-			throw new ConfigLoadException("Error while loading messages from language file!", e);
-		}
-
-		onSettingsChanged();
-	}
-
 	public static void onSettingsChanged() {
 		// Prepare derived settings:
 		DerivedSettings.setup();
@@ -889,14 +476,14 @@ public class Settings {
 			namingItemData = new ItemData(ItemUtils.setItemStackName(nameItem.createItemStack(), null));
 
 			// Button items:
-			nameButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(nameItem.createItemStack(), msgButtonName, msgButtonNameLore));
-			containerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), msgButtonContainer, msgButtonContainerLore));
-			deleteButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), msgButtonDelete, msgButtonDeleteLore));
-			hireButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(hireItem.createItemStack(), msgButtonHire, msgButtonHireLore));
+			nameButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(nameItem.createItemStack(), Messages.buttonName, Messages.buttonNameLore));
+			containerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), Messages.buttonContainer, Messages.buttonContainerLore));
+			deleteButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), Messages.buttonDelete, Messages.buttonDeleteLore));
+			hireButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(hireItem.createItemStack(), Messages.buttonHire, Messages.buttonHireLore));
 
 			// Note: These use the same item types as the corresponding shopkeeper buttons.
-			deleteVillagerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), msgButtonDeleteVillager, msgButtonDeleteVillagerLore));
-			villagerInventoryButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), msgButtonVillagerInventory, msgButtonVillagerInventoryLore));
+			deleteVillagerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), Messages.buttonDeleteVillager, Messages.buttonDeleteVillagerLore));
+			villagerInventoryButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), Messages.buttonVillagerInventory, Messages.buttonVillagerInventoryLore));
 
 			try {
 				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
@@ -1020,5 +607,8 @@ public class Settings {
 			// Unknown entity type:
 			return null;
 		}
+	}
+
+	private Settings() {
 	}
 }

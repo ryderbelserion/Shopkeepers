@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.Property;
@@ -76,7 +76,7 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 
 	private ItemStack getCarryingChestEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.CHEST);
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonCarryingChest, Settings.msgButtonCarryingChestLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonCarryingChest, Messages.buttonCarryingChestLore);
 		return iconItem;
 	}
 

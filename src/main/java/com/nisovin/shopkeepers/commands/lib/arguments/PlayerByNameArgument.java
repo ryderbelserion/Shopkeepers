@@ -6,7 +6,7 @@ import java.util.stream.Stream;
 
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
 import com.nisovin.shopkeepers.text.Text;
@@ -42,7 +42,7 @@ public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 	@Override
 	public Text getInvalidArgumentErrorMsg(String argumentInput) {
 		if (argumentInput == null) argumentInput = "";
-		Text text = Settings.msgCommandPlayerArgumentInvalid;
+		Text text = Messages.commandPlayerArgumentInvalid;
 		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
 		text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
 		return text;

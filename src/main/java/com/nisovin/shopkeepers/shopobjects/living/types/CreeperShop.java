@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.Property;
@@ -82,7 +82,7 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 		} else {
 			iconItem = new ItemStack(Material.LIME_WOOL);
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonCreeperCharged, Settings.msgButtonCreeperChargedLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonCreeperCharged, Messages.buttonCreeperChargedLore);
 		return iconItem;
 	}
 

@@ -12,7 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.Property;
@@ -106,7 +106,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.ORANGE));
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonLlamaVariant, Settings.msgButtonLlamaVariantLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonLlamaVariant, Messages.buttonLlamaVariantLore);
 		return iconItem;
 	}
 
@@ -145,7 +145,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
 	private ItemStack getCarpetColorEditorItem() {
 		ItemStack iconItem = new ItemStack(carpetColor == null ? Material.BARRIER : ItemUtils.getCarpetType(carpetColor));
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonLlamaCarpetColor, Settings.msgButtonLlamaCarpetColorLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonLlamaCarpetColor, Messages.buttonLlamaCarpetColorLore);
 		return iconItem;
 	}
 

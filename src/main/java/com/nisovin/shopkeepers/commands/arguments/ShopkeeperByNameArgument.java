@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
@@ -47,7 +47,7 @@ public class ShopkeeperByNameArgument extends ObjectByIdArgument<String, Shopkee
 	@Override
 	public Text getInvalidArgumentErrorMsg(String argumentInput) {
 		if (argumentInput == null) argumentInput = "";
-		Text text = Settings.msgCommandShopkeeperArgumentInvalid;
+		Text text = Messages.commandShopkeeperArgumentInvalid;
 		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
 		text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
 		return text;

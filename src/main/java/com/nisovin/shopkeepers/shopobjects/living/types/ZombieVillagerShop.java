@@ -12,7 +12,7 @@ import org.bukkit.entity.ZombieVillager;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.Property;
@@ -131,7 +131,7 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 			break;
 		}
 		assert iconItem != null;
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonZombieVillagerProfession, Settings.msgButtonZombieVillagerProfessionLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonZombieVillagerProfession, Messages.buttonZombieVillagerProfessionLore);
 		return iconItem;
 	}
 

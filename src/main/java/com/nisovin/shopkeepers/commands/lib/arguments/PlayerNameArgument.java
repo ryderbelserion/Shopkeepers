@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -37,7 +37,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 
 	@Override
 	public Text getMissingArgumentErrorMsg() {
-		Text text = Settings.msgCommandPlayerArgumentMissing;
+		Text text = Messages.commandPlayerArgumentMissing;
 		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
 		return text;
 	}

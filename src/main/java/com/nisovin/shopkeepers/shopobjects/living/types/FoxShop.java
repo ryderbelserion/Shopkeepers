@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.EnumProperty;
@@ -106,7 +106,7 @@ public class FoxShop extends SittableShop<Fox> {
 			ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonFoxVariant, Settings.msgButtonFoxVariantLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonFoxVariant, Messages.buttonFoxVariantLore);
 		return iconItem;
 	}
 
@@ -150,7 +150,7 @@ public class FoxShop extends SittableShop<Fox> {
 
 	private ItemStack getSleepingEditorItem() {
 		ItemStack iconItem = new ItemStack(sleeping ? Material.GREEN_BED : Material.RED_BED);
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonFoxSleeping, Settings.msgButtonFoxSleepingLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonFoxSleeping, Messages.buttonFoxSleepingLore);
 		return iconItem;
 	}
 
@@ -194,7 +194,7 @@ public class FoxShop extends SittableShop<Fox> {
 
 	private ItemStack getCrouchingEditorItem() {
 		ItemStack iconItem = new ItemStack(crouching ? Material.GREEN_CARPET : Material.RED_CARPET);
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonFoxCrouching, Settings.msgButtonFoxCrouchingLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonFoxCrouching, Messages.buttonFoxCrouchingLore);
 		return iconItem;
 	}
 

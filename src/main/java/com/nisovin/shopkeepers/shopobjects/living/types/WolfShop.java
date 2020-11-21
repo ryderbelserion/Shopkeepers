@@ -11,7 +11,7 @@ import org.bukkit.entity.Wolf;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.EnumProperty;
@@ -91,7 +91,7 @@ public class WolfShop extends SittableShop<Wolf> {
 
 	private ItemStack getAngryEditorItem() {
 		ItemStack iconItem = new ItemStack(angry ? Material.RED_WOOL : Material.WHITE_WOOL);
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonWolfAngry, Settings.msgButtonWolfAngryLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonWolfAngry, Messages.buttonWolfAngryLore);
 		return iconItem;
 	}
 
@@ -140,7 +140,7 @@ public class WolfShop extends SittableShop<Wolf> {
 		} else {
 			iconItem = new ItemStack(ItemUtils.getWoolType(collarColor));
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonCollarColor, Settings.msgButtonCollarColorLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonCollarColor, Messages.buttonCollarColorLore);
 		return iconItem;
 	}
 

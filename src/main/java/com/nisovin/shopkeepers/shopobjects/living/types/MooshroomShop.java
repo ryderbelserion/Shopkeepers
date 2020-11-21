@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.Property;
@@ -88,7 +88,7 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 			iconItem = new ItemStack(Material.BROWN_MUSHROOM);
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonMooshroomVariant, Settings.msgButtonMooshroomVariantLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonMooshroomVariant, Messages.buttonMooshroomVariantLore);
 		return iconItem;
 	}
 

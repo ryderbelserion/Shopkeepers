@@ -10,7 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.text.Text;
 
 public class PlayerUtils {
@@ -174,21 +174,21 @@ public class PlayerUtils {
 	public static boolean handleAmbiguousPlayerName(CommandSender sender, String name, Iterable<Map.Entry<UUID, String>> matches, int maxEntries) {
 		return CommandUtils.handleAmbiguousInput(sender, name, matches, maxEntries,
 				() -> {
-					TextUtils.sendMessage(sender, Settings.msgAmbiguousPlayerName, "name", name);
+					TextUtils.sendMessage(sender, Messages.ambiguousPlayerName, "name", name);
 				},
 				(match, index) -> {
 					UUID matchUUID = match.getKey();
 					String matchUUIDString = matchUUID.toString();
 					String matchName = match.getValue();
 
-					TextUtils.sendMessage(sender, Settings.msgAmbiguousPlayerNameEntry,
+					TextUtils.sendMessage(sender, Messages.ambiguousPlayerNameEntry,
 							"index", index,
 							"name", Text.insertion(matchName).childText(matchName).buildRoot(),
 							"uuid", Text.insertion(matchUUIDString).childText(matchUUIDString).buildRoot()
 					);
 				},
 				() -> {
-					TextUtils.sendMessage(sender, Settings.msgAmbiguousPlayerNameMore);
+					TextUtils.sendMessage(sender, Messages.ambiguousPlayerNameMore);
 				}
 		);
 	}

@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.Property;
@@ -106,7 +106,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 
 	private ItemStack getBabyEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.EGG);
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonBaby, Settings.msgButtonBabyLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonBaby, Messages.buttonBabyLore);
 		return iconItem;
 	}
 

@@ -23,8 +23,9 @@ import com.nisovin.shopkeepers.util.Validate;
  * <p>
  * The structure and semantics of this Text representation are closely oriented on regular text with color codes, but
  * still supports advanced text features such as {@link HoverEventText hover events}. The goal is that
- * {@link #toPlainText()} for Texts produced by {@link Text#parse(String)} will reproduce the original input text. These
- * differences to Minecraft's / Spigot's text components need to be considered during conversions.
+ * {@link #toPlainText()} for Texts produced by {@link Text#parse(String)} will reproduce the original input text (using
+ * '§' as color character though). These differences to Minecraft's / Spigot's text components need to be considered
+ * during conversions.
  */
 public interface Text {
 
@@ -79,7 +80,7 @@ public interface Text {
 	 * <p>
 	 * This takes into account:
 	 * <ul>
-	 * <li>Legacy color codes (starting with '§')
+	 * <li>Legacy color codes (starting with '&' or '§')
 	 * <li>Placeholders
 	 * </ul>
 	 * <p>

@@ -7,7 +7,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -27,7 +27,7 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 
 	@Override
 	protected void onSelect(Player player) {
-		TextUtils.sendMessage(player, Settings.msgSelectedShopObjectType, "type", this.getDisplayName());
+		TextUtils.sendMessage(player, Messages.selectedShopObjectType, "type", this.getDisplayName());
 	}
 
 	/**

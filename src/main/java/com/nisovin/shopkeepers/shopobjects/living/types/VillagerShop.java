@@ -13,7 +13,7 @@ import org.bukkit.entity.Villager.Profession;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.IntegerProperty;
@@ -180,7 +180,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 			break;
 		}
 		assert iconItem != null;
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonVillagerProfession, Settings.msgButtonVillagerProfessionLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerProfession, Messages.buttonVillagerProfessionLore);
 		return iconItem;
 	}
 
@@ -244,7 +244,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonVillagerVariant, Settings.msgButtonVillagerVariantLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerVariant, Messages.buttonVillagerVariantLore);
 		return iconItem;
 	}
 
@@ -310,7 +310,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 			break;
 		}
 		assert iconItem != null;
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonVillagerLevel, Settings.msgButtonVillagerLevelLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerLevel, Messages.buttonVillagerLevelLore);
 		return iconItem;
 	}
 

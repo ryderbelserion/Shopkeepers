@@ -10,7 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -55,7 +55,7 @@ class CommandRemove extends Command {
 		// Permission gets checked by testPermission and during execution.
 
 		// Set description:
-		this.setDescription(Settings.msgCommandDescriptionRemove);
+		this.setDescription(Messages.commandDescriptionRemove);
 
 		// Arguments: TODO Allow specifying a single shopkeeper?
 		this.addArgument(new FirstOfArgument("target", Arrays.asList(
@@ -200,17 +200,17 @@ class CommandRemove extends Command {
 			// Print the result message:
 			if (admin) {
 				// Removed all admin shops:
-				TextUtils.sendMessage(sender, Settings.msgRemovedAdminShops,
+				TextUtils.sendMessage(sender, Messages.removedAdminShops,
 						"shopsCount", actualShopCount
 				);
 			} else if (all) {
 				// Removed all player shops:
-				TextUtils.sendMessage(sender, Settings.msgRemovedPlayerShops,
+				TextUtils.sendMessage(sender, Messages.removedPlayerShops,
 						"shopsCount", actualShopCount
 				);
 			} else {
 				// Removed all shops of the specified player:
-				TextUtils.sendMessage(sender, Settings.msgRemovedShopsOfPlayer,
+				TextUtils.sendMessage(sender, Messages.removedShopsOfPlayer,
 						"player", TextUtils.getPlayerText(finalTargetPlayerName, finalTargetPlayerUUID),
 						"shopsCount", actualShopCount
 				);
@@ -223,28 +223,28 @@ class CommandRemove extends Command {
 		int shopsCount = affectedShops.size();
 		if (admin) {
 			// Removing all admin shops:
-			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveAllAdminShops,
+			TextUtils.sendMessage(sender, Messages.confirmRemoveAllAdminShops,
 					"shopsCount", shopsCount
 			);
 		} else if (all) {
 			// Removing all player shops:
-			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveAllPlayerShops,
+			TextUtils.sendMessage(sender, Messages.confirmRemoveAllPlayerShops,
 					"shopsCount", shopsCount
 			);
 		} else if (targetOwnShops) {
 			// Removing own shops:
-			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveAllOwnShops,
+			TextUtils.sendMessage(sender, Messages.confirmRemoveAllOwnShops,
 					"shopsCount", shopsCount
 			);
 		} else {
 			// Removing shops of specific player:
-			TextUtils.sendMessage(sender, Settings.msgConfirmRemoveAllShopsOfPlayer,
+			TextUtils.sendMessage(sender, Messages.confirmRemoveAllShopsOfPlayer,
 					"player", TextUtils.getPlayerText(targetPlayerName, targetPlayerUUID),
 					"shopsCount", shopsCount
 			);
 		}
 		// Inform player on how to confirm the action:
 		// TODO Add clickable command suggestion?
-		TextUtils.sendMessage(sender, Settings.msgConfirmationRequired);
+		TextUtils.sendMessage(sender, Messages.confirmationRequired);
 	}
 }

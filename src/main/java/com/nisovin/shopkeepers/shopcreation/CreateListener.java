@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -63,7 +64,7 @@ class CreateListener implements Listener {
 		}
 
 		// Print info message about usage:
-		TextUtils.sendMessage(player, Settings.msgCreationItemSelected);
+		TextUtils.sendMessage(player, Messages.creationItemSelected);
 	}
 
 	// Since this might check container access by calling another dummy interaction event, we handle (cancel) this event
@@ -128,7 +129,7 @@ class CreateListener implements Listener {
 
 		if (shopType == null || shopObjType == null) {
 			// The player cannot create any shops at all:
-			TextUtils.sendMessage(player, Settings.msgNoPermission);
+			TextUtils.sendMessage(player, Messages.noPermission);
 			return;
 		}
 
@@ -168,12 +169,12 @@ class CreateListener implements Listener {
 					if (shopkeeperCreation.handleCheckContainer(player, clickedBlock)) {
 						// Select container:
 						shopkeeperCreation.selectContainer(player, clickedBlock);
-						TextUtils.sendMessage(player, Settings.msgContainerSelected);
+						TextUtils.sendMessage(player, Messages.containerSelected);
 					}
 				} else if (ItemUtils.isContainer(clickedBlock.getType())) {
 					// Player clicked a type of container which cannot be used for shops:
 					isContainerSelection = true;
-					TextUtils.sendMessage(player, Settings.msgUnsupportedContainer);
+					TextUtils.sendMessage(player, Messages.unsupportedContainer);
 				}
 			}
 
@@ -181,7 +182,7 @@ class CreateListener implements Listener {
 				// Player shop creation:
 				if (selectedContainer == null) {
 					// Clicked a location without having a container selected:
-					TextUtils.sendMessage(player, Settings.msgMustSelectContainer);
+					TextUtils.sendMessage(player, Messages.mustSelectContainer);
 					return;
 				}
 				assert ShopContainers.isSupportedContainer(selectedContainer.getType()); // Checked above already
@@ -189,7 +190,7 @@ class CreateListener implements Listener {
 				// Validate the selected shop type:
 				if (!(shopType instanceof PlayerShopType)) {
 					// Only player shop types are allowed here:
-					TextUtils.sendMessage(player, Settings.msgNoPlayerShopTypeSelected);
+					TextUtils.sendMessage(player, Messages.noPlayerShopTypeSelected);
 					return;
 				}
 

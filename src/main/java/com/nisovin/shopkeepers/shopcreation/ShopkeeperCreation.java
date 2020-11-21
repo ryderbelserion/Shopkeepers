@@ -11,6 +11,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
@@ -91,20 +92,20 @@ public class ShopkeeperCreation {
 	public boolean handleCheckContainer(Player player, Block containerBlock) {
 		// Check if the container is already used by some other shopkeeper:
 		if (SKShopkeepersPlugin.getInstance().getProtectedContainers().isContainerProtected(containerBlock, null)) {
-			TextUtils.sendMessage(player, Settings.msgContainerAlreadyInUse);
+			TextUtils.sendMessage(player, Messages.containerAlreadyInUse);
 			return false;
 		}
 
 		// Check for recently placed:
 		if (Settings.requireContainerRecentlyPlaced && !plugin.getShopkeeperCreation().isRecentlyPlacedContainer(player, containerBlock)) {
 			// Container was not recently placed:
-			TextUtils.sendMessage(player, Settings.msgContainerNotPlaced);
+			TextUtils.sendMessage(player, Messages.containerNotPlaced);
 			return false;
 		}
 
 		// Check if the player can access the container:
 		if (!Utils.checkBlockInteract(player, containerBlock)) { // checks access via dummy interact event
-			TextUtils.sendMessage(player, Settings.msgNoContainerAccess);
+			TextUtils.sendMessage(player, Messages.noContainerAccess);
 			return false;
 		}
 		return true;

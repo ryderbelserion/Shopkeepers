@@ -18,7 +18,8 @@ public class ConfigMigrations {
 	private static final List<ConfigMigration> migrations = Arrays.asList(
 			new ConfigMigration1(),
 			new ConfigMigration2(),
-			new ConfigMigration3()
+			new ConfigMigration3(),
+			new ConfigMigration4()
 	);
 
 	public static int getLatestVersion() {

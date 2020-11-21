@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
@@ -24,7 +24,7 @@ class CommandEdit extends PlayerCommand {
 		this.setPermission(ShopkeepersPlugin.REMOTE_EDIT_PERMISSION);
 
 		// Set description:
-		this.setDescription(Settings.msgCommandDescriptionRemoteEdit);
+		this.setDescription(Messages.commandDescriptionRemoteEdit);
 
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(

@@ -10,7 +10,7 @@ import org.bukkit.entity.Slime;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.IntegerProperty;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -91,8 +91,8 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 
 	private ItemStack getSlimeSizeEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.SLIME_BLOCK);
-		String displayName = TextUtils.replaceArguments(Settings.msgButtonSlimeSize, "size", slimeSize);
-		List<String> lore = TextUtils.replaceArguments(Settings.msgButtonSlimeSizeLore, "size", slimeSize);
+		String displayName = TextUtils.replaceArguments(Messages.buttonSlimeSize, "size", slimeSize);
+		List<String> lore = TextUtils.replaceArguments(Messages.buttonSlimeSizeLore, "size", slimeSize);
 		ItemUtils.setItemStackNameAndLore(iconItem, displayName, lore);
 		return iconItem;
 	}

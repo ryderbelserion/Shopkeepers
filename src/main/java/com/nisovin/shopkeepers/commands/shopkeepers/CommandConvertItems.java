@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.Command;
@@ -33,7 +34,7 @@ class CommandConvertItems extends Command {
 		// Permission gets checked by testPermission and during execution.
 
 		// Set description:
-		this.setDescription(Settings.msgCommandDescriptionConvertItems);
+		this.setDescription(Messages.commandDescriptionConvertItems);
 
 		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
@@ -103,12 +104,12 @@ class CommandConvertItems extends Command {
 		}
 
 		// Inform target player:
-		TextUtils.sendMessage(targetPlayer, Settings.msgItemsConverted,
+		TextUtils.sendMessage(targetPlayer, Messages.itemsConverted,
 				"count", convertedStacks
 		);
 		if (!targetSelf) {
 			// Inform command executor:
-			TextUtils.sendMessage(sender, Settings.msgItemsConverted,
+			TextUtils.sendMessage(sender, Messages.itemsConverted,
 					"count", convertedStacks
 			);
 		}

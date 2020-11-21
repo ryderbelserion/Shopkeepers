@@ -18,6 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
@@ -364,7 +365,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			prevPage = (page - 1);
 			prevPageText = String.valueOf(prevPage);
 		}
-		String itemName = TextUtils.replaceArguments(Settings.msgButtonPreviousPage,
+		String itemName = TextUtils.replaceArguments(Messages.buttonPreviousPage,
 				"prev_page", prevPageText,
 				"page", page,
 				"max_page", getMaxTradesPages()
@@ -372,7 +373,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		ItemStack item = Settings.previousPageItem.createItemStack();
 		// Note: Can exceed the item's natural max stack size.
 		item.setAmount(MathUtils.trim(prevPage, 1, ItemUtils.MAX_STACK_SIZE));
-		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonPreviousPageLore);
+		return ItemUtils.setItemStackNameAndLore(item, itemName, Messages.buttonPreviousPageLore);
 	}
 
 	protected ItemStack createNextPageIcon(int page) {
@@ -382,7 +383,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			nextPage = (page + 1);
 			nextPageText = String.valueOf(nextPage);
 		}
-		String itemName = TextUtils.replaceArguments(Settings.msgButtonNextPage,
+		String itemName = TextUtils.replaceArguments(Messages.buttonNextPage,
 				"next_page", nextPageText,
 				"page", page,
 				"max_page", getMaxTradesPages()
@@ -390,18 +391,18 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		ItemStack item = Settings.nextPageItem.createItemStack();
 		// Note: Can exceed the item's natural max stack size.
 		item.setAmount(MathUtils.trim(nextPage, 1, ItemUtils.MAX_STACK_SIZE));
-		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonNextPageLore);
+		return ItemUtils.setItemStackNameAndLore(item, itemName, Messages.buttonNextPageLore);
 	}
 
 	protected ItemStack createCurrentPageIcon(int page) {
-		String itemName = TextUtils.replaceArguments(Settings.msgButtonCurrentPage,
+		String itemName = TextUtils.replaceArguments(Messages.buttonCurrentPage,
 				"page", page,
 				"max_page", getMaxTradesPages()
 		);
 		ItemStack item = Settings.currentPageItem.createItemStack();
 		// Note: Can exceed the item's natural max stack size.
 		item.setAmount(MathUtils.trim(page, 1, ItemUtils.MAX_STACK_SIZE));
-		return ItemUtils.setItemStackNameAndLore(item, itemName, Settings.msgButtonCurrentPageLore);
+		return ItemUtils.setItemStackNameAndLore(item, itemName, Messages.buttonCurrentPageLore);
 	}
 
 	protected abstract ItemStack createTradeSetupIcon();

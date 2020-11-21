@@ -11,7 +11,7 @@ import org.bukkit.entity.Sittable;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.Property;
@@ -78,7 +78,7 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 
 	private ItemStack getSittingEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.IRON_HORSE_ARMOR);
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonSitting, Settings.msgButtonSittingLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonSitting, Messages.buttonSittingLore);
 		return iconItem;
 	}
 

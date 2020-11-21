@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.IntegerProperty;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -91,8 +91,8 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 
 	private ItemStack getMagmaCubeSizeEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.SLIME_BLOCK);
-		String displayName = TextUtils.replaceArguments(Settings.msgButtonMagmaCubeSize, "size", magmaCubeSize);
-		List<String> lore = TextUtils.replaceArguments(Settings.msgButtonMagmaCubeSizeLore, "size", magmaCubeSize);
+		String displayName = TextUtils.replaceArguments(Messages.buttonMagmaCubeSize, "size", magmaCubeSize);
+		List<String> lore = TextUtils.replaceArguments(Messages.buttonMagmaCubeSizeLore, "size", magmaCubeSize);
 		ItemUtils.setItemStackNameAndLore(iconItem, displayName, lore);
 		return iconItem;
 	}

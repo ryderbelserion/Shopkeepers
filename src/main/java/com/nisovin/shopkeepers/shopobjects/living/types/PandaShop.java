@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.Property;
@@ -81,7 +81,7 @@ public class PandaShop extends BabyableShop<Panda> {
 
 	private ItemStack getGeneEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.PANDA_SPAWN_EGG);
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonPandaVariant, Settings.msgButtonPandaVariantLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonPandaVariant, Messages.buttonPandaVariantLore);
 		return iconItem;
 	}
 

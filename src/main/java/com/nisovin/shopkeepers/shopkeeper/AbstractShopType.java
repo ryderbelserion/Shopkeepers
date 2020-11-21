@@ -9,8 +9,8 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.events.PlayerCreateShopkeeperEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
@@ -34,14 +34,14 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 
 	@Override
 	protected void onSelect(Player player) {
-		TextUtils.sendMessage(player, Settings.msgSelectedShopType,
+		TextUtils.sendMessage(player, Messages.selectedShopType,
 				"type", this.getDisplayName(),
 				"description", this.getDescription()
 		);
 	}
 
 	protected Text getCreatedMessage() {
-		Text text = Settings.msgShopkeeperCreated;
+		Text text = Messages.shopkeeperCreated;
 		text.setPlaceholderArguments(
 				"type", this.getDisplayName(),
 				"description", this.getDescription(),
@@ -91,21 +91,21 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 
 		// Can the selected shop type be used?
 		if (!shopType.hasPermission(creator)) {
-			TextUtils.sendMessage(creator, Settings.msgNoPermission);
+			TextUtils.sendMessage(creator, Messages.noPermission);
 			return null;
 		}
 		if (!shopType.isEnabled()) {
-			TextUtils.sendMessage(creator, Settings.msgShopTypeDisabled, "type", shopType.getIdentifier());
+			TextUtils.sendMessage(creator, Messages.shopTypeDisabled, "type", shopType.getIdentifier());
 			return null;
 		}
 
 		// Can the selected shop object type be used?
 		if (!shopObjectType.hasPermission(creator)) {
-			TextUtils.sendMessage(creator, Settings.msgNoPermission);
+			TextUtils.sendMessage(creator, Messages.noPermission);
 			return null;
 		}
 		if (!shopObjectType.isEnabled()) {
-			TextUtils.sendMessage(creator, Settings.msgShopObjectTypeDisabled, "type", shopObjectType.getIdentifier());
+			TextUtils.sendMessage(creator, Messages.shopObjectTypeDisabled, "type", shopObjectType.getIdentifier());
 			return null;
 		}
 
@@ -115,13 +115,13 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		// Check if the shop can be placed there (enough space, etc.):
 		if (!shopObjectType.isValidSpawnLocation(spawnLocation, targetedBlockFace)) {
 			// Invalid spawn location or targeted block face:
-			TextUtils.sendMessage(creator, Settings.msgShopCreateFail);
+			TextUtils.sendMessage(creator, Messages.shopCreateFail);
 			return null;
 		}
 
 		if (spawnLocation != null && !shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
 			// There is already a shopkeeper at that location:
-			TextUtils.sendMessage(creator, Settings.msgShopCreateFail);
+			TextUtils.sendMessage(creator, Messages.shopCreateFail);
 			return null;
 		}
 

@@ -7,8 +7,8 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -67,7 +67,7 @@ public class ShopkeeperNaming {
 		} else {
 			// Validate name:
 			if (!((AbstractShopkeeper) shopkeeper).isValidName(newName)) {
-				TextUtils.sendMessage(player, Settings.msgNameInvalid);
+				TextUtils.sendMessage(player, Messages.nameInvalid);
 				return false;
 			}
 		}
@@ -78,12 +78,12 @@ public class ShopkeeperNaming {
 
 		// Compare to previous name:
 		if (oldName.equals(shopkeeper.getName())) {
-			TextUtils.sendMessage(player, Settings.msgNameHasNotChanged);
+			TextUtils.sendMessage(player, Messages.nameHasNotChanged);
 			return false;
 		}
 
 		// Inform player:
-		TextUtils.sendMessage(player, Settings.msgNameSet);
+		TextUtils.sendMessage(player, Messages.nameSet);
 
 		// Close all open windows:
 		shopkeeper.abortUISessionsDelayed(); // TODO Really needed?

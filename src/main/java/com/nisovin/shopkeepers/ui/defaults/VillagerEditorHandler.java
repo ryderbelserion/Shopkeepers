@@ -21,6 +21,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -47,7 +48,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		Validate.notNull(villager, "villager is null");
 		this.villager = villager;
 		String villagerName = villager.getName(); // Not null
-		this.title = TextUtils.replaceArguments(Settings.msgVillagerEditorTitle, "villagerName", villagerName);
+		this.title = TextUtils.replaceArguments(Messages.villagerEditorTitle, "villagerName", villagerName);
 	}
 
 	public AbstractVillager getVillager() {
@@ -68,7 +69,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				if (!silent) {
 					Log.debug(() -> "Blocked villager editor from opening for " + player.getName()
 							+ ": Missing edit-wandering-traders permission.");
-					TextUtils.sendMessage(player, Settings.msgMissingEditWanderingTradersPerm);
+					TextUtils.sendMessage(player, Messages.missingEditWanderingTradersPerm);
 				}
 				return false;
 			}
@@ -77,7 +78,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				if (!silent) {
 					Log.debug(() -> "Blocked villager editor from opening for " + player.getName()
 							+ ": Missing edit-villagers permission.");
-					TextUtils.sendMessage(player, Settings.msgMissingEditVillagersPerm);
+					TextUtils.sendMessage(player, Messages.missingEditVillagersPerm);
 				}
 				return false;
 			}
@@ -154,7 +155,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					int inventorySize = (int) Math.ceil(villagerInventory.getSize() / 9.0D) * 9;
 
 					String villagerName = villager.getName(); // Not null
-					String inventoryTitle = TextUtils.replaceArguments(Settings.msgVillagerInventoryTitle, "villagerName", villagerName);
+					String inventoryTitle = TextUtils.replaceArguments(Messages.villagerInventoryTitle, "villagerName", villagerName);
 					Inventory customInventory = Bukkit.createInventory(null, inventorySize, inventoryTitle);
 
 					// Copy storage contents:
@@ -171,7 +172,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			@Override
 			public ItemStack getIcon(Session session) {
 				ItemStack iconItem = new ItemStack(Material.EGG);
-				ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonBaby, Settings.msgButtonBabyLore);
+				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonBaby, Messages.buttonBabyLore);
 				return iconItem;
 			}
 
@@ -251,7 +252,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					break;
 				}
 				assert iconItem != null;
-				ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonVillagerProfession, Settings.msgButtonVillagerProfessionLore);
+				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerProfession, Messages.buttonVillagerProfessionLore);
 				return iconItem;
 			}
 
@@ -269,7 +270,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				// change its profession:
 				if (regularVillager.getVillagerExperience() == 0) {
 					regularVillager.setVillagerExperience(1);
-					TextUtils.sendMessage(player, Settings.msgSetVillagerXp, "xp", 1);
+					TextUtils.sendMessage(player, Messages.setVillagerXp, "xp", 1);
 				}
 				return true;
 			}
@@ -310,7 +311,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
 					break;
 				}
-				ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonVillagerVariant, Settings.msgButtonVillagerVariantLore);
+				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerVariant, Messages.buttonVillagerVariantLore);
 				return iconItem;
 			}
 
@@ -354,7 +355,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				}
 				assert iconItem != null;
 				// TODO Change the default message back to mention the villager level, instead of just the badge color?
-				ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonVillagerLevel, Settings.msgButtonVillagerLevelLore);
+				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerLevel, Messages.buttonVillagerLevelLore);
 				return iconItem;
 			}
 
@@ -387,7 +388,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					iconItem = new ItemStack(Material.CARVED_PUMPKIN);
 				}
 				assert iconItem != null;
-				ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonMobAi, Settings.msgButtonMobAiLore);
+				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonMobAi, Messages.buttonMobAiLore);
 				return iconItem;
 			}
 
@@ -405,8 +406,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	@Override
 	protected ItemStack createTradeSetupIcon() {
 		String villagerName = villager.getName(); // Not null
-		String itemName = TextUtils.replaceArguments(Settings.msgVillagerEditorDescriptionHeader, "villagerName", villagerName);
-		List<String> itemLore = Settings.msgVillagerEditorDescription;
+		String itemName = TextUtils.replaceArguments(Messages.villagerEditorDescriptionHeader, "villagerName", villagerName);
+		List<String> itemLore = Messages.villagerEditorDescription;
 		return ItemUtils.setItemStackNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, itemLore);
 	}
 
@@ -460,10 +461,10 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 
 		if (changedTrades == 0) {
 			// No changes:
-			TextUtils.sendMessage(player, Settings.msgNoVillagerTradesChanged);
+			TextUtils.sendMessage(player, Messages.noVillagerTradesChanged);
 			return;
 		} else {
-			TextUtils.sendMessage(player, Settings.msgVillagerTradesChanged, "changedTrades", changedTrades);
+			TextUtils.sendMessage(player, Messages.villagerTradesChanged, "changedTrades", changedTrades);
 		}
 
 		// Stop any current trading with this villager:
@@ -482,7 +483,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			// its profession (and thereby its trades):
 			if (regularVillager.getVillagerExperience() == 0) {
 				regularVillager.setVillagerExperience(1);
-				TextUtils.sendMessage(player, Settings.msgSetVillagerXp, "xp", 1);
+				TextUtils.sendMessage(player, Messages.setVillagerXp, "xp", 1);
 			}
 		}
 	}

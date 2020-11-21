@@ -11,7 +11,7 @@ import org.bukkit.entity.Sheep;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.EnumProperty;
@@ -87,7 +87,7 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 	private ItemStack getColorEditorItem() {
 		ItemStack iconItem = new ItemStack(ItemUtils.getWoolType(color));
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonSheepColor, Settings.msgButtonSheepColorLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonSheepColor, Messages.buttonSheepColorLore);
 		return iconItem;
 	}
 
@@ -126,7 +126,7 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 	private ItemStack getShearedEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.SHEARS);
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonSheepSheared, Settings.msgButtonSheepShearedLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonSheepSheared, Messages.buttonSheepShearedLore);
 		return iconItem;
 	}
 

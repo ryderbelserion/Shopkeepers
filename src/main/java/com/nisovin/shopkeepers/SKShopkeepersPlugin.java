@@ -11,7 +11,6 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -85,9 +84,10 @@ import com.nisovin.shopkeepers.villagers.VillagerInteractionListener;
 
 public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin {
 
+	public static final String DATA_FOLDER = "data";
+	public static final String LANG_FOLDER = "lang";
+
 	private static final int ASYNC_TASKS_TIMEOUT_SECONDS = 10;
-	private static final String dataFolder = "data";
-	private static final String langFolder = "lang";
 
 	private static SKShopkeepersPlugin plugin;
 
@@ -195,31 +195,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return null; // Config loaded successfully
 	}
 
-	private void loadLanguageFile() {
-		// Load language config:
-		String lang = Settings.language;
-		String langFileName = "language-" + lang + ".yml";
-		File langFile = new File(this.getSKLangFolder(), langFileName);
-		if (!langFile.exists() && this.getResource(langFileName) != null) {
-			this.saveResource(langFileName, false);
-		}
-
-		if (!langFile.exists()) {
-			if (!lang.equals("en")) { // If not default // TODO Don't hardcode
-				Log.warning("Could not find language file '" + langFile.getPath() + "'!");
-			} // Else: Ignore.
-		} else {
-			Log.info("Loading language file: " + langFileName);
-			try {
-				YamlConfiguration langConfig = new YamlConfiguration();
-				langConfig.load(langFile);
-				Settings.loadLanguageConfiguration(langConfig);
-			} catch (Exception e) {
-				Log.warning("Could not load language file '" + langFile.getPath() + "'!", e);
-			}
-		}
-	}
-
 	private void registerDefaults() {
 		Log.info("Registering defaults.");
 		uiRegistry.registerAll(defaultUITypes.getAllUITypes());
@@ -264,7 +239,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		this.createFolderStructure();
 
 		// Load language file:
-		this.loadLanguageFile();
+		Messages.loadLanguageFile();
 
 		// WorldGuard only allows registering flags before it gets enabled.
 		// Note: Changing the config setting has no effect until the next server restart or server reload.
@@ -320,7 +295,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// Load language file (if not already loaded during onLoad):
 		if (!alreadySetup) {
-			this.loadLanguageFile();
+			Messages.loadLanguageFile();
 		} else {
 			Log.debug("Language file already loaded.");
 		}
@@ -557,11 +532,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	// FOLDER STRUCTURE
 
 	public File getSKDataFolder() {
-		return new File(this.getDataFolder(), dataFolder);
+		return new File(this.getDataFolder(), DATA_FOLDER);
 	}
 
 	public File getSKLangFolder() {
-		return new File(this.getDataFolder(), langFolder);
+		return new File(this.getDataFolder(), LANG_FOLDER);
 	}
 
 	private void createFolderStructure() {

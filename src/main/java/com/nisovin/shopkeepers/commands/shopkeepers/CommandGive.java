@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.Command;
@@ -30,7 +31,7 @@ class CommandGive extends Command {
 		this.setPermission(ShopkeepersPlugin.GIVE_PERMISSION);
 
 		// Set description:
-		this.setDescription(Settings.msgCommandDescriptionGive);
+		this.setDescription(Messages.commandDescriptionGive);
 
 		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
@@ -65,12 +66,12 @@ class CommandGive extends Command {
 		// Success:
 		// TODO Show shop creation item via hover text?
 		// Inform target player:
-		TextUtils.sendMessage(targetPlayer, Settings.msgShopCreationItemsReceived,
+		TextUtils.sendMessage(targetPlayer, Messages.shopCreationItemsReceived,
 				"amount", amount
 		);
 		if (!targetSelf) {
 			// Inform command executor:
-			TextUtils.sendMessage(sender, Settings.msgShopCreationItemsGiven,
+			TextUtils.sendMessage(sender, Messages.shopCreationItemsGiven,
 					"player", TextUtils.getPlayerText(targetPlayer),
 					"amount", amount
 			);

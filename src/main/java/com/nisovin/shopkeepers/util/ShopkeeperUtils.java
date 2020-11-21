@@ -19,8 +19,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
@@ -86,7 +86,7 @@ public class ShopkeeperUtils {
 
 			@Override
 			public Text getNoTargetErrorMsg() {
-				return Settings.msgMustTargetShop;
+				return Messages.mustTargetShop;
 			}
 
 			@Override
@@ -103,12 +103,12 @@ public class ShopkeeperUtils {
 
 			@Override
 			public Text getNoTargetErrorMsg() {
-				return Settings.msgMustTargetAdminShop;
+				return Messages.mustTargetAdminShop;
 			}
 
 			@Override
 			public Text getInvalidTargetErrorMsg(Shopkeeper shopkeeper) {
-				return Settings.msgTargetShopIsNoAdminShop;
+				return Messages.targetShopIsNoAdminShop;
 			}
 		};
 
@@ -120,12 +120,12 @@ public class ShopkeeperUtils {
 
 			@Override
 			public Text getNoTargetErrorMsg() {
-				return Settings.msgMustTargetPlayerShop;
+				return Messages.mustTargetPlayerShop;
 			}
 
 			@Override
 			public Text getInvalidTargetErrorMsg(Shopkeeper shopkeeper) {
-				return Settings.msgTargetShopIsNoPlayerShop;
+				return Messages.targetShopIsNoPlayerShop;
 			}
 		};
 
@@ -159,7 +159,7 @@ public class ShopkeeperUtils {
 					if (ShopContainers.isSupportedContainer(targetBlock.getType())) {
 						List<PlayerShopkeeper> shopsUsingContainer = SKShopkeepersPlugin.getInstance().getProtectedContainers().getShopkeepersUsingContainer(targetBlock);
 						if (shopsUsingContainer.isEmpty()) {
-							return new TargetShopkeepersResult(Settings.msgUnusedContainer);
+							return new TargetShopkeepersResult(Messages.unusedContainer);
 						} else {
 							// Filter shops:
 							List<Shopkeeper> acceptedShops = new ArrayList<>();
@@ -182,7 +182,7 @@ public class ShopkeeperUtils {
 				assert targetEntity != null;
 				shopkeeper = ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperByEntity(targetEntity);
 				if (shopkeeper == null) {
-					return new TargetShopkeepersResult(Settings.msgTargetEntityIsNoShop);
+					return new TargetShopkeepersResult(Messages.targetEntityIsNoShop);
 				}
 			}
 

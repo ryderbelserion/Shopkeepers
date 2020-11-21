@@ -1,15 +1,23 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.12.1 (TBA)
+## v2.13.0 (TBA)
 ### Supported MC versions: 1.16.4, 1.16.3, 1.16.2, 1.16.1, 1.15.2, 1.14.4
+
+* Messages have been separated from the config.
+  * We always generate an 'en-default' language file. This file acts as a template for custom language files. It is not meant to be modified and is replaced with an up-to-date version on every plugin startup.
+  * Config: Changed the default language from 'en' to 'en-default'. Existing configs get automatically migrated.
+* Fixed: Text#parse can now also parse alternative color codes starting with '&'. This has an effect when some messages of the specified language file cannot be loaded and the plugin then uses the default messages instead.
+* Added warning output when the language file misses messages, or contains unexpected messages.
 
 Migration notes:  
 * The folder structure has changed:
   * The save file and trading logs (if enabled) are stored inside a new 'data' folder now.
   * If no save file exists at the new location and a previous save file is found at the old location, it is automatically moved.
-  * Custom language files need to be located inside a new 'lang' folder now.
-  * Existing custom language files need to be manually moved!
+  * Language files are located inside a new 'lang' folder now. Existing custom language files need to be manually moved!
+
+Messages:  
+* All message keys were changed to no longer start with the 'msg' prefix. You will have to manually update your custom language files to adapt for this change.
 
 ## v2.12.0 (2020-11-04)
 ### Supported MC versions: 1.16.4, 1.16.3, 1.16.2, 1.16.1, 1.15.2, 1.14.4

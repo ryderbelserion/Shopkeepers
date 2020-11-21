@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
@@ -100,7 +101,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 	@Override
 	protected ItemStack createTradeSetupIcon() {
 		ShopType<?> shopType = this.getShopkeeper().getType();
-		String itemName = TextUtils.replaceArguments(Settings.msgTradeSetupDescHeader, "shopType", shopType.getDisplayName());
+		String itemName = TextUtils.replaceArguments(Messages.tradeSetupDescHeader, "shopType", shopType.getDisplayName());
 		List<String> itemLore = shopType.getTradeSetupDescription();
 		return ItemUtils.setItemStackNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, itemLore);
 	}
@@ -167,7 +168,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 
 				// Start naming:
 				SKShopkeepersPlugin.getInstance().getShopkeeperNaming().startNaming(player, shopkeeper);
-				TextUtils.sendMessage(player, Settings.msgTypeNewName);
+				TextUtils.sendMessage(player, Messages.typeNewName);
 			}
 		};
 	}

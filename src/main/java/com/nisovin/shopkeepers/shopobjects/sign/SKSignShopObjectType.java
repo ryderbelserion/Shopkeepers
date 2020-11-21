@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObjectType;
@@ -20,7 +21,7 @@ public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShop
 
 	@Override
 	public String getDisplayName() {
-		return Settings.msgShopObjectTypeSign;
+		return Messages.shopObjectTypeSign;
 	}
 
 	@Override

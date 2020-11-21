@@ -6,6 +6,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHireEvent;
@@ -65,7 +66,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			if (Settings.hireRequireCreationPermission && (!this.getShopkeeper().getType().hasPermission(player)
 					|| !this.getShopkeeper().getShopObject().getType().hasPermission(player))) {
 				// Missing permission to hire this type of shopkeeper:
-				TextUtils.sendMessage(player, Settings.msgCantHireShopType);
+				TextUtils.sendMessage(player, Messages.cantHireShopType);
 				this.getUISession(player).abortDelayed();
 				return;
 			}
@@ -95,7 +96,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 
 			if (hireCost.getAmount() != 0) {
 				// Not enough money:
-				TextUtils.sendMessage(player, Settings.msgCantHire);
+				TextUtils.sendMessage(player, Messages.cantHire);
 				// Close window for this player:
 				this.getUISession(player).abortDelayed();
 				return;
@@ -117,7 +118,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			if (maxShops > 0) {
 				int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getPlayerShopkeepersByOwner(player.getUniqueId()).size();
 				if (count >= maxShops) {
-					TextUtils.sendMessage(player, Settings.msgTooManyShops);
+					TextUtils.sendMessage(player, Messages.tooManyShops);
 					this.getUISession(player).abortDelayed();
 					return;
 				}
@@ -128,7 +129,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			shopkeeper.setForHire(null);
 			shopkeeper.setOwner(player);
 			shopkeeper.save();
-			TextUtils.sendMessage(player, Settings.msgHired);
+			TextUtils.sendMessage(player, Messages.hired);
 
 			// Close all open windows for this shopkeeper:
 			shopkeeper.abortUISessionsDelayed();

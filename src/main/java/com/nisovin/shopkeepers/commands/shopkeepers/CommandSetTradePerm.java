@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import org.bukkit.command.CommandSender;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
@@ -36,7 +36,7 @@ class CommandSetTradePerm extends Command {
 		this.setPermission(ShopkeepersPlugin.SET_TRADE_PERM_PERMISSION);
 
 		// Set description:
-		this.setDescription(Settings.msgCommandDescriptionSettradeperm);
+		this.setDescription(Messages.commandDescriptionSettradeperm);
 
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
@@ -65,13 +65,13 @@ class CommandSetTradePerm extends Command {
 		if (removePerm) {
 			// Remove trade permission:
 			assert newTradePerm == null;
-			TextUtils.sendMessage(sender, Settings.msgTradePermRemoved, "perm", currentTradePerm);
+			TextUtils.sendMessage(sender, Messages.tradePermRemoved, "perm", currentTradePerm);
 		} else if (newTradePerm != null) {
 			// Set trade permission:
-			TextUtils.sendMessage(sender, Settings.msgTradePermSet, "perm", newTradePerm);
+			TextUtils.sendMessage(sender, Messages.tradePermSet, "perm", newTradePerm);
 		} else {
 			// Display current trade permission:
-			TextUtils.sendMessage(sender, Settings.msgTradePermView, "perm", currentTradePerm);
+			TextUtils.sendMessage(sender, Messages.tradePermView, "perm", currentTradePerm);
 			return;
 		}
 

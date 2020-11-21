@@ -5,7 +5,7 @@ import java.util.Arrays;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
@@ -30,7 +30,7 @@ class CommandRemote extends Command {
 		this.setPermission(ShopkeepersPlugin.REMOTE_PERMISSION);
 
 		// Set description:
-		this.setDescription(Settings.msgCommandDescriptionRemote);
+		this.setDescription(Messages.commandDescriptionRemote);
 
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(

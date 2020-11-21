@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.commands.arguments;
 
 import java.util.Collections;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -26,7 +26,7 @@ public final class ShopkeeperFilter {
 		@Override
 		public Text getInvalidArgumentErrorMsg(CommandArgument<Shopkeeper> argument, String argumentInput, Shopkeeper value) {
 			if (argumentInput == null) argumentInput = "";
-			Text text = Settings.msgCommandShopkeeperArgumentNoAdminShop;
+			Text text = Messages.commandShopkeeperArgumentNoAdminShop;
 			text.setPlaceholderArguments(argument.getDefaultErrorMsgArgs());
 			text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
 			return text;
@@ -42,7 +42,7 @@ public final class ShopkeeperFilter {
 		@Override
 		public Text getInvalidArgumentErrorMsg(CommandArgument<Shopkeeper> argument, String argumentInput, Shopkeeper value) {
 			if (argumentInput == null) argumentInput = "";
-			Text text = Settings.msgCommandShopkeeperArgumentNoPlayerShop;
+			Text text = Messages.commandShopkeeperArgumentNoPlayerShop;
 			text.setPlaceholderArguments(argument.getDefaultErrorMsgArgs());
 			text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
 			return text;

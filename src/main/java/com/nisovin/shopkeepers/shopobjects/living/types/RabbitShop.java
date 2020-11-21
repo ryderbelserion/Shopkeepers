@@ -11,7 +11,7 @@ import org.bukkit.entity.Rabbit;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.Property;
@@ -120,7 +120,7 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 			ItemUtils.setLeatherColor(iconItem, Color.PURPLE);
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonRabbitVariant, Settings.msgButtonRabbitVariantLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonRabbitVariant, Messages.buttonRabbitVariantLore);
 		return iconItem;
 	}
 

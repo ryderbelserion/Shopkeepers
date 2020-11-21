@@ -5,8 +5,8 @@ import org.bukkit.entity.AbstractVillager;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
@@ -40,12 +40,12 @@ class CommandEditVillager extends PlayerCommand {
 
 		@Override
 		public Text getNoTargetErrorMsg() {
-			return Settings.msgMustTargetVillager;
+			return Messages.mustTargetVillager;
 		}
 
 		@Override
 		public Text getInvalidTargetErrorMsg(Entity entity) {
-			return Settings.msgTargetEntityIsNoVillager;
+			return Messages.targetEntityIsNoVillager;
 		}
 	};
 
@@ -57,7 +57,7 @@ class CommandEditVillager extends PlayerCommand {
 		// Permission gets checked by testPermission and when opening the editor.
 
 		// Set description:
-		this.setDescription(Settings.msgCommandDescriptionEditVillager);
+		this.setDescription(Messages.commandDescriptionEditVillager);
 
 		// Arguments:
 		this.addArgument(new TargetEntityFallback(

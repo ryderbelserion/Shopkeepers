@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.commands.arguments;
 import java.util.Collections;
 import java.util.UUID;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
@@ -42,7 +42,7 @@ public class ShopkeeperByUUIDArgument extends ObjectByIdArgument<UUID, Shopkeepe
 	@Override
 	public Text getInvalidArgumentErrorMsg(String argumentInput) {
 		if (argumentInput == null) argumentInput = "";
-		Text text = Settings.msgCommandShopkeeperArgumentInvalid;
+		Text text = Messages.commandShopkeeperArgumentInvalid;
 		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
 		text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
 		return text;

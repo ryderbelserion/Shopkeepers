@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -260,7 +260,7 @@ public abstract class CommandArgument<T> {
 	 * @return the error message
 	 */
 	public Text getRequiresPlayerErrorMsg() {
-		Text text = Settings.msgCommandArgumentRequiresPlayer;
+		Text text = Messages.commandArgumentRequiresPlayer;
 		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
 		return text;
 	}
@@ -283,7 +283,7 @@ public abstract class CommandArgument<T> {
 	 * @return the error message
 	 */
 	public Text getMissingArgumentErrorMsg() {
-		Text text = Settings.msgCommandArgumentInvalid;
+		Text text = Messages.commandArgumentInvalid;
 		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
 		return text;
 	}
@@ -309,7 +309,7 @@ public abstract class CommandArgument<T> {
 	 */
 	public Text getInvalidArgumentErrorMsg(String argumentInput) {
 		if (argumentInput == null) argumentInput = "";
-		Text text = Settings.msgCommandArgumentInvalid;
+		Text text = Messages.commandArgumentInvalid;
 		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
 		text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
 		return text;

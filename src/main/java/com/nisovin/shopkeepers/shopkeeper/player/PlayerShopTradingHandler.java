@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -41,7 +42,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 			if (ownerPlayer != null) {
 				if (!silent) {
 					Log.debug(() -> "Blocked trade window opening for " + player.getName() + ", because the shop owner is online.");
-					TextUtils.sendMessage(player, Settings.msgCantTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
+					TextUtils.sendMessage(player, Messages.cantTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
 				}
 				return false;
 			}
@@ -58,7 +59,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		// No trading with own shop:
 		if (Settings.preventTradingWithOwnShop && shopkeeper.isOwner(tradingPlayer)
 				&& !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-			TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWithOwnShop);
+			TextUtils.sendMessage(tradingPlayer, Messages.cantTradeWithOwnShop);
 			this.debugPreventedTrade(tradingPlayer, "Trading with the own shop is not allowed.");
 			return false;
 		}
@@ -68,7 +69,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null && !shopkeeper.isOwner(tradingPlayer)
 					&& !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-				TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
+				TextUtils.sendMessage(tradingPlayer, Messages.cantTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
 				this.debugPreventedTrade(tradingPlayer, "Trading is not allowed while the shop owner is online.");
 				return false;
 			}
@@ -77,7 +78,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		// Check for the shop's container:
 		Block container = shopkeeper.getContainer();
 		if (!ShopContainers.isSupportedContainer(container.getType())) {
-			TextUtils.sendMessage(tradingPlayer, Settings.msgCantTradeWithShopMissingContainer, "owner", shopkeeper.getOwnerName());
+			TextUtils.sendMessage(tradingPlayer, Messages.cantTradeWithShopMissingContainer, "owner", shopkeeper.getOwnerName());
 			this.debugPreventedTrade(tradingPlayer, "The shop's container is missing.");
 			return false;
 		}

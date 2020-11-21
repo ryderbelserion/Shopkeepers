@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObjectType;
@@ -39,7 +40,7 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> ex
 	@Override
 	public String getDisplayName() {
 		// TODO Translation support for the entity type name?
-		return TextUtils.replaceArguments(Settings.msgShopObjectTypeLiving, "type", StringUtils.normalize(entityType.name()));
+		return TextUtils.replaceArguments(Messages.shopObjectTypeLiving, "type", StringUtils.normalize(entityType.name()));
 	}
 
 	@Override

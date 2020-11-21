@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.commands.lib.arguments.FallbackArgument;
 import com.nisovin.shopkeepers.text.Text;
@@ -233,7 +234,7 @@ public abstract class Command {
 	}
 
 	protected NoPermissionException noPermissionException() {
-		return new NoPermissionException(Settings.msgNoPermission);
+		return new NoPermissionException(Messages.noPermission);
 	}
 
 	/**
@@ -887,7 +888,7 @@ public abstract class Command {
 				throw firstUnparsedArgument.invalidArgumentError(firstUnparsedArg);
 			} else {
 				// Throw an 'unexpected argument' exception:
-				Text errorMsg = Settings.msgCommandArgumentUnexpected;
+				Text errorMsg = Messages.commandArgumentUnexpected;
 				errorMsg.setPlaceholderArguments(Collections.singletonMap("argument", firstUnparsedArg));
 				throw new ArgumentParseException(null, errorMsg);
 			}
@@ -895,7 +896,7 @@ public abstract class Command {
 	}
 
 	protected Text getUnknownCommandMessage(String command) {
-		Text text = Settings.msgCommandUnknown;
+		Text text = Messages.commandUnknown;
 		text.setPlaceholderArguments(Collections.singletonMap("command", command));
 		return text;
 	}

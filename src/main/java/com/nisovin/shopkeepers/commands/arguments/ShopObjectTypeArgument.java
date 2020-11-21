@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
@@ -25,7 +25,7 @@ public class ShopObjectTypeArgument extends CommandArgument<ShopObjectType<?>> {
 	@Override
 	public Text getInvalidArgumentErrorMsg(String argumentInput) {
 		if (argumentInput == null) argumentInput = "";
-		Text text = Settings.msgCommandShopObjectTypeArgumentInvalid;
+		Text text = Messages.commandShopObjectTypeArgumentInvalid;
 		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
 		text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
 		return text;

@@ -10,7 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.Property;
@@ -76,7 +76,7 @@ public class PigShop extends BabyableShop<Pig> {
 
 	private ItemStack getSaddleEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.SADDLE);
-		ItemUtils.setItemStackNameAndLore(iconItem, Settings.msgButtonPigSaddle, Settings.msgButtonPigSaddleLore);
+		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonPigSaddle, Messages.buttonPigSaddleLore);
 		return iconItem;
 	}
 

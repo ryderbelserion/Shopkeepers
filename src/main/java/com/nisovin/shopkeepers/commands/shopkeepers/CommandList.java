@@ -10,7 +10,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
@@ -54,7 +54,7 @@ class CommandList extends Command {
 		// Permission gets checked by testPermission and during execution.
 
 		// Set description:
-		this.setDescription(Settings.msgCommandDescriptionList);
+		this.setDescription(Messages.commandDescriptionList);
 
 		// Arguments:
 		this.addArgument(new FirstOfArgument("target", Arrays.asList(
@@ -171,21 +171,21 @@ class CommandList extends Command {
 
 		if (listAllShops) {
 			// Listing all shops:
-			TextUtils.sendMessage(sender, Settings.msgListAllShopsHeader,
+			TextUtils.sendMessage(sender, Messages.listAllShopsHeader,
 					"shopsCount", shopsCount,
 					"page", page,
 					"maxPage", maxPage
 			);
 		} else if (listAdminShops) {
 			// Listing admin shops:
-			TextUtils.sendMessage(sender, Settings.msgListAdminShopsHeader,
+			TextUtils.sendMessage(sender, Messages.listAdminShopsHeader,
 					"shopsCount", shopsCount,
 					"page", page,
 					"maxPage", maxPage
 			);
 		} else {
 			// Listing player shops:
-			TextUtils.sendMessage(sender, Settings.msgListPlayerShopsHeader,
+			TextUtils.sendMessage(sender, Messages.listPlayerShopsHeader,
 					"player", TextUtils.getPlayerText(targetPlayerName, targetPlayerUUID),
 					"shopsCount", shopsCount,
 					"page", page,
@@ -201,7 +201,7 @@ class CommandList extends Command {
 			// TODO Add shop info as hover text.
 			// TODO Add owner name/uuid as message arguments?
 			// TODO Move into shopkeeper.
-			TextUtils.sendMessage(sender, Settings.msgListShopsEntry,
+			TextUtils.sendMessage(sender, Messages.listShopsEntry,
 					"shopIndex", (index + 1),
 					"shopUUID", shopkeeper.getUniqueId().toString(),
 					// deprecated, use {shopId} instead; TODO Remove at some point

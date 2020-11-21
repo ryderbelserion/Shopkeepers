@@ -12,7 +12,7 @@ import org.bukkit.event.entity.EntityTransformEvent.TransformReason;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -35,7 +35,7 @@ public class BlockZombieVillagerCuringListener implements Listener {
 			// Prevent curing:
 			Log.debug(() -> "Preventing zombie villager curing at " + TextUtils.getLocationString(player.getLocation()));
 			event.setCancelled(true);
-			TextUtils.sendMessage(player, Settings.msgZombieVillagerCuringDisabled);
+			TextUtils.sendMessage(player, Messages.zombieVillagerCuringDisabled);
 		}
 	}
 
@@ -52,7 +52,7 @@ public class BlockZombieVillagerCuringListener implements Listener {
 		OfflinePlayer conversionOfflinePlayer = zombieVillager.getConversionPlayer();
 		Player conversionPlayer = (conversionOfflinePlayer == null) ? null : conversionOfflinePlayer.getPlayer();
 		if (conversionPlayer != null) {
-			TextUtils.sendMessage(conversionPlayer, Settings.msgZombieVillagerCuringDisabled);
+			TextUtils.sendMessage(conversionPlayer, Messages.zombieVillagerCuringDisabled);
 		}
 	}
 }

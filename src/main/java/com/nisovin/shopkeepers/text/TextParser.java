@@ -2,6 +2,8 @@ package com.nisovin.shopkeepers.text;
 
 import org.bukkit.ChatColor;
 
+import com.nisovin.shopkeepers.util.TextUtils;
+
 class TextParser {
 
 	private static final TextParser INSTANCE = new TextParser();
@@ -47,7 +49,7 @@ class TextParser {
 
 			// Color codes:
 			ChatColor color = null;
-			if (c == ChatColor.COLOR_CHAR && i + 1 < length) {
+			if ((c == ChatColor.COLOR_CHAR || c == TextUtils.COLOR_CHAR_ALTERNATIVE) && i + 1 < length) {
 				char colorChar = Character.toLowerCase(input.charAt(i + 1));
 				color = ChatColor.getByChar(colorChar);
 			}

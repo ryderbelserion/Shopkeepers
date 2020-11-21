@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.commands.shopkeepers;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
@@ -30,7 +30,7 @@ class CommandTransfer extends Command {
 		this.setPermission(ShopkeepersPlugin.TRANSFER_PERMISSION);
 
 		// Set description:
-		this.setDescription(Settings.msgCommandDescriptionTransfer);
+		this.setDescription(Messages.commandDescriptionTransfer);
 
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
@@ -53,7 +53,7 @@ class CommandTransfer extends Command {
 		// Check that the shop is owned by the executing player:
 		Player player = (sender instanceof Player) ? (Player) sender : null;
 		if ((player == null || !shopkeeper.isOwner(player)) && !PermissionUtils.hasPermission(sender, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-			TextUtils.sendMessage(sender, Settings.msgNotOwner);
+			TextUtils.sendMessage(sender, Messages.notOwner);
 			return;
 		}
 
@@ -61,7 +61,7 @@ class CommandTransfer extends Command {
 		shopkeeper.setOwner(newOwner);
 
 		// Success:
-		TextUtils.sendMessage(player, Settings.msgOwnerSet, "owner", TextUtils.getPlayerText(newOwner));
+		TextUtils.sendMessage(player, Messages.ownerSet, "owner", TextUtils.getPlayerText(newOwner));
 
 		// Save:
 		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();

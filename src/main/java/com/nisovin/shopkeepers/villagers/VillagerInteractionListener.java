@@ -15,6 +15,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -121,7 +122,7 @@ public class VillagerInteractionListener implements Listener {
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
 		if (!Settings.isHireItem(itemInMainHand)) {
 			// TODO Show hire item via hover event?
-			TextUtils.sendMessage(player, Settings.msgVillagerForHire,
+			TextUtils.sendMessage(player, Messages.villagerForHire,
 					"costs", Settings.hireOtherVillagersCosts,
 					"hire-item", Settings.hireItem.getType().name()
 			); // TODO Also print required hire item name and lore?
@@ -134,7 +135,7 @@ public class VillagerInteractionListener implements Listener {
 		if (costs > 0) {
 			ItemStack[] storageContents = playerInventory.getStorageContents();
 			if (!ItemUtils.containsAtLeast(storageContents, Settings.hireItem, costs)) {
-				TextUtils.sendMessage(player, Settings.msgCantHire);
+				TextUtils.sendMessage(player, Messages.cantHire);
 				Log.debug("    ..not holding enough hire items.");
 				return false;
 			}
@@ -170,7 +171,7 @@ public class VillagerInteractionListener implements Listener {
 		// Update client's inventory:
 		player.updateInventory();
 
-		TextUtils.sendMessage(player, Settings.msgHired);
+		TextUtils.sendMessage(player, Messages.hired);
 		Log.debug("    ..success (normal trading prevented).");
 		return true;
 	}

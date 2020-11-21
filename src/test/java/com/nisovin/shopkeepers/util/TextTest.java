@@ -18,20 +18,19 @@ import com.nisovin.shopkeepers.text.Text;
 
 public class TextTest extends AbstractBukkitTest {
 
-	// tests Text parsing and backwards conversion with the actual default messages extracted from the default config
+	// Tests Text parsing and backwards conversion with the actual default messages extracted from the default config
 	@Test
 	public void testRealMessageConversions() throws IOException {
 		// read default config:
 		Configuration config;
 		ClassLoader classLoader = this.getClass().getClassLoader();
-		try (Reader reader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream("config.yml")))) {
+		try (Reader reader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream("lang/language-en-default.yml")))) {
 			config = YamlConfiguration.loadConfiguration(reader);
 		}
 
 		Set<String> configKeys = config.getKeys(false);
 		int tested = 0;
 		for (String key : configKeys) {
-			if (!key.startsWith("msg")) continue;
 			Object value = config.get(key);
 			if (value.getClass() != String.class) continue;
 

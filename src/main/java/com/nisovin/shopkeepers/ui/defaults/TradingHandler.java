@@ -19,6 +19,7 @@ import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
@@ -129,7 +130,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.TRADE_PERMISSION)) {
 			if (!silent) {
 				Log.debug(() -> "Blocked trade window opening for " + player.getName() + ": Missing trade permission.");
-				TextUtils.sendMessage(player, Settings.msgMissingTradePerm);
+				TextUtils.sendMessage(player, Messages.missingTradePerm);
 			}
 			return false;
 		}
@@ -187,9 +188,9 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	protected String getInventoryTitle() {
 		String title = this.getShopkeeper().getName(); // Can be empty
 		if (title.isEmpty()) {
-			title = Settings.msgTradingTitleDefault;
+			title = Messages.tradingTitleDefault;
 		}
-		return Settings.msgTradingTitlePrefix + title;
+		return Messages.tradingTitlePrefix + title;
 	}
 
 	protected void updateTrades(Player player) {
