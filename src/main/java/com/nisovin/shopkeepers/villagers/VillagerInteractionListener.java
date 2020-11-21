@@ -135,7 +135,7 @@ public class VillagerInteractionListener implements Listener {
 		if (costs > 0) {
 			ItemStack[] storageContents = playerInventory.getStorageContents();
 			if (!ItemUtils.containsAtLeast(storageContents, Settings.hireItem, costs)) {
-				TextUtils.sendMessage(player, Messages.cantHire);
+				TextUtils.sendMessage(player, Messages.cannotHire);
 				Log.debug("    ..not holding enough hire items.");
 				return false;
 			}

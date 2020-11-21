@@ -177,16 +177,16 @@ public class Messages {
 	public static Text setForHire = Text.parse("&aThe Shopkeeper was set for hire.");
 	public static Text hired = Text.parse("&aYou have hired this shopkeeper!");
 	public static Text missingHirePerm = Text.parse("&7You do not have the permission to hire shopkeepers.");
-	public static Text cantHire = Text.parse("&aYou cannot afford to hire this shopkeeper.");
-	public static Text cantHireShopType = Text.parse("&7You do not have the permission to hire this type of shopkeeper.");
+	public static Text cannotHire = Text.parse("&aYou cannot afford to hire this shopkeeper.");
+	public static Text cannotHireShopType = Text.parse("&7You do not have the permission to hire this type of shopkeeper.");
 	// Placeholders: {costs}, {hire-item}
 	public static Text villagerForHire = Text.parse("&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a.");
 
 	public static Text missingTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
 	public static Text missingCustomTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
-	public static Text cantTradeWithOwnShop = Text.parse("&7You cannot trade with your own shop.");
-	public static Text cantTradeWhileOwnerOnline = Text.parse("&7You cannot trade while the owner of this shop ('&e{owner}&7') is online.");
-	public static Text cantTradeWithShopMissingContainer = Text.parse("&7You cannot trade with this shop, because its container is missing.");
+	public static Text cannotTradeWithOwnShop = Text.parse("&7You cannot trade with your own shop.");
+	public static Text cannotTradeWhileOwnerOnline = Text.parse("&7You cannot trade while the owner of this shop ('&e{owner}&7') is online.");
+	public static Text cannotTradeWithShopMissingContainer = Text.parse("&7You cannot trade with this shop, because its container is missing.");
 
 	public static Text shopkeeperCreated = Text.parse("&aShopkeeper created: &6{type} &7({description})\n{setupDesc}");
 

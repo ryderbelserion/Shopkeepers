@@ -42,7 +42,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 			if (ownerPlayer != null) {
 				if (!silent) {
 					Log.debug(() -> "Blocked trade window opening for " + player.getName() + ", because the shop owner is online.");
-					TextUtils.sendMessage(player, Messages.cantTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
+					TextUtils.sendMessage(player, Messages.cannotTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
 				}
 				return false;
 			}
@@ -59,7 +59,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		// No trading with own shop:
 		if (Settings.preventTradingWithOwnShop && shopkeeper.isOwner(tradingPlayer)
 				&& !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-			TextUtils.sendMessage(tradingPlayer, Messages.cantTradeWithOwnShop);
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeWithOwnShop);
 			this.debugPreventedTrade(tradingPlayer, "Trading with the own shop is not allowed.");
 			return false;
 		}
@@ -69,7 +69,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null && !shopkeeper.isOwner(tradingPlayer)
 					&& !PermissionUtils.hasPermission(tradingPlayer, ShopkeepersPlugin.BYPASS_PERMISSION)) {
-				TextUtils.sendMessage(tradingPlayer, Messages.cantTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
+				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
 				this.debugPreventedTrade(tradingPlayer, "Trading is not allowed while the shop owner is online.");
 				return false;
 			}
@@ -78,7 +78,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		// Check for the shop's container:
 		Block container = shopkeeper.getContainer();
 		if (!ShopContainers.isSupportedContainer(container.getType())) {
-			TextUtils.sendMessage(tradingPlayer, Messages.cantTradeWithShopMissingContainer, "owner", shopkeeper.getOwnerName());
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeWithShopMissingContainer, "owner", shopkeeper.getOwnerName());
 			this.debugPreventedTrade(tradingPlayer, "The shop's container is missing.");
 			return false;
 		}

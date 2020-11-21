@@ -66,7 +66,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			if (Settings.hireRequireCreationPermission && (!this.getShopkeeper().getType().hasPermission(player)
 					|| !this.getShopkeeper().getShopObject().getType().hasPermission(player))) {
 				// Missing permission to hire this type of shopkeeper:
-				TextUtils.sendMessage(player, Messages.cantHireShopType);
+				TextUtils.sendMessage(player, Messages.cannotHireShopType);
 				this.getUISession(player).abortDelayed();
 				return;
 			}
@@ -96,7 +96,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 
 			if (hireCost.getAmount() != 0) {
 				// Not enough money:
-				TextUtils.sendMessage(player, Messages.cantHire);
+				TextUtils.sendMessage(player, Messages.cannotHire);
 				// Close window for this player:
 				this.getUISession(player).abortDelayed();
 				return;

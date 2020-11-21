@@ -17,7 +17,14 @@ Migration notes:
   * Language files are located inside a new 'lang' folder now. Existing custom language files need to be manually moved!
 
 Messages:  
-* All message keys were changed to no longer start with the 'msg' prefix. You will have to manually update your custom language files to adapt for this change.
+* All message keys were changed to no longer start with the 'msg' prefix.
+* 'cant-hire' -> 'cannot-hire'
+* 'cant-hire-shop-type' -> 'cannot-hire-shop-type'
+* 'cant-trade-with-own-shop' -> 'cannot-trade-with-own-shop'
+* 'cant-trade-while-owner-online' -> 'cannot-trade-while-owner-online'
+* 'cant-trade-with-shop-missing-container' -> 'cannot-trade-with-shop-missing-container'
+
+You will have to manually update your custom language files to adapt for these changes.
 
 ## v2.12.0 (2020-11-04)
 ### Supported MC versions: 1.16.4, 1.16.3, 1.16.2, 1.16.1, 1.15.2, 1.14.4
