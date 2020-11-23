@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shopcreation;
 
 import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -52,7 +51,6 @@ class CreateListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onItemHeld(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
-		if (player.getGameMode() == GameMode.CREATIVE) return;
 		ItemStack newItemInHand = player.getInventory().getItem(event.getNewSlot());
 		if (!Settings.isShopCreationItem(newItemInHand)) {
 			return;
@@ -87,12 +85,6 @@ class CreateListener implements Listener {
 
 		Player player = event.getPlayer();
 		Log.debug(() -> "Player " + player.getName() + " is interacting with the shop creation item");
-
-		// Ignore creative mode players:
-		if (player.getGameMode() == GameMode.CREATIVE) {
-			Log.debug("  Ignoring creative mode player");
-			return;
-		}
 
 		// Capture event's cancellation state:
 		Result useItemInHand = event.useItemInHand();
@@ -240,7 +232,6 @@ class CreateListener implements Listener {
 	private void handleEntityInteraction(PlayerInteractEntityEvent event) {
 		if (!Settings.preventShopCreationItemRegularUsage) return;
 		Player player = event.getPlayer();
-		if (player.getGameMode() == GameMode.CREATIVE) return; // Creative mode players are ignored
 		// We check the permission first since this check is fast:
 		if (PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) return;
 		ItemStack itemInHand = ItemUtils.getItem(player.getInventory(), event.getHand());

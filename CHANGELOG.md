@@ -9,6 +9,7 @@ Date format: (YYYY-MM-DD)
   * Config: Changed the default language from 'en' to 'en-default'. Existing configs get automatically migrated.
 * Fixed: Text#parse can now also parse alternative color codes starting with '&'. This has an effect when some messages of the specified language file cannot be loaded and the plugin then uses the default messages instead.
 * Added warning output when the language file misses messages, or contains unexpected messages.
+* Changed: Players in creative mode are no longer ignored when using the shop creation item.
 
 Migration notes:  
 * The folder structure has changed:
