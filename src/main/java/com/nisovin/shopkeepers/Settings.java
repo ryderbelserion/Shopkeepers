@@ -87,7 +87,7 @@ public class Settings {
 
 		private AsyncSettings() {
 			this.debug = Settings.debug;
-			this.debugOptions = new ArrayList<String>(Settings.debugOptions);
+			this.debugOptions = new ArrayList<>(Settings.debugOptions);
 			this.fileEncoding = Settings.fileEncoding;
 		}
 	}
@@ -104,6 +104,11 @@ public class Settings {
 	// See DebugOptions for all available options.
 	public static List<String> debugOptions = new ArrayList<>(0);
 	public static boolean enableMetrics = true;
+
+	/*
+	 * Messages
+	 */
+	public static String language = "en-default";
 
 	/*
 	 * Shopkeeper Data
@@ -303,11 +308,6 @@ public class Settings {
 	// Note: This can in general be larger than 64!
 	public static int highCurrencyValue = 9;
 	public static int highCurrencyMinCost = 20;
-
-	/*
-	 * Messages
-	 */
-	public static String language = "en-default";
 
 	// /////
 
