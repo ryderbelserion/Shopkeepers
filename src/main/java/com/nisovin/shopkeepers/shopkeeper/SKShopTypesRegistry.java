@@ -18,7 +18,7 @@ public class SKShopTypesRegistry extends AbstractSelectableTypeRegistry<Abstract
 		// TODO This currently skips all shop types that are not PlayerShopType.
 		// Maybe include the admin shop types here for players which are admins, because there /could/ be different
 		// types of admin shops in the future.
-		// Maybe include other types of shop types here, is custom ones get registered?
+		// Maybe include other types of shop types here, if custom ones get registered?
 		return super.canBeSelected(player, type) && (type instanceof PlayerShopType);
 	}
 }

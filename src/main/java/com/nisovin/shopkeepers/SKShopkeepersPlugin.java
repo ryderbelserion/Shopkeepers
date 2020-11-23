@@ -11,7 +11,6 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.Configuration;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
@@ -60,7 +59,6 @@ import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradingOffer;
-import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShops;
@@ -628,20 +626,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	@Override
 	public SKDefaultShopObjectTypes getDefaultShopObjectTypes() {
 		return defaultShopObjectTypes;
-	}
-
-	/**
-	 * Gets the default shop object type.
-	 * 
-	 * <p>
-	 * Usually this will be the villager entity shop object type. However, there are no guarantees that this might not
-	 * get changed or be configurable in the future.
-	 * 
-	 * @return the default shop object type
-	 */
-	public AbstractShopObjectType<?> getDefaultShopObjectType() {
-		// Default: Villager entity shop object type.
-		return this.getDefaultShopObjectTypes().getLivingShopObjectTypes().get(EntityType.VILLAGER);
 	}
 
 	// SHOPKEEPER NAMING

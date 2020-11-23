@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
@@ -45,8 +46,12 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		// Validate container block:
 		Block containerBlock = playerShopCreationData.getShopContainer();
 		if (!ShopContainers.isSupportedContainer(containerBlock.getType())) {
-			// The block is not / no longer a supported container:
-			TextUtils.sendMessage(creator, Messages.invalidContainer);
+			// The block is not / no longer a supported type of container:
+			if (ItemUtils.isContainer(containerBlock.getType())) {
+				TextUtils.sendMessage(creator, Messages.unsupportedContainer);
+			} else {
+				TextUtils.sendMessage(creator, Messages.invalidContainer);
+			}
 			return false;
 		}
 

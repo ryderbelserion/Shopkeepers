@@ -179,12 +179,8 @@ class CreateListener implements Listener {
 				}
 				assert ShopContainers.isSupportedContainer(selectedContainer.getType()); // Checked above already
 
-				// Validate the selected shop type:
-				if (!(shopType instanceof PlayerShopType)) {
-					// Only player shop types are allowed here:
-					TextUtils.sendMessage(player, Messages.noPlayerShopTypeSelected);
-					return;
-				}
+				// Only player shops can be selected currently. TODO Change that?
+				assert shopType instanceof PlayerShopType;
 
 				// Determine spawn location:
 				BlockFace clickedBlockFace = event.getBlockFace();

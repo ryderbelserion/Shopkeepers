@@ -20,7 +20,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
-import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
@@ -34,7 +33,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.CommandRegistry;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
-import com.nisovin.shopkeepers.container.ShopContainers;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
@@ -125,63 +124,50 @@ public class ShopkeepersCommand extends BaseCommand {
 		ShopType<?> shopType = context.get(ARGUMENT_SHOP_TYPE);
 		ShopObjectType<?> shopObjType = context.get(ARGUMENT_OBJECT_TYPE);
 
-		boolean createPlayerShop = (Settings.createPlayerShopWithCommand && ShopContainers.isSupportedContainer(targetBlock.getType()));
-		if (createPlayerShop) {
-			// Create player shopkeeper:
-
-			// Default shop type and shop object type: First useable player shop type and shop object type.
+		// We use different defaults depending on whether the player might be trying to create a player or admin shop:
+		boolean containerTargeted = ItemUtils.isContainer(targetBlock.getType());
+		boolean maybeCreatePlayerShop = containerTargeted;
+		if (maybeCreatePlayerShop) {
+			// Default shop type and shop object type: First usable player shop type and shop object type.
 			if (shopType == null) {
 				shopType = plugin.getShopTypeRegistry().getDefaultSelection(player);
 			}
-			if (shopObjType == null) {
-				shopObjType = plugin.getShopObjectTypeRegistry().getDefaultSelection(player);
-			}
-
-			if (shopType == null || shopObjType == null) {
-				// The player cannot create shops at all:
-				TextUtils.sendMessage(player, Messages.noPermission);
-				return;
-			}
-
-			// Validate the selected shop type:
-			if (!(shopType instanceof PlayerShopType)) {
-				// Only player shop types are allowed here:
-				TextUtils.sendMessage(player, Messages.noPlayerShopTypeSelected);
-				return;
-			}
 		} else {
-			// Create admin shopkeeper:
-
-			// Check permission:
-			if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.ADMIN_PERMISSION)) {
-				TextUtils.sendMessage(sender, Messages.noPermission);
-				return;
-			}
-
 			// Default shop type and shop object type:
 			if (shopType == null) {
 				shopType = DefaultShopTypes.ADMIN();
-			}
-			if (shopObjType == null) {
-				shopObjType = plugin.getDefaultShopObjectType();
-			}
-			assert shopType != null && shopObjType != null;
-
-			// Validate the selected shop type:
-			if (!(shopType instanceof AdminShopType)) {
-				// Only admin shop types are allowed here:
-				TextUtils.sendMessage(player, Messages.noAdminShopTypeSelected);
-				return;
+				// Note: Shop type permissions are checked afterwards during shop creation.
 			}
 		}
+
+		if (shopObjType == null) {
+			shopObjType = plugin.getShopObjectTypeRegistry().getDefaultSelection(player);
+		}
+		if (shopType == null || shopObjType == null) {
+			// The player cannot create shops at all:
+			TextUtils.sendMessage(player, Messages.noPermission);
+			return;
+		}
 		assert shopType != null && shopObjType != null;
+		boolean isPlayerShopType = (shopType instanceof PlayerShopType);
+
+		if (isPlayerShopType) {
+			if (!Settings.createPlayerShopWithCommand) {
+				TextUtils.sendMessage(player, Messages.noPlayerShopsViaCommand);
+				return;
+			} else if (!containerTargeted) {
+				TextUtils.sendMessage(player, Messages.mustTargetContainer);
+				return;
+			}
+			// Note: We check if the targeted container is valid / supported during shop creation.
+		}
 
 		// Determine spawn location:
 		Location spawnLocation = plugin.getShopkeeperCreation().determineSpawnLocation(player, targetBlock, targetBlockFace);
 
 		// Shop creation data:
 		ShopCreationData shopCreationData;
-		if (createPlayerShop) {
+		if (isPlayerShopType) {
 			// Create player shopkeeper:
 			shopCreationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace, targetBlock);
 		} else {

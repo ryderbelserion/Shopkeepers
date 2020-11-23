@@ -129,14 +129,14 @@ public class Messages {
 	public static Text containerSelected = Text.parse("&aContainer selected! Right-click a block to place your shopkeeper.");
 	public static Text unsupportedContainer = Text.parse("&7This type of container cannot be used for shops.");
 	public static Text mustSelectContainer = Text.parse("&7You must right-click a container before placing your shopkeeper.");
+	public static Text mustTargetContainer = Text.parse("&7You must target a container to place this type of shop.");
 	public static Text invalidContainer = Text.parse("&7The selected block is not a valid container!");
 	public static Text containerTooFarAway = Text.parse("&7The shopkeeper's container is too far away!");
 	public static Text containerNotPlaced = Text.parse("&7You must select a container you have recently placed!");
 	public static Text containerAlreadyInUse = Text.parse("&7Another shopkeeper is already using the selected container!");
 	public static Text noContainerAccess = Text.parse("&7You cannot access the selected container!");
 	public static Text tooManyShops = Text.parse("&7You have too many shops!");
-	public static Text noAdminShopTypeSelected = Text.parse("&7You have to select an admin shop type!");
-	public static Text noPlayerShopTypeSelected = Text.parse("&7You have to select a player shop type!");
+	public static Text noPlayerShopsViaCommand = Text.parse("&7Player shops can only be created via the shop creation item!");
 	public static Text shopCreateFail = Text.parse("&7You cannot create a shopkeeper there.");
 
 	public static Text typeNewName = Text.parse("&aPlease type the shop's name into the chat.\n"

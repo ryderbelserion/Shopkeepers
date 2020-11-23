@@ -10,6 +10,11 @@ Date format: (YYYY-MM-DD)
 * Fixed: Text#parse can now also parse alternative color codes starting with '&'. This has an effect when some messages of the specified language file cannot be loaded and the plugin then uses the default messages instead.
 * Added warning output when the language file misses messages, or contains unexpected messages.
 * Changed: Players in creative mode are no longer ignored when using the shop creation item.
+* Improved the feedback messages when a player tries to create a shop via command.
+  * If the player targets a container (regardless of whether it is supported), we assume that he might be trying to create a player shop. However, unlike before this only affects the default shop type that is chosen if the player does not specify a shop type himself.
+  * It is now possible to create admin shops via command even when targeting a container. However, the admin shop type has to be explicitly specified as command argument.
+  * When a player shop type is selected, we send appropriate feedback messages depending on whether player shop creation via command is enabled, whether a container is targeted, and whether it is a supported type of container.
+  * When not specifying a shop object type, we pick the first shop object type that can be used by the player. This is consistent between the creation of player and admin shops now.
 
 Migration notes:  
 * The folder structure has changed:
@@ -24,6 +29,10 @@ Messages:
 * 'cant-trade-with-own-shop' -> 'cannot-trade-with-own-shop'
 * 'cant-trade-while-owner-online' -> 'cannot-trade-while-owner-online'
 * 'cant-trade-with-shop-missing-container' -> 'cannot-trade-with-shop-missing-container'
+* Added 'must-target-container'.
+* Added 'no-player-shops-via-command'.
+* Removed 'no-admin-shop-type-selected'.
+* Removed 'no-player-shop-type-selected'.
 
 You will have to manually update your custom language files to adapt for these changes.
 
