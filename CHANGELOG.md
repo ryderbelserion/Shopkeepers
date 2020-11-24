@@ -33,6 +33,7 @@ Messages:
 * Added 'no-player-shops-via-command'.
 * Removed 'no-admin-shop-type-selected'.
 * Removed 'no-player-shop-type-selected'.
+* Changed the default color of 'villager-editor-title' to be less bright.
 
 You will have to manually update your custom language files to adapt for these changes.
 

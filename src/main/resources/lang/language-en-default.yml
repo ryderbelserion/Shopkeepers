@@ -285,7 +285,7 @@ must-target-entity: "&7You have to target an entity."
 must-target-villager: "&7You have to target a villager."
 target-entity-is-no-villager: "&7The targeted entity is no regular villager."
 
-villager-editor-title: "&aVillager Editor: &e{villagerName}"
+villager-editor-title: "&2Villager Editor: &e{villagerName}"
 villager-editor-description-header: "&6Villager Editor"
 villager-editor-description:
 - 'Top row: Result items'

@@ -213,7 +213,7 @@ public class Messages {
 	public static Text mustTargetVillager = Text.parse("&7You have to target a villager.");
 	public static Text targetEntityIsNoVillager = Text.parse("&7The targeted entity is no regular villager.");
 
-	public static String villagerEditorTitle = "&aVillager Editor: &e{villagerName}";
+	public static String villagerEditorTitle = "&2Villager Editor: &e{villagerName}";
 	public static String villagerEditorDescriptionHeader = "&6Villager Editor";
 	public static List<String> villagerEditorDescription = Arrays.asList(
 			"Top row: Result items",

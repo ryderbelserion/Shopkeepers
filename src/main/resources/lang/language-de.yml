@@ -282,7 +282,7 @@ must-target-entity: "&7Du musst ein Objekt anvisieren."
 must-target-villager: "&7Du musst einen Dorfbewohner anvisieren."
 target-entity-is-no-villager: "&7Das anvisierte Objekt ist kein normaler Dorfbewohner."
 
-villager-editor-title: "&aDorfbewohner Editor: &e{villagerName}"
+villager-editor-title: "&2Dorfbewohner Editor: &e{villagerName}"
 villager-editor-description-header: "&6Dorfbewohner Editor"
 villager-editor-description:
 - 'Obere Reihe: Ergebnis Items'
