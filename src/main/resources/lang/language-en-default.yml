@@ -32,6 +32,8 @@ creation-item-selected: |-
   &e  Right-click a container to select it.
   &e  Then right-click a block to place the shopkeeper.
 
+editor-title: "Shopkeeper Editor"
+
 button-previous-page: "&6<- Previous page ({prev_page} of {max_page})"
 button-previous-page-lore: []
 button-next-page: "&6Next page ({next_page} of {max_page}) ->"
@@ -51,9 +53,6 @@ button-delete: "&4Delete"
 button-delete-lore:
 - Closes and removes
 - this shopkeeper
-button-hire: "&aHire"
-button-hire-lore:
-- Buy this shopkeeper
 
 button-sign-variant: "&aChoose sign variant"
 button-sign-variant-lore:
@@ -164,6 +163,11 @@ button-magma-cube-size: "&aChoose magma cube size"
 button-magma-cube-size-lore:
 - "Cycles the magma cube's size."
 - "Current size: &e{size}"
+
+for-hire-title: "For Hire"
+button-hire: "&aHire"
+button-hire-lore:
+- Buy this shopkeeper
 
 trading-title-prefix: "&2"
 trading-title-default: "Shopkeeper"

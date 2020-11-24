@@ -7,7 +7,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.Messages;
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
@@ -38,7 +37,7 @@ public abstract class HiringHandler extends AbstractShopkeeperUIHandler {
 
 	@Override
 	protected boolean isWindow(InventoryView view) {
-		return view != null && view.getTitle().equals(Settings.forHireTitle);
+		return view != null && view.getTitle().equals(Messages.forHireTitle);
 	}
 
 	@Override

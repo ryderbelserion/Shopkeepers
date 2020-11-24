@@ -48,6 +48,8 @@ public class Messages {
 			+ "&e  Right-click a container to select it.\n"
 			+ "&e  Then right-click a block to place the shopkeeper.");
 
+	public static String editorTitle = "Shopkeeper Editor";
+
 	public static String buttonPreviousPage = "&6<- Previous page ({prev_page} of {max_page})";
 	public static List<String> buttonPreviousPageLore = Arrays.asList();
 	public static String buttonNextPage = "&6Next page ({next_page} of {max_page}) ->";
@@ -61,8 +63,6 @@ public class Messages {
 	public static List<String> buttonContainerLore = Arrays.asList("Lets you view the inventory", " your shopkeeper is using");
 	public static String buttonDelete = "&4Delete";
 	public static List<String> buttonDeleteLore = Arrays.asList("Closes and removes", "this shopkeeper");
-	public static String buttonHire = "&aHire";
-	public static List<String> buttonHireLore = Arrays.asList("Buy this shop");
 
 	public static String buttonSignVariant = "&aChoose sign variant";
 	public static List<String> buttonSignVariantLore = Arrays.asList("Changes the sign's", "wood type");
@@ -122,6 +122,10 @@ public class Messages {
 	public static List<String> buttonSlimeSizeLore = Arrays.asList("Cycles the slime's size.", "Current size: &e{size}");
 	public static String buttonMagmaCubeSize = "&aChoose magma cube size";
 	public static List<String> buttonMagmaCubeSizeLore = Arrays.asList("Cycles the magma cube's size.", "Current size: &e{size}");
+
+	public static String forHireTitle = "For Hire";
+	public static String buttonHire = "&aHire";
+	public static List<String> buttonHireLore = Arrays.asList("Buy this shop");
 
 	public static String tradingTitlePrefix = "&2";
 	public static String tradingTitleDefault = "Shopkeeper";

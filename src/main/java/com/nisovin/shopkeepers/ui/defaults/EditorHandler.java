@@ -43,7 +43,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 
 	@Override
 	protected String getEditorTitle() {
-		return Settings.editorTitle;
+		return Messages.editorTitle;
 	}
 
 	// EDITOR BUTTONS

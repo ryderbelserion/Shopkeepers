@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
@@ -288,7 +289,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		} else {
 			// Set for hire:
 			this.hireCost = hireCost.clone();
-			this.setName(Settings.forHireTitle);
+			this.setName(Messages.forHireTitle);
 		}
 	}
 

@@ -302,10 +302,7 @@ allow-renaming-of-player-npc-shops: false
 # Editor Menu
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
-# The window title of the shopkeeper editor menu.
-editor-title: "Shopkeeper Editor"
-
-# The number of pages that can be filled with trades. Max 10.
+# The number of pages that can be filled with trades. The maximum is 10.
 max-trades-pages: 5
 
 # The items used for the buttons and icons in the trades page row.
@@ -367,8 +364,6 @@ edit-regular-wandering-traders: true
 hire-item: EMERALD
 # The amount of hire-cost items it costs to hire a non-shopkeeper villager.
 hire-other-villagers-costs: 1
-# The title of the hiring inventory window when hiring a player shopkeeper.
-for-hire-title: "For Hire"
 # Whether hiring a player shopkeeper also requires the permission to create
 # player shopkeepers of that type.
 hire-require-creation-permission: true

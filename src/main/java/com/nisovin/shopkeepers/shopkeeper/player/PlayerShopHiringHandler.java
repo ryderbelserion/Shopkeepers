@@ -34,7 +34,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 	@Override
 	protected boolean openWindow(Player player) {
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
-		Inventory inventory = Bukkit.createInventory(player, 9, Settings.forHireTitle);
+		Inventory inventory = Bukkit.createInventory(player, 9, Messages.forHireTitle);
 
 		ItemStack hireItem = Settings.createHireButtonItem();
 		inventory.setItem(BUTTON_HIRE_1, hireItem);

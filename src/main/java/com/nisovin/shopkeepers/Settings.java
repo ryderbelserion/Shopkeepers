@@ -246,8 +246,6 @@ public class Settings {
 	/*
 	 * Editor Menu
 	 */
-	public static String editorTitle = "Shopkeeper Editor";
-
 	public static int maxTradesPages = 5;
 
 	public static ItemData previousPageItem = new ItemData(Material.WRITABLE_BOOK);
@@ -282,7 +280,6 @@ public class Settings {
 	 */
 	public static ItemData hireItem = new ItemData(Material.EMERALD);
 	public static int hireOtherVillagersCosts = 1;
-	public static String forHireTitle = "For Hire";
 	public static boolean hireRequireCreationPermission = true;
 
 	/*

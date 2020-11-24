@@ -26,6 +26,8 @@ creation-item-selected: |-
   &e  Rechtsklick auf einen Behälter, um diesen auszuwählen.
   &e  Dann Rechtsklick auf einen Block, um dort den Händler zu erstellen.
 
+editor-title: "Shop Editor"
+
 button-previous-page: "&6<- Vorherige Seite ({prev_page} von {max_page})"
 button-previous-page-lore: []
 button-next-page: "&6Nächste Seite ({next_page} von {max_page}) ->"
@@ -45,9 +47,6 @@ button-delete: "&4Entfernen"
 button-delete-lore:
 - Schließt diesen Shop und
 - entfernt den Verkäufer
-button-hire: "&aAnheuern"
-button-hire-lore:
-- Kaufe diesen Shop
 
 button-sign-variant: "&aSchild-Variante ändern"
 button-sign-variant-lore:
@@ -163,6 +162,11 @@ button-magma-cube-size: "&aGröße ändern"
 button-magma-cube-size-lore:
 - "Ändert die Größe des Magmawürfels."
 - "Aktuelle Größe: &e{size}"
+
+for-hire-title: "Zum Anheuern"
+button-hire: "&aAnheuern"
+button-hire-lore:
+- Kaufe diesen Shop
 
 trading-title-prefix: "&2"
 trading-title-default: "Händler"
