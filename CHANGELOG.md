@@ -7,7 +7,7 @@ Date format: (YYYY-MM-DD)
 * Messages have been separated from the config.
   * We always generate an 'en-default' language file. This file acts as a template for custom language files. It is not meant to be modified and is replaced with an up-to-date version on every plugin startup.
   * Config: Changed the default language from 'en' to 'en-default'. Existing configs get automatically migrated.
-* Fixed: Text#parse can now also parse alternative color codes starting with '&'. This has an effect when some messages of the specified language file cannot be loaded and the plugin then uses the default messages instead.
+* Fixed: Color codes for default messages get replaced now. This has an effect when some messages of the specified language file cannot be loaded.
 * Added warning output when the language file misses messages, or contains unexpected messages.
 * Changed: Players in creative mode are no longer ignored when using the shop creation item.
 * Improved the feedback messages when a player tries to create a shop via command.

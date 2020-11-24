@@ -19,25 +19,26 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import com.nisovin.shopkeepers.config.ConfigLoadException;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public class Messages {
 
 	// TODO Replace all with Text? Will require converting back to String, especially for texts used by items.
-	public static String shopTypeAdminRegular = "Admin shop";
-	public static String shopTypeSelling = "Selling shop";
-	public static String shopTypeBuying = "Buying shop";
-	public static String shopTypeTrading = "Trading shop";
-	public static String shopTypeBook = "Book shop";
+	public static String shopTypeAdminRegular = c("Admin shop");
+	public static String shopTypeSelling = c("Selling shop");
+	public static String shopTypeBuying = c("Buying shop");
+	public static String shopTypeTrading = c("Trading shop");
+	public static String shopTypeBook = c("Book shop");
 
-	public static String shopTypeDescAdminRegular = "has unlimited stock";
-	public static String shopTypeDescSelling = "sells items to players";
-	public static String shopTypeDescBuying = "buys items from players";
-	public static String shopTypeDescTrading = "trades items with players";
-	public static String shopTypeDescBook = "sells book copies";
+	public static String shopTypeDescAdminRegular = c("has unlimited stock");
+	public static String shopTypeDescSelling = c("sells items to players");
+	public static String shopTypeDescBuying = c("buys items from players");
+	public static String shopTypeDescTrading = c("trades items with players");
+	public static String shopTypeDescBook = c("sells book copies");
 
-	public static String shopObjectTypeLiving = "{type}";
-	public static String shopObjectTypeSign = "sign";
-	public static String shopObjectTypeNpc = "npc";
+	public static String shopObjectTypeLiving = c("{type}");
+	public static String shopObjectTypeSign = c("sign");
+	public static String shopObjectTypeNpc = c("npc");
 
 	public static Text selectedShopType = Text.parse("&aSelected shop type: &6{type} &7({description})");
 	public static Text selectedShopObjectType = Text.parse("&aSelected object type: &6{type}");
@@ -48,87 +49,87 @@ public class Messages {
 			+ "&e  Right-click a container to select it.\n"
 			+ "&e  Then right-click a block to place the shopkeeper.");
 
-	public static String editorTitle = "Shopkeeper Editor";
+	public static String editorTitle = c("Shopkeeper Editor");
 
-	public static String buttonPreviousPage = "&6<- Previous page ({prev_page} of {max_page})";
-	public static List<String> buttonPreviousPageLore = Arrays.asList();
-	public static String buttonNextPage = "&6Next page ({next_page} of {max_page}) ->";
-	public static List<String> buttonNextPageLore = Arrays.asList();
-	public static String buttonCurrentPage = "&6Page {page} of {max_page}";
-	public static List<String> buttonCurrentPageLore = Arrays.asList();
+	public static String buttonPreviousPage = c("&6<- Previous page ({prev_page} of {max_page})");
+	public static List<String> buttonPreviousPageLore = c(Arrays.asList());
+	public static String buttonNextPage = c("&6Next page ({next_page} of {max_page}) ->");
+	public static List<String> buttonNextPageLore = c(Arrays.asList());
+	public static String buttonCurrentPage = c("&6Page {page} of {max_page}");
+	public static List<String> buttonCurrentPageLore = c(Arrays.asList());
 
-	public static String buttonName = "&aSet shop name";
-	public static List<String> buttonNameLore = Arrays.asList("Lets you rename", "your shopkeeper");
-	public static String buttonContainer = "&aView shop inventory";
-	public static List<String> buttonContainerLore = Arrays.asList("Lets you view the inventory", " your shopkeeper is using");
-	public static String buttonDelete = "&4Delete";
-	public static List<String> buttonDeleteLore = Arrays.asList("Closes and removes", "this shopkeeper");
+	public static String buttonName = c("&aSet shop name");
+	public static List<String> buttonNameLore = c(Arrays.asList("Lets you rename", "your shopkeeper"));
+	public static String buttonContainer = c("&aView shop inventory");
+	public static List<String> buttonContainerLore = c(Arrays.asList("Lets you view the inventory", " your shopkeeper is using"));
+	public static String buttonDelete = c("&4Delete");
+	public static List<String> buttonDeleteLore = c(Arrays.asList("Closes and removes", "this shopkeeper"));
 
-	public static String buttonSignVariant = "&aChoose sign variant";
-	public static List<String> buttonSignVariantLore = Arrays.asList("Changes the sign's", "wood type");
-	public static String buttonBaby = "&aToggle baby variant";
-	public static List<String> buttonBabyLore = Arrays.asList("Toggles between the mob's", "baby and adult variant");
-	public static String buttonSitting = "&aToggle sitting pose";
-	public static List<String> buttonSittingLore = Arrays.asList("Toggles the mob's", "sitting pose");
-	public static String buttonCatVariant = "&aChoose cat variant";
-	public static List<String> buttonCatVariantLore = Arrays.asList("Changes the cat's look");
-	public static String buttonRabbitVariant = "&aChoose rabbit variant";
-	public static List<String> buttonRabbitVariantLore = Arrays.asList("Changes the rabbit's look");
-	public static String buttonCollarColor = "&aChoose collar color";
-	public static List<String> buttonCollarColorLore = Arrays.asList("Changes the mob's", "collar color");
-	public static String buttonWolfAngry = "&aToggle angry wolf";
-	public static List<String> buttonWolfAngryLore = Arrays.asList("Toggles the wolf's", "angry state");
-	public static String buttonCarryingChest = "&aToggle carrying chest";
-	public static List<String> buttonCarryingChestLore = Arrays.asList("Toggles whether the mob", "is carrying a chest");
-	public static String buttonHorseColor = "&aChoose horse color";
-	public static List<String> buttonHorseColorLore = Arrays.asList("Changes the color", "of the horse");
-	public static String buttonHorseStyle = "&aChoose horse style";
-	public static List<String> buttonHorseStyleLore = Arrays.asList("Changes the coat pattern", "of the horse");
-	public static String buttonHorseArmor = "&aChoose horse armor";
-	public static List<String> buttonHorseArmorLore = Arrays.asList("Changes the armor", "of the horse");
-	public static String buttonLlamaVariant = "&aChoose llama variant";
-	public static List<String> buttonLlamaVariantLore = Arrays.asList("Changes the llama's look");
-	public static String buttonLlamaCarpetColor = "&aLlama carpet color";
-	public static List<String> buttonLlamaCarpetColorLore = Arrays.asList("Changes the llama's", "carpet color");
-	public static String buttonCreeperCharged = "&aToggle charged creeper";
-	public static List<String> buttonCreeperChargedLore = Arrays.asList("Toggles the creeper's", "charged state");
-	public static String buttonFoxVariant = "&aChoose fox variant";
-	public static List<String> buttonFoxVariantLore = Arrays.asList("Changes the fox's look");
-	public static String buttonFoxCrouching = "&aToggle crouching pose";
-	public static List<String> buttonFoxCrouchingLore = Arrays.asList("Toggles the fox's", "crouching pose");
-	public static String buttonFoxSleeping = "&aToggle sleeping pose";
-	public static List<String> buttonFoxSleepingLore = Arrays.asList("Toggles the fox's", "sleeping pose");
-	public static String buttonMooshroomVariant = "&aChoose mooshroom variant";
-	public static List<String> buttonMooshroomVariantLore = Arrays.asList("Changes the look", "of the mooshroom");
-	public static String buttonPandaVariant = "&aChoose panda variant";
-	public static List<String> buttonPandaVariantLore = Arrays.asList("Changes the panda's look");
-	public static String buttonParrotVariant = "&aChoose parrot variant";
-	public static List<String> buttonParrotVariantLore = Arrays.asList("Changes the parrot's look");
-	public static String buttonPigSaddle = "&aToggle pig saddle";
-	public static List<String> buttonPigSaddleLore = Arrays.asList("Toggles the pig's saddle");
-	public static String buttonSheepColor = "&aChoose sheep color";
-	public static List<String> buttonSheepColorLore = Arrays.asList("Changes the sheep's", "wool color");
-	public static String buttonSheepSheared = "&aToggle sheared sheep";
-	public static List<String> buttonSheepShearedLore = Arrays.asList("Toggles the sheep's", "sheared state");
-	public static String buttonVillagerProfession = "&aChoose villager profession";
-	public static List<String> buttonVillagerProfessionLore = Arrays.asList("Changes the profession", "of the villager");
-	public static String buttonVillagerVariant = "&aChoose villager variant";
-	public static List<String> buttonVillagerVariantLore = Arrays.asList("Changes the look", "of the villager");
-	public static String buttonVillagerLevel = "&aChoose villager badge color";
-	public static List<String> buttonVillagerLevelLore = Arrays.asList("Changes the badge color", "of the villager");
-	public static String buttonZombieVillagerProfession = "&aChoose villager profession";
-	public static List<String> buttonZombieVillagerProfessionLore = Arrays.asList("Changes the profession", "of the zombie villager");
-	public static String buttonSlimeSize = "&aChoose slime size";
-	public static List<String> buttonSlimeSizeLore = Arrays.asList("Cycles the slime's size.", "Current size: &e{size}");
-	public static String buttonMagmaCubeSize = "&aChoose magma cube size";
-	public static List<String> buttonMagmaCubeSizeLore = Arrays.asList("Cycles the magma cube's size.", "Current size: &e{size}");
+	public static String buttonSignVariant = c("&aChoose sign variant");
+	public static List<String> buttonSignVariantLore = c(Arrays.asList("Changes the sign's", "wood type"));
+	public static String buttonBaby = c("&aToggle baby variant");
+	public static List<String> buttonBabyLore = c(Arrays.asList("Toggles between the mob's", "baby and adult variant"));
+	public static String buttonSitting = c("&aToggle sitting pose");
+	public static List<String> buttonSittingLore = c(Arrays.asList("Toggles the mob's", "sitting pose"));
+	public static String buttonCatVariant = c("&aChoose cat variant");
+	public static List<String> buttonCatVariantLore = c(Arrays.asList("Changes the cat's look"));
+	public static String buttonRabbitVariant = c("&aChoose rabbit variant");
+	public static List<String> buttonRabbitVariantLore = c(Arrays.asList("Changes the rabbit's look"));
+	public static String buttonCollarColor = c("&aChoose collar color");
+	public static List<String> buttonCollarColorLore = c(Arrays.asList("Changes the mob's", "collar color"));
+	public static String buttonWolfAngry = c("&aToggle angry wolf");
+	public static List<String> buttonWolfAngryLore = c(Arrays.asList("Toggles the wolf's", "angry state"));
+	public static String buttonCarryingChest = c("&aToggle carrying chest");
+	public static List<String> buttonCarryingChestLore = c(Arrays.asList("Toggles whether the mob", "is carrying a chest"));
+	public static String buttonHorseColor = c("&aChoose horse color");
+	public static List<String> buttonHorseColorLore = c(Arrays.asList("Changes the color", "of the horse"));
+	public static String buttonHorseStyle = c("&aChoose horse style");
+	public static List<String> buttonHorseStyleLore = c(Arrays.asList("Changes the coat pattern", "of the horse"));
+	public static String buttonHorseArmor = c("&aChoose horse armor");
+	public static List<String> buttonHorseArmorLore = c(Arrays.asList("Changes the armor", "of the horse"));
+	public static String buttonLlamaVariant = c("&aChoose llama variant");
+	public static List<String> buttonLlamaVariantLore = c(Arrays.asList("Changes the llama's look"));
+	public static String buttonLlamaCarpetColor = c("&aLlama carpet color");
+	public static List<String> buttonLlamaCarpetColorLore = c(Arrays.asList("Changes the llama's", "carpet color"));
+	public static String buttonCreeperCharged = c("&aToggle charged creeper");
+	public static List<String> buttonCreeperChargedLore = c(Arrays.asList("Toggles the creeper's", "charged state"));
+	public static String buttonFoxVariant = c("&aChoose fox variant");
+	public static List<String> buttonFoxVariantLore = c(Arrays.asList("Changes the fox's look"));
+	public static String buttonFoxCrouching = c("&aToggle crouching pose");
+	public static List<String> buttonFoxCrouchingLore = c(Arrays.asList("Toggles the fox's", "crouching pose"));
+	public static String buttonFoxSleeping = c("&aToggle sleeping pose");
+	public static List<String> buttonFoxSleepingLore = c(Arrays.asList("Toggles the fox's", "sleeping pose"));
+	public static String buttonMooshroomVariant = c("&aChoose mooshroom variant");
+	public static List<String> buttonMooshroomVariantLore = c(Arrays.asList("Changes the look", "of the mooshroom"));
+	public static String buttonPandaVariant = c("&aChoose panda variant");
+	public static List<String> buttonPandaVariantLore = c(Arrays.asList("Changes the panda's look"));
+	public static String buttonParrotVariant = c("&aChoose parrot variant");
+	public static List<String> buttonParrotVariantLore = c(Arrays.asList("Changes the parrot's look"));
+	public static String buttonPigSaddle = c("&aToggle pig saddle");
+	public static List<String> buttonPigSaddleLore = c(Arrays.asList("Toggles the pig's saddle"));
+	public static String buttonSheepColor = c("&aChoose sheep color");
+	public static List<String> buttonSheepColorLore = c(Arrays.asList("Changes the sheep's", "wool color"));
+	public static String buttonSheepSheared = c("&aToggle sheared sheep");
+	public static List<String> buttonSheepShearedLore = c(Arrays.asList("Toggles the sheep's", "sheared state"));
+	public static String buttonVillagerProfession = c("&aChoose villager profession");
+	public static List<String> buttonVillagerProfessionLore = c(Arrays.asList("Changes the profession", "of the villager"));
+	public static String buttonVillagerVariant = c("&aChoose villager variant");
+	public static List<String> buttonVillagerVariantLore = c(Arrays.asList("Changes the look", "of the villager"));
+	public static String buttonVillagerLevel = c("&aChoose villager badge color");
+	public static List<String> buttonVillagerLevelLore = c(Arrays.asList("Changes the badge color", "of the villager"));
+	public static String buttonZombieVillagerProfession = c("&aChoose villager profession");
+	public static List<String> buttonZombieVillagerProfessionLore = c(Arrays.asList("Changes the profession", "of the zombie villager"));
+	public static String buttonSlimeSize = c("&aChoose slime size");
+	public static List<String> buttonSlimeSizeLore = c(Arrays.asList("Cycles the slime's size.", "Current size: &e{size}"));
+	public static String buttonMagmaCubeSize = c("&aChoose magma cube size");
+	public static List<String> buttonMagmaCubeSizeLore = c(Arrays.asList("Cycles the magma cube's size.", "Current size: &e{size}"));
 
-	public static String forHireTitle = "For Hire";
-	public static String buttonHire = "&aHire";
-	public static List<String> buttonHireLore = Arrays.asList("Buy this shop");
+	public static String forHireTitle = c("For Hire");
+	public static String buttonHire = c("&aHire");
+	public static List<String> buttonHireLore = c(Arrays.asList("Buy this shop"));
 
-	public static String tradingTitlePrefix = "&2";
-	public static String tradingTitleDefault = "Shopkeeper";
+	public static String tradingTitlePrefix = c("&2");
+	public static String tradingTitleDefault = c("Shopkeeper");
 
 	public static Text containerSelected = Text.parse("&aContainer selected! Right-click a block to place your shopkeeper.");
 	public static Text unsupportedContainer = Text.parse("&7This type of container cannot be used for shops.");
@@ -170,7 +171,7 @@ public class Messages {
 	public static Text highCurrencyItemsReceived = Text.parse("&aYou have received &e{amount}&a high currency item(s)!");
 	public static Text highCurrencyDisabled = Text.parse("&cThe high currency is disabled!");
 	public static Text itemsConverted = Text.parse("&aConverted &e{count}&a item stack(s)!");
-	public static String unknownBookAuthor = "Unknown";
+	public static String unknownBookAuthor = c("Unknown");
 
 	public static Text tradePermSet = Text.parse("&aThe shop's trading permission has been set to '&e{perm}&a'!");
 	public static Text tradePermRemoved = Text.parse("&aThe shop's trading permission '&e{perm}&a' has been removed!");
@@ -194,22 +195,22 @@ public class Messages {
 
 	public static Text shopkeeperCreated = Text.parse("&aShopkeeper created: &6{type} &7({description})\n{setupDesc}");
 
-	public static String shopSetupDescSelling = "&e  Add items you want to sell to your container, then\n"
-			+ "&e  right-click the shop while sneaking to modify costs.";
-	public static String shopSetupDescBuying = "&e  Add one of each item you want to buy to your container,\n"
-			+ "&e  then right-click the shop while sneaking to modify costs.";
-	public static String shopSetupDescTrading = "&e  Add items you want to sell to your container, then\n"
-			+ "&e  right-click the shop while sneaking to modify costs.";
-	public static String shopSetupDescBook = "&e  Add written books and blank books to your container, then\n"
-			+ "&e  right-click the shop while sneaking to modify costs.";
-	public static String shopSetupDescAdminRegular = "&e  Right-click the shop while sneaking to modify trades.";
+	public static String shopSetupDescSelling = c("&e  Add items you want to sell to your container, then\n"
+			+ "&e  right-click the shop while sneaking to modify costs.");
+	public static String shopSetupDescBuying = c("&e  Add one of each item you want to buy to your container,\n"
+			+ "&e  then right-click the shop while sneaking to modify costs.");
+	public static String shopSetupDescTrading = c("&e  Add items you want to sell to your container, then\n"
+			+ "&e  right-click the shop while sneaking to modify costs.");
+	public static String shopSetupDescBook = c("&e  Add written books and blank books to your container, then\n"
+			+ "&e  right-click the shop while sneaking to modify costs.");
+	public static String shopSetupDescAdminRegular = c("&e  Right-click the shop while sneaking to modify trades.");
 
-	public static String tradeSetupDescHeader = "&6{shopType}";
-	public static List<String> tradeSetupDescAdminRegular = Arrays.asList("Has unlimited stock.", "Insert items from your inventory.", "Top row: Result items", "Bottom rows: Cost items");
-	public static List<String> tradeSetupDescSelling = Arrays.asList("Sells items.", "Insert items to sell into the container.", "Left/Right click to adjust amounts.", "Top row: Items being sold", "Bottom rows: Cost items");
-	public static List<String> tradeSetupDescBuying = Arrays.asList("Buys items.", "Insert one of each item you want to", "buy and plenty of currency items", "into the container.", "Left/Right click to adjust amounts.", "Top row: Cost items", "Bottom row: Items being bought");
-	public static List<String> tradeSetupDescTrading = Arrays.asList("Trades items.", "Pickup an item from your inventory", "and then click a slot to place it.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items");
-	public static List<String> tradeSetupDescBook = Arrays.asList("Sells book copies.", "Insert written and blank books", "into the container.", "Left/Right click to adjust costs.", "Top row: Books being sold", "Bottom rows: Cost items");
+	public static String tradeSetupDescHeader = c("&6{shopType}");
+	public static List<String> tradeSetupDescAdminRegular = c(Arrays.asList("Has unlimited stock.", "Insert items from your inventory.", "Top row: Result items", "Bottom rows: Cost items"));
+	public static List<String> tradeSetupDescSelling = c(Arrays.asList("Sells items.", "Insert items to sell into the container.", "Left/Right click to adjust amounts.", "Top row: Items being sold", "Bottom rows: Cost items"));
+	public static List<String> tradeSetupDescBuying = c(Arrays.asList("Buys items.", "Insert one of each item you want to", "buy and plenty of currency items", "into the container.", "Left/Right click to adjust amounts.", "Top row: Cost items", "Bottom row: Items being bought"));
+	public static List<String> tradeSetupDescTrading = c(Arrays.asList("Trades items.", "Pickup an item from your inventory", "and then click a slot to place it.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items"));
+	public static List<String> tradeSetupDescBook = c(Arrays.asList("Sells book copies.", "Insert written and blank books", "into the container.", "Left/Right click to adjust costs.", "Top row: Books being sold", "Bottom rows: Cost items"));
 
 	public static Text missingEditVillagersPerm = Text.parse("&7You do not have the permission to edit villagers.");
 	public static Text missingEditWanderingTradersPerm = Text.parse("&7You do not have the permission to edit wandering traders.");
@@ -217,29 +218,29 @@ public class Messages {
 	public static Text mustTargetVillager = Text.parse("&7You have to target a villager.");
 	public static Text targetEntityIsNoVillager = Text.parse("&7The targeted entity is no regular villager.");
 
-	public static String villagerEditorTitle = "&2Villager Editor: &e{villagerName}";
-	public static String villagerEditorDescriptionHeader = "&6Villager Editor";
-	public static List<String> villagerEditorDescription = Arrays.asList(
+	public static String villagerEditorTitle = c("&2Villager Editor: &e{villagerName}");
+	public static String villagerEditorDescriptionHeader = c("&6Villager Editor");
+	public static List<String> villagerEditorDescription = c(Arrays.asList(
 			"Top row: Result items",
 			"Bottom rows: Cost items",
 			"Edited trades have infinite",
 			"uses and no XP rewards."
-	);
+	));
 
-	public static String buttonDeleteVillager = "&4Delete";
-	public static List<String> buttonDeleteVillagerLore = Arrays.asList("Deletes the villager");
-	public static String buttonVillagerInventory = "&aView villager inventory";
-	public static List<String> buttonVillagerInventoryLore = Arrays.asList(
+	public static String buttonDeleteVillager = c("&4Delete");
+	public static List<String> buttonDeleteVillagerLore = c(Arrays.asList("Deletes the villager"));
+	public static String buttonVillagerInventory = c("&aView villager inventory");
+	public static List<String> buttonVillagerInventoryLore = c(Arrays.asList(
 			"Lets you view a copy of",
 			"the villager's inventory"
-	);
-	public static String buttonMobAi = "&aToggle mob AI";
-	public static List<String> buttonMobAiLore = Arrays.asList("Toggles the mob's AI");
+	));
+	public static String buttonMobAi = c("&aToggle mob AI");
+	public static List<String> buttonMobAiLore = c(Arrays.asList("Toggles the mob's AI"));
 
-	public static String villagerInventoryTitle = "Villager inventory (copy)";
-	public static String setVillagerXp = "&aSet the villager's XP to &e{xp}";
-	public static String noVillagerTradesChanged = "&aNo trades have been changed.";
-	public static String villagerTradesChanged = "&e{changedTrades}&a trades have been changed.";
+	public static String villagerInventoryTitle = c("Villager inventory (copy)");
+	public static String setVillagerXp = c("&aSet the villager's XP to &e{xp}");
+	public static String noVillagerTradesChanged = c("&aNo trades have been changed.");
+	public static String villagerTradesChanged = c("&e{changedTrades}&a trades have been changed.");
 
 	public static Text listAdminShopsHeader = Text.parse("&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})");
 	public static Text listAllShopsHeader = Text.parse("&9There are &e{shopsCount} &9shops in total: &e(Page {page} of {maxPage})");
@@ -297,6 +298,15 @@ public class Messages {
 	public static Text commandDescriptionSettradeperm = Text.parse("Sets, removes (-) or displays (?) the trading permission.");
 	public static Text commandDescriptionSetforhire = Text.parse("Sets one of your shops for sale.");
 	public static Text commandDescriptionEditVillager = Text.parse("Opens the editor for the target villager.");
+
+	// Shortcut for coloring default messages.
+	private static String c(String message) {
+		return TextUtils.colorize(message);
+	}
+
+	private static List<String> c(List<String> messages) {
+		return TextUtils.colorize(messages);
+	}
 
 	private static final String DEFAULT_LANGUAGE = "en-default";
 
