@@ -34,7 +34,7 @@ public class ConfigUtils {
 	}
 
 	public static String yamlLineBreak() {
-		return "\n"; // YAML used unix line breaks by default
+		return "\n"; // YAML uses unix line breaks by default
 	}
 
 	public static void convertSectionsToMaps(Map<String, Object> sectionMap) {

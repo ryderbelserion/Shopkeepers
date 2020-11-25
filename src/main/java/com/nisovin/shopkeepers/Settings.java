@@ -37,67 +37,6 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class Settings {
 
-	public static final class DebugOptions {
-		private DebugOptions() {
-		}
-
-		// Logs details of the server version dependent capabilities.
-		public static final String capabilities = "capabilities";
-		// Logs all events (spams!). Starts slightly delayed. Subsequent calls of the same event get combined into a
-		// single logging entry to slightly reduce spam.
-		public static final String logAllEvents = "log-all-events";
-		// Prints the registered listeners for the first call of each event.
-		public static final String printListeners = "print-listeners";
-		// Enables debugging output related to shopkeeper activation.
-		public static final String shopkeeperActivation = "shopkeeper-activation";
-		// Enables additional commands related debugging output.
-		public static final String commands = "commands";
-		// Logs information when updating stored shop owner names.
-		public static final String ownerNameUpdates = "owner-name-updates";
-		// Logs whenever a shopkeeper performs item migrations (eg. for trading offers).
-		public static final String itemMigrations = "item-migrations";
-		// Logs whenever we explicitly convert items to Spigot's data format. Note that this does not log when items get
-		// implicitly converted, which may happen under various circumstances.
-		public static final String itemConversions = "item-conversions";
-	}
-
-	public static boolean isDebugging() {
-		return isDebugging(null);
-	}
-
-	public static boolean isDebugging(String option) {
-		if (Bukkit.isPrimaryThread()) {
-			return Settings.debug && (option == null || Settings.debugOptions.contains(option));
-		} else {
-			AsyncSettings async = Settings.async();
-			return async.debug && (option == null || async.debugOptions.contains(option));
-		}
-	}
-
-	// Cached values for settings which are used asynchronously.
-	public static final class AsyncSettings {
-
-		private static volatile AsyncSettings INSTANCE = new AsyncSettings();
-
-		private static void refresh() {
-			INSTANCE = new AsyncSettings();
-		}
-
-		public final boolean debug;
-		public final List<String> debugOptions;
-		public final String fileEncoding;
-
-		private AsyncSettings() {
-			this.debug = Settings.debug;
-			this.debugOptions = new ArrayList<>(Settings.debugOptions);
-			this.fileEncoding = Settings.fileEncoding;
-		}
-	}
-
-	public static AsyncSettings async() {
-		return AsyncSettings.INSTANCE;
-	}
-
 	/*
 	 * General Settings
 	 */
@@ -308,7 +247,281 @@ public class Settings {
 	public static int highCurrencyValue = 9;
 	public static int highCurrencyMinCost = 20;
 
-	// /////
+	///// DEBUGGING
+
+	public static final class DebugOptions {
+		private DebugOptions() {
+		}
+
+		// Logs details of the server version dependent capabilities.
+		public static final String capabilities = "capabilities";
+		// Logs all events (spams!). Starts slightly delayed. Subsequent calls of the same event get combined into a
+		// single logging entry to slightly reduce spam.
+		public static final String logAllEvents = "log-all-events";
+		// Prints the registered listeners for the first call of each event.
+		public static final String printListeners = "print-listeners";
+		// Enables debugging output related to shopkeeper activation.
+		public static final String shopkeeperActivation = "shopkeeper-activation";
+		// Enables additional commands related debugging output.
+		public static final String commands = "commands";
+		// Logs information when updating stored shop owner names.
+		public static final String ownerNameUpdates = "owner-name-updates";
+		// Logs whenever a shopkeeper performs item migrations (eg. for trading offers).
+		public static final String itemMigrations = "item-migrations";
+		// Logs whenever we explicitly convert items to Spigot's data format. Note that this does not log when items get
+		// implicitly converted, which may happen under various circumstances.
+		public static final String itemConversions = "item-conversions";
+	}
+
+	public static boolean isDebugging() {
+		return isDebugging(null);
+	}
+
+	public static boolean isDebugging(String option) {
+		if (Bukkit.isPrimaryThread()) {
+			return Settings.debug && (option == null || Settings.debugOptions.contains(option));
+		} else {
+			AsyncSettings async = Settings.async();
+			return async.debug && (option == null || async.debugOptions.contains(option));
+		}
+	}
+
+	///// DERIVED SETTINGS
+
+	public static class MaxShopsPermission implements Comparable<MaxShopsPermission> {
+
+		// Integer.MAX_VALUE indicates no limit.
+		public final int maxShops;
+		public final String permission;
+
+		private MaxShopsPermission(int maxShops, String permission) {
+			this.maxShops = maxShops;
+			this.permission = permission;
+		}
+
+		@Override
+		public int compareTo(MaxShopsPermission other) {
+			return Integer.compare(this.maxShops, other.maxShops);
+		}
+	}
+
+	// Stores derived settings which get setup after loading the config.
+	public static class DerivedSettings {
+
+		public static ItemData namingItemData;
+
+		// Button items:
+		public static ItemData nameButtonItem;
+		public static ItemData containerButtonItem;
+		public static ItemData deleteButtonItem;
+		public static ItemData hireButtonItem;
+
+		public static ItemData deleteVillagerButtonItem;
+		public static ItemData villagerInventoryButtonItem;
+
+		public static Pattern shopNamePattern;
+
+		// Sorted in descending order:
+		public static final List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>();
+
+		static {
+			// Initial setup of default values:
+			setup();
+		}
+
+		// Gets called after the config has been loaded:
+		private static void setup() {
+			// Ignore display name (which is used for specifying the new shopkeeper name):
+			namingItemData = new ItemData(ItemUtils.setItemStackName(nameItem.createItemStack(), null));
+
+			// Button items:
+			nameButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(nameItem.createItemStack(), Messages.buttonName, Messages.buttonNameLore));
+			containerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), Messages.buttonContainer, Messages.buttonContainerLore));
+			deleteButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), Messages.buttonDelete, Messages.buttonDeleteLore));
+			hireButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(hireItem.createItemStack(), Messages.buttonHire, Messages.buttonHireLore));
+
+			// Note: These use the same item types as the corresponding shopkeeper buttons.
+			deleteVillagerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), Messages.buttonDeleteVillager, Messages.buttonDeleteVillagerLore));
+			villagerInventoryButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), Messages.buttonVillagerInventory, Messages.buttonVillagerInventoryLore));
+
+			// Shop name pattern:
+			try {
+				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
+			} catch (PatternSyntaxException e) {
+				Log.warning("Config: 'name-regex' is not a valid regular expression ('" + Settings.nameRegex + "'). Reverting to default.");
+				Settings.nameRegex = "[A-Za-z0-9 ]{3,32}";
+				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
+			}
+
+			// Maximum shops permissions:
+			maxShopsPermissions.clear();
+			// Add permission for an unlimited number of shops:
+			maxShopsPermissions.add(new MaxShopsPermission(Integer.MAX_VALUE, ShopkeepersPlugin.MAXSHOPS_UNLIMITED_PERMISSION));
+			String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
+			for (String permOption : maxShopsPermOptions) {
+				// Validate:
+				Integer maxShops = ConversionUtils.parseInt(permOption);
+				if (maxShops == null || maxShops <= 0) {
+					Log.warning("Config: Ignoring invalid entry in 'max-shops-perm-options': " + permOption);
+					continue;
+				}
+				String permission = "shopkeeper.maxshops." + permOption;
+				maxShopsPermissions.add(new MaxShopsPermission(maxShops, permission));
+			}
+			Collections.sort(maxShopsPermissions, Collections.reverseOrder()); // Descending order
+		}
+
+		private DerivedSettings() {
+		}
+	}
+
+	// Cached values for settings which are used asynchronously.
+	public static final class AsyncSettings {
+
+		private static volatile AsyncSettings INSTANCE = new AsyncSettings();
+
+		private static void refresh() {
+			INSTANCE = new AsyncSettings();
+		}
+
+		public final boolean debug;
+		public final List<String> debugOptions;
+		public final String fileEncoding;
+
+		private AsyncSettings() {
+			this.debug = Settings.debug;
+			this.debugOptions = new ArrayList<>(Settings.debugOptions);
+			this.fileEncoding = Settings.fileEncoding;
+		}
+
+	}
+
+	public static AsyncSettings async() {
+		return AsyncSettings.INSTANCE;
+	}
+
+	// Can also be called externally, when settings are changed externally.
+	public static void onSettingsChanged() {
+		// Update derived settings:
+		DerivedSettings.setup();
+
+		// Refresh async settings cache:
+		AsyncSettings.refresh();
+	}
+
+	// ITEMS
+
+	// Shop creation item:
+	public static ItemStack createShopCreationItem() {
+		return shopCreationItem.createItemStack();
+	}
+
+	public static boolean isShopCreationItem(ItemStack item) {
+		return shopCreationItem.matches(item);
+	}
+
+	// Naming item:
+	public static boolean isNamingItem(ItemStack item) {
+		return DerivedSettings.namingItemData.matches(item);
+	}
+
+	public static ItemStack createNameButtonItem() {
+		return DerivedSettings.nameButtonItem.createItemStack();
+	}
+
+	// Container button:
+	public static ItemStack createContainerButtonItem() {
+		return DerivedSettings.containerButtonItem.createItemStack();
+	}
+
+	// Delete button:
+	public static ItemStack createDeleteButtonItem() {
+		return DerivedSettings.deleteButtonItem.createItemStack();
+	}
+
+	// Hire item:
+	public static ItemStack createHireButtonItem() {
+		return DerivedSettings.hireButtonItem.createItemStack();
+	}
+
+	public static boolean isHireItem(ItemStack item) {
+		return hireItem.matches(item);
+	}
+
+	// CURRENCY
+
+	// Currency item:
+	public static ItemStack createCurrencyItem(int amount) {
+		return currencyItem.createItemStack(amount);
+	}
+
+	public static boolean isCurrencyItem(ItemStack item) {
+		return currencyItem.matches(item);
+	}
+
+	// High currency item:
+	public static boolean isHighCurrencyEnabled() {
+		return (highCurrencyValue > 0 && highCurrencyItem.getType() != Material.AIR);
+	}
+
+	public static ItemStack createHighCurrencyItem(int amount) {
+		if (!isHighCurrencyEnabled()) return null;
+		return highCurrencyItem.createItemStack(amount);
+	}
+
+	public static boolean isHighCurrencyItem(ItemStack item) {
+		if (!isHighCurrencyEnabled()) return false;
+		return highCurrencyItem.matches(item);
+	}
+
+	// Zero currency item:
+	public static ItemStack createZeroCurrencyItem() {
+		if (zeroCurrencyItem.getType() == Material.AIR) return null;
+		return zeroCurrencyItem.createItemStack();
+	}
+
+	public static boolean isZeroCurrencyItem(ItemStack item) {
+		if (zeroCurrencyItem.getType() == Material.AIR) {
+			return ItemUtils.isEmpty(item);
+		}
+		return zeroCurrencyItem.matches(item);
+	}
+
+	// Zero high currency item:
+	public static ItemStack createZeroHighCurrencyItem() {
+		if (zeroHighCurrencyItem.getType() == Material.AIR) return null;
+		return zeroHighCurrencyItem.createItemStack();
+	}
+
+	public static boolean isZeroHighCurrencyItem(ItemStack item) {
+		if (zeroHighCurrencyItem.getType() == Material.AIR) {
+			return ItemUtils.isEmpty(item);
+		}
+		return zeroHighCurrencyItem.matches(item);
+	}
+
+	// VARIOUS
+
+	// Integer.MAX_VALUE indicates no limit.
+	public static int getMaxShopsLimit(Player player) {
+		if (Settings.maxShopsPerPlayer == -1) {
+			return Integer.MAX_VALUE; // No limit by default
+		}
+		int maxShops = Settings.maxShopsPerPlayer; // Default
+		for (MaxShopsPermission entry : DerivedSettings.maxShopsPermissions) {
+			// Note: The max shops permission entries are sorted in descending order.
+			if (entry.maxShops <= maxShops) {
+				break;
+			}
+			if (PermissionUtils.hasPermission(player, entry.permission)) {
+				maxShops = entry.maxShops;
+				break;
+			}
+		}
+		return maxShops;
+	}
+
+	///// LOADING
 
 	// These String / String list settings are exempt from color conversion:
 	private static final Set<String> noColorConversionKeys = new HashSet<>(Arrays.asList(
@@ -443,212 +656,7 @@ public class Settings {
 		return configChanged;
 	}
 
-	public static void onSettingsChanged() {
-		// Prepare derived settings:
-		DerivedSettings.setup();
-
-		// Refresh async settings cache:
-		AsyncSettings.refresh();
-	}
-
-	// Item utilities:
-
-	public static class MaxShopsPermission implements Comparable<MaxShopsPermission> {
-
-		// Integer.MAX_VALUE indicates no limit.
-		public final int maxShops;
-		public final String permission;
-
-		private MaxShopsPermission(int maxShops, String permission) {
-			this.maxShops = maxShops;
-			this.permission = permission;
-		}
-
-		@Override
-		public int compareTo(MaxShopsPermission other) {
-			return Integer.compare(this.maxShops, other.maxShops);
-		}
-	}
-
-	// Stores derived settings which get setup after loading the config.
-	public static class DerivedSettings {
-
-		public static ItemData namingItemData;
-
-		// Button items:
-		public static ItemData nameButtonItem;
-		public static ItemData containerButtonItem;
-		public static ItemData deleteButtonItem;
-		public static ItemData hireButtonItem;
-
-		public static ItemData deleteVillagerButtonItem;
-		public static ItemData villagerInventoryButtonItem;
-
-		public static Pattern shopNamePattern;
-
-		// Sorted in descending order:
-		public static final List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>();
-
-		static {
-			// Initial setup of default values:
-			setup();
-		}
-
-		// Gets called after the config has been loaded:
-		private static void setup() {
-			// Ignore display name (which is used for specifying the new shopkeeper name):
-			namingItemData = new ItemData(ItemUtils.setItemStackName(nameItem.createItemStack(), null));
-
-			// Button items:
-			nameButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(nameItem.createItemStack(), Messages.buttonName, Messages.buttonNameLore));
-			containerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), Messages.buttonContainer, Messages.buttonContainerLore));
-			deleteButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), Messages.buttonDelete, Messages.buttonDeleteLore));
-			hireButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(hireItem.createItemStack(), Messages.buttonHire, Messages.buttonHireLore));
-
-			// Note: These use the same item types as the corresponding shopkeeper buttons.
-			deleteVillagerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), Messages.buttonDeleteVillager, Messages.buttonDeleteVillagerLore));
-			villagerInventoryButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), Messages.buttonVillagerInventory, Messages.buttonVillagerInventoryLore));
-
-			// Shop name pattern:
-			try {
-				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
-			} catch (PatternSyntaxException e) {
-				Log.warning("Config: 'name-regex' is not a valid regular expression ('" + Settings.nameRegex + "'). Reverting to default.");
-				Settings.nameRegex = "[A-Za-z0-9 ]{3,32}";
-				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
-			}
-
-			// Maximum shops permissions:
-			maxShopsPermissions.clear();
-			// Add permission for an unlimited number of shops:
-			maxShopsPermissions.add(new MaxShopsPermission(Integer.MAX_VALUE, ShopkeepersPlugin.MAXSHOPS_UNLIMITED_PERMISSION));
-			String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
-			for (String permOption : maxShopsPermOptions) {
-				// Validate:
-				Integer maxShops = ConversionUtils.parseInt(permOption);
-				if (maxShops == null || maxShops <= 0) {
-					Log.warning("Config: Ignoring invalid entry in 'max-shops-perm-options': " + permOption);
-					continue;
-				}
-				String permission = "shopkeeper.maxshops." + permOption;
-				maxShopsPermissions.add(new MaxShopsPermission(maxShops, permission));
-			}
-			Collections.sort(maxShopsPermissions, Collections.reverseOrder()); // Descending order
-		}
-
-		private DerivedSettings() {
-		}
-	}
-
-	// Shop creation item:
-	public static ItemStack createShopCreationItem() {
-		return shopCreationItem.createItemStack();
-	}
-
-	public static boolean isShopCreationItem(ItemStack item) {
-		return shopCreationItem.matches(item);
-	}
-
-	// Naming item:
-	public static boolean isNamingItem(ItemStack item) {
-		return DerivedSettings.namingItemData.matches(item);
-	}
-
-	public static ItemStack createNameButtonItem() {
-		return DerivedSettings.nameButtonItem.createItemStack();
-	}
-
-	// Container button:
-	public static ItemStack createContainerButtonItem() {
-		return DerivedSettings.containerButtonItem.createItemStack();
-	}
-
-	// Delete button:
-	public static ItemStack createDeleteButtonItem() {
-		return DerivedSettings.deleteButtonItem.createItemStack();
-	}
-
-	// Hire item:
-	public static ItemStack createHireButtonItem() {
-		return DerivedSettings.hireButtonItem.createItemStack();
-	}
-
-	public static boolean isHireItem(ItemStack item) {
-		return hireItem.matches(item);
-	}
-
-	// CURRENCY
-
-	// Currency item:
-	public static ItemStack createCurrencyItem(int amount) {
-		return currencyItem.createItemStack(amount);
-	}
-
-	public static boolean isCurrencyItem(ItemStack item) {
-		return currencyItem.matches(item);
-	}
-
-	// High currency item:
-	public static boolean isHighCurrencyEnabled() {
-		return (highCurrencyValue > 0 && highCurrencyItem.getType() != Material.AIR);
-	}
-
-	public static ItemStack createHighCurrencyItem(int amount) {
-		if (!isHighCurrencyEnabled()) return null;
-		return highCurrencyItem.createItemStack(amount);
-	}
-
-	public static boolean isHighCurrencyItem(ItemStack item) {
-		if (!isHighCurrencyEnabled()) return false;
-		return highCurrencyItem.matches(item);
-	}
-
-	// Zero currency item:
-	public static ItemStack createZeroCurrencyItem() {
-		if (zeroCurrencyItem.getType() == Material.AIR) return null;
-		return zeroCurrencyItem.createItemStack();
-	}
-
-	public static boolean isZeroCurrencyItem(ItemStack item) {
-		if (zeroCurrencyItem.getType() == Material.AIR) {
-			return ItemUtils.isEmpty(item);
-		}
-		return zeroCurrencyItem.matches(item);
-	}
-
-	// Zero high currency item:
-	public static ItemStack createZeroHighCurrencyItem() {
-		if (zeroHighCurrencyItem.getType() == Material.AIR) return null;
-		return zeroHighCurrencyItem.createItemStack();
-	}
-
-	public static boolean isZeroHighCurrencyItem(ItemStack item) {
-		if (zeroHighCurrencyItem.getType() == Material.AIR) {
-			return ItemUtils.isEmpty(item);
-		}
-		return zeroHighCurrencyItem.matches(item);
-	}
-
-	//
-
-	// Integer.MAX_VALUE indicates no limit.
-	public static int getMaxShopsLimit(Player player) {
-		if (Settings.maxShopsPerPlayer == -1) {
-			return Integer.MAX_VALUE; // No limit by default
-		}
-		int maxShops = Settings.maxShopsPerPlayer; // Default
-		for (MaxShopsPermission entry : DerivedSettings.maxShopsPermissions) {
-			// Note: The max shops permission entries are sorted in descending order.
-			if (entry.maxShops <= maxShops) {
-				break;
-			}
-			if (PermissionUtils.hasPermission(player, entry.permission)) {
-				maxShops = entry.maxShops;
-				break;
-			}
-		}
-		return maxShops;
-	}
+	/////
 
 	private Settings() {
 	}

@@ -31,6 +31,8 @@ public class ItemData implements Cloneable {
 		return deserialize(dataObject, null);
 	}
 
+	// Only returns null if the input data is null, or if the data cannot be loaded (in which case the warning handler
+	// is informed).
 	public static ItemData deserialize(Object dataObject, Consumer<String> warningHandler) {
 		if (warningHandler == null) {
 			warningHandler = SILENT_WARNING_HANDLER; // Ignore all warnings
@@ -101,7 +103,7 @@ public class ItemData implements Cloneable {
 			dummyItemMeta.setDisplayName("dummy name"); // Ensure item meta is not empty
 			Object metaType = dummyItemMeta.serialize().get(META_TYPE_KEY);
 			if (metaType == null) {
-				throw new IllegalStateException("Couldn't determine meta type with key '" + META_TYPE_KEY + "'!");
+				throw new IllegalStateException("Could not determine meta type with key '" + META_TYPE_KEY + "'!");
 			}
 			// Insert meta type:
 			dataMap.put(META_TYPE_KEY, metaType);
