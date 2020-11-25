@@ -23,6 +23,9 @@ Date format: (YYYY-MM-DD)
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
 
+Internal:  
+* The config key pattern is cached now.
+
 Migration notes:  
 * The folder structure has changed:
   * The save file and trading logs (if enabled) are stored inside a new 'data' folder now.

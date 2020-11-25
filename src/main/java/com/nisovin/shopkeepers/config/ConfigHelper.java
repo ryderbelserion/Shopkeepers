@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.bukkit.Material;
@@ -18,11 +19,13 @@ import com.nisovin.shopkeepers.util.TextUtils;
 
 public class ConfigHelper {
 
+	private static final Pattern CONFIG_KEY_PATTERN = Pattern.compile("([A-Z][a-z]+)");
+
 	private ConfigHelper() {
 	}
 
 	public static String toConfigKey(String fieldName) {
-		return fieldName.replaceAll("([A-Z][a-z]+)", "-$1").toLowerCase(Locale.ROOT);
+		return CONFIG_KEY_PATTERN.matcher(fieldName).replaceAll("-$1").toLowerCase(Locale.ROOT);
 	}
 
 	public static Object loadConfigValue(Configuration config, String configKey, Set<String> noColorConversionKeys, Class<?> typeClass, Class<?> genericType) {
