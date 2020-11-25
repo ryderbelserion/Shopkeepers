@@ -10,7 +10,6 @@ import java.util.UUID;
 import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
@@ -165,34 +164,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return (NMSManager.getProvider() != null);
 	}
 
-	// Returns null on success, otherwise a severe issue prevented loading the config.
-	private ConfigLoadException loadConfig() {
-		Log.info("Loading config.");
-
-		// Save default config in case the config file doesn't exist:
-		this.saveDefaultConfig();
-
-		// Load config:
-		this.reloadConfig();
-		Configuration config = this.getConfig();
-
-		// Load settings from config:
-		boolean configChanged;
-		try {
-			configChanged = Settings.loadConfiguration(config);
-		} catch (ConfigLoadException e) {
-			// Config loading failed with a severe issue:
-			return e;
-		}
-
-		if (configChanged) {
-			// If the config was modified (migrations, adding missing settings, ..), save it:
-			// TODO Persist comments somehow.
-			this.saveConfig();
-		}
-		return null; // Config loaded successfully
-	}
-
 	private void registerDefaults() {
 		Log.info("Registering defaults.");
 		uiRegistry.registerAll(defaultUITypes.getAllUITypes());
@@ -228,7 +199,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 
 		// Load config:
-		this.configLoadError = this.loadConfig();
+		this.configLoadError = Settings.loadConfig(this);
 		if (this.configLoadError != null) {
 			return;
 		}
@@ -276,7 +247,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// Load config (if not already loaded during onLoad):
 		if (!alreadySetup) {
-			this.configLoadError = this.loadConfig();
+			this.configLoadError = Settings.loadConfig(this);
 		} else {
 			Log.debug("Config already loaded.");
 		}

@@ -23,6 +23,7 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.ConfigLoadException;
@@ -522,6 +523,34 @@ public class Settings {
 	}
 
 	///// LOADING
+
+	// Returns null on success, otherwise a severe issue prevented loading the config.
+	public static ConfigLoadException loadConfig(Plugin plugin) {
+		Log.info("Loading config.");
+
+		// Save default config in case the config file doesn't exist:
+		plugin.saveDefaultConfig();
+
+		// Load config:
+		plugin.reloadConfig();
+		Configuration config = plugin.getConfig();
+
+		// Load settings from config:
+		boolean configChanged = false;
+		try {
+			configChanged = Settings.loadConfiguration(config);
+		} catch (ConfigLoadException e) {
+			// Config loading failed with a severe issue:
+			return e;
+		}
+
+		if (configChanged) {
+			// If the config was modified (migrations, adding missing settings, ..), save it:
+			// TODO Persist comments somehow.
+			plugin.saveConfig();
+		}
+		return null; // Config loaded successfully
+	}
 
 	// These String / String list settings are exempt from color conversion:
 	private static final Set<String> noColorConversionKeys = new HashSet<>(Arrays.asList(
