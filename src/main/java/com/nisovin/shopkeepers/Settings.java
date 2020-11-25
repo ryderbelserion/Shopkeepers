@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -325,6 +325,8 @@ public class Settings {
 		// Sorted in descending order:
 		public static final List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>();
 
+		public static final Set<EntityType> enabledLivingShops = new LinkedHashSet<>();
+
 		static {
 			// Initial setup of default values:
 			setup();
@@ -370,6 +372,27 @@ public class Settings {
 				maxShopsPermissions.add(new MaxShopsPermission(maxShops, permission));
 			}
 			Collections.sort(maxShopsPermissions, Collections.reverseOrder()); // Descending order
+
+			// Enabled living shop types:
+			enabledLivingShops.clear();
+			boolean foundInvalidEntityType = false;
+			for (String entityTypeId : Settings.enabledLivingShops) {
+				EntityType entityType = EntityUtils.matchEntityType(entityTypeId);
+				if (entityType == null || !entityType.isAlive() || !entityType.isSpawnable()) {
+					foundInvalidEntityType = true;
+					if ("PIG_ZOMBIE".equals(entityTypeId)) {
+						// Migration note for MC 1.16 TODO Remove this again at some point?
+						Log.warning("Config: Ignoring mob type 'PIG_ZOMBIE' in setting 'enabled-living-shops'. This mob no longer exist since MC 1.16. Consider replacing it with 'ZOMBIFIED_PIGLIN'.");
+					} else {
+						Log.warning("Config: Invalid living entity type name in 'enabled-living-shops': " + entityTypeId);
+					}
+				} else {
+					enabledLivingShops.add(entityType);
+				}
+			}
+			if (foundInvalidEntityType) {
+				Log.warning("Config: All existing entity type names can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html");
+			}
 		}
 
 		private DerivedSettings() {
@@ -614,31 +637,13 @@ public class Settings {
 		}
 
 		// Validation:
+		validateSettings();
 
-		boolean foundInvalidEntityType = false;
-		boolean removePigZombie = false;
-		for (String entityTypeId : enabledLivingShops) {
-			EntityType entityType = EntityUtils.matchEntityType(entityTypeId);
-			if (entityType == null || !entityType.isAlive() || !entityType.isSpawnable()) {
-				foundInvalidEntityType = true;
-				if ("PIG_ZOMBIE".equals(entityTypeId)) {
-					removePigZombie = true;
-				} else {
-					Log.warning("Config: Invalid living entity type name in 'enabled-living-shops': " + entityTypeId);
-				}
-			}
-		}
-		// Migration for MC 1.16 TODO remove this again at some point
-		if (removePigZombie) {
-			Log.warning("Config: The mob type 'PIG_ZOMBIE' no longer exist since MC 1.16 and has therefore been removed from the 'enabled-living-shops'. Consider replacing it with 'ZOMBIFIED_PIGLIN'.");
-			enabledLivingShops.removeIf(e -> Objects.equals(e, "PIG_ZOMBIE"));
-			config.set(toConfigKey("enabledLivingShops"), enabledLivingShops);
-			configChanged = true;
-		}
-		if (foundInvalidEntityType) {
-			Log.warning("Config: All existing entity type names can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html");
-		}
+		onSettingsChanged();
+		return configChanged;
+	}
 
+	private static void validateSettings() {
 		if (maxContainerDistance > 50) {
 			Log.warning("Config: 'max-container-distance' can be at most 50.");
 			maxContainerDistance = 50;
@@ -680,9 +685,6 @@ public class Settings {
 			Log.warning("Config: 'tax-rate' can not be larger than 100!");
 			taxRate = 100;
 		}
-
-		onSettingsChanged();
-		return configChanged;
 	}
 
 	/////

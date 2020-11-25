@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.Messages;
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObjectType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -48,6 +48,6 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> ex
 
 	@Override
 	public boolean isEnabled() {
-		return Settings.enabledLivingShops.contains(entityType.name());
+		return DerivedSettings.enabledLivingShops.contains(entityType);
 	}
 }

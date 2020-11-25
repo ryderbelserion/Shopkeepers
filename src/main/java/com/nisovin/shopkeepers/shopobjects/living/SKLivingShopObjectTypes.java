@@ -17,7 +17,7 @@ import org.bukkit.entity.Llama;
 import org.bukkit.entity.TraderLlama;
 import org.bukkit.entity.Zombie;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObjectTypes;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -40,7 +40,6 @@ import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.WolfShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieVillagerShop;
-import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
 
 public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
@@ -154,12 +153,10 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	public SKLivingShopObjectTypes(LivingShops livingShops) {
 		this.livingShops = livingShops;
 		// First, create the enabled living object types, in the same order as specified in the config:
-		for (String entityTypeId : Settings.enabledLivingShops) {
-			EntityType entityType = EntityUtils.matchEntityType(entityTypeId);
-			if (entityType != null && entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType)) {
-				// Not using aliases (yet?)
-				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, this.getAliases(entityType)));
-			}
+		for (EntityType entityType : DerivedSettings.enabledLivingShops) {
+			assert entityType != null && entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType);
+			// Not using aliases (yet?)
+			objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, this.getAliases(entityType)));
 		}
 
 		// Register object types for all other remaining living entity types:

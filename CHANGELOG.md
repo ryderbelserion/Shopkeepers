@@ -19,6 +19,7 @@ Date format: (YYYY-MM-DD)
   * Config: A value of '0' for the 'max-shops-per-player' setting no longer indicates no limit, but can be used to disable the creation and hiring of player shops. 'No limit' is indicated by a value of '-1' now. Any previous limit of '0' is automatically migrated.
   * The permissions specified inside the config get cached and checked in decreasing order now. We abort checking permissions if they cannot further increase the player's current shops limit. An effect of this is that it is only possible to increase the default limit, not decrease it.
   * Added permission node 'shopkeeper.maxshops.unlimited' (default: op), which disables the max shops limit for a player.
+* Fixed: Enabled living shops specified inside the config would previously not get enabled if they were not perfectly matching the entity type name.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
@@ -31,6 +32,7 @@ Migration notes:
   * The save file and trading logs (if enabled) are stored inside a new 'data' folder now.
   * If no save file exists at the new location and a previous save file is found at the old location, it is automatically moved.
   * Language files are located inside a new 'lang' folder now. Existing custom language files need to be manually moved!
+* Removed the 1.16 'PIG_ZOMBIE' migration. We no longer automatically remove this mob type from the config, but only log a warning and then ignore it.
 
 Messages:  
 * All message keys were changed to no longer start with the 'msg' prefix.
