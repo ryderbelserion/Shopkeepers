@@ -24,6 +24,8 @@ public class PlayerCreatePlayerShopkeeperEvent extends PlayerCreateShopkeeperEve
 
 	/**
 	 * Gets the maximum number of shops the owner of the new shopkeeper can have.
+	 * <p>
+	 * {@link Integer#MAX_VALUE} indicates no limit.
 	 * 
 	 * @return the owner's max shops limit
 	 */
@@ -36,11 +38,16 @@ public class PlayerCreatePlayerShopkeeperEvent extends PlayerCreateShopkeeperEve
 	 * <p>
 	 * The new max shops limit only affects this specific shopkeeper creation. If the player already has more shops than
 	 * this, the shop will not be created.
+	 * <p>
+	 * {@link Integer#MAX_VALUE} indicates no limit.
 	 * 
 	 * @param maxShopsLimit
 	 *            the owner's max shops limit to use for this shopkeeper creation
 	 */
 	public void setMaxShopsLimit(int maxShopsLimit) {
+		if (maxShopsLimit < 0) {
+			throw new IllegalArgumentException("maxShopsLimit cannot be negative!");
+		}
 		this.maxShopsLimit = maxShopsLimit;
 	}
 

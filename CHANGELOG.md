@@ -15,6 +15,13 @@ Date format: (YYYY-MM-DD)
   * It is now possible to create admin shops via command even when targeting a container. However, the admin shop type has to be explicitly specified as command argument.
   * When a player shop type is selected, we send appropriate feedback messages depending on whether player shop creation via command is enabled, whether a container is targeted, and whether it is a supported type of container.
   * When not specifying a shop object type, we pick the first shop object type that can be used by the player. This is consistent between the creation of player and admin shops now.
+* Changes to the maximum shops limit:
+  * Config: A value of '0' for the 'max-shops-per-player' setting no longer indicates no limit, but can be used to disable the creation and hiring of player shops. 'No limit' is indicated by a value of '-1' now. Any previous limit of '0' is automatically migrated.
+  * The permissions specified inside the config get cached and checked in decreasing order now. We abort checking permissions if they cannot further increase the player's current shops limit. An effect of this is that it is only possible to increase the default limit, not decrease it.
+  * Added permission node 'shopkeeper.maxshops.unlimited' (default: op), which disables the max shops limit for a player.
+
+API:  
+* PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
 
 Migration notes:  
 * The folder structure has changed:
@@ -35,6 +42,7 @@ Messages:
 * Removed 'no-player-shop-type-selected'.
 * Moved 'editor-title' and 'for-hire-title' from config into messages.
 * Changed the default color of 'villager-editor-title' to be less bright.
+* Changed the 'too-many-shops' message to be more general.
 
 You will have to manually update your custom language files to adapt for these changes.
 

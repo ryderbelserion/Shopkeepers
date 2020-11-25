@@ -181,7 +181,7 @@ container-too-far-away: "&7The shopkeeper's container is too far away!"
 container-not-placed: "&7You must select a container you have recently placed!"
 container-already-in-use: "&7Another shopkeeper is already using the selected container!"
 no-container-access: "&7You cannot access the selected container!"
-too-many-shops: "&7You have too many shops!"
+too-many-shops: "&7You have already reached the limit of how many shops you can own!"
 no-player-shops-via-command: "&7Player shops can only be created via the shop creation item!"
 shop-create-fail: "&7You cannot create a shopkeeper there."
 

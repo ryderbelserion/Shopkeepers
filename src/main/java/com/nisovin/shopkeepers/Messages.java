@@ -140,7 +140,7 @@ public class Messages {
 	public static Text containerNotPlaced = Text.parse("&7You must select a container you have recently placed!");
 	public static Text containerAlreadyInUse = Text.parse("&7Another shopkeeper is already using the selected container!");
 	public static Text noContainerAccess = Text.parse("&7You cannot access the selected container!");
-	public static Text tooManyShops = Text.parse("&7You have too many shops!");
+	public static Text tooManyShops = Text.parse("&7You have already reached the limit of how many shops you can own!");
 	public static Text noPlayerShopsViaCommand = Text.parse("&7Player shops can only be created via the shop creation item!");
 	public static Text shopCreateFail = Text.parse("&7You cannot create a shopkeeper there.");
 

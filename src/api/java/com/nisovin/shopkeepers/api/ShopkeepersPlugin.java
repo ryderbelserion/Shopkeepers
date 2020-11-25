@@ -55,6 +55,7 @@ public interface ShopkeepersPlugin extends Plugin {
 	public static final String EDIT_VILLAGERS_PERMISSION = "shopkeeper.edit-villagers";
 	public static final String EDIT_WANDERING_TRADERS_PERMISSION = "shopkeeper.edit-wandering-traders";
 	public static final String BYPASS_PERMISSION = "shopkeeper.bypass";
+	public static final String MAXSHOPS_UNLIMITED_PERMISSION = "shopkeeper.maxshops.unlimited";
 
 	public static final String ADMIN_PERMISSION = "shopkeeper.admin";
 	public static final String PLAYER_SELL_PERMISSION = "shopkeeper.player.sell";

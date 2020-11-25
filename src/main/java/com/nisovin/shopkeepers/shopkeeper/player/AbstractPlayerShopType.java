@@ -67,7 +67,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 			return false;
 		}
 
-		// Check worldguard:
+		// Check WorldGuard:
 		if (Settings.enableWorldGuardRestrictions) {
 			if (!WorldGuardHandler.isShopAllowed(creator, spawnLocation)) {
 				TextUtils.sendMessage(creator, Messages.shopCreateFail);
@@ -75,7 +75,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 			}
 		}
 
-		// Check towny:
+		// Check Towny:
 		if (Settings.enableTownyRestrictions) {
 			if (!TownyHandler.isCommercialArea(spawnLocation)) {
 				TextUtils.sendMessage(creator, Messages.shopCreateFail);
@@ -83,7 +83,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 			}
 		}
 
-		int maxShopsLimit = Settings.getMaxShops(creator);
+		int maxShopsLimit = Settings.getMaxShopsLimit(creator);
 		// Call event:
 		PlayerCreatePlayerShopkeeperEvent createEvent = new PlayerCreatePlayerShopkeeperEvent(shopCreationData, maxShopsLimit);
 		Bukkit.getPluginManager().callEvent(createEvent);
@@ -95,7 +95,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		}
 
 		// Count owned shops:
-		if (maxShopsLimit > 0) {
+		if (maxShopsLimit != Integer.MAX_VALUE) {
 			int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getPlayerShopkeepersByOwner(creator.getUniqueId()).size();
 			if (count >= maxShopsLimit) {
 				TextUtils.sendMessage(creator, Messages.tooManyShops);

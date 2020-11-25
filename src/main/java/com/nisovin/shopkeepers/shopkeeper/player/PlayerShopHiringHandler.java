@@ -103,8 +103,8 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			}
 
 			// Call event:
-			int maxShops = Settings.getMaxShops(player);
-			PlayerShopkeeperHireEvent hireEvent = new PlayerShopkeeperHireEvent(shopkeeper, player, newPlayerInventoryContents, maxShops);
+			int maxShopsLimit = Settings.getMaxShopsLimit(player);
+			PlayerShopkeeperHireEvent hireEvent = new PlayerShopkeeperHireEvent(shopkeeper, player, newPlayerInventoryContents, maxShopsLimit);
 			Bukkit.getPluginManager().callEvent(hireEvent);
 			if (hireEvent.isCancelled()) {
 				Log.debug("PlayerShopkeeperHireEvent was cancelled!");
@@ -114,10 +114,10 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			}
 
 			// Check max shops limit:
-			maxShops = hireEvent.getMaxShopsLimit();
-			if (maxShops > 0) {
+			maxShopsLimit = hireEvent.getMaxShopsLimit();
+			if (maxShopsLimit != Integer.MAX_VALUE) {
 				int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getPlayerShopkeepersByOwner(player.getUniqueId()).size();
-				if (count >= maxShops) {
+				if (count >= maxShopsLimit) {
 					TextUtils.sendMessage(player, Messages.tooManyShops);
 					this.getUISession(player).abortDelayed();
 					return;

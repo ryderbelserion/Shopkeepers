@@ -62,6 +62,8 @@ public class PlayerShopkeeperHireEvent extends ShopkeeperEvent implements Cancel
 
 	/**
 	 * Gets the maximum number of shops the hiring player can have.
+	 * <p>
+	 * {@link Integer#MAX_VALUE} indicates no limit.
 	 * 
 	 * @return the hiring player's max shops limit
 	 */
@@ -74,11 +76,16 @@ public class PlayerShopkeeperHireEvent extends ShopkeeperEvent implements Cancel
 	 * <p>
 	 * The new max shops limit only affects this specific shopkeeper hire. If the player already has more shops than
 	 * this, the shop will not be hired.
+	 * <p>
+	 * {@link Integer#MAX_VALUE} indicates no limit.
 	 * 
 	 * @param maxShopsLimit
 	 *            the hiring player's max shops limit to use for this hire
 	 */
 	public void setMaxShopsLimit(int maxShopsLimit) {
+		if (maxShopsLimit < 0) {
+			throw new IllegalArgumentException("maxShopsLimit cannot be negative!");
+		}
 		this.maxShopsLimit = maxShopsLimit;
 	}
 

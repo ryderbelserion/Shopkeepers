@@ -180,7 +180,7 @@ container-too-far-away: "&7Der Behälter des Shops ist zu weit entfernt!"
 container-not-placed: "&7Du musst einen Behälter auswählen, den du kürzlich platziert hast!"
 container-already-in-use: "&7Ein anderer Shop benutzt bereits den ausgewählten Behälter!"
 no-container-access: "&7Du hast keinen Zugriff auf den ausgewählten Behälter!"
-too-many-shops: "&7Du hast bereits zu viele Shops!"
+too-many-shops: "&7Du hast bereits das Limit an Shops erreicht, die du besitzen kannst!"
 no-player-shops-via-command: "&7Spieler-Shops können nur mit dem Shop-Erstellungs Item erzeugt werden!"
 shop-create-fail: "&7Du kannst dort keinen Shop erstellen."
 

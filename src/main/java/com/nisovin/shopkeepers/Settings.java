@@ -9,6 +9,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -24,8 +25,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.ConfigLoadException;
 import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
+import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -144,7 +147,7 @@ public class Settings {
 
 	public static boolean requireContainerRecentlyPlaced = true;
 	public static int maxContainerDistance = 15;
-	public static int maxShopsPerPlayer = 0;
+	public static int maxShopsPerPlayer = -1;
 	public static String maxShopsPermOptions = "10,15,25";
 
 	public static boolean protectContainers = true;
@@ -451,6 +454,23 @@ public class Settings {
 
 	// Item utilities:
 
+	public static class MaxShopsPermission implements Comparable<MaxShopsPermission> {
+
+		// Integer.MAX_VALUE indicates no limit.
+		public final int maxShops;
+		public final String permission;
+
+		private MaxShopsPermission(int maxShops, String permission) {
+			this.maxShops = maxShops;
+			this.permission = permission;
+		}
+
+		@Override
+		public int compareTo(MaxShopsPermission other) {
+			return Integer.compare(this.maxShops, other.maxShops);
+		}
+	}
+
 	// Stores derived settings which get setup after loading the config.
 	public static class DerivedSettings {
 
@@ -467,6 +487,9 @@ public class Settings {
 
 		public static Pattern shopNamePattern = Pattern.compile("^[A-Za-z0-9 ]{3,32}$");
 
+		// Sorted in descending order:
+		public static final List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>();
+
 		// Gets called after the config has been loaded:
 		private static void setup() {
 			// Ignore display name (which is used for specifying the new shopkeeper name):
@@ -482,6 +505,7 @@ public class Settings {
 			deleteVillagerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), Messages.buttonDeleteVillager, Messages.buttonDeleteVillagerLore));
 			villagerInventoryButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), Messages.buttonVillagerInventory, Messages.buttonVillagerInventoryLore));
 
+			// Shop name pattern:
 			try {
 				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
 			} catch (PatternSyntaxException e) {
@@ -489,6 +513,23 @@ public class Settings {
 				Settings.nameRegex = "[A-Za-z0-9 ]{3,32}";
 				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
 			}
+
+			// Maximum shops permissions:
+			maxShopsPermissions.clear();
+			// Add permission for an unlimited number of shops:
+			maxShopsPermissions.add(new MaxShopsPermission(Integer.MAX_VALUE, ShopkeepersPlugin.MAXSHOPS_UNLIMITED_PERMISSION));
+			String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
+			for (String permOption : maxShopsPermOptions) {
+				// Validate:
+				Integer maxShops = ConversionUtils.parseInt(permOption);
+				if (maxShops == null || maxShops <= 0) {
+					Log.warning("Config: Ignoring invalid entry in 'max-shops-perm-options': " + permOption);
+					continue;
+				}
+				String permission = "shopkeeper.maxshops." + permOption;
+				maxShopsPermissions.add(new MaxShopsPermission(maxShops, permission));
+			}
+			Collections.sort(maxShopsPermissions, Collections.reverseOrder()); // Descending order
 		}
 	}
 
@@ -583,12 +624,20 @@ public class Settings {
 
 	//
 
-	public static int getMaxShops(Player player) {
-		int maxShops = Settings.maxShopsPerPlayer;
-		String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
-		for (String perm : maxShopsPermOptions) {
-			if (PermissionUtils.hasPermission(player, "shopkeeper.maxshops." + perm)) {
-				maxShops = Integer.parseInt(perm);
+	// Integer.MAX_VALUE indicates no limit.
+	public static int getMaxShopsLimit(Player player) {
+		if (Settings.maxShopsPerPlayer == -1) {
+			return Integer.MAX_VALUE; // No limit by default
+		}
+		int maxShops = Settings.maxShopsPerPlayer; // Default
+		for (MaxShopsPermission entry : DerivedSettings.maxShopsPermissions) {
+			// Note: The max shops permission entries are sorted in descending order.
+			if (entry.maxShops <= maxShops) {
+				break;
+			}
+			if (PermissionUtils.hasPermission(player, entry.permission)) {
+				maxShops = entry.maxShops;
+				break;
 			}
 		}
 		return maxShops;

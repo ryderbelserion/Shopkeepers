@@ -12,12 +12,18 @@ public class ConfigMigration4 implements ConfigMigration {
 	@Override
 	public void apply(Configuration config) {
 		// Migrate language 'en' to 'en-default':
-		String key = "language";
+		migrateValue(config, "language", "en", "en-default");
+
+		// Migrate max shops limit from 0 to -1 (indicating no limit by default):
+		migrateValue(config, "max-shops-per-player", 0, -1);
+	}
+
+	private static void migrateValue(Configuration config, String key, Object expectedOldValue, Object newValue) {
 		if (config.isSet(key)) {
 			Object oldValue = config.get(key);
-			if (oldValue.equals("en")) {
-				Log.info("  Migrating setting '" + key + "' from value 'en' to new value 'en-default'.");
-				config.set(key, "en-default");
+			if (expectedOldValue.equals(oldValue)) {
+				Log.info("  Migrating setting '" + key + "' from value '" + oldValue + "' to new value '" + newValue + "'.");
+				config.set(key, newValue);
 			}
 		}
 	}

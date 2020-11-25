@@ -99,6 +99,9 @@ permissions:
     shopkeeper.bypass:
         description: Bypass player shop restrictions (access player shops of others)
         default: op
+    shopkeeper.maxshops.unlimited:
+        description: Allows the creation of an unlimited number of shops
+        default: op
     # Dynamic max shops permissions: The default max shops limit is configured in the config.
     # shopkeeper.maxshops.<count>
     #   description: The maximum number of shops a player can have, only values setup in the config can be used
@@ -175,6 +178,7 @@ permissions:
             shopkeeper.trade: true
             shopkeeper.hire: true
             shopkeeper.bypass: true
+            shopkeeper.maxshops.unlimited: true
             shopkeeper.admin: true
             shopkeeper.player: true
             shopkeeper.sign: true
