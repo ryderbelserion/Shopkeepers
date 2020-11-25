@@ -473,21 +473,26 @@ public class Settings {
 	// Stores derived settings which get setup after loading the config.
 	public static class DerivedSettings {
 
-		public static ItemData namingItemData = new ItemData(Material.AIR);
+		public static ItemData namingItemData;
 
 		// Button items:
-		public static ItemData nameButtonItem = new ItemData(Material.AIR);
-		public static ItemData containerButtonItem = new ItemData(Material.AIR);
-		public static ItemData deleteButtonItem = new ItemData(Material.AIR);
-		public static ItemData hireButtonItem = new ItemData(Material.AIR);
+		public static ItemData nameButtonItem;
+		public static ItemData containerButtonItem;
+		public static ItemData deleteButtonItem;
+		public static ItemData hireButtonItem;
 
-		public static ItemData deleteVillagerButtonItem = new ItemData(Material.AIR);
-		public static ItemData villagerInventoryButtonItem = new ItemData(Material.AIR);
+		public static ItemData deleteVillagerButtonItem;
+		public static ItemData villagerInventoryButtonItem;
 
-		public static Pattern shopNamePattern = Pattern.compile("^[A-Za-z0-9 ]{3,32}$");
+		public static Pattern shopNamePattern;
 
 		// Sorted in descending order:
 		public static final List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>();
+
+		static {
+			// Initial setup of default values:
+			setup();
+		}
 
 		// Gets called after the config has been loaded:
 		private static void setup() {
@@ -529,6 +534,9 @@ public class Settings {
 				maxShopsPermissions.add(new MaxShopsPermission(maxShops, permission));
 			}
 			Collections.sort(maxShopsPermissions, Collections.reverseOrder()); // Descending order
+		}
+
+		private DerivedSettings() {
 		}
 	}
 
