@@ -40,6 +40,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.WolfShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieVillagerShop;
+import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
 
 public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
@@ -154,7 +155,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 		this.livingShops = livingShops;
 		// First, create the enabled living object types, in the same order as specified in the config:
 		for (String entityTypeId : Settings.enabledLivingShops) {
-			EntityType entityType = Settings.matchEntityType(entityTypeId);
+			EntityType entityType = EntityUtils.matchEntityType(entityTypeId);
 			if (entityType != null && entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType)) {
 				// Not using aliases (yet?)
 				objectTypes.put(entityType, this.createLivingEntityObjectType(entityType, this.getAliases(entityType)));

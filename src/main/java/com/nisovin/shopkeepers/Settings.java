@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -29,11 +28,11 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.ConfigLoadException;
 import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
 import com.nisovin.shopkeepers.util.ConversionUtils;
+import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class Settings {
@@ -377,7 +376,7 @@ public class Settings {
 		boolean foundInvalidEntityType = false;
 		boolean removePigZombie = false;
 		for (String entityTypeId : enabledLivingShops) {
-			EntityType entityType = matchEntityType(entityTypeId);
+			EntityType entityType = EntityUtils.matchEntityType(entityTypeId);
 			if (entityType == null || !entityType.isAlive() || !entityType.isSpawnable()) {
 				foundInvalidEntityType = true;
 				if ("PIG_ZOMBIE".equals(entityTypeId)) {
@@ -641,18 +640,6 @@ public class Settings {
 			}
 		}
 		return maxShops;
-	}
-
-	public static EntityType matchEntityType(String entityTypeId) {
-		if (StringUtils.isEmpty(entityTypeId)) return null;
-		// Get by Bukkit id:
-		String normalizedEntityTypeId = entityTypeId.trim().toUpperCase(Locale.ROOT).replace('-', '_').replace(' ', '_');
-		try {
-			return EntityType.valueOf(normalizedEntityTypeId);
-		} catch (IllegalArgumentException e) {
-			// Unknown entity type:
-			return null;
-		}
 	}
 
 	private Settings() {

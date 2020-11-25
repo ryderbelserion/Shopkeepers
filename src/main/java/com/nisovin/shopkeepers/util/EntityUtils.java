@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.bukkit.Chunk;
@@ -20,6 +21,18 @@ import org.bukkit.util.Vector;
 public class EntityUtils {
 
 	private EntityUtils() {
+	}
+
+	public static EntityType matchEntityType(String entityTypeId) {
+		if (StringUtils.isEmpty(entityTypeId)) return null;
+		// Get by Bukkit id:
+		String normalizedEntityTypeId = entityTypeId.trim().toUpperCase(Locale.ROOT).replace('-', '_').replace(' ', '_');
+		try {
+			return EntityType.valueOf(normalizedEntityTypeId);
+		} catch (IllegalArgumentException e) {
+			// Unknown entity type:
+			return null;
+		}
 	}
 
 	public static void printEntityCounts(Chunk chunk) {
