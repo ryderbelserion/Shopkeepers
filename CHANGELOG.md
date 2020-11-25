@@ -45,7 +45,10 @@ Messages:
 * Added 'no-player-shops-via-command'.
 * Removed 'no-admin-shop-type-selected'.
 * Removed 'no-player-shop-type-selected'.
-* Moved 'editor-title' and 'for-hire-title' from config into messages.
+* Moved various messages from the config into the language files:
+  * 'editor-title'
+  * 'for-hire-title'
+  * 'nameplate-prefix'. Also changed the color to a dark green.
 * Changed the default color of 'villager-editor-title' to be less bright.
 * Changed the 'too-many-shops' message to be more general.
 

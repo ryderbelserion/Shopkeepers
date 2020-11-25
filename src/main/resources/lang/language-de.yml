@@ -188,6 +188,7 @@ type-new-name: "&aBitte gebe den neuen Shop-Namen im Chat ein.\n  &aTippe Minus 
 name-set: "&aDer Shop-Name wurde gesetzt!"
 name-has-not-changed: "&aDer Shop-Name hat sich nicht geändert."
 name-invalid: "&aDer Name ist ungültig!"
+nameplate-prefix: "&2"
 
 shop-type-disabled: "&7Der Shop-Typ '&6{type}&7' ist deaktiviert."
 shop-object-type-disabled: "&7Der Shop-Objekt-Typ '&6{type}&7' ist deaktiviert."

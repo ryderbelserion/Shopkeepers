@@ -149,6 +149,7 @@ public class Messages {
 	public static Text nameSet = Text.parse("&aThe shop's name has been set!");
 	public static Text nameHasNotChanged = Text.parse("&aThe shop's name has not changed.");
 	public static Text nameInvalid = Text.parse("&aThat name is not valid!");
+	public static String nameplatePrefix = c("&2");
 
 	public static Text shopTypeDisabled = Text.parse("&7The shop type '&6{type}&7' is disabled.");
 	public static Text shopObjectTypeDisabled = Text.parse("&7The shop object type '&6{type}&7' is disabled.");

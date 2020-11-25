@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -289,9 +290,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		if (npc == null) return;
 
 		if (Settings.showNameplates && name != null && !name.isEmpty()) {
-			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
-				name = Settings.nameplatePrefix + name;
-			}
+			name = Messages.nameplatePrefix + name;
 			name = this.prepareName(name);
 			// Set entity name plate:
 			npc.setName(name);

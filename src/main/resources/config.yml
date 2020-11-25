@@ -259,8 +259,6 @@ show-nameplates: true
 # Whether to always show nameplates. If disabled, nameplates will only be shown
 # when looking directly at the shopkeeper.
 always-show-nameplates: false
-# The prefix for nameplates (to help distinguish them from players).
-nameplate-prefix: "&a"
 
 # Whether to allow citizen (npc) shops. Requires the plugin Citizens.
 enable-citizen-shops: true

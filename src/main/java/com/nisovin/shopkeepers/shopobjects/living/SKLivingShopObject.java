@@ -18,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 
+import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -435,9 +436,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	protected void applyName(E entity, String name) {
 		if (Settings.showNameplates && name != null && !name.isEmpty()) {
-			if (Settings.nameplatePrefix != null && !Settings.nameplatePrefix.isEmpty()) {
-				name = Settings.nameplatePrefix + name;
-			}
+			name = Messages.nameplatePrefix + name;
 			name = this.prepareName(name);
 			// Set entity name plate:
 			entity.setCustomName(name);
