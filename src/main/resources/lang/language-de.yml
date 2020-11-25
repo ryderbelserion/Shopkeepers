@@ -235,18 +235,18 @@ shopkeeper-created: "&aShop erstellt: &6{type} &7({description})\n{setupDesc}"
 
 shop-setup-desc-selling: |-
   &e  Lege die zu verkaufenden Items in den Behälter und
-  &e  gib mit Shift+Rechts Klick auf den Shop die Preise an.
+  &e  gib mit Shift+Rechtsklick auf den Shop die Preise an.
 shop-setup-desc-buying: |-
   &e  Lege von jedem Item, das du ankaufen möchtest, eines in den Behälter.
-  &e  Mit Shift+Rechts Klick auf den Shop legst du die Preise fest.
+  &e  Mit Shift+Rechtsklick auf den Shop legst du die Preise fest.
 shop-setup-desc-trading: |-
   &e  Lege die Items, die du eintauschen möchtest, in den Behälter.
-  &e  Mit Shift+Rechts Klick auf den Shop legst du die Angebote fest.
+  &e  Mit Shift+Rechtsklick auf den Shop legst du die Angebote fest.
 shop-setup-desc-book: |-
   &e  Lege signierte und leere Bücher in den Behälter.
-  &e  Mit Shift+Rechts Klick auf den Shop legst du die Preise fest.
+  &e  Mit Shift+Rechtsklick auf den Shop legst du die Preise fest.
 shop-setup-desc-admin-regular: |-
-  &e  Mit Shift+Rechts Klick auf den Shop legst du die Preise fest.
+  &e  Mit Shift+Rechtsklick auf den Shop legst du die Preise fest.
 
 trade-setup-desc-header: '&6{shopType}'
 trade-setup-desc-admin-regular:
@@ -257,27 +257,27 @@ trade-setup-desc-admin-regular:
 trade-setup-desc-selling:
 - Verkauft Items an Spieler.
 - Lege die zu verkaufenden Items in den Behälter.
-- Links/Rechts Klick zum Ändern der Mengen.
+- 'Links-/Rechtsklick zum Ändern der Mengen.'
 - 'Obere Reihe: Verkaufte Items'
 - 'Untere Reihen: Kosten'
 trade-setup-desc-buying:
 - Kauft Items von Spielern.
 - Lege von jedem anzukaufendem Item eines
 - in den Behälter, sowie reichlich Währung.
-- Links/Rechts Klick zum Ändern der Mengen.
+- 'Links-/Rechtsklick zum Ändern der Mengen.'
 - 'Obere Reihe: Kosten'
 - 'Untere Reihe: Angekaufte Items'
 trade-setup-desc-trading:
 - Tauscht Items mit Spielern.
 - Wähle ein Item aus deinem Inventar und
 - klicke ein Feld an, um es zu platzieren.
-- Links/Rechts Klick zum Ändern der Mengen.
+- 'Links-/Rechtsklick zum Ändern der Mengen.'
 - 'Obere Reihe: Ergebnis Items'
 - 'Untere Reihen: Kosten'
 trade-setup-desc-book:
 - Verkauft Kopien von Büchern.
 - Lege signierte und leere Bücher in den Behälter.
-- Links/Rechts Klick zum Ändern der Kosten.
+- 'Links-/Rechtsklick zum Ändern der Kosten.'
 - 'Obere Reihe: Verkaufte Bücher'
 - 'Untere Reihen: Kosten'
 

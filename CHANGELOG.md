@@ -51,6 +51,7 @@ Messages:
   * 'nameplate-prefix'. Also changed the color to a dark green.
 * Changed the default color of 'villager-editor-title' to be less bright.
 * Changed the 'too-many-shops' message to be more general.
+* Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.
 
