@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.MathUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
@@ -91,8 +91,8 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 
 	private ItemStack getMagmaCubeSizeEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.SLIME_BLOCK);
-		String displayName = TextUtils.replaceArguments(Messages.buttonMagmaCubeSize, "size", magmaCubeSize);
-		List<String> lore = TextUtils.replaceArguments(Messages.buttonMagmaCubeSizeLore, "size", magmaCubeSize);
+		String displayName = StringUtils.replaceArguments(Messages.buttonMagmaCubeSize, "size", magmaCubeSize);
+		List<String> lore = StringUtils.replaceArguments(Messages.buttonMagmaCubeSizeLore, "size", magmaCubeSize);
 		ItemUtils.setItemStackNameAndLore(iconItem, displayName, lore);
 		return iconItem;
 	}

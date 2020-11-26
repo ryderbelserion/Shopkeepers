@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.ShopkeeperUIHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -101,7 +102,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 	@Override
 	protected ItemStack createTradeSetupIcon() {
 		ShopType<?> shopType = this.getShopkeeper().getType();
-		String itemName = TextUtils.replaceArguments(Messages.tradeSetupDescHeader, "shopType", shopType.getDisplayName());
+		String itemName = StringUtils.replaceArguments(Messages.tradeSetupDescHeader, "shopType", shopType.getDisplayName());
 		List<String> itemLore = shopType.getTradeSetupDescription();
 		return ItemUtils.setItemStackNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, itemLore);
 	}

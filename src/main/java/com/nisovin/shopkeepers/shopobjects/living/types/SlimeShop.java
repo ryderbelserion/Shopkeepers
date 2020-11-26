@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.MathUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SlimeShop extends SKLivingShopObject<Slime> {
@@ -91,8 +91,8 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 
 	private ItemStack getSlimeSizeEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.SLIME_BLOCK);
-		String displayName = TextUtils.replaceArguments(Messages.buttonSlimeSize, "size", slimeSize);
-		List<String> lore = TextUtils.replaceArguments(Messages.buttonSlimeSizeLore, "size", slimeSize);
+		String displayName = StringUtils.replaceArguments(Messages.buttonSlimeSize, "size", slimeSize);
+		List<String> lore = StringUtils.replaceArguments(Messages.buttonSlimeSizeLore, "size", slimeSize);
 		ItemUtils.setItemStackNameAndLore(iconItem, displayName, lore);
 		return iconItem;
 	}

@@ -3,8 +3,6 @@ package com.nisovin.shopkeepers.util;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -177,60 +175,6 @@ public class TextUtils {
 		return colored;
 	}
 
-	// ARGUMENTS
-
-	private static final Map<String, Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
-
-	// Arguments format: [key1, value1, key2, value2, ...]
-	// The keys are expected to be of type String.
-	public static <T> void addArgumentsToMap(Map<String, Object> argumentsMap, Object... argumentPairs) {
-		Validate.notNull(argumentsMap, "argumentsMap is null");
-		Validate.notNull(argumentPairs, "argumentPairs is null");
-		Validate.isTrue(argumentPairs.length % 2 == 0, "argumentPairs.length is not a multiple of 2");
-		int argumentsKeyLimit = argumentPairs.length - 1;
-		for (int i = 0; i < argumentsKeyLimit; i += 2) {
-			String key = (String) argumentPairs[i];
-			Object value = argumentPairs[i + 1];
-			argumentsMap.put(key, value);
-		}
-	}
-
-	public static String replaceArguments(String message, Object... argumentPairs) {
-		assert TEMP_ARGUMENTS_MAP.isEmpty();
-		try {
-			addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
-			return replaceArguments(message, TEMP_ARGUMENTS_MAP);
-		} finally {
-			TEMP_ARGUMENTS_MAP.clear(); // reset
-		}
-	}
-
-	public static String replaceArguments(String message, Map<String, Object> arguments) {
-		Validate.notNull(message, "Message is null!");
-		// Uses the default key format: {key}
-		return StringUtils.replaceArguments(message, arguments); // Checks arguments
-	}
-
-	// Creates and returns a new List of messages:
-	public static List<String> replaceArguments(Collection<String> messages, Map<String, Object> arguments) {
-		Validate.notNull(messages, "Messages is null!");
-		List<String> replaced = new ArrayList<>(messages.size());
-		for (String message : messages) {
-			replaced.add(replaceArguments(message, arguments)); // Checks message and arguments
-		}
-		return replaced;
-	}
-
-	public static List<String> replaceArguments(Collection<String> messages, Object... argumentPairs) {
-		assert TEMP_ARGUMENTS_MAP.isEmpty();
-		try {
-			addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
-			return replaceArguments(messages, TEMP_ARGUMENTS_MAP);
-		} finally {
-			TEMP_ARGUMENTS_MAP.clear(); // Reset
-		}
-	}
-
 	// SENDING
 
 	public static void sendMessage(CommandSender recipient, String message) {
@@ -247,12 +191,12 @@ public class TextUtils {
 
 	public static void sendMessage(CommandSender recipient, String message, Map<String, Object> arguments) {
 		// Replace message arguments and then send:
-		sendMessage(recipient, replaceArguments(message, arguments));
+		sendMessage(recipient, StringUtils.replaceArguments(message, arguments));
 	}
 
 	public static void sendMessage(CommandSender recipient, String message, Object... argumentPairs) {
 		// Replace message arguments and then send:
-		sendMessage(recipient, replaceArguments(message, argumentPairs));
+		sendMessage(recipient, StringUtils.replaceArguments(message, argumentPairs));
 	}
 
 	/*

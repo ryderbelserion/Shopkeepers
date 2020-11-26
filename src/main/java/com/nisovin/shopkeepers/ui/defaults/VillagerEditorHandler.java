@@ -32,6 +32,7 @@ import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.MathUtils;
 import com.nisovin.shopkeepers.util.MerchantUtils;
 import com.nisovin.shopkeepers.util.PermissionUtils;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -48,7 +49,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		Validate.notNull(villager, "villager is null");
 		this.villager = villager;
 		String villagerName = villager.getName(); // Not null
-		this.title = TextUtils.replaceArguments(Messages.villagerEditorTitle, "villagerName", villagerName);
+		this.title = StringUtils.replaceArguments(Messages.villagerEditorTitle, "villagerName", villagerName);
 	}
 
 	public AbstractVillager getVillager() {
@@ -155,7 +156,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					int inventorySize = (int) Math.ceil(villagerInventory.getSize() / 9.0D) * 9;
 
 					String villagerName = villager.getName(); // Not null
-					String inventoryTitle = TextUtils.replaceArguments(Messages.villagerInventoryTitle, "villagerName", villagerName);
+					String inventoryTitle = StringUtils.replaceArguments(Messages.villagerInventoryTitle, "villagerName", villagerName);
 					Inventory customInventory = Bukkit.createInventory(null, inventorySize, inventoryTitle);
 
 					// Copy storage contents:
@@ -406,7 +407,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	@Override
 	protected ItemStack createTradeSetupIcon() {
 		String villagerName = villager.getName(); // Not null
-		String itemName = TextUtils.replaceArguments(Messages.villagerEditorDescriptionHeader, "villagerName", villagerName);
+		String itemName = StringUtils.replaceArguments(Messages.villagerEditorDescriptionHeader, "villagerName", villagerName);
 		List<String> itemLore = Messages.villagerEditorDescription;
 		return ItemUtils.setItemStackNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, itemLore);
 	}

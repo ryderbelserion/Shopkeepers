@@ -25,7 +25,7 @@ import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.MathUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -365,7 +365,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			prevPage = (page - 1);
 			prevPageText = String.valueOf(prevPage);
 		}
-		String itemName = TextUtils.replaceArguments(Messages.buttonPreviousPage,
+		String itemName = StringUtils.replaceArguments(Messages.buttonPreviousPage,
 				"prev_page", prevPageText,
 				"page", page,
 				"max_page", getMaxTradesPages()
@@ -383,7 +383,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			nextPage = (page + 1);
 			nextPageText = String.valueOf(nextPage);
 		}
-		String itemName = TextUtils.replaceArguments(Messages.buttonNextPage,
+		String itemName = StringUtils.replaceArguments(Messages.buttonNextPage,
 				"next_page", nextPageText,
 				"page", page,
 				"max_page", getMaxTradesPages()
@@ -395,7 +395,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	protected ItemStack createCurrentPageIcon(int page) {
-		String itemName = TextUtils.replaceArguments(Messages.buttonCurrentPage,
+		String itemName = StringUtils.replaceArguments(Messages.buttonCurrentPage,
 				"page", page,
 				"max_page", getMaxTradesPages()
 		);

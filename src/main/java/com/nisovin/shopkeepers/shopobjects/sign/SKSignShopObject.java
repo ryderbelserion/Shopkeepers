@@ -30,7 +30,7 @@ import com.nisovin.shopkeepers.util.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
@@ -272,20 +272,20 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		arguments.put("shopName", this.prepareName(playerShop.getName())); // Not null, can be empty
 		arguments.put("owner", playerShop.getOwnerName());  // Not null, can be empty
 
-		sign.setLine(0, TextUtils.replaceArguments(Messages.playerSignShopLine1, arguments));
-		sign.setLine(1, TextUtils.replaceArguments(Messages.playerSignShopLine2, arguments));
-		sign.setLine(2, TextUtils.replaceArguments(Messages.playerSignShopLine3, arguments));
-		sign.setLine(3, TextUtils.replaceArguments(Messages.playerSignShopLine4, arguments));
+		sign.setLine(0, StringUtils.replaceArguments(Messages.playerSignShopLine1, arguments));
+		sign.setLine(1, StringUtils.replaceArguments(Messages.playerSignShopLine2, arguments));
+		sign.setLine(2, StringUtils.replaceArguments(Messages.playerSignShopLine3, arguments));
+		sign.setLine(3, StringUtils.replaceArguments(Messages.playerSignShopLine4, arguments));
 	}
 
 	protected void setupAdminShopSign(Sign sign, AdminShopkeeper adminShop) {
 		Map<String, Object> arguments = new HashMap<>();
 		arguments.put("shopName", this.prepareName(adminShop.getName())); // Not null, can be empty
 
-		sign.setLine(0, TextUtils.replaceArguments(Messages.adminSignShopLine1, arguments));
-		sign.setLine(1, TextUtils.replaceArguments(Messages.adminSignShopLine2, arguments));
-		sign.setLine(2, TextUtils.replaceArguments(Messages.adminSignShopLine3, arguments));
-		sign.setLine(3, TextUtils.replaceArguments(Messages.adminSignShopLine4, arguments));
+		sign.setLine(0, StringUtils.replaceArguments(Messages.adminSignShopLine1, arguments));
+		sign.setLine(1, StringUtils.replaceArguments(Messages.adminSignShopLine2, arguments));
+		sign.setLine(2, StringUtils.replaceArguments(Messages.adminSignShopLine3, arguments));
+		sign.setLine(3, StringUtils.replaceArguments(Messages.adminSignShopLine4, arguments));
 	}
 
 	@Override

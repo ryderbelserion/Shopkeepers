@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.bukkit.ChatColor;
 
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -141,7 +141,7 @@ public abstract class AbstractText implements Text {
 	public Text setPlaceholderArguments(Object... argumentPairs) {
 		assert TEMP_ARGUMENTS_MAP.isEmpty();
 		try {
-			TextUtils.addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
+			StringUtils.addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
 			return this.setPlaceholderArguments(TEMP_ARGUMENTS_MAP);
 		} finally {
 			TEMP_ARGUMENTS_MAP.clear(); // Reset

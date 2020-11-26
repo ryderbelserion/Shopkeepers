@@ -1,6 +1,8 @@
 package com.nisovin.shopkeepers.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -198,11 +200,58 @@ public class StringUtils {
 	}
 
 	private static final ArgumentsReplacer ARGUMENTS_REPLACER = new ArgumentsReplacer(); // Singleton for reuse
+	private static final Map<String, Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
 
+	// Arguments format: [key1, value1, key2, value2, ...]
+	// The keys are expected to be of type String.
+	// The replaced keys use the format {key} (braces are not specified in the argument keys).
+	public static <T> void addArgumentsToMap(Map<String, Object> argumentsMap, Object... argumentPairs) {
+		Validate.notNull(argumentsMap, "argumentsMap is null");
+		Validate.notNull(argumentPairs, "argumentPairs is null");
+		Validate.isTrue(argumentPairs.length % 2 == 0, "argumentPairs.length is not a multiple of 2");
+		int argumentsKeyLimit = argumentPairs.length - 1;
+		for (int i = 0; i < argumentsKeyLimit; i += 2) {
+			String key = (String) argumentPairs[i];
+			Object value = argumentPairs[i + 1];
+			argumentsMap.put(key, value);
+		}
+	}
+
+	public static String replaceArguments(String source, Object... argumentPairs) {
+		assert TEMP_ARGUMENTS_MAP.isEmpty();
+		try {
+			addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
+			return replaceArguments(source, TEMP_ARGUMENTS_MAP);
+		} finally {
+			TEMP_ARGUMENTS_MAP.clear(); // Reset
+		}
+	}
+
+	// The replaced keys use the format {key} (braces are not specified in the argument keys).
 	// Uses the String representation of the given arguments.
 	// If an argument is a Supplier, it gets invoked to obtain the actual argument.
 	public static String replaceArguments(String source, Map<String, Object> arguments) {
-		return ARGUMENTS_REPLACER.replaceArguments(source, arguments);
+		return ARGUMENTS_REPLACER.replaceArguments(source, arguments); // Checks arguments
+	}
+
+	public static List<String> replaceArguments(Collection<String> messages, Object... argumentPairs) {
+		assert TEMP_ARGUMENTS_MAP.isEmpty();
+		try {
+			addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
+			return replaceArguments(messages, TEMP_ARGUMENTS_MAP);
+		} finally {
+			TEMP_ARGUMENTS_MAP.clear(); // Reset
+		}
+	}
+
+	// Creates and returns a new List:
+	public static List<String> replaceArguments(Collection<String> sources, Map<String, Object> arguments) {
+		Validate.notNull(sources, "sources is null!");
+		List<String> replaced = new ArrayList<>(sources.size());
+		for (String source : sources) {
+			replaced.add(replaceArguments(source, arguments)); // Checks arguments
+		}
+		return replaced;
 	}
 
 	// Faster than regex/matcher and StringBuilder#replace in a loop.
