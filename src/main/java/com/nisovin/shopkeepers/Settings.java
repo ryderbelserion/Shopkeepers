@@ -175,7 +175,6 @@ public class Settings {
 
 	public static boolean enableSignShops = true;
 	public static boolean enableSignPostShops = true;
-	public static String signShopFirstLine = "[SHOP]";
 
 	/*
 	 * Naming

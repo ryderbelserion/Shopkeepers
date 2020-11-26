@@ -124,6 +124,16 @@ public class Messages {
 	public static String buttonMagmaCubeSize = c("&aChoose magma cube size");
 	public static List<String> buttonMagmaCubeSizeLore = c(Arrays.asList("Cycles the magma cube's size.", "Current size: &e{size}"));
 
+	public static String adminSignShopLine1 = c("&2[SHOP]");
+	public static String adminSignShopLine2 = c("&7{shopName}");
+	public static String adminSignShopLine3 = c("");
+	public static String adminSignShopLine4 = c("&eRight click!");
+
+	public static String playerSignShopLine1 = c("&2[SHOP]");
+	public static String playerSignShopLine2 = c("&7{shopName}");
+	public static String playerSignShopLine3 = c("&7{owner}");
+	public static String playerSignShopLine4 = c("&eRight click!");
+
 	public static String forHireTitle = c("For Hire");
 	public static String buttonHire = c("&aHire");
 	public static List<String> buttonHireLore = c(Arrays.asList("Buy this shop"));

@@ -49,6 +49,10 @@ Messages:
   * 'editor-title'
   * 'for-hire-title'
   * 'nameplate-prefix'. Also changed the color to a dark green.
+  * 'sign-shop-first-line'. This has been replaced with 8 new messages for the sign lines of different types of shops:
+    * 'admin-sign-shop-line1/2/3/4'
+    * 'player-sign-shop-line1/2/3/4'
+    * The appearance of sign shops has changed. They are slightly more colorful now.
 * Changed the default color of 'villager-editor-title' to be less bright.
 * Changed the 'too-many-shops' message to be more general.
 * Minor changes to the german translation.

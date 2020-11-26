@@ -163,6 +163,16 @@ button-magma-cube-size-lore:
 - "Ändert die Größe des Magmawürfels."
 - "Aktuelle Größe: &e{size}"
 
+admin-sign-shop-line1: "&2[SHOP]"
+admin-sign-shop-line2: "&7{shopName}"
+admin-sign-shop-line3: ""
+admin-sign-shop-line4: "&eRechtsklick!"
+
+player-sign-shop-line1: "&2[SHOP]"
+player-sign-shop-line2: "&7{shopName}"
+player-sign-shop-line3: "&7{owner}"
+player-sign-shop-line4: "&eRechtsklick!"
+
 for-hire-title: "Zum Anheuern"
 button-hire: "&aAnheuern"
 button-hire-lore:

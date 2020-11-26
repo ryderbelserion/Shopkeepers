@@ -164,6 +164,16 @@ button-magma-cube-size-lore:
 - "Cycles the magma cube's size."
 - "Current size: &e{size}"
 
+admin-sign-shop-line1: "&2[SHOP]"
+admin-sign-shop-line2: "&7{shopName}"
+admin-sign-shop-line3: ""
+admin-sign-shop-line4: "&eRight click!"
+
+player-sign-shop-line1: "&2[SHOP]"
+player-sign-shop-line2: "&7{shopName}"
+player-sign-shop-line3: "&7{owner}"
+player-sign-shop-line4: "&eRight click!"
+
 for-hire-title: "For Hire"
 button-hire: "&aHire"
 button-hire-lore:

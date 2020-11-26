@@ -1,7 +1,9 @@
 package com.nisovin.shopkeepers.shopobjects.sign;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -17,8 +19,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.Messages;
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -28,6 +30,7 @@ import com.nisovin.shopkeepers.util.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
@@ -252,27 +255,37 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			return;
 		}
 
-		// Line 0: Header
-		sign.setLine(0, Settings.signShopFirstLine);
-
-		// Line 1: Shop name
-		String name = shopkeeper.getName(); // Can be empty
-		name = this.prepareName(name);
-		String line1 = name;
-		sign.setLine(1, line1);
-
-		// Line 2: Owner name
-		String line2 = "";
+		// Setup sign contents:
 		if (shopkeeper instanceof PlayerShopkeeper) {
-			line2 = ((PlayerShopkeeper) shopkeeper).getOwnerName();
+			this.setupPlayerShopSign(sign, (PlayerShopkeeper) shopkeeper);
+		} else {
+			assert shopkeeper instanceof AdminShopkeeper;
+			this.setupAdminShopSign(sign, (AdminShopkeeper) shopkeeper);
 		}
-		sign.setLine(2, line2);
-
-		// Line 3: Empty
-		sign.setLine(3, "");
 
 		// Apply sign changes:
 		sign.update(false, false);
+	}
+
+	protected void setupPlayerShopSign(Sign sign, PlayerShopkeeper playerShop) {
+		Map<String, Object> arguments = new HashMap<>();
+		arguments.put("shopName", this.prepareName(playerShop.getName())); // Not null, can be empty
+		arguments.put("owner", playerShop.getOwnerName());  // Not null, can be empty
+
+		sign.setLine(0, TextUtils.replaceArguments(Messages.playerSignShopLine1, arguments));
+		sign.setLine(1, TextUtils.replaceArguments(Messages.playerSignShopLine2, arguments));
+		sign.setLine(2, TextUtils.replaceArguments(Messages.playerSignShopLine3, arguments));
+		sign.setLine(3, TextUtils.replaceArguments(Messages.playerSignShopLine4, arguments));
+	}
+
+	protected void setupAdminShopSign(Sign sign, AdminShopkeeper adminShop) {
+		Map<String, Object> arguments = new HashMap<>();
+		arguments.put("shopName", this.prepareName(adminShop.getName())); // Not null, can be empty
+
+		sign.setLine(0, TextUtils.replaceArguments(Messages.adminSignShopLine1, arguments));
+		sign.setLine(1, TextUtils.replaceArguments(Messages.adminSignShopLine2, arguments));
+		sign.setLine(2, TextUtils.replaceArguments(Messages.adminSignShopLine3, arguments));
+		sign.setLine(3, TextUtils.replaceArguments(Messages.adminSignShopLine4, arguments));
 	}
 
 	@Override
