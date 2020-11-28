@@ -13,8 +13,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
 import com.nisovin.shopkeepers.Messages;
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.commands.lib.arguments.FallbackArgument;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.MapUtils;
@@ -464,11 +464,11 @@ public abstract class Command {
 		ArgumentsReader argsReader = new ArgumentsReader(input);
 		try {
 			this.processCommand(input, context, argsReader);
-			Log.debug(Settings.DebugOptions.commands, () -> "Command succeeded. Context: " + context.toString());
+			Log.debug(DebugOptions.commands, () -> "Command succeeded. Context: " + context.toString());
 		} catch (CommandException e) {
 			TextUtils.sendMessage(sender, e.getMessageText());
 
-			Log.debug(Settings.DebugOptions.commands, () -> {
+			Log.debug(DebugOptions.commands, () -> {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Command failed. Argument chain: ");
 				CommandArgument<?> argument = null;
@@ -478,8 +478,8 @@ public abstract class Command {
 				sb.append(this.getArgumentChain(argument));
 				return sb.toString();
 			});
-			Log.debug(Settings.DebugOptions.commands, () -> "Context: " + context.toString());
-			Log.debug(Settings.DebugOptions.commands, () -> "Arguments reader: " + argsReader.toString());
+			Log.debug(DebugOptions.commands, () -> "Context: " + context.toString());
+			Log.debug(DebugOptions.commands, () -> "Arguments reader: " + argsReader.toString());
 		} catch (Exception e) {
 			// An unexpected exception was caught:
 			TextUtils.sendMessage(sender, Text.color(ChatColor.RED).text("An error occurred during command handling! Check the console log."));
@@ -717,7 +717,7 @@ public abstract class Command {
 			// On success this stores any parsed values inside the context:
 			argument.parse(parsingContext.input, context, argsReader);
 		} catch (FallbackArgumentException e) {
-			Log.debug(Settings.DebugOptions.commands, () -> "Fallback for argument '" + argument.getName() + "': " + e.getMessage());
+			Log.debug(DebugOptions.commands, () -> "Fallback for argument '" + argument.getName() + "': " + e.getMessage());
 			argsReader.setState(argsReaderState); // Restore previous args reader state
 
 			// Keep track of context changes while continuing with the pending fallback:

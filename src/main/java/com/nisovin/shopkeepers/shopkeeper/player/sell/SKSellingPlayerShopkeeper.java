@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.sell.SellingPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
@@ -77,7 +78,7 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 		List<SKPriceOffer> offers = SKPriceOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId());
 		List<SKPriceOffer> migratedOffers = SKPriceOffer.migrateItems(offers, "Shopkeeper " + this.getId());
 		if (offers != migratedOffers) {
-			Log.debug(Settings.DebugOptions.itemMigrations,
+			Log.debug(DebugOptions.itemMigrations,
 					() -> "Shopkeeper " + this.getId() + ": Migrated trading offer items."
 			);
 			this.markDirty();

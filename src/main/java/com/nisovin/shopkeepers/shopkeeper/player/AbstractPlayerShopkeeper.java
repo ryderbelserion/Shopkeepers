@@ -29,6 +29,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.container.ShopContainers;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.citizens.SKCitizensShopObject;
 import com.nisovin.shopkeepers.shopobjects.sign.SKSignShopObject;
@@ -132,7 +133,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				hireCost = null;
 			} else {
 				hireCost = migratedHireCost;
-				Log.debug(Settings.DebugOptions.itemMigrations,
+				Log.debug(DebugOptions.itemMigrations,
 						() -> "Shopkeeper " + this.getId() + ": Migrated hire cost item."
 				);
 			}

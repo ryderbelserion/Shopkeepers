@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.debug.Debug;
 
 public final class Log {
 
@@ -40,13 +40,13 @@ public final class Log {
 	}
 
 	public static void debug(String debugOption, String message) {
-		if (Settings.isDebugging(debugOption)) {
+		if (Debug.isDebugging(debugOption)) {
 			info(message);
 		}
 	}
 
 	public static void debug(String debugOption, Supplier<String> msgSupplier) {
-		if (Settings.isDebugging(debugOption)) {
+		if (Debug.isDebugging(debugOption)) {
 			info(msgSupplier);
 		}
 	}

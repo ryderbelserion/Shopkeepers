@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.container.ShopContainers;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -83,7 +84,7 @@ public class ItemConversions {
 				long durationMillis = (System.nanoTime() - start) / 1000000L;
 				// Note: The conversion always has some performance impact, even if no items got actually converted. We
 				// therefore always print the debug messages to allow debugging the item conversion times.
-				Log.debug(Settings.DebugOptions.itemConversions,
+				Log.debug(DebugOptions.itemConversions,
 						() -> "Converted " + convertedContainerStacks + " affected item stacks in the container of shopkeeper "
 								+ shopkeeper.getId() + ", triggered by player '" + player.getName()
 								+ "' (took " + durationMillis + " ms)."
@@ -110,7 +111,7 @@ public class ItemConversions {
 		long durationMillis = (System.nanoTime() - start) / 1000000L;
 		// Note: The conversion always has some performance impact, even if no items got actually converted. We
 		// therefore always print the debug messages to allow debugging the item conversion times.
-		Log.debug(Settings.DebugOptions.itemConversions,
+		Log.debug(DebugOptions.itemConversions,
 				() -> "Converted " + convertedStacks + " affected item stacks in the inventory of player '"
 						+ player.getName() + "' (took " + durationMillis + " ms)."
 		);

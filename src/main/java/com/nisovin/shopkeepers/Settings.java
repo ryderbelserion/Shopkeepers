@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.EntityType;
@@ -237,45 +236,6 @@ public class Settings extends Config {
 	// Note: This can in general be larger than 64!
 	public static int highCurrencyValue = 9;
 	public static int highCurrencyMinCost = 20;
-
-	///// DEBUGGING
-
-	public static final class DebugOptions {
-		private DebugOptions() {
-		}
-
-		// Logs details of the server version dependent capabilities.
-		public static final String capabilities = "capabilities";
-		// Logs all events (spams!). Starts slightly delayed. Subsequent calls of the same event get combined into a
-		// single logging entry to slightly reduce spam.
-		public static final String logAllEvents = "log-all-events";
-		// Prints the registered listeners for the first call of each event.
-		public static final String printListeners = "print-listeners";
-		// Enables debugging output related to shopkeeper activation.
-		public static final String shopkeeperActivation = "shopkeeper-activation";
-		// Enables additional commands related debugging output.
-		public static final String commands = "commands";
-		// Logs information when updating stored shop owner names.
-		public static final String ownerNameUpdates = "owner-name-updates";
-		// Logs whenever a shopkeeper performs item migrations (eg. for trading offers).
-		public static final String itemMigrations = "item-migrations";
-		// Logs whenever we explicitly convert items to Spigot's data format. Note that this does not log when items get
-		// implicitly converted, which may happen under various circumstances.
-		public static final String itemConversions = "item-conversions";
-	}
-
-	public static boolean isDebugging() {
-		return isDebugging(null);
-	}
-
-	public static boolean isDebugging(String option) {
-		if (Bukkit.isPrimaryThread()) {
-			return Settings.debug && (option == null || Settings.debugOptions.contains(option));
-		} else {
-			AsyncSettings async = Settings.async();
-			return async.debug && (option == null || async.debugOptions.contains(option));
-		}
-	}
 
 	///// DERIVED SETTINGS
 

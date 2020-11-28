@@ -35,6 +35,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
@@ -483,7 +484,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 				// Spawn shopkeeper in active chunk:
 				this.spawnShopkeeper(shopkeeper);
 			} else {
-				Log.debug(Settings.DebugOptions.shopkeeperActivation,
+				Log.debug(DebugOptions.shopkeeperActivation,
 						() -> "Skipping spawning of shopkeeper at " + shopkeeper.getPositionString() + " due to pending respawn after world save."
 				);
 			}
@@ -606,12 +607,12 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		// Chunk is not expected to already be active or pending activation (if chunk loading and unloading events are
 		// consistently ordered and correctly handled by us):
 		if (chunkEntry.active) {
-			Log.debug(Settings.DebugOptions.shopkeeperActivation,
+			Log.debug(DebugOptions.shopkeeperActivation,
 					() -> "Detected chunk load for already active chunk: " + TextUtils.getChunkString(chunkCoords)
 			);
 			return;
 		} else if (chunkEntry.isActivationPending()) {
-			Log.debug(Settings.DebugOptions.shopkeeperActivation,
+			Log.debug(DebugOptions.shopkeeperActivation,
 					() -> "Detected chunk load for already pending chunk activation: " + TextUtils.getChunkString(chunkCoords)
 			);
 			return;
@@ -649,14 +650,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		if (shopkeepers.isEmpty()) return;
 
 		if (chunkEntry.worldEntry.isWorldSaveRespawnPending()) {
-			Log.debug(Settings.DebugOptions.shopkeeperActivation,
+			Log.debug(DebugOptions.shopkeeperActivation,
 					() -> "Skipping spawning of " + shopkeepers.size() + " shopkeepers in chunk " + TextUtils.getChunkString(chunkEntry.chunkCoords)
 							+ ": Respawn pending after world save."
 			);
 			return;
 		}
 
-		Log.debug(Settings.DebugOptions.shopkeeperActivation,
+		Log.debug(DebugOptions.shopkeeperActivation,
 				() -> "Spawning " + shopkeepers.size() + " shopkeepers in chunk " + TextUtils.getChunkString(chunkEntry.chunkCoords)
 						+ (worldSavingFinished ? " (world saving finished)" : "")
 		);
@@ -711,7 +712,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		Collection<? extends AbstractShopkeeper> shopkeepers = chunkEntry.shopkeepers;
 		if (shopkeepers.isEmpty()) return;
 
-		Log.debug(Settings.DebugOptions.shopkeeperActivation,
+		Log.debug(DebugOptions.shopkeeperActivation,
 				() -> "Despawning " + shopkeepers.size() + " shopkeepers in chunk " + TextUtils.getChunkString(chunkEntry.chunkCoords)
 						+ (worldSaving ? " (world saving)" : "")
 		);
@@ -753,7 +754,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		WorldShopkeepers worldEntry = shopkeepersByWorld.get(worldName);
 		if (worldEntry == null) return; // There are no shopkeepers in this world
 
-		Log.debug(Settings.DebugOptions.shopkeeperActivation,
+		Log.debug(DebugOptions.shopkeeperActivation,
 				() -> "Spawning " + worldEntry.shopkeeperCount + " shopkeepers in world '" + worldName + "'"
 		);
 
@@ -790,7 +791,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		WorldShopkeepers worldEntry = shopkeepersByWorld.get(worldName);
 		if (worldEntry == null) return; // There are no shopkeepers in this world
 
-		Log.debug(Settings.DebugOptions.shopkeeperActivation,
+		Log.debug(DebugOptions.shopkeeperActivation,
 				() -> "Despawning " + worldEntry.shopkeeperCount + " shopkeepers in world '" + worldName + "'"
 		);
 
@@ -812,7 +813,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		if (worldEntry.isWorldSaveRespawnPending()) {
 			// Already despawned the shopkeepers due to another world save just recently.
-			Log.debug(Settings.DebugOptions.shopkeeperActivation,
+			Log.debug(DebugOptions.shopkeeperActivation,
 					() -> "Detected another world save while shopkeepers were already despawned due to a previous world save: " + worldName
 			);
 			return;
@@ -829,7 +830,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	private void despawnShopkeepersInWorld(WorldShopkeepers worldEntry, boolean worldSaving) {
 		assert worldEntry != null;
-		Log.debug(Settings.DebugOptions.shopkeeperActivation,
+		Log.debug(DebugOptions.shopkeeperActivation,
 				() -> "Despawning " + worldEntry.shopkeeperCount + " shopkeepers in world '" + worldEntry.worldName + "'"
 						+ (worldSaving ? " (world saving)" : "")
 		);
@@ -842,7 +843,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	private void spawnShopkeepersInWorld(WorldShopkeepers worldEntry, boolean worldSavingFinished) {
 		assert worldEntry != null;
-		Log.debug(Settings.DebugOptions.shopkeeperActivation,
+		Log.debug(DebugOptions.shopkeeperActivation,
 				() -> "Spawning " + worldEntry.shopkeeperCount + " shopkeepers in world '" + worldEntry.worldName + "'"
 						+ (worldSavingFinished ? " (world saving finished)" : "")
 		);

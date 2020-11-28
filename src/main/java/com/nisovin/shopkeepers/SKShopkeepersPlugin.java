@@ -35,6 +35,8 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.ConfigLoadException;
 import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
 import com.nisovin.shopkeepers.container.protection.RemoveShopOnContainerBreak;
+import com.nisovin.shopkeepers.debug.Debug;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.itemconversion.ItemConversions;
 import com.nisovin.shopkeepers.metrics.CitizensChart;
 import com.nisovin.shopkeepers.metrics.FeaturesChart;
@@ -390,8 +392,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			// Register debug listener:
 			// Run delayed to also catch events / event listeners of other plugins.
 			Bukkit.getScheduler().runTaskLater(this, () -> {
-				boolean logAllEvent = Settings.debugOptions.contains(Settings.DebugOptions.logAllEvents);
-				boolean printListeners = Settings.debugOptions.contains(Settings.DebugOptions.printListeners);
+				boolean logAllEvent = Debug.isDebugging(DebugOptions.logAllEvents);
+				boolean printListeners = Debug.isDebugging(DebugOptions.printListeners);
 				if (logAllEvent || printListeners) {
 					DebugListener.register(logAllEvent, printListeners);
 				}
@@ -702,7 +704,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// Updates owner names for the shopkeepers of the specified player:
 	private void updateShopkeepersForPlayer(UUID playerUUID, String playerName) {
-		Log.debug(Settings.DebugOptions.ownerNameUpdates,
+		Log.debug(DebugOptions.ownerNameUpdates,
 				() -> "Updating shopkeepers for: " + TextUtils.getPlayerString(playerName, playerUUID)
 		);
 		boolean dirty = false;
@@ -715,7 +717,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 				if (ownerUUID.equals(playerUUID)) {
 					if (!ownerName.equals(playerName)) {
 						// Update the stored name, because the player must have changed it:
-						Log.debug(Settings.DebugOptions.ownerNameUpdates,
+						Log.debug(DebugOptions.ownerNameUpdates,
 								() -> "  Updating owner name ('" + ownerName + "') of shopkeeper " + shopkeeper.getId() + "."
 						);
 						playerShop.setOwner(playerUUID, playerName);
@@ -724,7 +726,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 						// The stored owner name matches the player's current name.
 						// Assumption: The stored owner names among all shops are consistent.
 						// We can therefore abort checking the other shops here.
-						Log.debug(Settings.DebugOptions.ownerNameUpdates,
+						Log.debug(DebugOptions.ownerNameUpdates,
 								() -> "  The stored owner name of shopkeeper " + shopkeeper.getId()
 										+ " matches the current player name. Skipping checking of further shops."
 						);

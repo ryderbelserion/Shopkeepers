@@ -8,7 +8,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.Messages;
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
@@ -18,6 +17,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.PermissionUtils;
@@ -78,7 +78,7 @@ class CommandConvertItems extends Command {
 			final int finalConvertedStacks = convertedStacks;
 			// Note: The conversion always has some performance impact, even if no items got actually converted. We
 			// therefore always print the debug messages to allow debugging the item conversion times.
-			Log.debug(Settings.DebugOptions.itemConversions,
+			Log.debug(DebugOptions.itemConversions,
 					() -> "Converted " + finalConvertedStacks + " item stacks in the inventory of player '"
 							+ targetPlayer.getName() + "' (took " + durationMillis + " ms)."
 			);
@@ -96,7 +96,7 @@ class CommandConvertItems extends Command {
 				}
 				// Note: The conversion always has some performance impact, even if no items got actually converted. We
 				// therefore always print the debug messages to allow debugging the item conversion times.
-				Log.debug(Settings.DebugOptions.itemConversions,
+				Log.debug(DebugOptions.itemConversions,
 						() -> "Converted the held item stack of player '" + targetPlayer.getName()
 								+ "' (took " + durationMillis + " ms)."
 				);
