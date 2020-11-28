@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.util;
+package com.nisovin.shopkeepers.debug.events;
 
 import java.util.EnumMap;
 import java.util.Map;

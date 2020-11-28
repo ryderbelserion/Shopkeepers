@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.util;
+package com.nisovin.shopkeepers.debug.events;
 
 import java.util.HashMap;
 import java.util.List;
@@ -13,6 +13,8 @@ import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.RegisteredListener;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class DebugListener implements Listener {
 
