@@ -10,7 +10,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -28,6 +27,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.PlayerNameArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerUUIDArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerNameFallback;
 import com.nisovin.shopkeepers.event.ShopkeeperEventHelper;
+import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.PlayerUtils;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils;

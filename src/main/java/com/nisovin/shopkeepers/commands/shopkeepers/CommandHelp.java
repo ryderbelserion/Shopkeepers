@@ -2,10 +2,10 @@ package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import java.util.Arrays;
 
-import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.HelpCommand;
+import com.nisovin.shopkeepers.lang.Messages;
 
 class CommandHelp extends HelpCommand {
 

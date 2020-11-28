@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
+import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;

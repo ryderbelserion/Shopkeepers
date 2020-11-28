@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.arguments.ShopkeeperArgument;
@@ -11,6 +10,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
+import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils.TargetShopkeeperFilter;
 
 class CommandEdit extends PlayerCommand {

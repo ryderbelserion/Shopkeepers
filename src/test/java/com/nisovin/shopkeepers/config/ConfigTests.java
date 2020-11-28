@@ -14,7 +14,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.nisovin.shopkeepers.Messages;
+import com.nisovin.shopkeepers.lang.Messages;
 
 public class ConfigTests {
 
