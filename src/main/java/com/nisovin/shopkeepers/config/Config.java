@@ -348,9 +348,6 @@ public abstract class Config {
 	protected <T> void onSettingLoadException(Field field, ConfigurationSection config, SettingLoadException e) throws ConfigLoadException {
 		String configKey = this.getConfigKey(field);
 		Log.warning(this.msgSettingLoadException(configKey, e));
-		for (String extraMessage : e.getExtraMessages()) {
-			Log.warning(this.getLogPrefix() + extraMessage);
-		}
 	}
 
 	protected String msgSettingLoadException(String configKey, SettingLoadException e) {
@@ -419,9 +416,6 @@ public abstract class Config {
 			return (T) valueType.load(defaults, configKey);
 		} catch (SettingLoadException e) {
 			Log.warning(this.msgDefaultSettingLoadException(configKey, e));
-			for (String extraMessage : e.getExtraMessages()) {
-				Log.warning(this.getLogPrefix() + extraMessage);
-			}
 			return null;
 		}
 	}
