@@ -17,8 +17,8 @@ import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.Messages;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.ui.defaults.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;

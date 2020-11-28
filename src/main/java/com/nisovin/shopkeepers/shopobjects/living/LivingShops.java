@@ -6,7 +6,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.config.Settings;
 
 public class LivingShops {
 

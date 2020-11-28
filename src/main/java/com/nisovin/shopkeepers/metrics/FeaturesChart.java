@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.bstats.bukkit.Metrics;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;

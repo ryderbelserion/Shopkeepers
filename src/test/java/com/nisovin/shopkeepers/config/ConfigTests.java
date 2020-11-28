@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.config;
 
-import static com.nisovin.shopkeepers.config.ConfigHelper.toConfigKey;
+import static com.nisovin.shopkeepers.config.lib.ConfigHelper.toConfigKey;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -15,7 +15,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.nisovin.shopkeepers.Messages;
-import com.nisovin.shopkeepers.Settings;
 
 public class ConfigTests {
 

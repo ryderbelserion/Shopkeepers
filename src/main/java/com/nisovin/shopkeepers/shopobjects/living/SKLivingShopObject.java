@@ -19,12 +19,12 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 
 import com.nisovin.shopkeepers.Messages;
-import com.nisovin.shopkeepers.Settings;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObject;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.events.DebugListener;
 import com.nisovin.shopkeepers.debug.events.EventDebugListener;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;

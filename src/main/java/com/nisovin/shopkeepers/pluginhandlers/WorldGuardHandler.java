@@ -5,7 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.util.Log;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;

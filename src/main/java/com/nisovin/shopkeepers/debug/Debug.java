@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.debug;
 
 import org.bukkit.Bukkit;
 
-import com.nisovin.shopkeepers.Settings;
+import com.nisovin.shopkeepers.config.Settings;
 
 public class Debug {
 

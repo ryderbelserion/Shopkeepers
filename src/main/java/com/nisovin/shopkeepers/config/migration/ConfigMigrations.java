@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.bukkit.configuration.Configuration;
 
-import com.nisovin.shopkeepers.config.ConfigLoadException;
+import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.Log;
 
