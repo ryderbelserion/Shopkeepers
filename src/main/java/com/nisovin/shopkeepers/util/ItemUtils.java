@@ -635,12 +635,12 @@ public final class ItemUtils {
 
 	// Inventory utilities:
 
-	public static List<ItemCount> countItems(ItemStack[] contents, Filter<ItemStack> filter) {
+	public static List<ItemCount> countItems(ItemStack[] contents, Predicate<ItemStack> filter) {
 		List<ItemCount> itemCounts = new ArrayList<>();
 		if (contents == null) return itemCounts;
 		for (ItemStack item : contents) {
 			if (isEmpty(item)) continue;
-			if (filter != null && !filter.accept(item)) continue;
+			if (filter != null && !filter.test(item)) continue;
 
 			// Check if we already have a counter for this type of item:
 			ItemCount itemCount = ItemCount.findSimilar(itemCounts, item);

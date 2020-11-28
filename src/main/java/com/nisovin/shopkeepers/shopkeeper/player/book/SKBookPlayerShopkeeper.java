@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -27,7 +28,6 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
-import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -35,7 +35,7 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements BookPlayerShopkeeper {
 
-	private static final Filter<ItemStack> ITEM_FILTER = (ItemStack item) -> {
+	private static final Predicate<ItemStack> ITEM_FILTER = (ItemStack item) -> {
 		return isCopyableBook(item) && (getBookTitle(item) != null);
 	};
 

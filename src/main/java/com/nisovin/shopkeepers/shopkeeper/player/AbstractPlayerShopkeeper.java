@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopkeeper.player;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -33,7 +34,6 @@ import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.citizens.SKCitizensShopObject;
 import com.nisovin.shopkeepers.shopobjects.sign.SKSignShopObject;
-import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -445,7 +445,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return totalCurrency;
 	}
 
-	protected List<ItemCount> getItemsFromContainer(Filter<ItemStack> filter) {
+	protected List<ItemCount> getItemsFromContainer(Predicate<ItemStack> filter) {
 		ItemStack[] contents = null;
 		Block container = this.getContainer();
 		if (ShopContainers.isSupportedContainer(container.getType())) {

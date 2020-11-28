@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -22,7 +23,6 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
-import com.nisovin.shopkeepers.util.Filter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -30,7 +30,7 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implements BuyingPlayerShopkeeper {
 
-	private static final Filter<ItemStack> ITEM_FILTER = (ItemStack item) -> {
+	private static final Predicate<ItemStack> ITEM_FILTER = (ItemStack item) -> {
 		if (Settings.isCurrencyItem(item) || Settings.isHighCurrencyItem(item)) return false;
 		if (item.getType() == Material.WRITTEN_BOOK) return false;
 		if (!item.getEnchantments().isEmpty()) return false; // TODO Why don't allow buying of enchanted items?
