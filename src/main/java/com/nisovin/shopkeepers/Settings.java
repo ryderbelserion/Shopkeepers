@@ -1,16 +1,8 @@
 package com.nisovin.shopkeepers;
 
-import static com.nisovin.shopkeepers.config.ConfigHelper.loadConfigValue;
-import static com.nisovin.shopkeepers.config.ConfigHelper.setConfigValue;
-import static com.nisovin.shopkeepers.config.ConfigHelper.toConfigKey;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.config.Config;
 import com.nisovin.shopkeepers.config.ConfigLoadException;
 import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
 import com.nisovin.shopkeepers.util.ConversionUtils;
@@ -34,9 +27,8 @@ import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.Utils;
 
-public class Settings {
+public class Settings extends Config {
 
 	/*
 	 * General Settings
@@ -330,7 +322,7 @@ public class Settings {
 			setup();
 		}
 
-		// Gets called after the config has been loaded:
+		// Gets called after setting values have changed (eg. after the config has been loaded):
 		private static void setup() {
 			// Ignore display name (which is used for specifying the new shopkeeper name):
 			namingItemData = new ItemData(ItemUtils.setItemStackName(nameItem.createItemStack(), null));
@@ -349,7 +341,7 @@ public class Settings {
 			try {
 				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
 			} catch (PatternSyntaxException e) {
-				Log.warning("Config: 'name-regex' is not a valid regular expression ('" + Settings.nameRegex + "'). Reverting to default.");
+				Log.warning(INSTANCE.getLogPrefix() + "'name-regex' is not a valid regular expression ('" + Settings.nameRegex + "'). Reverting to default.");
 				Settings.nameRegex = "[A-Za-z0-9 ]{3,32}";
 				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
 			}
@@ -363,7 +355,7 @@ public class Settings {
 				// Validate:
 				Integer maxShops = ConversionUtils.parseInt(permOption);
 				if (maxShops == null || maxShops <= 0) {
-					Log.warning("Config: Ignoring invalid entry in 'max-shops-perm-options': " + permOption);
+					Log.warning(INSTANCE.getLogPrefix() + "Ignoring invalid entry in 'max-shops-perm-options': " + permOption);
 					continue;
 				}
 				String permission = "shopkeeper.maxshops." + permOption;
@@ -380,16 +372,16 @@ public class Settings {
 					foundInvalidEntityType = true;
 					if ("PIG_ZOMBIE".equals(entityTypeId)) {
 						// Migration note for MC 1.16 TODO Remove this again at some point?
-						Log.warning("Config: Ignoring mob type 'PIG_ZOMBIE' in setting 'enabled-living-shops'. This mob no longer exist since MC 1.16. Consider replacing it with 'ZOMBIFIED_PIGLIN'.");
+						Log.warning(INSTANCE.getLogPrefix() + "Ignoring mob type 'PIG_ZOMBIE' in setting 'enabled-living-shops'. This mob no longer exist since MC 1.16. Consider replacing it with 'ZOMBIFIED_PIGLIN'.");
 					} else {
-						Log.warning("Config: Invalid living entity type name in 'enabled-living-shops': " + entityTypeId);
+						Log.warning(INSTANCE.getLogPrefix() + "Invalid living entity type name in 'enabled-living-shops': " + entityTypeId);
 					}
 				} else {
 					enabledLivingShops.add(entityType);
 				}
 			}
 			if (foundInvalidEntityType) {
-				Log.warning("Config: All existing entity type names can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html");
+				Log.warning(INSTANCE.getLogPrefix() + "All existing entity type names can be found here: https://hub.spigotmc.org/javadocs/spigot/org/bukkit/entity/EntityType.html");
 			}
 		}
 
@@ -549,7 +541,7 @@ public class Settings {
 	public static ConfigLoadException loadConfig(Plugin plugin) {
 		Log.info("Loading config.");
 
-		// Save default config in case the config file doesn't exist:
+		// Save default config in case the config file does not exist:
 		plugin.saveDefaultConfig();
 
 		// Load config:
@@ -559,7 +551,7 @@ public class Settings {
 		// Load settings from config:
 		boolean configChanged = false;
 		try {
-			configChanged = Settings.loadConfiguration(config);
+			configChanged = loadConfig(config);
 		} catch (ConfigLoadException e) {
 			// Config loading failed with a severe issue:
 			return e;
@@ -573,14 +565,8 @@ public class Settings {
 		return null; // Config loaded successfully
 	}
 
-	// These String / String list settings are exempt from color conversion:
-	private static final Set<String> noColorConversionKeys = new HashSet<>(Arrays.asList(
-			toConfigKey("debugOptions"), toConfigKey("fileEncoding"), toConfigKey("shopCreationItemSpawnEggEntityType"),
-			toConfigKey("maxShopsPermOptions"), toConfigKey("enabledLivingShops"), toConfigKey("nameRegex"),
-			toConfigKey("language")));
-
-	// Returns true, if the config misses values which need to be saved
-	public static boolean loadConfiguration(Configuration config) throws ConfigLoadException {
+	// Returns true, if the config has changed and needs to be saved.
+	private static boolean loadConfig(Configuration config) throws ConfigLoadException {
 		boolean configChanged = false;
 
 		// Perform config migrations:
@@ -589,104 +575,68 @@ public class Settings {
 			configChanged = true;
 		}
 
-		try {
-			Field[] fields = Settings.class.getDeclaredFields();
-			for (Field field : fields) {
-				if (field.isSynthetic()) continue;
-				if (!Modifier.isPublic(field.getModifiers())) {
-					continue;
-				}
-				Class<?> typeClass = field.getType();
-				Class<?> genericType = null;
-				if (typeClass == List.class) {
-					genericType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-				}
-				String configKey = toConfigKey(field.getName());
-
-				// Initialize the setting with the default value, if it is missing in the config
-				if (!config.isSet(configKey)) {
-					Log.warning("Config: Inserting default value for missing config entry: " + configKey);
-
-					// Determine default value:
-					Configuration defaults = config.getDefaults();
-					Object defaultValue = loadConfigValue(defaults, configKey, noColorConversionKeys, typeClass, genericType);
-
-					// Validate default value:
-					if (defaultValue == null) {
-						Log.warning("Config: Missing default value for missing config entry: " + configKey);
-						continue;
-					} else if (!Utils.isAssignableFrom(typeClass, defaultValue.getClass())) {
-						Log.warning("Config: Default value for missing config entry '" + configKey + "' is of wrong type: "
-								+ "Got " + defaultValue.getClass().getName() + ", expecting " + typeClass.getName());
-						continue;
-					}
-
-					// Set default value:
-					setConfigValue(config, configKey, noColorConversionKeys, typeClass, genericType, defaultValue);
-					configChanged = true;
-				}
-
-				// Load value:
-				Object value = loadConfigValue(config, configKey, noColorConversionKeys, typeClass, genericType);
-				field.set(null, value);
-			}
-		} catch (Exception e) {
-			throw new ConfigLoadException("Error while loading config values!", e);
+		// Insert default values for settings missing inside the config:
+		boolean insertedDefaults = Settings.INSTANCE.insertMissingDefaultValues(config);
+		if (insertedDefaults) {
+			configChanged = true;
 		}
 
-		// Validation:
-		validateSettings();
+		// Load and validate settings:
+		Settings.INSTANCE.load(config);
 
 		onSettingsChanged();
 		return configChanged;
 	}
 
-	private static void validateSettings() {
+	/////
+
+	private static final Settings INSTANCE = new Settings();
+
+	private Settings() {
+	}
+
+	@Override
+	protected void validateSettings() {
 		if (maxContainerDistance > 50) {
-			Log.warning("Config: 'max-container-distance' can be at most 50.");
+			Log.warning(this.getLogPrefix() + "'max-container-distance' can be at most 50.");
 			maxContainerDistance = 50;
 		}
 		if (gravityChunkRange < 0) {
-			Log.warning("Config: 'gravity-chunk-range' cannot be negative.");
+			Log.warning(this.getLogPrefix() + "'gravity-chunk-range' cannot be negative.");
 			gravityChunkRange = 0;
 		}
 		// Certain items cannot be of type AIR:
 		if (shopCreationItem.getType() == Material.AIR) {
-			Log.warning("Config: 'shop-creation-item' can not be AIR.");
+			Log.warning(this.getLogPrefix() + "'shop-creation-item' can not be AIR.");
 			shopCreationItem = shopCreationItem.withType(Material.VILLAGER_SPAWN_EGG);
 		}
 		if (hireItem.getType() == Material.AIR) {
-			Log.warning("Config: 'hire-item' can not be AIR.");
+			Log.warning(this.getLogPrefix() + "'hire-item' can not be AIR.");
 			hireItem = hireItem.withType(Material.EMERALD);
 		}
 		if (currencyItem.getType() == Material.AIR) {
-			Log.warning("Config: 'currency-item' can not be AIR.");
+			Log.warning(this.getLogPrefix() + "'currency-item' can not be AIR.");
 			currencyItem = currencyItem.withType(Material.EMERALD);
 		}
 		if (namingOfPlayerShopsViaItem) {
 			if (nameItem.getType() == Material.AIR) {
-				Log.warning("Config: 'name-item' can not be AIR if naming-of-player-shops-via-item is enabled!");
+				Log.warning(this.getLogPrefix() + "'name-item' can not be AIR if naming-of-player-shops-via-item is enabled!");
 				nameItem = nameItem.withType(Material.NAME_TAG);
 			}
 		}
 		if (maxTradesPages < 1) {
-			Log.warning("Config: 'max-trades-pages' can not be less than 1!");
+			Log.warning(this.getLogPrefix() + "'max-trades-pages' can not be less than 1!");
 			maxTradesPages = 1;
 		} else if (maxTradesPages > 10) {
-			Log.warning("Config: 'max-trades-pages' can not be greater than 10!");
+			Log.warning(this.getLogPrefix() + "'max-trades-pages' can not be greater than 10!");
 			maxTradesPages = 10;
 		}
 		if (taxRate < 0) {
-			Log.warning("Config: 'tax-rate' can not be less than 0!");
+			Log.warning(this.getLogPrefix() + "'tax-rate' can not be less than 0!");
 			taxRate = 0;
 		} else if (taxRate > 100) {
-			Log.warning("Config: 'tax-rate' can not be larger than 100!");
+			Log.warning(this.getLogPrefix() + "'tax-rate' can not be larger than 100!");
 			taxRate = 100;
 		}
-	}
-
-	/////
-
-	private Settings() {
 	}
 }

@@ -26,6 +26,7 @@ API:
 
 Internal:  
 * The config key pattern is cached now.
+* Major refactoring related to how the config and language files are loaded.
 
 Migration notes:  
 * The folder structure has changed:

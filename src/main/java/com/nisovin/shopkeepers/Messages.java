@@ -1,27 +1,28 @@
 package com.nisovin.shopkeepers;
 
-import static com.nisovin.shopkeepers.config.ConfigHelper.loadConfigValue;
-import static com.nisovin.shopkeepers.config.ConfigHelper.toConfigKey;
-
 import java.io.File;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import com.nisovin.shopkeepers.config.Config;
 import com.nisovin.shopkeepers.config.ConfigLoadException;
+import com.nisovin.shopkeepers.config.annotation.WithDefaultValueType;
+import com.nisovin.shopkeepers.config.annotation.WithValueTypeProvider;
+import com.nisovin.shopkeepers.config.value.SettingLoadException;
+import com.nisovin.shopkeepers.config.value.types.ColoredStringListValue;
+import com.nisovin.shopkeepers.config.value.types.ColoredStringValue;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 
-public class Messages {
+@WithDefaultValueType(fieldType = String.class, valueType = ColoredStringValue.class)
+@WithValueTypeProvider(ColoredStringListValue.Provider.class)
+public class Messages extends Config {
 
 	// TODO Replace all with Text? Will require converting back to String, especially for texts used by items.
 	public static String shopTypeAdminRegular = c("Admin shop");
@@ -360,65 +361,80 @@ public class Messages {
 			plugin.saveResource(languageFilePath, false);
 		}
 
-		// Load language config:
+		// Load messages from language config:
 		if (!languageFile.exists()) {
 			Log.warning("Could not find language file '" + languageFile.getName() + "'!");
 		} else {
 			Log.info("Loading language file: " + languageFile.getName());
 			try {
-				YamlConfiguration langConfig = new YamlConfiguration();
-				langConfig.load(languageFile);
-				loadLanguageConfiguration(langConfig);
+				// Load language config:
+				YamlConfiguration languageConfig = new YamlConfiguration();
+				languageConfig.load(languageFile);
+
+				// Load messages:
+				INSTANCE.load(languageConfig);
+
+				// Also update the derived settings:
+				Settings.onSettingsChanged();
 			} catch (Exception e) {
 				Log.warning("Could not load language file '" + languageFile.getName() + "'!", e);
 			}
 		}
 	}
 
-	private static void loadLanguageConfiguration(Configuration config) throws ConfigLoadException {
-		Set<String> messageKeys = new HashSet<>();
-		try {
-			Field[] fields = Messages.class.getDeclaredFields();
-			for (Field field : fields) {
-				if (field.isSynthetic()) continue;
-				if (!Modifier.isPublic(field.getModifiers())) {
-					continue;
-				}
-				Class<?> typeClass = field.getType();
-				Class<?> genericType = null;
-				if (typeClass == List.class) {
-					genericType = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
-				}
-				String configKey = toConfigKey(field.getName());
-				messageKeys.add(configKey);
-				if (!config.isSet(configKey)) {
-					Log.warning("  Missing message: " + configKey);
-					continue; // Skip, keeps current value (default)
-				}
+	/////
 
-				Object value = loadConfigValue(config, configKey, Collections.emptySet(), typeClass, genericType);
-				if (value == null) {
-					Log.warning("  Could not load message: " + configKey);
-					continue; // Skip, keeps current value (default)
-				}
-				field.set(null, value);
-			}
-		} catch (Exception e) {
-			throw new ConfigLoadException("Error while loading messages from language file!", e);
-		}
-
-		Set<String> configKeys = config.getKeys(false);
-		if (configKeys.size() != messageKeys.size()) {
-			for (String configKey : configKeys) {
-				if (!messageKeys.contains(configKey)) {
-					Log.warning("  Unknown message: " + configKey);
-				}
-			}
-		}
-
-		Settings.onSettingsChanged();
-	}
+	private static final Messages INSTANCE = new Messages();
 
 	private Messages() {
+	}
+
+	@Override
+	protected String getLogPrefix() {
+		return "Language: ";
+	}
+
+	@Override
+	protected String msgMissingValue(String configKey) {
+		return this.getLogPrefix() + "Missing message: " + configKey;
+	}
+
+	@Override
+	protected String msgUsingDefaultForMissingValue(String configKey, Object defaultValue) {
+		return this.getLogPrefix() + "Using default value for missing message: " + configKey;
+	}
+
+	@Override
+	protected String msgSettingLoadException(String configKey, SettingLoadException e) {
+		return this.getLogPrefix() + "Could not load message '" + configKey + "': " + e.getMessage();
+	}
+
+	@Override
+	protected String msgDefaultSettingLoadException(String configKey, SettingLoadException e) {
+		return this.getLogPrefix() + "Could not load default value for message '" + configKey + "': " + e.getMessage();
+	}
+
+	@Override
+	protected String msgInsertingDefault(String configKey) {
+		return this.getLogPrefix() + "Inserting default value for missing message: " + configKey;
+	}
+
+	@Override
+	protected String msgMissingDefault(String configKey) {
+		return this.getLogPrefix() + "Missing default value for message: " + configKey;
+	}
+
+	@Override
+	protected void validateConfig(ConfigurationSection config) throws ConfigLoadException {
+		super.validateConfig(config);
+
+		// Check for unexpected (possibly no longer existing) message keys:
+		Set<String> messageKeys = this.getSettings().stream().map(this::getConfigKey).collect(Collectors.toSet());
+		Set<String> configKeys = config.getKeys(false);
+		for (String configKey : configKeys) {
+			if (!messageKeys.contains(configKey)) {
+				Log.warning(this.getLogPrefix() + "Unknown message: " + configKey);
+			}
+		}
 	}
 }
