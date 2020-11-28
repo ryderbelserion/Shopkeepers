@@ -1,7 +1,7 @@
 package com.nisovin.shopkeepers.config.value.types;
 
+import com.nisovin.shopkeepers.config.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.value.ValueType;
-import com.nisovin.shopkeepers.config.value.SettingLoadException;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 
 public class BooleanValue extends ValueType<Boolean> {
@@ -12,11 +12,11 @@ public class BooleanValue extends ValueType<Boolean> {
 	}
 
 	@Override
-	public Boolean load(Object configValue) throws SettingLoadException {
+	public Boolean load(Object configValue) throws ValueLoadException {
 		if (configValue == null) return null;
 		Boolean value = ConversionUtils.toBoolean(configValue);
 		if (value == null) {
-			throw new SettingLoadException("Invalid boolean value: " + configValue);
+			throw new ValueLoadException("Invalid boolean value: " + configValue);
 		}
 		return value;
 	}

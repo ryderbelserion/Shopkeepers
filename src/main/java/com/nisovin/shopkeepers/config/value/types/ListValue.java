@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.config.value.types;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.nisovin.shopkeepers.config.value.SettingLoadException;
+import com.nisovin.shopkeepers.config.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.value.ValueType;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -17,10 +17,10 @@ public class ListValue<E> extends ValueType<List<E>> {
 	}
 
 	@Override
-	public List<E> load(Object configValue) throws SettingLoadException {
+	public List<E> load(Object configValue) throws ValueLoadException {
 		if (configValue == null) return null;
 		if (!(configValue instanceof List<?>)) {
-			throw new SettingLoadException("Expecting a list of values, but got " + configValue.getClass().getName());
+			throw new ValueLoadException("Expecting a list of values, but got " + configValue.getClass().getName());
 		}
 		List<?> configValues = (List<?>) configValue;
 		List<E> values = new ArrayList<>(configValues.size());

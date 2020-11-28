@@ -1,14 +1,14 @@
 package com.nisovin.shopkeepers.config.value;
 
-public class SettingLoadException extends Exception {
+public class ValueLoadException extends Exception {
 
 	private static final long serialVersionUID = -3068903999888105245L;
 
-	public SettingLoadException(String message) {
+	public ValueLoadException(String message) {
 		super(message);
 	}
 
-	public SettingLoadException(String message, Throwable cause) {
+	public ValueLoadException(String message, Throwable cause) {
 		super(message, cause);
 	}
 }

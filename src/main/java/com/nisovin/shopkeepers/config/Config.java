@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.config.annotation.WithDefaultValueType;
 import com.nisovin.shopkeepers.config.annotation.WithValueType;
 import com.nisovin.shopkeepers.config.annotation.WithValueTypeProvider;
 import com.nisovin.shopkeepers.config.value.DefaultValueTypes;
-import com.nisovin.shopkeepers.config.value.SettingLoadException;
+import com.nisovin.shopkeepers.config.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.value.UnknownMaterialException;
 import com.nisovin.shopkeepers.config.value.ValueType;
 import com.nisovin.shopkeepers.config.value.ValueTypeProvider;
@@ -324,8 +324,8 @@ public abstract class Config {
 			if (value != null) {
 				this.setSetting(field, value);
 			} // Else: Retain previous value.
-		} catch (SettingLoadException e) {
-			this.onSettingLoadException(field, config, e);
+		} catch (ValueLoadException e) {
+			this.onValueLoadException(field, config, e);
 		}
 	}
 
@@ -346,23 +346,23 @@ public abstract class Config {
 		return this.getLogPrefix() + "Using default value for missing config entry: " + configKey;
 	}
 
-	protected <T> void onSettingLoadException(Field field, ConfigurationSection config, SettingLoadException e) throws ConfigLoadException {
+	protected <T> void onValueLoadException(Field field, ConfigurationSection config, ValueLoadException e) throws ConfigLoadException {
 		String configKey = this.getConfigKey(field);
-		Log.warning(this.msgSettingLoadException(configKey, e));
+		Log.warning(this.msgValueLoadException(configKey, e));
 		if (e instanceof UnknownMaterialException) {
 			Log.warning(this.getLogPrefix() + "All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
 		}
 	}
 
-	protected String msgSettingLoadException(String configKey, SettingLoadException e) {
+	protected String msgValueLoadException(String configKey, ValueLoadException e) {
 		return this.getLogPrefix() + "Could not load setting '" + configKey + "': " + e.getMessage();
 	}
 
-	protected void setSetting(Field field, Object value) throws SettingLoadException {
+	protected void setSetting(Field field, Object value) throws ValueLoadException {
 		if (value != null) {
 			Class<?> fieldType = field.getType();
 			if (!Utils.isAssignableFrom(fieldType, value.getClass())) {
-				throw new SettingLoadException("Value is of wrong type: Got " + value.getClass().getName() + ", expected " + fieldType.getName());
+				throw new ValueLoadException("Value is of wrong type: Got " + value.getClass().getName() + ", expected " + fieldType.getName());
 			}
 		}
 
@@ -375,7 +375,7 @@ public abstract class Config {
 			// Note: The config instance is ignored if the field is static.
 			field.set(this, value);
 		} catch (Exception e) {
-			throw new SettingLoadException(e.getMessage(), e);
+			throw new ValueLoadException(e.getMessage(), e);
 		} finally {
 			// Restore previous accessible state:
 			try {
@@ -418,13 +418,13 @@ public abstract class Config {
 		try {
 			// Note: This can return null if the default config does not contain a default value for this setting.
 			return (T) valueType.load(defaults, configKey);
-		} catch (SettingLoadException e) {
-			Log.warning(this.msgDefaultSettingLoadException(configKey, e));
+		} catch (ValueLoadException e) {
+			Log.warning(this.msgDefaultValueLoadException(configKey, e));
 			return null;
 		}
 	}
 
-	protected String msgDefaultSettingLoadException(String configKey, SettingLoadException e) {
+	protected String msgDefaultValueLoadException(String configKey, ValueLoadException e) {
 		return this.getLogPrefix() + "Could not load default value for setting '" + configKey + "': " + e.getMessage();
 	}
 

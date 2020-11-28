@@ -13,7 +13,7 @@ import com.nisovin.shopkeepers.config.Config;
 import com.nisovin.shopkeepers.config.ConfigLoadException;
 import com.nisovin.shopkeepers.config.annotation.WithDefaultValueType;
 import com.nisovin.shopkeepers.config.annotation.WithValueTypeProvider;
-import com.nisovin.shopkeepers.config.value.SettingLoadException;
+import com.nisovin.shopkeepers.config.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.value.types.ColoredStringListValue;
 import com.nisovin.shopkeepers.config.value.types.ColoredStringValue;
 import com.nisovin.shopkeepers.text.Text;
@@ -405,12 +405,12 @@ public class Messages extends Config {
 	}
 
 	@Override
-	protected String msgSettingLoadException(String configKey, SettingLoadException e) {
+	protected String msgValueLoadException(String configKey, ValueLoadException e) {
 		return this.getLogPrefix() + "Could not load message '" + configKey + "': " + e.getMessage();
 	}
 
 	@Override
-	protected String msgDefaultSettingLoadException(String configKey, SettingLoadException e) {
+	protected String msgDefaultValueLoadException(String configKey, ValueLoadException e) {
 		return this.getLogPrefix() + "Could not load default value for message '" + configKey + "': " + e.getMessage();
 	}
 

@@ -1,7 +1,7 @@
 package com.nisovin.shopkeepers.config.value.types;
 
+import com.nisovin.shopkeepers.config.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.value.ValueType;
-import com.nisovin.shopkeepers.config.value.SettingLoadException;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 
 public class DoubleValue extends ValueType<Double> {
@@ -12,11 +12,11 @@ public class DoubleValue extends ValueType<Double> {
 	}
 
 	@Override
-	public Double load(Object configValue) throws SettingLoadException {
+	public Double load(Object configValue) throws ValueLoadException {
 		if (configValue == null) return null;
 		Double value = ConversionUtils.toDouble(configValue);
 		if (value == null) {
-			throw new SettingLoadException("Invalid double value: " + configValue);
+			throw new ValueLoadException("Invalid double value: " + configValue);
 		}
 		return value;
 	}

@@ -19,7 +19,7 @@ public abstract class ValueType<T> {
 	public ValueType() {
 	}
 
-	public T load(ConfigurationSection config, String key) throws SettingLoadException {
+	public T load(ConfigurationSection config, String key) throws ValueLoadException {
 		Object configValue = config.get(key);
 		return this.load(configValue);
 	}
@@ -28,7 +28,7 @@ public abstract class ValueType<T> {
 		T value = null;
 		try {
 			value = this.load(config, key);
-		} catch (SettingLoadException e) {
+		} catch (ValueLoadException e) {
 		}
 		if (value == null) {
 			return defaultValue;
@@ -38,7 +38,7 @@ public abstract class ValueType<T> {
 	}
 
 	// Null indicates the absence of a value and should only be used if the input has been null.
-	public abstract T load(Object configValue) throws SettingLoadException;
+	public abstract T load(Object configValue) throws ValueLoadException;
 
 	// A value of null will clear the config entry.
 	public void save(ConfigurationSection config, String key, T value) {
