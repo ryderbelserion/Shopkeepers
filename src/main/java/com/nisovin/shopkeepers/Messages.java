@@ -430,7 +430,7 @@ public class Messages extends Config {
 
 		// Check for unexpected (possibly no longer existing) message keys:
 		Set<String> messageKeys = this.getSettings().stream().map(this::getConfigKey).collect(Collectors.toSet());
-		Set<String> configKeys = config.getKeys(false);
+		Set<String> configKeys = config.getKeys(true);
 		for (String configKey : configKeys) {
 			if (!messageKeys.contains(configKey)) {
 				Log.warning(this.getLogPrefix() + "Unknown message: " + configKey);
