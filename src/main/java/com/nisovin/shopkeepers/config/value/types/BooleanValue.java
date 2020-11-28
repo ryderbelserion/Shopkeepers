@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.config.value.types;
 
 import com.nisovin.shopkeepers.config.value.ValueLoadException;
+import com.nisovin.shopkeepers.config.value.ValueParseException;
 import com.nisovin.shopkeepers.config.value.ValueType;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 
@@ -23,6 +24,15 @@ public class BooleanValue extends ValueType<Boolean> {
 
 	@Override
 	public Object save(Boolean value) {
+		return value;
+	}
+
+	@Override
+	public Boolean parse(String input) throws ValueParseException {
+		Boolean value = ConversionUtils.parseBoolean(input);
+		if (value == null) {
+			throw new ValueParseException("Invalid boolean value: " + input);
+		}
 		return value;
 	}
 }

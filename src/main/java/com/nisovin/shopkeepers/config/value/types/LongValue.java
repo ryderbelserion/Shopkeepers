@@ -1,7 +1,8 @@
 package com.nisovin.shopkeepers.config.value.types;
 
-import com.nisovin.shopkeepers.config.value.ValueType;
 import com.nisovin.shopkeepers.config.value.ValueLoadException;
+import com.nisovin.shopkeepers.config.value.ValueParseException;
+import com.nisovin.shopkeepers.config.value.ValueType;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 
 public class LongValue extends ValueType<Long> {
@@ -23,6 +24,15 @@ public class LongValue extends ValueType<Long> {
 
 	@Override
 	public Object save(Long value) {
+		return value;
+	}
+
+	@Override
+	public Long parse(String input) throws ValueParseException {
+		Long value = ConversionUtils.parseLong(input);
+		if (value == null) {
+			throw new ValueParseException("Invalid long value: " + input);
+		}
 		return value;
 	}
 }

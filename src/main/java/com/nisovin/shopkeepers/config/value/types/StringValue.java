@@ -1,7 +1,9 @@
 package com.nisovin.shopkeepers.config.value.types;
 
 import com.nisovin.shopkeepers.config.value.ValueLoadException;
+import com.nisovin.shopkeepers.config.value.ValueParseException;
 import com.nisovin.shopkeepers.config.value.ValueType;
+import com.nisovin.shopkeepers.util.Validate;
 
 public class StringValue extends ValueType<String> {
 
@@ -19,5 +21,11 @@ public class StringValue extends ValueType<String> {
 	@Override
 	public Object save(String value) {
 		return value;
+	}
+
+	@Override
+	public String parse(String input) throws ValueParseException {
+		Validate.notNull(input, "input is null");
+		return input;
 	}
 }

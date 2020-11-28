@@ -1,7 +1,8 @@
 package com.nisovin.shopkeepers.config.value.types;
 
-import com.nisovin.shopkeepers.config.value.ValueType;
 import com.nisovin.shopkeepers.config.value.ValueLoadException;
+import com.nisovin.shopkeepers.config.value.ValueParseException;
+import com.nisovin.shopkeepers.config.value.ValueType;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 
 public class IntegerValue extends ValueType<Integer> {
@@ -23,6 +24,15 @@ public class IntegerValue extends ValueType<Integer> {
 
 	@Override
 	public Object save(Integer value) {
+		return value;
+	}
+
+	@Override
+	public Integer parse(String input) throws ValueParseException {
+		Integer value = ConversionUtils.parseInt(input);
+		if (value == null) {
+			throw new ValueParseException("Invalid integer value: " + input);
+		}
 		return value;
 	}
 }

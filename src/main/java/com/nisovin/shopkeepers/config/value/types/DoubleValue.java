@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.config.value.types;
 
 import com.nisovin.shopkeepers.config.value.ValueLoadException;
+import com.nisovin.shopkeepers.config.value.ValueParseException;
 import com.nisovin.shopkeepers.config.value.ValueType;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 
@@ -23,6 +24,15 @@ public class DoubleValue extends ValueType<Double> {
 
 	@Override
 	public Object save(Double value) {
+		return value;
+	}
+
+	@Override
+	public Double parse(String input) throws ValueParseException {
+		Double value = ConversionUtils.parseDouble(input);
+		if (value == null) {
+			throw new ValueParseException("Invalid double value: " + input);
+		}
 		return value;
 	}
 }
