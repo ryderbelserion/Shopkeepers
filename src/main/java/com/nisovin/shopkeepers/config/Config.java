@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.config.annotation.WithValueType;
 import com.nisovin.shopkeepers.config.annotation.WithValueTypeProvider;
 import com.nisovin.shopkeepers.config.value.DefaultValueTypes;
 import com.nisovin.shopkeepers.config.value.SettingLoadException;
+import com.nisovin.shopkeepers.config.value.UnknownMaterialException;
 import com.nisovin.shopkeepers.config.value.ValueType;
 import com.nisovin.shopkeepers.config.value.ValueTypeProvider;
 import com.nisovin.shopkeepers.config.value.ValueTypeRegistry;
@@ -348,6 +349,9 @@ public abstract class Config {
 	protected <T> void onSettingLoadException(Field field, ConfigurationSection config, SettingLoadException e) throws ConfigLoadException {
 		String configKey = this.getConfigKey(field);
 		Log.warning(this.msgSettingLoadException(configKey, e));
+		if (e instanceof UnknownMaterialException) {
+			Log.warning(this.getLogPrefix() + "All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
+		}
 	}
 
 	protected String msgSettingLoadException(String configKey, SettingLoadException e) {

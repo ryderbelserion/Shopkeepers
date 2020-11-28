@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -18,8 +17,32 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 public class ItemData implements Cloneable {
 
-	private static final Consumer<String> SILENT_WARNING_HANDLER = (warning) -> {
-	};
+	public static class ItemDataDeserializeException extends Exception {
+
+		private static final long serialVersionUID = -6637983932875623362L;
+
+		public ItemDataDeserializeException(String message) {
+			super(message);
+		}
+
+		public ItemDataDeserializeException(String message, Throwable cause) {
+			super(message, cause);
+		}
+	}
+
+	public static class UnknownItemTypeException extends ItemDataDeserializeException {
+
+		private static final long serialVersionUID = -6123823171023440870L;
+
+		public UnknownItemTypeException(String message) {
+			super(message);
+		}
+
+		public UnknownItemTypeException(String message, Throwable cause) {
+			super(message, cause);
+		}
+	}
+
 	private static final String META_TYPE_KEY = "meta-type";
 	private static final String DISPLAY_NAME_KEY = "display-name";
 	private static final String LORE_KEY = "lore";
@@ -27,16 +50,8 @@ public class ItemData implements Cloneable {
 	// Special case: Omitting 'blockMaterial' for empty TILE_ENTITY item meta.
 	private static final String TILE_ENTITY_BLOCK_MATERIAL_KEY = "blockMaterial";
 
-	public static ItemData deserialize(Object dataObject) {
-		return deserialize(dataObject, null);
-	}
-
-	// Only returns null if the input data is null, or if the data cannot be loaded (in which case the warning handler
-	// is informed).
-	public static ItemData deserialize(Object dataObject, Consumer<String> warningHandler) {
-		if (warningHandler == null) {
-			warningHandler = SILENT_WARNING_HANDLER; // Ignore all warnings
-		}
+	// Only returns null if the input data is null.
+	public static ItemData deserialize(Object dataObject) throws ItemDataDeserializeException {
 		if (dataObject == null) return null;
 
 		String typeName = null;
@@ -56,8 +71,7 @@ public class ItemData implements Cloneable {
 					dataMap.put(entry.getKey().toString(), entry.getValue());
 				}
 			} else {
-				warningHandler.accept("Unknown item data: " + dataObject);
-				return null;
+				throw new ItemDataDeserializeException("Unknown item data representation: " + dataObject);
 			}
 			assert dataMap != null; // Assert: dataMap is a (shallow) copy
 
@@ -67,8 +81,7 @@ public class ItemData implements Cloneable {
 			}
 			if (typeName == null) {
 				// Missing item type information:
-				warningHandler.accept("Missing item type");
-				return null;
+				throw new ItemDataDeserializeException("Missing item type");
 			}
 			assert typeName != null;
 
@@ -83,8 +96,7 @@ public class ItemData implements Cloneable {
 		Material type = Material.matchMaterial(typeName);
 		if (type == null) {
 			// Unknown item type:
-			warningHandler.accept("Unknown item type: " + typeName);
-			return null;
+			throw new UnknownItemTypeException("Unknown item type: " + typeName);
 		}
 
 		// Create item stack (still misses meta data):

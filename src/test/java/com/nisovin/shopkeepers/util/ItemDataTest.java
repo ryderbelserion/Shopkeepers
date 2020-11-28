@@ -25,10 +25,11 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
+import com.nisovin.shopkeepers.util.ItemData.ItemDataDeserializeException;
 
 public class ItemDataTest extends AbstractBukkitTest {
 
-	private static void testDeserialization(ItemData originalItemData) {
+	private static void testDeserialization(ItemData originalItemData) throws ItemDataDeserializeException {
 		YamlConfiguration config = new YamlConfiguration();
 		Object serialized = originalItemData.serialize();
 		config.set("key", serialized);
@@ -72,7 +73,7 @@ public class ItemDataTest extends AbstractBukkitTest {
 	}
 
 	@Test
-	public void testDeserializationSimple() {
+	public void testDeserializationSimple() throws ItemDataDeserializeException {
 		ItemStack itemStack = createItemStackSimple();
 		ItemData itemData = new ItemData(itemStack);
 		testDeserialization(itemData);
@@ -110,7 +111,7 @@ public class ItemDataTest extends AbstractBukkitTest {
 	}
 
 	@Test
-	public void testDeserializationMinimal() {
+	public void testDeserializationMinimal() throws ItemDataDeserializeException {
 		ItemStack itemStack = createItemStackMinimal();
 		ItemData itemData = new ItemData(itemStack);
 		testDeserialization(itemData);
@@ -209,7 +210,7 @@ public class ItemDataTest extends AbstractBukkitTest {
 	}
 
 	@Test
-	public void testDeserializationFull() {
+	public void testDeserializationFull() throws ItemDataDeserializeException {
 		ItemStack itemStack = createItemStackFull();
 		ItemData itemData = new ItemData(itemStack);
 		testDeserialization(itemData);
@@ -253,7 +254,7 @@ public class ItemDataTest extends AbstractBukkitTest {
 	}
 
 	@Test
-	public void testDeserializationUncommon() {
+	public void testDeserializationUncommon() throws ItemDataDeserializeException {
 		ItemStack itemStack = createItemStackUncommon();
 		ItemData itemData = new ItemData(itemStack);
 		testDeserialization(itemData);
@@ -286,7 +287,7 @@ public class ItemDataTest extends AbstractBukkitTest {
 	}
 
 	@Test
-	public void testDeserializationTileEntitySimple() {
+	public void testDeserializationTileEntitySimple() throws ItemDataDeserializeException {
 		ItemStack itemStack = createItemStackTileEntitySimple();
 		ItemData itemData = new ItemData(itemStack);
 		testDeserialization(itemData);
@@ -324,7 +325,7 @@ public class ItemDataTest extends AbstractBukkitTest {
 	}
 
 	@Test
-	public void testDeserializationTileEntityMinimal() {
+	public void testDeserializationTileEntityMinimal() throws ItemDataDeserializeException {
 		ItemStack itemStack = createItemStackTileEntityMinimal();
 		ItemData itemData = new ItemData(itemStack);
 		testDeserialization(itemData);
