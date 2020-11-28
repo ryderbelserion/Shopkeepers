@@ -267,6 +267,8 @@ public abstract class Config {
 		return settings;
 	}
 
+	// TODO Support for sections, eg. by inner classes?
+	// TODO Support @Key annotation.
 	protected String getConfigKey(Field field) {
 		return ConfigHelper.toConfigKey(field.getName());
 	}
