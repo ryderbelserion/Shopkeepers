@@ -20,6 +20,7 @@ Date format: (YYYY-MM-DD)
   * The permissions specified inside the config get cached and checked in decreasing order now. We abort checking permissions if they cannot further increase the player's current shops limit. An effect of this is that it is only possible to increase the default limit, not decrease it.
   * Added permission node 'shopkeeper.maxshops.unlimited' (default: op), which disables the max shops limit for a player.
 * Fixed: Enabled living shops specified inside the config would previously not get enabled if they were not perfectly matching the entity type name.
+* Minor changes to the '/shopkeeper checkitem' debugging command: The output for the main and off hand items is more compact now, and it checks if the items match the shop creation item.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
