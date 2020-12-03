@@ -71,7 +71,7 @@ import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.sign.SignShops;
 import com.nisovin.shopkeepers.spigot.SpigotFeatures;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
-import com.nisovin.shopkeepers.tradelogging.TradeFileLogger;
+import com.nisovin.shopkeepers.tradelogging.TradeCsvLogger;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.util.ClassUtils;
@@ -84,9 +84,6 @@ import com.nisovin.shopkeepers.villagers.BlockZombieVillagerCuringListener;
 import com.nisovin.shopkeepers.villagers.VillagerInteractionListener;
 
 public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin {
-
-	public static final String DATA_FOLDER = "data";
-	public static final String LANG_FOLDER = "lang";
 
 	private static final int ASYNC_TASKS_TIMEOUT_SECONDS = 10;
 
@@ -208,9 +205,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			return;
 		}
 
-		// Create folder structure:
-		this.createFolderStructure();
-
 		// Load language file:
 		Messages.loadLanguageFile();
 
@@ -261,11 +255,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			return;
 		}
 
-		// Create folder structure (if not already done during onLoad):
-		if (!alreadySetup) {
-			this.createFolderStructure();
-		}
-
 		// Load language file (if not already loaded during onLoad):
 		if (!alreadySetup) {
 			Messages.loadLanguageFile();
@@ -312,7 +301,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new TradingCountListener(this), this);
-		pm.registerEvents(new TradeFileLogger(this.getSKDataFolder()), this);
+		pm.registerEvents(new TradeCsvLogger(this.getDataFolder()), this);
 
 		// DEFAULT SHOP OBJECT TYPES
 
@@ -500,21 +489,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopkeeperNaming.onPlayerQuit(player);
 		shopkeeperCreation.onPlayerQuit(player);
 		commands.onPlayerQuit(player);
-	}
-
-	// FOLDER STRUCTURE
-
-	public File getSKDataFolder() {
-		return new File(this.getDataFolder(), DATA_FOLDER);
-	}
-
-	public File getSKLangFolder() {
-		return new File(this.getDataFolder(), LANG_FOLDER);
-	}
-
-	private void createFolderStructure() {
-		this.getSKDataFolder().mkdirs();
-		this.getSKLangFolder().mkdirs();
 	}
 
 	// SHOPKEEPER REGISTRY

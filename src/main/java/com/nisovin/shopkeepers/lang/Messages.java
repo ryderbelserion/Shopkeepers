@@ -322,7 +322,14 @@ public class Messages extends Config {
 		return TextUtils.colorize(messages);
 	}
 
+	/////
+
+	private static final String LANG_FOLDER = "lang";
 	private static final String DEFAULT_LANGUAGE = "en-default";
+
+	public static File getLangFolder() {
+		return new File(SKShopkeepersPlugin.getInstance().getDataFolder(), LANG_FOLDER);
+	}
 
 	private static String getLanguageFileName(String language) {
 		return "language-" + language + ".yml";
@@ -330,7 +337,7 @@ public class Messages extends Config {
 
 	// Relative to the plugin's data folder:
 	private static String getLanguageFilePath(String language) {
-		return SKShopkeepersPlugin.LANG_FOLDER + "/" + getLanguageFileName(language);
+		return LANG_FOLDER + "/" + getLanguageFileName(language);
 	}
 
 	private static File getLanguageFile(String language) {

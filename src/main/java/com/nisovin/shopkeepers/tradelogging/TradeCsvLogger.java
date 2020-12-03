@@ -25,23 +25,25 @@ import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
- * Logs purchases to files.
+ * Logs trades to csv files.
  */
-public class TradeFileLogger implements Listener {
+public class TradeCsvLogger implements Listener {
+
+	public static final String TRADE_LOGS_FOLDER = "trade-logs";
 
 	private static final String FILE_NAME_PREFIX = "purchases-";
 	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 	private static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
 
-	private final File dataFolder;
+	private final File tradeLogsFolder;
 
-	public TradeFileLogger(File dataFolder) {
-		this.dataFolder = dataFolder;
+	public TradeCsvLogger(File pluginDataFolder) {
+		this.tradeLogsFolder = new File(pluginDataFolder, TRADE_LOGS_FOLDER);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onTradeCompleted(ShopkeeperTradeEvent event) {
-		if (!Settings.enablePurchaseLogging) {
+		if (!Settings.logTradesToCsv) {
 			return;
 		}
 		Player player = event.getPlayer();
@@ -64,7 +66,7 @@ public class TradeFileLogger implements Listener {
 		// TODO fully serialize the traded items? (metadata)
 		// TODO do the file writing async
 		Date now = new Date();
-		File file = new File(dataFolder, FILE_NAME_PREFIX + DATE_FORMAT.format(now) + ".csv");
+		File file = new File(tradeLogsFolder, FILE_NAME_PREFIX + DATE_FORMAT.format(now) + ".csv");
 		boolean isNew = !file.exists();
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter(file, true))) {
 			if (isNew) writer.append("TIME,PLAYER,SHOP ID,SHOP TYPE,SHOP POS,OWNER,ITEM TYPE,DATA,QUANTITY,CURRENCY 1,CURRENCY 1 AMOUNT,CURRENCY 2,CURRENCY 2 AMOUNT\n");

@@ -31,9 +31,9 @@ Internal:
 
 Migration notes:  
 * The folder structure has changed:
-  * The save file and trading logs (if enabled) are stored inside a new 'data' folder now.
-  * If no save file exists at the new location and a previous save file is found at the old location, it is automatically moved.
+  * The save file is stored inside a new 'data' folder now. If no save file exists at the new location and a previous save file is found at the old location, it is automatically moved.
   * Language files are located inside a new 'lang' folder now. Existing custom language files need to be manually moved!
+  * Trading logs (if enabled) are stored inside the folder 'trade-logs' now. Existing logs are not automatically moved to the new location!
 * Removed the 1.16 'PIG_ZOMBIE' migration. We no longer automatically remove this mob type from the config, but only log a warning and then ignore it.
 
 Messages:  

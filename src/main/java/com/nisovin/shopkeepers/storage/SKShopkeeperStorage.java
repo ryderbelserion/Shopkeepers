@@ -48,6 +48,8 @@ import com.nisovin.shopkeepers.util.StringUtils;
  */
 public class SKShopkeeperStorage implements ShopkeeperStorage {
 
+	private static final String DATA_FOLDER = "data";
+
 	// Our stored 'data version' is a combination of two different data versions:
 	// - Our own 'shopkeepers data version', which we can use to determine our own required migrations or force a full
 	// save of all shopkeepers data after we have made changes to the storage format which affect all shopkeepers.
@@ -181,8 +183,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		this.savingDisabled = false;
 	}
 
+	private File getDataFolder() {
+		return new File(plugin.getDataFolder(), DATA_FOLDER);
+	}
+
 	private File getSaveFile() {
-		return new File(plugin.getSKDataFolder(), "save.yml");
+		return new File(this.getDataFolder(), "save.yml");
 	}
 
 	private File getTempSaveFile() {
