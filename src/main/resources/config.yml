@@ -384,10 +384,9 @@ prevent-trading-while-owner-is-online: false
 # trading result slot.
 use-strict-item-comparison: false
 # Whether all shopkeeper purchases shall be logged to csv files in the plugin
-# folder. Note: This might currently not properly work for admin shops, so
-# don't rely on the correctness of the logged purchases for those!
+# folder.
 enable-purchase-logging: false
-# Whether to increment minecraft's talked-to-villager and traded-with-villager
+# Whether to increment Minecraft's talked-to-villager and traded-with-villager
 # statistics whenever a player opens the trading menu and trades with a
 # shopkeeper.
 increment-villager-statistics: false
