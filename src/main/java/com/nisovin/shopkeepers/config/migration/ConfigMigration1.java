@@ -23,7 +23,7 @@ public class ConfigMigration1 implements ConfigMigration {
 		// The conversion of spawn egg types is no longer supported.
 		if (config.isSet("shop-creation-item-spawn-egg-entity-type")) {
 			Log.info("  Migration of 'shop-creation-item-spawn-egg-entity-type' is no longer supported.");
-			clear(config, "shop-creation-item-spawn-egg-entity-type");
+			ConfigMigrationHelper.removeSetting(config, "shop-creation-item-spawn-egg-entity-type");
 		}
 		migrateLegacyItemData(config, "shop-creation-item", "shop-creation-item-data", Material.VILLAGER_SPAWN_EGG);
 
@@ -52,16 +52,6 @@ public class ConfigMigration1 implements ConfigMigration {
 		migrateLegacyItemData(config, "high-zero-currency-item", "high-zero-currency-item-data", Material.BARRIER);
 	}
 
-	// Returns true if the key got cleared.
-	private static boolean clear(ConfigurationSection config, String key) {
-		if (config.isSet(key)) {
-			Log.info("  Removing '" + key + "' (previously '" + config.get(key, null) + "').");
-			config.set(key, null);
-			return true;
-		}
-		return false;
-	}
-
 	// This previously converted legacy material + data value to new material.
 	// This conversion is no longer supported. Instead we migrate any unknown materials to their defaults.
 	// Returns true if any migrations took place.
@@ -84,7 +74,7 @@ public class ConfigMigration1 implements ConfigMigration {
 		}
 
 		// Remove data value from config:
-		if (clear(config, itemDataKey)) {
+		if (ConfigMigrationHelper.removeSetting(config, itemDataKey)) {
 			migrated = true;
 		}
 		return migrated;
