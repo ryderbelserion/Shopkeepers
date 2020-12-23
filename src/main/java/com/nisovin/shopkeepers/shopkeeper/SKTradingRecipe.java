@@ -57,7 +57,7 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 
 	@Override
 	public final ItemStack getItem2() {
-		return (item2 == null ? null : item2.clone());
+		return (item2 == null) ? null : item2.clone();
 	}
 
 	@Override
