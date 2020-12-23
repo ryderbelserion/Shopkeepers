@@ -28,6 +28,12 @@ API:
 Internal:  
 * The config key pattern is cached now.
 * Major refactoring related to how the config and language files are loaded.
+* Refactoring related to how shopkeeper data is saved.
+  * Shopkeepers are saved after they are unloaded now. This allows them to still modify their data during despawning or when handling the unload.
+  * When a new immediate save is triggered (for example during plugin shutdown), we no longer abort any currently scheduled but not yet started save task. Instead we finish it and then execute the save task again. This may trigger more saves than necessary in a few cases, but ensures that frequent requests to save the shopkeepers won't repeatedly abort any previous saving attempts.
+  * Reloading will now wait for any current and pending saves to complete. However, this has not really been an issue before since we only reload the shopkeeper data during plugin startup currently.
+  * Debug: The debug output related to shopkeeper saves has slightly changed.
+  * Debug/Fixed: If saving failed for some reason, the logged number of shopkeepers that have been deleted since the last successful save might not have matched the actual number of deleted shopkeepers, because we did not take into account the shopkeepers that got deleted during the failed save attempt.
 
 Migration notes:  
 * The folder structure has changed:

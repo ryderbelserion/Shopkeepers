@@ -26,6 +26,7 @@ import org.bukkit.scheduler.BukkitTask;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
+import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent.Cause;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
@@ -534,8 +535,10 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			playerShopCount--;
 		}
 
-		// Remove shopkeeper from storage:
-		this.getShopkeeperStorage().clearShopkeeperData(shopkeeper);
+		if (cause == ShopkeeperRemoveEvent.Cause.DELETE) {
+			// Remove shopkeeper from storage:
+			this.getShopkeeperStorage().clearShopkeeperData(shopkeeper);
+		}
 	}
 
 	// Only called for non-virtual shopkeepers.

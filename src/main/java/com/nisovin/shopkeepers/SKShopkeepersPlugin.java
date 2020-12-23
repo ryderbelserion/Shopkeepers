@@ -412,17 +412,14 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// Disable citizens shops:
 		citizensShops.onDisable();
 
-		// Save shopkeepers:
-		shopkeeperStorage.saveImmediateIfDirty();
-
 		// Disable protected containers:
 		protectedContainers.disable();
 		removeShopOnContainerBreak.onDisable();
 
-		// Disable shopkeeper registry: unloads all shopkeepers
+		// Disable shopkeeper registry: Unloads all shopkeepers
 		shopkeeperRegistry.onDisable();
 
-		// Disable storage:
+		// Shutdown shopkeeper storage (saves shopkeepers):
 		shopkeeperStorage.onDisable();
 
 		shopTypesRegistry.clearAllSelections();
