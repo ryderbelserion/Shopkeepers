@@ -40,9 +40,11 @@ language: en-default
 # Shopkeeper Data
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
-# The file encoding to use for the save file. If empty, your system's default
-# encoding will be used. If you have issues with the save file, such as special
-# characters not being saved correctly, try setting this option to 'UTF-8'.
+# The file encoding to use for the save file. If you have issues with the save
+# file, such as special characters not being saved correctly, make sure that
+# this encoding supports these characters. It is recommended to keep this at
+# its default 'UTF-8'. It is not supported to dynamically change this encoding
+# after the save file has already been created.
 file-encoding: "UTF-8"
 # Whether the save file shall get written every time a shopkeeper was edited.
 # If disabled, saving will occur at 5 minute intervals and on plugin shutdown.

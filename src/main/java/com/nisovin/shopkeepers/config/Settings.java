@@ -1,5 +1,9 @@
 package com.nisovin.shopkeepers.config;
 
+import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.StandardCharsets;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -27,6 +31,7 @@ import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.PermissionUtils;
+import com.nisovin.shopkeepers.util.StringUtils;
 
 public class Settings extends Config {
 
@@ -260,6 +265,8 @@ public class Settings extends Config {
 	// Stores derived settings which get setup after loading the config.
 	public static class DerivedSettings {
 
+		public static Charset fileCharset;
+
 		public static ItemData namingItemData;
 
 		// Button items:
@@ -285,6 +292,19 @@ public class Settings extends Config {
 
 		// Gets called after setting values have changed (eg. after the config has been loaded):
 		private static void setup() {
+			// Charset derived from specified file encoding:
+			if (StringUtils.isEmpty(fileEncoding)) {
+				Log.warning(INSTANCE.getLogPrefix() + "'file-encoding' is empty. Using default 'UTF-8'.");
+				fileEncoding = "UTF-8";
+			}
+			try {
+				fileCharset = Charset.forName(fileEncoding);
+			} catch (IllegalCharsetNameException | UnsupportedCharsetException e) {
+				Log.warning(INSTANCE.getLogPrefix() + "Invalid or unsupported 'file-encoding' ('" + fileEncoding + "'). Using default 'UTF-8'.");
+				fileEncoding = "UTF-8";
+				fileCharset = StandardCharsets.UTF_8;
+			}
+
 			// Ignore display name (which is used for specifying the new shopkeeper name):
 			namingItemData = new ItemData(ItemUtils.setItemStackName(nameItem.createItemStack(), null));
 
@@ -361,14 +381,13 @@ public class Settings extends Config {
 
 		public final boolean debug;
 		public final List<String> debugOptions;
-		public final String fileEncoding;
+		public final Charset fileCharset;
 
 		private AsyncSettings() {
 			this.debug = Settings.debug;
 			this.debugOptions = new ArrayList<>(Settings.debugOptions);
-			this.fileEncoding = Settings.fileEncoding;
+			this.fileCharset = DerivedSettings.fileCharset;
 		}
-
 	}
 
 	public static AsyncSettings async() {

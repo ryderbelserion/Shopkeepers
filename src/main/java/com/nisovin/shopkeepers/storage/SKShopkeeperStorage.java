@@ -2,8 +2,10 @@ package com.nisovin.shopkeepers.storage;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
@@ -365,15 +368,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		try {
-			if (!StringUtils.isEmpty(Settings.fileEncoding)) {
-				// Load with specified charset:
-				try (	FileInputStream stream = new FileInputStream(saveFile);
-						InputStreamReader reader = new InputStreamReader(stream, Settings.fileEncoding)) {
-					saveData.load(reader);
-				}
-			} else {
-				// Load with default charset handling:
-				saveData.load(saveFile);
+			// Load with the specified encoding:
+			// Note: The config's load method wraps the reader into a BufferedReader.
+			try (	FileInputStream stream = new FileInputStream(saveFile);
+					InputStreamReader reader = new InputStreamReader(stream, DerivedSettings.fileCharset)) {
+				saveData.load(reader);
 			}
 		} catch (Exception e) {
 			Log.severe("Failed to load save file!", e);
@@ -625,8 +624,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		// Can be run async and sync.
-		// TODO saveToString on main thread and only do the actual file writing async?
-		// Because Bukkit's serialization API is not strictly thread-safe..
 		private void saveToFile(FileConfiguration config) {
 			assert config != null;
 			File saveFile = getSaveFile();
@@ -718,25 +715,33 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 						}
 					}
 
+					// Serialize data to String:
+					// TODO Do this on the main thread? Bukkit's serialization API is not strictly thread-safe..
+					// However, this should usually not be an issue if the serialized objects inside the config are not
+					// accessed externally, and do not rely on external state during serialization.
+					String data = null;
+					if (!problem) {
+						try {
+							data = config.saveToString();
+						} catch (Exception e) {
+							error = "Could not serialize shopkeeper data: " + e.getMessage();
+							exception = e;
+							problem = true;
+						}
+					}
+
 					// Write shopkeeper data to temporary save file:
 					if (!problem) {
-						PrintWriter writer = null;
-						try {
-							String fileEncoding = Settings.async().fileEncoding;
-							if (fileEncoding != null && !fileEncoding.isEmpty()) {
-								writer = new PrintWriter(tempSaveFile, fileEncoding);
-								writer.write(config.saveToString());
-							} else {
-								config.save(tempSaveFile);
-							}
+						assert data != null;
+						// Save with the specified encoding:
+						// Note: BufferedWriter is not required here, since we invoke the writer only once.
+						try (	FileOutputStream stream = new FileOutputStream(tempSaveFile);
+								OutputStreamWriter writer = new OutputStreamWriter(stream, DerivedSettings.fileCharset)) {
+							writer.write(data);
 						} catch (Exception e) {
 							error = "Could not save data to temporary save file! (" + tempSaveFile.getName() + ") : " + e.getMessage();
 							exception = e;
 							problem = true;
-						} finally {
-							if (writer != null) {
-								writer.close();
-							}
 						}
 					}
 

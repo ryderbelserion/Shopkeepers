@@ -21,6 +21,10 @@ Date format: (YYYY-MM-DD)
   * Added permission node 'shopkeeper.maxshops.unlimited' (default: op), which disables the max shops limit for a player.
 * Fixed: Enabled living shops specified inside the config would previously not get enabled if they were not perfectly matching the entity type name.
 * Minor changes to the '/shopkeeper checkitem' debugging command: The output for the main and off hand items is more compact now, and it checks if the items match the shop creation item.
+* Config: Updated the description of the 'file-encoding' setting. On all recent versions of Bukkit (since around 2016), we were actually using UTF-8 if this setting is left empty.
+* Config: Added validation for the 'file-encoding' setting. If it is empty or invalid, we print a warning and use UTF-8.
+* Added additional error checking around the serialization of shopkeeper data.
+* Fixed: We were missing to check an error flag during the saving of shopkeeper data. This should also resolve an issue with the save data being lost if the disk is full.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
