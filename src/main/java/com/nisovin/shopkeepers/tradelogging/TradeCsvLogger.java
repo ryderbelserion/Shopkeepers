@@ -43,7 +43,7 @@ public class TradeCsvLogger implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onTradeCompleted(ShopkeeperTradeEvent event) {
-		if (!Settings.logTradesToCsv) {
+		if (!Settings.enablePurchaseLogging) {
 			return;
 		}
 		Player player = event.getPlayer();
