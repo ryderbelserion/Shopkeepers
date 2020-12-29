@@ -31,12 +31,28 @@ public final class Log {
 		getLogger().info(msgSupplier);
 	}
 
+	public static void info(String message, Throwable throwable) {
+		getLogger().log(Level.INFO, message, throwable);
+	}
+
+	public static void info(Throwable throwable, Supplier<String> msgSupplier) {
+		getLogger().log(Level.INFO, throwable, msgSupplier);
+	}
+
 	public static void debug(String message) {
 		debug(null, message);
 	}
 
 	public static void debug(Supplier<String> msgSupplier) {
-		debug(null, msgSupplier);
+		debug((String) null, msgSupplier);
+	}
+
+	public static void debug(String message, Throwable throwable) {
+		debug(message, throwable);
+	}
+
+	public static void debug(Throwable throwable, Supplier<String> msgSupplier) {
+		debug(throwable, msgSupplier);
 	}
 
 	public static void debug(String debugOption, String message) {
@@ -48,6 +64,18 @@ public final class Log {
 	public static void debug(String debugOption, Supplier<String> msgSupplier) {
 		if (Debug.isDebugging(debugOption)) {
 			info(msgSupplier);
+		}
+	}
+
+	public static void debug(String debugOption, String message, Throwable throwable) {
+		if (Debug.isDebugging(debugOption)) {
+			info(message, throwable);
+		}
+	}
+
+	public static void debug(String debugOption, Throwable throwable, Supplier<String> msgSupplier) {
+		if (Debug.isDebugging(debugOption)) {
+			info(throwable, msgSupplier);
 		}
 	}
 

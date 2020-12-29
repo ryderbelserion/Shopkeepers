@@ -23,8 +23,18 @@ Date format: (YYYY-MM-DD)
 * Minor changes to the '/shopkeeper checkitem' debugging command: The output for the main and off hand items is more compact now, and it checks if the items match the shop creation item.
 * Config: Updated the description of the 'file-encoding' setting. On all recent versions of Bukkit (since around 2016), we were actually using UTF-8 if this setting is left empty.
 * Config: Added validation for the 'file-encoding' setting. If it is empty or invalid, we print a warning and use UTF-8.
-* Added additional error checking around the serialization of shopkeeper data.
-* Fixed: We were missing to check an error flag during the saving of shopkeeper data. This should also resolve an issue with the save data being lost if the disk is full.
+
+* Refactoring related to the saving and loading of shopkeeper data:
+  * Added additional error checking around the serialization of shopkeeper data.
+  * Fixed: We were missing to check an error flag during the saving of shopkeeper data. This should also resolve an issue with the save data being lost if the disk is full.
+  * Fixed: We now ensure that the new shopkeeper data is actually written to disk before we replace the old save data with the new save data, and before we return from the saving procedure. This should provide additional protection against data loss and corruption in case of severe system failures (such as crashes, power loss, etc.).
+  * Improved: We attempt to atomically replace the old and new save data, and log a warning if this is not possible. There are several non-atomic fallback solutions in case the atomic renaming does not work. However, non-atomic renaming may result in data loss or corruption in case of severe system failures (hence the logged warning).
+  * Improved: When saving shopkeeper data, we now check the directory for write and execute (i.e. access) permissions, which are required to rename files within the directory. This should provide better error messages in case of failures related to access permissions.
+  * Improved: Replaced the old Java IO based implementation of saving and loading shopkeeper data with a new NIO based implementation. This should provide more accurate error messages in case of failures.
+  * Improved: We no longer serialize the shopkeeper data multiple times if the saving of that data fails and requires several attempts to succeed.
+  * The name of the temporary save file has slightly changed ('save.temp' -> 'save.yml.tmp').
+  * Debug: The debug output related to shopkeeper saves has slightly changed.
+  * Debug/Fixed: If saving failed for some reason, the logged number of shopkeepers that have been deleted since the last successful save might not have matched the actual number of deleted shopkeepers, because we did not take into account the shopkeepers that got deleted during the failed save attempt.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
@@ -32,12 +42,10 @@ API:
 Internal:  
 * The config key pattern is cached now.
 * Major refactoring related to how the config and language files are loaded.
-* Refactoring related to how shopkeeper data is saved.
+* Refactoring related to how shopkeeper data is saved:
   * Shopkeepers are saved after they are unloaded now. This allows them to still modify their data during despawning or when handling the unload.
   * When a new immediate save is triggered (for example during plugin shutdown), we no longer abort any currently scheduled but not yet started save task. Instead we finish it and then execute the save task again. This may trigger more saves than necessary in a few cases, but ensures that frequent requests to save the shopkeepers won't repeatedly abort any previous saving attempts.
-  * Reloading will now wait for any current and pending saves to complete. However, this has not really been an issue before since we only reload the shopkeeper data during plugin startup currently.
-  * Debug: The debug output related to shopkeeper saves has slightly changed.
-  * Debug/Fixed: If saving failed for some reason, the logged number of shopkeepers that have been deleted since the last successful save might not have matched the actual number of deleted shopkeepers, because we did not take into account the shopkeepers that got deleted during the failed save attempt.
+  * Reloading the shopkeeper data will now wait for any current and pending saves to complete. However, this has not really been an issue before since we only reload the shopkeeper data during plugin startup currently.
 
 Migration notes:  
 * The folder structure has changed:
