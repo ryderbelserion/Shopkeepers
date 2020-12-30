@@ -1,12 +1,12 @@
 package com.nisovin.shopkeepers.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import org.bukkit.Chunk;
 import org.bukkit.FluidCollisionMode;
@@ -50,73 +50,80 @@ public class EntityUtils {
 		Log.info("Entities of chunk " + TextUtils.getChunkString(chunk) + " (total: " + entities.length + "): " + entityCounts);
 	}
 
-	public static List<Entity> getNearbyEntities(Location location, double radius, EntityType... types) {
-		List<Entity> entities = new ArrayList<>();
-		if (location == null) return entities;
-		if (radius <= 0.0D) return entities;
-
-		List<EntityType> typesList = (types == null) ? Collections.<EntityType>emptyList() : Arrays.asList(types);
-		double radius2 = radius * radius;
-		int chunkRadius = ((int) (radius / 16)) + 1;
-		Chunk center = location.getChunk();
-		int startX = center.getX() - chunkRadius;
-		int endX = center.getX() + chunkRadius;
-		int startZ = center.getZ() - chunkRadius;
-		int endZ = center.getZ() + chunkRadius;
-		World world = location.getWorld();
-		for (int chunkX = startX; chunkX <= endX; chunkX++) {
-			for (int chunkZ = startZ; chunkZ <= endZ; chunkZ++) {
-				if (!world.isChunkLoaded(chunkX, chunkZ)) continue;
-				Chunk chunk = world.getChunkAt(chunkX, chunkZ);
-				for (Entity entity : chunk.getEntities()) {
-					Location entityLoc = entity.getLocation();
-					// TODO This is a workaround: For some yet unknown reason entities sometimes report to be in a
-					// different world..
-					if (!entityLoc.getWorld().equals(world)) {
-						Log.debug(() -> "Found an entity which reports to be in a different world than the chunk we got it from: "
-								+ "Location=" + location + ", Chunk=" + chunk + ", ChunkWorld=" + chunk.getWorld()
-								+ ", entityType=" + entity.getType() + ", entityLocation=" + entityLoc);
-						continue; // Skip this entity
-					}
-
-					if (entityLoc.distanceSquared(location) <= radius2) {
-						if (typesList.isEmpty() || typesList.contains(entity.getType())) {
-							entities.add(entity);
-						}
-					}
-				}
-			}
+	// acceptedTypes: null or empty accepts all entity types
+	public static Predicate<Entity> filterByType(Set<EntityType> acceptedTypes) {
+		if (acceptedTypes == null || acceptedTypes.isEmpty()) {
+			return (entity) -> true;
+		} else {
+			return (entity) -> acceptedTypes.contains(entity.getType());
 		}
-		return entities;
 	}
 
-	public static List<Entity> getNearbyChunkEntities(Chunk chunk, int chunkRadius, boolean loadChunks, EntityType... types) {
-		List<Entity> entities = new ArrayList<>();
-		if (chunk == null) return entities;
-		if (chunkRadius < 0) return entities;
+	// searchedTypes: null or empty includes all entity types
+	public static List<Entity> getNearbyEntities(Location location, double radius, boolean loadChunks, Set<EntityType> searchedTypes) {
+		return getNearbyEntities(location, radius, loadChunks, filterByType(searchedTypes));
+	}
 
-		List<EntityType> typesList = (types == null) ? Collections.<EntityType>emptyList() : Arrays.asList(types);
-		int startX = chunk.getX() - chunkRadius;
-		int endX = chunk.getX() + chunkRadius;
-		int startZ = chunk.getZ() - chunkRadius;
-		int endZ = chunk.getZ() + chunkRadius;
-		World world = chunk.getWorld();
+	// filter of null: Accepts all found entities.
+	public static List<Entity> getNearbyEntities(Location location, double radius, boolean loadChunks, Predicate<Entity> filter) {
+		Validate.notNull(location, "location is null");
+		World world = location.getWorld(); // Throws an exception if the world is not loaded
+		int centerChunkX = location.getBlockX() >> 4;
+		int centerChunkZ = location.getBlockZ() >> 4;
+		int chunkRadius = ((int) (radius / 16)) + 1;
+		double radius2 = radius * radius;
+		Predicate<Entity> actualFilter = (entity) -> {
+			Location entityLoc = entity.getLocation();
+			if (entityLoc.distanceSquared(location) > radius2) return false;
+			return (filter == null || filter.test(entity));
+		};
+		return getNearbyChunkEntities(world, centerChunkX, centerChunkZ, chunkRadius, loadChunks, actualFilter);
+	}
+
+	// searchedTypes: null or empty includes all entity types
+	// chunkRadius of 0: Search only within the given chunk.
+	public static List<Entity> getNearbyChunkEntities(Chunk chunk, int chunkRadius, boolean loadChunks, Set<EntityType> searchedTypes) {
+		return getNearbyChunkEntities(chunk, chunkRadius, loadChunks, filterByType(searchedTypes));
+	}
+
+	// chunkRadius of 0: Search only within the given chunk.
+	// filter of null: Accepts all found entities.
+	public static List<Entity> getNearbyChunkEntities(Chunk chunk, int chunkRadius, boolean loadChunks, Predicate<Entity> filter) {
+		Validate.notNull(chunk, "chunk is null");
+		return getNearbyChunkEntities(chunk.getWorld(), chunk.getX(), chunk.getZ(), chunkRadius, loadChunks, filter);
+	}
+
+	// chunkRadius of 0: Search only within the center chunk.
+	// filter of null: Accepts all found entities.
+	public static List<Entity> getNearbyChunkEntities(World world, int centerChunkX, int centerChunkZ, int chunkRadius, boolean loadChunks, Predicate<Entity> filter) {
+		Validate.notNull(world, "world is null");
+		// Assert: World is loaded.
+
+		List<Entity> entities = new ArrayList<>();
+		if (chunkRadius < 0) return entities;
+		if (filter == null) {
+			filter = (entity) -> true;
+		}
+
+		int startX = centerChunkX - chunkRadius;
+		int endX = centerChunkX + chunkRadius;
+		int startZ = centerChunkZ - chunkRadius;
+		int endZ = centerChunkZ + chunkRadius;
 		for (int chunkX = startX; chunkX <= endX; chunkX++) {
 			for (int chunkZ = startZ; chunkZ <= endZ; chunkZ++) {
 				if (!loadChunks && !world.isChunkLoaded(chunkX, chunkZ)) continue;
 				Chunk currentChunk = world.getChunkAt(chunkX, chunkZ);
 				for (Entity entity : currentChunk.getEntities()) {
-					Location entityLoc = entity.getLocation();
 					// TODO This is a workaround: For some yet unknown reason entities sometimes report to be in a
 					// different world..
-					if (!entityLoc.getWorld().equals(world)) {
+					if (!entity.getWorld().equals(world)) {
 						Log.debug(() -> "Found an entity which reports to be in a different world than the chunk we got it from: "
 								+ "Chunk=" + currentChunk + ", ChunkWorld=" + currentChunk.getWorld()
-								+ ", entityType=" + entity.getType() + ", entityLocation=" + entityLoc);
+								+ ", entityType=" + entity.getType() + ", entityLocation=" + entity.getLocation());
 						continue; // Skip this entity
 					}
 
-					if (typesList.isEmpty() || typesList.contains(entity.getType())) {
+					if (filter.test(entity)) {
 						entities.add(entity);
 					}
 				}
