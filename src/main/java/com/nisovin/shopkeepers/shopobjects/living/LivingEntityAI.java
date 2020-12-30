@@ -237,10 +237,18 @@ public class LivingEntityAI {
 				boolean gravityActive = this.isGravityActive();
 				int gravityChunkRange = Math.max(Settings.gravityChunkRange, 0);
 				for (Player player : Bukkit.getOnlinePlayers()) {
-					Chunk centerChunk = player.getLocation(tempLocation).getChunk();
-					this.activateNearbyChunks(centerChunk, AI_ACTIVATION_CHUNK_RANGE, ActivationType.AI);
+					World world = player.getWorld();
+					Location playerLocation = player.getLocation(tempLocation);
+					// Note: On some Paper versions with their async chunk loading, the player's current chunk may
+					// sometimes not be loaded yet. We therefore avoid accessing (and thereby loading) that chunk here,
+					// but instead only use its coordinates. The subsequent activation of nearby chunks only considers
+					// loaded chunks.
+					int chunkX = playerLocation.getBlockX() >> 4;
+					int chunkZ = playerLocation.getBlockZ() >> 4;
+
+					this.activateNearbyChunks(world, chunkX, chunkZ, AI_ACTIVATION_CHUNK_RANGE, ActivationType.AI);
 					if (gravityActive) {
-						this.activateNearbyChunks(centerChunk, gravityChunkRange, ActivationType.GRAVITY);
+						this.activateNearbyChunks(world, chunkX, chunkZ, gravityChunkRange, ActivationType.GRAVITY);
 					}
 				}
 				activationTimings.stop();
@@ -446,13 +454,12 @@ public class LivingEntityAI {
 		AI;
 	}
 
-	private void activateNearbyChunks(Chunk centerChunk, int chunkRadius, ActivationType activationType) {
-		assert centerChunk != null && chunkRadius >= 0 && activationType != null;
-		World world = centerChunk.getWorld();
-		int minX = centerChunk.getX() - chunkRadius;
-		int minZ = centerChunk.getZ() - chunkRadius;
-		int maxX = centerChunk.getX() + chunkRadius;
-		int maxZ = centerChunk.getZ() + chunkRadius;
+	private void activateNearbyChunks(World world, int centerChunkX, int centerChunkZ, int chunkRadius, ActivationType activationType) {
+		assert world != null && chunkRadius >= 0 && activationType != null;
+		int minX = centerChunkX - chunkRadius;
+		int maxX = centerChunkX + chunkRadius;
+		int minZ = centerChunkZ - chunkRadius;
+		int maxZ = centerChunkZ + chunkRadius;
 		for (int x = minX; x <= maxX; x++) {
 			for (int z = minZ; z <= maxZ; z++) {
 				if (!world.isChunkLoaded(x, z)) continue;
