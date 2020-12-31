@@ -83,11 +83,15 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	@Override
 	public E getEntity() {
 		// Is-active check:
-		// Note: Some Spigot versions didn't check the isDead flag inside isValid.
-		// Note: isValid-flag gets set at the tick after handling all queued chunk unloads, so isChunkLoaded check is
-		// needed if we check during chunk unloads and the entity in question might be in another chunk than the
-		// currently unloaded one. TODO Entity#isValid might already be doing the is-chunk-loaded check now.
-		if (entity != null && !entity.isDead() && entity.isValid() && ChunkCoords.isChunkLoaded(entity.getLocation())) {
+		// Note: Entity#isValid also checks if the entity is dead.
+		// Note: The entity's valid flag may get set one tick after the chunk got unloaded. We might also want to check
+		// if the entity is still valid when handling chunk unloads, and the entity might be located in a chunk
+		// different to the one that is currently being unloaded (and that other chunk might already have been
+		// unloaded).
+		// In the past we therefore also checked if the chunk in which the entity is currently located is still loaded.
+		// However, on later versions of Spigot (late 1.14.1 and above), Entity#isValid also already checks if the chunk
+		// is currently loaded, so this is no longer required.
+		if (entity != null && entity.isValid()) {
 			return entity;
 		}
 		return null;

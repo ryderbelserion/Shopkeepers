@@ -16,7 +16,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.util.MathUtils;
@@ -262,7 +261,7 @@ public class LivingEntityAI {
 				LivingEntity entity = entry.getKey();
 				EntityData entityData = entry.getValue();
 				// Entity still alive and loaded?
-				if (entity.isDead() || !entity.isValid() || !ChunkCoords.isChunkLoaded(entity.getLocation(tempLocation))) {
+				if (!entity.isValid()) {
 					iterator.remove();
 					this.onEntityRemoved(entity, entityData);
 					continue;
@@ -343,7 +342,7 @@ public class LivingEntityAI {
 
 	public void addEntity(LivingEntity entity) {
 		Validate.notNull(entity, "Entity is null!");
-		Validate.isTrue(!entity.isDead() && entity.isValid(), "Entity is invalid!");
+		Validate.isTrue(entity.isValid(), "Entity is invalid!");
 		Validate.isTrue(!currentlyRunning, "Cannot add entities while the ai task is running!");
 		if (entities.containsKey(entity)) return;
 
