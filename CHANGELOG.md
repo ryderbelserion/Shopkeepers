@@ -48,6 +48,7 @@ Internal:
   * Shopkeepers are saved after they are unloaded now. This allows them to still modify their data during despawning or when handling the unload.
   * When a new immediate save is triggered (for example during plugin shutdown), we no longer abort any currently scheduled but not yet started save task. Instead we finish it and then execute the save task again. This may trigger more saves than necessary in a few cases, but ensures that frequent requests to save the shopkeepers won't repeatedly abort any previous saving attempts.
   * Reloading the shopkeeper data will now wait for any current and pending saves to complete. However, this has not really been an issue before since we only reload the shopkeeper data during plugin startup currently.
+* Minor cleanup related to the AI and gravity processing of shopkeeper entities.
 
 Migration notes:  
 * The folder structure has changed:

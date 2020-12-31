@@ -37,8 +37,7 @@ public class LivingShops {
 		creatureForceSpawnListener.forceCreatureSpawn(null, null);
 
 		// Stop living entity AI:
-		livingEntityAI.stop();
-		livingEntityAI.reset(); // Cleanup, reset timings, etc.
+		livingEntityAI.onDisable();
 	}
 
 	public SKLivingShopObjectTypes getLivingEntityObjectTypes() {

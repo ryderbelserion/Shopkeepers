@@ -14,7 +14,9 @@ public class MathUtils {
 	/**
 	 * Calculates the average of the given values.
 	 * <p>
-	 * Note: This can overflow if the sum of the values doesn't fit into a single <code>long</code>.
+	 * The average is calculated by forming the sum of all values and then dividing by the number of values. If the sum
+	 * of the given values does not fit into a single <code>long</code>, it can overflow and produce an incorrect
+	 * result.
 	 * 
 	 * @param values
 	 *            the values
@@ -26,6 +28,25 @@ public class MathUtils {
 			total += value;
 		}
 		return ((double) total / values.length);
+	}
+
+	/**
+	 * Calculates the maximum of the given values.
+	 * <p>
+	 * Returns {@link Long#MIN_VALUE} if no values are given.
+	 * 
+	 * @param values
+	 *            the values
+	 * @return the max value
+	 */
+	public static long max(long[] values) {
+		long max = Long.MIN_VALUE;
+		for (long value : values) {
+			if (value > max) {
+				max = value;
+			}
+		}
+		return max;
 	}
 
 	// Brings the given value into the specified range via a modulo operation.
