@@ -133,6 +133,11 @@ public class EntityUtils {
 	private static final int ENTITY_TARGET_RANGE = 10;
 
 	public static Entity getTargetedEntity(Player player) {
+		return getTargetedEntity(player, PredicateUtils.alwaysTrue());
+	}
+
+	public static Entity getTargetedEntity(Player player, Predicate<Entity> filter) {
+		Predicate<Entity> filterOrTrue = PredicateUtils.orAlwaysTrue(filter);
 		Location playerLoc = player.getEyeLocation();
 		World world = playerLoc.getWorld();
 		Vector viewDirection = playerLoc.getDirection();
@@ -140,7 +145,9 @@ public class EntityUtils {
 		// Ray trace to check for the closest block and entity collision:
 		// We ignore passable blocks to make the targeting easier.
 		RayTraceResult rayTraceResult = world.rayTrace(playerLoc, viewDirection, ENTITY_TARGET_RANGE, FluidCollisionMode.NEVER, true, 0.0D, (entity) -> {
-			return !entity.isDead() && !entity.equals(player); // TODO SPIGOT-5228: Filtering dead entities.
+			if (entity.isDead()) return false; // TODO SPIGOT-5228: Ignore dead entities.
+			if (entity.equals(player)) return false; // Ignore player.
+			return filterOrTrue.test(entity); // Custom filter.
 		});
 		if (rayTraceResult != null) {
 			return rayTraceResult.getHitEntity(); // Can be null
