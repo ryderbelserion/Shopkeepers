@@ -24,7 +24,6 @@ Date format: (YYYY-MM-DD)
 * Config: Updated the description of the 'file-encoding' setting. On all recent versions of Bukkit (since around 2016), we were actually using UTF-8 if this setting is left empty.
 * Config: Added validation for the 'file-encoding' setting. If it is empty or invalid, we print a warning and use UTF-8.
 * Fixed: On some Paper versions with their async chunk loading, the player's current chunk may sometimes not be loaded yet. We now avoid accessing (and thereby loading) that chunk when activating the AI and gravity behavior of nearby shopkeeper entities.
-* Removed a few redundant checks regarding whether an entity is still alive and its chunk is still loaded. These additional checks have been required in some previous versions of Spigot, but that should no longer apply to late Spigot 1.14.1 and above.
 
 * Refactoring related to the saving and loading of shopkeeper data:
   * Added additional error checking around the serialization of shopkeeper data.
@@ -49,6 +48,7 @@ Internal:
   * When a new immediate save is triggered (for example during plugin shutdown), we no longer abort any currently scheduled but not yet started save task. Instead we finish it and then execute the save task again. This may trigger more saves than necessary in a few cases, but ensures that frequent requests to save the shopkeepers won't repeatedly abort any previous saving attempts.
   * Reloading the shopkeeper data will now wait for any current and pending saves to complete. However, this has not really been an issue before since we only reload the shopkeeper data during plugin startup currently.
 * Minor cleanup related to the AI and gravity processing of shopkeeper entities.
+* Removed a few redundant checks regarding whether an entity is still alive and its chunk is still loaded. These additional checks have been required in some previous versions of Spigot, but that should no longer apply to late Spigot 1.14.1 and above.
 
 Migration notes:  
 * The folder structure has changed:
