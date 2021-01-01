@@ -24,6 +24,7 @@ Date format: (YYYY-MM-DD)
 * Config: Updated the description of the 'file-encoding' setting. On all recent versions of Bukkit (since around 2016), we were actually using UTF-8 if this setting is left empty.
 * Config: Added validation for the 'file-encoding' setting. If it is empty or invalid, we print a warning and use UTF-8.
 * Fixed: On some Paper versions with their async chunk loading, the player's current chunk may sometimes not be loaded yet. We now avoid accessing (and thereby loading) that chunk when activating the AI and gravity behavior of nearby shopkeeper entities.
+* Fixed: Book shops logged warnings previously when being loaded. The importer for legacy data attempted to read non-legacy data and then failed to read the book prices.
 
 * Refactoring related to the saving and loading of shopkeeper data:
   * Added additional error checking around the serialization of shopkeeper data.

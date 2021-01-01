@@ -110,6 +110,10 @@ public class SKBookOffer implements BookOffer {
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String bookTitle : offersSection.getKeys(false)) {
+				if (offersSection.isConfigurationSection(bookTitle)) {
+					// Found a config section instead of an integer. -> Probably already uses the new data format.
+					continue; // Skip
+				}
 				int price = offersSection.getInt(bookTitle);
 				if (StringUtils.isEmpty(bookTitle)) {
 					// Invalid offer.
