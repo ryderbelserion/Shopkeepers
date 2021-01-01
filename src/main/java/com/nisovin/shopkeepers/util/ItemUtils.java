@@ -536,7 +536,7 @@ public final class ItemUtils {
 
 	public static int convertItems(ItemStack[] contents, Predicate<ItemStack> filter) {
 		Validate.notNull(contents, "contents is null");
-		if (filter == null) filter = (item) -> true;
+		filter = PredicateUtils.orAlwaysTrue(filter);
 		int convertedStacks = 0;
 		for (int slot = 0; slot < contents.length; slot++) {
 			ItemStack slotItem = contents[slot];
@@ -553,7 +553,7 @@ public final class ItemUtils {
 
 	public static int convertItems(Inventory inventory, Predicate<ItemStack> filter, boolean updateViewers) {
 		Validate.notNull(inventory, "inventory is null");
-		if (filter == null) filter = (item) -> true;
+		filter = PredicateUtils.orAlwaysTrue(filter);
 
 		// Convert inventory contents (includes armor and off hand slots for player inventories):
 		ItemStack[] contents = inventory.getContents();
@@ -638,9 +638,10 @@ public final class ItemUtils {
 	public static List<ItemCount> countItems(ItemStack[] contents, Predicate<ItemStack> filter) {
 		List<ItemCount> itemCounts = new ArrayList<>();
 		if (contents == null) return itemCounts;
+		filter = PredicateUtils.orAlwaysTrue(filter);
 		for (ItemStack item : contents) {
 			if (isEmpty(item)) continue;
-			if (filter != null && !filter.test(item)) continue;
+			if (!filter.test(item)) continue;
 
 			// Check if we already have a counter for this type of item:
 			ItemCount itemCount = ItemCount.findSimilar(itemCounts, item);

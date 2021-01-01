@@ -53,7 +53,7 @@ public class EntityUtils {
 	// acceptedTypes: null or empty accepts all entity types
 	public static Predicate<Entity> filterByType(Set<EntityType> acceptedTypes) {
 		if (acceptedTypes == null || acceptedTypes.isEmpty()) {
-			return (entity) -> true;
+			return PredicateUtils.alwaysTrue();
 		} else {
 			return (entity) -> acceptedTypes.contains(entity.getType());
 		}
@@ -72,12 +72,13 @@ public class EntityUtils {
 		int centerChunkZ = location.getBlockZ() >> 4;
 		int chunkRadius = ((int) (radius / 16)) + 1;
 		double radius2 = radius * radius;
-		Predicate<Entity> actualFilter = (entity) -> {
+		Predicate<Entity> filterOrTrue = PredicateUtils.orAlwaysTrue(filter);
+		Predicate<Entity> combinedFilter = (entity) -> {
 			Location entityLoc = entity.getLocation();
 			if (entityLoc.distanceSquared(location) > radius2) return false;
-			return (filter == null || filter.test(entity));
+			return filterOrTrue.test(entity);
 		};
-		return getNearbyChunkEntities(world, centerChunkX, centerChunkZ, chunkRadius, loadChunks, actualFilter);
+		return getNearbyChunkEntities(world, centerChunkX, centerChunkZ, chunkRadius, loadChunks, combinedFilter);
 	}
 
 	// searchedTypes: null or empty includes all entity types
@@ -98,13 +99,10 @@ public class EntityUtils {
 	public static List<Entity> getNearbyChunkEntities(World world, int centerChunkX, int centerChunkZ, int chunkRadius, boolean loadChunks, Predicate<Entity> filter) {
 		Validate.notNull(world, "world is null");
 		// Assert: World is loaded.
-
 		List<Entity> entities = new ArrayList<>();
 		if (chunkRadius < 0) return entities;
-		if (filter == null) {
-			filter = (entity) -> true;
-		}
 
+		filter = PredicateUtils.orAlwaysTrue(filter);
 		int startX = centerChunkX - chunkRadius;
 		int endX = centerChunkX + chunkRadius;
 		int startZ = centerChunkZ - chunkRadius;

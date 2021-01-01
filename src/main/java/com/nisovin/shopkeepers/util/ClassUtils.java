@@ -25,7 +25,7 @@ public class ClassUtils {
 	 */
 	public static boolean loadAllClassesFromJar(File jarFile, Predicate<String> filter) {
 		Validate.notNull(jarFile, "jarFile is null");
-		if (filter == null) filter = (className) -> true;
+		filter = PredicateUtils.orAlwaysTrue(filter);
 
 		try (ZipInputStream jar = new ZipInputStream(new FileInputStream(jarFile))) {
 			for (ZipEntry entry = jar.getNextEntry(); entry != null; entry = jar.getNextEntry()) {

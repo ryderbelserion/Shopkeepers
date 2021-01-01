@@ -29,6 +29,7 @@ public class EnumUtils {
 	private static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, boolean nullable, T current, boolean backwards, Predicate<T> predicate) {
 		Validate.notNull(enumClass);
 		Validate.isTrue(current != null || nullable, "Not nullable, but current is null!");
+		predicate = PredicateUtils.orAlwaysTrue(predicate);
 		T[] values = enumClass.getEnumConstants();
 		int currentId = (current == null ? -1 : current.ordinal());
 		int nextId = currentId;
@@ -48,7 +49,7 @@ public class EnumUtils {
 				return current;
 			}
 			T next = (nextId == -1 ? null : values[nextId]);
-			if (predicate == null || predicate.test(next)) {
+			if (predicate.test(next)) {
 				return next;
 			}
 		}
