@@ -89,6 +89,7 @@ public class ShopkeepersCommand extends BaseCommand {
 		childCommands.register(new CommandCheckItem());
 		childCommands.register(new CommandYaml());
 		childCommands.register(new CommandDebugCreateShops(plugin));
+		childCommands.register(new CommandTestDamage(plugin));
 	}
 
 	// Also responsible for hiding the command from the help page, if shop creation via command is disabled:
