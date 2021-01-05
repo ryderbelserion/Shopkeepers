@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.api.events;
 
-import org.bukkit.event.HandlerList;
-
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 
@@ -49,16 +47,5 @@ public class PlayerCreatePlayerShopkeeperEvent extends PlayerCreateShopkeeperEve
 			throw new IllegalArgumentException("maxShopsLimit cannot be negative!");
 		}
 		this.maxShopsLimit = maxShopsLimit;
-	}
-
-	private static final HandlerList handlers = new HandlerList();
-
-	@Override
-	public HandlerList getHandlers() {
-		return handlers;
-	}
-
-	public static HandlerList getHandlerList() {
-		return handlers;
 	}
 }

@@ -41,6 +41,7 @@ Date format: (YYYY-MM-DD)
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
+* Fixed: Event handlers for the PlayerCreateShopkeeperEvent were not informed for the creation of player shopkeepers.
 
 Internal:  
 * The config key pattern is cached now.
