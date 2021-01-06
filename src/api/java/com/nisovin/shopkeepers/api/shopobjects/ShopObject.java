@@ -20,7 +20,7 @@ public interface ShopObject {
 	/**
 	 * Checks if this shop object is active (is currently present in the world).
 	 * 
-	 * @return <code>true</code> if the shopkeeper is active
+	 * @return <code>true</code> if the shop object is active
 	 */
 	public boolean isActive();
 

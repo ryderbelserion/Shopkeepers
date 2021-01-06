@@ -180,7 +180,7 @@ public class CitizensShops {
 	public UUID getNPCUniqueId(Entity entity) {
 		if (this.isEnabled()) {
 			NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
-			return (npc != null ? npc.getUniqueId() : null);
+			return (npc != null) ? npc.getUniqueId() : null;
 		} else {
 			return null;
 		}

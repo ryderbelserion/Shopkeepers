@@ -13,7 +13,7 @@ public interface EntityShopObject extends ShopObject {
 	/**
 	 * Gets the entity.
 	 * 
-	 * @return the entity, or <code>null</code> if the shop object isn't active currently
+	 * @return the entity, or <code>null</code> if the shop object is not active currently
 	 */
 	public Entity getEntity();
 }

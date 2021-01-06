@@ -54,7 +54,7 @@ class CommandCheck extends Command {
 		// Hidden debugging command:
 		this.setHiddenInParentHelp(true);
 
-		// arguments:
+		// Arguments:
 		this.addArgument(new OptionalArgument<>(new FirstOfArgument("context", Arrays.asList(
 				new LiteralArgument(ARGUMENT_CHUNKS),
 				new LiteralArgument(ARGUMENT_ACTIVE)

@@ -29,7 +29,7 @@ public interface ShopkeeperRegistry {
 	 * @param creationData
 	 *            the shop creation data containing the necessary arguments (spawn location, object type, owner, etc.)
 	 *            for creating the shopkeeper
-	 * @return the created Shopkeeper
+	 * @return the created shopkeeper
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper could not be created
 	 */
@@ -249,11 +249,11 @@ public interface ShopkeeperRegistry {
 	public Shopkeeper getShopkeeperByEntity(Entity entity);
 
 	/**
-	 * Checks if the given entity is a Shopkeeper.
+	 * Checks if the given entity is a shopkeeper.
 	 * 
 	 * @param entity
 	 *            the entity
-	 * @return <code>true</code> if the entity is a Shopkeeper
+	 * @return <code>true</code> if the entity is a shopkeeper
 	 */
 	public boolean isShopkeeper(Entity entity);
 
@@ -269,11 +269,11 @@ public interface ShopkeeperRegistry {
 	public Shopkeeper getShopkeeperByBlock(Block block);
 
 	/**
-	 * Checks if the given block is a Shopkeeper.
+	 * Checks if the given block is a shopkeeper.
 	 * 
 	 * @param block
 	 *            the block
-	 * @return <code>true</code> if the block is a Shopkeeper
+	 * @return <code>true</code> if the block is a shopkeeper
 	 */
 	public boolean isShopkeeper(Block block);
 }

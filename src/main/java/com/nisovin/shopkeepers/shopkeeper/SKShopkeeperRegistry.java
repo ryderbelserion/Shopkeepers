@@ -26,7 +26,6 @@ import org.bukkit.scheduler.BukkitTask;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
-import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent.Cause;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
@@ -915,7 +914,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			this._deactivateShopkeeper(shopkeeper);
 			assert shopkeeper.getShopObject().getLastId() == null;
 
-			// activate shopkeeper:
+			// Activate shopkeeper:
 			activeShopkeepers.put(objectId, shopkeeper);
 			shopkeeper.getShopObject().setLastId(objectId); // Remember object id
 			return true;

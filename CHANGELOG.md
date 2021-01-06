@@ -26,7 +26,6 @@ Date format: (YYYY-MM-DD)
 * Fixed: On some Paper versions with their async chunk loading, the player's current chunk may sometimes not be loaded yet. We now avoid accessing (and thereby loading) that chunk when activating the AI and gravity behavior of nearby shopkeeper entities.
 * Fixed: Book shops logged warnings previously when being loaded. The importer for legacy data attempted to read non-legacy data and then failed to read the book prices.
 * Debug: Added command `/shopkeeper testDamage [damage] [times-per-tick] [duration-ticks]` which can be used to produce lots of damage events in order to debug the performance of handling those.
-
 * Refactoring related to the saving and loading of shopkeeper data:
   * Added additional error checking around the serialization of shopkeeper data.
   * Fixed: We were missing to check an error flag during the saving of shopkeeper data. This should also resolve an issue with the save data being lost if the disk is full.

@@ -236,7 +236,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	@Override
 	public Location getLocation() {
 		Entity entity = this.getEntity();
-		return entity != null ? entity.getLocation() : null;
+		return (entity != null) ? entity.getLocation() : null;
 	}
 
 	@Override
