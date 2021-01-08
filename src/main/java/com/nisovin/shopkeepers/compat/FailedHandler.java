@@ -4,10 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeInstance;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -40,9 +36,6 @@ public final class FailedHandler implements NMSCallProvider {
 	private final Class<?> obcCraftEntityClass;
 	private final Method obcGetHandleMethod;
 
-	// Bukkit
-	private final AttributeModifier movementSpeedModifier;
-
 	public FailedHandler() throws Exception {
 		String cbVersion = Utils.getServerCBVersion();
 		String nmsPackageString = "net.minecraft.server." + cbVersion + ".";
@@ -69,9 +62,6 @@ public final class FailedHandler implements NMSCallProvider {
 
 		obcCraftEntityClass = Class.forName(obcPackageString + "entity.CraftEntity");
 		obcGetHandleMethod = obcCraftEntityClass.getDeclaredMethod("getHandle");
-
-		// Bukkit
-		movementSpeedModifier = new AttributeModifier("ShopkeepersFreeze", -1.0D, Operation.MULTIPLY_SCALAR_1);
 	}
 
 	@Override
@@ -81,19 +71,11 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public void overwriteLivingEntityAI(LivingEntity entity) {
-		// Workaround to make mobs stationary:
-		AttributeInstance attributeInstance = entity.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
-		if (attributeInstance != null) {
-			// Remove first, in case the entity already has this modifier:
-			attributeInstance.removeModifier(movementSpeedModifier);
-			attributeInstance.addModifier(movementSpeedModifier);
-		}
 	}
 
 	@Override
 	public boolean supportsCustomMobAI() {
-		// Not supported, uses the regular mob AI and gravity.
-		// Relies on overwriteLivingEntityAI being able to make the entities stationary.
+		// Not supported. Mobs will be stationary and not react towards nearby players due to the NoAI flag.
 		return false;
 	}
 

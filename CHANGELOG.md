@@ -37,6 +37,7 @@ Date format: (YYYY-MM-DD)
   * The name of the temporary save file has slightly changed ('save.temp' -> 'save.yml.tmp').
   * Debug: The debug output related to shopkeeper saves has slightly changed.
   * Debug/Fixed: If saving failed for some reason, the logged number of shopkeepers that have been deleted since the last successful save might not have matched the actual number of deleted shopkeepers, because we did not take into account the shopkeepers that got deleted during the failed save attempt.
+* When running on an unsupported server version, the fallback handler no longer adds a movement speed attribute modifier to make the mob stationary. This should no longer be required, because on all recent and supported server versions mobs are made stationary by the NoAI flag.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
