@@ -88,10 +88,6 @@ convert-player-items-exceptions: []
 # Plugin Compatibility
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
-# Whether the plugin shall periodically verify that all shopkeepers that should
-# currently be spawned are actually present. This should only be enabled if you
-# have problems with shopkeepers disappearing.
-enable-spawn-verifier: false
 # If enabled, Shopkeepers tries to bypass other plugins which deny mob spawning
 # (ex. land protection plugins).
 bypass-spawn-blocking: true

@@ -34,7 +34,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
-import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
@@ -255,11 +254,6 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		// Start teleporter task:
 		this.startTeleporterTask();
 
-		// Start verifier task:
-		if (Settings.enableSpawnVerifier) {
-			this.startSpawnVerifierTask();
-		}
-
 		Bukkit.getPluginManager().registerEvents(new WorldListener(this), plugin);
 	}
 
@@ -312,47 +306,6 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}, 200, 200); // 10 seconds
 	}
 
-	// TODO Ideally this task should not be required..
-	// TODO Actually, the shops get already respawned as part of the teleporter task when missing.
-	// -> Remove this task and the corresponding setting?
-	private void startSpawnVerifierTask() {
-		Bukkit.getScheduler().runTaskTimer(plugin, () -> {
-			int count = 0;
-			boolean dirty = false;
-
-			for (WorldShopkeepers worldEntry : shopkeepersByWorld.values()) {
-				for (ChunkShopkeepers chunkEntry : worldEntry.shopkeepersByChunk.values()) {
-					if (!chunkEntry.active) continue;
-
-					for (AbstractShopkeeper shopkeeper : chunkEntry.shopkeepers) {
-						ShopObject shopObject = shopkeeper.getShopObject();
-						if (!shopObject.needsSpawning() || shopObject.isActive()) continue;
-
-						// Deactivate by old object id:
-						this._deactivateShopkeeper(shopkeeper);
-						// Respawn:
-						boolean spawned = shopObject.spawn();
-						if (!spawned) {
-							Log.debug(() -> "Spawn verifier: Failed to spawn shopkeeper at " + shopkeeper.getPositionString());
-							continue;
-						}
-						// Activate with new object id:
-						this._activateShopkeeper(shopkeeper);
-						count++;
-						if (shopkeeper.isDirty()) dirty = true;
-					}
-				}
-			}
-
-			if (count > 0) {
-				int finalCount = count;
-				Log.debug(() -> "Spawn verifier: " + finalCount + " shopkeepers respawned");
-				if (dirty) {
-					this.getShopkeeperStorage().save();
-				}
-			}
-		}, 600, 1200); // 30,60 seconds
-	}
 
 	// TICKING
 

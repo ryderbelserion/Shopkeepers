@@ -62,7 +62,6 @@ public class Settings extends Config {
 	/*
 	 * Plugin Compatibility
 	 */
-	public static boolean enableSpawnVerifier = false;
 	public static boolean bypassSpawnBlocking = true;
 	public static boolean checkShopInteractionResult = false;
 

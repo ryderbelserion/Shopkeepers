@@ -14,5 +14,8 @@ public class ConfigMigration4 implements ConfigMigration {
 
 		// Migrate max shops limit from 0 to -1 (indicating no limit by default):
 		ConfigMigrationHelper.migrateValue(config, "max-shops-per-player", 0, -1);
+
+		// Setting 'enable-spawn-verifier' got removed:
+		ConfigMigrationHelper.removeSetting(config, "enable-spawn-verifier");
 	}
 }

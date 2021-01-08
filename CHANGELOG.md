@@ -38,6 +38,7 @@ Date format: (YYYY-MM-DD)
   * Debug: The debug output related to shopkeeper saves has slightly changed.
   * Debug/Fixed: If saving failed for some reason, the logged number of shopkeepers that have been deleted since the last successful save might not have matched the actual number of deleted shopkeepers, because we did not take into account the shopkeepers that got deleted during the failed save attempt.
 * When running on an unsupported server version, the fallback handler no longer adds a movement speed attribute modifier to make the mob stationary. This should no longer be required, because on all recent and supported server versions mobs are made stationary by the NoAI flag.
+* Removed setting 'enable-spawn-verifier'. This setting should provide no additional benefit, because the plugin already checks periodically if the mobs are still there and attempts to respawn them if they are not (regardless of this setting).
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
@@ -59,6 +60,7 @@ Migration notes:
   * Language files are located inside a new 'lang' folder now. Existing custom language files need to be manually moved!
   * Trading logs (if enabled) are stored inside the folder 'trade-logs' now. Existing logs are not automatically moved to the new location!
 * Removed the 1.16 'PIG_ZOMBIE' migration. We no longer automatically remove this mob type from the config, but only log a warning and then ignore it.
+* The setting 'enable-spawn-verifier' is no longer used and is automatically removed from existing configs during the update.
 
 Messages:  
 * All message keys were changed to no longer start with the 'msg' prefix.
