@@ -56,6 +56,7 @@ Date format: (YYYY-MM-DD)
 * The spawning and despawning of shopkeepers is handled more consistently now. For instance, if shopkeepers are marked as dirty during the spawning of their shop objects we would previously trigger a delayed save. We do the same when they are despawned now.
 * Debug: Several tasks no longer use lambdas but named classes. This makes it easier to identify them in timing reports.
 * Debug: A few debug messages are now printed before their denoted action takes place (eg. before the shop object is teleported or respawned).
+* Performance: Living shopkeepers no longer tick Minecraft's floating behavior. This has no effect since the shopkeeper entities have no AI.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.

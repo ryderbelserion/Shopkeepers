@@ -37,7 +37,6 @@ import net.minecraft.server.v1_16_R3.GameProfileSerializer;
 import net.minecraft.server.v1_16_R3.IMerchant;
 import net.minecraft.server.v1_16_R3.MerchantRecipeList;
 import net.minecraft.server.v1_16_R3.NBTTagCompound;
-import net.minecraft.server.v1_16_R3.PathfinderGoalFloat;
 import net.minecraft.server.v1_16_R3.PathfinderGoalLookAtPlayer;
 import net.minecraft.server.v1_16_R3.PathfinderGoalSelector;
 
@@ -54,6 +53,7 @@ public final class NMSHandler implements NMSCallProvider {
 			EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
 			// example: armor stands are living, but not insentient
 			if (!(mcLivingEntity instanceof EntityInsentient)) return;
+			EntityInsentient mcInsentientEntity = (EntityInsentient) mcLivingEntity;
 
 			// make goal selector items accessible:
 			Field cField = PathfinderGoalSelector.class.getDeclaredField("c"); // active goals
@@ -73,8 +73,7 @@ public final class NMSHandler implements NMSCallProvider {
 			goals_d.clear();
 
 			// add new goals:
-			goals.a(0, new PathfinderGoalFloat((EntityInsentient) mcLivingEntity));
-			goals.a(1, new PathfinderGoalLookAtPlayer((EntityInsentient) mcLivingEntity, EntityHuman.class, 12.0F, 1.0F));
+			goals.a(0, new PathfinderGoalLookAtPlayer(mcInsentientEntity, EntityHuman.class, 12.0F, 1.0F));
 
 			// overwrite target selector:
 			Field targetsField = EntityInsentient.class.getDeclaredField("targetSelector");
