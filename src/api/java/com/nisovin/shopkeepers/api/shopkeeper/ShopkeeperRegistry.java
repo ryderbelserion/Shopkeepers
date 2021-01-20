@@ -188,22 +188,34 @@ public interface ShopkeeperRegistry {
 	public boolean isChunkActive(ChunkCoords chunkCoords);
 
 	/**
-	 * Gets all shopkeepers in currently <b>active chunks</b> in the specified world.
+	 * Gets all shopkeepers in currently {@link #getActiveChunks(String) active chunks}.
 	 * <p>
 	 * Note: Since chunk activation may be deferred from chunk loading, this may not return shopkeepers even if their
 	 * chunk is currently already loaded.
 	 * <p>
-	 * Also note that the activation of some {@link ShopObject shop objects} may fail (eg. if spawning fails), while
-	 * others may not even need to be activated and rather stay active all the time. This is not reflected by this
-	 * method, which only considers the activation state of chunks as a whole. The actual activation state of the
-	 * individual {@link ShopObject shop objects} can be determined by {@link ShopObject#isActive()}.
+	 * Also note that the activation of {@link ShopObject shop objects} may fail (eg. if spawning fails). This is not
+	 * reflected by this method, which only considers the activation state of chunks as a whole. The actual activation
+	 * state of the individual {@link ShopObject shop objects} can be checked via {@link ShopObject#isActive()}.
+	 * 
+	 * @return an unmodifiable view on the active shopkeepers
+	 */
+	public Collection<? extends Shopkeeper> getActiveShopkeepers();
+
+	/**
+	 * Gets all shopkeepers in currently {@link #getActiveChunks(String) active chunks} in the specified world.
+	 * <p>
+	 * Note: Since chunk activation may be deferred from chunk loading, this may not return shopkeepers even if their
+	 * chunk is currently already loaded.
+	 * <p>
+	 * Also note that the activation of {@link ShopObject shop objects} may fail (eg. if spawning fails). This is not
+	 * reflected by this method, which only considers the activation state of chunks as a whole. The actual activation
+	 * state of the individual {@link ShopObject shop objects} can be checked via {@link ShopObject#isActive()}.
 	 * 
 	 * @param worldName
 	 *            the world name
-	 * @return an unmodifiable view on the shopkeepers, may be empty
-	 * @see #getActiveChunks(String)
+	 * @return an unmodifiable view on the active shopkeepers
 	 */
-	public Collection<? extends Shopkeeper> getShopkeepersInActiveChunks(String worldName);
+	public Collection<? extends Shopkeeper> getActiveShopkeepers(String worldName);
 
 	// BY CHUNK
 
@@ -225,22 +237,19 @@ public interface ShopkeeperRegistry {
 	 *            the location
 	 * @return an unmodifiable view on the shopkeepers, may be empty
 	 */
+	// TODO Replace with getShopkeeperAtLocation? We already prevent players from creating more than a single shopkeeper
+	// at the same location.
 	public Collection<? extends Shopkeeper> getShopkeepersAtLocation(Location location);
 
 	// BY SHOP OBJECT
 
 	/**
-	 * Gets all active shopkeepers. Some shopkeeper types might be always active (like sign shops),
-	 * others are only active as long as the chunk they are in is loaded.
-	 * 
-	 * @return an unmodifiable view on all active shopkeepers
-	 */
-	public Collection<? extends Shopkeeper> getActiveShopkeepers();
-
-	public Shopkeeper getActiveShopkeeper(String objectId);
-
-	/**
-	 * Gets the shopkeeper that is being represented by the given entity.
+	 * Gets the shopkeeper that is represented by the given entity.
+	 * <p>
+	 * The return value may only be accurate if the shopkeeper's {@link ShopObject} is currently
+	 * {@link ShopObject#isActive() active}. For example, if the shopkeeper's chunk is not
+	 * {@link #isChunkActive(ChunkCoords) active}, or if the entity is no longer {@link Entity#isValid() valid}, this
+	 * may or may not return <code>false</code> for that entity.
 	 * 
 	 * @param entity
 	 *            the entity
@@ -254,13 +263,21 @@ public interface ShopkeeperRegistry {
 	 * @param entity
 	 *            the entity
 	 * @return <code>true</code> if the entity is a shopkeeper
+	 * @see #getShopkeeperByEntity(Entity)
 	 */
 	public boolean isShopkeeper(Entity entity);
 
 	/**
-	 * Gets the shopkeeper that is represented by the given block (ex: sign shops).
+	 * Gets the shopkeeper that is represented by the given block (for example in case of sign shops).
 	 * <p>
-	 * In order to get the shopkeepers at a specific location use {@link #getShopkeepersAtLocation(Location)} instead.
+	 * The return value may only be accurate if the shopkeeper's {@link ShopObject} is currently
+	 * {@link ShopObject#isActive() active}. For example, if the shopkeeper's chunk is not
+	 * {@link #isChunkActive(ChunkCoords) active}, or if the block could not be placed with its intended state, this may
+	 * or may not return <code>false</code> for that block.
+	 * <p>
+	 * In order to get the shopkeepers at a specific location (regardless of whether that chunk is currently loaded and
+	 * whether the shopkeepers inside of it have already been spawned) use {@link #getShopkeepersAtLocation(Location)}
+	 * instead.
 	 * 
 	 * @param block
 	 *            the block
@@ -274,6 +291,7 @@ public interface ShopkeeperRegistry {
 	 * @param block
 	 *            the block
 	 * @return <code>true</code> if the block is a shopkeeper
+	 * @see #getShopkeeperByBlock(Block)
 	 */
 	public boolean isShopkeeper(Block block);
 }

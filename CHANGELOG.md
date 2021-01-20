@@ -39,10 +39,34 @@ Date format: (YYYY-MM-DD)
   * Debug/Fixed: If saving failed for some reason, the logged number of shopkeepers that have been deleted since the last successful save might not have matched the actual number of deleted shopkeepers, because we did not take into account the shopkeepers that got deleted during the failed save attempt.
 * When running on an unsupported server version, the fallback handler no longer adds a movement speed attribute modifier to make the mob stationary. This should no longer be required, because on all recent and supported server versions mobs are made stationary by the NoAI flag.
 * Removed setting 'enable-spawn-verifier'. This setting should provide no additional benefit, because the plugin already checks periodically if the mobs are still there and attempts to respawn them if they are not (regardless of this setting).
+* Changes to object ids:
+  * Performance: Object ids can be of any type now (not only String). This avoids having to construct new Strings whenever a shop object is queried. There are usually already objects present that can be used as identifiers, without having to construct them first. Living entity shops use the entity UUID as identifier now, Citizens shops use their unique NPC id, and sign shops use their block location.
+  * Performance: By using a shared mutable block location object, the performance of checking if a block at a certain coordinate is a sign shop has been further improved (around 70% in my testing!). This is especially relevant when handling block physics events, since these can occur quite frequently.
+  * The object id can be a non-null value even if the entity is not active currently (eg. for Citizens shopkeepers, which use the unique NPC id for this). The description of the #getId() method and of some affected API methods in the ShopkeeperRegistry have been slightly adapted to account for that.
+  * Virtual shop objects always return null as id now, since they are never present in the world.
+  * The Citizens shopkeeper trait no longer keeps track of the shop object id. There is no need for that as the shopkeeper can be determined directly by the NPC.
+* Changes to how shopkeepers and shop objects are ticked:
+  * Similar to shopkeepers, shop objects are also ticked every second now. This replaces the previous periodic check task. The actual checking if the shop object is still active or has to be respawned still happens only once every 10 seconds.
+  * We not only tick the shopkeepers with active shop objects, but all shopkeepers in active chunks. This ensures that we periodically check if we can respawn missing shop objects. Additionally, instead of permanently aborting these periodic validation and respawn attempts of living shopkeepers when they cannot be respawned 5 times in a row, we now throttle the rate at which they perform these checks. Only due to these changes we can actually omit the spawn verifier task. Whenever a shop object is successfully spawned, its tick rate and respawn counter are reset.
+  * Performance: For load balancing purposes, the checking activities of all shopkeepers are distributed across multiple shopkeeper ticks. And similarly, the ticking shopkeepers are divided into 4 groups to distribute their ticking across multiple Minecraft ticks (ticking happens every 5 Minecraft ticks for a fourth of the shopkeepers). The number of these ticking groups is a balance between no load balancing (1 group) and having to iterate all active shopkeepers every tick (20 groups), which provides optimal load balancing but is associated with a high total overhead.
+  * When offsetting ticking activities of shopkeepers and shop objects for load balancing purposes, we use a simple cyclic counter now instead of relying on random numbers. This should produce a more even and consistent load distribution.
+  * Performance: To slightly speed up iterations, we use LinkedHashMap instead of HashMap and Collection#forEach instead of iterators at a few places now.
+  * When a shopkeeper is marked as dirty during ticking, we trigger a delayed save instead of an immediate save now.
+  * Fixed: Previously, if the shopkeeper location changed due to a Citizen NPC moving around, it was not guaranteed whether or not that change would be persisted. Now, we always trigger a save if at least one shopkeeper is marked as dirty during ticking.
+* The spawning and despawning of shopkeepers is handled more consistently now. For instance, if shopkeepers are marked as dirty during the spawning of their shop objects we would previously trigger a delayed save. We do the same when they are despawned now.
+* Debug: Several tasks no longer use lambdas but named classes. This makes it easier to identify them in timing reports.
+* Debug: A few debug messages are now printed before their denoted action takes place (eg. before the shop object is teleported or respawned).
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
 * Fixed: Event handlers for the PlayerCreateShopkeeperEvent were not informed for the creation of player shopkeepers.
+* Removed ShopObject#getId() and ShopkeeperRegistry#getActiveShopkeeper(String). Object ids are no longer exposed in the API.
+* The behavior of ShopkeeperRegistry#getActiveShopkeepers() has changed and has been clarified: It returns all shopkeepers in active chunks now, even if their shop objects are not actually active currently (i.e. if they could not be spawned). For consistency, the method #getShopkeepersInActiveChunks(String) has been renamed to #getActiveShopkeepers(String).
+* The meaning of ShopObject#isActive() is more consistent now across different types of shop objects: It checks if the shop object is currently present in the world. Consequently, virtual shops always return false instead of true now. And the Citizens shop object's #getEntity() and #isActive() methods check if the entity exists and is still alive (instead of checking for the NPC's existence).
+* Removed ShopObject#spawn() and #despawn(). These are no longer exposed in the API.
+* Removed ShopObject#needsSpawning() and the internal AbstractShopObject#despawnDuringWorldSaves(). These have been replaced with corresponding internal methods in AbstractShopObjectType.
+* Added methods to BlockShopObjectType and EntityShopObjectType to query and check for shopkeepers of that specific type. This is less performance intensive compared to checking all shop object types when querying the ShopkeeperRegistry. Internally, sign shops make use of these new querying methods.
+* Various minor Javadoc clarifications.
 
 Internal:  
 * The config key pattern is cached now.
@@ -53,6 +77,12 @@ Internal:
   * Reloading the shopkeeper data will now wait for any current and pending saves to complete. However, this has not really been an issue before since we only reload the shopkeeper data during plugin startup currently.
 * Minor cleanup related to the AI and gravity processing of shopkeeper entities.
 * Removed a few redundant checks regarding whether an entity is still alive and its chunk is still loaded. These additional checks have been required in some previous versions of Spigot, but that should no longer apply to late Spigot 1.14.1 and above.
+* Added AbstractShopObject#onIdChanged that can be used to update the shopkeepers entry in the shopkeeper registry when a shop object's id dynamically changes.
+* A new RateLimiter class is used for all shopkeeper and shop object ticking activities that do not need to happen with every tick.
+* Added AbstractShopkeeper#onChunkActivation() and #onChunkDeactivation().
+* Instead of passing the chunk coordinates around whenever a shopkeeper is registered, unregistered, or moved, each shopkeeper remembers the chunk now by which we previously stored it.
+* ShopkeeperRegistry#onShopkeeperMove has been renamed to #onShopkeeperMoved.
+* Minor code formatting and method renaming.
 
 Migration notes:  
 * The folder structure has changed:

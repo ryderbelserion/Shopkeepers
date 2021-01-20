@@ -41,17 +41,12 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 
 	@Override
 	public boolean isActive() {
-		return true; // Always active
+		return false; // Virtual shops are not present in any world
 	}
 
 	@Override
 	public String getId() {
-		return this.getType().createObjectId(shopkeeper);
-	}
-
-	@Override
-	public boolean needsSpawning() {
-		return false; // Does not need to be spawned and despawned
+		return null;
 	}
 
 	@Override
@@ -68,9 +63,11 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 		return null;
 	}
 
+	// TICKING
+
 	@Override
-	public boolean check() {
-		return false; // Everything alright
+	public void tick() {
+		// Nothing to do
 	}
 
 	// NAMING

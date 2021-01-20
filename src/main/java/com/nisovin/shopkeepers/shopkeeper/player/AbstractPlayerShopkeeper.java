@@ -34,9 +34,11 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.citizens.SKCitizensShopObject;
 import com.nisovin.shopkeepers.shopobjects.sign.SKSignShopObject;
+import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.RateLimiter;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
@@ -44,6 +46,7 @@ import com.nisovin.shopkeepers.util.Validate;
 public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
 
 	private static final int CHECK_CONTAINER_PERIOD_SECONDS = 5;
+	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(CHECK_CONTAINER_PERIOD_SECONDS);
 
 	protected UUID ownerUUID; // Not null after successful initialization
 	protected String ownerName; // Not null after successful initialization
@@ -54,8 +57,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	protected int containerZ;
 	protected ItemStack hireCost = null; // Null if not for hire
 
-	// Random shopkeeper-specific starting offset between [1, CHECK_CONTAINER_PERIOD_SECONDS]
-	private int remainingCheckContainerSeconds = (int) (Math.random() * CHECK_CONTAINER_PERIOD_SECONDS) + 1;
+	// Initial offset between [0, CHECK_CONTAINER_PERIOD_SECONDS) for load balancing:
+	private final RateLimiter checkContainerLimiter = RateLimiter.withInitialOffset(CHECK_CONTAINER_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
 
 	/**
 	 * Creates a not yet initialized {@link AbstractPlayerShopkeeper} (for use in sub-classes).
@@ -493,14 +496,14 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		// Delete the shopkeeper if the container is no longer present (eg. if it got removed externally by another
 		// plugin, such as WorldEdit, etc.):
 		if (Settings.deleteShopkeeperOnBreakContainer) {
-			remainingCheckContainerSeconds--;
-			if (remainingCheckContainerSeconds <= 0) {
-				remainingCheckContainerSeconds = CHECK_CONTAINER_PERIOD_SECONDS;
-				// This checks if the block is still a valid container:
-				Block containerBlock = this.getContainer();
-				if (!ShopContainers.isSupportedContainer(containerBlock.getType())) {
-					SKShopkeepersPlugin.getInstance().getRemoveShopOnContainerBreak().handleBlockBreakage(containerBlock);
-				}
+			if (!checkContainerLimiter.request()) {
+				return;
+			}
+
+			// This checks if the block is still a valid container:
+			Block containerBlock = this.getContainer();
+			if (!ShopContainers.isSupportedContainer(containerBlock.getType())) {
+				SKShopkeepersPlugin.getInstance().getRemoveShopOnContainerBreak().handleBlockBreakage(containerBlock);
 			}
 		}
 	}

@@ -37,6 +37,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
+import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -53,6 +54,24 @@ import com.nisovin.shopkeepers.util.Validate;
  */
 public abstract class AbstractShopkeeper implements Shopkeeper {
 
+	/**
+	 * The ticking period of active shopkeepers and shop objects in ticks.
+	 */
+	public static final int TICKING_PERIOD_TICKS = 20; // 1 second
+	/**
+	 * For load balancing purposes, shopkeepers are ticked in groups.
+	 * <p>
+	 * This number is chosen as a balance between {@code 1} group (all shopkeepers are ticked within the same tick; no
+	 * load balancing), and the maximum of {@code 20} groups (groups are as small as possible for the tick rate of once
+	 * every second, i.e. once every {@code 20} ticks; best load balancing; but this is associated with a large overhead
+	 * due to having to iterate the active shopkeepers each Minecraft tick).
+	 * <p>
+	 * With {@code 4} ticking groups, the active shopkeepers are iterated once every {@code 5} ticks, and one fourth of
+	 * them are actually processed.
+	 */
+	public static final int TICKING_GROUPS = 4;
+	private static final CyclicCounter nextTickingGroup = new CyclicCounter(TICKING_GROUPS);
+
 	// The maximum supported name length:
 	// The actual maximum name length that can be used might be lower depending on config settings
 	// and on shop object specific limits.
@@ -68,6 +87,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private int y;
 	private int z;
 	private ChunkCoords chunkCoords; // Null for virtual shops
+	// The ChunkCoords under which the shopkeeper is currently stored:
+	private ChunkCoords lastChunkCoords = null;
 	private String name = ""; // Not null, can be empty
 
 	// Has unsaved data changes:
@@ -77,6 +98,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	// UI type identifier -> UI handler
 	private final Map<String, UIHandler> uiHandlers = new HashMap<>();
+
+	// Internally used for load balancing purposes:
+	private final int tickingGroup = nextTickingGroup.getAndIncrement();
 
 	// CONSTRUCTION AND SETUP
 
@@ -515,8 +539,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Sets the stored location of this shopkeeper.
 	 * <p>
-	 * This will not actually move the shop object on its own, until the next time it gets spawned at or teleported to
-	 * its intended location.
+	 * This will not actually move the shop object on its own, until the next time it is spawned or teleported to its
+	 * new location.
 	 * 
 	 * @param location
 	 *            the new stored location of this shopkeeper
@@ -527,9 +551,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		World world = location.getWorld();
 		Validate.notNull(world, "Location's world is null!");
 
-		ChunkCoords oldChunk = this.getChunkCoords();
 		// TODO Changing the world is not safe (at least not for all types of shops)! Consider for example player shops
-		// which currently use the world name to locate their container,
+		// which currently use the world name to locate their container.
 		worldName = world.getName();
 		x = location.getBlockX();
 		y = location.getBlockY();
@@ -538,7 +561,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.markDirty();
 
 		// Update shopkeeper in chunk map:
-		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperMove(this, oldChunk);
+		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperMoved(this);
 	}
 
 	@Override
@@ -548,6 +571,26 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	private void updateChunkCoords() {
 		this.chunkCoords = this.isVirtual() ? null : ChunkCoords.fromBlockPos(worldName, x, z);
+	}
+
+	/**
+	 * Gets the {@link ChunkCoords} under which the shopkeeper is currently stored.
+	 * <p>
+	 * Internal use only!
+	 * 
+	 * @return the chunk coordinates
+	 */
+	public final ChunkCoords getLastChunkCoords() {
+		return lastChunkCoords;
+	}
+
+	/**
+	 * Update the {@link ChunkCoords} under which the shopkeeper is currently stored.
+	 * <p>
+	 * Internal use only!
+	 */
+	public final void setLastChunkCoords(ChunkCoords chunkCoords) {
+		this.lastChunkCoords = chunkCoords;
 	}
 
 	// TODO This has to be aware of sub types in order to replace arguments with empty strings.
@@ -700,10 +743,24 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		}
 	}
 
-	// TICKING
+	// ACTIVATION AND TICKING
 
+	public void onChunkActivation() {
+	}
+
+	public void onChunkDeactivation() {
+	}
+
+	int getTickingGroup() {
+		return tickingGroup;
+	}
+
+	// TODO Maybe also tick shopkeepers if the container chunk is loaded? This might make sense once a shopkeeper can be
+	// linked to multiple containers, and for virtual player shopkeepers.
 	/**
 	 * This is called periodically (roughly once per second) for shopkeepers in active chunks.
+	 * <p>
+	 * Consequently, this is not called for {@link Shopkeeper#isVirtual() virtual} shopkeepers.
 	 * <p>
 	 * This can for example be used for checks that need to happen periodically, such as checking if the container of a
 	 * player shop still exists.
@@ -711,8 +768,14 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * If the check to perform is potentially heavy or not required to happen every second, the shopkeeper may decide to
 	 * only run it every X invocations.
 	 * <p>
+	 * The ticking of shopkeepers in active chunks may be spread across multiple ticks and may therefore not happen for
+	 * all shopkeepers within the same tick.
+	 * <p>
 	 * If any of the ticked shopkeepers are marked as {@link Shopkeeper#isDirty() dirty}, a
-	 * {@link ShopkeeperStorage#save() save} will be triggered after all shopkeepers in active chunks have been ticked.
+	 * {@link ShopkeeperStorage#saveDelayed() delayed save} will subsequently be triggered.
+	 * <p>
+	 * Any changes to the shopkeeper's activation state or {@link AbstractShopObject#getId() shop object id} may only be
+	 * processed after the ticking of all currently ticked shopkeepers completes.
 	 */
 	public void tick() {
 		// Nothing to do by default.

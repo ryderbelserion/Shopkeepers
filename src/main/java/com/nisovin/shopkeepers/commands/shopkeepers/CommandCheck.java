@@ -137,7 +137,7 @@ class CommandCheck extends Command {
 
 			int worldTotalShopkeepers = shopkeeperRegistry.getShopkeepersInWorld(worldName).size();
 			int worldActiveChunks = shopkeeperRegistry.getActiveChunks(worldName).size();
-			int worldShopkeepersInActiveChunks = shopkeeperRegistry.getShopkeepersInActiveChunks(worldName).size();
+			int worldShopkeepersInActiveChunks = shopkeeperRegistry.getActiveShopkeepers(worldName).size();
 
 			int worldChunksWithShopkeepers = 0;
 			int worldLoadedChunksWithShopkeepers = 0;

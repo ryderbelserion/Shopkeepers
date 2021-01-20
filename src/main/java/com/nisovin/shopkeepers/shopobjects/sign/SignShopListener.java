@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.sign;
 
 import java.util.Iterator;
-import java.util.UUID;
 
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -26,53 +25,31 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.MutableBlockLocation;
 import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 class SignShopListener implements Listener {
 
-	// Local copy as array (allows for very performant iteration):
+	// Local copy as array (enables a very high-performance iteration):
 	private static final BlockFace[] BLOCK_SIDES = BlockFaceUtils.getBlockSides().toArray(new BlockFace[0]);
 
-	private final SignShops signShops;
+	private final SKSignShopObjectType signShopObjectType;
 
-	private static class ModifiableBlockPos {
-
-		private UUID worldId = null; // Null indicates cleared block pos
-		private int x;
-		private int y;
-		private int z;
-
-		// Null to clear
-		public void set(Block block) {
-			if (block == null) {
-				// Clear:
-				worldId = null;
-			} else {
-				worldId = block.getWorld().getUID();
-				x = block.getX();
-				y = block.getY();
-				z = block.getZ();
-			}
-		}
-
-		public boolean matches(UUID otherWorldId, int otherX, int otherY, int otherZ) {
-			assert otherWorldId != null;
-			// Comparing world ids by identity should work, since all world ids are retrieved from the same source.
-			// See also CraftWorld#equals(Object).
-			return this.worldId == otherWorldId && this.x == otherX && this.y == otherY && this.z == otherZ;
-		}
-	}
-
-	private final ModifiableBlockPos cancelNextBlockPhysics = new ModifiableBlockPos();
+	private final MutableBlockLocation cancelNextBlockPhysics = new MutableBlockLocation();
 
 	SignShopListener(SignShops signShops) {
-		this.signShops = signShops;
+		this.signShopObjectType = signShops.getSignShopObjectType();
 	}
 
+	// Null to clear
 	void cancelNextBlockPhysics(Block block) {
-		cancelNextBlockPhysics.set(block); // Null to clear
+		if (block == null) {
+			cancelNextBlockPhysics.unsetWorldName();
+		} else {
+			cancelNextBlockPhysics.set(block);
+		}
 	}
 
 	// See LivingEntityShopListener for a reasoning behind using event priority LOWEST.
@@ -90,7 +67,7 @@ class SignShopListener implements Listener {
 		Player player = event.getPlayer();
 		Log.debug(() -> "Player " + player.getName() + " is interacting (" + (event.getHand()) + ") with sign at " + TextUtils.getLocationString(block));
 
-		AbstractShopkeeper shopkeeper = signShops.getSignShop(block);
+		AbstractShopkeeper shopkeeper = signShopObjectType.getShopkeeper(block);
 		if (shopkeeper == null) {
 			Log.debug("  Non-shopkeeper");
 			return;
@@ -133,12 +110,12 @@ class SignShopListener implements Listener {
 
 	private boolean isProtectedBlock(Block block) {
 		// Not protected if the sign shop is not active (if the block is not a sign currently):
-		if (ItemUtils.isSign(block.getType()) && signShops.isSignShop(block)) {
+		if (ItemUtils.isSign(block.getType()) && signShopObjectType.isShopkeeper(block)) {
 			return true;
 		}
 		for (BlockFace blockFace : BLOCK_SIDES) {
 			Block adjacentBlock = block.getRelative(blockFace);
-			Shopkeeper shopkeeper = signShops.getSignShop(adjacentBlock);
+			Shopkeeper shopkeeper = signShopObjectType.getShopkeeper(adjacentBlock);
 			if (shopkeeper != null) {
 				SKSignShopObject signObject = (SKSignShopObject) shopkeeper.getShopObject();
 				BlockFace attachedFace = BlockFace.UP; // In case of sign post
@@ -165,7 +142,7 @@ class SignShopListener implements Listener {
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockPlace(BlockPlaceEvent event) {
 		Block block = event.getBlock();
-		if (signShops.isSignShop(block)) {
+		if (signShopObjectType.isShopkeeper(block)) {
 			event.setCancelled(true);
 		}
 	}
@@ -175,11 +152,10 @@ class SignShopListener implements Listener {
 		Block block = event.getBlock();
 		World world = block.getWorld();
 		String worldName = world.getName();
-		UUID worldId = world.getUID();
 		int blockX = block.getX();
 		int blockY = block.getY();
 		int blockZ = block.getZ();
-		if (this.checkCancelPhysics(worldName, worldId, blockX, blockY, blockZ)) {
+		if (this.checkCancelPhysics(worldName, blockX, blockY, blockZ)) {
 			event.setCancelled(true);
 			return;
 		}
@@ -190,17 +166,17 @@ class SignShopListener implements Listener {
 			int adjacentX = blockX + blockFace.getModX();
 			int adjacentY = blockY + blockFace.getModY();
 			int adjacentZ = blockZ + blockFace.getModZ();
-			if (this.checkCancelPhysics(worldName, worldId, adjacentX, adjacentY, adjacentZ)) {
+			if (this.checkCancelPhysics(worldName, adjacentX, adjacentY, adjacentZ)) {
 				event.setCancelled(true);
 				return;
 			}
 		}
 	}
 
-	private boolean checkCancelPhysics(String worldName, UUID worldId, int blockX, int blockY, int blockZ) {
-		if (cancelNextBlockPhysics.matches(worldId, blockX, blockY, blockZ)) {
+	private boolean checkCancelPhysics(String worldName, int blockX, int blockY, int blockZ) {
+		if (cancelNextBlockPhysics.equals(worldName, blockX, blockY, blockZ)) {
 			return true;
-		} else if (signShops.isSignShop(worldName, blockX, blockY, blockZ)) {
+		} else if (signShopObjectType.isShopkeeper(worldName, blockX, blockY, blockZ)) {
 			return true;
 		}
 		return false;

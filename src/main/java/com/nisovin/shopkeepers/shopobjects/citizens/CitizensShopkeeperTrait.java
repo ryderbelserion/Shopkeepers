@@ -25,28 +25,22 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	public static final String TRAIT_NAME = "shopkeeper";
 
-	// Citizens shop object id:
-	private String shopObjectId = null;
-
 	public CitizensShopkeeperTrait() {
 		super(TRAIT_NAME);
 	}
 
 	@Override
 	public void load(DataKey key) {
-		this.shopObjectId = key.getString("ShopkeeperId", null);
 	}
 
 	@Override
 	public void save(DataKey key) {
-		key.setString("ShopkeeperId", shopObjectId);
 	}
 
 	public Shopkeeper getShopkeeper() {
-		if (shopObjectId == null) return null;
-		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
-		if (plugin == null) return null;
-		return plugin.getShopkeeperRegistry().getActiveShopkeeper(shopObjectId);
+		NPC npc = this.getNPC(); // Null if not yet attached
+		// Returns null if the NPC is null or if the Shopkeepers plugin is not running:
+		return CitizensShops.getShopkeeper(npc);
 	}
 
 	@Override
@@ -58,7 +52,6 @@ public class CitizensShopkeeperTrait extends Trait {
 	void onShopkeeperDeletion(Shopkeeper shopkeeper) {
 		Log.debug(() -> "Removing the 'shopkeeper' trait from Citizens NPC " + CitizensShops.getNPCIdString(npc)
 				+ " due to the deletion of shopkeeper " + shopkeeper.getIdString());
-		shopObjectId = null;
 		this.getNPC().removeTrait(CitizensShopkeeperTrait.class);
 	}
 
@@ -79,7 +72,7 @@ public class CitizensShopkeeperTrait extends Trait {
 			assert shopkeeper.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN();
 			SKCitizensShopObject shopObject = (SKCitizensShopObject) shopkeeper.getShopObject();
 			shopObject.setKeepNPCOnDeletion();
-			// This should keep the citizens npc and only remove the shopkeeper data:
+			// This should keep the citizens NPC and only remove the shopkeeper data:
 			shopkeeper.delete(player);
 			// Save:
 			shopkeeper.save();
@@ -124,15 +117,11 @@ public class CitizensShopkeeperTrait extends Trait {
 		}, 5L);
 	}
 
+	// Note: This also returns true if the Shopkeepers plugin is not running currently.
 	private boolean isMissingShopkeeper() {
 		NPC npc = this.getNPC();
 		if (npc == null || !npc.hasTrait(CitizensShopkeeperTrait.class)) {
 			// Citizens not running or trait got already removed again?
-			return false;
-		}
-		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
-		if (plugin == null) {
-			// Shopkeepers not running:
 			return false;
 		}
 
@@ -142,6 +131,8 @@ public class CitizensShopkeeperTrait extends Trait {
 			// Citizens.
 			return false;
 		}
+
+		// No shopkeeper exists yet, or Shopkeepers plugin is not running:
 		return true;
 	}
 
@@ -194,9 +185,7 @@ public class CitizensShopkeeperTrait extends Trait {
 				}
 			}
 
-			if (shopkeeper != null) {
-				shopObjectId = shopkeeper.getShopObject().getId();
-			} else {
+			if (shopkeeper == null) {
 				// Shopkeeper creation failed:
 				// TODO Translation?
 				shopkeeperCreationError = "Shopkeeper creation via trait failed. Removing the trait again.";
@@ -214,7 +203,6 @@ public class CitizensShopkeeperTrait extends Trait {
 				TextUtils.sendMessage(creator, ChatColor.RED + shopkeeperCreationError);
 			}
 
-			shopObjectId = null;
 			Bukkit.getScheduler().runTask(plugin, () -> npc.removeTrait(CitizensShopkeeperTrait.class));
 		}
 	}

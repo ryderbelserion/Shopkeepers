@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.entity;
 
+import org.bukkit.entity.Entity;
+
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.entity.EntityShopObject;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -20,8 +22,9 @@ public abstract class AbstractEntityShopObject extends AbstractShopObject implem
 	}
 
 	@Override
-	public String getId() {
-		// Returns null if the entity is null:
-		return this.getType().createObjectId(this.getEntity());
+	public Object getId() {
+		Entity entity = this.getEntity();
+		if (entity == null) return null; // Not active
+		return this.getType().getObjectId(entity);
 	}
 }

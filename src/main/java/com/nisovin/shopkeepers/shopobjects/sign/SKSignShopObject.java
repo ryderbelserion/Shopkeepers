@@ -27,13 +27,18 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.BlockFaceUtils;
+import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.RateLimiter;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
+
+	private static final int CHECK_PERIOD_SECONDS = 10;
+	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(CHECK_PERIOD_SECONDS);
 
 	protected final SignShops signShops;
 	private SignType signType = SignType.OAK; // Not null, not unsupported, default is OAK.
@@ -43,6 +48,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	// sign content:
 	private boolean updateSign = true;
 	private long lastFailedRespawnAttempt = 0;
+
+	// Initial offset between [0, CHECK_PERIOD_SECONDS) for load balancing:
+	private final RateLimiter checkLimiter = RateLimiter.withInitialOffset(CHECK_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
 
 	protected SKSignShopObject(SignShops signShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
@@ -167,11 +175,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	@Override
-	public boolean needsSpawning() {
-		return true; // Despawn signs on chunk unload, and spawn them again on chunk load
-	}
-
-	@Override
 	public boolean spawn() {
 		Location signLocation = this.getLocation();
 		if (signLocation == null) {
@@ -288,11 +291,17 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		sign.setLine(3, StringUtils.replaceArguments(Messages.adminSignShopLine4, arguments));
 	}
 
+	// TICKING
+
 	@Override
-	public boolean check() {
+	public void tick() {
+		if (!checkLimiter.request()) {
+			return;
+		}
+
 		if (!shopkeeper.getChunkCoords().isChunkLoaded()) {
 			// Only verify sign, if the chunk is currently loaded:
-			return false;
+			return;
 		}
 
 		Block signBlock = this.getBlock();
@@ -301,7 +310,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			if (!this.spawn()) {
 				Log.warning("Shopkeeper sign at " + shopkeeper.getPositionString() + " could not be spawned!");
 			}
-			return true;
+			return;
 		}
 
 		// Update sign content if requested:
@@ -309,8 +318,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			updateSign = false;
 			this.updateSign();
 		}
-
-		return false;
 	}
 
 	// NAMING

@@ -29,8 +29,10 @@ import com.nisovin.shopkeepers.debug.events.EventDebugListener;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
+import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.RateLimiter;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -38,6 +40,12 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	protected static final double SPAWN_LOCATION_OFFSET = 0.98D;
 	protected static final double SPAWN_LOCATION_RANGE = 2.0D;
+	protected static final int CHECK_PERIOD_SECONDS = 10;
+	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(CHECK_PERIOD_SECONDS);
+	// If the entity could not be respawned this amount of times, we throttle its tick rate (i.e. the rate at which we
+	// attempt to respawn it):
+	protected static final int MAX_RESPAWN_ATTEMPTS = 5;
+	protected static final int THROTTLED_CHECK_PERIOD_SECONDS = 60;
 
 	protected final LivingShops livingShops;
 	private final SKLivingShopObjectType<?> livingObjectType;
@@ -45,6 +53,10 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	private int respawnAttempts = 0;
 	private boolean debuggingSpawn = false;
 	private static long lastSpawnDebugging = 0; // Shared among all living shopkeepers to prevent spam
+
+	// Initial offset between [0, CHECK_PERIOD_SECONDS) for load balancing:
+	private final int checkingOffset = nextCheckingOffset.getAndIncrement();
+	private final RateLimiter checkLimiter = RateLimiter.withInitialOffset(CHECK_PERIOD_SECONDS, checkingOffset);
 
 	protected SKLivingShopObject(	LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
 									AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -91,21 +103,11 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		// In the past we therefore also checked if the chunk in which the entity is currently located is still loaded.
 		// However, on later versions of Spigot (late 1.14.1 and above), Entity#isValid also already checks if the chunk
 		// is currently loaded, so this is no longer required.
+		// TODO: Omit the slightly costly isValid check here? Maybe only do it when checking isActive explicitly.
 		if (entity != null && entity.isValid()) {
 			return entity;
 		}
 		return null;
-	}
-
-	@Override
-	public boolean needsSpawning() {
-		return true; // Despawn shop entities on chunk unload, and spawn them again on chunk load.
-	}
-
-	@Override
-	public boolean despawnDuringWorldSaves() {
-		// Spawned entities are non-persistent and therefore already skipped during world saves:
-		return false;
 	}
 
 	protected void assignShopkeeperMetadata(E entity) {
@@ -120,7 +122,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	// (because shopkeepers might have been placed 1 block above passable or non-full blocks).
 	private Location getSpawnLocation() {
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		if (world == null) return null; // world not loaded
+		if (world == null) return null; // World not loaded
 		Location spawnLocation = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + SPAWN_LOCATION_OFFSET, shopkeeper.getZ() + 0.5D);
 		double distanceToGround = Utils.getCollisionDistanceToGround(spawnLocation, SPAWN_LOCATION_RANGE);
 		if (distanceToGround == SPAWN_LOCATION_RANGE) {
@@ -206,7 +208,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			livingShops.forceCreatureSpawn(spawnLocation, entityType);
 		});
 
-		if (this.isActive()) {
+		boolean success = this.isActive();
+		if (success) {
 			// Further setup entity after it was successfully spawned:
 			// Some entities randomly spawn with passengers:
 			for (Entity passenger : entity.getPassengers()) {
@@ -242,9 +245,6 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 			// Apply sub type:
 			this.onSpawn(entity);
-
-			// Success:
-			return true;
 		} else {
 			// Failure:
 			E localEntity = this.entity;
@@ -284,19 +284,23 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 					});
 
 					// Try to spawn entity again:
-					boolean result = this.spawn();
+					success = this.spawn();
 
 					// Unregister listeners again:
 					debugListener.unregister();
 					spawnListener.unregister();
 					debuggingSpawn = false;
-					Log.info(".. Done. Successful: " + result);
-
-					return result; // true if retry was successful
+					Log.info(".. Done. Successful: " + success);
 				}
 			}
-			return false;
 		}
+
+		if (success) {
+			// Reset respawn attempts counter and tick rate:
+			respawnAttempts = 0;
+			this.resetTickRate();
+		}
+		return success;
 	}
 
 	// Gets called after the entity was spawned. Can be used to apply any additionally configured mob-specific setup.
@@ -377,44 +381,83 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		}
 	}
 
+	// TICKING
+
 	@Override
-	public boolean check() {
+	public void tick() {
+		if (checkLimiter.request()) {
+			this.check();
+		}
+	}
+
+	private boolean isTickRateThrottled() {
+		return (checkLimiter.getThreshold() == THROTTLED_CHECK_PERIOD_SECONDS);
+	}
+
+	private void throttleTickRate() {
+		if (this.isTickRateThrottled()) return; // Already throttled
+		Log.debug("Throttling tick rate");
+		checkLimiter.setThreshold(THROTTLED_CHECK_PERIOD_SECONDS);
+		checkLimiter.setRemainingThreshold(THROTTLED_CHECK_PERIOD_SECONDS + checkingOffset);
+	}
+
+	private void resetTickRate() {
+		checkLimiter.setThreshold(CHECK_PERIOD_SECONDS);
+		checkLimiter.setRemainingThreshold(CHECK_PERIOD_SECONDS + checkingOffset);
+	}
+
+	private void check() {
 		if (!this.isActive()) {
-			Log.debug(() -> "Shopkeeper (" + shopkeeper.getPositionString() + ") missing, triggering respawn now");
-			if (entity != null && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
-				// The chunk was silently unloaded before:
-				Log.debug(
-						() -> "  Chunk got silently unloaded or mob got removed! (dead: " + entity.isDead() + ", valid: "
-								+ entity.isValid() + ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()) + ")"
-				);
-			}
-			boolean spawned = this.spawn(); // This will load the chunk if necessary
-			if (spawned) {
-				respawnAttempts = 0;
-				return true;
-			} else {
-				// TODO Maybe add a setting to remove shopkeeper if it can't be spawned a certain amount of times?
-				Log.debug("  Respawn failed");
-				return (++respawnAttempts > 5);
-			}
+			this.respawnInactiveEntity();
 		} else {
-			Location entityLoc = entity.getLocation();
-			Location spawnLocation = this.getSpawnLocation();
-			assert spawnLocation != null; // Since entity is active
+			this.teleportBackIfMoved();
+			this.removePotionEffects();
+		}
+	}
+
+	// True if the entity was respawned.
+	private boolean respawnInactiveEntity() {
+		assert !this.isActive();
+		Log.debug(() -> "Shopkeeper (" + shopkeeper.getPositionString() + ") is missing, attemtping respawn");
+		if (entity != null && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
+			// The chunk was silently unloaded before:
+			Log.debug(
+					() -> "  Chunk got silently unloaded or mob got removed! (dead: " + entity.isDead() + ", valid: "
+							+ entity.isValid() + ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()) + ")"
+			);
+		}
+		boolean spawned = this.spawn(); // This will load the chunk if necessary
+		if (!spawned) {
+			// TODO Maybe add a setting to remove shopkeeper if it can't be spawned a certain amount of times?
+			Log.debug("  Respawn failed");
+			respawnAttempts += 1;
+			if (respawnAttempts >= MAX_RESPAWN_ATTEMPTS) {
+				// Throttle the rate at which we attempt to respawn the entity:
+				this.throttleTickRate();
+			}
+		} // Else: respawnAttempts and tick rate got reset.
+		return spawned;
+	}
+
+	private void teleportBackIfMoved() {
+		assert this.isActive();
+		Location entityLoc = entity.getLocation();
+		Location spawnLocation = this.getSpawnLocation();
+		assert spawnLocation != null; // Since entity is active
+		if (!entityLoc.getWorld().equals(spawnLocation.getWorld()) || entityLoc.distanceSquared(spawnLocation) > 0.4D) {
+			// Teleport back:
+			Log.debug(() -> "Shopkeeper (" + shopkeeper.getPositionString() + ") out of place, teleporting back");
 			spawnLocation.setYaw(entityLoc.getYaw());
 			spawnLocation.setPitch(entityLoc.getPitch());
-			if (!entityLoc.getWorld().equals(spawnLocation.getWorld()) || entityLoc.distanceSquared(spawnLocation) > 0.4D) {
-				// Teleport back:
-				entity.teleport(spawnLocation);
-				this.overwriteAI();
-				Log.debug(() -> "Shopkeeper (" + shopkeeper.getPositionString() + ") out of place, teleported back");
-			}
+			entity.teleport(spawnLocation);
+			this.overwriteAI();
+		}
+	}
 
-			// Remove potion effects:
-			for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
-				entity.removePotionEffect(potionEffect.getType());
-			}
-			return false;
+	private void removePotionEffects() {
+		assert this.isActive();
+		for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
+			entity.removePotionEffect(potionEffect.getType());
 		}
 	}
 

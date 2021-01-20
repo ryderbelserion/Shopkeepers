@@ -23,6 +23,11 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 	}
 
 	@Override
+	public boolean isEnabled() {
+		return citizensShops.isEnabled();
+	}
+
+	@Override
 	public String getDisplayName() {
 		return Messages.shopObjectTypeNpc;
 	}
@@ -34,30 +39,30 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 	}
 
 	@Override
-	public String createObjectId(Entity entity) {
-		if (entity == null) return null;
-		UUID npcUniqueId = citizensShops.getNPCUniqueId(entity);
-		if (npcUniqueId == null) return null;
-		return this.createObjectId(npcUniqueId);
+	public Object getObjectId(Entity entity) {
+		// We use the NPC's unique id as identifier:
+		// Note: On later versions of Citizens this matches the entity UUID of the NPC entity (actually the other way
+		// around: Citizens injects the NPC UUID into the entity). However, since we expect that each entity represents
+		// at most one shopkeeper, this is not an issue in regards to potential conflicts with the object ids of other
+		// shopkeepers and object types.
+		UUID npcUniqueId = citizensShops.getNPCUniqueId(entity); // Null if the entity is not a NPC
+		if (npcUniqueId == null) return null; // Entity is not a NPC
+		return this.getObjectId(npcUniqueId);
 	}
 
-	public String createObjectId(UUID npcUniqueId) {
-		return this.getIdentifier() + ":" + npcUniqueId;
+	public Object getObjectId(UUID npcUniqueId) {
+		assert npcUniqueId != null;
+		return npcUniqueId;
 	}
 
 	// TODO Remove again at some point.
-	public String createObjectId(int npcLegacyId) {
+	public String getObjectId(int npcLegacyId) {
 		return this.getIdentifier() + ":" + npcLegacyId;
 	}
 
 	@Override
-	public SKCitizensShopObject createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		return new SKCitizensShopObject(citizensShops, shopkeeper, creationData);
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return citizensShops.isEnabled();
+	public boolean isSpawnedByShopkeepers() {
+		return false; // Spawning and despawning is handled by Citizens.
 	}
 
 	@Override
@@ -65,5 +70,10 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 		// A reduced set of checks, compared to the default:
 		if (spawnLocation == null || spawnLocation.getWorld() == null) return false;
 		return true;
+	}
+
+	@Override
+	public SKCitizensShopObject createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		return new SKCitizensShopObject(citizensShops, shopkeeper, creationData);
 	}
 }

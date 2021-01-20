@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.block;
 
+import org.bukkit.block.Block;
+
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.block.BlockShopObject;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -20,8 +22,9 @@ public abstract class AbstractBlockShopObject extends AbstractShopObject impleme
 	}
 
 	@Override
-	public String getId() {
-		// Returns null if the block is null:
-		return this.getType().createObjectId(this.getBlock());
+	public Object getId() {
+		Block block = this.getBlock();
+		if (block == null) return null; // Not active
+		return this.getType().getObjectId(block);
 	}
 }

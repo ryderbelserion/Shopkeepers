@@ -20,18 +20,18 @@ public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShop
 	}
 
 	@Override
+	public boolean isEnabled() {
+		return Settings.enableSignShops;
+	}
+
+	@Override
 	public String getDisplayName() {
 		return Messages.shopObjectTypeSign;
 	}
 
 	@Override
-	public SKSignShopObject createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
-		return new SKSignShopObject(signShops, shopkeeper, creationData);
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return Settings.enableSignShops;
+	public boolean isSpawnedByShopkeepers() {
+		return true; // Despawn signs on chunk unload, and spawn them again on chunk load
 	}
 
 	@Override
@@ -40,5 +40,10 @@ public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShop
 		return spawnLocation.getBlock().isEmpty()
 				&& (Settings.enableSignPostShops || targetedBlockFace != BlockFace.UP)
 				&& super.isValidSpawnLocation(spawnLocation, targetedBlockFace);
+	}
+
+	@Override
+	public SKSignShopObject createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		return new SKSignShopObject(signShops, shopkeeper, creationData);
 	}
 }

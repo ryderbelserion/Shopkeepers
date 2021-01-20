@@ -18,6 +18,8 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.util.Log;
 
@@ -230,9 +232,9 @@ public class CitizensShops {
 			// Cannot determine which shopkeepers have a backing NPC if Citizens isn't running:
 			return;
 		}
-		ShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
+		SKShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
 		List<Shopkeeper> forRemoval = new ArrayList<>();
-		for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
+		for (AbstractShopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 			if (shopkeeper.getShopObject() instanceof SKCitizensShopObject) {
 				SKCitizensShopObject citizensShop = (SKCitizensShopObject) shopkeeper.getShopObject();
 				UUID npcUniqueId = citizensShop.getNPCUniqueId();
@@ -282,9 +284,13 @@ public class CitizensShops {
 
 	public static Shopkeeper getShopkeeper(NPC npc) {
 		if (npc == null) return null;
-		assert ShopkeepersAPI.isEnabled();
+		if (!ShopkeepersAPI.isEnabled()) {
+			// Plugin is not running:
+			return null;
+		}
 		UUID npcUniqueId = npc.getUniqueId();
-		String shopObjectId = SKDefaultShopObjectTypes.CITIZEN().createObjectId(npcUniqueId);
-		return ShopkeepersAPI.getShopkeeperRegistry().getActiveShopkeeper(shopObjectId);
+		assert npcUniqueId != null;
+		Object shopObjectId = SKDefaultShopObjectTypes.CITIZEN().getObjectId(npcUniqueId);
+		return SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getActiveShopkeeper(shopObjectId);
 	}
 }

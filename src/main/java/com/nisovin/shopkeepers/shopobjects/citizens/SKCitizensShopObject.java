@@ -10,7 +10,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.citizens.CitizensShopObject;
@@ -20,7 +19,9 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.ConversionUtils;
+import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.RateLimiter;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -34,12 +35,17 @@ import net.citizensnpcs.api.trait.trait.MobType;
 public class SKCitizensShopObject extends AbstractEntityShopObject implements CitizensShopObject {
 
 	public static String CREATION_DATA_NPC_UUID_KEY = "CitizensNpcUUID";
+	private static final int CHECK_PERIOD_SECONDS = 10;
+	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(CHECK_PERIOD_SECONDS);
 
 	protected final CitizensShops citizensShops;
 	private UUID npcUniqueId = null;
 	private Integer npcLegacyId = null;
 	// If false, this will not remove the NPC on deletion:
 	private boolean destroyNPC = true;
+
+	// Initial offset between [0, CHECK_PERIOD_SECONDS) for load balancing:
+	private final RateLimiter checkLimiter = RateLimiter.withInitialOffset(CHECK_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
 
 	protected SKCitizensShopObject(CitizensShops citizensShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);
@@ -92,7 +98,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 				shopkeeper.markDirty();
 
 				// Re-activate by new object id:
-				SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperObjectIdChanged(shopkeeper);
+				this.onIdChanged();
 			}
 		}
 	}
@@ -192,23 +198,22 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	public Entity getEntity() {
 		NPC npc = this.getNPC();
 		if (npc == null) return null;
-		return npc.getEntity();
+		// Note: Citizens despawns the entity on chunk unloads. This checks if the entity is still alive.
+		if (!npc.isSpawned()) return null;
+		Entity entity = npc.getEntity();
+		assert entity != null; // Checked by isSpawned
+		return entity;
 	}
 
 	@Override
-	public boolean isActive() {
-		return (this.getNPC() != null);
-	}
-
-	@Override
-	public String getId() {
+	public Object getId() {
 		if (npcUniqueId == null) {
 			if (npcLegacyId == null) return null;
 			else {
-				return this.getType().createObjectId(npcLegacyId);
+				return this.getType().getObjectId(npcLegacyId);
 			}
 		}
-		return this.getType().createObjectId(npcUniqueId);
+		return this.getType().getObjectId(npcUniqueId);
 	}
 
 	private Location getSpawnLocation() {
@@ -216,11 +221,6 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
 		if (world == null) return null; // World not loaded currently
 		return new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
-	}
-
-	@Override
-	public boolean needsSpawning() {
-		return false; // Spawning and despawning is handled by Citizens.
 	}
 
 	@Override
@@ -239,38 +239,43 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		return (entity != null) ? entity.getLocation() : null;
 	}
 
+	// TICKING
+
 	@Override
-	public boolean check() {
+	public void tick() {
+		if (!checkLimiter.request()) {
+			return;
+		}
+
 		NPC npc = this.getNPC();
 		if (npc == null) {
 			// Not going to force NPC creation, as this seems like it could go really wrong.
-			return false;
+			return;
 		}
 
 		Location expectedLocation = this.getSpawnLocation();
 		if (expectedLocation == null) {
 			// The spawn location's world is not loaded currently.
-			return false;
+			// We only tick shop objects in loaded chunks, but the world might have been unloaded during the ticking.
+			return;
 		}
 		assert expectedLocation.getWorld() != null;
 
 		Location currentLocation = npc.getStoredLocation();
 		if (currentLocation == null) {
 			assert !npc.isSpawned();
+			Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") had no location, attempting spawn");
 			// This will log a debug message from Citizens if it cannot spawn the NPC currently, but will then later
 			// attempt to spawn it when the chunk gets loaded:
 			npc.spawn(expectedLocation);
-			Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") had no location, attempted spawn");
-			return false;
+			return;
 		}
-		assert currentLocation.getWorld() != null; // Citizens will return a null Location in this case
+		assert currentLocation.getWorld() != null; // Citizens returns a null Location in this case
 
 		if (!expectedLocation.getWorld().equals(currentLocation.getWorld()) || expectedLocation.distanceSquared(currentLocation) > 1.0D) {
+			Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") moved, updating shopkeeper location");
 			shopkeeper.setLocation(currentLocation);
-			Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") out of place, re-indexing");
-			return false;
 		}
-		return false;
 	}
 
 	// NAMING

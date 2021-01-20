@@ -13,7 +13,7 @@ import com.nisovin.shopkeepers.api.types.SelectableType;
  */
 public interface ShopObjectType<T extends ShopObject> extends SelectableType {
 
-	// override to enforce that each subtype actually specifies a non-default display name
+	// Override to enforce that each subtype actually specifies a non-default display name
 	@Override
 	public abstract String getDisplayName();
 

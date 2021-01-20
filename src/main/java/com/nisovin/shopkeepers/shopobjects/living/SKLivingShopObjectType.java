@@ -32,6 +32,11 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> ex
 	}
 
 	@Override
+	public boolean isEnabled() {
+		return DerivedSettings.enabledLivingShops.contains(entityType);
+	}
+
+	@Override
 	public boolean hasPermission(Player player) {
 		return super.hasPermission(player) || PermissionUtils.hasPermission(player, "shopkeeper.entity.*");
 	}
@@ -43,10 +48,16 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> ex
 	}
 
 	@Override
-	public abstract T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData);
+	public boolean isSpawnedByShopkeepers() {
+		return true; // Despawn entities on chunk unload, and spawn them again on chunk load.
+	}
 
 	@Override
-	public boolean isEnabled() {
-		return DerivedSettings.enabledLivingShops.contains(entityType);
+	public boolean isDespawnedDuringWorldSaves() {
+		// Spawned entities are non-persistent and therefore already skipped during world saves:
+		return false;
 	}
+
+	@Override
+	public abstract T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData);
 }

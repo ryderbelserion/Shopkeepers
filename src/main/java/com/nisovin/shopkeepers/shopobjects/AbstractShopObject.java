@@ -6,9 +6,11 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
+import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 
@@ -23,7 +25,7 @@ import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 public abstract class AbstractShopObject implements ShopObject {
 
 	protected final AbstractShopkeeper shopkeeper; // Not null
-	private String lastId = null;
+	private Object lastId = null;
 
 	// Fresh creation
 	protected AbstractShopObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -92,15 +94,37 @@ public abstract class AbstractShopObject implements ShopObject {
 	@Override
 	public abstract boolean isActive();
 
-	@Override
-	public abstract String getId();
+	/**
+	 * Gets an object that uniquely identifies this {@link ShopObject} while it is {@link #isActive() active}.
+	 * <p>
+	 * The id has to be unique among all currently active shop objects, including other types of shop objects. It has be
+	 * be suitable to be used as key in {@link Object#hashCode() hash-based} data structures.
+	 * <p>
+	 * The returned id may only be valid while the shop object is active, and it may change whenever the shop object is
+	 * respawned.
+	 * 
+	 * @return the id of the shop object, or possibly (but not necessarily) <code>null</code> if it is not active
+	 *         currently
+	 */
+	public abstract Object getId();
+
+	/**
+	 * This has to be invoked whenever the id of this shop object has changed.
+	 * <p>
+	 * This is not required to be called if the object id changes due to spawning or during ticking.
+	 * <p>
+	 * This updates the id by which the shopkeeper is currently stored by inside the shopkeeper registry.
+	 */
+	protected final void onIdChanged() {
+		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperObjectIdChanged(shopkeeper);
+	}
 
 	/**
 	 * Gets the object id the shopkeeper is currently stored by inside the shopkeeper registry.
 	 * 
 	 * @return the object id, or <code>null</code>
 	 */
-	public final String getLastId() {
+	public final Object getLastId() {
 		return lastId;
 	}
 
@@ -110,40 +134,54 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * @param lastId
 	 *            the object id, can be <code>null</code>
 	 */
-	public final void setLastId(String lastId) {
+	public final void setLastId(Object lastId) {
 		this.lastId = lastId; // can be null
 	}
 
-	@Override
-	public abstract boolean needsSpawning();
-
 	/**
-	 * Whether or not this shop object gets despawned right before world saves and respawned afterwards.
+	 * Spawns the shop object into the world at its spawn location.
 	 * 
-	 * @return <code>true</code> if this shop object gets despawned during world saves
+	 * @return <code>true</code> on success
 	 */
-	public boolean despawnDuringWorldSaves() {
-		return this.needsSpawning();
-	}
-
-	@Override
 	public abstract boolean spawn();
 
-	@Override
+	/**
+	 * Removes this shop object from the world.
+	 * <p>
+	 * This has no effect if the shop object is not spawned currently.
+	 */
 	public abstract void despawn();
 
 	@Override
 	public abstract Location getLocation();
 
+	// TICKING
+
 	/**
-	 * This is periodically called for active shopkeepers.
+	 * This is called periodically (roughly once per second) for shopkeepers in active chunks.
 	 * <p>
-	 * It makes sure that everything is still alright with the shop object.<br>
-	 * Ex: Attempts to respawn shop entities, teleports them back into place, informs about their removal.
-	 * 
-	 * @return <code>true</code> if the shop object might no longer be active or its id has changed
+	 * This can for example be used to check if everything is still alright with the shop object, such as if it still
+	 * exists and if it is still in its expected location and state. If any of these checks fail, the shop object may be
+	 * respawned, teleported back into place, and brought back into its expected state.
+	 * <p>
+	 * This is also called for shop objects that manage their spawning and despawning
+	 * {@link AbstractShopObjectType#isSpawnedWithChunks() manually}.
+	 * <p>
+	 * Any changes to the shopkeeper's activation state or {@link AbstractShopObject#getId() shop object id} may only be
+	 * processed after the ticking of all currently ticked shop objects completes.
+	 * <p>
+	 * If the checks to perform are potentially heavy or not required to happen every second, the shop object may decide
+	 * to only run it every X invocations.
+	 * <p>
+	 * The ticking of shop objects in active chunks may be spread across multiple ticks and may therefore not happen for
+	 * all shopkeepers within the same tick.
+	 * <p>
+	 * If any of the shopkeepers whose shop objects are ticked are marked as {@link Shopkeeper#isDirty() dirty}, a
+	 * {@link ShopkeeperStorage#saveDelayed() delayed save} will subsequently be triggered.
 	 */
-	public abstract boolean check();
+	public void tick() {
+		// Nothing to do by default.
+	}
 
 	// NAMING
 

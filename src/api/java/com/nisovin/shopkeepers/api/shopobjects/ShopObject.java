@@ -8,50 +8,24 @@ import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObject;
 /**
  * Represents a {@link Shopkeeper} in the world.
  * <p>
- * A special case is {@link VirtualShopObject}, which gets used if the shopkeeper is not represented by any object in
- * the world.
+ * A special case is {@link VirtualShopObject}, which is used if the shopkeeper is not represented by any object in the
+ * world.
  */
 public interface ShopObject {
 
+	/**
+	 * Gets the {@link ShopObjectType} of this shop object.
+	 * 
+	 * @return the shop object type
+	 */
 	public ShopObjectType<?> getType();
 
-	// ACTIVATION
-
 	/**
-	 * Checks if this shop object is active (is currently present in the world).
+	 * Checks if this shop object is active (i.e. if it is currently present in the world).
 	 * 
 	 * @return <code>true</code> if the shop object is active
 	 */
 	public boolean isActive();
-
-	/**
-	 * Gets an unique id that can be used to identify this shop object while it is active.
-	 * <p>
-	 * The returned id may only be valid while the shop object is active, and it may change whenever the shop object
-	 * gets respawned.
-	 * 
-	 * @return the id of the shop object, possibly <code>null</code> if it is not active currently
-	 */
-	public String getId();
-
-	/**
-	 * Whether or not this shop object gets spawned and despawned with chunk load and unloads.
-	 * 
-	 * @return <code>true</code> if this shop object gets spawned and despawned with chunk loads and unloads
-	 */
-	public boolean needsSpawning();
-
-	/**
-	 * Spawns the shop object into the world at its spawn location.
-	 * 
-	 * @return <code>true</code> on success
-	 */
-	public boolean spawn();
-
-	/**
-	 * Removes this shop object from the world.
-	 */
-	public void despawn();
 
 	/**
 	 * Gets the location this shop object is currently located at.

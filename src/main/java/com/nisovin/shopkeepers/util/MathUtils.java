@@ -1,8 +1,23 @@
 package com.nisovin.shopkeepers.util;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class MathUtils {
 
 	private MathUtils() {
+	}
+
+	/**
+	 * Gets a random integer between the given min value (inclusive) and max value (exclusive).
+	 * 
+	 * @param min
+	 *            the minimum value (inclusive)
+	 * @param max
+	 *            the maximum value (exclusive)
+	 * @return the random value in between
+	 */
+	public static int randomInRange(int min, int max) {
+		return ThreadLocalRandom.current().nextInt(min, max);
 	}
 
 	public static int trim(int value, int min, int max) {
