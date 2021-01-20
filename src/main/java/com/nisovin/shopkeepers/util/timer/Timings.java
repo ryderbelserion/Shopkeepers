@@ -4,7 +4,7 @@ public interface Timings {
 
 	public void reset();
 
-	public int getCounter();
+	public long getCounter();
 
 	public double getAverageTimeMillis();
 

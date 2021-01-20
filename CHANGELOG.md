@@ -59,6 +59,7 @@ Date format: (YYYY-MM-DD)
 * Debug: The debug command can toggle debug options now ('/shopkeeper debug [option]').
 * Fixed: Optional arguments delegate to the wrapped argument for more detailed error messages now.
 * Performance: Living shopkeepers no longer tick Minecraft's floating behavior. This has no effect since the shopkeeper entities have no AI.
+* Debug/Fixed: Average timings would previously sometimes be incorrect since they took into account unset values of the timing history.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
@@ -86,6 +87,8 @@ Internal:
 * Instead of passing the chunk coordinates around whenever a shopkeeper is registered, unregistered, or moved, each shopkeeper remembers the chunk now by which we previously stored it.
 * ShopkeeperRegistry#onShopkeeperMove has been renamed to #onShopkeeperMoved.
 * The FixedValuesArgument is less restrictive with the types of Map values it accepts.
+* Timer uses Java's TimeUnit for conversions now.
+* Timer and Timings use a long counter now.
 * Minor code formatting and method renaming.
 
 Migration notes:  

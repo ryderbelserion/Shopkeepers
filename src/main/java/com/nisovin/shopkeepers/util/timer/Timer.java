@@ -1,13 +1,16 @@
 package com.nisovin.shopkeepers.util.timer;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import com.nisovin.shopkeepers.util.MathUtils;
 
 public class Timer implements Timings {
 
+	private static final long UNSET = -1L;
+
 	private long[] timingsHistory;
-	private int counter = 0;
+	private long counter = 0L;
 
 	// Current timing:
 	private boolean started = false;
@@ -22,6 +25,7 @@ public class Timer implements Timings {
 	public Timer(int historySize) {
 		assert historySize > 0;
 		timingsHistory = new long[historySize];
+		this.reset();
 	}
 
 	public void start() {
@@ -63,7 +67,7 @@ public class Timer implements Timings {
 
 		// Update timings history:
 		counter++;
-		int historyIndex = (counter % timingsHistory.length);
+		int historyIndex = (int) (counter % timingsHistory.length);
 		timingsHistory[historyIndex] = elapsedTime;
 	}
 
@@ -71,22 +75,24 @@ public class Timer implements Timings {
 
 	@Override
 	public void reset() {
-		counter = 0;
-		Arrays.fill(timingsHistory, 0L);
+		counter = 0L;
+		Arrays.fill(timingsHistory, UNSET);
 	}
 
 	@Override
-	public int getCounter() {
+	public long getCounter() {
 		return counter;
 	}
 
 	@Override
 	public double getAverageTimeMillis() {
-		return (MathUtils.average(timingsHistory) * 1.0E-6D);
+		long avgTimeNanos = (long) MathUtils.average(timingsHistory, UNSET);
+		return TimeUnit.NANOSECONDS.toMillis(avgTimeNanos);
 	}
 
 	@Override
 	public double getMaxTimeMillis() {
-		return (MathUtils.max(timingsHistory) * 1.0E-6D);
+		long maxTimeNanos = MathUtils.max(timingsHistory, UNSET);
+		return TimeUnit.NANOSECONDS.toMillis(maxTimeNanos);
 	}
 }

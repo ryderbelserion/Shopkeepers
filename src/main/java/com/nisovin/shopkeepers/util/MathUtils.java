@@ -20,6 +20,17 @@ public class MathUtils {
 		return ThreadLocalRandom.current().nextInt(min, max);
 	}
 
+	/**
+	 * Calculates the closest value in the specified range.
+	 * 
+	 * @param value
+	 *            the value
+	 * @param min
+	 *            the lower bound (inclusive)
+	 * @param max
+	 *            the upper bound (inclusive)
+	 * @return the value within the specified range
+	 */
 	public static int trim(int value, int min, int max) {
 		if (value <= min) return min;
 		if (value >= max) return max;
@@ -32,6 +43,8 @@ public class MathUtils {
 	 * The average is calculated by forming the sum of all values and then dividing by the number of values. If the sum
 	 * of the given values does not fit into a single <code>long</code>, it can overflow and produce an incorrect
 	 * result.
+	 * <p>
+	 * If no values are given, {@code 0} is returned.
 	 * 
 	 * @param values
 	 *            the values
@@ -46,15 +59,49 @@ public class MathUtils {
 	}
 
 	/**
+	 * Calculates the average of the given values, ignoring values that match the specified one.
+	 * <p>
+	 * The average is calculated by forming the sum of all values and then dividing by the number of values. If the sum
+	 * of the given values does not fit into a single <code>long</code>, it can overflow and produce an incorrect
+	 * result.
+	 * <p>
+	 * If no values are given, {@code 0} is returned.
+	 * 
+	 * @param values
+	 *            the values
+	 * @param ignore
+	 *            the value to ignore
+	 * @return the average
+	 */
+	public static double average(long[] values, long ignore) {
+		long total = 0L;
+		int ignored = 0;
+		for (long value : values) {
+			if (value == ignore) {
+				ignored += 1;
+				continue;
+			}
+			total += value;
+		}
+		int elementCount = values.length - ignored;
+		if (elementCount == 0) {
+			return 0L;
+		} else {
+			return ((double) total / elementCount);
+		}
+	}
+
+	/**
 	 * Calculates the maximum of the given values.
 	 * <p>
-	 * Returns {@link Long#MIN_VALUE} if no values are given.
+	 * If no values are given, {@code 0} is returned.
 	 * 
 	 * @param values
 	 *            the values
 	 * @return the max value
 	 */
 	public static long max(long[] values) {
+		if (values.length == 0) return 0L;
 		long max = Long.MIN_VALUE;
 		for (long value : values) {
 			if (value > max) {
@@ -64,7 +111,44 @@ public class MathUtils {
 		return max;
 	}
 
-	// Brings the given value into the specified range via a modulo operation.
+	/**
+	 * Calculates the maximum of the given values, ignoring values that match the specified one.
+	 * <p>
+	 * If no values are given, {@code 0} is returned.
+	 * 
+	 * @param values
+	 *            the values
+	 * @param ignore
+	 *            the value to ignore
+	 * @return the max value
+	 */
+	public static long max(long[] values, long ignore) {
+		long max = Long.MIN_VALUE;
+		int ignored = 0;
+		for (long value : values) {
+			if (value == ignore) {
+				ignored += 1;
+				continue;
+			}
+			if (value > max) {
+				max = value;
+			}
+		}
+		if (values.length - ignored == 0) return 0L;
+		return max;
+	}
+
+	/**
+	 * Brings the given value into the specified range via a modulo (cyclic) operation.
+	 * 
+	 * @param value
+	 *            the value
+	 * @param min
+	 *            the lower bound (inclusive)
+	 * @param max
+	 *            the upper bound (inclusive)
+	 * @return the value within the specified range
+	 */
 	public static int rangeModulo(int value, int min, int max) {
 		assert min <= max; // Note: value can be outside the range.
 		int offset = min;
