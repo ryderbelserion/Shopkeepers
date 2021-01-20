@@ -15,9 +15,9 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class FixedValuesArgument extends CommandArgument<Object> {
 
-	private final Map<String, Object> values;
+	private final Map<String, ? extends Object> values;
 
-	public FixedValuesArgument(String name, Map<String, Object> values) {
+	public FixedValuesArgument(String name, Map<String, ? extends Object> values) {
 		super(name);
 		Validate.notNull(values, "Values is null");
 		Validate.isTrue(!values.containsKey(null), "Values cannot contain null key!");

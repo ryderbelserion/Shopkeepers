@@ -9,6 +9,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
+import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -40,6 +41,21 @@ public class OptionalArgument<T> extends FallbackArgument<T> {
 	@Override
 	public String getReducedFormat() {
 		return argument.getReducedFormat();
+	}
+
+	@Override
+	public Text getRequiresPlayerErrorMsg() {
+		return argument.getRequiresPlayerErrorMsg();
+	}
+
+	@Override
+	public Text getMissingArgumentErrorMsg() {
+		return argument.getMissingArgumentErrorMsg();
+	}
+
+	@Override
+	public Text getInvalidArgumentErrorMsg(String argumentInput) {
+		return argument.getInvalidArgumentErrorMsg(argumentInput);
 	}
 
 	@FunctionalInterface
