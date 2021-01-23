@@ -18,7 +18,6 @@ import org.bukkit.entity.Entity;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.commands.lib.Command;
@@ -28,9 +27,11 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
+import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.timer.Timings;
 
 class CommandCheck extends Command {
 
@@ -38,7 +39,7 @@ class CommandCheck extends Command {
 	private static final String ARGUMENT_ACTIVE = "active";
 
 	private final SKShopkeepersPlugin plugin;
-	private final ShopkeeperRegistry shopkeeperRegistry;
+	private final SKShopkeeperRegistry shopkeeperRegistry;
 
 	CommandCheck(SKShopkeepersPlugin plugin) {
 		super("check");
@@ -90,6 +91,13 @@ class CommandCheck extends Command {
 		sender.sendMessage("    With AI: " + livingEntityAI.getEntityCount());
 		sender.sendMessage("    With active AI: " + livingEntityAI.getActiveAIEntityCount());
 		sender.sendMessage("    With active gravity: " + livingEntityAI.getActiveGravityEntityCount());
+
+		Timings chunkActivationTimings = shopkeeperRegistry.getChunkActivationTimings();
+		double avgChunkActivationTimings = chunkActivationTimings.getAverageTimeMillis();
+		double maxChunkActivationTimings = chunkActivationTimings.getMaxTimeMillis();
+		sender.sendMessage("  Chunk activation timings (avg | max): "
+				+ TextUtils.DECIMAL_FORMAT.format(avgChunkActivationTimings) + " ms" + " | "
+				+ TextUtils.DECIMAL_FORMAT.format(maxChunkActivationTimings) + " ms");
 
 		double avgTotalAITimings = livingEntityAI.getTotalTimings().getAverageTimeMillis();
 		double maxTotalAITiming = livingEntityAI.getTotalTimings().getMaxTimeMillis();

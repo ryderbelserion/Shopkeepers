@@ -47,6 +47,8 @@ import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.timer.Timer;
+import com.nisovin.shopkeepers.util.timer.Timings;
 
 public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
@@ -275,6 +277,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// False: Deactivate
 	private final Map<AbstractShopkeeper, Boolean> pendingActivationChanges = new LinkedHashMap<>();
 
+	private final Timer chunkActivationTimings = new Timer();
+
 	public SKShopkeeperRegistry(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 	}
@@ -298,6 +302,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		virtualShopkeepers.clear();
 		activeShopkeepersByObjectId.clear();
 		playerShopCount = 0;
+		chunkActivationTimings.reset();
+	}
+
+	// TIMINGS
+
+	public Timings getChunkActivationTimings() {
+		return chunkActivationTimings;
 	}
 
 	// TICKING
@@ -670,6 +681,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			return;
 		}
 
+		chunkActivationTimings.start();
+
 		chunkEntry.cancelActivationTask(); // Stop pending activation if any
 		chunkEntry.active = true; // Mark chunk active
 
@@ -678,6 +691,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		// Spawn shopkeepers:
 		this.spawnShopkeepers(chunkEntry, false);
+
+		chunkActivationTimings.stop();
 	}
 
 	private void informShopkeeperOnChunkActivation(AbstractShopkeeper shopkeeper) {
