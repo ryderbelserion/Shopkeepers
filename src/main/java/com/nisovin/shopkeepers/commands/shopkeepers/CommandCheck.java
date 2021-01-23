@@ -95,9 +95,10 @@ class CommandCheck extends Command {
 		Timings chunkActivationTimings = shopkeeperRegistry.getChunkActivationTimings();
 		double avgChunkActivationTimings = chunkActivationTimings.getAverageTimeMillis();
 		double maxChunkActivationTimings = chunkActivationTimings.getMaxTimeMillis();
-		sender.sendMessage("  Chunk activation timings (avg | max): "
+		sender.sendMessage("  Chunk activation timings (avg | max | cnt): "
 				+ TextUtils.DECIMAL_FORMAT.format(avgChunkActivationTimings) + " ms" + " | "
-				+ TextUtils.DECIMAL_FORMAT.format(maxChunkActivationTimings) + " ms");
+				+ TextUtils.DECIMAL_FORMAT.format(maxChunkActivationTimings) + " ms" + " | "
+				+ chunkActivationTimings.getCounter());
 
 		double avgTotalAITimings = livingEntityAI.getTotalTimings().getAverageTimeMillis();
 		double maxTotalAITiming = livingEntityAI.getTotalTimings().getMaxTimeMillis();

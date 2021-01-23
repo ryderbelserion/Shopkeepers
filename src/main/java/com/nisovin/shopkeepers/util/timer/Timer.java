@@ -1,32 +1,22 @@
 package com.nisovin.shopkeepers.util.timer;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import com.nisovin.shopkeepers.util.MathUtils;
 import com.nisovin.shopkeepers.util.TimeUtils;
 
 public class Timer implements Timings {
 
-	private static final long UNSET = -1L;
-
-	private long[] timingsHistory;
 	private long counter = 0L;
+	private long totalTime = 0L; // In nano seconds
+	private long maxTime = 0L; // In nano seconds
 
 	// Current timing:
 	private boolean started = false;
 	private boolean paused = false;
 	private long startTime; // Nano time
-	private long elapsedTime; // Nanos
+	private long elapsedTime; // In nano seconds
 
 	public Timer() {
-		this(100);
-	}
-
-	public Timer(int historySize) {
-		assert historySize > 0;
-		timingsHistory = new long[historySize];
-		this.reset();
 	}
 
 	public void start() {
@@ -66,10 +56,14 @@ public class Timer implements Timings {
 		}
 		assert paused;
 
-		// Update timings history:
+		// Update timings:
 		counter++;
-		int historyIndex = (int) (counter % timingsHistory.length);
-		timingsHistory[historyIndex] = elapsedTime;
+		totalTime += elapsedTime;
+
+		// Update max timing:
+		if (elapsedTime > maxTime) {
+			maxTime = elapsedTime;
+		}
 	}
 
 	// TIMINGS
@@ -77,7 +71,8 @@ public class Timer implements Timings {
 	@Override
 	public void reset() {
 		counter = 0L;
-		Arrays.fill(timingsHistory, UNSET);
+		totalTime = 0L;
+		maxTime = 0L;
 	}
 
 	@Override
@@ -87,13 +82,12 @@ public class Timer implements Timings {
 
 	@Override
 	public double getAverageTimeMillis() {
-		double avgTimeNanos = MathUtils.average(timingsHistory, UNSET);
+		double avgTimeNanos = (double) totalTime / (counter == 0L ? 1L : counter);
 		return TimeUtils.convert(avgTimeNanos, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public double getMaxTimeMillis() {
-		long maxTimeNanos = MathUtils.max(timingsHistory, UNSET);
-		return TimeUtils.convert(maxTimeNanos, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
+		return TimeUtils.convert(maxTime, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
 	}
 }

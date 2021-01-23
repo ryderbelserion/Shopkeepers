@@ -105,7 +105,7 @@ public class LivingEntityAI {
 	private int activeGravityEntityCount = 0;
 
 	private final Timer totalTimings = new Timer();
-	private final Timer activationTimings = new Timer(10);
+	private final Timer activationTimings = new Timer();
 	private final Timer gravityTimings = new Timer();
 	private final Timer aiTimings = new Timer();
 
