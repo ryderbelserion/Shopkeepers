@@ -60,6 +60,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: Optional arguments delegate to the wrapped argument for more detailed error messages now.
 * Performance: Living shopkeepers no longer tick Minecraft's floating behavior. This has no effect since the shopkeeper entities have no AI.
 * Debug/Fixed: Average timings would previously sometimes be incorrect since they took into account unset values of the timing history.
+* Metrics: We capture the actually used gravity-chunk-range now.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.

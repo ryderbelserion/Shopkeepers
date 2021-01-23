@@ -31,8 +31,7 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 
 			// Mob behavior features:
 			addFeatureEntry(allFeatures, "disable-gravity", Settings.disableGravity);
-			addFeatureEntry(allFeatures, "increased gravity chunk range", Settings.gravityChunkRange > 4);
-			addFeatureEntry(allFeatures, "decreased gravity chunk range", Settings.gravityChunkRange < 4);
+			addFeatureEntry(allFeatures, "gravity-chunk-range", Settings.gravityChunkRange);
 
 			// Others:
 			addFeatureEntry(allFeatures, "save-instantly", Settings.saveInstantly);
@@ -52,8 +51,15 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 		});
 	}
 
-	private static void addFeatureEntry(Map<String, Map<String, Integer>> allFeatures, String featureName, boolean featureActive) {
+	// Converts the given boolean value to a more user-friendly 'Yes'/'No' value.
+	private static void addFeatureEntry(Map<String, Map<String, Integer>> allFeatures, String featureName, boolean value) {
 		assert allFeatures != null && featureName != null;
-		allFeatures.put(featureName, (featureActive ? MapUtils.createMap("Yes", 1) : MapUtils.createMap("No", 1)));
+		addFeatureEntry(allFeatures, featureName, value ? "Yes" : "No");
+	}
+
+	// Uses the String representation of the given object as value in the chart.
+	private static void addFeatureEntry(Map<String, Map<String, Integer>> allFeatures, String featureName, Object value) {
+		assert allFeatures != null && featureName != null;
+		allFeatures.put(featureName, MapUtils.createMap(String.valueOf(value), 1));
 	}
 }
