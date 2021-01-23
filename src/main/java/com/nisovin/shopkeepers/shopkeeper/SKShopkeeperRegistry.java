@@ -1242,7 +1242,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		int y = location.getBlockY();
 		int z = location.getBlockZ();
 
-		ChunkCoords chunkCoords = ChunkCoords.fromBlockPos(worldName, x, z);
+		ChunkCoords chunkCoords = ChunkCoords.fromBlock(worldName, x, z);
 		for (AbstractShopkeeper shopkeeper : this.getShopkeepersInChunk(chunkCoords)) {
 			assert worldName.equals(shopkeeper.getWorldName());
 			if (shopkeeper.getX() == x && shopkeeper.getY() == y && shopkeeper.getZ() == z) {
@@ -1263,7 +1263,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		int z = location.getBlockZ();
 
 		List<AbstractShopkeeper> shopkeepers = new ArrayList<>();
-		ChunkCoords chunkCoords = ChunkCoords.fromBlockPos(worldName, x, z);
+		ChunkCoords chunkCoords = ChunkCoords.fromBlock(worldName, x, z);
 		for (AbstractShopkeeper shopkeeper : this.getShopkeepersInChunk(chunkCoords)) {
 			assert worldName.equals(shopkeeper.getWorldName());
 			if (shopkeeper.getX() == x && shopkeeper.getY() == y && shopkeeper.getZ() == z) {

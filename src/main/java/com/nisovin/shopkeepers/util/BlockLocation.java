@@ -56,7 +56,7 @@ public class BlockLocation {
 	/**
 	 * Creates a new {@link BlockLocation}.
 	 * <p>
-	 * The given {@link Location} is expected to provide {@link World}.
+	 * The given {@link Location} is expected to provide a {@link World}.
 	 * 
 	 * @param location
 	 *            the location, not <code>null</code>
@@ -82,15 +82,6 @@ public class BlockLocation {
 	 */
 	public BlockLocation(String worldName, double x, double y, double z) {
 		this(worldName, toBlock(x), toBlock(y), toBlock(z));
-	}
-
-	/**
-	 * Gets the {@link World} this block location is located in, or <code>null</code> if the world is not loaded.
-	 * 
-	 * @return the world, or <code>null</code> if it is not loaded
-	 */
-	public World getWorld() {
-		return Bukkit.getWorld(worldName);
 	}
 
 	/**
@@ -170,6 +161,15 @@ public class BlockLocation {
 		this.z = z;
 	}
 
+	/**
+	 * Gets the {@link World} this block location is located in, or <code>null</code> if the world is not loaded.
+	 * 
+	 * @return the world, or <code>null</code> if it is not loaded
+	 */
+	public World getWorld() {
+		return Bukkit.getWorld(worldName);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -186,7 +186,7 @@ public class BlockLocation {
 		if (this == obj) return true;
 		if (!(obj instanceof BlockLocation)) return false;
 		BlockLocation other = (BlockLocation) obj;
-		return this.equals(other.worldName, other.x, other.y, other.z);
+		return this.matches(other.worldName, other.x, other.y, other.z);
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class BlockLocation {
 	 *            the z coordinate
 	 * @return <code>true</code> if the world name and coordinates match
 	 */
-	public boolean equals(String worldName, int x, int y, int z) {
+	public boolean matches(String worldName, int x, int y, int z) {
 		if (this.x != x) return false;
 		if (this.y != y) return false;
 		if (this.z != z) return false;
@@ -214,7 +214,8 @@ public class BlockLocation {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append(this.getClass().getSimpleName() + " [worldName=");
+		builder.append(this.getClass().getSimpleName());
+		builder.append(" [worldName=");
 		builder.append(worldName);
 		builder.append(", x=");
 		builder.append(x);

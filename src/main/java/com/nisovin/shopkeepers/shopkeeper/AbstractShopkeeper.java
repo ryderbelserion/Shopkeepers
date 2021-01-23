@@ -570,7 +570,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	private void updateChunkCoords() {
-		this.chunkCoords = this.isVirtual() ? null : ChunkCoords.fromBlockPos(worldName, x, z);
+		this.chunkCoords = this.isVirtual() ? null : ChunkCoords.fromBlock(worldName, x, z);
 	}
 
 	/**

@@ -174,7 +174,7 @@ class SignShopListener implements Listener {
 	}
 
 	private boolean checkCancelPhysics(String worldName, int blockX, int blockY, int blockZ) {
-		if (cancelNextBlockPhysics.equals(worldName, blockX, blockY, blockZ)) {
+		if (cancelNextBlockPhysics.matches(worldName, blockX, blockY, blockZ)) {
 			return true;
 		} else if (signShopObjectType.isShopkeeper(worldName, blockX, blockY, blockZ)) {
 			return true;

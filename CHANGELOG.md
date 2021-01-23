@@ -70,6 +70,7 @@ API:
 * Removed ShopObject#spawn() and #despawn(). These are no longer exposed in the API.
 * Removed ShopObject#needsSpawning() and the internal AbstractShopObject#despawnDuringWorldSaves(). These have been replaced with corresponding internal methods in AbstractShopObjectType.
 * Added methods to BlockShopObjectType and EntityShopObjectType to query and check for shopkeepers of that specific type. This is less performance intensive compared to checking all shop object types when querying the ShopkeeperRegistry. Internally, sign shops make use of these new querying methods.
+* A few methods of ChunkCoords have been renamed for consistency with the rest of the code base.
 * Various minor Javadoc clarifications.
 
 Internal:  
@@ -89,6 +90,7 @@ Internal:
 * The FixedValuesArgument is less restrictive with the types of Map values it accepts.
 * Timer uses Java's TimeUnit for conversions now.
 * Timer and Timings use a long counter now.
+* Added a mutable variant of ChunkCoords.
 * Minor code formatting and method renaming.
 
 Migration notes:  

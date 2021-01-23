@@ -9,8 +9,8 @@ public class MutableBlockLocation extends BlockLocation {
 	/**
 	 * The (invalid) dummy world name that is used to indicate that the world name is unset.
 	 * <p>
-	 * BlockLocation always expects a non-empty name, but this class additionally provides a state with an unset world
-	 * name.
+	 * {@link BlockLocation} always expects a non-empty name, but this class additionally provides a state with an unset
+	 * world name.
 	 */
 	public static final String UNSET_WORLD_NAME = "<UNSET>";
 
@@ -53,7 +53,7 @@ public class MutableBlockLocation extends BlockLocation {
 	/**
 	 * Creates a new {@link MutableBlockLocation}.
 	 * <p>
-	 * The given {@link Location} is expected to provide {@link World}.
+	 * The given {@link Location} is expected to provide a {@link World}.
 	 * 
 	 * @param location
 	 *            the location, not <code>null</code>
@@ -106,7 +106,7 @@ public class MutableBlockLocation extends BlockLocation {
 	 * Sets this block location to the specified world name and coordinates.
 	 * 
 	 * @param worldName
-	 *            the world name
+	 *            the world name, not <code>null</code> or empty
 	 * @param x
 	 *            the x coordinate
 	 * @param y
