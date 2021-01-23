@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import com.nisovin.shopkeepers.util.MathUtils;
+import com.nisovin.shopkeepers.util.TimeUtils;
 
 public class Timer implements Timings {
 
@@ -86,13 +87,13 @@ public class Timer implements Timings {
 
 	@Override
 	public double getAverageTimeMillis() {
-		long avgTimeNanos = (long) MathUtils.average(timingsHistory, UNSET);
-		return TimeUnit.NANOSECONDS.toMillis(avgTimeNanos);
+		double avgTimeNanos = MathUtils.average(timingsHistory, UNSET);
+		return TimeUtils.convert(avgTimeNanos, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
 	}
 
 	@Override
 	public double getMaxTimeMillis() {
 		long maxTimeNanos = MathUtils.max(timingsHistory, UNSET);
-		return TimeUnit.NANOSECONDS.toMillis(maxTimeNanos);
+		return TimeUtils.convert(maxTimeNanos, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
 	}
 }
