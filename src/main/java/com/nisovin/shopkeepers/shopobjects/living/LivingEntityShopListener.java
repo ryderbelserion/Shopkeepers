@@ -60,18 +60,28 @@ class LivingEntityShopListener implements Listener {
 		this.shopkeeperRegistry = shopkeeperRegistry;
 	}
 
-	// We want to bypass other plugins by default. To allow other plugins (eg. protection plugins) to ignore the event
-	// if we have cancelled it, we handle the event as early as possible (LOWEST priority).
-	// In order to resolve conflicts with other event handlers potentially running at LOWEST priority, we ignore the
-	// event if it already got cancelled.
+	// We want to bypass other plugins by default, so that shops can also be opened in protected regions.
+	// We cancel the event to prevent any vanilla mechanics from taking place, and also to indicate to other plugins
+	// that they can safely ignore the event (eg. to prevent protection plugins from sending their 'interaction denied'
+	// message for shopkeeper entities). For that purpose, we handle and cancel the event as early as possible (LOWEST
+	// priority).
+	// Using a higher event priority with a setting to ignore whether the event got already cancelled by other plugins
+	// is not an option, because then these other plugins will already have handled the event and we have no chance to
+	// avoid their side-effects (eg. protection plugins will already have sent the player their 'interaction denied'
+	// message, even though we open the shop UI afterwards anyways).
 	// In some usecases it may make sense to take into account if some other plugin wants to cancel the interaction. For
-	// those situations the setting check-shop-interaction-result can be used to call an additional interact event
+	// those situations the setting 'check-shop-interaction-result' can be used to call an additional interaction event
 	// that other plugins can react to and which determines whether we handle the interaction. Since this might cause
 	// side-effects in general due to other plugins handling the event, this is disabled by default.
-	// Using a higher event priority with a setting to ignore whether the event got already cancelled by other
-	// plugins is not an option, because then other plugins will already have handled the event and we have no chance to
-	// avoid their side-effects (eg. protection plugins will already have sent the player a message, that interaction
-	// with the entity is denied).
+	// There is still the potential for conflicts with other event handlers that run on LOWEST priority as well (the
+	// execution order of these event handlers and ours is random). These conflicts cannot be avoided, regardless of
+	// whether or not we ignore the event when it has already been cancelled by another event handler: If we ignore the
+	// cancelled event, we won't open the shop menu in situations in which it is meant to be opened regardless of other
+	// plugins (eg. to bypass protection plugins). And if we handle the cancelled event, other plugins will already have
+	// handled the event and caused all kinds of side-effects (eg. the most harmless being a protection plugin that has
+	// already sent its 'interaction denied' message). However, we cannot prevent these side-effects either way. In
+	// order to still remain at least functional in the harmless case of a protection plugin canceling the event on
+	// LOWEST priority, we ignore the cancellation state of the event and attempt to open the shop UI anyways.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onEntityInteract(PlayerInteractEntityEvent event) {
 		// Ignore our own fake interact event:
@@ -91,10 +101,10 @@ class LivingEntityShopListener implements Listener {
 			return;
 		}
 
-		// Ignore if already cancelled. Resolves conflicts with other event handlers running at LOWEST priority as well.
+		// We ignore the event's cancellation state, but log a debug message since it indicates a potential
+		// incompatibility with another plugin.
 		if (event.isCancelled()) {
-			Log.debug("  Ignoring already cancelled event");
-			return;
+			Log.debug("  The event is already cancelled. This might indicate a conflict with another plugin. We continue anyways.");
 		}
 
 		// If Citizens NPC: Don't cancel the event, let Citizens perform other actions as appropriate.

@@ -63,6 +63,7 @@ Date format: (YYYY-MM-DD)
 * Debug: Added chunk activation timings to the 'check' command.
 * Metrics: We capture the actually used gravity-chunk-range now.
 * Fixed: The shop creation item can no longer be renamed in anvils if the 'prevent-shop-creation-item-regular-usage' setting is enabled.
+* We no longer ignore cancelled entity interaction events. This won't resolve the general potential incompatibility issues with other plugins that also react to entity interactions on lowest event priority, but at least we try to still open the shopkeeper UI(s) in these situations anyways. This affects for example the compatibility with GriefPrevention, which would sometimes (depending on the order of dynamically performed plugin reloads) prevent the shopkeeper UIs from being opened previously. With this new behavior you may observe GriefPrevention to send players an 'interaction denied' message, but at least we will still open the shopkeeper UI(s) in this situation anyways (which is our primary concern).
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
