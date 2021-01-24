@@ -1,13 +1,9 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Random;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
@@ -15,8 +11,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.util.CyclicCounter;
+import com.nisovin.shopkeepers.util.MutableChunkCoords;
+import com.nisovin.shopkeepers.util.RateLimiter;
 import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
 import com.nisovin.shopkeepers.util.timer.Timer;
@@ -30,10 +30,17 @@ import com.nisovin.shopkeepers.util.timer.Timings;
  */
 public class LivingEntityAI {
 
-	// Determines how often AI activations get rechecked (every X ticks):
+	/**
+	 * Determines how often AI activations get rechecked (every X ticks).
+	 */
+
 	public static final int AI_ACTIVATION_TICK_RATE = 20;
-	// The look-at-players ai goal only targets players in 12 block radius, so we can limit the ai ticking to the direct
-	// chunks around the player:
+	/**
+	 * The range in chunks around players in which AI is active.
+	 * <p>
+	 * The look-at-players AI goal only targets players in 12 block radius, so we can limit the AI ticking to the direct
+	 * chunks around the player.
+	 */
 	private static final int AI_ACTIVATION_CHUNK_RANGE = 1;
 	// Regarding gravity activation range:
 	// Players can see shop entities from further away, so we use a large enough range for the activation of falling
@@ -50,52 +57,65 @@ public class LivingEntityAI {
 	// TODO Dynamically increase an entities falling speed? Need to dynamically adjust the collision check range as well
 	// then.
 	private static final double MAX_FALLING_DISTANCE_PER_TICK = 0.5D;
+
+	/**
+	 * The period in ticks in which we check if an entity is supposed to fall.
+	 */
+	private static final int FALLING_CHECK_PERIOD_TICKS = 10;
+	private static final CyclicCounter nextFallingCheckTickOffset = new CyclicCounter(FALLING_CHECK_PERIOD_TICKS);
 	// The range in which we check for block collisions:
 	// Has to be slightly larger than the max-falling-distance-per-tick in order to make full use of the max. falling
 	// speed, and to be able to detect the end of the falling without having to check for block collisions another time
 	// in the next tick.
 	private static final double GRAVITY_COLLISION_CHECK_RANGE = MAX_FALLING_DISTANCE_PER_TICK + 0.1D;
 
-	private static final Random RANDOM = new Random();
+	// Temporarily re-used objects:
+	private static final Location sharedLocation = new Location(null, 0, 0, 0);
+	private static final MutableChunkCoords sharedChunkCoords = new MutableChunkCoords();
 
 	private final ShopkeepersPlugin plugin;
+	/**
+	 * Whether we use our custom gravity handling.
+	 * <p>
+	 * The value of this depends on the plugin configuration (gravity can be disabled) and the specific Minecraft
+	 * version (on some Minecraft versions the NoAI entity flag does not disable the gravity of mobs).
+	 */
+	private boolean customGravityEnabled;
 
 	private static class EntityData {
+		private final LivingEntity entity;
 		private final ChunkData chunkData;
-		// Random initial delay to distribute falling checks of entities among ticks:
-		public int skipFallingCheckTicks = RANDOM.nextInt(10);
+		// Initial offset between [0, FALLING_CHECK_PERIOD_TICKS) for load distribution:
+		public final RateLimiter fallingCheckLimiter = RateLimiter.withInitialOffset(FALLING_CHECK_PERIOD_TICKS, nextFallingCheckTickOffset.getAndIncrement());
 		public boolean falling = false;
 		public double distanceToGround = 0.0D;
 
-		public EntityData(ChunkData chunkData) {
+		public EntityData(LivingEntity entity, ChunkData chunkData) {
+			this.entity = entity;
 			this.chunkData = chunkData;
 		}
 	}
 
 	// Ticking entities -> entity data
-	private final Map<LivingEntity, EntityData> entities = new HashMap<>();
+	private final Map<LivingEntity, EntityData> entities = new LinkedHashMap<>();
 
 	private static class ChunkData {
-		private final Chunk chunk;
+		private final ChunkCoords chunkCoords;
 		private int entityCount = 0;
 		// Active by default for fast initial reactions in case players are nearby:
 		public boolean activeGravity;
 		public boolean activeAI = true;
 
-		public ChunkData(Chunk chunk, boolean activeGravity) {
-			this.chunk = chunk;
+		public ChunkData(ChunkCoords chunkCoords, boolean activeGravity) {
+			this.chunkCoords = chunkCoords;
 			this.activeGravity = activeGravity;
 		}
 	}
 
-	private final Map<Chunk, ChunkData> activeChunks = new HashMap<>();
-
-	// Temporarily re-used Location object:
-	private final Location tempLocation = new Location(null, 0, 0, 0);
+	private final Map<ChunkCoords, ChunkData> activeChunks = new LinkedHashMap<>();
 
 	private BukkitTask aiTask = null;
 	private boolean currentlyRunning = false;
-	private int tickCounter = 0;
 
 	// Statistics:
 	private int activeAIChunksCount = 0;
@@ -113,6 +133,10 @@ public class LivingEntityAI {
 		this.plugin = plugin;
 	}
 
+	public void onEnable() {
+		customGravityEnabled = _isCustomGravityEnabled();
+	}
+
 	public void onDisable() {
 		this.stop();
 		this.reset(); // Cleanup, reset timings, etc.
@@ -121,7 +145,7 @@ public class LivingEntityAI {
 	private void reset() {
 		Validate.isTrue(!currentlyRunning, "Cannot reset while the AI task is running!");
 		entities.clear();
-		// activeChunks.clear();
+		activeChunks.clear();
 		this.resetStatistics();
 	}
 
@@ -134,22 +158,21 @@ public class LivingEntityAI {
 		if (entities.containsKey(entity)) return;
 
 		// Determine entity chunk (asserts that the entity won't move!):
-		Chunk entityChunk = entity.getLocation(tempLocation).getChunk();
-		tempLocation.setWorld(null); // Cleanup temporarily used location object
-
-		// Active gravity handling?
-		boolean gravityActive = this.isGravityActive();
+		// We assert that the chunk is loaded (checked above by isValid call).
+		ChunkCoords chunkCoords = new ChunkCoords(entity.getLocation(sharedLocation));
+		sharedLocation.setWorld(null); // Reset
 
 		// Add chunk entry:
-		ChunkData chunkData = activeChunks.get(entityChunk);
+		ChunkData chunkData = activeChunks.get(chunkCoords);
 		if (chunkData == null) {
-			chunkData = new ChunkData(entityChunk, gravityActive);
-			activeChunks.put(entityChunk, chunkData);
+			chunkData = new ChunkData(chunkCoords, customGravityEnabled);
+			activeChunks.put(chunkCoords, chunkData);
 		}
 		chunkData.entityCount++;
 
 		// Add entity entry:
-		entities.put(entity, new EntityData(chunkData));
+		EntityData entityData = new EntityData(entity, chunkData);
+		entities.put(entity, entityData);
 
 		// Start the AI task, if it isn't already running:
 		this.start();
@@ -170,7 +193,7 @@ public class LivingEntityAI {
 		ChunkData chunkData = entityData.chunkData;
 		chunkData.entityCount--;
 		if (chunkData.entityCount <= 0) {
-			activeChunks.remove(chunkData.chunk);
+			activeChunks.remove(chunkData.chunkCoords);
 		}
 	}
 
@@ -232,9 +255,19 @@ public class LivingEntityAI {
 		else if (aiTask != null) this.stop(); // Not active, but already setup: Perform cleanup.
 
 		// Start AI task:
-		aiTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+		aiTask = Bukkit.getScheduler().runTaskTimer(plugin, new TickTask(), 1L, 1L);
+	}
+
+	private class TickTask implements Runnable {
+
+		private final RateLimiter aiActivationLimiter = new RateLimiter(AI_ACTIVATION_TICK_RATE);
+
+		TickTask() {
+		}
+
+		@Override
+		public void run() {
 			currentlyRunning = true;
-			tickCounter++;
 
 			// Start timings:
 			totalTimings.start();
@@ -242,28 +275,25 @@ public class LivingEntityAI {
 			aiTimings.startPaused();
 
 			// Freshly determine active chunks/entities (near players) every AI_ACTIVATION_TICK_RATE ticks:
-			boolean activationPhase = (tickCounter % AI_ACTIVATION_TICK_RATE == 0);
-			if (activationPhase) {
-				activationTimings.start();
+			if (aiActivationLimiter.request()) {
 				updateChunkActivations();
-				activationTimings.stop();
 			}
 
 			// Process entities:
 			processEntities();
 
-			// Stop the task if there are no entities with AI anymore:
-			if (entities.isEmpty()) {
-				this.stop();
-			}
-
-			// Timings:
+			// Stop timings:
 			totalTimings.stop();
 			gravityTimings.stop();
 			aiTimings.stop();
 
 			currentlyRunning = false;
-		}, 1L, 1L);
+
+			// Stop the task if there are no entities with AI anymore:
+			if (entities.isEmpty()) {
+				stop();
+			}
+		}
 	}
 
 	private void stop() {
@@ -282,32 +312,42 @@ public class LivingEntityAI {
 	// CHUNK ACTIVATIONS
 
 	private void updateChunkActivations() {
+		activationTimings.start();
+
 		// Deactivate all chunks:
-		for (ChunkData chunkData : activeChunks.values()) {
+		activeChunks.values().forEach(chunkData -> {
 			chunkData.activeAI = false;
 			chunkData.activeGravity = false;
-		}
+		});
 		activeAIChunksCount = 0;
 		activeGravityChunksCount = 0;
 
-		// Activate chunks with nearby players:
-		boolean gravityActive = this.isGravityActive();
-		int gravityChunkRange = Math.max(Settings.gravityChunkRange, 0);
+		// Activate chunks around online players:
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			World world = player.getWorld();
-			Location playerLocation = player.getLocation(tempLocation);
-			// Note: On some Paper versions with their async chunk loading, the player's current chunk may
-			// sometimes not be loaded yet. We therefore avoid accessing (and thereby loading) that chunk here,
-			// but instead only use its coordinates. The subsequent activation of nearby chunks only considers
-			// loaded chunks.
-			int chunkX = playerLocation.getBlockX() >> 4;
-			int chunkZ = playerLocation.getBlockZ() >> 4;
-
-			this.activateNearbyChunks(world, chunkX, chunkZ, AI_ACTIVATION_CHUNK_RANGE, ActivationType.AI);
-			if (gravityActive) {
-				this.activateNearbyChunks(world, chunkX, chunkZ, gravityChunkRange, ActivationType.GRAVITY);
-			}
+			this.activateNearbyChunks(player);
 		}
+
+		activationTimings.stop();
+	}
+
+	// Note: This only activates chunks around the player, but does not deactivate any chunks that have previously been
+	// activated by the player. The periodic full activation update deactivates all chunks that no longer require
+	// activation.
+	private void activateNearbyChunks(Player player) {
+		World world = player.getWorld();
+		Location location = player.getLocation(sharedLocation);
+		// Note: On some Paper versions with their async chunk loading, the player's current chunk may sometimes not be
+		// loaded yet. We therefore avoid accessing (and thereby loading) that chunk here, but instead only use its
+		// coordinates. The subsequent activation of nearby chunks only considers loaded chunks.
+		int chunkX = ChunkCoords.fromBlock(location.getBlockX());
+		int chunkZ = ChunkCoords.fromBlock(location.getBlockZ());
+
+		this.activateNearbyChunks(world, chunkX, chunkZ, AI_ACTIVATION_CHUNK_RANGE, ActivationType.AI);
+		if (customGravityEnabled) {
+			assert Settings.gravityChunkRange >= 0;
+			this.activateNearbyChunks(world, chunkX, chunkZ, Settings.gravityChunkRange, ActivationType.GRAVITY);
+		}
+		sharedLocation.setWorld(null); // Reset
 	}
 
 	private static enum ActivationType {
@@ -317,15 +357,15 @@ public class LivingEntityAI {
 
 	private void activateNearbyChunks(World world, int centerChunkX, int centerChunkZ, int chunkRadius, ActivationType activationType) {
 		assert world != null && chunkRadius >= 0 && activationType != null;
-		int minX = centerChunkX - chunkRadius;
-		int maxX = centerChunkX + chunkRadius;
-		int minZ = centerChunkZ - chunkRadius;
-		int maxZ = centerChunkZ + chunkRadius;
-		for (int x = minX; x <= maxX; x++) {
-			for (int z = minZ; z <= maxZ; z++) {
-				if (!world.isChunkLoaded(x, z)) continue;
-				Chunk chunk = world.getChunkAt(x, z);
-				ChunkData chunkData = activeChunks.get(chunk);
+		String worldName = world.getName();
+		int minChunkX = centerChunkX - chunkRadius;
+		int maxChunkX = centerChunkX + chunkRadius;
+		int minChunkZ = centerChunkZ - chunkRadius;
+		int maxChunkZ = centerChunkZ + chunkRadius;
+		for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
+			for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
+				sharedChunkCoords.set(worldName, chunkX, chunkZ);
+				ChunkData chunkData = activeChunks.get(sharedChunkCoords);
 				if (chunkData == null) continue;
 
 				switch (activationType) {
@@ -353,76 +393,81 @@ public class LivingEntityAI {
 	private void processEntities() {
 		activeAIEntityCount = 0;
 		activeGravityEntityCount = 0;
-		Iterator<Entry<LivingEntity, EntityData>> iterator = entities.entrySet().iterator();
-		while (iterator.hasNext()) {
-			Entry<LivingEntity, EntityData> entry = iterator.next();
-			LivingEntity entity = entry.getKey();
-			EntityData entityData = entry.getValue();
+		entities.values().forEach(this::processEntity);
+	}
 
-			// Entity still alive and loaded?
-			if (!entity.isValid()) {
-				iterator.remove();
-				this.onEntityRemoved(entity, entityData);
-				continue;
-			}
-			ChunkData chunkData = entityData.chunkData;
-
-			// Process gravity:
-			gravityTimings.resume();
-			if (chunkData.activeGravity) {
-				activeGravityEntityCount++;
-				processGravity(entity, entityData);
-			}
-			gravityTimings.pause();
-
-			// Process AI:
-			aiTimings.resume();
-			if (chunkData.activeAI) {
-				activeAIEntityCount++;
-				processAI(entity, entityData);
-			}
-			aiTimings.pause();
+	private void processEntity(EntityData entityData) {
+		LivingEntity entity = entityData.entity;
+		// Note: Checking entity.isValid() is relatively heavy (compared to other operations) due to a chunk lookup. The
+		// entity's entry is already immediately getting removed as reaction to its chunk being unloaded. So there
+		// should be no need to check for that here.
+		// TODO Actually, if the entity moved into a different chunk and we did not update its location in the chunk
+		// index yet, it may already have been unloaded but still getting ticked here. However, this is not the case
+		// currently, since all shopkeeper entities are stationary (unless some other plugin teleports them).
+		if (entity.isDead()) {
+			// Some plugin might have removed the entity. The shop object will remove the entity's entry once it
+			// recognizes that the entity has been removed. Until then we simply skip it here.
+			return;
 		}
-		// Cleanup temporarily used location object:
-		tempLocation.setWorld(null);
+
+		ChunkData chunkData = entityData.chunkData;
+
+		// Process gravity:
+		gravityTimings.resume();
+		if (chunkData.activeGravity) {
+			activeGravityEntityCount++;
+			processGravity(entityData);
+		}
+		gravityTimings.pause();
+
+		// Process AI:
+		aiTimings.resume();
+		if (chunkData.activeAI) {
+			activeAIEntityCount++;
+			processAI(entityData);
+		}
+		aiTimings.pause();
 	}
 
 	// GRAVITY
 
-	// Whether our custom gravity handling shall be active.
-	private boolean isGravityActive() {
+	// The result of this check is cached on plugin enable.
+	private boolean _isCustomGravityEnabled() {
 		// Gravity is enabled and not already handled by Minecraft itself:
 		return !Settings.disableGravity && NMSManager.getProvider().isNoAIDisablingGravity();
 	}
 
-	private void processGravity(LivingEntity entity, EntityData entityData) {
+	private void processGravity(EntityData entityData) {
 		// Check periodically, or if already falling, if the entity is meant to (continue to) fall:
-		entityData.skipFallingCheckTicks--;
-		if ((entityData.skipFallingCheckTicks <= 0) || entityData.falling) {
-			// Falling, if the distance-to-ground is above the threshold:
-			Location entityLocation = entity.getLocation(tempLocation);
+		// Note: The falling check limiter is not invoked while the entity is already falling. This ensures that once
+		// the entity stops its current fall the limiter will wait a full cycle before we check again if the entity is
+		// falling again.
+		if (entityData.falling || entityData.fallingCheckLimiter.request()) {
+			// Check if the entity is supposed to (continue to) fall by performing a ray cast towards the ground:
+			LivingEntity entity = entityData.entity;
+			Location entityLocation = entity.getLocation(sharedLocation);
 			entityData.distanceToGround = Utils.getCollisionDistanceToGround(entityLocation, GRAVITY_COLLISION_CHECK_RANGE);
-			entityData.falling = (entityData.distanceToGround >= DISTANCE_TO_GROUND_THRESHOLD);
+			sharedLocation.setWorld(null); // Reset
+			boolean falling = (entityData.distanceToGround >= DISTANCE_TO_GROUND_THRESHOLD);
+			entityData.falling = falling;
 
 			// Tick falling:
-			if (entityData.falling) {
+			if (falling) {
 				// Prevents SPIGOT-3948 / MC-130725
 				NMSManager.getProvider().setOnGround(entity, false);
-				this.tickFalling(entity, entityData);
+				this.tickFalling(entityData);
 			}
 			if (!entityData.falling) {
 				// Prevents SPIGOT-3948 / MC-130725
 				NMSManager.getProvider().setOnGround(entity, true);
 			}
-
-			// Wait 10 ticks before checking again:
-			entityData.skipFallingCheckTicks = 10;
 		}
 	}
 
 	// Gets run every tick while falling:
-	private void tickFalling(LivingEntity entity, EntityData entityData) {
+	private void tickFalling(EntityData entityData) {
 		assert entityData.falling && entityData.distanceToGround >= DISTANCE_TO_GROUND_THRESHOLD;
+		LivingEntity entity = entityData.entity;
 		// Determine falling step size:
 		double fallingStepSize;
 		double remainingDistance = (entityData.distanceToGround - MAX_FALLING_DISTANCE_PER_TICK);
@@ -436,17 +481,18 @@ public class LivingEntityAI {
 		}
 
 		// Teleport the entity to its new location:
-		Location newLocation = entity.getLocation(tempLocation);
+		Location newLocation = entity.getLocation(sharedLocation);
 		newLocation.add(0.0D, -fallingStepSize, 0.0D);
 		entity.teleport(newLocation);
-		tempLocation.setWorld(null); // Cleanup temporarily used location object
+		sharedLocation.setWorld(null); // Reset
 	}
 
 	// ENTITY AI
 
-	private void processAI(LivingEntity entity, EntityData entityData) {
+	private void processAI(EntityData entityData) {
 		// Only tick AI if not currently falling:
 		if (!entityData.falling) {
+			LivingEntity entity = entityData.entity;
 			this.tickAI(entity);
 		}
 	}

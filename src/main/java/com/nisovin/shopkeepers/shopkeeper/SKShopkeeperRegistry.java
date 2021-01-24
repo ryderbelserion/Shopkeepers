@@ -52,6 +52,12 @@ import com.nisovin.shopkeepers.util.timer.Timings;
 
 public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
+	// TODO We assume that shopkeeper entities are stationary. If they get teleported into another chunk, or even
+	// another world, we would need to check for them during chunk unloads, world unloads, and world saves (which we
+	// currently don't).
+	// This isn't that big of an issue, since all shopkeeper entities are non-persistent currently. But in general this
+	// may be required.
+
 	private static final class ChunkShopkeepers {
 
 		final WorldShopkeepers worldEntry;

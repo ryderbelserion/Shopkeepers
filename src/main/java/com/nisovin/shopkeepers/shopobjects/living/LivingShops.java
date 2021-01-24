@@ -23,6 +23,7 @@ public class LivingShops {
 	}
 
 	public void onEnable() {
+		livingEntityAI.onEnable();
 		Bukkit.getPluginManager().registerEvents(livingEntityShopListener, plugin);
 		// Register force-creature-spawn event handler:
 		if (Settings.bypassSpawnBlocking) {

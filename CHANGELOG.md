@@ -50,10 +50,10 @@ Date format: (YYYY-MM-DD)
   * We not only tick the shopkeepers with active shop objects, but all shopkeepers in active chunks. This ensures that we periodically check if we can respawn missing shop objects. Additionally, instead of permanently aborting these periodic validation and respawn attempts of living shopkeepers when they cannot be respawned 5 times in a row, we now throttle the rate at which they perform these checks. Only due to these changes we can actually omit the spawn verifier task. Whenever a shop object is successfully spawned, its tick rate and respawn counter are reset.
   * Performance: For load balancing purposes, the checking activities of all shopkeepers are distributed across multiple shopkeeper ticks. And similarly, the ticking shopkeepers are divided into 4 groups to distribute their ticking across multiple Minecraft ticks (ticking happens every 5 Minecraft ticks for a fourth of the shopkeepers). The number of these ticking groups is a balance between no load balancing (1 group) and having to iterate all active shopkeepers every tick (20 groups), which provides optimal load balancing but is associated with a high total overhead.
   * When offsetting ticking activities of shopkeepers and shop objects for load balancing purposes, we use a simple cyclic counter now instead of relying on random numbers. This should produce a more even and consistent load distribution.
-  * Performance: To slightly speed up iterations, we use LinkedHashMap instead of HashMap and Collection#forEach instead of iterators at a few places now.
   * When a shopkeeper is marked as dirty during ticking, we trigger a delayed save instead of an immediate save now.
   * Fixed: Previously, if the shopkeeper location changed due to a Citizen NPC moving around, it was not guaranteed whether or not that change would be persisted. Now, we always trigger a save if at least one shopkeeper is marked as dirty during ticking.
 * The spawning and despawning of shopkeepers is handled more consistently now. For instance, if shopkeepers are marked as dirty during the spawning of their shop objects we would previously trigger a delayed save. We do the same when they are despawned now.
+* Performance: To slightly speed up iterations, we use LinkedHashMap instead of HashMap and Collection#forEach instead of iterators at a few places now.
 * Debug: Several tasks no longer use lambdas but named classes. This makes it easier to identify them in timing reports.
 * Debug: A few debug messages are now printed before their denoted action takes place (eg. before the shop object is teleported or respawned).
 * Debug: The debug command can toggle debug options now ('/shopkeeper debug [option]').
@@ -64,6 +64,10 @@ Date format: (YYYY-MM-DD)
 * Metrics: We capture the actually used gravity-chunk-range now.
 * Fixed: The shop creation item can no longer be renamed in anvils if the 'prevent-shop-creation-item-regular-usage' setting is enabled.
 * We no longer ignore cancelled entity interaction events. This won't resolve the general potential incompatibility issues with other plugins that also react to entity interactions on lowest event priority, but at least we try to still open the shopkeeper UI(s) in these situations anyways. This affects for example the compatibility with GriefPrevention, which would sometimes (depending on the order of dynamically performed plugin reloads) prevent the shopkeeper UIs from being opened previously. With this new behavior you may observe GriefPrevention to send players an 'interaction denied' message, but at least we will still open the shopkeeper UI(s) in this situation anyways (which is our primary concern).
+* Performance: The shopkeeper mob AI task no longer checks if the entity is still valid, but only if it is still alive. This avoids having to check if the entity's chunk is still loaded, which is relatively costly compared to other operations. This check shouldn't be required since we expect the shopkeeper mobs to be stationary and we already stop their AI on chunk unloads.
+* We also no longer remove dead entities from our mob AI processing right away, but simply ignore them. They are cleaned up once the shop objects recognize that the entities are no longer alive.
+* Performance: The shopkeeper mob AI no longer stores and queries chunk data by the chunks themselves, but via their coordinates. This avoids having to retrieve and check if the chunks around players are currently loaded during AI activation updates.
+* Debug: The shopkeeper mob AI timers are stopped before the AI task is stopped now. This might, in rare cases, affect the correctness of some of the timing outputs of the 'check' command.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
@@ -95,7 +99,7 @@ Internal:
 * Timer uses Java's TimeUnit for conversions now.
 * Timer and Timings use a long counter now.
 * Added a mutable variant of ChunkCoords.
-* Minor code formatting and method renaming.
+* Minor other internal code refactoring.
 
 Migration notes:  
 * The folder structure has changed:
