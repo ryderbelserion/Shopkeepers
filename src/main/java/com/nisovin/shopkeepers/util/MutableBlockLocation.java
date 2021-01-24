@@ -103,6 +103,18 @@ public class MutableBlockLocation extends BlockLocation {
 	}
 
 	/**
+	 * Sets this block location to the block at the given {@link Location}.
+	 * 
+	 * @param location
+	 *            the location, not <code>null</code> and provides a world
+	 */
+	public void set(Location location) {
+		Validate.notNull(location, "location is null");
+		// Throws an exception if the Location does not provide a world:
+		this.set(location.getWorld().getName(), location.getBlockX(), location.getBlockY(), location.getBlockZ());
+	}
+
+	/**
 	 * Sets this block location to the specified world name and coordinates.
 	 * 
 	 * @param worldName

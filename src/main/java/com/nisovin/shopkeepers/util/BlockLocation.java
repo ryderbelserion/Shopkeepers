@@ -170,6 +170,17 @@ public class BlockLocation {
 		return Bukkit.getWorld(worldName);
 	}
 
+	/**
+	 * Gets the {@link Block} associated with this location, or <code>null</code> if the world is not loaded.
+	 * 
+	 * @return the block, or <code>null</code> if the world is not loaded
+	 */
+	public Block getBlock() {
+		World world = this.getWorld();
+		if (world == null) return null;
+		return world.getBlockAt(x, y, z); // Not null (even for coordinates outside the world's bounds)
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -209,6 +220,18 @@ public class BlockLocation {
 		// Checked last for performance reasons:
 		if (!this.worldName.equals(worldName)) return false;
 		return true;
+	}
+
+	/**
+	 * Checks if this {@link BlockLocation} matches the location of the given {@link Block}
+	 * 
+	 * @param block
+	 *            the block
+	 * @return <code>true</code> if the locations match
+	 */
+	public boolean matches(Block block) {
+		if (block == null) return false;
+		return this.matches(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
 	}
 
 	@Override
