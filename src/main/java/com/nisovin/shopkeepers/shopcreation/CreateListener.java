@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopcreation;
 
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -11,11 +13,13 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.inventory.PrepareAnvilEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -245,5 +249,43 @@ class CreateListener implements Listener {
 			}
 		});
 		event.setCancelled(true);
+	}
+
+	// Rate limiting of debug messages related to the PrepareAnvilEvent:
+	private static final long ANVIL_DEBUG_MESSAGE_THROTTLE_MILLISECONDS = 5000L; // 5 seconds
+	private UUID lastAnvilDebugMessagePlayer = null;
+	private long lastAnvilDebugMessageTime = 0L; // System time in milliseconds
+
+	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+	void onPrepareAnvilEvent(PrepareAnvilEvent event) {
+		if (!Settings.preventShopCreationItemRegularUsage) return;
+		if (ItemUtils.isEmpty(event.getResult())) {
+			// The PrepareAnvilEvent is called multiple times. We only need to handle it when a result item is set.
+			return;
+		}
+
+		Inventory anvilInventory = event.getInventory();
+		if (!Settings.isShopCreationItem(anvilInventory.getItem(0)) && !Settings.isShopCreationItem(anvilInventory.getItem(1))) {
+			// No shop creation item involved.
+			// Note: We only prevent the renaming of the shop creation item, not its creation. I.e. we do not check the
+			// result item here. The shop creation item could intentionally be set up to be an item that can be created
+			// with an anvil.
+			return;
+		}
+
+		if (Settings.debug) {
+			// Rate limiting of debug messages (this event is called for every text change):
+			Player player = (Player) event.getView().getPlayer();
+			UUID playerUniqueId = player.getUniqueId();
+			long now = System.currentTimeMillis();
+			if (!playerUniqueId.equals(lastAnvilDebugMessagePlayer) || (now - lastAnvilDebugMessageTime) > ANVIL_DEBUG_MESSAGE_THROTTLE_MILLISECONDS) {
+				lastAnvilDebugMessagePlayer = playerUniqueId;
+				lastAnvilDebugMessageTime = now;
+				Log.debug(() -> "Preventing renaming of shop creation item by " + player.getName() + " (debug output is throttled)");
+			}
+		}
+		event.setResult(null);
+		ItemUtils.updateInventoryLater(anvilInventory);
+		// TODO Inform the player? (This would require some per-player throttling)
 	}
 }

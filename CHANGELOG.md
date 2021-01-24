@@ -62,6 +62,7 @@ Date format: (YYYY-MM-DD)
 * Debug/Fixed: Average timings would previously sometimes be incorrect since they took into account unset values of the timing history.
 * Debug: Added chunk activation timings to the 'check' command.
 * Metrics: We capture the actually used gravity-chunk-range now.
+* Fixed: The shop creation item can no longer be renamed in anvils if the 'prevent-shop-creation-item-regular-usage' setting is enabled.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
