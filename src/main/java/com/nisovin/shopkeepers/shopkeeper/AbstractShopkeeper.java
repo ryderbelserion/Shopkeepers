@@ -7,7 +7,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -37,6 +40,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
+import com.nisovin.shopkeepers.util.ColorUtils;
 import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -76,6 +80,30 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// The actual maximum name length that can be used might be lower depending on config settings
 	// and on shop object specific limits.
 	public static final int MAX_NAME_LENGTH = 128;
+
+	// Shopkeeper tick visualization:
+	// Particles of different colors indicate the different ticking groups.
+	// Note: The client seems to randomly change the color slightly each time a dust particle is spawned.
+	// Note: The particle size also determines the effect duration.
+	private static final DustOptions[] TICK_VISUALIZATION_DUSTS = new DustOptions[AbstractShopkeeper.TICKING_GROUPS];
+	static {
+		// Even distribution of colors in the HSB color space: Ensures a distinct color for each ticking group.
+		float hueStep = (1.0F / AbstractShopkeeper.TICKING_GROUPS);
+		for (int i = 0; i < AbstractShopkeeper.TICKING_GROUPS; ++i) {
+			float hue = i * hueStep; // Starts with red
+			int rgb = ColorUtils.HSBtoRGB(hue, 1.0F, 1.0F);
+			Color color = Color.fromRGB(rgb);
+			TICK_VISUALIZATION_DUSTS[i] = new DustOptions(color, 1.0F);
+		}
+	}
+
+	// This is called on plugin enable and can be used to setup or reset any initial static state.
+	static void setupOnEnable() {
+		// Resetting the ticking group counter ensures that shopkeepers retain their ticking group across reloads (if
+		// there are no changes in the order of the loaded shopkeepers). This ensures that the particle colors of our
+		// tick visualization remain the same across reloads (avoids possible confusion for users).
+		nextTickingGroup.reset();
+	}
 
 	private final int id;
 	private UUID uniqueId; // Not null after initialization
@@ -751,7 +779,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public void onChunkDeactivation() {
 	}
 
-	int getTickingGroup() {
+	// For internal purposes only.
+	final int getTickingGroup() {
 		return tickingGroup;
 	}
 
@@ -776,9 +805,24 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * <p>
 	 * Any changes to the shopkeeper's activation state or {@link AbstractShopObject#getId() shop object id} may only be
 	 * processed after the ticking of all currently ticked shopkeepers completes.
+	 * <p>
+	 * If you are overriding this method, consider calling the parent class version of this method.
 	 */
 	public void tick() {
 		// Nothing to do by default.
+	}
+
+	/**
+	 * Visualizes the shopkeeper's activity during the last tick.
+	 */
+	public void visualizeLastTick() {
+		Location particleLocation = shopObject.getTickVisualizationParticleLocation();
+		if (particleLocation == null) return;
+
+		assert particleLocation.isWorldLoaded();
+		World world = particleLocation.getWorld();
+		assert world != null;
+		world.spawnParticle(Particle.REDSTONE, particleLocation, 1, TICK_VISUALIZATION_DUSTS[tickingGroup]);
 	}
 
 	// HASHCODE AND EQUALS

@@ -16,6 +16,8 @@ debug: false
 #    each event.
 # - 'shopkeeper-activation': Enables debugging output related to shopkeeper
 #    activation.
+# - 'visualize-shopkeeper-ticks': Visualizes the ticking activities of
+#    shopkeepers in-game.
 # - 'commands': Enables additional commands related debugging output.
 # - 'owner-name-updates': Logs information when updating stored shop owner
 #    names.

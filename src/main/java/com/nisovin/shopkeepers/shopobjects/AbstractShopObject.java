@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Location;
+import org.bukkit.Particle;
+import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -26,6 +28,7 @@ public abstract class AbstractShopObject implements ShopObject {
 
 	protected final AbstractShopkeeper shopkeeper; // Not null
 	private Object lastId = null;
+	private boolean tickActivity = false;
 
 	// Fresh creation
 	protected AbstractShopObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -155,6 +158,14 @@ public abstract class AbstractShopObject implements ShopObject {
 	@Override
 	public abstract Location getLocation();
 
+	/**
+	 * Gets the location at which particles for the shopkeeper's tick visualization shall be spawned.
+	 * 
+	 * @return the location, or possibly (but not necessarily) <code>null</code> if the shop object is not active
+	 *         currently, or if it does not support the tick visualization
+	 */
+	public abstract Location getTickVisualizationParticleLocation();
+
 	// TICKING
 
 	/**
@@ -178,9 +189,36 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * <p>
 	 * If any of the shopkeepers whose shop objects are ticked are marked as {@link Shopkeeper#isDirty() dirty}, a
 	 * {@link ShopkeeperStorage#saveDelayed() delayed save} will subsequently be triggered.
+	 * <p>
+	 * If you are overriding this method, consider calling the parent class version of this method.
 	 */
 	public void tick() {
-		// Nothing to do by default.
+		// Reset activity indicator:
+		tickActivity = false;
+	}
+
+	/**
+	 * Optional: Subclasses can call this method to indicate activity during their last tick. If the tick visualization
+	 * is enabled, this will result in a default visualization of that ticking activity.
+	 */
+	protected void indicateTickActivity() {
+		tickActivity = true;
+	}
+
+	/**
+	 * Visualizes the shop object's activity during the last tick.
+	 */
+	public void visualizeLastTick() {
+		// Default visualization:
+		if (!tickActivity) return;
+
+		Location particleLocation = this.getTickVisualizationParticleLocation();
+		if (particleLocation == null) return;
+
+		assert particleLocation.isWorldLoaded();
+		World world = particleLocation.getWorld();
+		assert world != null;
+		world.spawnParticle(Particle.VILLAGER_ANGRY, particleLocation, 1);
 	}
 
 	// NAMING

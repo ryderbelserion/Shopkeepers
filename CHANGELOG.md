@@ -68,6 +68,7 @@ Date format: (YYYY-MM-DD)
 * We also no longer remove dead entities from our mob AI processing right away, but simply ignore them. They are cleaned up once the shop objects recognize that the entities are no longer alive.
 * Performance: The shopkeeper mob AI no longer stores and queries chunk data by the chunks themselves, but via their coordinates. This avoids having to retrieve and check if the chunks around players are currently loaded during AI activation updates.
 * Debug: The shopkeeper mob AI timers are stopped before the AI task is stopped now. This might, in rare cases, affect the correctness of some of the timing outputs of the 'check' command.
+* Debug: Added debug option 'visualize-shopkeeper-ticks'. This enables an in-game visualization of shopkeeper and shop object ticking activities using particles.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
@@ -95,6 +96,7 @@ Internal:
 * Added AbstractShopkeeper#onChunkActivation() and #onChunkDeactivation().
 * Instead of passing the chunk coordinates around whenever a shopkeeper is registered, unregistered, or moved, each shopkeeper remembers the chunk now by which we previously stored it.
 * ShopkeeperRegistry#onShopkeeperMove has been renamed to #onShopkeeperMoved.
+* When ticking sign shopkeepers, we no longer check twice if the chunk is loaded in the regular case, but only if the sign block could not be retrieved (i.e. only in the exceptional case).
 * The FixedValuesArgument is less restrictive with the types of Map values it accepts.
 * Timer uses Java's TimeUnit for conversions now.
 * Timer and Timings use a long counter now.

@@ -243,6 +243,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	@Override
 	public void tick() {
+		super.tick();
 		if (!checkLimiter.request()) {
 			return;
 		}
@@ -260,6 +261,9 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			return;
 		}
 		assert expectedLocation.getWorld() != null;
+
+		// Indicate ticking activity for visualization:
+		this.indicateTickActivity();
 
 		Location currentLocation = npc.getStoredLocation();
 		if (currentLocation == null) {

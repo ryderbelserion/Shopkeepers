@@ -34,6 +34,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
+import com.nisovin.shopkeepers.debug.Debug;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
@@ -43,6 +44,7 @@ import com.nisovin.shopkeepers.shopobjects.block.DefaultBlockShopObjectIds;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.entity.DefaultEntityShopObjectIds;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
+import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -290,6 +292,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	public void onEnable() {
+		// Setup of static state related to shopkeepers:
+		AbstractShopkeeper.setupOnEnable();
+
 		// Start shopkeeper ticking task:
 		this.startShopkeeperTickTask();
 
@@ -321,8 +326,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	private class ShopkeeperTickTask extends BukkitRunnable {
 
-		private int tickingGroup = 0;
+		private final CyclicCounter tickingGroup = new CyclicCounter(AbstractShopkeeper.TICKING_GROUPS);
 		private boolean dirty;
+		private boolean visualizeTicks;
 
 		public void start() {
 			// For load balancing purposes, we run the task more often and then process only a subset of all active
@@ -334,6 +340,12 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		@Override
 		public void run() {
 			dirty = false;
+			// We only check once per shopkeeper tick if the tick visualization is enabled (by default this avoids that
+			// each shopkeeper and shop object has to check this itself):
+			// TODO We could probably also cache this once on plugin enable and only update it on changes to the
+			// settings. However, this check isn't actually that costly that this would be required.
+			visualizeTicks = Debug.isDebugging(DebugOptions.visualizeShopkeeperTicks);
+
 			tickingShopkeepers = true;
 			activeShopkeepersByObjectId.values().forEach(this::tickShopkeeper);
 			tickingShopkeepers = false;
@@ -354,15 +366,12 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			}
 
 			// Update ticking group:
-			tickingGroup += 1;
-			if (tickingGroup >= AbstractShopkeeper.TICKING_GROUPS) {
-				tickingGroup = 0;
-			}
+			tickingGroup.getAndIncrement();
 		}
 
 		private void tickShopkeeper(AbstractShopkeeper shopkeeper) {
 			assert shopkeeper.getShopObject().getLastId() != null; // We only tick the active shopkeepers
-			if (shopkeeper.getTickingGroup() != tickingGroup) return;
+			if (shopkeeper.getTickingGroup() != tickingGroup.getValue()) return;
 			// Skip if the shopkeeper is no longer valid (got deleted) or is pending deactivation.
 			// Note: Checking if the shopkeeper is pending deactivation is enough, since deleting the shopkeeper also
 			// deactivates it.
@@ -371,15 +380,25 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			// Tick shopkeeper:
 			shopkeeper.tick();
 
-			// Skip if the shopkeeper got deleted or deactivated during the shopkeeper ticking:
-			if (isPendingDeactivation(shopkeeper)) return;
+			// Skip the ticking of the shop object if the shopkeeper got deleted or deactivated during the tick:
+			boolean tickShopObject = !isPendingDeactivation(shopkeeper);
 
 			// Tick shop object:
 			AbstractShopObject shopObject = shopkeeper.getShopObject();
-			shopObject.tick();
-			// If the shop object had to be respawned, its id might have changed.
-			if (!shopObject.getLastId().equals(shopObject.getId())) {
-				onShopkeeperObjectIdChanged(shopkeeper);
+			if (tickShopObject) {
+				shopObject.tick();
+
+				// If the shop object had to be respawned, its id might have changed.
+				if (!shopObject.getLastId().equals(shopObject.getId())) {
+					onShopkeeperObjectIdChanged(shopkeeper);
+				}
+			}
+
+			if (visualizeTicks) {
+				shopkeeper.visualizeLastTick();
+				if (tickShopObject) {
+					shopObject.visualizeLastTick();
+				}
 			}
 
 			if (shopkeeper.isDirty()) {

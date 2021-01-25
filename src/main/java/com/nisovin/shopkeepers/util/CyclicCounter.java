@@ -31,6 +31,13 @@ public class CyclicCounter {
 	}
 
 	/**
+	 * Resets this counter back to {@code 0}.
+	 */
+	public void reset() {
+		value = 0;
+	}
+
+	/**
 	 * Gets the current value and then increments it by one.
 	 * <p>
 	 * If the new value reaches the upper bound of this counter, it is reset to {@link 0}.

@@ -18,6 +18,8 @@ public final class DebugOptions {
 	public static final String printListeners = add("print-listeners");
 	// Enables debugging output related to shopkeeper activation.
 	public static final String shopkeeperActivation = add("shopkeeper-activation");
+	// Visualizes the ticking activities of shopkeepers in-game.
+	public static final String visualizeShopkeeperTicks = add("visualize-shopkeeper-ticks");
 	// Enables additional commands related debugging output.
 	public static final String commands = add("commands");
 	// Logs information when updating stored shop owner names.

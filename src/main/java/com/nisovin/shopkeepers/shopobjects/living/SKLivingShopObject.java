@@ -385,8 +385,12 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	@Override
 	public void tick() {
+		super.tick();
 		if (checkLimiter.request()) {
 			this.check();
+
+			// Indicate ticking activity for visualization:
+			this.indicateTickActivity();
 		}
 	}
 

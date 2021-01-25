@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.entity;
 
+import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -26,5 +27,14 @@ public abstract class AbstractEntityShopObject extends AbstractShopObject implem
 		Entity entity = this.getEntity();
 		if (entity == null) return null; // Not active
 		return this.getType().getObjectId(entity);
+	}
+
+	@Override
+	public Location getTickVisualizationParticleLocation() {
+		Entity entity = this.getEntity();
+		if (entity == null) return null;
+		// Return location slightly above the entity:
+		Location entityLocation = entity.getLocation();
+		return entityLocation.add(0.0D, entity.getHeight() + 0.4D, 0.0D);
 	}
 }

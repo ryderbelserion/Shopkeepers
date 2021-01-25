@@ -493,6 +493,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void tick() {
+		super.tick();
 		// Delete the shopkeeper if the container is no longer present (eg. if it got removed externally by another
 		// plugin, such as WorldEdit, etc.):
 		if (Settings.deleteShopkeeperOnBreakContainer) {

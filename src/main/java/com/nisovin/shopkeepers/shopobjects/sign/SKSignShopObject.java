@@ -251,6 +251,19 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		return shopkeeper.getLocation();
 	}
 
+	@Override
+	public Location getTickVisualizationParticleLocation() {
+		Location location = this.getLocation();
+		if (location == null) return null;
+		if (this.isWallSign()) {
+			// Return location at the block center:
+			return location.add(0.5D, 0.5D, 0.5D);
+		} else {
+			// Return location above the sign post:
+			return location.add(0.5D, 1.3D, 0.5D);
+		}
+	}
+
 	public void updateSign() {
 		Sign sign = this.getSign();
 		if (sign == null) {
@@ -295,17 +308,21 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	@Override
 	public void tick() {
+		super.tick();
 		if (!checkLimiter.request()) {
 			return;
 		}
 
-		if (!shopkeeper.getChunkCoords().isChunkLoaded()) {
-			// Only verify sign, if the chunk is currently loaded:
-			return;
-		}
+		// Indicate ticking activity for visualization:
+		this.indicateTickActivity();
 
 		Block signBlock = this.getBlock();
 		if (signBlock == null) {
+			// If the block is null because the chunk is not loaded currently, we skip this check:
+			if (!shopkeeper.getChunkCoords().isChunkLoaded()) {
+				return;
+			}
+
 			Log.debug(() -> "Shopkeeper sign at " + shopkeeper.getPositionString() + " is no longer existing! Attempting respawn now.");
 			if (!this.spawn()) {
 				Log.warning("Shopkeeper sign at " + shopkeeper.getPositionString() + " could not be spawned!");
