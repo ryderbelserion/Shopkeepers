@@ -158,8 +158,13 @@ max-shops-perm-options: 5,15,25
 # is usually recommended to keep this enabled.
 protect-containers: true
 # Whether to prevent item movements from and to protected shop containers (via
-# hoppers, droppers, etc.). Item movement will always be allowed if the
-# container protection is disabled.
+# hoppers, droppers, etc.). If you disable this, you and your players will have
+# to somehow else protect their shop container from unauthorized players who may
+# maliciously insert or extract items. This can be rather tricky even for land
+# protection plugins, because items can also be extracted via hopper minecarts.
+# Your land protection plugin would need to prevent other players from placing
+# or pushing those minecarts into a protected region.
+# Item movement will always be allowed if the container protection is disabled.
 prevent-item-movement: true
 # Whether to delete player shopkeepers when their container is broken.
 delete-shopkeeper-on-break-container: false
