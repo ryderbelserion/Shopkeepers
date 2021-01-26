@@ -208,8 +208,8 @@ public class Settings extends Config {
 	public static boolean blockWanderingTraderSpawns = false;
 	public static boolean hireWanderingTraders = false;
 
-	public static boolean editRegularVillagers = true;
-	public static boolean editRegularWanderingTraders = true;
+	public static boolean editRegularVillagers = false;
+	public static boolean editRegularWanderingTraders = false;
 
 	/*
 	 * Hiring

@@ -348,10 +348,10 @@ block-wandering-trader-spawns: false
 hire-wandering-traders: false
 
 # Whether regular villagers can be edited by sneaking and right-clicking.
-edit-regular-villagers: true
+edit-regular-villagers: false
 # Whether regular wandering traders can be edited by sneaking and
 # right-clicking.
-edit-regular-wandering-traders: true
+edit-regular-wandering-traders: false
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Hiring

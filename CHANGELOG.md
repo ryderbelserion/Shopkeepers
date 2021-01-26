@@ -69,6 +69,7 @@ Date format: (YYYY-MM-DD)
 * Performance: The shopkeeper mob AI no longer stores and queries chunk data by the chunks themselves, but via their coordinates. This avoids having to retrieve and check if the chunks around players are currently loaded during AI activation updates.
 * Debug: The shopkeeper mob AI timers are stopped before the AI task is stopped now. This might, in rare cases, affect the correctness of some of the timing outputs of the 'check' command.
 * Debug: Added debug option 'visualize-shopkeeper-ticks'. This enables an in-game visualization of shopkeeper and shop object ticking activities using particles.
+* Config: The settings 'edit-regular-villagers' and 'edit-regular-wandering-traders' are now disabled by default. This feature seems to cause confusion for people who are not aware of it. Regular villagers can still be edited by default via the 'editVillager' command.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
