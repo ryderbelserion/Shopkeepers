@@ -287,7 +287,14 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			Log.debug("Defaults already registered.");
 		}
 
-		// Call startup event so other plugins can make their registrations:
+		// Call startup event so that other plugins can make their registrations:
+		// TODO This event doesn't make much sense, because dependent plugins are enabled after us, so they were not yet
+		// able to register their event handlers.
+		// An option could be to enable the Shopkeepers plugin 1 tick after all other plugins have been enabled. But
+		// then any performance intensive startup tasks (loading shops, ..) would potentially be interpreted as lag by
+		// the server.
+		// Another option is for these plugins to perform their setup during onLoad (similar to how we register default
+		// shop types, etc., during onLoad).
 		Bukkit.getPluginManager().callEvent(new ShopkeepersStartupEvent());
 
 		// Inform UI registry (registers UI event handlers):
