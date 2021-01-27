@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.shopobjects.living;
 
 import java.util.Collection;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -12,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.EntityBlockFormEvent;
 import org.bukkit.event.entity.CreeperPowerEvent;
@@ -44,44 +46,78 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.projectiles.ProjectileSource;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.util.EventUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TestPlayerInteractEntityEvent;
 import com.nisovin.shopkeepers.util.Utils;
 
 class LivingEntityShopListener implements Listener {
 
+	private final SKShopkeepersPlugin plugin;
 	private final SKShopkeeperRegistry shopkeeperRegistry;
 
-	LivingEntityShopListener(SKShopkeeperRegistry shopkeeperRegistry) {
-		this.shopkeeperRegistry = shopkeeperRegistry;
+	LivingEntityShopListener(SKShopkeepersPlugin plugin) {
+		this.plugin = plugin;
+		this.shopkeeperRegistry = plugin.getShopkeeperRegistry();
+	}
+
+	void onEnable() {
+		Bukkit.getPluginManager().registerEvents(this, plugin);
+		// Ensure that our interact event handler is always executed first, even after plugin reloads:
+		// In order to not change the order among the already registered event handlers of our own plugin, we move them
+		// all together to the front of the handler list.
+		EventUtils.enforceExecuteFirst(PlayerInteractEntityEvent.class, EventPriority.LOWEST, plugin);
+	}
+
+	void onDisable() {
+		HandlerList.unregisterAll(this);
 	}
 
 	// We want to bypass other plugins by default, so that shops can also be opened in protected regions.
-	// We cancel the event to prevent any vanilla mechanics from taking place, and also to indicate to other plugins
-	// that they can safely ignore the event (eg. to prevent protection plugins from sending their 'interaction denied'
-	// message for shopkeeper entities). For that purpose, we handle and cancel the event as early as possible (LOWEST
-	// priority).
+	// We cancel the event to prevent any vanilla mechanics from taking place, and also to indicate to other plugins,
+	// and to later event handlers of our own plugin, that they can safely ignore the event (eg. to prevent protection
+	// plugins from sending their 'interaction denied' message for shopkeeper entities). For that purpose, we handle and
+	// cancel the event as early as possible (LOWEST priority).
 	// Using a higher event priority with a setting to ignore whether the event got already cancelled by other plugins
 	// is not an option, because then these other plugins will already have handled the event and we have no chance to
 	// avoid their side-effects (eg. protection plugins will already have sent the player their 'interaction denied'
 	// message, even though we open the shop UI afterwards anyways).
-	// In some usecases it may make sense to take into account if some other plugin wants to cancel the interaction. For
-	// those situations the setting 'check-shop-interaction-result' can be used to call an additional interaction event
-	// that other plugins can react to and which determines whether we handle the interaction. Since this might cause
-	// side-effects in general due to other plugins handling the event, this is disabled by default.
-	// There is still the potential for conflicts with other event handlers that run on LOWEST priority as well (the
-	// execution order of these event handlers and ours is random). These conflicts cannot be avoided, regardless of
-	// whether or not we ignore the event when it has already been cancelled by another event handler: If we ignore the
-	// cancelled event, we won't open the shop menu in situations in which it is meant to be opened regardless of other
-	// plugins (eg. to bypass protection plugins). And if we handle the cancelled event, other plugins will already have
-	// handled the event and caused all kinds of side-effects (eg. the most harmless being a protection plugin that has
-	// already sent its 'interaction denied' message). However, we cannot prevent these side-effects either way. In
-	// order to still remain at least functional in the harmless case of a protection plugin canceling the event on
-	// LOWEST priority, we ignore the cancellation state of the event and attempt to open the shop UI anyways.
+	// In some usecases it may be desired by the server admin that we take into account whether some other plugin wants
+	// to cancel the interaction. For those situations the setting 'check-shop-interaction-result' can be used to call
+	// an additional interaction event that other plugins can react to and which determines whether we handle the
+	// interaction. Since this might cause side-effects in general due to other plugins handling the event, this is
+	// disabled by default. This also requires that we listen to and cancel the event as early as possible, so that the
+	// event is not handled twice by other plugins in this situation.
+	// There is still the potential for conflicts with other event handlers that run on LOWEST priority as well. If
+	// these are event handlers of our own plugin (for which we control the order in which they are registered and
+	// handle the event), we usually want to ignore the event if it has already been cancelled, because this indicates
+	// that the event has triggered some other mechanic that takes precedence.
+	// And if the event has been cancelled by another plugin, we cannot differentiate between whether this is one of the
+	// cases that we could relatively safely bypass (for example, if some protection plugin reacts on LOWEST event
+	// priority and has sent its 'interaction denied' message, it may be reasonable to still open the shop menu
+	// regardless to at least remain functional in that case), or if this is a case in which we definitively do not want
+	// to trigger our action (for example, if another plugin defines a mechanic that is triggered by the same event we
+	// usually want that only one of these actions takes place).
+	// For the above reasons we therefore ignore the event if it has already been cancelled.
+	// One option to resolve these conflicts with other plugins that listen on LOWEST event priority as well might seem
+	// to be the 'loadbefore' entry in the plugin.yml file. However, this is not an acceptable solution, because it
+	// depends on being aware of and explicitly specifying these other plugins, and it breaks whenever the Shopkeepers
+	// plugin is dynamically reloaded, because that re-registers all event handlers and thereby moves them to the back
+	// of the registered event handlers.
+	// In an attempt to resolve these conflicts with other plugins anyways (for instance, GriefPrevention, a popular
+	// protection plugin, reacts on LOWEST event priority), we forcefully move our event handler(s) to the front of the
+	// relevant handler list. This ensures that our event handler(s) are executed first, even if our plugin has been
+	// dynamically reloaded.
+	// If another plugin is supposed to still execute before us so that it can cancel our event handling, it could
+	// either apply a similar trick, or the server admin can enable the already mentioned
+	// 'check-shop-interaction-result' setting.
+	// The reasoning outlined here does not only apply to this specific event handler, but also to other event handlers
+	// in this plugin for which we chose to execute at event priority LOWEST.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onEntityInteract(PlayerInteractEntityEvent event) {
 		// Ignore our own fake interact event:
@@ -101,10 +137,10 @@ class LivingEntityShopListener implements Listener {
 			return;
 		}
 
-		// We ignore the event's cancellation state, but log a debug message since it indicates a potential
-		// incompatibility with another plugin.
+		// Ignore if already cancelled. Resolves conflicts with other event handlers that also run at LOWEST priority.
 		if (event.isCancelled()) {
-			Log.debug("  The event is already cancelled. This might indicate a conflict with another plugin. We continue anyways.");
+			Log.debug("  Ignoring already cancelled event.");
+			return;
 		}
 
 		// If Citizens NPC: Don't cancel the event, let Citizens perform other actions as appropriate.

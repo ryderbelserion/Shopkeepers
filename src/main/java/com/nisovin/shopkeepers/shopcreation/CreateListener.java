@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockDispenseEvent;
@@ -33,6 +34,7 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.util.EventUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.PermissionUtils;
@@ -52,6 +54,18 @@ class CreateListener implements Listener {
 		this.shopkeeperCreation = shopkeeperCreation;
 	}
 
+	void onEnable() {
+		Bukkit.getPluginManager().registerEvents(this, plugin);
+		// Ensure that our interact event handler is always executed first, even after plugin reloads:
+		// In order to not change the order among the already registered event handlers of our own plugin, we move them
+		// all together to the front of the handler list.
+		EventUtils.enforceExecuteFirst(PlayerInteractEvent.class, EventPriority.LOWEST, plugin);
+	}
+
+	void onDisable() {
+		HandlerList.unregisterAll(this);
+	}
+
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onItemHeld(PlayerItemHeldEvent event) {
 		Player player = event.getPlayer();
@@ -69,9 +83,16 @@ class CreateListener implements Listener {
 		TextUtils.sendMessage(player, Messages.creationItemSelected);
 	}
 
-	// Since this might check container access by calling another dummy interaction event, we handle (cancel) this event
-	// as early as possible, so that other plugins (eg. protection plugins) can ignore it and don't handle it twice. In
-	// case some other event handler managed to already cancel the event on LOWEST priority, we ignore the interaction.
+	// See LivingEntityShopListener for a reasoning on why we handle this the event the way we do:
+	// We handle and cancel this event on LOWEST priority so that other plugins (eg. protection plugins) can ignore it.
+	// This event handler might check container access by calling another dummy interaction event. Handling and
+	// canceling this event as early as possible is also required so that other event handlers (for example of
+	// protection plugins) can ignore the first event and don't handle the interaction twice.
+	// To resolve conflicts with other event handlers at LOWEST priority, we ignore the event if it is already
+	// cancelled. This includes, for example, the interaction handler for sign shops within this plugin, which takes
+	// precedence over this event handler.
+	// To further reduce conflicts with other event handlers at LOWEST priority, including after dynamic plugin reloads,
+	// we forcefully move our event handler(s) to the front of the handler list.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		// Ignore our own fake interact event:
@@ -79,7 +100,9 @@ class CreateListener implements Listener {
 
 		// Ignore if the player isn't right-clicking, or left-clicking air:
 		Action action = event.getAction();
-		if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_AIR) return;
+		if (action != Action.RIGHT_CLICK_AIR && action != Action.RIGHT_CLICK_BLOCK && action != Action.LEFT_CLICK_AIR) {
+			return;
+		}
 
 		// Make sure that the used item is the shop creation item:
 		ItemStack itemInHand = event.getItem();

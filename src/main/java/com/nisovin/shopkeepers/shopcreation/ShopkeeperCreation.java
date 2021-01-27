@@ -21,19 +21,24 @@ import com.nisovin.shopkeepers.util.Utils;
 public class ShopkeeperCreation {
 
 	private final SKShopkeepersPlugin plugin;
+	private final CreateListener createListener;
+
+	// By player name:
 	private final Map<String, List<String>> recentlyPlacedContainers = new HashMap<>();
 	private final Map<String, Block> selectedContainer = new HashMap<>();
 
 	public ShopkeeperCreation(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
+		this.createListener = new CreateListener(plugin, this);
 	}
 
 	public void onEnable() {
 		Bukkit.getPluginManager().registerEvents(new RecentlyPlacedContainersListener(this), plugin);
-		Bukkit.getPluginManager().registerEvents(new CreateListener(plugin, this), plugin);
+		createListener.onEnable();
 	}
 
 	public void onDisable() {
+		createListener.onDisable();
 		selectedContainer.clear();
 		// Note: recentlyPlacedContainers does not get cleared here to persist across plugin reloads.
 	}

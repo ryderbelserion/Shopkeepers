@@ -19,12 +19,12 @@ public class LivingShops {
 	public LivingShops(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
 		livingEntityAI = new LivingEntityAI(plugin);
-		livingEntityShopListener = new LivingEntityShopListener(plugin.getShopkeeperRegistry());
+		livingEntityShopListener = new LivingEntityShopListener(plugin);
 	}
 
 	public void onEnable() {
 		livingEntityAI.onEnable();
-		Bukkit.getPluginManager().registerEvents(livingEntityShopListener, plugin);
+		livingEntityShopListener.onEnable();
 		// Register force-creature-spawn event handler:
 		if (Settings.bypassSpawnBlocking) {
 			Bukkit.getPluginManager().registerEvents(creatureForceSpawnListener, plugin);
@@ -32,7 +32,7 @@ public class LivingShops {
 	}
 
 	public void onDisable() {
-		HandlerList.unregisterAll(livingEntityShopListener);
+		livingEntityShopListener.onDisable();
 		HandlerList.unregisterAll(creatureForceSpawnListener);
 		// Reset force spawning:
 		creatureForceSpawnListener.forceCreatureSpawn(null, null);

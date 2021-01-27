@@ -1,31 +1,27 @@
 package com.nisovin.shopkeepers.shopobjects.sign;
 
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
-import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.Settings;
 
 public class SignShops {
 
-	private final SKShopkeepersPlugin plugin;
 	private final SKSignShopObjectType signShopObjectType = new SKSignShopObjectType(this);
 	private final SignShopListener signShopListener;
 
 	public SignShops(SKShopkeepersPlugin plugin) {
-		this.plugin = plugin;
-		signShopListener = new SignShopListener(this);
+		this.signShopListener = new SignShopListener(plugin, this);
 	}
 
 	public void onEnable() {
 		if (Settings.enableSignShops) {
-			Bukkit.getPluginManager().registerEvents(signShopListener, plugin);
+			signShopListener.onEnable();
 		}
 	}
 
 	public void onDisable() {
-		HandlerList.unregisterAll(signShopListener);
+		signShopListener.onDisable();
 	}
 
 	public SKSignShopObjectType getSignShopObjectType() {

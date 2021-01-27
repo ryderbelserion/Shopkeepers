@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 
 import java.util.Iterator;
 
+import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -9,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -19,10 +21,12 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.BlockFaceUtils;
+import com.nisovin.shopkeepers.util.EventUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.MutableBlockLocation;
@@ -35,12 +39,26 @@ class SignShopListener implements Listener {
 	// Local copy as array (enables a very high-performance iteration):
 	private static final BlockFace[] BLOCK_SIDES = BlockFaceUtils.getBlockSides().toArray(new BlockFace[0]);
 
+	private final SKShopkeepersPlugin plugin;
 	private final SKSignShopObjectType signShopObjectType;
 
 	private final MutableBlockLocation cancelNextBlockPhysics = new MutableBlockLocation();
 
-	SignShopListener(SignShops signShops) {
+	SignShopListener(SKShopkeepersPlugin plugin, SignShops signShops) {
+		this.plugin = plugin;
 		this.signShopObjectType = signShops.getSignShopObjectType();
+	}
+
+	void onEnable() {
+		Bukkit.getPluginManager().registerEvents(this, plugin);
+		// Ensure that our interact event handler is always executed first, even after plugin reloads:
+		// In order to not change the order among the already registered event handlers of our own plugin, we move them
+		// all together to the front of the handler list.
+		EventUtils.enforceExecuteFirst(PlayerInteractEvent.class, EventPriority.LOWEST, plugin);
+	}
+
+	void onDisable() {
+		HandlerList.unregisterAll(this);
 	}
 
 	// Null to clear
@@ -52,7 +70,10 @@ class SignShopListener implements Listener {
 		}
 	}
 
-	// See LivingEntityShopListener for a reasoning behind using event priority LOWEST.
+	// See LivingEntityShopListener for the reasoning behind using event priority LOWEST and ignoring cancelled events.
+	// The shop creation item reacts to player interactions as well. If a player interacts with a sign shop while
+	// holding a shop creation item in his hand, we want the sign shop interaction to take precedence. This listener
+	// therefore has to be registered before the shop creation listener.
 	@EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
 	void onPlayerInteract(PlayerInteractEvent event) {
 		// Ignore our own fake interact event:

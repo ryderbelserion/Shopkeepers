@@ -316,12 +316,14 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		livingShops.onEnable();
 
 		// Enable sign shops:
+		// Note: This has to be enabled before the shop creation listener, so that interactions with sign shops take
+		// precedence over interactions with the shop creation item.
 		signShops.onEnable();
 
 		// Enable citizens shops:
 		citizensShops.onEnable();
 
-		//
+		// -----
 
 		// Handling of regular villagers:
 		pm.registerEvents(new VillagerInteractionListener(this), this);
