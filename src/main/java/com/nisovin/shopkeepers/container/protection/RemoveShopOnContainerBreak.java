@@ -44,7 +44,7 @@ public class RemoveShopOnContainerBreak {
 
 		// Copy to deal with concurrent modifications:
 		for (PlayerShopkeeper shopkeeper : shopkeepers.toArray(new PlayerShopkeeper[shopkeepers.size()])) {
-			if (!shopkeeper.isValid()) continue; // skip if no longer valid
+			if (!shopkeeper.isValid()) continue; // Skip if no longer valid
 			// Return the shop creation item for player shopkeepers:
 			if (Settings.deletingPlayerShopReturnsCreationItem) {
 				ItemStack shopCreationItem = Settings.createShopCreationItem();

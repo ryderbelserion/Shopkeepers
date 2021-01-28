@@ -78,6 +78,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private static final String HEADER = "This file is not intended to be manually modified! If you want to manually edit this"
 			+ " file anyways, ensure that the server is not running currently and that you have prepared a backup of this file.";
 
+	private static final int DELAYED_SAVE_TICKS = 600; // 30 seconds
+
 	// Max total delay: 500ms
 	private static final int SAVING_MAX_ATTEMPTS = 20;
 	private static final long SAVING_ATTEMPTS_DELAY_MILLIS = 25;
@@ -516,7 +518,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				if (this.isDirty()) {
 					this.saveNow();
 				}
-			}, 600); // 30 seconds delay
+			}, DELAYED_SAVE_TICKS);
 		} // Else: The periodic save task will trigger a save at some point.
 	}
 

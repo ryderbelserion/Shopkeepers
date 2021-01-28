@@ -504,6 +504,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			// This checks if the block is still a valid container:
 			Block containerBlock = this.getContainer();
 			if (!ShopContainers.isSupportedContainer(containerBlock.getType())) {
+				// Note: If this shopkeeper got deleted due to the chest being broken, we will trigger a delayed save
+				// after the ticking of the shopkeepers.
 				SKShopkeepersPlugin.getInstance().getRemoveShopOnContainerBreak().handleBlockBreakage(containerBlock);
 			}
 		}
