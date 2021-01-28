@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopcreation;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -38,6 +40,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.EventUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.MutableLong;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -47,8 +50,17 @@ import com.nisovin.shopkeepers.util.TextUtils;
  */
 class CreateListener implements Listener {
 
+	// We sometimes receive two interact events (right click air and then left click air) at the same time when a player
+	// right-clicks air while being in survival mode and targeting a block that is slightly further away than the block
+	// interaction range allows.
+	// By only handling one interaction event within a small time span, we ignore the additional left click air event.
+	private static final long INTERACTION_DELAY_MILLISECONDS = 50L;
+
 	private final SKShopkeepersPlugin plugin;
 	private final ShopkeeperCreation shopkeeperCreation;
+
+	// By player UUID:
+	private final Map<UUID, MutableLong> lastHandledPlayerInteractions = new HashMap<>();
 
 	// Cached value whether the shop creation item selection message is enabled:
 	private boolean shopCreationItemSelectedMessageEnabled;
@@ -69,14 +81,17 @@ class CreateListener implements Listener {
 
 	void onDisable() {
 		HandlerList.unregisterAll(this);
+		lastHandledPlayerInteractions.clear();
 		ShopCreationItemSelectionTask.onDisable();
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onPlayerQuit(PlayerQuitEvent event) {
 		Player player = event.getPlayer();
+		UUID uniqueId = player.getUniqueId();
 
 		// Cleanup:
+		lastHandledPlayerInteractions.remove(uniqueId);
 		ShopCreationItemSelectionTask.cleanupAndCancel(player);
 	}
 
@@ -129,12 +144,15 @@ class CreateListener implements Listener {
 		}
 
 		Player player = event.getPlayer();
-		Log.debug(() -> "Player " + player.getName() + " is interacting with the shop creation item");
+		Log.debug(() -> "Player " + player.getName() + " is interacting with the shop creation item: action=" + action
+				+ ", hand=" + event.getHand());
 
 		// Capture event's cancellation state:
 		Result useItemInHand = event.useItemInHand();
 
 		// Prevent regular usage:
+		// If we actually act on the interaction later, we always cancel the event. However, if we don't cancel the
+		// event here, players are able to use the item like normal when holding it in their off hand.
 		// TODO Are there items which would require canceling the event for all left clicks or physical interaction as
 		// well?
 		if (Settings.preventShopCreationItemRegularUsage && !PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) {
@@ -156,8 +174,29 @@ class CreateListener implements Listener {
 			return;
 		}
 
-		// Cancel interactions with our custom shop creation item:
+		// This is one of the interactions that we want to act on. We always cancel the event to prevent any vanilla or
+		// subsequent actions of other event handlers:
 		event.setCancelled(true);
+
+		// Ignore the event if we already handled an interaction for the player recently:
+		// This filters out duplicate left click air interaction events that we sometimes receive alongside a right
+		// click air interaction event (TODO This assumes that we first receive the intended right click event, before
+		// we receive the additional left click event).
+		// Note: We do this after the above checks, so that we always cancel the interaction with the shop creation
+		// item, even if we don't actually handle the interaction then. This also avoids unrelated debug spam, since we
+		// only print debug output for interactions with the shop creation item.
+		UUID uniqueId = player.getUniqueId();
+		MutableLong lastHandledInteraction = lastHandledPlayerInteractions.computeIfAbsent(uniqueId, (uuid) -> new MutableLong());
+		long now = System.currentTimeMillis();
+		long timeDifferenceMillis = (now - lastHandledInteraction.getValue());
+		if (timeDifferenceMillis < INTERACTION_DELAY_MILLISECONDS) {
+			Log.debug(() -> "Ignoring interaction of player " + player.getName() + ": Last handled interaction was "
+					+ timeDifferenceMillis + "ms ago");
+			return;
+		}
+		// We only update the last interaction timestamp when we actually handle the event. This prevents that delays
+		// between individual events accumulate and that we always handle the event after the intended delay is over.
+		lastHandledInteraction.setValue(now);
 
 		// Get shop type:
 		ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);

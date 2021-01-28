@@ -72,6 +72,7 @@ Date format: (YYYY-MM-DD)
 * Config: The settings 'edit-regular-villagers' and 'edit-regular-wandering-traders' are now disabled by default. This feature seems to cause confusion for people who are not aware of it. Regular villagers can still be edited by default via the 'editVillager' command.
 * Config: Minor additions to the default comment of the 'prevent-item-movement' setting.
 * We only print the shop creation item usage message if the player is still holding the item after a short delay now. This avoids message spam when a player quickly scrolls through the items on the hotbar via the mouse wheel.
+* Fixed: We sometimes receive an additional left-click air interaction event when a player right-clicks air while looking at a block slightly outside of the interaction range. This lead to the shop creation item switching between two selections back and forth for a single right-click. We ignore this additional left-click air interaction now by ignoring any subsequent interactions that occur within a brief time span of the last handled interaction. The ignored interactions are still cancelled to prevent any vanilla behaviors or side-effects of other event handlers. But they no longer change the player's selection.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
