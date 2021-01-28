@@ -71,6 +71,7 @@ Date format: (YYYY-MM-DD)
 * Debug: Added debug option 'visualize-shopkeeper-ticks'. This enables an in-game visualization of shopkeeper and shop object ticking activities using particles.
 * Config: The settings 'edit-regular-villagers' and 'edit-regular-wandering-traders' are now disabled by default. This feature seems to cause confusion for people who are not aware of it. Regular villagers can still be edited by default via the 'editVillager' command.
 * Config: Minor additions to the default comment of the 'prevent-item-movement' setting.
+* We only print the shop creation item usage message if the player is still holding the item after a short delay now. This avoids message spam when a player quickly scrolls through the items on the hotbar via the mouse wheel.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.

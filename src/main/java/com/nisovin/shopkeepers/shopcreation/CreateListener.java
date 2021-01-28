@@ -19,6 +19,7 @@ import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -49,12 +50,16 @@ class CreateListener implements Listener {
 	private final SKShopkeepersPlugin plugin;
 	private final ShopkeeperCreation shopkeeperCreation;
 
+	// Cached value whether the shop creation item selection message is enabled:
+	private boolean shopCreationItemSelectedMessageEnabled;
+
 	CreateListener(SKShopkeepersPlugin plugin, ShopkeeperCreation shopkeeperCreation) {
 		this.plugin = plugin;
 		this.shopkeeperCreation = shopkeeperCreation;
 	}
 
 	void onEnable() {
+		shopCreationItemSelectedMessageEnabled = !Messages.creationItemSelected.isPlainTextEmpty();
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		// Ensure that our interact event handler is always executed first, even after plugin reloads:
 		// In order to not change the order among the already registered event handlers of our own plugin, we move them
@@ -64,10 +69,22 @@ class CreateListener implements Listener {
 
 	void onDisable() {
 		HandlerList.unregisterAll(this);
+		ShopCreationItemSelectionTask.onDisable();
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	void onPlayerQuit(PlayerQuitEvent event) {
+		Player player = event.getPlayer();
+
+		// Cleanup:
+		ShopCreationItemSelectionTask.cleanupAndCancel(player);
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onItemHeld(PlayerItemHeldEvent event) {
+		// If the shop creation item selection message is disabled, we can skip all of this:
+		if (!shopCreationItemSelectedMessageEnabled) return;
+
 		Player player = event.getPlayer();
 		ItemStack newItemInHand = player.getInventory().getItem(event.getNewSlot());
 		if (!Settings.isShopCreationItem(newItemInHand)) {
@@ -79,8 +96,9 @@ class CreateListener implements Listener {
 			return;
 		}
 
-		// Print info message about usage:
-		TextUtils.sendMessage(player, Messages.creationItemSelected);
+		// To avoid message spam, we only print the shop creation item selection message if the player is still holding
+		// the item after a short delay. Any already active task is aborted.
+		ShopCreationItemSelectionTask.start(plugin, player);
 	}
 
 	// See LivingEntityShopListener for a reasoning on why we handle this the event the way we do:
