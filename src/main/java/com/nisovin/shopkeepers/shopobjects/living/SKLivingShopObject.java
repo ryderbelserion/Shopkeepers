@@ -24,6 +24,7 @@ import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObject;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.debug.events.DebugListener;
 import com.nisovin.shopkeepers.debug.events.EventDebugListener;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -450,7 +451,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		assert spawnLocation != null; // Since entity is active
 		if (!entityLoc.getWorld().equals(spawnLocation.getWorld()) || entityLoc.distanceSquared(spawnLocation) > 0.4D) {
 			// Teleport back:
-			Log.debug(() -> "Shopkeeper (" + shopkeeper.getPositionString() + ") out of place, teleporting back");
+			Log.debug(DebugOptions.regularTickActivities, () -> "Shopkeeper (" + shopkeeper.getPositionString()
+					+ ") out of place, teleporting back");
 			spawnLocation.setYaw(entityLoc.getYaw());
 			spawnLocation.setPitch(entityLoc.getPitch());
 			entity.teleport(spawnLocation);

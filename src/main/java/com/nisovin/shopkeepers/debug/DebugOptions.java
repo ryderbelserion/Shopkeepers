@@ -18,6 +18,10 @@ public final class DebugOptions {
 	public static final String printListeners = add("print-listeners");
 	// Enables debugging output related to shopkeeper activation.
 	public static final String shopkeeperActivation = add("shopkeeper-activation");
+	// Enables debug output related to shopkeeper ticking activities that may be considered non-exceptional, and might
+	// occur regularly and therefore cause debug spam otherwise. This includes, for example, the activity of teleporting
+	// shopkeepers back into place, or updating a shopkeeper's location when a mobile shopkeeper NPC moved around.
+	public static final String regularTickActivities = add("regular-tick-activities");
 	// Visualizes the ticking activities of shopkeepers in-game.
 	public static final String visualizeShopkeeperTicks = add("visualize-shopkeeper-ticks");
 	// Enables additional commands related debugging output.

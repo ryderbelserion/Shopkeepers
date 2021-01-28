@@ -14,6 +14,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.citizens.CitizensShopObject;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
@@ -277,7 +278,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		assert currentLocation.getWorld() != null; // Citizens returns a null Location in this case
 
 		if (!expectedLocation.getWorld().equals(currentLocation.getWorld()) || expectedLocation.distanceSquared(currentLocation) > 1.0D) {
-			Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") moved, updating shopkeeper location");
+			Log.debug(DebugOptions.regularTickActivities, () -> "Shopkeeper NPC (" + shopkeeper.getPositionString()
+					+ ") moved, updating shopkeeper location");
 			shopkeeper.setLocation(currentLocation);
 		}
 	}
