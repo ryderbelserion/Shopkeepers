@@ -24,9 +24,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 // Using Babyable as common super type of all sittable mobs for now.
 public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> {
 
-	private static final Property<Boolean> PROPERTY_SITTING = new BooleanProperty("sitting", false);
-
-	private boolean sitting = PROPERTY_SITTING.getDefaultValue();
+	private final Property<Boolean> sittingProperty = new BooleanProperty(shopkeeper, "sitting", false);
 
 	public SittableShop(LivingShops livingShops, SKLivingShopObjectType<? extends SittableShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -36,13 +34,13 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.sitting = PROPERTY_SITTING.load(shopkeeper, configSection);
+		sittingProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_SITTING.save(shopkeeper, configSection, sitting);
+		sittingProperty.save(configSection);
 	}
 
 	@Override
@@ -59,21 +57,25 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 		return editorButtons;
 	}
 
-	// SITTING STATE
+	// SITTING
+
+	public boolean isSitting() {
+		return sittingProperty.getValue();
+	}
 
 	public void setSitting(boolean sitting) {
-		this.sitting = sitting;
+		sittingProperty.setValue(sitting);
 		shopkeeper.markDirty();
 		this.applySitting(this.getEntity()); // Null if not active
 	}
 
-	private void applySitting(Sittable entity) {
-		if (entity == null) return;
-		entity.setSitting(sitting);
+	public void cycleSitting() {
+		this.setSitting(!this.isSitting());
 	}
 
-	public void cycleSitting() {
-		this.setSitting(!sitting);
+	private void applySitting(Sittable entity) {
+		if (entity == null) return;
+		entity.setSitting(this.isSitting());
 	}
 
 	private ItemStack getSittingEditorItem() {

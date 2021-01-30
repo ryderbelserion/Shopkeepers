@@ -25,9 +25,7 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class RabbitShop extends BabyableShop<Rabbit> {
 
-	private static final Property<Rabbit.Type> PROPERTY_RABBIT_TYPE = new EnumProperty<>(Rabbit.Type.class, "rabbitType", Rabbit.Type.BROWN);
-
-	private Rabbit.Type rabbitType = PROPERTY_RABBIT_TYPE.getDefaultValue();
+	private final Property<Rabbit.Type> rabbitTypeProperty = new EnumProperty<>(shopkeeper, Rabbit.Type.class, "rabbitType", Rabbit.Type.BROWN);
 
 	public RabbitShop(	LivingShops livingShops, SKLivingShopObjectType<RabbitShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -37,13 +35,13 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.rabbitType = PROPERTY_RABBIT_TYPE.load(shopkeeper, configSection);
+		rabbitTypeProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_RABBIT_TYPE.save(shopkeeper, configSection, rabbitType);
+		rabbitTypeProperty.save(configSection);
 	}
 
 	@Override
@@ -62,15 +60,24 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 
 	// RABBIT TYPE
 
+	public Rabbit.Type getRabbitType() {
+		return rabbitTypeProperty.getValue();
+	}
+
 	public void setRabbitType(Rabbit.Type rabbitType) {
 		Validate.notNull(rabbitType, "rabbitType is null");
-		this.rabbitType = rabbitType;
+		rabbitTypeProperty.setValue(rabbitType);
 		shopkeeper.markDirty();
 		this.applyRabbitType(this.getEntity()); // Null if not active
 	}
 
+	public void cycleRabbitType(boolean backwards) {
+		this.setRabbitType(EnumUtils.cycleEnumConstant(Rabbit.Type.class, this.getRabbitType(), backwards));
+	}
+
 	private void applyRabbitType(Rabbit entity) {
 		if (entity == null) return;
+		Rabbit.Type rabbitType = this.getRabbitType();
 		if (rabbitType == Rabbit.Type.THE_KILLER_BUNNY) {
 			// Special handling if the rabbit type is the killer rabbit:
 			// If the entity's custom name is not empty, Minecraft applies the 'The Killer Rabbit' name. We therefore
@@ -87,13 +94,9 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 		}
 	}
 
-	public void cycleRabbitType(boolean backwards) {
-		this.setRabbitType(EnumUtils.cycleEnumConstant(Rabbit.Type.class, rabbitType, backwards));
-	}
-
 	private ItemStack getRabbitTypeEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
-		switch (rabbitType) {
+		switch (this.getRabbitType()) {
 		case BROWN:
 			ItemUtils.setLeatherColor(iconItem, Color.fromRGB(141, 118, 88));
 			break;

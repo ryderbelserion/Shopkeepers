@@ -23,9 +23,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 
-	private static final Property<Boolean> PROPERTY_BABY = new BooleanProperty("baby", false);
-
-	private boolean baby = PROPERTY_BABY.getDefaultValue();
+	private final Property<Boolean> babyProperty = new BooleanProperty(shopkeeper, "baby", false);
 
 	public BabyableShop(LivingShops livingShops, SKLivingShopObjectType<? extends BabyableShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -48,7 +46,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
 		if (this.isBabyable()) {
-			this.baby = PROPERTY_BABY.load(shopkeeper, configSection);
+			babyProperty.load(configSection);
 		}
 	}
 
@@ -56,7 +54,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
 		if (this.isBabyable()) {
-			PROPERTY_BABY.save(shopkeeper, configSection, baby);
+			babyProperty.save(configSection);
 		}
 	}
 
@@ -79,29 +77,33 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 		return editorButtons;
 	}
 
-	// BABY STATE
+	// BABY
+
+	public boolean isBaby() {
+		return babyProperty.getValue();
+	}
 
 	public void setBaby(boolean baby) {
 		if (!this.isBabyable()) return;
-		this.baby = baby;
+		babyProperty.setValue(baby);
 		shopkeeper.markDirty();
 		this.applyBaby(this.getEntity()); // Null if not active
+	}
+
+	public void cycleBaby() {
+		this.setBaby(!this.isBaby());
 	}
 
 	private void applyBaby(E entity) {
 		if (entity == null) return;
 		if (!this.isBabyable()) return;
-		if (baby) {
+		if (this.isBaby()) {
 			entity.setBaby();
 		} else {
 			entity.setAdult();
 			// TODO: MC-9568: Growing up mobs get moved.
 			this.teleportBack();
 		}
-	}
-
-	public void cycleBaby() {
-		this.setBaby(!baby);
 	}
 
 	private ItemStack getBabyEditorItem() {

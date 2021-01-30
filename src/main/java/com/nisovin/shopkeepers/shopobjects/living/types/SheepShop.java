@@ -26,11 +26,8 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class SheepShop extends BabyableShop<Sheep> {
 
-	private static final Property<DyeColor> PROPERTY_COLOR = new EnumProperty<>(DyeColor.class, "color", DyeColor.WHITE);
-	private static final Property<Boolean> PROPERTY_SHEARED = new BooleanProperty("sheared", false);
-
-	private DyeColor color = PROPERTY_COLOR.getDefaultValue();
-	private boolean sheared = PROPERTY_SHEARED.getDefaultValue();
+	private final Property<DyeColor> colorProperty = new EnumProperty<>(shopkeeper, DyeColor.class, "color", DyeColor.WHITE);
+	private final Property<Boolean> shearedProperty = new BooleanProperty(shopkeeper, "sheared", false);
 
 	public SheepShop(	LivingShops livingShops, SKLivingShopObjectType<SheepShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -40,15 +37,15 @@ public class SheepShop extends BabyableShop<Sheep> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.color = PROPERTY_COLOR.load(shopkeeper, configSection);
-		this.sheared = PROPERTY_SHEARED.load(shopkeeper, configSection);
+		colorProperty.load(configSection);
+		shearedProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_COLOR.save(shopkeeper, configSection, color);
-		PROPERTY_SHEARED.save(shopkeeper, configSection, sheared);
+		colorProperty.save(configSection);
+		shearedProperty.save(configSection);
 	}
 
 	@Override
@@ -69,24 +66,28 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 	// COLOR
 
+	public DyeColor getColor() {
+		return colorProperty.getValue();
+	}
+
 	public void setColor(DyeColor color) {
 		Validate.notNull(color, "Color is null!");
-		this.color = color;
+		colorProperty.setValue(color);
 		shopkeeper.markDirty();
 		this.applyColor(this.getEntity()); // Null if not active
 	}
 
-	private void applyColor(Sheep entity) {
-		if (entity == null) return;
-		entity.setColor(color);
+	public void cycleColor(boolean backwards) {
+		this.setColor(EnumUtils.cycleEnumConstant(DyeColor.class, this.getColor(), backwards));
 	}
 
-	public void cycleColor(boolean backwards) {
-		this.setColor(EnumUtils.cycleEnumConstant(DyeColor.class, color, backwards));
+	private void applyColor(Sheep entity) {
+		if (entity == null) return;
+		entity.setColor(this.getColor());
 	}
 
 	private ItemStack getColorEditorItem() {
-		ItemStack iconItem = new ItemStack(ItemUtils.getWoolType(color));
+		ItemStack iconItem = new ItemStack(ItemUtils.getWoolType(this.getColor()));
 		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonSheepColor, Messages.buttonSheepColorLore);
 		return iconItem;
 	}
@@ -109,19 +110,23 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 	// SHEARED
 
+	public boolean isSheared() {
+		return shearedProperty.getValue();
+	}
+
 	public void setSheared(boolean sheared) {
-		this.sheared = sheared;
+		shearedProperty.setValue(sheared);
 		shopkeeper.markDirty();
 		this.applySheared(this.getEntity()); // Null if not active
 	}
 
-	private void applySheared(Sheep entity) {
-		if (entity == null) return;
-		entity.setSheared(sheared);
+	public void cycleSheared() {
+		this.setSheared(!this.isSheared());
 	}
 
-	public void cycleSheared() {
-		this.setSheared(!sheared);
+	private void applySheared(Sheep entity) {
+		if (entity == null) return;
+		entity.setSheared(this.isSheared());
 	}
 
 	private ItemStack getShearedEditorItem() {

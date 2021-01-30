@@ -24,9 +24,7 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class ParrotShop extends SittableShop<Parrot> {
 
-	private static final Property<Parrot.Variant> PROPERTY_PARROT_VARIANT = new EnumProperty<>(Parrot.Variant.class, "parrotVariant", Parrot.Variant.RED);
-
-	private Parrot.Variant parrotVariant = PROPERTY_PARROT_VARIANT.getDefaultValue();
+	private final Property<Parrot.Variant> variantProperty = new EnumProperty<>(shopkeeper, Parrot.Variant.class, "parrotVariant", Parrot.Variant.RED);
 
 	public ParrotShop(	LivingShops livingShops, SKLivingShopObjectType<ParrotShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -36,50 +34,54 @@ public class ParrotShop extends SittableShop<Parrot> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.parrotVariant = PROPERTY_PARROT_VARIANT.load(shopkeeper, configSection);
+		variantProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_PARROT_VARIANT.save(shopkeeper, configSection, parrotVariant);
+		variantProperty.save(configSection);
 	}
 
 	@Override
 	protected void onSpawn(Parrot entity) {
 		super.onSpawn(entity);
-		this.applyParrotVariant(entity);
+		this.applyVariant(entity);
 	}
 
 	@Override
 	public List<EditorHandler.Button> getEditorButtons() {
 		List<EditorHandler.Button> editorButtons = new ArrayList<>();
 		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(this.getParrotVariantEditorButton());
+		editorButtons.add(this.getVariantEditorButton());
 		return editorButtons;
 	}
 
-	// PARROT VARIANT
+	// VARIANT
 
-	public void setParrotVariant(Parrot.Variant parrotVariant) {
-		Validate.notNull(parrotVariant, "Parrot variant is null!");
-		this.parrotVariant = parrotVariant;
+	public Parrot.Variant getVariant() {
+		return variantProperty.getValue();
+	}
+
+	public void setVariant(Parrot.Variant variant) {
+		Validate.notNull(variant, "variant is null");
+		variantProperty.setValue(variant);
 		shopkeeper.markDirty();
-		this.applyParrotVariant(this.getEntity()); // Null if not active
+		this.applyVariant(this.getEntity()); // Null if not active
 	}
 
-	private void applyParrotVariant(Parrot entity) {
+	public void cycleVariant(boolean backwards) {
+		this.setVariant(EnumUtils.cycleEnumConstant(Parrot.Variant.class, this.getVariant(), backwards));
+	}
+
+	private void applyVariant(Parrot entity) {
 		if (entity == null) return;
-		entity.setVariant(parrotVariant);
+		entity.setVariant(this.getVariant());
 	}
 
-	public void cycleParrotVariant(boolean backwards) {
-		this.setParrotVariant(EnumUtils.cycleEnumConstant(Parrot.Variant.class, parrotVariant, backwards));
-	}
-
-	private ItemStack getParrotVariantEditorItem() {
+	private ItemStack getVariantEditorItem() {
 		ItemStack iconItem;
-		switch (parrotVariant) {
+		switch (this.getVariant()) {
 		case BLUE:
 			iconItem = new ItemStack(ItemUtils.getWoolType(DyeColor.BLUE));
 			break;
@@ -101,17 +103,17 @@ public class ParrotShop extends SittableShop<Parrot> {
 		return iconItem;
 	}
 
-	private EditorHandler.Button getParrotVariantEditorButton() {
+	private EditorHandler.Button getVariantEditorButton() {
 		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
-				return getParrotVariantEditorItem();
+				return getVariantEditorItem();
 			}
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				boolean backwards = clickEvent.isRightClick();
-				cycleParrotVariant(backwards);
+				cycleVariant(backwards);
 				return true;
 			}
 		};

@@ -28,9 +28,7 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 	// Note: Minecraft actually allows magma cubes with sizes up to 256 (internally stored as 0 - 255). However, at
 	// these sizes the magma cube is not properly rendered anymore, cannot be interacted with, and it becomes laggy.
 	// We limit it to 10 since this seems to be a more reasonable limit.
-	private static final IntegerProperty PROPERTY_MAGMA_CUBE_SIZE = new IntegerProperty("magmaCubeSize", 1, 10, 1);
-
-	private int magmaCubeSize = PROPERTY_MAGMA_CUBE_SIZE.getDefaultValue();
+	private final IntegerProperty sizeProperty = new IntegerProperty(shopkeeper, "magmaCubeSize", 1, 10, 1);
 
 	public MagmaCubeShop(	LivingShops livingShops, SKLivingShopObjectType<MagmaCubeShop> livingObjectType,
 							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -40,74 +38,80 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.magmaCubeSize = PROPERTY_MAGMA_CUBE_SIZE.load(shopkeeper, configSection);
+		sizeProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_MAGMA_CUBE_SIZE.save(shopkeeper, configSection, magmaCubeSize);
+		sizeProperty.save(configSection);
 	}
 
 	@Override
 	protected void onSpawn(MagmaCube entity) {
 		super.onSpawn(entity);
-		this.applyMagmaCubeSize(entity);
+		this.applySize(entity);
 	}
 
 	@Override
 	public List<EditorHandler.Button> getEditorButtons() {
 		List<EditorHandler.Button> editorButtons = new ArrayList<>();
 		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(this.getMagmaCubeSizeEditorButton());
+		editorButtons.add(this.getSizeEditorButton());
 		return editorButtons;
 	}
 
-	// MAGMA CUBE SIZE
+	// SIZE
 
-	public void setMagmaCubeSize(int magmaCubeSize) {
-		Validate.isTrue(PROPERTY_MAGMA_CUBE_SIZE.isInBounds(magmaCubeSize), "magmaCubeSize is out of bounds: " + magmaCubeSize);
-		this.magmaCubeSize = magmaCubeSize;
+	public int getSize() {
+		return sizeProperty.getValue();
+	}
+
+	public void setSize(int size) {
+		Validate.isTrue(sizeProperty.isInBounds(size), () -> "size is out of bounds: " + size);
+		sizeProperty.setValue(size);
 		shopkeeper.markDirty();
-		this.applyMagmaCubeSize(this.getEntity()); // Null if not active
+		this.applySize(this.getEntity()); // Null if not active
 	}
 
-	private void applyMagmaCubeSize(MagmaCube entity) {
-		if (entity == null) return;
-		// Note: Minecraft will also adjust some of the magma cube's attributes, but these should not affect us.
-		entity.setSize(magmaCubeSize);
-	}
-
-	public void cycleMagmaCubeSize(boolean backwards) {
+	public void cycleSize(boolean backwards) {
+		int size = this.getSize();
 		int nextSize;
 		if (backwards) {
-			nextSize = magmaCubeSize - 1;
+			nextSize = size - 1;
 		} else {
-			nextSize = magmaCubeSize + 1;
+			nextSize = size + 1;
 		}
-		nextSize = MathUtils.rangeModulo(nextSize, PROPERTY_MAGMA_CUBE_SIZE.getMinValue(), PROPERTY_MAGMA_CUBE_SIZE.getMaxValue());
-		this.setMagmaCubeSize(nextSize);
+		nextSize = MathUtils.rangeModulo(nextSize, sizeProperty.getMinValue(), sizeProperty.getMaxValue());
+		this.setSize(nextSize);
 	}
 
-	private ItemStack getMagmaCubeSizeEditorItem() {
+	private void applySize(MagmaCube entity) {
+		if (entity == null) return;
+		// Note: Minecraft will also adjust some of the magma cube's attributes, but these should not affect us.
+		entity.setSize(this.getSize());
+	}
+
+	private ItemStack getSizeEditorItem() {
+		int size = this.getSize();
 		ItemStack iconItem = new ItemStack(Material.SLIME_BLOCK);
-		String displayName = StringUtils.replaceArguments(Messages.buttonMagmaCubeSize, "size", magmaCubeSize);
-		List<String> lore = StringUtils.replaceArguments(Messages.buttonMagmaCubeSizeLore, "size", magmaCubeSize);
+		String displayName = StringUtils.replaceArguments(Messages.buttonMagmaCubeSize, "size", size);
+		List<String> lore = StringUtils.replaceArguments(Messages.buttonMagmaCubeSizeLore, "size", size);
 		ItemUtils.setItemStackNameAndLore(iconItem, displayName, lore);
 		return iconItem;
 	}
 
-	private EditorHandler.Button getMagmaCubeSizeEditorButton() {
+	private EditorHandler.Button getSizeEditorButton() {
 		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
-				return getMagmaCubeSizeEditorItem();
+				return getSizeEditorItem();
 			}
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				boolean backwards = clickEvent.isRightClick();
-				cycleMagmaCubeSize(backwards);
+				cycleSize(backwards);
 				return true;
 			}
 		};

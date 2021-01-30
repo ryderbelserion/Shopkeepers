@@ -28,9 +28,7 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 	// Note: Minecraft actually allows slimes with sizes up to 256 (internally stored as 0 - 255). However, at these
 	// sizes the slime is not properly rendered anymore, cannot be interacted with, and it becomes laggy.
 	// We limit it to 10 since this seems to be a more reasonable limit.
-	private static final IntegerProperty PROPERTY_SLIME_SIZE = new IntegerProperty("slimeSize", 1, 10, 1);
-
-	private int slimeSize = PROPERTY_SLIME_SIZE.getDefaultValue();
+	private final IntegerProperty sizeProperty = new IntegerProperty(shopkeeper, "slimeSize", 1, 10, 1);
 
 	public SlimeShop(	LivingShops livingShops, SKLivingShopObjectType<SlimeShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -40,74 +38,80 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.slimeSize = PROPERTY_SLIME_SIZE.load(shopkeeper, configSection);
+		sizeProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_SLIME_SIZE.save(shopkeeper, configSection, slimeSize);
+		sizeProperty.save(configSection);
 	}
 
 	@Override
 	protected void onSpawn(Slime entity) {
 		super.onSpawn(entity);
-		this.applySlimeSize(entity);
+		this.applySize(entity);
 	}
 
 	@Override
 	public List<EditorHandler.Button> getEditorButtons() {
 		List<EditorHandler.Button> editorButtons = new ArrayList<>();
 		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(this.getSlimeSizeEditorButton());
+		editorButtons.add(this.getSizeEditorButton());
 		return editorButtons;
 	}
 
-	// SLIME SIZE
+	// SIZE
 
-	public void setSlimeSize(int slimeSize) {
-		Validate.isTrue(PROPERTY_SLIME_SIZE.isInBounds(slimeSize), "slimeSize is out of bounds: " + slimeSize);
-		this.slimeSize = slimeSize;
+	public int getSize() {
+		return sizeProperty.getValue();
+	}
+
+	public void setSize(int size) {
+		Validate.isTrue(sizeProperty.isInBounds(size), () -> "size is out of bounds: " + size);
+		sizeProperty.setValue(size);
 		shopkeeper.markDirty();
-		this.applySlimeSize(this.getEntity()); // Null if not active
+		this.applySize(this.getEntity()); // Null if not active
 	}
 
-	private void applySlimeSize(Slime entity) {
-		if (entity == null) return;
-		// Note: Minecraft will also adjust some of the slime's attributes, but these should not affect us.
-		entity.setSize(slimeSize);
-	}
-
-	public void cycleSlimeSize(boolean backwards) {
+	public void cycleSize(boolean backwards) {
+		int size = this.getSize();
 		int nextSize;
 		if (backwards) {
-			nextSize = slimeSize - 1;
+			nextSize = size - 1;
 		} else {
-			nextSize = slimeSize + 1;
+			nextSize = size + 1;
 		}
-		nextSize = MathUtils.rangeModulo(nextSize, PROPERTY_SLIME_SIZE.getMinValue(), PROPERTY_SLIME_SIZE.getMaxValue());
-		this.setSlimeSize(nextSize);
+		nextSize = MathUtils.rangeModulo(nextSize, sizeProperty.getMinValue(), sizeProperty.getMaxValue());
+		this.setSize(nextSize);
 	}
 
-	private ItemStack getSlimeSizeEditorItem() {
+	private void applySize(Slime entity) {
+		if (entity == null) return;
+		// Note: Minecraft will also adjust some of the slime's attributes, but these should not affect us.
+		entity.setSize(this.getSize());
+	}
+
+	private ItemStack getSizeEditorItem() {
+		int size = this.getSize();
 		ItemStack iconItem = new ItemStack(Material.SLIME_BLOCK);
-		String displayName = StringUtils.replaceArguments(Messages.buttonSlimeSize, "size", slimeSize);
-		List<String> lore = StringUtils.replaceArguments(Messages.buttonSlimeSizeLore, "size", slimeSize);
+		String displayName = StringUtils.replaceArguments(Messages.buttonSlimeSize, "size", size);
+		List<String> lore = StringUtils.replaceArguments(Messages.buttonSlimeSizeLore, "size", size);
 		ItemUtils.setItemStackNameAndLore(iconItem, displayName, lore);
 		return iconItem;
 	}
 
-	private EditorHandler.Button getSlimeSizeEditorButton() {
+	private EditorHandler.Button getSizeEditorButton() {
 		return new EditorHandler.ShopkeeperActionButton() {
 			@Override
 			public ItemStack getIcon(EditorHandler.Session session) {
-				return getSlimeSizeEditorItem();
+				return getSizeEditorItem();
 			}
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				boolean backwards = clickEvent.isRightClick();
-				cycleSlimeSize(backwards);
+				cycleSize(backwards);
 				return true;
 			}
 		};

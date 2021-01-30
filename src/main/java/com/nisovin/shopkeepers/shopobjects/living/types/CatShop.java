@@ -26,17 +26,13 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class CatShop extends SittableShop<Cat> {
 
-	private static final Property<Cat.Type> PROPERTY_CAT_TYPE = new EnumProperty<>(Cat.Type.class, "catType", Cat.Type.TABBY);
-	private static final Property<DyeColor> PROPERTY_COLLAR_COLOR = new EnumProperty<DyeColor>(DyeColor.class, "collarColor", null) {
+	private final Property<Cat.Type> catTypeProperty = new EnumProperty<>(shopkeeper, Cat.Type.class, "catType", Cat.Type.TABBY);
+	private final Property<DyeColor> collarColorProperty = new EnumProperty<DyeColor>(shopkeeper, DyeColor.class, "collarColor", null) {
 		@Override
 		public boolean isNullable() {
-			// Null to indicate 'no collar / untamed':
-			return true;
+			return true; // Null indicates 'no collar' / untamed
 		}
 	};
-
-	private Cat.Type catType = PROPERTY_CAT_TYPE.getDefaultValue();
-	private DyeColor collarColor = PROPERTY_COLLAR_COLOR.getDefaultValue(); // Can be null
 
 	public CatShop(	LivingShops livingShops, SKLivingShopObjectType<CatShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -46,15 +42,15 @@ public class CatShop extends SittableShop<Cat> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.catType = PROPERTY_CAT_TYPE.load(shopkeeper, configSection);
-		this.collarColor = PROPERTY_COLLAR_COLOR.load(shopkeeper, configSection);
+		catTypeProperty.load(configSection);
+		collarColorProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_CAT_TYPE.save(shopkeeper, configSection, catType);
-		PROPERTY_COLLAR_COLOR.save(shopkeeper, configSection, collarColor);
+		catTypeProperty.save(configSection);
+		collarColorProperty.save(configSection);
 	}
 
 	@Override
@@ -87,29 +83,33 @@ public class CatShop extends SittableShop<Cat> {
 		case "SIAMESE_CAT":
 			return Cat.Type.SIAMESE;
 		default:
-			return PROPERTY_CAT_TYPE.getDefaultValue(); // Fallback to default
+			return Cat.Type.TABBY; // Fallback to default cat type
 		}
+	}
+
+	public Cat.Type getCatType() {
+		return catTypeProperty.getValue();
 	}
 
 	public void setCatType(Cat.Type catType) {
 		Validate.notNull(catType, "Cat type is null!");
-		this.catType = catType;
+		catTypeProperty.setValue(catType);
 		shopkeeper.markDirty();
 		this.applyCatType(this.getEntity()); // Null if not active
 	}
 
-	private void applyCatType(Cat entity) {
-		if (entity == null) return;
-		entity.setCatType(catType);
+	public void cycleCatType(boolean backwards) {
+		this.setCatType(EnumUtils.cycleEnumConstant(Cat.Type.class, this.getCatType(), backwards));
 	}
 
-	public void cycleCatType(boolean backwards) {
-		this.setCatType(EnumUtils.cycleEnumConstant(Cat.Type.class, catType, backwards));
+	private void applyCatType(Cat entity) {
+		if (entity == null) return;
+		entity.setCatType(this.getCatType());
 	}
 
 	private ItemStack getCatTypeEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
-		switch (catType) {
+		switch (this.getCatType()) {
 		case TABBY:
 			ItemUtils.setLeatherColor(iconItem, Color.BLACK.mixColors(Color.ORANGE));
 			break;
@@ -170,14 +170,23 @@ public class CatShop extends SittableShop<Cat> {
 
 	// COLLAR COLOR
 
+	public DyeColor getCollarColor() {
+		return collarColorProperty.getValue();
+	}
+
 	public void setCollarColor(DyeColor collarColor) {
-		this.collarColor = collarColor;
+		collarColorProperty.setValue(collarColor);
 		shopkeeper.markDirty();
 		this.applyCollarColor(this.getEntity()); // Null if not active
 	}
 
+	public void cycleCollarColor(boolean backwards) {
+		this.setCollarColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, this.getCollarColor(), backwards));
+	}
+
 	private void applyCollarColor(Cat entity) {
 		if (entity == null) return;
+		DyeColor collarColor = this.getCollarColor();
 		if (collarColor == null) {
 			// No collar / untamed:
 			entity.setTamed(false);
@@ -187,11 +196,8 @@ public class CatShop extends SittableShop<Cat> {
 		}
 	}
 
-	public void cycleCollarColor(boolean backwards) {
-		this.setCollarColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, collarColor, backwards));
-	}
-
 	private ItemStack getCollarColorEditorItem() {
+		DyeColor collarColor = this.getCollarColor();
 		ItemStack iconItem;
 		if (collarColor == null) {
 			iconItem = new ItemStack(Material.BARRIER);

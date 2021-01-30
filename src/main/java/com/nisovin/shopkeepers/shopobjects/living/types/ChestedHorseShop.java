@@ -22,9 +22,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 
-	private static final Property<Boolean> PROPERTY_CARRYING_CHEST = new BooleanProperty("carryingChest", false);
-
-	private boolean carryingChest = PROPERTY_CARRYING_CHEST.getDefaultValue();
+	private final Property<Boolean> carryingChestProperty = new BooleanProperty(shopkeeper, "carryingChest", false);
 
 	public ChestedHorseShop(LivingShops livingShops, SKLivingShopObjectType<? extends ChestedHorseShop<E>> livingObjectType,
 							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -34,13 +32,13 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.carryingChest = PROPERTY_CARRYING_CHEST.load(shopkeeper, configSection);
+		carryingChestProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_CARRYING_CHEST.save(shopkeeper, configSection, carryingChest);
+		carryingChestProperty.save(configSection);
 	}
 
 	@Override
@@ -59,19 +57,23 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 
 	// CARRYING CHEST
 
+	public boolean isCarryingChest() {
+		return carryingChestProperty.getValue();
+	}
+
 	public void setCarryingChest(boolean carryingChest) {
-		this.carryingChest = carryingChest;
+		carryingChestProperty.setValue(carryingChest);
 		shopkeeper.markDirty();
 		this.applyCarryingChest(this.getEntity()); // Null if not active
 	}
 
-	private void applyCarryingChest(E entity) {
-		if (entity == null) return;
-		entity.setCarryingChest(carryingChest);
+	public void cycleCarryingChest() {
+		this.setCarryingChest(!this.isCarryingChest());
 	}
 
-	public void cycleCarryingChest() {
-		this.setCarryingChest(!carryingChest);
+	private void applyCarryingChest(E entity) {
+		if (entity == null) return;
+		entity.setCarryingChest(this.isCarryingChest());
 	}
 
 	private ItemStack getCarryingChestEditorItem() {

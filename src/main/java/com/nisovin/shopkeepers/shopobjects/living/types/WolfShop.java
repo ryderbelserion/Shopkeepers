@@ -25,17 +25,13 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class WolfShop extends SittableShop<Wolf> {
 
-	private static final Property<Boolean> PROPERTY_ANGRY = new BooleanProperty("angry", false);
-	private static final Property<DyeColor> PROPERTY_COLLAR_COLOR = new EnumProperty<DyeColor>(DyeColor.class, "collarColor", null) {
+	private final Property<Boolean> angryProperty = new BooleanProperty(shopkeeper, "angry", false);
+	private final Property<DyeColor> collarColorProperty = new EnumProperty<DyeColor>(shopkeeper, DyeColor.class, "collarColor", null) {
 		@Override
 		public boolean isNullable() {
-			// Null to indicate 'no collar / untamed':
-			return true;
+			return true; // Null to indicate 'no collar' / untamed
 		}
 	};
-
-	private boolean angry = PROPERTY_ANGRY.getDefaultValue();
-	private DyeColor collarColor = PROPERTY_COLLAR_COLOR.getDefaultValue(); // Can be null
 
 	public WolfShop(LivingShops livingShops, SKLivingShopObjectType<WolfShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -45,15 +41,15 @@ public class WolfShop extends SittableShop<Wolf> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.angry = PROPERTY_ANGRY.load(shopkeeper, configSection);
-		this.collarColor = PROPERTY_COLLAR_COLOR.load(shopkeeper, configSection);
+		angryProperty.load(configSection);
+		collarColorProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_ANGRY.save(shopkeeper, configSection, angry);
-		PROPERTY_COLLAR_COLOR.save(shopkeeper, configSection, collarColor);
+		angryProperty.save(configSection);
+		collarColorProperty.save(configSection);
 	}
 
 	@Override
@@ -74,23 +70,27 @@ public class WolfShop extends SittableShop<Wolf> {
 
 	// ANGRY
 
+	public boolean isAngry() {
+		return angryProperty.getValue();
+	}
+
 	public void setAngry(boolean angry) {
-		this.angry = angry;
+		angryProperty.setValue(angry);
 		shopkeeper.markDirty();
 		this.applyAngry(this.getEntity()); // Null if not active
 	}
 
-	private void applyAngry(Wolf entity) {
-		if (entity == null) return;
-		entity.setAngry(angry);
+	public void cycleAngry() {
+		this.setAngry(!this.isAngry());
 	}
 
-	public void cycleAngry() {
-		this.setAngry(!angry);
+	private void applyAngry(Wolf entity) {
+		if (entity == null) return;
+		entity.setAngry(this.isAngry());
 	}
 
 	private ItemStack getAngryEditorItem() {
-		ItemStack iconItem = new ItemStack(angry ? Material.RED_WOOL : Material.WHITE_WOOL);
+		ItemStack iconItem = new ItemStack(this.isAngry() ? Material.RED_WOOL : Material.WHITE_WOOL);
 		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonWolfAngry, Messages.buttonWolfAngryLore);
 		return iconItem;
 	}
@@ -112,14 +112,23 @@ public class WolfShop extends SittableShop<Wolf> {
 
 	// COLLAR COLOR
 
+	public DyeColor getCollarColor() {
+		return collarColorProperty.getValue();
+	}
+
 	public void setCollarColor(DyeColor collarColor) {
-		this.collarColor = collarColor;
+		collarColorProperty.setValue(collarColor);
 		shopkeeper.markDirty();
 		this.applyCollarColor(this.getEntity()); // Null if not active
 	}
 
+	public void cycleCollarColor(boolean backwards) {
+		this.setCollarColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, this.getCollarColor(), backwards));
+	}
+
 	private void applyCollarColor(Wolf entity) {
 		if (entity == null) return;
+		DyeColor collarColor = this.getCollarColor();
 		if (collarColor == null) {
 			// No collar / untamed:
 			entity.setTamed(false);
@@ -129,11 +138,8 @@ public class WolfShop extends SittableShop<Wolf> {
 		}
 	}
 
-	public void cycleCollarColor(boolean backwards) {
-		this.setCollarColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, collarColor, backwards));
-	}
-
 	private ItemStack getCollarColorEditorItem() {
+		DyeColor collarColor = this.getCollarColor();
 		ItemStack iconItem;
 		if (collarColor == null) {
 			iconItem = new ItemStack(Material.BARRIER);

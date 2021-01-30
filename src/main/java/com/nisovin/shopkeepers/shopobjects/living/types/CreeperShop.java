@@ -23,9 +23,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class CreeperShop extends SKLivingShopObject<Creeper> {
 
-	private static final Property<Boolean> PROPERTY_POWERED = new BooleanProperty("powered", false);
-
-	private boolean powered = PROPERTY_POWERED.getDefaultValue();
+	private final Property<Boolean> poweredProperty = new BooleanProperty(shopkeeper, "powered", false);
 
 	public CreeperShop(	LivingShops livingShops, SKLivingShopObjectType<CreeperShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -35,13 +33,13 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.powered = PROPERTY_POWERED.load(shopkeeper, configSection);
+		poweredProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_POWERED.save(shopkeeper, configSection, powered);
+		poweredProperty.save(configSection);
 	}
 
 	@Override
@@ -60,24 +58,28 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 
 	// POWERED STATE
 
+	public boolean isPowered() {
+		return poweredProperty.getValue();
+	}
+
 	public void setPowered(boolean powered) {
-		this.powered = powered;
+		poweredProperty.setValue(powered);
 		shopkeeper.markDirty();
 		this.applyPowered(this.getEntity()); // Null if not active
 	}
 
-	private void applyPowered(Creeper entity) {
-		if (entity == null) return;
-		entity.setPowered(powered);
+	public void cyclePowered() {
+		this.setPowered(!this.isPowered());
 	}
 
-	public void cyclePowered() {
-		this.setPowered(!powered);
+	private void applyPowered(Creeper entity) {
+		if (entity == null) return;
+		entity.setPowered(this.isPowered());
 	}
 
 	private ItemStack getPoweredEditorItem() {
 		ItemStack iconItem;
-		if (powered) {
+		if (this.isPowered()) {
 			iconItem = new ItemStack(Material.LIGHT_BLUE_WOOL);
 		} else {
 			iconItem = new ItemStack(Material.LIME_WOOL);

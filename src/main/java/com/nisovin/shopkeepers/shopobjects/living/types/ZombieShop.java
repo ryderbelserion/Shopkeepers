@@ -24,9 +24,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 // TODO Use BabyableShop as base once there is a common interface for this inside Bukkit.
 public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 
-	private static final Property<Boolean> PROPERTY_BABY = new BooleanProperty("baby", false);
-
-	private boolean baby = PROPERTY_BABY.getDefaultValue();
+	private final Property<Boolean> babyProperty = new BooleanProperty(shopkeeper, "baby", false);
 
 	public ZombieShop(	LivingShops livingShops, SKLivingShopObjectType<? extends ZombieShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -36,13 +34,13 @@ public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.baby = PROPERTY_BABY.load(shopkeeper, configSection);
+		babyProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_BABY.save(shopkeeper, configSection, baby);
+		babyProperty.save(configSection);
 	}
 
 	@Override
@@ -59,21 +57,25 @@ public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 		return editorButtons;
 	}
 
-	// BABY STATE
+	// BABY
+
+	public boolean isBaby() {
+		return babyProperty.getValue();
+	}
 
 	public void setBaby(boolean baby) {
-		this.baby = baby;
+		babyProperty.setValue(baby);
 		shopkeeper.markDirty();
 		this.applyBaby(this.getEntity()); // Null if not active
 	}
 
-	private void applyBaby(E entity) {
-		if (entity == null) return;
-		entity.setBaby(baby);
+	public void cycleBaby() {
+		this.setBaby(!this.isBaby());
 	}
 
-	public void cycleBaby() {
-		this.setBaby(!baby);
+	private void applyBaby(E entity) {
+		if (entity == null) return;
+		entity.setBaby(this.isBaby());
 	}
 
 	private ItemStack getBabyEditorItem() {

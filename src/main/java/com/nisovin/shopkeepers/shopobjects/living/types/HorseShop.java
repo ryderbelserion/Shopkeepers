@@ -28,16 +28,8 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class HorseShop extends BabyableShop<Horse> {
 
-	private static final Property<Horse.Color> PROPERTY_COLOR = new EnumProperty<>(Horse.Color.class, "color", Horse.Color.BROWN);
-	private static final Property<Horse.Style> PROPERTY_STYLE = new EnumProperty<>(Horse.Style.class, "style", Horse.Style.NONE);
-	private static final Property<HorseArmor> PROPERTY_ARMOR = new EnumProperty<HorseArmor>(HorseArmor.class, "armor", null) {
-		@Override
-		public boolean isNullable() {
-			return true; // Null indicates 'no armor'
-		}
-	};
-
 	public static enum HorseArmor {
+
 		LEATHER(Material.LEATHER_HORSE_ARMOR),
 		IRON(Material.IRON_HORSE_ARMOR),
 		GOLD(Material.GOLDEN_HORSE_ARMOR),
@@ -46,6 +38,7 @@ public class HorseShop extends BabyableShop<Horse> {
 		private final Material material;
 
 		private HorseArmor(Material material) {
+			assert material != null;
 			this.material = material;
 		}
 
@@ -54,9 +47,14 @@ public class HorseShop extends BabyableShop<Horse> {
 		}
 	}
 
-	private Horse.Color color = PROPERTY_COLOR.getDefaultValue();
-	private Horse.Style style = PROPERTY_STYLE.getDefaultValue();
-	private HorseArmor armor = PROPERTY_ARMOR.getDefaultValue();
+	private final Property<Horse.Color> colorProperty = new EnumProperty<>(shopkeeper, Horse.Color.class, "color", Horse.Color.BROWN);
+	private final Property<Horse.Style> styleProperty = new EnumProperty<>(shopkeeper, Horse.Style.class, "style", Horse.Style.NONE);
+	private final Property<HorseArmor> armorProperty = new EnumProperty<HorseArmor>(shopkeeper, HorseArmor.class, "armor", null) {
+		@Override
+		public boolean isNullable() {
+			return true; // Null indicates 'no armor'
+		}
+	};
 
 	public HorseShop(	LivingShops livingShops, SKLivingShopObjectType<HorseShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -66,17 +64,17 @@ public class HorseShop extends BabyableShop<Horse> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.color = PROPERTY_COLOR.load(shopkeeper, configSection);
-		this.style = PROPERTY_STYLE.load(shopkeeper, configSection);
-		this.armor = PROPERTY_ARMOR.load(shopkeeper, configSection);
+		colorProperty.load(configSection);
+		styleProperty.load(configSection);
+		armorProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_COLOR.save(shopkeeper, configSection, color);
-		PROPERTY_STYLE.save(shopkeeper, configSection, style);
-		PROPERTY_ARMOR.save(shopkeeper, configSection, armor);
+		colorProperty.save(configSection);
+		styleProperty.load(configSection);
+		armorProperty.save(configSection);
 	}
 
 	@Override
@@ -99,24 +97,28 @@ public class HorseShop extends BabyableShop<Horse> {
 
 	// COLOR
 
+	public Horse.Color getColor() {
+		return colorProperty.getValue();
+	}
+
 	public void setColor(Horse.Color color) {
-		this.color = color;
+		colorProperty.setValue(color);
 		shopkeeper.markDirty();
 		this.applyColor(this.getEntity()); // Null if not active
 	}
 
-	private void applyColor(Horse entity) {
-		if (entity == null) return;
-		entity.setColor(color);
+	public void cycleColor(boolean backwards) {
+		this.setColor(EnumUtils.cycleEnumConstant(Horse.Color.class, this.getColor(), backwards));
 	}
 
-	public void cycleColor(boolean backwards) {
-		this.setColor(EnumUtils.cycleEnumConstant(Horse.Color.class, color, backwards));
+	private void applyColor(Horse entity) {
+		if (entity == null) return;
+		entity.setColor(this.getColor());
 	}
 
 	private ItemStack getColorEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
-		switch (color) {
+		switch (this.getColor()) {
 		case BLACK:
 			ItemUtils.setLeatherColor(iconItem, Color.fromRGB(31, 31, 31));
 			break;
@@ -162,19 +164,23 @@ public class HorseShop extends BabyableShop<Horse> {
 
 	// STYLE
 
+	public Horse.Style getStyle() {
+		return styleProperty.getValue();
+	}
+
 	public void setStyle(Horse.Style style) {
-		this.style = style;
+		styleProperty.setValue(style);
 		shopkeeper.markDirty();
 		this.applyStyle(this.getEntity()); // Null if not active
 	}
 
-	private void applyStyle(Horse entity) {
-		if (entity == null) return;
-		entity.setStyle(style);
+	public void cycleStyle(boolean backwards) {
+		this.setStyle(EnumUtils.cycleEnumConstant(Horse.Style.class, this.getStyle(), backwards));
 	}
 
-	public void cycleStyle(boolean backwards) {
-		this.setStyle(EnumUtils.cycleEnumConstant(Horse.Style.class, style, backwards));
+	private void applyStyle(Horse entity) {
+		if (entity == null) return;
+		entity.setStyle(this.getStyle());
 	}
 
 	private ItemStack getStyleEditorItem() {
@@ -206,22 +212,28 @@ public class HorseShop extends BabyableShop<Horse> {
 
 	// ARMOR
 
+	public HorseArmor getArmor() {
+		return armorProperty.getValue();
+	}
+
 	public void setArmor(HorseArmor armor) {
-		this.armor = armor;
+		armorProperty.setValue(armor);
 		shopkeeper.markDirty();
 		this.applyArmor(this.getEntity()); // Null if not active
 	}
 
+	public void cycleArmor(boolean backwards) {
+		this.setArmor(EnumUtils.cycleEnumConstantNullable(HorseArmor.class, this.getArmor(), backwards));
+	}
+
 	private void applyArmor(Horse entity) {
 		if (entity == null) return;
+		HorseArmor armor = this.getArmor();
 		entity.getInventory().setArmor(armor == null ? null : new ItemStack(armor.getMaterial()));
 	}
 
-	public void cycleArmor(boolean backwards) {
-		this.setArmor(EnumUtils.cycleEnumConstantNullable(HorseArmor.class, armor, backwards));
-	}
-
 	private ItemStack getArmorEditorItem() {
+		HorseArmor armor = this.getArmor();
 		ItemStack iconItem = new ItemStack(armor == null ? Material.BARRIER : armor.getMaterial());
 		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonHorseArmor, Messages.buttonHorseArmorLore);
 		return iconItem;

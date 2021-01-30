@@ -25,9 +25,7 @@ import com.nisovin.shopkeepers.util.Validate;
 // TODO Pose (laying, sitting, eating, worried).
 public class PandaShop extends BabyableShop<Panda> {
 
-	private static final Property<Panda.Gene> PROPERTY_GENE = new EnumProperty<>(Panda.Gene.class, "gene", Panda.Gene.NORMAL);
-
-	private Panda.Gene gene = PROPERTY_GENE.getDefaultValue();
+	private final Property<Panda.Gene> geneProperty = new EnumProperty<>(shopkeeper, Panda.Gene.class, "gene", Panda.Gene.NORMAL);
 
 	public PandaShop(	LivingShops livingShops, SKLivingShopObjectType<PandaShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -37,13 +35,13 @@ public class PandaShop extends BabyableShop<Panda> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.gene = PROPERTY_GENE.load(shopkeeper, configSection);
+		geneProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_GENE.save(shopkeeper, configSection, gene);
+		geneProperty.save(configSection);
 	}
 
 	@Override
@@ -62,21 +60,26 @@ public class PandaShop extends BabyableShop<Panda> {
 
 	// GENE
 
+	public Panda.Gene getGene() {
+		return geneProperty.getValue();
+	}
+
 	public void setGene(Panda.Gene gene) {
 		Validate.notNull(gene, "Gene is null!");
-		this.gene = gene;
+		geneProperty.setValue(gene);
 		shopkeeper.markDirty();
 		this.applyGene(this.getEntity()); // Null if not active
 	}
 
-	private void applyGene(Panda entity) {
-		if (entity == null) return;
-		entity.setMainGene(gene);
-		entity.setHiddenGene(gene);
+	public void cycleGene(boolean backwards) {
+		this.setGene(EnumUtils.cycleEnumConstant(Panda.Gene.class, this.getGene(), backwards));
 	}
 
-	public void cycleGene(boolean backwards) {
-		this.setGene(EnumUtils.cycleEnumConstant(Panda.Gene.class, gene, backwards));
+	private void applyGene(Panda entity) {
+		if (entity == null) return;
+		Panda.Gene gene = this.getGene();
+		entity.setMainGene(gene);
+		entity.setHiddenGene(gene);
 	}
 
 	private ItemStack getGeneEditorItem() {

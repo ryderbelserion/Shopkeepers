@@ -22,9 +22,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class PigShop extends BabyableShop<Pig> {
 
-	private static final Property<Boolean> PROPERTY_SADDLE = new BooleanProperty("saddle", false);
-
-	private boolean saddle = PROPERTY_SADDLE.getDefaultValue();
+	private final Property<Boolean> saddleProperty = new BooleanProperty(shopkeeper, "saddle", false);
 
 	public PigShop(	LivingShops livingShops, SKLivingShopObjectType<PigShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -34,13 +32,13 @@ public class PigShop extends BabyableShop<Pig> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.saddle = PROPERTY_SADDLE.load(shopkeeper, configSection);
+		saddleProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_SADDLE.save(shopkeeper, configSection, saddle);
+		saddleProperty.save(configSection);
 	}
 
 	@Override
@@ -59,19 +57,23 @@ public class PigShop extends BabyableShop<Pig> {
 
 	// SADDLE
 
+	public boolean hasSaddle() {
+		return saddleProperty.getValue();
+	}
+
 	public void setSaddle(boolean saddle) {
-		this.saddle = saddle;
+		saddleProperty.setValue(saddle);
 		shopkeeper.markDirty();
 		this.applySaddle(this.getEntity()); // Null if not active
 	}
 
-	private void applySaddle(Pig entity) {
-		if (entity == null) return;
-		entity.setSaddle(saddle);
+	public void cycleSaddle() {
+		this.setSaddle(!this.hasSaddle());
 	}
 
-	public void cycleSaddle() {
-		this.setSaddle(!saddle);
+	private void applySaddle(Pig entity) {
+		if (entity == null) return;
+		entity.setSaddle(this.hasSaddle());
 	}
 
 	private ItemStack getSaddleEditorItem() {

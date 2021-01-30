@@ -87,6 +87,10 @@ API:
 * A few methods of ChunkCoords have been renamed for consistency with the rest of the code base.
 * Various minor Javadoc clarifications.
 
+Internal API:  
+* Added methods to retrieve the values of the various mob shopkeeper properties.
+* For consistency reasons, a few methods related to the slime size, magma cube size, and parrot variant have been renamed.
+
 Internal:  
 * The config key pattern is cached now.
 * Major refactoring related to how the config and language files are loaded.
@@ -106,6 +110,7 @@ Internal:
 * Timer uses Java's TimeUnit for conversions now.
 * Timer and Timings use a long counter now.
 * Added a mutable variant of ChunkCoords.
+* Minor refactoring related to shop object properties.
 * Minor other internal code refactoring.
 
 Migration notes:  

@@ -25,17 +25,13 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
-	private static final Property<Llama.Color> PROPERTY_COLOR = new EnumProperty<>(Llama.Color.class, "color", Llama.Color.CREAMY);
-	private static final Property<DyeColor> PROPERTY_CARPET_COLOR = new EnumProperty<DyeColor>(DyeColor.class, "carpetColor", null) {
+	private final Property<Llama.Color> colorProperty = new EnumProperty<>(shopkeeper, Llama.Color.class, "color", Llama.Color.CREAMY);
+	private final Property<DyeColor> carpetColorProperty = new EnumProperty<DyeColor>(shopkeeper, DyeColor.class, "carpetColor", null) {
 		@Override
 		public boolean isNullable() {
-			// Null to indicate 'no carpet':
-			return true;
+			return true; // Null indicates 'no carpet'
 		}
 	};
-
-	private Llama.Color color = PROPERTY_COLOR.getDefaultValue();
-	private DyeColor carpetColor = PROPERTY_CARPET_COLOR.getDefaultValue();
 
 	public LlamaShop(	LivingShops livingShops, SKLivingShopObjectType<? extends LlamaShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -45,15 +41,15 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.color = PROPERTY_COLOR.load(shopkeeper, configSection);
-		this.carpetColor = PROPERTY_CARPET_COLOR.load(shopkeeper, configSection);
+		colorProperty.load(configSection);
+		carpetColorProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_COLOR.save(shopkeeper, configSection, color);
-		PROPERTY_CARPET_COLOR.save(shopkeeper, configSection, carpetColor);
+		colorProperty.save(configSection);
+		carpetColorProperty.save(configSection);
 	}
 
 	@Override
@@ -74,24 +70,28 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
 	// COLOR
 
+	public Llama.Color getColor() {
+		return colorProperty.getValue();
+	}
+
 	public void setColor(Llama.Color color) {
-		this.color = color;
+		colorProperty.setValue(color);
 		shopkeeper.markDirty();
 		this.applyColor(this.getEntity()); // Null if not active
 	}
 
-	private void applyColor(E entity) {
-		if (entity == null) return;
-		entity.setColor(color);
+	public void cycleColor(boolean backwards) {
+		this.setColor(EnumUtils.cycleEnumConstant(Llama.Color.class, this.getColor(), backwards));
 	}
 
-	public void cycleColor(boolean backwards) {
-		this.setColor(EnumUtils.cycleEnumConstant(Llama.Color.class, color, backwards));
+	private void applyColor(E entity) {
+		if (entity == null) return;
+		entity.setColor(this.getColor());
 	}
 
 	private ItemStack getColorEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
-		switch (color) {
+		switch (this.getColor()) {
 		case BROWN:
 			ItemUtils.setLeatherColor(iconItem, DyeColor.BROWN.getColor());
 			break;
@@ -128,22 +128,28 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
 	// CARPET COLOR
 
+	public DyeColor getCarpetColor() {
+		return carpetColorProperty.getValue();
+	}
+
 	public void setCarpetColor(DyeColor carpetColor) {
-		this.carpetColor = carpetColor;
+		carpetColorProperty.setValue(carpetColor);
 		shopkeeper.markDirty();
 		this.applyCarpetColor(this.getEntity()); // Null if not active
 	}
 
+	public void cycleCarpetColor(boolean backwards) {
+		this.setCarpetColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, this.getCarpetColor(), backwards));
+	}
+
 	private void applyCarpetColor(E entity) {
 		if (entity == null) return;
+		DyeColor carpetColor = this.getCarpetColor();
 		entity.getInventory().setDecor(carpetColor == null ? null : new ItemStack(ItemUtils.getCarpetType(carpetColor)));
 	}
 
-	public void cycleCarpetColor(boolean backwards) {
-		this.setCarpetColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, carpetColor, backwards));
-	}
-
 	private ItemStack getCarpetColorEditorItem() {
+		DyeColor carpetColor = this.getCarpetColor();
 		ItemStack iconItem = new ItemStack(carpetColor == null ? Material.BARRIER : ItemUtils.getCarpetType(carpetColor));
 		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonLlamaCarpetColor, Messages.buttonLlamaCarpetColorLore);
 		return iconItem;

@@ -26,9 +26,7 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 
-	private static final Property<Profession> PROPERTY_PROFESSION = new EnumProperty<Profession>(Profession.class, "profession", Profession.NONE);
-
-	private Profession profession = PROPERTY_PROFESSION.getDefaultValue();
+	private final Property<Profession> professionProperty = new EnumProperty<Profession>(shopkeeper, Profession.class, "profession", Profession.NONE);
 
 	public ZombieVillagerShop(	LivingShops livingShops, SKLivingShopObjectType<ZombieVillagerShop> livingObjectType,
 								AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -38,13 +36,13 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.profession = PROPERTY_PROFESSION.load(shopkeeper, configSection);
+		professionProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_PROFESSION.save(shopkeeper, configSection, profession);
+		professionProperty.save(configSection);
 	}
 
 	@Override
@@ -63,25 +61,29 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 
 	// PROFESSION
 
+	public Profession getProfession() {
+		return professionProperty.getValue();
+	}
+
 	public void setProfession(Profession profession) {
 		Validate.notNull(profession, "Profession is null!");
-		this.profession = profession;
+		professionProperty.setValue(profession);
 		shopkeeper.markDirty();
 		this.applyProfession(this.getEntity()); // Null if not active
 	}
 
-	private void applyProfession(ZombieVillager entity) {
-		if (entity == null) return;
-		entity.setVillagerProfession(profession);
+	public void cycleProfession(boolean backwards) {
+		this.setProfession(EnumUtils.cycleEnumConstant(Profession.class, this.getProfession(), backwards));
 	}
 
-	public void cycleProfession(boolean backwards) {
-		this.setProfession(EnumUtils.cycleEnumConstant(Profession.class, profession, backwards));
+	private void applyProfession(ZombieVillager entity) {
+		if (entity == null) return;
+		entity.setVillagerProfession(this.getProfession());
 	}
 
 	private ItemStack getProfessionEditorItem() {
 		ItemStack iconItem;
-		switch (profession) {
+		switch (this.getProfession()) {
 		case ARMORER:
 			iconItem = new ItemStack(Material.BLAST_FURNACE);
 			break;

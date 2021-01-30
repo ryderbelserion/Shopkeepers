@@ -30,9 +30,9 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class VillagerShop extends BabyableShop<Villager> {
 
-	private static final Property<Profession> PROPERTY_PROFESSION = new EnumProperty<Profession>(Profession.class, "profession", Profession.NONE) {
+	private final Property<Profession> professionProperty = new EnumProperty<Profession>(shopkeeper, Profession.class, "profession", Profession.NONE) {
 		@Override
-		protected void migrate(AbstractShopkeeper shopkeeper, ConfigurationSection configSection) {
+		protected void migrate(ConfigurationSection configSection) {
 			// Migration from 'prof' key: TODO Added with 1.14 update, remove again at some point.
 			String professionName = configSection.getString("prof");
 			if (professionName != null) {
@@ -60,12 +60,8 @@ public class VillagerShop extends BabyableShop<Villager> {
 			}
 		}
 	};
-	private static final Property<Villager.Type> PROPERTY_VILLAGER_TYPE = new EnumProperty<>(Villager.Type.class, "villagerType", Villager.Type.PLAINS);
-	private static final IntegerProperty PROPERTY_VILLAGER_LEVEL = new IntegerProperty("villagerLevel", 1, 5, 1);
-
-	private Profession profession = PROPERTY_PROFESSION.getDefaultValue();
-	private Villager.Type villagerType = PROPERTY_VILLAGER_TYPE.getDefaultValue();
-	private int villagerLevel = PROPERTY_VILLAGER_LEVEL.getDefaultValue();
+	private final Property<Villager.Type> villagerTypeProperty = new EnumProperty<>(shopkeeper, Villager.Type.class, "villagerType", Villager.Type.PLAINS);
+	private final IntegerProperty villagerLevelProperty = new IntegerProperty(shopkeeper, "villagerLevel", 1, 5, 1);
 
 	public VillagerShop(LivingShops livingShops, SKLivingShopObjectType<VillagerShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -75,17 +71,17 @@ public class VillagerShop extends BabyableShop<Villager> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.profession = PROPERTY_PROFESSION.load(shopkeeper, configSection);
-		this.villagerType = PROPERTY_VILLAGER_TYPE.load(shopkeeper, configSection);
-		this.villagerLevel = PROPERTY_VILLAGER_LEVEL.load(shopkeeper, configSection);
+		professionProperty.load(configSection);
+		villagerTypeProperty.load(configSection);
+		villagerLevelProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_PROFESSION.save(shopkeeper, configSection, profession);
-		PROPERTY_VILLAGER_TYPE.save(shopkeeper, configSection, villagerType);
-		PROPERTY_VILLAGER_LEVEL.save(shopkeeper, configSection, villagerLevel);
+		professionProperty.save(configSection);
+		villagerTypeProperty.save(configSection);
+		villagerLevelProperty.save(configSection);
 	}
 
 	@Override
@@ -112,25 +108,29 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 	// PROFESSION
 
+	public Profession getProfession() {
+		return professionProperty.getValue();
+	}
+
 	public void setProfession(Profession profession) {
 		Validate.notNull(profession, "Profession is null!");
-		this.profession = profession;
+		professionProperty.setValue(profession);
 		shopkeeper.markDirty();
 		this.applyProfession(this.getEntity()); // Null if not active
 	}
 
-	private void applyProfession(Villager entity) {
-		if (entity == null) return;
-		entity.setProfession(profession);
+	public void cycleProfession(boolean backwards) {
+		this.setProfession(EnumUtils.cycleEnumConstant(Profession.class, this.getProfession(), backwards));
 	}
 
-	public void cycleProfession(boolean backwards) {
-		this.setProfession(EnumUtils.cycleEnumConstant(Profession.class, profession, backwards));
+	private void applyProfession(Villager entity) {
+		if (entity == null) return;
+		entity.setProfession(this.getProfession());
 	}
 
 	private ItemStack getProfessionEditorItem() {
 		ItemStack iconItem;
-		switch (profession) {
+		switch (this.getProfession()) {
 		case ARMORER:
 			iconItem = new ItemStack(Material.BLAST_FURNACE);
 			break;
@@ -202,25 +202,29 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 	// VILLAGER TYPE
 
+	public Villager.Type getVillagerType() {
+		return villagerTypeProperty.getValue();
+	}
+
 	public void setVillagerType(Villager.Type villagerType) {
 		Validate.notNull(villagerType, "Villager type is null!");
-		this.villagerType = villagerType;
+		villagerTypeProperty.setValue(villagerType);
 		shopkeeper.markDirty();
 		this.applyVillagerType(this.getEntity()); // Null if not active
 	}
 
-	private void applyVillagerType(Villager entity) {
-		if (entity == null) return;
-		entity.setVillagerType(villagerType);
+	public void cycleVillagerType(boolean backwards) {
+		this.setVillagerType(EnumUtils.cycleEnumConstant(Villager.Type.class, this.getVillagerType(), backwards));
 	}
 
-	public void cycleVillagerType(boolean backwards) {
-		this.setVillagerType(EnumUtils.cycleEnumConstant(Villager.Type.class, villagerType, backwards));
+	private void applyVillagerType(Villager entity) {
+		if (entity == null) return;
+		entity.setVillagerType(this.getVillagerType());
 	}
 
 	private ItemStack getVillagerTypeEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
-		switch (villagerType) {
+		switch (this.getVillagerType()) {
 		default:
 		case PLAINS:
 			// Default brown color:
@@ -266,32 +270,37 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 	// VILLAGER LEVEL
 
+	public int getVillagerLevel() {
+		return villagerLevelProperty.getValue();
+	}
+
 	public void setVillagerLevel(int villagerLevel) {
-		Validate.isTrue(PROPERTY_VILLAGER_LEVEL.isInBounds(villagerLevel), "villagerLevel is out of bounds: " + villagerLevel);
-		this.villagerLevel = villagerLevel;
+		Validate.isTrue(villagerLevelProperty.isInBounds(villagerLevel), () -> "villagerLevel is out of bounds: " + villagerLevel);
+		villagerLevelProperty.setValue(villagerLevel);
 		shopkeeper.markDirty();
 		this.applyVillagerLevel(this.getEntity()); // Null if not active
 	}
 
-	private void applyVillagerLevel(Villager entity) {
-		if (entity == null) return;
-		entity.setVillagerLevel(villagerLevel);
-	}
-
 	public void cycleVillagerLevel(boolean backwards) {
+		int villagerLevel = this.getVillagerLevel();
 		int nextLevel;
 		if (backwards) {
 			nextLevel = villagerLevel - 1;
 		} else {
 			nextLevel = villagerLevel + 1;
 		}
-		nextLevel = MathUtils.rangeModulo(nextLevel, PROPERTY_VILLAGER_LEVEL.getMinValue(), PROPERTY_VILLAGER_LEVEL.getMaxValue());
+		nextLevel = MathUtils.rangeModulo(nextLevel, villagerLevelProperty.getMinValue(), villagerLevelProperty.getMaxValue());
 		this.setVillagerLevel(nextLevel);
+	}
+
+	private void applyVillagerLevel(Villager entity) {
+		if (entity == null) return;
+		entity.setVillagerLevel(this.getVillagerLevel());
 	}
 
 	private ItemStack getVillagerLevelEditorItem() {
 		ItemStack iconItem;
-		switch (villagerLevel) {
+		switch (this.getVillagerLevel()) {
 		default:
 		case 1:
 			iconItem = new ItemStack(Material.COBBLESTONE);

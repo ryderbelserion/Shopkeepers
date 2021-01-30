@@ -24,9 +24,7 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class MooshroomShop extends BabyableShop<MushroomCow> {
 
-	private static final Property<MushroomCow.Variant> PROPERTY_VARIANT = new EnumProperty<>(MushroomCow.Variant.class, "variant", MushroomCow.Variant.RED);
-
-	private MushroomCow.Variant variant = PROPERTY_VARIANT.getDefaultValue();
+	private final Property<MushroomCow.Variant> variantProperty = new EnumProperty<>(shopkeeper, MushroomCow.Variant.class, "variant", MushroomCow.Variant.RED);
 
 	public MooshroomShop(	LivingShops livingShops, SKLivingShopObjectType<MooshroomShop> livingObjectType,
 							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -36,13 +34,13 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		this.variant = PROPERTY_VARIANT.load(shopkeeper, configSection);
+		variantProperty.load(configSection);
 	}
 
 	@Override
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
-		PROPERTY_VARIANT.save(shopkeeper, configSection, variant);
+		variantProperty.save(configSection);
 	}
 
 	@Override
@@ -61,25 +59,29 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 
 	// VARIANT
 
+	public MushroomCow.Variant getVariant() {
+		return variantProperty.getValue();
+	}
+
 	public void setVariant(MushroomCow.Variant variant) {
 		Validate.notNull(variant, "Variant is null!");
-		this.variant = variant;
+		variantProperty.setValue(variant);
 		shopkeeper.markDirty();
 		this.applyVariant(this.getEntity()); // Null if not active
 	}
 
-	private void applyVariant(MushroomCow entity) {
-		if (entity == null) return;
-		entity.setVariant(variant);
+	public void cycleVariant(boolean backwards) {
+		this.setVariant(EnumUtils.cycleEnumConstant(MushroomCow.Variant.class, this.getVariant(), backwards));
 	}
 
-	public void cycleVariant(boolean backwards) {
-		this.setVariant(EnumUtils.cycleEnumConstant(MushroomCow.Variant.class, variant, backwards));
+	private void applyVariant(MushroomCow entity) {
+		if (entity == null) return;
+		entity.setVariant(this.getVariant());
 	}
 
 	private ItemStack getVariantEditorItem() {
 		ItemStack iconItem;
-		switch (variant) {
+		switch (this.getVariant()) {
 		case RED:
 			iconItem = new ItemStack(Material.RED_MUSHROOM);
 			break;
