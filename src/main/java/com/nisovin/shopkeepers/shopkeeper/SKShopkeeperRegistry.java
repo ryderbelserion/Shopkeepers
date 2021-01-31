@@ -442,6 +442,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 
 		// Success:
+		// Inform the storage about the used up id:
 		shopkeeperStorage.onShopkeeperIdUsed(id);
 		if (shopkeeper.isDirty()) shopkeeperStorage.markDirty();
 		this.addShopkeeper(shopkeeper, ShopkeeperAddedEvent.Cause.CREATED);
@@ -467,6 +468,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 
 		// Success:
+		// Inform the storage about the used up id:
 		SKShopkeeperStorage shopkeeperStorage = this.getShopkeeperStorage();
 		shopkeeperStorage.onShopkeeperIdUsed(id);
 		if (shopkeeper.isDirty()) shopkeeperStorage.markDirty();

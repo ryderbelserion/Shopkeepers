@@ -111,6 +111,7 @@ Internal:
 * Timer and Timings use a long counter now.
 * Added a mutable variant of ChunkCoords.
 * Minor refactoring related to shop object properties.
+* By keeping track of the largest already used shopkeeper id, we no longer have to check all currently loaded shopkeepers when an id turns out to already be in use.
 * Minor other internal code refactoring.
 
 Migration notes:  

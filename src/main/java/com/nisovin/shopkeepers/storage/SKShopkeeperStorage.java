@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
@@ -98,7 +99,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	 * This cannot be modified while an async save is in progress.
 	 */
 	private final FileConfiguration saveData = new YamlConfiguration();
-	private int maxStoredShopkeeperId = 0;
+	private int maxUsedShopkeeperId = 0;
 	private int nextShopkeeperId = 1;
 
 	/* Loading */
@@ -212,31 +213,32 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	// SHOPKEEPER IDs
 
-	// Does not increment the shopkeeper id counter on its own (we don't want to increment it in case the shopkeeper
-	// creation fails).
+	/**
+	 * Gets an unused shopkeeper id that can be used for a new shopkeeper.
+	 * <p>
+	 * This does not increment the shopkeeper id counter on its own, because we do not want to increment it in case the
+	 * shopkeeper creation fails. Use {@link #onShopkeeperIdUsed(int)} once the id is actually being used.
+	 * 
+	 * @return the next unused shopkeeper id
+	 */
 	public int getNextShopkeeperId() {
 		int nextId = nextShopkeeperId; // Can end up negative after increments due to overflows
 		if (nextId <= 0 || !this.isUnusedId(nextId)) {
 			// Try to use an id larger than the max currently used id:
-			int maxId = maxStoredShopkeeperId;
-			for (Shopkeeper shopkeeper : this.getShopkeeperRegistry().getAllShopkeepers()) {
-				int id = shopkeeper.getId();
-				if (id > maxId) {
-					maxId = id;
-				}
-			}
+			int maxId = maxUsedShopkeeperId;
 			assert maxId > 0;
 			if (maxId < Integer.MAX_VALUE) {
-				nextId = maxId + 1;
+				nextId = maxId + 1; // Causes no overflow
+				assert this.isUnusedId(nextId); // There is no used id greater than the max id
 			} else {
 				// Find the first unused id:
 				nextId = 1;
 				while (!this.isUnusedId(nextId)) {
-					nextId++;
-					if (nextId <= 0) {
-						// Overflow, all ids are in use..:
+					if (nextId == Integer.MAX_VALUE) {
+						// All ids are in use (unlikely..):
 						throw new IllegalStateException("No unused shopkeeper ids available!");
 					}
+					nextId++;
 				}
 				assert nextId > 0;
 			}
@@ -246,13 +248,35 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		return nextId;
 	}
 
-	// Also takes ids of stored shopkeepers in account that could not be loaded for some reason.
+	/**
+	 * Checks if the given id is already used by any shopkeeper.
+	 * <p>
+	 * This also takes the shopkeepers into account that are not currently loaded (for example if they could not be
+	 * loaded for some reason, or if they were already unloaded again).
+	 * 
+	 * @param id
+	 *            the shopkeeper id
+	 * @return <code>true</code> if the shopkeeper id is not yet being used
+	 */
 	private boolean isUnusedId(int id) {
 		return (!saveData.contains(String.valueOf(id)) && this.getShopkeeperRegistry().getShopkeeperById(id) == null);
 	}
 
+	/**
+	 * Informs this storage that the given shopkeeper id is now being used.
+	 * <p>
+	 * This has to be called by the {@link ShopkeeperRegistry} whenever it creates or loads a shopkeeper.
+	 * 
+	 * @param id
+	 *            the shopkeeper id
+	 */
 	public void onShopkeeperIdUsed(int id) {
-		if (id >= nextShopkeeperId) nextShopkeeperId = id + 1;
+		if (id > maxUsedShopkeeperId) {
+			maxUsedShopkeeperId = id;
+		}
+		if (id >= nextShopkeeperId) {
+			nextShopkeeperId = id + 1;
+		}
 	}
 
 	// SHOPKEEPER DATA REMOVAL
@@ -262,7 +286,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	 */
 	private void clearSaveData() {
 		ConfigUtils.clearConfigSection(saveData);
-		maxStoredShopkeeperId = 0;
+		maxUsedShopkeeperId = 0;
 		nextShopkeeperId = 1;
 
 		// Setup data version as first / top entry:
@@ -426,8 +450,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				continue;
 			}
 			int id = idInt.intValue();
-			if (id > maxStoredShopkeeperId) {
-				maxStoredShopkeeperId = id;
+			if (id > maxUsedShopkeeperId) {
+				maxUsedShopkeeperId = id;
 			}
 
 			ConfigurationSection shopkeeperSection = saveData.getConfigurationSection(key);
