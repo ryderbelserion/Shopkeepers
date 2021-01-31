@@ -89,13 +89,23 @@ public abstract class SingletonTask {
 	}
 
 	/**
-	 * Checks if an execution is in progress currently.
+	 * Checks if an execution is currently in progress.
 	 * 
 	 * @return <code>true</code> if an execution is in progress
 	 */
 	public final boolean isRunning() {
 		assert Bukkit.isPrimaryThread();
 		return (state != State.NOT_RUNNING);
+	}
+
+	/**
+	 * Checks whether an execution is in progress that is currently being post-processed.
+	 * 
+	 * @return <code>true</code> if there is an execution that is currently being post-processed
+	 */
+	public final boolean isPostProcessing() {
+		assert Bukkit.isPrimaryThread();
+		return (state == State.SYNC_CALLBACK);
 	}
 
 	private boolean isWithinSyncExecution() {

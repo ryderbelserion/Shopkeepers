@@ -587,7 +587,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		if (cause == ShopkeeperRemoveEvent.Cause.DELETE) {
 			// Remove shopkeeper from storage:
-			this.getShopkeeperStorage().clearShopkeeperData(shopkeeper);
+			this.getShopkeeperStorage().deleteShopkeeper(shopkeeper);
 		}
 	}
 

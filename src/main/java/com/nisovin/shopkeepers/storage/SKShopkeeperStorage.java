@@ -273,12 +273,15 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		saveData.set(DATA_VERSION_KEY, MISSING_DATA_VERSION);
 	}
 
-	public void clearShopkeeperData(AbstractShopkeeper shopkeeper) {
+	public void deleteShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
-		if (saveTask.isRunning()) {
-			// Remember to remove the data after the current async save has finished:
+		// If the save task is currently running (and not in its synchronous post-processing callback), we defer the
+		// deletion of the shopkeeper's data:
+		if (saveTask.isRunning() && !saveTask.isPostProcessing()) {
+			// Remember to remove the data after the current async save completes:
 			shopkeepersToDelete.add(shopkeeper);
 		} else {
+			// Remove the shopkeeper's data from the storage:
 			String key = String.valueOf(shopkeeper.getId());
 			saveData.set(key, null);
 			deletedShopkeepersCount++;
@@ -845,7 +848,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 			// Remove data of shopkeepers that have been deleted in the meantime:
 			for (AbstractShopkeeper deletedShopkeeper : shopkeepersToDelete) {
-				clearShopkeeperData(deletedShopkeeper);
+				deleteShopkeeper(deletedShopkeeper);
 			}
 			shopkeepersToDelete.clear();
 		}
