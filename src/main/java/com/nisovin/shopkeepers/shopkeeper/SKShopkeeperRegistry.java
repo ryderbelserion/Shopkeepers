@@ -510,6 +510,21 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			playerShopCount++;
 		}
 
+		// Log a warning if either the shop type or the shop object type is disabled. The shopkeeper is still added (so
+		// containers are still protected), but it might not get spawned, and there is no guarantee that the shop still
+		// works as expected. Admins are advised to either delete the shopkeeper, or change its object type to something
+		// else.
+		AbstractShopType<?> shopType = shopkeeper.getType();
+		if (!shopType.isEnabled()) {
+			Log.warning("Shop type '" + shopType.getIdentifier() + "' of shopkeeper " + shopkeeper.getId()
+					+ " is disabled! Consider deleting this shopkeeper.");
+		}
+		AbstractShopObjectType<?> shopObjectType = shopkeeper.getShopObject().getType();
+		if (!shopObjectType.isEnabled()) {
+			Log.warning("Object type '" + shopObjectType.getIdentifier() + "' of shopkeeper " + shopkeeper.getId()
+					+ " is disabled! Consider changing its object type.");
+		}
+
 		// Inform shopkeeper:
 		shopkeeper.informAdded(cause);
 
@@ -518,7 +533,6 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		// Activate the shopkeeper if the chunk is currently active:
 		if (chunkEntry != null && chunkEntry.active) {
-			AbstractShopObjectType<?> shopObjectType = shopkeeper.getShopObject().getType();
 			if (shopObjectType.isSpawnedByShopkeepers()) {
 				if (chunkEntry.worldEntry.isWorldSaveRespawnPending() && shopObjectType.isDespawnedDuringWorldSaves()) {
 					Log.debug(DebugOptions.shopkeeperActivation,
@@ -1017,16 +1031,22 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	private void spawnShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		AbstractShopObject shopObject = shopkeeper.getShopObject();
-		assert shopObject.getType().isSpawnedByShopkeepers();
-		boolean spawned = shopObject.spawn();
-		if (spawned) {
-			// Validation:
-			Object objectId = shopObject.getId();
-			if (objectId == null) {
-				Log.warning("Shopkeeper " + shopkeeper.getId() + " has been spawned but provides no object id!");
+		AbstractShopObjectType<?> shopObjectType = shopObject.getType();
+		assert shopObjectType.isSpawnedByShopkeepers();
+		if (shopObjectType.isEnabled()) {
+			boolean spawned = shopObject.spawn();
+			if (spawned) {
+				// Validation:
+				Object objectId = shopObject.getId();
+				if (objectId == null) {
+					Log.warning("Shopkeeper " + shopkeeper.getId() + " has been spawned but provides no object id!");
+				}
+			} else {
+				Log.warning("Failed to spawn shopkeeper " + shopkeeper.getId() + " at " + shopkeeper.getPositionString());
 			}
 		} else {
-			Log.warning("Failed to spawn shopkeeper " + shopkeeper.getId() + " at " + shopkeeper.getPositionString());
+			Log.debug(DebugOptions.shopkeeperActivation, () -> "Skipping spawning of shopkeeper " + shopkeeper.getId()
+					+ ": Object type '" + shopObjectType.getIdentifier() + "' is disabled.");
 		}
 
 		// In either case, activate the shopkeeper:
