@@ -130,24 +130,35 @@ class SignShopListener implements Listener {
 	// Protect sign block:
 
 	private boolean isProtectedBlock(Block block) {
-		// Not protected if the sign shop is not active (if the block is not a sign currently):
-		if (ItemUtils.isSign(block.getType()) && signShopObjectType.isShopkeeper(block)) {
+		// Check if the block itself is a sign shop:
+		if (signShopObjectType.isShopkeeper(block)) {
 			return true;
 		}
+
+		// Check if there is a sign shop attached to this block:
+		String worldName = block.getWorld().getName();
+		int blockX = block.getX();
+		int blockY = block.getY();
+		int blockZ = block.getZ();
 		for (BlockFace blockFace : BLOCK_SIDES) {
-			Block adjacentBlock = block.getRelative(blockFace);
-			Shopkeeper shopkeeper = signShopObjectType.getShopkeeper(adjacentBlock);
-			if (shopkeeper != null) {
-				SKSignShopObject signObject = (SKSignShopObject) shopkeeper.getShopObject();
-				BlockFace attachedFace = BlockFace.UP; // In case of sign post
-				if (signObject.isWallSign()) {
-					attachedFace = signObject.getSignFacing();
-				}
-				if (blockFace == attachedFace) {
-					// Sign is (supposed to be) / might be attached to the given block:
-					return true;
-				}
+			// Note: Avoiding getting the adjacent block slightly improves the performance.
+			int adjacentX = blockX + blockFace.getModX();
+			int adjacentY = blockY + blockFace.getModY();
+			int adjacentZ = blockZ + blockFace.getModZ();
+			Shopkeeper shopkeeper = signShopObjectType.getShopkeeper(worldName, adjacentX, adjacentY, adjacentZ);
+			if (shopkeeper == null) continue;
+
+			SKSignShopObject signObject = (SKSignShopObject) shopkeeper.getShopObject();
+			BlockFace attachedFace = BlockFace.UP; // In case of sign post
+			if (signObject.isWallSign()) {
+				attachedFace = signObject.getSignFacing();
 			}
+			if (blockFace == attachedFace) {
+				// The sign shop is attached to the given block:
+				return true;
+			}
+			// Else continue: There might be other signs shops that are actually attached to the block in the remaining
+			// block directions.
 		}
 		return false;
 	}

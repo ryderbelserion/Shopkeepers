@@ -76,6 +76,7 @@ Date format: (YYYY-MM-DD)
 * Debug: Added debug option 'regular-tick-activities'. The debug output for a few non-exceptional ticking activities, which could sometimes be considered spam if one is not specifically interested in them, such as shopkeepers teleporting back into place, or mobile Citizens shopkeepers updating their shopkeeper's location, are disabled by default now. This new debug option enables them again.
 * We log a warning now whenever a shopkeeper is loaded or created that uses a shop type or shop object type that is disabled. We still load the shopkeeper, so that in the case of a player shop the container is still protected. However, even though the shopkeeper might in some cases seem to still work as normal, there is no guarantee for this. Admins are advised to either delete the shopkeeper, or change its shop object type to something else.
 * We no longer spawn shopkeepers whose object type is disabled.
+* Performance: Slightly improved the performance of checking for protected sign shops when blocks are broken or explode.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.

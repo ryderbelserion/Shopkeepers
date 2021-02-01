@@ -189,6 +189,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		}
 
 		// Place sign:
+		// This replaces any currently existing block at that location.
 		Block signBlock = signLocation.getBlock();
 		BlockData signData = this.createBlockData();
 		assert signData != null;
