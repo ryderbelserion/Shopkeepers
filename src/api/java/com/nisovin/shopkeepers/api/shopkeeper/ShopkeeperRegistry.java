@@ -35,21 +35,6 @@ public interface ShopkeeperRegistry {
 	 */
 	public Shopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException;
 
-	/**
-	 * Recreates a shopkeeper by loading its previously saved data from the given config section.
-	 * 
-	 * @param shopType
-	 *            the shop type
-	 * @param id
-	 *            the shopkeeper id
-	 * @param configSection
-	 *            the config section to load the shopkeeper data from
-	 * @return the loaded shopkeeper
-	 * @throws ShopkeeperCreateException
-	 *             if the shopkeeper could not be loaded
-	 */
-	public Shopkeeper loadShopkeeper(ShopType<?> shopType, int id, ConfigurationSection configSection) throws ShopkeeperCreateException;
-
 	// QUERYING
 
 	/**

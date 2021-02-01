@@ -449,7 +449,23 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		return shopkeeper;
 	}
 
-	@Override
+	/**
+	 * Recreates a shopkeeper by loading its previously saved data from the given config section.
+	 * 
+	 * @param shopType
+	 *            the shop type
+	 * @param id
+	 *            the shopkeeper id
+	 * @param configSection
+	 *            the config section to load the shopkeeper data from
+	 * @return the loaded shopkeeper
+	 * @throws ShopkeeperCreateException
+	 *             if the shopkeeper could not be loaded
+	 */
+	// Internal method: This is only supposed to be called by the built-in storage currently. If the data comes from any
+	// other source, the storage would need to be made aware of the shopkeeper (eg. by marking the shopkeeper as dirty).
+	// Otherwise, certain operations (such as checking if a certain shopkeeper id is already in use) would no longer
+	// work as expected.
 	public AbstractShopkeeper loadShopkeeper(ShopType<?> shopType, int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
 		AbstractShopType<?> abstractShopType = this.validateShopType(shopType);
 		Validate.notNull(configSection, "Missing config section!");

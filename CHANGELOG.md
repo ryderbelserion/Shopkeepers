@@ -87,6 +87,7 @@ API:
 * Removed ShopObject#spawn() and #despawn(). These are no longer exposed in the API.
 * Removed ShopObject#needsSpawning() and the internal AbstractShopObject#despawnDuringWorldSaves(). These have been replaced with corresponding internal methods in AbstractShopObjectType.
 * Added methods to BlockShopObjectType and EntityShopObjectType to query and check for shopkeepers of that specific type. This is less performance intensive compared to checking all shop object types when querying the ShopkeeperRegistry. Internally, sign shops make use of these new querying methods.
+* Removed ShopkeeperRegistry#loadShopkeeper from the API. This isn't properly supported by the implementation currently: The implementation expects all shopkeepers to be loaded from the built-in storage currently in order for certain operations (such as checking if a certain shopkeeper id is already in use) to work as expected.
 * A few methods of ChunkCoords have been renamed for consistency with the rest of the code base.
 * Various minor Javadoc clarifications.
 
