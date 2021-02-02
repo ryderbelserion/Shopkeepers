@@ -442,9 +442,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 
 		// Success:
-		// Inform the storage about the used up id:
-		shopkeeperStorage.onShopkeeperIdUsed(id);
-		if (shopkeeper.isDirty()) shopkeeperStorage.markDirty();
+
+		// Add the shopkeeper to the registry and spawn it:
 		this.addShopkeeper(shopkeeper, ShopkeeperAddedEvent.Cause.CREATED);
 		return shopkeeper;
 	}
@@ -484,10 +483,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 
 		// Success:
-		// Inform the storage about the used up id:
-		SKShopkeeperStorage shopkeeperStorage = this.getShopkeeperStorage();
-		shopkeeperStorage.onShopkeeperIdUsed(id);
-		if (shopkeeper.isDirty()) shopkeeperStorage.markDirty();
+
+		// Add the shopkeeper to the registry and spawn it:
 		this.addShopkeeper(shopkeeper, ShopkeeperAddedEvent.Cause.LOADED);
 		return shopkeeper;
 	}
@@ -508,8 +505,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		// Store by unique id and session id:
 		UUID shopkeeperUniqueId = shopkeeper.getUniqueId();
+		int shopkeeperId = shopkeeper.getId();
 		shopkeepersByUUID.put(shopkeeperUniqueId, shopkeeper);
-		shopkeepersById.put(shopkeeper.getId(), shopkeeper);
+		shopkeepersById.put(shopkeeperId, shopkeeper);
+
+		// Inform the storage about the used up id:
+		SKShopkeeperStorage shopkeeperStorage = this.getShopkeeperStorage();
+		shopkeeperStorage.onShopkeeperIdUsed(shopkeeperId);
 
 		ChunkShopkeepers chunkEntry;
 		if (shopkeeper.isVirtual()) {
@@ -546,6 +548,10 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		// Call event:
 		Bukkit.getPluginManager().callEvent(new ShopkeeperAddedEvent(shopkeeper, cause));
+		if (!shopkeeper.isValid()) {
+			// The shopkeeper has been removed again:
+			return;
+		}
 
 		// Activate the shopkeeper if the chunk is currently active:
 		if (chunkEntry != null && chunkEntry.active) {

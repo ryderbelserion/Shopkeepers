@@ -377,10 +377,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
 		}
 
-		// Write back all updated data:
-		if (shopkeeperStorage.isDirty()) {
-			shopkeeperStorage.saveNow();
-		}
+		// Save all updated shopkeeper data (eg. after data migrations):
+		shopkeeperStorage.saveIfDirty();
 
 		// Setup metrics:
 		if (Settings.enableMetrics) {

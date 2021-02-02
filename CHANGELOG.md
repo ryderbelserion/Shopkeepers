@@ -30,12 +30,15 @@ Date format: (YYYY-MM-DD)
   * Added additional error checking around the serialization of shopkeeper data.
   * Fixed: We were missing to check an error flag during the saving of shopkeeper data. This should also resolve an issue with the save data being lost if the disk is full.
   * Fixed: We now ensure that the new shopkeeper data is actually written to disk before we replace the old save data with the new save data, and before we return from the saving procedure. This should provide additional protection against data loss and corruption in case of severe system failures (such as crashes, power loss, etc.).
+  * Fixed: When a save fails, we also trigger a delayed save now even if there are no dirty shopkeepers. This is for example required if there has been an explicit save request, or if shopkeepers have been deleted. These changes would not be reliably persisted before.
+  * If a save fails, we no longer serialize the data of the affected shopkeepers again during the next save if the storage's internal memory of that data is still up-to-date. However, for debugging purposes, the storage keeps track of the shopkeepers whose data changes could not be successfully persisted to disk yet.
   * Improved: We attempt to atomically replace the old and new save data, and log a warning if this is not possible. There are several non-atomic fallback solutions in case the atomic renaming does not work. However, non-atomic renaming may result in data loss or corruption in case of severe system failures (hence the logged warning).
   * Improved: When saving shopkeeper data, we now check the directory for write and execute (i.e. access) permissions, which are required to rename files within the directory. This should provide better error messages in case of failures related to access permissions.
   * Improved: Replaced the old Java IO based implementation of saving and loading shopkeeper data with a new NIO based implementation. This should provide more accurate error messages in case of failures.
   * Improved: We no longer serialize the shopkeeper data multiple times if the saving of that data fails and requires several attempts to succeed.
+  * During plugin shutdown, we now explicitly verify that there is really no unsaved shopkeeper data anymore, and that there are no saves pending or still in progress. Otherwise, we log a warning. This warning may for example be logged if the final save during plugin shutdown fails for some reason, or if there is a bug in the storage's shutdown logic.
   * The name of the temporary save file has slightly changed ('save.temp' -> 'save.yml.tmp').
-  * Debug: The debug output related to shopkeeper saves has slightly changed.
+  * Debug: The debug output related to shopkeeper saves has slightly changed, and also provides information about the number of shopkeepers that we failed to save, or that we failed to save in earlier saving attempts.
   * Debug/Fixed: If saving failed for some reason, the logged number of shopkeepers that have been deleted since the last successful save might not have matched the actual number of deleted shopkeepers, because we did not take into account the shopkeepers that got deleted during the failed save attempt.
 * When running on an unsupported server version, the fallback handler no longer adds a movement speed attribute modifier to make the mob stationary. This should no longer be required, because on all recent and supported server versions mobs are made stationary by the NoAI flag.
 * Removed setting 'enable-spawn-verifier'. This setting should provide no additional benefit, because the plugin already checks periodically if the mobs are still there and attempts to respawn them if they are not (regardless of this setting).
@@ -89,19 +92,30 @@ API:
 * Added methods to BlockShopObjectType and EntityShopObjectType to query and check for shopkeepers of that specific type. This is less performance intensive compared to checking all shop object types when querying the ShopkeeperRegistry. Internally, sign shops make use of these new querying methods.
 * Removed ShopkeeperRegistry#loadShopkeeper from the API. This isn't properly supported by the implementation currently: The implementation expects all shopkeepers to be loaded from the built-in storage currently in order for certain operations (such as checking if a certain shopkeeper id is already in use) to work as expected.
 * A few methods of ChunkCoords have been renamed for consistency with the rest of the code base.
-* Various minor Javadoc clarifications.
+* Removed Shopkeeper#isDirty from the API. Internally, this flag has a different meaning now and should only be of use to the shopkeeper storage.
+* Added ShopkeeperStorage#saveIfDirty and #saveIfDirtyAndAwaitCompletion.
+* We skip spawning and activating shopkeepers now if they are immediately removed again during the ShopkeeperAddEvent.
+* Various minor Javadoc improvements and clarifications.
 
 Internal API:  
 * Added methods to retrieve the values of the various mob shopkeeper properties.
 * For consistency reasons, a few methods related to the slime size, magma cube size, and parrot variant have been renamed.
+* The dirty flag of shopkeepers only indicates whether the the storage is aware of the shopkeeper's latest data changes. It is no longer an indicator for whether these changes have actually been persisted to disk yet.
+* Several methods related to the shopkeeper's dirty flag are final now.
+* Renamed a few methods of the ShopkeeperStorage.
 
 Internal:  
 * The config key pattern is cached now.
 * Major refactoring related to how the config and language files are loaded.
-* Refactoring related to how shopkeeper data is saved:
+* Refactoring related to how shopkeeper data is saved and loaded:
   * Shopkeepers are saved after they are unloaded now. This allows them to still modify their data during despawning or when handling the unload.
   * When a new immediate save is triggered (for example during plugin shutdown), we no longer abort any currently scheduled but not yet started save task. Instead we finish it and then execute the save task again. This may trigger more saves than necessary in a few cases, but ensures that frequent requests to save the shopkeepers won't repeatedly abort any previous saving attempts.
   * Reloading the shopkeeper data will now wait for any current and pending saves to complete. However, this has not really been an issue before since we only reload the shopkeeper data during plugin startup currently.
+  * The storage no longer checks for config defaults when checking if the save data contains data for a specific shopkeeper.
+  * Shopkeepers are no longer marked as dirty when they are deleted. The storage keeps track of the deleted shopkeepers separately, so there is no need for that.
+  * The code for informing the shopkeeper storage about shopkeepers that have been marked as dirty during their loading or due to being newly created has been moved from the shopkeeper registry into the shopkeeper itself, after the shopkeeper has been marked as valid.
+  * The code for informing the shopkeeper storage about used up shopkeeper ids has been moved to SKShopkeeperRegistry#addShopkeeper.
+  * We no longer check the shopkeeper registry's loaded shopkeepers when we check if a given shopkeeper id is unused. Instead, the storage checks the available shopkeeper data (this also includes unloaded shopkeepers, and shopkeepers that could not be loaded for some reason), as well as the shopkeepers that are dirty (this also includes newly created shopkeepers that have not yet been persisted) or that are pending deletion from the storage. Ids of deleted shopkeepers can no longer be reused until their deletion has been persisted. If a deleted shopkeeper has never been saved before, its id becomes available for reuse right away. However, this is rarely relevant in practice, because we still prefer to use ascending unused ids when they are available.
 * Minor cleanup related to the AI and gravity processing of shopkeeper entities.
 * Removed a few redundant checks regarding whether an entity is still alive and its chunk is still loaded. These additional checks have been required in some previous versions of Spigot, but that should no longer apply to late Spigot 1.14.1 and above.
 * Added AbstractShopObject#onIdChanged that can be used to update the shopkeepers entry in the shopkeeper registry when a shop object's id dynamically changes.

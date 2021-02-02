@@ -119,7 +119,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private ChunkCoords lastChunkCoords = null;
 	private String name = ""; // Not null, can be empty
 
-	// Has unsaved data changes:
+	// Whether there have been changes to the shopkeeper's data that the storage is not yet aware of. A value of 'false'
+	// only indicates that the storage is aware of the latest data of the shopkeeper, not that it has actually persisted
+	// the data to disk yet.
 	private boolean dirty = false;
 	// Is currently registered:
 	private boolean valid = false;
@@ -402,40 +404,54 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
-	public void save() {
+	public final void save() {
 		this.markDirty();
 		ShopkeepersPlugin.getInstance().getShopkeeperStorage().save();
 	}
 
 	@Override
-	public void saveDelayed() {
+	public final void saveDelayed() {
 		this.markDirty();
 		ShopkeepersPlugin.getInstance().getShopkeeperStorage().saveDelayed();
 	}
 
 	/**
-	 * Marks this shopkeeper as 'dirty'. Its data gets saved with the next save of the {@link ShopkeeperStorage}.
+	 * Marks this shopkeeper as 'dirty'.
 	 * <p>
-	 * The shopkeeper and the shop object implementations are responsible for marking the shopkeeper as dirty on every
-	 * change affecting data that needs to be persisted.
+	 * This indicates that there have been changes to the shopkeeper's data that the storage is not yet aware of. The
+	 * shopkeeper and shop object implementations have to invoke this on every change of data that needs to be
+	 * persisted.
+	 * <p>
+	 * If this shopkeeper is currently {@link #isValid() loaded}, or about to be loaded, its data is saved with the next
+	 * successful save of the {@link ShopkeeperStorage}. If the shopkeeper has already been deleted or unloaded,
+	 * invoking this method will have no effect on the data that is stored by the storage.
 	 */
-	public void markDirty() {
+	public final void markDirty() {
 		dirty = true;
-		// Inform the storage that there are dirty shopkeepers:
+		// Inform the storage that the shopkeeper is dirty:
 		if (this.isValid()) {
-			// If the shopkeeper gets marked as dirty during creation or loading (while it is not yet valid), the
-			// storage gets marked as dirty by the shopkeeper registry after the creation/loading was successful.
-			SKShopkeepersPlugin.getInstance().getShopkeeperStorage().markDirty();
+			// If the shopkeeper is marked as dirty during creation or loading (while it is not yet valid), the storage
+			// is informed once the shopkeeper becomes valid.
+			SKShopkeepersPlugin.getInstance().getShopkeeperStorage().markDirty(this);
 		}
 	}
 
-	@Override
-	public boolean isDirty() {
+	/**
+	 * Checks whether this shopkeeper had changes to its data that the storage is not yet aware of.
+	 * <p>
+	 * A return value of {@code false} indicates that the {@link ShopkeeperStorage} is aware of the shopkeeper's latest
+	 * data, but not necessarily that this data has already been successfully persisted to disk.
+	 * 
+	 * @return <code>true</code> if there are data changes that the storage is not yet aware of
+	 */
+	public final boolean isDirty() {
 		return dirty;
 	}
 
-	// Called by shopkeeper storage once the shopkeeper data gets saved.
-	public void onSave() {
+	// Called by shopkeeper storage when it has retrieved the shopkeeper's latest data for the next save. The data might
+	// not yet have been persisted at that point.
+	// This may not be called if the shopkeeper was deleted.
+	public final void onSave() {
 		dirty = false;
 	}
 
@@ -449,16 +465,24 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	public final void informAdded(ShopkeeperAddedEvent.Cause cause) {
 		assert !valid;
 		valid = true;
+
+		// If the shopkeeper has been marked as dirty earlier (eg. due to data migrations during loading, or when being
+		// newly created), we inform the storage here:
+		if (this.isDirty()) {
+			this.markDirty();
+		}
+
+		// Custom processing done by sub-classes:
 		this.onAdded(cause);
 	}
 
 	/**
-	 * This gets called once the shopkeeper has been added to the {@link ShopkeeperRegistry}.
+	 * This is called when the shopkeeper is added to the {@link ShopkeeperRegistry}.
 	 * <p>
-	 * The shopkeeper has not yet been activated at this point.
+	 * The shopkeeper has not yet been spawned or activated at this point.
 	 * 
 	 * @param cause
-	 *            the cause for the addition
+	 *            the cause of the addition
 	 */
 	protected void onAdded(ShopkeeperAddedEvent.Cause cause) {
 	}
@@ -489,9 +513,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.delete(null);
 	}
 
+	// TODO Make this final and provide the involved player to the onDeletion method somehow.
 	@Override
 	public void delete(Player player) {
-		this.markDirty();
 		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().deleteShopkeeper(this);
 	}
 

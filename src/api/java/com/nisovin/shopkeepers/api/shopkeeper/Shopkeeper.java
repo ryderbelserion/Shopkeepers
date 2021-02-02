@@ -32,13 +32,6 @@ public interface Shopkeeper {
 	 */
 	public void saveDelayed();
 
-	/**
-	 * Checks whether this shopkeeper has unsaved changes to its data.
-	 * 
-	 * @return <code>true</code> if marked as dirty
-	 */
-	public boolean isDirty();
-
 	// LIFE CYCLE
 
 	/**

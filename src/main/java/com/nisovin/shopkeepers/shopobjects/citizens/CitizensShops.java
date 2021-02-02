@@ -15,7 +15,6 @@ import org.bukkit.plugin.Plugin;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -211,9 +210,9 @@ public class CitizensShops {
 			// Cannot determine backing NPCs if citizens isn't running:
 			return;
 		}
-		ShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
+		SKShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
 		boolean dirty = false;
-		for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
+		for (AbstractShopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
 			if (shopkeeper.getShopObject() instanceof SKCitizensShopObject) {
 				SKCitizensShopObject citizensShop = (SKCitizensShopObject) shopkeeper.getShopObject();
 				citizensShop.convertLegacyId();

@@ -108,6 +108,15 @@ public abstract class SingletonTask {
 		return (state == State.SYNC_CALLBACK);
 	}
 
+	/**
+	 * Checks whether there is an execution pending, which will start once the current execution completes.
+	 * 
+	 * @return <code>true</code> if there is an execution pending
+	 */
+	public final boolean isExecutionPending() {
+		return runAgain;
+	}
+
 	private boolean isWithinSyncExecution() {
 		assert Bukkit.isPrimaryThread();
 		return (state == State.PREPARING || (asyncTask == null && state == State.EXECUTING) || state == State.SYNC_CALLBACK);

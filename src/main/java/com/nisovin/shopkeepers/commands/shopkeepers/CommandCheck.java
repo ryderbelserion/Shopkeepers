@@ -81,8 +81,8 @@ class CommandCheck extends Command {
 		sender.sendMessage("  Total: " + shopkeeperRegistry.getAllShopkeepers().size()
 				+ "    (Virtual: " + shopkeeperRegistry.getVirtualShopkeepers().size() + ")");
 		sender.sendMessage("  Unsaved dirty | deleted | dirty storage: "
-				+ plugin.getShopkeeperStorage().getDirtyCount()
-				+ " | " + plugin.getShopkeeperStorage().getUnsavedDeletedCount()
+				+ plugin.getShopkeeperStorage().getUnsavedDirtyShopkeepersCount()
+				+ " | " + plugin.getShopkeeperStorage().getUnsavedDeletedShopkeepersCount()
 				+ " | " + plugin.getShopkeeperStorage().isDirty());
 		sender.sendMessage("  Chunks with shopkeepers: " + totalChunksWithShopkeepers);
 		sender.sendMessage("    With active AI: " + livingEntityAI.getActiveAIChunksCount());
