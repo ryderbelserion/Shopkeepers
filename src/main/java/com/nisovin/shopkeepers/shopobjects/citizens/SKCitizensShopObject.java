@@ -150,6 +150,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	@Override
 	public void delete() {
+		super.delete();
 		if (npcUniqueId == null) return; // There is no corresponding NPC (maybe already deleted)
 		if (destroyNPC) {
 			NPC npc = this.getNPC();
