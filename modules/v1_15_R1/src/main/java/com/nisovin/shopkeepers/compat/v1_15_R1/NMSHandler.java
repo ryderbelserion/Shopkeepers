@@ -49,36 +49,36 @@ public final class NMSHandler implements NMSCallProvider {
 	public void overwriteLivingEntityAI(LivingEntity entity) {
 		try {
 			EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
-			// example: armor stands are living, but not insentient
+			// Example: Armor stands are living, but not insentient.
 			if (!(mcLivingEntity instanceof EntityInsentient)) return;
 			EntityInsentient mcInsentientEntity = (EntityInsentient) mcLivingEntity;
 
-			// make goal selector items accessible:
-			Field cField = PathfinderGoalSelector.class.getDeclaredField("c"); // active goals
+			// Make the goal selector items accessible:
+			Field cField = PathfinderGoalSelector.class.getDeclaredField("c"); // Active goals
 			cField.setAccessible(true);
-			Field dField = PathfinderGoalSelector.class.getDeclaredField("d"); // registered goals
+			Field dField = PathfinderGoalSelector.class.getDeclaredField("d"); // Registered goals
 			dField.setAccessible(true);
 
-			// overwrite goal selector:
+			// Overwrite the goal selector:
 			Field goalsField = EntityInsentient.class.getDeclaredField("goalSelector");
 			goalsField.setAccessible(true);
 			PathfinderGoalSelector goals = (PathfinderGoalSelector) goalsField.get(mcLivingEntity);
 
-			// clear old goals:
+			// Clear old goals:
 			Map<?, ?> goals_c = (Map<?, ?>) cField.get(goals);
 			goals_c.clear();
 			Set<?> goals_d = (Set<?>) dField.get(goals);
 			goals_d.clear();
 
-			// add new goals:
+			// Add new goals:
 			goals.a(0, new PathfinderGoalLookAtPlayer(mcInsentientEntity, EntityHuman.class, 12.0F, 1.0F));
 
-			// overwrite target selector:
+			// Overwrite the target selector:
 			Field targetsField = EntityInsentient.class.getDeclaredField("targetSelector");
 			targetsField.setAccessible(true);
 			PathfinderGoalSelector targets = (PathfinderGoalSelector) targetsField.get(mcLivingEntity);
 
-			// clear old target goals:
+			// Clear old target goals:
 			Map<?, ?> targets_c = (Map<?, ?>) cField.get(targets);
 			targets_c.clear();
 			Set<?> targets_d = (Set<?>) dField.get(targets);
@@ -91,16 +91,16 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public void tickAI(LivingEntity entity, int ticks) {
 		EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
-		// example: armor stands are living, but not insentient
+		// Example: Armor stands are living, but not insentient.
 		if (!(mcLivingEntity instanceof EntityInsentient)) return;
 		EntityInsentient mcInsentientEntity = (EntityInsentient) mcLivingEntity;
-		mcInsentientEntity.getEntitySenses().a(); // clear sensing cache
+		mcInsentientEntity.getEntitySenses().a(); // Clear sensing cache
 		// The sensing cache is reused for the indivual ticks.
 		for (int i = 0; i < ticks; ++i) {
 			mcInsentientEntity.goalSelector.doTick();
-			mcInsentientEntity.getControllerLook().a(); // tick look controller
+			mcInsentientEntity.getControllerLook().a(); // Tick look controller
 		}
-		mcInsentientEntity.getEntitySenses().a(); // clear sensing cache
+		mcInsentientEntity.getEntitySenses().a(); // Clear sensing cache
 	}
 
 	@Override
@@ -116,22 +116,20 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public void setNoclip(org.bukkit.entity.Entity entity) {
-		// when gravity gets disabled, we are able to also disable collisions/pushing of mobs via the noclip flag:
-		// this might not properly work for Vec, since those disable noclip again after their movement:
 		Entity mcEntity = ((CraftEntity) entity).getHandle();
 		mcEntity.noclip = true;
 	}
 
 	@Override
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
-		// only works in the latest versions of 1.15.1 and upwards:
+		// Only works in the latest versions of Bukkit 1.15.1 and upwards:
 		raider.setCanJoinRaid(canJoinRaid);
 	}
 
 	@Override
 	public boolean matches(ItemStack provided, ItemStack required) {
 		if (provided == required) return true;
-		// if the required item is empty, then the provided item has to be empty as well:
+		// If the required item is empty, then the provided item has to be empty as well:
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
 		if (provided.getType() != required.getType()) return false;
@@ -139,7 +137,8 @@ public final class NMSHandler implements NMSCallProvider {
 		net.minecraft.server.v1_15_R1.ItemStack nmsRequired = CraftItemStack.asNMSCopy(required);
 		NBTTagCompound providedTag = nmsProvided.getTag();
 		NBTTagCompound requiredTag = nmsRequired.getTag();
-		return GameProfileSerializer.a(requiredTag, providedTag, false); // compare tags
+		// Compare the tags according to Minecraft's matching rules (imprecise):
+		return GameProfileSerializer.a(requiredTag, providedTag, false);
 	}
 
 	@Override
@@ -150,14 +149,14 @@ public final class NMSHandler implements NMSCallProvider {
 		}
 		MerchantInventory merchantInventory = (MerchantInventory) openInventory;
 
-		// update merchant inventory on the server (updates the result item, etc.):
+		// Update the merchant inventory on the server (updates the result item, etc.):
 		merchantInventory.setItem(0, merchantInventory.getItem(0));
 
 		Merchant merchant = merchantInventory.getMerchant();
 		IMerchant nmsMerchant;
 		boolean regularVillager = false;
 		boolean canRestock = false;
-		// note: when using the 'is-regular-villager'-flag, using level 0 allows hiding the level name suffix
+		// Note: When using the 'is-regular-villager'-flag, using level 0 allows hiding the level name suffix.
 		int merchantLevel = 1;
 		int merchantExperience = 0;
 		if (merchant instanceof Villager) {
@@ -171,12 +170,12 @@ public final class NMSHandler implements NMSCallProvider {
 			nmsMerchant = ((CraftAbstractVillager) merchant).getHandle();
 		} else {
 			nmsMerchant = ((CraftMerchant) merchant).getMerchant();
-			merchantLevel = 0; // hide name suffix
+			merchantLevel = 0; // Hide name suffix
 		}
 		MerchantRecipeList merchantRecipeList = nmsMerchant.getOffers();
-		if (merchantRecipeList == null) merchantRecipeList = new MerchantRecipeList(); // just in case
+		if (merchantRecipeList == null) merchantRecipeList = new MerchantRecipeList(); // Just in case
 
-		// send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1: Novice, .., 5:
+		// Send PacketPlayOutOpenWindowMerchant packet: window id, recipe list, merchant level (1: Novice, .., 5:
 		// Master), merchant total experience, is-regular-villager flag (false: hides some gui elements), can-restock
 		// flag (false: hides restock message if out of stock)
 		EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();

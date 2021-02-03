@@ -327,7 +327,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		}
 		if (Settings.disableGravity) {
 			this.setNoGravity(entity);
-			// When gravity gets disabled, we might be able to also disable collisions/pushing of mobs via noclip:
+			// When gravity is disabled, we may also able to disable collisions / the pushing of mobs via the noclip
+			// flag. However, this might not properly work for Vex, since they disable their noclip again after their
+			// movement.
 			// TODO Still required? Bukkit's setCollidable API might actually work now.
 			NMSManager.getProvider().setNoclip(entity);
 		}
