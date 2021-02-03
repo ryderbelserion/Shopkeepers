@@ -18,7 +18,7 @@ public interface NMSCallProvider {
 		return true;
 	}
 
-	public void tickAI(LivingEntity entity);
+	public void tickAI(LivingEntity entity, int ticks);
 
 	public void setOnGround(Entity entity, boolean onGround);
 

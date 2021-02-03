@@ -27,6 +27,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.text.Text;
@@ -102,7 +103,7 @@ class CommandCheck extends Command {
 
 		double avgTotalAITimings = livingEntityAI.getTotalTimings().getAverageTimeMillis();
 		double maxTotalAITiming = livingEntityAI.getTotalTimings().getMaxTimeMillis();
-		sender.sendMessage("  Total AI timings (avg | max): "
+		sender.sendMessage("  Total AI timings (per " + Settings.mobBehaviorTickPeriod + " ticks) (avg | max): "
 				+ TextUtils.DECIMAL_FORMAT.format(avgTotalAITimings) + " ms" + " | "
 				+ TextUtils.DECIMAL_FORMAT.format(maxTotalAITiming) + " ms");
 
@@ -115,13 +116,13 @@ class CommandCheck extends Command {
 
 		double avgGravityTimings = livingEntityAI.getGravityTimings().getAverageTimeMillis();
 		double maxGravityTiming = livingEntityAI.getGravityTimings().getMaxTimeMillis();
-		sender.sendMessage("    Gravity timings (avg | max): "
+		sender.sendMessage("    Gravity timings (per " + Settings.mobBehaviorTickPeriod + " ticks) (avg | max): "
 				+ TextUtils.DECIMAL_FORMAT.format(avgGravityTimings) + " ms" + " | "
 				+ TextUtils.DECIMAL_FORMAT.format(maxGravityTiming) + " ms");
 
 		double avgAITimings = livingEntityAI.getAITimings().getAverageTimeMillis();
 		double maxAITiming = livingEntityAI.getAITimings().getMaxTimeMillis();
-		sender.sendMessage("    AI timings (avg | max): "
+		sender.sendMessage("    AI timings (per " + Settings.mobBehaviorTickPeriod + " ticks) (avg | max): "
 				+ TextUtils.DECIMAL_FORMAT.format(avgAITimings) + " ms" + " | "
 				+ TextUtils.DECIMAL_FORMAT.format(maxAITiming) + " ms");
 

@@ -80,6 +80,14 @@ Date format: (YYYY-MM-DD)
 * We log a warning now whenever a shopkeeper is loaded or created that uses a shop type or shop object type that is disabled. We still load the shopkeeper, so that in the case of a player shop the container is still protected. However, even though the shopkeeper might in some cases seem to still work as normal, there is no guarantee for this. Admins are advised to either delete the shopkeeper, or change its shop object type to something else.
 * We no longer spawn shopkeepers whose object type is disabled.
 * Performance: Slightly improved the performance of checking for protected sign shops when blocks are broken or explode.
+* Performance improvements related to the shopkeeper mob AI: Added the setting 'mob-behavior-tick-period' with a default value of 3.
+  * This controls the rate at which we update the gravity and AI of shopkeeper mobs. Previously, these behaviors were updated every tick (such as it is the case in vanilla Minecraft). Values above 1 indicate a reduced tick rate, which result in a less smooth, less reactive, and possibly slower behavior in comparison to the behavior of mobs in vanilla Minecraft.
+  * In order to compensate for a reduced tick rate some activities may be scaled accordingly. This ensures, for example, that mobs still rotate their head at the same speed towards nearby players, or that mobs still fall at the same speed when being affected by gravity.
+  * Consequently, a reduced tick rate is less performance-intensive in total, but may on the other hand be slightly more performance-intensive per individual behavior update.
+  * In my testing, the value 3 offered a large overall performance benefit with a relatively small additional performance impact per individual behavior update, while still providing an acceptable smooth mob behavior. Values above 3 are clearly noticeable and offer little additional benefit.
+  * Debug: Added the shopkeeper mob behavior tick period to the output of the 'check' command.
+  * Metrics: The value of the new 'mob-behavior-tick-period' setting is captured by the features chart.
+* Performance: The rate at which the shopkeeper mob AI activations are updated for online players has been reduced from every 20 ticks to every 30 ticks. This seems sufficient to fluently activate nearby shopkeeper mobs even for players that fly around in creative mode.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.

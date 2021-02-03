@@ -31,10 +31,11 @@ import com.nisovin.shopkeepers.util.timer.Timings;
 public class LivingEntityAI {
 
 	/**
-	 * Determines how often AI activations get rechecked (every X ticks).
+	 * Determines how often AI activations are rechecked (every X ticks).
 	 */
+	// 30 ticks is quick enough to fluently react even to players flying in creative mode with default flying speed.
+	public static final int AI_ACTIVATION_TICK_RATE = 30;
 
-	public static final int AI_ACTIVATION_TICK_RATE = 20;
 	/**
 	 * The range in chunks around players in which AI is active.
 	 * <p>
@@ -56,6 +57,7 @@ public class LivingEntityAI {
 	// most a single step for the most common falls and have the entity positioned perfectly on the ground.
 	// TODO Dynamically increase an entities falling speed? Need to dynamically adjust the collision check range as well
 	// then.
+	// Note: This is scaled according to the used tick rate.
 	private static final double MAX_FALLING_DISTANCE_PER_TICK = 0.5D;
 
 	/**
@@ -63,17 +65,24 @@ public class LivingEntityAI {
 	 */
 	private static final int FALLING_CHECK_PERIOD_TICKS = 10;
 	private static final CyclicCounter nextFallingCheckTickOffset = new CyclicCounter(FALLING_CHECK_PERIOD_TICKS);
-	// The range in which we check for block collisions:
-	// Has to be slightly larger than the max-falling-distance-per-tick in order to make full use of the max. falling
-	// speed, and to be able to detect the end of the falling without having to check for block collisions another time
-	// in the next tick.
-	private static final double GRAVITY_COLLISION_CHECK_RANGE = MAX_FALLING_DISTANCE_PER_TICK + 0.1D;
 
 	// Temporarily re-used objects:
 	private static final Location sharedLocation = new Location(null, 0, 0, 0);
 	private static final MutableChunkCoords sharedChunkCoords = new MutableChunkCoords();
 
 	private final ShopkeepersPlugin plugin;
+	/**
+	 * The MAX_FALLING_DISTANCE_PER_TICK scaled according to the configured tick rate.
+	 */
+	private double maxFallingDistancePerUpdate;
+	/**
+	 * The range in which we check for block collisions.
+	 * <p>
+	 * Has to be slightly larger than the {@code maxFallingDistancePerUpdate + DISTANCE_TO_GROUND_THRESHOLD} in order to
+	 * take into account the max falling speed and to detect the end of the falling without having to check for block
+	 * collisions another time in the next behavior update.
+	 */
+	private double gravityCollisionCheckRange;
 	/**
 	 * Whether we use our custom gravity handling.
 	 * <p>
@@ -134,6 +143,10 @@ public class LivingEntityAI {
 	}
 
 	public void onEnable() {
+		// Setup values based on settings:
+		// TODO: Also update these on dynamic setting changes.
+		maxFallingDistancePerUpdate = Settings.mobBehaviorTickPeriod * MAX_FALLING_DISTANCE_PER_TICK;
+		gravityCollisionCheckRange = maxFallingDistancePerUpdate + 0.1D;
 		customGravityEnabled = _isCustomGravityEnabled();
 	}
 
@@ -255,7 +268,8 @@ public class LivingEntityAI {
 		else if (aiTask != null) this.stop(); // Not active, but already setup: Perform cleanup.
 
 		// Start AI task:
-		aiTask = Bukkit.getScheduler().runTaskTimer(plugin, new TickTask(), 1L, 1L);
+		int tickPeriod = Settings.mobBehaviorTickPeriod;
+		aiTask = Bukkit.getScheduler().runTaskTimer(plugin, new TickTask(), tickPeriod, tickPeriod);
 	}
 
 	private class TickTask implements Runnable {
@@ -275,7 +289,7 @@ public class LivingEntityAI {
 			aiTimings.startPaused();
 
 			// Freshly determine active chunks/entities (near players) every AI_ACTIVATION_TICK_RATE ticks:
-			if (aiActivationLimiter.request()) {
+			if (aiActivationLimiter.request(Settings.mobBehaviorTickPeriod)) {
 				updateChunkActivations();
 			}
 
@@ -442,11 +456,11 @@ public class LivingEntityAI {
 		// Note: The falling check limiter is not invoked while the entity is already falling. This ensures that once
 		// the entity stops its current fall the limiter will wait a full cycle before we check again if the entity is
 		// falling again.
-		if (entityData.falling || entityData.fallingCheckLimiter.request()) {
+		if (entityData.falling || entityData.fallingCheckLimiter.request(Settings.mobBehaviorTickPeriod)) {
 			// Check if the entity is supposed to (continue to) fall by performing a ray cast towards the ground:
 			LivingEntity entity = entityData.entity;
 			Location entityLocation = entity.getLocation(sharedLocation);
-			entityData.distanceToGround = Utils.getCollisionDistanceToGround(entityLocation, GRAVITY_COLLISION_CHECK_RANGE);
+			entityData.distanceToGround = Utils.getCollisionDistanceToGround(entityLocation, gravityCollisionCheckRange);
 			sharedLocation.setWorld(null); // Reset
 			boolean falling = (entityData.distanceToGround >= DISTANCE_TO_GROUND_THRESHOLD);
 			entityData.falling = falling;
@@ -457,6 +471,7 @@ public class LivingEntityAI {
 				NMSManager.getProvider().setOnGround(entity, false);
 				this.tickFalling(entityData);
 			}
+
 			if (!entityData.falling) {
 				// Prevents SPIGOT-3948 / MC-130725
 				NMSManager.getProvider().setOnGround(entity, true);
@@ -464,19 +479,19 @@ public class LivingEntityAI {
 		}
 	}
 
-	// Gets run every tick while falling:
+	// Gets run every behavior update while falling:
 	private void tickFalling(EntityData entityData) {
 		assert entityData.falling && entityData.distanceToGround >= DISTANCE_TO_GROUND_THRESHOLD;
 		LivingEntity entity = entityData.entity;
 		// Determine falling step size:
 		double fallingStepSize;
-		double remainingDistance = (entityData.distanceToGround - MAX_FALLING_DISTANCE_PER_TICK);
+		double remainingDistance = (entityData.distanceToGround - maxFallingDistancePerUpdate);
 		if (remainingDistance <= DISTANCE_TO_GROUND_THRESHOLD) {
 			// We are nearly there: Let's position the entity exactly on the ground and stop the falling.
 			fallingStepSize = entityData.distanceToGround;
 			entityData.falling = false;
 		} else {
-			fallingStepSize = MAX_FALLING_DISTANCE_PER_TICK;
+			fallingStepSize = maxFallingDistancePerUpdate;
 			// We continue the falling and check for collisions again in the next tick.
 		}
 
@@ -497,9 +512,11 @@ public class LivingEntityAI {
 		}
 	}
 
-	// Gets run every tick while in range of players:
+	// Gets run every behavior update while in range of players:
 	private void tickAI(LivingEntity entity) {
 		// Look at nearby players: Implemented by manually running the vanilla AI goal.
-		NMSManager.getProvider().tickAI(entity);
+		// In order to compensate for a reduced tick rate, we invoke the AI multiple times. Otherwise, the entity would
+		// turn its head more slowly and track the player for an increased duration.
+		NMSManager.getProvider().tickAI(entity, Settings.mobBehaviorTickPeriod);
 	}
 }

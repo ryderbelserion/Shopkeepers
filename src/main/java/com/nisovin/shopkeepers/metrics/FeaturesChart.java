@@ -32,6 +32,7 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 			// Mob behavior features:
 			addFeatureEntry(allFeatures, "disable-gravity", Settings.disableGravity);
 			addFeatureEntry(allFeatures, "gravity-chunk-range", Settings.gravityChunkRange);
+			addFeatureEntry(allFeatures, "mob-behavior-tick-period", Settings.mobBehaviorTickPeriod);
 
 			// Others:
 			addFeatureEntry(allFeatures, "save-instantly", Settings.saveInstantly);

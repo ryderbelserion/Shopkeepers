@@ -162,6 +162,14 @@ public class Settings extends Config {
 
 	public static boolean disableGravity = false;
 	public static int gravityChunkRange = 4;
+
+	// A tick period of 4 and higher is clearly noticeable, especially when entities are affected by gravity.
+	// The total performance benefits of higher tick periods also become increasingly smaller and instead result in
+	// higher performance impacts per individual behavior update.
+	// The gravity updates at a tick period of 2 actually appear less smooth in my testing than at a period of 3 (maybe
+	// due to some interpolation artifact by the client).
+	public static int mobBehaviorTickPeriod = 3;
+
 	public static boolean silenceLivingShopEntities = true;
 
 	public static boolean showNameplates = true;
@@ -583,6 +591,10 @@ public class Settings extends Config {
 		if (gravityChunkRange < 0) {
 			Log.warning(this.getLogPrefix() + "'gravity-chunk-range' cannot be negative.");
 			gravityChunkRange = 0;
+		}
+		if (mobBehaviorTickPeriod <= 0) {
+			Log.warning(this.getLogPrefix() + "'mob-behavior-tick-period' has to be positive.");
+			mobBehaviorTickPeriod = 1;
 		}
 		// Certain items cannot be of type AIR:
 		if (shopCreationItem.getType() == Material.AIR) {

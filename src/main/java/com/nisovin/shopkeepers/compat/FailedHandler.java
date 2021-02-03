@@ -80,7 +80,7 @@ public final class FailedHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public void tickAI(LivingEntity entity) {
+	public void tickAI(LivingEntity entity, int ticks) {
 		// Not supported.
 	}
 

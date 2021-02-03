@@ -89,14 +89,17 @@ public final class NMSHandler implements NMSCallProvider {
 	}
 
 	@Override
-	public void tickAI(LivingEntity entity) {
+	public void tickAI(LivingEntity entity, int ticks) {
 		EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
 		// example: armor stands are living, but not insentient
 		if (!(mcLivingEntity instanceof EntityInsentient)) return;
-		EntityInsentient mcInsentientEntity = ((EntityInsentient) mcLivingEntity);
+		EntityInsentient mcInsentientEntity = (EntityInsentient) mcLivingEntity;
 		mcInsentientEntity.getEntitySenses().a(); // clear sensing cache
-		mcInsentientEntity.goalSelector.doTick();
-		mcInsentientEntity.getControllerLook().a(); // tick look controller
+		// The sensing cache is reused for the indivual ticks.
+		for (int i = 0; i < ticks; ++i) {
+			mcInsentientEntity.goalSelector.doTick();
+			mcInsentientEntity.getControllerLook().a(); // tick look controller
+		}
 		mcInsentientEntity.getEntitySenses().a(); // clear sensing cache
 	}
 
