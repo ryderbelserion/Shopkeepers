@@ -783,6 +783,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		);
 
 		boolean worldSaveRespawnPending = chunkEntry.worldEntry.isWorldSaveRespawnPending();
+		int spawned = 0;
 		int awaitingWorldSaveRespawn = 0;
 		boolean dirty = false;
 		for (AbstractShopkeeper shopkeeper : shopkeepers) {
@@ -799,6 +800,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 				// If world saving finished, only consider shopkeepers that need to be respawned:
 				if (!worldSavingFinished || objectType.mustDespawnDuringWorldSave()) {
+					spawned++;
 					this.spawnShopkeeper(shopkeeper);
 				}
 				// The shopkeeper either got spawned (and thereby already activated), or it has been kept spawned during
@@ -821,11 +823,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			}
 		}
 
+		int actuallySpawned = spawned;
+		Log.debug(DebugOptions.shopkeeperActivation, () -> "  Actually spawned: " + actuallySpawned);
+
 		if (awaitingWorldSaveRespawn > 0) {
 			int skipped = awaitingWorldSaveRespawn;
 			Log.debug(DebugOptions.shopkeeperActivation,
-					() -> "Skipped spawning of " + skipped + " shopkeepers in chunk " + TextUtils.getChunkString(chunkEntry.chunkCoords)
-							+ ": Respawn pending after world save."
+					() -> "  Skipped due to a pending respawn after world save: " + skipped
 			);
 		}
 
@@ -879,6 +883,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 						+ (worldSaving ? " (world saving)" : "")
 		);
 
+		int despawned = 0;
 		boolean dirty = false;
 		for (AbstractShopkeeper shopkeeper : shopkeepers) {
 			AbstractShopObject shopObject = shopkeeper.getShopObject();
@@ -888,6 +893,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			if (objectType.mustBeSpawned()) {
 				// If world saving, only consider shopkeepers that need to be despawned:
 				if (!worldSaving || objectType.mustDespawnDuringWorldSave()) {
+					despawned++;
 					this.despawnShopkeeper(shopkeeper);
 				}
 				// The shopkeeper either got despawned (and thereby already deactivated), or it is kept spawned and
@@ -909,6 +915,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 				dirty = true;
 			}
 		}
+
+		int actuallyDespawned = despawned;
+		Log.debug(DebugOptions.shopkeeperActivation, () -> "  Actually despawned: " + actuallyDespawned);
 
 		if (dirty) {
 			// Save delayed:
