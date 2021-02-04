@@ -6,6 +6,9 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,7 +23,9 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.util.BlockLocation;
 import com.nisovin.shopkeepers.util.CyclicCounter;
+import com.nisovin.shopkeepers.util.MutableBlockLocation;
 import com.nisovin.shopkeepers.util.MutableChunkCoords;
 import com.nisovin.shopkeepers.util.RateLimiter;
 import com.nisovin.shopkeepers.util.Utils;
@@ -77,6 +82,7 @@ public class LivingEntityAI implements Listener {
 	// Temporarily re-used objects:
 	private static final Location sharedLocation = new Location(null, 0, 0, 0);
 	private static final MutableChunkCoords sharedChunkCoords = new MutableChunkCoords();
+	private static final MutableBlockLocation sharedBlockLocation = new MutableBlockLocation();
 
 	private final ShopkeepersPlugin plugin;
 	/**
@@ -104,6 +110,8 @@ public class LivingEntityAI implements Listener {
 		private final ChunkData chunkData;
 		// Initial offset between [0, FALLING_CHECK_PERIOD_TICKS) for load distribution:
 		public final RateLimiter fallingCheckLimiter = RateLimiter.withInitialOffset(FALLING_CHECK_PERIOD_TICKS, nextFallingCheckTickOffset.getAndIncrement());
+		public Block groundBlock = null;
+		public BlockData groundBlockData = null;
 		public boolean falling = false;
 		public double distanceToGround = 0.0D;
 
@@ -492,6 +500,18 @@ public class LivingEntityAI implements Listener {
 		// the entity stops its current fall the limiter will wait a full cycle before we check again if the entity is
 		// falling again.
 		if (entityData.falling || entityData.fallingCheckLimiter.request(Settings.mobBehaviorTickPeriod)) {
+			// We only ray trace to check if the mob is falling if the entity has changed its location, or if the ground
+			// block has changed. Otherwise, we assume that the entity is still standing on solid ground and avoid the
+			// (relatively costly) ray trace.
+			// Assertion: If the entity is already marked as falling, the ground block was previously cleared and the
+			// following check evaluates to false:
+			assert entityData.falling ? (entityData.groundBlock == null) : true;
+			assert (entityData.groundBlock == null) ? !this.isGroundBlockStillTheSame(entityData) : true;
+			if (this.isGroundBlockStillTheSame(entityData)) {
+				assert !entityData.falling;
+				return;
+			}
+
 			// Check if the entity is supposed to (continue to) fall by performing a ray cast towards the ground:
 			LivingEntity entity = entityData.entity;
 			Location entityLocation = entity.getLocation(sharedLocation);
@@ -510,6 +530,19 @@ public class LivingEntityAI implements Listener {
 			if (!entityData.falling) {
 				// Prevents SPIGOT-3948 / MC-130725
 				NMSManager.getProvider().setOnGround(entity, true);
+
+				// Determine new ground block:
+				// Note: We do this regardless of whether the entity was previously falling, and regardless of if we
+				// already have a ground block, because the previous ground block might no longer be valid (it might
+				// have changed). If it did not change, then we wouldn't even reach this code due to the check above.
+				entityData.groundBlock = getGroundBlock(entity, sharedBlockLocation).getBlock();
+				assert entityData.groundBlock != null; // World is expected to be loaded
+				entityData.groundBlockData = entityData.groundBlock.getBlockData();
+			} else {
+				// The entity started and/or continues to fall.
+				// Clear the previous ground block (if any):
+				entityData.groundBlock = null;
+				entityData.groundBlockData = null;
 			}
 		}
 	}
@@ -535,6 +568,52 @@ public class LivingEntityAI implements Listener {
 		newLocation.add(0.0D, -fallingStepSize, 0.0D);
 		entity.teleport(newLocation);
 		sharedLocation.setWorld(null); // Reset
+	}
+
+	private static final double BLOCK_BOUNDARY_EPSILON = 0.01D;
+
+	// Determines the block the entity is standing on based on its current location. The result is stored inside the
+	// given target MutableBlockLocation. The same MutableBlockLocation is then returned.
+	private static MutableBlockLocation getGroundBlock(Entity entity, MutableBlockLocation target) {
+		World world = entity.getWorld();
+		Location entityLocation = entity.getLocation(sharedLocation);
+		// Fuzzy check of the y coordinate to determine if the entity is standing inside or exactly on top of a block:
+		double y = entityLocation.getY();
+		int fuzzyBlockY = BlockLocation.toBlock(y + BLOCK_BOUNDARY_EPSILON);
+		if (Math.abs(y - fuzzyBlockY) <= BLOCK_BOUNDARY_EPSILON) {
+			// The entity is located directly on a block boundary. Return the block below.
+			target.set(world.getName(), entityLocation.getBlockX(), fuzzyBlockY - 1, entityLocation.getBlockZ());
+		} else {
+			// The entity located inside a block. Return that block.
+			assert fuzzyBlockY == entityLocation.getBlockY();
+			target.set(world.getName(), entityLocation.getBlockX(), fuzzyBlockY, entityLocation.getBlockZ());
+		}
+		sharedLocation.setWorld(null); // Reset
+		return target;
+	}
+
+	// Checks if the entity is still standing on the same block and if that block has changed.
+	private boolean isGroundBlockStillTheSame(EntityData entityData) {
+		assert entityData != null;
+		assert (entityData.groundBlock == null) == (entityData.groundBlockData == null); // Both null or not null
+		if (entityData.groundBlock == null) {
+			// We have no knowledge about the previous ground block:
+			return false;
+		}
+		assert entityData.groundBlockData != null;
+
+		if (!getGroundBlock(entityData.entity, sharedBlockLocation).matches(entityData.groundBlock)) {
+			// The entity is no longer standing on the same block:
+			return false;
+		}
+
+		if (!entityData.groundBlockData.equals(entityData.groundBlock.getBlockData())) {
+			// The ground block has changed:
+			return false;
+		}
+
+		// Still standing on the same block, and that block has not changed:
+		return true;
 	}
 
 	// ENTITY AI
