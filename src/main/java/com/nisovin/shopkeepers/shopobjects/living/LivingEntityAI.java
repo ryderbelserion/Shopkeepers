@@ -8,6 +8,12 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -28,10 +34,12 @@ import com.nisovin.shopkeepers.util.timer.Timings;
  * It is assumed that entities usually don't change their initial chunk: Their gravity and AI activation depend on
  * whether their initial chunk has players nearby, rather than whether their current chunk has players nearby.
  */
-public class LivingEntityAI {
+public class LivingEntityAI implements Listener {
 
 	/**
 	 * Determines how often AI activations are rechecked (every X ticks).
+	 * <p>
+	 * We also separately react to player joins and teleports in order to quickly activate nearby chunks in those cases.
 	 */
 	// 30 ticks is quick enough to fluently react even to players flying in creative mode with default flying speed.
 	public static final int AI_ACTIVATION_TICK_RATE = 30;
@@ -134,6 +142,8 @@ public class LivingEntityAI {
 	private int activeGravityEntityCount = 0;
 
 	private final Timer totalTimings = new Timer();
+	// Note: This only captures the periodic full activation updates, and not the player-specific activations triggered
+	// by player joins and teleports.
 	private final Timer activationTimings = new Timer();
 	private final Timer gravityTimings = new Timer();
 	private final Timer aiTimings = new Timer();
@@ -148,9 +158,13 @@ public class LivingEntityAI {
 		maxFallingDistancePerUpdate = Settings.mobBehaviorTickPeriod * MAX_FALLING_DISTANCE_PER_TICK;
 		gravityCollisionCheckRange = maxFallingDistancePerUpdate + 0.1D;
 		customGravityEnabled = _isCustomGravityEnabled();
+
+		// Register listener:
+		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 
 	public void onDisable() {
+		HandlerList.unregisterAll(this); // Unregister listener
 		this.stop();
 		this.reset(); // Cleanup, reset timings, etc.
 	}
@@ -364,6 +378,27 @@ public class LivingEntityAI {
 		sharedLocation.setWorld(null); // Reset
 	}
 
+	private void activateNearbyChunksDelayed(Player player) {
+		if (!player.isOnline()) return; // Player is no longer online
+		Bukkit.getScheduler().runTask(plugin, new ActivateNearbyChunksDelayedTask(player));
+	}
+
+	private class ActivateNearbyChunksDelayedTask implements Runnable {
+
+		private final Player player;
+
+		ActivateNearbyChunksDelayedTask(Player player) {
+			assert player != null;
+			this.player = player;
+		}
+
+		@Override
+		public void run() {
+			if (!player.isOnline()) return; // Player is no longer online
+			activateNearbyChunks(player);
+		}
+	}
+
 	private static enum ActivationType {
 		GRAVITY,
 		AI;
@@ -518,5 +553,31 @@ public class LivingEntityAI {
 		// In order to compensate for a reduced tick rate, we invoke the AI multiple times. Otherwise, the entity would
 		// turn its head more slowly and track the player for an increased duration.
 		NMSManager.getProvider().tickAI(entity, Settings.mobBehaviorTickPeriod);
+	}
+
+	// EVENT HANDLERS
+
+	// By reacting to player joins and teleports we can very quickly activate chunks around players that suddenly
+	// appear near shopkeepers.
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	void onPlayerJoin(PlayerJoinEvent event) {
+		// Activate chunks around the player after the server has completely handled the join.
+		// Note: This also checks if the player is still online (some other plugin might have kicked the player during
+		// the event) and otherwise ignores the request.
+		Player player = event.getPlayer();
+		this.activateNearbyChunksDelayed(player);
+	}
+
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	void onPlayerTeleport(PlayerTeleportEvent event) {
+		// The target location can be null in some circumstances (eg. when a player enters an end gateway, but there is
+		// no end world). We ignore the event in this case.
+		Location targetLocation = event.getTo();
+		if (targetLocation == null) return;
+
+		// Activate chunks around the player after the teleport:
+		Player player = event.getPlayer();
+		this.activateNearbyChunksDelayed(player);
 	}
 }
