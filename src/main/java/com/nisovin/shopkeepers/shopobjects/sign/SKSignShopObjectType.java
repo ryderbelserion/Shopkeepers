@@ -30,7 +30,7 @@ public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShop
 	}
 
 	@Override
-	public boolean isSpawnedByShopkeepers() {
+	public boolean mustBeSpawned() {
 		return true; // Despawn signs on chunk unload, and spawn them again on chunk load
 	}
 

@@ -61,7 +61,7 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 	}
 
 	@Override
-	public boolean isSpawnedByShopkeepers() {
+	public boolean mustBeSpawned() {
 		return false; // Spawning and despawning is handled by Citizens.
 	}
 

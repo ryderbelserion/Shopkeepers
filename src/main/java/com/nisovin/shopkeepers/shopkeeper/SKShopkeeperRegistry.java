@@ -555,8 +555,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		// Activate the shopkeeper if the chunk is currently active:
 		if (chunkEntry != null && chunkEntry.active) {
-			if (shopObjectType.isSpawnedByShopkeepers()) {
-				if (chunkEntry.worldEntry.isWorldSaveRespawnPending() && shopObjectType.isDespawnedDuringWorldSaves()) {
+			if (shopObjectType.mustBeSpawned()) {
+				if (chunkEntry.worldEntry.isWorldSaveRespawnPending() && shopObjectType.mustDespawnDuringWorldSave()) {
 					Log.debug(DebugOptions.shopkeeperActivation,
 							() -> "Skipping spawning of shopkeeper at " + shopkeeper.getPositionString() + " due to pending respawn after world save."
 					);
@@ -592,7 +592,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		shopkeeper.abortUISessionsDelayed();
 
 		// Despawn and deactivate shopkeeper:
-		if (shopkeeper.getShopObject().getType().isSpawnedByShopkeepers()) {
+		if (shopkeeper.getShopObject().getType().mustBeSpawned()) {
 			this.despawnShopkeeper(shopkeeper);
 		} else {
 			// Only deactivate the shopkeeper:
@@ -790,15 +790,15 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			AbstractShopObjectType<?> objectType = shopObject.getType();
 			boolean activate = true; // Whether to activate the shopkeeper
 			// Only consider shopkeepers that are dynamically spawned and despawned by us:
-			if (objectType.isSpawnedByShopkeepers()) {
-				if (worldSaveRespawnPending && objectType.isDespawnedDuringWorldSaves()) {
+			if (objectType.mustBeSpawned()) {
+				if (worldSaveRespawnPending && objectType.mustDespawnDuringWorldSave()) {
 					// Skip due to pending world save respawn:
 					awaitingWorldSaveRespawn++;
 					continue;
 				}
 
 				// If world saving finished, only consider shopkeepers that need to be respawned:
-				if (!worldSavingFinished || objectType.isDespawnedDuringWorldSaves()) {
+				if (!worldSavingFinished || objectType.mustDespawnDuringWorldSave()) {
 					this.spawnShopkeeper(shopkeeper);
 				}
 				// The shopkeeper either got spawned (and thereby already activated), or it has been kept spawned during
@@ -885,9 +885,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			AbstractShopObjectType<?> objectType = shopObject.getType();
 			boolean deactivate = true; // Whether to deactivate the shopkeeper
 			// Only consider shopkeepers that are dynamically spawned and despawned by us:
-			if (objectType.isSpawnedByShopkeepers()) {
+			if (objectType.mustBeSpawned()) {
 				// If world saving, only consider shopkeepers that need to be despawned:
-				if (!worldSaving || objectType.isDespawnedDuringWorldSaves()) {
+				if (!worldSaving || objectType.mustDespawnDuringWorldSave()) {
 					this.despawnShopkeeper(shopkeeper);
 				}
 				// The shopkeeper either got despawned (and thereby already deactivated), or it is kept spawned and
@@ -1049,7 +1049,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		assert shopkeeper != null;
 		AbstractShopObject shopObject = shopkeeper.getShopObject();
 		AbstractShopObjectType<?> shopObjectType = shopObject.getType();
-		assert shopObjectType.isSpawnedByShopkeepers();
+		assert shopObjectType.mustBeSpawned();
 		if (shopObjectType.isEnabled()) {
 			boolean spawned = shopObject.spawn();
 			if (spawned) {
@@ -1074,7 +1074,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	private void despawnShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		AbstractShopObject shopObject = shopkeeper.getShopObject();
-		assert shopObject.getType().isSpawnedByShopkeepers();
+		assert shopObject.getType().mustBeSpawned();
 		shopObject.despawn();
 		this.deactivateShopkeeper(shopkeeper);
 	}

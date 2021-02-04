@@ -29,7 +29,7 @@ public class SKVirtualShopObjectType extends AbstractShopObjectType<SKVirtualSho
 	}
 
 	@Override
-	public boolean isSpawnedByShopkeepers() {
+	public boolean mustBeSpawned() {
 		return false; // Does not need to be spawned and despawned
 	}
 

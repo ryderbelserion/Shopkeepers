@@ -48,12 +48,12 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> ex
 	}
 
 	@Override
-	public boolean isSpawnedByShopkeepers() {
+	public boolean mustBeSpawned() {
 		return true; // Despawn entities on chunk unload, and spawn them again on chunk load.
 	}
 
 	@Override
-	public boolean isDespawnedDuringWorldSaves() {
+	public boolean mustDespawnDuringWorldSave() {
 		// Spawned entities are non-persistent and therefore already skipped during world saves:
 		return false;
 	}
