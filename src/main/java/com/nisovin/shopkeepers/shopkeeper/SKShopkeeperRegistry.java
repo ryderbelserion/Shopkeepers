@@ -649,9 +649,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	public void unloadAllShopkeepers() {
-		for (AbstractShopkeeper shopkeeper : new ArrayList<>(this.getAllShopkeepers())) {
-			this.unloadShopkeeper(shopkeeper);
-		}
+		new ArrayList<>(this.getAllShopkeepers()).forEach(this::unloadShopkeeper);
 	}
 
 	public void deleteShopkeeper(AbstractShopkeeper shopkeeper) {
@@ -661,9 +659,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	public void deleteAllShopkeepers() {
-		for (AbstractShopkeeper shopkeeper : new ArrayList<>(this.getAllShopkeepers())) {
-			this.deleteShopkeeper(shopkeeper);
-		}
+		new ArrayList<>(this.getAllShopkeepers()).forEach(this::deleteShopkeeper);
 	}
 
 	// This does not get called for virtual shopkeepers.
@@ -735,6 +731,18 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			chunkShopkeepers.activationTask = null;
 			activateChunk(chunkShopkeepers);
 		}
+	}
+
+	private void activateChunkIfLoaded(ChunkShopkeepers chunkEntry) {
+		assert chunkEntry != null;
+		// Check if already active or activation pending (avoids unnecessary isChunkLoaded calls):
+		if (chunkEntry.active || chunkEntry.isActivationPending()) {
+			return;
+		}
+		if (!chunkEntry.chunkCoords.isChunkLoaded()) {
+			return; // Chunk is not loaded
+		}
+		this.activateChunk(chunkEntry);
 	}
 
 	private void activateChunk(ChunkShopkeepers chunkEntry) {
@@ -848,13 +856,15 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		chunkEntry.active = false; // Mark chunk inactive
 
 		// Inform shopkeepers:
-		for (AbstractShopkeeper shopkeeper : chunkEntry.shopkeepers) {
-			shopkeeper.onChunkDeactivation();
-			shopkeeper.getShopObject().onChunkDeactivation();
-		}
+		chunkEntry.shopkeepers.forEach(this::informShopkeeperOnChunkDeactivation);
 
 		// Despawn and deactivate shopkeepers:
 		this.despawnShopkeepers(chunkEntry, false);
+	}
+
+	private void informShopkeeperOnChunkDeactivation(AbstractShopkeeper shopkeeper) {
+		shopkeeper.onChunkDeactivation();
+		shopkeeper.getShopObject().onChunkDeactivation();
 	}
 
 	// The chunk might already be marked as inactive when this is called.
@@ -912,9 +922,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// shopkeeper gets added.
 	public void activateShopkeepersInAllWorlds() {
 		// Activate (spawn) shopkeepers in loaded chunks of all loaded worlds:
-		for (World world : Bukkit.getWorlds()) {
-			this.activateChunks(world);
-		}
+		Bukkit.getWorlds().forEach(this::activateChunks);
 	}
 
 	void onWorldLoad(World world) {
@@ -934,25 +942,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		);
 
 		// Activate loaded chunks:
-		for (ChunkShopkeepers chunkEntry : worldEntry.shopkeepersByChunk.values()) {
-			// Check if already active or activation pending (avoids unnecessary isChunkLoaded calls):
-			if (chunkEntry.active || chunkEntry.isActivationPending()) {
-				continue;
-			}
-			if (!chunkEntry.chunkCoords.isChunkLoaded()) {
-				continue; // Chunk is not loaded
-			}
-			this.activateChunk(chunkEntry);
-		}
+		worldEntry.shopkeepersByChunk.values().forEach(this::activateChunkIfLoaded);
 	}
 
 	// WORLD UNLOAD
 
 	public void deactivateShopkeepersInAllWorlds() {
 		// Deactivate (despawn) shopkeepers in all loaded worlds:
-		for (World world : Bukkit.getWorlds()) {
-			this.deactivateChunks(world);
-		}
+		Bukkit.getWorlds().forEach(this::deactivateChunks);
 	}
 
 	void onWorldUnload(World world) {
@@ -974,9 +971,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		worldEntry.cancelWorldSaveRespawnTask();
 
 		// Deactivate chunks:
-		for (ChunkShopkeepers chunkEntry : worldEntry.shopkeepersByChunk.values()) {
-			this.deactivateChunk(chunkEntry);
-		}
+		worldEntry.shopkeepersByChunk.values().forEach(this::deactivateChunk);
 	}
 
 	// WORLD SAVE
@@ -1027,11 +1022,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 				() -> "Despawning " + worldEntry.shopkeeperCount + " shopkeepers in world '" + worldEntry.worldName + "'"
 						+ (worldSaving ? " (world saving)" : "")
 		);
-		for (ChunkShopkeepers chunkEntry : worldEntry.shopkeepersByChunk.values()) {
+		worldEntry.shopkeepersByChunk.values().forEach(chunkEntry -> {
 			if (chunkEntry.active) {
 				this.despawnShopkeepers(chunkEntry, worldSaving);
 			}
-		}
+		});
 	}
 
 	private void spawnShopkeepersInWorld(WorldShopkeepers worldEntry, boolean worldSavingFinished) {
@@ -1040,11 +1035,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 				() -> "Spawning " + worldEntry.shopkeeperCount + " shopkeepers in world '" + worldEntry.worldName + "'"
 						+ (worldSavingFinished ? " (world saving finished)" : "")
 		);
-		for (ChunkShopkeepers chunkEntry : worldEntry.shopkeepersByChunk.values()) {
+		worldEntry.shopkeepersByChunk.values().forEach(chunkEntry -> {
 			if (chunkEntry.active) {
 				this.spawnShopkeepers(chunkEntry, worldSavingFinished);
 			}
-		}
+		});
 	}
 
 	// SHOPKEEPER ACTIVATION
