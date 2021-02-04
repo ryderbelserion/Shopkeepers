@@ -37,6 +37,8 @@ import com.nisovin.shopkeepers.util.Utils;
 class SignShopListener implements Listener {
 
 	// Local copy as array (enables a very high-performance iteration):
+	// Note: This also includes the direction DOWN, even though signs cannot be attached to the bottom of blocks,
+	// because physics updates can also propagate from the block above to a non-attached sign block below.
 	private static final BlockFace[] BLOCK_SIDES = BlockFaceUtils.getBlockSides().toArray(new BlockFace[0]);
 
 	private final SKShopkeepersPlugin plugin;
