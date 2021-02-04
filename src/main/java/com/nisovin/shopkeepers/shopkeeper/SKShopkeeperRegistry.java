@@ -831,7 +831,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		if (dirty) {
 			// Save delayed:
-			plugin.getShopkeeperStorage().saveDelayed();
+			this.getShopkeeperStorage().saveDelayed();
 		}
 	}
 
@@ -912,7 +912,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		if (dirty) {
 			// Save delayed:
-			plugin.getShopkeeperStorage().saveDelayed();
+			this.getShopkeeperStorage().saveDelayed();
 		}
 	}
 
