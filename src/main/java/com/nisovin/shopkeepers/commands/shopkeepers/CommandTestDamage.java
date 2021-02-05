@@ -58,9 +58,9 @@ class CommandTestDamage extends PlayerCommand {
 		double damage = context.get(ARGUMENT_DAMAGE);
 		assert damage >= 0.0D;
 		int timesPerTick = context.get(ARGUMENT_TIMES_PER_TICK);
-		assert timesPerTick > 1;
+		assert timesPerTick >= 1;
 		int durationTicks = context.get(ARGUMENT_DURATION_TICKS);
-		assert durationTicks > 1;
+		assert durationTicks >= 1;
 
 		LivingEntity target = (LivingEntity) EntityUtils.getTargetedEntity(player, (entity) -> entity instanceof LivingEntity);
 		if (target == null) {
