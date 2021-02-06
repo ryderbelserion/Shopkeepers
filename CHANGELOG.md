@@ -90,6 +90,7 @@ Date format: (YYYY-MM-DD)
 * Performance: The rate at which the shopkeeper mob AI activations are updated for online players has been reduced from every 20 ticks to every 30 ticks. This seems sufficient to fluently activate nearby shopkeeper mobs even for players that fly around in creative mode.
 * We immediately activate the shopkeeper mob AI in nearby chunks now whenever a player joins the server or teleports.
 * Debug: Added debug information about the number of shopkeepers that actually had to be spawned or despawned during the spawning or despawning of a chunk's shopkeepers.
+* Debug: Added debug command `/shopkeeper testSpawn [repetitions]` which measures the time it takes to respawn the active shopkeepers within the current chunk.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
