@@ -1,8 +1,9 @@
 package com.nisovin.shopkeepers.shopkeeper;
 
+import java.util.Objects;
+
 import org.bukkit.inventory.ItemStack;
 
-import com.google.common.base.Objects;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -107,9 +108,9 @@ public class TradingRecipeDraft {
 	}
 
 	public boolean areItemsEqual(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		if (!Objects.equal(this.resultItem, resultItem)) return false;
-		if (!Objects.equal(this.item1, item1)) return false;
-		if (!Objects.equal(this.item2, item2)) return false;
+		if (!Objects.equals(this.resultItem, resultItem)) return false;
+		if (!Objects.equals(this.item1, item1)) return false;
+		if (!Objects.equals(this.item2, item2)) return false;
 		return true;
 	}
 
@@ -157,9 +158,9 @@ public class TradingRecipeDraft {
 		if (obj == null) return false;
 		if (!(obj instanceof TradingRecipeDraft)) return false;
 		TradingRecipeDraft other = (TradingRecipeDraft) obj;
-		if (!Objects.equal(resultItem, other.resultItem)) return false;
-		if (!Objects.equal(item1, other.item1)) return false;
-		if (!Objects.equal(item2, other.item2)) return false;
+		if (!Objects.equals(resultItem, other.resultItem)) return false;
+		if (!Objects.equals(item1, other.item1)) return false;
+		if (!Objects.equals(item2, other.item2)) return false;
 		return true;
 	}
 }
