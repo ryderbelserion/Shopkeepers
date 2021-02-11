@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopkeeper.player.sell;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -60,7 +59,7 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected void addRecipe(Player player, TradingRecipeDraft recipe) {
+	protected void addRecipe(TradingRecipeDraft recipe) {
 		assert recipe != null && recipe.isValid();
 		int price = this.getPrice(recipe);
 		if (price <= 0) return;

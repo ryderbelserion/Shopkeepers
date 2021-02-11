@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
@@ -73,7 +72,7 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected void addRecipe(Player player, TradingRecipeDraft recipe) {
+	protected void addRecipe(TradingRecipeDraft recipe) {
 		assert recipe != null && recipe.isValid();
 		ItemStack bookItem = recipe.getResultItem();
 		if (!SKBookPlayerShopkeeper.isCopyableOrDummyBook(bookItem)) return;

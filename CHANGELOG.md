@@ -120,6 +120,7 @@ Internal API:
 * The dirty flag of shopkeepers only indicates whether the the storage is aware of the shopkeeper's latest data changes. It is no longer an indicator for whether these changes have actually been persisted to disk yet.
 * Several methods related to the shopkeeper's dirty flag are final now.
 * Renamed a few methods of the ShopkeeperStorage.
+* EditorHandler#addRecipe no longer receives the editing player as argument: None of the other related methods (getTradingRecipes and clearRecipes) receive the player either.
 
 Internal:  
 * The config key pattern is cached now.

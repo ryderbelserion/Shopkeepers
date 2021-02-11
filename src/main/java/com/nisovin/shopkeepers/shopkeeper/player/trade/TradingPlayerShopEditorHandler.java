@@ -67,7 +67,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected void addRecipe(Player player, TradingRecipeDraft recipe) {
+	protected void addRecipe(TradingRecipeDraft recipe) {
 		assert recipe != null && recipe.isValid();
 		SKTradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		shopkeeper.addOffer(ShopkeepersAPI.createTradingOffer(recipe.getResultItem(), recipe.getItem1(), recipe.getItem2()));

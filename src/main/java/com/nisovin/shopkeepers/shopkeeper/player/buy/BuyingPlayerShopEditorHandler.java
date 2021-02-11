@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopkeeper.player.buy;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -64,7 +63,7 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected void addRecipe(Player player, TradingRecipeDraft recipe) {
+	protected void addRecipe(TradingRecipeDraft recipe) {
 		assert recipe != null && recipe.isValid();
 		assert recipe.getItem2() == null;
 

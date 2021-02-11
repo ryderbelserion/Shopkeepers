@@ -196,29 +196,62 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 		};
 	}
 
+	@Override
 	protected abstract List<TradingRecipeDraft> getTradingRecipes();
 
 	@Override
 	protected void saveRecipes(Session session) {
 		Player player = session.getPlayer();
-		this.clearRecipes();
-		for (TradingRecipeDraft recipe : session.getRecipes()) {
-			if (!recipe.isValid()) {
-				this.handleInvalidRecipeDraft(player, recipe);
-				continue;
-			}
-			this.addRecipe(player, recipe);
-		}
+		this.setRecipes(player, session.getRecipes());
 
 		// Save the shopkeeper:
 		shopkeeper.save();
 	}
 
-	// Called for every recipe draft that is not valid:
+	/**
+	 * Applies the given trading recipe drafts to the shopkeeper.
+	 * <p>
+	 * Any {@link TradingRecipeDraft#isValid() invalid} trading recipe drafts are passed to
+	 * {@link #handleInvalidRecipeDraft(Player, TradingRecipeDraft)} and then ignored.
+	 * 
+	 * @param player
+	 *            the editing player
+	 * @param recipes
+	 *            the trading recipe drafts
+	 */
+	protected void setRecipes(Player player, List<TradingRecipeDraft> recipes) {
+		this.clearRecipes();
+		for (TradingRecipeDraft recipe : recipes) {
+			if (!recipe.isValid()) {
+				this.handleInvalidRecipeDraft(player, recipe);
+				continue;
+			}
+			this.addRecipe(recipe);
+		}
+	}
+
+	/**
+	 * This is called for every {@link TradingRecipeDraft#isValid() invalid} trading recipe draft when the trading
+	 * recipes from the editor are applied to the shopkeeper.
+	 * 
+	 * @param player
+	 *            the editing player
+	 * @param recipe
+	 *            the invalid trading recipe draft
+	 */
 	protected void handleInvalidRecipeDraft(Player player, TradingRecipeDraft recipe) {
 	}
 
+	/**
+	 * Clears the shopkeeper's trading recipes.
+	 */
 	protected abstract void clearRecipes();
 
-	protected abstract void addRecipe(Player player, TradingRecipeDraft recipe);
+	/**
+	 * Adds the given ({@link TradingRecipeDraft#isValid() valid}) trading recipe to the shopkeeper.
+	 * 
+	 * @param recipe
+	 *            the trading recipe draft
+	 */
+	protected abstract void addRecipe(TradingRecipeDraft recipe);
 }

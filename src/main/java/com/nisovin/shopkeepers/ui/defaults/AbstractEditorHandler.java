@@ -491,6 +491,9 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	// PLAYER SESSIONS
 
+	/**
+	 * The editor state of a player.
+	 */
 	public static class Session {
 
 		private final Player player;
@@ -525,6 +528,19 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		}
 	}
 
+	/**
+	 * Creates a new {@link Session}.
+	 * <p>
+	 * The given list of recipes is not copied, but edited directly.
+	 * 
+	 * @param player
+	 *            the editing player, not <code>null</code>
+	 * @param recipes
+	 *            the trading recipe drafts, not <code>null</code> and expected to be modifiable
+	 * @param inventory
+	 *            the editor inventory, not <code>null</code>
+	 * @return the session, not <code>null</code>
+	 */
 	protected Session createSession(Player player, List<TradingRecipeDraft> recipes, Inventory inventory) {
 		return new Session(player, recipes, inventory);
 	}
@@ -534,6 +550,13 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		return sessions.get(player.getUniqueId());
 	}
 
+	/**
+	 * Gets the list of {@link TradingRecipeDraft trading recipe drafts}.
+	 * <p>
+	 * The returned list is not copied, but edited directly.
+	 * 
+	 * @return the trading recipe drafts
+	 */
 	protected abstract List<TradingRecipeDraft> getTradingRecipes();
 
 	@Override
@@ -770,7 +793,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	/**
-	 * Saves the current page of the editor interface.
+	 * Saves the current page of the editor interface to the session.
 	 * 
 	 * @param session
 	 *            the session
@@ -807,12 +830,18 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	 */
 	protected void saveEditor(Session session) {
 		assert session != null;
-		// Save current page:
+		// Save the current editor page from the UI to the session:
 		this.saveEditorPage(session);
 
-		// Save recipes:
+		// Save the recipes from the session:
 		this.saveRecipes(session);
 	}
 
+	/**
+	 * Saves (i.e. applies) the trading recipes of the given session.
+	 * 
+	 * @param session
+	 *            the session
+	 */
 	protected abstract void saveRecipes(Session session);
 }
