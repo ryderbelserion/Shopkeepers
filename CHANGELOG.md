@@ -91,6 +91,11 @@ Date format: (YYYY-MM-DD)
 * We immediately activate the shopkeeper mob AI in nearby chunks now whenever a player joins the server or teleports.
 * Debug: Added debug information about the number of shopkeepers that actually had to be spawned or despawned during the spawning or despawning of a chunk's shopkeepers.
 * Debug: Added debug command `/shopkeeper testSpawn [repetitions]` which measures the time it takes to respawn the active shopkeepers within the current chunk.
+* Added a spawn queue for shopkeepers spawned on chunk loads.
+  * Spawning lots of shopkeepers at the same time can be quite costly performance-wise. This queue distributes the spawning of shopkeepers across multiple ticks to avoid performance drops.
+  * We spawn at most 6 shopkeepers every 3 ticks (~40 shopkeepers per second): These numbers are a balance between keeping the number of shopkeepers spawned per cycle low, while avoiding the general performance overhead associated with higher spawn rates.
+  * In order to avoid players having to wait for shopkeepers to spawn, there are some situations in which we spawn the shopkeepers immediately instead of adding them to the queue. This includes: When a shopkeeper is newly created, when a shopkeeper is loaded (i.e. on plugin reloads), and after world saves. In the latter two cases, a potentially large number of shopkeepers is expected to be spawned at the same time. Due to its limited throughput, the queue would not be able to deal with this sudden peak appropriately. However, since these are situations that are associated with a certain performance impact anyways, we prefer to spawn all the affected shopkeepers immediately, instead of causing confusion among players by having them wait for the shopkeepers to respawn.
+  * Debug: The 'check' command shows statistics on the current and maximum number of pending shopkeeper spawns.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.

@@ -32,6 +32,7 @@ import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.taskqueue.TaskQueueStatistics;
 import com.nisovin.shopkeepers.util.timer.Timings;
 
 class CommandCheck extends Command {
@@ -92,6 +93,10 @@ class CommandCheck extends Command {
 		sender.sendMessage("    With AI: " + livingEntityAI.getEntityCount());
 		sender.sendMessage("    With active AI: " + livingEntityAI.getActiveAIEntityCount());
 		sender.sendMessage("    With active gravity: " + livingEntityAI.getActiveGravityEntityCount());
+
+		TaskQueueStatistics spawnQueueStatistics = shopkeeperRegistry.getSpawnQueueStatistics();
+		sender.sendMessage("  Pending shopkeeper spawns | max: " + spawnQueueStatistics.getPendingCount()
+				+ " | " + spawnQueueStatistics.getMaxPendingCount());
 
 		Timings chunkActivationTimings = shopkeeperRegistry.getChunkActivationTimings();
 		double avgChunkActivationTimings = chunkActivationTimings.getAverageTimeMillis();

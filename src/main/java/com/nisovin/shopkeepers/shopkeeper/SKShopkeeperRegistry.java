@@ -49,6 +49,7 @@ import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.taskqueue.TaskQueueStatistics;
 import com.nisovin.shopkeepers.util.timer.Timer;
 import com.nisovin.shopkeepers.util.timer.Timings;
 
@@ -276,9 +277,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 	};
 
-	// The shopkeepers that are ticked (i.e. the shopkeepers in active chunks).
+	// The shopkeepers that are ticked (i.e. the (activated) shopkeepers in active chunks).
 	// The shopkeepers are stored by their object id, or, if they don't provide one, by a shopkeeper-specific fallback
 	// id (this ensures that shopkeepers that could not be spawned are still ticked, eg. for periodic respawn attempts).
+	// Shopkeepers that are pending to be spawned (i.e. that are in the spawn queue) are not yet activated, and are
+	// therefore also not yet ticked.
 	private final Map<Object, AbstractShopkeeper> activeShopkeepersByObjectId = new LinkedHashMap<>();
 	private boolean tickingShopkeepers = false;
 	// True: Activate (or update previous activation, eg. after the object id changed)
@@ -287,13 +290,30 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	private final Timer chunkActivationTimings = new Timer();
 
+	// A spawn queue which prevents that we spawn to many shopkeepers at the same time (which can lead to short
+	// performance drops). Shopkeepers that are pending to be spawned are not yet activated, and are therefore also not
+	// yet ticked until after the spawn queue has processed them.
+	// In order to avoid players having to wait for shopkeepers to spawn, there are some situations in which we spawn
+	// the shopkeepers immediately instead of adding them to the queue. This includes: When a shopkeeper is newly
+	// created, when a shopkeeper is loaded (i.e. on plugin reloads), and after world saves. In the latter two cases, a
+	// potentially large number of shopkeepers is expected to be spawned at the same time. Due to its limited
+	// throughput, the queue would not be able to deal with this sudden peak appropriately. However, since these are
+	// situations that are associated with a certain performance impact anyways, we prefer to spawn all the affected
+	// shopkeepers immediately, instead of causing confusion among players by having them wait for the shopkeepers to
+	// respawn.
+	private final ShopkeeperSpawnQueue spawnQueue;
+
 	public SKShopkeeperRegistry(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
+		this.spawnQueue = new ShopkeeperSpawnQueue(plugin, this::spawnShopkeeper);
 	}
 
 	public void onEnable() {
 		// Setup of static state related to shopkeepers:
 		AbstractShopkeeper.setupOnEnable();
+
+		// Start spawn queue:
+		spawnQueue.start();
 
 		// Start shopkeeper ticking task:
 		this.startShopkeeperTickTask();
@@ -302,6 +322,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	public void onDisable() {
+		// Shutdown spawn queue (also clears the queue right away):
+		spawnQueue.shutdown();
+
 		// Unload all shopkeepers:
 		this.unloadAllShopkeepers();
 		assert this.getAllShopkeepers().isEmpty();
@@ -562,6 +585,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 					);
 				} else {
 					// Spawn and activate the shopkeeper:
+					// In order to not have players wait for newly created shopkeepers, as well as for loaded
+					// shopkeepers after plugin reloads, we don't use the spawn queue here, but spawn the shopkeeper
+					// immediately.
 					this.spawnShopkeeper(shopkeeper);
 				}
 			} else {
@@ -684,6 +710,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		String worldName = chunkCoords.getWorldName();
 		WorldShopkeepers worldEntry = shopkeepersByWorld.get(worldName);
 		if (worldEntry == null) return null; // There are no shopkeepers in this world
+		// Returns null if there are no shopkeepers in this chunk:
 		return worldEntry.shopkeepersByChunk.get(chunkCoords);
 	}
 
@@ -801,7 +828,15 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 				// If world saving finished, only consider shopkeepers that need to be respawned:
 				if (!worldSavingFinished || objectType.mustDespawnDuringWorldSave()) {
 					spawned++;
-					this.spawnShopkeeper(shopkeeper);
+					if (worldSavingFinished) {
+						// In order to not have players wait for shopkeepers to respawn after world saves, we respawn
+						// the shopkeepers immediately:
+						this.spawnShopkeeper(shopkeeper);
+					} else {
+						// In order to avoid spawning lots of shopkeepers at the same time, we don't actually spawn the
+						// shopkeeper here, but add it to the spawn queue:
+						spawnQueue.add(shopkeeper);
+					}
 				}
 				// The shopkeeper either got spawned (and thereby already activated), or it has been kept spawned during
 				// the world save and therefore does not need to be reactivated:
@@ -824,7 +859,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 
 		int actuallySpawned = spawned;
-		Log.debug(DebugOptions.shopkeeperActivation, () -> "  Actually spawned: " + actuallySpawned);
+		Log.debug(DebugOptions.shopkeeperActivation, () -> "  Actually spawned: " + actuallySpawned + (worldSavingFinished ? "" : " (queued)"));
 
 		if (awaitingWorldSaveRespawn > 0) {
 			int skipped = awaitingWorldSaveRespawn;
@@ -837,6 +872,10 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			// Save delayed:
 			this.getShopkeeperStorage().saveDelayed();
 		}
+	}
+
+	public TaskQueueStatistics getSpawnQueueStatistics() {
+		return spawnQueue;
 	}
 
 	// CHUNK DEACTIVATION
@@ -1082,6 +1121,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// This also deactivates the shopkeeper.
 	private void despawnShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
+		spawnQueue.remove(shopkeeper);
 		AbstractShopObject shopObject = shopkeeper.getShopObject();
 		assert shopObject.getType().mustBeSpawned();
 		shopObject.despawn();
