@@ -315,10 +315,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	private void _addOffers(List<? extends BookOffer> offers) {
 		assert offers != null && !offers.contains(null);
-		for (BookOffer offer : offers) {
-			assert offer != null;
-			// Add new offer: This replaces any previous offer for the same book.
-			this._addOffer(offer);
-		}
+		// This replaces any previous offers for the same books:
+		offers.forEach(this::_addOffer);
 	}
 }

@@ -154,9 +154,6 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 
 	private void _addOffers(List<? extends TradingOffer> offers) {
 		assert offers != null && !offers.contains(null);
-		for (TradingOffer offer : offers) {
-			assert offer != null;
-			this._addOffer(offer);
-		}
+		offers.forEach(this::_addOffer);
 	}
 }
