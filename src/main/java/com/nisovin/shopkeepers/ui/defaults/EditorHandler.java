@@ -209,6 +209,9 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 			}
 			this.addRecipe(player, recipe);
 		}
+
+		// Save the shopkeeper:
+		shopkeeper.save();
 	}
 
 	// Called for every recipe draft that is not valid:
