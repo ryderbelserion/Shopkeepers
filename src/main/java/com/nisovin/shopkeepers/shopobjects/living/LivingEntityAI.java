@@ -133,7 +133,7 @@ public class LivingEntityAI implements Listener {
 		}
 	}
 
-	private final Map<ChunkCoords, ChunkData> activeChunks = new LinkedHashMap<>();
+	private final Map<ChunkCoords, ChunkData> chunks = new LinkedHashMap<>();
 
 	private BukkitTask aiTask = null;
 	private boolean currentlyRunning = false;
@@ -165,18 +165,17 @@ public class LivingEntityAI implements Listener {
 
 		// Register listener:
 		Bukkit.getPluginManager().registerEvents(this, plugin);
+
+		// Start task:
+		this.startTask();
 	}
 
 	public void onDisable() {
+		assert !currentlyRunning;
 		HandlerList.unregisterAll(this); // Unregister listener
-		this.stop();
-		this.reset(); // Cleanup, reset timings, etc.
-	}
-
-	private void reset() {
-		Validate.isTrue(!currentlyRunning, "Cannot reset while the AI task is running!");
+		this.stopTask();
 		entities.clear();
-		activeChunks.clear();
+		chunks.clear();
 		this.resetStatistics();
 	}
 
@@ -190,41 +189,69 @@ public class LivingEntityAI implements Listener {
 
 		// Determine entity chunk (asserts that the entity won't move!):
 		// We assert that the chunk is loaded (checked above by isValid call).
-		ChunkCoords chunkCoords = new ChunkCoords(entity.getLocation(sharedLocation));
+		sharedChunkCoords.set(entity.getLocation(sharedLocation));
 		sharedLocation.setWorld(null); // Reset
 
 		// Add chunk entry:
-		ChunkData chunkData = activeChunks.get(chunkCoords);
+		ChunkData chunkData = chunks.get(sharedChunkCoords);
 		if (chunkData == null) {
+			ChunkCoords chunkCoords = new ChunkCoords(sharedChunkCoords); // Copy
 			chunkData = new ChunkData(chunkCoords, customGravityEnabled);
-			activeChunks.put(chunkCoords, chunkData);
+			chunks.put(chunkCoords, chunkData);
+
+			// Update chunk statistics:
+			if (chunkData.activeAI) {
+				activeAIChunksCount++;
+			}
+			if (chunkData.activeGravity) {
+				activeGravityChunksCount++;
+			}
 		}
+
+		// Update entity statistics:
 		chunkData.entityCount++;
+		if (chunkData.activeAI) {
+			activeAIEntityCount++;
+		}
+		if (chunkData.activeGravity) {
+			activeGravityEntityCount++;
+		}
 
 		// Add entity entry:
 		EntityData entityData = new EntityData(entity, chunkData);
 		entities.put(entity, entityData);
 
 		// Start the AI task, if it isn't already running:
-		this.start();
+		this.startTask();
 	}
 
 	public void removeEntity(LivingEntity entity) {
 		Validate.isTrue(!currentlyRunning, "Cannot remove entities while the AI task is running!");
 		// Remove entity:
 		EntityData entityData = entities.remove(entity);
-		if (entityData != null) {
-			this.onEntityRemoved(entity, entityData);
-		}
-	}
+		if (entityData == null) return; // Entity was not contained
 
-	private void onEntityRemoved(LivingEntity entity, EntityData entityData) {
-		assert entity != null && entityData != null;
-		// Update/remove chunk entry:
 		ChunkData chunkData = entityData.chunkData;
+
+		// Update entity statistics:
 		chunkData.entityCount--;
+		if (chunkData.activeAI) {
+			activeAIEntityCount--;
+		}
+		if (chunkData.activeGravity) {
+			activeGravityEntityCount--;
+		}
+
 		if (chunkData.entityCount <= 0) {
-			activeChunks.remove(chunkData.chunkCoords);
+			chunks.remove(chunkData.chunkCoords);
+
+			// Update chunk statistics:
+			if (chunkData.activeAI) {
+				activeAIChunksCount--;
+			}
+			if (chunkData.activeGravity) {
+				activeGravityChunksCount--;
+			}
 		}
 	}
 
@@ -281,13 +308,18 @@ public class LivingEntityAI implements Listener {
 
 	// TASK
 
-	private void start() {
-		if (this.isActive()) return;
-		else if (aiTask != null) this.stop(); // Not active, but already setup: Perform cleanup.
+	private void startTask() {
+		if (aiTask != null) return; // Already running
 
 		// Start AI task:
 		int tickPeriod = Settings.mobBehaviorTickPeriod;
 		aiTask = Bukkit.getScheduler().runTaskTimer(plugin, new TickTask(), tickPeriod, tickPeriod);
+	}
+
+	private void stopTask() {
+		if (aiTask == null) return;
+		aiTask.cancel();
+		aiTask = null;
 	}
 
 	private class TickTask implements Runnable {
@@ -299,6 +331,13 @@ public class LivingEntityAI implements Listener {
 
 		@Override
 		public void run() {
+			// Skip if there are no entities with AI currently:
+			// Note: We keep the task running, because frequently starting and stopping the task would be associated
+			// with a certain overhead as well.
+			if (entities.isEmpty()) {
+				return;
+			}
+
 			currentlyRunning = true;
 
 			// Start timings:
@@ -320,25 +359,7 @@ public class LivingEntityAI implements Listener {
 			aiTimings.stop();
 
 			currentlyRunning = false;
-
-			// Stop the task if there are no entities with AI anymore:
-			if (entities.isEmpty()) {
-				stop();
-			}
 		}
-	}
-
-	private void stop() {
-		if (aiTask == null) return;
-		aiTask.cancel();
-		aiTask = null;
-		this.resetStatistics();
-	}
-
-	private boolean isActive() {
-		if (aiTask == null) return false;
-		// Checking this here, since something else might cancel our task from outside:
-		return (currentlyRunning || Bukkit.getScheduler().isQueued(aiTask.getTaskId()));
 	}
 
 	// CHUNK ACTIVATIONS
@@ -347,7 +368,7 @@ public class LivingEntityAI implements Listener {
 		activationTimings.start();
 
 		// Deactivate all chunks:
-		activeChunks.values().forEach(chunkData -> {
+		chunks.values().forEach(chunkData -> {
 			chunkData.activeAI = false;
 			chunkData.activeGravity = false;
 		});
@@ -418,7 +439,7 @@ public class LivingEntityAI implements Listener {
 		for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
 			for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
 				sharedChunkCoords.set(worldName, chunkX, chunkZ);
-				ChunkData chunkData = activeChunks.get(sharedChunkCoords);
+				ChunkData chunkData = chunks.get(sharedChunkCoords);
 				if (chunkData == null) continue;
 
 				switch (activationType) {

@@ -97,6 +97,8 @@ Date format: (YYYY-MM-DD)
   * In order to avoid players having to wait for shopkeepers to spawn, there are some situations in which we spawn the shopkeepers immediately instead of adding them to the queue. This includes: When a shopkeeper is newly created, when a shopkeeper is loaded (i.e. on plugin reloads), and after world saves. In the latter two cases, a potentially large number of shopkeepers is expected to be spawned at the same time. Due to its limited throughput, the queue would not be able to deal with this sudden peak appropriately. However, since these are situations that are associated with a certain performance impact anyways, we prefer to spawn all the affected shopkeepers immediately, instead of causing confusion among players by having them wait for the shopkeepers to respawn.
   * Debug: The 'check' command shows statistics on the current and maximum number of pending shopkeeper spawns.
 * Fixed: Closing a shopkeeper editor did not immediately trigger a save, but relied on the periodic shopkeeper tick task to trigger the save.
+* Performance: The shopkeeper mob AI task is no longer dynamically started and stopped, but instead keeps running even if there are no entities to process currently. Frequently stopping and restarting the task is associated with a certain overhead.
+* Debug: The shopkeeper mob AI and gravity statistics are no longer reset when there are no more active entities.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
