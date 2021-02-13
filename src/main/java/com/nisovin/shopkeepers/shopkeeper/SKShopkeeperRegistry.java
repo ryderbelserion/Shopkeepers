@@ -17,10 +17,12 @@ import java.util.stream.Stream;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -46,6 +48,7 @@ import com.nisovin.shopkeepers.shopobjects.entity.DefaultEntityShopObjectIds;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.MutableChunkCoords;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
@@ -54,6 +57,24 @@ import com.nisovin.shopkeepers.util.timer.Timer;
 import com.nisovin.shopkeepers.util.timer.Timings;
 
 public class SKShopkeeperRegistry implements ShopkeeperRegistry {
+
+	/**
+	 * Spawning shopkeepers is relatively costly performance-wise. In order to not spawn shopkeepers for chunks that are
+	 * only loaded briefly, we defer the activation of chunks by this amount of ticks. This also account for players who
+	 * frequently cross chunk boundaries back and forth.
+	 */
+	private static final long CHUNK_ACTIVATION_DELAY_TICKS = 20;
+	/**
+	 * The radius in chunks around the player that we immediately activate when a player freshly joins, or teleports. A
+	 * radius of {@code zero} only activates the player's own chunk.
+	 * <p>
+	 * The actually used radius is the minimum of this setting and the server's {@link Server#getViewDistance() view
+	 * distance}.
+	 */
+	private static final int IMMEDIATE_CHUNK_ACTIVATION_RADIUS = 2;
+
+	private static final Location sharedLocation = new Location(null, 0, 0, 0);
+	private static final MutableChunkCoords sharedChunkCoords = new MutableChunkCoords();
 
 	// TODO We assume that shopkeeper entities are stationary. If they get teleported into another chunk, or even
 	// another world, we would need to check for them during chunk unloads, world unloads, and world saves (which we
@@ -218,8 +239,6 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 	}
 
-	private static final long CHUNK_ACTIVATION_DELAY_TICKS = 2;
-
 	private final SKShopkeepersPlugin plugin;
 
 	// All shopkeepers:
@@ -289,6 +308,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	private final Map<AbstractShopkeeper, Boolean> pendingActivationChanges = new LinkedHashMap<>();
 
 	private final Timer chunkActivationTimings = new Timer();
+	private int immediateChunkActivationRadius;
 
 	// A spawn queue which prevents that we spawn to many shopkeepers at the same time (which can lead to short
 	// performance drops). Shopkeepers that are pending to be spawned are not yet activated, and are therefore also not
@@ -311,6 +331,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	public void onEnable() {
 		// Setup of static state related to shopkeepers:
 		AbstractShopkeeper.setupOnEnable();
+
+		// Determine the immediate chunk activation radius:
+		immediateChunkActivationRadius = Math.min(IMMEDIATE_CHUNK_ACTIVATION_RADIUS, Bukkit.getViewDistance());
 
 		// Start spawn queue:
 		spawnQueue.start();
@@ -757,6 +780,59 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			assert chunkShopkeepers.chunkCoords.isChunkLoaded(); // We stop the task on chunk unloads
 			chunkShopkeepers.activationTask = null;
 			activateChunk(chunkShopkeepers);
+		}
+	}
+
+	void activatePendingNearbyChunksDelayed(Player player) {
+		assert player != null;
+		Bukkit.getScheduler().runTask(plugin, new ActivatePendingNearbyChunksTask(player));
+	}
+
+	private class ActivatePendingNearbyChunksTask implements Runnable {
+
+		private final Player player;
+
+		ActivatePendingNearbyChunksTask(Player player) {
+			assert player != null;
+			this.player = player;
+		}
+
+		@Override
+		public void run() {
+			if (!player.isOnline()) return; // Player is no longer online
+			activatePendingNearbyChunks(player);
+		}
+	}
+
+	// Activates nearby chunks if they are currently pending activation:
+	private void activatePendingNearbyChunks(Player player) {
+		World world = player.getWorld();
+		Location location = player.getLocation(sharedLocation);
+		int chunkX = ChunkCoords.fromBlock(location.getBlockX());
+		int chunkZ = ChunkCoords.fromBlock(location.getBlockZ());
+		sharedLocation.setWorld(null); // Reset
+		this.activatePendingNearbyChunks(world, chunkX, chunkZ, immediateChunkActivationRadius);
+	}
+
+	// Activates nearby chunks if they are currently pending activation:
+	private void activatePendingNearbyChunks(World world, int centerChunkX, int centerChunkZ, int chunkRadius) {
+		assert world != null && chunkRadius >= 0;
+		String worldName = world.getName();
+		int minChunkX = centerChunkX - chunkRadius;
+		int maxChunkX = centerChunkX + chunkRadius;
+		int minChunkZ = centerChunkZ - chunkRadius;
+		int maxChunkZ = centerChunkZ + chunkRadius;
+		for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
+			for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
+				sharedChunkCoords.set(worldName, chunkX, chunkZ);
+				ChunkShopkeepers chunkEntry = this.getChunkEntry(sharedChunkCoords);
+				if (chunkEntry == null) continue;
+
+				// Activate the chunk if it is currently pending activation:
+				if (chunkEntry.isActivationPending()) {
+					this.activateChunk(chunkEntry);
+				}
+			}
 		}
 	}
 

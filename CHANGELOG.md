@@ -100,6 +100,7 @@ Date format: (YYYY-MM-DD)
 * Performance: Shopkeeper mobs with AI are now stored by chunk. Instead of iterating over all mobs and checking if their AI or gravity is active, we now iterate over the chunks first and skip those with neither active AI nor gravity. Additionally, we skip the processing of mobs altogether if we know that there are no chunks with neither active AI nor gravity.
 * Performance: The shopkeeper mob AI task is no longer dynamically started and stopped, but instead keeps running even if there are no entities to process currently. Frequently stopping and restarting the task is associated with a certain overhead.
 * Debug: The shopkeeper mob AI and gravity statistics are no longer reset when there are no more active entities.
+* Performance: Increased the chunk activation delay from 2 to 20 ticks. This further limits the rate at which shopkeepers may get spawned and despawned, for instance, when players frequently cross chunk boundaries back and forth. When a player joins the server or teleports, we immediately activate the chunks in a 2 chunk radius.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
