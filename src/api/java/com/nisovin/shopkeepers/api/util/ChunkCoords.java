@@ -112,6 +112,16 @@ public class ChunkCoords {
 
 	/**
 	 * Creates a new {@link ChunkCoords}.
+	 * 
+	 * @param chunkCoords
+	 *            the chunk coordinates to copy, not <code>null</code>
+	 */
+	public ChunkCoords(ChunkCoords chunkCoords) {
+		this(chunkCoords.getWorldName(), chunkCoords.getChunkX(), chunkCoords.getChunkZ());
+	}
+
+	/**
+	 * Creates a new {@link ChunkCoords}.
 	 * <p>
 	 * The given {@link Location} is expected to provide a {@link World}.
 	 * 

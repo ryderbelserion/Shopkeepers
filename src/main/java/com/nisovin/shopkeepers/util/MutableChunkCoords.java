@@ -53,6 +53,16 @@ public class MutableChunkCoords extends ChunkCoords {
 
 	/**
 	 * Creates a new {@link MutableChunkCoords}.
+	 * 
+	 * @param chunkCoords
+	 *            the chunk coordinates to copy, not <code>null</code>
+	 */
+	public MutableChunkCoords(ChunkCoords chunkCoords) {
+		super(chunkCoords);
+	}
+
+	/**
+	 * Creates a new {@link MutableChunkCoords}.
 	 * <p>
 	 * The given {@link Location} is expected to provide a {@link World}.
 	 * 
@@ -93,6 +103,19 @@ public class MutableChunkCoords extends ChunkCoords {
 	public void set(Block block) {
 		Validate.notNull(block, "block is null");
 		this.set(block.getWorld().getName(), fromBlock(block.getX()), fromBlock(block.getZ()));
+	}
+
+	/**
+	 * Sets this {@link MutableChunkCoords} to the chunk coordinates of the given {@link Location}.
+	 * <p>
+	 * The location is expected to provide a {@link World}.
+	 * 
+	 * @param location
+	 *            the location, not <code>null</code>
+	 */
+	public void set(Location location) {
+		Validate.notNull(location, "location is null");
+		this.set(location.getWorld().getName(), fromBlock(location.getBlockX()), fromBlock(location.getBlockZ()));
 	}
 
 	/**
