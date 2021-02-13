@@ -1,6 +1,9 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -117,12 +120,10 @@ public class LivingEntityAI implements Listener {
 		}
 	}
 
-	// Ticking entities -> entity data
-	private final Map<LivingEntity, EntityData> entities = new LinkedHashMap<>();
-
 	private static class ChunkData {
 		private final ChunkCoords chunkCoords;
-		private int entityCount = 0;
+		// We don't expect there to be many entities within a single chunk, so using a list is okay:
+		private final List<EntityData> entities = new ArrayList<>();
 		// Active by default for fast initial reactions in case players are nearby:
 		public boolean activeGravity;
 		public boolean activeAI = true;
@@ -134,6 +135,8 @@ public class LivingEntityAI implements Listener {
 	}
 
 	private final Map<ChunkCoords, ChunkData> chunks = new LinkedHashMap<>();
+	// Index for fast removal: Entity -> EntityData
+	private final Map<LivingEntity, EntityData> entities = new HashMap<>();
 
 	private BukkitTask aiTask = null;
 	private boolean currentlyRunning = false;
@@ -174,8 +177,8 @@ public class LivingEntityAI implements Listener {
 		assert !currentlyRunning;
 		HandlerList.unregisterAll(this); // Unregister listener
 		this.stopTask();
-		entities.clear();
 		chunks.clear();
+		entities.clear();
 		this.resetStatistics();
 	}
 
@@ -208,18 +211,18 @@ public class LivingEntityAI implements Listener {
 			}
 		}
 
+		// Add entity entry:
+		EntityData entityData = new EntityData(entity, chunkData);
+		entities.put(entity, entityData);
+		chunkData.entities.add(entityData);
+
 		// Update entity statistics:
-		chunkData.entityCount++;
 		if (chunkData.activeAI) {
 			activeAIEntityCount++;
 		}
 		if (chunkData.activeGravity) {
 			activeGravityEntityCount++;
 		}
-
-		// Add entity entry:
-		EntityData entityData = new EntityData(entity, chunkData);
-		entities.put(entity, entityData);
 
 		// Start the AI task, if it isn't already running:
 		this.startTask();
@@ -232,17 +235,8 @@ public class LivingEntityAI implements Listener {
 		if (entityData == null) return; // Entity was not contained
 
 		ChunkData chunkData = entityData.chunkData;
-
-		// Update entity statistics:
-		chunkData.entityCount--;
-		if (chunkData.activeAI) {
-			activeAIEntityCount--;
-		}
-		if (chunkData.activeGravity) {
-			activeGravityEntityCount--;
-		}
-
-		if (chunkData.entityCount <= 0) {
+		chunkData.entities.remove(entityData);
+		if (chunkData.entities.isEmpty()) {
 			chunks.remove(chunkData.chunkCoords);
 
 			// Update chunk statistics:
@@ -252,6 +246,14 @@ public class LivingEntityAI implements Listener {
 			if (chunkData.activeGravity) {
 				activeGravityChunksCount--;
 			}
+		}
+
+		// Update entity statistics:
+		if (chunkData.activeAI) {
+			activeAIEntityCount--;
+		}
+		if (chunkData.activeGravity) {
+			activeGravityEntityCount--;
 		}
 	}
 
@@ -467,10 +469,27 @@ public class LivingEntityAI implements Listener {
 	private void processEntities() {
 		activeAIEntityCount = 0;
 		activeGravityEntityCount = 0;
-		entities.values().forEach(this::processEntity);
+
+		if (activeAIChunksCount == 0 && activeGravityChunksCount == 0) {
+			// There is no need to process any entities if there are no chunks with active AI or gravity:
+			return;
+		}
+
+		chunks.values().forEach(this::processEntities);
+	}
+
+	private void processEntities(ChunkData chunkData) {
+		assert chunkData != null;
+		if (!chunkData.activeGravity && !chunkData.activeAI) {
+			// There is no need to process the chunk's entities:
+			return;
+		}
+
+		chunkData.entities.forEach(this::processEntity);
 	}
 
 	private void processEntity(EntityData entityData) {
+		assert entityData != null;
 		LivingEntity entity = entityData.entity;
 		// Note: Checking entity.isValid() is relatively heavy (compared to other operations) due to a chunk lookup. The
 		// entity's entry is already immediately getting removed as reaction to its chunk being unloaded. So there
