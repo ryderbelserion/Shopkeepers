@@ -39,7 +39,11 @@ public class LivingEntityAI implements Listener {
 	/**
 	 * Determines how often AI activations are rechecked (every X ticks).
 	 * <p>
-	 * We also separately react to player joins and teleports in order to quickly activate nearby chunks in those cases.
+	 * We also separately react to player joins and teleports in order to quickly activate the AI of nearby shopkeepers
+	 * in those cases. Note that this only has an effect if the nearby chunks were already loaded and their shopkeepers
+	 * were already spawned. However, if this is not the case, the chunk will be marked as active by default anyways
+	 * already once the shopkeepers are spawned (which can happen deferred to chunk loading, due to the deferred chunk
+	 * activation and the spawn queue).
 	 */
 	// 30 ticks is quick enough to fluently react even to players flying in creative mode with default flying speed.
 	public static final int AI_ACTIVATION_TICK_RATE = 30;
