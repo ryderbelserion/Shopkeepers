@@ -238,6 +238,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 			// Overwrite AI:
 			this.overwriteAI();
+			// Register the entity for our custom AI processing:
+			livingShops.getLivingEntityAI().addEntity(entity);
 
 			// Prevent raider shopkeepers from participating in nearby raids:
 			if (entity instanceof Raider) {
@@ -317,10 +319,6 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 		// Disable AI (also disables gravity) and replace it with our own handling:
 		this.setNoAI(entity);
-
-		if (NMSManager.getProvider().supportsCustomMobAI()) {
-			livingShops.getLivingEntityAI().addEntity(entity);
-		}
 
 		if (Settings.silenceLivingShopEntities) {
 			entity.setSilent(true);

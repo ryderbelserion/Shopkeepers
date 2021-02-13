@@ -186,7 +186,7 @@ public class LivingEntityAI implements Listener {
 		Validate.notNull(entity, "Entity is null!");
 		Validate.isTrue(entity.isValid(), "Entity is invalid!");
 		Validate.isTrue(!currentlyRunning, "Cannot add entities while the AI task is running!");
-		if (entities.containsKey(entity)) return;
+		Validate.isTrue(!entities.containsKey(entity), "Entity is already added!");
 
 		// Determine entity chunk (asserts that the entity won't move!):
 		// We assert that the chunk is loaded (checked above by isValid call).
