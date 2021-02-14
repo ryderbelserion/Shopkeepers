@@ -209,7 +209,6 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				if (!villager.isValid()) return false;
 				getUISession(player).closeDelayedAndRunTask(() -> {
 					if (!player.isValid() || !villager.isValid()) return;
 					// We cannot open the villagers inventory directly. Instead we create custom inventory with its
