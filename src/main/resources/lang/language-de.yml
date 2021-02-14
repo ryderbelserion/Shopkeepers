@@ -194,7 +194,7 @@ too-many-shops: "&7Du hast bereits das Limit an Shops erreicht, die du besitzen 
 no-player-shops-via-command: "&7Spieler-Shops können nur mit dem Shop-Erstellungs Item erzeugt werden!"
 shop-create-fail: "&7Du kannst dort keinen Shop erstellen."
 
-type-new-name: "&aBitte gebe den neuen Shop-Namen im Chat ein.\n  &aTippe Minus (-) ein, um den Namen zu entfernen."
+type-new-name: "&aBitte gib den neuen Shop-Namen im Chat ein.\n  &aTippe Minus (-) ein, um den Namen zu entfernen."
 name-set: "&aDer Shop-Name wurde gesetzt!"
 name-has-not-changed: "&aDer Shop-Name hat sich nicht geändert."
 name-invalid: "&aDer Name ist ungültig!"
