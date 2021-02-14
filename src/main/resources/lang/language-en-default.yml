@@ -311,6 +311,10 @@ villager-editor-description:
 button-delete-villager: "&4Delete"
 button-delete-villager-lore:
 - Deletes the villager
+button-name-villager: "&aSet villager name"
+button-name-villager-lore:
+- "Lets you rename"
+- "the villager"
 button-villager-inventory: "&aView villager inventory"
 button-villager-inventory-lore:
 - Lets you view a copy of
@@ -323,6 +327,10 @@ villager-inventory-title: "Villager inventory (copy)"
 set-villager-xp: "&aSet the villager's XP to &e{xp}"
 no-villager-trades-changed: "&aNo trades have been changed."
 villager-trades-changed: "&e{changedTrades}&a trades have been changed."
+
+type-new-villager-name: "&aPlease type the villager's name into the chat.\n  &aType a dash (-) to remove the name."
+villager-name-set: "&aThe villager's name has been set!"
+villager-name-invalid: "&aThat name is not valid!"
 
 list-admin-shops-header: "&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})"
 list-all-shops-header: "&9There are &e{shopsCount} &9shops in total: &e(Page {page} of {maxPage})"

@@ -308,6 +308,10 @@ villager-editor-description:
 button-delete-villager: "&4Entfernen"
 button-delete-villager-lore:
 - Entfernt den Dorfbewohner
+button-name-villager: "&aUmbenennen"
+button-name-villager-lore:
+- "Ändere den Namen"
+- "des Dorfbewohners"
 button-villager-inventory: "&aDorfbewohner Inventar"
 button-villager-inventory-lore:
 - Zeigt dir eine Kopie des
@@ -321,6 +325,10 @@ villager-inventory-title: "Dorfbewohner Inventar (Kopie)"
 set-villager-xp: "&aDie XP des Dorfbewohners wurde auf &e{xp}&a gesetzt."
 no-villager-trades-changed: "&aEs wurden keine Angebote geändert."
 villager-trades-changed: "&aEs wurden &e{changedTrades}&a Angebote geändert."
+
+type-new-villager-name: "&aBitte gib den neuen Namen im Chat ein.\n  &aTippe Minus (-) ein, um den Namen zu entfernen."
+villager-name-set: "&aDer Dorfbewohner wurde umbenannt!"
+villager-name-invalid: "&aDer Name ist ungültig!"
 
 list-admin-shops-header: "&9Es gibt &e{shopsCount} &9Admin-Shops: &e(Seite {page} von {maxPage})"
 list-all-shops-header: "&9Es gibt insgesamt &e{shopsCount} &9Shops: &e(Seite {page} von {maxPage})"

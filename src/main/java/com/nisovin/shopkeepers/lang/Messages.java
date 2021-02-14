@@ -243,6 +243,8 @@ public class Messages extends Config {
 
 	public static String buttonDeleteVillager = c("&4Delete");
 	public static List<String> buttonDeleteVillagerLore = c(Arrays.asList("Deletes the villager"));
+	public static String buttonNameVillager = c("&aSet villager name");
+	public static List<String> buttonNameVillagerLore = c(Arrays.asList("Lets you rename", "the villager"));
 	public static String buttonVillagerInventory = c("&aView villager inventory");
 	public static List<String> buttonVillagerInventoryLore = c(Arrays.asList(
 			"Lets you view a copy of",
@@ -255,6 +257,11 @@ public class Messages extends Config {
 	public static String setVillagerXp = c("&aSet the villager's XP to &e{xp}");
 	public static String noVillagerTradesChanged = c("&aNo trades have been changed.");
 	public static String villagerTradesChanged = c("&e{changedTrades}&a trades have been changed.");
+
+	public static Text typeNewVillagerName = Text.parse("&aPlease type the villager's name into the chat.\n"
+			+ "  &aType a dash (-) to remove the name.");
+	public static Text villagerNameSet = Text.parse("&aThe villager's name has been set!");
+	public static Text villagerNameInvalid = Text.parse("&aThat name is not valid!");
 
 	public static Text listAdminShopsHeader = Text.parse("&9There are &e{shopsCount} &9admin shops: &e(Page {page} of {maxPage})");
 	public static Text listAllShopsHeader = Text.parse("&9There are &e{shopsCount} &9shops in total: &e(Page {page} of {maxPage})");

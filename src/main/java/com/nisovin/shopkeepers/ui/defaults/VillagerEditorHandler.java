@@ -21,6 +21,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
@@ -104,7 +105,9 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	protected void setupButtons() {
 		super.setupButtons();
 		this.addButtonOrIgnore(this.createDeleteButton());
-		// TODO Villager renaming? Players can simply use a nametag for this as well.
+		// Note: Players can also use nametags to rename the villager like normal. However, this option allows to setup
+		// colored names more conveniently.
+		this.addButtonOrIgnore(this.createNamingButton());
 		// Note: Wandering traders have an inventory as well, but it is usually always empty.
 		this.addButtonOrIgnore(this.createContainerButton());
 		if (villager instanceof Villager) {
@@ -135,6 +138,66 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				return true;
 			}
 		};
+	}
+
+	protected Button createNamingButton() {
+		return new ActionButton() {
+			@Override
+			public ItemStack getIcon(Session session) {
+				return DerivedSettings.nameVillagerButtonItem.createItemStack();
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				getUISession(player).closeDelayedAndRunTask(() -> {
+					if (!player.isValid() || !villager.isValid()) return;
+
+					// Start naming:
+					SKShopkeepersPlugin.getInstance().getChatInput().request(player, (message) -> {
+						renameVillager(player, message);
+					});
+					TextUtils.sendMessage(player, Messages.typeNewVillagerName);
+				});
+				return true;
+			}
+		};
+	}
+
+	private void renameVillager(Player player, String newName) {
+		assert player != null && newName != null;
+		if (!villager.isValid()) return;
+
+		// Prepare the new name:
+		newName = newName.trim();
+
+		if (newName.isEmpty() || newName.equals("-")) {
+			// Remove name:
+			newName = "";
+		} else {
+			// Validate name:
+			if (!this.isValidName(newName)) {
+				TextUtils.sendMessage(player, Messages.villagerNameInvalid);
+				return;
+			}
+		}
+
+		// Apply new name:
+		if (newName.isEmpty()) {
+			villager.setCustomName(null);
+		} else {
+			// Further preparation:
+			newName = TextUtils.colorize(newName);
+			villager.setCustomName(newName);
+		}
+
+		// Inform player:
+		TextUtils.sendMessage(player, Messages.villagerNameSet);
+	}
+
+	private static final int MAX_NAME_LENGTH = 128;
+
+	private boolean isValidName(String name) {
+		return (name != null && name.length() <= MAX_NAME_LENGTH);
 	}
 
 	protected Button createContainerButton() {

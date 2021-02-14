@@ -101,6 +101,7 @@ Date format: (YYYY-MM-DD)
 * Performance: The shopkeeper mob AI task is no longer dynamically started and stopped, but instead keeps running even if there are no entities to process currently. Frequently stopping and restarting the task is associated with a certain overhead.
 * Debug: The shopkeeper mob AI and gravity statistics are no longer reset when there are no more active entities.
 * Performance: Increased the chunk activation delay from 2 to 20 ticks. This further limits the rate at which shopkeepers may get spawned and despawned, for instance, when players frequently cross chunk boundaries back and forth. When a player joins the server or teleports, we immediately activate the chunks in a 2 chunk radius.
+* Added an editor option to rename regular villagers. Unlike the renaming via nametags, this allows the use of color codes.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
@@ -183,6 +184,11 @@ Messages:
     * The appearance of sign shops has changed. They are slightly more colorful now.
 * Changed the default color of 'villager-editor-title' to be less bright.
 * Changed the 'too-many-shops' message to be more general.
+* Added 'button-name-villager'.
+* Added 'button-name-villager-lore'.
+* Added 'type-new-villager-name'.
+* Added 'villager-name-set'.
+* Added 'villager-name-invalid'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.

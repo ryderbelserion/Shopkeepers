@@ -283,6 +283,7 @@ public class Settings extends Config {
 		public static ItemData hireButtonItem;
 
 		public static ItemData deleteVillagerButtonItem;
+		public static ItemData nameVillagerButtonItem;
 		public static ItemData villagerInventoryButtonItem;
 
 		public static Pattern shopNamePattern;
@@ -323,6 +324,7 @@ public class Settings extends Config {
 
 			// Note: These use the same item types as the corresponding shopkeeper buttons.
 			deleteVillagerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), Messages.buttonDeleteVillager, Messages.buttonDeleteVillagerLore));
+			nameVillagerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(nameItem.createItemStack(), Messages.buttonNameVillager, Messages.buttonNameVillagerLore));
 			villagerInventoryButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), Messages.buttonVillagerInventory, Messages.buttonVillagerInventoryLore));
 
 			// Shop name pattern:
