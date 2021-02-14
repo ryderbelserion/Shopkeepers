@@ -1,64 +1,71 @@
 package com.nisovin.shopkeepers.naming;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
+import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.chatinput.ChatInput;
+import com.nisovin.shopkeepers.chatinput.ChatInput.Request;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 public class ShopkeeperNaming {
 
-	private final SKShopkeepersPlugin plugin;
-	private final Map<String, Shopkeeper> naming = Collections.synchronizedMap(new HashMap<>());
+	private final ChatInput chatInput;
 
-	public ShopkeeperNaming(SKShopkeepersPlugin plugin) {
-		this.plugin = plugin;
+	public ShopkeeperNaming(ChatInput chatInput) {
+		Validate.notNull(chatInput, "chatInput is null");
+		this.chatInput = chatInput;
 	}
 
 	public void onEnable() {
-		Bukkit.getPluginManager().registerEvents(new ShopNamingListener(plugin, this), plugin);
 	}
 
 	public void onDisable() {
-		naming.clear();
-	}
-
-	public void onPlayerQuit(Player player) {
-		assert player != null;
-		this.endNaming(player);
 	}
 
 	public void startNaming(Player player, Shopkeeper shopkeeper) {
-		assert player != null && shopkeeper != null;
-		naming.put(player.getName(), shopkeeper);
+		Validate.notNull(player, "player is null");
+		Validate.notNull(shopkeeper, "shopkeeper is null");
+		chatInput.request(player, new ShopkeeperNamingChatInputRequest(player, shopkeeper));
 	}
 
-	public Shopkeeper getCurrentlyNamedShopkeeper(Player player) {
-		assert player != null;
-		return naming.get(player.getName());
+	private class ShopkeeperNamingChatInputRequest implements Request {
+
+		private final Player player;
+		private final Shopkeeper shopkeeper;
+
+		ShopkeeperNamingChatInputRequest(Player player, Shopkeeper shopkeeper) {
+			assert player != null && shopkeeper != null;
+			this.player = player;
+			this.shopkeeper = shopkeeper;
+		}
+
+		@Override
+		public void onChatInput(String message) {
+			requestNameChange(player, shopkeeper, message);
+		}
 	}
 
-	public boolean isNaming(Player player) {
-		assert player != null;
-		return this.getCurrentlyNamedShopkeeper(player) != null;
-	}
-
-	public Shopkeeper endNaming(Player player) {
-		assert player != null;
-		return naming.remove(player.getName());
+	public void abortNaming(Player player) {
+		Validate.notNull(player, "player is null");
+		Request request = chatInput.getRequest(player);
+		if (request instanceof ShopkeeperNamingChatInputRequest) {
+			chatInput.abortRequest(player);
+		}
 	}
 
 	public boolean requestNameChange(Player player, Shopkeeper shopkeeper, String newName) {
-		if (player == null) return false;
+		Validate.notNull(player, "player is null");
+		Validate.notNull(shopkeeper, "shopkeeper is null");
+		Validate.notNull(newName, "newName is null");
 		if (!shopkeeper.isValid()) return false;
+
+		// Prepare the new name:
+		newName = newName.trim();
 
 		// Update name:
 		if (newName.isEmpty() || newName.equals("-")) {

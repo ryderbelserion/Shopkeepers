@@ -29,6 +29,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.chatinput.ChatInput;
 import com.nisovin.shopkeepers.commands.Commands;
 import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -113,7 +114,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	private final ItemConversions itemConversions = new ItemConversions(this);
 	private final Commands commands = new Commands(this);
-	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(this);
+	private final ChatInput chatInput = new ChatInput(this);
+	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(chatInput);
 	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(this);
 
 	private final ProtectedContainers protectedContainers = new ProtectedContainers(this);
@@ -340,6 +342,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// Enable commands:
 		commands.onEnable();
 
+		// Chat input:
+		chatInput.onEnable();
+
 		// Enable shopkeeper naming:
 		shopkeeperNaming.onEnable();
 
@@ -435,6 +440,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// Disable commands:
 		commands.onDisable();
 
+		// Chat input:
+		chatInput.onDisable();
+
 		// Item conversions:
 		itemConversions.onDisable();
 
@@ -490,7 +498,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopObjectTypesRegistry.clearSelection(player);
 		uiRegistry.onPlayerQuit(player);
 
-		shopkeeperNaming.onPlayerQuit(player);
 		shopkeeperCreation.onPlayerQuit(player);
 		commands.onPlayerQuit(player);
 	}
@@ -513,6 +520,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	public Commands getCommands() {
 		return commands;
+	}
+
+	// CHAT INPUT
+
+	public ChatInput getChatInput() {
+		return chatInput;
 	}
 
 	// UI
