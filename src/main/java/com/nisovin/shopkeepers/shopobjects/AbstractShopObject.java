@@ -11,6 +11,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -242,6 +243,14 @@ public abstract class AbstractShopObject implements ShopObject {
 
 	@Override
 	public abstract String getName();
+
+	// PLAYER SHOP OWNER
+
+	/**
+	 * This is called by {@link PlayerShopkeeper player shopkeepers} when their owner changes.
+	 */
+	public void onShopOwnerChanged() {
+	}
 
 	// EDITOR ACTIONS
 

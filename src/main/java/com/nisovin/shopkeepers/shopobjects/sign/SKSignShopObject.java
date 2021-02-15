@@ -265,7 +265,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		}
 	}
 
-	public void updateSign() {
+	private void updateSign() {
 		Sign sign = this.getSign();
 		if (sign == null) {
 			updateSign = true; // Request update, once the sign is available again
@@ -353,6 +353,14 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		Sign sign = this.getSign();
 		if (sign == null) return null;
 		return sign.getLine(1);
+	}
+
+	// PLAYER SHOP OWNER
+
+	@Override
+	public void onShopOwnerChanged() {
+		// Update the sign:
+		this.updateSign();
 	}
 
 	// EDITOR ACTIONS

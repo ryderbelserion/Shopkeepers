@@ -25,15 +25,12 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
-import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopobjects.citizens.SKCitizensShopObject;
-import com.nisovin.shopkeepers.shopobjects.sign.SKSignShopObject;
 import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -243,14 +240,9 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		this.markDirty();
 		this.ownerUUID = ownerUUID;
 		this.ownerName = ownerName;
-		// TODO Do this in a more abstract way.
-		if (!Settings.allowRenamingOfPlayerNpcShops && this.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN()) {
-			// Update the NPC's name:
-			((SKCitizensShopObject) this.getShopObject()).setName(ownerName);
-		} else if (this.getShopObject().getType() == DefaultShopObjectTypes.SIGN()) {
-			// Update sign:
-			((SKSignShopObject) this.getShopObject()).updateSign();
-		}
+
+		// Inform the shop object:
+		this.getShopObject().onShopOwnerChanged();
 	}
 
 	@Override

@@ -127,6 +127,7 @@ Internal API:
 * Several methods related to the shopkeeper's dirty flag are final now.
 * Renamed a few methods of the ShopkeeperStorage.
 * EditorHandler#addRecipe no longer receives the editing player as argument: None of the other related methods (getTradingRecipes and clearRecipes) receive the player either.
+* Shop objects are now informed when the owner of their associated player shopkeeper changes.
 
 Internal:  
 * The config key pattern is cached now.

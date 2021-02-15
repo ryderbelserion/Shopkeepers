@@ -321,6 +321,17 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		return npc.getFullName();
 	}
 
+	// PLAYER SHOP OWNER
+
+	@Override
+	public void onShopOwnerChanged() {
+		if (!Settings.allowRenamingOfPlayerNpcShops) {
+			// Update the NPC's name:
+			String ownerName = ((PlayerShopkeeper) shopkeeper).getOwnerName();
+			this.setName(ownerName);
+		}
+	}
+
 	// EDITOR ACTIONS
 
 	// TODO: Support sub types? A menu of entity types here would be cool.
