@@ -16,10 +16,10 @@ import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityArgument.Targe
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityFallback;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.ui.defaults.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 
 /**
  * Opens the villager editor for the targeted (regular) villager or wandering trader.
@@ -32,8 +32,8 @@ class CommandEditVillager extends PlayerCommand {
 			if (!(entity instanceof AbstractVillager)) {
 				return false; // No villager or wandering trader.
 			}
-			if (CitizensHandler.isNPC(entity) || ShopkeeperUtils.isShopkeeper(entity)) {
-				return false; // NPC or shopkeeper.
+			if (ShopkeeperMetadata.isTagged(entity) || CitizensHandler.isNPC(entity)) {
+				return false; // Shopkeeper or Citizens NPC.
 			}
 			return true;
 		}

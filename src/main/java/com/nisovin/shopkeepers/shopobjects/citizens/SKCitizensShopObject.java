@@ -200,11 +200,16 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	public Entity getEntity() {
 		NPC npc = this.getNPC();
 		if (npc == null) return null;
-		// Note: Citizens despawns the entity on chunk unloads. This checks if the entity is still alive.
-		if (!npc.isSpawned()) return null;
-		Entity entity = npc.getEntity();
-		assert entity != null; // Checked by isSpawned
-		return entity;
+		return npc.getEntity(); // Can be null if the NPC is not spawned currently
+	}
+
+	@Override
+	public boolean isActive() {
+		NPC npc = this.getNPC();
+		if (npc == null) return false;
+		// Note: Citizens despawns the entity on chunk unloads. isSpawned checks if the entity is still alive.
+		assert !npc.isSpawned() || (npc.getEntity() != null); // The entity is not null if the NPC is spawned
+		return npc.isSpawned();
 	}
 
 	@Override

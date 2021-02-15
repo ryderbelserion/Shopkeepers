@@ -179,7 +179,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			if (!remaining.isEmpty()) {
 				// Inventory is full, drop the item instead:
 				Location playerLocation = player.getEyeLocation();
-				Location shopLocation = this.getShopObject().getLocation();
+				Location shopLocation = this.getShopObject().getLocation(); // Null if not spawned
 				// If within a certain range, drop the item at the shop's location, else drop at player's location:
 				Location dropLocation;
 				if (shopLocation != null && Utils.getDistanceSquared(shopLocation, playerLocation) <= 100) {

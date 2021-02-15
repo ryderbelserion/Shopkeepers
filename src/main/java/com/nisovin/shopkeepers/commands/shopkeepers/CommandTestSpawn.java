@@ -64,7 +64,7 @@ class CommandTestSpawn extends PlayerCommand {
 			return;
 		}
 
-		// We only despawn and spawn the shopkeepers that are currently spawned (i.e. active):
+		// We only despawn and spawn the shopkeepers that are currently spawned and active:
 		List<AbstractShopkeeper> activeShopkeepers = new ArrayList<>(chunkShopkeepers.size());
 		chunkShopkeepers.forEach(shopkeeper -> {
 			if (shopkeeper.getShopObject().isActive()) {

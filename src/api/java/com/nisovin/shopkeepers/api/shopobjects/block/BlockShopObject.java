@@ -13,7 +13,7 @@ public interface BlockShopObject extends ShopObject {
 	/**
 	 * Gets the block.
 	 * 
-	 * @return the block, or <code>null</code> if the shop object is not active currently
+	 * @return the block, or <code>null</code> if the shop object is not spawned currently
 	 */
 	public Block getBlock();
 }

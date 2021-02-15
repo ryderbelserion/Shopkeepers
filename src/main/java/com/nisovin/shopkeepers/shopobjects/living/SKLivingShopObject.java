@@ -15,10 +15,8 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 
-import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObject;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
@@ -29,12 +27,12 @@ import com.nisovin.shopkeepers.debug.events.DebugListener;
 import com.nisovin.shopkeepers.debug.events.EventDebugListener;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.RateLimiter;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
 public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntityShopObject implements LivingShopObject {
@@ -95,28 +93,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	@Override
 	public E getEntity() {
-		// Is-active check:
-		// Note: Entity#isValid also checks if the entity is dead.
-		// Note: The entity's valid flag may get set one tick after the chunk got unloaded. We might also want to check
-		// if the entity is still valid when handling chunk unloads, and the entity might be located in a chunk
-		// different to the one that is currently being unloaded (and that other chunk might already have been
-		// unloaded).
-		// In the past we therefore also checked if the chunk in which the entity is currently located is still loaded.
-		// However, on later versions of Spigot (late 1.14.1 and above), Entity#isValid also already checks if the chunk
-		// is currently loaded, so this is no longer required.
-		// TODO: Omit the slightly costly isValid check here? Maybe only do it when checking isActive explicitly.
-		if (entity != null && entity.isValid()) {
-			return entity;
-		}
-		return null;
-	}
-
-	protected void assignShopkeeperMetadata(E entity) {
-		entity.setMetadata(ShopkeeperUtils.SHOPKEEPER_METADATA_KEY, new FixedMetadataValue(ShopkeepersPlugin.getInstance(), true));
-	}
-
-	protected void removeShopkeeperMetadata(E entity) {
-		entity.removeMetadata(ShopkeeperUtils.SHOPKEEPER_METADATA_KEY, ShopkeepersPlugin.getInstance());
+		return entity;
 	}
 
 	// Places the entity at the exact location it would fall to, within a range of at most 1 block below the spawn block
@@ -138,7 +115,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	// Any preparation that needs to be done before spawning. Might only allow limited operations.
 	protected void prepareEntity(E entity) {
 		// Assign metadata for easy identification by other plugins:
-		this.assignShopkeeperMetadata(entity);
+		ShopkeeperMetadata.apply(entity);
 
 		// Don't save the entity to the world data:
 		entity.setPersistent(false);
@@ -168,18 +145,14 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		this.cleanupAI();
 
 		// Remove metadata again:
-		this.removeShopkeeperMetadata(entity);
+		ShopkeeperMetadata.remove(entity);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean spawn() {
-		// Check if our current old entity is still valid:
-		if (this.isActive()) return true;
 		if (entity != null) {
-			// Perform cleanup before replacing the currently stored entity with a new one:
-			this.cleanUpEntity(entity);
-			entity = null; // Reset
+			return true; // Already spawned
 		}
 
 		// Prepare spawn location:
@@ -375,11 +348,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	@Override
 	public Location getLocation() {
-		if (this.isActive()) {
-			return entity.getLocation();
-		} else {
-			return null;
-		}
+		if (entity == null) return null;
+		return entity.getLocation();
 	}
 
 	// TICKING
@@ -424,13 +394,19 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	private boolean respawnInactiveEntity() {
 		assert !this.isActive();
 		Log.debug(() -> "Shopkeeper (" + shopkeeper.getPositionString() + ") is missing, attemtping respawn");
-		if (entity != null && ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
-			// The chunk was silently unloaded before:
-			Log.debug(
-					() -> "  Chunk got silently unloaded or mob got removed! (dead: " + entity.isDead() + ", valid: "
-							+ entity.isValid() + ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()) + ")"
-			);
+		if (entity != null) {
+			if (ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
+				// The chunk was silently unloaded before:
+				Log.debug(
+						() -> "  Chunk got silently unloaded or mob got removed! (dead: " + entity.isDead() + ", valid: "
+								+ entity.isValid() + ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()) + ")"
+				);
+			}
+
+			// Despawn (i.e. cleanup) the previously spawned but no longer active entity:
+			this.despawn();
 		}
+
 		boolean spawned = this.spawn(); // This will load the chunk if necessary
 		if (!spawned) {
 			// TODO Maybe add a setting to remove shopkeeper if it can't be spawned a certain amount of times?
@@ -461,7 +437,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	}
 
 	private void removePotionEffects() {
-		assert this.isActive();
+		assert entity != null;
 		for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
 			entity.removePotionEffect(potionEffect.getType());
 		}
@@ -483,7 +459,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	@Override
 	public void setName(String name) {
-		if (!this.isActive()) return;
+		if (entity == null) return;
 		this.applyName(entity, name);
 	}
 
@@ -503,7 +479,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	@Override
 	public String getName() {
-		if (!this.isActive()) return null;
+		if (entity == null) return null;
 		return entity.getCustomName();
 	}
 

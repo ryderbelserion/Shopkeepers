@@ -21,20 +21,30 @@ public interface ShopObject {
 	public ShopObjectType<?> getType();
 
 	/**
-	 * Checks if this shop object is active (i.e. if it is currently present in the world).
+	 * Checks if this shop object is currently spawned.
+	 * <p>
+	 * This does not verify the state of the spawned shop object. For instance, the object used to represent the shop in
+	 * the world might have been externally modified or removed since it was spawned. Use {@link #isActive()} to check
+	 * for that.
+	 * 
+	 * @return <code>true</code> if the shop object is spawned
+	 */
+	public boolean isSpawned();
+
+	/**
+	 * Checks if this shop object has been {@link #isSpawned() spawned} and is still valid and present in the world.
 	 * 
 	 * @return <code>true</code> if the shop object is active
 	 */
 	public boolean isActive();
 
 	/**
-	 * Gets the location this shop object is currently located at.
+	 * Gets the current location of this shop object.
 	 * <p>
-	 * The returned location may only be valid while the shop object is active, might not match the location of the
-	 * corresponding {@link Shopkeeper}, and might change over time if the shop object is able to move.
+	 * The returned location might not match the location of the corresponding {@link Shopkeeper}, and it may change
+	 * over time if the shop object is able to move.
 	 * 
-	 * @return the location of the shop object, or <code>null</code> if the shop is virtual or if the shop object is not
-	 *         active currently
+	 * @return the location of the shop object, or <code>null</code> if it is not spawned currently
 	 */
 	public Location getLocation();
 
@@ -61,7 +71,7 @@ public interface ShopObject {
 	/**
 	 * Sets the name of the shop object.
 	 * <p>
-	 * This may not be supported if the shop object is not active currently.
+	 * This may have no effect if the shop object is not spawned currently.
 	 * <p>
 	 * The final name used might be different from the given name, due to {@link #prepareName(String) preparation} and
 	 * other transformations being applied.
@@ -77,7 +87,7 @@ public interface ShopObject {
 	/**
 	 * Gets the name this shop object is currently using.
 	 * 
-	 * @return the name of this shop object, or <code>null</code> or empty if the shop object is not active or has no
+	 * @return the name of this shop object, or <code>null</code> or empty if the shop object is not spawned or has no
 	 *         name
 	 */
 	public String getName();

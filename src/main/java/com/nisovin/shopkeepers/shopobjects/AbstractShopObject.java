@@ -99,16 +99,13 @@ public abstract class AbstractShopObject implements ShopObject {
 	public abstract boolean isActive();
 
 	/**
-	 * Gets an object that uniquely identifies this {@link ShopObject} while it is {@link #isActive() active}.
+	 * Gets an object that uniquely identifies this {@link ShopObject} while it is {@link #isSpawned() spawned}.
 	 * <p>
-	 * The id has to be unique among all currently active shop objects, including other types of shop objects. It has be
-	 * be suitable to be used as key in {@link Object#hashCode() hash-based} data structures.
-	 * <p>
-	 * The returned id may only be valid while the shop object is active, and it may change whenever the shop object is
-	 * respawned.
+	 * The id has to be unique among all currently spawned shop objects, including other types of shop objects. It has
+	 * to be suitable to be used as key in {@link Object#hashCode() hash-based} data structures, and not change while
+	 * the shop object is spawned. The id may change whenever the shop object is respawned.
 	 * 
-	 * @return the id of the shop object, or possibly (but not necessarily) <code>null</code> if it is not active
-	 *         currently
+	 * @return the id of the shop object, or <code>null</code> if it is not spawned currently
 	 */
 	public abstract Object getId();
 
@@ -144,8 +141,12 @@ public abstract class AbstractShopObject implements ShopObject {
 
 	/**
 	 * Spawns the shop object into the world at its spawn location.
+	 * <p>
+	 * This may have no effect if the shop object has already been spawned. To respawn the shop object, use
+	 * {@link #despawn()} first.
 	 * 
-	 * @return <code>true</code> on success
+	 * @return <code>false</code> if the spawning failed, or <code>true</code> if the shop object either is already
+	 *         spawned or has successfully been spawned
 	 */
 	public abstract boolean spawn();
 
@@ -162,7 +163,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	/**
 	 * Gets the location at which particles for the shopkeeper's tick visualization shall be spawned.
 	 * 
-	 * @return the location, or possibly (but not necessarily) <code>null</code> if the shop object is not active
+	 * @return the location, or possibly (but not necessarily) <code>null</code> if the shop object is not spawned
 	 *         currently, or if it does not support the tick visualization
 	 */
 	public abstract Location getTickVisualizationParticleLocation();

@@ -17,8 +17,14 @@ public abstract class AbstractBlockShopObject extends AbstractShopObject impleme
 	public abstract AbstractBlockShopObjectType<?> getType();
 
 	@Override
-	public boolean isActive() {
+	public boolean isSpawned() {
 		return (this.getBlock() != null);
+	}
+
+	@Override
+	public boolean isActive() {
+		// Same as isSpawned by default:
+		return this.isSpawned();
 	}
 
 	@Override

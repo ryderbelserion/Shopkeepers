@@ -40,8 +40,13 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 	// ACTIVATION
 
 	@Override
-	public boolean isActive() {
+	public boolean isSpawned() {
 		return false; // Virtual shops are not present in any world
+	}
+
+	@Override
+	public boolean isActive() {
+		return false;
 	}
 
 	@Override

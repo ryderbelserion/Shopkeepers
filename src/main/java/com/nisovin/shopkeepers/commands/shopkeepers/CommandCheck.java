@@ -207,7 +207,8 @@ class CommandCheck extends Command {
 				ShopObject shopObject = shopkeeper.getShopObject();
 				if (shopObject.isActive()) {
 					Location location = shopObject.getLocation();
-					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": active (" + (location != null ? location.toString() : "maybe not?!?") + ")");
+					assert location != null;
+					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": active (" + TextUtils.getLocationString(location) + ")");
 				} else {
 					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": INACTIVE!");
 				}

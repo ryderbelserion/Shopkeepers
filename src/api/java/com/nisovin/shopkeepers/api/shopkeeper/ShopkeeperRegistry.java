@@ -7,7 +7,6 @@ import java.util.stream.Stream;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -175,12 +174,13 @@ public interface ShopkeeperRegistry {
 	/**
 	 * Gets all shopkeepers in currently {@link #getActiveChunks(String) active chunks}.
 	 * <p>
-	 * Note: Since chunk activation may be deferred from chunk loading, this may not return shopkeepers even if their
+	 * Since the chunk activation may be deferred from chunk loading, this may not return shopkeepers even if their
 	 * chunk is currently already loaded.
 	 * <p>
-	 * Also note that the activation of {@link ShopObject shop objects} may fail (eg. if spawning fails). This is not
-	 * reflected by this method, which only considers the activation state of chunks as a whole. The actual activation
-	 * state of the individual {@link ShopObject shop objects} can be checked via {@link ShopObject#isActive()}.
+	 * Similarly, the spawning of {@link ShopObject shop objects} may be deferred from chunk activation, or even fail.
+	 * This is not reflected by this method, which only considers the activation state of chunks as a whole. Use
+	 * {@link ShopObject#isSpawned()} or {@link ShopObject#isActive()} to check if a shop object is actually spawned and
+	 * active.
 	 * 
 	 * @return an unmodifiable view on the active shopkeepers
 	 */
@@ -189,12 +189,13 @@ public interface ShopkeeperRegistry {
 	/**
 	 * Gets all shopkeepers in currently {@link #getActiveChunks(String) active chunks} in the specified world.
 	 * <p>
-	 * Note: Since chunk activation may be deferred from chunk loading, this may not return shopkeepers even if their
+	 * Since the chunk activation may be deferred from chunk loading, this may not return shopkeepers even if their
 	 * chunk is currently already loaded.
 	 * <p>
-	 * Also note that the activation of {@link ShopObject shop objects} may fail (eg. if spawning fails). This is not
-	 * reflected by this method, which only considers the activation state of chunks as a whole. The actual activation
-	 * state of the individual {@link ShopObject shop objects} can be checked via {@link ShopObject#isActive()}.
+	 * Similarly, the spawning of {@link ShopObject shop objects} may be deferred from chunk activation, or even fail.
+	 * This is not reflected by this method, which only considers the activation state of chunks as a whole. Use
+	 * {@link ShopObject#isSpawned()} or {@link ShopObject#isActive()} to check if a shop object is actually spawned and
+	 * active.
 	 * 
 	 * @param worldName
 	 *            the world name
@@ -232,7 +233,7 @@ public interface ShopkeeperRegistry {
 	 * Gets the shopkeeper that is represented by the given entity.
 	 * <p>
 	 * The return value may only be accurate if the shopkeeper's {@link ShopObject} is currently
-	 * {@link ShopObject#isActive() active}. For example, if the shopkeeper's chunk is not
+	 * {@link ShopObject#isSpawned() spawned}. For example, if the shopkeeper's chunk is not
 	 * {@link #isChunkActive(ChunkCoords) active}, or if the entity is no longer {@link Entity#isValid() valid}, this
 	 * may or may not return <code>false</code> for that entity.
 	 * 
@@ -256,7 +257,7 @@ public interface ShopkeeperRegistry {
 	 * Gets the shopkeeper that is represented by the given block (for example in case of sign shops).
 	 * <p>
 	 * The return value may only be accurate if the shopkeeper's {@link ShopObject} is currently
-	 * {@link ShopObject#isActive() active}. For example, if the shopkeeper's chunk is not
+	 * {@link ShopObject#isSpawned() spawned}. For example, if the shopkeeper's chunk is not
 	 * {@link #isChunkActive(ChunkCoords) active}, or if the block could not be placed with its intended state, this may
 	 * or may not return <code>false</code> for that block.
 	 * <p>

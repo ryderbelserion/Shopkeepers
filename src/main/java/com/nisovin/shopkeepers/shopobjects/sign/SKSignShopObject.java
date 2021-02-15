@@ -24,6 +24,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.util.BlockFaceUtils;
@@ -47,6 +48,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	// Update the sign content at least once after plugin start, in case some settings have changed which affect the
 	// sign content:
 	private boolean updateSign = true;
+	private Block block = null;
 	private long lastFailedRespawnAttempt = 0;
 
 	// Initial offset between [0, CHECK_PERIOD_SECONDS) for load balancing:
@@ -159,24 +161,31 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	@Override
 	public Block getBlock() {
-		Location signLocation = this.getLocation();
-		if (signLocation == null) return null; // World not loaded
-		if (!shopkeeper.getChunkCoords().isChunkLoaded()) return null; // Chunk not loaded
-		Block signBlock = signLocation.getBlock();
-		if (!ItemUtils.isSign(signBlock.getType())) return null; // Not a sign
-		return signBlock;
+		return block;
 	}
 
 	public Sign getSign() {
-		Block signBlock = this.getBlock();
-		if (signBlock == null) return null;
-		assert ItemUtils.isSign(signBlock.getType());
-		return (Sign) signBlock.getState();
+		if (!this.isActive()) return null;
+		assert block != null && ItemUtils.isSign(block.getType());
+		return (Sign) block.getState();
+	}
+
+	@Override
+	public boolean isActive() {
+		Block block = this.getBlock();
+		if (block == null) return false; // Not spawned
+		assert shopkeeper.getChunkCoords().isChunkLoaded(); // The shopkeeper is despawned on chunk unload
+		if (!ItemUtils.isSign(block.getType())) return false; // No longer a sign
+		return true;
 	}
 
 	@Override
 	public boolean spawn() {
-		Location signLocation = this.getLocation();
+		if (block != null) {
+			return true; // Already spawned
+		}
+
+		Location signLocation = shopkeeper.getLocation();
 		if (signLocation == null) {
 			return false;
 		}
@@ -191,20 +200,26 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		// Place sign:
 		// This replaces any currently existing block at that location.
 		Block signBlock = signLocation.getBlock();
-		BlockData signData = this.createBlockData();
-		assert signData != null;
+		BlockData blockData = this.createBlockData();
+		assert blockData != null;
 
 		// Cancel block physics for this placed sign if needed:
 		signShops.cancelNextBlockPhysics(signBlock);
-		signBlock.setBlockData(signData, false); // Skip physics update
+		signBlock.setBlockData(blockData, false); // Skip physics update
 		// Cleanup state if no block physics were triggered:
 		signShops.cancelNextBlockPhysics(null);
 
 		// In case sign placement has failed for some reason:
 		if (!ItemUtils.isSign(signBlock.getType())) {
 			lastFailedRespawnAttempt = System.currentTimeMillis();
+			this.cleanUpBlock(signBlock);
 			return false;
 		}
+
+		// Remember the block (indicates that this shop object has been spawned):
+		this.block = signBlock;
+		// Assign metadata for easy identification by other plugins:
+		ShopkeeperMetadata.apply(block);
 
 		// Init sign content:
 		updateSign = false;
@@ -239,17 +254,27 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	@Override
 	public void despawn() {
-		Block signBlock = this.getBlock();
-		if (signBlock != null) {
-			assert ItemUtils.isSign(signBlock.getType());
-			// Remove sign:
-			signBlock.setType(Material.AIR, false);
-		}
+		if (block == null) return;
+
+		// Cleanup:
+		this.cleanUpBlock(block);
+
+		// Remove the sign:
+		block.setType(Material.AIR, false);
+		this.block = null;
+	}
+
+	// Any clean up that needs to happen for the block.
+	protected void cleanUpBlock(Block block) {
+		assert block != null;
+		// Remove the metadata again:
+		ShopkeeperMetadata.remove(block);
 	}
 
 	@Override
 	public Location getLocation() {
-		return shopkeeper.getLocation();
+		if (block == null) return null;
+		return block.getLocation();
 	}
 
 	@Override
@@ -317,15 +342,20 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		// Indicate ticking activity for visualization:
 		this.indicateTickActivity();
 
-		Block signBlock = this.getBlock();
-		if (signBlock == null) {
-			// If the block is null because the chunk is not loaded currently, we skip this check:
-			if (!shopkeeper.getChunkCoords().isChunkLoaded()) {
-				return;
+		// This is only called for shopkeepers in active (i.e. loaded) chunks, and shopkeepers are despawned on chunk
+		// unload:
+		assert shopkeeper.getChunkCoords().isChunkLoaded();
+
+		if (!this.isActive()) {
+			Log.debug(() -> "Shopkeeper sign at " + shopkeeper.getPositionString() + " is missing! Attempting respawn.");
+
+			// Cleanup any previously spawned block first:
+			if (this.isSpawned()) {
+				this.despawn();
 			}
 
-			Log.debug(() -> "Shopkeeper sign at " + shopkeeper.getPositionString() + " is no longer existing! Attempting respawn now.");
-			if (!this.spawn()) {
+			boolean success = this.spawn();
+			if (!success) {
 				Log.warning("Shopkeeper sign at " + shopkeeper.getPositionString() + " could not be spawned!");
 			}
 			return;
@@ -395,11 +425,13 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	protected void applySignType() {
 		Sign sign = this.getSign();
-		if (sign != null) {
-			BlockData signData = this.createBlockData();
-			sign.setBlockData(signData); // Keeps sign data (text) the same
-			sign.update(true, false); // Force: Material has changed, skip physics update.
-		}
+		if (sign == null) return; // Not spawned or no longer a sign
+
+		// Note: The different sign types are different materials. We need to capture the sign state (eg. sign
+		// contents), because they would otherwise be removed when changing the block's type.
+		BlockData blockData = this.createBlockData();
+		sign.setBlockData(blockData); // Keeps sign data (eg. text) the same
+		sign.update(true, false); // Force: Material has changed, skip physics update.
 	}
 
 	public void cycleSignType(boolean backwards) {

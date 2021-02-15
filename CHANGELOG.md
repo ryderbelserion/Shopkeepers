@@ -119,7 +119,10 @@ API:
 * Added ShopkeeperStorage#saveIfDirty and #saveIfDirtyAndAwaitCompletion.
 * We skip spawning and activating shopkeepers now if they are immediately removed again during the ShopkeeperAddEvent.
 * Sign shop objects no longer return a name. We previously returned the sign's second line. However, this isn't really useful anymore because the exact sign contents are configurable.
-* Various minor Javadoc improvements and clarifications.
+* Added ShopObject#isSpawned as a more lightweight variant of ShopObject#isActive.
+* Several ShopObject methods no longer check if the shop object is currently active, but only if it has been spawned, which is sufficient most of the time.
+* The blocks of sign shopkeepers are also marked with the shopkeeper metadata now.
+* Several Javadoc improvements and clarifications.
 
 Internal API:  
 * Added methods to retrieve the values of the various mob shopkeeper properties.
@@ -129,6 +132,7 @@ Internal API:
 * Renamed a few methods of the ShopkeeperStorage.
 * EditorHandler#addRecipe no longer receives the editing player as argument: None of the other related methods (getTradingRecipes and clearRecipes) receive the player either.
 * Shop objects are now informed when the owner of their associated player shopkeeper changes.
+* AbstractShopObject#spawn() no longer respawns the shop object if it is already spawned but no longer active. Instead, this method simply skips the spawning if it has already been spawned (this no longer checks if the shop object is still active). In order to respawn the shop object, it has to be explicitly despawned first.
 
 Internal:  
 * The config key pattern is cached now.
@@ -156,6 +160,8 @@ Internal:
 * Added a mutable variant of ChunkCoords.
 * Minor refactoring related to shop object properties.
 * By keeping track of the largest already used shopkeeper id, we no longer have to check all currently loaded shopkeepers when an id turns out to already be in use.
+* Sign shops no longer check if their chunk is still loaded when accessing their block or checking if the block is still a sign. Since shopkeepers are despawned on chunk unloads, and sign shops cannot change their location, this is not required.
+* Moved the handling of shopkeeper metadata from ShopkeeperUtils into ShopkeeperMetadata.
 * Minor other internal code refactoring.
 
 Migration notes:  

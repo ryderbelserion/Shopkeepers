@@ -36,12 +36,6 @@ public class ShopkeeperUtils {
 	private ShopkeeperUtils() {
 	}
 
-	public static final String SHOPKEEPER_METADATA_KEY = "shopkeeper";
-
-	public static boolean isShopkeeper(Entity entity) {
-		return entity.hasMetadata(SHOPKEEPER_METADATA_KEY);
-	}
-
 	private static final int SHOPKEEPER_TARGET_RANGE = 10;
 
 	public static final class TargetShopkeepersResult {

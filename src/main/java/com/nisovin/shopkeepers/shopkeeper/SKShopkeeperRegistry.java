@@ -1211,9 +1211,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		return shopkeeper.getUniqueId();
 	}
 
-	// If the shop object provides no id (eg. if it is not actually active), we store the shopkeeper under a fallback id
-	// nevertheless. This allows us to keep track of all shopkeepers that are located in active chunks (eg. in order to
-	// still tick them, so that they can check if they should be respawned).
+	// If the shop object provides no id (eg. if it could not be spawned), we store the shopkeeper under a fallback id
+	// nevertheless. This allows us to keep track of all shopkeepers that are located in active chunks and still tick
+	// them, so that they can check if they can be respawned.
 	// If the shopkeeper is already active under a different object id, that entry is removed first.
 	private void activateShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
@@ -1230,7 +1230,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		assert shopObject.getLastId() == null;
 
 		// Get the new object id:
-		Object objectId = shopObject.getId(); // Can be null if the shop object is not active
+		Object objectId = shopObject.getId(); // Can be null if the shop object is not spawned
 		if (objectId == null) {
 			// We store the shopkeeper under its inactive object id:
 			objectId = this.getInactiveShopObjectId(shopkeeper);
