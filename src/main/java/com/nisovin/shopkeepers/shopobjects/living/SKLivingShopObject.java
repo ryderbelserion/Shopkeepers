@@ -163,6 +163,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	// Any clean up that needs to happen for the entity. The entity might not be fully setup yet.
 	protected void cleanUpEntity(E entity) {
+		assert entity != null;
 		// Disable AI:
 		this.cleanupAI();
 
@@ -192,6 +193,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		// Spawn entity:
 		// TODO Check if the block is passable before spawning there?
 		EntityType entityType = this.getEntityType();
+		// Note: We expect this type of entity to be spawnable, and not result in an IllegalArgumentException.
 		entity = (E) world.spawn(spawnLocation, entityType.getEntityClass(), (entity) -> {
 			// Note: This callback is run after the entity has been prepared (this includes the creation of random
 			// equipment and the random spawning of passengers) and right before the entity gets added to the world
@@ -208,6 +210,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			// Try to bypass entity-spawn blocking plugins (right before this specific entity is about to get spawned):
 			livingShops.forceCreatureSpawn(spawnLocation, entityType);
 		});
+		assert entity != null;
 
 		boolean success = this.isActive();
 		if (success) {
@@ -250,51 +253,48 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			this.onSpawn(entity);
 		} else {
 			// Failure:
+			// Reset entity:
 			E localEntity = this.entity;
-			this.entity = null; // Reset
+			this.cleanUpEntity(localEntity);
+			this.entity = null;
 
-			if (localEntity == null) {
-				Log.warning("Failed to spawn shopkeeper entity: Entity is null");
-			} else {
-				// TODO Config option to delete the shopkeeper on failed spawn attempt? Check for this during shop
-				// creation?
+			// TODO Config option to delete the shopkeeper on failed spawn attempt? Check for this during shop creation?
 
-				// Debug, if not already debugging and cooldown is over:
-				boolean debug = (Settings.debug && !debuggingSpawn && (System.currentTimeMillis() - lastSpawnDebugging) > (5 * 60 * 1000)
-						&& localEntity.isDead() && ChunkCoords.isChunkLoaded(localEntity.getLocation()));
+			// Debug, if not already debugging and cooldown is over:
+			boolean debug = (Settings.debug && !debuggingSpawn && (System.currentTimeMillis() - lastSpawnDebugging) > (5 * 60 * 1000)
+					&& localEntity.isDead() && ChunkCoords.isChunkLoaded(localEntity.getLocation()));
 
-				Log.warning("Failed to spawn shopkeeper entity: Entity dead: " + localEntity.isDead() + ", entity valid: " + localEntity.isValid()
-						+ ", chunk loaded: " + ChunkCoords.isChunkLoaded(localEntity.getLocation()) + ", debug -> " + debug);
+			Log.warning("Failed to spawn shopkeeper entity: Entity dead: " + localEntity.isDead() + ", entity valid: " + localEntity.isValid()
+					+ ", chunk loaded: " + ChunkCoords.isChunkLoaded(localEntity.getLocation()) + ", debug -> " + debug);
 
-				// Debug entity spawning:
-				if (debug) {
-					// Print chunk's entity counts:
-					EntityUtils.printEntityCounts(spawnLocation.getChunk());
+			// Debug entity spawning:
+			if (debug) {
+				// Print chunk's entity counts:
+				EntityUtils.printEntityCounts(spawnLocation.getChunk());
 
-					// Try again and log event activity:
-					debuggingSpawn = true;
-					lastSpawnDebugging = System.currentTimeMillis();
-					Log.info("Trying again and logging event activity ..");
+				// Try again and log event activity:
+				debuggingSpawn = true;
+				lastSpawnDebugging = System.currentTimeMillis();
+				Log.info("Trying again and logging event activity ..");
 
-					// Log all events occurring during spawning, and their registered listeners:
-					DebugListener debugListener = DebugListener.register(true, true);
+				// Log all events occurring during spawning, and their registered listeners:
+				DebugListener debugListener = DebugListener.register(true, true);
 
-					// Log creature spawn handling:
-					EventDebugListener<CreatureSpawnEvent> spawnListener = new EventDebugListener<>(CreatureSpawnEvent.class, (priority, event) -> {
-						LivingEntity spawnedEntity = event.getEntity();
-						Log.info("  CreatureSpawnEvent (" + priority + "): " + "cancelled: " + event.isCancelled() + ", dead: " + spawnedEntity.isDead()
-								+ ", valid: " + spawnedEntity.isValid() + ", chunk loaded: " + ChunkCoords.isChunkLoaded(spawnedEntity.getLocation()));
-					});
+				// Log creature spawn handling:
+				EventDebugListener<CreatureSpawnEvent> spawnListener = new EventDebugListener<>(CreatureSpawnEvent.class, (priority, event) -> {
+					LivingEntity spawnedEntity = event.getEntity();
+					Log.info("  CreatureSpawnEvent (" + priority + "): " + "cancelled: " + event.isCancelled() + ", dead: " + spawnedEntity.isDead()
+							+ ", valid: " + spawnedEntity.isValid() + ", chunk loaded: " + ChunkCoords.isChunkLoaded(spawnedEntity.getLocation()));
+				});
 
-					// Try to spawn entity again:
-					success = this.spawn();
+				// Try to spawn the entity again:
+				success = this.spawn();
 
-					// Unregister listeners again:
-					debugListener.unregister();
-					spawnListener.unregister();
-					debuggingSpawn = false;
-					Log.info(".. Done. Successful: " + success);
-				}
+				// Unregister listeners again:
+				debugListener.unregister();
+				spawnListener.unregister();
+				debuggingSpawn = false;
+				Log.info(".. Done. Successful: " + success);
 			}
 		}
 
