@@ -118,6 +118,7 @@ API:
 * Removed Shopkeeper#isDirty from the API. Internally, this flag has a different meaning now and should only be of use to the shopkeeper storage.
 * Added ShopkeeperStorage#saveIfDirty and #saveIfDirtyAndAwaitCompletion.
 * We skip spawning and activating shopkeepers now if they are immediately removed again during the ShopkeeperAddEvent.
+* Sign shop objects no longer return a name. We previously returned the sign's second line. However, this isn't really useful anymore because the exact sign contents are configurable.
 * Various minor Javadoc improvements and clarifications.
 
 Internal API:  

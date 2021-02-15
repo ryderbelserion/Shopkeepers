@@ -342,17 +342,15 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	@Override
 	public void setName(String name) {
-		// The name gets set during sign update, which always uses the name of the shopkeeper:
-		// TODO Allow changing only the name? Currently this restriction allows to not have to store
-		// custom names inside this sign shop object.
+		// Sign blocks don't have a name (the sign contents are language file specific). However, this method is usually
+		// called when the shopkeeper is renamed, which may require an update of the sign contents.
 		this.updateSign();
 	}
 
 	@Override
 	public String getName() {
-		Sign sign = this.getSign();
-		if (sign == null) return null;
-		return sign.getLine(1);
+		// Sign blocks don't have a name (the sign contents are language file specific):
+		return null;
 	}
 
 	// PLAYER SHOP OWNER
