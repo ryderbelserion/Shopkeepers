@@ -37,7 +37,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	public static String CREATION_DATA_NPC_UUID_KEY = "CitizensNpcUUID";
 	private static final int CHECK_PERIOD_SECONDS = 10;
-	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(CHECK_PERIOD_SECONDS);
+	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);
 
 	protected final CitizensShops citizensShops;
 	private UUID npcUniqueId = null;
@@ -45,8 +45,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	// If false, this will not remove the NPC on deletion:
 	private boolean destroyNPC = true;
 
-	// Initial offset between [0, CHECK_PERIOD_SECONDS) for load balancing:
-	private final RateLimiter checkLimiter = RateLimiter.withInitialOffset(CHECK_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
+	// Initial threshold between [1, CHECK_PERIOD_SECONDS] for load balancing:
+	private final RateLimiter checkLimiter = new RateLimiter(CHECK_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
 
 	protected SKCitizensShopObject(CitizensShops citizensShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);

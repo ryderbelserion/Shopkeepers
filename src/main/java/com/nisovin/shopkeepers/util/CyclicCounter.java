@@ -1,24 +1,58 @@
 package com.nisovin.shopkeepers.util;
 
 /**
- * A counter that resets to {@code 0} whenever its value reaches a specified upper bound (exclusive).
+ * A counter that resets to a specified lower bound (inclusive) whenever its value reaches a specified upper bound
+ * (exclusive).
  * <p>
  * Not thread-safe.
  */
 public class CyclicCounter {
 
-	private final int upperBound; // Exclusive
-	private int value = 0;
+	private final int lowerBound; // Inclusive
+	private final int upperBound; // Exclusive, > lowerBound
+	private int value;
 
 	/**
-	 * Creates a new {@link CyclicCounter}.
+	 * Creates a new {@link CyclicCounter} with a lower bound of {@code 0}.
 	 * 
 	 * @param upperBound
 	 *            the upper bound (exclusive), has to be positive
 	 */
 	public CyclicCounter(int upperBound) {
-		Validate.isTrue(upperBound > 0, "upperBound has to be positive");
+		this(0, upperBound);
+	}
+
+	/**
+	 * Creates a new {@link CyclicCounter}.
+	 * 
+	 * @param lowerBound
+	 *            the lower bound (inclusive) and the initial value
+	 * @param upperBound
+	 *            the upper bound (exclusive), has to be greater than the lower bound
+	 */
+	public CyclicCounter(int lowerBound, int upperBound) {
+		Validate.isTrue(upperBound > lowerBound, "upperBound has to be greater than lowerBound");
+		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
+		this.value = lowerBound;
+	}
+
+	/**
+	 * Gets the lower bound.
+	 * 
+	 * @return the lower bound
+	 */
+	public int getLowerBound() {
+		return lowerBound;
+	}
+
+	/**
+	 * Gets the upper bound.
+	 * 
+	 * @return the upper bound
+	 */
+	public int getUpperBound() {
+		return upperBound;
 	}
 
 	/**
@@ -31,24 +65,36 @@ public class CyclicCounter {
 	}
 
 	/**
-	 * Resets this counter back to {@code 0}.
+	 * Sets the current value.
+	 * 
+	 * @param value
+	 *            the new value, has to be within the lower bound (inclusive) and the upper bound (exclusive)
+	 */
+	public void setValue(int value) {
+		Validate.isTrue(value >= lowerBound && value < upperBound, "value out of bounds");
+		this.value = value;
+	}
+
+	/**
+	 * Resets this counter back to the {@code lower bound}.
 	 */
 	public void reset() {
-		value = 0;
+		value = lowerBound;
 	}
 
 	/**
 	 * Gets the current value and then increments it by one.
 	 * <p>
-	 * If the new value reaches the upper bound of this counter, it is reset to {@link 0}.
+	 * If the new value reaches the upper bound of this counter, it is reset to the {@code lower bound}.
 	 * 
 	 * @return the current value (prior to the increment)
 	 */
 	public int getAndIncrement() {
 		int currentValue = value;
 		int nextValue = currentValue + 1;
-		if (nextValue >= upperBound) {
-			value = 0;
+		assert nextValue <= upperBound;
+		if (nextValue == upperBound) {
+			value = lowerBound;
 		} else {
 			value = nextValue;
 		}
@@ -58,7 +104,9 @@ public class CyclicCounter {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("CyclicCounter [upperBound=");
+		builder.append("CyclicCounter [lowerBound=");
+		builder.append(lowerBound);
+		builder.append(", upperBound=");
 		builder.append(upperBound);
 		builder.append(", value=");
 		builder.append(value);

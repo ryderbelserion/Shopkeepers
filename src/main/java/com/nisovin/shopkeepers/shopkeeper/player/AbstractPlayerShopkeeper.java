@@ -43,7 +43,7 @@ import com.nisovin.shopkeepers.util.Validate;
 public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
 
 	private static final int CHECK_CONTAINER_PERIOD_SECONDS = 5;
-	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(CHECK_CONTAINER_PERIOD_SECONDS);
+	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_CONTAINER_PERIOD_SECONDS + 1);
 
 	protected UUID ownerUUID; // Not null after successful initialization
 	protected String ownerName; // Not null after successful initialization
@@ -54,8 +54,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	protected int containerZ;
 	protected ItemStack hireCost = null; // Null if not for hire
 
-	// Initial offset between [0, CHECK_CONTAINER_PERIOD_SECONDS) for load balancing:
-	private final RateLimiter checkContainerLimiter = RateLimiter.withInitialOffset(CHECK_CONTAINER_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
+	// Initial threshold between [1, CHECK_CONTAINER_PERIOD_SECONDS] for load balancing:
+	private final RateLimiter checkContainerLimiter = new RateLimiter(CHECK_CONTAINER_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
 
 	/**
 	 * Creates a not yet initialized {@link AbstractPlayerShopkeeper} (for use in sub-classes).

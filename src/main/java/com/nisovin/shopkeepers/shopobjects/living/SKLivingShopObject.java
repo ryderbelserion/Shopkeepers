@@ -40,7 +40,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	protected static final double SPAWN_LOCATION_OFFSET = 0.98D;
 	protected static final double SPAWN_LOCATION_RANGE = 2.0D;
 	protected static final int CHECK_PERIOD_SECONDS = 10;
-	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(CHECK_PERIOD_SECONDS);
+	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);
 	// If the entity could not be respawned this amount of times, we throttle its tick rate (i.e. the rate at which we
 	// attempt to respawn it):
 	protected static final int MAX_RESPAWN_ATTEMPTS = 5;
@@ -53,9 +53,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	private boolean debuggingSpawn = false;
 	private static long lastSpawnDebugging = 0; // Shared among all living shopkeepers to prevent spam
 
-	// Initial offset between [0, CHECK_PERIOD_SECONDS) for load balancing:
+	// Initial threshold between [1, CHECK_PERIOD_SECONDS] for load balancing:
 	private final int checkingOffset = nextCheckingOffset.getAndIncrement();
-	private final RateLimiter checkLimiter = RateLimiter.withInitialOffset(CHECK_PERIOD_SECONDS, checkingOffset);
+	private final RateLimiter checkLimiter = new RateLimiter(CHECK_PERIOD_SECONDS, checkingOffset);
 
 	protected SKLivingShopObject(	LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
 									AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -378,7 +378,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 	private void resetTickRate() {
 		checkLimiter.setThreshold(CHECK_PERIOD_SECONDS);
-		checkLimiter.setRemainingThreshold(CHECK_PERIOD_SECONDS + checkingOffset);
+		checkLimiter.setRemainingThreshold(checkingOffset);
 	}
 
 	private void check() {

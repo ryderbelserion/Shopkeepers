@@ -39,7 +39,7 @@ import com.nisovin.shopkeepers.util.Validate;
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
 
 	private static final int CHECK_PERIOD_SECONDS = 10;
-	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(CHECK_PERIOD_SECONDS);
+	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);
 
 	protected final SignShops signShops;
 	private SignType signType = SignType.OAK; // Not null, not unsupported, default is OAK.
@@ -51,8 +51,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	private Block block = null;
 	private long lastFailedRespawnAttempt = 0;
 
-	// Initial offset between [0, CHECK_PERIOD_SECONDS) for load balancing:
-	private final RateLimiter checkLimiter = RateLimiter.withInitialOffset(CHECK_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
+	// Initial threshold between [1, CHECK_PERIOD_SECONDS] for load balancing:
+	private final RateLimiter checkLimiter = new RateLimiter(CHECK_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
 
 	protected SKSignShopObject(SignShops signShops, AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(shopkeeper, creationData);

@@ -79,7 +79,7 @@ public class LivingEntityAI implements Listener {
 	 * The period in ticks in which we check if an entity is supposed to fall.
 	 */
 	private static final int FALLING_CHECK_PERIOD_TICKS = 10;
-	private static final CyclicCounter nextFallingCheckTickOffset = new CyclicCounter(FALLING_CHECK_PERIOD_TICKS);
+	private static final CyclicCounter nextFallingCheckOffset = new CyclicCounter(1, FALLING_CHECK_PERIOD_TICKS + 1);
 
 	// Temporarily re-used objects:
 	private static final Location sharedLocation = new Location(null, 0, 0, 0);
@@ -109,8 +109,8 @@ public class LivingEntityAI implements Listener {
 	private static class EntityData {
 		private final LivingEntity entity;
 		private final ChunkData chunkData;
-		// Initial offset between [0, FALLING_CHECK_PERIOD_TICKS) for load distribution:
-		public final RateLimiter fallingCheckLimiter = RateLimiter.withInitialOffset(FALLING_CHECK_PERIOD_TICKS, nextFallingCheckTickOffset.getAndIncrement());
+		// Initial threshold between [1, FALLING_CHECK_PERIOD_TICKS] for load balancing:
+		public final RateLimiter fallingCheckLimiter = new RateLimiter(FALLING_CHECK_PERIOD_TICKS, nextFallingCheckOffset.getAndIncrement());
 		public boolean falling = false;
 		public double distanceToGround = 0.0D;
 
