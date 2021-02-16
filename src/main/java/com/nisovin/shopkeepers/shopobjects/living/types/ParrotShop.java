@@ -67,7 +67,7 @@ public class ParrotShop extends SittableShop<Parrot> {
 		Validate.notNull(variant, "variant is null");
 		variantProperty.setValue(variant);
 		shopkeeper.markDirty();
-		this.applyVariant(this.getEntity()); // Null if not active
+		this.applyVariant(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleVariant(boolean backwards) {

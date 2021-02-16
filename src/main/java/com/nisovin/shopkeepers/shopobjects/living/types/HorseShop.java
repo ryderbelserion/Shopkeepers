@@ -104,7 +104,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	public void setColor(Horse.Color color) {
 		colorProperty.setValue(color);
 		shopkeeper.markDirty();
-		this.applyColor(this.getEntity()); // Null if not active
+		this.applyColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleColor(boolean backwards) {
@@ -171,7 +171,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	public void setStyle(Horse.Style style) {
 		styleProperty.setValue(style);
 		shopkeeper.markDirty();
-		this.applyStyle(this.getEntity()); // Null if not active
+		this.applyStyle(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleStyle(boolean backwards) {
@@ -219,7 +219,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	public void setArmor(HorseArmor armor) {
 		armorProperty.setValue(armor);
 		shopkeeper.markDirty();
-		this.applyArmor(this.getEntity()); // Null if not active
+		this.applyArmor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleArmor(boolean backwards) {

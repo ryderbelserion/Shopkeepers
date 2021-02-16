@@ -68,7 +68,7 @@ public class PandaShop extends BabyableShop<Panda> {
 		Validate.notNull(gene, "Gene is null!");
 		geneProperty.setValue(gene);
 		shopkeeper.markDirty();
-		this.applyGene(this.getEntity()); // Null if not active
+		this.applyGene(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleGene(boolean backwards) {

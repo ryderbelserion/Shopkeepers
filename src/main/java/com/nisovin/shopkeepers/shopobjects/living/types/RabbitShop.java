@@ -68,7 +68,7 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 		Validate.notNull(rabbitType, "rabbitType is null");
 		rabbitTypeProperty.setValue(rabbitType);
 		shopkeeper.markDirty();
-		this.applyRabbitType(this.getEntity()); // Null if not active
+		this.applyRabbitType(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleRabbitType(boolean backwards) {

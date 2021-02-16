@@ -87,7 +87,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 		if (!this.isBabyable()) return;
 		babyProperty.setValue(baby);
 		shopkeeper.markDirty();
-		this.applyBaby(this.getEntity()); // Null if not active
+		this.applyBaby(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleBaby() {

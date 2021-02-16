@@ -74,7 +74,7 @@ public class SheepShop extends BabyableShop<Sheep> {
 		Validate.notNull(color, "Color is null!");
 		colorProperty.setValue(color);
 		shopkeeper.markDirty();
-		this.applyColor(this.getEntity()); // Null if not active
+		this.applyColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleColor(boolean backwards) {
@@ -117,7 +117,7 @@ public class SheepShop extends BabyableShop<Sheep> {
 	public void setSheared(boolean sheared) {
 		shearedProperty.setValue(sheared);
 		shopkeeper.markDirty();
-		this.applySheared(this.getEntity()); // Null if not active
+		this.applySheared(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleSheared() {

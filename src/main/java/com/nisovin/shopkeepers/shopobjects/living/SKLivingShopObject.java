@@ -447,7 +447,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	}
 
 	public void teleportBack() {
-		E entity = this.getEntity(); // Null if not active
+		E entity = this.getEntity(); // Null if not spawned
 		if (entity == null) return;
 
 		Location spawnLocation = this.getSpawnLocation();

@@ -66,7 +66,7 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 	public void setSitting(boolean sitting) {
 		sittingProperty.setValue(sitting);
 		shopkeeper.markDirty();
-		this.applySitting(this.getEntity()); // Null if not active
+		this.applySitting(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleSitting() {

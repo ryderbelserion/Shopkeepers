@@ -95,7 +95,7 @@ public class CatShop extends SittableShop<Cat> {
 		Validate.notNull(catType, "Cat type is null!");
 		catTypeProperty.setValue(catType);
 		shopkeeper.markDirty();
-		this.applyCatType(this.getEntity()); // Null if not active
+		this.applyCatType(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCatType(boolean backwards) {
@@ -177,7 +177,7 @@ public class CatShop extends SittableShop<Cat> {
 	public void setCollarColor(DyeColor collarColor) {
 		collarColorProperty.setValue(collarColor);
 		shopkeeper.markDirty();
-		this.applyCollarColor(this.getEntity()); // Null if not active
+		this.applyCollarColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCollarColor(boolean backwards) {

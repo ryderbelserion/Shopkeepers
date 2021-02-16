@@ -83,7 +83,7 @@ public class FoxShop extends SittableShop<Fox> {
 		Validate.notNull(foxType, "Fox type is null!");
 		foxTypeProperty.setValue(foxType);
 		shopkeeper.markDirty();
-		this.applyFoxType(this.getEntity()); // Null if not active
+		this.applyFoxType(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleFoxType(boolean backwards) {
@@ -140,7 +140,7 @@ public class FoxShop extends SittableShop<Fox> {
 			this.setCrouching(false);
 		}
 		shopkeeper.markDirty();
-		this.applySleeping(this.getEntity()); // Null if not active
+		this.applySleeping(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleSleeping() {
@@ -188,7 +188,7 @@ public class FoxShop extends SittableShop<Fox> {
 			this.setSleeping(false);
 		}
 		shopkeeper.markDirty();
-		this.applyCrouching(this.getEntity()); // Null if not active
+		this.applyCrouching(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCrouching() {

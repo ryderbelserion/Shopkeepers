@@ -66,7 +66,7 @@ public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 	public void setBaby(boolean baby) {
 		babyProperty.setValue(baby);
 		shopkeeper.markDirty();
-		this.applyBaby(this.getEntity()); // Null if not active
+		this.applyBaby(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleBaby() {

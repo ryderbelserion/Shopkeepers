@@ -69,7 +69,7 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 		Validate.notNull(profession, "Profession is null!");
 		professionProperty.setValue(profession);
 		shopkeeper.markDirty();
-		this.applyProfession(this.getEntity()); // Null if not active
+		this.applyProfession(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleProfession(boolean backwards) {

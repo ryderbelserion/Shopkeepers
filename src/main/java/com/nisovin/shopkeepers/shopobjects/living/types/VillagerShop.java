@@ -116,7 +116,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 		Validate.notNull(profession, "Profession is null!");
 		professionProperty.setValue(profession);
 		shopkeeper.markDirty();
-		this.applyProfession(this.getEntity()); // Null if not active
+		this.applyProfession(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleProfession(boolean backwards) {
@@ -210,7 +210,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 		Validate.notNull(villagerType, "Villager type is null!");
 		villagerTypeProperty.setValue(villagerType);
 		shopkeeper.markDirty();
-		this.applyVillagerType(this.getEntity()); // Null if not active
+		this.applyVillagerType(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleVillagerType(boolean backwards) {
@@ -278,7 +278,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 		Validate.isTrue(villagerLevelProperty.isInBounds(villagerLevel), () -> "villagerLevel is out of bounds: " + villagerLevel);
 		villagerLevelProperty.setValue(villagerLevel);
 		shopkeeper.markDirty();
-		this.applyVillagerLevel(this.getEntity()); // Null if not active
+		this.applyVillagerLevel(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleVillagerLevel(boolean backwards) {

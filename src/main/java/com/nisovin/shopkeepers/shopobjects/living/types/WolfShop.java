@@ -77,7 +77,7 @@ public class WolfShop extends SittableShop<Wolf> {
 	public void setAngry(boolean angry) {
 		angryProperty.setValue(angry);
 		shopkeeper.markDirty();
-		this.applyAngry(this.getEntity()); // Null if not active
+		this.applyAngry(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleAngry() {
@@ -119,7 +119,7 @@ public class WolfShop extends SittableShop<Wolf> {
 	public void setCollarColor(DyeColor collarColor) {
 		collarColorProperty.setValue(collarColor);
 		shopkeeper.markDirty();
-		this.applyCollarColor(this.getEntity()); // Null if not active
+		this.applyCollarColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCollarColor(boolean backwards) {

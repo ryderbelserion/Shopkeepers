@@ -64,7 +64,7 @@ public class PigShop extends BabyableShop<Pig> {
 	public void setSaddle(boolean saddle) {
 		saddleProperty.setValue(saddle);
 		shopkeeper.markDirty();
-		this.applySaddle(this.getEntity()); // Null if not active
+		this.applySaddle(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleSaddle() {

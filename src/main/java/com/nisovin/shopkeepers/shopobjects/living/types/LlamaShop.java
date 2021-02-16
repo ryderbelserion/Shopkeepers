@@ -77,7 +77,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	public void setColor(Llama.Color color) {
 		colorProperty.setValue(color);
 		shopkeeper.markDirty();
-		this.applyColor(this.getEntity()); // Null if not active
+		this.applyColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleColor(boolean backwards) {
@@ -135,7 +135,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	public void setCarpetColor(DyeColor carpetColor) {
 		carpetColorProperty.setValue(carpetColor);
 		shopkeeper.markDirty();
-		this.applyCarpetColor(this.getEntity()); // Null if not active
+		this.applyCarpetColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCarpetColor(boolean backwards) {

@@ -64,7 +64,7 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 	public void setCarryingChest(boolean carryingChest) {
 		carryingChestProperty.setValue(carryingChest);
 		shopkeeper.markDirty();
-		this.applyCarryingChest(this.getEntity()); // Null if not active
+		this.applyCarryingChest(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCarryingChest() {

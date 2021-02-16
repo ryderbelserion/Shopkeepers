@@ -71,7 +71,7 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 		Validate.isTrue(sizeProperty.isInBounds(size), () -> "size is out of bounds: " + size);
 		sizeProperty.setValue(size);
 		shopkeeper.markDirty();
-		this.applySize(this.getEntity()); // Null if not active
+		this.applySize(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleSize(boolean backwards) {
