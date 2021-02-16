@@ -425,7 +425,10 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		Location entityLoc = entity.getLocation();
 		Location spawnLocation = this.getSpawnLocation();
 		assert spawnLocation != null; // Since entity is active
-		if (!entityLoc.getWorld().equals(spawnLocation.getWorld()) || entityLoc.distanceSquared(spawnLocation) > 0.4D) {
+		if (!entityLoc.getWorld().equals(spawnLocation.getWorld()) || entityLoc.distanceSquared(spawnLocation) > 0.2D) {
+			// The squared distance 0.2 triggers for distances slightly below 0.5. Since we spawn the entity at the
+			// center of the spawn block, this ensures that we teleport it back into place whenever it changes its
+			// block.
 			// Teleport back:
 			Log.debug(DebugOptions.regularTickActivities, () -> "Shopkeeper (" + shopkeeper.getPositionString()
 					+ ") out of place, teleporting back");

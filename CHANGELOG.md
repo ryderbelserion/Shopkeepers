@@ -103,6 +103,7 @@ Date format: (YYYY-MM-DD)
 * Performance: Increased the chunk activation delay from 2 to 20 ticks. This further limits the rate at which shopkeepers may get spawned and despawned, for instance, when players frequently cross chunk boundaries back and forth. When a player joins the server or teleports, we immediately activate the chunks in a 2 chunk radius.
 * Added an editor option to rename regular villagers. Unlike the renaming via nametags, this allows the use of color codes.
 * Fixed: The shopkeeper metadata is also removed from the entity again now if the spawning failed.
+* Decreased the distance shopkeeper mobs are allowed to move before they are teleported back from slightly above 0.6 to slightly below 0.5. Since shopkeeper mobs are spawned at the center of their block, this ensures that we teleport them back into place whenever they change their block.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
