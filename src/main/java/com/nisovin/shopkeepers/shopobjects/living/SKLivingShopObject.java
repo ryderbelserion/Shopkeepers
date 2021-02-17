@@ -37,8 +37,13 @@ import com.nisovin.shopkeepers.util.Utils;
 
 public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntityShopObject implements LivingShopObject {
 
+	/**
+	 * We check from slightly below the top of the spawn block (= offset) in a range of up to one block below the spawn
+	 * block (= range) for a location to spawn the shopkeeper entity at.
+	 */
 	protected static final double SPAWN_LOCATION_OFFSET = 0.98D;
 	protected static final double SPAWN_LOCATION_RANGE = 2.0D;
+
 	protected static final int CHECK_PERIOD_SECONDS = 10;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);
 	// If the entity could not be respawned this amount of times, we throttle its tick rate (i.e. the rate at which we
@@ -49,6 +54,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	protected final LivingShops livingShops;
 	private final SKLivingShopObjectType<?> livingObjectType;
 	private E entity;
+	private Location lastSpawnLocation = null;
 	private int respawnAttempts = 0;
 	private boolean debuggingSpawn = false;
 	private static long lastSpawnDebugging = 0; // Shared among all living shopkeepers to prevent spam
@@ -96,15 +102,20 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		return entity;
 	}
 
-	// Places the entity at the exact location it would fall to, within a range of at most 1 block below the spawn block
-	// (because shopkeepers might have been placed 1 block above passable or non-full blocks).
+	// Shopkeepers might be located 1 block above passable (especially in the past) or non-full blocks. In order to not
+	// have these shopkeepers hover but stand on the ground, we determine the exact spawn location their entity would
+	// fall to within the range of up to 1 block below their spawn block.
+	// This also applies with gravity disabled, and even if the block below their spawn block is air now: Passable
+	// blocks like grass or non-full blocks like carpets or slabs might have been broken since the shopkeeper was
+	// created. We still want to place the shopkeeper nicely on the ground in those cases.
 	private Location getSpawnLocation() {
 		World world = Bukkit.getWorld(shopkeeper.getWorldName());
 		if (world == null) return null; // World not loaded
+
 		Location spawnLocation = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + SPAWN_LOCATION_OFFSET, shopkeeper.getZ() + 0.5D);
 		double distanceToGround = Utils.getCollisionDistanceToGround(spawnLocation, SPAWN_LOCATION_RANGE);
 		if (distanceToGround == SPAWN_LOCATION_RANGE) {
-			// No collision within the checked range, remove offset from spawn location:
+			// No collision within the checked range: Remove the initial offset from the spawn location.
 			distanceToGround = SPAWN_LOCATION_OFFSET;
 		}
 		// Adjust spawn location:
@@ -187,6 +198,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 		boolean success = this.isActive();
 		if (success) {
+			// Remember the spawn location:
+			this.lastSpawnLocation = spawnLocation;
+
 			// Further setup entity after it was successfully spawned:
 			// Some entities randomly spawn with passengers:
 			for (Entity passenger : entity.getPassengers()) {
@@ -344,6 +358,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		// Remove entity:
 		entity.remove();
 		entity = null;
+		lastSpawnLocation = null;
 	}
 
 	@Override
@@ -420,21 +435,31 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		return spawned;
 	}
 
+	// This is not only relevant when gravity is enabled, but also to react to other plugins teleporting shopkeeper
+	// entities around or enabling their AI again.
 	private void teleportBackIfMoved() {
 		assert this.isActive();
+		assert entity != null && lastSpawnLocation != null;
+		// Note: Comparing the entity's current location with the last spawn location (instead of freshly calculating
+		// the 'intended' spawn location) not only provides a small performance benefit, but also ensures that
+		// shopkeeper mobs don't start to fall if the block below them is broken and gravity is disabled (which is
+		// confusing when gravity is supposed to be disabled).
+		// However, to account for shopkeepers that have previously been placed above passable or non-full blocks, which
+		// might also have been broken since then, we still place the shopkeeper mob up to one block below their
+		// location when they are respawned (we just don't move them there dynamically during this check). If the mob is
+		// supposed to dynamically move when the block below it is broken, gravity needs to be enabled.
 		Location entityLoc = entity.getLocation();
-		Location spawnLocation = this.getSpawnLocation();
-		assert spawnLocation != null; // Since entity is active
-		if (!entityLoc.getWorld().equals(spawnLocation.getWorld()) || entityLoc.distanceSquared(spawnLocation) > 0.2D) {
+		Location lastSpawnLocation = this.lastSpawnLocation;
+		if (!entityLoc.getWorld().equals(lastSpawnLocation.getWorld()) || entityLoc.distanceSquared(lastSpawnLocation) > 0.2D) {
 			// The squared distance 0.2 triggers for distances slightly below 0.5. Since we spawn the entity at the
 			// center of the spawn block, this ensures that we teleport it back into place whenever it changes its
 			// block.
 			// Teleport back:
 			Log.debug(DebugOptions.regularTickActivities, () -> "Shopkeeper (" + shopkeeper.getPositionString()
 					+ ") out of place, teleporting back");
-			spawnLocation.setYaw(entityLoc.getYaw());
-			spawnLocation.setPitch(entityLoc.getPitch());
-			entity.teleport(spawnLocation);
+			lastSpawnLocation.setYaw(entityLoc.getYaw());
+			lastSpawnLocation.setPitch(entityLoc.getPitch());
+			entity.teleport(lastSpawnLocation);
 			this.overwriteAI();
 		}
 	}
@@ -449,13 +474,13 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	public void teleportBack() {
 		E entity = this.getEntity(); // Null if not spawned
 		if (entity == null) return;
+		assert lastSpawnLocation != null;
 
-		Location spawnLocation = this.getSpawnLocation();
-		assert spawnLocation != null; // Since entity is active
+		Location lastSpawnLocation = this.lastSpawnLocation;
 		Location entityLoc = entity.getLocation();
-		spawnLocation.setYaw(entityLoc.getYaw());
-		spawnLocation.setPitch(entityLoc.getPitch());
-		entity.teleport(spawnLocation);
+		lastSpawnLocation.setYaw(entityLoc.getYaw());
+		lastSpawnLocation.setPitch(entityLoc.getPitch());
+		entity.teleport(lastSpawnLocation);
 	}
 
 	// NAMING
