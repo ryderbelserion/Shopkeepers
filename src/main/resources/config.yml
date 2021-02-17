@@ -251,6 +251,7 @@ enabled-living-shops:
 - HOGLIN
 - ZOGLIN
 - STRIDER
+- PIGLIN_BRUTE
 
 # Whether shopkeeper mobs shall not be affected by gravity.
 disable-gravity: false

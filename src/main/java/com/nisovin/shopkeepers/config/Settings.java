@@ -83,7 +83,7 @@ public class Settings extends Config {
 	public static boolean requireContainerRecentlyPlaced = true;
 	public static int maxContainerDistance = 15;
 	public static int maxShopsPerPlayer = -1;
-	public static String maxShopsPermOptions = "10,15,25";
+	public static String maxShopsPermOptions = "5,15,25";
 
 	public static boolean protectContainers = true;
 	public static boolean preventItemMovement = true;
@@ -183,7 +183,7 @@ public class Settings extends Config {
 	/*
 	 * Naming
 	 */
-	public static String nameRegex = "[A-Za-z0-9 ]{3,32}";
+	public static String nameRegex = "[A-Za-z0-9 ]{3,25}";
 	public static boolean namingOfPlayerShopsViaItem = false;
 	public static boolean allowRenamingOfPlayerNpcShops = false;
 
@@ -332,7 +332,7 @@ public class Settings extends Config {
 				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
 			} catch (PatternSyntaxException e) {
 				Log.warning(INSTANCE.getLogPrefix() + "'name-regex' is not a valid regular expression ('" + Settings.nameRegex + "'). Reverting to default.");
-				Settings.nameRegex = "[A-Za-z0-9 ]{3,32}";
+				Settings.nameRegex = "[A-Za-z0-9 ]{3,25}";
 				shopNamePattern = Pattern.compile("^" + Settings.nameRegex + "$");
 			}
 
