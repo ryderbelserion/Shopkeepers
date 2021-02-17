@@ -3,7 +3,9 @@ package com.nisovin.shopkeepers.util;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -30,6 +32,18 @@ import org.bukkit.util.Vector;
 public final class Utils {
 
 	private Utils() {
+	}
+
+	public static <E, L extends List<? extends E>> L sort(L list, Comparator<? super E> comparator) {
+		assert list != null && comparator != null;
+		list.sort(comparator);
+		return list;
+	}
+
+	public static <E, C extends Collection<? super E>> C addAll(C collection, Collection<? extends E> toAdd) {
+		assert collection != null && toAdd != null;
+		collection.addAll(toAdd);
+		return collection;
 	}
 
 	// Note: Doesn't work for primitive arrays.

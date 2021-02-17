@@ -109,6 +109,7 @@ This change also ensures that shopkeeper mobs no longer start to fall if the blo
 Another side effect of this change is that if gravity is disabled, it is no longer as easily possible to force the shopkeeper mob to move back to its original location after the block it was previously standing on is broken. The shopkeeper will only check for an updated spawn location when it is being respawned now. If the mob is supposed to dynamically move when the block below it is broken, gravity needs to be enabled.
 * Similar to non-Citizens shopkeepers, we also periodically respawn Citizens shopkeepers now if they have previously been spawned (i.e. have an entity associated with them) but their entity has been removed, for example by another plugin. If the NPC has intentionally been despawned, it is not automatically respawned.
 * Config: The default config missed piglin brute as a by default enabled mob type.
+* Config: The default enabled shopkeeper mobs are now alphabetically sorted. This only applies to newly generated default configs.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.

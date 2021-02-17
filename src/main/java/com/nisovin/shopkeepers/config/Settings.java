@@ -32,6 +32,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
+import com.nisovin.shopkeepers.util.Utils;
 
 public class Settings extends Config {
 
@@ -94,8 +95,8 @@ public class Settings extends Config {
 	/*
 	 * Shop (Object) Types
 	 */
-	public static List<String> enabledLivingShops = Arrays.asList(
-			EntityType.VILLAGER.name(),
+	// Villager is the default and therefore first. The other entity types are alphabetically sorted.
+	public static List<String> enabledLivingShops = Utils.addAll(new ArrayList<>(Arrays.asList(EntityType.VILLAGER.name())), Utils.sort(Arrays.asList(
 			EntityType.COW.name(),
 			EntityType.MUSHROOM_COW.name(),
 			EntityType.SHEEP.name(),
@@ -158,7 +159,7 @@ public class Settings extends Config {
 			"ZOGLIN", // MC 1.16
 			"STRIDER", // MC 1.16
 			"PIGLIN_BRUTE" // MC 1.16.2
-	);
+	), String::compareTo));
 
 	public static boolean disableGravity = false;
 	public static int gravityChunkRange = 4;
