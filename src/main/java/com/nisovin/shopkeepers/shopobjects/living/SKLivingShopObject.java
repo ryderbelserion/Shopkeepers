@@ -51,6 +51,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	protected static final int MAX_RESPAWN_ATTEMPTS = 5;
 	protected static final int THROTTLED_CHECK_PERIOD_SECONDS = 60;
 
+	private static final Location sharedLocation = new Location(null, 0, 0, 0);
+
 	protected final LivingShops livingShops;
 	private final SKLivingShopObjectType<?> livingObjectType;
 	private E entity;
@@ -448,7 +450,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		// might also have been broken since then, we still place the shopkeeper mob up to one block below their
 		// location when they are respawned (we just don't move them there dynamically during this check). If the mob is
 		// supposed to dynamically move when the block below it is broken, gravity needs to be enabled.
-		Location entityLoc = entity.getLocation();
+		Location entityLoc = entity.getLocation(sharedLocation);
 		Location lastSpawnLocation = this.lastSpawnLocation;
 		if (!entityLoc.getWorld().equals(lastSpawnLocation.getWorld()) || entityLoc.distanceSquared(lastSpawnLocation) > 0.2D) {
 			// The squared distance 0.2 triggers for distances slightly below 0.5. Since we spawn the entity at the
@@ -462,6 +464,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			entity.teleport(lastSpawnLocation);
 			this.overwriteAI();
 		}
+		sharedLocation.setWorld(null); // Reset
 	}
 
 	private void removePotionEffects() {
