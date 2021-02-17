@@ -272,6 +272,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		// Indicate ticking activity for visualization:
 		this.indicateTickActivity();
 
+		// Check if the NPC has been spawned at least once before:
 		Location currentLocation = npc.getStoredLocation();
 		if (currentLocation == null) {
 			assert !npc.isSpawned();
@@ -281,8 +282,25 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			npc.spawn(expectedLocation);
 			return;
 		}
-		assert currentLocation.getWorld() != null; // Citizens returns a null Location in this case
+		// Citizens returns a null location instead of a location with null world:
+		assert currentLocation != null && currentLocation.getWorld() != null;
 
+		// Check if a previously spawned NPC entity is still there:
+		// Note: If the entity is null the NPC might also have been intentionally despawned.
+		Entity entity = npc.getEntity();
+		if (entity != null && entity.isDead()) {
+			// An entity has previously been spawned but is marked for removal (maybe some other plugin removed it). The
+			// Citizens plugin doesn't automatically respawn the entity in this case, but we do (similar to non-Citizens
+			// shopkeepers).
+			// Note: Entity#isDead is sufficient to detect the entity removal. Checking the slightly more costly
+			// Entity#isValid is not required, since Citizens removes the entity on chunk unloads anyways.
+			Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") is missing, attempting respawn");
+			// Note: We respawn the entity at its last known location, rather then the (expected) shopkeeper location.
+			// This will log a debug message from Citizens if it cannot spawn the NPC currently:
+			npc.spawn(currentLocation);
+		} // Continue to update the shopkeeper location if the NPC moved since we last checked.
+
+		// Update the shopkeeper's location if the NPC is able to move:
 		if (!expectedLocation.getWorld().equals(currentLocation.getWorld()) || expectedLocation.distanceSquared(currentLocation) > 1.0D) {
 			Log.debug(DebugOptions.regularTickActivities, () -> "Shopkeeper NPC (" + shopkeeper.getPositionString()
 					+ ") moved, updating shopkeeper location");
