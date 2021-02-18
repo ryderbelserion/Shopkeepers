@@ -163,6 +163,10 @@ button-magma-cube-size: "&aChoose magma cube size"
 button-magma-cube-size-lore:
 - "Cycles the magma cube's size."
 - "Current size: &e{size}"
+button-snowman-pumpkin-head: "&aToggle pumpkin head"
+button-snowman-pumpkin-head-lore:
+- "Toggles the snowman's"
+- "pumpkin head"
 
 admin-sign-shop-line1: "&2[SHOP]"
 admin-sign-shop-line2: "&7{shopName}"

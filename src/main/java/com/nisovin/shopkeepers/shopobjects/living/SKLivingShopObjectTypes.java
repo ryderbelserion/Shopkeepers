@@ -36,6 +36,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.PigShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.RabbitShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SheepShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SlimeShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.SnowmanShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.WolfShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieShop;
@@ -332,6 +333,14 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 				@Override
 				public MagmaCubeShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new MagmaCubeShop(livingShops, this, shopkeeper, creationData);
+				}
+			};
+			break;
+		case SNOWMAN:
+			objectType = new SKLivingShopObjectType<SnowmanShop>(livingShops, entityType, aliases, typeName, permission) {
+				@Override
+				public SnowmanShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new SnowmanShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;

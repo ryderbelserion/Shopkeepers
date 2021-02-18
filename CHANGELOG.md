@@ -110,6 +110,7 @@ Another side effect of this change is that if gravity is disabled, it is no long
 * Similar to non-Citizens shopkeepers, we also periodically respawn Citizens shopkeepers now if they have previously been spawned (i.e. have an entity associated with them) but their entity has been removed, for example by another plugin. If the NPC has intentionally been despawned, it is not automatically respawned.
 * Config: The default config missed piglin brute as a by default enabled mob type.
 * Config: The default enabled shopkeeper mobs are now alphabetically sorted. This only applies to newly generated default configs.
+* Added an editor option to toggle the pumpkin head of snowman shopkeepers.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
@@ -207,6 +208,8 @@ Messages:
 * Added 'type-new-villager-name'.
 * Added 'villager-name-set'.
 * Added 'villager-name-invalid'.
+* Added 'button-snowman-pumpkin-head'.
+* Added 'button-snowman-pumpkin-head-lore'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.
