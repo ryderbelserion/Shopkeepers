@@ -32,6 +32,10 @@ public class FieldSetting<T> implements Setting<T> {
 		this.field = field;
 		this.configKey = configKey;
 		this.valueType = valueType;
+
+		// Make the field accessible (it is inaccessible by default):
+		// This is for example required to access private fields.
+		field.setAccessible(true);
 	}
 
 	@Override
@@ -65,8 +69,7 @@ public class FieldSetting<T> implements Setting<T> {
 			// Note: The config instance is ignored if the field is static.
 			return (T) field.get(config);
 		} catch (IllegalArgumentException | IllegalAccessException e) {
-			e.printStackTrace();
-			return null;
+			throw new RuntimeException("Could not get the value from the setting's field!", e);
 		}
 	}
 
@@ -80,22 +83,11 @@ public class FieldSetting<T> implements Setting<T> {
 			}
 		}
 
-		boolean accessible = field.isAccessible();
 		try {
-			if (!accessible) {
-				// Temporarily set the field accessible, for example for private fields:
-				field.setAccessible(true);
-			}
 			// Note: The config instance is ignored if the field is static.
 			field.set(config, value);
 		} catch (Exception e) {
-			throw new ValueLoadException(e.getMessage(), e);
-		} finally {
-			// Restore previous accessible state:
-			try {
-				field.setAccessible(accessible);
-			} catch (SecurityException e) {
-			}
+			throw new ValueLoadException("Could not set the value of the setting's field!", e);
 		}
 	}
 }
