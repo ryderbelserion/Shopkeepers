@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -21,6 +20,7 @@ import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringValue;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.Validate;
 
 @WithDefaultValueType(fieldType = String.class, valueType = ColoredStringValue.class)
 @WithValueTypeProvider(ColoredStringListValue.Provider.class)
@@ -402,6 +402,10 @@ public class Messages extends Config {
 
 	private static final Messages INSTANCE = new Messages();
 
+	public static Messages getInstance() {
+		return INSTANCE;
+	}
+
 	private Messages() {
 	}
 
@@ -441,16 +445,17 @@ public class Messages extends Config {
 	}
 
 	@Override
-	protected void validateConfig(ConfigurationSection config) throws ConfigLoadException {
-		super.validateConfig(config);
-
+	public void load(ConfigurationSection config) throws ConfigLoadException {
+		Validate.notNull(config, "config is null");
 		// Check for unexpected (possibly no longer existing) message keys:
-		Set<String> messageKeys = this.getSettings().stream().map(this::getConfigKey).collect(Collectors.toSet());
 		Set<String> configKeys = config.getKeys(true);
 		for (String configKey : configKeys) {
-			if (!messageKeys.contains(configKey)) {
+			if (this.getSetting(configKey) == null) {
 				Log.warning(this.getLogPrefix() + "Unknown message: " + configKey);
 			}
 		}
+
+		// Load the config:
+		super.load(config);
 	}
 }

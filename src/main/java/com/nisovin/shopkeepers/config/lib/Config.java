@@ -19,6 +19,8 @@ import com.nisovin.shopkeepers.config.lib.annotation.Uncolored;
 import com.nisovin.shopkeepers.config.lib.annotation.WithDefaultValueType;
 import com.nisovin.shopkeepers.config.lib.annotation.WithValueType;
 import com.nisovin.shopkeepers.config.lib.annotation.WithValueTypeProvider;
+import com.nisovin.shopkeepers.config.lib.setting.FieldSetting;
+import com.nisovin.shopkeepers.config.lib.setting.Setting;
 import com.nisovin.shopkeepers.config.lib.value.DefaultValueTypes;
 import com.nisovin.shopkeepers.config.lib.value.UnknownMaterialException;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
@@ -39,9 +41,9 @@ public abstract class Config {
 	// This is lazily setup if required during settings setup.
 	private ValueTypeRegistry customDefaultValueTypes = null;
 
-	// Lazily setup cache of all settings and value types:
-	private Map<Field, ValueType<?>> valueTypes = null;
-	private Collection<Field> settings = null;
+	// Lazily setup cache of all settings:
+	private Map<String, FieldSetting<?>> settings = null;
+	private Collection<? extends FieldSetting<?>> settingsView = null;
 
 	protected Config() {
 	}
@@ -56,37 +58,39 @@ public abstract class Config {
 		if (settings != null) {
 			return; // Already setup
 		}
-		assert valueTypes == null;
+		assert settingsView == null;
 
-		this.valueTypes = new LinkedHashMap<>();
-		this.settings = Collections.unmodifiableSet(valueTypes.keySet());
-		for (Field field : Utils.toIterable(this.streamSettings())) {
+		this.settings = new LinkedHashMap<>();
+		this.settingsView = Collections.unmodifiableCollection(settings.values());
+		for (Field field : Utils.toIterable(this.streamSettingFields())) {
+			String configKey = this.getConfigKey(field);
 			ValueType<?> valueType = this.setupValueType(field);
 			assert valueType != null;
-			valueTypes.put(field, valueType);
+			FieldSetting<?> setting = new FieldSetting<>(this, field, configKey, valueType);
+			settings.put(configKey, setting);
 		}
 
 		// The custom default value types are only required during the setup:
 		customDefaultValueTypes = null;
 	}
 
-	private Stream<Field> streamSettings() {
+	private Stream<Field> streamSettingFields() {
 		Class<?> configClass = this.getClass();
-		Stream<Field> settings = this.streamSettings(configClass);
+		Stream<Field> settings = this.streamSettingFields(configClass);
 
-		// Append settings of parent config classes (allows for composition of config classes):
+		// Append setting fields of parent config classes (allows for composition of config classes):
 		// We stop once we reach this class in the type hierarchy:
 		Class<?> parentClass = configClass.getSuperclass();
 		assert parentClass != null;
 		while (parentClass != Config.class) {
-			settings = Stream.concat(settings, this.streamSettings(parentClass));
+			settings = Stream.concat(settings, this.streamSettingFields(parentClass));
 			parentClass = configClass.getSuperclass();
 			assert parentClass != null;
 		}
 		return settings;
 	}
 
-	private final Stream<Field> streamSettings(Class<?> configClass) {
+	private final Stream<Field> streamSettingFields(Class<?> configClass) {
 		List<Field> fields = Arrays.asList(configClass.getDeclaredFields());
 		return fields.stream().filter(field -> {
 			// Filter fields:
@@ -114,6 +118,14 @@ public abstract class Config {
 		}
 		return true;
 	}
+
+	// TODO Support for sections, eg. by inner classes?
+	// TODO Support @Key annotation.
+	protected String getConfigKey(Field field) {
+		return ConfigHelper.toConfigKey(field.getName());
+	}
+
+	// VALUE TYPES
 
 	// Assert: Does not return null.
 	protected <T> ValueType<T> setupValueType(Field field) {
@@ -258,64 +270,59 @@ public abstract class Config {
 	// SETTINGS
 
 	/**
-	 * Gets the setting fields.
+	 * Gets the settings.
 	 * 
-	 * @return an unmodifiable view on the setting fields
+	 * @return an unmodifiable view on the settings
 	 */
-	protected final Collection<Field> getSettings() {
+	public final Collection<? extends Setting<?>> getSettings() {
 		this.setupSettings();
-		return settings;
+		return settingsView;
 	}
 
-	// TODO Support for sections, eg. by inner classes?
-	// TODO Support @Key annotation.
-	protected String getConfigKey(Field field) {
-		return ConfigHelper.toConfigKey(field.getName());
+	// Returns null if there is no setting for this config key:
+	protected final Setting<?> getSetting(String configKey) {
+		return settings.get(configKey);
 	}
 
-	protected final Field getSetting(String configKey) {
-		for (Field field : this.getSettings()) {
-			if (this.getConfigKey(field).equals(configKey)) {
-				return field;
-			}
+	// SAVING
+
+	public void save(ConfigurationSection config) {
+		Validate.notNull(config, "config is null");
+		for (Setting<?> setting : this.getSettings()) {
+			this.saveSetting(config, setting);
 		}
-		return null;
 	}
 
-	// Assert: Does not return null. Expects a valid setting field.
-	@SuppressWarnings("unchecked")
-	protected final <T> ValueType<T> getValueType(Field field) {
-		this.setupSettings();
-		ValueType<T> valueType = (ValueType<T>) valueTypes.get(field);
-		Validate.notNull(valueType, "Field is not a setting: " + field.getName());
-		return valueType;
+	protected <T> void saveSetting(ConfigurationSection config, Setting<T> setting) {
+		assert setting.getConfig() == this;
+		String configKey = setting.getConfigKey();
+		ValueType<T> valueType = setting.getValueType();
+		T value = setting.getValue();
+		valueType.save(config, configKey, value);
 	}
 
 	// LOADING
 
 	public void load(ConfigurationSection config) throws ConfigLoadException {
 		Validate.notNull(config, "config is null");
-		this.validateConfig(config);
-		for (Field field : this.getSettings()) {
-			this.loadSetting(field, config);
+		for (Setting<?> setting : this.getSettings()) {
+			this.loadSetting(config, setting);
 		}
 		this.validateSettings();
 	}
 
-	protected void validateConfig(ConfigurationSection config) throws ConfigLoadException {
-	}
-
-	protected <T> void loadSetting(Field field, ConfigurationSection config) throws ConfigLoadException {
-		String configKey = this.getConfigKey(field);
-		ValueType<T> valueType = this.getValueType(field);
+	protected <T> void loadSetting(ConfigurationSection config, Setting<T> setting) throws ConfigLoadException {
+		assert setting.getConfig() == this;
+		String configKey = setting.getConfigKey();
+		ValueType<T> valueType = setting.getValueType();
 		try {
 			T value = null;
 
 			// Handle missing value:
 			if (!config.isSet(configKey)) {
 				// We use the default value, if there is one:
-				value = this.getDefaultValue(field, config); // Can be null
-				this.onValueMissing(field, config, value);
+				value = this.getDefaultValue(config, setting); // Can be null
+				this.onValueMissing(config, setting, value);
 			} else {
 				// Load value:
 				value = valueType.load(config, configKey);
@@ -324,15 +331,15 @@ public abstract class Config {
 
 			// Apply value:
 			if (value != null) {
-				this.setSetting(field, value);
+				setting.setValue(value);
 			} // Else: Retain previous value.
 		} catch (ValueLoadException e) {
-			this.onValueLoadException(field, config, e);
+			this.onValueLoadException(config, setting, e);
 		}
 	}
 
-	protected <T> void onValueMissing(Field field, ConfigurationSection config, T defaultValue) throws ConfigLoadException {
-		String configKey = this.getConfigKey(field);
+	protected <T> void onValueMissing(ConfigurationSection config, Setting<T> setting, T defaultValue) throws ConfigLoadException {
+		String configKey = setting.getConfigKey();
 		if (defaultValue == null) {
 			Log.warning(this.msgMissingValue(configKey));
 		} else {
@@ -348,8 +355,8 @@ public abstract class Config {
 		return this.getLogPrefix() + "Using default value for missing config entry: " + configKey;
 	}
 
-	protected <T> void onValueLoadException(Field field, ConfigurationSection config, ValueLoadException e) throws ConfigLoadException {
-		String configKey = this.getConfigKey(field);
+	protected <T> void onValueLoadException(ConfigurationSection config, Setting<T> setting, ValueLoadException e) throws ConfigLoadException {
+		String configKey = setting.getConfigKey();
 		Log.warning(this.msgValueLoadException(configKey, e));
 		if (e instanceof UnknownMaterialException) {
 			Log.warning(this.getLogPrefix() + "All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
@@ -360,35 +367,8 @@ public abstract class Config {
 		return this.getLogPrefix() + "Could not load setting '" + configKey + "': " + e.getMessage();
 	}
 
-	protected void setSetting(Field field, Object value) throws ValueLoadException {
-		if (value != null) {
-			Class<?> fieldType = field.getType();
-			if (!Utils.isAssignableFrom(fieldType, value.getClass())) {
-				throw new ValueLoadException("Value is of wrong type: Got " + value.getClass().getName() + ", expected " + fieldType.getName());
-			}
-		}
-
-		boolean accessible = field.isAccessible();
-		try {
-			if (!accessible) {
-				// Temporarily set the field accessible, for example for private fields:
-				field.setAccessible(true);
-			}
-			// Note: The config instance is ignored if the field is static.
-			field.set(this, value);
-		} catch (Exception e) {
-			throw new ValueLoadException(e.getMessage(), e);
-		} finally {
-			// Restore previous accessible state:
-			try {
-				field.setAccessible(accessible);
-			} catch (SecurityException e) {
-			}
-		}
-	}
-
 	/**
-	 * Validation once all settings have been loaded.
+	 * Validates the values of settings once all settings have been loaded.
 	 */
 	protected void validateSettings() {
 	}
@@ -403,7 +383,8 @@ public abstract class Config {
 
 	// Returns null if there is no default value.
 	@SuppressWarnings("unchecked")
-	protected <T> T getDefaultValue(Field field, ConfigurationSection config) {
+	protected <T> T getDefaultValue(ConfigurationSection config, Setting<T> setting) {
+		assert setting.getConfig() == this;
 		Configuration defaults = null;
 		if (config instanceof Configuration) {
 			defaults = ((Configuration) config).getDefaults();
@@ -413,8 +394,8 @@ public abstract class Config {
 			return null;
 		}
 
-		String configKey = this.getConfigKey(field);
-		ValueType<?> valueType = this.getValueType(field);
+		String configKey = setting.getConfigKey();
+		ValueType<?> valueType = setting.getValueType();
 
 		// Load default value:
 		try {
@@ -446,8 +427,8 @@ public abstract class Config {
 
 		// Initialize missing settings with their default value:
 		boolean configChanged = false;
-		for (Field field : this.getSettings()) {
-			if (this.insertMissingDefaultValue(config, field)) {
+		for (Setting<?> setting : this.getSettings()) {
+			if (this.insertMissingDefaultValue(config, setting)) {
 				configChanged = true;
 			}
 		}
@@ -455,22 +436,23 @@ public abstract class Config {
 	}
 
 	// Returns true if the default value got inserted.
-	protected <T> boolean insertMissingDefaultValue(ConfigurationSection config, Field field) {
+	protected <T> boolean insertMissingDefaultValue(ConfigurationSection config, Setting<T> setting) {
+		assert setting.getConfig() == this;
 		assert this.hasDefaultValues(config);
-		String configKey = this.getConfigKey(field);
+		String configKey = setting.getConfigKey();
 		if (config.isSet(configKey)) return false; // Not missing.
 
 		Log.warning(this.msgInsertingDefault(configKey));
 
 		// Get default value:
-		T defaultValue = this.getDefaultValue(field, config);
+		T defaultValue = this.getDefaultValue(config, setting);
 		if (defaultValue == null) {
 			Log.warning(this.msgMissingDefault(configKey));
 			return false;
 		}
 
 		// Save default value to config:
-		ValueType<T> valueType = this.getValueType(field);
+		ValueType<T> valueType = setting.getValueType();
 		valueType.save(config, configKey, defaultValue);
 		return true;
 	}

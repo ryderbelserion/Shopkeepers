@@ -170,6 +170,7 @@ Internal:
 * Sign shops no longer check if their chunk is still loaded when accessing their block or checking if the block is still a sign. Since shopkeepers are despawned on chunk unloads, and sign shops cannot change their location, this is not required.
 * Moved the handling of shopkeeper metadata from ShopkeeperUtils into ShopkeeperMetadata.
 * When checking if a shopkeeper entity moved, we reuse a single Location object now.
+* Added test cases that compare the values of the default config and language file with their internal counter parts.
 * Minor other internal code refactoring.
 
 Migration notes:  

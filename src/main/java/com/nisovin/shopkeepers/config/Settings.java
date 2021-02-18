@@ -582,6 +582,10 @@ public class Settings extends Config {
 
 	private static final Settings INSTANCE = new Settings();
 
+	public static Settings getInstance() {
+		return INSTANCE;
+	}
+
 	private Settings() {
 	}
 
