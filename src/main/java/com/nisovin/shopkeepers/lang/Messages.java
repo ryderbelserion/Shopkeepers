@@ -64,7 +64,7 @@ public class Messages extends Config {
 	public static String buttonName = c("&aSet shop name");
 	public static List<String> buttonNameLore = c(Arrays.asList("Lets you rename", "your shopkeeper"));
 	public static String buttonContainer = c("&aView shop inventory");
-	public static List<String> buttonContainerLore = c(Arrays.asList("Lets you view the inventory", " your shopkeeper is using"));
+	public static List<String> buttonContainerLore = c(Arrays.asList("Lets you view the inventory", "your shopkeeper is using"));
 	public static String buttonDelete = c("&4Delete");
 	public static List<String> buttonDeleteLore = c(Arrays.asList("Closes and removes", "this shopkeeper"));
 
@@ -139,7 +139,7 @@ public class Messages extends Config {
 
 	public static String forHireTitle = c("For Hire");
 	public static String buttonHire = c("&aHire");
-	public static List<String> buttonHireLore = c(Arrays.asList("Buy this shop"));
+	public static List<String> buttonHireLore = c(Arrays.asList("Buy this shopkeeper"));
 
 	public static String tradingTitlePrefix = c("&2");
 	public static String tradingTitleDefault = c("Shopkeeper");
@@ -196,7 +196,7 @@ public class Messages extends Config {
 	public static Text setForHire = Text.parse("&aThe Shopkeeper was set for hire.");
 	public static Text hired = Text.parse("&aYou have hired this shopkeeper!");
 	public static Text missingHirePerm = Text.parse("&7You do not have the permission to hire shopkeepers.");
-	public static Text cannotHire = Text.parse("&aYou cannot afford to hire this shopkeeper.");
+	public static Text cannotHire = Text.parse("&7You cannot afford to hire this shopkeeper.");
 	public static Text cannotHireShopType = Text.parse("&7You do not have the permission to hire this type of shopkeeper.");
 	// Placeholders: {costs}, {hire-item}
 	public static Text villagerForHire = Text.parse("&aThe villager offered his services as a shopkeeper in exchange for &6{costs}x {hire-item}&a.");
@@ -215,15 +215,15 @@ public class Messages extends Config {
 			+ "&e  then right-click the shop while sneaking to modify costs.");
 	public static String shopSetupDescTrading = c("&e  Add items you want to sell to your container, then\n"
 			+ "&e  right-click the shop while sneaking to modify costs.");
-	public static String shopSetupDescBook = c("&e  Add written books and blank books to your container, then\n"
+	public static String shopSetupDescBook = c("&e  Add written and blank books to your container, then\n"
 			+ "&e  right-click the shop while sneaking to modify costs.");
 	public static String shopSetupDescAdminRegular = c("&e  Right-click the shop while sneaking to modify trades.");
 
 	public static String tradeSetupDescHeader = c("&6{shopType}");
 	public static List<String> tradeSetupDescAdminRegular = c(Arrays.asList("Has unlimited stock.", "Insert items from your inventory.", "Top row: Result items", "Bottom rows: Cost items"));
-	public static List<String> tradeSetupDescSelling = c(Arrays.asList("Sells items.", "Insert items to sell into the container.", "Left/Right click to adjust amounts.", "Top row: Items being sold", "Bottom rows: Cost items"));
-	public static List<String> tradeSetupDescBuying = c(Arrays.asList("Buys items.", "Insert one of each item you want to", "buy and plenty of currency items", "into the container.", "Left/Right click to adjust amounts.", "Top row: Cost items", "Bottom row: Items being bought"));
-	public static List<String> tradeSetupDescTrading = c(Arrays.asList("Trades items.", "Pickup an item from your inventory", "and then click a slot to place it.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items"));
+	public static List<String> tradeSetupDescSelling = c(Arrays.asList("Sells items to players.", "Insert items to sell into the container.", "Left/Right click to adjust amounts.", "Top row: Items being sold", "Bottom rows: Cost items"));
+	public static List<String> tradeSetupDescBuying = c(Arrays.asList("Buys items from players.", "Insert one of each item you want to", "buy and plenty of currency items", "into the container.", "Left/Right click to adjust amounts.", "Top row: Cost items", "Bottom row: Items being bought"));
+	public static List<String> tradeSetupDescTrading = c(Arrays.asList("Trades items with players.", "Pickup an item from your inventory", "and then click a slot to place it.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items"));
 	public static List<String> tradeSetupDescBook = c(Arrays.asList("Sells book copies.", "Insert written and blank books", "into the container.", "Left/Right click to adjust costs.", "Top row: Books being sold", "Bottom rows: Cost items"));
 
 	public static Text missingEditVillagersPerm = Text.parse("&7You do not have the permission to edit villagers.");
@@ -298,7 +298,7 @@ public class Messages extends Config {
 
 	public static Text ambiguousPlayerName = Text.parse("&cThere are multiple matches for the name '&e{name}&c'!");
 	public static Text ambiguousPlayerNameEntry = Text.parse("&c  - '&e{name}&r&c' (&6{uuid}&c)");
-	public static Text ambiguousPlayerNameMore = Text.parse("&c  ....");
+	public static Text ambiguousPlayerNameMore = Text.parse("&c  - ....");
 
 	public static Text commandHelpTitle = Text.parse("&9***** &8[&6Shopkeepers v{version}&8] &9*****");
 	public static Text commandHelpUsageFormat = Text.parse("&e{usage}");
@@ -313,7 +313,7 @@ public class Messages extends Config {
 	public static Text commandDescriptionGive = Text.parse("Gives shop creation item(s) to the specified player.");
 	public static Text commandDescriptionGiveCurrency = Text.parse("Gives currency item(s) to the specified player.");
 	public static Text commandDescriptionConvertItems = Text.parse("Converts the held (or all) items to conform to Spigot's data format.");
-	public static Text commandDescriptionRemote = Text.parse("Remotely opens a shop.");
+	public static Text commandDescriptionRemote = Text.parse("Remotely opens a shop (Optionally: For another player).");
 	public static Text commandDescriptionRemoteEdit = Text.parse("Remotely edits a shop.");
 	public static Text commandDescriptionTransfer = Text.parse("Transfers the ownership of a shop.");
 	public static Text commandDescriptionSettradeperm = Text.parse("Sets, removes (-) or displays (?) the trading permission.");
