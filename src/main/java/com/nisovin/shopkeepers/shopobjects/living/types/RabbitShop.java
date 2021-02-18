@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Color;
@@ -51,9 +50,8 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 	}
 
 	@Override
-	public List<EditorHandler.Button> getEditorButtons() {
-		List<EditorHandler.Button> editorButtons = new ArrayList<>();
-		editorButtons.addAll(super.getEditorButtons());
+	public List<EditorHandler.Button> createEditorButtons() {
+		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getRabbitTypeEditorButton());
 		return editorButtons;
 	}

@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -67,13 +66,11 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	}
 
 	@Override
-	public List<EditorHandler.Button> getEditorButtons() {
-		if (!this.isBabyable()) {
-			return super.getEditorButtons();
+	public List<EditorHandler.Button> createEditorButtons() {
+		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
+		if (this.isBabyable()) {
+			editorButtons.add(this.getBabyEditorButton());
 		}
-		List<EditorHandler.Button> editorButtons = new ArrayList<>();
-		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(this.getBabyEditorButton());
 		return editorButtons;
 	}
 

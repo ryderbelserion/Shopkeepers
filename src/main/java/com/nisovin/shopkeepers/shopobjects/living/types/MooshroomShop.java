@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -50,9 +49,8 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 	}
 
 	@Override
-	public List<EditorHandler.Button> getEditorButtons() {
-		List<EditorHandler.Button> editorButtons = new ArrayList<>();
-		editorButtons.addAll(super.getEditorButtons());
+	public List<EditorHandler.Button> createEditorButtons() {
+		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getVariantEditorButton());
 		return editorButtons;
 	}

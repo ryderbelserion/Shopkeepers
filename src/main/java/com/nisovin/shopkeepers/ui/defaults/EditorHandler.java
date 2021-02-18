@@ -113,7 +113,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 		this.addButtonOrIgnore(this.createDeleteButton());
 		this.addButtonOrIgnore(this.createNamingButton());
 		this.addButtonOrIgnore(this.createContainerButton());
-		this.addButtonsOrIgnore(shopkeeper.getShopObject().getEditorButtons());
+		this.addButtonsOrIgnore(shopkeeper.getShopObject().createEditorButtons());
 	}
 
 	protected Button createDeleteButton() {

@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -255,7 +255,18 @@ public abstract class AbstractShopObject implements ShopObject {
 
 	// EDITOR ACTIONS
 
-	public List<EditorHandler.Button> getEditorButtons() {
-		return Collections.emptyList(); // None by default
+	/**
+	 * Creates the editor buttons for editing this shop object.
+	 * <p>
+	 * This is usually only invoked once, when the {@link EditorHandler} is setup for the shopkeeper. So it is not
+	 * possible to dynamically add or remove buttons with this method.
+	 * <p>
+	 * In order to allow for subtypes to more easily add or modify the returned editor buttons, this method is expected
+	 * to return a new modifiable list with each invocation.
+	 * 
+	 * @return the editor buttons
+	 */
+	public List<EditorHandler.Button> createEditorButtons() {
+		return new ArrayList<>(); // None by default, modifiable by subtypes
 	}
 }

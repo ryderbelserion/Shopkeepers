@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.shopobjects.living.types;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.DyeColor;
@@ -56,9 +55,8 @@ public class SheepShop extends BabyableShop<Sheep> {
 	}
 
 	@Override
-	public List<EditorHandler.Button> getEditorButtons() {
-		List<EditorHandler.Button> editorButtons = new ArrayList<>();
-		editorButtons.addAll(super.getEditorButtons());
+	public List<EditorHandler.Button> createEditorButtons() {
+		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getColorEditorButton());
 		editorButtons.add(this.getShearedEditorButton());
 		return editorButtons;

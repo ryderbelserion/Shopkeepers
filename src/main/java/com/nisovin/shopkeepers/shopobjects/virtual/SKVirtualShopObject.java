@@ -94,9 +94,7 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 	// EDITOR ACTIONS
 
 	@Override
-	public List<EditorHandler.Button> getEditorButtons() {
-		List<EditorHandler.Button> editorButtons = new ArrayList<EditorHandler.Button>();
-		editorButtons.addAll(super.getEditorButtons());
-		return editorButtons;
+	public List<EditorHandler.Button> createEditorButtons() {
+		return super.createEditorButtons();
 	}
 }

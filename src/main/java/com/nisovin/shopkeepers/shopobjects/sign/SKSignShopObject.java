@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.shopobjects.sign;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -394,22 +393,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	// EDITOR ACTIONS
 
 	@Override
-	public List<EditorHandler.Button> getEditorButtons() {
-		List<EditorHandler.Button> editorButtons = new ArrayList<EditorHandler.Button>();
-		editorButtons.addAll(super.getEditorButtons());
-		editorButtons.add(new EditorHandler.ShopkeeperActionButton() {
-			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
-				return getSignTypeEditorItem();
-			}
-
-			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				boolean backwards = clickEvent.isRightClick();
-				cycleSignType(backwards);
-				return true;
-			}
-		});
+	public List<EditorHandler.Button> createEditorButtons() {
+		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
+		editorButtons.add(this.getSignTypeEditorButton());
 		return editorButtons;
 	}
 
@@ -438,8 +424,24 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		this.setSignType(EnumUtils.cycleEnumConstant(SignType.class, signType, backwards, SignType.IS_SUPPORTED));
 	}
 
-	protected ItemStack getSignTypeEditorItem() {
+	private ItemStack getSignTypeEditorItem() {
 		ItemStack iconItem = new ItemStack(signType.getSignMaterial());
 		return ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonSignVariant, Messages.buttonSignVariantLore);
+	}
+
+	private EditorHandler.Button getSignTypeEditorButton() {
+		return new EditorHandler.ShopkeeperActionButton() {
+			@Override
+			public ItemStack getIcon(EditorHandler.Session session) {
+				return getSignTypeEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				boolean backwards = clickEvent.isRightClick();
+				cycleSignType(backwards);
+				return true;
+			}
+		};
 	}
 }
