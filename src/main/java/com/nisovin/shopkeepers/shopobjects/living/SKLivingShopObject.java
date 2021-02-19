@@ -477,9 +477,16 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			// Teleport back:
 			Log.debug(DebugOptions.regularTickActivities, () -> "Shopkeeper (" + shopkeeper.getPositionString()
 					+ ") out of place, teleporting back");
-			lastSpawnLocation.setYaw(entityLoc.getYaw());
-			lastSpawnLocation.setPitch(entityLoc.getPitch());
-			entity.teleport(lastSpawnLocation);
+			// We freshly determine a potentially new spawn location:
+			// The previous spawn location might no longer be ideal. For example, if the shopkeeper previously spawned
+			// slightly below its actual spawn location (due to there missing some block), players might want to reset
+			// the shopkeeper's location by letting it fall due to gravity and then placing a block below its actual
+			// spawn location for the shopkeeper to now be able to stand on.
+			Location spawnLocation = this.getSpawnLocation();
+			spawnLocation.setYaw(entityLoc.getYaw());
+			spawnLocation.setPitch(entityLoc.getPitch());
+			this.lastSpawnLocation = spawnLocation;
+			entity.teleport(spawnLocation);
 			this.overwriteAI();
 		}
 		sharedLocation.setWorld(null); // Reset
