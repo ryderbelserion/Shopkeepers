@@ -118,9 +118,10 @@ public class ShopkeeperCreation {
 
 	public Location determineSpawnLocation(Player player, Block targetBlock, BlockFace targetBlockFace) {
 		assert player != null && targetBlock != null && targetBlockFace != null;
-		// If the target block is passable, spawn there, otherwise shift according to target block face:
+		// If the target block is passable (and not a liquid, which can only come up as target block when we try to
+		// place the shopkeeper on top of water or lava), spawn there, otherwise shift according to target block face:
 		Block spawnBlock;
-		if (targetBlock.isPassable()) {
+		if (targetBlock.isPassable() && !targetBlock.isLiquid()) {
 			spawnBlock = targetBlock;
 		} else {
 			spawnBlock = targetBlock.getRelative(targetBlockFace);

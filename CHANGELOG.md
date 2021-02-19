@@ -111,6 +111,8 @@ Another side effect of this change is that if gravity is disabled, it is no long
 * Config: The default config missed piglin brute as a by default enabled mob type.
 * Config: The default enabled shopkeeper mobs are now alphabetically sorted. This only applies to newly generated default configs.
 * Added an editor option to toggle the pumpkin head of snowman shopkeepers.
+* Striders, magma cubes, and blazes are now able to stand on top of lava. This only applies if they are not completely submerged by lava (in which case they don't float to the top as they do in vanilla Minecraft, but sink to the ground as before).
+* When creating shopkeepers via command, it is now possible to place them on top of liquids: Targeting a water or lava block will attempt to place the shopkeeper on top of it. If the player is under water (or inside of lava), the shopkeeper is placed at the targeted block as before. Since we spawn shopkeepers up to one block below their location, this still allows placing shopkeepers on the ground in shallow liquids, without them being continuously teleported back if they are not able to stand on top of the liquid.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.

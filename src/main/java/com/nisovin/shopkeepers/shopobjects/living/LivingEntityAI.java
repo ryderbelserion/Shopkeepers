@@ -1,14 +1,18 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,6 +28,7 @@ import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.util.CyclicCounter;
+import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.MutableChunkCoords;
 import com.nisovin.shopkeepers.util.RateLimiter;
 import com.nisovin.shopkeepers.util.Utils;
@@ -543,7 +548,21 @@ public class LivingEntityAI implements Listener {
 			// adds a small performance impact on top instead.
 			LivingEntity entity = entityData.entity;
 			Location entityLocation = entity.getLocation(sharedLocation);
-			entityData.distanceToGround = Utils.getCollisionDistanceToGround(entityLocation, gravityCollisionCheckRange);
+
+			// The entity may be able to stand on certain types of fluids:
+			Set<Material> collidableFluids = EntityUtils.getCollidableFluids(entity.getType());
+			// However, if the entity is inside of a fluid (i.e. if it is spawned under water or inside of lava), we
+			// ignore this aspect (i.e. it sinks to the ground even if can usually stand on top of the liquid).
+			// We check the block above the entity's location, because fluids are usually not a full block high (even if
+			// the block at the entity's foot location is liquid, it may actually stand on top of the liquid).
+			if (!collidableFluids.isEmpty()) {
+				Block blockAbove = entity.getWorld().getBlockAt(entityLocation.getBlockX(), entityLocation.getBlockY() + 1, entityLocation.getBlockZ());
+				if (blockAbove.isLiquid()) {
+					collidableFluids = Collections.emptySet();
+				}
+			}
+
+			entityData.distanceToGround = Utils.getCollisionDistanceToGround(entityLocation, gravityCollisionCheckRange, collidableFluids);
 			sharedLocation.setWorld(null); // Reset
 			boolean falling = (entityData.distanceToGround >= DISTANCE_TO_GROUND_THRESHOLD);
 			entityData.falling = falling;

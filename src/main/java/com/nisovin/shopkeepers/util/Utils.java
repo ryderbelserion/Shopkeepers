@@ -8,12 +8,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -26,6 +28,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.RegisteredListener;
+import org.bukkit.util.BlockIterator;
+import org.bukkit.util.NumberConversions;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
@@ -265,7 +269,8 @@ public final class Utils {
 	/**
 	 * Get the distance to the nearest block collision in the range of the given <code>maxDistance</code>.
 	 * <p>
-	 * This performs a ray trace through the blocks' collision boxes, ignoring fluids and passable blocks.
+	 * This performs a ray trace through the blocks' collision boxes, ignoring passable blocks and optionally ignoring
+	 * specific types of fluids.
 	 * <p>
 	 * The ray tracing gets slightly offset (by <code>0.01</code>) in order to make sure that we don't miss any block
 	 * directly at the start location. If this results in a hit above the start location, we ignore it and return
@@ -275,10 +280,13 @@ public final class Utils {
 	 *            the start location, has to use a valid world, does not get modified
 	 * @param maxDistance
 	 *            the max distance to check for block collisions, has to be positive
+	 * @param collidableFluids
+	 *            the types of fluids to collide with
 	 * @return the distance to the ground, or <code>maxDistance</code> if there are no block collisions within the
 	 *         specified range
 	 */
-	public static double getCollisionDistanceToGround(Location startLocation, double maxDistance) {
+	public static double getCollisionDistanceToGround(Location startLocation, double maxDistance, Set<Material> collidableFluids) {
+		assert collidableFluids != null;
 		World world = startLocation.getWorld();
 		assert world != null;
 		// Setup re-used offset start location:
@@ -287,8 +295,31 @@ public final class Utils {
 		TEMP_START_LOCATION.setY(startLocation.getY() + RAY_TRACE_OFFSET);
 		TEMP_START_LOCATION.setZ(startLocation.getZ());
 
-		// Considers block collision boxes, ignoring fluids and passable blocks:
-		RayTraceResult rayTraceResult = world.rayTraceBlocks(TEMP_START_LOCATION, DOWN_DIRECTION, maxDistance + RAY_TRACE_OFFSET, FluidCollisionMode.NEVER, true);
+		TEMP_START_POSITION.setX(TEMP_START_LOCATION.getX());
+		TEMP_START_POSITION.setY(TEMP_START_LOCATION.getY());
+		TEMP_START_POSITION.setZ(TEMP_START_LOCATION.getZ());
+
+		double offsetMaxDistance = maxDistance + RAY_TRACE_OFFSET;
+
+		RayTraceResult rayTraceResult = null;
+		if (collidableFluids.isEmpty()) {
+			// Considers block collision boxes, ignoring passable blocks and fluids (null if there is not hit):
+			rayTraceResult = world.rayTraceBlocks(TEMP_START_LOCATION, DOWN_DIRECTION, offsetMaxDistance, FluidCollisionMode.NEVER, true);
+		} else {
+			// Take the given types of fluids into account, but still ignore other types of passable blocks:
+			int offsetMaxDistanceBlocks = NumberConversions.ceil(offsetMaxDistance);
+			BlockIterator blockIterator = new BlockIterator(world, TEMP_START_POSITION, DOWN_DIRECTION, 0.0D, offsetMaxDistanceBlocks);
+			while (blockIterator.hasNext()) {
+				Block block = blockIterator.next();
+				if (!block.isPassable() || collidableFluids.contains(block.getType())) {
+					rayTraceResult = block.rayTrace(TEMP_START_LOCATION, DOWN_DIRECTION, offsetMaxDistance, FluidCollisionMode.ALWAYS);
+					if (rayTraceResult != null) {
+						break;
+					} // Else: The raytrace did not collide with the block (eg. open trap doors, etc.)
+				} // Else: Continue.
+			}
+			// rayTraceResult can remain null if there are no block collisions in range.
+		}
 		TEMP_START_LOCATION.setWorld(null); // Cleanup temporarily used start location
 
 		double distanceToGround;
@@ -296,9 +327,6 @@ public final class Utils {
 			// No collision with the range:
 			distanceToGround = maxDistance;
 		} else {
-			TEMP_START_POSITION.setX(TEMP_START_LOCATION.getX());
-			TEMP_START_POSITION.setY(TEMP_START_LOCATION.getY());
-			TEMP_START_POSITION.setZ(TEMP_START_LOCATION.getZ());
 			distanceToGround = TEMP_START_POSITION.distance(rayTraceResult.getHitPosition()) - RAY_TRACE_OFFSET;
 			// Might be negative if the hit is between the start location and the offset start location.
 			// We ignore it then.

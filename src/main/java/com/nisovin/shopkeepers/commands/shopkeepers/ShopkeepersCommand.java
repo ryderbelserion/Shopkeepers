@@ -111,7 +111,15 @@ public class ShopkeepersCommand extends BaseCommand {
 		// Creating new shopkeeper:
 
 		// Get targeted block information:
-		RayTraceResult targetBlockInfo = player.rayTraceBlocks(10.0D, FluidCollisionMode.NEVER);
+		// If the player is under water or lava, we ignore fluid collisions (allows placing shopkeepers under water or
+		// inside of lava). Otherwise, we take fluids into account (allows placing shopkeepers on top of water or lava,
+		// such as for example for striders).
+		Block playerBlock = player.getEyeLocation().getBlock();
+		boolean ignoreFluids = playerBlock.isLiquid();
+		FluidCollisionMode fluidCollisionMode = ignoreFluids ? FluidCollisionMode.NEVER : FluidCollisionMode.ALWAYS;
+		// This takes passable blocks (including fluids, depending on the collision mode) into account (i.e. collides
+		// with them):
+		RayTraceResult targetBlockInfo = player.rayTraceBlocks(10.0D, fluidCollisionMode);
 
 		// Check for valid targeted block:
 		if (targetBlockInfo == null) {

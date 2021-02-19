@@ -1,9 +1,13 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
+import java.util.Collections;
+import java.util.Set;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
@@ -115,7 +119,21 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		if (world == null) return null; // World not loaded
 
 		Location spawnLocation = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + SPAWN_LOCATION_OFFSET, shopkeeper.getZ() + 0.5D);
-		double distanceToGround = Utils.getCollisionDistanceToGround(spawnLocation, SPAWN_LOCATION_RANGE);
+
+		// The entity may be able to stand on certain types of fluids:
+		Set<Material> collidableFluids = EntityUtils.getCollidableFluids(this.getEntityType());
+		// However, if the spawn location is inside of a fluid (i.e. under water or inside of lava), we ignore this
+		// aspect (i.e. the entity sinks to the ground even if can usually stand on top of the liquid).
+		// We don't check the spawn block itself but the block above in order to also spawn entities that are in shallow
+		// liquids on top of the liquid.
+		if (!collidableFluids.isEmpty()) {
+			Block blockAbove = world.getBlockAt(shopkeeper.getX(), shopkeeper.getY() + 1, shopkeeper.getZ());
+			if (blockAbove.isLiquid()) {
+				collidableFluids = Collections.emptySet();
+			}
+		}
+
+		double distanceToGround = Utils.getCollisionDistanceToGround(spawnLocation, SPAWN_LOCATION_RANGE, collidableFluids);
 		if (distanceToGround == SPAWN_LOCATION_RANGE) {
 			// No collision within the checked range: Remove the initial offset from the spawn location.
 			distanceToGround = SPAWN_LOCATION_OFFSET;

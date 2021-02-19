@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
@@ -11,6 +12,7 @@ import java.util.function.Predicate;
 import org.bukkit.Chunk;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -21,6 +23,31 @@ import org.bukkit.util.Vector;
 public class EntityUtils {
 
 	private EntityUtils() {
+	}
+
+	private static final Set<Material> LAVA = Collections.singleton(Material.LAVA);
+
+	/**
+	 * Gets the types of fluids this type of entity can stand on.
+	 * <p>
+	 * For example, striders and magma cubes can stand on lava.
+	 * 
+	 * @param entityType
+	 *            the entity type
+	 * @return the fluids on which entities of this type can stand, not <code>null</code> but can be empty
+	 */
+	public static Set<Material> getCollidableFluids(EntityType entityType) {
+		// Even though blazes sink to the ground in vanilla Minecraft, we allow them to stand on top of lava because
+		// that makes them more useful in nether themed shops. They are also able to fly and hover in mid air, so this
+		// deviation from vanilla is not that severe.
+		switch (entityType.name()) {
+		case "STRIDER": // TODO Replace with enum constant once we only support 1.16+
+		case "MAGMA_CUBE":
+		case "BLAZE":
+			return LAVA;
+		default:
+			return Collections.emptySet();
+		}
 	}
 
 	public static EntityType matchEntityType(String entityTypeId) {
