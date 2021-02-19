@@ -184,6 +184,7 @@ Migration notes:
   * Language files are located inside a new 'lang' folder now. Existing custom language files need to be manually moved!
   * Trading logs (if enabled) are stored inside the folder 'trade-logs' now. Existing logs are not automatically moved to the new location!
 * Removed the 1.16 'PIG_ZOMBIE' migration. We no longer automatically remove this mob type from the config, but only log a warning and then ignore it.
+* Removed the migration from Citizens shopkeeper NPC ids to NPC unique ids (originally added in v2.4.0).
 * The setting 'enable-spawn-verifier' is no longer used and is automatically removed from existing configs during the update.
 
 Messages:  

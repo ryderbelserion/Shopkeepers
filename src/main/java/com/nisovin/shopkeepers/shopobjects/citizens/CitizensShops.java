@@ -115,8 +115,6 @@ public class CitizensShops {
 
 		// Delayed to run after shopkeepers were loaded:
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			// Run legacy id conversion: // TODO Remove again at some point.
-			this.convertLegacyNPCIds();
 			// Remove invalid citizens shopkeepers:
 			this.removeInvalidCitizensShopkeepers();
 		}, 3L);
@@ -192,7 +190,7 @@ public class CitizensShops {
 		if (!this.isEnabled()) return null;
 		NPC npc = CitizensAPI.getNPCRegistry().createNPC(entityType, name);
 		if (npc == null) return null;
-		// Look towards near players:
+		// Look towards nearby players:
 		npc.getTrait(LookClose.class).lookClose(true);
 		if (location != null) {
 			// This will log a debug message from Citizens if it cannot spawn the NPC currently, but will then later
@@ -203,27 +201,6 @@ public class CitizensShops {
 			// not yet happened (if it has no location assigned yet).
 		}
 		return npc.getUniqueId();
-	}
-
-	private void convertLegacyNPCIds() {
-		if (!this.isEnabled()) {
-			// Cannot determine backing NPCs if citizens isn't running:
-			return;
-		}
-		SKShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
-		boolean dirty = false;
-		for (AbstractShopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
-			if (shopkeeper.getShopObject() instanceof SKCitizensShopObject) {
-				SKCitizensShopObject citizensShop = (SKCitizensShopObject) shopkeeper.getShopObject();
-				citizensShop.convertLegacyId();
-				if (shopkeeper.isDirty()) dirty = true;
-			}
-		}
-
-		if (dirty) {
-			// Save:
-			plugin.getShopkeeperStorage().save();
-		}
 	}
 
 	public void removeInvalidCitizensShopkeepers() {

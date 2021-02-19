@@ -55,11 +55,6 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 		return npcUniqueId;
 	}
 
-	// TODO Remove again at some point.
-	public String getObjectId(int npcLegacyId) {
-		return this.getIdentifier() + ":" + npcLegacyId;
-	}
-
 	@Override
 	public boolean mustBeSpawned() {
 		return false; // Spawning and despawning is handled by Citizens.

@@ -40,8 +40,9 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);
 
 	protected final CitizensShops citizensShops;
+	// Null if no NPC has been created for this shop object yet (eg. if Citizens was not enabled at the time this shop
+	// object has been created):
 	private UUID npcUniqueId = null;
-	private Integer npcLegacyId = null;
 	// If false, this will not remove the NPC on deletion:
 	private boolean destroyNPC = true;
 
@@ -71,35 +72,12 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
+
 		if (configSection.contains("npcId")) {
-			// Legacy conversion from integer ids
-			// TODO Remove again at some point.
-			if (configSection.isInt("npcId")) {
-				npcLegacyId = configSection.getInt("npcId");
-			} else {
-				String npcUniqueIdString = configSection.getString("npcId");
-				this.npcUniqueId = ConversionUtils.parseUUID(npcUniqueIdString);
-				if (npcUniqueId == null) {
-					Log.warning("Couldn't parse NPC unique id for shopkeeper " + shopkeeper.getId() + ": " + npcUniqueIdString);
-				}
-			}
-		}
-	}
-
-	// TODO Remove again at some point.
-	// Gets called from CitizensShops.
-	void convertLegacyId() {
-		if (npcLegacyId != null && citizensShops.isEnabled()) {
-			assert npcUniqueId == null;
-			NPC npc = CitizensAPI.getNPCRegistry().getById(npcLegacyId);
-			if (npc != null) {
-				Log.info("Citizens shopkeeper id conversion: Mapping shopkeeper " + shopkeeper.getId() + " to NPC " + CitizensShops.getNPCIdString(npc));
-				npcUniqueId = npc.getUniqueId();
-				npcLegacyId = null;
-				shopkeeper.markDirty();
-
-				// Re-activate by new object id:
-				this.onIdChanged();
+			String npcUniqueIdString = configSection.getString("npcId");
+			this.npcUniqueId = ConversionUtils.parseUUID(npcUniqueIdString);
+			if (npcUniqueId == null) {
+				Log.warning("Couldn't parse NPC unique id for shopkeeper " + shopkeeper.getId() + ": " + npcUniqueIdString);
 			}
 		}
 	}
@@ -109,16 +87,13 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		super.save(configSection);
 		if (npcUniqueId != null) {
 			configSection.set("npcId", npcUniqueId.toString());
-		} else if (npcLegacyId != null) {
-			// TODO Remove again at some point.
-			configSection.set("npcId", npcLegacyId);
 		}
 	}
 
 	@Override
 	public void setup() {
 		super.setup();
-		if (npcLegacyId != null || npcUniqueId != null || !citizensShops.isEnabled()) return;
+		if (npcUniqueId != null || !citizensShops.isEnabled()) return;
 
 		// Create NPC:
 		Log.debug(() -> "Creating citizens NPC for shopkeeper " + shopkeeper.getId());
@@ -151,7 +126,9 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	@Override
 	public void delete() {
 		super.delete();
-		if (npcUniqueId == null) return; // There is no corresponding NPC (maybe already deleted)
+		// Check if there even is a corresponding NPC (maybe it has already been deleted, or it has not actually been
+		// created yet):
+		if (npcUniqueId == null) return;
 		if (destroyNPC) {
 			NPC npc = this.getNPC();
 			if (npc != null) {
@@ -214,12 +191,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	@Override
 	public Object getId() {
-		if (npcUniqueId == null) {
-			if (npcLegacyId == null) return null;
-			else {
-				return this.getType().getObjectId(npcLegacyId);
-			}
-		}
+		if (npcUniqueId == null) return null;
 		return this.getType().getObjectId(npcUniqueId);
 	}
 
