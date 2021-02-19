@@ -22,6 +22,7 @@ import com.nisovin.shopkeepers.config.lib.annotation.WithValueTypeProvider;
 import com.nisovin.shopkeepers.config.lib.setting.FieldSetting;
 import com.nisovin.shopkeepers.config.lib.setting.Setting;
 import com.nisovin.shopkeepers.config.lib.value.DefaultValueTypes;
+import com.nisovin.shopkeepers.config.lib.value.UnknownEntityTypeException;
 import com.nisovin.shopkeepers.config.lib.value.UnknownMaterialException;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
@@ -360,6 +361,8 @@ public abstract class Config {
 		Log.warning(this.msgValueLoadException(configKey, e));
 		if (e instanceof UnknownMaterialException) {
 			Log.warning(this.getLogPrefix() + "All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
+		} else if (e instanceof UnknownEntityTypeException) {
+			Log.warning(this.getLogPrefix() + "All valid entity type names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html");
 		}
 	}
 

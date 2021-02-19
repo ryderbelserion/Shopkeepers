@@ -3,11 +3,15 @@ package com.nisovin.shopkeepers.config.lib.value;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.function.Function;
 
 import org.bukkit.Material;
+import org.bukkit.entity.EntityType;
 
 import com.nisovin.shopkeepers.config.lib.value.types.BooleanValue;
 import com.nisovin.shopkeepers.config.lib.value.types.DoubleValue;
+import com.nisovin.shopkeepers.config.lib.value.types.EntityTypeValue;
+import com.nisovin.shopkeepers.config.lib.value.types.EnumValue;
 import com.nisovin.shopkeepers.config.lib.value.types.IntegerValue;
 import com.nisovin.shopkeepers.config.lib.value.types.ItemDataValue;
 import com.nisovin.shopkeepers.config.lib.value.types.ListValue;
@@ -39,7 +43,24 @@ public class DefaultValueTypes {
 		registry.register(Text.class, TextValue.INSTANCE);
 		registry.register(Material.class, MaterialValue.INSTANCE);
 		registry.register(ItemData.class, ItemDataValue.INSTANCE);
+		registry.register(EntityType.class, EntityTypeValue.INSTANCE);
 
+		// The following more general value type providers are only used for types which didn't match any of the above:
+
+		registry.register(ValueTypeProviders.forTypePattern(TypePatterns.forBaseType(Enum.class), new Function<Type, ValueType<?>>() {
+			@SuppressWarnings("unchecked")
+			@Override
+			public ValueType<?> apply(Type type) {
+				assert type instanceof Enum<?>;
+				Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) type;
+				return this.newEnumValueType(enumClass);
+			}
+
+			@SuppressWarnings("unchecked")
+			private <E extends Enum<E>> EnumValue<E> newEnumValueType(Class<? extends Enum<?>> enumClass) {
+				return new EnumValue<>((Class<E>) enumClass);
+			}
+		}));
 		registry.register(ValueTypeProviders.forTypePattern(TypePatterns.forClass(List.class), (type) -> {
 			assert type instanceof ParameterizedType;
 			Type elementType = ((ParameterizedType) type).getActualTypeArguments()[0];

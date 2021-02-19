@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.config.lib.value;
 import org.bukkit.Material;
 
 /**
- * This exception is issued by {@link ValueType#load(Object)} when an unknown {@link Material} is encountered.
+ * This exception is thrown by {@link ValueType#load(Object)} when an unknown {@link Material} is encountered.
  */
 public class UnknownMaterialException extends ValueLoadException {
 

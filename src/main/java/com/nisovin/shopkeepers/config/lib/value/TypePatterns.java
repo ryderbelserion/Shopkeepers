@@ -32,6 +32,33 @@ public class TypePatterns {
 		}
 	}
 
+	public static TypePattern forBaseType(Class<?> baseType) {
+		return new BaseTypePattern(baseType);
+	}
+
+	private static class BaseTypePattern implements TypePattern {
+
+		private final Class<?> baseType;
+
+		public BaseTypePattern(Class<?> baseType) {
+			Validate.notNull(baseType, "baseType is null");
+			this.baseType = baseType;
+		}
+
+		@Override
+		public boolean matches(Type type) {
+			Type actualType = type;
+			if (type instanceof ParameterizedType) {
+				actualType = ((ParameterizedType) type).getRawType();
+			}
+			if (!(actualType instanceof Class)) {
+				return false;
+			}
+			Class<?> actualClass = (Class<?>) actualType;
+			return this.baseType.isAssignableFrom(actualClass);
+		}
+	}
+
 	public static TypePattern parameterized(Class<?> clazz, TypePattern... typeParameters) {
 		return new ParameterizedTypePattern(clazz, typeParameters);
 	}

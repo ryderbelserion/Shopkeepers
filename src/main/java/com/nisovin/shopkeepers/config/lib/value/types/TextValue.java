@@ -11,20 +11,20 @@ public class TextValue extends ValueType<Text> {
 
 	public static final TextValue INSTANCE = new TextValue();
 
-	private static final ColoredStringValue coloredStringValue = new ColoredStringValue();
+	private static final ColoredStringValue COLORED_STRING_VALUE = new ColoredStringValue();
 
 	public TextValue() {
 	}
 
 	@Override
 	public Text load(Object configValue) throws ValueLoadException {
-		return Text.parse(coloredStringValue.load(configValue));
+		return Text.parse(COLORED_STRING_VALUE.load(configValue));
 	}
 
 	@Override
 	public Object save(Text value) {
 		if (value == null) return null;
-		return coloredStringValue.save(value.toPlainFormatText());
+		return COLORED_STRING_VALUE.save(value.toPlainFormatText());
 	}
 
 	@Override
