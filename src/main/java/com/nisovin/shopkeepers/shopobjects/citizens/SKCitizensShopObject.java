@@ -35,7 +35,7 @@ import net.citizensnpcs.api.trait.trait.MobType;
  */
 public class SKCitizensShopObject extends AbstractEntityShopObject implements CitizensShopObject {
 
-	public static String CREATION_DATA_NPC_UUID_KEY = "CitizensNpcUUID";
+	public static final String CREATION_DATA_NPC_UUID_KEY = "CitizensNpcUUID";
 	private static final int CHECK_PERIOD_SECONDS = 10;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);
 
