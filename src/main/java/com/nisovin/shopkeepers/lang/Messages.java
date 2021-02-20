@@ -128,6 +128,8 @@ public class Messages extends Config {
 	public static List<String> buttonMagmaCubeSizeLore = c(Arrays.asList("Cycles the magma cube's size.", "Current size: &e{size}"));
 	public static String buttonSnowmanPumpkinHead = c("&aToggle pumpkin head");
 	public static List<String> buttonSnowmanPumpkinHeadLore = c(Arrays.asList("Toggles the snowman's", "pumpkin head"));
+	public static String buttonShulkerColor = c("&aChoose shulker color");
+	public static List<String> buttonShulkerColorLore = c(Arrays.asList("Changes the color", "of the shulker"));
 
 	public static String adminSignShopLine1 = c("&2[SHOP]");
 	public static String adminSignShopLine2 = c("&7{shopName}");

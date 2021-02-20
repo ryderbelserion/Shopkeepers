@@ -167,6 +167,10 @@ button-snowman-pumpkin-head: "&aToggle pumpkin head"
 button-snowman-pumpkin-head-lore:
 - "Toggles the snowman's"
 - "pumpkin head"
+button-shulker-color: "&aChoose shulker color"
+button-shulker-color-lore:
+- "Changes the color"
+- "of the shulker"
 
 admin-sign-shop-line1: "&2[SHOP]"
 admin-sign-shop-line2: "&7{shopName}"

@@ -35,6 +35,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.ParrotShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PigShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.RabbitShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SheepShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.ShulkerShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SlimeShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SnowmanShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
@@ -341,6 +342,14 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 				@Override
 				public SnowmanShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 					return new SnowmanShop(livingShops, this, shopkeeper, creationData);
+				}
+			};
+			break;
+		case SHULKER:
+			objectType = new SKLivingShopObjectType<ShulkerShop>(livingShops, entityType, aliases, typeName, permission) {
+				@Override
+				public ShulkerShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+					return new ShulkerShop(livingShops, this, shopkeeper, creationData);
 				}
 			};
 			break;

@@ -166,6 +166,10 @@ button-snowman-pumpkin-head: "&aKürbiskopf umschalten"
 button-snowman-pumpkin-head-lore:
 - "Schaltet zwischen Schneemann"
 - "mit und ohne Kürbiskopf um"
+button-shulker-color: "&aShulkerfarbe ändern"
+button-shulker-color-lore:
+- "Ändert die Farbe"
+- "des Shulkers"
 
 admin-sign-shop-line1: "&2[SHOP]"
 admin-sign-shop-line2: "&7{shopName}"
