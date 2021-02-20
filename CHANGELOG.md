@@ -114,6 +114,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Added an editor option to toggle the pumpkin head of snowman shopkeepers.
 * Striders, magma cubes, and blazes are now able to stand on top of lava. This only applies if they are not completely submerged by lava (in which case they don't float to the top as they do in vanilla Minecraft, but sink to the ground as before).
 * When creating shopkeepers via command, it is now possible to place them on top of liquids: Targeting a water or lava block will attempt to place the shopkeeper on top of it. If the player is under water (or inside of lava), the shopkeeper is placed at the targeted block as before. Since we spawn shopkeepers up to one block below their location, this still allows placing shopkeepers on the ground in shallow liquids, without them being continuously teleported back if they are not able to stand on top of the liquid.
+* Config: Minor changes to a few comments inside the default config.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.

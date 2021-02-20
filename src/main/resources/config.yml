@@ -287,10 +287,11 @@ show-nameplates: true
 # when looking directly at the shopkeeper.
 always-show-nameplates: false
 
-# Whether to allow citizen (npc) shops. Requires the plugin Citizens.
+# Whether to allow the creation of Citizen (NPC) shopkeepers. Requires the
+# plugin Citizens.
 enable-citizen-shops: true
 
-# Whether to allow sign shops.
+# Whether to allow the creation of sign shops.
 enable-sign-shops: true
 # Whether to allow the creation of sign posts (instead of only wall signs).
 enable-sign-post-shops: true
