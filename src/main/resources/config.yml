@@ -290,6 +290,8 @@ always-show-nameplates: false
 # Whether to allow the creation of Citizen (NPC) shopkeepers. Requires the
 # plugin Citizens.
 enable-citizen-shops: true
+# The entity type used by newly created Citizen NPC shopkeepers:
+default-citizen-npc-type: 'PLAYER'
 
 # Whether to allow the creation of sign shops.
 enable-sign-shops: true

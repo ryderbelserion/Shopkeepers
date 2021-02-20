@@ -43,6 +43,9 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	// Null if no NPC has been created for this shop object yet (eg. if Citizens was not enabled at the time this shop
 	// object has been created):
 	private UUID npcUniqueId = null;
+	// Only used initially, when the shopkeeper is created by a player. If this name is not available when we create the
+	// NPC, we fall back to a different name.
+	private String creatorName = null;
 	// If false, this will not remove the NPC on deletion:
 	private boolean destroyNPC = true;
 
@@ -56,17 +59,14 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			// Can be null here, as currently only NPC shopkeepers created by the shopkeeper trait provide the NPC's
 			// unique id via the creation data:
 			this.npcUniqueId = creationData.getValue(CREATION_DATA_NPC_UUID_KEY);
+			Player creator = creationData.getCreator();
+			this.creatorName = (creator != null) ? creator.getName() : null;
 		}
 	}
 
 	@Override
 	public SKCitizensShopObjectType getType() {
 		return SKDefaultShopObjectTypes.CITIZEN();
-	}
-
-	// Can be null if not set yet.
-	public UUID getNPCUniqueId() {
-		return npcUniqueId;
 	}
 
 	@Override
@@ -93,28 +93,65 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	@Override
 	public void setup() {
 		super.setup();
+
+		// Create the NPC if required (and possible):
+		this.createNpcIfMissing();
+	}
+
+	private void createNpcIfMissing() {
 		if (npcUniqueId != null || !citizensShops.isEnabled()) return;
 
-		// Create NPC:
 		Log.debug(() -> "Creating citizens NPC for shopkeeper " + shopkeeper.getId());
 
-		EntityType entityType;
-		String name;
-		if (shopkeeper instanceof PlayerShopkeeper) {
-			// Player shops will use a player NPC:
-			entityType = EntityType.PLAYER;
-			name = ((PlayerShopkeeper) shopkeeper).getOwnerName();
-		} else {
-			entityType = EntityType.VILLAGER;
-			name = "Shopkeeper";
-		}
-
-		// Create NPC:
+		EntityType entityType = Settings.defaultCitizenNpcType;
 		// Note: The spawn location can be null if the world is not loaded currently. We can still create the NPC, but
 		// spawning will happen later once the world is loaded.
 		Location spawnLocation = this.getSpawnLocation(); // Can be null
-		npcUniqueId = citizensShops.createNPC(spawnLocation, entityType, name);
+		// The NPC name is initially empty (works fine, even for player NPCs):
+		npcUniqueId = citizensShops.createNPC(spawnLocation, entityType, "");
+
+		// Empty initial name for non-player NPCs:
+		String name = "";
+		if (entityType == EntityType.PLAYER) {
+			// The name influences the initial skin of the player NPC:
+			if (shopkeeper instanceof PlayerShopkeeper) {
+				// Use the owner name for player shops (regardless of who actually created the shop):
+				name = ((PlayerShopkeeper) shopkeeper).getOwnerName();
+			} else {
+				// Fallback to empty name (works fine, even for player NPCs):
+				name = (creatorName != null) ? creatorName : "";
+			}
+		}
+		assert name != null;
+
+		// Apply the name:
+		// This also applies the nameplate prefix and adjusts the nameplate visibility if required.
+		this.setName(name);
+
 		shopkeeper.markDirty();
+	}
+
+	// NPC
+
+	// Can be null if not set yet.
+	public UUID getNPCUniqueId() {
+		return npcUniqueId;
+	}
+
+	public NPC getNPC() {
+		if (npcUniqueId == null) return null;
+		if (!citizensShops.isEnabled()) return null;
+		return CitizensAPI.getNPCRegistry().getByUniqueId(npcUniqueId);
+	}
+
+	private EntityType getEntityType() {
+		NPC npc = this.getNPC();
+		if (npc == null) return null;
+
+		Entity entity = npc.getEntity(); // Null if not spawned
+		if (entity != null) return entity.getType();
+
+		return npc.getTrait(MobType.class).getType();
 	}
 
 	// LIFE CYCLE
@@ -166,12 +203,6 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	}
 
 	// ACTIVATION
-
-	public NPC getNPC() {
-		if (npcUniqueId == null) return null;
-		if (!citizensShops.isEnabled()) return null;
-		return CitizensAPI.getNPCRegistry().getByUniqueId(npcUniqueId);
-	}
 
 	@Override
 	public Entity getEntity() {
@@ -284,10 +315,9 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	@Override
 	public int getNameLengthLimit() {
-		// Citizens uses different limits depending on the npc type (64 for mobs, 46 for players).
-		// Citizens might dynamically truncate the name of the corresponding npc, and will then print a warning.
-		NPC npc = this.getNPC();
-		if (npc != null && npc.getTrait(MobType.class).getType() == EntityType.PLAYER) return 46;
+		// Citizens uses different limits depending on the NPC type (64 for mobs, 46 for players).
+		// Citizens might dynamically truncate the name of the corresponding NPC, and will then print a warning.
+		if (this.getEntityType() == EntityType.PLAYER) return 46;
 		return 64;
 	}
 
@@ -297,15 +327,18 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		if (npc == null) return;
 
 		if (Settings.showNameplates && name != null && !name.isEmpty()) {
-			name = Messages.nameplatePrefix + name;
+			if (this.getEntityType() != EntityType.PLAYER) {
+				name = Messages.nameplatePrefix + name;
+			} // Else: The name (including the prefix) influence the NPC's skin, so we avoid adding the prefix.
 			name = this.prepareName(name);
-			// Set entity name plate:
+
+			// Set name and nameplate visibility:
 			npc.setName(name);
-			// this.entity.setCustomNameVisible(Settings.alwaysShowNameplates);
+			npc.data().setPersistent(NPC.NAMEPLATE_VISIBLE_METADATA, Settings.alwaysShowNameplates ? "true" : "hover");
 		} else {
-			// Remove name plate:
+			// Remove name and nameplate:
 			npc.setName("");
-			// this.entity.setCustomNameVisible(false);
+			npc.data().setPersistent(NPC.NAMEPLATE_VISIBLE_METADATA, "false");
 		}
 	}
 
@@ -313,7 +346,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	public String getName() {
 		NPC npc = this.getNPC();
 		if (npc == null) return null;
-		return npc.getFullName();
+		return npc.getName();
 	}
 
 	// PLAYER SHOP OWNER

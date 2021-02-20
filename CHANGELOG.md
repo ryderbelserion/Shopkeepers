@@ -115,6 +115,14 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Striders, magma cubes, and blazes are now able to stand on top of lava. This only applies if they are not completely submerged by lava (in which case they don't float to the top as they do in vanilla Minecraft, but sink to the ground as before).
 * When creating shopkeepers via command, it is now possible to place them on top of liquids: Targeting a water or lava block will attempt to place the shopkeeper on top of it. If the player is under water (or inside of lava), the shopkeeper is placed at the targeted block as before. Since we spawn shopkeepers up to one block below their location, this still allows placing shopkeepers on the ground in shallow liquids, without them being continuously teleported back if they are not able to stand on top of the liquid.
 * Config: Minor changes to a few comments inside the default config.
+* Config: Added setting 'default-citizen-npc-type' (default: 'PLAYER') which controls the entity type used by newly created Citizen shopkeeper NPCs.
+  * Admin shopkeepers also use player NPCs by default now, because using villager NPCs for them has caused some confusion in the past.
+  * This also resolves an issue for offline-mode servers, because on recent versions of Citizens the creation of player NPCs fails if they share the same name as regular players on the server (due to some conflict with their UUIDs being the same).
+* Changes to Citizen shopkeeper NPC names:
+  * NPCs are initially created with an empty name now. This works fine even for player NPCs. Only if the NPC is of type player, we subsequently assign it a name, because that determines its initial skin.
+  * If the shopkeeper is a player shop, we use the shop owner's name as before. Otherwise, we try to use the name of the player who created the shopkeeper. If this is not available, we fallback to an empty name.
+  * We no longer add the nameplate prefix if the NPC is of type player, because this messes with the NPC's skin.
+  * When setting the NPC's name we now also set the nameplate visibility: If the name is empty, the nameplate is hidden. Otherwise, the 'always-show-nameplates' setting determines whether to always show the nameplate, or to only show it when looking directly at the entity (this only works for non-player NPCs though).
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
@@ -134,6 +142,7 @@ API:
 * Added ShopObject#isSpawned as a more lightweight variant of ShopObject#isActive.
 * Several ShopObject methods no longer check if the shop object is currently active, but only if it has been spawned, which is sufficient most of the time.
 * The blocks of sign shopkeepers are also marked with the shopkeeper metadata now.
+* API: CitizensShopObject#getName returns the NPC name instead of it's 'full name' now (i.e. the name that more closely corresponds to the name set via #setName).
 * Several Javadoc improvements and clarifications.
 
 Internal API:  
@@ -177,6 +186,8 @@ Internal:
 * Moved the handling of shopkeeper metadata from ShopkeeperUtils into ShopkeeperMetadata.
 * When checking if a shopkeeper entity moved, we reuse a single Location object now.
 * Added test cases that compare the values of the default config and language file with their internal counter parts.
+* We explicitly set the mob type of Citizen shopkeeper NPCs now when we create the NPC, similar to Citizens' own NPC creation command.
+* Slightly changed how we retrieve the entity type of Citizen shopkeeper NPCs.
 * Minor other internal code refactoring.
 
 Migration notes:  

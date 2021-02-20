@@ -177,6 +177,7 @@ public class Settings extends Config {
 	public static boolean alwaysShowNameplates = false;
 
 	public static boolean enableCitizenShops = true;
+	public static EntityType defaultCitizenNpcType = EntityType.PLAYER;
 
 	public static boolean enableSignShops = true;
 	public static boolean enableSignPostShops = true;

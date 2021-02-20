@@ -25,6 +25,7 @@ import com.nisovin.shopkeepers.util.Log;
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
 import net.citizensnpcs.api.trait.TraitInfo;
+import net.citizensnpcs.api.trait.trait.MobType;
 import net.citizensnpcs.trait.LookClose;
 
 /**
@@ -190,15 +191,20 @@ public class CitizensShops {
 		if (!this.isEnabled()) return null;
 		NPC npc = CitizensAPI.getNPCRegistry().createNPC(entityType, name);
 		if (npc == null) return null;
+
+		// Ensure that Citizens remembers the mob type:
+		npc.getTrait(MobType.class).setType(entityType);
+
 		// Look towards nearby players:
 		npc.getTrait(LookClose.class).lookClose(true);
+
 		if (location != null) {
 			// This will log a debug message from Citizens if it cannot spawn the NPC currently, but will then later
 			// attempt to spawn it when the chunk gets loaded:
 			npc.spawn(location);
 		} else {
-			// Our teleport task will periodically call SKCitizensShopObject#check(), which spawns the NPC if this has
-			// not yet happened (if it has no location assigned yet).
+			// The Citizens shop object will periodically check if the NPC has already been spawned (i.e. if it has no
+			// location assigned yet) and will otherwise attempt to spawn it.
 		}
 		return npc.getUniqueId();
 	}
