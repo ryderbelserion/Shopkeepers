@@ -123,6 +123,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * If the shopkeeper is a player shop, we use the shop owner's name as before. Otherwise, we try to use the name of the player who created the shopkeeper. If this is not available, we fallback to an empty name.
   * We no longer add the nameplate prefix if the NPC is of type player, because this messes with the NPC's skin.
   * When setting the NPC's name we now also set the nameplate visibility: If the name is empty, the nameplate is hidden. Otherwise, the 'always-show-nameplates' setting determines whether to always show the nameplate, or to only show it when looking directly at the entity (this only works for non-player NPCs though).
+* Config: Added shulker to the by default enabled mob types. However, note that this mob will stay in its closed form currently due to its disabled AI.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.

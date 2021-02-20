@@ -81,7 +81,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> ENDERMITE: seems to work, however it shows strange movement
 	 * <li> GUARDIAN: does not work, error when trying to apply common AI goals
 	 * <li> ARMOR_STAND: cannot be clicked / accessed yet
-	 * <li> SHULKER: seems to work on first glance, though it is rather uninteresting because it stays in closed form
+	 * <li> SHULKER: seems to work, but stays in closed state
 	 * <li> HORSE: okay
 	 * <li> MULE: okay
 	 * <li> DONKEY: okay

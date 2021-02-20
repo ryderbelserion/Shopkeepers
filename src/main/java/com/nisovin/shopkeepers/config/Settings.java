@@ -131,6 +131,7 @@ public class Settings extends Config {
 			EntityType.DONKEY.name(),
 			EntityType.SKELETON_HORSE.name(),
 			EntityType.ZOMBIE_HORSE.name(),
+			EntityType.SHULKER.name(),
 			EntityType.EVOKER.name(), // MC 1.11
 			EntityType.VEX.name(), // MC 1.11
 			EntityType.VINDICATOR.name(), // MC 1.11
