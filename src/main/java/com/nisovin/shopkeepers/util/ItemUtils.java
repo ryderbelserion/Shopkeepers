@@ -485,12 +485,58 @@ public final class ItemUtils {
 		return data.equals(target);
 	}
 
+	// PREDICATES
+
+	private static final Predicate<ItemStack> EMPTY_ITEMS = ItemUtils::isEmpty;
+	private static final Predicate<ItemStack> NON_EMPTY_ITEMS = (itemStack) -> !isEmpty(itemStack);
+
+	/**
+	 * Gets a {@link Predicate} that accepts {@link #isEmpty(ItemStack) empty} {@link ItemStack ItemStacks}.
+	 * 
+	 * @return the Predicate
+	 */
+	public static Predicate<ItemStack> emptyItems() {
+		return EMPTY_ITEMS;
+	}
+
+	/**
+	 * Gets a {@link Predicate} that accepts {@link #isEmpty(ItemStack) non-empty} {@link ItemStack ItemStacks}.
+	 * 
+	 * @return the Predicate
+	 */
+	public static Predicate<ItemStack> nonEmptyItems() {
+		return NON_EMPTY_ITEMS;
+	}
+
+	/**
+	 * Gets a {@link Predicate} that accepts {@link ItemStack ItemStacks} that {@link ItemData#matches(ItemStack) match}
+	 * the given {@link ItemData}.
+	 * 
+	 * @param itemData
+	 *            the ItemData, not <code>null</code>
+	 * @return the Predicate
+	 */
+	public static Predicate<ItemStack> matchingItems(ItemData itemData) {
+		Validate.notNull(itemData, "itemData is null");
+		return (itemStack) -> itemData.matches(itemStack);
+	}
+
+	/**
+	 * Gets a {@link Predicate} that accepts {@link #isEmpty(ItemStack) non-empty} {@link ItemStack ItemStacks} that
+	 * {@link ItemData#matches(ItemStack) match} any of the given {@link ItemData}.
+	 * 
+	 * @param itemDataList
+	 *            the list of ItemData, not <code>null</code> and does not contain <code>null</code>
+	 * @return the Predicate
+	 */
 	public static Predicate<ItemStack> matchingItems(List<ItemData> itemDataList) {
 		Validate.notNull(itemDataList, "itemDataList is null");
-		return (item) -> {
-			if (isEmpty(item)) return false;
+		assert !itemDataList.contains(null);
+		return (itemStack) -> {
+			if (isEmpty(itemStack)) return false;
 			for (ItemData itemData : itemDataList) {
-				if (itemData != null && itemData.matches(item)) {
+				assert itemData != null;
+				if (itemData.matches(itemStack)) {
 					return true;
 				} // Else: Continue.
 			}
@@ -657,31 +703,49 @@ public final class ItemUtils {
 	}
 
 	/**
-	 * Checks if the given contents contains at least the specified amount of items matching the specified
-	 * {@link ItemData}.
+	 * Checks if the given contents contains at least the specified amount of items that are accepted by the given
+	 * {@link Predicate}.
+	 * <p>
+	 * The given Predicate is only invoked for {@link #isEmpty(ItemStack) non-empty} ItemStacks.
+	 * 
+	 * @param contents
+	 *            the contents to search through
+	 * @param predicate
+	 *            the predicate, not <code>null</code>
+	 * @param amount
+	 *            the amount of items to check for
+	 * @return <code>true</code> if at least the specified amount of items were found
+	 */
+	public static boolean containsAtLeast(ItemStack[] contents, Predicate<ItemStack> predicate, int amount) {
+		Validate.notNull(predicate, "predicate is null");
+		if (amount <= 0) return true;
+		if (contents == null) return false;
+		int remainingAmount = amount;
+		for (ItemStack itemStack : contents) {
+			if (isEmpty(itemStack)) continue;
+			if (!predicate.test(itemStack)) continue;
+			remainingAmount -= itemStack.getAmount();
+			if (remainingAmount <= 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks if the given contents contains at least the specified amount of items that
+	 * {@link ItemData#matches(ItemStack) match} the given {@link ItemData}.
 	 * 
 	 * @param contents
 	 *            the contents to search through
 	 * @param itemData
-	 *            the item data to match, <code>null</code> will not match any item
+	 *            the item data to check for, not <code>null</code>
 	 * @param amount
-	 *            the amount of items to look for
-	 * @return <code>true</code> if the at least specified amount of matching items was found
+	 *            the amount of items to check for
+	 * @return <code>true</code> if at least the specified amount of items were found
 	 */
 	public static boolean containsAtLeast(ItemStack[] contents, ItemData itemData, int amount) {
-		if (contents == null) return false;
-		if (itemData == null) return false; // Consider null to match no item here
-		int remainingAmount = amount;
-		for (ItemStack itemStack : contents) {
-			if (!itemData.matches(itemStack)) continue;
-			int currentAmount = itemStack.getAmount() - remainingAmount;
-			if (currentAmount >= 0) {
-				return true;
-			} else {
-				remainingAmount = -currentAmount;
-			}
-		}
-		return false;
+		return containsAtLeast(contents, matchingItems(itemData), amount);
 	}
 
 	/**
