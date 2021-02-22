@@ -849,6 +849,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		world.spawnParticle(Particle.REDSTONE, particleLocation, 1, TICK_VISUALIZATION_DUSTS[tickingGroup]);
 	}
 
+	// TOSTRING
+
+	@Override
+	public String toString() {
+		return "Shopkeeper " + this.getIdString();
+	}
+
 	// HASHCODE AND EQUALS
 
 	@Override
