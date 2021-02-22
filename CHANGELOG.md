@@ -125,6 +125,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * When setting the NPC's name we now also set the nameplate visibility: If the name is empty, the nameplate is hidden. Otherwise, the 'always-show-nameplates' setting determines whether to always show the nameplate, or to only show it when looking directly at the entity (this only works for non-player NPCs though).
 * Config: Added shulker to the by default enabled mob types. However, note that this mob will stay in its closed form currently due to its disabled AI.
 * Added an editor option to change the color of shulker shopkeepers.
+* Config: List settings verify now that they don't contain null elements when being loaded from the config.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.

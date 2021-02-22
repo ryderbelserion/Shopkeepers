@@ -14,10 +14,18 @@ public class ListValue<E> extends ValueType<List<E>> {
 	public static final String DEFAULT_LIST_DELIMITER = ",";
 
 	private final ValueType<E> elementValueType;
+	// TODO Make this configurable per setting, maybe via annotation?
+	private final boolean nullElementsAllowed;
 
 	public ListValue(ValueType<E> elementValueType) {
+		// By default, null elements are not allowed:
+		this(elementValueType, false);
+	}
+
+	public ListValue(ValueType<E> elementValueType, boolean nullElementsAllowed) {
 		Validate.notNull(elementValueType, "elementValueType is null!");
 		this.elementValueType = elementValueType;
+		this.nullElementsAllowed = nullElementsAllowed;
 	}
 
 	@Override
@@ -29,7 +37,11 @@ public class ListValue<E> extends ValueType<List<E>> {
 		List<?> configValues = (List<?>) configValue;
 		List<E> values = new ArrayList<>(configValues.size());
 		for (Object configElement : configValues) {
-			values.add(elementValueType.load(configElement));
+			E value = elementValueType.load(configElement);
+			if (value == null && !nullElementsAllowed) {
+				throw new ValueLoadException("List contains null element!");
+			}
+			values.add(value);
 		}
 		return values;
 	}
@@ -66,6 +78,7 @@ public class ListValue<E> extends ValueType<List<E>> {
 		String[] splits = input.split(listDelimiter);
 		List<E> values = new ArrayList<>(splits.length);
 		for (String split : splits) {
+			assert split != null;
 			// Can throw ValueParseException:
 			E element = elementValueType.parse(split.trim());
 			assert element != null;
