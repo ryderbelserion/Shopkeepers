@@ -367,6 +367,45 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return Bukkit.getWorld(this.getWorldName()).getBlockAt(containerX, containerY, containerZ);
 	}
 
+	// Returns null if the container could not be found.
+	public ItemStack[] getContainerContents() {
+		ItemStack[] contents = null;
+		Block container = this.getContainer();
+		if (ShopContainers.isSupportedContainer(container.getType())) {
+			Inventory inventory = ShopContainers.getInventory(container);
+			contents = inventory.getContents();
+		}
+		return contents;
+	}
+
+	@Deprecated
+	@Override
+	public int getCurrencyInChest() {
+		return this.getCurrencyInContainer();
+	}
+
+	@Override
+	public int getCurrencyInContainer() {
+		ItemStack[] contents = this.getContainerContents(); // Can be null
+		if (contents == null) return 0;
+
+		int totalCurrency = 0;
+		for (ItemStack itemStack : contents) {
+			if (Settings.isCurrencyItem(itemStack)) {
+				totalCurrency += itemStack.getAmount();
+			} else if (Settings.isHighCurrencyItem(itemStack)) {
+				totalCurrency += (itemStack.getAmount() * Settings.highCurrencyValue);
+			}
+		}
+		return totalCurrency;
+	}
+
+	protected List<ItemCount> getItemsFromContainer(Predicate<ItemStack> filter) {
+		ItemStack[] contents = this.getContainerContents(); // Can be null
+		// Returns an empty List if contents is null:
+		return ItemUtils.countItems(contents, filter);
+	}
+
 	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
 	protected TradingRecipe createSellingRecipe(ItemStack itemBeingSold, int price, boolean outOfStock) {
 		int remainingPrice = price;
@@ -412,43 +451,6 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		}
 		ItemStack currencyItem = Settings.createCurrencyItem(price);
 		return ShopkeepersAPI.createTradingRecipe(currencyItem, itemBeingBought, null, outOfStock);
-	}
-
-	@Deprecated
-	@Override
-	public int getCurrencyInChest() {
-		return this.getCurrencyInContainer();
-	}
-
-	@Override
-	public int getCurrencyInContainer() {
-		Block container = this.getContainer();
-		if (!ShopContainers.isSupportedContainer(container.getType())) {
-			return 0;
-		}
-
-		int totalCurrency = 0;
-		Inventory inventory = ShopContainers.getInventory(container);
-		ItemStack[] contents = inventory.getContents();
-		for (ItemStack itemStack : contents) {
-			if (Settings.isCurrencyItem(itemStack)) {
-				totalCurrency += itemStack.getAmount();
-			} else if (Settings.isHighCurrencyItem(itemStack)) {
-				totalCurrency += (itemStack.getAmount() * Settings.highCurrencyValue);
-			}
-		}
-		return totalCurrency;
-	}
-
-	protected List<ItemCount> getItemsFromContainer(Predicate<ItemStack> filter) {
-		ItemStack[] contents = null;
-		Block container = this.getContainer();
-		if (ShopContainers.isSupportedContainer(container.getType())) {
-			Inventory inventory = ShopContainers.getInventory(container);
-			contents = inventory.getContents();
-		}
-		// Returns an empty list if the container could not be found:
-		return ItemUtils.countItems(contents, filter);
 	}
 
 	// SHOPKEEPER UIs - Shortcuts for common UI types:
