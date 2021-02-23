@@ -101,9 +101,9 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	@Override
 	public List<TradingRecipe> getTradingRecipes(Player player) {
 		List<BookOffer> offers = this.getOffers();
-		List<TradingRecipe> recipes = new ArrayList<>(offers.size());
 		boolean hasBlankBooks = this.hasContainerBlankBooks();
 		Map<String, ItemStack> containerBooksByTitle = this.getCopyableBooksFromContainer();
+		List<TradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(bookOffer -> {
 			String bookTitle = bookOffer.getBookTitle();
 			ItemStack bookItem = containerBooksByTitle.get(bookTitle);
@@ -277,9 +277,11 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	private void _addOffer(BookOffer offer) {
 		assert offer != null;
+		// Remove any previous offer for the same book:
 		String bookTitle = offer.getBookTitle();
-		// Remove previous offer for the same book:
 		this.removeOffer(bookTitle);
+
+		// Add the new offer:
 		offersByBookTitle.put(bookTitle, offer);
 
 		// If the list view has already been setup, we can update it right away:

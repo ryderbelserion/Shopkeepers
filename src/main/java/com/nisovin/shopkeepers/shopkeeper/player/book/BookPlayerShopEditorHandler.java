@@ -31,16 +31,12 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	protected List<TradingRecipeDraft> getTradingRecipes() {
 		SKBookPlayerShopkeeper shopkeeper = this.getShopkeeper();
 
-		// We only add one recipe per book title:
-		Set<String> bookTitles = new HashSet<>();
-
 		// Add the shopkeeper's offers:
 		List<BookOffer> offers = shopkeeper.getOffers();
 		Map<String, ItemStack> containerBooksByTitle = shopkeeper.getCopyableBooksFromContainer();
 		List<TradingRecipeDraft> recipes = new ArrayList<>(Math.max(offers.size(), containerBooksByTitle.size()));
 		offers.forEach(bookOffer -> {
 			String bookTitle = bookOffer.getBookTitle();
-			bookTitles.add(bookTitle);
 			ItemStack bookItem = containerBooksByTitle.get(bookTitle);
 			if (bookItem == null) {
 				bookItem = shopkeeper.createDummyBook(bookTitle);
@@ -52,15 +48,25 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		});
 
 		// Add recipe drafts for book items from the container without existing offer:
+		// We only add one recipe per book title:
+		Set<String> newBookTitles = new HashSet<>();
 		containerBooksByTitle.entrySet().forEach(bookEntry -> {
 			String bookTitle = bookEntry.getKey();
 			assert bookTitle != null;
-			if (bookTitles.add(bookTitle)) {
-				// Add recipe:
-				ItemStack bookItem = ItemUtils.copySingleItem(bookEntry.getValue()); // Also ensures a stack size of 1
-				TradingRecipeDraft recipe = this.createTradingRecipeDraft(bookItem, 0);
-				recipes.add(recipe);
-			} // Else: We already added a recipe for a book with this title.
+			if (shopkeeper.getOffer(bookTitle) != null) {
+				// We already added a recipe for the existing offer for a book with this title:
+				return;
+			}
+
+			if (!newBookTitles.add(bookTitle)) {
+				// We already added a new recipe for a book with this title.
+				return;
+			}
+
+			// Add new empty recipe:
+			ItemStack bookItem = ItemUtils.copySingleItem(bookEntry.getValue()); // Ensures a stack size of 1
+			TradingRecipeDraft recipe = this.createTradingRecipeDraft(bookItem, 0);
+			recipes.add(recipe);
 		});
 
 		return recipes;
