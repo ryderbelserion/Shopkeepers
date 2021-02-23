@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Predicate;
 
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -32,8 +31,6 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 
 	private static final Predicate<ItemStack> ITEM_FILTER = (ItemStack item) -> {
 		if (Settings.isCurrencyItem(item) || Settings.isHighCurrencyItem(item)) return false;
-		if (item.getType() == Material.WRITTEN_BOOK) return false;
-		if (!item.getEnchantments().isEmpty()) return false; // TODO Why don't allow buying of enchanted items?
 		return true;
 	};
 

@@ -126,6 +126,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Config: Added shulker to the by default enabled mob types. However, note that this mob will stay in its closed form currently due to its disabled AI.
 * Added an editor option to change the color of shulker shopkeepers.
 * Config: List settings verify now that they don't contain null elements when being loaded from the config.
+* Buying shopkeepers can also buy written books and enchanted items now. Being able to buy written books is probably not really useful though, because any book item being bought has to nearly perfectly match the requested book item.
 
 API:  
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
