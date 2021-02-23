@@ -100,10 +100,11 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	@Override
 	public List<TradingRecipe> getTradingRecipes(Player player) {
-		List<TradingRecipe> recipes = new ArrayList<>();
+		List<BookOffer> offers = this.getOffers();
+		List<TradingRecipe> recipes = new ArrayList<>(offers.size());
 		boolean hasBlankBooks = this.hasContainerBlankBooks();
 		Map<String, ItemStack> containerBooksByTitle = this.getCopyableBooksFromContainer();
-		this.getOffers().forEach(bookOffer -> {
+		offers.forEach(bookOffer -> {
 			String bookTitle = bookOffer.getBookTitle();
 			ItemStack bookItem = containerBooksByTitle.get(bookTitle);
 			boolean outOfStock = !hasBlankBooks;
