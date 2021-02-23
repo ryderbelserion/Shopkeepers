@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.util.BookItems;
@@ -38,8 +36,8 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 		// Add the shopkeeper's offers:
 		Map<String, ItemStack> containerBooksByTitle = shopkeeper.getCopyableBooksFromContainer();
-		for (BookOffer offer : shopkeeper.getOffers()) {
-			String bookTitle = offer.getBookTitle();
+		shopkeeper.getOffers().forEach(bookOffer -> {
+			String bookTitle = bookOffer.getBookTitle();
 			bookTitles.add(bookTitle);
 			ItemStack bookItem = containerBooksByTitle.get(bookTitle);
 			if (bookItem == null) {
@@ -47,24 +45,21 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			} else {
 				bookItem = ItemUtils.copySingleItem(bookItem); // Also ensures a stack size of 1
 			}
-			TradingRecipeDraft recipe = this.createTradingRecipeDraft(bookItem, offer.getPrice());
+			TradingRecipeDraft recipe = this.createTradingRecipeDraft(bookItem, bookOffer.getPrice());
 			recipes.add(recipe);
-		}
+		});
 
 		// Add recipe drafts for book items from the container without existing offer:
-		for (Entry<String, ItemStack> bookEntry : containerBooksByTitle.entrySet()) {
+		containerBooksByTitle.entrySet().forEach(bookEntry -> {
 			String bookTitle = bookEntry.getKey();
 			assert bookTitle != null;
-			if (!bookTitles.add(bookTitle)) {
-				// We already added a recipe for a book with this title.
-				continue;
-			}
-
-			// Add recipe:
-			ItemStack bookItem = ItemUtils.copySingleItem(bookEntry.getValue()); // Also ensures a stack size of 1
-			TradingRecipeDraft recipe = this.createTradingRecipeDraft(bookItem, 0);
-			recipes.add(recipe);
-		}
+			if (bookTitles.add(bookTitle)) {
+				// Add recipe:
+				ItemStack bookItem = ItemUtils.copySingleItem(bookEntry.getValue()); // Also ensures a stack size of 1
+				TradingRecipeDraft recipe = this.createTradingRecipeDraft(bookItem, 0);
+				recipes.add(recipe);
+			} // Else: We already added a recipe for a book with this title.
+		});
 
 		return recipes;
 	}

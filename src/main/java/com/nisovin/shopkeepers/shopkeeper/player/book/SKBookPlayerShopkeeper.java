@@ -102,8 +102,8 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		List<TradingRecipe> recipes = new ArrayList<>();
 		boolean hasBlankBooks = this.hasContainerBlankBooks();
 		Map<String, ItemStack> containerBooksByTitle = this.getCopyableBooksFromContainer();
-		for (BookOffer offer : this.getOffers()) {
-			String bookTitle = offer.getBookTitle();
+		this.getOffers().forEach(bookOffer -> {
+			String bookTitle = bookOffer.getBookTitle();
 			ItemStack bookItem = containerBooksByTitle.get(bookTitle);
 			boolean outOfStock = !hasBlankBooks;
 			if (bookItem == null) {
@@ -116,11 +116,11 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 				assert bookItem != null;
 			}
 
-			TradingRecipe recipe = this.createSellingRecipe(bookItem, offer.getPrice(), outOfStock);
+			TradingRecipe recipe = this.createSellingRecipe(bookItem, bookOffer.getPrice(), outOfStock);
 			if (recipe != null) {
 				recipes.add(recipe);
 			}
-		}
+		});
 		return Collections.unmodifiableList(recipes);
 	}
 
