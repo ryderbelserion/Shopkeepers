@@ -3,12 +3,11 @@ package com.nisovin.shopkeepers.shopkeeper.player.book;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.function.Predicate;
+import java.util.Map;
 
 import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -20,24 +19,19 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.book.BookPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
-import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
-import com.nisovin.shopkeepers.util.ItemCount;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.BookItems;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements BookPlayerShopkeeper {
-
-	private static final Predicate<ItemStack> ITEM_FILTER = (ItemStack item) -> {
-		return isCopyableBook(item) && (getBookTitle(item) != null);
-	};
 
 	// Contains only one offer for a specific book (book title):
 	private final List<BookOffer> offers = new ArrayList<>();
@@ -107,17 +101,19 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	public List<TradingRecipe> getTradingRecipes(Player player) {
 		List<TradingRecipe> recipes = new ArrayList<>();
 		boolean hasBlankBooks = this.hasContainerBlankBooks();
-		List<ItemCount> bookItems = this.getCopyableBooksFromContainer();
+		Map<String, ItemStack> containerBooksByTitle = this.getCopyableBooksFromContainer();
 		for (BookOffer offer : this.getOffers()) {
 			String bookTitle = offer.getBookTitle();
-			ItemStack bookItem = this.getBookItem(bookItems, bookTitle);
+			ItemStack bookItem = containerBooksByTitle.get(bookTitle);
 			boolean outOfStock = !hasBlankBooks;
 			if (bookItem == null) {
 				outOfStock = true;
 				bookItem = this.createDummyBook(bookTitle);
 			} else {
-				// Create copy:
-				bookItem = this.copyBook(bookItem);
+				// Create a copy of the book from the container:
+				assert BookItems.isCopyableBook(bookItem);
+				bookItem = BookItems.copyBook(bookItem);
+				assert bookItem != null;
 			}
 
 			TradingRecipe recipe = this.createSellingRecipe(bookItem, offer.getPrice(), outOfStock);
@@ -128,108 +124,78 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		return Collections.unmodifiableList(recipes);
 	}
 
-	protected List<ItemCount> getCopyableBooksFromContainer() {
-		return this.getItemsFromContainer(ITEM_FILTER);
-	}
+	/**
+	 * Gets the {@link BookItems#isCopyableBook(ItemStack) copyable} {@link BookItems#isWrittenBook(ItemStack) written
+	 * book} items from the shopkeeper's {@link PlayerShopkeeper#getContainer() container}.
+	 * <p>
+	 * Book items without title are omitted. If multiple book items share the same title, only the first encountered
+	 * book item with that title is returned.
+	 * 
+	 * @return the book items mapped by their title, or an empty Map if the container is not found
+	 */
+	protected Map<String, ItemStack> getCopyableBooksFromContainer() {
+		ItemStack[] contents = this.getContainerContents();
+		if (contents == null) return Collections.emptyMap(); // Container not found
 
-	protected ItemStack getBookItem(List<ItemCount> itemCounts, String title) {
-		if (itemCounts == null) return null;
-		for (ItemCount itemCount : itemCounts) {
-			if (itemCount == null) continue;
-			ItemStack item = itemCount.getItem(); // Note: No additional copy.
-			if (Objects.equals(getBookTitle(item), title)) {
-				return item;
-			}
+		// Linked Map: Preserves the order of encountered items.
+		Map<String, ItemStack> booksByTitle = new LinkedHashMap<>();
+		for (ItemStack itemStack : contents) {
+			BookMeta bookMeta = BookItems.getBookMeta(itemStack);
+			if (bookMeta == null) continue; // Not a written book
+			if (!BookItems.isCopyable(bookMeta)) continue;
+			String title = BookItems.getTitle(bookMeta);
+			if (title == null) continue;
+
+			// The item is ignored if we already encountered another book item with the same title before:
+			booksByTitle.putIfAbsent(title, itemStack);
 		}
-		return null;
+		return booksByTitle;
 	}
 
-	protected static BookMeta getBookMeta(ItemStack item) {
-		if (ItemUtils.isEmpty(item)) return null;
-		if (item.getType() != Material.WRITTEN_BOOK) return null;
-		return (BookMeta) item.getItemMeta(); // Can be null
-	}
-
-	protected static Generation getBookGeneration(ItemStack item) {
-		BookMeta meta = getBookMeta(item);
-		if (meta == null) return null;
-		if (!meta.hasGeneration()) {
-			// If the generation is missing, Minecraft treats the book as an original and so do we:
-			return Generation.ORIGINAL;
-		}
-		return meta.getGeneration(); // assert: not null
-	}
-
-	protected static boolean isCopyableBook(ItemStack item) {
-		Generation generation = getBookGeneration(item);
-		return (generation == Generation.ORIGINAL || generation == Generation.COPY_OF_ORIGINAL);
-	}
-
-	protected static boolean isCopyableOrDummyBook(ItemStack item) {
-		Generation generation = getBookGeneration(item);
-		return (generation == Generation.ORIGINAL || generation == Generation.COPY_OF_ORIGINAL || generation == Generation.TATTERED);
-	}
-
-	protected static boolean isValidBookCopy(ItemStack item) {
-		Generation generation = getBookGeneration(item);
-		return (generation == Generation.COPY_OF_ORIGINAL || generation == Generation.COPY_OF_COPY);
-	}
-
-	protected static String getBookTitle(ItemStack item) {
-		BookMeta meta = getBookMeta(item);
-		if (meta == null) return null;
-		if (!meta.hasTitle()) return null;
-		String title = meta.getTitle(); // Not null, but can be empty!
-		// We ignore books with empty titles for now:
-		// TODO Support them? They can't be created in vanilla.
-		if (title.isEmpty()) return null;
-		return title;
-	}
-
+	/**
+	 * Checks if the shopkeeper's container contains any blank books (i.e. items of type
+	 * {@link Material#WRITABLE_BOOK}).
+	 * 
+	 * @return <code>true</code> if the container is found and contains blank books
+	 */
 	protected boolean hasContainerBlankBooks() {
-		Block container = this.getContainer();
-		if (ShopContainers.isSupportedContainer(container.getType())) {
-			Inventory inventory = ShopContainers.getInventory(container);
-			return inventory.contains(Material.WRITABLE_BOOK);
-		}
-		return false;
+		Inventory containerInventory = this.getContainerInventory();
+		if (containerInventory == null) return false; // Container not found
+		return containerInventory.contains(Material.WRITABLE_BOOK);
 	}
 
+	/**
+	 * Creates a dummy book {@link ItemStack} that acts as substitute representation of the book item with the given
+	 * title.
+	 * <p>
+	 * This dummy book item is used as a replacement in the shopkeeper editor and trading interface if no actual book
+	 * item with the given title is found in the shopkeeper's container.
+	 * 
+	 * @param title
+	 *            the book title
+	 * @return the dummy book item
+	 */
 	protected ItemStack createDummyBook(String title) {
-		ItemStack item = new ItemStack(Material.WRITTEN_BOOK, 1);
-		BookMeta meta = (BookMeta) item.getItemMeta();
-		meta.setTitle(title);
-		meta.setAuthor(Messages.unknownBookAuthor);
-		meta.setGeneration(Generation.TATTERED);
-		item.setItemMeta(meta);
-		return item;
+		ItemStack bookItem = new ItemStack(Material.WRITTEN_BOOK, 1);
+		BookMeta bookMeta = (BookMeta) bookItem.getItemMeta();
+		bookMeta.setTitle(title);
+		bookMeta.setAuthor(Messages.unknownBookAuthor);
+		bookMeta.setGeneration(Generation.TATTERED);
+		bookItem.setItemMeta(bookMeta);
+		return bookItem;
 	}
 
-	protected ItemStack copyBook(ItemStack book) {
-		assert isCopyableBook(book);
-		Generation oldGeneration = getBookGeneration(book);
-		assert oldGeneration != null;
-		Generation nextGeneration = getNextGeneration(oldGeneration);
-		assert nextGeneration != null;
-
-		ItemStack copy = book.clone();
-		BookMeta newMeta = (BookMeta) copy.getItemMeta();
-		newMeta.setGeneration(nextGeneration);
-		copy.setItemMeta(newMeta);
-		return copy;
-	}
-
-	protected static Generation getNextGeneration(Generation generation) {
-		assert generation != null;
-		switch (generation) {
-		case ORIGINAL:
-			return Generation.COPY_OF_ORIGINAL;
-		case COPY_OF_ORIGINAL:
-			return Generation.COPY_OF_COPY;
-		default:
-			// All other books cannot be copied:
-			return null;
-		}
+	/**
+	 * Checks if the given {@link BookMeta} corresponds to a {@link #createDummyBook(String) dummy book item}.
+	 * 
+	 * @param bookMeta
+	 *            the book meta, not <code>null</code>
+	 * @return <code>true</code> if the book meta corresponds to a dummy book item
+	 */
+	protected static boolean isDummyBook(BookMeta bookMeta) {
+		assert bookMeta != null;
+		Generation generation = BookItems.getGeneration(bookMeta);
+		return (generation == Generation.TATTERED);
 	}
 
 	// OFFERS:
@@ -241,12 +207,14 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	@Override
 	public BookOffer getOffer(ItemStack bookItem) {
-		String bookTitle = getBookTitle(bookItem);
+		String bookTitle = BookItems.getBookTitle(bookItem);
+		if (bookTitle == null) return null; // Not a written book, or has no title
 		return this.getOffer(bookTitle);
 	}
 
 	@Override
 	public BookOffer getOffer(String bookTitle) {
+		Validate.notNull(bookTitle, "bookTitle is null");
 		for (BookOffer offer : this.getOffers()) {
 			if (offer.getBookTitle().equals(bookTitle)) {
 				return offer;
@@ -257,6 +225,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	@Override
 	public void removeOffer(String bookTitle) {
+		Validate.notNull(bookTitle, "bookTitle is null");
 		Iterator<BookOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
 			if (iterator.next().getBookTitle().equals(bookTitle)) {

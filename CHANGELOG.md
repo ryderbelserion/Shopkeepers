@@ -191,6 +191,7 @@ Internal:
 * Added test cases that compare the values of the default config and language file with their internal counter parts.
 * We explicitly set the mob type of Citizen shopkeeper NPCs now when we create the NPC, similar to Citizens' own NPC creation command.
 * Slightly changed how we retrieve the entity type of Citizen shopkeeper NPCs.
+* Optimizations and refactoring related to book shopkeepers.
 * Minor other internal code refactoring.
 
 Migration notes:  

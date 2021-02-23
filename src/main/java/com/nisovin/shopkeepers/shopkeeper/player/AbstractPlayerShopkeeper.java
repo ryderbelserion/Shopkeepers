@@ -368,14 +368,19 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	// Returns null if the container could not be found.
-	public ItemStack[] getContainerContents() {
-		ItemStack[] contents = null;
+	public Inventory getContainerInventory() {
 		Block container = this.getContainer();
 		if (ShopContainers.isSupportedContainer(container.getType())) {
-			Inventory inventory = ShopContainers.getInventory(container);
-			contents = inventory.getContents();
+			return ShopContainers.getInventory(container); // Not null
 		}
-		return contents;
+		return null;
+	}
+
+	// Returns null if the container could not be found.
+	public ItemStack[] getContainerContents() {
+		Inventory containerInventory = this.getContainerInventory();
+		if (containerInventory == null) return null; // Container not found
+		return containerInventory.getContents(); // Not null
 	}
 
 	@Deprecated
@@ -469,8 +474,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	@Override
 	public boolean openContainerWindow(Player player) {
 		// Check if the container still exists:
-		Block container = this.getContainer();
-		if (!ShopContainers.isSupportedContainer(container.getType())) {
+		Inventory containerInventory = this.getContainerInventory();
+		if (containerInventory == null) {
 			Log.debug(() -> "Cannot open container inventory for player '" + player.getName()
 					+ "': The block is no longer a valid container!");
 			return false;
@@ -478,8 +483,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 		Log.debug(() -> "Opening container inventory for player '" + player.getName() + "'.");
 		// Open the container directly for the player (no need for a custom UI):
-		Inventory inventory = ShopContainers.getInventory(container);
-		player.openInventory(inventory);
+		player.openInventory(containerInventory);
 		return true;
 	}
 

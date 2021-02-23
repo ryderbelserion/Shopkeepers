@@ -40,7 +40,7 @@ public class ShopContainers {
 	 * 
 	 * @param containerBlock
 	 *            the container block
-	 * @return the inventory
+	 * @return the inventory, not <code>null</code>
 	 */
 	public static Inventory getInventory(Block containerBlock) {
 		Validate.notNull(containerBlock, "containerBlock is null");
@@ -50,6 +50,6 @@ public class ShopContainers {
 		assert state instanceof Container;
 		Container container = (Container) state;
 		// Note: For double chests this returns the complete double chest inventory.
-		return container.getInventory();
+		return container.getInventory(); // Not null
 	}
 }

@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.shopkeeper.player;
 
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -8,7 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
-import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.defaults.TradingHandler;
@@ -53,7 +51,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 	@Override
 	protected boolean prepareTrade(TradeData tradeData) {
 		if (!super.prepareTrade(tradeData)) return false;
-		PlayerShopkeeper shopkeeper = this.getShopkeeper();
+		AbstractPlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Player tradingPlayer = tradeData.tradingPlayer;
 
 		// No trading with own shop:
@@ -76,15 +74,15 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 		}
 
 		// Check for the shop's container:
-		Block container = shopkeeper.getContainer();
-		if (!ShopContainers.isSupportedContainer(container.getType())) {
+		Inventory containerInventory = shopkeeper.getContainerInventory();
+		if (containerInventory == null) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeWithShopMissingContainer, "owner", shopkeeper.getOwnerName());
 			this.debugPreventedTrade(tradingPlayer, "The shop's container is missing.");
 			return false;
 		}
 
 		// Setup common state information for handling this trade:
-		this.containerInventory = ShopContainers.getInventory(container);
+		this.containerInventory = containerInventory;
 		this.newContainerContents = containerInventory.getContents();
 
 		return true;

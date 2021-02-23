@@ -135,17 +135,30 @@ public final class ItemUtils {
 	}
 
 	/**
-	 * Creates a clone of the given {@link ItemStack} with amount <code>1</code>.
+	 * Creates a {@link ItemStack#clone() copy} of the given {@link ItemStack} with a stack size of {@code 1}.
 	 * 
-	 * @param item
-	 *            the item to get a normalized version of
-	 * @return the normalized item
+	 * @param itemStack
+	 *            the item stack to copy
+	 * @return the copy, or <code>null</code> if the given item stack is <code>null</code>
 	 */
-	public static ItemStack getNormalizedItem(ItemStack item) {
-		if (item == null) return null;
-		ItemStack normalizedClone = item.clone();
-		normalizedClone.setAmount(1);
-		return normalizedClone;
+	public static ItemStack copySingleItem(ItemStack itemStack) {
+		return copyWithAmount(itemStack, 1);
+	}
+
+	/**
+	 * Creates a {@link ItemStack#clone() copy} of the given {@link ItemStack} with the specified stack size.
+	 * 
+	 * @param itemStack
+	 *            the item stack to copy
+	 * @param amount
+	 *            the stack size of the copy
+	 * @return the copy, or <code>null</code> if the given item stack is <code>null</code>
+	 */
+	public static ItemStack copyWithAmount(ItemStack itemStack, int amount) {
+		if (itemStack == null) return null;
+		ItemStack copy = itemStack.clone();
+		copy.setAmount(amount);
+		return copy;
 	}
 
 	public static int trimItemAmount(ItemStack item, int amount) {
