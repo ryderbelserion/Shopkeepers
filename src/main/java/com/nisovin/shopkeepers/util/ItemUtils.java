@@ -557,6 +557,19 @@ public final class ItemUtils {
 		};
 	}
 
+	/**
+	 * Gets a {@link Predicate} that accepts {@link ItemStack ItemStacks} that are {@link ItemStack#isSimilar(ItemStack)
+	 * similar} to the given {@link ItemStack}.
+	 * 
+	 * @param itemStack
+	 *            the item stack, not <code>null</code>
+	 * @return the Predicate
+	 */
+	public static Predicate<ItemStack> similarItems(ItemStack itemStack) {
+		Validate.notNull(itemStack, "itemStack is null");
+		return (otherItemStack) -> itemStack.isSimilar(otherItemStack);
+	}
+
 	// ItemStack migration
 
 	private static Inventory DUMMY_INVENTORY = null;
@@ -759,6 +772,22 @@ public final class ItemUtils {
 	 */
 	public static boolean containsAtLeast(ItemStack[] contents, ItemData itemData, int amount) {
 		return containsAtLeast(contents, matchingItems(itemData), amount);
+	}
+
+	/**
+	 * Checks if the given contents contains at least the specified amount of items that are
+	 * {@link ItemStack#isSimilar(ItemStack) similar} to the given {@link ItemStack}.
+	 * 
+	 * @param contents
+	 *            the contents to search through
+	 * @param itemStack
+	 *            the item stack to check for, not <code>null</code>
+	 * @param amount
+	 *            the amount of items to check for
+	 * @return <code>true</code> if at least the specified amount of items were found
+	 */
+	public static boolean containsAtLeast(ItemStack[] contents, ItemStack itemStack, int amount) {
+		return containsAtLeast(contents, similarItems(itemStack), amount);
 	}
 
 	/**
