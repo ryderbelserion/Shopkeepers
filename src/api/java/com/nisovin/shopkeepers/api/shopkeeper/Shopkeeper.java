@@ -160,20 +160,20 @@ public interface Shopkeeper {
 	// TRADING
 
 	/**
-	 * Gets the shopkeeper's currently available trading recipes for the given player.
+	 * Gets the shopkeeper's current trading recipes for the given player.
 	 * <p>
-	 * Depending on the type of shopkeeper this might access the world data to determine the available stock (shop
-	 * container contents).<br>
-	 * Managing (adding, removing, editing, validating) the overall available trading recipes of this shopkeeper might
-	 * differ between different shopkeeper types and is therefore in their responsibility.
+	 * Depending on the type of this shopkeeper, this might access the world (eg. check container contents) in order to
+	 * determine the available stock.
 	 * <p>
-	 * The <code>player</code> parameter can be used to request player-specific trading recipes, if the shopkeeper type
-	 * supports that.
+	 * Managing (adding, removing, editing) the trading recipes usually differs depending on the type of shopkeeper and
+	 * is therefore not part of the general {@link Shopkeeper} interface.
+	 * <p>
+	 * The <code>player</code> parameter can be used to request player-specific trading recipes, if this type of
+	 * shopkeeper supports that.
 	 * 
 	 * @param player
-	 *            the player (can be <code>null</code>), allows for returning player-specific trading recipes if the
-	 *            shopkeeper supports that
-	 * @return an unmodifiable view on the currently available trading recipes of this shopkeeper for the given player
+	 *            the trading player, or <code>null</code> to not take player-specific trading recipes into account
+	 * @return an unmodifiable view on the current trading recipes of this shopkeeper for the given player
 	 */
 	public List<TradingRecipe> getTradingRecipes(Player player);
 

@@ -10,8 +10,9 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 /**
  * Sells copies of written books in exchange for currency items.
  * <p>
- * Books are identified solely based on their title. There exists at most one offer for a certain book. If there are
- * multiple books with the same title in the shop's container, the shopkeeper uses only the first book it finds.
+ * Books are identified solely based on their title: There can be at most one offer for books with a certain title. If
+ * there are multiple books with the same title in the shop's container, the shopkeeper uses only the first book it
+ * finds.
  */
 public interface BookPlayerShopkeeper extends PlayerShopkeeper {
 
@@ -20,7 +21,7 @@ public interface BookPlayerShopkeeper extends PlayerShopkeeper {
 	/**
 	 * Gets the offers of this shopkeeper.
 	 * <p>
-	 * Contains at most one offer for a certain book.
+	 * There can be at most one offer for books with a certain title.
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */
@@ -36,11 +37,11 @@ public interface BookPlayerShopkeeper extends PlayerShopkeeper {
 	public BookOffer getOffer(ItemStack bookItem);
 
 	/**
-	 * Gets the offer for a specific book title.
+	 * Gets the offer for the book with the specified title.
 	 * 
 	 * @param bookTitle
 	 *            the book title
-	 * @return the offer, or <code>null</code> if there is none for the specified book title
+	 * @return the offer, or <code>null</code> if there is no offer for books with the specified title
 	 */
 	public BookOffer getOffer(String bookTitle);
 

@@ -14,6 +14,8 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 
 	/**
 	 * Gets the offers of this shopkeeper.
+	 * <p>
+	 * There can be multiple different offers for the same kind of item.
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */

@@ -11,7 +11,7 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	private final boolean outOfStock;
 
 	/**
-	 * Creates a trading recipe.
+	 * Creates a {@link SKTradingRecipe}.
 	 * <p>
 	 * The recipe is not out of stock.
 	 * 
@@ -27,7 +27,7 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	}
 
 	/**
-	 * Creates a TradingRecipe.
+	 * Creates a {@link SKTradingRecipe}.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty

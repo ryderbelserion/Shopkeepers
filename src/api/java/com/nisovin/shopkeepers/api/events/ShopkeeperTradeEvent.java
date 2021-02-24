@@ -32,8 +32,8 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	private final boolean swappedItemOrder;
 	private boolean cancelled = false;
 
-	// the passed offered items are expected to be copies and their stack sizes are supposed to match those of the
-	// trading recipe
+	// The offered items are expected to be copies and their stack sizes are supposed to match those of the trading
+	// recipe.
 	public ShopkeeperTradeEvent(Shopkeeper shopkeeper, Player player, InventoryClickEvent clickEvent,
 								TradingRecipe tradingRecipe, ItemStack offeredItem1, ItemStack offeredItem2,
 								boolean swappedItemOrder) {
@@ -80,11 +80,11 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	 * Gets the a copy of the item offered by the player matching the first required item of the used trading recipe
 	 * (not necessarily the item in the first slot).
 	 * <p>
-	 * The type and stack size equal those of the required item from the trading recipe. The metadata however can
-	 * differ, but still be accepted for the trade depending on the item matching rules of the used minecraft version
-	 * and the shopkeeper settings (ex. strict item comparison disabled).
+	 * The type and stack size equal those of the required item of the trading recipe. The metadata however can differ,
+	 * but still be accepted for the trade depending on the item matching rules of the used Minecraft version and the
+	 * shopkeeper settings (i.e. with strict item comparisons being disabled).
 	 * 
-	 * @return a copy of the offered item matching the first required item, not <code>null</code> or empty
+	 * @return a copy of the offered item that matches the first required item, not <code>null</code> or empty
 	 */
 	public ItemStack getOfferedItem1() {
 		return offeredItem1.clone();
@@ -94,11 +94,11 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	 * Gets the a copy of the item offered by the player matching the second required item of the used trading recipe
 	 * (not necessarily the item in the second slot).
 	 * <p>
-	 * The type and stack size equal those of the required item from the trading recipe. The metadata however can
-	 * differ, but still be accepted for the trade depending on the item matching rules of the used minecraft version
-	 * and the shopkeeper settings (ex. strict item comparison disabled).
+	 * The type and stack size equal those of the required item of the trading recipe. The metadata however can differ,
+	 * but still be accepted for the trade depending on the item matching rules of the used Minecraft version and the
+	 * shopkeeper settings (i.e. with strict item comparisons being disabled).
 	 * 
-	 * @return a copy of the offered item matching the second required item, can be <code>null</code>
+	 * @return a copy of the offered item that matches the second required item, can be <code>null</code>
 	 */
 	public ItemStack getOfferedItem2() {
 		return (offeredItem2 == null) ? null : offeredItem2.clone();

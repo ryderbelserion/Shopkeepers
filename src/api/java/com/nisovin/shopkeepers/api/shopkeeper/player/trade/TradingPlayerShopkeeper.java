@@ -6,9 +6,9 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 
 /**
- * Trades arbitrary items (is not limited to currency items).
+ * Trades arbitrary items.
  * <p>
- * There can be multiple different offers for the same item.
+ * Unlike the buying or selling shopkeepers, this type of shopkeeper is not limited to trading currency items.
  */
 public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 
@@ -16,6 +16,8 @@ public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 
 	/**
 	 * Gets the offers of this shopkeeper.
+	 * <p>
+	 * There can be multiple different offers for the same kind of item.
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */

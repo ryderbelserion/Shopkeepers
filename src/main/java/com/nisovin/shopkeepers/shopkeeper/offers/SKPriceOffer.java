@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public class SKPriceOffer implements PriceOffer {
 
-	private final ItemStack item; // not null/empty
+	private final ItemStack item; // Not null or empty
 	private final int price; // > 0
 
 	public SKPriceOffer(ItemStack item, int price) {

@@ -47,7 +47,7 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			recipes.add(recipe);
 		});
 
-		// Add recipe drafts for book items from the container without existing offer:
+		// Add new empty recipe drafts for book items from the container without existing offer:
 		// We only add one recipe per book title:
 		Set<String> newBookTitles = new HashSet<>();
 		containerBooksByTitle.entrySet().forEach(bookEntry -> {

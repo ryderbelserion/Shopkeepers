@@ -34,9 +34,9 @@ public interface TradingRecipe {
 	public ItemStack getItem2();
 
 	/**
-	 * Gets whether this trading recipe is out of stock.
+	 * Gets whether this trading recipe is marked as being out of stock.
 	 * 
-	 * @return <code>true</code> if out of stock
+	 * @return <code>true</code> if this trading recipe is out of stock
 	 */
 	public boolean isOutOfStock();
 
