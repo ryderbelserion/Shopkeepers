@@ -24,7 +24,6 @@ import com.nisovin.shopkeepers.api.events.ShopkeepersStartupEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
-import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
@@ -737,12 +736,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	// FACTORY
 
 	@Override
-	public TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+	public SKTradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		return new SKTradingRecipe(resultItem, item1, item2);
 	}
 
 	@Override
-	public TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2, boolean outOfStock) {
+	public SKTradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2, boolean outOfStock) {
 		return new SKTradingRecipe(resultItem, item1, item2, outOfStock);
 	}
 
