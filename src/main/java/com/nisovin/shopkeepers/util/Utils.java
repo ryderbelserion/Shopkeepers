@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -38,16 +39,104 @@ public final class Utils {
 	private Utils() {
 	}
 
+	/**
+	 * Creates a fixed-sized list backed by the given array.
+	 * <p>
+	 * Unlike {@link Arrays#asList(Object...)} this returns an {@link Collections#emptyList() empty list} if the given
+	 * array is <code>null</code>.
+	 * 
+	 * @param <E>
+	 *            the element type
+	 * @param array
+	 *            the array
+	 * @return the list backed by the given array, or an empty list if the given array is <code>null</code>
+	 */
+	@SafeVarargs
+	public static <E> List<E> asList(E... array) {
+		return (array == null) ? Collections.emptyList() : Arrays.asList(array);
+	}
+
+	/**
+	 * Sorts the given list using the given {@link Comparator} and then returns the list.
+	 * 
+	 * @param <E>
+	 *            the element type
+	 * @param <L>
+	 *            the type of the list
+	 * @param list
+	 *            the list to sort
+	 * @param comparator
+	 *            the comparator
+	 * @return the given list sorted
+	 * @see List#sort(Comparator)
+	 */
 	public static <E, L extends List<? extends E>> L sort(L list, Comparator<? super E> comparator) {
 		assert list != null && comparator != null;
 		list.sort(comparator);
 		return list;
 	}
 
+	/**
+	 * Adds the given elements to the given collection and then returns the collection.
+	 * 
+	 * @param <E>
+	 *            the element type
+	 * @param <C>
+	 *            the type of the collection
+	 * @param collection
+	 *            the collection
+	 * @param toAdd
+	 *            the elements to add
+	 * @return the given collection with the elements added
+	 * @see Collection#addAll(Collection)
+	 */
 	public static <E, C extends Collection<? super E>> C addAll(C collection, Collection<? extends E> toAdd) {
 		assert collection != null && toAdd != null;
 		collection.addAll(toAdd);
 		return collection;
+	}
+
+	/**
+	 * Searches through the given {@link Iterable} for an element that is accepted by the given {@link Predicate}.
+	 * 
+	 * @param <E>
+	 *            the element type
+	 * @param iterable
+	 *            the elements to search through
+	 * @param predicate
+	 *            the Predicate, not <code>null</code>
+	 * @return the first found element accepted by the Predicate, or <code>null</code> if either no such element was
+	 *         found, or if the Predicate accepted a <code>null</code> element
+	 */
+	public static <E> E findFirst(Iterable<E> iterable, Predicate<? super E> predicate) {
+		Validate.notNull(predicate, "predicate is null");
+		for (E element : iterable) {
+			if (predicate.test(element)) {
+				return element;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Checks if the given {@link Iterable} contains an element that is accepted by the given {@link Predicate}.
+	 * 
+	 * @param <E>
+	 *            the element type
+	 * @param iterable
+	 *            the elements to search through
+	 * @param predicate
+	 *            the Predicate, not <code>null</code>
+	 * @return <code>true</code> if an element is found that is accepted by the given Predicate
+	 */
+	public static <E> boolean contains(Iterable<E> iterable, Predicate<? super E> predicate) {
+		Validate.notNull(predicate, "predicate is null");
+		for (E element : iterable) {
+			if (predicate.test(element)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	// Note: Doesn't work for primitive arrays.

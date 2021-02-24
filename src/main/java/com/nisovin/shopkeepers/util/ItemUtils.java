@@ -814,6 +814,128 @@ public final class ItemUtils {
 	}
 
 	/**
+	 * Checks if the given contents contains at least one item that {@link ItemData#matches(ItemStack) matches} the
+	 * given {@link ItemData}.
+	 * 
+	 * @param contents
+	 *            the contents to search through
+	 * @param itemData
+	 *            the item data to check for, not <code>null</code>
+	 * @return <code>true</code> if an item was found
+	 */
+	public static boolean contains(ItemStack[] contents, ItemData itemData) {
+		return containsAtLeast(contents, itemData, 1);
+	}
+
+	/**
+	 * Checks if the given contents contains at least one item that is {@link ItemStack#isSimilar(ItemStack) similar} to
+	 * the given {@link ItemStack}.
+	 * 
+	 * @param contents
+	 *            the contents to search through
+	 * @param itemStack
+	 *            the item stack to check for, not <code>null</code>
+	 * @return <code>true</code> if an item was found
+	 */
+	public static boolean contains(ItemStack[] contents, ItemStack itemStack) {
+		return containsAtLeast(contents, itemStack, 1);
+	}
+
+	// ItemStack Iterable
+
+	/**
+	 * Checks if the given contents contains at least the specified amount of items that are accepted by the given
+	 * {@link Predicate}.
+	 * <p>
+	 * The given Predicate is only invoked for {@link #isEmpty(ItemStack) non-empty} ItemStacks.
+	 * 
+	 * @param contents
+	 *            the contents to search through
+	 * @param predicate
+	 *            the predicate, not <code>null</code>
+	 * @param amount
+	 *            the amount of items to check for
+	 * @return <code>true</code> if at least the specified amount of items were found
+	 */
+	public static boolean containsAtLeast(Iterable<ItemStack> contents, Predicate<ItemStack> predicate, int amount) {
+		Validate.notNull(predicate, "predicate is null");
+		if (amount <= 0) return true;
+		if (contents == null) return false;
+		int remainingAmount = amount;
+		for (ItemStack itemStack : contents) {
+			if (isEmpty(itemStack)) continue;
+			if (!predicate.test(itemStack)) continue;
+			remainingAmount -= itemStack.getAmount();
+			if (remainingAmount <= 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checks if the given contents contains at least the specified amount of items that
+	 * {@link ItemData#matches(ItemStack) match} the given {@link ItemData}.
+	 * 
+	 * @param contents
+	 *            the contents to search through
+	 * @param itemData
+	 *            the item data to check for, not <code>null</code>
+	 * @param amount
+	 *            the amount of items to check for
+	 * @return <code>true</code> if at least the specified amount of items were found
+	 */
+	public static boolean containsAtLeast(Iterable<ItemStack> contents, ItemData itemData, int amount) {
+		return containsAtLeast(contents, matchingItems(itemData), amount);
+	}
+
+	/**
+	 * Checks if the given contents contains at least the specified amount of items that are
+	 * {@link ItemStack#isSimilar(ItemStack) similar} to the given {@link ItemStack}.
+	 * 
+	 * @param contents
+	 *            the contents to search through
+	 * @param itemStack
+	 *            the item stack to check for, not <code>null</code>
+	 * @param amount
+	 *            the amount of items to check for
+	 * @return <code>true</code> if at least the specified amount of items were found
+	 */
+	public static boolean containsAtLeast(Iterable<ItemStack> contents, ItemStack itemStack, int amount) {
+		return containsAtLeast(contents, similarItems(itemStack), amount);
+	}
+
+	/**
+	 * Checks if the given contents contains at least one item that {@link ItemData#matches(ItemStack) matches} the
+	 * given {@link ItemData}.
+	 * 
+	 * @param contents
+	 *            the contents to search through
+	 * @param itemData
+	 *            the item data to check for, not <code>null</code>
+	 * @return <code>true</code> if an item was found
+	 */
+	public static boolean contains(Iterable<ItemStack> contents, ItemData itemData) {
+		return containsAtLeast(contents, itemData, 1);
+	}
+
+	/**
+	 * Checks if the given contents contains at least one item that is {@link ItemStack#isSimilar(ItemStack) similar} to
+	 * the given {@link ItemStack}.
+	 * 
+	 * @param contents
+	 *            the contents to search through
+	 * @param itemStack
+	 *            the item stack to check for, not <code>null</code>
+	 * @return <code>true</code> if an item was found
+	 */
+	public static boolean contains(Iterable<ItemStack> contents, ItemStack itemStack) {
+		return containsAtLeast(contents, itemStack, 1);
+	}
+
+	// -----
+
+	/**
 	 * Removes the specified amount of items which match the specified {@link ItemData} from the given contents.
 	 * 
 	 * @param contents
