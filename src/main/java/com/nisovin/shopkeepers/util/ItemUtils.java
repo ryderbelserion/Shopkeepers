@@ -170,6 +170,53 @@ public final class ItemUtils {
 		return MathUtils.trim(amount, 1, itemType.getMaxStackSize());
 	}
 
+	/**
+	 * Increases the amount of the given {@link ItemStack}.
+	 * <p>
+	 * This makes sure that the item stack's amount ends up to be at most {@link ItemStack#getMaxStackSize()}, and that
+	 * empty item stacks are represented by <code>null</code>.
+	 * 
+	 * @param itemStack
+	 *            the item stack, can be empty
+	 * @param amountToIncrease
+	 *            the amount to increase, can be negative to decrease
+	 * @return the resulting item stack, or <code>null</code> if the item stack ends up being empty
+	 */
+	public static ItemStack increaseItemAmount(ItemStack itemStack, int amountToIncrease) {
+		if (isEmpty(itemStack)) return null;
+		int newAmount = Math.min(itemStack.getAmount() + amountToIncrease, itemStack.getMaxStackSize());
+		if (newAmount <= 0) return null;
+		itemStack.setAmount(newAmount);
+		return itemStack;
+	}
+
+	/**
+	 * Decreases the amount of the given {@link ItemStack}.
+	 * <p>
+	 * This makes sure that the item stack's amount ends up to be at most {@link ItemStack#getMaxStackSize()}, and that
+	 * empty item stacks are represented by <code>null</code>.
+	 * 
+	 * @param itemStack
+	 *            the item stack, can be empty
+	 * @param amountToDescrease
+	 *            the amount to decrease, can be negative to increase
+	 * @return the resulting item, or <code>null</code> if the item ends up being empty
+	 */
+	public static ItemStack descreaseItemAmount(ItemStack itemStack, int amountToDescrease) {
+		return increaseItemAmount(itemStack, -amountToDescrease);
+	}
+
+	/**
+	 * Gets an itemstack's amount and returns <code>0</code> for empty itemstacks.
+	 * 
+	 * @param itemStack
+	 *            the item stack, can be empty
+	 * @return the item stack's amount, or <code>0</code> if the item stack is empty
+	 */
+	public static int getItemStackAmount(ItemStack itemStack) {
+		return isEmpty(itemStack) ? 0 : itemStack.getAmount();
+	}
+
 	public static ItemStack createItemStack(Material type, int amount, String displayName, List<String> lore) {
 		// TODO Return null in case of type AIR?
 		ItemStack itemStack = new ItemStack(type, amount);
@@ -656,53 +703,29 @@ public final class ItemUtils {
 		return convertedStacks;
 	}
 
-	//
+	// ItemStack serialization
 
-	/**
-	 * Increases the amount of the given {@link ItemStack}.
-	 * <p>
-	 * This makes sure that the itemstack's amount ends up to be at most {@link ItemStack#getMaxStackSize()}, and that
-	 * empty itemstacks are represented by <code>null</code>.
-	 * 
-	 * @param itemStack
-	 *            the itemstack, can be empty
-	 * @param amountToIncrease
-	 *            the amount to increase, can be negative to decrease
-	 * @return the resulting item, or <code>null</code> if the item ends up being empty
-	 */
-	public static ItemStack increaseItemAmount(ItemStack itemStack, int amountToIncrease) {
-		if (isEmpty(itemStack)) return null;
-		int newAmount = Math.min(itemStack.getAmount() + amountToIncrease, itemStack.getMaxStackSize());
-		if (newAmount <= 0) return null;
-		itemStack.setAmount(newAmount);
-		return itemStack;
+	private static final String ITEM_META_SERIALIZATION_KEY = "ItemMeta";
+
+	static Map<String, Object> serializeItemMeta(ItemMeta itemMeta) {
+		// Check whether ItemMeta is empty; equivalent to ItemStack#hasItemMeta
+		if (itemMeta != null && !Bukkit.getItemFactory().equals(itemMeta, null)) {
+			return itemMeta.serialize(); // assert: not null nor empty
+		} else {
+			return null;
+		}
 	}
 
-	/**
-	 * Decreases the amount of the given {@link ItemStack}.
-	 * <p>
-	 * This makes sure that the itemstack's amount ends up to be at most {@link ItemStack#getMaxStackSize()}, and that
-	 * empty itemstacks are represented by <code>null</code>.
-	 * 
-	 * @param itemStack
-	 *            the itemstack, can be empty
-	 * @param amountToDescrease
-	 *            the amount to decrease, can be negative to increase
-	 * @return the resulting item, or <code>null</code> if the item ends up being empty
-	 */
-	public static ItemStack descreaseItemAmount(ItemStack itemStack, int amountToDescrease) {
-		return increaseItemAmount(itemStack, -amountToDescrease);
-	}
-
-	/**
-	 * Gets an itemstack's amount and returns <code>0</code> for empty itemstacks.
-	 * 
-	 * @param itemStack
-	 *            the itemstack, can be empty
-	 * @return the itemstack's amount, or <code>0</code> if the itemstack is empty
-	 */
-	public static int getItemStackAmount(ItemStack itemStack) {
-		return (isEmpty(itemStack) ? 0 : itemStack.getAmount());
+	static ItemMeta deserializeItemMeta(Map<String, Object> itemMetaData) {
+		if (itemMetaData == null) return null;
+		// Get the class CraftBukkit internally uses for the deserialization:
+		Class<? extends ConfigurationSerializable> serializableItemMetaClass = ConfigurationSerialization.getClassByAlias(ITEM_META_SERIALIZATION_KEY);
+		if (serializableItemMetaClass == null) {
+			throw new IllegalStateException("Missing ItemMeta ConfigurationSerializable class for key/alias '" + ITEM_META_SERIALIZATION_KEY + "'!");
+		}
+		// Can be null:
+		ItemMeta itemMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(itemMetaData, serializableItemMetaClass);
+		return itemMeta;
 	}
 
 	// Inventory utilities:
@@ -1033,30 +1056,5 @@ public final class ItemUtils {
 		default:
 			return null;
 		}
-	}
-
-	// ItemStack serialization
-
-	private static final String ITEM_META_SERIALIZATION_KEY = "ItemMeta";
-
-	static Map<String, Object> serializeItemMeta(ItemMeta itemMeta) {
-		// Check whether ItemMeta is empty; equivalent to ItemStack#hasItemMeta
-		if (itemMeta != null && !Bukkit.getItemFactory().equals(itemMeta, null)) {
-			return itemMeta.serialize(); // assert: not null nor empty
-		} else {
-			return null;
-		}
-	}
-
-	static ItemMeta deserializeItemMeta(Map<String, Object> itemMetaData) {
-		if (itemMetaData == null) return null;
-		// Get the class CraftBukkit internally uses for the deserialization:
-		Class<? extends ConfigurationSerializable> serializableItemMetaClass = ConfigurationSerialization.getClassByAlias(ITEM_META_SERIALIZATION_KEY);
-		if (serializableItemMetaClass == null) {
-			throw new IllegalStateException("Missing ItemMeta ConfigurationSerializable class for key/alias '" + ITEM_META_SERIALIZATION_KEY + "'!");
-		}
-		// Can be null:
-		ItemMeta itemMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(itemMetaData, serializableItemMetaClass);
-		return itemMeta;
 	}
 }
