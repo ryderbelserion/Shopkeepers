@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.shopkeeper.player.book;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +34,8 @@ import com.nisovin.shopkeepers.util.Validate;
 public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements BookPlayerShopkeeper {
 
 	// Contains only one offer for a specific book (book title):
-	private final Map<String, BookOffer> offersByBookTitle = new LinkedHashMap<>();
-	// Lazily setup List view that is recreated whenever it is requested and the offers have changed:
-	private List<BookOffer> offerList = null;
-	private List<BookOffer> offerListView = null;
+	private final List<SKBookOffer> offers = new ArrayList<>();
+	private final List<SKBookOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a not yet initialized {@link SKBookPlayerShopkeeper} (for use in sub-classes).
@@ -204,12 +203,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	@Override
 	public List<BookOffer> getOffers() {
-		if (offerList == null) {
-			offerList = new ArrayList<>(offersByBookTitle.values());
-			offerListView = Collections.unmodifiableList(offerList);
-		}
-		assert offerListView != null;
-		return offerListView;
+		return offersView;
 	}
 
 	@Override
@@ -222,20 +216,24 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	@Override
 	public BookOffer getOffer(String bookTitle) {
 		Validate.notNull(bookTitle, "bookTitle is null");
-		return offersByBookTitle.get(bookTitle);
+		for (BookOffer offer : this.getOffers()) {
+			if (offer.getBookTitle().equals(bookTitle)) {
+				return offer;
+			}
+		}
+		return null;
 	}
 
 	@Override
 	public void removeOffer(String bookTitle) {
 		Validate.notNull(bookTitle, "bookTitle is null");
-		BookOffer bookOffer = offersByBookTitle.remove(bookTitle);
-		if (bookOffer == null) return; // There was no offer for this book title
-		this.markDirty();
-
-		// Reset the list view, so that it is recreated the next time it is requested:
-		if (offerList != null) {
-			offerList = null;
-			offerListView = null;
+		Iterator<BookOffer> iterator = offers.iterator();
+		while (iterator.hasNext()) {
+			if (iterator.next().getBookTitle().equals(bookTitle)) {
+				iterator.remove();
+				this.markDirty();
+				break;
+			}
 		}
 	}
 
@@ -246,12 +244,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	private void _clearOffers() {
-		offersByBookTitle.clear();
-
-		// If the list view has already been setup, we can update it right away:
-		if (offerList != null) {
-			offerList.clear();
-		}
+		offers.clear();
 	}
 
 	@Override
@@ -282,12 +275,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		this.removeOffer(bookTitle);
 
 		// Add the new offer:
-		offersByBookTitle.put(bookTitle, offer);
-
-		// If the list view has already been setup, we can update it right away:
-		if (offerList != null) {
-			offerList.add(offer);
-		}
+		offers.add(offer);
 	}
 
 	@Override
