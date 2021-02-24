@@ -7,7 +7,6 @@ import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -19,16 +18,6 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 
 	public SKTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		super(resultItem, item1, item2);
-	}
-
-	@Override
-	public boolean areItemsEqual(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		return super.areItemsEqual(resultItem, item1, item2);
-	}
-
-	@Override
-	public boolean areItemsEqual(TradingRecipe tradingRecipe) {
-		return super.areItemsEqual(tradingRecipe);
 	}
 
 	@Override

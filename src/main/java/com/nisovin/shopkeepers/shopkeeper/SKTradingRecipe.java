@@ -66,16 +66,6 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	}
 
 	@Override
-	public boolean areItemsEqual(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		return super.areItemsEqual(resultItem, item1, item2);
-	}
-
-	@Override
-	public boolean areItemsEqual(TradingRecipe otherRecipe) {
-		return super.areItemsEqual(otherRecipe);
-	}
-
-	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("SKTradingRecipe [resultItem=");
