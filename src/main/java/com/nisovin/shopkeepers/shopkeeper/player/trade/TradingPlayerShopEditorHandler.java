@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.util.ItemCount;
@@ -37,7 +37,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
 		// Add the shopkeeper's offers:
-		for (TradingOffer offer : shopkeeper.getOffers()) {
+		for (TradeOffer offer : shopkeeper.getOffers()) {
 			TradingRecipeDraft recipe = new TradingRecipeDraft(offer.getResultItem(), offer.getItem1(), offer.getItem2());
 			recipes.add(recipe);
 		}
@@ -70,7 +70,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	protected void addRecipe(TradingRecipeDraft recipe) {
 		assert recipe != null && recipe.isValid();
 		SKTradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.addOffer(ShopkeepersAPI.createTradingOffer(recipe.getResultItem(), recipe.getItem1(), recipe.getItem2()));
+		shopkeeper.addOffer(ShopkeepersAPI.createTradeOffer(recipe.getResultItem(), recipe.getItem1(), recipe.getItem2()));
 	}
 
 	@Override

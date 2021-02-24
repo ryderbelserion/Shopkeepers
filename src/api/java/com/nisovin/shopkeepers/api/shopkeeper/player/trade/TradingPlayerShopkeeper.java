@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.api.shopkeeper.player.trade;
 
 import java.util.List;
 
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 
 /**
@@ -19,7 +19,7 @@ public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */
-	public List<TradingOffer> getOffers();
+	public List<TradeOffer> getOffers();
 
 	/**
 	 * Clears the shopkeeper's offers.
@@ -34,7 +34,7 @@ public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 	 * @param offers
 	 *            the new offers
 	 */
-	public void setOffers(List<TradingOffer> offers);
+	public void setOffers(List<TradeOffer> offers);
 
 	/**
 	 * Adds the given offer to the shopkeeper.
@@ -45,7 +45,7 @@ public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 	 * @param offer
 	 *            the offer to add
 	 */
-	public void addOffer(TradingOffer offer);
+	public void addOffer(TradeOffer offer);
 
 	/**
 	 * Adds the given offers to the shopkeeper.
@@ -56,5 +56,5 @@ public interface TradingPlayerShopkeeper extends PlayerShopkeeper {
 	 * @param offers
 	 *            the offers to add
 	 */
-	public void addOffers(List<TradingOffer> offers);
+	public void addOffers(List<TradeOffer> offers);
 }

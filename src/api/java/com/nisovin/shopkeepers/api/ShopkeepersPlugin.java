@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
@@ -129,7 +129,7 @@ public interface ShopkeepersPlugin extends Plugin {
 
 	public PriceOffer createPriceOffer(ItemStack item, int price);
 
-	public TradingOffer createTradingOffer(ItemStack resultItem, ItemStack item1, ItemStack item2);
+	public TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2);
 
 	public BookOffer createBookOffer(String bookTitle, int price);
 }

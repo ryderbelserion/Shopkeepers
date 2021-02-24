@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
@@ -27,7 +27,7 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
 		// Find offer:
-		TradingOffer offer = shopkeeper.getOffer(tradingRecipe);
+		TradeOffer offer = shopkeeper.getOffer(tradingRecipe);
 		if (offer == null) {
 			// This might happen if the trades got modified while the player was trading:
 			this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");

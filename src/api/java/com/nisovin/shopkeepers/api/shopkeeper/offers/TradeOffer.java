@@ -8,9 +8,9 @@ import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 /**
  * Stores information about up to two items being traded for another item.
  * <p>
- * Instances of this can be created via {@link ShopkeepersAPI#createTradingOffer(ItemStack, ItemStack, ItemStack)}.
+ * Instances of this can be created via {@link ShopkeepersAPI#createTradeOffer(ItemStack, ItemStack, ItemStack)}.
  */
-public interface TradingOffer {
+public interface TradeOffer {
 
 	/**
 	 * Gets the result item.
@@ -34,7 +34,7 @@ public interface TradingOffer {
 	public ItemStack getItem2();
 
 	/**
-	 * Checks if the given items are equal to the items of this trading offer.
+	 * Checks if the given items are equal to the items of this trade offer.
 	 * 
 	 * @param resultItem
 	 *            the result item

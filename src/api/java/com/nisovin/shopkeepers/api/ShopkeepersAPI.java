@@ -13,7 +13,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
@@ -154,8 +154,8 @@ public final class ShopkeepersAPI {
 		return getPlugin().createPriceOffer(item, price);
 	}
 
-	public static TradingOffer createTradingOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		return getPlugin().createTradingOffer(resultItem, item1, item2);
+	public static TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+		return getPlugin().createTradeOffer(resultItem, item1, item2);
 	}
 
 	public static BookOffer createBookOffer(String bookTitle, int price) {

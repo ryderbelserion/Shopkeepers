@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
@@ -36,7 +36,7 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
 		// Add the shopkeeper's offers:
-		for (TradingOffer offer : shopkeeper.getOffers()) {
+		for (TradeOffer offer : shopkeeper.getOffers()) {
 			TradingRecipeDraft recipe = new TradingRecipeDraft(offer.getResultItem(), offer.getItem1(), offer.getItem2());
 			recipes.add(recipe);
 		}
@@ -53,7 +53,7 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 	protected void addRecipe(TradingRecipeDraft recipe) {
 		assert recipe != null && recipe.isValid();
 		SKRegularAdminShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.addOffer(ShopkeepersAPI.createTradingOffer(recipe.getResultItem(), recipe.getItem1(), recipe.getItem2()));
+		shopkeeper.addOffer(ShopkeepersAPI.createTradeOffer(recipe.getResultItem(), recipe.getItem1(), recipe.getItem2()));
 	}
 
 	// TODO Remove this? Maybe handle the trades setup similar to the player trading shop: Copying the selected items

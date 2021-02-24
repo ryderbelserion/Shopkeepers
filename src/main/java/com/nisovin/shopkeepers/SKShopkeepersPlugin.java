@@ -27,7 +27,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.chatinput.ChatInput;
 import com.nisovin.shopkeepers.commands.Commands;
@@ -64,7 +64,7 @@ import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
-import com.nisovin.shopkeepers.shopkeeper.offers.SKTradingOffer;
+import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShops;
@@ -754,8 +754,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	}
 
 	@Override
-	public TradingOffer createTradingOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		return new SKTradingOffer(resultItem, item1, item2);
+	public TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+		return new SKTradeOffer(resultItem, item1, item2);
 	}
 
 	@Override

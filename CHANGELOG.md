@@ -129,6 +129,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Buying shopkeepers can also buy written books and enchanted items now. Being able to buy written books is probably not really useful though, because any book item being bought has to nearly perfectly match the requested book item.
 
 API:  
+* Renamed TradingOffer to TradeOffer.
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
 * Fixed: Event handlers for the PlayerCreateShopkeeperEvent were not informed for the creation of player shopkeepers.
 * Removed ShopObject#getId() and ShopkeeperRegistry#getActiveShopkeeper(String). Object ids are no longer exposed in the API.

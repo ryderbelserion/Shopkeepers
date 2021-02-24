@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.api.shopkeeper.admin.regular;
 import java.util.List;
 
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 
 /**
  * This admin shopkeeper has unlimited supply and will not store earnings anywhere.
@@ -17,7 +17,7 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */
-	public List<TradingOffer> getOffers();
+	public List<TradeOffer> getOffers();
 
 	/**
 	 * Clears the shopkeeper's offers.
@@ -32,7 +32,7 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * @param offers
 	 *            the new offers
 	 */
-	public void setOffers(List<TradingOffer> offers);
+	public void setOffers(List<TradeOffer> offers);
 
 	/**
 	 * Adds the given offer to the shopkeeper.
@@ -43,7 +43,7 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * @param offer
 	 *            the offer to add
 	 */
-	public void addOffer(TradingOffer offer);
+	public void addOffer(TradeOffer offer);
 
 	/**
 	 * Adds the given offers to the shopkeeper.
@@ -54,5 +54,5 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * @param offers
 	 *            the offers to add
 	 */
-	public void addOffers(List<TradingOffer> offers);
+	public void addOffers(List<TradeOffer> offers);
 }

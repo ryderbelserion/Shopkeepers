@@ -8,16 +8,16 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradingOffer;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
 
-// Shares its implementation with TradingRecipe, but always reports to not be out of stock.
-public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
+// Shares its implementation with SKTradingRecipe, but always reports to not be out of stock.
+public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 
-	public SKTradingOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+	public SKTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		super(resultItem, item1, item2);
 	}
 
@@ -34,7 +34,7 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("SKTradingOffer [resultItem=");
+		builder.append("SKTradeOffer [resultItem=");
 		builder.append(resultItem);
 		builder.append(", item1=");
 		builder.append(item1);
@@ -53,7 +53,7 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
 		if (!super.equals(obj)) return false;
-		if (!(obj instanceof SKTradingOffer)) return false;
+		if (!(obj instanceof SKTradeOffer)) return false;
 		return true;
 	}
 
@@ -61,10 +61,10 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 	// STATIC UTILITIES
 	// //////////
 
-	public static void saveToConfig(ConfigurationSection config, String node, Collection<? extends TradingOffer> offers) {
+	public static void saveToConfig(ConfigurationSection config, String node, Collection<? extends TradeOffer> offers) {
 		ConfigurationSection offersSection = config.createSection(node);
 		int id = 1;
-		for (TradingOffer offer : offers) {
+		for (TradeOffer offer : offers) {
 			// Note: The items are clones.
 			ItemStack item1 = offer.getItem1();
 			ItemStack item2 = offer.getItem2();
@@ -78,8 +78,8 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 		}
 	}
 
-	public static List<SKTradingOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
-		List<SKTradingOffer> offers = new ArrayList<>();
+	public static List<SKTradeOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
+		List<SKTradeOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String key : offersSection.getKeys(false)) {
@@ -97,7 +97,7 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid trading offer for " + key + ": item1 or resultItem is empty"));
 					continue;
 				}
-				offers.add(new SKTradingOffer(resultItem, item1, item2));
+				offers.add(new SKTradeOffer(resultItem, item1, item2));
 			}
 		}
 
@@ -105,12 +105,12 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 	}
 
 	// Note: Returns the same list instance if no items were migrated.
-	public static List<SKTradingOffer> migrateItems(List<SKTradingOffer> offers, String errorContext) {
+	public static List<SKTradeOffer> migrateItems(List<SKTradeOffer> offers, String errorContext) {
 		if (offers == null) return null;
-		List<SKTradingOffer> migratedOffers = null;
+		List<SKTradeOffer> migratedOffers = null;
 		final int size = offers.size();
 		for (int i = 0; i < size; ++i) {
-			SKTradingOffer offer = offers.get(i);
+			SKTradeOffer offer = offers.get(i);
 			if (offer == null) continue; // Skip invalid entries
 
 			boolean itemsMigrated = false;
@@ -150,7 +150,7 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 				if (migratedOffers == null) {
 					migratedOffers = new ArrayList<>(size);
 					for (int j = 0; j < i; ++j) {
-						SKTradingOffer oldOffer = offers.get(j);
+						SKTradeOffer oldOffer = offers.get(j);
 						if (oldOffer == null) continue; // Skip invalid entries
 						migratedOffers.add(oldOffer);
 					}
@@ -162,7 +162,7 @@ public class SKTradingOffer extends SKTradingRecipe implements TradingOffer {
 					continue; // Skip this offer
 				}
 				assert !ItemUtils.isEmpty(resultItem) && !ItemUtils.isEmpty(item1);
-				migratedOffers.add(new SKTradingOffer(resultItem, item1, item2));
+				migratedOffers.add(new SKTradeOffer(resultItem, item1, item2));
 			}
 		}
 		return (migratedOffers == null) ? offers : migratedOffers;
