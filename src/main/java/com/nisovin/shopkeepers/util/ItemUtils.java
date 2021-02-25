@@ -250,16 +250,6 @@ public final class ItemUtils {
 		return itemStack;
 	}
 
-	public static ItemStack setLocalizedName(ItemStack item, String locName) {
-		if (item == null) return null;
-		ItemMeta meta = item.getItemMeta();
-		if (meta != null) {
-			meta.setLocalizedName(locName);
-			item.setItemMeta(meta);
-		}
-		return item;
-	}
-
 	public static ItemStack setLeatherColor(ItemStack leatherArmorItem, Color color) {
 		if (leatherArmorItem == null) return null;
 		ItemMeta meta = leatherArmorItem.getItemMeta();
