@@ -4,7 +4,6 @@ import java.util.Objects;
 
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
@@ -98,13 +97,13 @@ public class TradingRecipeDraft {
 	 * Creates a {@link TradingRecipe} based on this draft.
 	 * 
 	 * @param outOfStock
-	 *            <code>true</code> if out of stock
-	 * @return the trading recipe, or <code>null</code> if this draft does not represent a valid recipe
+	 *            whether to mark the trading recipe as being out of stock
+	 * @return the trading recipe, or <code>null</code> if this draft is not a valid trading recipe
 	 */
-	public TradingRecipe toRecipe(boolean outOfStock) {
-		if (resultItem == null) return null;
-		if (item1 == null) return null;
-		return ShopkeepersAPI.createTradingRecipe(resultItem, item1, item2, outOfStock);
+	public SKTradingRecipe toTradingRecipe(boolean outOfStock) {
+		if (!this.isValid()) return null;
+		// Creating the trading recipe already copies the items, so there is no need to copy them here:
+		return new SKTradingRecipe(resultItem, item1, item2, outOfStock);
 	}
 
 	public boolean areItemsEqual(ItemStack resultItem, ItemStack item1, ItemStack item2) {
@@ -122,7 +121,7 @@ public class TradingRecipeDraft {
 	public boolean areItemsEqual(TradingRecipe otherRecipe) {
 		if (otherRecipe == null) return false;
 		if (otherRecipe instanceof TradingRecipeDraft) {
-			// This is true for TradingRecipes based on SKTradingRecipe:
+			// This is true for trading recipe based on SKTradingRecipe:
 			return this.areItemsEqual((TradingRecipeDraft) otherRecipe); // Avoids copying the items
 		} else {
 			return this.areItemsEqual(otherRecipe.getResultItem(), otherRecipe.getItem1(), otherRecipe.getItem2());

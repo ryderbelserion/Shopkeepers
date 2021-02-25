@@ -9,7 +9,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopTypesRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
-import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
@@ -119,13 +118,7 @@ public interface ShopkeepersPlugin extends Plugin {
 	 */
 	public Shopkeeper handleShopkeeperCreation(ShopCreationData shopCreationData);
 
-	// FACTORY
-
-	public TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2);
-
-	public TradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2, boolean outOfStock);
-
-	// OFFERS
+	// OFFERS FACTORY
 
 	public PriceOffer createPriceOffer(ItemStack item, int price);
 

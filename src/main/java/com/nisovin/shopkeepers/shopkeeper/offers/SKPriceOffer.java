@@ -30,6 +30,17 @@ public class SKPriceOffer implements PriceOffer {
 		return item.clone();
 	}
 
+	/**
+	 * Gets the traded item without making a copy of it first.
+	 * <p>
+	 * For internal use only. The item is expected to not be modified.
+	 * 
+	 * @return the item, not <code>null</code> or empty
+	 */
+	public ItemStack getInternalItem() {
+		return item;
+	}
+
 	@Override
 	public int getPrice() {
 		return price;

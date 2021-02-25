@@ -14,10 +14,9 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
+import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
-import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
@@ -34,26 +33,36 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	@Override
 	protected List<TradingRecipeDraft> getTradingRecipes() {
 		SKTradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
 		// Add the shopkeeper's offers:
-		for (TradeOffer offer : shopkeeper.getOffers()) {
+		List<SKTradeOffer> offers = shopkeeper.getOffers();
+		List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
+		offers.forEach(offer -> {
+			// The offer returns copies of its items:
 			TradingRecipeDraft recipe = new TradingRecipeDraft(offer.getResultItem(), offer.getItem1(), offer.getItem2());
 			recipes.add(recipe);
-		}
+		});
 
-		// Add empty offers for items from the container:
-		List<ItemCount> containerItems = shopkeeper.getItemsFromContainer();
-		for (int containerItemIndex = 0; containerItemIndex < containerItems.size(); containerItemIndex++) {
-			ItemCount itemCount = containerItems.get(containerItemIndex);
-			ItemStack itemFromContainer = itemCount.getItem(); // This item is already a copy with amount 1
+		// Add new empty recipe drafts for items from the container without existing offer:
+		// We only add one recipe per similar item:
+		List<ItemStack> newRecipes = new ArrayList<>();
+		ItemStack[] containerContents = shopkeeper.getContainerContents(); // Empty if the container is not found
+		for (ItemStack containerItem : containerContents) {
+			if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
 
-			if (shopkeeper.getOffer(itemFromContainer) != null) {
-				continue; // Already added
+			if (shopkeeper.hasOffer(containerItem)) {
+				// There is already a recipe for this item:
+				continue;
 			}
 
-			// Add recipe:
-			TradingRecipeDraft recipe = new TradingRecipeDraft(itemFromContainer, null, null);
+			if (ItemUtils.contains(newRecipes, containerItem)) {
+				// We already added a new recipe for this item:
+				continue;
+			}
+
+			// Add new empty recipe:
+			containerItem = ItemUtils.copySingleItem(containerItem); // Ensures a stack size of 1
+			TradingRecipeDraft recipe = new TradingRecipeDraft(containerItem, null, null);
 			recipes.add(recipe);
 		}
 

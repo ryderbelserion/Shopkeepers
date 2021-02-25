@@ -2,13 +2,8 @@ package com.nisovin.shopkeepers.api.shopkeeper;
 
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
-
 /**
  * An unmodifiable trading recipe.
- * <p>
- * Instances of this can be created via
- * {@link ShopkeepersAPI#createTradingRecipe(ItemStack, ItemStack, ItemStack, boolean)}.
  */
 public interface TradingRecipe {
 

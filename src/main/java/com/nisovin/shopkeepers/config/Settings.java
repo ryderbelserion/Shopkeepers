@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -455,6 +456,16 @@ public class Settings extends Config {
 	}
 
 	// CURRENCY
+
+	private static final Predicate<ItemStack> ANY_CURRENCY_ITEMS = Settings::isAnyCurrencyItem;
+
+	public static Predicate<ItemStack> anyCurrencyItems() {
+		return ANY_CURRENCY_ITEMS;
+	}
+
+	public static boolean isAnyCurrencyItem(ItemStack itemStack) {
+		return isCurrencyItem(itemStack) || isHighCurrencyItem(itemStack);
+	}
 
 	// Currency item:
 	public static ItemStack createCurrencyItem(int amount) {

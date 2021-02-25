@@ -130,6 +130,9 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 
 API:  
 * Renamed TradingOffer to TradeOffer.
+* Removed the factory methods for trading recipes from the API. Only the Shopkeepers plugin itself, and plugins using the internal API should be required to create trading recipes.
+* Shopkeeper#getTradingRecipes, as well as the various shopkeeper type specific methods to get, set, and add offers are less specific now about the element types of the involved lists.
+* The different types of shopkeepers validate now that any added offers are of the expected implementation type, i.e. have been created via the provided factory methods.
 * PlayerCreatePlayerShopkeeperEvent and PlayerShopkeeperHireEvent: The meaning of the max shops limit has changed. A value of 0 or less no longer indicates 'no limit'.
 * Fixed: Event handlers for the PlayerCreateShopkeeperEvent were not informed for the creation of player shopkeepers.
 * Removed ShopObject#getId() and ShopkeeperRegistry#getActiveShopkeeper(String). Object ids are no longer exposed in the API.
@@ -193,7 +196,7 @@ Internal:
 * Added test cases that compare the values of the default config and language file with their internal counter parts.
 * We explicitly set the mob type of Citizen shopkeeper NPCs now when we create the NPC, similar to Citizens' own NPC creation command.
 * Slightly changed how we retrieve the entity type of Citizen shopkeeper NPCs.
-* Optimizations and refactoring related to book shopkeepers.
+* Several minor optimizations and refactors related to the various types of shopkeepers. Items are copied and compared less often now.
 * Minor other internal code refactoring.
 
 Migration notes:  

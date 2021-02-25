@@ -7,8 +7,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.MerchantRecipe;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 
 /**
@@ -19,12 +19,12 @@ public class MerchantUtils {
 	private MerchantUtils() {
 	}
 
-	public static TradingRecipe getSelectedTradingRecipe(MerchantInventory merchantInventory) {
+	public static SKTradingRecipe getSelectedTradingRecipe(MerchantInventory merchantInventory) {
 		MerchantRecipe merchantRecipe = merchantInventory.getSelectedRecipe();
 		return createTradingRecipe(merchantRecipe);
 	}
 
-	public static TradingRecipe createTradingRecipe(MerchantRecipe merchantRecipe) {
+	public static SKTradingRecipe createTradingRecipe(MerchantRecipe merchantRecipe) {
 		if (merchantRecipe == null) return null;
 		List<ItemStack> ingredients = merchantRecipe.getIngredients();
 		ItemStack item1 = ingredients.get(0);
@@ -36,7 +36,7 @@ public class MerchantUtils {
 			}
 		}
 		ItemStack resultItem = merchantRecipe.getResult();
-		return ShopkeepersAPI.createTradingRecipe(resultItem, item1, item2);
+		return new SKTradingRecipe(resultItem, item1, item2);
 	}
 
 	public static TradingRecipeDraft createTradingRecipeDraft(MerchantRecipe merchantRecipe) {
@@ -97,7 +97,7 @@ public class MerchantUtils {
 		return tradingRecipeDrafts;
 	}
 
-	public static List<MerchantRecipe> createMerchantRecipes(List<TradingRecipe> recipes) {
+	public static List<MerchantRecipe> createMerchantRecipes(List<? extends TradingRecipe> recipes) {
 		List<MerchantRecipe> merchantRecipes = new ArrayList<>();
 		for (TradingRecipe recipe : recipes) {
 			merchantRecipes.add(createMerchantRecipe(recipe));

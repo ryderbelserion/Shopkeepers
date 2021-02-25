@@ -10,8 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
+import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.util.BookItems;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -35,8 +35,8 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		Set<String> bookTitles = new HashSet<>();
 
 		// Add the shopkeeper's offers:
-		List<BookOffer> offers = shopkeeper.getOffers();
 		Map<String, ItemStack> containerBooksByTitle = shopkeeper.getCopyableBooksFromContainer();
+		List<SKBookOffer> offers = shopkeeper.getOffers();
 		List<TradingRecipeDraft> recipes = new ArrayList<>(Math.max(offers.size(), containerBooksByTitle.size()));
 		offers.forEach(bookOffer -> {
 			String bookTitle = bookOffer.getBookTitle();

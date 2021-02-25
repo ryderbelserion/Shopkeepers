@@ -7,16 +7,15 @@ import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.regular.RegularAdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
+import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.util.Log;
@@ -25,12 +24,8 @@ import com.nisovin.shopkeepers.util.Validate;
 public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements RegularAdminShopkeeper {
 
 	// There can be multiple different offers for the same kind of item:
-	private final List<TradeOffer> offers = new ArrayList<>();
-	private final List<TradeOffer> offersView = Collections.unmodifiableList(offers);
-
-	// Kept in sync with offers:
-	private final List<TradingRecipe> recipes = new ArrayList<>();
-	private final List<TradingRecipe> recipesView = Collections.unmodifiableList(recipes);
+	private final List<SKTradeOffer> offers = new ArrayList<>();
+	private final List<SKTradeOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a not yet initialized {@link SKRegularAdminShopkeeper} (for use in sub-classes).
@@ -69,7 +64,7 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 		List<SKTradeOffer> offers = SKTradeOffer.loadFromConfig(configSection, "recipes", "Shopkeeper " + this.getId());
 		List<SKTradeOffer> migratedOffers = SKTradeOffer.migrateItems(offers, "Shopkeeper " + this.getId());
 		if (offers != migratedOffers) {
-			Log.debug(DebugOptions.itemMigrations, () -> "Shopkeeper " + this.getId() + ": Migrated trade offer items.");
+			Log.debug(DebugOptions.itemMigrations, () -> "Shopkeeper " + this.getId() + ": Migrated items of trade offers.");
 			this.markDirty();
 		}
 		this._setOffers(migratedOffers);
@@ -88,14 +83,17 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	}
 
 	@Override
-	public List<TradingRecipe> getTradingRecipes(Player player) {
-		return recipesView;
+	public List<? extends SKTradingRecipe> getTradingRecipes(Player player) {
+		// SKTradeOffer extends SKTradingRecipe and reports to not be out-of-stock. Both SKTradeOffer and TradingRecipe
+		// are expected to be immutable (they return copies of their items). We can therefore reuse the offers as
+		// trading recipes, and don't have to create a new trading recipes for them.
+		return offersView;
 	}
 
 	// OFFERS:
 
 	@Override
-	public List<TradeOffer> getOffers() {
+	public List<SKTradeOffer> getOffers() {
 		return offersView;
 	}
 
@@ -107,11 +105,10 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 
 	private void _clearOffers() {
 		offers.clear();
-		recipes.clear();
 	}
 
 	@Override
-	public void setOffers(List<TradeOffer> offers) {
+	public void setOffers(List<? extends TradeOffer> offers) {
 		Validate.notNull(offers, "Offers is null!");
 		Validate.noNullElements(offers, "Offers contains null elements!");
 		this._setOffers(offers);
@@ -133,17 +130,15 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 
 	private void _addOffer(TradeOffer offer) {
 		assert offer != null;
-		offers.add(offer);
-		if (offer instanceof TradingRecipe) {
-			// SKTradeOffer extends SKTradingRecipe and reports to not be out-of-stock.
-			recipes.add((TradingRecipe) offer);
-		} else {
-			recipes.add(ShopkeepersAPI.createTradingRecipe(offer.getResultItem(), offer.getItem1(), offer.getItem2(), false));
-		}
+		Validate.isTrue(offer instanceof SKTradeOffer, "offer is not of type SKTradeOffer");
+		SKTradeOffer skOffer = (SKTradeOffer) offer;
+
+		// Add the new offer:
+		offers.add(skOffer);
 	}
 
 	@Override
-	public void addOffers(List<TradeOffer> offers) {
+	public void addOffers(List<? extends TradeOffer> offers) {
 		Validate.notNull(offers, "Offers is null!");
 		Validate.noNullElements(offers, "Offers contains null elements!");
 		this._addOffers(offers);

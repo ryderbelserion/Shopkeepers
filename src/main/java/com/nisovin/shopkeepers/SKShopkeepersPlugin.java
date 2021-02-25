@@ -60,7 +60,6 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.SKShopTypesRegistry;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
-import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
@@ -733,19 +732,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}
 	}
 
-	// FACTORY
-
-	@Override
-	public SKTradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		return new SKTradingRecipe(resultItem, item1, item2);
-	}
-
-	@Override
-	public SKTradingRecipe createTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2, boolean outOfStock) {
-		return new SKTradingRecipe(resultItem, item1, item2, outOfStock);
-	}
-
-	// OFFERS
+	// OFFERS FACTORY
 
 	@Override
 	public PriceOffer createPriceOffer(ItemStack item, int price) {

@@ -4,39 +4,30 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.function.Predicate;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.buy.BuyingPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
-import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
+import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
-import com.nisovin.shopkeepers.util.ItemCount;
-import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implements BuyingPlayerShopkeeper {
 
-	private static final Predicate<ItemStack> ITEM_FILTER = (ItemStack item) -> {
-		if (Settings.isCurrencyItem(item) || Settings.isHighCurrencyItem(item)) return false;
-		return true;
-	};
-
-	// Contains only one offer for a specific type of item:
-	private final List<PriceOffer> offers = new ArrayList<>();
-	private final List<PriceOffer> offersView = Collections.unmodifiableList(offers);
+	// Contains only one offer for any specific type of item:
+	private final List<SKPriceOffer> offers = new ArrayList<>();
+	private final List<SKPriceOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a not yet initialized {@link SKBuyingPlayerShopkeeper} (for use in sub-classes).
@@ -78,9 +69,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 		List<SKPriceOffer> offers = SKPriceOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId());
 		List<SKPriceOffer> migratedOffers = SKPriceOffer.migrateItems(offers, "Shopkeeper " + this.getId());
 		if (offers != migratedOffers) {
-			Log.debug(DebugOptions.itemMigrations,
-					() -> "Shopkeeper " + this.getId() + ": Migrated trading offer items."
-			);
+			Log.debug(DebugOptions.itemMigrations, () -> "Shopkeeper " + this.getId() + ": Migrated items of trade offers.");
 			this.markDirty();
 		}
 		this._setOffers(migratedOffers);
@@ -99,35 +88,34 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	}
 
 	@Override
-	public List<TradingRecipe> getTradingRecipes(Player player) {
-		List<TradingRecipe> recipes = new ArrayList<>();
+	public List<? extends SKTradingRecipe> getTradingRecipes(Player player) {
 		int currencyInContainer = this.getCurrencyInContainer();
-		for (PriceOffer offer : this.getOffers()) {
-			ItemStack tradedItem = offer.getItem();
+		List<SKPriceOffer> offers = this.getOffers();
+		List<SKTradingRecipe> recipes = new ArrayList<>(offers.size());
+		offers.forEach(offer -> {
+			// Creating the trading recipe already copies the item, so there is no need to copy it here:
+			ItemStack tradedItem = offer.getInternalItem();
 			boolean outOfStock = (currencyInContainer < offer.getPrice());
-			TradingRecipe recipe = this.createBuyingRecipe(tradedItem, offer.getPrice(), outOfStock);
+			SKTradingRecipe recipe = this.createBuyingRecipe(tradedItem, offer.getPrice(), outOfStock);
 			if (recipe != null) {
 				recipes.add(recipe);
-			}
-		}
+			} // Else: Price is invalid (cannot be represented by currency items).
+		});
 		return Collections.unmodifiableList(recipes);
-	}
-
-	protected List<ItemCount> getItemsFromContainer() {
-		return this.getItemsFromContainer(ITEM_FILTER);
 	}
 
 	// OFFERS:
 
 	@Override
-	public List<PriceOffer> getOffers() {
+	public List<SKPriceOffer> getOffers() {
 		return offersView;
 	}
 
 	@Override
-	public PriceOffer getOffer(ItemStack tradedItem) {
-		for (PriceOffer offer : this.getOffers()) {
-			if (ItemUtils.isSimilar(offer.getItem(), tradedItem)) {
+	public SKPriceOffer getOffer(ItemStack tradedItem) {
+		Validate.notNull(tradedItem, "tradedItem is null");
+		for (SKPriceOffer offer : this.getOffers()) {
+			if (offer.getInternalItem().isSimilar(tradedItem)) {
 				return offer;
 			}
 		}
@@ -136,9 +124,10 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 
 	@Override
 	public void removeOffer(ItemStack tradedItem) {
-		Iterator<PriceOffer> iterator = offers.iterator();
+		Validate.notNull(tradedItem, "tradedItem is null");
+		Iterator<SKPriceOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
-			if (ItemUtils.isSimilar(iterator.next().getItem(), tradedItem)) {
+			if (iterator.next().getInternalItem().isSimilar(tradedItem)) {
 				iterator.remove();
 				this.markDirty();
 				break;
@@ -157,7 +146,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	}
 
 	@Override
-	public void setOffers(List<PriceOffer> offers) {
+	public void setOffers(List<? extends PriceOffer> offers) {
 		Validate.notNull(offers, "Offers is null!");
 		Validate.noNullElements(offers, "Offers contains null elements!");
 		this._setOffers(offers);
@@ -179,13 +168,19 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 
 	private void _addOffer(PriceOffer offer) {
 		assert offer != null;
-		// Remove previous offer for the same item:
-		this.removeOffer(offer.getItem());
-		offers.add(offer);
+		Validate.isTrue(offer instanceof SKPriceOffer, "offer is not of type SKPriceOffer");
+		SKPriceOffer skOffer = (SKPriceOffer) offer;
+
+		// Remove any previous offer for the same item:
+		ItemStack tradedItem = skOffer.getInternalItem();
+		this.removeOffer(tradedItem);
+
+		// Add the new offer:
+		offers.add(skOffer);
 	}
 
 	@Override
-	public void addOffers(List<PriceOffer> offers) {
+	public void addOffers(List<? extends PriceOffer> offers) {
 		Validate.notNull(offers, "Offers is null!");
 		Validate.noNullElements(offers, "Offers contains null elements!");
 		this._addOffers(offers);
@@ -194,7 +189,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 
 	private void _addOffers(List<? extends PriceOffer> offers) {
 		assert offers != null && !offers.contains(null);
-		// This replaces any previous offers for the same items.
+		// This replaces any previous offers for the same items:
 		offers.forEach(this::_addOffer);
 	}
 }

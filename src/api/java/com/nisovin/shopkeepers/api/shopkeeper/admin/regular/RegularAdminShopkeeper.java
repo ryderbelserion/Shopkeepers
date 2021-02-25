@@ -19,7 +19,7 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */
-	public List<TradeOffer> getOffers();
+	public List<? extends TradeOffer> getOffers();
 
 	/**
 	 * Clears the shopkeeper's offers.
@@ -34,7 +34,7 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * @param offers
 	 *            the new offers
 	 */
-	public void setOffers(List<TradeOffer> offers);
+	public void setOffers(List<? extends TradeOffer> offers);
 
 	/**
 	 * Adds the given offer to the shopkeeper.
@@ -56,5 +56,5 @@ public interface RegularAdminShopkeeper extends AdminShopkeeper {
 	 * @param offers
 	 *            the offers to add
 	 */
-	public void addOffers(List<TradeOffer> offers);
+	public void addOffers(List<? extends TradeOffer> offers);
 }

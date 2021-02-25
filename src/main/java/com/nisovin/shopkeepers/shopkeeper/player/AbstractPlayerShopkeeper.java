@@ -1,9 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.player;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -16,13 +14,11 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
@@ -31,8 +27,8 @@ import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.CyclicCounter;
-import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.RateLimiter;
@@ -376,11 +372,15 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return null;
 	}
 
-	// Returns null if the container could not be found.
+	// Returns an empty array if the container could not be found.
 	public ItemStack[] getContainerContents() {
 		Inventory containerInventory = this.getContainerInventory();
-		if (containerInventory == null) return null; // Container not found
-		return containerInventory.getContents(); // Not null
+		if (containerInventory == null) {
+			// Container not found:
+			return ItemUtils.emptyItemStackArray();
+		} else {
+			return containerInventory.getContents(); // Not null
+		}
 	}
 
 	@Deprecated
@@ -391,10 +391,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public int getCurrencyInContainer() {
-		ItemStack[] contents = this.getContainerContents(); // Can be null
-		if (contents == null) return 0;
-
 		int totalCurrency = 0;
+		ItemStack[] contents = this.getContainerContents(); // Empty if the container is not found
 		for (ItemStack itemStack : contents) {
 			if (Settings.isCurrencyItem(itemStack)) {
 				totalCurrency += itemStack.getAmount();
@@ -405,14 +403,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return totalCurrency;
 	}
 
-	protected List<ItemCount> getItemsFromContainer(Predicate<ItemStack> filter) {
-		ItemStack[] contents = this.getContainerContents(); // Can be null
-		// Returns an empty List if contents is null:
-		return ItemUtils.countItems(contents, filter);
-	}
-
 	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
-	protected TradingRecipe createSellingRecipe(ItemStack itemBeingSold, int price, boolean outOfStock) {
+	protected SKTradingRecipe createSellingRecipe(ItemStack itemBeingSold, int price, boolean outOfStock) {
 		int remainingPrice = price;
 
 		ItemStack item1 = null;
@@ -443,11 +435,11 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				item2 = currencyItem;
 			}
 		}
-		return ShopkeepersAPI.createTradingRecipe(itemBeingSold, item1, item2, outOfStock);
+		return new SKTradingRecipe(itemBeingSold, item1, item2, outOfStock);
 	}
 
 	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
-	protected TradingRecipe createBuyingRecipe(ItemStack itemBeingBought, int price, boolean outOfStock) {
+	protected SKTradingRecipe createBuyingRecipe(ItemStack itemBeingBought, int price, boolean outOfStock) {
 		if (price > Settings.currencyItem.getType().getMaxStackSize()) {
 			// Cannot represent this price with the used currency items:
 			Log.warning("Shopkeeper " + this.getIdString() + " at " + this.getPositionString()
@@ -455,7 +447,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			return null;
 		}
 		ItemStack currencyItem = Settings.createCurrencyItem(price);
-		return ShopkeepersAPI.createTradingRecipe(currencyItem, itemBeingBought, null, outOfStock);
+		return new SKTradingRecipe(currencyItem, itemBeingBought, null, outOfStock);
 	}
 
 	// SHOPKEEPER UIs - Shortcuts for common UI types:

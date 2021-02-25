@@ -175,7 +175,7 @@ public interface Shopkeeper {
 	 *            the trading player, or <code>null</code> to not take player-specific trading recipes into account
 	 * @return an unmodifiable view on the current trading recipes of this shopkeeper for the given player
 	 */
-	public List<TradingRecipe> getTradingRecipes(Player player);
+	public List<? extends TradingRecipe> getTradingRecipes(Player player);
 
 	// SHOPKEEPER UIs
 

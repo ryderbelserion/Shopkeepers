@@ -6,6 +6,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
+// Shares its implementation with TradingRecipeDraft, but returns copies of its items.
 public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe {
 
 	private final boolean outOfStock;
@@ -58,6 +59,39 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	@Override
 	public final ItemStack getItem2() {
 		return (item2 == null) ? null : item2.clone();
+	}
+
+	/**
+	 * Gets the result item without making a copy of it first.
+	 * <p>
+	 * For internal use only. The item is expected to not be modified.
+	 * 
+	 * @return the result item, not <code>null</code> or empty
+	 */
+	public ItemStack getInternalResultItem() {
+		return super.getResultItem();
+	}
+
+	/**
+	 * Gets the first required item without making a copy of it first.
+	 * <p>
+	 * For internal use only. The item is expected to not be modified.
+	 * 
+	 * @return the first required item, not <code>null</code> or empty
+	 */
+	public ItemStack getInternalItem1() {
+		return super.getItem1();
+	}
+
+	/**
+	 * Gets the second required item without making a copy of it first.
+	 * <p>
+	 * For internal use only. The item is expected to not be modified.
+	 * 
+	 * @return the second required item, can be <code>null</code>
+	 */
+	public ItemStack getInternalItem2() {
+		return super.getItem2();
 	}
 
 	@Override

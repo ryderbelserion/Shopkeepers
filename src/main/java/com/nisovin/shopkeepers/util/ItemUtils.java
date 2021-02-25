@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.util;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -730,25 +729,15 @@ public final class ItemUtils {
 
 	// Inventory utilities:
 
-	public static List<ItemCount> countItems(ItemStack[] contents, Predicate<ItemStack> filter) {
-		List<ItemCount> itemCounts = new ArrayList<>();
-		if (contents == null) return itemCounts;
-		filter = PredicateUtils.orAlwaysTrue(filter);
-		for (ItemStack item : contents) {
-			if (isEmpty(item)) continue;
-			if (!filter.test(item)) continue;
+	private static final ItemStack[] EMPTY_ITEMSTACK_ARRAY = new ItemStack[0];
 
-			// Check if we already have a counter for this type of item:
-			ItemCount itemCount = ItemCount.findSimilar(itemCounts, item);
-			if (itemCount != null) {
-				// Increase item count:
-				itemCount.addAmount(item.getAmount());
-			} else {
-				// Add new item entry:
-				itemCounts.add(new ItemCount(item, item.getAmount()));
-			}
-		}
-		return itemCounts;
+	/**
+	 * Returns an empty array of {@link ItemStack ItemStacks}.
+	 * 
+	 * @return the empty array
+	 */
+	public static final ItemStack[] emptyItemStackArray() {
+		return EMPTY_ITEMSTACK_ARRAY;
 	}
 
 	/**

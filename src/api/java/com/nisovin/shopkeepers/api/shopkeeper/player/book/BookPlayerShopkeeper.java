@@ -25,7 +25,7 @@ public interface BookPlayerShopkeeper extends PlayerShopkeeper {
 	 * 
 	 * @return an unmodifiable view on the shopkeeper's offers
 	 */
-	public List<BookOffer> getOffers();
+	public List<? extends BookOffer> getOffers();
 
 	/**
 	 * Gets the offer for a specific book item.
@@ -68,7 +68,7 @@ public interface BookPlayerShopkeeper extends PlayerShopkeeper {
 	 * @param offers
 	 *            the new offers
 	 */
-	public void setOffers(List<BookOffer> offers);
+	public void setOffers(List<? extends BookOffer> offers);
 
 	/**
 	 * Adds the given offer to the shopkeeper.
@@ -95,5 +95,5 @@ public interface BookPlayerShopkeeper extends PlayerShopkeeper {
 	 * @param offers
 	 *            the offers to add
 	 */
-	public void addOffers(List<BookOffer> offers);
+	public void addOffers(List<? extends BookOffer> offers);
 }

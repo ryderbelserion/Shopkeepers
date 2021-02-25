@@ -7,6 +7,7 @@ import java.util.List;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -18,6 +19,18 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 
 	public SKTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		super(resultItem, item1, item2);
+	}
+
+	/**
+	 * Creates a {@link TradingRecipe} for this trade offer.
+	 * 
+	 * @param outOfStock
+	 *            whether to mark the trading recipe as being out of stock
+	 * @return the trading recipe
+	 */
+	@Override
+	public SKTradingRecipe toTradingRecipe(boolean outOfStock) {
+		return super.toTradingRecipe(outOfStock);
 	}
 
 	@Override

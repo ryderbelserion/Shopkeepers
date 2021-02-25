@@ -8,8 +8,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
+import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 
@@ -33,13 +33,15 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 	@Override
 	protected List<TradingRecipeDraft> getTradingRecipes() {
 		SKRegularAdminShopkeeper shopkeeper = this.getShopkeeper();
-		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
 		// Add the shopkeeper's offers:
-		for (TradeOffer offer : shopkeeper.getOffers()) {
+		List<SKTradeOffer> offers = shopkeeper.getOffers();
+		List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size());
+		offers.forEach(offer -> {
+			// The offer returns copies of its items:
 			TradingRecipeDraft recipe = new TradingRecipeDraft(offer.getResultItem(), offer.getItem1(), offer.getItem2());
 			recipes.add(recipe);
-		}
+		});
 		return recipes;
 	}
 

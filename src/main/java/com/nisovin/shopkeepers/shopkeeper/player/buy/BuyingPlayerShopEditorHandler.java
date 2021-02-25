@@ -7,11 +7,10 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
+import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
-import com.nisovin.shopkeepers.util.ItemCount;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
@@ -28,28 +27,39 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	@Override
 	protected List<TradingRecipeDraft> getTradingRecipes() {
 		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		List<TradingRecipeDraft> recipes = new ArrayList<>();
 
 		// Add the shopkeeper's offers:
-		for (PriceOffer offer : shopkeeper.getOffers()) {
+		List<SKPriceOffer> offers = shopkeeper.getOffers();
+		List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
+		offers.forEach(offer -> {
+			ItemStack tradedItem = offer.getItem(); // Copy
 			ItemStack currencyItem = Settings.createCurrencyItem(offer.getPrice());
-			TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, offer.getItem(), null);
+			TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, tradedItem, null);
 			recipes.add(recipe);
-		}
+		});
 
-		// Add empty offers for items from the container:
-		List<ItemCount> containerItems = shopkeeper.getItemsFromContainer();
-		for (int containerItemIndex = 0; containerItemIndex < containerItems.size(); containerItemIndex++) {
-			ItemCount itemCount = containerItems.get(containerItemIndex);
-			ItemStack itemFromContainer = itemCount.getItem(); // This item is already a copy with amount 1
+		// Add new empty recipe drafts for items from the container without existing offer:
+		// We only add one recipe per similar item:
+		List<ItemStack> newRecipes = new ArrayList<>();
+		ItemStack[] containerContents = shopkeeper.getContainerContents(); // Empty if the container is not found
+		for (ItemStack containerItem : containerContents) {
+			if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
+			if (Settings.isAnyCurrencyItem(containerItem)) continue; // Ignore currency items
 
-			if (shopkeeper.getOffer(itemFromContainer) != null) {
-				continue; // Already added
+			if (shopkeeper.getOffer(containerItem) != null) {
+				// There is already a recipe for this item:
+				continue;
 			}
 
-			// Add recipe:
+			if (ItemUtils.contains(newRecipes, containerItem)) {
+				// We already added a new recipe for this item:
+				continue;
+			}
+
+			// Add new empty recipe:
+			containerItem = ItemUtils.copySingleItem(containerItem); // Ensures a stack size of 1
 			ItemStack currencyItem = Settings.createZeroCurrencyItem();
-			TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, itemFromContainer, null);
+			TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, containerItem, null);
 			recipes.add(recipe);
 		}
 

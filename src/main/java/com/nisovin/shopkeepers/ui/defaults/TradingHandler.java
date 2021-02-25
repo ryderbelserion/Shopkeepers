@@ -142,11 +142,11 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		// Create and open trading window:
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		String title = this.getInventoryTitle();
-		List<TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
+		List<? extends TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
 		return this.openTradeWindow(title, recipes, player);
 	}
 
-	protected boolean openTradeWindow(String title, List<TradingRecipe> recipes, Player player) {
+	protected boolean openTradeWindow(String title, List<? extends TradingRecipe> recipes, Player player) {
 		// Setup merchant:
 		Merchant merchant = this.setupMerchant(title, recipes);
 
@@ -159,21 +159,21 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		return (player.openMerchant(merchant, true) != null);
 	}
 
-	protected Merchant setupMerchant(String title, List<TradingRecipe> recipes) {
+	protected Merchant setupMerchant(String title, List<? extends TradingRecipe> recipes) {
 		// Setup merchant:
 		Merchant merchant = Bukkit.createMerchant(title);
 		this.setupMerchantRecipes(merchant, recipes);
 		return merchant;
 	}
 
-	protected void setupMerchantRecipes(Merchant merchant, List<TradingRecipe> recipes) {
+	protected void setupMerchantRecipes(Merchant merchant, List<? extends TradingRecipe> recipes) {
 		// Create list of merchant recipes:
 		List<MerchantRecipe> merchantRecipes = this.createMerchantRecipes(recipes);
 		// Set merchant's recipes:
 		merchant.setRecipes(merchantRecipes);
 	}
 
-	protected List<MerchantRecipe> createMerchantRecipes(List<TradingRecipe> recipes) {
+	protected List<MerchantRecipe> createMerchantRecipes(List<? extends TradingRecipe> recipes) {
 		List<MerchantRecipe> merchantRecipes = new ArrayList<>();
 		for (TradingRecipe recipe : recipes) {
 			merchantRecipes.add(this.createMerchantRecipe(recipe));
@@ -204,7 +204,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		List<MerchantRecipe> oldMerchantRecipes = merchant.getRecipes();
 
 		Shopkeeper shopkeeper = this.getShopkeeper();
-		List<TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
+		List<? extends TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
 		List<MerchantRecipe> newMerchantRecipes = this.createMerchantRecipes(recipes);
 		if (MerchantUtils.MERCHANT_RECIPES_EQUAL_IGNORING_USES.equals(oldMerchantRecipes, newMerchantRecipes)) {
 			Log.debug(() -> "Trades are still up-to-date for player " + player.getName());
