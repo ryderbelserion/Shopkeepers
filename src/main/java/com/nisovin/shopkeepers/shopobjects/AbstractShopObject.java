@@ -9,8 +9,10 @@ import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
@@ -58,11 +60,13 @@ public abstract class AbstractShopObject implements ShopObject {
 	}
 
 	/**
-	 * This gets called at the end of shopkeeper construction, when the shopkeeper has been loaded and setup.
+	 * This is called at the end of shopkeeper construction, when the shopkeeper has been fully loaded and setup, and
+	 * can be used to perform any remaining initial shop object setup.
 	 * <p>
-	 * The shopkeeper has not yet been registered at this point!
-	 * <p>
-	 * This can be used to perform any remaining initial shop object setup.
+	 * The shopkeeper has not yet been registered at this point! If the registration fails, or if the shopkeeper is
+	 * created for some other purpose, the {@link #remove()} and {@link #delete()} methods may never get called for this
+	 * shop object. For any setup that relies on cleanup during {@link #remove()} or {@link #delete()},
+	 * {@link #onShopkeeperAdded(ShopkeeperAddedEvent.Cause)} may be better suited.
 	 */
 	public void setup() {
 	}
@@ -70,7 +74,19 @@ public abstract class AbstractShopObject implements ShopObject {
 	// LIFE CYCLE
 
 	/**
-	 * This gets called when the {@link ShopObject} is meant to be removed.
+	 * This is called when the shopkeeper is added to the {@link ShopkeeperRegistry}.
+	 * <p>
+	 * The shopkeeper has not yet been spawned or activated at this point.
+	 * 
+	 * @param cause
+	 *            the cause of the addition
+	 */
+	public void onShopkeeperAdded(ShopkeeperAddedEvent.Cause cause) {
+	}
+
+	/**
+	 * This is called when the {@link ShopObject} is removed, usually when the corresponding shopkeeper is removed from
+	 * the {@link ShopkeeperRegistry}.
 	 * <p>
 	 * This can for example be used to disable any active components (ex. listeners) for this shop object.
 	 */
@@ -78,9 +94,9 @@ public abstract class AbstractShopObject implements ShopObject {
 	}
 
 	/**
-	 * This gets called when the {@link ShopObject} is meant to be permanently deleted.
+	 * This is called when the {@link ShopObject} is permanently deleted.
 	 * <p>
-	 * This gets called after {@link #remove()}.
+	 * This is called after {@link #remove()}.
 	 * <p>
 	 * This can for example be used to cleanup any persistent data corresponding to this shop object.
 	 */

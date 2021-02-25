@@ -10,6 +10,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.citizens.CitizensShopObject;
@@ -90,18 +91,12 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		}
 	}
 
-	@Override
-	public void setup() {
-		super.setup();
-
-		// Create the NPC if required (and possible):
-		this.createNpcIfMissing();
-	}
+	// NPC
 
 	private void createNpcIfMissing() {
 		if (npcUniqueId != null || !citizensShops.isEnabled()) return;
 
-		Log.debug(() -> "Creating citizens NPC for shopkeeper " + shopkeeper.getId());
+		Log.debug(() -> "Creating Citizens NPC for shopkeeper " + shopkeeper.getId());
 
 		EntityType entityType = Settings.defaultCitizenNpcType;
 		// Note: The spawn location can be null if the world is not loaded currently. We can still create the NPC, but
@@ -131,8 +126,6 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		shopkeeper.markDirty();
 	}
 
-	// NPC
-
 	// Can be null if not set yet.
 	public UUID getNPCUniqueId() {
 		return npcUniqueId;
@@ -158,6 +151,19 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	protected void setKeepNPCOnDeletion() {
 		destroyNPC = false;
+	}
+
+	@Override
+	public void onShopkeeperAdded(ShopkeeperAddedEvent.Cause cause) {
+		super.onShopkeeperAdded(cause);
+
+		// Create the NPC if required (and possible):
+		this.createNpcIfMissing();
+	}
+
+	@Override
+	public void remove() {
+		super.remove();
 	}
 
 	@Override

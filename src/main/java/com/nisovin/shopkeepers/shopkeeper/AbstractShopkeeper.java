@@ -217,14 +217,19 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * This gets called at the end of construction, after the shopkeeper data has been loaded.
-	 * <p>
-	 * This can be used to perform any remaining setup.
+	 * This is called at the end of construction, after the shopkeeper data has been loaded, and can be used to perform
+	 * any remaining setup.
 	 * <p>
 	 * This might setup defaults for some things, if not yet specified by the sub-classes. So if you are overriding this
 	 * method, consider doing your own setup before calling the overridden method. And also take into account that
 	 * further sub-classes might perform their setup prior to calling your setup method as well. So don't replace any
 	 * components that have already been setup by further sub-classes.
+	 * <p>
+	 * The shopkeeper has not yet been registered at this point! If the registration fails, or if the shopkeeper is
+	 * created for some other purpose, the {@link #onRemoval(ShopkeeperRemoveEvent.Cause)} and {@link #onDeletion()}
+	 * methods may never get called for this shopkeeper. For any setup that relies on cleanup during
+	 * {@link #onRemoval(ShopkeeperRemoveEvent.Cause)} or {@link #onDeletion()},
+	 * {@link #onAdded(ShopkeeperAddedEvent.Cause)} may be better suited.
 	 */
 	protected void setup() {
 		// Add a default trading handler, if none is provided:
@@ -484,6 +489,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the cause of the addition
 	 */
 	protected void onAdded(ShopkeeperAddedEvent.Cause cause) {
+		shopObject.onShopkeeperAdded(cause);
 	}
 
 	public final void informRemoval(ShopkeeperRemoveEvent.Cause cause) {
@@ -496,7 +502,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * This gets called once the shopkeeper is about to be removed from the {@link ShopkeeperRegistry}.
+	 * This is called once the shopkeeper is about to be removed from the {@link ShopkeeperRegistry}.
 	 * <p>
 	 * The shopkeeper has already been deactivated at this point.
 	 * 
@@ -519,9 +525,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * This gets called if the shopkeeper is about to be removed due to permanent deletion.
+	 * This is called if the shopkeeper is about to be removed due to permanent deletion.
 	 * <p>
-	 * This gets called after {@link #onRemoval(com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent.Cause)}.
+	 * This is called after {@link #onRemoval(ShopkeeperRemoveEvent.Cause)}.
 	 */
 	protected void onDeletion() {
 		shopObject.delete();
