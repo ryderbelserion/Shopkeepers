@@ -73,6 +73,8 @@ public class Settings extends Config {
 
 	public static boolean enableTownyRestrictions = false;
 
+	public static boolean disableInventoryVerification = false;
+
 	/*
 	 * Shop Creation (and removal)
 	 */

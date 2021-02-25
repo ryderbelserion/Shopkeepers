@@ -17,6 +17,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
 
@@ -80,7 +81,7 @@ class UIListener implements Listener {
 		}
 
 		// Check if the inventory view matches the expected view:
-		if (!uiHandler.isWindow(view)) {
+		if (!Settings.disableInventoryVerification && !uiHandler.isWindow(view)) {
 			// The player probably has some other inventory open, but an active session.. let's close it:
 			Log.debug(() -> "Closing inventory of type " + view.getType() + " with title '" + view.getTitle()
 					+ "' for " + player.getName() + ", because a different open inventory was expected for '"

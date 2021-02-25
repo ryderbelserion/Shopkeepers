@@ -124,6 +124,22 @@ register-world-guard-allow-shop-flag: true
 # have been designated as commercial areas by Towny.
 enable-towny-restrictions: false
 
+# In order to guard against unnoticed changes to a player's currently open
+# inventory, the Shopkeepers plugin verifies that the open inventory still
+# matches the expected type of inventory before it handles inventory
+# interactions. This setting disables this verification.
+# It is usually recommended to keep this verification enabled. However, when
+# the Shopkeepers plugin is used on certain types of modded servers (such as
+# variants of Cauldron and its successors), a known issue is that these types
+# of servers sometimes report that the currently open inventory is of a type
+# different to what it actually is. The result of this verification is then
+# that for example the trading inventory is closed when a player tries to
+# trade.
+# Even though modded servers are not officially supported and may break the
+# plugin in various other unexpected ways, disabling the inventory verification
+# via this setting may help resolve this particular known incompatibility.
+disable-inventory-verification: false
+
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Shop Creation (and removal)
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
