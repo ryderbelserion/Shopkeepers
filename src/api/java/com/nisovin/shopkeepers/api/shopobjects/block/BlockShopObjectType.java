@@ -15,19 +15,19 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 public interface BlockShopObjectType<T extends BlockShopObject> extends ShopObjectType<T> {
 
 	/**
-	 * Gets the {@link Shopkeeper} that uses a {@link ShopObject} of this type and is being represented by the given
+	 * Gets the {@link Shopkeeper} that uses a {@link ShopObject} of this type and is currently represented by the given
 	 * block.
 	 * 
 	 * @param block
 	 *            the block, not <code>null</code>
-	 * @return the shopkeeper, or <code>null</code> if the given block is not a shopkeeper, or if the shopkeeper is not
-	 *         using this type of shop object
+	 * @return the shopkeeper, or <code>null</code> if the given block is not a shopkeeper currently, or if the
+	 *         shopkeeper is not using this type of shop object
 	 */
 	public Shopkeeper getShopkeeper(Block block);
 
 	/**
-	 * Gets the {@link Shopkeeper} that uses a {@link ShopObject} of this type and is being represented by the block at
-	 * the specified location.
+	 * Gets the {@link Shopkeeper} that uses a {@link ShopObject} of this type and is currently represented by the block
+	 * at the specified location.
 	 * 
 	 * @param worldName
 	 *            the world name, not <code>null</code> or empty
@@ -37,23 +37,23 @@ public interface BlockShopObjectType<T extends BlockShopObject> extends ShopObje
 	 *            the block's y coordinate
 	 * @param blockZ
 	 *            the block's z coordinate
-	 * @return the shopkeeper, or <code>null</code> if the specified block is not a shopkeeper, or if the shopkeeper is
-	 *         not using this type of shop object
+	 * @return the shopkeeper, or <code>null</code> if the specified block is not a shopkeeper currently, or if the
+	 *         shopkeeper is not using this type of shop object
 	 */
 	public Shopkeeper getShopkeeper(String worldName, int blockX, int blockY, int blockZ);
 
 	/**
-	 * Checks if the given block is a {@link Shopkeeper} that uses a {@link ShopObject} of this type.
+	 * Checks if the given block currently represents a {@link Shopkeeper} that uses a {@link ShopObject} of this type.
 	 * 
 	 * @param block
 	 *            the block, not <code>null</code>
-	 * @return <code>true</code> if the block is a shopkeeper and that shopkeeper uses this type of shop object
+	 * @return <code>true</code> if the block is currently a shopkeeper that uses this type of shop object
 	 */
 	public boolean isShopkeeper(Block block);
 
 	/**
-	 * Checks if the block at the specified location is a {@link Shopkeeper} that uses a {@link ShopObject} of this
-	 * type.
+	 * Checks if the block at the specified location currently represents a {@link Shopkeeper} that uses a
+	 * {@link ShopObject} of this type.
 	 * 
 	 * @param worldName
 	 *            the world name, not <code>null</code> or empty
@@ -63,7 +63,7 @@ public interface BlockShopObjectType<T extends BlockShopObject> extends ShopObje
 	 *            the block's y coordinate
 	 * @param blockZ
 	 *            the block's z coordinate
-	 * @return <code>true</code> if the block is a shopkeeper and that shopkeeper uses this type of shop object
+	 * @return <code>true</code> if the block is currently a shopkeeper that uses this type of shop object
 	 */
 	public boolean isShopkeeper(String worldName, int blockX, int blockY, int blockZ);
 }

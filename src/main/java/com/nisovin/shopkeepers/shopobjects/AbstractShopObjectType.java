@@ -91,12 +91,13 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 	public abstract T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData);
 
 	/**
-	 * Gets the {@link Shopkeeper} for the given object id that uses a {@link ShopObject} of this type.
+	 * Gets the active (i.e. ticking) {@link Shopkeeper} for the given object id that uses a {@link ShopObject} of this
+	 * type.
 	 * 
 	 * @param objectId
 	 *            the object id
-	 * @return the shopkeeper, or <code>null</code> if no shopkeeper is found for the given object id, or if the
-	 *         shopkeeper is not using this type of shop object
+	 * @return the shopkeeper, or <code>null</code> if no such shopkeeper is found, or if the shopkeeper is not using
+	 *         this type of shop object
 	 */
 	protected AbstractShopkeeper getShopkeeperByObjectId(Object objectId) {
 		SKShopkeeperRegistry shopkeeperRegistry = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry();
