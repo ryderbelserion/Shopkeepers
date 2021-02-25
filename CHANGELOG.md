@@ -166,6 +166,7 @@ Internal API:
 * AbstractShopObject#spawn() no longer respawns the shop object if it is already spawned but no longer active. Instead, this method simply skips the spawning if it has already been spawned (this no longer checks if the shop object is still active). In order to respawn the shop object, it has to be explicitly despawned first.
 * Renamed AbstractShopObject#getEditorButtons to #createEditorButtons to make it more clear that is usually only invoked once. Also, this returns a new modifiable list now. Subtypes therefore no longer need to create their own copies of that list.
 * Added AbstractShopObject#onShopkeeperAdded.
+* Added AbstractShopObject#getShopkeeper.
 
 Internal:  
 * The config key pattern is cached now.

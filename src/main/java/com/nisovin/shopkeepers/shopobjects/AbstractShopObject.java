@@ -42,6 +42,15 @@ public abstract class AbstractShopObject implements ShopObject {
 	@Override
 	public abstract AbstractShopObjectType<?> getType();
 
+	/**
+	 * Gets the shopkeeper associated with this shop object.
+	 * 
+	 * @return the shopkeeper, not <code>null</code>
+	 */
+	public final AbstractShopkeeper getShopkeeper() {
+		return shopkeeper;
+	}
+
 	public void load(ConfigurationSection configSection) {
 	}
 
