@@ -1237,16 +1237,15 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 		assert objectId != null;
 
-		AbstractShopkeeper activeShopkeeper = this.getActiveShopkeeper(objectId);
+		// Activate the shopkeeper, if there isn't already another shopkeeper using the same object id:
+		AbstractShopkeeper activeShopkeeper = activeShopkeepersByObjectId.putIfAbsent(objectId, shopkeeper);
 		if (activeShopkeeper != null) {
 			Log.warning("Detected shopkeepers (" + activeShopkeeper.getId() + " and " + shopkeeper.getId()
 					+ ") with duplicate object ids: " + objectId);
 			return;
+		} else {
+			shopObject.setLastId(objectId); // Remember object id
 		}
-
-		// Activate shopkeeper:
-		activeShopkeepersByObjectId.put(objectId, shopkeeper);
-		shopObject.setLastId(objectId); // Remember object id
 	}
 
 	// Removes the shopkeeper from the active shopkeepers by its last shop object id (if there is one).
