@@ -19,7 +19,6 @@ import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringListValue;
 import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringValue;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 @WithDefaultValueType(fieldType = String.class, valueType = ColoredStringValue.class)
@@ -323,15 +322,6 @@ public class Messages extends Config {
 	public static Text commandDescriptionSettradeperm = Text.parse("Sets, removes (-) or displays (?) the trading permission.");
 	public static Text commandDescriptionSetforhire = Text.parse("Sets one of your shops for sale.");
 	public static Text commandDescriptionEditVillager = Text.parse("Opens the editor for the target villager.");
-
-	// Shortcut for coloring default messages.
-	private static String c(String message) {
-		return TextUtils.colorize(message);
-	}
-
-	private static List<String> c(List<String> messages) {
-		return TextUtils.colorize(messages);
-	}
 
 	/////
 

@@ -128,6 +128,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Config: List settings verify now that they don't contain null elements when being loaded from the config.
 * Buying shopkeepers can also buy written books and enchanted items now. Being able to buy written books is probably not really useful though, because any book item being bought has to nearly perfectly match the requested book item.
 * Config: Added setting `disable-inventory-verification` (default: `false`). Even though modded servers (Cauldron and variants) are not officially supported, this setting may help resolve a particular known incompatibility with these types of servers.
+* Fixed: If the material of the configured shop creation item was invalid, the used default shop creation item used a display name with untranslated color codes.
 
 API:  
 * Renamed TradingOffer to TradeOffer.

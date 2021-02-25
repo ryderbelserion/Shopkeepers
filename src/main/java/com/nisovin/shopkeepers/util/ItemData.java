@@ -152,6 +152,7 @@ public class ItemData implements Cloneable {
 		this(new ItemStack(type));
 	}
 
+	// The display name and lore are expected to use Minecraft's color codes.
 	public ItemData(Material type, String displayName, List<String> lore) {
 		this(ItemUtils.createItemStack(type, 1, displayName, lore));
 	}

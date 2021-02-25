@@ -149,16 +149,32 @@ public class TextUtils {
 		return decolored;
 	}
 
-	public static String colorize(String message) {
-		if (message == null || message.isEmpty()) return message;
-		return ChatColor.translateAlternateColorCodes(COLOR_CHAR_ALTERNATIVE, message);
+	/**
+	 * Translates {@code &}-based color codes to Minecraft's {@code §}-based color codes.
+	 * 
+	 * @param text
+	 *            the text with {@code &}-based color codes
+	 * @return the text with Minecraft's color codes, or <code>null</code> if the given text is <code>null</code>
+	 */
+	public static String colorize(String text) {
+		if (text == null || text.isEmpty()) return text;
+		return ChatColor.translateAlternateColorCodes(COLOR_CHAR_ALTERNATIVE, text);
 	}
 
-	public static List<String> colorize(List<String> messages) {
-		if (messages == null) return messages;
-		List<String> colored = new ArrayList<>(messages.size());
-		for (String message : messages) {
-			colored.add(colorize(message));
+	/**
+	 * Translates {@code &}-based color codes to Minecraft's {@code §}-based color codes.
+	 * <p>
+	 * This creates a new list. Any contained <code>null</code> texts will remain <code>null</code>.
+	 * 
+	 * @param texts
+	 *            the texts with {@code &}-based color codes
+	 * @return the texts with Minecraft's color codes, or <code>null</code> if the given list is <code>null</code>
+	 */
+	public static List<String> colorize(List<String> texts) {
+		if (texts == null) return texts;
+		List<String> colored = new ArrayList<>(texts.size());
+		for (String text : texts) {
+			colored.add(colorize(text));
 		}
 		return colored;
 	}

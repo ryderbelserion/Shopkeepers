@@ -33,6 +33,7 @@ import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringValue;
 import com.nisovin.shopkeepers.config.lib.value.types.StringListValue;
 import com.nisovin.shopkeepers.config.lib.value.types.StringValue;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -466,5 +467,31 @@ public abstract class Config {
 
 	protected String msgMissingDefault(String configKey) {
 		return this.getLogPrefix() + "Missing default value for setting: " + configKey;
+	}
+
+	// CONVENIENCE HELPERS
+
+	/**
+	 * Translates {@code &}-based color codes to Minecraft's {@code §}-based color codes.
+	 * 
+	 * @param text
+	 *            the text with {@code &}-based color codes
+	 * @return the text with Minecraft's color codes, or <code>null</code> if the given text is <code>null</code>
+	 */
+	protected static String c(String text) {
+		return TextUtils.colorize(text);
+	}
+
+	/**
+	 * Translates {@code &}-based color codes to Minecraft's {@code §}-based color codes.
+	 * <p>
+	 * This creates a new list. Any contained <code>null</code> texts will remain <code>null</code>.
+	 * 
+	 * @param texts
+	 *            the texts with {@code &}-based color codes
+	 * @return the texts with Minecraft's color codes, or <code>null</code> if the given list is <code>null</code>
+	 */
+	protected static List<String> c(List<String> texts) {
+		return TextUtils.colorize(texts);
 	}
 }

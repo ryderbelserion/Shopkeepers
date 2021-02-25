@@ -216,12 +216,14 @@ public final class ItemUtils {
 		return isEmpty(itemStack) ? 0 : itemStack.getAmount();
 	}
 
+	// The display name and lore are expected to use Minecraft's color codes.
 	public static ItemStack createItemStack(Material type, int amount, String displayName, List<String> lore) {
 		// TODO Return null in case of type AIR?
 		ItemStack itemStack = new ItemStack(type, amount);
 		return ItemUtils.setItemStackNameAndLore(itemStack, displayName, lore);
 	}
 
+	// The display name and lore are expected to use Minecraft's color codes.
 	public static ItemStack setItemStackNameAndLore(ItemStack item, String displayName, List<String> lore) {
 		if (item == null) return null;
 		ItemMeta meta = item.getItemMeta();
@@ -238,6 +240,7 @@ public final class ItemUtils {
 	}
 
 	// Null to remove display name.
+	// The display name is expected to use Minecraft's color codes.
 	public static ItemStack setItemStackName(ItemStack itemStack, String displayName) {
 		if (itemStack == null) return null;
 		ItemMeta itemMeta = itemStack.getItemMeta();
