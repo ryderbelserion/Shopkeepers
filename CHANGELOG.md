@@ -134,6 +134,8 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * Config: Added setting `delete-invalid-citizen-shopkeepers` (default: `false`). This setting can be used to enable the previous behavior of automatically deleting invalid Citizen shopkeepers again.
   * Alternatively, the new command `/shopkeepers cleanupCitizenShopkeepers` can be used to manually check for and delete invalid Citizen shopkeepers. This command requires the new permission `shopkeeper.cleanup-citizen-shopkeepers` (default: `op`).
   * If a NPC is deleted and there are multiple shopkeepers associated with it, all of these shopkeepers are deleted now.
+* If player shopkeepers for inactive players are to be deleted, we not only check for inactive players during plugin startup, but also periodically now (roughly every 4 hours). This accounts for servers that keep running for long durations. We also log a message now whenever we check for shops of inactive players.
+* Performance: Improvements related to checking and deleting shopkeepers of inactive players.
 
 API:  
 * Renamed TradingOffer to TradeOffer.
@@ -209,6 +211,7 @@ Internal:
 * Several minor optimizations and refactors related to the various types of shopkeepers. Items are copied and compared less often now.
 * Citizens shopkeepers setup their NPC after the shopkeeper has been successfully added to the shopkeeper registry now.
 * We now keep track of the mapping between Citizens NPCs and their corresponding Citizen shopkeepers independently of the activation states of these shopkeepers.
+* Refactors related to the updating of shop owner names, and the checking and deleting of shopkeepers of inactive players.
 * Minor other internal code refactoring.
 
 Migration notes:  
