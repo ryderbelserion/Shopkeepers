@@ -78,9 +78,7 @@ import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
-import com.nisovin.shopkeepers.villagers.BlockVillagerSpawnListener;
-import com.nisovin.shopkeepers.villagers.BlockZombieVillagerCuringListener;
-import com.nisovin.shopkeepers.villagers.VillagerInteractionListener;
+import com.nisovin.shopkeepers.villagers.RegularVillagers;
 
 public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin {
 
@@ -121,6 +119,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final LivingShops livingShops = new LivingShops(this);
 	private final SignShops signShops = new SignShops(this);
 	private final CitizensShops citizensShops = new CitizensShops(this);
+
+	private final RegularVillagers regularVillagers = new RegularVillagers(this);
 
 	private boolean outdatedServer = false;
 	private boolean incompatibleServer = false;
@@ -325,14 +325,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// -----
 
-		// Handling of regular villagers:
-		pm.registerEvents(new VillagerInteractionListener(this), this);
-		if (Settings.blockVillagerSpawns || Settings.blockWanderingTraderSpawns) {
-			pm.registerEvents(new BlockVillagerSpawnListener(), this);
-		}
-		if (Settings.disableZombieVillagerCuring) {
-			pm.registerEvents(new BlockZombieVillagerCuringListener(), this);
-		}
+		// Features related to regular villagers:
+		regularVillagers.onEnable();
 
 		// Item conversions:
 		itemConversions.onEnable();
@@ -443,6 +437,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// Item conversions:
 		itemConversions.onDisable();
+
+		// Regular villagers:
+		regularVillagers.onDisable();
 
 		shopkeeperNaming.onDisable();
 		shopkeeperCreation.onDisable();
@@ -598,7 +595,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return shopkeeperNaming;
 	}
 
-	// SHOPKEEPER CREATION:
+	// REGULAR VILLAGERS
+
+	public RegularVillagers getRegularVillagers() {
+		return regularVillagers;
+	}
+
+	// SHOPKEEPER CREATION
 
 	public ShopkeeperCreation getShopkeeperCreation() {
 		return shopkeeperCreation;

@@ -33,6 +33,7 @@ public class VillagerInteractionListener implements Listener {
 	private final ShopkeepersPlugin plugin;
 
 	public VillagerInteractionListener(ShopkeepersPlugin plugin) {
+		assert plugin != null;
 		this.plugin = plugin;
 	}
 
