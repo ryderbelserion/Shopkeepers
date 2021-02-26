@@ -78,8 +78,6 @@ Low priority:
   * Enderman: carrying block
   * Phantom: size
   * Puffer fish: puff up state.
-  * Shulker: color
-  * Snowman: derp
   * Tropical fish: color, pattern, pattern color
   * Vex: charged state?
 * Add individual config options for the different editor options?
