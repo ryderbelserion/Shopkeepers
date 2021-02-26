@@ -132,6 +132,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		final Set<AbstractShopkeeper> shopkeepersView = new AbstractSet<AbstractShopkeeper>() {
 			@Override
 			public Iterator<AbstractShopkeeper> iterator() {
+				if (this.isEmpty()) {
+					return Collections.emptyIterator();
+				}
 				return shopkeepersByChunk.values().stream()
 						.flatMap(chunkEntry -> chunkEntry.shopkeepers.stream())
 						.iterator();
@@ -264,6 +267,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	private final Set<AbstractPlayerShopkeeper> allPlayerShopkeepersView = new AbstractSet<AbstractPlayerShopkeeper>() {
 		@Override
 		public Iterator<AbstractPlayerShopkeeper> iterator() {
+			if (this.isEmpty()) {
+				return Collections.emptyIterator();
+			}
 			return getAllShopkeepers().stream()
 					.filter(shopkeeper -> shopkeeper instanceof PlayerShopkeeper)
 					.map(shopkeeper -> (AbstractPlayerShopkeeper) shopkeeper)

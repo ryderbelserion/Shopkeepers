@@ -157,7 +157,8 @@ API:
 * Added ShopObject#isSpawned as a more lightweight variant of ShopObject#isActive.
 * Several ShopObject methods no longer check if the shop object is currently active, but only if it has been spawned, which is sufficient most of the time.
 * The blocks of sign shopkeepers are also marked with the shopkeeper metadata now.
-* API: CitizensShopObject#getName returns the NPC name instead of it's 'full name' now (i.e. the name that more closely corresponds to the name set via #setName).
+* CitizensShopObject#getName returns the NPC name instead of it's 'full name' now (i.e. the name that more closely corresponds to the name set via #setName).
+* Optimization: Various lazily populated views provided by the shopkeeper registry return an empty iterator now when they are known to be empty.
 * Several Javadoc improvements and clarifications.
 
 Internal API:  
