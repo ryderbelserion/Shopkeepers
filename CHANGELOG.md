@@ -129,6 +129,11 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Buying shopkeepers can also buy written books and enchanted items now. Being able to buy written books is probably not really useful though, because any book item being bought has to nearly perfectly match the requested book item.
 * Config: Added setting `disable-inventory-verification` (default: `false`). Even though modded servers (Cauldron and variants) are not officially supported, this setting may help resolve a particular known incompatibility with these types of servers.
 * Fixed: If the material of the configured shop creation item was invalid, the used default shop creation item used a display name with untranslated color codes.
+* We no longer automatically delete invalid Citizen shopkeepers by default. This has caused some issue in the past due to Citizen shopkeepers being incorrectly classified as invalid in some situations.
+  * By default, we only log warnings now about any detected invalid Citizen shopkeepers, and instructions on how these shopkeepers can be deleted in order to get rid of these warnings.
+  * Config: Added setting `delete-invalid-citizen-shopkeepers` (default: `false`). This setting can be used to enable the previous behavior of automatically deleting invalid Citizen shopkeepers again.
+  * Alternatively, the new command `/shopkeepers cleanupCitizenShopkeepers` can be used to manually check for and delete invalid Citizen shopkeepers. This command requires the new permission `shopkeeper.cleanup-citizen-shopkeepers` (default: `op`).
+  * If a NPC is deleted and there are multiple shopkeepers associated with it, all of these shopkeepers are deleted now.
 
 API:  
 * Renamed TradingOffer to TradeOffer.
@@ -202,6 +207,7 @@ Internal:
 * Slightly changed how we retrieve the entity type of Citizen shopkeeper NPCs.
 * Several minor optimizations and refactors related to the various types of shopkeepers. Items are copied and compared less often now.
 * Citizens shopkeepers setup their NPC after the shopkeeper has been successfully added to the shopkeeper registry now.
+* We now keep track of the mapping between Citizens NPCs and their corresponding Citizen shopkeepers independently of the activation states of these shopkeepers.
 * Minor other internal code refactoring.
 
 Migration notes:  

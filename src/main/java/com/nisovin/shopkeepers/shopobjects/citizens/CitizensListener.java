@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.citizens;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -145,10 +147,12 @@ class CitizensListener implements Listener {
 		protected abstract void handleTrait(CitizensShopkeeperTrait trait, Player player);
 	}
 
+	private final CitizensShops citizensShops;
 	private final PendingTraitState pendingTraitAddition;
 
-	CitizensListener(ShopkeepersPlugin plugin) {
-		assert plugin != null;
+	CitizensListener(ShopkeepersPlugin plugin, CitizensShops citizensShops) {
+		assert plugin != null && citizensShops != null;
+		this.citizensShops = citizensShops;
 		pendingTraitAddition = new PendingTraitState(plugin) {
 			@Override
 			protected void handleTrait(CitizensShopkeeperTrait trait, Player player) {
@@ -236,10 +240,10 @@ class CitizensListener implements Listener {
 	// This is not called when the traits get removed due to the deletion of the NPC.
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onTraitRemoved(NPCRemoveTraitEvent event) {
-		pendingTraitAddition.reset(); // handles any currently pending trait
+		pendingTraitAddition.reset(); // Handles any currently pending trait
 		if (event.getTrait() instanceof CitizensShopkeeperTrait) {
 			CitizensShopkeeperTrait shopkeeperTrait = (CitizensShopkeeperTrait) event.getTrait();
-			shopkeeperTrait.onTraitDeleted(null); // handle without player
+			shopkeeperTrait.onTraitDeleted(null); // Handle without player
 		}
 	}
 
@@ -252,10 +256,14 @@ class CitizensListener implements Listener {
 			CitizensShopkeeperTrait shopkeeperTrait = npc.getTrait(CitizensShopkeeperTrait.class);
 			shopkeeperTrait.onTraitDeleted(null); // Handle without player
 		} else {
-			Shopkeeper shopkeeper = CitizensShops.getShopkeeper(npc);
-			if (shopkeeper != null) {
-				assert shopkeeper.getShopObject() instanceof SKCitizensShopObject;
-				((SKCitizensShopObject) shopkeeper.getShopObject()).onNPCDeleted(null); // Handle without player
+			// Delete the corresponding shopkeeper(s):
+			// If there are multiple associated shopkeepers, we delete all of them.
+			List<? extends Shopkeeper> shopkeepers = citizensShops.getShopkeepers(npc);
+			if (!shopkeepers.isEmpty()) {
+				new ArrayList<>(shopkeepers).forEach(shopkeeper -> {
+					assert shopkeeper.getShopObject() instanceof SKCitizensShopObject;
+					((SKCitizensShopObject) shopkeeper.getShopObject()).onNPCDeleted(null); // Handle without player
+				});
 			}
 		}
 	}

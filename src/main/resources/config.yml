@@ -309,6 +309,19 @@ always-show-nameplates: false
 enable-citizen-shops: true
 # The entity type used by newly created Citizen NPC shopkeepers:
 default-citizen-npc-type: 'PLAYER'
+# Whether to automatically delete all invalid Citizen shopkeepers during plugin
+# startup. This includes for example Citizen shopkeepers that are attached to
+# the same Citizen NPC as another shopkeeper, or any shopkeepers for which the
+# corresponding Citizen NPC is missing (this can for example occur if the NPC
+# has been deleted while the Shopkeepers plugin was disabled).
+# In previous versions, this has been the default behavior. However, because it
+# is risky to automatically delete shopkeepers, especially since the detection
+# of invalid shopkeepers can potentially go wrong, this functionality is now
+# offered via this setting and disabled by default. In either case, the plugin
+# will log warnings whenever it detects invalid Citizen shopkeepers.
+# Alternatively, the command '/shopkeepers cleanupCitizenShopkeepers' can also
+# be used to manually delete these invalid shopkeepers when they are detected.
+delete-invalid-citizen-shopkeepers: false
 
 # Whether to allow the creation of sign shops.
 enable-sign-shops: true

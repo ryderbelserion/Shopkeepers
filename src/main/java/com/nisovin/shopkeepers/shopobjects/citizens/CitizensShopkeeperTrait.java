@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -37,16 +38,22 @@ public class CitizensShopkeeperTrait extends Trait {
 	public void save(DataKey key) {
 	}
 
+	// Also returns null if the Shopkeepers plugin is not enabled currently.
 	public Shopkeeper getShopkeeper() {
-		NPC npc = this.getNPC(); // Null if not yet attached
-		// Returns null if the NPC is null or if the Shopkeepers plugin is not running:
-		return CitizensShops.getShopkeeper(npc);
+		NPC npc = this.getNPC();
+		if (npc == null) return null; // Not yet attached
+
+		SKShopkeepersPlugin shopkeepersPlugin = SKShopkeepersPlugin.getInstance();
+		if (shopkeepersPlugin == null) return null; // Shopkeepers plugin is not enabled
+
+		CitizensShops citizensShops = shopkeepersPlugin.getCitizensShops();
+		return citizensShops.getShopkeeper(npc);
 	}
 
 	@Override
 	public void onRemove() {
-		// This was also called when citizens reloads or disables in the past..
-		// We detect trait removal by listening to specific citizens events.
+		// In the past, this was also called when Citizens reloads or disables. We therefore detect trait removal by
+		// listening to specific Citizens events instead.
 	}
 
 	void onShopkeeperDeletion(Shopkeeper shopkeeper) {
@@ -77,24 +84,23 @@ public class CitizensShopkeeperTrait extends Trait {
 			// Save:
 			shopkeeper.save();
 		} else {
-			// TODO If the trait gets removed while the Shopkeepers plugin is not running, the shopkeeper does not get
-			// removed and will remain attached to the NPC until it gets removed via the shopkeeper editor or via
-			// command. Maybe always attach the 'shopkeeper' trait and check on startup if the trait is still present
-			// and otherwise delete the shopkeeper?
+			// TODO If the trait is removed while the Shopkeepers plugin is disabled, the associated shopkeeper is not
+			// deleted and will remain attached to the NPC until it is deleted via the shopkeeper editor or via command.
 		}
 	}
 
 	/**
-	 * Called whenever this trait got added to a NPC.
+	 * This is called whenever this trait was added to a NPC.
 	 * <p>
-	 * This is also called whenever the NPC gets reloaded. This is called shortly after the trait got attached.
+	 * This is also called whenever the NPC is reloaded. The corresponding shopkeeper might therefore already exist.
+	 * This is called shortly after the trait is attached to the NPC.
 	 * 
 	 * @param player
 	 *            the player who added the trait, can be <code>null</code> if not available
 	 */
 	void onTraitAdded(Player player) {
-		// Create a new shopkeeper (if there isn't one already for this NPC), using the given player as creator:
-		this.createShopkeeper(player);
+		// Create a new shopkeeper for this NPC, if there isn't one already, using the given player as creator:
+		this.createShopkeeperIfMissing(player);
 	}
 
 	@Override
@@ -113,43 +119,31 @@ public class CitizensShopkeeperTrait extends Trait {
 		// Also: Shopkeeper creation by a player is handled after trait attachment.
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			// Create a new shopkeeper if there isn't one already for this NPC (without creator):
-			this.createShopkeeper(null);
+			this.createShopkeeperIfMissing(null);
 		}, 5L);
 	}
 
-	// Note: This also returns true if the Shopkeepers plugin is not running currently.
-	private boolean isMissingShopkeeper() {
+	// Creator can be null.
+	private void createShopkeeperIfMissing(Player creator) {
 		NPC npc = this.getNPC();
 		if (npc == null || !npc.hasTrait(CitizensShopkeeperTrait.class)) {
-			// Citizens not running or trait got already removed again?
-			return false;
+			// The trait is no longer attached to the NPC. Has is already been removed again? We skip creating a
+			// shopkeeper for this no longer attached trait:
+			return;
 		}
 
-		Shopkeeper shopkeeper = CitizensShops.getShopkeeper(npc);
-		if (shopkeeper != null) {
+		if (this.getShopkeeper() != null) {
 			// There is already a shopkeeper for this NPC. The trait was probably re-attached after a reload of
 			// Citizens.
-			return false;
+			return;
 		}
 
-		// No shopkeeper exists yet, or Shopkeepers plugin is not running:
-		return true;
-	}
-
-	// Creator can be null.
-	private void createShopkeeper(Player creator) {
 		ShopkeepersPlugin plugin = ShopkeepersPlugin.getInstance();
 		if (plugin == null) {
-			// Shopkeepers is not running:
+			// The Shopkeepers plugin is not enabled currently:
 			return;
 		}
 
-		// Create a new shopkeeper (if there isn't one already for this NPC):
-		if (!this.isMissingShopkeeper()) {
-			return;
-		}
-
-		NPC npc = this.getNPC();
 		Log.debug(() -> "Creating shopkeeper for NPC " + CitizensShops.getNPCIdString(npc)
 				+ (creator != null ? " and player '" + creator.getName() + "'" : ""));
 

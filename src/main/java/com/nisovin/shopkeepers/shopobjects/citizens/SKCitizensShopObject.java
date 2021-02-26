@@ -159,11 +159,17 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 		// Create the NPC if required (and possible):
 		this.createNpcIfMissing();
+
+		// Register:
+		citizensShops.registerCitizensShopkeeper(this);
 	}
 
 	@Override
 	public void remove() {
 		super.remove();
+
+		// Unregister:
+		citizensShops.unregisterCitizensShopkeeper(this);
 	}
 
 	@Override

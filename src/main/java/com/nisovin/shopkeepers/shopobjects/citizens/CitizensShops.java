@@ -1,8 +1,11 @@
 package com.nisovin.shopkeepers.shopobjects.citizens;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -13,13 +16,11 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
-import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.util.Log;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -65,20 +66,29 @@ public class CitizensShops {
 	private boolean citizensShopsEnabled = false;
 	private TraitInfo shopkeeperTrait = null;
 
+	// This mapping is updated whenever shopkeepers with Citizens shop objects are added or removed from the shopkeeper
+	// registry.
+	// Shopkeepers for which the corresponding NPC could not be created are not contained in this mapping.
+	// If multiple shopkeepers are associated with the same NPC, this mapping keeps track of all of these shopkeepers.
+	private final Map<UUID, List<AbstractShopkeeper>> shopkeepersByNpcId = new HashMap<>();
+
 	public CitizensShops(SKShopkeepersPlugin plugin) {
 		assert plugin != null;
 		this.plugin = plugin;
-		this.citizensListener = new CitizensListener(plugin);
+		this.citizensListener = new CitizensListener(plugin, this);
 	}
 
+	// This is called on plugin enable.
 	public void onEnable() {
 		this.enable();
 		Bukkit.getPluginManager().registerEvents(pluginListener, plugin);
 	}
 
+	// This is called on plugin disable.
 	public void onDisable() {
 		this.disable();
 		HandlerList.unregisterAll(pluginListener);
+		shopkeepersByNpcId.clear();
 	}
 
 	public SKCitizensShopObjectType getCitizensShopObjectType() {
@@ -114,13 +124,13 @@ public class CitizensShops {
 		Bukkit.getPluginManager().registerEvents(citizensListener, plugin);
 		citizensListener.onEnable();
 
-		// Delayed to run after shopkeepers were loaded:
+		// Delayed to run after shopkeepers and NPCs were loaded:
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			// Remove invalid citizens shopkeepers:
-			this.removeInvalidCitizensShopkeepers();
+			// Check for invalid Citizens shopkeepers:
+			this.validateCitizenShopkeepers(Settings.deleteInvalidCitizenShopkeepers, false);
 		}, 3L);
 
-		// enabled:
+		// Enabled:
 		citizensShopsEnabled = true;
 	}
 
@@ -139,6 +149,10 @@ public class CitizensShops {
 		// Unregister citizens listener:
 		citizensListener.onDisable();
 		HandlerList.unregisterAll(citizensListener);
+
+		// Note: We intentionally don't clear the shopkeepersByNpcId mapping here, so that we do not freshly have to
+		// fill it again on reloads of the Citizens plugin. It is cleaned up when the corresponding shopkeepers are
+		// unloaded, and on disable of the Shopkeepers plugin.
 
 		// Disabled:
 		citizensShopsEnabled = false;
@@ -170,6 +184,54 @@ public class CitizensShops {
 				shopkeeperTrait = null;
 			}
 		}
+	}
+
+	void registerCitizensShopkeeper(SKCitizensShopObject citizensShop) {
+		assert citizensShop != null;
+		UUID npcId = citizensShop.getNPCUniqueId();
+		if (npcId == null) return;
+
+		AbstractShopkeeper shopkeeper = citizensShop.getShopkeeper();
+		// If there is no entry for this NPC id yet, we create a new List with an initial capacity of 1, because we
+		// usually expect there to only be one shopkeeper associated with the NPC:
+		shopkeepersByNpcId.computeIfAbsent(npcId, key -> new ArrayList<>(1)).add(shopkeeper);
+	}
+
+	void unregisterCitizensShopkeeper(SKCitizensShopObject citizensShop) {
+		assert citizensShop != null;
+		UUID npcId = citizensShop.getNPCUniqueId();
+		if (npcId == null) return;
+
+		AbstractShopkeeper shopkeeper = citizensShop.getShopkeeper();
+		shopkeepersByNpcId.computeIfPresent(npcId, (key, shopkeepers) -> {
+			shopkeepers.remove(shopkeeper);
+			if (shopkeepers.isEmpty()) {
+				return null; // Removes the mapping
+			} else {
+				return shopkeepers;
+			}
+		});
+	}
+
+	// If there are multiple shopkeepers associated with the given NPC, this only returns one of them.
+	public AbstractShopkeeper getShopkeeper(NPC npc) {
+		List<? extends AbstractShopkeeper> shopkeepers = this.getShopkeepers(npc);
+		return shopkeepers.isEmpty() ? null : shopkeepers.get(0);
+	}
+
+	// Returns an empty list if there are no shopkeepers associated with the given NPC.
+	public List<? extends AbstractShopkeeper> getShopkeepers(NPC npc) {
+		if (npc == null) return Collections.emptyList();
+		UUID npcId = npc.getUniqueId();
+		assert npcId != null;
+		return this.getShopkeepers(npcId);
+	}
+
+	// Returns an empty list if there are no shopkeepers associated with the given NPC id.
+	private List<? extends AbstractShopkeeper> getShopkeepers(UUID npcId) {
+		assert npcId != null;
+		List<AbstractShopkeeper> shopkeepers = shopkeepersByNpcId.get(npcId);
+		return (shopkeepers != null) ? shopkeepers : Collections.emptyList();
 	}
 
 	public static String getNPCIdString(NPC npc) {
@@ -209,47 +271,94 @@ public class CitizensShops {
 		return npc.getUniqueId();
 	}
 
-	public void removeInvalidCitizensShopkeepers() {
+	/**
+	 * Checks for and optionally warns about or deletes invalid Citizen shopkeepers.
+	 * <p>
+	 * This does nothing if the Citizens integration is disabled, or if the Citizens plugin is not running currently.
+	 * 
+	 * @param deleteInvalidShopkeepers
+	 *            <code>true</code> to also delete any found invalid Citizen shopkeepers
+	 * @param silent
+	 *            <code>true</code> to not log warnings about any found invalid Citizen shopkeepers
+	 * @return the number of found invalid Citizen shopkeepers
+	 */
+	public int validateCitizenShopkeepers(boolean deleteInvalidShopkeepers, boolean silent) {
 		if (!this.isEnabled()) {
 			// Cannot determine which shopkeepers have a backing NPC if Citizens isn't running:
-			return;
+			return 0;
 		}
+
 		SKShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
-		List<Shopkeeper> forRemoval = new ArrayList<>();
-		for (AbstractShopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
-			if (shopkeeper.getShopObject() instanceof SKCitizensShopObject) {
-				SKCitizensShopObject citizensShop = (SKCitizensShopObject) shopkeeper.getShopObject();
-				UUID npcUniqueId = citizensShop.getNPCUniqueId();
-				if (npcUniqueId == null) {
-					// NPC wasn't created yet, which is only the case if a shopkeeper got somehow created without
-					// citizens being enabled:
-					forRemoval.add(shopkeeper);
-					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
-							+ ": NPC has not been created.");
-				} else if (CitizensAPI.getNPCRegistry().getByUniqueId(npcUniqueId) == null) {
-					// There is no NPC with the stored unique id:
-					forRemoval.add(shopkeeper);
-					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
-							+ ": No NPC existing with unique id '" + npcUniqueId + "'.");
-				} else if (shopkeeperRegistry.getActiveShopkeeper(shopkeeper.getShopObject().getId()) != shopkeeper) {
-					// There is already another citizens shopkeeper using this NPC id:
+		List<Shopkeeper> invalidShopkeepers = new ArrayList<>();
+		shopkeeperRegistry.getAllShopkeepers().forEach(shopkeeper -> {
+			if (!(shopkeeper.getShopObject() instanceof SKCitizensShopObject)) {
+				return;
+			}
+
+			SKCitizensShopObject citizensShop = (SKCitizensShopObject) shopkeeper.getShopObject();
+			UUID npcUniqueId = citizensShop.getNPCUniqueId();
+			if (npcUniqueId == null) {
+				// NPC wasn't created yet, which is only the case if a shopkeeper got somehow created without Citizens
+				// being enabled:
+				invalidShopkeepers.add(shopkeeper);
+				if (!silent) {
+					Log.warning("Invalid Citizen shopkeeper " + shopkeeper.getId() + ": The NPC has not yet been created.");
+				}
+				return;
+			}
+
+			if (CitizensAPI.getNPCRegistry().getByUniqueId(npcUniqueId) == null) {
+				// There is no NPC with the stored NPC id:
+				invalidShopkeepers.add(shopkeeper);
+				if (!silent) {
+					Log.warning("Invalid Citizen shopkeeper " + shopkeeper.getId() + ": There is no NPC with unique id "
+							+ npcUniqueId);
+				}
+				return;
+			}
+
+			List<? extends AbstractShopkeeper> shopkeepers = this.getShopkeepers(npcUniqueId);
+			if (shopkeepers.size() > 1) {
+				// There are multiple Citizen shopkeepers using the same NPC.
+				// We consider the first registered shopkeeper to be the legitimate one and don't add it to the invalid
+				// shopkeepers:
+				Shopkeeper mainShopkeeper = shopkeepers.get(0);
+				if (mainShopkeeper != shopkeeper) {
 					citizensShop.setKeepNPCOnDeletion();
-					forRemoval.add(shopkeeper);
-					Log.warning("Removing citizens shopkeeper at " + shopkeeper.getPositionString()
-							+ ": There exists another shopkeeper using the same NPC with unique id '" + npcUniqueId + "'.");
+					invalidShopkeepers.add(shopkeeper);
+					if (!silent) {
+						Log.warning("Invalid Citizen shopkeeper " + shopkeeper.getId() + ": Shopkeeper "
+								+ mainShopkeeper.getId() + " is using the same NPC with unique id " + npcUniqueId);
+					}
+					return;
+				}
+			}
+		});
+
+		if (!invalidShopkeepers.isEmpty()) {
+			if (deleteInvalidShopkeepers) {
+				// Delete those shopkeepers:
+				for (Shopkeeper shopkeeper : invalidShopkeepers) {
+					shopkeeper.delete();
+				}
+
+				// Save:
+				plugin.getShopkeeperStorage().save();
+
+				if (!silent) {
+					Log.warning("Deleted " + invalidShopkeepers.size() + " invalid Citizen shopkeepers!");
+				}
+			} else {
+				// Only log a warning:
+				if (!silent) {
+					Log.warning("Found " + invalidShopkeepers.size() + " invalid Citizen shopkeepers!");
+					Log.warning("Either enable the setting 'delete-invalid-citizen-shopkeepers' inside the config, or use the "
+							+ "command '/shopkeepers cleanupCitizenShopkeepers' to automatically delete these shopkeepers and "
+							+ "get rid of these warnings.");
 				}
 			}
 		}
-
-		// Remove those shopkeepers:
-		if (!forRemoval.isEmpty()) {
-			for (Shopkeeper shopkeeper : forRemoval) {
-				shopkeeper.delete();
-			}
-
-			// Save:
-			plugin.getShopkeeperStorage().save();
-		}
+		return invalidShopkeepers.size();
 	}
 
 	// Unused
@@ -262,17 +371,5 @@ public class CitizensShops {
 				npc.removeTrait(CitizensShopkeeperTrait.class);
 			}
 		}
-	}
-
-	public static Shopkeeper getShopkeeper(NPC npc) {
-		if (npc == null) return null;
-		if (!ShopkeepersAPI.isEnabled()) {
-			// Plugin is not running:
-			return null;
-		}
-		UUID npcUniqueId = npc.getUniqueId();
-		assert npcUniqueId != null;
-		Object shopObjectId = SKDefaultShopObjectTypes.CITIZEN().getObjectId(npcUniqueId);
-		return SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getActiveShopkeeper(shopObjectId);
 	}
 }

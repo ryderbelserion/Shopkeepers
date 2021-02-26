@@ -30,6 +30,7 @@ public interface ShopkeepersPlugin extends Plugin {
 	public static final String TRADE_PERMISSION = "shopkeeper.trade";
 	public static final String RELOAD_PERMISSION = "shopkeeper.reload";
 	public static final String DEBUG_PERMISSION = "shopkeeper.debug";
+	public static final String CLEANUP_CITIZEN_SHOPKEEPERS = "shopkeeper.cleanup-citizen-shopkeepers";
 
 	public static final String LIST_OWN_PERMISSION = "shopkeeper.list.own";
 	public static final String LIST_OTHERS_PERMISSION = "shopkeeper.list.others";

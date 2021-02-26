@@ -26,6 +26,9 @@ permissions:
     shopkeeper.debug:
         description: Toggle debug mode and access debugging commands
         default: op
+    shopkeeper.cleanup-citizen-shopkeepers:
+        description: Delete invalid Citizen shopkeepers via command
+        default: op
 
     shopkeeper.list.own:
         description: List your own player shops
@@ -156,6 +159,7 @@ permissions:
             shopkeeper.help: true
             shopkeeper.reload: true
             shopkeeper.debug: true
+            shopkeeper.cleanup-citizen-shopkeepers: true
             shopkeeper.list.own: true
             shopkeeper.list.others: true
             shopkeeper.list.admin: true

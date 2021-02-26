@@ -182,6 +182,7 @@ public class Settings extends Config {
 
 	public static boolean enableCitizenShops = true;
 	public static EntityType defaultCitizenNpcType = EntityType.PLAYER;
+	public static boolean deleteInvalidCitizenShopkeepers = false;
 
 	public static boolean enableSignShops = true;
 	public static boolean enableSignPostShops = true;

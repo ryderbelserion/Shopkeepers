@@ -85,6 +85,7 @@ public class ShopkeepersCommand extends BaseCommand {
 		// Hidden commands:
 		childCommands.register(new CommandConfirm(confirmations));
 		// Hidden debugging / utility commands:
+		childCommands.register(new CommandCleanupCitizenShopkeepers());
 		childCommands.register(new CommandCheck(plugin));
 		childCommands.register(new CommandCheckItem());
 		childCommands.register(new CommandYaml());
