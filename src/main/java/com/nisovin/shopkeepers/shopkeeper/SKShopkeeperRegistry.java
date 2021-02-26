@@ -1326,19 +1326,25 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		// Note: Already unmodifiable.
 		return new AbstractSet<AbstractPlayerShopkeeper>() {
 			private Stream<AbstractPlayerShopkeeper> createStream() {
-				return getAllShopkeepers().stream()
-						.filter(shopkeeper -> shopkeeper instanceof PlayerShopkeeper)
-						.map(shopkeeper -> (AbstractPlayerShopkeeper) shopkeeper)
+				return allPlayerShopkeepersView.stream()
 						.filter(shopkeeper -> shopkeeper.getOwnerUUID().equals(ownerUUID));
 			}
 
 			@Override
 			public Iterator<AbstractPlayerShopkeeper> iterator() {
+				if (allPlayerShopkeepersView.isEmpty()) {
+					// There are no player shops at all:
+					return Collections.emptyIterator();
+				}
 				return this.createStream().iterator();
 			}
 
 			@Override
 			public int size() {
+				if (allPlayerShopkeepersView.isEmpty()) {
+					// There are no player shops at all:
+					return 0;
+				}
 				return this.createStream().mapToInt(shopkeeper -> 1).sum();
 			}
 		};
