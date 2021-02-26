@@ -12,8 +12,8 @@ public class MapUtils {
 	// Maximum capacity of a HashMap (largest power of two fitting into an int):
 	private static final int MAX_CAPACITY = (1 << 30);
 
-	// Capacity for a HashMap with the specified expected size and a loading-factor of >= 0.75,
-	// that prevents the map from resizing.
+	// Capacity for a HashMap/Set with the specified expected size and a load factor of >= 0.75 that prevents the
+	// Map/Set from resizing.
 	public static int getIdealHashMapCapacity(int expectedSize) {
 		Validate.isTrue(expectedSize >= 0, "Expected size cannot be negative!");
 		assert expectedSize >= 0;
