@@ -12,12 +12,18 @@ public class ShopkeepersCountChart extends Metrics.SimplePie {
 	public ShopkeepersCountChart(ShopkeeperRegistry shopkeeperRegistry) {
 		super("shopkeepers_count", () -> {
 			int numberOfShopkeepers = shopkeeperRegistry.getAllShopkeepers().size();
-			if (numberOfShopkeepers >= 1000) return (numberOfShopkeepers / 1000) + "000+";
-			else if (numberOfShopkeepers >= 500) return "500+";
-			else if (numberOfShopkeepers >= 100) return "100+";
-			else if (numberOfShopkeepers >= 10) return "10+";
-			else if (numberOfShopkeepers > 0) return "<10";
-			else return "0";
+			if (numberOfShopkeepers >= 100) {
+				int hundreds = (numberOfShopkeepers / 100);
+				return "[" + hundreds + "00," + (hundreds + 1) + "00)";
+			} else if (numberOfShopkeepers >= 50) {
+				return "[50,100)";
+			} else if (numberOfShopkeepers >= 10) {
+				return "[10,50)";
+			} else if (numberOfShopkeepers > 0) {
+				return "<10";
+			} else {
+				return "0";
+			}
 		});
 	}
 }

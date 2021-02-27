@@ -136,6 +136,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * If a NPC is deleted and there are multiple shopkeepers associated with it, all of these shopkeepers are deleted now.
 * If player shopkeepers for inactive players are to be deleted, we not only check for inactive players during plugin startup, but also periodically now (roughly every 4 hours). This accounts for servers that keep running for long durations. We also log a message now whenever we check for shops of inactive players.
 * Performance: Improvements related to checking and deleting shopkeepers of inactive players.
+* Metrics: The shopkeepers count chart groups its results into slightly more detailed categories now.
 
 API:  
 * Renamed TradingOffer to TradeOffer.
