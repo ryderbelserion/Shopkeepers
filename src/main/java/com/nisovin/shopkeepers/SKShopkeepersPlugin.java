@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers;
 
 import java.io.File;
 
-import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -32,15 +31,7 @@ import com.nisovin.shopkeepers.debug.events.EventDebugger;
 import com.nisovin.shopkeepers.debug.trades.TradingCountListener;
 import com.nisovin.shopkeepers.itemconversion.ItemConversions;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.metrics.CitizensChart;
-import com.nisovin.shopkeepers.metrics.FeaturesChart;
-import com.nisovin.shopkeepers.metrics.GringottsChart;
-import com.nisovin.shopkeepers.metrics.PlayerShopsChart;
-import com.nisovin.shopkeepers.metrics.ShopkeepersCountChart;
-import com.nisovin.shopkeepers.metrics.TownyChart;
-import com.nisovin.shopkeepers.metrics.VaultEconomyChart;
-import com.nisovin.shopkeepers.metrics.WorldGuardChart;
-import com.nisovin.shopkeepers.metrics.WorldsChart;
+import com.nisovin.shopkeepers.metrics.PluginMetrics;
 import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
 import com.nisovin.shopkeepers.playershops.PlayerInactivity;
 import com.nisovin.shopkeepers.playershops.ShopOwnerNameUpdates;
@@ -115,6 +106,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final CitizensShops citizensShops = new CitizensShops(this);
 
 	private final RegularVillagers regularVillagers = new RegularVillagers(this);
+
+	private final PluginMetrics pluginMetrics = new PluginMetrics(this);
 
 	private boolean outdatedServer = false;
 	private boolean incompatibleServer = false;
@@ -363,10 +356,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// Save all updated shopkeeper data (eg. after data migrations):
 		shopkeeperStorage.saveIfDirty();
 
-		// Setup metrics:
-		if (Settings.enableMetrics) {
-			this.setupMetrics();
-		}
+		// Plugin metrics:
+		pluginMetrics.onEnable();
 
 		// Event debugger:
 		eventDebugger.onEnable();
@@ -428,6 +419,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopObjectTypesRegistry.clearAll();
 		uiRegistry.clearAll();
 
+		// Plugin metrics:
+		pluginMetrics.onDisable();
+
 		// Event debugger:
 		eventDebugger.onDisable();
 
@@ -444,23 +438,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	public void reload() {
 		this.onDisable();
 		this.onEnable();
-	}
-
-	// METRICS
-
-	private void setupMetrics() {
-		Metrics metrics = new Metrics(this);
-		metrics.addCustomChart(new CitizensChart());
-		metrics.addCustomChart(new WorldGuardChart());
-		metrics.addCustomChart(new TownyChart());
-		metrics.addCustomChart(new VaultEconomyChart());
-		metrics.addCustomChart(new GringottsChart());
-		metrics.addCustomChart(new ShopkeepersCountChart(shopkeeperRegistry));
-		metrics.addCustomChart(new PlayerShopsChart(shopkeeperRegistry));
-		metrics.addCustomChart(new FeaturesChart());
-		metrics.addCustomChart(new WorldsChart(shopkeeperRegistry));
-		// TODO Add chart with number of virtual shops?
-		// TODO Add chart with the server variant used (CraftBukkit, Spigot, Paper, other..).
 	}
 
 	// PLAYER JOINING AND QUITTING
