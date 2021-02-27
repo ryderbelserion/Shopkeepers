@@ -14,6 +14,16 @@ import org.bukkit.plugin.EventExecutor;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 
+/**
+ * Registers event handlers at every event priority for a particular type of event and then invokes a callback whenever
+ * one of these event handlers is invoked.
+ * <p>
+ * The callback can for example be used to step by step debug the behavior of event handlers at different priorities for
+ * a particular type of event.
+ *
+ * @param <E>
+ *            the event type
+ */
 public class EventDebugListener<E extends Event> implements Listener {
 
 	public interface EventHandler<E extends Event> {

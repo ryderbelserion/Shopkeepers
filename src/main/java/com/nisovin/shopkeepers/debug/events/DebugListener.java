@@ -16,6 +16,10 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Utils;
 
+/**
+ * Registers event handlers for all currently known (i.e. loaded) types of events and then prints debug information
+ * whenever these events are triggered.
+ */
 public class DebugListener implements Listener {
 
 	public static DebugListener register(boolean logAllEvents, boolean printListeners) {
@@ -56,11 +60,7 @@ public class DebugListener implements Listener {
 
 	private void handleEvent(Event event) {
 		String eventName = event.getEventName();
-		EventData data = eventData.get(eventName);
-		if (data == null) {
-			data = new EventData();
-			eventData.put(eventName, data);
-		}
+		EventData data = eventData.computeIfAbsent(eventName, key -> new EventData());
 
 		// Event logging:
 		if (logAllEvents) {

@@ -28,9 +28,7 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
 import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
 import com.nisovin.shopkeepers.container.protection.RemoveShopOnContainerBreak;
-import com.nisovin.shopkeepers.debug.Debug;
-import com.nisovin.shopkeepers.debug.DebugOptions;
-import com.nisovin.shopkeepers.debug.events.DebugListener;
+import com.nisovin.shopkeepers.debug.events.EventDebugger;
 import com.nisovin.shopkeepers.debug.trades.TradingCountListener;
 import com.nisovin.shopkeepers.itemconversion.ItemConversions;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -105,6 +103,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final ChatInput chatInput = new ChatInput(this);
 	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(chatInput);
 	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(this);
+	private final EventDebugger eventDebugger = new EventDebugger(this);
 
 	private final PlayerInactivity playerInactivity = new PlayerInactivity(this);
 	private final ShopOwnerNameUpdates shopOwnerNameUpdates = new ShopOwnerNameUpdates(this);
@@ -369,18 +368,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			this.setupMetrics();
 		}
 
-		// Debugging tools:
-		if (Settings.debug) {
-			// Register debug listener:
-			// Run delayed to also catch events / event listeners of other plugins.
-			Bukkit.getScheduler().runTaskLater(this, () -> {
-				boolean logAllEvent = Debug.isDebugging(DebugOptions.logAllEvents);
-				boolean printListeners = Debug.isDebugging(DebugOptions.printListeners);
-				if (logAllEvent || printListeners) {
-					DebugListener.register(logAllEvent, printListeners);
-				}
-			}, 10L);
-		}
+		// Event debugger:
+		eventDebugger.onEnable();
 	}
 
 	@Override
@@ -438,6 +427,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopTypesRegistry.clearAll();
 		shopObjectTypesRegistry.clearAll();
 		uiRegistry.clearAll();
+
+		// Event debugger:
+		eventDebugger.onDisable();
 
 		HandlerList.unregisterAll(this);
 		Bukkit.getScheduler().cancelTasks(this);
