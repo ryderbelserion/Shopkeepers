@@ -11,6 +11,7 @@ import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHireEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
 import com.nisovin.shopkeepers.ui.defaults.HiringHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.util.Log;
@@ -103,7 +104,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			}
 
 			// Call event:
-			int maxShopsLimit = Settings.getMaxShopsLimit(player);
+			int maxShopsLimit = PlayerShopsLimit.getMaxShopsLimit(player);
 			PlayerShopkeeperHireEvent hireEvent = new PlayerShopkeeperHireEvent(shopkeeper, player, newPlayerInventoryContents, maxShopsLimit);
 			Bukkit.getPluginManager().callEvent(hireEvent);
 			if (hireEvent.isCancelled()) {

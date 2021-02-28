@@ -33,8 +33,7 @@ import com.nisovin.shopkeepers.itemconversion.ItemConversions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.metrics.PluginMetrics;
 import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
-import com.nisovin.shopkeepers.playershops.PlayerInactivity;
-import com.nisovin.shopkeepers.playershops.ShopOwnerNameUpdates;
+import com.nisovin.shopkeepers.playershops.PlayerShops;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.shopcreation.ShopkeeperCreation;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
@@ -96,8 +95,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(this);
 	private final EventDebugger eventDebugger = new EventDebugger(this);
 
-	private final PlayerInactivity playerInactivity = new PlayerInactivity(this);
-	private final ShopOwnerNameUpdates shopOwnerNameUpdates = new ShopOwnerNameUpdates(this);
+	private final PlayerShops playerShops = new PlayerShops(this);
 
 	private final ProtectedContainers protectedContainers = new ProtectedContainers(this);
 	private final RemoveShopOnContainerBreak removeShopOnContainerBreak = new RemoveShopOnContainerBreak(this, protectedContainers);
@@ -350,8 +348,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// Activate (spawn) shopkeepers in loaded chunks of all loaded worlds:
 		shopkeeperRegistry.activateShopkeepersInAllWorlds();
 
-		shopOwnerNameUpdates.onEnable();
-		playerInactivity.onEnable();
+		playerShops.onEnable();
 
 		// Save all updated shopkeeper data (eg. after data migrations):
 		shopkeeperStorage.saveIfDirty();
@@ -411,8 +408,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopkeeperNaming.onDisable();
 		shopkeeperCreation.onDisable();
 
-		shopOwnerNameUpdates.onDisable();
-		playerInactivity.onDisable();
+		playerShops.onDisable();
 
 		// Clear all types of registers:
 		shopTypesRegistry.clearAll();
@@ -584,12 +580,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// PLAYER SHOPS
 
-	public PlayerInactivity getPlayerInactivity() {
-		return playerInactivity;
-	}
-
-	public ShopOwnerNameUpdates getShopOwnerNameUpdates() {
-		return shopOwnerNameUpdates;
+	public PlayerShops getPlayerShops() {
+		return playerShops;
 	}
 
 	// OFFERS FACTORY

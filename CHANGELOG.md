@@ -212,7 +212,8 @@ Internal:
 * Several minor optimizations and refactors related to the various types of shopkeepers. Items are copied and compared less often now.
 * Citizens shopkeepers setup their NPC after the shopkeeper has been successfully added to the shopkeeper registry now.
 * We now keep track of the mapping between Citizens NPCs and their corresponding Citizen shopkeepers independently of the activation states of these shopkeepers.
-* Refactors related to the updating of shop owner names, and the checking and deleting of shopkeepers of inactive players.
+* Refactors related to the various player shops related functionality, such as the updating of shop owner names, the checking and deleting of shopkeepers of inactive players, and the max shops permissions.
+* The dynamically registered max shops permissions have a description now.
 * Minor other internal code refactoring.
 
 Migration notes:  

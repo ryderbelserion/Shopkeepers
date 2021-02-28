@@ -6,7 +6,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -17,21 +16,19 @@ import java.util.regex.PatternSyntaxException;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.lib.Config;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
 import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.util.ConversionUtils;
+import com.nisovin.shopkeepers.playershops.MaxShopsPermission;
+import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
 import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -259,23 +256,6 @@ public class Settings extends Config {
 
 	///// DERIVED SETTINGS
 
-	public static class MaxShopsPermission implements Comparable<MaxShopsPermission> {
-
-		// Integer.MAX_VALUE indicates no limit.
-		public final int maxShops;
-		public final String permission;
-
-		private MaxShopsPermission(int maxShops, String permission) {
-			this.maxShops = maxShops;
-			this.permission = permission;
-		}
-
-		@Override
-		public int compareTo(MaxShopsPermission other) {
-			return Integer.compare(this.maxShops, other.maxShops);
-		}
-	}
-
 	// Stores derived settings which get setup after loading the config.
 	public static class DerivedSettings {
 
@@ -344,21 +324,9 @@ public class Settings extends Config {
 			}
 
 			// Maximum shops permissions:
-			maxShopsPermissions.clear();
-			// Add permission for an unlimited number of shops:
-			maxShopsPermissions.add(new MaxShopsPermission(Integer.MAX_VALUE, ShopkeepersPlugin.MAXSHOPS_UNLIMITED_PERMISSION));
-			String[] maxShopsPermOptions = Settings.maxShopsPermOptions.replace(" ", "").split(",");
-			for (String permOption : maxShopsPermOptions) {
-				// Validate:
-				Integer maxShops = ConversionUtils.parseInt(permOption);
-				if (maxShops == null || maxShops <= 0) {
-					Log.warning(INSTANCE.getLogPrefix() + "Ignoring invalid entry in 'max-shops-perm-options': " + permOption);
-					continue;
-				}
-				String permission = "shopkeeper.maxshops." + permOption;
-				maxShopsPermissions.add(new MaxShopsPermission(maxShops, permission));
-			}
-			Collections.sort(maxShopsPermissions, Collections.reverseOrder()); // Descending order
+			PlayerShopsLimit.updateMaxShopsPermissions(invalidPermissionOption -> {
+				Log.warning(INSTANCE.getLogPrefix() + "Ignoring invalid entry in 'max-shops-perm-options': " + invalidPermissionOption);
+			});
 
 			// Enabled living shop types:
 			enabledLivingShops.clear();
@@ -518,27 +486,6 @@ public class Settings extends Config {
 			return ItemUtils.isEmpty(item);
 		}
 		return zeroHighCurrencyItem.matches(item);
-	}
-
-	// VARIOUS
-
-	// Integer.MAX_VALUE indicates no limit.
-	public static int getMaxShopsLimit(Player player) {
-		if (Settings.maxShopsPerPlayer == -1) {
-			return Integer.MAX_VALUE; // No limit by default
-		}
-		int maxShops = Settings.maxShopsPerPlayer; // Default
-		for (MaxShopsPermission entry : DerivedSettings.maxShopsPermissions) {
-			// Note: The max shops permission entries are sorted in descending order.
-			if (entry.maxShops <= maxShops) {
-				break;
-			}
-			if (PermissionUtils.hasPermission(player, entry.permission)) {
-				maxShops = entry.maxShops;
-				break;
-			}
-		}
-		return maxShops;
 	}
 
 	///// LOADING
