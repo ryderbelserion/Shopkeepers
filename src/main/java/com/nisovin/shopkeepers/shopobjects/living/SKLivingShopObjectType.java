@@ -13,17 +13,21 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
+import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> extends AbstractEntityShopObjectType<T> implements LivingShopObjectType<T> {
+
+	private static final String PERMISSION_ALL_ENTITY_TYPES = "shopkeeper.entity.*";
 
 	protected final LivingShops livingShops;
 	protected final EntityType entityType;
 
-	protected SKLivingShopObjectType(LivingShops livingShops, EntityType entityType, List<String> aliases, String identifier, String permission) {
+	protected SKLivingShopObjectType(LivingShops livingShops, EntityType entityType, String identifier, List<String> aliases, String permission) {
 		super(identifier, aliases, permission);
+		Validate.isTrue(entityType.isAlive(), "entityType is not alive");
+		Validate.isTrue(entityType.isSpawnable(), "entityType is not spawnable");
 		this.livingShops = livingShops;
 		this.entityType = entityType;
-		assert entityType.isAlive();
 	}
 
 	@Override
@@ -38,7 +42,7 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> ex
 
 	@Override
 	public boolean hasPermission(Player player) {
-		return super.hasPermission(player) || PermissionUtils.hasPermission(player, "shopkeeper.entity.*");
+		return PermissionUtils.hasPermission(player, PERMISSION_ALL_ENTITY_TYPES) || super.hasPermission(player);
 	}
 
 	@Override

@@ -214,6 +214,8 @@ Internal:
 * We now keep track of the mapping between Citizens NPCs and their corresponding Citizen shopkeepers independently of the activation states of these shopkeepers.
 * Refactors related to the various player shops related functionality, such as the updating of shop owner names, the checking and deleting of shopkeepers of inactive players, and the max shops permissions.
 * The dynamically registered max shops permissions have a description now.
+* We also register the dynamic mob type specific shop object type permissions now.
+* Since the `shopkeeper.entity.*` permission is given to all players by default, we check it first now, prior to checking the mob type specific permission.
 * Minor other internal code refactoring.
 
 Migration notes:  

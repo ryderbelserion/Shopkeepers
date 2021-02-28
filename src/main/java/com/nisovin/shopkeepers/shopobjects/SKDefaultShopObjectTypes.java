@@ -30,7 +30,7 @@ public class SKDefaultShopObjectTypes implements DefaultShopObjectTypes {
 
 	@Override
 	public SKLivingShopObjectTypes getLivingShopObjectTypes() {
-		return plugin.getLivingShops().getLivingEntityObjectTypes();
+		return plugin.getLivingShops().getLivingShopObjectTypes();
 	}
 
 	@Override

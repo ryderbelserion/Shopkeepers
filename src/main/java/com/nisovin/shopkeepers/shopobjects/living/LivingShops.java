@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.config.Settings;
 public class LivingShops {
 
 	private final SKShopkeepersPlugin plugin;
-	private final SKLivingShopObjectTypes livingEntityObjectTypes = new SKLivingShopObjectTypes(this);
+	private final SKLivingShopObjectTypes livingShopObjectTypes = new SKLivingShopObjectTypes(this);
 	private final LivingEntityAI livingEntityAI;
 	private final LivingEntityShopListener livingEntityShopListener;
 	private final CreatureForceSpawnListener creatureForceSpawnListener = new CreatureForceSpawnListener();
@@ -41,8 +41,8 @@ public class LivingShops {
 		livingEntityAI.onDisable();
 	}
 
-	public SKLivingShopObjectTypes getLivingEntityObjectTypes() {
-		return livingEntityObjectTypes;
+	public SKLivingShopObjectTypes getLivingShopObjectTypes() {
+		return livingShopObjectTypes;
 	}
 
 	public LivingEntityAI getLivingEntityAI() {
