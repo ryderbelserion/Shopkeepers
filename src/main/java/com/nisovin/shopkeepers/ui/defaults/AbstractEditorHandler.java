@@ -221,7 +221,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 		@Override
 		protected final void onClick(InventoryClickEvent clickEvent, Player player) {
-			if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return; // ignore double clicks
+			if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return; // Ignore double clicks
 
 			// Run action:
 			boolean success = this.runAction(clickEvent, player);

@@ -20,6 +20,9 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -118,6 +121,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		this.addButtonOrIgnore(this.getVillagerTypeEditorButton());
 		this.addButtonOrIgnore(this.getVillagerLevelEditorButton());
 		this.addButtonOrIgnore(this.getAIButton());
+		this.addButtonOrIgnore(this.getInvulnerabilityButton());
 		// TODO Equipment?
 		// TODO Option to generate random vanilla trades? Maybe when changing the profession and/or level and there are
 		// no trades currently?
@@ -459,6 +463,36 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				hasAI = !hasAI;
 				villager.setAI(hasAI);
+				return true;
+			}
+		};
+	}
+
+	protected Button getInvulnerabilityButton() {
+		return new ActionButton() {
+
+			private boolean invulnerable = villager.isInvulnerable();
+
+			@Override
+			public ItemStack getIcon(Session session) {
+				ItemStack iconItem;
+				if (invulnerable) {
+					iconItem = new ItemStack(Material.POTION);
+					PotionMeta potionMeta = (PotionMeta) iconItem.getItemMeta();
+					potionMeta.setBasePotionData(new PotionData(PotionType.INSTANT_HEAL));
+					iconItem.setItemMeta(potionMeta);
+				} else {
+					iconItem = new ItemStack(Material.GLASS_BOTTLE);
+				}
+				assert iconItem != null;
+				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonInvulnerability, Messages.buttonInvulnerabilityLore);
+				return iconItem;
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				invulnerable = !invulnerable;
+				villager.setInvulnerable(invulnerable);
 				return true;
 			}
 		};

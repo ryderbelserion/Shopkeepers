@@ -330,6 +330,12 @@ button-villager-inventory-lore:
 button-mob-ai: "&aToggle mob AI"
 button-mob-ai-lore:
 - "Toggles the mob's AI"
+button-invulnerability: "&aToggle invulnerability"
+button-invulnerability-lore:
+- "Toggles the mob's"
+- "invulnerability."
+- "Players in creative mode"
+- "can still damage the mob."
 
 villager-inventory-title: "Villager inventory (copy)"
 set-villager-xp: "&aSet the villager's XP to &e{xp}"

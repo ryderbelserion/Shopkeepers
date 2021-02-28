@@ -137,6 +137,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * If player shopkeepers for inactive players are to be deleted, we not only check for inactive players during plugin startup, but also periodically now (roughly every 4 hours). This accounts for servers that keep running for long durations. We also log a message now whenever we check for shops of inactive players.
 * Performance: Improvements related to checking and deleting shopkeepers of inactive players.
 * Metrics: The shopkeepers count chart groups its results into slightly more detailed categories now.
+* Added editor option to toggle the invulnerability of regular villagers.
 
 API:  
 * Renamed TradingOffer to TradeOffer.
@@ -257,6 +258,8 @@ Messages:
 * Added 'button-snowman-pumpkin-head-lore'.
 * Added 'button-shulker-color'.
 * Added 'button-shulker-color-lore'.
+* Added 'button-invulnerability'.
+* Added 'button-invulnerability-lore'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.

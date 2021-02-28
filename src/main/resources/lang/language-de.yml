@@ -328,6 +328,13 @@ button-mob-ai: "&aKI umschalten"
 button-mob-ai-lore:
 - "Schaltet die KI der"
 - "Kreatur an oder aus"
+button-invulnerability: "&aUnverwundbarkeit umschalten"
+button-invulnerability-lore:
+- "Schaltet die Unverwundbarkeit"
+- "der Kreatur an oder aus."
+- "Spieler im Kreativmodus"
+- "können der Kreatur trotzdem"
+- "noch Schaden zufügen."
 
 villager-inventory-title: "Dorfbewohner Inventar (Kopie)"
 set-villager-xp: "&aDie XP des Dorfbewohners wurde auf &e{xp}&a gesetzt."

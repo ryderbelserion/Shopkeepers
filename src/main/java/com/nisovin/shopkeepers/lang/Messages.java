@@ -255,6 +255,8 @@ public class Messages extends Config {
 	));
 	public static String buttonMobAi = c("&aToggle mob AI");
 	public static List<String> buttonMobAiLore = c(Arrays.asList("Toggles the mob's AI"));
+	public static String buttonInvulnerability = c("&aToggle invulnerability");
+	public static List<String> buttonInvulnerabilityLore = c(Arrays.asList("Toggles the mob's", "invulnerability.", "Players in creative mode", "can still damage the mob."));
 
 	public static String villagerInventoryTitle = c("Villager inventory (copy)");
 	public static String setVillagerXp = c("&aSet the villager's XP to &e{xp}");
