@@ -115,7 +115,10 @@ public class ItemData implements Cloneable {
 			ConfigUtils.convertSectionsToMaps(dataMap);
 
 			// Determine meta type by creating the serialization of a dummy item meta:
-			ItemMeta dummyItemMeta = dataItem.getItemMeta();
+			ItemMeta dummyItemMeta = dataItem.getItemMeta(); // Can be null
+			if (dummyItemMeta == null) {
+				throw new ItemDataDeserializeException("Items of type " + type.name() + " do not support meta data!");
+			}
 			dummyItemMeta.setDisplayName("dummy name"); // Ensure item meta is not empty
 			Object metaType = dummyItemMeta.serialize().get(META_TYPE_KEY);
 			if (metaType == null) {

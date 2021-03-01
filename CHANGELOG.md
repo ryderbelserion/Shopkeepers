@@ -139,6 +139,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Metrics: The shopkeepers count chart groups its results into slightly more detailed categories now.
 * Added an editor option to toggle the invulnerability of regular villagers.
 * Config: Legacy item types, and item types that are not actually items, can no longer be specified. We log a warning now when we encounter such an item type, similar to how we deal with unknown item types.
+* Fixed: Specifying meta data for items of type AIR (which do not support meta data) no longer results in an exception.
 
 API:  
 * Renamed TradingOffer to TradeOffer.
