@@ -1,16 +1,13 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
-import java.util.Locale;
-import java.util.regex.Pattern;
-
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class EnumValue<E extends Enum<E>> extends ValueType<E> {
 
-	private static final Pattern WHITESPACE_AND_DASH = Pattern.compile("[-\\s]+");
 	private static final StringValue STRING_VALUE = new StringValue();
 
 	private final Class<E> enumClass;
@@ -52,9 +49,7 @@ public class EnumValue<E extends Enum<E>> extends ValueType<E> {
 	public E parse(String input) throws ValueParseException {
 		Validate.notNull(input, "input is null");
 
-		String normalized = input.trim().toUpperCase(Locale.ROOT);
-		normalized = WHITESPACE_AND_DASH.matcher(normalized).replaceAll("_");
-
+		String normalized = StringUtils.normalizeEnumName(input);
 		try {
 			return Enum.valueOf(enumClass, normalized);
 		} catch (IllegalArgumentException e) {

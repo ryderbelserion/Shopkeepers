@@ -93,6 +93,27 @@ public class StringUtils {
 	}
 
 	/**
+	 * Formats the given String in a way that is typical for enum names.
+	 * <p>
+	 * This trims leading and trailing whitespace, converts all remaining whitespace and dashes to underscores
+	 * ('{@code _}') and converts all characters to upper case.
+	 * <p>
+	 * This returns <code>null</code> if the input String is <code>null</code>.
+	 * 
+	 * @param enumName
+	 *            the String to normalize
+	 * @return the normalized enum name
+	 */
+	public static String normalizeEnumName(String enumName) {
+		if (enumName == null) return null;
+		enumName = enumName.trim();
+		enumName = enumName.replace('-', '_');
+		enumName = replaceWhitespace(enumName, "_");
+		enumName = enumName.toUpperCase(Locale.ROOT);
+		return enumName;
+	}
+
+	/**
 	 * Checks if the given strings contains whitespace characters.
 	 * 
 	 * @param string
