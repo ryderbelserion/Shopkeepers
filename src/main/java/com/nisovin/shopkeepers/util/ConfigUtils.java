@@ -17,6 +17,9 @@ public class ConfigUtils {
 		String materialName = config.getString(key); // Note: Takes defaults into account.
 		if (materialName == null) return null;
 		Material material = Material.matchMaterial(materialName); // Can be null
+		if (material != null && material.isLegacy()) {
+			return null;
+		}
 		return material;
 	}
 

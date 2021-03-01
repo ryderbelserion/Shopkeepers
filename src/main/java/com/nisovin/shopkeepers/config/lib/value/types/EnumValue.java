@@ -25,11 +25,11 @@ public class EnumValue<E extends Enum<E>> extends ValueType<E> {
 		try {
 			return this.parse(enumValueName);
 		} catch (ValueParseException e) {
-			throw this.newUnknownEnumValueException(enumValueName, e);
+			throw this.newInvalidEnumValueException(enumValueName, e);
 		}
 	}
 
-	protected ValueLoadException newUnknownEnumValueException(String valueName, ValueParseException parseException) {
+	protected ValueLoadException newInvalidEnumValueException(String valueName, ValueParseException parseException) {
 		return new ValueLoadException(parseException.getMessage(), parseException);
 	}
 

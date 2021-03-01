@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.config.lib.value.types;
 
 import org.bukkit.entity.EntityType;
 
-import com.nisovin.shopkeepers.config.lib.value.UnknownEntityTypeException;
+import com.nisovin.shopkeepers.config.lib.value.InvalidEntityTypeException;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 
@@ -15,7 +15,7 @@ public class EntityTypeValue extends MinecraftEnumValue<EntityType> {
 	}
 
 	@Override
-	protected ValueLoadException newUnknownEnumValueException(String valueName, ValueParseException parseException) {
-		return new UnknownEntityTypeException(parseException.getMessage(), parseException);
+	protected ValueLoadException newInvalidEnumValueException(String valueName, ValueParseException parseException) {
+		return new InvalidEntityTypeException(parseException.getMessage(), parseException);
 	}
 }

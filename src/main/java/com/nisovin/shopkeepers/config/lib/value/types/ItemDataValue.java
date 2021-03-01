@@ -1,12 +1,12 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
-import com.nisovin.shopkeepers.config.lib.value.UnknownMaterialException;
+import com.nisovin.shopkeepers.config.lib.value.InvalidMaterialException;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemData.ItemDataDeserializeException;
-import com.nisovin.shopkeepers.util.ItemData.UnknownItemTypeException;
+import com.nisovin.shopkeepers.util.ItemData.InvalidItemTypeException;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class ItemDataValue extends ValueType<ItemData> {
@@ -21,8 +21,8 @@ public class ItemDataValue extends ValueType<ItemData> {
 		try {
 			// Returns null if the config value is null.
 			return ItemData.deserialize(configValue);
-		} catch (UnknownItemTypeException e) {
-			throw new UnknownMaterialException(e.getMessage(), e);
+		} catch (InvalidItemTypeException e) {
+			throw new InvalidMaterialException(e.getMessage(), e);
 		} catch (ItemDataDeserializeException e) {
 			throw new ValueLoadException(e.getMessage(), e);
 		}

@@ -218,6 +218,7 @@ public final class ItemUtils {
 
 	// The display name and lore are expected to use Minecraft's color codes.
 	public static ItemStack createItemStack(Material type, int amount, String displayName, List<String> lore) {
+		assert type != null && type.isItem();
 		// TODO Return null in case of type AIR?
 		ItemStack itemStack = new ItemStack(type, amount);
 		return ItemUtils.setItemStackNameAndLore(itemStack, displayName, lore);

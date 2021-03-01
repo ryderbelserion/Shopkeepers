@@ -30,15 +30,15 @@ public class ItemData implements Cloneable {
 		}
 	}
 
-	public static class UnknownItemTypeException extends ItemDataDeserializeException {
+	public static class InvalidItemTypeException extends ItemDataDeserializeException {
 
 		private static final long serialVersionUID = -6123823171023440870L;
 
-		public UnknownItemTypeException(String message) {
+		public InvalidItemTypeException(String message) {
 			super(message);
 		}
 
-		public UnknownItemTypeException(String message, Throwable cause) {
+		public InvalidItemTypeException(String message, Throwable cause) {
 			super(message, cause);
 		}
 	}
@@ -95,8 +95,12 @@ public class ItemData implements Cloneable {
 		// Assuming up-to-date material name (performs no conversions besides basic formatting):
 		Material type = Material.matchMaterial(typeName);
 		if (type == null) {
-			// Unknown item type:
-			throw new UnknownItemTypeException("Unknown item type: " + typeName);
+			throw new InvalidItemTypeException("Unknown item type: " + typeName);
+		} else if (type.isLegacy()) {
+			throw new InvalidItemTypeException("Unsupported legacy item type: " + typeName);
+		} else if (!type.isItem()) {
+			// Note: AIR is a valid item type. It is for example used for empty slots in inventories.
+			throw new InvalidItemTypeException("Invalid item type: " + typeName);
 		}
 
 		// Create item stack (still misses meta data):
@@ -170,6 +174,7 @@ public class ItemData implements Cloneable {
 	// Creates a copy of this ItemData, but changes the item type.
 	// Any incompatible data gets removed.
 	public ItemData withType(Material type) {
+		assert type != null && type.isItem();
 		ItemStack newDataItem = this.createItemStack();
 		newDataItem.setType(type);
 		return new ItemData(newDataItem);
