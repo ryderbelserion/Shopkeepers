@@ -61,6 +61,7 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			ItemStack currencyItem = Settings.createZeroCurrencyItem();
 			TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, containerItem, null);
 			recipes.add(recipe);
+			newRecipes.add(containerItem);
 		}
 
 		return recipes;

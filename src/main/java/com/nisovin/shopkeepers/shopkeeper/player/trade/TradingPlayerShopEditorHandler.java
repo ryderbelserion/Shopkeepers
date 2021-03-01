@@ -64,6 +64,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			containerItem = ItemUtils.copySingleItem(containerItem); // Ensures a stack size of 1
 			TradingRecipeDraft recipe = new TradingRecipeDraft(containerItem, null, null);
 			recipes.add(recipe);
+			newRecipes.add(containerItem);
 		}
 
 		return recipes;
