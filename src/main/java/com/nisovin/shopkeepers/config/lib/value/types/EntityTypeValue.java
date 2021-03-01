@@ -6,7 +6,7 @@ import com.nisovin.shopkeepers.config.lib.value.UnknownEntityTypeException;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 
-public class EntityTypeValue extends EnumValue<EntityType> {
+public class EntityTypeValue extends MinecraftEnumValue<EntityType> {
 
 	public static final EntityTypeValue INSTANCE = new EntityTypeValue();
 

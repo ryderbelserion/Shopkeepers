@@ -45,11 +45,23 @@ public class EnumValue<E extends Enum<E>> extends ValueType<E> {
 		return value.name();
 	}
 
+	/**
+	 * Formats the given String input in a way that matches the names of the enum values.
+	 * 
+	 * @param input
+	 *            the String input, not <code>null</code>
+	 * @return the normalized input
+	 */
+	protected String normalize(String input) {
+		assert input != null;
+		return StringUtils.normalizeEnumName(input);
+	}
+
 	@Override
 	public E parse(String input) throws ValueParseException {
 		Validate.notNull(input, "input is null");
 
-		String normalized = StringUtils.normalizeEnumName(input);
+		String normalized = this.normalize(input);
 		try {
 			return Enum.valueOf(enumClass, normalized);
 		} catch (IllegalArgumentException e) {

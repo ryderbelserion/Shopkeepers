@@ -6,7 +6,7 @@ import com.nisovin.shopkeepers.config.lib.value.UnknownMaterialException;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 
-public class MaterialValue extends EnumValue<Material> {
+public class MaterialValue extends MinecraftEnumValue<Material> {
 
 	public static final MaterialValue INSTANCE = new MaterialValue();
 
