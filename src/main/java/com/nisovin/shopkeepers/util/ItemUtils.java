@@ -634,7 +634,7 @@ public final class ItemUtils {
 	// Note: This is performing much better compared to serializing and deserializing a YAML config containing the item.
 	public static ItemStack convertItem(ItemStack itemStack) {
 		if (itemStack == null) return null;
-		ItemMeta itemMeta = itemStack.getItemMeta(); // can be null
+		ItemMeta itemMeta = itemStack.getItemMeta(); // Can be null
 		Map<String, Object> serializedItemMeta = serializeItemMeta(itemMeta); // Can be null
 		if (serializedItemMeta == null) {
 			// Item has no ItemMeta that could get converted:
@@ -703,7 +703,7 @@ public final class ItemUtils {
 	static Map<String, Object> serializeItemMeta(ItemMeta itemMeta) {
 		// Check whether ItemMeta is empty; equivalent to ItemStack#hasItemMeta
 		if (itemMeta != null && !Bukkit.getItemFactory().equals(itemMeta, null)) {
-			return itemMeta.serialize(); // assert: not null nor empty
+			return itemMeta.serialize(); // Assert: Not null or empty
 		} else {
 			return null;
 		}

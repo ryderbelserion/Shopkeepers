@@ -85,7 +85,7 @@ public class ItemData implements Cloneable {
 			}
 			assert typeName != null;
 
-			// Skip meta data loading if no further data (besides item type) is given:
+			// Skip the meta data loading if no further data (besides the item type) is given:
 			if (dataMap.size() <= 1) {
 				dataMap = null;
 			}
@@ -111,7 +111,7 @@ public class ItemData implements Cloneable {
 			// Prepare for meta data deserialization (assumes dataMap is modifiable):
 			// Note: Additional information does not need to be removed, but simply gets ignored (eg. item type).
 
-			// Recursively replace all config sections with maps, since ItemMeta deserialization expects Maps:
+			// Recursively replace all config sections with Maps, because the ItemMeta deserialization expects Maps:
 			ConfigUtils.convertSectionsToMaps(dataMap);
 
 			// Determine meta type by creating the serialization of a dummy item meta:
