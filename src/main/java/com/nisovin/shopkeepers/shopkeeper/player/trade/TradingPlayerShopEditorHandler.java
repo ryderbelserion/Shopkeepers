@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
+import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
@@ -50,6 +51,9 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		for (ItemStack containerItem : containerContents) {
 			if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
 
+			// Replace placeholder item, if this is one:
+			containerItem = PlaceholderItems.replace(containerItem);
+
 			if (shopkeeper.hasOffer(containerItem)) {
 				// There is already a recipe for this item:
 				continue;
@@ -79,8 +83,19 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	@Override
 	protected void addRecipe(TradingRecipeDraft recipe) {
 		assert recipe != null && recipe.isValid();
+		ItemStack resultItem = recipe.getResultItem();
+		ItemStack item1 = recipe.getItem1();
+		ItemStack item2 = recipe.getItem2();
+
+		// Replace placeholder items, if any:
+		// Note: We also replace placeholder items in the buy items, because this allows the setup of trades before the
+		// player has all of the required items.
+		resultItem = PlaceholderItems.replace(resultItem);
+		item1 = PlaceholderItems.replace(item1);
+		item2 = PlaceholderItems.replace(item2);
+
 		SKTradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.addOffer(ShopkeepersAPI.createTradeOffer(recipe.getResultItem(), recipe.getItem1(), recipe.getItem2()));
+		shopkeeper.addOffer(ShopkeepersAPI.createTradeOffer(resultItem, item1, item2));
 	}
 
 	@Override
@@ -114,11 +129,10 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		if (!ItemUtils.isEmpty(cursor)) {
 			// Place item from cursor:
 			Inventory inventory = event.getInventory();
-			ItemStack cursorClone = cursor.clone();
-			cursorClone.setAmount(1);
-			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-				inventory.setItem(rawSlot, cursorClone);
-			});
+			ItemStack cursorClone = ItemUtils.copySingleItem(cursor); // Copy with a stack size of 1
+			// Replace placeholder item, if this is one:
+			cursorClone = PlaceholderItems.replace(cursorClone);
+			ItemUtils.setItemDelayed(inventory, rawSlot, cursorClone);
 		} else {
 			// Changing stack size of clicked item:
 			boolean resultRow = this.isResultRow(rawSlot);
@@ -140,10 +154,10 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		if (this.isResultRow(rawSlot) || this.isItem1Row(rawSlot) || this.isItem2Row(rawSlot)) {
 			// Place item from cursor:
 			Inventory inventory = event.getInventory();
-			cursor.setAmount(1);
-			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-				inventory.setItem(rawSlot, cursor);
-			});
+			cursor.setAmount(1); // Cursor is already a copy
+			// Replace placeholder item, if this is one:
+			cursor = PlaceholderItems.replace(cursor);
+			ItemUtils.setItemDelayed(inventory, rawSlot, cursor);
 		} else {
 			InventoryView view = event.getView();
 			if (this.isPlayerInventory(view, view.getSlotType(rawSlot), rawSlot)) {

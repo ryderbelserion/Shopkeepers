@@ -10,6 +10,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
+import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
@@ -43,6 +44,10 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		ItemStack[] containerContents = shopkeeper.getContainerContents(); // Empty if the container is not found
 		for (ItemStack containerItem : containerContents) {
 			if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
+
+			// Replace placeholder item, if this is one:
+			containerItem = PlaceholderItems.replace(containerItem);
+
 			if (Settings.isAnyCurrencyItem(containerItem)) continue; // Ignore currency items
 
 			if (shopkeeper.getOffer(containerItem) != null) {
@@ -77,8 +82,14 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		int price = this.getPrice(recipe);
 		if (price <= 0) return;
 
+		ItemStack resultItem = recipe.getResultItem();
+		// Replace placeholder item, if this is one:
+		// Note: We also replace placeholder items in selling shopkeepers, because this allows the setup of trades
+		// before the player has all of the required items.
+		resultItem = PlaceholderItems.replace(resultItem);
+
 		SKSellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.addOffer(ShopkeepersAPI.createPriceOffer(recipe.getResultItem(), price));
+		shopkeeper.addOffer(ShopkeepersAPI.createPriceOffer(resultItem, price));
 	}
 
 	@Override

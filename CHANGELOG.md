@@ -140,6 +140,13 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Added an editor option to toggle the invulnerability of regular villagers.
 * Config: Legacy item types, and item types that are not actually items, can no longer be specified. We log a warning now when we encounter such an item type, similar to how we deal with unknown item types.
 * Fixed: Specifying meta data for items of type AIR (which do not support meta data) no longer results in an exception.
+* New feature: When setting up the trades of player shopkeepers, players can now use renamed name tag items as substitutes for items they do not have.
+  * The name tag's display name has to match the name of the substituted item type. Item display names that do not match their item type names, including non-english item display names, won't work. Other properties of the substituted item cannot be specified.
+  * The parsing is lenient to some extent: The Minecraft namespace prefix (`minecraft:`) is optional (some item type names are even too long to be used in anvils if the prefix is included). The upper and lower case of characters is not important. Leading and trailing whitespace is ignored. Spaces and dashes are converted to underscores. Color codes (if any) are also ignored.
+  * Placeholder items are immediately converted to their substituted item inside the shopkeeper editor. If what appears to be a placeholder item is not converted, its display name probably doesn't match a known item type.
+  * Placeholder items are supported by the selling, buying, and trading player shopkeeper. The admin shopkeeper treats them like normal items.
+  * Placeholder items can not only be used for items that are bought, but also for items that are sold. This allows players to setup trades before they have the items required to fulfill these trades.
+  * Since these placeholder items are replaced immediately inside the editor, it is not possible to setup player shopkeeper trades that buy or sell the placeholder items themselves. Normal nametags, and nametags whose names do not match a valid item type, are treated like normal items and can be bought or sold as usual.
 
 API:  
 * Renamed TradingOffer to TradeOffer.

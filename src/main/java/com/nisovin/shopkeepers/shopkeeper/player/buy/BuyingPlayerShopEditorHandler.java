@@ -10,6 +10,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
+import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
@@ -44,6 +45,10 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		ItemStack[] containerContents = shopkeeper.getContainerContents(); // Empty if the container is not found
 		for (ItemStack containerItem : containerContents) {
 			if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
+
+			// Replace placeholder item, if this is one:
+			containerItem = PlaceholderItems.replace(containerItem);
+
 			if (Settings.isAnyCurrencyItem(containerItem)) continue; // Ignore currency items
 
 			if (shopkeeper.getOffer(containerItem) != null) {
@@ -78,16 +83,19 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		assert recipe != null && recipe.isValid();
 		assert recipe.getItem2() == null;
 
-		ItemStack tradedItem = recipe.getItem1();
-		assert tradedItem != null;
-
 		ItemStack priceItem = recipe.getResultItem();
 		assert priceItem != null;
 		if (priceItem.getType() != Settings.currencyItem.getType()) return; // Checking this just in case
 		assert priceItem.getAmount() > 0;
+		int price = priceItem.getAmount();
+
+		ItemStack tradedItem = recipe.getItem1();
+		assert tradedItem != null;
+		// Replace placeholder item, if this is one:
+		tradedItem = PlaceholderItems.replace(tradedItem);
 
 		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.addOffer(ShopkeepersAPI.createPriceOffer(tradedItem, priceItem.getAmount()));
+		shopkeeper.addOffer(ShopkeepersAPI.createPriceOffer(tradedItem, price));
 	}
 
 	@Override

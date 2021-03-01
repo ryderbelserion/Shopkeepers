@@ -1141,6 +1141,14 @@ public final class ItemUtils {
 		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> player.updateInventory());
 	}
 
+	// This can for example be used during the handling of inventory interaction events.
+	public static void setItemDelayed(Inventory inventory, int slot, ItemStack itemStack) {
+		assert inventory != null;
+		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+			inventory.setItem(slot, itemStack);
+		});
+	}
+
 	// TODO Replace this with the corresponding Bukkit API method added in late 1.15.2
 	// See https://hub.spigotmc.org/stash/projects/SPIGOT/repos/bukkit/commits/da9ef3c55fa3bce91f7fdcd77d50171be7297d7d
 	public static ItemStack getItem(PlayerInventory playerInventory, EquipmentSlot slot) {
