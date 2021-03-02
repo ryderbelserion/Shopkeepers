@@ -60,7 +60,6 @@ public class EnumValue<E extends Enum<E>> extends ValueType<E> {
 	@Override
 	public E parse(String input) throws ValueParseException {
 		Validate.notNull(input, "input is null");
-
 		String normalized = this.normalize(input);
 		try {
 			return Enum.valueOf(enumClass, normalized);

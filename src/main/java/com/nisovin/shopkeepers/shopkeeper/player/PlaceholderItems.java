@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.nisovin.shopkeepers.util.MinecraftEnumUtils;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
@@ -32,15 +32,14 @@ public class PlaceholderItems {
 	}
 
 	/**
-	 * Gets the {@link Material} that is substituted by the given placeholder {@link ItemStack}, if it actually is a
-	 * placeholder item.
+	 * Gets the {@link ItemStack} that is substituted by the given placeholder {@link ItemStack}, if it actually is a
+	 * valid placeholder item (i.e. if we can successfully derive its substituted item).
 	 * 
 	 * @param placeholderItem
 	 *            the (potential) placeholder item
-	 * @return the substituted material, or <code>null</code> if either the given item stack is not a placeholder, or
-	 *         the material could not be determined
+	 * @return the substituted item stack, or <code>null</code> if the given item stack is not a valid placeholder
 	 */
-	public static Material getSubstitutedMaterial(ItemStack placeholderItem) {
+	public static ItemStack getSubstitutedItem(ItemStack placeholderItem) {
 		if (!isPlaceholderItemType(placeholderItem)) return null;
 
 		// Get the display name:
@@ -48,47 +47,37 @@ public class PlaceholderItems {
 		assert meta != null;
 		String displayName = meta.getDisplayName();
 		assert displayName != null; // But can be empty
+		if (displayName.isEmpty()) return null;
 
-		// Get the corresponding material name:
-		String materialName = TextUtils.decolorize(displayName);
-		materialName = MinecraftEnumUtils.normalizeEnumName(materialName);
+		// Basic formatting:
+		displayName = displayName.trim();
+		displayName = TextUtils.decolorize(displayName);
 
-		// Lookup the substituted material:
-		Material substitutedMaterial = Material.getMaterial(materialName);
-		if (substitutedMaterial == null) return null;
+		// Check for a substituted material:
+		Material material = ItemUtils.parseMaterial(displayName);
+		if (material != null) {
+			// Validate the material:
+			if (material.isLegacy() || material.isAir() || !material.isItem()) {
+				return null;
+			}
 
-		// Validate the material:
-		if (substitutedMaterial.isLegacy() || substitutedMaterial.isAir() || !substitutedMaterial.isItem()) {
-			return null;
+			// We preserve the stack size of the placeholder item stack:
+			return new ItemStack(material, placeholderItem.getAmount());
 		}
-		return substitutedMaterial;
+
+		return null;
 	}
 
 	/**
 	 * Checks if the given {@link ItemStack} is a valid placeholder item, i.e. with valid
-	 * {@link #getSubstitutedMaterial(ItemStack) substituted material}.
+	 * {@link #getSubstitutedItem(ItemStack) substituted item}.
 	 * 
 	 * @param itemStack
 	 *            the item stack
 	 * @return <code>true</code> if the item stack is a valid placeholder
 	 */
 	public static boolean isPlaceholderItem(ItemStack itemStack) {
-		return getSubstitutedMaterial(itemStack) != null;
-	}
-
-	/**
-	 * Gets the {@link ItemStack} that is substituted by the given placeholder {@link ItemStack}, if it actually is a
-	 * {@link #isPlaceholderItem(ItemStack) valid placeholder}.
-	 * 
-	 * @param placeholderItem
-	 *            the (potential) placeholder item
-	 * @return the substituted item stack, or <code>null</code> if the given item stack is not a valid placeholder
-	 */
-	public static ItemStack getSubstitutedItem(ItemStack placeholderItem) {
-		Material substitutedMaterial = getSubstitutedMaterial(placeholderItem);
-		if (substitutedMaterial == null) return null;
-		// We preserve the stack size of the placeholder item stack:
-		return new ItemStack(substitutedMaterial, placeholderItem.getAmount());
+		return getSubstitutedItem(itemStack) != null;
 	}
 
 	/**

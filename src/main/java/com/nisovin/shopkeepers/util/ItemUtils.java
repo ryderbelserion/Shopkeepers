@@ -38,6 +38,26 @@ public final class ItemUtils {
 	// Material utilities:
 
 	/**
+	 * Parses the {@link Material} from the given input String.
+	 * <p>
+	 * This is similar to {@link Material#matchMaterial(String)}, but may have small performance benefits, or be more
+	 * lenient in the inputs it accepts.
+	 * 
+	 * @param input
+	 *            the input String
+	 * @return the parsed Material, or <code>null</code>
+	 */
+	public static Material parseMaterial(String input) {
+		if (input == null) return null;
+		// Format the input:
+		String materialName = MinecraftEnumUtils.normalizeEnumName(input);
+
+		// Lookup the material:
+		Material material = Material.getMaterial(materialName);
+		return material;
+	}
+
+	/**
 	 * Checks if the given material is a container.
 	 * 
 	 * @param material

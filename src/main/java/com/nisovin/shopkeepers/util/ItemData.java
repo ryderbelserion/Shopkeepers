@@ -93,7 +93,7 @@ public class ItemData implements Cloneable {
 		assert typeName != null;
 
 		// Assuming up-to-date material name (performs no conversions besides basic formatting):
-		Material type = Material.matchMaterial(typeName);
+		Material type = ItemUtils.parseMaterial(typeName); // Can be null
 		if (type == null) {
 			throw new InvalidItemTypeException("Unknown item type: " + typeName);
 		} else if (type.isLegacy()) {

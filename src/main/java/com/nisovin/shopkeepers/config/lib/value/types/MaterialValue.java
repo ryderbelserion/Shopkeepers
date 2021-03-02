@@ -5,6 +5,8 @@ import org.bukkit.Material;
 import com.nisovin.shopkeepers.config.lib.value.InvalidMaterialException;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
+import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Validate;
 
 public class MaterialValue extends MinecraftEnumValue<Material> {
 
@@ -21,8 +23,11 @@ public class MaterialValue extends MinecraftEnumValue<Material> {
 
 	@Override
 	public Material parse(String input) throws ValueParseException {
-		Material material = super.parse(input);
-		assert material != null; // Parsing throws an exception instead
+		Validate.notNull(input, "input is null");
+		Material material = ItemUtils.parseMaterial(input);
+		if (material == null) {
+			throw new ValueParseException("Unknown Material: " + input);
+		}
 		// Filter legacy materials:
 		if (material.isLegacy()) {
 			throw new ValueParseException("Unsupported legacy Material: " + input);
