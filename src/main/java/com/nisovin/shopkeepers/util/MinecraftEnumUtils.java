@@ -8,7 +8,7 @@ public class MinecraftEnumUtils {
 
 	// Upper case because we normalize Strings to match the names of enum constants, which are upper case, before we
 	// check for this prefix:
-	private static final String MINECRAFT_NAMESPACE_PREFIX = NamespacedKey.MINECRAFT.toUpperCase(Locale.ROOT) + ":";
+	private static final String MINECRAFT_NAMESPACE_PREFIX = NamespacedKeyUtils.MINECRAFT_NAMESPACE_PREFIX.toUpperCase(Locale.ROOT);
 
 	/**
 	 * Formats the given String in a way that matches the names of the Bukkit enum values.

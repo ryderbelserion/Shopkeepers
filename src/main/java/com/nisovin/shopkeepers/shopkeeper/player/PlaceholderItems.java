@@ -1,9 +1,12 @@
 package com.nisovin.shopkeepers.shopkeeper.player;
 
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.nisovin.shopkeepers.util.EnchantmentUtils;
+import com.nisovin.shopkeepers.util.EnchantmentUtils.EnchantmentEntry;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
@@ -53,7 +56,7 @@ public class PlaceholderItems {
 		displayName = displayName.trim();
 		displayName = TextUtils.decolorize(displayName);
 
-		// Check for a substituted material:
+		// Check for a specified material:
 		Material material = ItemUtils.parseMaterial(displayName);
 		if (material != null) {
 			// Validate the material:
@@ -63,6 +66,14 @@ public class PlaceholderItems {
 
 			// We preserve the stack size of the placeholder item stack:
 			return new ItemStack(material, placeholderItem.getAmount());
+		}
+
+		// Check for a specified enchantment:
+		EnchantmentEntry enchantmentEntry = EnchantmentUtils.parseEnchantmentWithLevel(displayName);
+		if (enchantmentEntry != null) {
+			Enchantment enchantment = enchantmentEntry.getEnchantment();
+			int level = enchantmentEntry.getLevel();
+			return EnchantmentUtils.createEnchantedBook(enchantment, level);
 		}
 
 		return null;

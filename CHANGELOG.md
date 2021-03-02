@@ -147,6 +147,13 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * Placeholder items are supported by the selling, buying, and trading player shopkeeper. The admin shopkeeper treats them like normal items.
   * Placeholder items can not only be used for items that are bought, but also for items that are sold. This allows players to setup trades before they have the items required to fulfill these trades.
   * Since these placeholder items are replaced immediately inside the editor, it is not possible to setup player shopkeeper trades that buy or sell the placeholder items themselves. Normal nametags, and nametags whose names do not match a valid item type, are treated like normal items and can be bought or sold as usual.
+  * It is also possible to specify basic enchanted books via placeholder items:
+    * The used format is `<enchantment> <level>`.
+    * The parsing is similar to that of item type names. The normalized display name has to match the namespaced id of the intended enchantment.
+    * Aliases have been defined for some of the enchantments, so that for example `curse of binding` is correctly mapped to the enchantment with id `binding_curse`.
+    * Only a single enchantment can be specified.
+    * The level can be specified freely, even outside the range of enchantment levels that can usually be obtained in vanilla Minecraft. Levels outside the range of shorts are truncated to the nearest valid short number. If no level is specified, or if the level cannot be parsed, the enchantment's minimum level is used (usually `1`).
+    * Up to level ten, the level can also be specified via roman numerals (`I` to `X`). It is also possible to specify the levels `min` and `max`, which results in the normal minimum or maximum level of the specified enchantment being used.
 
 API:  
 * Renamed TradingOffer to TradeOffer.
