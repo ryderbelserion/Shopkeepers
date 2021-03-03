@@ -26,8 +26,16 @@
 		* Add new editor buttons and messages.
 
 * New blocks or items:
-	* Check the ItemUtils if there are any material lists that need to be updated.
-		* Containers, supported containers, rails.
+	* Check the ItemUtils if there are any material lists or mappings that need to be updated.
+		* Containers, chests, shulker boxes, signs, rails.
+		* Wool material by dye color, carpet material by dye color.
+	* Also check if the supported containers in ShopContainers require changes.
+
+* New EquipmentSlots:
+	* ItemUtils#getItem(PlayerInventory, EquipmentSlot) may need to be adapted.
+
+* New enchantments:
+	* Check the aliases inside EnchantmentUtils.
 
 * If there are major differences, consider dropping support for older Minecraft versions.
 	* Remove corresponding Maven modules.

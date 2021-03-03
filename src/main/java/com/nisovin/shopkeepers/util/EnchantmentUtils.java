@@ -33,6 +33,7 @@ public class EnchantmentUtils {
 		LEVEL_NAMES.put("x", 10);
 	}
 
+	// TODO This may require updating on Minecraft updates.
 	private static final Map<String, Enchantment> ALIASES = new HashMap<>();
 	static {
 		ALIASES.put("curse_of_binding", Enchantment.BINDING_CURSE);
