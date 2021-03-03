@@ -14,15 +14,15 @@ public class NamespacedKeyUtils {
 	/**
 	 * Parses a {@link NamespacedKey} from the given input String.
 	 * <p>
-	 * The given input String is formatted in a way that matches valid {@link NamespacedKey NamespacedKeys}: Leading and
-	 * trailing whitespace is removed. All remaining whitespace is converted to underscores, since this is what
-	 * Minecraft's namespaced keys use. All characters are converted to lower case.
+	 * The given input String is formatted in a way that matches valid {@link NamespacedKey NamespacedKeys} (see
+	 * {@link #normalizeNamespacedKey(String)}).
 	 * <p>
 	 * If no namespace is specified, this uses {@link NamespacedKey#MINECRAFT} as namespace.
 	 * <p>
-	 * If the used namespace (either specified or due to default) is {@link NamespacedKey#MINECRAFT}, dashes in the key
-	 * are converted to underscores as well, because this is what Minecraft uses for its keys. For any other namespace,
-	 * they are kept as is, because they may be valid keys.
+	 * If the namespace is {@link NamespacedKey#MINECRAFT} (either specified or due to default), dashes in the key are
+	 * converted to underscores, because this is what Minecraft uses for its keys (see
+	 * {@link #normalizeMinecraftNamespacedKey(String)}) For any other namespace, they are kept as is, because they
+	 * might be valid keys.
 	 *
 	 * @param input
 	 *            the input String
@@ -32,9 +32,7 @@ public class NamespacedKeyUtils {
 		if (input == null || input.isEmpty()) return null;
 
 		// General formatting:
-		input = input.trim();
-		input = StringUtils.replaceWhitespace(input, "_");
-		input = input.toLowerCase(Locale.ROOT);
+		input = normalizeNamespacedKey(input);
 
 		// Split at separator:
 		String[] components = input.split(NAMESPACED_KEY_SEPARATOR, 3);
@@ -71,7 +69,7 @@ public class NamespacedKeyUtils {
 		// We know that Minecraft's namespaced keys use underscores, so we can convert dashes to underscores (allows for
 		// more lenient parsing):
 		if (namespace.equals(NamespacedKey.MINECRAFT)) {
-			key = key.replace("-", "_");
+			key = key.replace('-', '_');
 		}
 
 		// Create the NamespacedKey:
@@ -83,6 +81,45 @@ public class NamespacedKeyUtils {
 		} catch (IllegalArgumentException e) {
 			return null;
 		}
+		return namespacedKey;
+	}
+
+	/**
+	 * Formats the given input String in a way that matches valid {@link NamespacedKey NamespacedKeys}.
+	 * <p>
+	 * Leading and trailing whitespace is removed. All remaining whitespace is converted to underscores, since this is
+	 * what Minecraft's namespaced keys use. All characters are converted to lower case.
+	 * 
+	 * @param namespacedKey
+	 *            the input String
+	 * @return the formatted String, or <code>null</code> if the input String is <code>null</code>
+	 */
+	public static String normalizeNamespacedKey(String namespacedKey) {
+		if (namespacedKey == null) return null;
+		namespacedKey = namespacedKey.trim();
+		// Without further contextual knowledge, we don't know what kind of separator the namespaced key is supposed to
+		// use. We normalize whitespace to underscores because this is what Minecraft uses for its own keys:
+		namespacedKey = StringUtils.replaceWhitespace(namespacedKey, "_");
+		namespacedKey = namespacedKey.toLowerCase(Locale.ROOT);
+		return namespacedKey;
+	}
+
+	/**
+	 * Formats the given input String in a way that matches valid {@link NamespacedKey NamespacedKeys} as they are used
+	 * by Minecraft.
+	 * <p>
+	 * This formats the given String in the same way as {@link #normalizeNamespacedKey(String)}, but additionally
+	 * replaces all dashes ('{@code -}') with underscores ('{@code _}').
+	 * 
+	 * @param namespacedKey
+	 *            the input String
+	 * @return the formatted String, or <code>null</code> if the input String is <code>null</code>
+	 */
+	public static String normalizeMinecraftNamespacedKey(String namespacedKey) {
+		if (namespacedKey == null) return null;
+		namespacedKey = normalizeNamespacedKey(namespacedKey);
+		// Minecraft's namespaced keys use underscores:
+		namespacedKey = namespacedKey.replace('-', '_');
 		return namespacedKey;
 	}
 

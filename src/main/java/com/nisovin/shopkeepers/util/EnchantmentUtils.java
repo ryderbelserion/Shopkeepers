@@ -45,13 +45,15 @@ public class EnchantmentUtils {
 
 	public static Enchantment parseEnchantment(String input) {
 		if (input == null) return null;
+
 		// Parse namespaced key:
 		NamespacedKey namespacedKey = NamespacedKeyUtils.parse(input);
 		if (namespacedKey == null) return null;
 		if (!namespacedKey.getNamespace().equals(NamespacedKey.MINECRAFT)) return null;
 
 		// Check the predefined aliases:
-		Enchantment enchantment = ALIASES.get(namespacedKey.getKey());
+		String enchantmentName = namespacedKey.getKey();
+		Enchantment enchantment = ALIASES.get(enchantmentName);
 		if (enchantment != null) return enchantment;
 
 		// Lookup by key:
