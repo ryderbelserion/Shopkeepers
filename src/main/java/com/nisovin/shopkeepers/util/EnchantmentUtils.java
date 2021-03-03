@@ -34,6 +34,7 @@ public class EnchantmentUtils {
 	}
 
 	// TODO This may require updating on Minecraft updates.
+	// Formatted like the keys of namespaced keys:
 	private static final Map<String, Enchantment> ALIASES = new HashMap<>();
 	static {
 		ALIASES.put("curse_of_binding", Enchantment.BINDING_CURSE);
@@ -128,6 +129,7 @@ public class EnchantmentUtils {
 
 		// General formatting:
 		input = input.trim();
+		input = input.toLowerCase(Locale.ROOT);
 
 		Enchantment enchantment;
 		Integer level = null; // Null results in the enchantment's default (min) value to be used
@@ -139,7 +141,6 @@ public class EnchantmentUtils {
 			level = ConversionUtils.parseInt(levelString);
 			if (level == null) {
 				// Could not parse the level as integer. Check for predefined level names:
-				levelString = levelString.toLowerCase(Locale.ROOT);
 				level = LEVEL_NAMES.get(levelString); // Can be null
 			}
 			if (level != null) {
