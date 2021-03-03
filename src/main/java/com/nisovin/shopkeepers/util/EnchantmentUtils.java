@@ -162,10 +162,11 @@ public class EnchantmentUtils {
 			if (level == null && lastSpace != -1) {
 				input = input.substring(0, lastSpace);
 				enchantment = parseEnchantment(input);
-				if (enchantment == null) {
-					// Still not able to parse the enchantment:
-					return null;
-				}
+			}
+
+			if (enchantment == null) {
+				// We were not able to parse the enchantment:
+				return null;
 			}
 		}
 		assert enchantment != null;
