@@ -69,7 +69,7 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item: DIAMOND_SWORD" + ConfigUtils.yamlLineBreak(), yamlString);
+		Assert.assertEquals("item: DIAMOND_SWORD" + ConfigUtils.yamlNewLine(), yamlString);
 	}
 
 	@Test
@@ -105,9 +105,9 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + ConfigUtils.yamlLineBreak() +
-				"  type: DIAMOND_SWORD" + ConfigUtils.yamlLineBreak() +
-				"  display-name: '&cCustom Name'" + ConfigUtils.yamlLineBreak(), yamlString);
+		Assert.assertEquals("item:" + ConfigUtils.yamlNewLine() +
+				"  type: DIAMOND_SWORD" + ConfigUtils.yamlNewLine() +
+				"  display-name: '&cCustom Name'" + ConfigUtils.yamlNewLine(), yamlString);
 	}
 
 	@Test
@@ -167,46 +167,46 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + ConfigUtils.yamlLineBreak() +
-				"  type: DIAMOND_SWORD" + ConfigUtils.yamlLineBreak() +
-				"  display-name: '&cCustom Name'" + ConfigUtils.yamlLineBreak() +
-				"  loc-name: loc name" + ConfigUtils.yamlLineBreak() +
-				"  lore:" + ConfigUtils.yamlLineBreak() +
-				"  - '&alore1'" + ConfigUtils.yamlLineBreak() +
-				"  - lore2" + ConfigUtils.yamlLineBreak() +
-				"  custom-model-data: 1" + ConfigUtils.yamlLineBreak() +
-				"  enchants:" + ConfigUtils.yamlLineBreak() +
-				"    DURABILITY: 1" + ConfigUtils.yamlLineBreak() +
-				"    DAMAGE_ALL: 2" + ConfigUtils.yamlLineBreak() +
-				"  attribute-modifiers:" + ConfigUtils.yamlLineBreak() +
-				"    GENERIC_ATTACK_SPEED:" + ConfigUtils.yamlLineBreak() +
-				"    - ==: org.bukkit.attribute.AttributeModifier" + ConfigUtils.yamlLineBreak() +
-				"      amount: 2.0" + ConfigUtils.yamlLineBreak() +
-				"      name: attack speed bonus" + ConfigUtils.yamlLineBreak() +
-				"      slot: HAND" + ConfigUtils.yamlLineBreak() +
-				"      uuid: 00000000-0000-0001-0000-000000000001" + ConfigUtils.yamlLineBreak() +
-				"      operation: 0" + ConfigUtils.yamlLineBreak() +
-				"    - ==: org.bukkit.attribute.AttributeModifier" + ConfigUtils.yamlLineBreak() +
-				"      amount: 0.5" + ConfigUtils.yamlLineBreak() +
-				"      name: attack speed bonus 2" + ConfigUtils.yamlLineBreak() +
-				"      slot: OFF_HAND" + ConfigUtils.yamlLineBreak() +
-				"      uuid: 00000000-0000-0002-0000-000000000002" + ConfigUtils.yamlLineBreak() +
-				"      operation: 2" + ConfigUtils.yamlLineBreak() +
-				"    GENERIC_MAX_HEALTH:" + ConfigUtils.yamlLineBreak() +
-				"    - ==: org.bukkit.attribute.AttributeModifier" + ConfigUtils.yamlLineBreak() +
-				"      amount: 2.0" + ConfigUtils.yamlLineBreak() +
-				"      name: attack speed bonus" + ConfigUtils.yamlLineBreak() +
-				"      slot: HAND" + ConfigUtils.yamlLineBreak() +
-				"      uuid: 00000000-0000-0003-0000-000000000003" + ConfigUtils.yamlLineBreak() +
-				"      operation: 0" + ConfigUtils.yamlLineBreak() +
-				"  ItemFlags:" + ConfigUtils.yamlLineBreak() +
-				"  - HIDE_ENCHANTS" + ConfigUtils.yamlLineBreak() +
-				"  Unbreakable: true" + ConfigUtils.yamlLineBreak() +
-				"  Damage: 2" + ConfigUtils.yamlLineBreak() +
-				"  PublicBukkitValues:" + ConfigUtils.yamlLineBreak() +
-				"    some_plugin:some-other-key:" + ConfigUtils.yamlLineBreak() +
-				"      inner_plugin:inner-key: 0.3f" + ConfigUtils.yamlLineBreak() +
-				"    some_plugin:some-key: some value" + ConfigUtils.yamlLineBreak(), yamlString);
+		Assert.assertEquals("item:" + ConfigUtils.yamlNewLine() +
+				"  type: DIAMOND_SWORD" + ConfigUtils.yamlNewLine() +
+				"  display-name: '&cCustom Name'" + ConfigUtils.yamlNewLine() +
+				"  loc-name: loc name" + ConfigUtils.yamlNewLine() +
+				"  lore:" + ConfigUtils.yamlNewLine() +
+				"  - '&alore1'" + ConfigUtils.yamlNewLine() +
+				"  - lore2" + ConfigUtils.yamlNewLine() +
+				"  custom-model-data: 1" + ConfigUtils.yamlNewLine() +
+				"  enchants:" + ConfigUtils.yamlNewLine() +
+				"    DURABILITY: 1" + ConfigUtils.yamlNewLine() +
+				"    DAMAGE_ALL: 2" + ConfigUtils.yamlNewLine() +
+				"  attribute-modifiers:" + ConfigUtils.yamlNewLine() +
+				"    GENERIC_ATTACK_SPEED:" + ConfigUtils.yamlNewLine() +
+				"    - ==: org.bukkit.attribute.AttributeModifier" + ConfigUtils.yamlNewLine() +
+				"      amount: 2.0" + ConfigUtils.yamlNewLine() +
+				"      name: attack speed bonus" + ConfigUtils.yamlNewLine() +
+				"      slot: HAND" + ConfigUtils.yamlNewLine() +
+				"      uuid: 00000000-0000-0001-0000-000000000001" + ConfigUtils.yamlNewLine() +
+				"      operation: 0" + ConfigUtils.yamlNewLine() +
+				"    - ==: org.bukkit.attribute.AttributeModifier" + ConfigUtils.yamlNewLine() +
+				"      amount: 0.5" + ConfigUtils.yamlNewLine() +
+				"      name: attack speed bonus 2" + ConfigUtils.yamlNewLine() +
+				"      slot: OFF_HAND" + ConfigUtils.yamlNewLine() +
+				"      uuid: 00000000-0000-0002-0000-000000000002" + ConfigUtils.yamlNewLine() +
+				"      operation: 2" + ConfigUtils.yamlNewLine() +
+				"    GENERIC_MAX_HEALTH:" + ConfigUtils.yamlNewLine() +
+				"    - ==: org.bukkit.attribute.AttributeModifier" + ConfigUtils.yamlNewLine() +
+				"      amount: 2.0" + ConfigUtils.yamlNewLine() +
+				"      name: attack speed bonus" + ConfigUtils.yamlNewLine() +
+				"      slot: HAND" + ConfigUtils.yamlNewLine() +
+				"      uuid: 00000000-0000-0003-0000-000000000003" + ConfigUtils.yamlNewLine() +
+				"      operation: 0" + ConfigUtils.yamlNewLine() +
+				"  ItemFlags:" + ConfigUtils.yamlNewLine() +
+				"  - HIDE_ENCHANTS" + ConfigUtils.yamlNewLine() +
+				"  Unbreakable: true" + ConfigUtils.yamlNewLine() +
+				"  Damage: 2" + ConfigUtils.yamlNewLine() +
+				"  PublicBukkitValues:" + ConfigUtils.yamlNewLine() +
+				"    some_plugin:some-other-key:" + ConfigUtils.yamlNewLine() +
+				"      inner_plugin:inner-key: 0.3f" + ConfigUtils.yamlNewLine() +
+				"    some_plugin:some-key: some value" + ConfigUtils.yamlNewLine(), yamlString);
 	}
 
 	@Test
@@ -243,14 +243,14 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + ConfigUtils.yamlLineBreak() +
-				"  type: LEATHER_CHESTPLATE" + ConfigUtils.yamlLineBreak() +
-				"  display-name: '&cCustom Name'" + ConfigUtils.yamlLineBreak() +
-				"  color:" + ConfigUtils.yamlLineBreak() +
-				"    ==: Color" + ConfigUtils.yamlLineBreak() +
-				"    RED: 0" + ConfigUtils.yamlLineBreak() +
-				"    BLUE: 255" + ConfigUtils.yamlLineBreak() +
-				"    GREEN: 0" + ConfigUtils.yamlLineBreak(), yamlString);
+		Assert.assertEquals("item:" + ConfigUtils.yamlNewLine() +
+				"  type: LEATHER_CHESTPLATE" + ConfigUtils.yamlNewLine() +
+				"  display-name: '&cCustom Name'" + ConfigUtils.yamlNewLine() +
+				"  color:" + ConfigUtils.yamlNewLine() +
+				"    ==: Color" + ConfigUtils.yamlNewLine() +
+				"    RED: 0" + ConfigUtils.yamlNewLine() +
+				"    BLUE: 255" + ConfigUtils.yamlNewLine() +
+				"    GREEN: 0" + ConfigUtils.yamlNewLine(), yamlString);
 	}
 
 	@Test
@@ -283,7 +283,7 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item: CHEST" + ConfigUtils.yamlLineBreak(), yamlString);
+		Assert.assertEquals("item: CHEST" + ConfigUtils.yamlNewLine(), yamlString);
 	}
 
 	@Test
@@ -319,9 +319,9 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + ConfigUtils.yamlLineBreak() +
-				"  type: CHEST" + ConfigUtils.yamlLineBreak() +
-				"  display-name: '&cCustom Name'" + ConfigUtils.yamlLineBreak(), yamlString);
+		Assert.assertEquals("item:" + ConfigUtils.yamlNewLine() +
+				"  type: CHEST" + ConfigUtils.yamlNewLine() +
+				"  display-name: '&cCustom Name'" + ConfigUtils.yamlNewLine(), yamlString);
 	}
 
 	@Test

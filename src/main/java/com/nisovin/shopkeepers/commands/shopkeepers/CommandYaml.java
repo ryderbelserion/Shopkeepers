@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.io.PrintStream;
-
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -15,6 +13,7 @@ import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
 
 class CommandYaml extends PlayerCommand {
 
@@ -45,41 +44,35 @@ class CommandYaml extends PlayerCommand {
 		}
 
 		// Serialized ItemStack and ItemData:
-		String[] serializedItemStack = ConfigUtils.getYAMLOutput(itemInHand);
-		String[] serializedItemData = ConfigUtils.getYAMLOutput(new ItemData(itemInHand).serialize());
+		String itemStackYaml = ConfigUtils.toYaml("item-in-hand", itemInHand);
+		String itemDataYaml = ConfigUtils.toYaml("item-in-hand-config-data", new ItemData(itemInHand).serialize());
+
+		String[] itemStackYamlLines = ConfigUtils.splitYamlLines(itemStackYaml);
+		String[] itemDataYamlLines = ConfigUtils.splitYamlLines(itemDataYaml);
 
 		// Print to player:
 		player.sendMessage(ChatColor.YELLOW + "Serialized ItemStack:");
-		if (serializedItemStack.length > MAX_OUTPUT_LENGTH) {
+		if (itemStackYamlLines.length > MAX_OUTPUT_LENGTH) {
 			player.sendMessage(ChatColor.GRAY + "The output is too large for the chat.");
 		} else {
-			for (String line : serializedItemStack) {
+			for (String line : itemStackYamlLines) {
 				player.sendMessage(line);
 			}
 		}
 
 		player.sendMessage(ChatColor.YELLOW + "Config item data:");
-		if (serializedItemData.length > MAX_OUTPUT_LENGTH) {
+		if (itemDataYamlLines.length > MAX_OUTPUT_LENGTH) {
 			player.sendMessage(ChatColor.GRAY + "The output is too large for the chat.");
 		} else {
-			for (String line : serializedItemData) {
+			for (String line : itemDataYamlLines) {
 				player.sendMessage(line);
 			}
 		}
 
-		player.sendMessage(ChatColor.GRAY + "Note: The output gets also logged to the console for easier copying.");
+		player.sendMessage(ChatColor.GRAY + "Note: The output is also logged to the console for easier copying.");
 
-		// Print to console:
-		PrintStream stream = System.out;
-		synchronized (stream) { // Assumes the implementation synchronizes on itself.
-			stream.println("Serialized ItemStack:");
-			for (String line : serializedItemStack) {
-				stream.println(line);
-			}
-			stream.println("Config item data:");
-			for (String line : serializedItemData) {
-				stream.println(line);
-			}
-		}
+		// Print to console as multi-line messages:
+		Log.info("Serialized ItemStack:\n" + itemStackYaml);
+		Log.info("Config item data:\n" + itemDataYaml);
 	}
 }

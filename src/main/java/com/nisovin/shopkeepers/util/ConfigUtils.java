@@ -11,7 +11,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 public class ConfigUtils {
 
 	// Shared YAML config that gets reused:
-	private static final ThreadLocal<YamlConfiguration> YAML = ThreadLocal.withInitial(() -> new YamlConfiguration());
+	private static final ThreadLocal<YamlConfiguration> YAML_CONFIG = ThreadLocal.withInitial(() -> new YamlConfiguration());
 
 	public static Material loadMaterial(ConfigurationSection config, String key) {
 		String materialName = config.getString(key); // Note: Takes defaults into account.
@@ -36,10 +36,6 @@ public class ConfigUtils {
 		}
 	}
 
-	public static String yamlLineBreak() {
-		return "\n"; // YAML uses unix line breaks by default
-	}
-
 	public static void convertSectionsToMaps(Map<String, Object> sectionMap) {
 		for (Entry<String, Object> entry : sectionMap.entrySet()) {
 			Object value = entry.getValue();
@@ -52,25 +48,35 @@ public class ConfigUtils {
 		}
 	}
 
-	private static final String YAML_OUTPUT_KEY = "yaml-output";
-
-	public static String[] getYAMLOutput(ConfigurationSerializable serializable) {
-		return getYAMLOutput(serializable.serialize());
-	}
-
-	public static String[] getYAMLOutput(Object serializedObject) {
-		YamlConfiguration yaml = YAML.get(); // Shared yaml config
-		yaml.set(YAML_OUTPUT_KEY, serializedObject);
-		String configOutput = yaml.saveToString();
-		yaml.set(YAML_OUTPUT_KEY, null);
-		return configOutput.split(yamlLineBreak());
-	}
-
 	public static void clearConfigSection(ConfigurationSection configSection) {
 		if (configSection == null) return;
 		for (String key : configSection.getKeys(false)) {
 			configSection.set(key, null);
 		}
+	}
+
+	// Not null, may be empty.
+	public static String toYaml(String key, ConfigurationSerializable serializable) {
+		if (serializable == null) return "";
+		return toYaml(key, serializable.serialize());
+	}
+
+	// Not null, may be empty.
+	public static String toYaml(String key, Object serializedObject) {
+		YamlConfiguration yamlConfig = YAML_CONFIG.get(); // Shared YAML config
+		yamlConfig.set(key, serializedObject);
+		String yaml = yamlConfig.saveToString();
+		yamlConfig.set(key, null);
+		return yaml;
+	}
+
+	public static String yamlNewLine() {
+		return "\n"; // YAML uses Unix line breaks by default
+	}
+
+	public static String[] splitYamlLines(String yaml) {
+		Validate.notNull(yaml, "yaml is null");
+		return yaml.split(yamlNewLine());
 	}
 
 	private ConfigUtils() {
