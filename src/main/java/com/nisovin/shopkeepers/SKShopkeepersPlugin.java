@@ -6,8 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -245,14 +243,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			Messages.loadLanguageFile();
 		} else {
 			Log.debug("Language file already loaded.");
-		}
-
-		// Process additional permissions:
-		String[] perms = Settings.maxShopsPermOptions.replace(" ", "").split(",");
-		for (String perm : perms) {
-			if (Bukkit.getPluginManager().getPermission("shopkeeper.maxshops." + perm) == null) {
-				Bukkit.getPluginManager().addPermission(new Permission("shopkeeper.maxshops." + perm, PermissionDefault.FALSE));
-			}
 		}
 
 		// Check for and initialize version dependent utilities:
