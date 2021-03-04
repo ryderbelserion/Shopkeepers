@@ -13,6 +13,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -105,7 +106,8 @@ public abstract class UIHandler {
 	 */
 	protected final boolean isOpen(Player player) {
 		SKUISession session = SKShopkeepersPlugin.getInstance().getUIRegistry().getUISession(player);
-		return (session != null && session.getUIHandler() == this && this.isWindow(player.getOpenInventory()));
+		if (session == null || session.getUIHandler() != this) return false;
+		return (Settings.disableInventoryVerification || this.isWindow(player.getOpenInventory()));
 	}
 
 	/**
