@@ -84,16 +84,16 @@ public abstract class UIHandler {
 	protected abstract boolean openWindow(Player player);
 
 	/**
-	 * Checks whether or not the given inventory view is a custom inventory created by this handler.
+	 * Checks whether or not the given inventory view is managed by this UI handler.
 	 * <p>
-	 * The UI registry already keeps track of players' currently open UIs. This is an additional check that aims to
-	 * verify that the inventory the player is interacting with actually corresponds to the expected UI. The result of
-	 * this method gets checked before any inventory events are passed through to this handler.
+	 * The UI registry already keeps track of a player's currently open UI. This additional check verifies,
+	 * heuristically, in a best-effort manner, that the inventory view the player is interacting with actually
+	 * corresponds to the inventory view expected by this UI handler. The result of this method is checked before any
+	 * inventory events are passed through to this handler.
 	 * 
 	 * @param view
 	 *            an inventory view
-	 * @return <code>true</code> if the given inventory view is representing a custom interface window created and
-	 *         handled by this handler
+	 * @return <code>true</code> if the given inventory view has been opened and is handled by this UI handler
 	 */
 	protected abstract boolean isWindow(InventoryView view);
 
@@ -173,8 +173,8 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called early ({@link EventPriority#LOW} for InventoryClickEvent's for inventories for which
-	 * {@link #isWindow(InventoryView)} returned true.
+	 * Called early ({@link EventPriority#LOW}) for {@link InventoryClickEvent InventoryClickEvents} for inventory views
+	 * that are {@link #isOpen(Player) managed} by this UI handler.
 	 * <p>
 	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
 	 * event.
@@ -194,8 +194,8 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called late ({@link EventPriority#HIGH} for InventoryClickEvent's for inventories for which
-	 * {@link #isWindow(InventoryView)} returned true.
+	 * Called late ({@link EventPriority#HIGH}) for {@link InventoryClickEvent InventoryClickEvents} for inventory views
+	 * that are {@link #isOpen(Player) managed} by this UI handler.
 	 * 
 	 * @param event
 	 *            the inventory click event
@@ -212,8 +212,8 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called early ({@link EventPriority#LOW} for InventoryDragEvent's for inventories for which
-	 * {@link #isWindow(InventoryView)} returned true.
+	 * Called early ({@link EventPriority#LOW}) for {@link InventoryDragEvent InventoryDragEvents} for inventory views
+	 * that are {@link #isOpen(Player) managed} by this UI handler.
 	 * <p>
 	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
 	 * event.
@@ -233,8 +233,8 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Called late ({@link EventPriority#HIGH} for InventoryDragEvent's for inventories for which
-	 * {@link #isWindow(InventoryView)} returned true.
+	 * Called late ({@link EventPriority#HIGH}) for {@link InventoryDragEvent InventoryDragEvents} for inventory views
+	 * that are {@link #isOpen(Player) managed} by this UI handler.
 	 * 
 	 * @param event
 	 *            the inventory drag event
