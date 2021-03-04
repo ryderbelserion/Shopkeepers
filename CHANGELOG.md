@@ -156,6 +156,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
     * Up to level ten, the level can also be specified via roman numerals (`I` to `X`). It is also possible to specify the levels `min` and `max`, which results in the normal minimum or maximum level of the specified enchantment being used.
 * Debug: The Yaml output of the `/shopkeeper yaml` command is logged as a single multi-line message to the server log now. This should make it easier to copy and paste the output (depends on the logging configuration though). The keys used in the Yaml output are also more context-specific now.
 * Debug: When the result item of a trade does not match the expected result item, we additionally log the serialized Yaml representation of these items now.
+* Fixed: Editing and removing trades from a shopkeeper while another player is trading with it could result in an exception. The issue was that the insertion of empty dummy trades did not properly work.
 
 API:  
 * Renamed TradingOffer to TradeOffer.

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
@@ -215,10 +216,12 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		Log.debug(() -> "Updating trades for player " + player.getName());
 
 		// It is not safe to reduce the number of trading recipes for the player, so we need to add dummy recipes:
-		// TODO Check if this still applies in MC 1.14
+		// TODO Check if this still applies in MC 1.14+
+		// TODO Maybe instead close the trading inventory if there have been major changes (such as the removal or
+		// insertion of trading recipes)?
 		for (int i = recipes.size(); i < oldMerchantRecipes.size(); ++i) {
-			// TODO API doesn't expect null here (but works).. use something else?
-			MerchantRecipe merchantRecipe = new MerchantRecipe(null, 0, 0, false);
+			MerchantRecipe merchantRecipe = new MerchantRecipe(new ItemStack(Material.AIR), 0, 0, false);
+			merchantRecipe.addIngredient(new ItemStack(Material.AIR));
 			newMerchantRecipes.add(merchantRecipe);
 		}
 		// Set merchant's recipes:
