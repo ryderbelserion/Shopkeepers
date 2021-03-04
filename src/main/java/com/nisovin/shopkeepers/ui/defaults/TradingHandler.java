@@ -209,7 +209,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		List<? extends TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
 		List<MerchantRecipe> newMerchantRecipes = this.createMerchantRecipes(recipes);
-		if (MerchantUtils.MERCHANT_RECIPES_EQUAL_IGNORING_USES.equals(oldMerchantRecipes, newMerchantRecipes)) {
+		if (MerchantUtils.MERCHANT_RECIPES_IGNORE_USES_EXCEPT_BLOCKED.equals(oldMerchantRecipes, newMerchantRecipes)) {
 			Log.debug(() -> "Trades are still up-to-date for player " + player.getName());
 			return; // Recipes did not change
 		}

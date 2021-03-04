@@ -136,15 +136,15 @@ public class MerchantUtils {
 	};
 
 	// Does not compare the exact amounts of uses and max-uses, but the 'is blocked' state has to match.
-	public static final MerchantRecipeComparator MERCHANT_RECIPES_EQUAL_IGNORING_USES = new MerchantRecipeComparator() {
+	public static final MerchantRecipeComparator MERCHANT_RECIPES_IGNORE_USES_EXCEPT_BLOCKED = new MerchantRecipeComparator() {
 		@Override
 		public boolean equals(MerchantRecipe recipe1, MerchantRecipe recipe2) {
 			if (recipe1 == recipe2) return true;
 			if (recipe1 == null || recipe2 == null) return false;
 
-			boolean outOfStock1 = (recipe1.getUses() >= recipe1.getMaxUses());
-			boolean outOfStock2 = (recipe2.getUses() >= recipe2.getMaxUses());
-			if (outOfStock1 != outOfStock2) return false;
+			boolean isBlocked1 = (recipe1.getUses() >= recipe1.getMaxUses());
+			boolean isBlocked2 = (recipe2.getUses() >= recipe2.getMaxUses());
+			if (isBlocked1 != isBlocked2) return false;
 			if (recipe1.hasExperienceReward() != recipe2.hasExperienceReward()) return false;
 			if (recipe1.getPriceMultiplier() != recipe2.getPriceMultiplier()) return false;
 			if (recipe1.getVillagerExperience() != recipe2.getVillagerExperience()) return false;
