@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Statistic;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
@@ -215,20 +214,61 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		}
 		Log.debug(() -> "Updating trades for player " + player.getName());
 
-		// It is not safe to reduce the number of trading recipes for the player, so we need to add dummy recipes:
-		// TODO Check if this still applies in MC 1.14+
-		// TODO Maybe instead close the trading inventory if there have been major changes (such as the removal or
-		// insertion of trading recipes)?
-		for (int i = recipes.size(); i < oldMerchantRecipes.size(); ++i) {
-			MerchantRecipe merchantRecipe = new MerchantRecipe(new ItemStack(Material.AIR), 0, 0, false);
-			merchantRecipe.addIngredient(new ItemStack(Material.AIR));
-			newMerchantRecipes.add(merchantRecipe);
-		}
+		// It is not safe to reduce the number of trading recipes for the player, so we may need to add dummy recipes:
+		this.ensureNoFewerRecipes(oldMerchantRecipes, newMerchantRecipes);
+
 		// Set merchant's recipes:
 		merchant.setRecipes(newMerchantRecipes);
 
 		// Update recipes for the client:
 		NMSManager.getProvider().updateTrades(player);
+	}
+
+	// Dynamically modifying trades (eg. their blocked state, or properties such as their items), or adding trades, is
+	// fine. But reducing the number of trades is not safe, because the index of the currently selected recipe can end
+	// up being out of bounds on the client. There is no way for us to remotely update it into valid bounds.
+	// TODO Check if this still applies in MC 1.14+
+	// We therefore insert blocked dummy trades to retain the previous recipe count. We could insert empty dummy trades
+	// at the end of the recipe list, but that might confuse players since empty trades are rather unusual. Instead we
+	// try to (heuristically) determine the recipes that were removed, and then insert blocked variants of these
+	// recipes.
+	private void ensureNoFewerRecipes(List<MerchantRecipe> oldMerchantRecipes, List<MerchantRecipe> newMerchantRecipes) {
+		int oldRecipeCount = oldMerchantRecipes.size();
+		int newRecipeCount = newMerchantRecipes.size();
+		if (newRecipeCount >= oldRecipeCount) {
+			// The new recipe list already contains no fewer recipes than the previous recipe list:
+			return;
+		}
+
+		// Try to identify the removed recipes in order to insert blocked dummy recipes that likely make sense:
+		// In order to keep the computational effort low, this heuristic simply walks through both recipe lists at the
+		// same time and matches recipes based on their index and their items: If the items of the recipes at the same
+		// index are the same, it is assumed that these recipes correspond to each other.
+		// If the items of a recipe changed, or recipes were inserted at positions other than at the end of the list,
+		// this heuristic may insert sub-optimal dummy recipes. However, it still ensures that the recipe list does not
+		// shrink in size.
+		for (int i = 0; i < oldRecipeCount; ++i) {
+			MerchantRecipe oldRecipe = oldMerchantRecipes.get(i);
+			MerchantRecipe newRecipe;
+			if (i < newRecipeCount) {
+				newRecipe = newMerchantRecipes.get(i);
+			} else {
+				newRecipe = null;
+			}
+			if (!MerchantUtils.MERCHANT_RECIPES_EQUAL_ITEMS.equals(oldRecipe, newRecipe)) {
+				// The recipes at this index differ: Insert the old recipe into the new recipe list, but set its max
+				// uses to 0 so that it cannot be used.
+				oldRecipe.setMaxUses(0); // Block the trade
+				newMerchantRecipes.add(i, oldRecipe);
+				newRecipeCount++;
+				if (newRecipeCount == oldRecipeCount) {
+					// Abort the insertion of dummy recipes if we reached our goal of ensuring that the new recipe list
+					// contains no fewer recipes than the old recipe list:
+					break;
+				}
+			}
+		}
+		assert newRecipeCount == oldRecipeCount;
 	}
 
 	@Override
