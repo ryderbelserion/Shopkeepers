@@ -16,6 +16,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
@@ -1159,6 +1160,20 @@ public final class ItemUtils {
 
 	public static void updateInventoryLater(Player player) {
 		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> player.updateInventory());
+	}
+
+	// Only closes the player's open inventory view if it is still the specified view after the delay:
+	public static void closeInventoryDelayed(InventoryView inventoryView) {
+		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+			InventoryView openInventoryView = inventoryView.getPlayer().getOpenInventory();
+			if (inventoryView == openInventoryView) {
+				inventoryView.close(); // Same as player.closeInventory()
+			}
+		});
+	}
+
+	public static void closeInventoryDelayed(Player player) {
+		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> player.closeInventory());
 	}
 
 	// This can for example be used during the handling of inventory interaction events.
