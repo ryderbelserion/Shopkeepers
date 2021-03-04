@@ -12,6 +12,7 @@ import org.bukkit.plugin.PluginManager;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.PermissionUtils;
+import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -61,7 +62,7 @@ public class MaxShopsPermission implements Comparable<MaxShopsPermission> {
 	 */
 	public static List<MaxShopsPermission> parseList(String maxShopsPermissionOptionsList, Consumer<String> invalidPermissionOptionCallback) {
 		assert maxShopsPermissionOptionsList != null && invalidPermissionOptionCallback != null;
-		String[] permissionOptions = maxShopsPermissionOptionsList.replace(" ", "").split(",");
+		String[] permissionOptions = StringUtils.removeWhitespace(maxShopsPermissionOptionsList).split(",");
 		List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>(permissionOptions.length);
 		for (String permissionOption : permissionOptions) {
 			MaxShopsPermission maxShopsPermission;
