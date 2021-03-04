@@ -37,6 +37,10 @@
 * New enchantments:
 	* Check the aliases inside EnchantmentUtils.
 
+* New MerchantRecipe properties:
+	* Update the comparator in MerchantUtils.
+	* Check the MerchentRecipe constructions in MerchantUtils.
+
 * If there are major differences, consider dropping support for older Minecraft versions.
 	* Remove corresponding Maven modules.
 	* Update Bukkit/Spigot/CraftBukkit dependencies inside the parent pom.
