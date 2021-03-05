@@ -8,6 +8,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import com.nisovin.shopkeepers.util.EnchantmentUtils;
 import com.nisovin.shopkeepers.util.EnchantmentUtils.EnchantmentEntry;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.PotionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
@@ -74,6 +75,12 @@ public class PlaceholderItems {
 			Enchantment enchantment = enchantmentEntry.getEnchantment();
 			int level = enchantmentEntry.getLevel();
 			return EnchantmentUtils.createEnchantedBook(enchantment, level);
+		}
+
+		// Check for a specified potion item:
+		ItemStack potionItem = PotionUtils.parsePotionItem(displayName);
+		if (potionItem != null) {
+			return potionItem;
 		}
 
 		return null;

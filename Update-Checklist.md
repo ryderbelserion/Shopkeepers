@@ -37,6 +37,9 @@
 * New enchantments:
 	* Check the aliases inside EnchantmentUtils.
 
+* New potion types or items with potion data:
+	* Check the aliases and the parsing inside PotionUtils.
+
 * New MerchantRecipe properties:
 	* Update the comparator in MerchantUtils.
 	* Check the MerchentRecipe constructions in MerchantUtils.

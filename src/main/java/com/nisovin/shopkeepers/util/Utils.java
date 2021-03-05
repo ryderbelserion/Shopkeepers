@@ -6,8 +6,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Objects;
+import java.util.RandomAccess;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -37,6 +39,41 @@ import org.bukkit.util.Vector;
 public final class Utils {
 
 	private Utils() {
+	}
+
+	/**
+	 * Replaces the first occurrence of the given element inside the given list.
+	 * 
+	 * @param <E>
+	 *            the element type
+	 * @param list
+	 *            the list, not <code>null</code>
+	 * @param element
+	 *            the element to replace
+	 * @param replacement
+	 *            the replacement
+	 * @return <code>true</code> if the element has been found inside the list
+	 */
+	public static <E> boolean replace(List<E> list, E element, E replacement) {
+		if (list instanceof RandomAccess) { // Also checks for null
+			int index = list.indexOf(element);
+			if (index != -1) {
+				list.set(index, replacement);
+				return true;
+			}
+			return false;
+		} else {
+			Validate.notNull(list, "list is null");
+			ListIterator<E> iterator = list.listIterator();
+			while (iterator.hasNext()) {
+				E next = iterator.next();
+				if (Objects.equals(element, next)) {
+					iterator.set(replacement);
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
 	/**
