@@ -283,6 +283,7 @@ public abstract class Config {
 
 	// Returns null if there is no setting for this config key:
 	protected final Setting<?> getSetting(String configKey) {
+		this.setupSettings();
 		return settings.get(configKey);
 	}
 
