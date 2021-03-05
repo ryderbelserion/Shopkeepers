@@ -20,7 +20,9 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
+import com.nisovin.shopkeepers.util.BlockLocation;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.MutableBlockLocation;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -59,11 +61,13 @@ import com.nisovin.shopkeepers.util.Validate;
  */
 public class ProtectedContainers {
 
+	// Does not need to be reset after every use.
+	private static final MutableBlockLocation sharedBlockLocation = new MutableBlockLocation();
+
 	private final SKShopkeepersPlugin plugin;
 	private final ContainerProtectionListener containerProtectionListener = new ContainerProtectionListener(this);
 	private final InventoryMoveItemListener inventoryMoveItemListener = new InventoryMoveItemListener(this);
-	// Player shopkeepers by location key:
-	private final Map<String, List<PlayerShopkeeper>> protectedContainers = new HashMap<>();
+	private final Map<BlockLocation, List<PlayerShopkeeper>> protectedContainers = new HashMap<>();
 
 	public ProtectedContainers(SKShopkeepersPlugin plugin) {
 		this.plugin = plugin;
@@ -85,35 +89,41 @@ public class ProtectedContainers {
 		protectedContainers.clear();
 	}
 
-	private String getKey(String worldName, int x, int y, int z) {
-		return worldName + ";" + x + ";" + y + ";" + z;
+	private BlockLocation createKey(String worldName, int x, int y, int z) {
+		return new BlockLocation(worldName, x, y, z);
+	}
+
+	private BlockLocation getSharedKey(String worldName, int x, int y, int z) {
+		sharedBlockLocation.set(worldName, x, y, z);
+		return sharedBlockLocation;
 	}
 
 	public void addContainer(String worldName, int x, int y, int z, PlayerShopkeeper shopkeeper) {
 		Validate.notNull(shopkeeper, "shopkeeper is null");
-		String key = this.getKey(worldName, x, y, z);
-		List<PlayerShopkeeper> shopkeepers = protectedContainers.get(key);
-		if (shopkeepers == null) {
-			shopkeepers = new ArrayList<>(1);
-			protectedContainers.put(key, shopkeepers);
-		}
+		BlockLocation key = this.createKey(worldName, x, y, z);
+		List<PlayerShopkeeper> shopkeepers = protectedContainers.computeIfAbsent(key, k -> new ArrayList<>(1));
 		shopkeepers.add(shopkeeper);
 	}
 
 	public void removeContainer(String worldName, int x, int y, int z, PlayerShopkeeper shopkeeper) {
 		Validate.notNull(shopkeeper, "shopkeeper is null");
-		String key = this.getKey(worldName, x, y, z);
-		List<PlayerShopkeeper> shopkeepers = protectedContainers.get(key);
-		if (shopkeepers == null) return;
-		shopkeepers.remove(shopkeeper);
-		if (shopkeepers.isEmpty()) {
-			protectedContainers.remove(key);
-		}
+		BlockLocation key = this.getSharedKey(worldName, x, y, z);
+		// Note: We either update the value, or remove it. We don't insert a new value. The Map implementation removes
+		// the corresponding node or updates its value. It does not store the provided key in either of these cases. We
+		// can therefore safely use the shared key here.
+		protectedContainers.computeIfPresent(key, (k, shopkeepers) -> {
+			shopkeepers.remove(shopkeeper);
+			if (shopkeepers.isEmpty()) {
+				return null; // Removes the mapping
+			} else {
+				return shopkeepers; // Keeps the mapping
+			}
+		});
 	}
 
 	// Gets the shopkeepers which are directly using the container at the specified location:
 	private List<PlayerShopkeeper> _getShopkeepers(String worldName, int x, int y, int z) {
-		String key = this.getKey(worldName, x, y, z);
+		BlockLocation key = this.getSharedKey(worldName, x, y, z);
 		return protectedContainers.get(key);
 	}
 

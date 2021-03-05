@@ -249,6 +249,7 @@ Internal:
 * The dynamically registered max shops permissions have a description now.
 * We also register the dynamic mob type specific shop object type permissions now.
 * Since the `shopkeeper.entity.*` permission is given to all players by default, we check it first now, prior to checking the mob type specific permission.
+* Slightly optimized the lookup of protected containers.
 * Minor other internal code refactoring.
 
 Migration notes:  
