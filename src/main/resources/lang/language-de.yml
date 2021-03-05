@@ -21,6 +21,7 @@ selected-shop-object-type: "&aAusgewählter Objekt-Typ: &6{type}"
 
 creation-item-selected: |-
   &aShop-Erstellung:
+  &e  Visiere keinen Block an. Dann:
   &e  Links-/Rechtsklick, um den Shop-Typ auszuwählen.
   &e  Shift + Links-/Rechtsklick, um den Objekt-Typ auszuwählen.
   &e  Rechtsklick auf einen Behälter, um diesen auszuwählen.

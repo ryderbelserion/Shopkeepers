@@ -27,6 +27,7 @@ selected-shop-object-type: "&aSelected object type: &6{type}"
 
 creation-item-selected: |-
   &aShop creation:
+  &e  Do not aim at any block. Then:
   &e  Left/Right-click to select the shop type.
   &e  Sneak + left/right-click to select the object type.
   &e  Right-click a container to select it.

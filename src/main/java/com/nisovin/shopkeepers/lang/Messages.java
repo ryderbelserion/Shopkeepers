@@ -46,6 +46,7 @@ public class Messages extends Config {
 	public static Text selectedShopObjectType = Text.parse("&aSelected object type: &6{type}");
 
 	public static Text creationItemSelected = Text.parse("&aShop creation:\n"
+			+ "&e  Do not aim at any block. Then:\n"
 			+ "&e  Left/Right-click to select the shop type.\n"
 			+ "&e  Sneak + left/right-click to select the object type.\n"
 			+ "&e  Right-click a container to select it.\n"

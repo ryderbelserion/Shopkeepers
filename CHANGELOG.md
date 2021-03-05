@@ -291,6 +291,7 @@ Messages:
 * Added 'button-shulker-color-lore'.
 * Added 'button-invulnerability'.
 * Added 'button-invulnerability-lore'.
+* Changed 'creation-item-selected' to clarify that one has to not aim at any block in order to select the shop or object type.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.
