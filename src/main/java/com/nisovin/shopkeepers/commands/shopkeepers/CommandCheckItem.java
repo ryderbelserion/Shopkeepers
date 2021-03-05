@@ -11,6 +11,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
+import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -46,6 +47,7 @@ class CommandCheckItem extends PlayerCommand {
 		player.sendMessage("- Is shop creation item: " + checkItems(mainHandItem, offHandItem, Settings::isShopCreationItem));
 		player.sendMessage("- Similar to off-hand item: " + toDisplayString(ItemUtils.isSimilar(mainHandItem, offHandItem)));
 		player.sendMessage("- Matching off-hand item: " + toDisplayString(ItemUtils.matchesData(mainHandItem, offHandItem)));
+		player.sendMessage("- MC matching off-hand item: " + toDisplayString(NMSManager.getProvider().matches(mainHandItem, offHandItem)));
 	}
 
 	private static String checkItems(ItemStack mainHand, ItemStack offHand, Predicate<ItemStack> check) {

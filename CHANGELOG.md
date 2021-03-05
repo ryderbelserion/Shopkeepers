@@ -169,6 +169,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Debug: When the result item of a trade does not match the expected result item, we additionally log the serialized Yaml representation of these items now.
 * Fixed: Editing and removing trades from a shopkeeper while another player is trading with it could result in an exception. The issue was that the insertion of empty dummy trades did not properly work.
 * Improved: When trades are removed while a player trades with a shopkeeper, we would previously insert empty dummy trades at the end of the trades list. This ensures that the number of trades never decreases while a player is trading, even if the shopkeeper's trades dynamically change in the meantime. This is required because the Minecraft client does not properly deal with the list of trades dynamically shrinking in size. However, these empty dummy trade are rather unusual and may therefore be confusing to players. Therefore, we now try to (heuristically) guess the trades that were removed and then insert blocked dummy trades that correspond to those.
+* Debug: Added a check to the `/shopkeeper checkitem` debug command whether the held item matches the off-hand item according to Minecraft's matching rules. Unlike our matching rules, this is more strict about differences in the internal data types.
 
 API:  
 * Renamed TradingOffer to TradeOffer.
