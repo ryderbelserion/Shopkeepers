@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopkeeper.player;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -9,7 +10,6 @@ import com.nisovin.shopkeepers.util.EnchantmentUtils;
 import com.nisovin.shopkeepers.util.EnchantmentUtils.EnchantmentEntry;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.PotionUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
 
 /**
  * Helper methods related to placeholder items.
@@ -55,7 +55,7 @@ public class PlaceholderItems {
 
 		// Basic formatting:
 		displayName = displayName.trim();
-		displayName = TextUtils.decolorize(displayName);
+		displayName = ChatColor.stripColor(displayName);
 
 		// Check for a specified material:
 		Material material = ItemUtils.parseMaterial(displayName);
