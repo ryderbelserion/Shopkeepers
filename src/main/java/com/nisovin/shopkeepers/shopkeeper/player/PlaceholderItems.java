@@ -23,6 +23,19 @@ import com.nisovin.shopkeepers.util.PotionUtils;
 public class PlaceholderItems {
 
 	/**
+	 * Creates a placeholder item.
+	 * 
+	 * @param displayName
+	 *            the placeholder item's display name
+	 * @return the placeholder item
+	 */
+	public static ItemStack createPlaceholderItem(String displayName) {
+		ItemStack item = new ItemStack(Material.NAME_TAG, 1);
+		ItemUtils.setDisplayName(item, displayName);
+		return item;
+	}
+
+	/**
 	 * Checks if the given {@link ItemStack} is of the type used by placeholder items (i.e. {@link Material#NAME_TAG}).
 	 * 
 	 * @param itemStack
