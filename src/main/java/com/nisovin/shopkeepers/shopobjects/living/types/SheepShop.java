@@ -86,7 +86,7 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 	private ItemStack getColorEditorItem() {
 		ItemStack iconItem = new ItemStack(ItemUtils.getWoolType(this.getColor()));
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonSheepColor, Messages.buttonSheepColorLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSheepColor, Messages.buttonSheepColorLore);
 		return iconItem;
 	}
 
@@ -129,7 +129,7 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 	private ItemStack getShearedEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.SHEARS);
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonSheepSheared, Messages.buttonSheepShearedLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSheepSheared, Messages.buttonSheepShearedLore);
 		return iconItem;
 	}
 

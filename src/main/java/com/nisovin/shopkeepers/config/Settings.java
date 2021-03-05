@@ -301,18 +301,18 @@ public class Settings extends Config {
 			}
 
 			// Ignore display name (which is used for specifying the new shopkeeper name):
-			namingItemData = new ItemData(ItemUtils.setItemStackName(nameItem.createItemStack(), null));
+			namingItemData = new ItemData(ItemUtils.setDisplayName(nameItem.createItemStack(), null));
 
 			// Button items:
-			nameButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(nameItem.createItemStack(), Messages.buttonName, Messages.buttonNameLore));
-			containerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), Messages.buttonContainer, Messages.buttonContainerLore));
-			deleteButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), Messages.buttonDelete, Messages.buttonDeleteLore));
-			hireButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(hireItem.createItemStack(), Messages.buttonHire, Messages.buttonHireLore));
+			nameButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(nameItem.createItemStack(), Messages.buttonName, Messages.buttonNameLore));
+			containerButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(containerItem.createItemStack(), Messages.buttonContainer, Messages.buttonContainerLore));
+			deleteButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(deleteItem.createItemStack(), Messages.buttonDelete, Messages.buttonDeleteLore));
+			hireButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(hireItem.createItemStack(), Messages.buttonHire, Messages.buttonHireLore));
 
 			// Note: These use the same item types as the corresponding shopkeeper buttons.
-			deleteVillagerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(deleteItem.createItemStack(), Messages.buttonDeleteVillager, Messages.buttonDeleteVillagerLore));
-			nameVillagerButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(nameItem.createItemStack(), Messages.buttonNameVillager, Messages.buttonNameVillagerLore));
-			villagerInventoryButtonItem = new ItemData(ItemUtils.setItemStackNameAndLore(containerItem.createItemStack(), Messages.buttonVillagerInventory, Messages.buttonVillagerInventoryLore));
+			deleteVillagerButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(deleteItem.createItemStack(), Messages.buttonDeleteVillager, Messages.buttonDeleteVillagerLore));
+			nameVillagerButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(nameItem.createItemStack(), Messages.buttonNameVillager, Messages.buttonNameVillagerLore));
+			villagerInventoryButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(containerItem.createItemStack(), Messages.buttonVillagerInventory, Messages.buttonVillagerInventoryLore));
 
 			// Shop name pattern:
 			try {

@@ -82,7 +82,7 @@ public class PandaShop extends BabyableShop<Panda> {
 
 	private ItemStack getGeneEditorItem() {
 		ItemStack iconItem = new ItemStack(Material.PANDA_SPAWN_EGG);
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonPandaVariant, Messages.buttonPandaVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonPandaVariant, Messages.buttonPandaVariantLore);
 		return iconItem;
 	}
 

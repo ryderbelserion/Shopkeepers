@@ -239,7 +239,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			@Override
 			public ItemStack getIcon(Session session) {
 				ItemStack iconItem = new ItemStack(Material.EGG);
-				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonBaby, Messages.buttonBabyLore);
+				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonBaby, Messages.buttonBabyLore);
 				return iconItem;
 			}
 
@@ -319,7 +319,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					break;
 				}
 				assert iconItem != null;
-				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerProfession, Messages.buttonVillagerProfessionLore);
+				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerProfession, Messages.buttonVillagerProfessionLore);
 				return iconItem;
 			}
 
@@ -378,7 +378,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
 					break;
 				}
-				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerVariant, Messages.buttonVillagerVariantLore);
+				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerVariant, Messages.buttonVillagerVariantLore);
 				return iconItem;
 			}
 
@@ -422,7 +422,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				}
 				assert iconItem != null;
 				// TODO Change the default message back to mention the villager level, instead of just the badge color?
-				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerLevel, Messages.buttonVillagerLevelLore);
+				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerLevel, Messages.buttonVillagerLevelLore);
 				return iconItem;
 			}
 
@@ -455,7 +455,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					iconItem = new ItemStack(Material.CARVED_PUMPKIN);
 				}
 				assert iconItem != null;
-				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonMobAi, Messages.buttonMobAiLore);
+				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonMobAi, Messages.buttonMobAiLore);
 				return iconItem;
 			}
 
@@ -485,7 +485,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 					iconItem = new ItemStack(Material.GLASS_BOTTLE);
 				}
 				assert iconItem != null;
-				ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonInvulnerability, Messages.buttonInvulnerabilityLore);
+				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonInvulnerability, Messages.buttonInvulnerabilityLore);
 				return iconItem;
 			}
 
@@ -505,7 +505,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		String villagerName = villager.getName(); // Not null
 		String itemName = StringUtils.replaceArguments(Messages.villagerEditorDescriptionHeader, "villagerName", villagerName);
 		List<String> itemLore = Messages.villagerEditorDescription;
-		return ItemUtils.setItemStackNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, itemLore);
+		return ItemUtils.setDisplayNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, itemLore);
 	}
 
 	@Override

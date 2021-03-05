@@ -95,7 +95,7 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 		ItemStack iconItem = new ItemStack(Material.SLIME_BLOCK);
 		String displayName = StringUtils.replaceArguments(Messages.buttonSlimeSize, "size", size);
 		List<String> lore = StringUtils.replaceArguments(Messages.buttonSlimeSizeLore, "size", size);
-		ItemUtils.setItemStackNameAndLore(iconItem, displayName, lore);
+		ItemUtils.setDisplayNameAndLore(iconItem, displayName, lore);
 		return iconItem;
 	}
 

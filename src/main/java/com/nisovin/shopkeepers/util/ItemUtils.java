@@ -242,11 +242,11 @@ public final class ItemUtils {
 		assert type != null && type.isItem();
 		// TODO Return null in case of type AIR?
 		ItemStack itemStack = new ItemStack(type, amount);
-		return ItemUtils.setItemStackNameAndLore(itemStack, displayName, lore);
+		return ItemUtils.setDisplayNameAndLore(itemStack, displayName, lore);
 	}
 
 	// The display name and lore are expected to use Minecraft's color codes.
-	public static ItemStack setItemStackNameAndLore(ItemStack item, String displayName, List<String> lore) {
+	public static ItemStack setDisplayNameAndLore(ItemStack item, String displayName, List<String> lore) {
 		if (item == null) return null;
 		ItemMeta meta = item.getItemMeta();
 		if (meta != null) {
@@ -263,7 +263,7 @@ public final class ItemUtils {
 
 	// Null to remove display name.
 	// The display name is expected to use Minecraft's color codes.
-	public static ItemStack setItemStackName(ItemStack itemStack, String displayName) {
+	public static ItemStack setDisplayName(ItemStack itemStack, String displayName) {
 		if (itemStack == null) return null;
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		if (itemMeta == null) return itemStack;

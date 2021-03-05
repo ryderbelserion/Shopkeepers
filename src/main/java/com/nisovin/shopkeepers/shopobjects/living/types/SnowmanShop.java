@@ -77,7 +77,7 @@ public class SnowmanShop extends SKLivingShopObject<Snowman> {
 
 	private ItemStack getPumpkinHeadEditorItem() {
 		ItemStack iconItem = new ItemStack(this.hasPumpkinHead() ? Material.CARVED_PUMPKIN : Material.PUMPKIN);
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonSnowmanPumpkinHead, Messages.buttonSnowmanPumpkinHeadLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSnowmanPumpkinHead, Messages.buttonSnowmanPumpkinHeadLore);
 		return iconItem;
 	}
 

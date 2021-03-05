@@ -95,7 +95,7 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 		ItemStack iconItem = new ItemStack(Material.SLIME_BLOCK);
 		String displayName = StringUtils.replaceArguments(Messages.buttonMagmaCubeSize, "size", size);
 		List<String> lore = StringUtils.replaceArguments(Messages.buttonMagmaCubeSizeLore, "size", size);
-		ItemUtils.setItemStackNameAndLore(iconItem, displayName, lore);
+		ItemUtils.setDisplayNameAndLore(iconItem, displayName, lore);
 		return iconItem;
 	}
 

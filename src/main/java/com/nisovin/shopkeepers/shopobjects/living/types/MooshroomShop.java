@@ -88,7 +88,7 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 			iconItem = new ItemStack(Material.BROWN_MUSHROOM);
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonMooshroomVariant, Messages.buttonMooshroomVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonMooshroomVariant, Messages.buttonMooshroomVariantLore);
 		return iconItem;
 	}
 

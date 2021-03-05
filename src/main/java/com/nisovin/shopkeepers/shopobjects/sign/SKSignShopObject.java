@@ -426,7 +426,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	private ItemStack getSignTypeEditorItem() {
 		ItemStack iconItem = new ItemStack(signType.getSignMaterial());
-		return ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonSignVariant, Messages.buttonSignVariantLore);
+		return ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSignVariant, Messages.buttonSignVariantLore);
 	}
 
 	private EditorHandler.Button getSignTypeEditorButton() {

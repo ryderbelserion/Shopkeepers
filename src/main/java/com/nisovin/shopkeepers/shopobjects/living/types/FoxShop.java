@@ -104,7 +104,7 @@ public class FoxShop extends SittableShop<Fox> {
 			ItemUtils.setLeatherColor(iconItem, Color.ORANGE);
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonFoxVariant, Messages.buttonFoxVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonFoxVariant, Messages.buttonFoxVariantLore);
 		return iconItem;
 	}
 
@@ -152,7 +152,7 @@ public class FoxShop extends SittableShop<Fox> {
 
 	private ItemStack getSleepingEditorItem() {
 		ItemStack iconItem = new ItemStack(this.isSleeping() ? Material.GREEN_BED : Material.RED_BED);
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonFoxSleeping, Messages.buttonFoxSleepingLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonFoxSleeping, Messages.buttonFoxSleepingLore);
 		return iconItem;
 	}
 
@@ -200,7 +200,7 @@ public class FoxShop extends SittableShop<Fox> {
 
 	private ItemStack getCrouchingEditorItem() {
 		ItemStack iconItem = new ItemStack(this.isCrouching() ? Material.GREEN_CARPET : Material.RED_CARPET);
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonFoxCrouching, Messages.buttonFoxCrouchingLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonFoxCrouching, Messages.buttonFoxCrouchingLore);
 		return iconItem;
 	}
 

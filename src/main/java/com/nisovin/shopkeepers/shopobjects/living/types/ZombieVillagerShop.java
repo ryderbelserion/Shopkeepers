@@ -131,7 +131,7 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 			break;
 		}
 		assert iconItem != null;
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonZombieVillagerProfession, Messages.buttonZombieVillagerProfessionLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonZombieVillagerProfession, Messages.buttonZombieVillagerProfessionLore);
 		return iconItem;
 	}
 

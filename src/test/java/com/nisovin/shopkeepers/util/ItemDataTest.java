@@ -339,7 +339,7 @@ public class ItemDataTest extends AbstractBukkitTest {
 		ItemData itemData = new ItemData(itemStack);
 		ItemStack differentItemType = itemStack.clone();
 		differentItemType.setType(Material.IRON_SWORD);
-		ItemStack differentItemData = ItemUtils.setItemStackName(itemStack.clone(), "different name");
+		ItemStack differentItemData = ItemUtils.setDisplayName(itemStack.clone(), "different name");
 
 		Assert.assertTrue("ItemData#matches(ItemStack)", itemData.matches(itemStack));
 		Assert.assertTrue("ItemData#matches(ItemData)", itemData.matches(new ItemData(itemStack)));

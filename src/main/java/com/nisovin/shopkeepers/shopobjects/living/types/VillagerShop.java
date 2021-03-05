@@ -178,7 +178,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 			break;
 		}
 		assert iconItem != null;
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerProfession, Messages.buttonVillagerProfessionLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerProfession, Messages.buttonVillagerProfessionLore);
 		return iconItem;
 	}
 
@@ -246,7 +246,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.BROWN));
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerVariant, Messages.buttonVillagerVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerVariant, Messages.buttonVillagerVariantLore);
 		return iconItem;
 	}
 
@@ -317,7 +317,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 			break;
 		}
 		assert iconItem != null;
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonVillagerLevel, Messages.buttonVillagerLevelLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonVillagerLevel, Messages.buttonVillagerLevelLore);
 		return iconItem;
 	}
 

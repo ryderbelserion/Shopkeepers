@@ -104,7 +104,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE.mixDyes(DyeColor.ORANGE));
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonLlamaVariant, Messages.buttonLlamaVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonLlamaVariant, Messages.buttonLlamaVariantLore);
 		return iconItem;
 	}
 
@@ -149,7 +149,7 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	private ItemStack getCarpetColorEditorItem() {
 		DyeColor carpetColor = this.getCarpetColor();
 		ItemStack iconItem = new ItemStack(carpetColor == null ? Material.BARRIER : ItemUtils.getCarpetType(carpetColor));
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonLlamaCarpetColor, Messages.buttonLlamaCarpetColorLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonLlamaCarpetColor, Messages.buttonLlamaCarpetColorLore);
 		return iconItem;
 	}
 

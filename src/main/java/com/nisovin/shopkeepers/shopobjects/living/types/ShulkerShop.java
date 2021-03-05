@@ -90,7 +90,7 @@ public class ShulkerShop extends SKLivingShopObject<Shulker> {
 		} else {
 			iconItem = new ItemStack(ItemUtils.getWoolType(color));
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonShulkerColor, Messages.buttonShulkerColorLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonShulkerColor, Messages.buttonShulkerColorLore);
 		return iconItem;
 	}
 

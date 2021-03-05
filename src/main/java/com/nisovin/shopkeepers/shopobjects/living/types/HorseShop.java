@@ -140,7 +140,7 @@ public class HorseShop extends BabyableShop<Horse> {
 			ItemUtils.setLeatherColor(iconItem, Color.WHITE);
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonHorseColor, Messages.buttonHorseColorLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonHorseColor, Messages.buttonHorseColorLore);
 		return iconItem;
 	}
 
@@ -188,7 +188,7 @@ public class HorseShop extends BabyableShop<Horse> {
 		meta.addPattern(new Pattern(DyeColor.BROWN, PatternType.TRIANGLES_BOTTOM));
 		meta.addPattern(new Pattern(DyeColor.BROWN, PatternType.TRIANGLES_TOP));
 		iconItem.setItemMeta(meta);
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonHorseStyle, Messages.buttonHorseStyleLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonHorseStyle, Messages.buttonHorseStyleLore);
 		return iconItem;
 	}
 
@@ -233,7 +233,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	private ItemStack getArmorEditorItem() {
 		HorseArmor armor = this.getArmor();
 		ItemStack iconItem = new ItemStack(armor == null ? Material.BARRIER : armor.getMaterial());
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonHorseArmor, Messages.buttonHorseArmorLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonHorseArmor, Messages.buttonHorseArmorLore);
 		return iconItem;
 	}
 

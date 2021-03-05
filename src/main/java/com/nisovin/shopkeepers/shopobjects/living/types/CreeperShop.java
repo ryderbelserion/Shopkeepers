@@ -82,7 +82,7 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 		} else {
 			iconItem = new ItemStack(Material.LIME_WOOL);
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonCreeperCharged, Messages.buttonCreeperChargedLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonCreeperCharged, Messages.buttonCreeperChargedLore);
 		return iconItem;
 	}
 

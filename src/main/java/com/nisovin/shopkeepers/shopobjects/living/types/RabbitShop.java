@@ -121,7 +121,7 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 			ItemUtils.setLeatherColor(iconItem, Color.PURPLE);
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonRabbitVariant, Messages.buttonRabbitVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonRabbitVariant, Messages.buttonRabbitVariantLore);
 		return iconItem;
 	}
 

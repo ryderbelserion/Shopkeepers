@@ -104,7 +104,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 		ShopType<?> shopType = this.getShopkeeper().getType();
 		String itemName = StringUtils.replaceArguments(Messages.tradeSetupDescHeader, "shopType", shopType.getDisplayName());
 		List<String> itemLore = shopType.getTradeSetupDescription();
-		return ItemUtils.setItemStackNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, itemLore);
+		return ItemUtils.setDisplayNameAndLore(Settings.tradeSetupItem.createItemStack(), itemName, itemLore);
 	}
 
 	@Override

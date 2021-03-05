@@ -97,7 +97,7 @@ public class ParrotShop extends SittableShop<Parrot> {
 			iconItem = new ItemStack(ItemUtils.getWoolType(DyeColor.RED));
 			break;
 		}
-		ItemUtils.setItemStackNameAndLore(iconItem, Messages.buttonParrotVariant, Messages.buttonParrotVariantLore);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonParrotVariant, Messages.buttonParrotVariantLore);
 		return iconItem;
 	}
 
