@@ -351,7 +351,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		if (objectType instanceof VirtualShopObjectType) {
 			if (storedWorldName != null || storedX != 0 || storedY != 0 || storedZ != 0) {
 				Log.warning("Ignoring stored world and coordinates ("
-						+ TextUtils.getLocationString(StringUtils.getNotNull(storedWorldName), storedX, storedY, storedZ)
+						+ TextUtils.getLocationString(StringUtils.getOrEmpty(storedWorldName), storedX, storedY, storedZ)
 						+ ") for virtual shopkeeper '" + id + "'!");
 				this.markDirty();
 			}
@@ -396,7 +396,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		configSection.set("uniqueId", uniqueId.toString());
 		configSection.set("name", TextUtils.decolorize(name));
 		// Null world name gets stored as empty string:
-		configSection.set("world", StringUtils.getNotNull(worldName));
+		configSection.set("world", StringUtils.getOrEmpty(worldName));
 		configSection.set("x", x);
 		configSection.set("y", y);
 		configSection.set("z", z);

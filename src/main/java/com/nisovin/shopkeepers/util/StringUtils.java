@@ -41,7 +41,7 @@ public class StringUtils {
 	 *            the string
 	 * @return the string itself, or an empty string if it is <code>null</code>
 	 */
-	public static String getNotNull(String string) {
+	public static String getOrEmpty(String string) {
 		return (string == null) ? "" : string;
 	}
 
@@ -186,7 +186,7 @@ public class StringUtils {
 		return builder.toString();
 	}
 
-	// Matches windows and unix line endings, and literal newlines:
+	// Matches Windows and Unix line endings, and literal newlines:
 	private static final Pattern NEWLINE_PATTERN = Pattern.compile("(\\r?\\n)|\\\\n");
 
 	// Includes empty and trailing empty lines:
