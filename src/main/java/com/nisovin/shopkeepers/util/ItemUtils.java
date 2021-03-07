@@ -374,9 +374,14 @@ public final class ItemUtils {
 
 	public static int getDurability(ItemStack itemStack) {
 		assert itemStack != null;
+		// Checking if the item is damageable is cheap in comparison to retrieving the ItemMeta:
+		if (!isDamageable(itemStack)) return 0;
+
 		ItemMeta itemMeta = itemStack.getItemMeta();
-		if (!(itemMeta instanceof Damageable)) return 0; // Also checks for null ItemMeta
-		return ((Damageable) itemMeta).getDamage();
+		if (itemMeta instanceof Damageable) { // Also checks for null ItemMeta
+			return ((Damageable) itemMeta).getDamage();
+		} // Else: Unexpected, since we already checked that the item is damageable above.
+		return 0;
 	}
 
 	public static String getSimpleItemInfo(ItemStack item) {
