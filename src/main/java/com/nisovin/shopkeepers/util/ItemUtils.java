@@ -405,9 +405,9 @@ public final class ItemUtils {
 	 * <code>null</code>.
 	 * 
 	 * @param item1
-	 *            an itemstack
+	 *            an item stack
 	 * @param item2
-	 *            another itemstack
+	 *            another item stack
 	 * @return <code>true</code> if the given item stacks are both <code>null</code> or similar
 	 */
 	public static boolean isSimilar(ItemStack item1, ItemStack item2) {
@@ -977,7 +977,6 @@ public final class ItemUtils {
 
 	/**
 	 * Adds the given {@link ItemStack} to the given contents.
-	 * 
 	 * <p>
 	 * This will first try to fill similar partial {@link ItemStack}s in the contents up to the item's max stack size.
 	 * Afterwards it will insert the remaining amount into empty slots, splitting at the item's max stack size.
@@ -1062,12 +1061,11 @@ public final class ItemUtils {
 
 	/**
 	 * Removes the given {@link ItemStack} from the given contents.
-	 * 
 	 * <p>
 	 * If the amount of the given {@link ItemStack} is {@link Integer#MAX_VALUE}, then all similar items are being
 	 * removed from the contents.<br>
 	 * This does not modify the original item stacks. If it has to modify the amount of an item stack, it first replaces
-	 * it with a copy. So in case those item stacks are mirroring changes to their minecraft counterpart, those don't
+	 * it with a copy. So in case those item stacks are mirroring changes to their Minecraft counterpart, those don't
 	 * get affected directly.
 	 * </p>
 	 * 

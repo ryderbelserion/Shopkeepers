@@ -1073,7 +1073,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				// Error message throttle of 4 minutes (slightly less than the saving interval).
 				if (Math.abs(System.currentTimeMillis() - lastSavingErrorMsgTimestamp) > (4 * 60 * 1000L)) {
 					lastSavingErrorMsgTimestamp = System.currentTimeMillis();
-					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Saving shopkeepers failed! Please check the server logs and look into the issue!";
+					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Saving shopkeepers failed!"
+							+ " Please check the server logs and look into the issue!";
 					for (Player player : Bukkit.getOnlinePlayers()) {
 						if (player.hasPermission(ShopkeepersPlugin.ADMIN_PERMISSION)) {
 							player.sendMessage(errorMsg);
@@ -1089,8 +1090,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				sb.append("Saved shopkeeper data (");
 
 				// Dirty shopkeepers:
-				sb.append(savingDirtyShopkeepers.size());
-				sb.append(" dirty");
+				sb.append(savingDirtyShopkeepers.size()).append(" dirty");
 
 				// Previously unsaved shopkeepers:
 				if (!unsavedShopkeepers.isEmpty()) {

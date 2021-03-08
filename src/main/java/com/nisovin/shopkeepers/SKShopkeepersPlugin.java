@@ -338,6 +338,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// Activate (spawn) shopkeepers in loaded chunks of all loaded worlds:
 		shopkeeperRegistry.activateShopkeepersInAllWorlds();
 
+		// Player shops:
 		playerShops.onEnable();
 
 		// Save all updated shopkeeper data (eg. after data migrations):
@@ -398,6 +399,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		shopkeeperNaming.onDisable();
 		shopkeeperCreation.onDisable();
 
+		// Player shops:
 		playerShops.onDisable();
 
 		// Clear all types of registers:
