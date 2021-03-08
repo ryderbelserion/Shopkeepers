@@ -422,6 +422,15 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			// If the current trading recipe is no longer fulfilled, and the currently selected recipe index is 0,
 			// it will switch to the next applicable trading recipe, and continue the trading if the new result item is
 			// equal to the previous result item.
+			// TODO Handling each trade individually, eg. 64 times one item for one other item, can result in the trade
+			// to fail if the chest of a player shop is full, even though it would in principal be possible to trade one
+			// time 64 items for 64 items (because removing 64 items will clear a slot of the chest, whereas removing
+			// only one item at a time may not). However, determining up front how often the trade can be applied would
+			// be tricky, especially since the used trading recipe may change mid trading (at least in vanilla
+			// Minecraft). Also, usually the situation may dynamically change in-between the individual trades
+			// (especially if plugins or the shopkeepers themselves react to the individual trades), and each trade may
+			// have other side effects. So trading one time 64 for 64 items may not be equivalent to trading 64 times
+			// one item for one item.
 			while (true) {
 				// Check if there is enough space in the player's inventory:
 				ItemStack[] newPlayerContents = playerInventory.getStorageContents();
