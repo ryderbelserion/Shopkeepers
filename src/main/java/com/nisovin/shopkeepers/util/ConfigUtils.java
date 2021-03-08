@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.util;
 
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -23,29 +22,30 @@ public class ConfigUtils {
 		return material;
 	}
 
-	// The given top section itself does not get converted.
+	// The given top level section itself is not converted.
 	public static void convertSectionsToMaps(ConfigurationSection section) {
-		for (Entry<String, Object> entry : section.getValues(false).entrySet()) {
+		section.getValues(false).entrySet().forEach(entry -> {
 			Object value = entry.getValue();
 			if (value instanceof ConfigurationSection) {
 				// Recursively replace sections with maps:
 				Map<String, Object> innerSectionMap = ((ConfigurationSection) value).getValues(false);
-				section.set(entry.getKey(), innerSectionMap);
 				convertSectionsToMaps(innerSectionMap);
+				section.set(entry.getKey(), innerSectionMap);
 			}
-		}
+		});
 	}
 
+	// This requires the given Map to be modifiable.
 	public static void convertSectionsToMaps(Map<String, Object> sectionMap) {
-		for (Entry<String, Object> entry : sectionMap.entrySet()) {
+		sectionMap.entrySet().forEach(entry -> {
 			Object value = entry.getValue();
 			if (value instanceof ConfigurationSection) {
 				// Recursively replace sections with maps:
 				Map<String, Object> innerSectionMap = ((ConfigurationSection) value).getValues(false);
-				entry.setValue(innerSectionMap);
 				convertSectionsToMaps(innerSectionMap);
+				entry.setValue(innerSectionMap);
 			}
-		}
+		});
 	}
 
 	public static void clearConfigSection(ConfigurationSection configSection) {
