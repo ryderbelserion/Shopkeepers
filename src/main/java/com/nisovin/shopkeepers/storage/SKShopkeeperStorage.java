@@ -35,6 +35,7 @@ import com.nisovin.shopkeepers.util.ConversionUtils;
 import com.nisovin.shopkeepers.util.FileUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Retry;
+import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.SingletonTask;
 import com.nisovin.shopkeepers.util.ThrowableUtils;
 import com.nisovin.shopkeepers.util.Validate;
@@ -716,7 +717,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	public void saveDelayed() {
 		this.requestSave();
 		if (Settings.saveInstantly && delayedSaveTask == null) {
-			delayedSaveTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			delayedSaveTask = SchedulerUtils.runTaskLaterOrOmit(plugin, () -> {
 				delayedSaveTask = null;
 				this.saveIfDirty();
 			}, DELAYED_SAVE_TICKS);
@@ -1067,6 +1068,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Any other remaining post-processing that should happen after the storage's state has been updated:
 			if (!savingSucceeded) {
 				// Attempt the save again after a short delay (this requests another save):
+				// However, during the final save attempt during plugin disable, this is skipped and data might be lost.
 				saveDelayed();
 
 				// Inform admins about the saving issue:
