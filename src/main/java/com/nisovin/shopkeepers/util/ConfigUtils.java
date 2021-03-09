@@ -50,18 +50,35 @@ public class ConfigUtils {
 
 	public static void clearConfigSection(ConfigurationSection configSection) {
 		if (configSection == null) return;
-		for (String key : configSection.getKeys(false)) {
+		configSection.getKeys(false).forEach(key -> {
 			configSection.set(key, null);
+		});
+	}
+
+	// Not null.
+	public static String toYaml(ConfigurationSerializable serializable) {
+		return toYaml((serializable != null) ? serializable.serialize() : null);
+	}
+
+	// Not null.
+	public static String toYaml(Map<String, Object> map) {
+		YamlConfiguration yamlConfig = YAML_CONFIG.get(); // Shared YAML config
+		if (map != null) {
+			map.entrySet().forEach(entry -> {
+				yamlConfig.set(entry.getKey(), entry.getValue());
+			});
 		}
+		String yaml = yamlConfig.saveToString();
+		clearConfigSection(yamlConfig);
+		return yaml;
 	}
 
-	// Not null, may be empty.
+	// Not null.
 	public static String toYaml(String key, ConfigurationSerializable serializable) {
-		if (serializable == null) return "";
-		return toYaml(key, serializable.serialize());
+		return toYaml(key, (serializable != null) ? serializable.serialize() : null);
 	}
 
-	// Not null, may be empty.
+	// Not null.
 	public static String toYaml(String key, Object serializedObject) {
 		YamlConfiguration yamlConfig = YAML_CONFIG.get(); // Shared YAML config
 		yamlConfig.set(key, serializedObject);
@@ -70,13 +87,13 @@ public class ConfigUtils {
 		return yaml;
 	}
 
-	public static String yamlNewLine() {
+	public static String yamlNewline() {
 		return "\n"; // YAML uses Unix line breaks by default
 	}
 
 	public static String[] splitYamlLines(String yaml) {
-		Validate.notNull(yaml, "yaml is null");
-		return yaml.split(yamlNewLine());
+		Validate.notNull(yaml, "yaml String is null");
+		return yaml.split(yamlNewline());
 	}
 
 	private ConfigUtils() {

@@ -29,6 +29,10 @@ import com.nisovin.shopkeepers.util.ItemData.ItemDataDeserializeException;
 
 public class ItemDataTest extends AbstractBukkitTest {
 
+	private static String yamlNewline() {
+		return ConfigUtils.yamlNewline();
+	}
+
 	private static void testDeserialization(ItemData originalItemData) throws ItemDataDeserializeException {
 		YamlConfiguration config = new YamlConfiguration();
 		Object serialized = originalItemData.serialize();
@@ -69,7 +73,7 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item: DIAMOND_SWORD" + ConfigUtils.yamlNewLine(), yamlString);
+		Assert.assertEquals("item: DIAMOND_SWORD" + yamlNewline(), yamlString);
 	}
 
 	@Test
@@ -105,9 +109,9 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + ConfigUtils.yamlNewLine() +
-				"  type: DIAMOND_SWORD" + ConfigUtils.yamlNewLine() +
-				"  display-name: '&cCustom Name'" + ConfigUtils.yamlNewLine(), yamlString);
+		Assert.assertEquals("item:" + yamlNewline() +
+				"  type: DIAMOND_SWORD" + yamlNewline() +
+				"  display-name: '&cCustom Name'" + yamlNewline(), yamlString);
 	}
 
 	@Test
@@ -167,46 +171,46 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + ConfigUtils.yamlNewLine() +
-				"  type: DIAMOND_SWORD" + ConfigUtils.yamlNewLine() +
-				"  display-name: '&cCustom Name'" + ConfigUtils.yamlNewLine() +
-				"  loc-name: loc name" + ConfigUtils.yamlNewLine() +
-				"  lore:" + ConfigUtils.yamlNewLine() +
-				"  - '&alore1'" + ConfigUtils.yamlNewLine() +
-				"  - lore2" + ConfigUtils.yamlNewLine() +
-				"  custom-model-data: 1" + ConfigUtils.yamlNewLine() +
-				"  enchants:" + ConfigUtils.yamlNewLine() +
-				"    DURABILITY: 1" + ConfigUtils.yamlNewLine() +
-				"    DAMAGE_ALL: 2" + ConfigUtils.yamlNewLine() +
-				"  attribute-modifiers:" + ConfigUtils.yamlNewLine() +
-				"    GENERIC_ATTACK_SPEED:" + ConfigUtils.yamlNewLine() +
-				"    - ==: org.bukkit.attribute.AttributeModifier" + ConfigUtils.yamlNewLine() +
-				"      amount: 2.0" + ConfigUtils.yamlNewLine() +
-				"      name: attack speed bonus" + ConfigUtils.yamlNewLine() +
-				"      slot: HAND" + ConfigUtils.yamlNewLine() +
-				"      uuid: 00000000-0000-0001-0000-000000000001" + ConfigUtils.yamlNewLine() +
-				"      operation: 0" + ConfigUtils.yamlNewLine() +
-				"    - ==: org.bukkit.attribute.AttributeModifier" + ConfigUtils.yamlNewLine() +
-				"      amount: 0.5" + ConfigUtils.yamlNewLine() +
-				"      name: attack speed bonus 2" + ConfigUtils.yamlNewLine() +
-				"      slot: OFF_HAND" + ConfigUtils.yamlNewLine() +
-				"      uuid: 00000000-0000-0002-0000-000000000002" + ConfigUtils.yamlNewLine() +
-				"      operation: 2" + ConfigUtils.yamlNewLine() +
-				"    GENERIC_MAX_HEALTH:" + ConfigUtils.yamlNewLine() +
-				"    - ==: org.bukkit.attribute.AttributeModifier" + ConfigUtils.yamlNewLine() +
-				"      amount: 2.0" + ConfigUtils.yamlNewLine() +
-				"      name: attack speed bonus" + ConfigUtils.yamlNewLine() +
-				"      slot: HAND" + ConfigUtils.yamlNewLine() +
-				"      uuid: 00000000-0000-0003-0000-000000000003" + ConfigUtils.yamlNewLine() +
-				"      operation: 0" + ConfigUtils.yamlNewLine() +
-				"  ItemFlags:" + ConfigUtils.yamlNewLine() +
-				"  - HIDE_ENCHANTS" + ConfigUtils.yamlNewLine() +
-				"  Unbreakable: true" + ConfigUtils.yamlNewLine() +
-				"  Damage: 2" + ConfigUtils.yamlNewLine() +
-				"  PublicBukkitValues:" + ConfigUtils.yamlNewLine() +
-				"    some_plugin:some-other-key:" + ConfigUtils.yamlNewLine() +
-				"      inner_plugin:inner-key: 0.3f" + ConfigUtils.yamlNewLine() +
-				"    some_plugin:some-key: some value" + ConfigUtils.yamlNewLine(), yamlString);
+		Assert.assertEquals("item:" + yamlNewline() +
+				"  type: DIAMOND_SWORD" + yamlNewline() +
+				"  display-name: '&cCustom Name'" + yamlNewline() +
+				"  loc-name: loc name" + yamlNewline() +
+				"  lore:" + yamlNewline() +
+				"  - '&alore1'" + yamlNewline() +
+				"  - lore2" + yamlNewline() +
+				"  custom-model-data: 1" + yamlNewline() +
+				"  enchants:" + yamlNewline() +
+				"    DURABILITY: 1" + yamlNewline() +
+				"    DAMAGE_ALL: 2" + yamlNewline() +
+				"  attribute-modifiers:" + yamlNewline() +
+				"    GENERIC_ATTACK_SPEED:" + yamlNewline() +
+				"    - ==: org.bukkit.attribute.AttributeModifier" + yamlNewline() +
+				"      amount: 2.0" + yamlNewline() +
+				"      name: attack speed bonus" + yamlNewline() +
+				"      slot: HAND" + yamlNewline() +
+				"      uuid: 00000000-0000-0001-0000-000000000001" + yamlNewline() +
+				"      operation: 0" + yamlNewline() +
+				"    - ==: org.bukkit.attribute.AttributeModifier" + yamlNewline() +
+				"      amount: 0.5" + yamlNewline() +
+				"      name: attack speed bonus 2" + yamlNewline() +
+				"      slot: OFF_HAND" + yamlNewline() +
+				"      uuid: 00000000-0000-0002-0000-000000000002" + yamlNewline() +
+				"      operation: 2" + yamlNewline() +
+				"    GENERIC_MAX_HEALTH:" + yamlNewline() +
+				"    - ==: org.bukkit.attribute.AttributeModifier" + yamlNewline() +
+				"      amount: 2.0" + yamlNewline() +
+				"      name: attack speed bonus" + yamlNewline() +
+				"      slot: HAND" + yamlNewline() +
+				"      uuid: 00000000-0000-0003-0000-000000000003" + yamlNewline() +
+				"      operation: 0" + yamlNewline() +
+				"  ItemFlags:" + yamlNewline() +
+				"  - HIDE_ENCHANTS" + yamlNewline() +
+				"  Unbreakable: true" + yamlNewline() +
+				"  Damage: 2" + yamlNewline() +
+				"  PublicBukkitValues:" + yamlNewline() +
+				"    some_plugin:some-other-key:" + yamlNewline() +
+				"      inner_plugin:inner-key: 0.3f" + yamlNewline() +
+				"    some_plugin:some-key: some value" + yamlNewline(), yamlString);
 	}
 
 	@Test
@@ -243,14 +247,14 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + ConfigUtils.yamlNewLine() +
-				"  type: LEATHER_CHESTPLATE" + ConfigUtils.yamlNewLine() +
-				"  display-name: '&cCustom Name'" + ConfigUtils.yamlNewLine() +
-				"  color:" + ConfigUtils.yamlNewLine() +
-				"    ==: Color" + ConfigUtils.yamlNewLine() +
-				"    RED: 0" + ConfigUtils.yamlNewLine() +
-				"    BLUE: 255" + ConfigUtils.yamlNewLine() +
-				"    GREEN: 0" + ConfigUtils.yamlNewLine(), yamlString);
+		Assert.assertEquals("item:" + yamlNewline() +
+				"  type: LEATHER_CHESTPLATE" + yamlNewline() +
+				"  display-name: '&cCustom Name'" + yamlNewline() +
+				"  color:" + yamlNewline() +
+				"    ==: Color" + yamlNewline() +
+				"    RED: 0" + yamlNewline() +
+				"    BLUE: 255" + yamlNewline() +
+				"    GREEN: 0" + yamlNewline(), yamlString);
 	}
 
 	@Test
@@ -283,7 +287,7 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item: CHEST" + ConfigUtils.yamlNewLine(), yamlString);
+		Assert.assertEquals("item: CHEST" + yamlNewline(), yamlString);
 	}
 
 	@Test
@@ -319,9 +323,9 @@ public class ItemDataTest extends AbstractBukkitTest {
 		YamlConfiguration config = new YamlConfiguration();
 		config.set("item", serialized);
 		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + ConfigUtils.yamlNewLine() +
-				"  type: CHEST" + ConfigUtils.yamlNewLine() +
-				"  display-name: '&cCustom Name'" + ConfigUtils.yamlNewLine(), yamlString);
+		Assert.assertEquals("item:" + yamlNewline() +
+				"  type: CHEST" + yamlNewline() +
+				"  display-name: '&cCustom Name'" + yamlNewline(), yamlString);
 	}
 
 	@Test
