@@ -11,8 +11,8 @@ import org.junit.Test;
 
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.util.ItemData;
-import com.nisovin.shopkeepers.util.ItemDataTest;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.TestItemStacks;
 
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
@@ -47,7 +47,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 		System.out.println("Testing ItemStack creation performance:");
 		int warmupCount = 10000;
 		int testCount = 1000000;
-		ItemStack itemStack = ItemDataTest.createItemStackFull();
+		ItemStack itemStack = TestItemStacks.createItemStackComplete();
 		ItemData itemData = new ItemData(itemStack);
 
 		testPerformance("  ", "ItemData#createItemStack", warmupCount, testCount, () -> {
@@ -69,7 +69,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 		System.out.println("Testing ItemStack isSimilar performance:");
 		int warmupCount = 10000;
 		int testCount = 1000000;
-		ItemStack itemStack = ItemDataTest.createItemStackFull();
+		ItemStack itemStack = TestItemStacks.createItemStackComplete();
 		ItemStack itemStackCopy = itemStack.clone();
 		CraftItemStack craftItemStack = CraftItemStack.asCraftMirror(CraftItemStack.asNMSCopy(itemStack));
 		CraftItemStack craftItemStackCopy = craftItemStack.clone();
@@ -96,7 +96,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 		System.out.println("Testing ItemStack matching performance:");
 		int warmupCount = 10000;
 		int testCount = 1000000;
-		ItemStack itemStack = ItemDataTest.createItemStackFull();
+		ItemStack itemStack = TestItemStacks.createItemStackComplete();
 		ItemData itemData = new ItemData(itemStack);
 		Material type = itemStack.getType();
 		String displayName = itemStack.getItemMeta().getDisplayName();

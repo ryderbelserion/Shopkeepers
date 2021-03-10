@@ -1,177 +1,124 @@
 package com.nisovin.shopkeepers.util;
 
-import java.util.Arrays;
-import java.util.UUID;
-
-import org.bukkit.ChatColor;
-import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.attribute.AttributeModifier.Operation;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.util.ItemData.ItemDataDeserializeException;
 
-public class ItemDataTest extends AbstractBukkitTest {
+// Note: We test the ItemStack deserialization through ItemData. Since ItemData is defined by its stored ItemStack,
+// this is sufficient to also test the deserialization of the ItemData itself.
+public class ItemDataTest extends AbstractItemStackSerializationTest {
 
 	private static String yamlNewline() {
 		return ConfigUtils.yamlNewline();
 	}
 
-	private static void testDeserialization(ItemData originalItemData) throws ItemDataDeserializeException {
-		YamlConfiguration config = new YamlConfiguration();
-		Object serialized = originalItemData.serialize();
-		config.set("key", serialized);
-		String configString = config.saveToString();
+	private String serializeToYamlConfig(ItemData itemData) {
+		YamlConfiguration yamlConfig = new YamlConfiguration();
+		Object serialized = (itemData != null) ? itemData.serialize() : null;
+		yamlConfig.set("item", serialized);
+		return yamlConfig.saveToString();
+	}
 
-		YamlConfiguration newConfig = new YamlConfiguration();
+	private ItemData deserializeFromYamlConfig(String yamlConfigString) {
+		YamlConfiguration yamlConfig = new YamlConfiguration();
 		try {
-			newConfig.loadFromString(configString);
+			yamlConfig.loadFromString(yamlConfigString);
 		} catch (InvalidConfigurationException e) {
 		}
-		Object data = newConfig.get("key");
-		ItemData deserialized = ItemData.deserialize(data);
-
-		Assert.assertEquals(originalItemData, deserialized);
+		Object serialized = yamlConfig.get("item"); // Can be null
+		ItemData deserialized;
+		try {
+			deserialized = ItemData.deserialize(serialized);
+		} catch (ItemDataDeserializeException e) {
+			throw new RuntimeException(e);
+		}
+		return deserialized;
 	}
 
-	// COMPACT
-
-	private static ItemStack createItemStackSimple() {
-		ItemStack itemStack = new ItemStack(Material.DIAMOND_SWORD);
-		return itemStack;
+	@Override
+	protected Object serialize(ItemStack itemStack) {
+		ItemData itemData = null;
+		if (itemStack != null) {
+			itemStack.setAmount(1); // We don't serialize the stack size
+			itemData = new ItemData(itemStack);
+		}
+		return this.serializeToYamlConfig(itemData);
 	}
+
+	@Override
+	protected ItemStack deserialize(Object data) {
+		String configString = (String) data;
+		ItemData deserialized = deserializeFromYamlConfig(configString);
+		return (deserialized != null) ? deserialized.createItemStack() : null;
+	}
+
+	// Additional tests
+
+	private void testSerialization(ItemStack itemStack, String expected) {
+		ItemData itemData = new ItemData(itemStack);
+		Object serialized = itemData.serialize();
+		Assert.assertEquals(expected, serialized.toString());
+	}
+
+	private void testYamlSerialization(ItemStack itemStack, String expected) {
+		ItemData itemData = new ItemData(itemStack);
+		String yamlString = this.serializeToYamlConfig(itemData);
+		Assert.assertEquals(expected, yamlString);
+	}
+
+	// Compact representation (basic tool)
 
 	@Test
 	public void testSerializationCompact() {
-		ItemStack itemStack = createItemStackSimple();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		Assert.assertEquals("DIAMOND_SWORD", serialized.toString());
+		ItemStack itemStack = TestItemStacks.createItemStackBasicTool();
+		this.testSerialization(itemStack, "DIAMOND_SWORD");
 	}
 
 	@Test
-	public void testYAMLSerializationCompact() {
-		ItemStack itemStack = createItemStackSimple();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		YamlConfiguration config = new YamlConfiguration();
-		config.set("item", serialized);
-		String yamlString = config.saveToString();
-		Assert.assertEquals("item: DIAMOND_SWORD" + yamlNewline(), yamlString);
+	public void testYamlSerializationCompact() {
+		ItemStack itemStack = TestItemStacks.createItemStackBasicTool();
+		this.testYamlSerialization(itemStack, "item: DIAMOND_SWORD" + yamlNewline());
+	}
+
+	// Display name
+
+	@Test
+	public void testSerializationDisplayName() {
+		ItemStack itemStack = TestItemStacks.createItemStackDisplayName();
+		this.testSerialization(itemStack, "{type=DIAMOND_SWORD, display-name=&cCustom Name}");
 	}
 
 	@Test
-	public void testDeserializationSimple() throws ItemDataDeserializeException {
-		ItemStack itemStack = createItemStackSimple();
-		ItemData itemData = new ItemData(itemStack);
-		testDeserialization(itemData);
-	}
-
-	// MINIMAL
-
-	private static ItemStack createItemStackMinimal() {
-		ItemStack itemStack = new ItemStack(Material.DIAMOND_SWORD);
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
-		itemStack.setItemMeta(itemMeta);
-		return itemStack;
-	}
-
-	@Test
-	public void testSerializationMinimal() {
-		ItemStack itemStack = createItemStackMinimal();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		Assert.assertEquals("{type=DIAMOND_SWORD, display-name=&cCustom Name}", serialized.toString());
-	}
-
-	@Test
-	public void testYAMLSerializationMinimal() {
-		ItemStack itemStack = createItemStackMinimal();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		YamlConfiguration config = new YamlConfiguration();
-		config.set("item", serialized);
-		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + yamlNewline() +
+	public void testYAMLSerializationDisplayName() {
+		ItemStack itemStack = TestItemStacks.createItemStackDisplayName();
+		this.testYamlSerialization(itemStack, "item:" + yamlNewline() +
 				"  type: DIAMOND_SWORD" + yamlNewline() +
-				"  display-name: '&cCustom Name'" + yamlNewline(), yamlString);
+				"  display-name: '&cCustom Name'" + yamlNewline());
 	}
+
+	// Complete meta
 
 	@Test
-	public void testDeserializationMinimal() throws ItemDataDeserializeException {
-		ItemStack itemStack = createItemStackMinimal();
-		ItemData itemData = new ItemData(itemStack);
-		testDeserialization(itemData);
-	}
-
-	// FULL
-
-	public static ItemStack createItemStackFull() {
-		ItemStack itemStack = new ItemStack(Material.DIAMOND_SWORD);
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
-		itemMeta.setLore(Arrays.asList(ChatColor.GREEN + "lore1", "lore2"));
-		itemMeta.addEnchant(Enchantment.DURABILITY, 1, true);
-		itemMeta.addEnchant(Enchantment.DAMAGE_ALL, 2, true);
-		itemMeta.setCustomModelData(1);
-		itemMeta.setLocalizedName("loc name");
-		itemMeta.setUnbreakable(true);
-		itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-		itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(new UUID(1L, 1L), "attack speed bonus", 2, Operation.ADD_NUMBER, EquipmentSlot.HAND));
-		itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(new UUID(2L, 2L), "attack speed bonus 2", 0.5, Operation.MULTIPLY_SCALAR_1, EquipmentSlot.OFF_HAND));
-		itemMeta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(new UUID(3L, 3L), "attack speed bonus", 2, Operation.ADD_NUMBER, EquipmentSlot.HAND));
-		((Damageable) itemMeta).setDamage(2);
-		// note: this data ends up getting stored in an arbitrary order internally
-		PersistentDataContainer customTags = itemMeta.getPersistentDataContainer();
-		customTags.set(new NamespacedKey("some_plugin", "some-key"), PersistentDataType.STRING, "some value");
-		PersistentDataContainer customContainer = customTags.getAdapterContext().newPersistentDataContainer();
-		customContainer.set(new NamespacedKey("inner_plugin", "inner-key"), PersistentDataType.FLOAT, 0.3F);
-		customTags.set(new NamespacedKey("some_plugin", "some-other-key"), PersistentDataType.TAG_CONTAINER, customContainer);
-		itemStack.setItemMeta(itemMeta);
-		return itemStack;
-	}
-
-	@Test
-	public void testSerializationFull() {
-		ItemStack itemStack = createItemStackFull();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		Assert.assertEquals("{type=DIAMOND_SWORD, display-name=&cCustom Name, loc-name=loc name, lore=[&alore1, lore2],"
+	public void testSerializationComplete() {
+		ItemStack itemStack = TestItemStacks.createItemStackComplete();
+		this.testSerialization(itemStack, "{type=DIAMOND_SWORD, display-name=&cCustom Name, loc-name=loc name, lore=[&alore1, lore2],"
 				+ " custom-model-data=1, enchants={DURABILITY=1, DAMAGE_ALL=2}, attribute-modifiers="
 				+ "{GENERIC_ATTACK_SPEED=[AttributeModifier{uuid=00000000-0000-0001-0000-000000000001, name=attack speed bonus, operation=ADD_NUMBER, amount=2.0, slot=HAND},"
 				+ " AttributeModifier{uuid=00000000-0000-0002-0000-000000000002, name=attack speed bonus 2, operation=MULTIPLY_SCALAR_1, amount=0.5, slot=OFF_HAND}],"
 				+ " GENERIC_MAX_HEALTH=[AttributeModifier{uuid=00000000-0000-0003-0000-000000000003, name=attack speed bonus, operation=ADD_NUMBER, amount=2.0, slot=HAND}]},"
 				+ " ItemFlags=[HIDE_ENCHANTS], Unbreakable=true, Damage=2,"
-				+ " PublicBukkitValues={some_plugin:some-other-key={inner_plugin:inner-key=0.3f}, some_plugin:some-key=some value}}",
-				serialized.toString());
+				+ " PublicBukkitValues={some_plugin:some-other-key={inner_plugin:inner-key=0.3f}, some_plugin:some-key=some value}}");
 	}
 
 	@Test
-	public void testYAMLSerializationFull() {
-		ItemStack itemStack = createItemStackFull();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		YamlConfiguration config = new YamlConfiguration();
-		config.set("item", serialized);
-		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + yamlNewline() +
+	public void testYAMLSerializationComplete() {
+		ItemStack itemStack = TestItemStacks.createItemStackComplete();
+		this.testYamlSerialization(itemStack, "item:" + yamlNewline() +
 				"  type: DIAMOND_SWORD" + yamlNewline() +
 				"  display-name: '&cCustom Name'" + yamlNewline() +
 				"  loc-name: loc name" + yamlNewline() +
@@ -210,136 +157,65 @@ public class ItemDataTest extends AbstractBukkitTest {
 				"  PublicBukkitValues:" + yamlNewline() +
 				"    some_plugin:some-other-key:" + yamlNewline() +
 				"      inner_plugin:inner-key: 0.3f" + yamlNewline() +
-				"    some_plugin:some-key: some value" + yamlNewline(), yamlString);
+				"    some_plugin:some-key: some value" + yamlNewline());
+	}
+
+	// Uncommon ItemMeta
+
+	@Test
+	public void testSerializationUncommonMeta() {
+		ItemStack itemStack = TestItemStacks.createItemStackUncommonMeta();
+		this.testSerialization(itemStack, "{type=LEATHER_CHESTPLATE, display-name=&cCustom Name, color=Color:[rgb0x00FF]}");
 	}
 
 	@Test
-	public void testDeserializationFull() throws ItemDataDeserializeException {
-		ItemStack itemStack = createItemStackFull();
-		ItemData itemData = new ItemData(itemStack);
-		testDeserialization(itemData);
-	}
-
-	// UNCOMMON
-
-	private static ItemStack createItemStackUncommon() {
-		ItemStack itemStack = new ItemStack(Material.LEATHER_CHESTPLATE);
-		LeatherArmorMeta itemMeta = (LeatherArmorMeta) itemStack.getItemMeta();
-		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
-		itemMeta.setColor(Color.BLUE);
-		itemStack.setItemMeta(itemMeta);
-		return itemStack;
-	}
-
-	@Test
-	public void testSerializationUncommon() {
-		ItemStack itemStack = createItemStackUncommon();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		Assert.assertEquals("{type=LEATHER_CHESTPLATE, display-name=&cCustom Name, color=Color:[rgb0x00FF]}", serialized.toString());
-	}
-
-	@Test
-	public void testYAMLSerializationUncommon() {
-		ItemStack itemStack = createItemStackUncommon();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		YamlConfiguration config = new YamlConfiguration();
-		config.set("item", serialized);
-		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + yamlNewline() +
+	public void testYAMLSerializationUncommonMeta() {
+		ItemStack itemStack = TestItemStacks.createItemStackUncommonMeta();
+		this.testYamlSerialization(itemStack, "item:" + yamlNewline() +
 				"  type: LEATHER_CHESTPLATE" + yamlNewline() +
 				"  display-name: '&cCustom Name'" + yamlNewline() +
 				"  color:" + yamlNewline() +
 				"    ==: Color" + yamlNewline() +
 				"    RED: 0" + yamlNewline() +
 				"    BLUE: 255" + yamlNewline() +
-				"    GREEN: 0" + yamlNewline(), yamlString);
+				"    GREEN: 0" + yamlNewline());
+	}
+
+	// Basic TileEntity
+
+	@Test
+	public void testSerializationBasicTileEntity() {
+		ItemStack itemStack = TestItemStacks.createItemStackBasicTileEntity();
+		this.testSerialization(itemStack, "CHEST");
 	}
 
 	@Test
-	public void testDeserializationUncommon() throws ItemDataDeserializeException {
-		ItemStack itemStack = createItemStackUncommon();
-		ItemData itemData = new ItemData(itemStack);
-		testDeserialization(itemData);
+	public void testYAMLSerializationBasicTileEntity() {
+		ItemStack itemStack = TestItemStacks.createItemStackBasicTileEntity();
+		this.testYamlSerialization(itemStack, "item: CHEST" + yamlNewline());
 	}
 
-	// TILE ENTITY SIMPLE
+	// TileEntity with display name
 
-	private static ItemStack createItemStackTileEntitySimple() {
-		ItemStack itemStack = new ItemStack(Material.CHEST);
-		return itemStack;
+	@Test
+	public void testSerializationTileEntityDisplayName() {
+		ItemStack itemStack = TestItemStacks.createItemStackTileEntityDisplayName();
+		this.testSerialization(itemStack, "{type=CHEST, display-name=&cCustom Name}");
 	}
 
 	@Test
-	public void testSerializationTileEntitySimple() {
-		ItemStack itemStack = createItemStackTileEntitySimple();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		Assert.assertEquals("CHEST", serialized.toString());
-	}
-
-	@Test
-	public void testYAMLSerializationTileEntitySimple() {
-		ItemStack itemStack = createItemStackTileEntitySimple();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		YamlConfiguration config = new YamlConfiguration();
-		config.set("item", serialized);
-		String yamlString = config.saveToString();
-		Assert.assertEquals("item: CHEST" + yamlNewline(), yamlString);
-	}
-
-	@Test
-	public void testDeserializationTileEntitySimple() throws ItemDataDeserializeException {
-		ItemStack itemStack = createItemStackTileEntitySimple();
-		ItemData itemData = new ItemData(itemStack);
-		testDeserialization(itemData);
-	}
-
-	// TILE ENTITY MINIMAL
-
-	private static ItemStack createItemStackTileEntityMinimal() {
-		ItemStack itemStack = new ItemStack(Material.CHEST);
-		ItemMeta itemMeta = itemStack.getItemMeta();
-		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
-		itemStack.setItemMeta(itemMeta);
-		return itemStack;
-	}
-
-	@Test
-	public void testSerializationTileEntityMinimal() {
-		ItemStack itemStack = createItemStackTileEntityMinimal();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		Assert.assertEquals("{type=CHEST, display-name=&cCustom Name}", serialized.toString());
-	}
-
-	@Test
-	public void testYAMLSerializationTileEntityMinimal() {
-		ItemStack itemStack = createItemStackTileEntityMinimal();
-		ItemData itemData = new ItemData(itemStack);
-		Object serialized = itemData.serialize();
-		YamlConfiguration config = new YamlConfiguration();
-		config.set("item", serialized);
-		String yamlString = config.saveToString();
-		Assert.assertEquals("item:" + yamlNewline() +
+	public void testYAMLSerializationTileEntityDisplayName() {
+		ItemStack itemStack = TestItemStacks.createItemStackTileEntityDisplayName();
+		this.testYamlSerialization(itemStack, "item:" + yamlNewline() +
 				"  type: CHEST" + yamlNewline() +
-				"  display-name: '&cCustom Name'" + yamlNewline(), yamlString);
-	}
-
-	@Test
-	public void testDeserializationTileEntityMinimal() throws ItemDataDeserializeException {
-		ItemStack itemStack = createItemStackTileEntityMinimal();
-		ItemData itemData = new ItemData(itemStack);
-		testDeserialization(itemData);
+				"  display-name: '&cCustom Name'" + yamlNewline());
 	}
 
 	// ITEMDATA MATCHES
 
 	@Test
 	public void testItemDataMatches() {
-		ItemStack itemStack = createItemStackFull();
+		ItemStack itemStack = TestItemStacks.createItemStackComplete();
 		ItemData itemData = new ItemData(itemStack);
 		ItemStack differentItemType = itemStack.clone();
 		differentItemType.setType(Material.IRON_SWORD);
