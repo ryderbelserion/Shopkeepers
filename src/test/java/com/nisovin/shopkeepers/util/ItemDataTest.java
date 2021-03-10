@@ -111,7 +111,7 @@ public class ItemDataTest extends AbstractItemStackSerializationTest {
 				+ "{GENERIC_ATTACK_SPEED=[AttributeModifier{uuid=00000000-0000-0001-0000-000000000001, name=attack speed bonus, operation=ADD_NUMBER, amount=2.0, slot=HAND},"
 				+ " AttributeModifier{uuid=00000000-0000-0002-0000-000000000002, name=attack speed bonus 2, operation=MULTIPLY_SCALAR_1, amount=0.5, slot=OFF_HAND}],"
 				+ " GENERIC_MAX_HEALTH=[AttributeModifier{uuid=00000000-0000-0003-0000-000000000003, name=attack speed bonus, operation=ADD_NUMBER, amount=2.0, slot=HAND}]},"
-				+ " ItemFlags=[HIDE_ENCHANTS], Unbreakable=true, Damage=2,"
+				+ " repair-cost=3, ItemFlags=[HIDE_ENCHANTS], Unbreakable=true, Damage=2,"
 				+ " PublicBukkitValues={some_plugin:some-other-key={inner_plugin:inner-key=0.3f}, some_plugin:some-key=some value}}");
 	}
 
@@ -150,6 +150,7 @@ public class ItemDataTest extends AbstractItemStackSerializationTest {
 				"      slot: HAND" + yamlNewline() +
 				"      uuid: 00000000-0000-0003-0000-000000000003" + yamlNewline() +
 				"      operation: 0" + yamlNewline() +
+				"  repair-cost: 3" + yamlNewline() +
 				"  ItemFlags:" + yamlNewline() +
 				"  - HIDE_ENCHANTS" + yamlNewline() +
 				"  Unbreakable: true" + yamlNewline() +
@@ -158,6 +159,30 @@ public class ItemDataTest extends AbstractItemStackSerializationTest {
 				"    some_plugin:some-other-key:" + yamlNewline() +
 				"      inner_plugin:inner-key: 0.3f" + yamlNewline() +
 				"    some_plugin:some-key: some value" + yamlNewline());
+	}
+
+	// Block data
+
+	// TODO This might be broken in Bukkit: https://hub.spigotmc.org/jira/browse/SPIGOT-6257
+	// Even though this specific test case passes, it might break once Spigot releases a fix for the linked issue.
+	// @Test
+	public void testSerializationBlockData() {
+		ItemStack itemStack = TestItemStacks.createItemStackBlockData();
+		this.testSerialization(itemStack, "{type=CAMPFIRE, BlockStateTag={waterlogged=false, signal_fire=false, lit=false, facing=north}}");
+	}
+
+	// TODO This might be broken in Bukkit: https://hub.spigotmc.org/jira/browse/SPIGOT-6257
+	// Even though this specific test case passes, it might break once Spigot releases a fix for the linked issue.
+	// @Test
+	public void testYAMLSerializationBlockData() {
+		ItemStack itemStack = TestItemStacks.createItemStackBlockData();
+		this.testYamlSerialization(itemStack, "item:" + yamlNewline() +
+				"  type: CAMPFIRE" + yamlNewline() +
+				"  BlockStateTag:" + yamlNewline() +
+				"    waterlogged: 'false'" + yamlNewline() +
+				"    signal_fire: 'false'" + yamlNewline() +
+				"    lit: 'false'" + yamlNewline() +
+				"    facing: north" + yamlNewline());
 	}
 
 	// Uncommon ItemMeta

@@ -11,13 +11,17 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.type.Campfire;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BlockDataMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -36,6 +40,10 @@ public class TestItemStacks {
 				createItemStackBasicTool(),
 				createItemStackDisplayName(),
 				createItemStackComplete(),
+				// TODO This might be broken in Bukkit: Serializing and deserializing this item will produce non-equal
+				// ItemStacks with different BlockData (false vs 0b). See
+				// https://hub.spigotmc.org/jira/browse/SPIGOT-6257
+				// createItemStackBlockData(),
 				createItemStackUncommonMeta(),
 				createItemStackBasicTileEntity(),
 				createItemStackTileEntityDisplayName()
@@ -86,12 +94,23 @@ public class TestItemStacks {
 		itemMeta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(new UUID(2L, 2L), "attack speed bonus 2", 0.5, Operation.MULTIPLY_SCALAR_1, EquipmentSlot.OFF_HAND));
 		itemMeta.addAttributeModifier(Attribute.GENERIC_MAX_HEALTH, new AttributeModifier(new UUID(3L, 3L), "attack speed bonus", 2, Operation.ADD_NUMBER, EquipmentSlot.HAND));
 		((Damageable) itemMeta).setDamage(2);
-		// note: this data ends up getting stored in an arbitrary order internally
+		((Repairable) itemMeta).setRepairCost(3);
+		// Note: This data ends up getting stored in an arbitrary order internally.
 		PersistentDataContainer customTags = itemMeta.getPersistentDataContainer();
 		customTags.set(new NamespacedKey("some_plugin", "some-key"), PersistentDataType.STRING, "some value");
 		PersistentDataContainer customContainer = customTags.getAdapterContext().newPersistentDataContainer();
 		customContainer.set(new NamespacedKey("inner_plugin", "inner-key"), PersistentDataType.FLOAT, 0.3F);
 		customTags.set(new NamespacedKey("some_plugin", "some-other-key"), PersistentDataType.TAG_CONTAINER, customContainer);
+		itemStack.setItemMeta(itemMeta);
+		return itemStack;
+	}
+
+	public static ItemStack createItemStackBlockData() {
+		ItemStack itemStack = new ItemStack(Material.CAMPFIRE);
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		BlockData data = Material.CAMPFIRE.createBlockData();
+		((Campfire) data).setLit(false);
+		((BlockDataMeta) itemMeta).setBlockData(data);
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;
 	}
