@@ -9,7 +9,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 public class ConfigUtils {
 
-	// Shared YAML config that gets reused:
+	// Shared and reused YAML config:
 	private static final ThreadLocal<YamlConfiguration> YAML_CONFIG = ThreadLocal.withInitial(() -> new YamlConfiguration());
 
 	public static Material loadMaterial(ConfigurationSection config, String key) {
@@ -62,15 +62,17 @@ public class ConfigUtils {
 
 	// Not null.
 	public static String toYaml(Map<String, Object> map) {
-		YamlConfiguration yamlConfig = YAML_CONFIG.get(); // Shared YAML config
-		if (map != null) {
-			map.entrySet().forEach(entry -> {
-				yamlConfig.set(entry.getKey(), entry.getValue());
-			});
+		YamlConfiguration yamlConfig = YAML_CONFIG.get();
+		try {
+			if (map != null) {
+				map.entrySet().forEach(entry -> {
+					yamlConfig.set(entry.getKey(), entry.getValue());
+				});
+			}
+			return yamlConfig.saveToString();
+		} finally {
+			clearConfigSection(yamlConfig);
 		}
-		String yaml = yamlConfig.saveToString();
-		clearConfigSection(yamlConfig);
-		return yaml;
 	}
 
 	// Not null.
@@ -80,11 +82,13 @@ public class ConfigUtils {
 
 	// Not null.
 	public static String toYaml(String key, Object serializedObject) {
-		YamlConfiguration yamlConfig = YAML_CONFIG.get(); // Shared YAML config
-		yamlConfig.set(key, serializedObject);
-		String yaml = yamlConfig.saveToString();
-		yamlConfig.set(key, null);
-		return yaml;
+		YamlConfiguration yamlConfig = YAML_CONFIG.get();
+		try {
+			yamlConfig.set(key, serializedObject);
+			return yamlConfig.saveToString();
+		} finally {
+			yamlConfig.set(key, null);
+		}
 	}
 
 	public static String yamlNewline() {
