@@ -18,10 +18,12 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BlockDataMeta;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.Repairable;
+import org.bukkit.inventory.meta.BookMeta.Generation;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
@@ -45,6 +47,10 @@ public class TestItemStacks {
 				// https://hub.spigotmc.org/jira/browse/SPIGOT-6257
 				// createItemStackBlockData(),
 				createItemStackUncommonMeta(),
+				// TODO The deserialization of the text data of books is broken in Bukkit 1.14 and should be fixed in
+				// late versions of 1.16. See https://hub.spigotmc.org/jira/browse/SPIGOT-3206
+				// createItemStackWritableBook(),
+				// createItemStackWrittenBook(),
 				createItemStackBasicTileEntity(),
 				createItemStackTileEntityDisplayName()
 		);
@@ -120,6 +126,36 @@ public class TestItemStacks {
 		LeatherArmorMeta itemMeta = (LeatherArmorMeta) itemStack.getItemMeta();
 		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
 		itemMeta.setColor(Color.BLUE);
+		itemStack.setItemMeta(itemMeta);
+		return itemStack;
+	}
+
+	public static ItemStack createItemStackWritableBook() {
+		ItemStack itemStack = new ItemStack(Material.WRITABLE_BOOK);
+		BookMeta itemMeta = (BookMeta) itemStack.getItemMeta();
+		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
+		itemMeta.setTitle("Finding Diamonds");
+		itemMeta.setAuthor("D. Whining Rod");
+		itemMeta.setGeneration(Generation.COPY_OF_ORIGINAL);
+		itemMeta.setPages(
+				"Page 1\nWith empty lines\n\nAnd literal newline \\n and different kinds of quotes like ' and \"!",
+				"Page2\n  With multiple lines and whitespace\nAnd §ccolors &a!"
+		);
+		itemStack.setItemMeta(itemMeta);
+		return itemStack;
+	}
+
+	public static ItemStack createItemStackWrittenBook() {
+		ItemStack itemStack = new ItemStack(Material.WRITTEN_BOOK);
+		BookMeta itemMeta = (BookMeta) itemStack.getItemMeta();
+		itemMeta.setDisplayName(ChatColor.RED + "Custom Name");
+		itemMeta.setTitle("Finding Diamonds");
+		itemMeta.setAuthor("D. Whining Rod");
+		itemMeta.setGeneration(Generation.COPY_OF_ORIGINAL);
+		itemMeta.setPages(
+				"Page 1\nWith empty lines\n\nAnd literal newline \\n and different kinds of quotes like ' and \"!",
+				"Page2\n  With multiple lines and whitespace\nAnd §ccolors &a!"
+		);
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;
 	}
