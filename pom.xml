@@ -155,6 +155,7 @@
 	<!-- Also compile at root to avoid some issues in Eclipse -->
 	<build>
 		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<plugins>
 			<!-- Manually add sources of dependencies -->
 			<plugin>
