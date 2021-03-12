@@ -369,6 +369,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		// Handle trade depending on used inventory action:
 		// TODO: In MC 1.15.1 PICKUP_ONE and PICKUP_SOME might get triggered when clicking the result slot (test again:
 		// left click, shift+left click, right click, middle click).
+		// TODO: Even though this is not available in vanilla Minecraft, maybe add a way to trade as often as possible,
+		// using up all the items in the player's inventory (i.e. being able to sell all items with one click)?
 		if (action == InventoryAction.PICKUP_ALL || action == InventoryAction.PICKUP_HALF) {
 			if (!isCursorEmpty && (!cursor.isSimilar(resultItem) || (cursor.getAmount() + resultItem.getAmount()) > cursor.getMaxStackSize())) {
 				Log.debug("Not handling trade: The cursor cannot carry the resulting items.");
