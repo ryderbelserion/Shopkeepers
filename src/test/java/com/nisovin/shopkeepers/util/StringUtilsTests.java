@@ -7,12 +7,31 @@ public class StringUtilsTests {
 
 	@Test
 	public void testSplitLines() {
-		String input = "This is\n a \r\nmulti-line\\ntext\\n! With\n\\nempty lines and trailing\n";
-		String[] result = StringUtils.splitLines(input);
-		String[] expected = new String[] {
-				"This is", " a ", "multi-line", "text", "! With", "", "empty lines and trailing", ""
+		String newlines = "Unix\nWindows\r\nMac\rForm Feed\fVertical Tab\u000BNext line\u0085Line Separator\u2028Paragraph Separator\u2029 trailing \n\n";
+		String[] newlinesSplit = StringUtils.splitLines(newlines, false);
+		// This should produce the same result, since there are no literal newlines:
+		String[] newlinesAndLiteralSplit = StringUtils.splitLines(newlines, true);
+		String[] expectedNewlinesSplit = new String[] {
+			"Unix", "Windows", "Mac", "Form Feed", "Vertical Tab", "Next line", "Line Separator", "Paragraph Separator", " trailing ", "", ""
 		};
-		Assert.assertArrayEquals(expected, result);
+		Assert.assertArrayEquals(expectedNewlinesSplit, newlinesSplit);
+		Assert.assertArrayEquals(expectedNewlinesSplit, newlinesAndLiteralSplit);
+	}
+
+	@Test
+	public void testSplitLiteralNewlines() {
+		String literal = "Literal\\n trailing \\n\\n";
+		String[] literalSplit = StringUtils.splitLines(literal, true);
+		String[] expectedLiteralSplit = new String[] {
+			"Literal", " trailing ", "", ""
+		};
+		Assert.assertArrayEquals(expectedLiteralSplit, literalSplit);
+
+		String[] nonLiteralSplit = StringUtils.splitLines(literal, false);
+		String[] expectedNonLiteralSplit = new String[] {
+			"Literal\\n trailing \\n\\n"
+		};
+		Assert.assertArrayEquals(expectedNonLiteralSplit, nonLiteralSplit);
 	}
 
 	@Test

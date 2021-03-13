@@ -186,12 +186,18 @@ public class StringUtils {
 		return builder.toString();
 	}
 
-	// Matches Windows and Unix line endings, and literal newlines:
-	private static final Pattern NEWLINE_PATTERN = Pattern.compile("(\\r?\\n)|\\\\n");
+	// Matches any Unicode newlines (including the Windows newline sequence):
+	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\\R");
+	// Additionally matches literal Unix newlines:
+	private static final Pattern NEWLINE_OR_LITERAL_PATTERN = Pattern.compile("\\R|\\\\n");
 
 	// Includes empty and trailing empty lines:
-	public static String[] splitLines(String source) {
-		return NEWLINE_PATTERN.split(source, -1);
+	public static String[] splitLines(String source, boolean splitLiteralNewlines) {
+		if (splitLiteralNewlines) {
+			return NEWLINE_OR_LITERAL_PATTERN.split(source, -1);
+		} else {
+			return NEWLINE_PATTERN.split(source, -1);
+		}
 	}
 
 	public static String prefix(String prefix, String delimiter, String message) {

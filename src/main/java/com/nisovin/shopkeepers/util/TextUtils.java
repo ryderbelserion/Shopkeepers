@@ -202,7 +202,7 @@ public class TextUtils {
 		if (message.isEmpty()) return;
 
 		// Send (potentially multi-line) message:
-		for (String line : StringUtils.splitLines(message)) {
+		for (String line : StringUtils.splitLines(message, true)) {
 			recipient.sendMessage(line);
 		}
 	}
