@@ -46,6 +46,37 @@ public class StringUtils {
 	}
 
 	/**
+	 * Converts the given {@link Object} to a String via its {@link #toString()} method.
+	 * <p>
+	 * If the object is <code>null</code>, or if its {@link #toString()} method returns <code>null</code>, this returns
+	 * an empty String.
+	 * 
+	 * @param object
+	 *            the object
+	 * @return the String, not <code>null</code>
+	 */
+	public static String toStringOrEmpty(Object object) {
+		if (object == null) return "";
+		String string = object.toString();
+		return (string != null) ? string : "";
+	}
+
+	/**
+	 * Converts the given {@link Object} to a String via its {@link #toString()} method.
+	 * <p>
+	 * Returns <code>null</code> if the object is <code>null</code>, or if its {@link #toString()} method returns
+	 * <code>null</code>.
+	 * 
+	 * @param object
+	 *            the object
+	 * @return the String, possibly <code>null</code>
+	 */
+	public static String toStringOrNull(Object object) {
+		if (object == null) return null;
+		return object.toString();
+	}
+
+	/**
 	 * Normalizes the given identifier.
 	 * <p>
 	 * This trims leading and trailing whitespace and converts all remaining whitespace and underscores to dashes

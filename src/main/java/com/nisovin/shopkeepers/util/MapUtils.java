@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.util;
 
 import java.util.AbstractMap;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -82,5 +83,44 @@ public class MapUtils {
 
 	public static <K, V> Map.Entry<K, V> entry(K key, V value) {
 		return new AbstractMap.SimpleImmutableEntry<>(key, value);
+	}
+
+	/**
+	 * Creates a new Map that copies the entries of the given Map, but converts all keys {@link Object#toString() to
+	 * Strings}.
+	 * <p>
+	 * If the given Map contains a <code>null</code> key, the resulting Map will contain a <code>null</code> key as
+	 * well.
+	 * 
+	 * @param map
+	 *            the map of arbitrary key and value type
+	 * @return a new String to Object map, or <code>null</code> if the given Map is <code>null</code>
+	 */
+	public static Map<String, Object> toStringMap(Map<?, ?> map) {
+		if (map == null) return null;
+		Map<String, Object> stringMap = new LinkedHashMap<>(getIdealHashMapCapacity(map.size()));
+		map.entrySet().forEach(entry -> {
+			Object key = entry.getKey();
+			Object value = entry.getValue();
+			String stringKey = StringUtils.toStringOrNull(key);
+			stringMap.put(stringKey, value);
+		});
+		return stringMap;
+	}
+
+	/**
+	 * Returns the given Map if it is not <code>null</code>, and otherwise returns an {@link Collections#emptyMap()
+	 * empty Map}.
+	 * 
+	 * @param <K>
+	 *            the key type
+	 * @param <V>
+	 *            the value type
+	 * @param map
+	 *            the map
+	 * @return the given map, or an empty map, not <code>null</code>
+	 */
+	public static <K, V> Map<K, V> getOrEmpty(Map<K, V> map) {
+		return (map != null) ? map : Collections.emptyMap();
 	}
 }
