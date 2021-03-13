@@ -190,6 +190,12 @@ public class StringUtils {
 	private static final Pattern NEWLINE_PATTERN = Pattern.compile("\\R");
 	// Additionally matches literal Unix newlines:
 	private static final Pattern NEWLINE_OR_LITERAL_PATTERN = Pattern.compile("\\R|\\\\n");
+	private static final Pattern ALL_TRAILING_NEWLINES_PATTERN = Pattern.compile("\\R+$");
+
+	// Includes empty and trailing empty lines:
+	public static String[] splitLines(String source) {
+		return splitLines(source, false);
+	}
 
 	// Includes empty and trailing empty lines:
 	public static String[] splitLines(String source, boolean splitLiteralNewlines) {
@@ -198,6 +204,32 @@ public class StringUtils {
 		} else {
 			return NEWLINE_PATTERN.split(source, -1);
 		}
+	}
+
+	public static String stripTrailingNewlines(String string) {
+		Validate.notNull(string, "string is null");
+		return ALL_TRAILING_NEWLINES_PATTERN.matcher(string).replaceFirst("");
+	}
+
+	public static boolean containsNewline(String string) {
+		if (string == null) return false;
+		int length = string.length();
+		for (int i = 0; i < length; i++) {
+			char c = string.charAt(i);
+			switch (c) {
+			case '\n': // Line feed (\\u000A)
+			case '\r': // Carriage return (\\u000D)
+			case '\f': // Form feed (\\u000C)
+			case '\u000B': // Vertical tab
+			case '\u0085': // Next line
+			case '\u2028': // Unicode line separator
+			case '\u2029': // Unicode paragraph separator
+				return true;
+			default:
+				continue;
+			}
+		}
+		return false;
 	}
 
 	public static String prefix(String prefix, String delimiter, String message) {

@@ -35,6 +35,23 @@ public class StringUtilsTests {
 	}
 
 	@Test
+	public void testStripTrailingNewlines() {
+		String string1 = "Multi-line\nString\r\nwith trailing\nnewlines\n";
+		String string2 = "Multi-line\nString\r\nwith trailing\nnewlines\r\n";
+		String string3 = "Multi-line\nString\r\nwith trailing\nnewlines\n\n\n";
+		String string4 = "Multi-line\nString\r\nwith trailing\nnewlines\n\r\r\n";
+		String expected = "Multi-line\nString\r\nwith trailing\nnewlines";
+		String stripped1 = StringUtils.stripTrailingNewlines(string1);
+		String stripped2 = StringUtils.stripTrailingNewlines(string2);
+		String stripped3 = StringUtils.stripTrailingNewlines(string3);
+		String stripped4 = StringUtils.stripTrailingNewlines(string4);
+		Assert.assertEquals(expected, stripped1);
+		Assert.assertEquals(expected, stripped2);
+		Assert.assertEquals(expected, stripped3);
+		Assert.assertEquals(expected, stripped4);
+	}
+
+	@Test
 	public void testReplaceFirst() {
 		String input = "Text with {key} and {key}!";
 		String result = StringUtils.replaceFirst(input, "{key}", "replacement");

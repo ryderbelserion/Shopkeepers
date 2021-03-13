@@ -14,6 +14,7 @@ import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.StringUtils;
 
 class CommandYaml extends PlayerCommand {
 
@@ -44,11 +45,11 @@ class CommandYaml extends PlayerCommand {
 		}
 
 		// Serialized ItemStack and ItemData:
-		String itemStackYaml = ConfigUtils.toYaml("item-in-hand", itemInHand);
-		String itemDataYaml = ConfigUtils.toYaml("item-in-hand-config-data", new ItemData(itemInHand).serialize());
+		String itemStackYaml = ConfigUtils.toConfigYaml("item-in-hand", itemInHand);
+		String itemDataYaml = ConfigUtils.toConfigYaml("item-in-hand-config-data", new ItemData(itemInHand).serialize());
 
-		String[] itemStackYamlLines = ConfigUtils.splitYamlLines(itemStackYaml);
-		String[] itemDataYamlLines = ConfigUtils.splitYamlLines(itemDataYaml);
+		String[] itemStackYamlLines = StringUtils.splitLines(itemStackYaml);
+		String[] itemDataYamlLines = StringUtils.splitLines(itemDataYaml);
 
 		// Print to player:
 		player.sendMessage(ChatColor.YELLOW + "Serialized ItemStack:");

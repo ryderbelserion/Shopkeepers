@@ -1,11 +1,14 @@
 package com.nisovin.shopkeepers.util;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 
 public class ConfigUtils {
 
@@ -55,49 +58,120 @@ public class ConfigUtils {
 		});
 	}
 
-	// Not null.
-	public static String toYaml(ConfigurationSerializable serializable) {
-		return toYaml((serializable != null) ? serializable.serialize() : null);
+	public static void setAll(ConfigurationSection configSection, Map<String, Object> map) {
+		Validate.notNull(configSection, "configSection is null");
+		if (map != null) {
+			map.entrySet().forEach(entry -> {
+				configSection.set(entry.getKey(), entry.getValue());
+			});
+		}
 	}
 
-	// Not null.
-	public static String toYaml(Map<String, Object> map) {
+	// Mimics Bukkit's serialization. Includes the type key of the given ConfigurationSerializable.
+	public static Map<String, Object> serialize(ConfigurationSerializable serializable) {
+		if (serializable == null) return null;
+		Map<String, Object> dataMap = new LinkedHashMap<>();
+		dataMap.put(ConfigurationSerialization.SERIALIZED_TYPE_KEY, ConfigurationSerialization.getAlias(serializable.getClass()));
+		dataMap.putAll(serializable.serialize());
+		return dataMap;
+	}
+
+	// Expects the Map to contain a type key.
+	@SuppressWarnings("unchecked")
+	public static <T extends ConfigurationSerializable> T deserialize(Map<String, Object> dataMap) {
+		if (dataMap == null) return null;
+		try {
+			return (T) ConfigurationSerialization.deserializeObject(dataMap);
+		} catch (IllegalArgumentException ex) {
+			throw new IllegalArgumentException("Could not deserialize object", ex);
+		}
+	}
+
+	public static Map<String, Object> serializeDeeply(ConfigurationSerializable serializable) {
+		Map<String, Object> dataMap = serialize(serializable); // Can be null
+		serializeDeeply(dataMap);
+		return dataMap;
+	}
+
+	// This deeply and recursively replaces all serializable elements, as well as ConfigurationSections, in the given
+	// Map with their respective serializations. The given Map is expected to be modifiable. But since the inner Maps
+	// may be immutable, they may need to be copied.
+	public static void serializeDeeply(Map<?, Object> dataMap) {
+		if (dataMap == null) return;
+		dataMap.entrySet().forEach(entry -> {
+			Object value = entry.getValue();
+			if (value instanceof Map) {
+				// The Map may be unmodifiable. But since we may need to recursively replace its entries, we need to
+				// copy it.
+				Map<?, Object> innerMap = new LinkedHashMap<>((Map<?, ?>) value);
+				serializeDeeply(innerMap);
+				entry.setValue(innerMap);
+			} else if (value instanceof ConfigurationSection) {
+				Map<String, Object> innerSectionMap = ((ConfigurationSection) value).getValues(false);
+				serializeDeeply(innerSectionMap);
+				entry.setValue(innerSectionMap);
+			} else if (value instanceof ConfigurationSerializable) {
+				Map<String, Object> innerSerializableData = serialize((ConfigurationSerializable) value);
+				serializeDeeply(innerSerializableData);
+				entry.setValue(innerSerializableData);
+			}
+		});
+	}
+
+	// Serializes the data of the given ConfigurationSerializable as a flat Map, without the serialized type key.
+	// Does not return null. Returns an empty String if the object is null.
+	public static String toFlatConfigYaml(ConfigurationSerializable serializable) {
+		Map<String, Object> dataMap = (serializable != null) ? serializable.serialize() : null;
+		return toFlatConfigYaml(dataMap);
+	}
+
+	// This does not store the given data under any key, but inserts it into the top-level map of a YamlConfiguration.
+	// Does not return null, even if the given Map is null.
+	// Note: If the given map is the data of a serialized ConfigurationSerializable and it includes its serialized type
+	// key, the produced Yaml output may not be loadable again as a YamlConfiguration, because it will deserialize as
+	// the ConfigurationSerializable instead of a Map.
+	public static String toFlatConfigYaml(Map<String, Object> map) {
 		YamlConfiguration yamlConfig = YAML_CONFIG.get();
 		try {
-			if (map != null) {
-				map.entrySet().forEach(entry -> {
-					yamlConfig.set(entry.getKey(), entry.getValue());
-				});
-			}
+			setAll(yamlConfig, map);
 			return yamlConfig.saveToString();
 		} finally {
 			clearConfigSection(yamlConfig);
 		}
 	}
 
-	// Not null.
-	public static String toYaml(String key, ConfigurationSerializable serializable) {
-		return toYaml(key, (serializable != null) ? serializable.serialize() : null);
+	// Serializes the data of the given ConfigurationSerializable as a flat Map, without the serialized type key, under
+	// the specified config key.
+	// Does not return null. Returns an empty String if the object is null.
+	public static String toFlatConfigYaml(String key, ConfigurationSerializable serializable) {
+		Map<String, Object> dataMap = (serializable != null) ? serializable.serialize() : null;
+		return toConfigYaml(key, dataMap);
 	}
 
-	// Not null.
-	public static String toYaml(String key, Object serializedObject) {
+	// Does not return null. Returns an empty String if the object is null.
+	public static String toConfigYaml(String key, Object object) {
 		YamlConfiguration yamlConfig = YAML_CONFIG.get();
 		try {
-			yamlConfig.set(key, serializedObject);
+			yamlConfig.set(key, object);
 			return yamlConfig.saveToString();
 		} finally {
 			yamlConfig.set(key, null);
 		}
 	}
 
-	public static String yamlNewline() {
-		return "\n"; // YAML uses Unix line breaks by default
-	}
-
-	public static String[] splitYamlLines(String yaml) {
-		Validate.notNull(yaml, "yaml String is null");
-		return yaml.split(yamlNewline());
+	// The input is expected to be a serialized config Map.
+	@SuppressWarnings("unchecked")
+	public static <T> T fromConfigYaml(String yamlConfigString, String key) {
+		if (yamlConfigString == null) return null;
+		YamlConfiguration yamlConfig = YAML_CONFIG.get();
+		try {
+			yamlConfig.loadFromString(yamlConfigString);
+			return (T) yamlConfig.get(key);
+		} catch (InvalidConfigurationException e) {
+			return null;
+		} finally {
+			clearConfigSection(yamlConfig);
+		}
 	}
 
 	private ConfigUtils() {

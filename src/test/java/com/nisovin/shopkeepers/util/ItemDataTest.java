@@ -8,13 +8,14 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.nisovin.shopkeepers.util.ItemData.ItemDataDeserializeException;
+import com.nisovin.shopkeepers.util.yaml.YamlUtils;
 
 // Note: We test the ItemStack deserialization through ItemData. Since ItemData is defined by its stored ItemStack,
 // this is sufficient to also test the deserialization of the ItemData itself.
 public class ItemDataTest extends AbstractItemStackSerializationTest {
 
 	private static String yamlNewline() {
-		return ConfigUtils.yamlNewline();
+		return YamlUtils.yamlNewline();
 	}
 
 	private String serializeToYamlConfig(ItemData itemData) {
@@ -41,7 +42,7 @@ public class ItemDataTest extends AbstractItemStackSerializationTest {
 	}
 
 	@Override
-	protected Object serialize(ItemStack itemStack) {
+	protected String serialize(ItemStack itemStack) {
 		ItemData itemData = null;
 		if (itemStack != null) {
 			itemStack.setAmount(1); // We don't serialize the stack size

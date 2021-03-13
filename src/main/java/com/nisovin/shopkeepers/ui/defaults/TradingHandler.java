@@ -530,8 +530,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			if (!silent) {
 				if (Debug.isDebugging()) {
 					Log.debug("Not handling trade: The trade result item does not match the expected item of the used trading recipe!");
-					String recipeResultItemYaml = ConfigUtils.toYaml("recipeResultItem", recipeResultItem);
-					String resultItemYaml = ConfigUtils.toYaml("resultItem", resultItem);
+					String recipeResultItemYaml = ConfigUtils.toConfigYaml("recipeResultItem", recipeResultItem);
+					String resultItemYaml = ConfigUtils.toConfigYaml("resultItem", resultItem);
 					Log.debug(recipeResultItemYaml);
 					Log.debug(resultItemYaml);
 				}
