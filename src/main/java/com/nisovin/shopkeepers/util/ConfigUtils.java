@@ -118,18 +118,11 @@ public class ConfigUtils {
 		});
 	}
 
-	// Serializes the data of the given ConfigurationSerializable as a flat Map, without the serialized type key.
-	// Does not return null. Returns an empty String if the object is null.
-	public static String toFlatConfigYaml(ConfigurationSerializable serializable) {
-		Map<String, Object> dataMap = (serializable != null) ? serializable.serialize() : null;
-		return toFlatConfigYaml(dataMap);
-	}
-
 	// This does not store the given data under any key, but inserts it into the top-level map of a YamlConfiguration.
 	// Does not return null, even if the given Map is null.
-	// Note: If the given map is the data of a serialized ConfigurationSerializable and it includes its serialized type
-	// key, the produced Yaml output may not be loadable again as a YamlConfiguration, because it will deserialize as
-	// the ConfigurationSerializable instead of a Map.
+	// Note: If the given map is the data of a serialized ConfigurationSerializable, and it includes its serialized type
+	// key, the produced Yaml output may not be loadable again as a YamlConfiguration, because it will deserialize as a
+	// ConfigurationSerializable instead of a Map.
 	public static String toFlatConfigYaml(Map<String, Object> map) {
 		YamlConfiguration yamlConfig = YAML_CONFIG.get();
 		try {
@@ -138,14 +131,6 @@ public class ConfigUtils {
 		} finally {
 			clearConfigSection(yamlConfig);
 		}
-	}
-
-	// Serializes the data of the given ConfigurationSerializable as a flat Map, without the serialized type key, under
-	// the specified config key.
-	// Does not return null. Returns an empty String if the object is null.
-	public static String toFlatConfigYaml(String key, ConfigurationSerializable serializable) {
-		Map<String, Object> dataMap = (serializable != null) ? serializable.serialize() : null;
-		return toConfigYaml(key, dataMap);
 	}
 
 	// Does not return null. Returns an empty String if the object is null.
