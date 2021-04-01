@@ -2,7 +2,7 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.13.0 (TBA)
-### Supported MC versions: 1.16.4, 1.16.3, 1.16.2, 1.16.1, 1.15.2, 1.14.4
+### Supported MC versions: 1.16.5, 1.15.2, 1.14.4
 
 * Messages have been separated from the config.
   * We always generate an 'en-default' language file. This file acts as a template for custom language files. It is not meant to be modified and is replaced with an up-to-date version on every plugin startup.
