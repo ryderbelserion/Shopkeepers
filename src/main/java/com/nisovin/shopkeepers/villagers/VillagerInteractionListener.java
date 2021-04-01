@@ -10,6 +10,7 @@ import org.bukkit.entity.WanderingTrader;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
@@ -65,10 +66,22 @@ public class VillagerInteractionListener implements Listener {
 			Log.debug("  trading prevented");
 		}
 
-		// Only react to main hand events:
-		if (event.getHand() != EquipmentSlot.HAND) return;
-
 		Player player = event.getPlayer();
+
+		// We only react to main hand events.
+		// However, unlike vanilla Minecraft, Forge clients might send additional off-hand interactions, even if the
+		// previous main-hand interaction was cancelled. This breaks the villager editor, because it immediately closes
+		// the villager editor again and opens the regular villager trading interface instead (see Shopkeepers#728). In
+		// an attempt to resolve this incompatibility, we therefore cancel these off-hand interactions if the player
+		// already has some inventory open currently.
+		if (event.getHand() != EquipmentSlot.HAND) {
+			if (ItemUtils.hasInventoryOpen(player)) {
+				event.setCancelled(true);
+				Log.debug("  off-hand interaction prevented due to open inventory");
+			}
+			return;
+		}
+
 		boolean overrideTrading = false;
 		if (this.handleEditRegularVillager(player, villager)) {
 			// Villager editor for regular villagers.

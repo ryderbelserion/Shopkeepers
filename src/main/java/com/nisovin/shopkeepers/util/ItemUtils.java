@@ -14,6 +14,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -758,6 +759,21 @@ public final class ItemUtils {
 	 */
 	public static final ItemStack[] emptyItemStackArray() {
 		return EMPTY_ITEMSTACK_ARRAY;
+	}
+
+	/**
+	 * Checks whether the given {@link Player} is currently viewing an inventory.
+	 * <p>
+	 * Because opening the own inventory does not inform the server, this method cannot detect if the player is
+	 * currently viewing his own inventory or the creative mode inventory.
+	 * 
+	 * @param player
+	 *            the player, not <code>null</code>
+	 * @return <code>true</code> if the player has currently an inventory open (that is not his own inventory)
+	 */
+	public static boolean hasInventoryOpen(Player player) {
+		InventoryType inventoryType = player.getOpenInventory().getType();
+		return inventoryType != InventoryType.CRAFTING && inventoryType != InventoryType.CREATIVE;
 	}
 
 	/**

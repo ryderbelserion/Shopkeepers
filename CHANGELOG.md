@@ -172,6 +172,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Debug: Added a check to the `/shopkeeper checkitem` debug command whether the held item matches the off-hand item according to Minecraft's matching rules. Unlike our matching rules, this is more strict about differences in the internal data types.
 * Messages: When splitting messages into multiple lines, we account for all kinds of Unicode newlines now.
 * Debug: The `/shopkeeper yaml` command includes the ItemStack's serialized type key now.
+* Fixed: Forge clients seem to send additional off-hand interactions when interacting with villagers. This breaks our villager editor, because it immediately closes the villager editor again and instead opens the regular villager trading interface. In an attempt to resolve this incompatibility, we now cancel all off-hand interactions with regular villagers if the player already has some inventory open.
 
 API:  
 * Renamed TradingOffer to TradeOffer.
