@@ -12,7 +12,7 @@ public interface AdminShopkeeper extends Shopkeeper {
 	 * 
 	 * @return the permission, or <code>null</code> if no permission is required
 	 */
-	public String getTradePremission();
+	public String getTradePermission();
 
 	/**
 	 * Sets the permission that is required to trade with this {@link AdminShopkeeper}.

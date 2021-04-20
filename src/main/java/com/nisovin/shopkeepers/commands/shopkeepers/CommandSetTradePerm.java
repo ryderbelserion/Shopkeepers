@@ -59,7 +59,7 @@ class CommandSetTradePerm extends Command {
 
 		String newTradePerm = context.get(ARGUMENT_NEW_PERMISSION);
 		boolean removePerm = context.has(ARGUMENT_REMOVE_PERMISSION);
-		String currentTradePerm = ((AdminShopkeeper) shopkeeper).getTradePremission();
+		String currentTradePerm = ((AdminShopkeeper) shopkeeper).getTradePermission();
 		if (currentTradePerm == null) currentTradePerm = "-";
 
 		if (removePerm) {

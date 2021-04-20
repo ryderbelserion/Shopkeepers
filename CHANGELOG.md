@@ -175,6 +175,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Fixed: Forge clients seem to send additional off-hand interactions when interacting with villagers. This breaks our villager editor, because it immediately closes the villager editor again and instead opens the regular villager trading interface. In an attempt to resolve this incompatibility, we now cancel all off-hand interactions with regular villagers if the player already has some inventory open.
 
 API:  
+* Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
 * Renamed TradingOffer to TradeOffer.
 * Removed the factory methods for trading recipes from the API. Only the Shopkeepers plugin itself, and plugins using the internal API should be required to create trading recipes.
 * Shopkeeper#getTradingRecipes, as well as the various shopkeeper type specific methods to get, set, and add offers are less specific now about the element types of the involved lists.
