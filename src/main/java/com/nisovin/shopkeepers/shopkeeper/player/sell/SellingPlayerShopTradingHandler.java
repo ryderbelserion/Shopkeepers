@@ -36,7 +36,7 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		// validate the found offer:
+		// Validate the found offer:
 		int expectedSoldItemAmount = offer.getItem().getAmount();
 		if (expectedSoldItemAmount != soldItem.getAmount()) {
 			// This should not happen .. because the recipe was created based on this offer.
