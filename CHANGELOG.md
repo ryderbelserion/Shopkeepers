@@ -173,6 +173,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Messages: When splitting messages into multiple lines, we account for all kinds of Unicode newlines now.
 * Debug: The `/shopkeeper yaml` command includes the ItemStack's serialized type key now.
 * Fixed: Forge clients seem to send additional off-hand interactions when interacting with villagers. This breaks our villager editor, because it immediately closes the villager editor again and instead opens the regular villager trading interface. In an attempt to resolve this incompatibility, we now cancel all off-hand interactions with regular villagers if the player already has some inventory open.
+* Fixed: Shopkeeper entities are now marked as invulnerable, so that other entities ignore them in various additional cases. Eg. villagers are no longer panicked by nearby hostile mob shopkeepers.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.

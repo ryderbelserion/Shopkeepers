@@ -230,6 +230,11 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			entity.setRemoveWhenFarAway(false);
 			entity.setCanPickupItems(false);
 
+			// This is also required so that certain Minecraft behaviors (eg. the panic behavior of nearby villagers) ignore the
+			// shopkeeper entities. Otherwise, the shopkeeper entities can be abused for mob farms (eg. villages spawn more iron
+			// golems when villagers are in panic due to nearby hostile mob shopkeepers).
+			entity.setInvulnerable(true);
+
 			// Disable breeding:
 			if (entity instanceof Ageable) {
 				Ageable ageable = ((Ageable) entity);
