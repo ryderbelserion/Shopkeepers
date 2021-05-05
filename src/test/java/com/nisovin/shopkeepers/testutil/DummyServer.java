@@ -74,7 +74,7 @@ public class DummyServer implements InvocationHandler {
 				}
 			});
 
-			// set dummy server:
+			// Set dummy server:
 			Bukkit.setServer((Server) Proxy.newProxyInstance(Server.class.getClassLoader(), new Class<?>[] { Server.class }, new DummyServer()));
 		} catch (Throwable t) {
 			throw new Error(t);

@@ -9,10 +9,11 @@ import org.bukkit.potion.PotionType;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.util.EnchantmentUtils;
 import com.nisovin.shopkeepers.util.PotionUtils;
 
-public class PlaceholderItemTests {
+public class PlaceholderItemTests extends AbstractBukkitTest {
 
 	@Test
 	public void testNonPlaceholderItems() {
