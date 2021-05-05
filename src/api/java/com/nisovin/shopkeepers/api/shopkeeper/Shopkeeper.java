@@ -35,9 +35,9 @@ public interface Shopkeeper {
 	// LIFE CYCLE
 
 	/**
-	 * Checks whether this shopkeeper object is currently valid.
+	 * Checks whether this shopkeeper instance is currently valid.
 	 * <p>
-	 * The shopkeeper gets marked as 'invalid' once it gets removed form the {@link ShopkeeperRegistry}.
+	 * The shopkeeper is marked as 'invalid' once it is removed form the {@link ShopkeeperRegistry}.
 	 * 
 	 * @return <code>true</code> if valid
 	 */
