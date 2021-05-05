@@ -574,8 +574,10 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 		if (Settings.useStrictItemComparison) {
 			// Verify the recipe items are perfectly matching (they can still be swapped though):
-			if (!ItemUtils.isSimilar(requiredItem1, offeredItem1) || !ItemUtils.isSimilar(requiredItem2, offeredItem2)) {
-				// Additional check for the debug flag, so we don't do the item comparisons if not really needed:
+			boolean item1Similar = ItemUtils.isSimilar(requiredItem1, offeredItem1);
+			boolean item2Similar = ItemUtils.isSimilar(requiredItem2, offeredItem2);
+			if (!item1Similar || !item2Similar) {
+				// Additional check for the debug flag, so that we can skip this whole block if it is not really needed:
 				if (!slientStrictItemComparison && Settings.debug) {
 					String errorMsg = "The offered items do not strictly match the required items.";
 					if (tradingContext) {
@@ -583,9 +585,20 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 					} else {
 						Log.debug(errorMsg);
 					}
+
 					Log.debug("Used trading recipe: " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
-					Log.debug("Recipe item 1: " + (ItemUtils.isSimilar(requiredItem1, offeredItem1) ? "similar" : "not similar"));
-					Log.debug("Recipe item 2: " + (ItemUtils.isSimilar(requiredItem2, offeredItem2) ? "similar" : "not similar"));
+					if (!item1Similar) {
+						String requiredItemYaml = ConfigUtils.toConfigYaml("requiredItem1", requiredItem1);
+						String offeredItemYaml = ConfigUtils.toConfigYaml("offeredItem1", offeredItem1);
+						Log.debug(requiredItemYaml);
+						Log.debug(offeredItemYaml);
+					}
+					if (!item2Similar) {
+						String requiredItemYaml = ConfigUtils.toConfigYaml("requiredItem2", requiredItem2);
+						String offeredItemYaml = ConfigUtils.toConfigYaml("offeredItem2", offeredItem2);
+						Log.debug(requiredItemYaml);
+						Log.debug(offeredItemYaml);
+					}
 				}
 				this.clearResultSlotForInvalidTrade(merchantInventory);
 				return null;

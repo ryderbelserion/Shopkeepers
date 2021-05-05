@@ -180,6 +180,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * Config: Added setting 'log-item-metadata' (disabled by default). This enables the logging of item metadata.
   * Performance: The logging happens asynchronously now, and in batches. When a trade occurs, we wait 5 seconds before we start logging the trade and any other trades that may have happened within these 5 seconds.
   * Debug: Improved the error handling and debug output related to the CSV trade logging.
+* Debug: When a strict item comparison fails, we now log the serialized data of the involved mismatching items.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
