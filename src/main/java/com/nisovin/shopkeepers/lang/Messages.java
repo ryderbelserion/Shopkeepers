@@ -314,7 +314,7 @@ public class Messages extends Config {
 	public static Text commandDescriptionHelp = Text.parse("Shows this help page.");
 	public static Text commandDescriptionReload = Text.parse("Reloads this plugin.");
 	public static Text commandDescriptionDebug = Text.parse("Toggles debug mode on and off.");
-	public static Text commandDescriptionList = Text.parse("Lists all shops for the specified player, or all admin shops.");
+	public static Text commandDescriptionList = Text.parse("Lists all shops of a specific player, or all admin shops.");
 	public static Text commandDescriptionRemoveAll = Text.parse("Removes all shops of a specific player, all players, or all admin shops.");
 	public static Text commandDescriptionGive = Text.parse("Gives shop creation item(s) to the specified player.");
 	public static Text commandDescriptionGiveCurrency = Text.parse("Gives currency item(s) to the specified player.");

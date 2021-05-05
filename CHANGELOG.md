@@ -317,6 +317,7 @@ Messages:
 * Added 'button-invulnerability-lore'.
 * Changed 'creation-item-selected' to clarify that one has to not aim at any block in order to select the shop or object type.
 * Renamed and slightly changed 'command-description-remove' -> 'command-description-remove-all'.
+* Slightly changed the default 'command-description-list' message.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.
