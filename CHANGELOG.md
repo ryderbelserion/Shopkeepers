@@ -181,6 +181,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * Performance: The logging happens asynchronously now, and in batches. When a trade occurs, we wait 5 seconds before we start logging the trade and any other trades that may have happened within these 5 seconds.
   * Debug: Improved the error handling and debug output related to the CSV trade logging.
 * Debug: When a strict item comparison fails, we now log the serialized data of the involved mismatching items.
+* Changed: The '/shopkeeper remove' command is now called '/shopkeeper removeAll'. All related permission nodes and some related messages have changed. The 'all' argument, which removes the player shops of all players, has been changed to 'player'.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
@@ -276,6 +277,11 @@ Migration notes:
 * Removed the migration from Citizens shopkeeper NPC ids to NPC unique ids (originally added in v2.4.0).
 * The setting 'enable-spawn-verifier' is no longer used and is automatically removed from existing configs during the update.
 * The data format of the CSV trade logs has changed. If you automatically process these CSV trade logs, you may have to update your programs to account for the new format.
+* The permissions for the shopkeeper remove (all) command have changed. You may have to update your permissions setup.
+  * 'shopkeeper.remove.own' -> 'shopkeeper.remove-all.own'
+  * 'shopkeeper.remove.others' -> 'shopkeeper.remove-all.others'
+  * 'shopkeeper.remove.all' -> 'shopkeeper.remove-all.player'
+  * 'shopkeeper.remove.admin' -> 'shopkeeper.remove-all.admin'
 
 Messages:  
 * All message keys were changed to no longer start with the 'msg' prefix.
@@ -310,6 +316,7 @@ Messages:
 * Added 'button-invulnerability'.
 * Added 'button-invulnerability-lore'.
 * Changed 'creation-item-selected' to clarify that one has to not aim at any block in order to select the shop or object type.
+* Renamed and slightly changed 'command-description-remove' -> 'command-description-remove-all'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.

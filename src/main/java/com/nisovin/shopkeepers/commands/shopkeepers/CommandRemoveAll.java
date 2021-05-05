@@ -34,20 +34,20 @@ import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 import com.nisovin.shopkeepers.util.ShopkeeperUtils.OwnedPlayerShopsResult;
 import com.nisovin.shopkeepers.util.TextUtils;
 
-class CommandRemove extends Command {
+class CommandRemoveAll extends Command {
 
 	private static final String ARGUMENT_PLAYER = "player";
 	private static final String ARGUMENT_PLAYER_NAME = "player:name";
 	private static final String ARGUMENT_PLAYER_UUID = "player:uuid";
-	private static final String ARGUMENT_ALL = "all";
-	private static final String ARGUMENT_ADMIN = "admin";
+	private static final String ARGUMENT_ALL_PLAYER_SHOPS = "player";
+	private static final String ARGUMENT_ALL_ADMIN_SHOPS = "admin";
 
 	private final ShopkeepersPlugin plugin;
 	private final ShopkeeperRegistry shopkeeperRegistry;
 	private final Confirmations confirmations;
 
-	CommandRemove(ShopkeepersPlugin plugin, ShopkeeperRegistry shopkeeperRegistry, Confirmations confirmations) {
-		super("remove", Arrays.asList("delete"));
+	CommandRemoveAll(ShopkeepersPlugin plugin, ShopkeeperRegistry shopkeeperRegistry, Confirmations confirmations) {
+		super("removeAll", Arrays.asList("deleteAll"));
 		this.plugin = plugin;
 		this.shopkeeperRegistry = shopkeeperRegistry;
 		this.confirmations = confirmations;
@@ -55,15 +55,15 @@ class CommandRemove extends Command {
 		// Permission gets checked by testPermission and during execution.
 
 		// Set description:
-		this.setDescription(Messages.commandDescriptionRemove);
+		this.setDescription(Messages.commandDescriptionRemoveAll);
 
 		// Arguments: TODO Allow specifying a single shopkeeper?
 		this.addArgument(new FirstOfArgument("target", Arrays.asList(
-				new LiteralArgument(ARGUMENT_ADMIN),
-				new LiteralArgument(ARGUMENT_ALL),
+				new LiteralArgument(ARGUMENT_ALL_ADMIN_SHOPS),
+				new LiteralArgument(ARGUMENT_ALL_PLAYER_SHOPS),
 				new FirstOfArgument(ARGUMENT_PLAYER, Arrays.asList(
 						// TODO Provide completions for known shop owners?
-						new PlayerUUIDArgument(ARGUMENT_PLAYER_UUID), // accepts any uuid
+						new PlayerUUIDArgument(ARGUMENT_PLAYER_UUID), // Accepts any uuid
 						// Accepts any name, falls back to sender if no name is specified.
 						// TODO Add alias 'own'?
 						new SenderPlayerNameFallback(new PlayerNameArgument(ARGUMENT_PLAYER_NAME))
@@ -74,21 +74,21 @@ class CommandRemove extends Command {
 	@Override
 	public boolean testPermission(CommandSender sender) {
 		if (!super.testPermission(sender)) return false;
-		return PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_OWN_PERMISSION)
-				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_OTHERS_PERMISSION)
-				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_ALL_PERMISSION)
-				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_ADMIN_PERMISSION);
+		return PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_ALL_OWN_PERMISSION)
+				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_ALL_OTHERS_PERMISSION)
+				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_ALL_PLAYER_PERMISSION)
+				|| PermissionUtils.hasPermission(sender, ShopkeepersPlugin.REMOVE_ALL_ADMIN_PERMISSION);
 	}
 
 	@Override
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 		Player senderPlayer = (sender instanceof Player) ? (Player) sender : null;
-		boolean all = context.has(ARGUMENT_ALL);
-		boolean admin = context.has(ARGUMENT_ADMIN);
+		boolean allPlayers = context.has(ARGUMENT_ALL_PLAYER_SHOPS);
+		boolean allAdmin = context.has(ARGUMENT_ALL_ADMIN_SHOPS);
 		UUID targetPlayerUUID = context.get(ARGUMENT_PLAYER_UUID); // can be null
 		String targetPlayerName = context.get(ARGUMENT_PLAYER_NAME); // can be null
-		assert all ^ admin ^ (targetPlayerUUID != null ^ targetPlayerName != null); // xor
+		assert allPlayers ^ allAdmin ^ (targetPlayerUUID != null ^ targetPlayerName != null); // xor
 
 		boolean targetOwnShops = false;
 		if (targetPlayerUUID != null || targetPlayerName != null) {
@@ -112,25 +112,25 @@ class CommandRemove extends Command {
 		}
 
 		// Permission checks:
-		if (admin) {
+		if (allAdmin) {
 			// Remove all admin shopkeepers:
-			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_ADMIN_PERMISSION);
-		} else if (all) {
+			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_ALL_ADMIN_PERMISSION);
+		} else if (allPlayers) {
 			// Remove all player shopkeepers:
-			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_ALL_PERMISSION);
+			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_ALL_PLAYER_PERMISSION);
 		} else if (targetOwnShops) {
 			// Remove own player shopkeepers:
-			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_OWN_PERMISSION);
+			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_ALL_OWN_PERMISSION);
 		} else {
 			// Remove other player's shopkeepers:
-			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_OTHERS_PERMISSION);
+			this.checkPermission(sender, ShopkeepersPlugin.REMOVE_ALL_OTHERS_PERMISSION);
 		}
 
 		// Get the affected shops:
 		// Note: Doing this before prompting the command executor for confirmation allows us to detect ambiguous player
 		// names and missing player information (the player name/uuid if only the uuid/name is specified).
 		List<? extends Shopkeeper> affectedShops;
-		if (admin) {
+		if (allAdmin) {
 			// Search all admin shops:
 			List<Shopkeeper> adminShops = new ArrayList<>();
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
@@ -139,7 +139,7 @@ class CommandRemove extends Command {
 				}
 			}
 			affectedShops = adminShops;
-		} else if (all) {
+		} else if (allPlayers) {
 			// Search all player shops:
 			List<Shopkeeper> playerShops = new ArrayList<>();
 			for (Shopkeeper shopkeeper : shopkeeperRegistry.getAllShopkeepers()) {
@@ -198,12 +198,12 @@ class CommandRemove extends Command {
 			plugin.getShopkeeperStorage().save();
 
 			// Print the result message:
-			if (admin) {
+			if (allAdmin) {
 				// Removed all admin shops:
 				TextUtils.sendMessage(sender, Messages.removedAdminShops,
 						"shopsCount", actualShopCount
 				);
-			} else if (all) {
+			} else if (allPlayers) {
 				// Removed all player shops:
 				TextUtils.sendMessage(sender, Messages.removedPlayerShops,
 						"shopsCount", actualShopCount
@@ -221,12 +221,12 @@ class CommandRemove extends Command {
 
 		// Inform the sender about required confirmation:
 		int shopsCount = affectedShops.size();
-		if (admin) {
+		if (allAdmin) {
 			// Removing all admin shops:
 			TextUtils.sendMessage(sender, Messages.confirmRemoveAllAdminShops,
 					"shopsCount", shopsCount
 			);
-		} else if (all) {
+		} else if (allPlayers) {
 			// Removing all player shops:
 			TextUtils.sendMessage(sender, Messages.confirmRemoveAllPlayerShops,
 					"shopsCount", shopsCount
