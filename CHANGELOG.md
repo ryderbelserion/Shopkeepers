@@ -174,6 +174,12 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Debug: The `/shopkeeper yaml` command includes the ItemStack's serialized type key now.
 * Fixed: Forge clients seem to send additional off-hand interactions when interacting with villagers. This breaks our villager editor, because it immediately closes the villager editor again and instead opens the regular villager trading interface. In an attempt to resolve this incompatibility, we now cancel all off-hand interactions with regular villagers if the player already has some inventory open.
 * Fixed: Shopkeeper entities are now marked as invulnerable, so that other entities ignore them in various additional cases. Eg. villagers are no longer panicked by nearby hostile mob shopkeepers.
+* Changes to the CSV trade logging:
+  * Data: The data format has changed. If you automatically process these CSV trade logs, you may have to update your programs to account for the new format.
+  * Config: Renamed 'enable-purchase-logging' to 'log-trades-to-csv'. The previous config is automatically migrated.
+  * Config: Added setting 'log-item-metadata' (disabled by default). This enables the logging of item metadata.
+  * Performance: The logging happens asynchronously now, and in batches. When a trade occurs, we wait 5 seconds before we start logging the trade and any other trades that may have happened within these 5 seconds.
+  * Debug: Improved the error handling and debug output related to the CSV trade logging.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
@@ -255,6 +261,9 @@ Internal:
 * We also register the dynamic mob type specific shop object type permissions now.
 * Since the `shopkeeper.entity.*` permission is given to all players by default, we check it first now, prior to checking the mob type specific permission.
 * Slightly optimized the lookup of protected containers.
+* Added classes to represent snapshot data of trades, players, and shops.
+* Added a CsvFormatter utility with various options.
+* The CSV trade logger uses new file and date-time APIs now.
 * Minor other internal code refactoring.
 
 Migration notes:  
@@ -265,6 +274,7 @@ Migration notes:
 * Removed the 1.16 'PIG_ZOMBIE' migration. We no longer automatically remove this mob type from the config, but only log a warning and then ignore it.
 * Removed the migration from Citizens shopkeeper NPC ids to NPC unique ids (originally added in v2.4.0).
 * The setting 'enable-spawn-verifier' is no longer used and is automatically removed from existing configs during the update.
+* The data format of the CSV trade logs has changed. If you automatically process these CSV trade logs, you may have to update your programs to account for the new format.
 
 Messages:  
 * All message keys were changed to no longer start with the 'msg' prefix.

@@ -443,9 +443,6 @@ prevent-trading-while-owner-is-online: false
 # will prevent the trade once the player tries to pickup the item from the
 # trading result slot.
 use-strict-item-comparison: false
-# Whether all shopkeeper purchases shall be logged to csv files in the plugin
-# folder.
-enable-purchase-logging: false
 # Whether to increment Minecraft's talked-to-villager and traded-with-villager
 # statistics whenever a player opens the trading menu and trades with a
 # shopkeeper.
@@ -456,6 +453,19 @@ tax-rate: 0
 # Whether to round up instead of down when calculating the tax of a player shop
 # transaction.
 tax-round-up: false
+
+# *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
+# Trade Log
+# *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
+
+# Whether to log all trades to CSV files inside the plugin folder.
+log-trades-to-csv: false
+
+# Whether to also log the metadata of items. This includes, for example, their
+# display name, lore, enchantments, etc. This data will be logged in Spigot's
+# YAML format. Enabling this setting can, however, noticeably increase the
+# storage space requirements.
+log-item-metadata: false
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Currencies

@@ -263,6 +263,44 @@ public class StringUtils {
 		return false;
 	}
 
+	public static String escapeNewlinesAndBackslash(String string) {
+		if (string == null) return null;
+		int length = string.length();
+		StringBuilder sb = new StringBuilder(length * 2);
+		for (int i = 0; i < length; i++) {
+			char c = string.charAt(i);
+			switch (c) {
+			case '\\': // Backslash
+				sb.append("\\\\");
+				break;
+			case '\n': // Line feed
+				sb.append("\\n");
+				break;
+			case '\r': // Carriage return
+				sb.append("\\r");
+				break;
+			case '\f': // Form feed
+				sb.append("\\f");
+				break;
+			case '\u000B': // Vertical tab
+				sb.append("\\u000B");
+				break;
+			case '\u0085': // Next line
+				sb.append("\\u0085");
+				break;
+			case '\u2028': // Unicode line separator
+				sb.append("\\u2028");
+				break;
+			case '\u2029': // Unicode paragraph separator
+				sb.append("\\u2029");
+				break;
+			default:
+				sb.append(c);
+			}
+		}
+		return sb.toString();
+	}
+
 	public static String prefix(String prefix, String delimiter, String message) {
 		if (StringUtils.isEmpty(prefix)) return message;
 		return prefix + (delimiter == null ? "" : delimiter) + message;

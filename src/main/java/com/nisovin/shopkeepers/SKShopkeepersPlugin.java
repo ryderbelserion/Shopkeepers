@@ -49,7 +49,7 @@ import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.sign.SignShops;
 import com.nisovin.shopkeepers.spigot.SpigotFeatures;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
-import com.nisovin.shopkeepers.tradelogging.TradeCsvLogger;
+import com.nisovin.shopkeepers.tradelog.TradeLoggers;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.util.ClassUtils;
@@ -91,6 +91,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final ChatInput chatInput = new ChatInput(this);
 	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(chatInput);
 	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(this);
+	private final TradeLoggers tradeLoggers = new TradeLoggers(this);
 	private final EventDebugger eventDebugger = new EventDebugger(this);
 
 	private final PlayerShops playerShops = new PlayerShops(this);
@@ -283,7 +284,6 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
 		pm.registerEvents(new TradingCountListener(this), this);
-		pm.registerEvents(new TradeCsvLogger(this.getDataFolder()), this);
 
 		// DEFAULT SHOP OBJECT TYPES
 
@@ -340,6 +340,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// Player shops:
 		playerShops.onEnable();
+
+		// Trade loggers:
+		tradeLoggers.onEnable();
 
 		// Save all updated shopkeeper data (eg. after data migrations):
 		shopkeeperStorage.saveIfDirty();
@@ -401,6 +404,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// Player shops:
 		playerShops.onDisable();
+
+		// Trade loggers:
+		tradeLoggers.onDisable();
 
 		// Clear all types of registers:
 		shopTypesRegistry.clearAll();

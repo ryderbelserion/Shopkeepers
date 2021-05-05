@@ -1,9 +1,14 @@
 package com.nisovin.shopkeepers.util;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
+import java.nio.file.OpenOption;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
@@ -256,5 +261,30 @@ public class FileUtils {
 		// Also fsync the containing directory since we might have freshly created the target file:
 		fsyncParentDirectory(target);
 		delete(source);
+	}
+
+	/**
+	 * Opens or creates a file for writing.
+	 * <p>
+	 * This mimics {@link Files#newBufferedWriter(Path, Charset, OpenOption...)}, but returns an unbuffered
+	 * {@link Writer}.
+	 * 
+	 * @param path
+	 *            the path to the file
+	 * @param cs
+	 *            the charset to use for encoding
+	 * @param options
+	 *            options specifying how the file is opened
+	 * @return the unbuffered writer to write text to the file
+	 * @throws IOException
+	 *             see {@link Files#newBufferedWriter(Path, Charset, OpenOption...)}
+	 */
+	public static Writer newUnbufferedWriter(Path path, Charset cs, OpenOption... options) throws IOException {
+		// Unlike the OutputStreamWriter constructor that accepts a Charset directly, which creates an encoder that
+		// removes or replaces invalid data from the input, this encoder throws exceptions when it encounters invalid
+		// data.
+		CharsetEncoder encoder = cs.newEncoder();
+		Writer writer = new OutputStreamWriter(Files.newOutputStream(path, options), encoder);
+		return writer;
 	}
 }

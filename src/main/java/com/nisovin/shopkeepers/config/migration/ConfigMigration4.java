@@ -17,5 +17,7 @@ public class ConfigMigration4 implements ConfigMigration {
 
 		// Setting 'enable-spawn-verifier' got removed:
 		ConfigMigrationHelper.removeSetting(config, "enable-spawn-verifier");
+
+		ConfigMigrationHelper.migrateSetting(config, "enable-purchase-logging", "log-trades-to-csv");
 	}
 }
