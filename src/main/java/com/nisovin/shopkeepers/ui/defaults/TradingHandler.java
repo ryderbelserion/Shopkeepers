@@ -517,16 +517,16 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		// Find (and validate) the recipe Minecraft is using for the trade:
 		TradingRecipe tradingRecipe = MerchantUtils.getSelectedTradingRecipe(merchantInventory);
 		if (tradingRecipe == null) {
-			// This should not happen..
+			// Unexpected, but may happen if some other plugin interferes.
 			if (!silent) {
-				Log.debug("Not handling trade: We could not find the used trading recipe!");
+				Log.debug("Not handling trade: Could not find the used trading recipe!");
 			}
 			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
 		}
 		ItemStack recipeResultItem = tradingRecipe.getResultItem();
 		if (!recipeResultItem.equals(resultItem)) {
-			// This should not happen..
+			// Unexpected, but may happen if some other plugin modifies the involved trades or items.
 			if (!silent) {
 				if (Debug.isDebugging()) {
 					Log.debug("Not handling trade: The trade result item does not match the expected item of the used trading recipe!");
@@ -551,9 +551,9 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 		// Minecraft checks both combinations (item1, item2) and (item2, item1) when determining if a trading recipe
 		// matches, so we need to determine the used item order for the currently used trading recipe:
-		if (matches(offeredItem1, offeredItem2, requiredItem1, requiredItem2)) {
+		if (this.matches(offeredItem1, offeredItem2, requiredItem1, requiredItem2)) {
 			// Order is as-is.
-		} else if (matches(offeredItem1, offeredItem2, requiredItem2, requiredItem1)) {
+		} else if (this.matches(offeredItem1, offeredItem2, requiredItem2, requiredItem1)) {
 			// Swapped order:
 			swappedItemOrder = true;
 			ItemStack temp = offeredItem1;
@@ -573,7 +573,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		assert offeredItem1 != null;
 
 		if (Settings.useStrictItemComparison) {
-			// Verify the recipe items are perfectly matching (they can still be swapped though):
+			// Verify that the recipe items are perfectly matching (they can still be swapped though):
 			boolean item1Similar = ItemUtils.isSimilar(requiredItem1, offeredItem1);
 			boolean item2Similar = ItemUtils.isSimilar(requiredItem2, offeredItem2);
 			if (!item1Similar || !item2Similar) {

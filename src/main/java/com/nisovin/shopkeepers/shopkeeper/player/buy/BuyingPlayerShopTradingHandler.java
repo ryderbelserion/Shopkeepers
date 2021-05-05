@@ -32,16 +32,16 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		ItemStack boughtItem = tradingRecipe.getItem1();
 		PriceOffer offer = shopkeeper.getOffer(boughtItem);
 		if (offer == null) {
-			// This should not happen.. because the recipes were created based on the shopkeeper's offers.
-			this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
+			// Unexpected, because the recipes were created based on the shopkeeper's offers.
+			this.debugPreventedTrade(tradingPlayer, "Could not find the offer corresponding to the trading recipe!");
 			return false;
 		}
 
 		// Validate the found offer:
 		int expectedBoughtItemAmount = offer.getItem().getAmount();
 		if (expectedBoughtItemAmount > boughtItem.getAmount()) {
-			// This should not happen .. because the recipe was created based on this offer.
-			this.debugPreventedTrade(tradingPlayer, "The offer doesn't match the trading recipe!");
+			// Unexpected, because the recipe was created based on this offer.
+			this.debugPreventedTrade(tradingPlayer, "The offer does not match the trading recipe!");
 			return false;
 		}
 

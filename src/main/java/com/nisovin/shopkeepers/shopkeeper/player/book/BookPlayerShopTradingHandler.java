@@ -33,22 +33,23 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		ItemStack bookItem = tradingRecipe.getResultItem();
 		BookMeta bookMeta = BookItems.getBookMeta(bookItem);
 		if (bookMeta == null || !BookItems.isCopy(bookMeta)) {
+			// Unexpected, because the recipes were created based on the shopkeeper's offers.
 			this.debugPreventedTrade(tradingPlayer, "The traded item is no valid book copy!");
 			return false;
 		}
 
 		String bookTitle = BookItems.getTitle(bookMeta);
 		if (bookTitle == null) {
-			// This should not happen.. because the recipes were created based on the shopkeeper's offers.
-			this.debugPreventedTrade(tradingPlayer, "Couldn't determine the book title of the traded item!");
+			// Unexpected, because the recipes were created based on the shopkeeper's offers.
+			this.debugPreventedTrade(tradingPlayer, "Could not determine the book title of the traded item!");
 			return false;
 		}
 
-		// Get offer for this type of item:
+		// Get the offer for this type of item:
 		BookOffer offer = shopkeeper.getOffer(bookTitle);
 		if (offer == null) {
-			// This might happen if the trades got modified while the player was trading:
-			this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
+			// Unexpected, but this might happen if the trades got modified while the player was trading:
+			this.debugPreventedTrade(tradingPlayer, "Could not find the offer corresponding to the trading recipe!");
 			return false;
 		}
 
