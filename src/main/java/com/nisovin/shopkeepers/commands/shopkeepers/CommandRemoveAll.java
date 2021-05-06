@@ -177,15 +177,21 @@ class CommandRemoveAll extends Command {
 			// Note: New shops might have been created in the meantime, but the command only affects the already
 			// determined affected shops.
 			// Remove shops:
+			int invalidShops = 0;
+			int cancelledDeletions = 0;
 			int actualShopCount = 0;
 			for (Shopkeeper shopkeeper : affectedShops) {
 				// Skip the shopkeeper if it no longer exists:
-				if (!shopkeeper.isValid()) continue;
+				if (!shopkeeper.isValid()) {
+					invalidShops += 1;
+					continue;
+				}
 
 				if (senderPlayer != null) {
 					// Call event:
 					PlayerDeleteShopkeeperEvent deleteEvent = ShopkeeperEventHelper.callPlayerDeleteShopkeeperEvent(shopkeeper, senderPlayer);
 					if (deleteEvent.isCancelled()) {
+						cancelledDeletions += 1;
 						continue;
 					}
 				}
@@ -197,7 +203,17 @@ class CommandRemoveAll extends Command {
 			// Trigger save:
 			plugin.getShopkeeperStorage().save();
 
-			// Print the result message:
+			// Print the result messages:
+			if (invalidShops > 0) {
+				TextUtils.sendMessage(sender, Messages.shopsAlreadyRemoved,
+						"shopsCount", invalidShops
+				);
+			}
+			if (cancelledDeletions > 0) {
+				TextUtils.sendMessage(sender, Messages.shopRemovalsCancelled,
+						"shopsCount", cancelledDeletions
+				);
+			}
 			if (allAdmin) {
 				// Removed all admin shops:
 				TextUtils.sendMessage(sender, Messages.adminShopsRemoved,

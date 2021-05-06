@@ -182,6 +182,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * Debug: Improved the error handling and debug output related to the CSV trade logging.
 * Debug: When a strict item comparison fails, we now log the serialized data of the involved mismatching items.
 * Changed: The '/shopkeeper remove' command is now called '/shopkeeper removeAll'. All related permission nodes and some related messages have changed. The 'all' argument, which removes the player shops of all players, has been changed to 'player'.
+* Improved: The removeAll command prints the number of shopkeepers now that have been skipped because they either have already been removed, or their removal has been cancelled by a plugin.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
@@ -327,6 +328,8 @@ Messages:
 * Small fix in 'confirm-remove-all-own-shops'.
 * Small fix in 'confirm-remove-all-shops-of-player'.
 * Small fix in 'confirm-remove-all-player-shops'.
+* Added 'shops-already-removed'.
+* Added 'shop-removals-cancelled'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.

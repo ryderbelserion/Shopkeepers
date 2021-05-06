@@ -352,6 +352,8 @@ list-all-shops-header: "&9There are &e{shopsCount} &9shops in total: &e(Page {pa
 list-player-shops-header: "&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})"
 list-shops-entry: "  &e{shopId}) &7{shopName}&r&8at &7({location})&8, type: &7{shopType}&8, object: &7{objectType}"
 
+shops-already-removed: "&e{shopsCount}&7 of the shops have already been removed."
+shop-removals-cancelled: "&cPlugins have prevented the removal of &e{shopsCount}&c of the shops."
 admin-shops-removed: "&e{shopsCount} &aadmin shops have been removed."
 shops-of-player-removed: "&e{shopsCount} &ashops of player '&e{player}&a' have been removed."
 player-shops-removed: "&e{shopsCount} &aplayer shops have been removed."

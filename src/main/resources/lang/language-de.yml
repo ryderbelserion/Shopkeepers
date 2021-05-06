@@ -351,6 +351,8 @@ list-all-shops-header: "&9Es gibt insgesamt &e{shopsCount} &9Shops: &e(Seite {pa
 list-player-shops-header: "&9Spieler '&e{player}&9' hat &e{shopsCount} &9Shops: &e(Seite {page} von {maxPage})"
 list-shops-entry: "  &e{shopId}) &7{shopName}&r&8an &7({location})&8, Typ: &7{shopType}&8, Objekt: &7{objectType}"
 
+shops-already-removed: "&e{shopsCount}&7 der Shops wurden bereits entfernt."
+shop-removals-cancelled: "&cPlugins haben das Entfernen von &e{shopsCount}&c der Shops verhindert."
 admin-shops-removed: "&aEs wurden &e{shopsCount} &aAdmin-Shops entfernt."
 shops-of-player-removed: "&aEs wurden &e{shopsCount} &aShops von Spieler '&e{player}&a' entfernt."
 player-shops-removed: "&aEs wurden &e{shopsCount} &aSpieler-Shops entfernt."

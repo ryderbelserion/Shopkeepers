@@ -274,6 +274,8 @@ public class Messages extends Config {
 	public static Text listPlayerShopsHeader = Text.parse("&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})");
 	public static Text listShopsEntry = Text.parse("  &e{shopId}) &7{shopName}&r&8at &7({location})&8, type: &7{shopType}&8, object: &7{objectType}");
 
+	public static Text shopsAlreadyRemoved = Text.parse("&e{shopsCount}&7 of the shops have already been removed.");
+	public static Text shopRemovalsCancelled = Text.parse("&cPlugins have prevented the removal of &e{shopsCount}&c of the shops.");
 	public static Text adminShopsRemoved = Text.parse("&e{shopsCount} &aadmin shops have been removed.");
 	public static Text shopsOfPlayerRemoved = Text.parse("&e{shopsCount} &ashops of player '&e{player}&a' have been removed.");
 	public static Text playerShopsRemoved = Text.parse("&e{shopsCount} &aplayer shops have been removed.");
