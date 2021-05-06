@@ -10,9 +10,11 @@ import org.bukkit.inventory.meta.BookMeta;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.util.BookItems;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
@@ -38,6 +40,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		BookMeta bookMeta = BookItems.getBookMeta(bookItem);
 		if (bookMeta == null || !BookItems.isCopy(bookMeta)) {
 			// Unexpected, because the recipes were created based on the shopkeeper's offers.
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 			this.debugPreventedTrade(tradingPlayer, "The traded item is no valid book copy!");
 			return false;
 		}
@@ -45,6 +48,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		String bookTitle = BookItems.getTitle(bookMeta);
 		if (bookTitle == null) {
 			// Unexpected, because the recipes were created based on the shopkeeper's offers.
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 			this.debugPreventedTrade(tradingPlayer, "Could not determine the book title of the traded item!");
 			return false;
 		}
@@ -53,6 +57,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		BookOffer offer = shopkeeper.getOffer(bookTitle);
 		if (offer == null) {
 			// Unexpected, but this might happen if the trades got modified while the player was trading:
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 			this.debugPreventedTrade(tradingPlayer, "Could not find the offer corresponding to the trading recipe!");
 			return false;
 		}
@@ -61,6 +66,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
 		// Remove a blank book from the container contents:
 		if (ItemUtils.removeItems(newContainerContents, WRITABLE_BOOK_MATCHER, 1) != 0) {
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientWritableBooks);
 			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain any writable (book-and-quill) items.");
 			return false;
 		}
@@ -78,6 +84,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			}
 			if (remaining > 0) {
 				if (ItemUtils.addItems(newContainerContents, Settings.createCurrencyItem(remaining)) != 0) {
+					TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 					this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 					return false;
 				}

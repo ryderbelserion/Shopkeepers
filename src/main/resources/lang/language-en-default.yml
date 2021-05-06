@@ -250,6 +250,12 @@ missing-custom-trade-perm: "&7You do not have the permission to trade with this 
 cannot-trade-with-own-shop: "&7You cannot trade with your own shop."
 cannot-trade-while-owner-online: "&7You cannot trade while the owner of this shop ('&e{owner}&7') is online."
 cannot-trade-with-shop-missing-container: "&7You cannot trade with this shop, because its container is missing."
+cannot-trade-unexpected-trade: "&7Trade aborted: The traded items do not match what this shopkeeper expected."
+cannot-trade-items-not-strictly-matching: "&7Trade aborted: The offered items do not exactly match the required items."
+cannot-trade-insufficient-storage-space: "&7Trade aborted: This shop does not have enough storage space."
+cannot-trade-insufficient-currency: "&7Trade aborted: This shop does not have enough currency."
+cannot-trade-insufficient-stock: "&7Trade aborted: This shop does not have enough of the traded item."
+cannot-trade-insufficient-writable-books: "&7Trade aborted: This book shop lacks writable books to copy the book with."
 
 shopkeeper-created: "&aShopkeeper created: &6{type} &7({description})\n{setupDesc}"
 

@@ -5,8 +5,10 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
+import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 
 public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
@@ -29,8 +31,9 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		// Find offer:
 		TradeOffer offer = shopkeeper.getOffer(tradingRecipe);
 		if (offer == null) {
-			// This might happen if the trades got modified while the player was trading:
-			this.debugPreventedTrade(tradingPlayer, "Couldn't find the offer corresponding to the trading recipe!");
+			// Unexpected, because the recipes were created based on the shopkeeper's offers.
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
+			this.debugPreventedTrade(tradingPlayer, "Could not find the offer corresponding to the trading recipe!");
 			return false;
 		}
 
@@ -40,13 +43,15 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		ItemStack resultItem = tradingRecipe.getResultItem();
 		assert resultItem != null;
 		if (ItemUtils.removeItems(newContainerContents, resultItem) != 0) {
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStock);
 			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain the required items.");
 			return false;
 		}
 
-		// Add traded items to container contents:
+		// Add the traded items to the container contents:
 		if (!this.addItems(newContainerContents, tradingRecipe.getItem1(), tradeData.offeredItem1)
 				|| !this.addItems(newContainerContents, tradingRecipe.getItem2(), tradeData.offeredItem2)) {
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 			this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 			return false;
 		}

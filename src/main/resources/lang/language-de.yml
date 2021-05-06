@@ -249,6 +249,12 @@ missing-custom-trade-perm: "&7Du hast nicht die nötige Befugnis, um mit diesem 
 cannot-trade-with-own-shop: "&7Du kannst nicht mit deinem eigenen Shop handeln."
 cannot-trade-while-owner-online: "&7Du kannst nicht handeln, während der Besitzer dieses Shops ('&e{owner}&7') online ist."
 cannot-trade-with-shop-missing-container: "&7Du kannst nicht mit diesem Shop handeln, da sein Behälter fehlt."
+cannot-trade-unexpected-trade: "&7Handel abgebrochen: Die gehandelten Items entsprechen nicht dem, was dieser Shop erwartet hat."
+cannot-trade-items-not-strictly-matching: "&7Handel abgebrochen: Die angebotenen Items stimmen nicht exakt mit den benötigten Items überein."
+cannot-trade-insufficient-storage-space: "&7Handel abgebrochen: Dieser Shop hat nicht genügend Lagerraum."
+cannot-trade-insufficient-currency: "&7Handel abgebrochen: Dieser Shop hat nicht genügend Währung."
+cannot-trade-insufficient-stock: "&7Handel abgebrochen: Dieser Shop hat nicht genügend von dem gehandelten Item."
+cannot-trade-insufficient-writable-books: "&7Handel abgebrochen: Diesem Buchladen fehlen beschreibbare Bücher für die Buchkopie."
 
 shopkeeper-created: "&aShop erstellt: &6{type} &7({description})\n{setupDesc}"
 

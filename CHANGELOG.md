@@ -187,6 +187,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * Added permission 'shopkeeper.remove.own' (default: op): Allows the removal of own shops via command.
   * Added permission 'shopkeeper.remove.others' (default: op): Allows the removal of shops of other players via command.
   * Added permission 'shopkeeper.remove.admin' (default: op): Allows the removal of admin shops via command.
+* Improved: Added more feedback messages for cases in which the trading may fail for some reason.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
@@ -340,6 +341,12 @@ Messages:
 * Added 'shop-removal-cancelled'.
 * Added 'confirm-remove-shop'.
 * Added 'command-description-remove'.
+* Added 'cannot-trade-unexpected-trade'.
+* Added 'cannot-trade-items-not-strictly-matching'.
+* Added 'cannot-trade-insufficient-storage-space'.
+* Added 'cannot-trade-insufficient-currency'.
+* Added 'cannot-trade-insufficient-stock'.
+* Added 'cannot-trade-insufficient-writable-books'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.

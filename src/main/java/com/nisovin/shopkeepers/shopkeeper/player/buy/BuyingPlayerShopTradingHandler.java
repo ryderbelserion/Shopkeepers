@@ -6,8 +6,10 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
@@ -33,6 +35,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		PriceOffer offer = shopkeeper.getOffer(boughtItem);
 		if (offer == null) {
 			// Unexpected, because the recipes were created based on the shopkeeper's offers.
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 			this.debugPreventedTrade(tradingPlayer, "Could not find the offer corresponding to the trading recipe!");
 			return false;
 		}
@@ -41,6 +44,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		int expectedBoughtItemAmount = offer.getItem().getAmount();
 		if (expectedBoughtItemAmount > boughtItem.getAmount()) {
 			// Unexpected, because the recipe was created based on this offer.
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 			this.debugPreventedTrade(tradingPlayer, "The offer does not match the trading recipe!");
 			return false;
 		}
@@ -50,9 +54,11 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		// Remove currency items from container contents:
 		int remaining = this.removeCurrency(newContainerContents, offer.getPrice());
 		if (remaining > 0) {
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientCurrency);
 			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain enough currency.");
 			return false;
 		} else if (remaining < 0) {
+			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 			this.debugPreventedTrade(tradingPlayer, "The shop's container does not have enough space to split large currency items.");
 			return false;
 		}
@@ -65,6 +71,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			ItemStack receivedItem = tradeData.offeredItem1.clone(); // Create a copy, just in case
 			receivedItem.setAmount(amountAfterTaxes);
 			if (ItemUtils.addItems(newContainerContents, receivedItem) != 0) {
+				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 				this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 				return false;
 			}

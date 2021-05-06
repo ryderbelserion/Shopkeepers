@@ -32,6 +32,7 @@ import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.LazyValue;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.MerchantUtils;
 import com.nisovin.shopkeepers.util.PermissionUtils;
@@ -504,7 +505,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	// Checks for an available trade and does some preparation in case a trade is found.
 	// Returns null if no trade could be prepared for some reason.
 	private TradeData checkForTrade(InventoryClickEvent clickEvent, boolean silent, boolean slientStrictItemComparison, boolean tradingContext) {
-		Player player = (Player) clickEvent.getWhoClicked();
+		Player tradingPlayer = (Player) clickEvent.getWhoClicked();
 		MerchantInventory merchantInventory = (MerchantInventory) clickEvent.getView().getTopInventory();
 		ItemStack resultItem = merchantInventory.getItem(RESULT_ITEM_SLOT_ID);
 		if (ItemUtils.isEmpty(resultItem)) {
@@ -517,17 +518,22 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		// Find (and validate) the recipe Minecraft is using for the trade:
 		TradingRecipe tradingRecipe = MerchantUtils.getSelectedTradingRecipe(merchantInventory);
 		if (tradingRecipe == null) {
-			// Unexpected, but may happen if some other plugin interferes.
+			// Unexpected, since there is an item inside the result slot.
 			if (!silent) {
+				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 				Log.debug("Not handling trade: Could not find the used trading recipe!");
 			}
 			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
 		}
+
+		// As a safe-guard, check that the result item of the selected recipe actually matches the result item expected
+		// by the player:
 		ItemStack recipeResultItem = tradingRecipe.getResultItem();
 		if (!recipeResultItem.equals(resultItem)) {
 			// Unexpected, but may happen if some other plugin modifies the involved trades or items.
 			if (!silent) {
+				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 				if (Debug.isDebugging()) {
 					Log.debug("Not handling trade: The trade result item does not match the expected item of the used trading recipe!");
 					String recipeResultItemYaml = ConfigUtils.toConfigYaml("recipeResultItem", recipeResultItem);
@@ -565,6 +571,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			// But this might for example happen if the FailedHandler#matches implementation falls back to using
 			// the stricter isSimilar for the item comparison and the involved items are not strictly similar.
 			if (!silent) {
+				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 				Log.debug("Not handling trade: Could not match the offered items to the used trading recipe!");
 			}
 			this.clearResultSlotForInvalidTrade(merchantInventory);
@@ -575,29 +582,35 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		if (Settings.useStrictItemComparison) {
 			// Verify that the recipe items are perfectly matching (they can still be swapped though):
 			boolean item1Similar = ItemUtils.isSimilar(requiredItem1, offeredItem1);
-			boolean item2Similar = ItemUtils.isSimilar(requiredItem2, offeredItem2);
-			if (!item1Similar || !item2Similar) {
-				// Additional check for the debug flag, so that we can skip this whole block if it is not really needed:
-				if (!slientStrictItemComparison && Settings.debug) {
-					String errorMsg = "The offered items do not strictly match the required items.";
-					if (tradingContext) {
-						this.debugPreventedTrade(player, errorMsg);
-					} else {
-						Log.debug(errorMsg);
-					}
+			ItemStack offeredItem2Final = offeredItem2;
+			LazyValue<Boolean> item2Similar = new LazyValue<>(() -> ItemUtils.isSimilar(requiredItem2, offeredItem2Final));
+			if (!item1Similar || !item2Similar.get()) {
+				if (!slientStrictItemComparison) {
+					// Feedback message:
+					TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeItemsNotStrictlyMatching);
 
-					Log.debug("Used trading recipe: " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
-					if (!item1Similar) {
-						String requiredItemYaml = ConfigUtils.toConfigYaml("requiredItem1", requiredItem1);
-						String offeredItemYaml = ConfigUtils.toConfigYaml("offeredItem1", offeredItem1);
-						Log.debug(requiredItemYaml);
-						Log.debug(offeredItemYaml);
-					}
-					if (!item2Similar) {
-						String requiredItemYaml = ConfigUtils.toConfigYaml("requiredItem2", requiredItem2);
-						String offeredItemYaml = ConfigUtils.toConfigYaml("offeredItem2", offeredItem2);
-						Log.debug(requiredItemYaml);
-						Log.debug(offeredItemYaml);
+					// Additional debug output:
+					if (Debug.isDebugging()) {
+						String errorMsg = "The offered items do not strictly match the required items.";
+						if (tradingContext) {
+							this.debugPreventedTrade(tradingPlayer, errorMsg);
+						} else {
+							Log.debug(errorMsg);
+						}
+
+						Log.debug("Used trading recipe: " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
+						if (!item1Similar) {
+							String requiredItemYaml = ConfigUtils.toConfigYaml("requiredItem1", requiredItem1);
+							String offeredItemYaml = ConfigUtils.toConfigYaml("offeredItem1", offeredItem1);
+							Log.debug(requiredItemYaml);
+							Log.debug(offeredItemYaml);
+						}
+						if (!item2Similar.get()) {
+							String requiredItemYaml = ConfigUtils.toConfigYaml("requiredItem2", requiredItem2);
+							String offeredItemYaml = ConfigUtils.toConfigYaml("offeredItem2", offeredItem2);
+							Log.debug(requiredItemYaml);
+							Log.debug(offeredItemYaml);
+						}
 					}
 				}
 				this.clearResultSlotForInvalidTrade(merchantInventory);
@@ -607,7 +620,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 		// Setup trade data:
 		TradeData tradeData = this.createTradeData();
-		tradeData.setup(clickEvent, merchantInventory, player, tradingRecipe, offeredItem1, offeredItem2, swappedItemOrder);
+		tradeData.setup(clickEvent, merchantInventory, tradingPlayer, tradingRecipe, offeredItem1, offeredItem2, swappedItemOrder);
 		// Custom setup by sub-classes:
 		this.setupTradeData(tradeData, clickEvent);
 		return tradeData;
@@ -750,7 +763,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	/**
-	 * Called if a previously already prepared trade got aborted for some reason.
+	 * Called when a previously already prepared trade got aborted for some reason.
 	 * <p>
 	 * Does also get called if the trade got aborted by {@link #prepareTrade(TradeData)} itself.
 	 * <p>

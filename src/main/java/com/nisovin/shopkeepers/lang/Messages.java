@@ -210,6 +210,12 @@ public class Messages extends Config {
 	public static Text cannotTradeWithOwnShop = Text.parse("&7You cannot trade with your own shop.");
 	public static Text cannotTradeWhileOwnerOnline = Text.parse("&7You cannot trade while the owner of this shop ('&e{owner}&7') is online.");
 	public static Text cannotTradeWithShopMissingContainer = Text.parse("&7You cannot trade with this shop, because its container is missing.");
+	public static Text cannotTradeUnexpectedTrade = Text.parse("&7Trade aborted: The traded items do not match what this shopkeeper expected.");
+	public static Text cannotTradeItemsNotStrictlyMatching = Text.parse("&7Trade aborted: The offered items do not exactly match the required items.");
+	public static Text cannotTradeInsufficientStorageSpace = Text.parse("&7Trade aborted: This shop does not have enough storage space.");
+	public static Text cannotTradeInsufficientCurrency = Text.parse("&7Trade aborted: This shop does not have enough currency.");
+	public static Text cannotTradeInsufficientStock = Text.parse("&7Trade aborted: This shop does not have enough of the traded item.");
+	public static Text cannotTradeInsufficientWritableBooks = Text.parse("&7Trade aborted: This book shop lacks writable books to copy the book with.");
 
 	public static Text shopkeeperCreated = Text.parse("&aShopkeeper created: &6{type} &7({description})\n{setupDesc}");
 
