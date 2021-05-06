@@ -57,7 +57,7 @@ class CommandRemoveAll extends Command {
 		// Set description:
 		this.setDescription(Messages.commandDescriptionRemoveAll);
 
-		// Arguments: TODO Allow specifying a single shopkeeper?
+		// Arguments:
 		this.addArgument(new FirstOfArgument("target", Arrays.asList(
 				new LiteralArgument(ARGUMENT_ALL_ADMIN_SHOPS),
 				new LiteralArgument(ARGUMENT_ALL_PLAYER_SHOPS),

@@ -274,12 +274,17 @@ public class Messages extends Config {
 	public static Text listPlayerShopsHeader = Text.parse("&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})");
 	public static Text listShopsEntry = Text.parse("  &e{shopId}) &7{shopName}&r&8at &7({location})&8, type: &7{shopType}&8, object: &7{objectType}");
 
+	public static Text shopRemoved = Text.parse("&aThe shopkeeper has been removed.");
+	public static Text shopAlreadyRemoved = Text.parse("&7The shopkeeper has already been removed.");
+	public static Text shopRemovalCancelled = Text.parse("&cA plugin has prevented the removal of the shopkeeper.");
+
 	public static Text shopsAlreadyRemoved = Text.parse("&e{shopsCount}&7 of the shops have already been removed.");
 	public static Text shopRemovalsCancelled = Text.parse("&cPlugins have prevented the removal of &e{shopsCount}&c of the shops.");
 	public static Text adminShopsRemoved = Text.parse("&e{shopsCount} &aadmin shops have been removed.");
 	public static Text shopsOfPlayerRemoved = Text.parse("&e{shopsCount} &ashops of player '&e{player}&a' have been removed.");
 	public static Text playerShopsRemoved = Text.parse("&e{shopsCount} &aplayer shops have been removed.");
 
+	public static Text confirmRemoveShop = Text.parse("&cYou are about to irrevocably remove the specified shopkeeper!");
 	public static Text confirmRemoveAllAdminShops = Text.parse("&cYou are about to irrevocably remove all admin shops (&6{shopsCount}&c)!");
 	public static Text confirmRemoveAllOwnShops = Text.parse("&cYou are about to irrevocably remove all your shops (&6{shopsCount}&c)!");
 	public static Text confirmRemoveAllShopsOfPlayer = Text.parse("&cYou are about to irrevocably remove all shops of player &6{player}&c (&6{shopsCount}&c)!");
@@ -317,6 +322,7 @@ public class Messages extends Config {
 	public static Text commandDescriptionReload = Text.parse("Reloads this plugin.");
 	public static Text commandDescriptionDebug = Text.parse("Toggles debug mode on and off.");
 	public static Text commandDescriptionList = Text.parse("Lists all shops of a specific player, or all admin shops.");
+	public static Text commandDescriptionRemove = Text.parse("Removes a specific shop.");
 	public static Text commandDescriptionRemoveAll = Text.parse("Removes all shops of a specific player, all players, or all admin shops.");
 	public static Text commandDescriptionGive = Text.parse("Gives shop creation item(s) to the specified player.");
 	public static Text commandDescriptionGiveCurrency = Text.parse("Gives currency item(s) to the specified player.");

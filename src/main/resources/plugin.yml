@@ -40,6 +40,16 @@ permissions:
         description: List the admin shops
         default: op
 
+    shopkeeper.remove.own:
+        description: Remove your own shops via command
+        default: op
+    shopkeeper.remove.others:
+        description: Remove the shops of other players via command
+        default: op
+    shopkeeper.remove.admin:
+        description: Remove admin shops via command
+        default: op
+
     shopkeeper.remove-all.own:
         description: Remove all of your own shops via command
         default: op
@@ -163,6 +173,9 @@ permissions:
             shopkeeper.list.own: true
             shopkeeper.list.others: true
             shopkeeper.list.admin: true
+            shopkeeper.remove.own: true
+            shopkeeper.remove.others: true
+            shopkeeper.remove.admin: true
             shopkeeper.remove-all.own: true
             shopkeeper.remove-all.others: true
             shopkeeper.remove-all.player: true

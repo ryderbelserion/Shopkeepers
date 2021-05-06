@@ -36,6 +36,10 @@ public interface ShopkeepersPlugin extends Plugin {
 	public static final String LIST_OTHERS_PERMISSION = "shopkeeper.list.others";
 	public static final String LIST_ADMIN_PERMISSION = "shopkeeper.list.admin";
 
+	public static final String REMOVE_OWN_PERMISSION = "shopkeeper.remove.own";
+	public static final String REMOVE_OTHERS_PERMISSION = "shopkeeper.remove.others";
+	public static final String REMOVE_ADMIN_PERMISSION = "shopkeeper.remove.admin";
+
 	public static final String REMOVE_ALL_OWN_PERMISSION = "shopkeeper.remove-all.own";
 	public static final String REMOVE_ALL_OTHERS_PERMISSION = "shopkeeper.remove-all.others";
 	public static final String REMOVE_ALL_PLAYER_PERMISSION = "shopkeeper.remove-all.player";

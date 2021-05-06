@@ -183,6 +183,10 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Debug: When a strict item comparison fails, we now log the serialized data of the involved mismatching items.
 * Changed: The '/shopkeeper remove' command is now called '/shopkeeper removeAll'. All related permission nodes and some related messages have changed. The 'all' argument, which removes the player shops of all players, has been changed to 'player'.
 * Improved: The removeAll command prints the number of shopkeepers now that have been skipped because they either have already been removed, or their removal has been cancelled by a plugin.
+* Added command '/shopkeeper remove [shop]'. This replaces the previous remove command, which has been renamed to removeAll, and allows the removal of a single specific shopkeeper.
+  * Added permission 'shopkeeper.remove.own' (default: op): Allows the removal of own shops via command.
+  * Added permission 'shopkeeper.remove.others' (default: op): Allows the removal of shops of other players via command.
+  * Added permission 'shopkeeper.remove.admin' (default: op): Allows the removal of admin shops via command.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
@@ -330,6 +334,11 @@ Messages:
 * Small fix in 'confirm-remove-all-player-shops'.
 * Added 'shops-already-removed'.
 * Added 'shop-removals-cancelled'.
+* Added 'shop-removed'.
+* Added 'shop-already-removed'.
+* Added 'shop-removal-cancelled'.
+* Added 'confirm-remove-shop'.
+* Added 'command-description-remove'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.
