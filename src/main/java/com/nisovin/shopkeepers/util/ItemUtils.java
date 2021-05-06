@@ -637,6 +637,19 @@ public final class ItemUtils {
 		return (otherItemStack) -> itemStack.isSimilar(otherItemStack);
 	}
 
+	/**
+	 * Gets a {@link Predicate} that accepts {@link ItemStack ItemStacks} that are of the specified {@link Material
+	 * type}.
+	 * 
+	 * @param itemType
+	 *            the item type, not <code>null</code>
+	 * @return the Predicate
+	 */
+	public static Predicate<ItemStack> itemsOfType(Material itemType) {
+		Validate.notNull(itemType, "itemType is null");
+		return (itemStack) -> itemStack.getType() == itemType;
+	}
+
 	// ItemStack migration
 
 	private static Inventory DUMMY_INVENTORY = null;
@@ -961,37 +974,6 @@ public final class ItemUtils {
 	// -----
 
 	/**
-	 * Removes the specified amount of items which match the specified {@link ItemData} from the given contents.
-	 * 
-	 * @param contents
-	 *            the contents
-	 * @param itemData
-	 *            the item data to match, <code>null</code> will not match any item
-	 * @param amount
-	 *            the amount of matching items to remove
-	 * @return the amount of items that couldn't be removed (<code>0</code> on full success)
-	 */
-	public static int removeItems(ItemStack[] contents, ItemData itemData, int amount) {
-		if (contents == null) return amount;
-		if (itemData == null) return amount;
-		int remainingAmount = amount;
-		for (int slotId = 0; slotId < contents.length; slotId++) {
-			ItemStack itemStack = contents[slotId];
-			if (!itemData.matches(itemStack)) continue;
-			int newAmount = itemStack.getAmount() - remainingAmount;
-			if (newAmount > 0) {
-				itemStack.setAmount(newAmount);
-				break;
-			} else {
-				contents[slotId] = null;
-				remainingAmount = -newAmount;
-				if (remainingAmount == 0) break;
-			}
-		}
-		return remainingAmount;
-	}
-
-	/**
 	 * Adds the given {@link ItemStack} to the given contents.
 	 * <p>
 	 * This will first try to fill similar partial {@link ItemStack}s in the contents up to the item's max stack size.
@@ -1076,51 +1058,84 @@ public final class ItemUtils {
 	}
 
 	/**
-	 * Removes the given {@link ItemStack} from the given contents.
-	 * <p>
-	 * If the amount of the given {@link ItemStack} is {@link Integer#MAX_VALUE}, then all similar items are being
-	 * removed from the contents.<br>
-	 * This does not modify the original item stacks. If it has to modify the amount of an item stack, it first replaces
-	 * it with a copy. So in case those item stacks are mirroring changes to their Minecraft counterpart, those don't
-	 * get affected directly.
-	 * </p>
+	 * Removes the specified amount of items that match the specified {@link ItemData} from the given contents.
 	 * 
 	 * @param contents
-	 *            the contents to remove the given {@link ItemStack} from
+	 *            the contents to remove the items from
+	 * @param itemData
+	 *            the item data to match
+	 * @param amount
+	 *            the amount of matching items to remove
+	 * @return the amount of items that could not be removed, or <code>0</code> if all items were removed
+	 * @see #removeItems(ItemStack[], Predicate, int)
+	 */
+	public static int removeItems(ItemStack[] contents, ItemData itemData, int amount) {
+		return removeItems(contents, matchingItems(itemData), amount);
+	}
+
+	/**
+	 * Removes the given {@link ItemStack} from the given contents.
+	 * 
+	 * @param contents
+	 *            the contents to remove the items from
 	 * @param item
-	 *            the {@link ItemStack} to remove from the given contents
-	 * @return the amount of items which couldn't be removed (<code>0</code> on full success)
+	 *            the {@link ItemStack} to remove
+	 * @return the amount of items that could not be removed, or <code>0</code> if all items were removed
+	 * @see #removeItems(ItemStack[], Predicate, int)
 	 */
 	public static int removeItems(ItemStack[] contents, ItemStack item) {
-		Validate.notNull(contents);
-		Validate.notNull(item);
-		int amount = item.getAmount();
-		Validate.isTrue(amount >= 0);
+		return removeItems(contents, similarItems(item), item.getAmount());
+	}
+
+	/**
+	 * Removes the specified amount of items accepted by the given {@link Predicate} from the given contents.
+	 * <p>
+	 * If the specified amount is {@link Integer#MAX_VALUE}, then all items matching the Predicate are removed from the
+	 * contents.
+	 * <p>
+	 * This operation does not modify the original item stacks: If it has to modify the amount of an item stack, it
+	 * first replaces it with a copy inside the contents array. So if the item stacks of the given contents array are
+	 * mirroring changes to their Minecraft counterpart, those underlying Minecraft item stacks are not immediately
+	 * affected by this operation until the modified contents array is actually applied to a Minecraft inventory.
+	 * 
+	 * @param contents
+	 *            the contents to remove the items from
+	 * @param itemMatcher
+	 *            the item matcher
+	 * @param amount
+	 *            the amount of items to remove
+	 * @return the amount of items that could not be removed, or <code>0</code> if all items were removed
+	 */
+	public static int removeItems(ItemStack[] contents, Predicate<ItemStack> itemMatcher, int amount) {
+		Validate.notNull(contents, "contents is null");
+		Validate.notNull(itemMatcher, "itemMatcher is null");
+		Validate.isTrue(amount >= 0, "amount is negative");
 		if (amount == 0) return 0;
 
 		boolean removeAll = (amount == Integer.MAX_VALUE);
 		for (int slot = 0; slot < contents.length; slot++) {
 			ItemStack slotItem = contents[slot];
-			if (slotItem == null) continue;
-			if (item.isSimilar(slotItem)) {
-				if (removeAll) {
-					contents[slot] = null;
+			if (ItemUtils.isEmpty(slotItem)) continue;
+			if (!itemMatcher.test(slotItem)) continue;
+
+			if (removeAll) {
+				contents[slot] = null;
+			} else {
+				int newAmount = slotItem.getAmount() - amount;
+				if (newAmount > 0) {
+					// Copy the ItemStack, so that we do not modify the original ItemStack (in case that we do not want
+					// to apply the changed inventory contents afterwards):
+					slotItem = slotItem.clone();
+					contents[slot] = slotItem;
+					slotItem.setAmount(newAmount);
+					// All items were removed:
+					return 0;
 				} else {
-					int newAmount = slotItem.getAmount() - amount;
-					if (newAmount > 0) {
-						// Copy ItemStack, so we don't modify the original ItemStack:
-						slotItem = slotItem.clone();
-						contents[slot] = slotItem;
-						slotItem.setAmount(newAmount);
+					contents[slot] = null;
+					amount = -newAmount;
+					if (amount == 0) {
 						// All items were removed:
 						return 0;
-					} else {
-						contents[slot] = null;
-						amount = -newAmount;
-						if (amount == 0) {
-							// All items were removed:
-							return 0;
-						}
 					}
 				}
 			}

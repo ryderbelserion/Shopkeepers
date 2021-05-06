@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.player.book;
 
+import java.util.function.Predicate;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -13,6 +15,8 @@ import com.nisovin.shopkeepers.util.BookItems;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
+
+	private static final Predicate<ItemStack> WRITABLE_BOOK_MATCHER = ItemUtils.itemsOfType(Material.WRITABLE_BOOK);
 
 	protected BookPlayerShopTradingHandler(SKBookPlayerShopkeeper shopkeeper) {
 		super(shopkeeper);
@@ -55,27 +59,8 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
 		assert containerInventory != null & newContainerContents != null;
 
-		// Remove blank book from container contents:
-		boolean removed = false;
-		for (int slot = 0; slot < newContainerContents.length; slot++) {
-			ItemStack itemStack = newContainerContents[slot];
-			if (ItemUtils.isEmpty(itemStack)) continue;
-			if (itemStack.getType() != Material.WRITABLE_BOOK) continue;
-
-			int newAmount = itemStack.getAmount() - 1;
-			assert newAmount >= 0;
-			if (newAmount == 0) {
-				newContainerContents[slot] = null;
-			} else {
-				// Copy the item before modifying it:
-				itemStack = itemStack.clone();
-				newContainerContents[slot] = itemStack;
-				itemStack.setAmount(newAmount);
-			}
-			removed = true;
-			break;
-		}
-		if (!removed) {
+		// Remove a blank book from the container contents:
+		if (ItemUtils.removeItems(newContainerContents, WRITABLE_BOOK_MATCHER, 1) != 0) {
 			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain any writable (book-and-quill) items.");
 			return false;
 		}

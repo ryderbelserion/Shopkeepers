@@ -271,6 +271,7 @@ Internal:
 * Added classes to represent snapshot data of trades, players, and shops.
 * Added a CsvFormatter utility with various options.
 * The CSV trade logger uses new file and date-time APIs now.
+* Minor refactor to the utility functions that remove items from inventories, and to how the book shopkeeper removes writable books from the shop container.
 * Minor other internal code refactoring.
 
 Migration notes:  
