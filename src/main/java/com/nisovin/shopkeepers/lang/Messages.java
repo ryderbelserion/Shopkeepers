@@ -180,7 +180,7 @@ public class Messages extends Config {
 	public static Text unusedContainer = Text.parse("&7No shopkeeper is using this container.");
 	public static Text notOwner = Text.parse("&7You are not the owner of this shopkeeper.");
 	// Placeholders: {owner} -> new owners name
-	public static Text ownerSet = Text.parse("&aNew owner was set to &e{owner}");
+	public static Text ownerSet = Text.parse("&aThe new owner is now &e{owner}");
 	public static Text shopCreationItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!");
 	public static Text shopCreationItemsReceived = Text.parse("&aYou have received &e{amount}&a shop creation item(s)!");
 	public static Text currencyItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a currency item(s)!");
@@ -197,7 +197,7 @@ public class Messages extends Config {
 
 	public static Text zombieVillagerCuringDisabled = Text.parse("&7Curing of zombie villagers is disabled.");
 	public static Text mustHoldHireItem = Text.parse("&7You have to hold the required hire item in your hand.");
-	public static Text setForHire = Text.parse("&aThe Shopkeeper was set for hire.");
+	public static Text setForHire = Text.parse("&aThis shopkeeper can now be hired.");
 	public static Text hired = Text.parse("&aYou have hired this shopkeeper!");
 	public static Text missingHirePerm = Text.parse("&7You do not have the permission to hire shopkeepers.");
 	public static Text cannotHire = Text.parse("&7You cannot afford to hire this shopkeeper.");
@@ -274,14 +274,14 @@ public class Messages extends Config {
 	public static Text listPlayerShopsHeader = Text.parse("&9Player '&e{player}&9' has &e{shopsCount} &9shops: &e(Page {page} of {maxPage})");
 	public static Text listShopsEntry = Text.parse("  &e{shopId}) &7{shopName}&r&8at &7({location})&8, type: &7{shopType}&8, object: &7{objectType}");
 
-	public static Text removedAdminShops = Text.parse("&e{shopsCount} &aadmin shops were removed.");
-	public static Text removedShopsOfPlayer = Text.parse("&e{shopsCount} &ashops of player '&e{player}&a' were removed.");
-	public static Text removedPlayerShops = Text.parse("&e{shopsCount} &aplayer shops were removed.");
+	public static Text adminShopsRemoved = Text.parse("&e{shopsCount} &aadmin shops have been removed.");
+	public static Text shopsOfPlayerRemoved = Text.parse("&e{shopsCount} &ashops of player '&e{player}&a' have been removed.");
+	public static Text playerShopsRemoved = Text.parse("&e{shopsCount} &aplayer shops have been removed.");
 
-	public static Text confirmRemoveAllAdminShops = Text.parse("&cYou are about to irrevocable remove all admin shops (&6{shopsCount}&c)!");
-	public static Text confirmRemoveAllOwnShops = Text.parse("&cYou are about to irrevocable remove all your shops (&6{shopsCount}&c)!");
-	public static Text confirmRemoveAllShopsOfPlayer = Text.parse("&cYou are about to irrevocable remove all shops of player &6{player}&c (&6{shopsCount}&c)!");
-	public static Text confirmRemoveAllPlayerShops = Text.parse("&cYou are about to irrevocable remove all player shops of all players (&6{shopsCount}&c)!");
+	public static Text confirmRemoveAllAdminShops = Text.parse("&cYou are about to irrevocably remove all admin shops (&6{shopsCount}&c)!");
+	public static Text confirmRemoveAllOwnShops = Text.parse("&cYou are about to irrevocably remove all your shops (&6{shopsCount}&c)!");
+	public static Text confirmRemoveAllShopsOfPlayer = Text.parse("&cYou are about to irrevocably remove all shops of player &6{player}&c (&6{shopsCount}&c)!");
+	public static Text confirmRemoveAllPlayerShops = Text.parse("&cYou are about to irrevocably remove all player shops of all players (&6{shopsCount}&c)!");
 
 	public static Text confirmationRequired = Text.parse("&7Please confirm this action by typing &6/shopkeepers confirm");
 	public static Text confirmationExpired = Text.parse("&cConfirmation expired.");

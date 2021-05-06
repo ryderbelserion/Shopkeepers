@@ -200,17 +200,17 @@ class CommandRemoveAll extends Command {
 			// Print the result message:
 			if (allAdmin) {
 				// Removed all admin shops:
-				TextUtils.sendMessage(sender, Messages.removedAdminShops,
+				TextUtils.sendMessage(sender, Messages.adminShopsRemoved,
 						"shopsCount", actualShopCount
 				);
 			} else if (allPlayers) {
 				// Removed all player shops:
-				TextUtils.sendMessage(sender, Messages.removedPlayerShops,
+				TextUtils.sendMessage(sender, Messages.playerShopsRemoved,
 						"shopsCount", actualShopCount
 				);
 			} else {
 				// Removed all shops of the specified player:
-				TextUtils.sendMessage(sender, Messages.removedShopsOfPlayer,
+				TextUtils.sendMessage(sender, Messages.shopsOfPlayerRemoved,
 						"player", TextUtils.getPlayerText(finalTargetPlayerName, finalTargetPlayerUUID),
 						"shopsCount", actualShopCount
 				);

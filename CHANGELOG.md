@@ -318,6 +318,15 @@ Messages:
 * Changed 'creation-item-selected' to clarify that one has to not aim at any block in order to select the shop or object type.
 * Renamed and slightly changed 'command-description-remove' -> 'command-description-remove-all'.
 * Slightly changed the default 'command-description-list' message.
+* Renamed and slightly changed 'removed-admin-shops' -> 'admin-shops-removed'.
+* Renamed and slightly changed 'removed-shops-of-player' -> 'shops-of-player-removed'.
+* Renamed and slightly changed 'removed-player-shops' -> 'shops-of-player-removed'.
+* Changed 'owner-set'.
+* Changed 'set-for-hire'.
+* Small fix in 'confirm-remove-all-admin-shops'.
+* Small fix in 'confirm-remove-all-own-shops'.
+* Small fix in 'confirm-remove-all-shops-of-player'.
+* Small fix in 'confirm-remove-all-player-shops'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.
