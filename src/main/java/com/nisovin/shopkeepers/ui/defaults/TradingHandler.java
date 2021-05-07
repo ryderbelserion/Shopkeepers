@@ -32,7 +32,7 @@ import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.LazyValue;
+import com.nisovin.shopkeepers.util.Lazy;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.MerchantUtils;
 import com.nisovin.shopkeepers.util.PermissionUtils;
@@ -583,7 +583,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			// Verify that the recipe items are perfectly matching (they can still be swapped though):
 			boolean item1Similar = ItemUtils.isSimilar(requiredItem1, offeredItem1);
 			ItemStack offeredItem2Final = offeredItem2;
-			LazyValue<Boolean> item2Similar = new LazyValue<>(() -> ItemUtils.isSimilar(requiredItem2, offeredItem2Final));
+			Lazy<Boolean> item2Similar = new Lazy<>(() -> ItemUtils.isSimilar(requiredItem2, offeredItem2Final));
 			if (!item1Similar || !item2Similar.get()) {
 				if (!slientStrictItemComparison) {
 					// Feedback message:

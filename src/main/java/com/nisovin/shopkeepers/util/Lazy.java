@@ -8,21 +8,21 @@ import java.util.function.Supplier;
  * @param <T>
  *            the type of the lazily calculated value
  */
-public final class LazyValue<T> {
+public final class Lazy<T> {
 
 	private final Supplier<T> supplier;
 	private boolean calculated = false;
 	private T value = null;
 
 	/**
-	 * Creates a new {@link LazyValue}.
+	 * Creates a new {@link Lazy}.
 	 * <p>
 	 * The value is lazily calculated by the provided {@link Supplier} the first time it is requested.
 	 * 
 	 * @param supplier
 	 *            the supplier that calculates the value, not <code>null</code>
 	 */
-	public LazyValue(Supplier<T> supplier) {
+	public Lazy(Supplier<T> supplier) {
 		Validate.notNull(supplier, "supplier is null");
 		this.supplier = supplier;
 	}
@@ -45,7 +45,7 @@ public final class LazyValue<T> {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("LazyValue [calculated=");
+		builder.append("Lazy [calculated=");
 		builder.append(calculated);
 		builder.append(", value=");
 		builder.append(value);
@@ -53,6 +53,6 @@ public final class LazyValue<T> {
 		return builder.toString();
 	}
 
-	// Note on hashCode and equals: LazyValue instances are compared based on their identity and not their current
-	// value, because it makes no sense for LazyValues to be considered equal if they have not yet been calculated.
+	// Note on hashCode and equals: Lazy instances are compared based on their identity and not their current value,
+	// because it makes no sense for Lazy instances to be considered equal if they have not yet been calculated.
 }
