@@ -214,6 +214,7 @@ API:
 * The blocks of sign shopkeepers are also marked with the shopkeeper metadata now.
 * CitizensShopObject#getName returns the NPC name instead of it's 'full name' now (i.e. the name that more closely corresponds to the name set via #setName).
 * Optimization: Various lazily populated views provided by the shopkeeper registry return an empty iterator now when they are known to be empty.
+* Added: ShopkeeperTradeEvent#hasOfferedItem2() as a shortcut for checking if the trade involves two input items.
 * Several Javadoc improvements and clarifications.
 
 Internal API:  

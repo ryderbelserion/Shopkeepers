@@ -686,6 +686,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		ItemStack eventOfferedItem2 = ItemUtils.isEmpty(tradeData.offeredItem2) ? null : tradeData.offeredItem2.clone();
 		eventOfferedItem1.setAmount(tradeData.tradingRecipe.getItem1().getAmount());
 		if (eventOfferedItem2 != null) {
+			// Minecraft disables the trade if there is second offered item but the trade only expects a single item.
 			assert tradeData.tradingRecipe.getItem2() != null;
 			eventOfferedItem2.setAmount(tradeData.tradingRecipe.getItem2().getAmount());
 		}

@@ -77,8 +77,8 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	}
 
 	/**
-	 * Gets the a copy of the item offered by the player matching the first required item of the used trading recipe
-	 * (not necessarily the item in the first slot).
+	 * Gets a copy of the item offered by the player matching the first required item of the used trading recipe (not
+	 * necessarily the item in the first slot).
 	 * <p>
 	 * The type and stack size equal those of the required item of the trading recipe. The metadata however can differ,
 	 * but still be accepted for the trade depending on the item matching rules of the used Minecraft version and the
@@ -91,8 +91,8 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	}
 
 	/**
-	 * Gets the a copy of the item offered by the player matching the second required item of the used trading recipe
-	 * (not necessarily the item in the second slot).
+	 * Gets a copy of the item offered by the player matching the second required item of the used trading recipe (not
+	 * necessarily the item in the second slot).
 	 * <p>
 	 * The type and stack size equal those of the required item of the trading recipe. The metadata however can differ,
 	 * but still be accepted for the trade depending on the item matching rules of the used Minecraft version and the
@@ -102,6 +102,17 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	 */
 	public ItemStack getOfferedItem2() {
 		return (offeredItem2 == null) ? null : offeredItem2.clone();
+	}
+
+	/**
+	 * Checks whether this is a trade with two input items.
+	 * <p>
+	 * This is a shortcut for checking if {@link #getOfferedItem2()} is not <code>null</code>.
+	 * 
+	 * @return <code>true</code> if this is a trade with two input items
+	 */
+	public boolean hasOfferedItem2() {
+		return offeredItem2 != null;
 	}
 
 	/**
