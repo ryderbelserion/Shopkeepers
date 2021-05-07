@@ -765,7 +765,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	/**
 	 * Called when a previously already prepared trade got aborted for some reason.
 	 * <p>
-	 * Does also get called if the trade got aborted by {@link #prepareTrade(TradeData)} itself.
+	 * This is also called if the trade was aborted by {@link #prepareTrade(TradeData)} itself.
 	 * <p>
 	 * This can be used to perform any necessary cleanup.
 	 * 

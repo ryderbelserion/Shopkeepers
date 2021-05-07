@@ -12,14 +12,22 @@ public class ShopkeeperEventHelper {
 	private ShopkeeperEventHelper() {
 	}
 
+	/**
+	 * Calls a {@link PlayerDeleteShopkeeperEvent} and debug logs when the event has been cancelled.
+	 * 
+	 * @param shopkeeper
+	 *            the shopkeeper that is deleted
+	 * @param player
+	 *            the player who is deleting the shopkeeper
+	 * @return the {@link PlayerDeleteShopkeeperEvent}
+	 */
 	public static PlayerDeleteShopkeeperEvent callPlayerDeleteShopkeeperEvent(Shopkeeper shopkeeper, Player player) {
 		assert shopkeeper != null && player != null;
 		PlayerDeleteShopkeeperEvent event = new PlayerDeleteShopkeeperEvent(shopkeeper, player);
 		Bukkit.getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
-			Log.debug(() -> "ShopkeeperDeleteEvent was cancelled for player " + player.getName()
-					+ " and shopkeeper " + shopkeeper.getIdString() + " at "
-					+ shopkeeper.getPositionString());
+			Log.debug(() -> "PlayerDeleteShopkeeperEvent was cancelled for player " + player.getName()
+					+ " and shopkeeper " + shopkeeper.getIdString() + " at " + shopkeeper.getPositionString());
 		}
 		return event;
 	}
