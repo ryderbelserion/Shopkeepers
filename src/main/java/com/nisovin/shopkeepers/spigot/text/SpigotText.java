@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.spigot.text;
 
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
@@ -53,10 +54,11 @@ public class SpigotText {
 			assert recipient != null && message != null;
 			BaseComponent component = toSpigot(message);
 			if (debugging) {
-				System.out.println("Text: " + message);
-				System.out.println("Plain text: " + message.toPlainText());
-				System.out.println("Plain format text: " + message.toPlainFormatText());
-				System.out.println("Component: " + component);
+				Log.info("Text: " + message);
+				Log.info("Plain text: " + message.toPlainText());
+				Log.info("Plain format text: " + message.toPlainFormatText());
+				Log.info("Component: " + component);
+				Bukkit.getConsoleSender().spigot().sendMessage(component);
 			}
 			recipient.spigot().sendMessage(component);
 		}
