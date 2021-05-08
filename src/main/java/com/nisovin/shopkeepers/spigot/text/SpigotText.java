@@ -134,6 +134,7 @@ public class SpigotText {
 			// Conversion depending on type of Text and whether it can be combined with the current component or a new
 			// one is required:
 			BaseComponent component;
+			boolean ignoreChild = false;
 			if (text instanceof FormattingText) {
 				ChatColor formatting = ((FormattingText) text).getFormatting();
 				if (formatting == ChatColor.RESET) {
@@ -214,6 +215,7 @@ public class SpigotText {
 				parent.addExtra(component);
 				textStyle.apply(component);
 				current = null;
+				ignoreChild = true;
 			} else {
 				throw new IllegalArgumentException("Unknown type of Text: " + text.getClass().getName());
 			}
@@ -221,7 +223,7 @@ public class SpigotText {
 
 			// Child: Add as child to current component, to inherit its features.
 			Text child = text.getChild();
-			if (child != null) {
+			if (!ignoreChild && child != null) {
 				// This modifies the passed TextStyle to contain the last encountered style:
 				toSpigot(child, current, component, textStyle);
 			}
