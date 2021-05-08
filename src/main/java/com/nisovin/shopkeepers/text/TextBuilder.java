@@ -168,6 +168,8 @@ public abstract class TextBuilder extends AbstractText {
 	 * @throws IllegalArgumentException
 	 *             if the given object is already a Text
 	 */
+	// TODO A common issue is to accidentally pass another Text here, which is not supported at runtime. Somehow change
+	// this to already detect and prevent this during compile time.
 	public TextBuilder childText(Object object) {
 		return this.child(Text.text(object));
 	}
