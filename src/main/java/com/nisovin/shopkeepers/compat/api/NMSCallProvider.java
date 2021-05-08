@@ -65,7 +65,7 @@ public interface NMSCallProvider {
 	public String getItemSNBT(ItemStack itemStack);
 
 	// For use in translatable item type names, null if not supported.
-	// Note: This might not necessarily match an ItemStack's name (for example for certain items, such as different
-	// types of potions, skulls, etc.).
+	// Note: This might not necessarily match the name that is usually displayed for an ItemStack, but rather the
+	// translated item type name (for example for items such as different types of potions, skulls, etc.).
 	public String getItemTypeTranslationKey(Material material);
 }
