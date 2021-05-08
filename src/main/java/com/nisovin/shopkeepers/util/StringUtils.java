@@ -145,6 +145,26 @@ public class StringUtils {
 	}
 
 	/**
+	 * Formats the given enum name to a more user-friendly representation.
+	 * <p>
+	 * This converts the enum name to lower case, replaces underscores with spaces, and capitalizes the leading
+	 * characters of all words.
+	 * <p>
+	 * This returns an empty String if the given enum name is <code>null</code>.
+	 * 
+	 * @param enumName
+	 *            the enum name
+	 * @return the formatted enum name
+	 */
+	public static String formatEnumName(String enumName) {
+		if (enumName == null) enumName = "";
+		enumName = enumName.toLowerCase(Locale.ROOT);
+		enumName = enumName.replace('_', ' ');
+		enumName = StringUtils.capitalizeAll(enumName);
+		return enumName;
+	}
+
+	/**
 	 * Checks if the given strings contains whitespace characters.
 	 * 
 	 * @param string

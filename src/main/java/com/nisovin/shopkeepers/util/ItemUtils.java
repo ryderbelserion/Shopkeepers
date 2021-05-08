@@ -135,6 +135,30 @@ public final class ItemUtils {
 		}
 	}
 
+	/**
+	 * Formats the name of the given {@link Material} to a more user-friendly representation. See also
+	 * {@link StringUtils#formatEnumName(String)}.
+	 * 
+	 * @param material
+	 *            the material
+	 * @return the formatted material name
+	 */
+	public static String formatMaterialName(Material material) {
+		return StringUtils.formatEnumName(material != null ? material.name() : "");
+	}
+
+	/**
+	 * Formats the {@link Material} name of the given {@link ItemStack} to a more user-friendly representation. See also
+	 * {@link #formatMaterialName(Material)}.
+	 * 
+	 * @param itemStack
+	 *            the item stack
+	 * @return the formatted material name
+	 */
+	public static String formatMaterialName(ItemStack itemStack) {
+		return formatMaterialName(itemStack != null ? itemStack.getType() : null);
+	}
+
 	// ItemStack utilities:
 
 	public static boolean isEmpty(ItemStack item) {

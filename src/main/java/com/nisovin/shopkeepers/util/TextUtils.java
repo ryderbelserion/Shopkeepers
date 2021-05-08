@@ -12,18 +12,23 @@ import java.util.regex.Pattern;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
+import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.spigot.text.SpigotText;
+import com.nisovin.shopkeepers.text.HoverEventText;
 import com.nisovin.shopkeepers.text.Text;
+import com.nisovin.shopkeepers.text.TextBuilder;
 
 /**
  * Text and messaging utilities.
  * <p>
- * In contrast to {@link StringUtils}, this contains utilities that are more minecraft and messaging specific.
+ * In contrast to {@link StringUtils}, this contains utilities that are more Minecraft and messaging specific.
  */
 public class TextUtils {
 
@@ -249,6 +254,60 @@ public class TextUtils {
 		} else {
 			return Text.of("[unknown]");
 		}
+	}
+
+	public static Text getItemText(ItemStack itemStack) {
+		return TextUtils.getItemHover(itemStack)
+				.child(getMaterialNameForDisplay(itemStack))
+				.getRoot();
+	}
+
+	public static TextBuilder getItemHover(ItemStack itemStack) {
+		if (itemStack == null) {
+			return Text.text("");
+		}
+		String itemSNBT = NMSManager.getProvider().getItemSNBT(itemStack);
+		if (itemSNBT == null) {
+			// Item SNBT is not supported.
+			return Text.text("");
+		} else {
+			return Text.hoverEvent(HoverEventText.Action.SHOW_ITEM, Text.of(itemSNBT));
+		}
+	}
+
+	/**
+	 * Formats the name of the given {@link Material} to a more user-friendly representation. This first attempts to use
+	 * a client-translatable Text, and if not available, falls back to using {@link #formatMaterialName(Material)}. If
+	 * the given material is <code>null</code>, this returns an empty Text.
+	 * 
+	 * @param material
+	 *            the material
+	 * @return the formatted material name
+	 */
+	public static Text getMaterialNameForDisplay(Material material) {
+		if (material == null) return Text.EMPTY;
+		Text formattedName = Text.of(ItemUtils.formatMaterialName(material));
+		String translationKey = NMSManager.getProvider().getItemTypeTranslationKey(material);
+		if (translationKey == null) {
+			// Item translation keys are not supported.
+			return formattedName;
+		} else {
+			// We use the formatted name as fallback.
+			return Text.translatable(translationKey).child(formattedName).getRoot();
+		}
+	}
+
+	/**
+	 * Formats the {@link Material} name of the given {@link ItemStack} to a more user-friendly representation. See also
+	 * {@link #getMaterialNameForDisplay(Material)}. If the given item stack is <code>null</code>, this returns an empty
+	 * Text.
+	 * 
+	 * @param itemStack
+	 *            the item stack
+	 * @return the formatted material name
+	 */
+	public static Text getMaterialNameForDisplay(ItemStack itemStack) {
+		return getMaterialNameForDisplay(itemStack != null ? itemStack.getType() : null);
 	}
 
 	// SENDING
