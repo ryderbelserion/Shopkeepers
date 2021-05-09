@@ -242,6 +242,12 @@ public class Settings extends Config {
 	public static boolean taxRoundUp = false;
 
 	/*
+	 * Trade Notifications
+	 */
+	public static boolean notifyPlayersAboutTrades = false;
+	public static boolean notifyShopOwnersAboutTrades = false;
+
+	/*
 	 * Trade Log
 	 */
 	public static boolean logTradesToCsv = false;

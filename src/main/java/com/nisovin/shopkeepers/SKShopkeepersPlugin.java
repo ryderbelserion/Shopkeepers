@@ -50,6 +50,7 @@ import com.nisovin.shopkeepers.shopobjects.sign.SignShops;
 import com.nisovin.shopkeepers.spigot.SpigotFeatures;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.tradelog.TradeLoggers;
+import com.nisovin.shopkeepers.tradenotifications.TradeNotifications;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.util.ClassUtils;
@@ -92,6 +93,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	private final ShopkeeperNaming shopkeeperNaming = new ShopkeeperNaming(chatInput);
 	private final ShopkeeperCreation shopkeeperCreation = new ShopkeeperCreation(this);
 	private final TradeLoggers tradeLoggers = new TradeLoggers(this);
+	private final TradeNotifications tradeNotifications = new TradeNotifications(this);
 	private final EventDebugger eventDebugger = new EventDebugger(this);
 
 	private final PlayerShops playerShops = new PlayerShops(this);
@@ -344,6 +346,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		// Trade loggers:
 		tradeLoggers.onEnable();
 
+		// Trade notifications:
+		tradeNotifications.onEnable();
+
 		// Save all updated shopkeeper data (eg. after data migrations):
 		shopkeeperStorage.saveIfDirty();
 
@@ -407,6 +412,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// Trade loggers:
 		tradeLoggers.onDisable();
+
+		// Trade notifications:
+		tradeNotifications.onDisable();
 
 		// Clear all types of registers:
 		shopTypesRegistry.clearAll();

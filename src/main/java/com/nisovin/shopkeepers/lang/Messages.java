@@ -217,6 +217,33 @@ public class Messages extends Config {
 	public static Text cannotTradeInsufficientStock = Text.parse("&7Trade aborted: This shop does not have enough of the traded item.");
 	public static Text cannotTradeInsufficientWritableBooks = Text.parse("&7Trade aborted: This book shop lacks writable books to copy the book with.");
 
+	// Trade placeholders: {player}, {playerId}, {resultItem}, {resultItemAmount}, {item1}, {item1Amount}, {item2},
+	// {item2Amount}, {shop} (replaced by admin or player shop text respectively), {trade_count} (replaced by the trade
+	// count message, or empty if the trade count is one).
+	// Shop placeholders: {shop_id}, {shop_uuid}, {shop_name}, {shop_world}, {shop_x}, {shop_y}, {shop_z},
+	// {shop_location} ('world,x,y,z' or '[virtual]'), {shop_type}, {shop_object_type}, {shop_owner_name},
+	// {shop_owner_uuid}. World name and coordinates are empty for virtual shops.
+	public static Text tradeNotificationOneItem = Text.parse("&7Trade: &e{player}&7 [&6{item1Amount}x &a{item1}&7] \u279e [&6{resultItemAmount}x &a{resultItem}&7] {shop}{trade_count}");
+	public static Text tradeNotificationTwoItems = Text.parse("&7Trade: &e{player}&7 [&6{item1Amount}x &a{item1}&7] [&6{item2Amount}x &a{item2}&7] \u279e [&6{resultItemAmount}x &a{resultItem}&7] {shop}{trade_count}");
+	public static Text buyNotificationOneItem = Text.parse("&7Trade: &e{player}&7 [&6{item1Amount}x &a{item1}&7] \u279e [&6{resultItemAmount}x &a{resultItem}&7] {shop}{trade_count}");
+	public static Text buyNotificationTwoItems = Text.parse("&7Trade: &e{player}&7 [&6{item1Amount}x &a{item1}&7] [&6{item2Amount}x &a{item2}&7] \u279e [&6{resultItemAmount}x &a{resultItem}&7] {shop}{trade_count}");
+	public static Text tradeNotificationPlayerShop = Text.parse("&e{shop_owner_name}");
+	public static Text tradeNotificationNamedPlayerShop = Text.parse("&e{shop_owner_name}");
+	public static Text tradeNotificationAdminShop = Text.parse("&eAdmin Shop");
+	public static Text tradeNotificationNamedAdminShop = Text.parse("&e\"{shop_name}\"");
+	public static Text tradeNotificationTradeCount = Text.parse("&7 (&6{count}x&7)");
+
+	// Placeholders: Same as the general trade notification messages.
+	public static Text ownerTradeNotificationOneItem = Text.parse("&e{player}&7 bought &6{resultItemAmount}x &a{resultItem}&7 from {shop}{trade_count}");
+	public static Text ownerTradeNotificationTwoItems = Text.parse("&e{player}&7 bought &6{resultItemAmount}x &a{resultItem}&7 from {shop}{trade_count}");
+	public static Text ownerBuyNotificationOneItem = Text.parse("&e{player}&7 sold &6{item1Amount}x &a{item1}&7 to {shop}{trade_count}");
+	public static Text ownerBuyNotificationTwoItems = Text.parse("&e{player}&7 sold &6{item1Amount}x &a{item1}&7 and &6{item2Amount}x &a{item2}&7 to {shop}{trade_count}");
+	public static Text ownerTradeNotificationShop = Text.parse("one of your shops");
+	public static Text ownerTradeNotificationNamedShop = Text.parse("your shop &e\"{shop_name}\"");
+	public static Text ownerBuyNotificationShop = Text.parse("one of your shops");
+	public static Text ownerBuyNotificationNamedShop = Text.parse("your shop &e\"{shop_name}\"");
+	public static Text ownerTradeNotificationTradeCount = Text.parse("&7 (&6{count}x&7)");
+
 	public static Text shopkeeperCreated = Text.parse("&aShopkeeper created: &6{type} &7({description})\n{setupDesc}");
 
 	public static String shopSetupDescSelling = c("&e  Add items you want to sell to your container, then\n"

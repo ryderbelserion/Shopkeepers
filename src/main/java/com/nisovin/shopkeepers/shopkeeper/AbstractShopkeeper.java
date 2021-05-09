@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -650,22 +651,34 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.lastChunkCoords = chunkCoords;
 	}
 
-	// TODO This has to be aware of sub types in order to replace arguments with empty strings.
-	// -> Move into Shop type and abstract shop type and let all registered types provide arguments.
-	// TODO Not yet used anywhere.
-	/*public final Map<String, Object> getShopkeeperMsgArgs(Shopkeeper shopkeeper) {
+	/**
+	 * Gets a {@link Map} of possible message arguments for this shopkeeper.
+	 * <p>
+	 * The message arguments may be {@link Supplier Suppliers} that lazily calculate their argument values.
+	 * 
+	 * @param contextPrefix
+	 *            this prefix is added in front of all message keys
+	 * @return the map of message arguments
+	 */
+	public final Map<String, Object> getMessageArguments(String contextPrefix) {
+		contextPrefix = StringUtils.getOrEmpty(contextPrefix);
 		Map<String, Object> msgArgs = new HashMap<>();
-		msgArgs.put("uuid", shopkeeper.getUniqueId().toString());
-		msgArgs.put("id", String.valueOf(shopkeeper.getId()));
-		msgArgs.put("name", shopkeeper.getName());
-		msgArgs.put("location", shopkeeper.getPositionString());
-		msgArgs.put("shopType", shopkeeper.getType().getIdentifier());
-		msgArgs.put("objectType", shopkeeper.getShopObject().getType().getIdentifier());
-		PlayerShopkeeper playerShop = (shopkeeper instanceof PlayerShopkeeper) ? (PlayerShopkeeper) shopkeeper : null;
-		msgArgs.put("ownerName", (playerShop == null) ? "" : playerShop.getOwnerName());
-		msgArgs.put("ownerUUID", (playerShop == null) ? "" : playerShop.getOwnerUUID().toString());
+		this.populateMessageArguments(msgArgs, contextPrefix);
 		return msgArgs;
-	}*/
+	}
+
+	protected void populateMessageArguments(Map<String, Object> msgArgs, String contextPrefix) {
+		msgArgs.put(contextPrefix + "id", (Supplier<Object>) () -> String.valueOf(this.getId()));
+		msgArgs.put(contextPrefix + "uuid", (Supplier<Object>) () -> this.getUniqueId().toString());
+		msgArgs.put(contextPrefix + "name", (Supplier<Object>) () -> this.getName());
+		msgArgs.put(contextPrefix + "world", (Supplier<Object>) () -> StringUtils.getOrEmpty(this.getWorldName()));
+		msgArgs.put(contextPrefix + "x", (Supplier<Object>) () -> this.getX());
+		msgArgs.put(contextPrefix + "y", (Supplier<Object>) () -> this.getY());
+		msgArgs.put(contextPrefix + "z", (Supplier<Object>) () -> this.getZ());
+		msgArgs.put(contextPrefix + "location", (Supplier<Object>) () -> this.getPositionString());
+		msgArgs.put(contextPrefix + "type", (Supplier<Object>) () -> this.getType().getIdentifier());
+		msgArgs.put(contextPrefix + "object_type", (Supplier<Object>) () -> this.getShopObject().getType().getIdentifier());
+	}
 
 	// NAMING
 

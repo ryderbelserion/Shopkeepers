@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.shopkeeper.player;
 
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -187,6 +188,13 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			}
 		}
 		super.delete(player);
+	}
+
+	@Override
+	protected void populateMessageArguments(Map<String, Object> msgArgs, String contextPrefix) {
+		super.populateMessageArguments(msgArgs, contextPrefix);
+		msgArgs.put(contextPrefix + "owner_name", (Supplier<Object>) () -> this.getOwnerName());
+		msgArgs.put(contextPrefix + "owner_uuid", (Supplier<Object>) () -> this.getOwnerUUID().toString());
 	}
 
 	@Override

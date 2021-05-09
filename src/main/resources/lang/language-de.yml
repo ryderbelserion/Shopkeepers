@@ -256,6 +256,26 @@ cannot-trade-insufficient-currency: "&7Handel abgebrochen: Dieser Shop hat nicht
 cannot-trade-insufficient-stock: "&7Handel abgebrochen: Dieser Shop hat nicht genügend von dem gehandelten Item."
 cannot-trade-insufficient-writable-books: "&7Handel abgebrochen: Diesem Buchladen fehlen beschreibbare Bücher für die Buchkopie."
 
+trade-notification-one-item: "&7Handel: &e{player}&7 [&6{item1Amount}x &a{item1}&7] \u279e [&6{resultItemAmount}x &a{resultItem}&7] {shop}{trade_count}"
+trade-notification-two-items: "&7Handel: &e{player}&7 [&6{item1Amount}x &a{item1}&7] [&6{item2Amount}x &a{item2}&7] \u279e [&6{resultItemAmount}x &a{resultItem}&7] {shop}{trade_count}"
+buy-notification-one-item: "&7Handel: &e{player}&7 [&6{item1Amount}x &a{item1}&7] \u279e [&6{resultItemAmount}x &a{resultItem}&7] {shop}{trade_count}"
+buy-notification-two-items: "&7Handel: &e{player}&7 [&6{item1Amount}x &a{item1}&7] [&6{item2Amount}x &a{item2}&7] \u279e [&6{resultItemAmount}x &a{resultItem}&7] {shop}{trade_count}"
+trade-notification-player-shop: "&e{shop_owner_name}"
+trade-notification-named-player-shop: "&e{shop_owner_name}"
+trade-notification-admin-shop: "&eAdmin-Shop"
+trade-notification-named-admin-shop: '&e"{shop_name}"'
+trade-notification-trade-count: "&7 (&6{count}x&7)"
+
+owner-trade-notification-one-item: "&e{player}&7 hat &6{resultItemAmount}x &a{resultItem}&7 von {shop}&7 gekauft{trade_count}"
+owner-trade-notification-two-items: "&e{player}&7 hat &6{resultItemAmount}x &a{resultItem}&7 von {shop}&7 gekauft{trade_count}"
+owner-buy-notification-one-item: "&e{player}&7 hat &6{item1Amount}x &a{item1}&7 an {shop}&7 verkauft{trade_count}"
+owner-buy-notification-two-items: "&e{player}&7 hat &6{item1Amount}x &a{item1}&7 und &6{item2Amount}x &a{item2}&7 an {shop}&7 verkauft{trade_count}"
+owner-trade-notification-shop: "einem deiner Shops"
+owner-trade-notification-named-shop: 'deinem Shop &e"{shop_name}"'
+owner-buy-notification-shop: "einen deiner Shops"
+owner-buy-notification-named-shop: 'deinen Shop &e"{shop_name}"'
+owner-trade-notification-trade-count: "&7 (&6{count}x&7)"
+
 shopkeeper-created: "&aShop erstellt: &6{type} &7({description})\n{setupDesc}"
 
 shop-setup-desc-selling: |-

@@ -61,6 +61,9 @@ public interface ShopkeepersPlugin extends Plugin {
 	public static final String BYPASS_PERMISSION = "shopkeeper.bypass";
 	public static final String MAXSHOPS_UNLIMITED_PERMISSION = "shopkeeper.maxshops.unlimited";
 
+	public static final String TRADE_NOTIFICATIONS_ADMIN = "shopkeeper.trade-notifications.admin";
+	public static final String TRADE_NOTIFICATIONS_PLAYER = "shopkeeper.trade-notifications.player";
+
 	public static final String ADMIN_PERMISSION = "shopkeeper.admin";
 	public static final String PLAYER_SELL_PERMISSION = "shopkeeper.player.sell";
 	public static final String PLAYER_BUY_PERMISSION = "shopkeeper.player.buy";

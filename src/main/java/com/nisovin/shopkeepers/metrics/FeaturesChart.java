@@ -44,6 +44,8 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 			addFeatureEntry(allFeatures, "tax-rate", Settings.taxRate > 0);
 			addFeatureEntry(allFeatures, "use-strict-item-comparison", Settings.useStrictItemComparison);
 			addFeatureEntry(allFeatures, "log-trades-to-csv", Settings.logTradesToCsv);
+			addFeatureEntry(allFeatures, "notify-players-about-trades", Settings.notifyPlayersAboutTrades);
+			addFeatureEntry(allFeatures, "notify-shop-owners-about-trades", Settings.notifyShopOwnersAboutTrades);
 			addFeatureEntry(allFeatures, "disable-other-villagers", Settings.disableOtherVillagers);
 			addFeatureEntry(allFeatures, "block-villager-spawns", Settings.blockVillagerSpawns);
 			addFeatureEntry(allFeatures, "hire-other-villagers", Settings.hireOtherVillagers);

@@ -455,6 +455,20 @@ tax-rate: 0
 tax-round-up: false
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
+# Trade Notifications
+# *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
+
+# Whether to inform players with the required trade notification permission
+# ('shopkeeper.trade-notifications.admin' for admin shop trade notifications
+# and 'shopkeeper.trade-notifications.player' for player shop trade
+# notifications) about trades that take place. If a player would also receive a
+# trade notification because trade notifications for shop owners are enabled,
+# they will only receive the shop owner specific notification.
+notify-players-about-trades: false
+# Whether to inform shop owners about trades that take place in their shops.
+notify-shop-owners-about-trades: false
+
+# *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Trade Log
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 

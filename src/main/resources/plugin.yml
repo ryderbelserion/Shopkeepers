@@ -161,6 +161,13 @@ permissions:
     #   description: Create shopkeepers of the specific mob type
     #   default: false
 
+    shopkeeper.trade-notifications.admin:
+        description: Receive trade notifications for admin shops
+        default: false
+    shopkeeper.trade-notifications.player:
+        description: Receive trade notifications for player shops
+        default: false
+
     # Star notation: Includes all other permissions
     shopkeeper.*:
         description: Access to everything

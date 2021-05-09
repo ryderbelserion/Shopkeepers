@@ -184,10 +184,15 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Changed: The '/shopkeeper remove' command is now called '/shopkeeper removeAll'. All related permission nodes and some related messages have changed. The 'all' argument, which removes the player shops of all players, has been changed to 'player'.
 * Improved: The removeAll command prints the number of shopkeepers now that have been skipped because they either have already been removed, or their removal has been cancelled by a plugin.
 * Added command '/shopkeeper remove [shop]'. This replaces the previous remove command, which has been renamed to removeAll, and allows the removal of a single specific shopkeeper.
-  * Added permission 'shopkeeper.remove.own' (default: op): Allows the removal of own shops via command.
-  * Added permission 'shopkeeper.remove.others' (default: op): Allows the removal of shops of other players via command.
-  * Added permission 'shopkeeper.remove.admin' (default: op): Allows the removal of admin shops via command.
+  * Permissions: Added permission 'shopkeeper.remove.own' (default: op): Allows the removal of own shops via command.
+  * Permissions: Added permission 'shopkeeper.remove.others' (default: op): Allows the removal of shops of other players via command.
+  * Permissions: Added permission 'shopkeeper.remove.admin' (default: op): Allows the removal of admin shops via command.
 * Improved: Added more feedback messages for cases in which the trading may fail for some reason.
+* Added trade notifications:
+  * Config: Added options 'notify-players-about-trades' and 'notify-shop-owners-about-trades' (both disabled by default). These settings enable trade notifications for all players with certain permissions, or for shop owners about trades that take place in their own shops.
+  * Permissions: Added permissions 'shopkeeper.trade-notifications.admin' and 'shopkeeper.trade-notifications.player' (both default to 'false'). Players with these permissions will receive trade notifications for all admin or player shops respectively, if trade notifications are enabled (setting 'notify-players-about-trades').
+  * Messages: Added different sets of messages for general trade notifications and owner trade notifications, as well as for general trades and trades in which the shop bought something for currency. And there are different messages for player shops, admin shops, and named variants of both. The default messages do not make use of all of these options, but this should provide a lot of flexibility when adjusting the trade notification messages.
+  * In order to avoid notification spam, the trade notifications merge trades that take place in quick succession and involve the same player, shopkeeper, and items. This covers that case when players trade multiple times by a single shift click, but also when they quickly perform the same trade multiple times themselves.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
@@ -229,6 +234,7 @@ Internal API:
 * Renamed AbstractShopObject#getEditorButtons to #createEditorButtons to make it more clear that is usually only invoked once. Also, this returns a new modifiable list now. Subtypes therefore no longer need to create their own copies of that list.
 * Added AbstractShopObject#onShopkeeperAdded.
 * Added AbstractShopObject#getShopkeeper.
+* Shopkeepers can now provide a lazily evaluated map of possible message arguments. However, this is not yet used everywhere yet.
 
 Internal:  
 * The config key pattern is cached now.
@@ -274,6 +280,7 @@ Internal:
 * Added a CsvFormatter utility with various options.
 * The CSV trade logger uses new file and date-time APIs now.
 * Minor refactor to the utility functions that remove items from inventories, and to how the book shopkeeper removes writable books from the shop container.
+* Added an utility class TradeMerger for merging equivalent trades.
 * Minor other internal code refactoring.
 
 Migration notes:  
@@ -348,6 +355,24 @@ Messages:
 * Added 'cannot-trade-insufficient-currency'.
 * Added 'cannot-trade-insufficient-stock'.
 * Added 'cannot-trade-insufficient-writable-books'.
+* Added 'trade-notification-one-item'.
+* Added 'trade-notification-two-items'.
+* Added 'buy-notification-one-item'.
+* Added 'buy-notification-two-items'.
+* Added 'trade-notification-player-shop'.
+* Added 'trade-notification-named-player-shop'.
+* Added 'trade-notification-admin-shop'.
+* Added 'trade-notification-named-admin-shop'.
+* Added 'trade-notification-trade-count'.
+* Added 'owner-trade-notification-one-item'.
+* Added 'owner-trade-notification-two-items'.
+* Added 'owner-buy-notification-one-item'.
+* Added 'owner-buy-notification-two-items'.
+* Added 'owner-trade-notification-shop'.
+* Added 'owner-trade-notification-named-shop'.
+* Added 'owner-buy-notification-shop'.
+* Added 'owner-buy-notification-named-shop'.
+* Added 'owner-trade-notification-trade-count'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.
