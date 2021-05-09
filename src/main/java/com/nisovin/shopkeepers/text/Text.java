@@ -9,6 +9,7 @@ import java.util.function.Supplier;
 import org.bukkit.ChatColor;
 
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**
  * A text representation with support for various interaction and formatting features.
@@ -332,6 +333,21 @@ public interface Text {
 	 * built by this method.
 	 * 
 	 * @param arguments
+	 *            the message arguments mapped by their placeholder keys
+	 * @return this Text
+	 */
+	public Text setPlaceholderArguments(MessageArguments arguments);
+
+	/**
+	 * Assigns the given arguments to their corresponding {@link PlaceholderText placeholders} used inside this
+	 * {@link Text}, its {@link #getChild() child} and {@link #getNext() subsequent} Texts and any {@link HoverEventText
+	 * hover events}.
+	 * <p>
+	 * This is provided as a convenience over having to manually prepare a {@link MessageArguments} when calling
+	 * {@link #setPlaceholderArguments(MessageArguments)}. However, to simplify the implementation of sub-classes, the
+	 * implementation of this method is supposed to delegate to {@link #setPlaceholderArguments(MessageArguments)}.
+	 * 
+	 * @param arguments
 	 *            a mapping between placeholder keys and their arguments
 	 * @return this Text
 	 */
@@ -342,9 +358,10 @@ public interface Text {
 	 * {@link Text}, its {@link #getChild() child} and {@link #getNext() subsequent} Texts and any {@link HoverEventText
 	 * hover events}.
 	 * <p>
-	 * This is provided as a convenience over having to manually prepare a Map when calling
-	 * {@link #setPlaceholderArguments(Map)}. However, to simplify the implementation of sub-classes, the implementation
-	 * of this method is supposed to delegate to {@link #setPlaceholderArguments(Map)}.
+	 * This is provided as a convenience over having to manually prepare a {@link Map} and {@link MessageArguments} when
+	 * calling {@link #setPlaceholderArguments(MessageArguments)}. However, to simplify the implementation of
+	 * sub-classes, the implementation of this method is supposed to delegate (directly or indirectly) to
+	 * {@link #setPlaceholderArguments(MessageArguments)}.
 	 * 
 	 * @param argumentPairs
 	 *            an array that pairwise contains placeholder keys (of type String) and their arguments in the format

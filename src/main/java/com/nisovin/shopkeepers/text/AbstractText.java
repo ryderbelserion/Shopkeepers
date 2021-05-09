@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**
  * Base class for all {@link Text} implementations.
@@ -120,7 +121,7 @@ public abstract class AbstractText implements Text {
 	// PLACEHOLDER ARGUMENTS
 
 	@Override
-	public Text setPlaceholderArguments(Map<String, ?> arguments) {
+	public Text setPlaceholderArguments(MessageArguments arguments) {
 		Validate.notNull(arguments, "arguments is null");
 
 		// Delegate to childs:
@@ -135,6 +136,11 @@ public abstract class AbstractText implements Text {
 			next.setPlaceholderArguments(arguments);
 		}
 		return this;
+	}
+
+	@Override
+	public Text setPlaceholderArguments(Map<String, ?> arguments) {
+		return this.setPlaceholderArguments(MessageArguments.ofMap(arguments));
 	}
 
 	@Override

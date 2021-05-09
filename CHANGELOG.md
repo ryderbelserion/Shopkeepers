@@ -281,6 +281,7 @@ Internal:
 * The CSV trade logger uses new file and date-time APIs now.
 * Minor refactor to the utility functions that remove items from inventories, and to how the book shopkeeper removes writable books from the shop container.
 * Added an utility class TradeMerger for merging equivalent trades.
+* Changes to how message arguments are represented.
 * Minor other internal code refactoring.
 
 Migration notes:  

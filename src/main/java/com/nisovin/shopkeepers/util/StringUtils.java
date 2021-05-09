@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+import com.nisovin.shopkeepers.util.text.MessageArguments;
+
 /**
  * Utility functions related to Strings.
  */
@@ -379,6 +381,10 @@ public class StringUtils {
 	// Uses the String representation of the given arguments.
 	// If an argument is a Supplier, it gets invoked to obtain the actual argument.
 	public static String replaceArguments(String source, Map<String, Object> arguments) {
+		return replaceArguments(source, MessageArguments.ofMap(arguments));
+	}
+
+	public static String replaceArguments(String source, MessageArguments arguments) {
 		return ARGUMENTS_REPLACER.replaceArguments(source, arguments); // Checks arguments
 	}
 
@@ -419,7 +425,7 @@ public class StringUtils {
 		private int sourceLength;
 		private char keyPrefixChar;
 		private char keySuffixChar;
-		private Map<String, Object> arguments;
+		private MessageArguments arguments;
 
 		// Current search state:
 		private int searchPos = 0; // Index of where to start the search for the next key in the source String
@@ -439,11 +445,11 @@ public class StringUtils {
 		public ArgumentsReplacer() {
 		}
 
-		public String replaceArguments(String source, Map<String, Object> arguments) {
+		public String replaceArguments(String source, MessageArguments arguments) {
 			return this.replaceArguments(source, DEFAULT_KEY_PREFIX_CHAR, DEFAULT_KEY_SUFFIX_CHAR, arguments);
 		}
 
-		public String replaceArguments(String source, char keyPrefixChar, char keySuffixChar, Map<String, Object> arguments) {
+		public String replaceArguments(String source, char keyPrefixChar, char keySuffixChar, MessageArguments arguments) {
 			// Setup:
 			this.setup(source, keyPrefixChar, keySuffixChar, arguments); // Validates input
 
@@ -460,9 +466,9 @@ public class StringUtils {
 			return result;
 		}
 
-		protected void setup(String source, char keyPrefixChar, char keySuffixChar, Map<String, Object> arguments) {
-			Validate.notNull(source, "Source is null!");
-			Validate.notNull(arguments, "Arguments is null!");
+		protected void setup(String source, char keyPrefixChar, char keySuffixChar, MessageArguments arguments) {
+			Validate.notNull(source, "source is null");
+			Validate.notNull(arguments, "arguments is null");
 
 			this.source = source;
 			sourceLength = source.length();
