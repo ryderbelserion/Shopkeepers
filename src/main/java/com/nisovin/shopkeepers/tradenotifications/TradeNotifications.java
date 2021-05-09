@@ -26,6 +26,7 @@ import com.nisovin.shopkeepers.util.Lazy;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.text.MessageArguments;
 import com.nisovin.shopkeepers.util.trading.TradeMerger;
 import com.nisovin.shopkeepers.util.trading.TradeMerger.MergeMode;
 import com.nisovin.shopkeepers.util.trading.TradeMerger.MergedTrades;
@@ -38,7 +39,7 @@ public class TradeNotifications implements Listener {
 	private static class TradeContext {
 
 		private final MergedTrades mergedTrades;
-		private final Lazy<Map<String, Object>> shopMessageArguments;
+		private final Lazy<MessageArguments> shopMessageArguments;
 		private final Lazy<Map<String, Object>> tradeMessageArguments;
 		private final Lazy<Boolean> isResultItemCurrency;
 
@@ -116,7 +117,7 @@ public class TradeNotifications implements Listener {
 			return mergedTrades.getTradeCount();
 		}
 
-		public Map<String, Object> getShopMessageArguments() {
+		public MessageArguments getShopMessageArguments() {
 			return shopMessageArguments.get();
 		}
 
@@ -251,7 +252,7 @@ public class TradeNotifications implements Listener {
 
 	private Text getTradeNotificationMessage(TradeContext tradeContext, Text message, Text shopText, Text tradeCountText) {
 		assert tradeContext != null;
-		Map<String, Object> shopMsgArgs = tradeContext.getShopMessageArguments();
+		MessageArguments shopMsgArgs = tradeContext.getShopMessageArguments();
 		Map<String, Object> tradeMsgArgs = tradeContext.getTradeMessageArguments();
 
 		shopText.setPlaceholderArguments(shopMsgArgs);

@@ -46,6 +46,7 @@ import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**
  * Abstract base class for all shopkeeper implementations.
@@ -118,6 +119,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// The ChunkCoords under which the shopkeeper is currently stored:
 	private ChunkCoords lastChunkCoords = null;
 	private String name = ""; // Not null, can be empty
+
+	// Map of dynamically evaluated message arguments:
+	private final Map<String, Supplier<Object>> messageArgumentsMap = new HashMap<>();
+	private final MessageArguments messageArguments = MessageArguments.ofMap(messageArgumentsMap);
 
 	// Whether there have been changes to the shopkeeper's data that the storage is not yet aware of. A value of 'false'
 	// only indicates that the storage is aware of the latest data of the shopkeeper, not that it has actually persisted
@@ -652,32 +657,49 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * Gets a {@link Map} of possible message arguments for this shopkeeper.
+	 * Gets the {@link MessageArguments} for this shopkeeper.
 	 * <p>
-	 * The message arguments may be {@link Supplier Suppliers} that lazily calculate their argument values.
+	 * The provided message arguments may be {@link Supplier Suppliers} that lazily and dynamically calculate the actual
+	 * message arguments only when they are requested.
 	 * 
 	 * @param contextPrefix
-	 *            this prefix is added in front of all message keys
-	 * @return the map of message arguments
+	 *            this prefix is added in front of all message keys, not <code>null</code>, but may be empty
+	 * @return the message arguments
 	 */
-	public final Map<String, Object> getMessageArguments(String contextPrefix) {
-		contextPrefix = StringUtils.getOrEmpty(contextPrefix);
-		Map<String, Object> msgArgs = new HashMap<>();
-		this.populateMessageArguments(msgArgs, contextPrefix);
-		return msgArgs;
+	public final MessageArguments getMessageArguments(String contextPrefix) {
+		// Lazily populated map of message argument suppliers:
+		if (messageArgumentsMap.isEmpty()) {
+			this.populateMessageArguments(messageArgumentsMap);
+			assert !messageArgumentsMap.isEmpty();
+		}
+		return messageArguments.prefixed(contextPrefix);
 	}
 
-	protected void populateMessageArguments(Map<String, Object> msgArgs, String contextPrefix) {
-		msgArgs.put(contextPrefix + "id", (Supplier<Object>) () -> String.valueOf(this.getId()));
-		msgArgs.put(contextPrefix + "uuid", (Supplier<Object>) () -> this.getUniqueId().toString());
-		msgArgs.put(contextPrefix + "name", (Supplier<Object>) () -> this.getName());
-		msgArgs.put(contextPrefix + "world", (Supplier<Object>) () -> StringUtils.getOrEmpty(this.getWorldName()));
-		msgArgs.put(contextPrefix + "x", (Supplier<Object>) () -> this.getX());
-		msgArgs.put(contextPrefix + "y", (Supplier<Object>) () -> this.getY());
-		msgArgs.put(contextPrefix + "z", (Supplier<Object>) () -> this.getZ());
-		msgArgs.put(contextPrefix + "location", (Supplier<Object>) () -> this.getPositionString());
-		msgArgs.put(contextPrefix + "type", (Supplier<Object>) () -> this.getType().getIdentifier());
-		msgArgs.put(contextPrefix + "object_type", (Supplier<Object>) () -> this.getShopObject().getType().getIdentifier());
+	/**
+	 * Populates the given {@link Map} with the possible message arguments for this shopkeeper.
+	 * <p>
+	 * In order to not calculate all message arguments in advance when they might not actually be required, the message
+	 * arguments are meant to be {@link Supplier Suppliers} that lazily calculate the actual message arguments only when
+	 * they are requested.
+	 * <p>
+	 * In order to be able to reuse the once populated Map, these {@link Supplier Suppliers} are also meant to be
+	 * stateless: Any message arguments that depend on dynamic state of this shopkeeper are meant to dynamically
+	 * retrieve the current values whenever their {@link Supplier Suppliers} are invoked.
+	 * 
+	 * @param messageArguments
+	 *            the Map of lazily and dynamically evaluated message arguments
+	 */
+	protected void populateMessageArguments(Map<String, Supplier<Object>> messageArguments) {
+		messageArguments.put("id", () -> String.valueOf(this.getId()));
+		messageArguments.put("uuid", () -> this.getUniqueId().toString());
+		messageArguments.put("name", () -> this.getName());
+		messageArguments.put("world", () -> StringUtils.getOrEmpty(this.getWorldName()));
+		messageArguments.put("x", () -> this.getX());
+		messageArguments.put("y", () -> this.getY());
+		messageArguments.put("z", () -> this.getZ());
+		messageArguments.put("location", () -> this.getPositionString());
+		messageArguments.put("type", () -> this.getType().getIdentifier());
+		messageArguments.put("object_type", () -> this.getShopObject().getType().getIdentifier());
 	}
 
 	// NAMING

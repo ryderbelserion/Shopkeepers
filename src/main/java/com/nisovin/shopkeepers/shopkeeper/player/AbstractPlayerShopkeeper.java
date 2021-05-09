@@ -191,10 +191,10 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	protected void populateMessageArguments(Map<String, Object> msgArgs, String contextPrefix) {
-		super.populateMessageArguments(msgArgs, contextPrefix);
-		msgArgs.put(contextPrefix + "owner_name", (Supplier<Object>) () -> this.getOwnerName());
-		msgArgs.put(contextPrefix + "owner_uuid", (Supplier<Object>) () -> this.getOwnerUUID().toString());
+	protected void populateMessageArguments(Map<String, Supplier<Object>> messageArguments) {
+		super.populateMessageArguments(messageArguments);
+		messageArguments.put("owner_name", () -> this.getOwnerName());
+		messageArguments.put("owner_uuid", () -> this.getOwnerUUID().toString());
 	}
 
 	@Override

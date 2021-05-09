@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.util.text;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import com.nisovin.shopkeepers.util.Validate;
 import com.nisovin.shopkeepers.util.text.CommonMessageArguments.CombinedMessageArguments;
 import com.nisovin.shopkeepers.util.text.CommonMessageArguments.MapMessageArguments;
 import com.nisovin.shopkeepers.util.text.CommonMessageArguments.PrefixedMessageArguments;
@@ -66,6 +67,8 @@ public interface MessageArguments {
 	 * @return the prefixed {@link MessageArguments}
 	 */
 	default MessageArguments prefixed(String keyPrefix) {
+		Validate.notNull(keyPrefix, "keyPrefix is null");
+		if (keyPrefix.isEmpty()) return this; // No prefix
 		return new PrefixedMessageArguments(this, keyPrefix);
 	}
 }
