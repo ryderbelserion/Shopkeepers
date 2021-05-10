@@ -139,12 +139,12 @@ public abstract class AbstractText implements Text {
 	}
 
 	@Override
-	public Text setPlaceholderArguments(Map<String, ?> arguments) {
+	public final Text setPlaceholderArguments(Map<String, ?> arguments) {
 		return this.setPlaceholderArguments(MessageArguments.ofMap(arguments));
 	}
 
 	@Override
-	public Text setPlaceholderArguments(Object... argumentPairs) {
+	public final Text setPlaceholderArguments(Object... argumentPairs) {
 		assert TEMP_ARGUMENTS_MAP.isEmpty();
 		try {
 			StringUtils.addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);

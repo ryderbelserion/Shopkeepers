@@ -1,11 +1,11 @@
 package com.nisovin.shopkeepers.text;
 
-import java.util.Map;
 import java.util.function.Supplier;
 
 import org.bukkit.ChatColor;
 
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**
  * The base class for builders that allow the fluent construction of {@link Text Texts}.
@@ -79,7 +79,7 @@ public abstract class TextBuilder extends AbstractText {
 	// PLACEHOLDER ARGUMENTS
 
 	@Override
-	public Text setPlaceholderArguments(Map<String, ?> arguments) {
+	public Text setPlaceholderArguments(MessageArguments arguments) {
 		Validate.isTrue(this.isBuilt(), "Cannot set placeholder arguments for unbuilt Text!");
 		return super.setPlaceholderArguments(arguments);
 	}

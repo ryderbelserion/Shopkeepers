@@ -1,9 +1,9 @@
 package com.nisovin.shopkeepers.text;
 
-import java.util.Map;
 import java.util.function.Supplier;
 
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**
  * A {@link Text} that uses a dynamically set {@link #getPlaceholderArgument() placeholder argument} as its child.
@@ -110,7 +110,7 @@ public class PlaceholderText extends TextBuilder {
 	// PLACEHOLDER ARGUMENTS
 
 	@Override
-	public Text setPlaceholderArguments(Map<String, ?> arguments) {
+	public Text setPlaceholderArguments(MessageArguments arguments) {
 		// Temporarily clear placeholder argument (if any) to not delegate to it via child delegation:
 		Text prevArgument = this.getPlaceholderArgument();
 		this.setPlaceholderArgument(null);

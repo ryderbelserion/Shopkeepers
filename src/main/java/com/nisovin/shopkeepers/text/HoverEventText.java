@@ -1,8 +1,7 @@
 package com.nisovin.shopkeepers.text;
 
-import java.util.Map;
-
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 public class HoverEventText extends TextBuilder {
 
@@ -65,7 +64,7 @@ public class HoverEventText extends TextBuilder {
 	// PLACEHOLDER ARGUMENTS
 
 	@Override
-	public Text setPlaceholderArguments(Map<String, ?> arguments) {
+	public Text setPlaceholderArguments(MessageArguments arguments) {
 		super.setPlaceholderArguments(arguments);
 		// Delegate to hover text:
 		value.setPlaceholderArguments(arguments);
