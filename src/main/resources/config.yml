@@ -466,7 +466,7 @@ tax-round-up: false
 # they will only receive the shop owner specific notification.
 notify-players-about-trades: false
 # Whether to inform shop owners about trades that take place in their shops.
-notify-shop-owners-about-trades: false
+notify-shop-owners-about-trades: true
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Trade Log

@@ -245,7 +245,7 @@ public class Settings extends Config {
 	 * Trade Notifications
 	 */
 	public static boolean notifyPlayersAboutTrades = false;
-	public static boolean notifyShopOwnersAboutTrades = false;
+	public static boolean notifyShopOwnersAboutTrades = true;
 
 	/*
 	 * Trade Log
