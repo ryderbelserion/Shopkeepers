@@ -13,7 +13,6 @@ import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
-import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.event.ShopkeeperEventHelper;
@@ -108,11 +107,18 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 	}
 
 	@Override
-	protected void setupButtons() {
+	protected final void setupButtons() {
 		super.setupButtons();
+		this.setupShopkeeperButtons();
+		this.setupShopObjectButtons();
+	}
+
+	protected void setupShopkeeperButtons() {
 		this.addButtonOrIgnore(this.createDeleteButton());
 		this.addButtonOrIgnore(this.createNamingButton());
-		this.addButtonOrIgnore(this.createContainerButton());
+	}
+
+	protected void setupShopObjectButtons() {
 		this.addButtonsOrIgnore(shopkeeper.getShopObject().createEditorButtons());
 	}
 
@@ -170,28 +176,6 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 				// Start naming:
 				SKShopkeepersPlugin.getInstance().getShopkeeperNaming().startNaming(player, shopkeeper);
 				TextUtils.sendMessage(player, Messages.typeNewName);
-			}
-		};
-	}
-
-	protected Button createContainerButton() {
-		if (!Settings.enableContainerOptionOnPlayerShop || !(shopkeeper.getType() instanceof PlayerShopType)) {
-			return null;
-		}
-		return new Button() {
-			@Override
-			public ItemStack getIcon(Session session) {
-				return Settings.createContainerButtonItem();
-			}
-
-			@Override
-			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// Also triggers save:
-				getUISession(player).closeDelayedAndRunTask(() -> {
-					// Open the shop container inventory:
-					if (!player.isValid() || !shopkeeper.isValid()) return;
-					((PlayerShopkeeper) shopkeeper).openContainerWindow(player);
-				});
 			}
 		};
 	}

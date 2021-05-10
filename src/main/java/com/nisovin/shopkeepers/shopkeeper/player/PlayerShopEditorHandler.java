@@ -6,6 +6,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
@@ -31,6 +32,35 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 	public boolean canOpen(Player player, boolean silent) {
 		if (!super.canOpen(player, silent)) return false;
 		return (this.getShopkeeper().isOwner(player) || PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION));
+	}
+
+	@Override
+	protected void setupShopkeeperButtons() {
+		super.setupShopkeeperButtons();
+		this.addButtonOrIgnore(this.createContainerButton());
+	}
+
+	protected Button createContainerButton() {
+		if (!Settings.enableContainerOptionOnPlayerShop) {
+			return null;
+		}
+		return new Button() {
+			@Override
+			public ItemStack getIcon(Session session) {
+				return Settings.createContainerButtonItem();
+			}
+
+			@Override
+			protected void onClick(InventoryClickEvent clickEvent, Player player) {
+				// Closing the UI also triggers a save of the current editor state:
+				getUISession(player).closeDelayedAndRunTask(() -> {
+					// Open the shop container inventory:
+					PlayerShopkeeper shopkeeper = getShopkeeper();
+					if (!player.isValid() || !shopkeeper.isValid()) return;
+					shopkeeper.openContainerWindow(player);
+				});
+			}
+		};
 	}
 
 	@Override
