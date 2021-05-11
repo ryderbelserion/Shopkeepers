@@ -223,7 +223,7 @@ public abstract class CommandArgument<T> {
 		Supplier<?> argumentFormatSupplier = () -> {
 			CommandArgument<?> rootArgument = this.getRootArgument();
 			String format = rootArgument.getFormat();
-			if (!format.isEmpty()) {
+			if (format.isEmpty()) {
 				// Use the name in case the format is empty (eg. for hidden arguments):
 				return argumentNameSupplier.get();
 			} else {
