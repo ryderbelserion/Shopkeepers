@@ -478,6 +478,7 @@ public abstract class Command {
 				sb.append(this.getArgumentChain(argument));
 				return sb.toString();
 			});
+			Log.debug(DebugOptions.commands, "Command exception: ", e);
 			Log.debug(DebugOptions.commands, () -> "Context: " + context.toString());
 			Log.debug(DebugOptions.commands, () -> "Arguments reader: " + argsReader.toString());
 		} catch (Exception e) {

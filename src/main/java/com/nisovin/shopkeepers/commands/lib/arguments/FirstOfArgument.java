@@ -152,7 +152,7 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 
 		if (nullParsed) {
 			// If one argument did return null as parsing result, and did not throw an exception (like optional
-			// arguments tend to do), we don't throw an exception here either:
+			// arguments tend to do), we do not throw an exception here either:
 			return null;
 		}
 

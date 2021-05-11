@@ -44,7 +44,7 @@ public class LiteralArgument extends CommandArgument<String> {
 	@Override
 	public CommandArgument<String> setDisplayName(String displayName) {
 		if (displayName != null) {
-			Validate.isTrue(this.literals.contains(displayName), "Display name doesn't match any of the literal argument's literals!");
+			Validate.isTrue(literals.contains(displayName), "The specified display name does not match any of the literal argument's literals!");
 		}
 		return super.setDisplayName(displayName);
 	}

@@ -194,6 +194,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * Messages: Added different sets of messages for general trade notifications and owner trade notifications, as well as for general trades and trades in which the shop bought something for currency. And there are different messages for player shops, admin shops, and named variants of both. The default messages do not make use of all of these options, but this should provide a lot of flexibility when adjusting the trade notification messages.
   * In order to avoid notification spam, the trade notifications merge trades that take place in quick succession and involve the same player, shopkeeper, and items. This covers that case when players trade multiple times by a single shift click, but also when they quickly perform the same trade multiple times themselves.
   * A new editor option allows shop owners to disable trade notifications for individual shopkeepers. This only affects the trade notification that are sent to the shop owner, not the general trade notifications that may be sent to other players.
+* Debug: When debugging failed command executions, we log the stack trace of the command exception now.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
