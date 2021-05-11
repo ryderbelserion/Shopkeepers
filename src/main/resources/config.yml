@@ -380,6 +380,9 @@ enable-container-option-on-player-shop: true
 # The item used for the 'open container' editor button.
 container-item: CHEST
 
+# The item used for the trade notifications editor button in player shops.
+trade-notifications-item: BELL
+
 # The item used for the delete button.
 delete-item: BONE
 

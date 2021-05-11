@@ -194,16 +194,15 @@ public class TradeNotifications implements Listener {
 
 		Lazy<Text> tradeNotification = new Lazy<>(() -> this.getTradeNotificationMessage(tradeContext));
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (player == shopOwner && Settings.notifyShopOwnersAboutTrades) {
-				// Avoid notifying the shop owner twice:
-				continue;
-			}
+			// Avoid notifying the shop owner twice.
+			// Note that the shop owner may have deactivated the trade notification for this particular shopkeeper. In
+			// this case, they will not receive either type of trade notification.
+			if (player == shopOwner && Settings.notifyShopOwnersAboutTrades) continue;
+			if (!PermissionUtils.hasPermission(player, tradeNotificationPermission)) continue;
+
 			// Note: We also send trade notifications for own trades (i.e. when the trading player matches the recipient
 			// of the notification).
-
-			if (PermissionUtils.hasPermission(player, tradeNotificationPermission)) {
-				TextUtils.sendMessage(player, tradeNotification.get());
-			}
+			TextUtils.sendMessage(player, tradeNotification.get());
 		}
 	}
 
@@ -275,6 +274,7 @@ public class TradeNotifications implements Listener {
 		if (!(tradeContext.getShopkeeper() instanceof PlayerShopkeeper)) return;
 
 		PlayerShopkeeper playerShop = (PlayerShopkeeper) tradeContext.getShopkeeper();
+		if (!playerShop.isNotifyOnTrades()) return;
 		Player owner = playerShop.getOwner();
 		if (owner == null) return; // Owner is offline
 

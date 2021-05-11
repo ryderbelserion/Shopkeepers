@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.player;
 
+import java.util.List;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
@@ -8,11 +10,13 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.PermissionUtils;
+import com.nisovin.shopkeepers.util.StringUtils;
 
 public abstract class PlayerShopEditorHandler extends EditorHandler {
 
@@ -38,6 +42,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 	protected void setupShopkeeperButtons() {
 		super.setupShopkeeperButtons();
 		this.addButtonOrIgnore(this.createContainerButton());
+		this.addButtonOrIgnore(this.createTradeNotificationsButton());
 	}
 
 	protected Button createContainerButton() {
@@ -59,6 +64,31 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 					if (!player.isValid() || !shopkeeper.isValid()) return;
 					shopkeeper.openContainerWindow(player);
 				});
+			}
+		};
+	}
+
+	protected Button createTradeNotificationsButton() {
+		if (!Settings.notifyShopOwnersAboutTrades) {
+			return null;
+		}
+		return new ShopkeeperActionButton() {
+			@Override
+			public ItemStack getIcon(Session session) {
+				AbstractPlayerShopkeeper shopkeeper = (AbstractPlayerShopkeeper) this.getShopkeeper();
+				ItemStack iconItem = Settings.tradeNotificationsItem.createItemStack();
+				String state = shopkeeper.isNotifyOnTrades() ? Messages.stateEnabled : Messages.stateDisabled;
+				String displayName = StringUtils.replaceArguments(Messages.buttonTradeNotifications, "state", state);
+				List<String> lore = StringUtils.replaceArguments(Messages.buttonTradeNotificationsLore, "state", state);
+				ItemUtils.setDisplayNameAndLore(iconItem, displayName, lore);
+				return iconItem;
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				AbstractPlayerShopkeeper shopkeeper = (AbstractPlayerShopkeeper) this.getShopkeeper();
+				shopkeeper.setNotifyOnTrades(!shopkeeper.isNotifyOnTrades());
+				return true;
 			}
 		};
 	}

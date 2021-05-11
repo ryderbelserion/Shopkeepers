@@ -206,6 +206,7 @@ public class Settings extends Config {
 	public static boolean enableContainerOptionOnPlayerShop = true;
 	public static ItemData containerItem = new ItemData(Material.CHEST);
 
+	public static ItemData tradeNotificationsItem = new ItemData(Material.BELL);
 	public static ItemData deleteItem = new ItemData(Material.BONE);
 
 	/*

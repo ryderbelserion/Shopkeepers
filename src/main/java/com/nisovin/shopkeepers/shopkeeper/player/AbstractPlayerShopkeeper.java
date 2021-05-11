@@ -39,6 +39,8 @@ import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
 
+	private static final boolean DEFAULT_NOTIFY_ON_TRADES = true;
+
 	private static final int CHECK_CONTAINER_PERIOD_SECONDS = 5;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_CONTAINER_PERIOD_SECONDS + 1);
 
@@ -49,6 +51,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	protected int containerX;
 	protected int containerY;
 	protected int containerZ;
+	private boolean notifyOnTrades = DEFAULT_NOTIFY_ON_TRADES;
 	protected ItemStack hireCost = null; // Null if not for hire
 
 	// Initial threshold between [1, CHECK_CONTAINER_PERIOD_SECONDS] for load balancing:
@@ -115,6 +118,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		// TODO Rename to storage keys to containerx/y/z?
 		this._setContainer(configSection.getInt("chestx"), configSection.getInt("chesty"), configSection.getInt("chestz"));
 
+		notifyOnTrades = configSection.getBoolean("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
+
 		hireCost = configSection.getItemStack("hirecost");
 		// Hire cost ItemStack is not null, but empty. -> Normalize to null:
 		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
@@ -146,6 +151,9 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		configSection.set("chestx", containerX);
 		configSection.set("chesty", containerY);
 		configSection.set("chestz", containerZ);
+		if (notifyOnTrades != DEFAULT_NOTIFY_ON_TRADES) {
+			configSection.set("notifyOnTrades", notifyOnTrades);
+		} // Not storing the default value
 		if (hireCost != null) {
 			configSection.set("hirecost", hireCost);
 		}
@@ -272,6 +280,19 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	@Override
 	public Player getOwner() {
 		return Bukkit.getPlayer(ownerUUID);
+	}
+
+	@Override
+	public boolean isNotifyOnTrades() {
+		return notifyOnTrades;
+	}
+
+	@Override
+	public void setNotifyOnTrades(boolean enabled) {
+		if (notifyOnTrades == enabled) return;
+
+		notifyOnTrades = enabled;
+		this.markDirty();
 	}
 
 	@Override

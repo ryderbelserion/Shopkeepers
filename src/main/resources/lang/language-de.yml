@@ -27,6 +27,9 @@ creation-item-selected: |-
   &e  Rechtsklick auf einen Behälter, um diesen auszuwählen.
   &e  Dann Rechtsklick auf einen Block, um dort den Händler zu erstellen.
 
+state-enabled: "&2Aktiviert"
+state-disabled: "&4Deaktiviert"
+
 editor-title: "Shop Editor"
 
 button-previous-page: "&6<- Vorherige Seite ({prev_page} von {max_page})"
@@ -44,6 +47,11 @@ button-container: "&aShop-Inventar öffnen"
 button-container-lore:
 - Zeigt dir das Inventar
 - deines Verkäufers
+button-trade-notifications: "&aHandelsbenachrichtigungen"
+button-trade-notifications-lore:
+- "Schaltet Handelsbenachrichtigungen"
+- "für diesen Shop an oder aus."
+- "Aktuell: {state}"
 button-delete: "&4Entfernen"
 button-delete-lore:
 - Schließt diesen Shop und

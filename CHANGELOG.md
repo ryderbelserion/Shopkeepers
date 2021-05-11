@@ -193,6 +193,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * Permissions: Added permissions 'shopkeeper.trade-notifications.admin' and 'shopkeeper.trade-notifications.player' (both default to 'false'). Players with these permissions will receive trade notifications for all admin or player shops respectively, if trade notifications are enabled (setting 'notify-players-about-trades').
   * Messages: Added different sets of messages for general trade notifications and owner trade notifications, as well as for general trades and trades in which the shop bought something for currency. And there are different messages for player shops, admin shops, and named variants of both. The default messages do not make use of all of these options, but this should provide a lot of flexibility when adjusting the trade notification messages.
   * In order to avoid notification spam, the trade notifications merge trades that take place in quick succession and involve the same player, shopkeeper, and items. This covers that case when players trade multiple times by a single shift click, but also when they quickly perform the same trade multiple times themselves.
+  * A new editor option allows shop owners to disable trade notifications for individual shopkeepers. This only affects the trade notification that are sent to the shop owner, not the general trade notifications that may be sent to other players.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
@@ -220,6 +221,7 @@ API:
 * CitizensShopObject#getName returns the NPC name instead of it's 'full name' now (i.e. the name that more closely corresponds to the name set via #setName).
 * Optimization: Various lazily populated views provided by the shopkeeper registry return an empty iterator now when they are known to be empty.
 * Added: ShopkeeperTradeEvent#hasOfferedItem2() as a shortcut for checking if the trade involves two input items.
+* Added: PlayerShopkeeper#isNotifyOnTrades and PlayerShopkeeper#setNotifyOnTrades.
 * Several Javadoc improvements and clarifications.
 
 Internal API:  
@@ -374,6 +376,10 @@ Messages:
 * Added 'owner-buy-notification-shop'.
 * Added 'owner-buy-notification-named-shop'.
 * Added 'owner-trade-notification-trade-count'.
+* Added 'state-enabled'.
+* Added 'state-disabled'.
+* Added 'button-trade-notifications'.
+* Added 'button-trade-notifications-lore'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.

@@ -52,6 +52,9 @@ public class Messages extends Config {
 			+ "&e  Right-click a container to select it.\n"
 			+ "&e  Then right-click a block to place the shopkeeper.");
 
+	public static String stateEnabled = c("&2Enabled");
+	public static String stateDisabled = c("&4Disabled");
+
 	public static String editorTitle = c("Shopkeeper Editor");
 
 	public static String buttonPreviousPage = c("&6<- Previous page ({prev_page} of {max_page})");
@@ -65,6 +68,8 @@ public class Messages extends Config {
 	public static List<String> buttonNameLore = c(Arrays.asList("Lets you rename", "your shopkeeper"));
 	public static String buttonContainer = c("&aView shop inventory");
 	public static List<String> buttonContainerLore = c(Arrays.asList("Lets you view the inventory", "your shopkeeper is using"));
+	public static String buttonTradeNotifications = c("&aTrade Notifications");
+	public static List<String> buttonTradeNotificationsLore = c(Arrays.asList("Toggles trade notifications", "for this shopkeeper on/off.", "Currently: {state}"));
 	public static String buttonDelete = c("&4Delete");
 	public static List<String> buttonDeleteLore = c(Arrays.asList("Closes and removes", "this shopkeeper"));
 

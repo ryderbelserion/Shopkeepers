@@ -33,6 +33,9 @@ creation-item-selected: |-
   &e  Right-click a container to select it.
   &e  Then right-click a block to place the shopkeeper.
 
+state-enabled: "&2Enabled"
+state-disabled: "&4Disabled"
+
 editor-title: "Shopkeeper Editor"
 
 button-previous-page: "&6<- Previous page ({prev_page} of {max_page})"
@@ -50,6 +53,11 @@ button-container: "&aView shop inventory"
 button-container-lore:
 - Lets you view the inventory
 - your shopkeeper is using
+button-trade-notifications: "&aTrade Notifications"
+button-trade-notifications-lore:
+- "Toggles trade notifications"
+- "for this shopkeeper on/off."
+- "Currently: {state}"
 button-delete: "&4Delete"
 button-delete-lore:
 - Closes and removes
