@@ -71,6 +71,7 @@ public class ShopkeepersCommand extends BaseCommand {
 		childCommands.register(new CommandHelp(this));
 		childCommands.register(new CommandReload(plugin));
 		childCommands.register(new CommandDebug());
+		childCommands.register(new CommandNotify());
 		childCommands.register(new CommandList(shopkeeperRegistry));
 		childCommands.register(new CommandRemove(confirmations));
 		childCommands.register(new CommandRemoveAll(plugin, shopkeeperRegistry, confirmations));

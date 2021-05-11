@@ -45,6 +45,7 @@ public interface ShopkeepersPlugin extends Plugin {
 	public static final String REMOVE_ALL_PLAYER_PERMISSION = "shopkeeper.remove-all.player";
 	public static final String REMOVE_ALL_ADMIN_PERMISSION = "shopkeeper.remove-all.admin";
 
+	public static final String NOTIFY_TRADES_PERMISSION = "shopkeeper.notify.trades";
 	public static final String GIVE_PERMISSION = "shopkeeper.give";
 	public static final String GIVE_CURRENCY_PERMISSION = "shopkeeper.givecurrency";
 	public static final String CONVERT_ITEMS_OWN_PERMISSION = "shopkeeper.convertitems.own";

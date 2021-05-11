@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.text.ClickEventText.Action;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.Lazy;
 import com.nisovin.shopkeepers.util.PermissionUtils;
@@ -143,6 +144,7 @@ public class TradeNotifications implements Listener {
 	private static final long TRADE_MERGE_DURATION_TICKS = 100L; // 5 seconds
 
 	private final Plugin plugin;
+	private final NotificationUserPreferences userPreferences;
 	private final TradeMerger tradeMerger;
 
 	private boolean enabled;
@@ -150,6 +152,7 @@ public class TradeNotifications implements Listener {
 	public TradeNotifications(Plugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
+		this.userPreferences = new NotificationUserPreferences(plugin);
 		this.tradeMerger = new TradeMerger(plugin, MergeMode.DURATION, this::onTradesCompleted)
 				.withMergeDuration(TRADE_MERGE_DURATION_TICKS);
 	}
@@ -159,6 +162,7 @@ public class TradeNotifications implements Listener {
 		if (!enabled) return;
 
 		Bukkit.getPluginManager().registerEvents(this, plugin);
+		userPreferences.onEnable();
 		tradeMerger.onEnable();
 	}
 
@@ -167,7 +171,12 @@ public class TradeNotifications implements Listener {
 		enabled = false;
 
 		tradeMerger.onDisable();
+		userPreferences.onDisable();
 		HandlerList.unregisterAll(this);
+	}
+
+	public NotificationUserPreferences getUserPreferences() {
+		return userPreferences;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -198,11 +207,13 @@ public class TradeNotifications implements Listener {
 			// Note that the shop owner may have deactivated the trade notification for this particular shopkeeper. In
 			// this case, they will not receive either type of trade notification.
 			if (player == shopOwner && Settings.notifyShopOwnersAboutTrades) continue;
+			if (!userPreferences.isNotifyOnTrades(player)) continue;
 			if (!PermissionUtils.hasPermission(player, tradeNotificationPermission)) continue;
 
 			// Note: We also send trade notifications for own trades (i.e. when the trading player matches the recipient
 			// of the notification).
 			TextUtils.sendMessage(player, tradeNotification.get());
+			this.sendDisableTradeNotificationsHint(player);
 		}
 	}
 
@@ -277,11 +288,13 @@ public class TradeNotifications implements Listener {
 		if (!playerShop.isNotifyOnTrades()) return;
 		Player owner = playerShop.getOwner();
 		if (owner == null) return; // Owner is offline
+		if (!userPreferences.isNotifyOnTrades(owner)) return;
 
 		// Note: We also send trade notifications for own trades (i.e. when the trading player matches the recipient of
 		// the notification).
 		Text message = this.getOwnerTradeNotificationMessage(tradeContext);
 		TextUtils.sendMessage(owner, message);
+		this.sendDisableTradeNotificationsHint(owner);
 	}
 
 	private Text getOwnerTradeNotificationMessage(TradeContext tradeContext) {
@@ -326,5 +339,17 @@ public class TradeNotifications implements Listener {
 		}
 
 		return this.getTradeNotificationMessage(tradeContext, message, shopText, tradeCountText);
+	}
+
+	private void sendDisableTradeNotificationsHint(Player player) {
+		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.NOTIFY_TRADES_PERMISSION)) return;
+
+		// We only send this once per session:
+		if (userPreferences.hasReceivedDisableTradeNotificationsHint(player)) return;
+		userPreferences.setReceivedDisableTradeNotificationsHint(player, true);
+
+		Text command = Messages.disableTradeNotificationsHintCommand.copy(); // TODO Avoid this copy
+		Text commandText = Text.clickEvent(Action.SUGGEST_COMMAND, command.toPlainText()).next(command).getRoot();
+		TextUtils.sendMessage(player, Messages.disableTradeNotificationsHint, "command", commandText);
 	}
 }

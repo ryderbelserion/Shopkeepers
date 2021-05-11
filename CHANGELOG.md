@@ -194,6 +194,14 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * Messages: Added different sets of messages for general trade notifications and owner trade notifications, as well as for general trades and trades in which the shop bought something for currency. And there are different messages for player shops, admin shops, and named variants of both. The default messages do not make use of all of these options, but this should provide a lot of flexibility when adjusting the trade notification messages.
   * In order to avoid notification spam, the trade notifications merge trades that take place in quick succession and involve the same player, shopkeeper, and items. This covers that case when players trade multiple times by a single shift click, but also when they quickly perform the same trade multiple times themselves.
   * A new editor option allows shop owners to disable trade notifications for individual shopkeepers. This only affects the trade notification that are sent to the shop owner, not the general trade notifications that may be sent to other players.
+  * Added command '/shopkeeper notify trades'.
+    * This command allows players to disable trade notifications. Since we do not keep track of any user data yet, the trade notifications are only disabled for the current game session (until they reconnect).
+    * Permissions: This command requires the new permission 'shopkeeper.notify.trades' (default: true).
+    * In the future, this command may also be used to toggle other kinds of notifications (hence the 'trades' argument and the specific permission).
+  * Added a hint message that informs players that they can disable trade notifications via the command.
+    * This hint message is sent together with the first trade notification a player receives during the current game session.
+    * The hint is only sent to players that have the permission to use the command.
+    * The command in this hint message is clickable: When clicked, it will insert the command to execute directly into the player's chat box.
 * Debug: When debugging failed command executions, we log the stack trace of the command exception now.
 * Fixed: When the parsing of a command argument failed, the error message was using the argument name instead of the argument format. However, this was mostly an issue for the few commands with required arguments whose format does not contain the argument name, for example because their format is constructed from their child arguments.
 

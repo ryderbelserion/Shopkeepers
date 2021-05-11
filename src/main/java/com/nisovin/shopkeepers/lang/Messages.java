@@ -249,6 +249,11 @@ public class Messages extends Config {
 	public static Text ownerBuyNotificationNamedShop = Text.parse("your shop &e\"{shop_name}\"");
 	public static Text ownerTradeNotificationTradeCount = Text.parse("&7 (&6{count}x&7)");
 
+	public static Text disableTradeNotificationsHint = Text.parse("&7You can disable these trade notifications with the command &e{command}");
+	public static Text disableTradeNotificationsHintCommand = Text.parse("/shopkeeper notify trades");
+	public static Text tradeNotificationsDisabled = Text.parse("&aYou will no longer receive trade notifications during this game session.");
+	public static Text tradeNotificationsEnabled = Text.parse("&aYou will now receive trade notifications again.");
+
 	public static Text shopkeeperCreated = Text.parse("&aShopkeeper created: &6{type} &7({description})\n{setupDesc}");
 
 	public static String shopSetupDescSelling = c("&e  Add items you want to sell to your container, then\n"
@@ -359,6 +364,7 @@ public class Messages extends Config {
 	public static Text commandDescriptionHelp = Text.parse("Shows this help page.");
 	public static Text commandDescriptionReload = Text.parse("Reloads this plugin.");
 	public static Text commandDescriptionDebug = Text.parse("Toggles debug mode on and off.");
+	public static Text commandDescriptionNotify = Text.parse("Turns trade notifications for you on or off.");
 	public static Text commandDescriptionList = Text.parse("Lists all shops of a specific player, or all admin shops.");
 	public static Text commandDescriptionRemove = Text.parse("Removes a specific shop.");
 	public static Text commandDescriptionRemoveAll = Text.parse("Removes all shops of a specific player, all players, or all admin shops.");

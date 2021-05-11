@@ -63,6 +63,9 @@ permissions:
         description: Remove all admin shops via command
         default: op
 
+    shopkeeper.notify.trades:
+        description: Allows turning trade notifications for you on or off by command
+        default: true
     shopkeeper.give:
         description: Give shop creation items per command
         default: op

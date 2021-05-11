@@ -590,6 +590,12 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return playerShops;
 	}
 
+	// TRADE NOTIFICATIONS
+
+	public TradeNotifications getTradeNotifications() {
+		return tradeNotifications;
+	}
+
 	// OFFERS FACTORY
 
 	@Override

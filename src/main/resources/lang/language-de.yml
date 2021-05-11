@@ -284,6 +284,11 @@ owner-buy-notification-shop: "einen deiner Shops"
 owner-buy-notification-named-shop: 'deinen Shop &e"{shop_name}"'
 owner-trade-notification-trade-count: "&7 (&6{count}x&7)"
 
+disable-trade-notifications-hint: "&7Du kannst diese Handelsbenachrichtigungen per Befehl ausschalten: &e{command}"
+disable-trade-notifications-hint-command: "/shopkeeper notify trades"
+trade-notifications-disabled: "&aDu erhältst während dieser Spielsitzung keine Handelsbenachrichtigungen mehr."
+trade-notifications-enabled: "&aDu erhältst jetzt wieder Handelsbenachrichtigungen."
+
 shopkeeper-created: "&aShop erstellt: &6{type} &7({description})\n{setupDesc}"
 
 shop-setup-desc-selling: |-
@@ -432,6 +437,7 @@ command-description-shopkeeper: "Erstellt einen neuen Shop."
 command-description-help: "Zeigt diese Hilfe."
 command-description-reload: "Lädt das Plugin neu."
 command-description-debug: "Schaltet den Debug-Modus an und aus."
+command-description-notify: "Schaltet Handelsbenachrichtigungen für dich an oder aus."
 command-description-list: "Listet alle Shops eines Spielers, oder alle Admin-Shops auf."
 command-description-remove: "Entfernt einen bestimmten Shop."
 command-description-remove-all: "Entfernt alle Shops eines Spielers, aller Spieler, oder alle Admin-Shops."
