@@ -283,7 +283,7 @@ public abstract class CommandArgument<T> {
 	 * @return the error message
 	 */
 	public Text getMissingArgumentErrorMsg() {
-		Text text = Messages.commandArgumentInvalid;
+		Text text = Messages.commandArgumentMissing;
 		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
 		return text;
 	}

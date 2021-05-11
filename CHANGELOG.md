@@ -285,6 +285,7 @@ Internal:
 * Minor refactor to the utility functions that remove items from inventories, and to how the book shopkeeper removes writable books from the shop container.
 * Added an utility class TradeMerger for merging equivalent trades.
 * Changes to how message arguments are represented.
+* Fixed: The default 'missing argument' error message was not being used. However, this issue probably remained unnoticed until now, because most of the commands either use more specific missing argument error messages, or provide fallbacks when no arguments are provided.
 * Minor other internal code refactoring.
 
 Migration notes:  
