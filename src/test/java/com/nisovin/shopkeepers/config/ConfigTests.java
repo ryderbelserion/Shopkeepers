@@ -5,6 +5,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.MemoryConfiguration;
@@ -28,17 +29,32 @@ public class ConfigTests extends AbstractBukkitTest {
 		// Expected default config:
 		MemoryConfiguration expectedDefaultConfig = new MemoryConfiguration();
 		Settings.getInstance().save(expectedDefaultConfig);
-		List<String> expectedKeys = new ArrayList<>(expectedDefaultConfig.getKeys(false));
+		Set<String> expectedKeysSet = expectedDefaultConfig.getKeys(false);
+		List<String> expectedKeys = new ArrayList<>(expectedKeysSet);
 		Map<String, Object> expectedValues = expectedDefaultConfig.getValues(false);
 
 		// Actual default config:
 		Configuration defaultConfig = this.loadConfigFromResource("config.yml");
-		List<String> actualKeys = new ArrayList<>(defaultConfig.getKeys(false));
+		Set<String> actualKeysSet = defaultConfig.getKeys(false);
+		List<String> actualKeys = new ArrayList<>(actualKeysSet);
 		Map<String, Object> actualValues = defaultConfig.getValues(false);
 		ConfigUtils.convertSectionsToMaps(actualValues);
 
-		// Check for missing keys, unexpected keys, order of keys, duplication of keys:
-		Assert.assertEquals("Default config keys do not match the expected keys!", expectedKeys, actualKeys);
+		// Check for missing keys:
+		for (String expectedKey : expectedKeys) {
+			Assert.assertTrue("The default config is missing the key '" + expectedKey + "'!",
+					actualKeysSet.contains(expectedKey));
+		}
+
+		// Check for unexpected keys:
+		for (String actualKey : actualKeys) {
+			Assert.assertTrue("The default config contains the unexpected key '" + actualKey + "'!",
+					expectedKeysSet.contains(actualKey));
+		}
+
+		// Check the order of keys and for duplicated keys:
+		Assert.assertEquals("The default config keys do not match the expected keys!", expectedKeys, actualKeys);
+
 		// Compare setting values:
 		Assert.assertEquals("Default config does not match the expected default config!", expectedValues, actualValues);
 	}
@@ -48,7 +64,8 @@ public class ConfigTests extends AbstractBukkitTest {
 		// Expected default language file:
 		MemoryConfiguration expectedDefaultLanguageFile = new MemoryConfiguration();
 		Messages.getInstance().save(expectedDefaultLanguageFile);
-		List<String> expectedKeys = new ArrayList<>(expectedDefaultLanguageFile.getKeys(false));
+		Set<String> expectedKeysSet = expectedDefaultLanguageFile.getKeys(false);
+		List<String> expectedKeys = new ArrayList<>(expectedKeysSet);
 		Map<String, Object> expectedValues = expectedDefaultLanguageFile.getValues(false);
 
 		// Actual default language files:
@@ -58,11 +75,25 @@ public class ConfigTests extends AbstractBukkitTest {
 		};
 		for (String languageFilePath : languageFilePaths) {
 			Configuration languageFile = this.loadConfigFromResource(languageFilePath);
-			List<String> actualKeys = new ArrayList<>(languageFile.getKeys(false));
+			Set<String> actualKeysSet = languageFile.getKeys(false);
+			List<String> actualKeys = new ArrayList<>(actualKeysSet);
 
-			// Check for missing keys, unexpected keys, order of keys, duplication of keys:
-			Assert.assertEquals("Keys of default language file '" + languageFilePath + "' do not match the expected keys!",
+			// Check for missing keys:
+			for (String expectedKey : expectedKeys) {
+				Assert.assertTrue("The default language file '" + languageFilePath + "' is missing the key '" + expectedKey + "'!",
+						actualKeysSet.contains(expectedKey));
+			}
+
+			// Check for unexpected keys:
+			for (String actualKey : actualKeys) {
+				Assert.assertTrue("The default language file '" + languageFilePath + "' contains the unexpected key '" + actualKey + "'!",
+						expectedKeysSet.contains(actualKey));
+			}
+
+			// Check the order of keys and for duplicated keys:
+			Assert.assertEquals("The keys of the default language file '" + languageFilePath + "' do not match the expected keys!",
 					expectedKeys, actualKeys);
+
 			if (languageFilePath.equals("lang/language-en-default.yml")) {
 				// Compare values:
 				Map<String, Object> actualValues = languageFile.getValues(false);
