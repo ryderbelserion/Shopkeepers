@@ -237,6 +237,26 @@ public class ConversionUtils {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
+	public static <E extends Enum<E>> E toEnum(Class<E> enumClass, Object object) {
+		if (enumClass.isInstance(object)) return (E) object;
+		// Note: We only expect objects of type String to be valid here. We do not convert the object to a String if it
+		// is not already a String.
+		if (object instanceof String) {
+			String enumName = (String) object;
+
+			// Try to parse the enum value without normalization first (in case the enum does not adhere to the expected
+			// normalized format):
+			E enumValue = EnumUtils.parseEnumValue(enumClass, enumName);
+			if (enumValue != null) return enumValue;
+
+			// Try with normalization:
+			enumName = StringUtils.normalizeEnumName(enumName);
+			return EnumUtils.parseEnumValue(enumClass, enumName);
+		}
+		return null;
+	}
+
 	// CONVERT LISTS OF OBJECTS:
 
 	public static List<Integer> toIntegerList(List<?> list) {
