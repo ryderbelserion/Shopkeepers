@@ -128,8 +128,8 @@ public class StringUtils {
 	/**
 	 * Formats the given String in a way that is typical for enum names.
 	 * <p>
-	 * This trims leading and trailing whitespace, converts all remaining whitespace and dashes to underscores
-	 * ('{@code _}') and converts all characters to upper case.
+	 * This trims leading and trailing whitespace, converts all remaining whitespace, dashes, and dots to underscores
+	 * ('{@code _}'), and converts all characters to upper case.
 	 * <p>
 	 * This returns <code>null</code> if the input String is <code>null</code>.
 	 * 
@@ -141,6 +141,7 @@ public class StringUtils {
 		if (enumName == null) return null;
 		enumName = enumName.trim();
 		enumName = enumName.replace('-', '_');
+		enumName = enumName.replace('.', '_');
 		enumName = replaceWhitespace(enumName, "_");
 		enumName = enumName.toUpperCase(Locale.ROOT);
 		return enumName;

@@ -295,6 +295,7 @@ Internal:
 * Added an utility class TradeMerger for merging equivalent trades.
 * Changes to how message arguments are represented.
 * Fixed: The default 'missing argument' error message was not being used. However, this issue probably remained unnoticed until now, because most of the commands either use more specific missing argument error messages, or provide fallbacks when no arguments are provided.
+* Minor improvements to normalizing and matching enum names (used by command arguments, config settings, shopkeeper data, etc.).
 * Minor other internal code refactoring.
 
 Migration notes:  
