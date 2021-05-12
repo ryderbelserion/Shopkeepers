@@ -108,7 +108,7 @@ public class ConversionUtils {
 		if (enumValue != null) return enumValue;
 
 		// Try with enum name normalization:
-		enumName = StringUtils.normalizeEnumName(enumName);
+		enumName = EnumUtils.normalizeEnumName(enumName);
 		return EnumUtils.valueOf(enumType, enumName); // Returns null if parsing fails
 	}
 

@@ -137,14 +137,14 @@ public final class ItemUtils {
 
 	/**
 	 * Formats the name of the given {@link Material} to a more user-friendly representation. See also
-	 * {@link StringUtils#formatEnumName(String)}.
+	 * {@link EnumUtils#formatEnumName(String)}.
 	 * 
 	 * @param material
 	 *            the material
 	 * @return the formatted material name
 	 */
 	public static String formatMaterialName(Material material) {
-		return StringUtils.formatEnumName(material != null ? material.name() : "");
+		return EnumUtils.formatEnumName(material != null ? material.name() : "");
 	}
 
 	/**

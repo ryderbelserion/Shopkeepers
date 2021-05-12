@@ -13,7 +13,7 @@ public class MinecraftEnumUtils {
 	/**
 	 * Formats the given String in a way that matches the names of the Bukkit enum values.
 	 * <p>
-	 * This performs the same transformations as {@link StringUtils#normalizeEnumName(String)}, but additionally strips
+	 * This performs the same transformations as {@link EnumUtils#normalizeEnumName(String)}, but additionally strips
 	 * Minecraft's namespace prefix (i.e. {@link NamespacedKey#MINECRAFT}), if it is present.
 	 * <p>
 	 * This returns <code>null</code> if the given input String is <code>null</code>.
@@ -24,7 +24,7 @@ public class MinecraftEnumUtils {
 	 */
 	public static String normalizeEnumName(String enumName) {
 		if (enumName == null) return null;
-		enumName = StringUtils.normalizeEnumName(enumName);
+		enumName = EnumUtils.normalizeEnumName(enumName);
 
 		// Remove the Minecraft namespace prefix, if it is present:
 		if (enumName.startsWith(MINECRAFT_NAMESPACE_PREFIX)) {
