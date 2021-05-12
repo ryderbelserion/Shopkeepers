@@ -36,7 +36,7 @@ public class EnumProperty<E extends Enum<E>> extends Property<E> {
 
 	@Override
 	protected E loadValue(ConfigurationSection configSection) throws InvalidValueException {
-		String valueName = configSection.getString(this.key);
+		String valueName = configSection.getString(key);
 		if (valueName == null) return null;
 		E enumValue = ConversionUtils.parseEnum(enumType, valueName);
 		if (enumValue == null) {
@@ -48,6 +48,6 @@ public class EnumProperty<E extends Enum<E>> extends Property<E> {
 
 	@Override
 	protected void saveValue(ConfigurationSection configSection, E value) {
-		configSection.set(this.key, (value == null) ? null : value.name());
+		configSection.set(key, (value == null) ? null : value.name());
 	}
 }

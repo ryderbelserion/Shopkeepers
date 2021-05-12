@@ -26,7 +26,7 @@ public class BooleanProperty extends Property<Boolean> {
 
 	@Override
 	protected Boolean loadValue(ConfigurationSection configSection) throws InvalidValueException {
-		Object value = configSection.get(this.key);
+		Object value = configSection.get(key);
 		if (value == null) return null;
 		Boolean booleanValue = ConversionUtils.toBoolean(value);
 		if (booleanValue == null) {
@@ -38,6 +38,6 @@ public class BooleanProperty extends Property<Boolean> {
 
 	@Override
 	protected void saveValue(ConfigurationSection configSection, Boolean value) {
-		configSection.set(this.key, value);
+		configSection.set(key, value);
 	}
 }

@@ -86,7 +86,7 @@ public class IntegerProperty extends Property<Integer> {
 
 	@Override
 	protected Integer loadValue(ConfigurationSection configSection) throws InvalidValueException {
-		Object value = configSection.get(this.key);
+		Object value = configSection.get(key);
 		if (value == null) return null;
 		Integer intValue = ConversionUtils.toInteger(value);
 		if (intValue == null) {
@@ -102,6 +102,6 @@ public class IntegerProperty extends Property<Integer> {
 
 	@Override
 	protected void saveValue(ConfigurationSection configSection, Integer value) {
-		configSection.set(this.key, value);
+		configSection.set(key, value);
 	}
 }
