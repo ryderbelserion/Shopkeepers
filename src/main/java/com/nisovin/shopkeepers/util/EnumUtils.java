@@ -55,10 +55,10 @@ public class EnumUtils {
 		}
 	}
 
-	public static <E extends Enum<E>> E parseEnumValue(Class<E> enumClass, String name) {
-		if (name == null) return null;
+	public static <E extends Enum<E>> E valueOf(Class<E> enumType, String enumName) {
+		if (enumName == null) return null;
 		try {
-			return Enum.valueOf(enumClass, name);
+			return Enum.valueOf(enumType, enumName);
 		} catch (IllegalArgumentException e) {
 			return null;
 		}

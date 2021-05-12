@@ -10,11 +10,11 @@ public class EnumValue<E extends Enum<E>> extends ValueType<E> {
 
 	private static final StringValue STRING_VALUE = new StringValue();
 
-	private final Class<E> enumClass;
+	private final Class<E> enumType;
 
-	public EnumValue(Class<E> enumClass) {
-		Validate.notNull(enumClass, "enumClass is null");
-		this.enumClass = enumClass;
+	public EnumValue(Class<E> enumType) {
+		Validate.notNull(enumType, "enumType is null");
+		this.enumType = enumType;
 	}
 
 	@Override
@@ -62,9 +62,9 @@ public class EnumValue<E extends Enum<E>> extends ValueType<E> {
 		Validate.notNull(input, "input is null");
 		String normalized = this.normalize(input);
 		try {
-			return Enum.valueOf(enumClass, normalized);
+			return Enum.valueOf(enumType, normalized);
 		} catch (IllegalArgumentException e) {
-			throw new ValueParseException("Unknown " + enumClass.getSimpleName() + ": " + input);
+			throw new ValueParseException("Unknown " + enumType.getSimpleName() + ": " + input);
 		}
 	}
 }

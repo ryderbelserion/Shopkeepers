@@ -98,19 +98,18 @@ public class ConversionUtils {
 		return null;
 	}
 
-	public static <T extends Enum<T>> T parseEnum(Class<T> clazz, String string) {
-		Validate.notNull(clazz);
-		if (string == null) return null;
-		try {
-			return Enum.valueOf(clazz, string);
-		} catch (Exception e) {
-			// Attempt with upper case input:
-			try {
-				return Enum.valueOf(clazz, string.toUpperCase(Locale.ROOT));
-			} catch (Exception e2) {
-				return null;
-			}
-		}
+	public static <E extends Enum<E>> E parseEnum(Class<E> enumType, String enumName) {
+		Validate.notNull(enumType, "enumType is null");
+		if (enumName == null) return null;
+
+		// Try to parse the enum value without normalizing the enum name first (in case the enum does not adhere to the
+		// expected normalized format):
+		E enumValue = EnumUtils.valueOf(enumType, enumName);
+		if (enumValue != null) return enumValue;
+
+		// Try with enum name normalization:
+		enumName = StringUtils.normalizeEnumName(enumName);
+		return EnumUtils.valueOf(enumType, enumName); // Returns null if parsing fails
 	}
 
 	// PARSE LISTS:
@@ -159,6 +158,19 @@ public class ConversionUtils {
 		if (strings != null) {
 			for (String string : strings) {
 				Float value = parseFloat(string);
+				if (value != null) {
+					result.add(value);
+				}
+			}
+		}
+		return result;
+	}
+
+	public static <E extends Enum<E>> List<E> parseEnumList(Class<E> enumType, Collection<String> strings) {
+		List<E> result = new ArrayList<>(strings.size());
+		if (strings != null) {
+			for (String string : strings) {
+				E value = parseEnum(enumType, string);
 				if (value != null) {
 					result.add(value);
 				}
@@ -238,21 +250,13 @@ public class ConversionUtils {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <E extends Enum<E>> E toEnum(Class<E> enumClass, Object object) {
-		if (enumClass.isInstance(object)) return (E) object;
+	public static <E extends Enum<E>> E toEnum(Class<E> enumType, Object object) {
+		if (enumType.isInstance(object)) return (E) object;
 		// Note: We only expect objects of type String to be valid here. We do not convert the object to a String if it
 		// is not already a String.
 		if (object instanceof String) {
 			String enumName = (String) object;
-
-			// Try to parse the enum value without normalization first (in case the enum does not adhere to the expected
-			// normalized format):
-			E enumValue = EnumUtils.parseEnumValue(enumClass, enumName);
-			if (enumValue != null) return enumValue;
-
-			// Try with normalization:
-			enumName = StringUtils.normalizeEnumName(enumName);
-			return EnumUtils.parseEnumValue(enumClass, enumName);
+			return parseEnum(enumType, enumName);
 		}
 		return null;
 	}
@@ -326,6 +330,18 @@ public class ConversionUtils {
 			String stringValue = toString(value);
 			if (stringValue != null) {
 				result.add(stringValue);
+			}
+		}
+		return result;
+	}
+
+	public static <E extends Enum<E>> List<E> toEnumList(Class<E> enumType, List<?> list) {
+		if (list == null) return null;
+		List<E> result = new ArrayList<>(list.size());
+		for (Object value : list) {
+			E enumValue = toEnum(enumType, value);
+			if (enumValue != null) {
+				result.add(enumValue);
 			}
 		}
 		return result;
