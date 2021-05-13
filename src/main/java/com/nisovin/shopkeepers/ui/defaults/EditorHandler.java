@@ -48,24 +48,8 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 
 	// EDITOR BUTTONS
 
-	// A button which may reference the shopkeeper.
-	public abstract static class ShopkeeperButton extends Button {
-
-		public ShopkeeperButton() {
-			this(false);
-		}
-
-		public ShopkeeperButton(boolean placeAtEnd) {
-			super(placeAtEnd);
-		}
-
-		protected Shopkeeper getShopkeeper() {
-			assert this.getEditorHandler() instanceof EditorHandler;
-			return ((EditorHandler) this.getEditorHandler()).getShopkeeper();
-		}
-	}
-
-	// For simple one-click actions which may reference the shopkeeper.
+	// A button for simple one-click shopkeeper editing actions. Successful actions trigger a ShopkeeperEditedEvent and
+	// a save of the shopkeeper.
 	public static abstract class ShopkeeperActionButton extends ActionButton {
 
 		public ShopkeeperActionButton() {
@@ -123,14 +107,14 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 	}
 
 	protected Button createDeleteButton() {
-		return new ShopkeeperButton(true) {
+		return new ActionButton(true) {
 			@Override
 			public ItemStack getIcon(Session session) {
 				return Settings.createDeleteButtonItem();
 			}
 
 			@Override
-			protected void onClick(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				// Call event:
 				PlayerDeleteShopkeeperEvent deleteEvent = ShopkeeperEventHelper.callPlayerDeleteShopkeeperEvent(shopkeeper, player);
 				Bukkit.getPluginManager().callEvent(deleteEvent);
@@ -141,6 +125,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 					// Save:
 					shopkeeper.save();
 				}
+				return true;
 			}
 		};
 	}
@@ -162,20 +147,21 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 		}
 		if (!useNamingButton) return null;
 
-		return new ShopkeeperButton() {
+		return new ActionButton() {
 			@Override
 			public ItemStack getIcon(Session session) {
 				return Settings.createNameButtonItem();
 			}
 
 			@Override
-			protected void onClick(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				// Also triggers save:
 				getUISession(player).closeDelayed();
 
 				// Start naming:
 				SKShopkeepersPlugin.getInstance().getShopkeeperNaming().startNaming(player, shopkeeper);
 				TextUtils.sendMessage(player, Messages.typeNewName);
+				return true;
 			}
 		};
 	}

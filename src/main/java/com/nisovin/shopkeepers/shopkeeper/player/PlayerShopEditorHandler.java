@@ -49,14 +49,14 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		if (!Settings.enableContainerOptionOnPlayerShop) {
 			return null;
 		}
-		return new Button() {
+		return new ActionButton() {
 			@Override
 			public ItemStack getIcon(Session session) {
 				return Settings.createContainerButtonItem();
 			}
 
 			@Override
-			protected void onClick(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				// Closing the UI also triggers a save of the current editor state:
 				getUISession(player).closeDelayedAndRunTask(() -> {
 					// Open the shop container inventory:
@@ -64,6 +64,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 					if (!player.isValid() || !shopkeeper.isValid()) return;
 					shopkeeper.openContainerWindow(player);
 				});
+				return true;
 			}
 		};
 	}

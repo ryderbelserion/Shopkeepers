@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -25,6 +26,7 @@ import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.MathUtils;
+import com.nisovin.shopkeepers.util.SoundEffect;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -34,6 +36,8 @@ import com.nisovin.shopkeepers.util.Validate;
  * For example used by {@link EditorHandler} and {@link VillagerEditorHandler}.
  */
 public abstract class AbstractEditorHandler extends UIHandler {
+
+	private static final SoundEffect PAGE_TURN_SOUND = new SoundEffect(Sound.ITEM_BOOK_PAGE_TURN);
 
 	protected static final int COLUMNS_PER_ROW = 9;
 	// 9 columns, column = [0,8]
@@ -152,6 +156,9 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	public static abstract class Button {
 
+		// Volume 0.25 matches Minecraft's default button click volume.
+		protected static final SoundEffect DEFAULT_BUTTON_CLICK_SOUND = new SoundEffect(Sound.UI_BUTTON_CLICK).withVolume(0.25f);
+
 		private static final int NO_SLOT = -1;
 
 		private final boolean placeAtEnd;
@@ -208,7 +215,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		protected abstract void onClick(InventoryClickEvent clickEvent, Player player);
 	}
 
-	// For simple one-click actions:
+	// A button for simple one-click actions.
 	public static abstract class ActionButton extends Button {
 
 		public ActionButton() {
@@ -217,6 +224,10 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 		public ActionButton(boolean placeAtEnd) {
 			super(placeAtEnd);
+		}
+
+		protected void playButtonClickSound(Player player, boolean actionSuccess) {
+			DEFAULT_BUTTON_CLICK_SOUND.play(player);
 		}
 
 		@Override
@@ -230,16 +241,19 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			// Post-processing:
 			this.onActionSuccess(clickEvent, player);
 
+			// Play sound:
+			this.playButtonClickSound(player, success);
+
 			// Icon might have changed:
 			this.updateIcon();
 		}
 
+		// Returns true on success:
+		protected abstract boolean runAction(InventoryClickEvent clickEvent, Player player);
+
 		protected void onActionSuccess(InventoryClickEvent clickEvent, Player player) {
 			// Nothing by default.
 		}
-
-		// Returns true on success:
-		protected abstract boolean runAction(InventoryClickEvent clickEvent, Player player);
 	}
 
 	private Button[] getTradesPageBarButtons() {
@@ -276,7 +290,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	protected Button createPrevPageButton() {
-		return new Button() {
+		return new ActionButton() {
 			@Override
 			public ItemStack getIcon(Session session) {
 				int page = session.currentPage;
@@ -285,25 +299,38 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			}
 
 			@Override
-			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// Previous page button:
-				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return; // Ignore double clicks
-				Session session = getSession(player);
-				if (session == null) return;
+			protected void playButtonClickSound(Player player, boolean actionSuccess) {
+				if (actionSuccess) {
+					PAGE_TURN_SOUND.play(player);
+				}
+			}
 
-				// Save current page:
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				// Ignore double clicks:
+				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return false;
+
+				Session session = getSession(player);
+				if (session == null) return false;
+
+				// Save the current page:
 				saveEditorPage(session);
 
+				// Switch to previous page:
+				int newPage = Math.max(1, session.currentPage - 1);
+				if (newPage == session.currentPage) return false; // Page has not changed
+
 				// Update page:
-				session.setPage(Math.max(1, session.currentPage - 1));
+				session.setPage(newPage);
 				setupPage(player, session.currentPage);
 				player.updateInventory();
+				return true;
 			}
 		};
 	}
 
 	protected Button createNextPageButton() {
-		return new Button() {
+		return new ActionButton() {
 			@Override
 			public ItemStack getIcon(Session session) {
 				int page = session.currentPage;
@@ -312,19 +339,32 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			}
 
 			@Override
-			protected void onClick(InventoryClickEvent clickEvent, Player player) {
-				// Next page button:
-				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return; // Ignore double clicks
-				Session session = getSession(player);
-				if (session == null) return;
+			protected void playButtonClickSound(Player player, boolean actionSuccess) {
+				if (actionSuccess) {
+					PAGE_TURN_SOUND.play(player);
+				}
+			}
 
-				// Save current page:
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				// Ignore double clicks:
+				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return false;
+
+				Session session = getSession(player);
+				if (session == null) return false;
+
+				// Save the current page:
 				saveEditorPage(session);
 
+				// Switch to next page:
+				int newPage = Math.min(getMaxTradesPages(), session.currentPage + 1);
+				if (newPage == session.currentPage) return false; // Page has not changed
+
 				// Update page:
-				session.setPage(Math.min(getMaxTradesPages(), session.currentPage + 1));
+				session.setPage(newPage);
 				setupPage(player, session.currentPage);
 				player.updateInventory();
+				return true;
 			}
 		};
 	}

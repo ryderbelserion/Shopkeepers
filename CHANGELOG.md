@@ -204,6 +204,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
     * The command in this hint message is clickable: When clicked, it will insert the command to execute directly into the player's chat box.
 * Debug: When debugging failed command executions, we log the stack trace of the command exception now.
 * Fixed: When the parsing of a command argument failed, the error message was using the argument name instead of the argument format. However, this was mostly an issue for the few commands with required arguments whose format does not contain the argument name, for example because their format is constructed from their child arguments.
+* Added: Added sounds to the various buttons inside the editor menu.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
