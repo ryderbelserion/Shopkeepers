@@ -331,11 +331,15 @@ public final class SoundEffect {
 		if (category != null) {
 			data.put("category", category.name());
 		}
+
+		// Note: We store these float values as doubles, because SnakeYaml produces doubles when reading the values from
+		// a config. Storing them as floats here would break tests cases that compare this serialized data with the
+		// deserialized data returned by SnakeYaml.
 		if (pitch != null) {
-			data.put("pitch", pitch);
+			data.put("pitch", (double) pitch);
 		}
 		if (volume != null) {
-			data.put("volume", volume);
+			data.put("volume", (double) volume);
 		}
 		return data;
 	}
