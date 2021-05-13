@@ -17,10 +17,12 @@ import com.nisovin.shopkeepers.config.lib.value.types.ItemDataValue;
 import com.nisovin.shopkeepers.config.lib.value.types.ListValue;
 import com.nisovin.shopkeepers.config.lib.value.types.LongValue;
 import com.nisovin.shopkeepers.config.lib.value.types.MaterialValue;
+import com.nisovin.shopkeepers.config.lib.value.types.SoundEffectValue;
 import com.nisovin.shopkeepers.config.lib.value.types.StringValue;
 import com.nisovin.shopkeepers.config.lib.value.types.TextValue;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.ItemData;
+import com.nisovin.shopkeepers.util.SoundEffect;
 
 /**
  * Registry of default value types of settings.
@@ -43,6 +45,7 @@ public class DefaultValueTypes {
 		registry.register(Text.class, TextValue.INSTANCE);
 		registry.register(Material.class, MaterialValue.INSTANCE);
 		registry.register(ItemData.class, ItemDataValue.INSTANCE);
+		registry.register(SoundEffect.class, SoundEffectValue.INSTANCE);
 		registry.register(EntityType.class, EntityTypeValue.INSTANCE);
 
 		// The following more general value type providers are only used for types which didn't match any of the above:
