@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
@@ -29,6 +30,7 @@ import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.SoundEffect;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
 
@@ -246,7 +248,10 @@ public class Settings extends Config {
 	 * Trade Notifications
 	 */
 	public static boolean notifyPlayersAboutTrades = false;
+	public static SoundEffect tradeNotificationSound = SoundEffect.EMPTY;
+
 	public static boolean notifyShopOwnersAboutTrades = true;
+	public static SoundEffect shopOwnerTradeNotificationSound = new SoundEffect(Sound.ENTITY_EXPERIENCE_ORB_PICKUP).withVolume(0.25f);
 
 	/*
 	 * Trade Log

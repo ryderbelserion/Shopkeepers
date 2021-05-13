@@ -213,6 +213,7 @@ public class TradeNotifications implements Listener {
 			// Note: We also send trade notifications for own trades (i.e. when the trading player matches the recipient
 			// of the notification).
 			TextUtils.sendMessage(player, tradeNotification.get());
+			Settings.tradeNotificationSound.play(player);
 			this.sendDisableTradeNotificationsHint(player);
 		}
 	}
@@ -294,6 +295,7 @@ public class TradeNotifications implements Listener {
 		// the notification).
 		Text message = this.getOwnerTradeNotificationMessage(tradeContext);
 		TextUtils.sendMessage(owner, message);
+		Settings.shopOwnerTradeNotificationSound.play(owner);
 		this.sendDisableTradeNotificationsHint(owner);
 	}
 

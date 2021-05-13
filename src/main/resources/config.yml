@@ -466,10 +466,19 @@ tax-round-up: false
 # and 'shopkeeper.trade-notifications.player' for player shop trade
 # notifications) about trades that take place. If a player would also receive a
 # trade notification because trade notifications for shop owners are enabled,
-# they will only receive the shop owner specific notification.
+# they will only receive the shop owner specific trade notification.
 notify-players-about-trades: false
+# This sound effect is played when a player receives a trade notification. Set
+# this to an empty String to disable the sound effect.
+trade-notification-sound: ""
+
 # Whether to inform shop owners about trades that take place in their shops.
 notify-shop-owners-about-trades: true
+# This sound effect is played when a shop owner receives a trade notification.
+# Set this to an empty String to disable the sound effect.
+shop-owner-trade-notification-sound:
+  sound: ENTITY_EXPERIENCE_ORB_PICKUP
+  volume: 0.25
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 # Trade Log

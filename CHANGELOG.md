@@ -202,6 +202,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
     * This hint message is sent together with the first trade notification a player receives during the current game session.
     * The hint is only sent to players that have the permission to use the command.
     * The command in this hint message is clickable: When clicked, it will insert the command to execute directly into the player's chat box.
+  * Config: Added settings 'trade-notification-sound' (disabled by default) and 'shop-owner-trade-notification-sound'. These sound effects are played when a player (or shop owner) receives a trade notification. These sound effects can be disabled by setting them to an empty String inside the config.
 * Debug: When debugging failed command executions, we log the stack trace of the command exception now.
 * Fixed: When the parsing of a command argument failed, the error message was using the argument name instead of the argument format. However, this was mostly an issue for the few commands with required arguments whose format does not contain the argument name, for example because their format is constructed from their child arguments.
 * Added: Added sounds to the various buttons inside the editor menu.
