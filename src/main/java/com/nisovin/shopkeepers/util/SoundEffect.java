@@ -29,7 +29,8 @@ import org.bukkit.entity.Player;
  * <p>
  * The {@link #getSoundName() sound name} can be empty to indicate that the sound effect shall not be played. This
  * allows plugin users to disable certain sound effects inside the config, and allows the plugin to differentiate
- * between disabled sound effects and missing / unspecified sound effects.
+ * between disabled sound effects and missing / unspecified sound effects. Another option to disable a sound effect is
+ * to set its volume to zero (or a value close to zero).
  */
 public final class SoundEffect {
 
@@ -41,6 +42,9 @@ public final class SoundEffect {
 	private static final SoundCategory DEFAULT_CATEGORY = SoundCategory.MASTER;
 	private static final float DEFAULT_PITCH = 1.0f;
 	private static final float DEFAULT_VOLUME = 1.0f;
+
+	// Sound effects with a volume below this value are not played.
+	private static final float MIN_VOLUME = 0.001f;
 
 	// Either sound or soundName is not null. Sound name is used when referring to a sound that is not known to the
 	// server and might only exist on (certain) clients.
@@ -216,6 +220,18 @@ public final class SoundEffect {
 	}
 
 	/**
+	 * Checks whether this {@link SoundEffect} is disabled.
+	 * <p>
+	 * The sound effect is disabled if either its {@link #getSoundName() sound name} is empty, or its
+	 * {@link #getVolume() volume} is close to zero. A disabled sound effect is not played by any of the play methods.
+	 * 
+	 * @return <code>true</code> if this sound effect is disabled
+	 */
+	public boolean isDisabled() {
+		return (soundName != null && soundName.isEmpty()) || (volume != null && volume <= MIN_VOLUME);
+	}
+
+	/**
 	 * Plays this {@link SoundEffect} at the specified {@link Location}.
 	 * 
 	 * @param location
@@ -226,11 +242,14 @@ public final class SoundEffect {
 		Validate.notNull(location, "location is null");
 		World world = location.getWorld();
 		Validate.notNull(world, "The location has no world!");
+		if (this.isDisabled()) return;
+
 		if (sound != null) {
 			world.playSound(location, sound, this.getEffectiveCategory(), this.getEffectiveVolume(), this.getEffectivePitch());
-		} else if (!soundName.isEmpty()) {
+		} else {
+			assert !soundName.isEmpty();
 			world.playSound(location, soundName, this.getEffectiveCategory(), this.getEffectiveVolume(), this.getEffectivePitch());
-		} // Else: An empty sound name indicates that no sound shall be played.
+		}
 	}
 
 	/**
@@ -257,11 +276,14 @@ public final class SoundEffect {
 	public void play(Player player, Location location) {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(location, "location is null");
+		if (this.isDisabled()) return;
+
 		if (sound != null) {
 			player.playSound(location, sound, this.getEffectiveCategory(), this.getEffectiveVolume(), this.getEffectivePitch());
-		} else if (!soundName.isEmpty()) {
+		} else {
+			assert !soundName.isEmpty();
 			player.playSound(location, soundName, this.getEffectiveCategory(), this.getEffectiveVolume(), this.getEffectivePitch());
-		} // Else: An empty sound name indicates that no sound shall be played.
+		}
 	}
 
 	@Override
