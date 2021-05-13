@@ -22,8 +22,6 @@ import com.nisovin.shopkeepers.config.lib.annotation.WithValueTypeProvider;
 import com.nisovin.shopkeepers.config.lib.setting.FieldSetting;
 import com.nisovin.shopkeepers.config.lib.setting.Setting;
 import com.nisovin.shopkeepers.config.lib.value.DefaultValueTypes;
-import com.nisovin.shopkeepers.config.lib.value.InvalidEntityTypeException;
-import com.nisovin.shopkeepers.config.lib.value.InvalidMaterialException;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.config.lib.value.ValueTypeProvider;
@@ -361,10 +359,8 @@ public abstract class Config {
 	protected <T> void onValueLoadException(ConfigurationSection config, Setting<T> setting, ValueLoadException e) throws ConfigLoadException {
 		String configKey = setting.getConfigKey();
 		Log.warning(this.msgValueLoadException(configKey, e));
-		if (e instanceof InvalidMaterialException) {
-			Log.warning(this.getLogPrefix() + "All valid material names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html");
-		} else if (e instanceof InvalidEntityTypeException) {
-			Log.warning(this.getLogPrefix() + "All valid entity type names can be found here: https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html");
+		for (String extraMessage : e.getExtraMessages()) {
+			Log.warning(this.getLogPrefix() + extraMessage);
 		}
 	}
 
