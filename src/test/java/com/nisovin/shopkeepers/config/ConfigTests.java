@@ -44,6 +44,12 @@ public class ConfigTests extends AbstractBukkitTest {
 		for (String expectedKey : expectedKeys) {
 			Assert.assertTrue("The default config is missing the key '" + expectedKey + "'!",
 					actualKeysSet.contains(expectedKey));
+
+			// Compare values:
+			Object expectedValue = expectedValues.get(expectedKey);
+			Object actualValue = actualValues.get(expectedKey);
+			Assert.assertEquals("The value for key '" + expectedKey + "' of the default config does not match the expected value!",
+					expectedValue, actualValue);
 		}
 
 		// Check for unexpected keys:
@@ -54,9 +60,6 @@ public class ConfigTests extends AbstractBukkitTest {
 
 		// Check the order of keys and for duplicated keys:
 		Assert.assertEquals("The default config keys do not match the expected keys!", expectedKeys, actualKeys);
-
-		// Compare setting values:
-		Assert.assertEquals("Default config does not match the expected default config!", expectedValues, actualValues);
 	}
 
 	@Test
@@ -98,8 +101,14 @@ public class ConfigTests extends AbstractBukkitTest {
 				// Compare values:
 				Map<String, Object> actualValues = languageFile.getValues(false);
 				ConfigUtils.convertSectionsToMaps(actualValues);
-				Assert.assertEquals("Default language file '" + languageFilePath + "' does not match the expected default language file!",
-						expectedValues, actualValues);
+
+				// Compare values:
+				for (String expectedKey : expectedKeys) {
+					Object expectedValue = expectedValues.get(expectedKey);
+					Object actualValue = actualValues.get(expectedKey);
+					Assert.assertEquals("The value for key '" + expectedKey + "' of the default language file '" + languageFilePath + "' does not match the expected value!",
+							expectedValue, actualValue);
+				}
 			}
 		}
 	}
