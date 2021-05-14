@@ -57,11 +57,11 @@ public class CsvTradeLogger implements TradeLogger {
 			"result_item_type", "result_item_amount", "result_item_metadata"
 	);
 
-	// TODO This uses the local locale and timezone currently. Config option(s) to change the locale and timezone? Or
+	// TODO This uses the system locale and timezone currently. Config option(s) to change the locale and timezone? Or
 	// always store in UTC?
 	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd").withZone(ZoneId.systemDefault());
 	private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss").withZone(ZoneId.systemDefault());
-	private static final int DELAYED_SAVE_TICKS = 100; // 5 seconds
+	private static final int DELAYED_SAVE_TICKS = 600; // 30 seconds
 
 	private static final int SAVE_MAX_ATTEMPTS = 20;
 	private static final long SAVE_RETRY_DELAY_MILLIS = 25L;
