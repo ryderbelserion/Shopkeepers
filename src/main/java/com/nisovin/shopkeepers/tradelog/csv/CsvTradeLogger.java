@@ -49,8 +49,9 @@ public class CsvTradeLogger implements TradeLogger {
 	private static final String TRADE_LOGS_FOLDER = "trade-logs";
 	private static final String FILE_NAME_PREFIX = "trades-";
 	private static final List<String> CSV_HEADER = Arrays.asList(
-			"time", "player_id", "player_name",
-			"shop_id", "shop_type", "shop_world", "shop_x", "shop_y", "shop_z", "owner_id", "owner_name",
+			"time", "player_uuid", "player_name",
+			"shop_uuid", "shop_type", "shop_world", "shop_x", "shop_y", "shop_z",
+			"shop_owner_uuid", "shop_owner_name",
 			"result_item_type", "result_item_amount", "result_item_metadata",
 			"item1_type", "item1_amount", "item1_metadata",
 			"item2_type", "item2_amount", "item2_metadata"
@@ -330,14 +331,16 @@ public class CsvTradeLogger implements TradeLogger {
 			item2Metadata = this.getItemMetadata(item2);
 		}
 
-		// "time", "player_id", "player_name",
-		// "shop_id", "shop_type", "shop_world", "shop_x", "shop_y", "shop_z", "owner_id", "owner_name",
+		// "time", "player_uuid", "player_name",
+		// "shop_uuid", "shop_type", "shop_world", "shop_x", "shop_y", "shop_z",
+		// "shop_owner_uuid", "shop_owner_name",
 		// "result_item_type", "result_item_amount", "result_item_metadata",
 		// "item1_type", "item1_amount", "item1_metadata",
 		// "item2_type", "item2_amount", "item2_metadata"
 		return csv.formatRecord(Arrays.asList(
 				TIME_FORMAT.format(timestamp), player.getUniqueId(), player.getName(),
-				shop.getUniqueId(), shop.getTypeId(), worldName, shop.getX(), shop.getY(), shop.getZ(), shopOwnerId, shopOwnerName,
+				shop.getUniqueId(), shop.getTypeId(), worldName, shop.getX(), shop.getY(), shop.getZ(),
+				shopOwnerId, shopOwnerName,
 				resultItem.getType().name(), resultItem.getAmount(), this.getItemMetadata(resultItem),
 				item1.getType().name(), item1.getAmount(), this.getItemMetadata(item1),
 				item2Type, item2Amount, item2Metadata
