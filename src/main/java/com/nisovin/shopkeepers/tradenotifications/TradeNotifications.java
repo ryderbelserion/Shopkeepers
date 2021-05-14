@@ -28,9 +28,9 @@ import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 import com.nisovin.shopkeepers.util.text.MessageArguments;
+import com.nisovin.shopkeepers.util.trading.MergedTrades;
 import com.nisovin.shopkeepers.util.trading.TradeMerger;
 import com.nisovin.shopkeepers.util.trading.TradeMerger.MergeMode;
-import com.nisovin.shopkeepers.util.trading.TradeMerger.MergedTrades;
 
 /**
  * Informs certain players and/or shop owners about trades that take place.
