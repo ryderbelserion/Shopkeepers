@@ -31,7 +31,7 @@ public class TradeMerger {
 		 */
 		SAME_CLICK_EVENT,
 		/**
-		 * Merges equivalent trades over a certain duration (at most 5 seconds by default).
+		 * Merges equivalent trades over a certain maximum duration (5 seconds by default).
 		 */
 		DURATION
 	}
@@ -41,7 +41,7 @@ public class TradeMerger {
 	private final Plugin plugin;
 	private final Consumer<MergedTrades> mergedTradesConsumer;
 	private final MergeMode mergeMode;
-	private long mergeDurationTicks;
+	private long mergeDurationTicks; // Can be 0 to disable the trade merging
 
 	private MergedTrades previousTrades = null;
 	private BukkitTask delayedTask = null;
@@ -56,9 +56,21 @@ public class TradeMerger {
 		mergeDurationTicks = (mergeMode == MergeMode.SAME_CLICK_EVENT) ? 1L : DEFAULT_MERGE_DURATION_TICKS;
 	}
 
+	/**
+	 * Sets the merge duration in ticks.
+	 * <p>
+	 * Calling this method is only valid if the {@link MergeMode} of this {@link TradeMerger} is
+	 * {@link MergeMode#DURATION}.
+	 * <p>
+	 * Changing the merge duration has no effect on the trades that are currently already being merged.
+	 * 
+	 * @param mergeDurationTicks
+	 *            the merge duration ticks, not negative, <code>0</code> to disable the trade merging
+	 * @return this {@link TradeMerger}
+	 */
 	public TradeMerger withMergeDuration(long mergeDurationTicks) {
-		Validate.State.isTrue(mergeMode == MergeMode.DURATION, "Calling this method is only valid if the MergeMode is DURATION.");
-		Validate.isTrue(mergeDurationTicks >= 1, "mergeDurationTicks has to be positive");
+		Validate.State.isTrue(mergeMode == MergeMode.DURATION, "Calling this method is only valid for MergeMode DURATION.");
+		Validate.isTrue(mergeDurationTicks >= 0, "mergeDurationTicks cannot be negative");
 		this.mergeDurationTicks = mergeDurationTicks;
 		return this;
 	}
@@ -67,8 +79,8 @@ public class TradeMerger {
 	}
 
 	public void onDisable() {
-		this.endDelayedTask();
 		// Process the pending trades, if there are any:
+		// This also stops the delayed task.
 		this.processPreviousTrades();
 	}
 
@@ -124,6 +136,12 @@ public class TradeMerger {
 	private void startDelayedTask() {
 		// End the previous task, if there is one:
 		this.endDelayedTask();
+
+		// A merge duration of 0 effectively disables the trade merging:
+		if (mergeDurationTicks == 0) {
+			this.processPreviousTrades();
+			return;
+		}
 
 		// Start a new delayed task that ends the trade merging after a certain maximum duration:
 		delayedTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
