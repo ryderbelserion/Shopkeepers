@@ -161,8 +161,18 @@ public final class ItemUtils {
 
 	// ItemStack utilities:
 
-	public static boolean isEmpty(ItemStack item) {
-		return item == null || item.getType() == Material.AIR || item.getAmount() <= 0;
+	/**
+	 * Checks if the given {@link ItemStack} is empty.
+	 * <p>
+	 * The item stack is considered 'empty' if it is <code>null</code>, it is of type {@link Material#AIR}, or its
+	 * amount is less than or equal to zero.
+	 * 
+	 * @param itemStack
+	 *            the item stack
+	 * @return <code>true</code> if the item stack is empty
+	 */
+	public static boolean isEmpty(ItemStack itemStack) {
+		return itemStack == null || itemStack.getType() == Material.AIR || itemStack.getAmount() <= 0;
 	}
 
 	public static ItemStack getNullIfEmpty(ItemStack item) {
@@ -252,7 +262,8 @@ public final class ItemUtils {
 	}
 
 	/**
-	 * Gets an itemstack's amount and returns <code>0</code> for empty itemstacks.
+	 * Gets the amount of the given {@link ItemStack}, and returns <code>0</code> if the item stack is
+	 * {@link #isEmpty(ItemStack) empty}.
 	 * 
 	 * @param itemStack
 	 *            the item stack, can be empty

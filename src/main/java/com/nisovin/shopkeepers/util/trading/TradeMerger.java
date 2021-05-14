@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.util.trading;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 import org.bukkit.Bukkit;
@@ -120,13 +121,32 @@ public class TradeMerger {
 				if (mergeMode == MergeMode.SAME_CLICK_EVENT) return false;
 				if (initialTrade.getPlayer() != otherInitialTrade.getPlayer()) return false;
 				if (initialTrade.getShopkeeper() != otherInitialTrade.getShopkeeper()) return false;
-				if (!ItemUtils.isSimilar(this.getOfferedItem1(), otherTrades.getOfferedItem1())) return false;
-				if (!ItemUtils.isSimilar(this.getOfferedItem2(), otherTrades.getOfferedItem2())) return false;
-				if (!ItemUtils.isSimilar(this.getResultItem(), otherTrades.getResultItem())) return false;
+
+				// Note: We do not compare the trading recipes here, because the items offered by the player might be
+				// different to those of the trading recipe, and therefore also among trades that use the same trading
+				// recipe.
+				// Items are compared with equals instead of isSimilar to also take stack sizes into account:
+				if (!Objects.equals(this.getResultItem(), otherTrades.getResultItem())) return false;
+				if (!Objects.equals(this.getOfferedItem1(), otherTrades.getOfferedItem1())) return false;
+				if (!Objects.equals(this.getOfferedItem2(), otherTrades.getOfferedItem2())) return false;
+			} else {
+				// We assume that the player, shopkeeper, and the involved items (offered items and the result item)
+				// remain the same throughout the same click event (this avoids costly item comparisons). However, if
+				// the selected trading recipe changed throughout the trades caused by the same click event, the item
+				// stack sizes of the involved trading recipes (i.e. of the offered items and the result items) might
+				// have changed. We consider these to be a separate kinds of trades then.
+				int resultItemAmount = ItemUtils.getItemStackAmount(this.getResultItem());
+				int otherResultItemAmount = ItemUtils.getItemStackAmount(otherTrades.getResultItem());
+				if (resultItemAmount != otherResultItemAmount) return false;
+
+				int offeredItem1Amount = ItemUtils.getItemStackAmount(this.getOfferedItem1());
+				int otherOfferedItem1Amount = ItemUtils.getItemStackAmount(otherTrades.getOfferedItem1());
+				if (offeredItem1Amount != otherOfferedItem1Amount) return false;
+
+				int offeredItem2Amount = ItemUtils.getItemStackAmount(this.getOfferedItem2());
+				int otherOfferedItem2Amount = ItemUtils.getItemStackAmount(otherTrades.getOfferedItem2());
+				if (offeredItem2Amount != otherOfferedItem2Amount) return false;
 			}
-			// Else: We assume that the player, shopkeeper, and the involved items (offered items and the result item)
-			// remain the same throughout the same click event (even if the selected trading recipe changed throughout
-			// the trades).
 
 			tradeCount += otherTrades.getTradeCount();
 			return true;
