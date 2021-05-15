@@ -141,7 +141,9 @@ public class TradeNotifications implements Listener {
 		return msgArgs;
 	}
 
-	private static final long TRADE_MERGE_DURATION_TICKS = 100L; // 5 seconds
+	// TODO Make these configurable
+	private static final long TRADE_MERGE_DURATION_TICKS = 300L; // 15 seconds
+	private static final long NEXT_MERGE_TIMEOUT_TICKS = 100L; // 5 seconds
 
 	private final Plugin plugin;
 	private final NotificationUserPreferences userPreferences;
@@ -154,7 +156,7 @@ public class TradeNotifications implements Listener {
 		this.plugin = plugin;
 		this.userPreferences = new NotificationUserPreferences(plugin);
 		this.tradeMerger = new TradeMerger(plugin, MergeMode.DURATION, this::onTradesCompleted)
-				.withMergeDuration(TRADE_MERGE_DURATION_TICKS);
+				.withMergeDurations(TRADE_MERGE_DURATION_TICKS, NEXT_MERGE_TIMEOUT_TICKS);
 	}
 
 	public void onEnable() {
