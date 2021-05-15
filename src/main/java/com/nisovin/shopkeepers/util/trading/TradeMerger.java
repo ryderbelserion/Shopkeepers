@@ -9,6 +9,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
+import com.nisovin.shopkeepers.util.Ticks;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -41,19 +42,33 @@ public class TradeMerger {
 
 	private static final long DEFAULT_MERGE_DURATION_TICKS = 300L; // 15 seconds
 	private static final long DEFAULT_NEXT_MERGE_TIMEOUT_TICKS = 100L; // 5 seconds
-	private static final long NEXT_MERGE_TIMEOUT_RESTART_THRESHOLD_NS = TimeUnit.MILLISECONDS.toNanos(500L);
+	// In order to avoid restarting the next merge timeout task too often (i.e. for performance reasons), the actual
+	// next merge timeout duration may dynamically vary by this amount. Since the primary purpose of this task is to
+	// detect the absence of trades that are manually triggered by players, it does not make much of a noticeable
+	// difference whether the trade merging is aborted slightly earlier or later.
+	private static final long NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS = TimeUnit.MILLISECONDS.toNanos(300L);
 
 	private final Plugin plugin;
 	private final Consumer<MergedTrades> mergedTradesConsumer;
 	private final MergeMode mergeMode;
 	// The maximum time span between the first and the last merged trade:
 	private long mergeDurationTicks; // Can be 0 to disable the trade merging
+	private long mergeDurationNanos;
 	// The maximum time span between successive merged trades:
 	private long nextMergeTimeoutTicks;
+	private long nextMergeTimeoutNanos;
 
 	private MergedTrades previousTrades = null;
+	// The expected maximum nano time by which this merge will end. If the server lags, the actual end time can be
+	// later. This is used to estimate whether it makes sense to start or skip a new timeout task for the next merge.
+	// TODO In order to account for server lag, check more frequently whether one of the trade merging timeouts has
+	// already been reached?
+	private long mergeEndNanos;
+	private long lastMergedTradeNanos;
+
 	private BukkitTask mergeDurationTask = null;
 	private BukkitTask nextMergeTimeoutTask = null;
+	// This is set to the lastMergedTradeNanos at the time the nextMergeTimeoutTask is started.
 	private long nextMergeTimeoutStartNanos;
 
 	public TradeMerger(Plugin plugin, MergeMode mergeMode, Consumer<MergedTrades> mergedTradesConsumer) {
@@ -64,11 +79,9 @@ public class TradeMerger {
 		this.mergedTradesConsumer = mergedTradesConsumer;
 		this.mergeMode = mergeMode;
 		if (mergeMode == MergeMode.SAME_CLICK_EVENT) {
-			mergeDurationTicks = 1L;
-			nextMergeTimeoutTicks = 1L;
+			this.setMergeDurations(1L, 1L);
 		} else {
-			mergeDurationTicks = DEFAULT_MERGE_DURATION_TICKS;
-			nextMergeTimeoutTicks = DEFAULT_NEXT_MERGE_TIMEOUT_TICKS;
+			this.setMergeDurations(DEFAULT_MERGE_DURATION_TICKS, DEFAULT_NEXT_MERGE_TIMEOUT_TICKS);
 		}
 	}
 
@@ -89,18 +102,24 @@ public class TradeMerger {
 	public TradeMerger withMergeDurations(long mergeDurationTicks, long nextMergeTimeoutTicks) {
 		Validate.State.isTrue(previousTrades == null, "This TradeMerger cannot be reconfigured while it is already merging trades.");
 		Validate.State.isTrue(mergeMode == MergeMode.DURATION, "Calling this method is only valid when using MergeMode DURATION.");
+		this.setMergeDurations(mergeDurationTicks, nextMergeTimeoutTicks);
+		return this;
+	}
+
+	private void setMergeDurations(long mergeDurationTicks, long nextMergeTimeoutTicks) {
 		Validate.isTrue(mergeDurationTicks >= 0, "mergeDurationTicks cannot be negative");
 		Validate.isTrue(nextMergeTimeoutTicks >= 0, "nextMergeTimeoutTicks cannot be negative");
 		this.mergeDurationTicks = mergeDurationTicks;
+		this.mergeDurationNanos = Ticks.toNanos(mergeDurationTicks);
 		this.nextMergeTimeoutTicks = nextMergeTimeoutTicks;
-		return this;
+		this.nextMergeTimeoutNanos = Ticks.toNanos(nextMergeTimeoutTicks);
 	}
 
 	public void onEnable() {
 	}
 
 	public void onDisable() {
-		// Process the pending trades, if there are any:
+		// Process the previous trades, if there are any:
 		// This also stops the delayed tasks.
 		this.processPreviousTrades();
 	}
@@ -118,19 +137,23 @@ public class TradeMerger {
 		// copies from the event. By creating the new MergedTrades right away, instead of only afterwards when it is
 		// actually required, we can cache these once retrieved item copies. This is therefore cheaper most of the time.
 		MergedTrades newMergedTrades = new MergedTrades(tradeEvent);
+		long now = System.nanoTime();
 		if (previousTrades == null) {
 			// There are no previous trades to merge with.
 			previousTrades = newMergedTrades;
+			mergeEndNanos = now + mergeDurationNanos;
+			lastMergedTradeNanos = now;
 			this.startDelayedTasks();
 		} else if (this.tryMergeTrades(previousTrades, newMergedTrades, mergeMode)) {
 			// The trade was merged with the previous trades.
-			// Restart the next merge timeout task:
-			this.startNextMergeTimeoutTask();
+			lastMergedTradeNanos = now;
 		} else {
 			// The trade could not be merged with the previous trades.
 			this.processPreviousTrades();
 			assert previousTrades == null;
 			previousTrades = newMergedTrades;
+			mergeEndNanos = now + mergeDurationNanos;
+			lastMergedTradeNanos = now;
 			this.startDelayedTasks();
 		}
 	}
@@ -206,28 +229,49 @@ public class TradeMerger {
 		if (nextMergeTimeoutTicks == 0 || nextMergeTimeoutTicks >= mergeDurationTicks) return;
 		assert mergeMode == MergeMode.DURATION;
 
-		// This method is called for every merged trade, including trades that occur within the same tick as the
-		// previous trades. However, since the primary purpose of this task is to react to manually triggered trades,
-		// restarting this task is not required when it would not make much of a noticeable difference whether the trade
-		// merging is aborted slightly earlier or later. We can therefore avoid restarting this task if it has not yet
-		// been running for some minimum amount of time.
-		long now = System.nanoTime();
-		if (nextMergeTimeoutTask != null) {
-			if (now - nextMergeTimeoutStartNanos <= NEXT_MERGE_TIMEOUT_RESTART_THRESHOLD_NS) {
-				return;
-			}
+		// End the previous task, if there is one:
+		this.endNextMergeTimeoutTask();
 
-			// End the previous task:
-			this.endNextMergeTimeoutTask();
+		// In order to avoid restarting this task very frequently (eg. after every merged trade), we instead only start
+		// this task once and then check afterwards whether there have been any trades in the meantime. If there has
+		// been another trade, a new next merge timeout task is started with a delay according to the remaining timeout
+		// duration for the last merged trade.
+		long now = System.nanoTime();
+		long nanosSinceLastMergedTrade = now - lastMergedTradeNanos;
+		assert nanosSinceLastMergedTrade >= 0;
+		// If the server lagged, this may end up being negative:
+		long remainingTimeoutNanos = nextMergeTimeoutNanos - nanosSinceLastMergedTrade;
+
+		// We avoid starting a new task if the remaining timeout duration is below a certain threshold. This threshold
+		// also captures the case where the remainingTimeoutNanos is less than 0, or the resulting task delay ticks is
+		// less than 1.
+		if (remainingTimeoutNanos <= NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS) {
+			this.processPreviousTrades();
+			return;
+		}
+
+		// We avoid starting a new task if the trade merging is expected to end earlier, or roughly at the same time (by
+		// up to NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS) as the task anyways:
+		if (mergeEndNanos <= now + remainingTimeoutNanos + NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS) {
+			return;
 		}
 
 		// Start a new delayed task that ends the trade merging after a certain maximum duration:
-		nextMergeTimeoutStartNanos = now;
+		long taskDelayTicks = Ticks.fromNanos(remainingTimeoutNanos);
+		assert taskDelayTicks >= 1; // Due to the threshold checked above
+		nextMergeTimeoutStartNanos = lastMergedTradeNanos; // Keep track of the timestamp of the last merged trade
 		nextMergeTimeoutTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			assert previousTrades != null; // Otherwise this task would have already been cancelled
 			nextMergeTimeoutTask = null;
-			this.processPreviousTrades();
-		}, nextMergeTimeoutTicks);
+
+			// If there has been another trade in the meantime, restart this timeout task:
+			if (lastMergedTradeNanos != nextMergeTimeoutStartNanos) {
+				this.startNextMergeTimeoutTask();
+			} else {
+				// Otherwise, abort the trade merging:
+				this.processPreviousTrades();
+			}
+		}, taskDelayTicks);
 	}
 
 	/**
