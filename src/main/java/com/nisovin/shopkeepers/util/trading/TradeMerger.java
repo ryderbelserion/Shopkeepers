@@ -46,7 +46,7 @@ public class TradeMerger {
 	// next merge timeout duration may dynamically vary by this amount. Since the primary purpose of this task is to
 	// detect the absence of trades that are manually triggered by players, it does not make much of a noticeable
 	// difference whether the trade merging is aborted slightly earlier or later.
-	private static final long NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS = TimeUnit.MILLISECONDS.toNanos(300L);
+	private static final long NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS = TimeUnit.MILLISECONDS.toNanos(500L);
 
 	private final Plugin plugin;
 	private final Consumer<MergedTrades> mergedTradesConsumer;
