@@ -54,7 +54,8 @@ public class CsvTradeLogger implements TradeLogger {
 			"shop_owner_uuid", "shop_owner_name",
 			"item1_type", "item1_amount", "item1_metadata",
 			"item2_type", "item2_amount", "item2_metadata",
-			"result_item_type", "result_item_amount", "result_item_metadata"
+			"result_item_type", "result_item_amount", "result_item_metadata",
+			"trade_count"
 	);
 
 	// TODO This uses the system locale and timezone currently. Config option(s) to change the locale and timezone? Or
@@ -214,10 +215,10 @@ public class CsvTradeLogger implements TradeLogger {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Logged trades to the CSV trade log (");
 
-				// Number of logged trades:
-				sb.append(saving.size()).append(" trades");
+				// Number of logged trade records:
+				sb.append(saving.size()).append(" records");
 
-				// Number of trades that we failed to log:
+				// Number of trade records that we failed to log:
 				if (saveContext.hasUnsavedTrades()) {
 					sb.append(", ").append(saveContext.getUnsavedTrades().size()).append(" failed to log");
 				}
@@ -336,14 +337,16 @@ public class CsvTradeLogger implements TradeLogger {
 		// "shop_owner_uuid", "shop_owner_name",
 		// "item1_type", "item1_amount", "item1_metadata",
 		// "item2_type", "item2_amount", "item2_metadata",
-		// "result_item_type", "result_item_amount", "result_item_metadata"
+		// "result_item_type", "result_item_amount", "result_item_metadata",
+		// "trade_count"
 		return csv.formatRecord(Arrays.asList(
 				TIME_FORMAT.format(timestamp), player.getUniqueId(), player.getName(),
 				shop.getUniqueId(), shop.getTypeId(), worldName, shop.getX(), shop.getY(), shop.getZ(),
 				shopOwnerId, shopOwnerName,
 				item1.getType().name(), item1.getAmount(), this.getItemMetadata(item1),
 				item2Type, item2Amount, item2Metadata,
-				resultItem.getType().name(), resultItem.getAmount(), this.getItemMetadata(resultItem)
+				resultItem.getType().name(), resultItem.getAmount(), this.getItemMetadata(resultItem),
+				trade.getTradeCount()
 
 		));
 	}

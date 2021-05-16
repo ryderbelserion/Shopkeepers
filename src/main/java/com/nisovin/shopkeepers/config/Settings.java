@@ -256,6 +256,9 @@ public class Settings extends Config {
 	/*
 	 * Trade Log
 	 */
+	public static int tradeLogMergeDurationTicks = 300; // 15 seconds
+	public static int tradeLogNextMergeTimeoutTicks = 100; // 5 seconds
+
 	public static boolean logTradesToCsv = false;
 
 	public static boolean logItemMetadata = false;
@@ -617,5 +620,17 @@ public class Settings extends Config {
 			Log.warning(this.getLogPrefix() + "'tax-rate' can not be larger than 100!");
 			taxRate = 100;
 		}
+
+		if (tradeLogMergeDurationTicks < 0) {
+			Log.warning(this.getLogPrefix() + "'trade-log-merge-duration-ticks' cannot be negative.");
+			tradeLogMergeDurationTicks = 0;
+		}
+		if (tradeLogNextMergeTimeoutTicks < 0) {
+			Log.warning(this.getLogPrefix() + "'trade-log-next-merge-timeout-ticks' cannot be negative.");
+			tradeLogNextMergeTimeoutTicks = 0;
+		}
+		// Note: If tradeLogNextMergeTimeoutTicks is greater than or equal to tradeLogMergeDurationTicks, it has no
+		// effect. However, we do not print a warning in this case to allow tradeLogMergeDurationTicks to be easily
+		// adjusted inside the config without having to keep tradeLogNextMergeTimeoutTicks consistent.
 	}
 }

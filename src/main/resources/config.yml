@@ -484,6 +484,34 @@ shop-owner-trade-notification-sound:
 # Trade Log
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
+# Players can trigger many equal trades in quick succession. For example, when
+# players trade by shift clicking the result slot, they can trigger up to 64
+# individual trades at once with a single click. And even when not shift
+# clicking, they can quickly trigger a considerable number of trades.
+# In order to represent the logged trades more compactly, we merge successive
+# trades that happen over a certain period of time if they involve the same
+# player, the same shopkeeper, and the same items. This setting specifies the
+# maximum duration in ticks during which successive equal trades are merged.
+# Setting this to a value of 0 disables the merging of trades. Setting this to
+# a value of 1 will only merge trades that are triggered by the same inventory
+# action (eg. by the same shift click).
+# It is recommended to not set this value to something longer than a few
+# seconds: The longer the chosen duration, the greater the difference between
+# the logged timestamps and shopkeeper states may be to the actual timestamps
+# and shopkeeper states at which the merged trades took place.
+trade-log-merge-duration-ticks: 300
+# The merging of trades is aborted prematurely if the time gap to the previous
+# trade is longer than this duration in ticks. This setting can be used in
+# combination with a larger value for 'trade-log-merge-duration-ticks' to limit
+# the maximum waiting time for a subsequent trade.
+# Setting this to a value of 0, or a value greater than or equal to
+# 'trade-log-merge-duration-ticks' will cause this setting to have no effect.
+# Setting this to something too low for trades to realistically be manually
+# triggered (such as only a few ticks) will make the chosen
+# 'trade-log-merge-duration-ticks' effectively pointless. For performance
+# reasons, the actual duration may dynamically vary by several ticks.
+trade-log-next-merge-timeout-ticks: 100
+
 # Whether to log all trades to CSV files inside the plugin folder.
 log-trades-to-csv: false
 

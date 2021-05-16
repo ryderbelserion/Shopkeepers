@@ -179,6 +179,9 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * Config: Renamed 'enable-purchase-logging' to 'log-trades-to-csv'. The previous config is automatically migrated.
   * Config: Added setting 'log-item-metadata' (disabled by default). This enables the logging of item metadata.
   * Performance: The logging happens asynchronously now, and in batches. When a trade takes place, we wait 30 seconds before we log the trade and any other trades that may have taken place during this duration.
+  * Performance/Data: In order to represent the logged trades more compactly, we merge equivalent trades that are triggered in quick succession over a certain period of time.
+    * By default, we merge successive equal trades for up to 15 seconds, but only if there is no gap larger than 5 seconds between the individual trades.
+    * Config: The new settings 'trade-log-merge-duration-ticks' and 'trade-log-next-merge-timeout-ticks' control the maximum duration during which trades can be merged. They also allow the trade merging to be disabled.
   * Debug: Improved the error handling and debug output related to the CSV trade logging.
 * Debug: When a strict item comparison fails, we now log the serialized data of the involved mismatching items.
 * Changed: The '/shopkeeper remove' command is now called '/shopkeeper removeAll'. All related permission nodes and some related messages have changed. The 'all' argument, which removes the player shops of all players, has been changed to 'player'.

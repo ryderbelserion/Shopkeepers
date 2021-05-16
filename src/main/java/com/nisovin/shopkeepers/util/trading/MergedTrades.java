@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.util.trading;
 
+import java.time.Instant;
 import java.util.Objects;
 
 import org.bukkit.inventory.ItemStack;
@@ -11,12 +12,13 @@ import com.nisovin.shopkeepers.util.Lazy;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
- * Represents a number of equivalent trades that occurred sequentially and involve the same player, shopkeeper, and
- * traded items.
+ * Represents a number of consecutive trades that involved the same player, the same shopkeeper, and the same traded
+ * items.
  */
 public class MergedTrades {
 
 	private final ShopkeeperTradeEvent initialTrade;
+	private final Instant timestamp = Instant.now();
 	private final Lazy<ItemStack> resultItem;
 	private final Lazy<ItemStack> offeredItem1;
 	private final Lazy<ItemStack> offeredItem2;
@@ -44,6 +46,15 @@ public class MergedTrades {
 	 */
 	public ShopkeeperTradeEvent getInitialTrade() {
 		return initialTrade;
+	}
+
+	/**
+	 * Gets the timestamp of the {@link #getInitialTrade() initial trade}.
+	 * 
+	 * @return the timestamp of the initial trade
+	 */
+	public Instant getTimestamp() {
+		return timestamp;
 	}
 
 	/**
