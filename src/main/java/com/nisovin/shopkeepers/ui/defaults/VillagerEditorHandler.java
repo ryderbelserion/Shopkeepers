@@ -169,26 +169,29 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				if (!checkVillagerExistence(player)) return false;
-				ConfirmationUI.requestConfirmation(player, CONFIRMATION_UI_CONFIG_DELETE_VILLAGER, () -> {
-					// Delete confirmed.
-					if (!player.isValid()) return;
-					if (!checkVillagerExistence(player)) return;
-
-					villager.remove();
-					TextUtils.sendMessage(player, Messages.villagerRemoved);
-				}, () -> {
-					// Delete cancelled.
-					if (!player.isValid()) return;
-					if (!checkVillagerExistence(player)) return;
-
-					// Try to open the editor again:
-					// Note: This may not remember the previous editor state currently (such as the selected trades
-					// page).
-					SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(VillagerEditorHandler.this, player);
-				});
+				getUISession(player).closeDelayedAndRunTask(() -> requestConfirmationDeleteVillager(player));
 				return true;
 			}
 		};
+	}
+
+	private void requestConfirmationDeleteVillager(Player player) {
+		ConfirmationUI.requestConfirmation(player, CONFIRMATION_UI_CONFIG_DELETE_VILLAGER, () -> {
+			// Delete confirmed.
+			if (!player.isValid()) return;
+			if (!checkVillagerExistence(player)) return;
+
+			villager.remove();
+			TextUtils.sendMessage(player, Messages.villagerRemoved);
+		}, () -> {
+			// Delete cancelled.
+			if (!player.isValid()) return;
+			if (!checkVillagerExistence(player)) return;
+
+			// Try to open the editor again:
+			// Note: This may currently not remember the previous editor state (such as the selected trades page).
+			SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(VillagerEditorHandler.this, player);
+		});
 	}
 
 	protected Button createNamingButton() {
