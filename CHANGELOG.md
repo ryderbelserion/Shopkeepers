@@ -215,6 +215,9 @@ However, if the shopkeeper actually moved from its previous spawn location and n
   * When the confirmation inventory is closed by some other mean, an abort message is printed.
   * If the shopkeeper is already removed by other means in the meantime, we send the 'shop-already-removed' message.
 * Added: We also send the 'shop-removed' message now when a shopkeeper is deleted via the editor menu.
+* Added: Players also have to have to confirm now when they delete a villager via the villager editor.
+* Added: Deleting a villager via the villager editor will print a message now.
+* Changed: When using the villager editor, we check more frequently now if the villager still exist, and close the editor if it does not.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
@@ -411,6 +414,10 @@ Messages:
 * Added 'confirmation-ui-cancel'.
 * Added 'confirmation-ui-cancel-lore'.
 * Added 'confirmation-ui-aborted'.
+* Added 'villager-no-longer-exists'.
+* Added 'confirmation-ui-delete-villager-title'.
+* Added 'confirmation-ui-delete-villager-confirm-lore'.
+* Added 'villager-removed'.
 * Fixed: The german translation was missing translations for 'confirmation-expired' and 'nothing-to-confirm'.
 * Minor changes to the german translation.
 

@@ -344,6 +344,7 @@ missing-edit-wandering-traders-perm: "&7Dir fehlt die nötige Berechtigung, um w
 must-target-entity: "&7Du musst ein Objekt anvisieren."
 must-target-villager: "&7Du musst einen Dorfbewohner anvisieren."
 target-entity-is-no-villager: "&7Das anvisierte Objekt ist kein normaler Dorfbewohner."
+villager-no-longer-exists: "&7Der Dorfbewohner existiert nicht mehr."
 
 villager-editor-title: "&2Dorfbewohner Editor: &e{villagerName}"
 villager-editor-description-header: "&6Dorfbewohner Editor"
@@ -414,6 +415,12 @@ confirmation-ui-delete-shop-title: "&cDiesen Shop wirklich entfernen?"
 confirmation-ui-delete-shop-confirm-lore:
 - "Dadurch wird dieser Shop"
 - "unwiderruflich gelöscht!"
+
+confirmation-ui-delete-villager-title: "&cDorfbewohner entfernen?"
+confirmation-ui-delete-villager-confirm-lore:
+- "Dadurch wird der Dorfbewohner"
+- "unwiderruflich gelöscht!"
+villager-removed: "&aDer Dorfbewohner wurde entfernt."
 
 confirmation-ui-confirm: "&2Bestätigen "
 confirmation-ui-cancel: "&4Abbrechen"

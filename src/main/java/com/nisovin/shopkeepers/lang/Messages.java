@@ -278,6 +278,7 @@ public class Messages extends Config {
 	public static Text mustTargetEntity = Text.parse("&7You have to target an entity.");
 	public static Text mustTargetVillager = Text.parse("&7You have to target a villager.");
 	public static Text targetEntityIsNoVillager = Text.parse("&7The targeted entity is no regular villager.");
+	public static Text villagerNoLongerExists = Text.parse("&7The villager no longer exists.");
 
 	public static String villagerEditorTitle = c("&2Villager Editor: &e{villagerName}");
 	public static String villagerEditorDescriptionHeader = c("&6Villager Editor");
@@ -339,6 +340,10 @@ public class Messages extends Config {
 
 	public static String confirmationUiDeleteShopTitle = c("&cReally delete this shop?");
 	public static List<String> confirmationUiDeleteShopConfirmLore = c(Arrays.asList("This will irrevocably", "remove this shop!"));
+
+	public static String confirmationUiDeleteVillagerTitle = c("&cReally delete this villager?");
+	public static List<String> confirmationUiDeleteVillagerConfirmLore = c(Arrays.asList("This will irrevocably", "remove this villager!"));
+	public static Text villagerRemoved = Text.parse("&aThe villager has been removed.");
 
 	public static String confirmationUiConfirm = c("&2Confirm");
 	public static String confirmationUiCancel = c("&4Cancel");

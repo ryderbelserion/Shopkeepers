@@ -347,6 +347,7 @@ missing-edit-wandering-traders-perm: "&7You do not have the permission to edit w
 must-target-entity: "&7You have to target an entity."
 must-target-villager: "&7You have to target a villager."
 target-entity-is-no-villager: "&7The targeted entity is no regular villager."
+villager-no-longer-exists: "&7The villager no longer exists."
 
 villager-editor-title: "&2Villager Editor: &e{villagerName}"
 villager-editor-description-header: "&6Villager Editor"
@@ -415,6 +416,12 @@ confirmation-ui-delete-shop-title: "&cReally delete this shop?"
 confirmation-ui-delete-shop-confirm-lore:
 - "This will irrevocably"
 - "remove this shop!"
+
+confirmation-ui-delete-villager-title: "&cReally delete this villager?"
+confirmation-ui-delete-villager-confirm-lore:
+- "This will irrevocably"
+- "remove this villager!"
+villager-removed: "&aThe villager has been removed."
 
 confirmation-ui-confirm: "&2Confirm"
 confirmation-ui-cancel: "&4Cancel"
