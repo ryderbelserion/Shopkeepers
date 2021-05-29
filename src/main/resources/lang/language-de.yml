@@ -407,8 +407,8 @@ confirm-remove-all-shops-of-player: "&cDu bist dabei alle Shops des Spielers &6{
 confirm-remove-all-player-shops: "&cDu bist dabei alle Spieler-Shops sämtlicher Spieler (&6{shopsCount}&c) unwiderruflich zu entfernen!"
 
 confirmation-required: "&7Bitte bestätige diese Aktion mittels &6/shopkeepers confirm"
-confirmation-expired: "&cConfirmation expired."
-nothing-to-confirm: "&cThere is nothing to confirm currently."
+confirmation-expired: "&cBestätigung abgelaufen."
+nothing-to-confirm: "&cDerzeit gibt es nichts zu bestätigen."
 
 no-permission: "&cDafür hast du nicht die nötigen Berechtigungen."
 

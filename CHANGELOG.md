@@ -398,6 +398,7 @@ Messages:
 * Added 'state-disabled'.
 * Added 'button-trade-notifications'.
 * Added 'button-trade-notifications-lore'.
+* Fixed: The german translation was missing translations for 'confirmation-expired' and 'nothing-to-confirm'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.
