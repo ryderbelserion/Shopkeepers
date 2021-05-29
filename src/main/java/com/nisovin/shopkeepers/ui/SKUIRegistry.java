@@ -66,7 +66,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 			Log.debug(() -> "Cannot open UI '" + uiIdentifier + "': This shopkeeper is not handling/supporting this type of user interface.");
 			return false;
 		}
-		return requestUI(uiHandler, player);
+		return this.requestUI(uiHandler, player);
 	}
 
 	public boolean requestUI(UIHandler uiHandler, Player player) {

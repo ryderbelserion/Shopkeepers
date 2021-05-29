@@ -40,7 +40,7 @@ public abstract class UIHandler {
 	 * 
 	 * @return the UI type, not <code>null</code>
 	 */
-	public AbstractUIType getUIType() {
+	public final AbstractUIType getUIType() {
 		return uiType;
 	}
 

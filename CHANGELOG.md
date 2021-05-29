@@ -252,6 +252,7 @@ Internal API:
 * Added AbstractShopObject#onShopkeeperAdded.
 * Added AbstractShopObject#getShopkeeper.
 * Shopkeepers can now provide a lazily evaluated map of possible message arguments. However, this is not yet used everywhere yet.
+* UIHandler#getUIType is final now.
 
 Internal:  
 * The config key pattern is cached now.
