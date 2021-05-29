@@ -411,6 +411,18 @@ confirmation-required: "&7Please confirm this action by typing &6/shopkeepers co
 confirmation-expired: "&cConfirmation expired."
 nothing-to-confirm: "&cThere is nothing to confirm currently."
 
+confirmation-ui-delete-shop-title: "&cReally delete this shop?"
+confirmation-ui-delete-shop-confirm-lore:
+- "This will irrevocably"
+- "remove this shop!"
+
+confirmation-ui-confirm: "&2Confirm"
+confirmation-ui-cancel: "&4Cancel"
+confirmation-ui-cancel-lore:
+- "This will abort the"
+- "current action."
+confirmation-ui-aborted: "&7Confirmation aborted."
+
 no-permission: "&cYou don't have the permission to do that."
 
 command-unknown: "&cUnknown command '&e{command}&c'!"

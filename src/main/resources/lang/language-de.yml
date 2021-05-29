@@ -410,6 +410,18 @@ confirmation-required: "&7Bitte bestätige diese Aktion mittels &6/shopkeepers c
 confirmation-expired: "&cBestätigung abgelaufen."
 nothing-to-confirm: "&cDerzeit gibt es nichts zu bestätigen."
 
+confirmation-ui-delete-shop-title: "&cDiesen Shop wirklich entfernen?"
+confirmation-ui-delete-shop-confirm-lore:
+- "Dadurch wird dieser Shop"
+- "unwiderruflich gelöscht!"
+
+confirmation-ui-confirm: "&2Bestätigen "
+confirmation-ui-cancel: "&4Abbrechen"
+confirmation-ui-cancel-lore:
+- "Dadurch wird die aktuelle"
+- "Aktion abgebrochen."
+confirmation-ui-aborted: "&7Bestätigung abgebrochen."
+
 no-permission: "&cDafür hast du nicht die nötigen Berechtigungen."
 
 command-unknown: "&cUnbekannter Befehl '&e{command}&c'!"

@@ -209,6 +209,12 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Debug: When debugging failed command executions, we log the stack trace of the command exception now.
 * Fixed: When the parsing of a command argument failed, the error message was using the argument name instead of the argument format. However, this was mostly an issue for the few commands with required arguments whose format does not contain the argument name, for example because their format is constructed from their child arguments.
 * Added: Added sounds to the various buttons inside the editor menu.
+* Added: Players now have to confirm when they delete a shopkeeper via the editor.
+  * The confirmation is done by pressing a corresponding button in an inventory menu that opens.
+  * Canceling the action returns the player back to the editor.
+  * When the confirmation inventory is closed by some other mean, an abort message is printed.
+  * If the shopkeeper is already removed by other means in the meantime, we send the 'shop-already-removed' message.
+* Added: We also send the 'shop-removed' message now when a shopkeeper is deleted via the editor menu.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
@@ -399,6 +405,12 @@ Messages:
 * Added 'state-disabled'.
 * Added 'button-trade-notifications'.
 * Added 'button-trade-notifications-lore'.
+* Added 'confirmation-ui-delete-shop-title'.
+* Added 'confirmation-ui-delete-shop-confirm-lore'
+* Added 'confirmation-ui-confirm'.
+* Added 'confirmation-ui-cancel'.
+* Added 'confirmation-ui-cancel-lore'.
+* Added 'confirmation-ui-aborted'.
 * Fixed: The german translation was missing translations for 'confirmation-expired' and 'nothing-to-confirm'.
 * Minor changes to the german translation.
 

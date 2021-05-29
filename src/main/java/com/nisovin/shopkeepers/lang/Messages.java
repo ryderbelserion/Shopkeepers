@@ -337,6 +337,14 @@ public class Messages extends Config {
 	public static Text confirmationExpired = Text.parse("&cConfirmation expired.");
 	public static Text nothingToConfirm = Text.parse("&cThere is nothing to confirm currently.");
 
+	public static String confirmationUiDeleteShopTitle = c("&cReally delete this shop?");
+	public static List<String> confirmationUiDeleteShopConfirmLore = c(Arrays.asList("This will irrevocably", "remove this shop!"));
+
+	public static String confirmationUiConfirm = c("&2Confirm");
+	public static String confirmationUiCancel = c("&4Cancel");
+	public static List<String> confirmationUiCancelLore = c(Arrays.asList("This will abort the", "current action."));
+	public static Text confirmationUiAborted = Text.parse("&7Confirmation aborted.");
+
 	public static Text noPermission = Text.parse("&cYou don't have the permission to do that.");
 
 	public static Text commandUnknown = Text.parse("&cUnknown command '&e{command}&c'!");

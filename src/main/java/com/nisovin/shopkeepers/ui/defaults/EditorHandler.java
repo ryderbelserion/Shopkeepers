@@ -21,12 +21,26 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.ShopkeeperUIHandler;
+import com.nisovin.shopkeepers.ui.defaults.confirmations.ConfirmationUIConfig;
+import com.nisovin.shopkeepers.ui.defaults.confirmations.ConfirmationUI;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class EditorHandler extends AbstractEditorHandler implements ShopkeeperUIHandler {
+
+	private static final ConfirmationUIConfig CONFIRMATION_UI_CONFIG_DELETE_SHOP = new ConfirmationUIConfig() {
+		@Override
+		public String getTitle() {
+			return Messages.confirmationUiDeleteShopTitle;
+		}
+
+		@Override
+		public List<String> getConfirmationLore() {
+			return Messages.confirmationUiDeleteShopConfirmLore;
+		}
+	};
 
 	private final AbstractShopkeeper shopkeeper;
 
@@ -115,16 +129,38 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 
 			@Override
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				// Call event:
-				PlayerDeleteShopkeeperEvent deleteEvent = ShopkeeperEventHelper.callPlayerDeleteShopkeeperEvent(shopkeeper, player);
-				Bukkit.getPluginManager().callEvent(deleteEvent);
-				if (!deleteEvent.isCancelled()) {
-					// Delete shopkeeper:
-					shopkeeper.delete(player);
+				ConfirmationUI.requestConfirmation(player, CONFIRMATION_UI_CONFIG_DELETE_SHOP, () -> {
+					// Delete confirmed.
+					if (!player.isValid()) return;
+					if (!shopkeeper.isValid()) {
+						// The shopkeeper has already been removed in the meantime.
+						TextUtils.sendMessage(player, Messages.shopAlreadyRemoved);
+						return;
+					}
 
-					// Save:
-					shopkeeper.save();
-				}
+					// Call event:
+					PlayerDeleteShopkeeperEvent deleteEvent = ShopkeeperEventHelper.callPlayerDeleteShopkeeperEvent(shopkeeper, player);
+					Bukkit.getPluginManager().callEvent(deleteEvent);
+					if (!deleteEvent.isCancelled()) {
+						// Delete the shopkeeper and save:
+						shopkeeper.delete(player);
+						shopkeeper.save();
+
+						TextUtils.sendMessage(player, Messages.shopRemoved);
+					}
+					// Else: Cancelled by another plugin.
+					// Note: We don't send a message in this case here, because we expect that the other plugin sends a
+					// more specific message anyways if it wants to inform the player.
+				}, () -> {
+					// Delete cancelled.
+					if (!player.isValid()) return;
+					if (!shopkeeper.isValid()) return;
+
+					// Try to open the editor again:
+					// Note: This may not remember the previous editor state currently (such as the selected trades
+					// page).
+					SKShopkeepersPlugin.getInstance().getUIRegistry().requestUI(this.getEditorHandler().getUIType(), shopkeeper, player);
+				});
 				return true;
 			}
 		};

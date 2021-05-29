@@ -6,6 +6,7 @@ import java.util.List;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
+import com.nisovin.shopkeepers.ui.defaults.confirmations.ConfirmationUIType;
 
 public class SKDefaultUITypes implements DefaultUITypes {
 
@@ -13,6 +14,7 @@ public class SKDefaultUITypes implements DefaultUITypes {
 	private final TradingUIType tradingUIType = new TradingUIType();
 	private final HiringUIType hiringUIType = new HiringUIType();
 	private final VillagerEditorUIType villagerEditorUIType = new VillagerEditorUIType();
+	private final ConfirmationUIType confirmationUIType = new ConfirmationUIType();
 
 	public SKDefaultUITypes() {
 	}
@@ -47,6 +49,11 @@ public class SKDefaultUITypes implements DefaultUITypes {
 		return villagerEditorUIType;
 	}
 
+	// Internal.
+	public ConfirmationUIType getConfirmationUIType() {
+		return confirmationUIType;
+	}
+
 	// STATICS (for convenience):
 
 	public static SKDefaultUITypes getInstance() {
@@ -67,5 +74,9 @@ public class SKDefaultUITypes implements DefaultUITypes {
 
 	public static VillagerEditorUIType VILLAGER_EDITOR() {
 		return getInstance().getVillagerEditorUIType();
+	}
+
+	public static ConfirmationUIType CONFIRMATION() {
+		return getInstance().getConfirmationUIType();
 	}
 }
