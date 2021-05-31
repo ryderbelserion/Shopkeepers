@@ -72,8 +72,8 @@ public class SKPriceOffer implements PriceOffer {
 		if (obj == null) return false;
 		if (!(obj instanceof SKPriceOffer)) return false;
 		SKPriceOffer other = (SKPriceOffer) obj;
-		if (!item.equals(other.item)) return false;
 		if (price != other.price) return false;
+		if (!item.equals(other.item)) return false;
 		return true;
 	}
 
