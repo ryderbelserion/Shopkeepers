@@ -90,18 +90,18 @@ public class MerchantUtils {
 	}
 
 	public static List<TradingRecipeDraft> createTradingRecipeDrafts(List<MerchantRecipe> merchantRecipes) {
-		List<TradingRecipeDraft> tradingRecipeDrafts = new ArrayList<>();
-		for (MerchantRecipe merchantRecipe : merchantRecipes) {
+		List<TradingRecipeDraft> tradingRecipeDrafts = new ArrayList<>(merchantRecipes.size());
+		merchantRecipes.forEach(merchantRecipe -> {
 			tradingRecipeDrafts.add(createTradingRecipeDraft(merchantRecipe));
-		}
+		});
 		return tradingRecipeDrafts;
 	}
 
 	public static List<MerchantRecipe> createMerchantRecipes(List<? extends TradingRecipe> recipes) {
-		List<MerchantRecipe> merchantRecipes = new ArrayList<>();
-		for (TradingRecipe recipe : recipes) {
+		List<MerchantRecipe> merchantRecipes = new ArrayList<>(recipes.size());
+		recipes.forEach(recipe -> {
 			merchantRecipes.add(createMerchantRecipe(recipe));
-		}
+		});
 		return merchantRecipes;
 	}
 
