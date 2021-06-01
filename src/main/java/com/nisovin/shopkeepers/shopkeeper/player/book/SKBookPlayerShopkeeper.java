@@ -34,8 +34,8 @@ import com.nisovin.shopkeepers.util.Validate;
 public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements BookPlayerShopkeeper {
 
 	// Contains only one offer for a specific book (book title):
-	private final List<SKBookOffer> offers = new ArrayList<>();
-	private final List<SKBookOffer> offersView = Collections.unmodifiableList(offers);
+	private final List<BookOffer> offers = new ArrayList<>();
+	private final List<? extends BookOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a not yet initialized {@link SKBookPlayerShopkeeper} (for use in sub-classes).
@@ -76,7 +76,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		// Load offers:
 		this._clearOffers();
 		// TODO Remove legacy: Load offers from old format (bookTitle -> price mapping) (since late MC 1.14.4).
-		List<SKBookOffer> legacyOffers = SKBookOffer.loadFromLegacyConfig(configSection, "offers", "Shopkeeper " + this.getId());
+		List<? extends BookOffer> legacyOffers = SKBookOffer.loadFromLegacyConfig(configSection, "offers", "Shopkeeper " + this.getId());
 		if (!legacyOffers.isEmpty()) {
 			Log.info("Shopkeeper " + this.getId() + ": Importing old book offers.");
 			this._addOffers(legacyOffers);
@@ -101,7 +101,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	public List<? extends SKTradingRecipe> getTradingRecipes(Player player) {
 		Map<String, ItemStack> containerBooksByTitle = this.getCopyableBooksFromContainer();
 		boolean hasBlankBooks = this.hasContainerBlankBooks();
-		List<SKBookOffer> offers = this.getOffers();
+		List<? extends BookOffer> offers = this.getOffers();
 		List<SKTradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(bookOffer -> {
 			String bookTitle = bookOffer.getBookTitle();
@@ -200,21 +200,21 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	// OFFERS:
 
 	@Override
-	public List<SKBookOffer> getOffers() {
+	public List<? extends BookOffer> getOffers() {
 		return offersView;
 	}
 
 	@Override
-	public SKBookOffer getOffer(ItemStack bookItem) {
+	public BookOffer getOffer(ItemStack bookItem) {
 		String bookTitle = BookItems.getBookTitle(bookItem);
 		if (bookTitle == null) return null; // Not a written book, or has no title
 		return this.getOffer(bookTitle);
 	}
 
 	@Override
-	public SKBookOffer getOffer(String bookTitle) {
+	public BookOffer getOffer(String bookTitle) {
 		Validate.notNull(bookTitle, "bookTitle is null");
-		for (SKBookOffer offer : this.getOffers()) {
+		for (BookOffer offer : this.getOffers()) {
 			if (offer.getBookTitle().equals(bookTitle)) {
 				return offer;
 			}
@@ -225,7 +225,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	@Override
 	public void removeOffer(String bookTitle) {
 		Validate.notNull(bookTitle, "bookTitle is null");
-		Iterator<SKBookOffer> iterator = offers.iterator();
+		Iterator<BookOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
 			if (iterator.next().getBookTitle().equals(bookTitle)) {
 				iterator.remove();

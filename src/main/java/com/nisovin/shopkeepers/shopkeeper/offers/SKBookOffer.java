@@ -79,8 +79,8 @@ public class SKBookOffer implements BookOffer {
 		}
 	}
 
-	public static List<SKBookOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
-		List<SKBookOffer> offers = new ArrayList<>();
+	public static List<? extends BookOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
+		List<BookOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String key : offersSection.getKeys(false)) {
@@ -105,8 +105,8 @@ public class SKBookOffer implements BookOffer {
 	}
 
 	// TODO Legacy, remove again at some point (changed during MC 1.14.4).
-	public static List<SKBookOffer> loadFromLegacyConfig(ConfigurationSection config, String node, String errorContext) {
-		List<SKBookOffer> offers = new ArrayList<>();
+	public static List<? extends BookOffer> loadFromLegacyConfig(ConfigurationSection config, String node, String errorContext) {
+		List<BookOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String bookTitle : offersSection.getKeys(false)) {

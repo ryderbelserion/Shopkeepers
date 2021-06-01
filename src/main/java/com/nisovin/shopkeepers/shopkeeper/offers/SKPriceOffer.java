@@ -93,8 +93,8 @@ public class SKPriceOffer implements PriceOffer {
 		}
 	}
 
-	public static List<SKPriceOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
-		List<SKPriceOffer> offers = new ArrayList<>();
+	public static List<? extends PriceOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
+		List<PriceOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String id : offersSection.getKeys(false)) {
@@ -119,12 +119,12 @@ public class SKPriceOffer implements PriceOffer {
 	}
 
 	// Note: Returns the same list instance if no items were migrated.
-	public static List<SKPriceOffer> migrateItems(List<SKPriceOffer> offers, String errorContext) {
+	public static List<? extends PriceOffer> migrateItems(List<? extends PriceOffer> offers, String errorContext) {
 		if (offers == null) return null;
-		List<SKPriceOffer> migratedOffers = null;
+		List<PriceOffer> migratedOffers = null;
 		final int size = offers.size();
 		for (int i = 0; i < size; ++i) {
-			SKPriceOffer offer = offers.get(i);
+			PriceOffer offer = offers.get(i);
 			if (offer == null) continue; // Skip invalid entries
 
 			boolean itemsMigrated = false;
@@ -144,7 +144,7 @@ public class SKPriceOffer implements PriceOffer {
 				if (migratedOffers == null) {
 					migratedOffers = new ArrayList<>(size);
 					for (int j = 0; j < i; ++j) {
-						SKPriceOffer oldOffer = offers.get(j);
+						PriceOffer oldOffer = offers.get(j);
 						if (oldOffer == null) continue; // Skip invalid entries
 						migratedOffers.add(oldOffer);
 					}

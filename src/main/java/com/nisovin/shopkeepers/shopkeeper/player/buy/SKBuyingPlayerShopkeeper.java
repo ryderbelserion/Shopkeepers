@@ -27,7 +27,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 
 	// Contains only one offer for any specific type of item:
 	private final List<SKPriceOffer> offers = new ArrayList<>();
-	private final List<SKPriceOffer> offersView = Collections.unmodifiableList(offers);
+	private final List<? extends SKPriceOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a not yet initialized {@link SKBuyingPlayerShopkeeper} (for use in sub-classes).
@@ -66,8 +66,8 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
 		// Load offers:
-		List<SKPriceOffer> offers = SKPriceOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId());
-		List<SKPriceOffer> migratedOffers = SKPriceOffer.migrateItems(offers, "Shopkeeper " + this.getId());
+		List<? extends PriceOffer> offers = SKPriceOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId());
+		List<? extends PriceOffer> migratedOffers = SKPriceOffer.migrateItems(offers, "Shopkeeper " + this.getId());
 		if (offers != migratedOffers) {
 			Log.debug(DebugOptions.itemMigrations, () -> "Shopkeeper " + this.getId() + ": Migrated items of trade offers.");
 			this.markDirty();
@@ -90,7 +90,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	@Override
 	public List<? extends SKTradingRecipe> getTradingRecipes(Player player) {
 		int currencyInContainer = this.getCurrencyInContainer();
-		List<SKPriceOffer> offers = this.getOffers();
+		List<? extends SKPriceOffer> offers = this.getOffers();
 		List<SKTradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(offer -> {
 			// Creating the trading recipe already copies the item, so there is no need to copy it here:
@@ -107,12 +107,12 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	// OFFERS:
 
 	@Override
-	public List<SKPriceOffer> getOffers() {
+	public List<? extends SKPriceOffer> getOffers() {
 		return offersView;
 	}
 
 	@Override
-	public SKPriceOffer getOffer(ItemStack tradedItem) {
+	public PriceOffer getOffer(ItemStack tradedItem) {
 		Validate.notNull(tradedItem, "tradedItem is null");
 		for (SKPriceOffer offer : this.getOffers()) {
 			if (offer.getInternalItem().isSimilar(tradedItem)) {
@@ -125,7 +125,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	@Override
 	public void removeOffer(ItemStack tradedItem) {
 		Validate.notNull(tradedItem, "tradedItem is null");
-		Iterator<SKPriceOffer> iterator = offers.iterator();
+		Iterator<? extends SKPriceOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
 			if (iterator.next().getInternalItem().isSimilar(tradedItem)) {
 				iterator.remove();

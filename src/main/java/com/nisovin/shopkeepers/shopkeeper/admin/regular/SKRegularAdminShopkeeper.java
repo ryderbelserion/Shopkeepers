@@ -25,7 +25,7 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 
 	// There can be multiple different offers for the same kind of item:
 	private final List<SKTradeOffer> offers = new ArrayList<>();
-	private final List<SKTradeOffer> offersView = Collections.unmodifiableList(offers);
+	private final List<? extends SKTradeOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a not yet initialized {@link SKRegularAdminShopkeeper} (for use in sub-classes).
@@ -61,8 +61,8 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
 		// Load offers:
-		List<SKTradeOffer> offers = SKTradeOffer.loadFromConfig(configSection, "recipes", "Shopkeeper " + this.getId());
-		List<SKTradeOffer> migratedOffers = SKTradeOffer.migrateItems(offers, "Shopkeeper " + this.getId());
+		List<? extends TradeOffer> offers = SKTradeOffer.loadFromConfig(configSection, "recipes", "Shopkeeper " + this.getId());
+		List<? extends TradeOffer> migratedOffers = SKTradeOffer.migrateItems(offers, "Shopkeeper " + this.getId());
 		if (offers != migratedOffers) {
 			Log.debug(DebugOptions.itemMigrations, () -> "Shopkeeper " + this.getId() + ": Migrated items of trade offers.");
 			this.markDirty();
@@ -93,7 +93,7 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	// OFFERS:
 
 	@Override
-	public List<SKTradeOffer> getOffers() {
+	public List<? extends TradeOffer> getOffers() {
 		return offersView;
 	}
 

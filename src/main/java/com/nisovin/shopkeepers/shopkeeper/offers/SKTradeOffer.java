@@ -80,8 +80,8 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		}
 	}
 
-	public static List<SKTradeOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
-		List<SKTradeOffer> offers = new ArrayList<>();
+	public static List<? extends TradeOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
+		List<TradeOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
 			for (String key : offersSection.getKeys(false)) {
@@ -107,12 +107,12 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	}
 
 	// Note: Returns the same list instance if no items were migrated.
-	public static List<SKTradeOffer> migrateItems(List<SKTradeOffer> offers, String errorContext) {
+	public static List<? extends TradeOffer> migrateItems(List<? extends TradeOffer> offers, String errorContext) {
 		if (offers == null) return null;
-		List<SKTradeOffer> migratedOffers = null;
+		List<TradeOffer> migratedOffers = null;
 		final int size = offers.size();
 		for (int i = 0; i < size; ++i) {
-			SKTradeOffer offer = offers.get(i);
+			TradeOffer offer = offers.get(i);
 			if (offer == null) continue; // Skip invalid entries
 
 			boolean itemsMigrated = false;
@@ -152,7 +152,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				if (migratedOffers == null) {
 					migratedOffers = new ArrayList<>(size);
 					for (int j = 0; j < i; ++j) {
-						SKTradeOffer oldOffer = offers.get(j);
+						TradeOffer oldOffer = offers.get(j);
 						if (oldOffer == null) continue; // Skip invalid entries
 						migratedOffers.add(oldOffer);
 					}

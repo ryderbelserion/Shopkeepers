@@ -266,6 +266,7 @@ Internal API:
 * UIHandler#getUIType is final now.
 * The conversion between the editor's trading recipe drafts and the merchant's own representation of trade offers has been moved behind the new interface TradingRecipesAdapter in AbstractEditorHandler.
 * PlayerShopEditorHandler#createTradingRecipeDraft and #getPrice are no longer instance methods.
+* Several internal references to the trade offer implementation classes have been replaced with references to the corresponding API interfaces. The internal return types of some shopkeeper methods for accessing these offers have changed.
 
 Internal:  
 * The config key pattern is cached now.

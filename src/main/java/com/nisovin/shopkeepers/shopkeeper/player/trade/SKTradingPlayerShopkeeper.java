@@ -28,7 +28,7 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 
 	// There can be multiple different offers for the same kind of item:
 	private final List<SKTradeOffer> offers = new ArrayList<>();
-	private final List<SKTradeOffer> offersView = Collections.unmodifiableList(offers);
+	private final List<? extends SKTradeOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a not yet initialized {@link SKTradingPlayerShopkeeper} (for use in sub-classes).
@@ -67,8 +67,8 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
 		// Load offers:
-		List<SKTradeOffer> offers = SKTradeOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId());
-		List<SKTradeOffer> migratedOffers = SKTradeOffer.migrateItems(offers, "Shopkeeper " + this.getId());
+		List<? extends TradeOffer> offers = SKTradeOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId());
+		List<? extends TradeOffer> migratedOffers = SKTradeOffer.migrateItems(offers, "Shopkeeper " + this.getId());
 		if (offers != migratedOffers) {
 			Log.debug(DebugOptions.itemMigrations, () -> "Shopkeeper " + this.getId() + ": Migrated items of trade offers.");
 			this.markDirty();
@@ -91,7 +91,7 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	@Override
 	public List<? extends SKTradingRecipe> getTradingRecipes(Player player) {
 		ItemStack[] containerContents = this.getContainerContents(); // Empty if the container is not found
-		List<SKTradeOffer> offers = this.getOffers();
+		List<? extends SKTradeOffer> offers = this.getOffers();
 		List<SKTradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(offer -> {
 			ItemStack resultItem = offer.getInternalResultItem();
@@ -105,7 +105,7 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	// OFFERS:
 
 	@Override
-	public List<SKTradeOffer> getOffers() {
+	public List<? extends SKTradeOffer> getOffers() {
 		return offersView;
 	}
 
@@ -119,8 +119,8 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 		return false;
 	}
 
-	public SKTradeOffer getOffer(TradingRecipe tradingRecipe) {
-		for (SKTradeOffer offer : this.getOffers()) {
+	public TradeOffer getOffer(TradingRecipe tradingRecipe) {
+		for (TradeOffer offer : this.getOffers()) {
 			if (offer.areItemsEqual(tradingRecipe)) {
 				return offer;
 			}

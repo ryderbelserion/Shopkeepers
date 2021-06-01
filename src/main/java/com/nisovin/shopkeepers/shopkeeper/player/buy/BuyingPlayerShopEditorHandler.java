@@ -10,7 +10,6 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
-import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -29,7 +28,7 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		@Override
 		public List<TradingRecipeDraft> getTradingRecipes() {
 			// Add the shopkeeper's offers:
-			List<SKPriceOffer> offers = shopkeeper.getOffers();
+			List<? extends PriceOffer> offers = shopkeeper.getOffers();
 			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
 			offers.forEach(offer -> {
 				ItemStack tradedItem = offer.getItem(); // Copy
