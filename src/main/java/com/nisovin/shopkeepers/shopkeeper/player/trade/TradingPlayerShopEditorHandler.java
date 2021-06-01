@@ -14,6 +14,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
@@ -22,80 +23,91 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
+	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<TradeOffer> {
+
+		private final SKTradingPlayerShopkeeper shopkeeper;
+
+		private TradingRecipesAdapter(SKTradingPlayerShopkeeper shopkeeper) {
+			assert shopkeeper != null;
+			this.shopkeeper = shopkeeper;
+		}
+
+		@Override
+		public List<TradingRecipeDraft> getTradingRecipes() {
+			// Add the shopkeeper's offers:
+			List<SKTradeOffer> offers = shopkeeper.getOffers();
+			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
+			offers.forEach(offer -> {
+				// The offer returns copies of its items:
+				TradingRecipeDraft recipe = new TradingRecipeDraft(offer.getResultItem(), offer.getItem1(), offer.getItem2());
+				recipes.add(recipe);
+			});
+
+			// Add new empty recipe drafts for items from the container without existing offer:
+			// We only add one recipe per similar item:
+			List<ItemStack> newRecipes = new ArrayList<>();
+			ItemStack[] containerContents = shopkeeper.getContainerContents(); // Empty if the container is not found
+			for (ItemStack containerItem : containerContents) {
+				if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
+
+				// Replace placeholder item, if this is one:
+				containerItem = PlaceholderItems.replace(containerItem);
+
+				if (shopkeeper.hasOffer(containerItem)) {
+					// There is already a recipe for this item:
+					continue;
+				}
+
+				if (ItemUtils.contains(newRecipes, containerItem)) {
+					// We already added a new recipe for this item:
+					continue;
+				}
+
+				// Add new empty recipe:
+				containerItem = ItemUtils.copySingleItem(containerItem); // Ensures a stack size of 1
+				TradingRecipeDraft recipe = new TradingRecipeDraft(containerItem, null, null);
+				recipes.add(recipe);
+				newRecipes.add(containerItem);
+			}
+
+			return recipes;
+		}
+
+		@Override
+		protected List<? extends TradeOffer> getOffers() {
+			return shopkeeper.getOffers();
+		}
+
+		@Override
+		protected void setOffers(List<TradeOffer> newOffers) {
+			shopkeeper.setOffers(newOffers);
+		}
+
+		@Override
+		protected TradeOffer createOffer(TradingRecipeDraft recipe) {
+			assert recipe != null && recipe.isValid();
+			ItemStack resultItem = recipe.getResultItem();
+			ItemStack item1 = recipe.getItem1();
+			ItemStack item2 = recipe.getItem2();
+
+			// Replace placeholder items, if any:
+			// Note: We also replace placeholder items in the buy items, because this allows the setup of trades before
+			// the player has all of the required items.
+			resultItem = PlaceholderItems.replace(resultItem);
+			item1 = PlaceholderItems.replace(item1);
+			item2 = PlaceholderItems.replace(item2);
+
+			return ShopkeepersAPI.createTradeOffer(resultItem, item1, item2);
+		}
+	}
+
 	protected TradingPlayerShopEditorHandler(SKTradingPlayerShopkeeper shopkeeper) {
-		super(shopkeeper);
+		super(shopkeeper, new TradingRecipesAdapter(shopkeeper));
 	}
 
 	@Override
 	public SKTradingPlayerShopkeeper getShopkeeper() {
 		return (SKTradingPlayerShopkeeper) super.getShopkeeper();
-	}
-
-	@Override
-	protected List<TradingRecipeDraft> getTradingRecipes() {
-		SKTradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-
-		// Add the shopkeeper's offers:
-		List<SKTradeOffer> offers = shopkeeper.getOffers();
-		List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
-		offers.forEach(offer -> {
-			// The offer returns copies of its items:
-			TradingRecipeDraft recipe = new TradingRecipeDraft(offer.getResultItem(), offer.getItem1(), offer.getItem2());
-			recipes.add(recipe);
-		});
-
-		// Add new empty recipe drafts for items from the container without existing offer:
-		// We only add one recipe per similar item:
-		List<ItemStack> newRecipes = new ArrayList<>();
-		ItemStack[] containerContents = shopkeeper.getContainerContents(); // Empty if the container is not found
-		for (ItemStack containerItem : containerContents) {
-			if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
-
-			// Replace placeholder item, if this is one:
-			containerItem = PlaceholderItems.replace(containerItem);
-
-			if (shopkeeper.hasOffer(containerItem)) {
-				// There is already a recipe for this item:
-				continue;
-			}
-
-			if (ItemUtils.contains(newRecipes, containerItem)) {
-				// We already added a new recipe for this item:
-				continue;
-			}
-
-			// Add new empty recipe:
-			containerItem = ItemUtils.copySingleItem(containerItem); // Ensures a stack size of 1
-			TradingRecipeDraft recipe = new TradingRecipeDraft(containerItem, null, null);
-			recipes.add(recipe);
-			newRecipes.add(containerItem);
-		}
-
-		return recipes;
-	}
-
-	@Override
-	protected void clearRecipes() {
-		SKTradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.clearOffers();
-	}
-
-	@Override
-	protected void addRecipe(TradingRecipeDraft recipe) {
-		assert recipe != null && recipe.isValid();
-		ItemStack resultItem = recipe.getResultItem();
-		ItemStack item1 = recipe.getItem1();
-		ItemStack item2 = recipe.getItem2();
-
-		// Replace placeholder items, if any:
-		// Note: We also replace placeholder items in the buy items, because this allows the setup of trades before the
-		// player has all of the required items.
-		resultItem = PlaceholderItems.replace(resultItem);
-		item1 = PlaceholderItems.replace(item1);
-		item2 = PlaceholderItems.replace(item2);
-
-		SKTradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.addOffer(ShopkeepersAPI.createTradeOffer(resultItem, item1, item2));
 	}
 
 	@Override

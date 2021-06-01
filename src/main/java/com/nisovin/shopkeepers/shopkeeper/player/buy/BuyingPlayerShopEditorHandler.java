@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
@@ -16,86 +17,100 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
+	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<PriceOffer> {
+
+		private final SKBuyingPlayerShopkeeper shopkeeper;
+
+		private TradingRecipesAdapter(SKBuyingPlayerShopkeeper shopkeeper) {
+			assert shopkeeper != null;
+			this.shopkeeper = shopkeeper;
+		}
+
+		@Override
+		public List<TradingRecipeDraft> getTradingRecipes() {
+			// Add the shopkeeper's offers:
+			List<SKPriceOffer> offers = shopkeeper.getOffers();
+			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
+			offers.forEach(offer -> {
+				ItemStack tradedItem = offer.getItem(); // Copy
+				ItemStack currencyItem = Settings.createCurrencyItem(offer.getPrice());
+				TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, tradedItem, null);
+				recipes.add(recipe);
+			});
+
+			// Add new empty recipe drafts for items from the container without existing offer:
+			// We only add one recipe per similar item:
+			List<ItemStack> newRecipes = new ArrayList<>();
+			ItemStack[] containerContents = shopkeeper.getContainerContents(); // Empty if the container is not found
+			for (ItemStack containerItem : containerContents) {
+				if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
+
+				// Replace placeholder item, if this is one:
+				containerItem = PlaceholderItems.replace(containerItem);
+
+				if (Settings.isAnyCurrencyItem(containerItem)) continue; // Ignore currency items
+
+				if (shopkeeper.getOffer(containerItem) != null) {
+					// There is already a recipe for this item:
+					continue;
+				}
+
+				if (ItemUtils.contains(newRecipes, containerItem)) {
+					// We already added a new recipe for this item:
+					continue;
+				}
+
+				// Add new empty recipe:
+				containerItem = ItemUtils.copySingleItem(containerItem); // Ensures a stack size of 1
+				ItemStack currencyItem = Settings.createZeroCurrencyItem();
+				TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, containerItem, null);
+				recipes.add(recipe);
+				newRecipes.add(containerItem);
+			}
+
+			return recipes;
+		}
+
+		@Override
+		protected List<? extends PriceOffer> getOffers() {
+			return shopkeeper.getOffers();
+		}
+
+		@Override
+		protected void setOffers(List<PriceOffer> newOffers) {
+			shopkeeper.setOffers(newOffers);
+		}
+
+		@Override
+		protected PriceOffer createOffer(TradingRecipeDraft recipe) {
+			assert recipe != null && recipe.isValid();
+			assert recipe.getItem2() == null; // Cannot be set via the editor
+
+			ItemStack priceItem = recipe.getResultItem();
+			assert priceItem != null;
+			// Make sure that the item is actually currency, this just in case:
+			if (priceItem.getType() != Settings.currencyItem.getType()) {
+				return null; // Invalid recipe
+			}
+			assert priceItem.getAmount() > 0;
+			int price = priceItem.getAmount();
+
+			ItemStack tradedItem = recipe.getItem1();
+			assert tradedItem != null;
+			// Replace placeholder item, if this is one:
+			tradedItem = PlaceholderItems.replace(tradedItem);
+
+			return ShopkeepersAPI.createPriceOffer(tradedItem, price);
+		}
+	}
+
 	protected BuyingPlayerShopEditorHandler(SKBuyingPlayerShopkeeper shopkeeper) {
-		super(shopkeeper);
+		super(shopkeeper, new TradingRecipesAdapter(shopkeeper));
 	}
 
 	@Override
 	public SKBuyingPlayerShopkeeper getShopkeeper() {
 		return (SKBuyingPlayerShopkeeper) super.getShopkeeper();
-	}
-
-	@Override
-	protected List<TradingRecipeDraft> getTradingRecipes() {
-		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-
-		// Add the shopkeeper's offers:
-		List<SKPriceOffer> offers = shopkeeper.getOffers();
-		List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
-		offers.forEach(offer -> {
-			ItemStack tradedItem = offer.getItem(); // Copy
-			ItemStack currencyItem = Settings.createCurrencyItem(offer.getPrice());
-			TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, tradedItem, null);
-			recipes.add(recipe);
-		});
-
-		// Add new empty recipe drafts for items from the container without existing offer:
-		// We only add one recipe per similar item:
-		List<ItemStack> newRecipes = new ArrayList<>();
-		ItemStack[] containerContents = shopkeeper.getContainerContents(); // Empty if the container is not found
-		for (ItemStack containerItem : containerContents) {
-			if (ItemUtils.isEmpty(containerItem)) continue; // Ignore empty ItemStacks
-
-			// Replace placeholder item, if this is one:
-			containerItem = PlaceholderItems.replace(containerItem);
-
-			if (Settings.isAnyCurrencyItem(containerItem)) continue; // Ignore currency items
-
-			if (shopkeeper.getOffer(containerItem) != null) {
-				// There is already a recipe for this item:
-				continue;
-			}
-
-			if (ItemUtils.contains(newRecipes, containerItem)) {
-				// We already added a new recipe for this item:
-				continue;
-			}
-
-			// Add new empty recipe:
-			containerItem = ItemUtils.copySingleItem(containerItem); // Ensures a stack size of 1
-			ItemStack currencyItem = Settings.createZeroCurrencyItem();
-			TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, containerItem, null);
-			recipes.add(recipe);
-			newRecipes.add(containerItem);
-		}
-
-		return recipes;
-	}
-
-	@Override
-	protected void clearRecipes() {
-		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.clearOffers();
-	}
-
-	@Override
-	protected void addRecipe(TradingRecipeDraft recipe) {
-		assert recipe != null && recipe.isValid();
-		assert recipe.getItem2() == null;
-
-		ItemStack priceItem = recipe.getResultItem();
-		assert priceItem != null;
-		if (priceItem.getType() != Settings.currencyItem.getType()) return; // Checking this just in case
-		assert priceItem.getAmount() > 0;
-		int price = priceItem.getAmount();
-
-		ItemStack tradedItem = recipe.getItem1();
-		assert tradedItem != null;
-		// Replace placeholder item, if this is one:
-		tradedItem = PlaceholderItems.replace(tradedItem);
-
-		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		shopkeeper.addOffer(ShopkeepersAPI.createPriceOffer(tradedItem, price));
 	}
 
 	@Override

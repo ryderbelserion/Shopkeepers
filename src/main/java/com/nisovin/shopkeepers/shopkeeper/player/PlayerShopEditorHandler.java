@@ -23,8 +23,8 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 	// Note: In the editor item1 is representing the low cost item and item2 the high cost item, but in the
 	// corresponding trading recipe they will be swapped if they are both present.
 
-	protected PlayerShopEditorHandler(AbstractPlayerShopkeeper shopkeeper) {
-		super(SKDefaultUITypes.EDITOR(), shopkeeper);
+	protected PlayerShopEditorHandler(AbstractPlayerShopkeeper shopkeeper, TradingRecipesAdapter tradingRecipesAdpter) {
+		super(SKDefaultUITypes.EDITOR(), shopkeeper, tradingRecipesAdpter);
 	}
 
 	@Override
@@ -188,7 +188,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 	// Note: In case the cost is too large to represent, it sets the cost to zero.
 	// (So opening and closing the editor window will remove the offer, instead of setting the costs to a lower
 	// value than what was previously somehow specified)
-	protected TradingRecipeDraft createTradingRecipeDraft(ItemStack resultItem, int cost) {
+	protected static TradingRecipeDraft createTradingRecipeDraft(ItemStack resultItem, int cost) {
 		ItemStack highCostItem = null;
 		ItemStack lowCostItem = null;
 
@@ -222,7 +222,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		return new TradingRecipeDraft(resultItem, lowCostItem, highCostItem);
 	}
 
-	protected int getPrice(TradingRecipeDraft recipe) {
+	protected static int getPrice(TradingRecipeDraft recipe) {
 		if (recipe == null) return 0;
 		ItemStack lowCostItem = recipe.getItem1();
 		ItemStack highCostItem = recipe.getItem2();

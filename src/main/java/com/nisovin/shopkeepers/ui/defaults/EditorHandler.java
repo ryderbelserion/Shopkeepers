@@ -18,12 +18,12 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.event.ShopkeeperEventHelper;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.ShopkeeperUIHandler;
 import com.nisovin.shopkeepers.ui.defaults.confirmations.ConfirmationUI;
 import com.nisovin.shopkeepers.ui.defaults.confirmations.ConfirmationUIConfig;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
@@ -44,8 +44,8 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 
 	private final AbstractShopkeeper shopkeeper;
 
-	protected EditorHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
-		super(uiType);
+	protected EditorHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper, TradingRecipesAdapter tradingRecipesAdapter) {
+		super(uiType, tradingRecipesAdapter);
 		Validate.notNull(shopkeeper, "shopkeeper is null");
 		this.shopkeeper = shopkeeper;
 	}
@@ -206,61 +206,25 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 	}
 
 	@Override
-	protected abstract List<TradingRecipeDraft> getTradingRecipes();
-
-	@Override
 	protected void saveRecipes(Session session) {
+		assert shopkeeper.isValid(); // UI sessions are aborted (i.e. not saved) when the shopkeeper is removed
 		Player player = session.getPlayer();
-		this.setRecipes(player, session.getRecipes());
+		int changedOffers = tradingRecipesAdapter.updateTradingRecipes(player, session.getRecipes());
+		if (changedOffers == 0) {
+			Log.debug("No shopkeeper offers changed.");
+		} else {
+			Log.debug(() -> changedOffers + " shopkeeper offer(s) changed.");
 
-		// Save the shopkeeper:
-		shopkeeper.save();
-	}
+			// Call event:
+			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
 
-	/**
-	 * Applies the given trading recipe drafts to the shopkeeper.
-	 * <p>
-	 * Any {@link TradingRecipeDraft#isValid() invalid} trading recipe drafts are passed to
-	 * {@link #handleInvalidRecipeDraft(Player, TradingRecipeDraft)} and then ignored.
-	 * 
-	 * @param player
-	 *            the editing player
-	 * @param recipes
-	 *            the trading recipe drafts
-	 */
-	protected void setRecipes(Player player, List<TradingRecipeDraft> recipes) {
-		this.clearRecipes();
-		for (TradingRecipeDraft recipe : recipes) {
-			if (!recipe.isValid()) {
-				this.handleInvalidRecipeDraft(player, recipe);
-				continue;
-			}
-			this.addRecipe(recipe);
+			// TODO Close all other UI sessions for the shopkeeper (eg. trading players)? Also send a message to them.
+		}
+
+		// Even if no trades have changed, the shopkeeper might have been marked as dirty due to other editor options.
+		// If this is the case, we trigger a save here. Otherwise, we omit the save.
+		if (shopkeeper.isDirty()) {
+			shopkeeper.save();
 		}
 	}
-
-	/**
-	 * This is called for every {@link TradingRecipeDraft#isValid() invalid} trading recipe draft when the trading
-	 * recipes from the editor are applied to the shopkeeper.
-	 * 
-	 * @param player
-	 *            the editing player
-	 * @param recipe
-	 *            the invalid trading recipe draft
-	 */
-	protected void handleInvalidRecipeDraft(Player player, TradingRecipeDraft recipe) {
-	}
-
-	/**
-	 * Clears the shopkeeper's trading recipes.
-	 */
-	protected abstract void clearRecipes();
-
-	/**
-	 * Adds the given ({@link TradingRecipeDraft#isValid() valid}) trading recipe to the shopkeeper.
-	 * 
-	 * @param recipe
-	 *            the trading recipe draft
-	 */
-	protected abstract void addRecipe(TradingRecipeDraft recipe);
 }

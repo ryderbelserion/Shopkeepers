@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,6 +37,203 @@ import com.nisovin.shopkeepers.util.Validate;
  * For example used by {@link EditorHandler} and {@link VillagerEditorHandler}.
  */
 public abstract class AbstractEditorHandler extends UIHandler {
+
+	/**
+	 * Different types of merchants differ in how they internally represent their offers. This
+	 * {@link TradingRecipesAdapter} converts between the merchant's offers and the {@link TradingRecipeDraft}s that are
+	 * visualized and edited in the editor.
+	 * <p>
+	 * Instead of mapping the merchant's offers one by one to {@link TradingRecipeDraft}s, {@link #getTradingRecipes()}
+	 * returns the complete list of trading recipe drafts to initially show in the editor. This list may also contain
+	 * partially setup but still invalid trading recipe drafts, for example to fill the editor with suggestions or
+	 * examples for the editing player on possible trading recipes.
+	 * <p>
+	 * Once the player exists the editor, {@link #updateTradingRecipes(Player, List)} is invoked with the list of the
+	 * potentially edited trading recipe drafts. This method is then responsible to update the merchant's offers based
+	 * on these trading recipe drafts, and to report back whether and how many offers have changed.
+	 */
+	protected static interface TradingRecipesAdapter {
+
+		/**
+		 * Gets the list of {@link TradingRecipeDraft}s to show in the editor.
+		 * <p>
+		 * The returned list has to be modifiable: It is not copied, but edited directly.
+		 * 
+		 * @return the trading recipe drafts
+		 */
+		public List<TradingRecipeDraft> getTradingRecipes();
+
+		/**
+		 * Updates the merchant's offers based on the given {@link TradingRecipeDraft}s from the editor.
+		 * <p>
+		 * These trading recipe drafts may contain {@link TradingRecipeDraft#isValid() invalid} trading recipes.
+		 * <p>
+		 * Implementations of this method can assume that the given trading recipe drafts and their items are no longer
+		 * used by the editor afterwards. Implementations are therefore allowed to reuse these objects.
+		 * 
+		 * @param player
+		 *            the editing player, not <code>null</code>
+		 * @param recipes
+		 *            the trading recipe drafts from the editor, not <code>null</code>
+		 * @return the (estimate) number of merchant offers that were changed, or <code>0</code> if no offers changed
+		 */
+		public int updateTradingRecipes(Player player, List<TradingRecipeDraft> recipes);
+	}
+
+	/**
+	 * Default abstract skeleton implementation of a {@link TradingRecipesAdapter}.
+	 * <p>
+	 * By default, we reuse the merchant's previous offers and only replace those that changed. The previous offers and
+	 * the new offers derived from the trading recipe drafts are matched by their index.
+	 *
+	 * @param <O>
+	 *            the type of offer the merchant uses to represent its trading recipes
+	 */
+	protected static abstract class DefaultTradingRecipesAdapter<O> implements TradingRecipesAdapter {
+
+		protected DefaultTradingRecipesAdapter() {
+		}
+
+		/**
+		 * See {@link TradingRecipesAdapter#getTradingRecipes()}.
+		 * <p>
+		 * The order of these trading recipe drafts is expected to match the order of the corresponding offers returned
+		 * by {@link #getOffers()}.
+		 */
+		@Override
+		public abstract List<TradingRecipeDraft> getTradingRecipes();
+
+		// TODO Maybe keep track of which TradingRecipeDrafts have actually been edited (i.e. clicked at in the editor
+		// or marked as 'dirty' by some other mean), and then avoid creating offers and comparing items for them.
+		// TODO When creating new offers, we can reuse the items of the trading recipe draft. Currently, these items are
+		// copied most of the time.
+		/**
+		 * See {@link TradingRecipesAdapter#updateTradingRecipes(Player, List)}.
+		 * <p>
+		 * Any encountered {@link TradingRecipeDraft#isValid() invalid} trading recipe drafts are passed to
+		 * {@link #handleInvalidTradingRecipe(Player, TradingRecipeDraft)} for further processing and are then ignored.
+		 */
+		@Override
+		public int updateTradingRecipes(Player player, List<TradingRecipeDraft> recipes) {
+			assert player != null && recipes != null && !recipes.contains(null);
+			assert this.getOffers() != null && !this.getOffers().contains(null);
+			List<O> newOffers = new ArrayList<>(this.getOffers());
+			final int oldOffersSize = newOffers.size();
+			int changedOffers = 0;
+			boolean clearedAtLeastOneOffer = false;
+			for (int index = 0; index < recipes.size(); index++) {
+				TradingRecipeDraft recipe = recipes.get(index);
+				// The recipe is also considered invalid if the created offer is null:
+				O newOffer = recipe.isValid() ? this.createOffer(recipe) : null; // Null if invalid
+				if (newOffer == null) {
+					this.handleInvalidTradingRecipe(player, recipe);
+					if (index < oldOffersSize) {
+						newOffers.set(index, null); // Mark as cleared
+						clearedAtLeastOneOffer = true;
+						changedOffers += 1;
+					}
+				} else {
+					if (index < oldOffersSize) {
+						// Only replace the old offer if it has actually changed:
+						O oldOffer = newOffers.get(index);
+						if (!this.areOffersEqual(oldOffer, newOffer)) {
+							newOffers.set(index, newOffer);
+							changedOffers += 1;
+						} // Else: Keep the old offer.
+					} else {
+						newOffers.add(newOffer);
+						changedOffers += 1;
+					}
+				}
+			}
+
+			if (changedOffers > 0) {
+				// Remove null markers:
+				if (clearedAtLeastOneOffer) {
+					newOffers.removeIf(Objects::isNull);
+				}
+
+				// Apply the new offers:
+				this.setOffers(newOffers);
+			}
+
+			return changedOffers;
+		}
+
+		/**
+		 * Gets the merchant's current offers.
+		 * <p>
+		 * The order of these offers is expected to match the order of the corresponding trading recipe drafts returned
+		 * by {@link #getTradingRecipes()}.
+		 * 
+		 * @return the current offers
+		 */
+		protected abstract List<? extends O> getOffers();
+
+		/**
+		 * Updates the merchant's offers to the given list of offers.
+		 * 
+		 * @param newOffers
+		 *            the new offers
+		 */
+		protected abstract void setOffers(List<O> newOffers);
+
+		/**
+		 * Creates a new offer for the given {@link TradingRecipeDraft}.
+		 * <p>
+		 * The given trading recipe draft is {@link TradingRecipeDraft#isValid() valid}. However, this method may
+		 * implement additional verifications and return <code>null</code> if it considers the trading recipe draft to
+		 * be invalid according to these checks: If this is the case, no offer is added to the merchant for the given
+		 * trading recipe draft, any previous offer is removed, and
+		 * {@link #handleInvalidTradingRecipe(Player, TradingRecipeDraft)} is invoked.
+		 * 
+		 * @param recipe
+		 *            the trading recipe draft, not <code>null</code> or {@link TradingRecipeDraft#isValid() invalid}
+		 * @return the offer, or <code>null</code> to consider the trading recipe draft as invalid
+		 */
+		protected abstract O createOffer(TradingRecipeDraft recipe);
+
+		/**
+		 * Checks whether the given old and new offers are considered equivalent.
+		 * <p>
+		 * This method is called when the new offers {@link #createOffer(TradingRecipeDraft) created} based on the
+		 * trading recipe drafts from the editor are compared with the merchant's previous offers. This method serves
+		 * two purposes:
+		 * <ul>
+		 * <li>It is used to detect whether the offers have changed.
+		 * <li>It allows to decide which of these two offers shall be further used by the merchant: If the given offers
+		 * are considered equal by this method, the previous offer is reused when building the list of new offers for
+		 * the merchant. Otherwise, the new offer replaces the previous one.
+		 * </ul>
+		 * <p>
+		 * By default, this method compares the offers based on {@link Object#equals(Object)}. However, this method may
+		 * be overridden if there are cases in which the offers may not be fully equal, but equal enough that the old
+		 * offer is meant to be reused nevertheless and not be replaced by the new offer. This situation can for example
+		 * arise if the editor does not represent all aspects of the merchant's previous offers.
+		 * 
+		 * @param oldOffer
+		 *            the previous offer, not <code>null</code>
+		 * @param newOffer
+		 *            the new offer derived from a trading recipe draft, not <code>null</code>
+		 * @return <code>true</code> if the offers are considered equal and the old offer shall not be replaced
+		 */
+		protected boolean areOffersEqual(O oldOffer, O newOffer) {
+			return oldOffer.equals(newOffer);
+		}
+
+		/**
+		 * When the trading recipes from the editor are applied to the merchant, this is called for every
+		 * {@link TradingRecipeDraft#isValid() invalid} trading recipe draft, as well as for every trading recipe draft
+		 * that is considered invalid by {@link #createOffer(TradingRecipeDraft)}.
+		 * 
+		 * @param player
+		 *            the editing player
+		 * @param invalidRecipe
+		 *            the invalid trading recipe draft
+		 */
+		protected void handleInvalidTradingRecipe(Player player, TradingRecipeDraft invalidRecipe) {
+		}
+	}
 
 	private static final SoundEffect PAGE_TURN_SOUND = new SoundEffect(Sound.ITEM_BOOK_PAGE_TURN);
 
@@ -72,10 +270,14 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	private boolean dirtyButtons = false;
 	private boolean setup = false; // lazy setup
 
+	protected final TradingRecipesAdapter tradingRecipesAdapter;
+
 	private final Map<UUID, Session> sessions = new HashMap<>();
 
-	protected AbstractEditorHandler(AbstractUIType uiType) {
+	protected AbstractEditorHandler(AbstractUIType uiType, TradingRecipesAdapter tradingRecipesAdapter) {
 		super(uiType);
+		Validate.notNull(tradingRecipesAdapter, "tradingRecipesAdapter is null");
+		this.tradingRecipesAdapter = tradingRecipesAdapter;
 	}
 
 	/**
@@ -145,6 +347,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		inventory.setItem(column + ITEM_2_OFFSET, recipe.getItem2());
 	}
 
+	// TODO Avoid creating new TradingRecipeDraft objects here and instead update the drafts of the session?
 	protected TradingRecipeDraft getTradingRecipe(Inventory inventory, int column) {
 		ItemStack resultItem = inventory.getItem(column + RESULT_ITEM_OFFSET);
 		ItemStack item1 = inventory.getItem(column + ITEM_1_OFFSET);
@@ -590,22 +793,13 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		return sessions.get(player.getUniqueId());
 	}
 
-	/**
-	 * Gets the list of {@link TradingRecipeDraft trading recipe drafts}.
-	 * <p>
-	 * The returned list is not copied, but edited directly.
-	 * 
-	 * @return the trading recipe drafts
-	 */
-	protected abstract List<TradingRecipeDraft> getTradingRecipes();
-
 	@Override
 	public boolean openWindow(Player player) {
 		// Lazy setup:
 		this.setup();
 
 		// Setup session:
-		List<TradingRecipeDraft> recipes = this.getTradingRecipes();
+		List<TradingRecipeDraft> recipes = tradingRecipesAdapter.getTradingRecipes();
 
 		// Create inventory:
 		Inventory inventory = Bukkit.createInventory(player, this.getInventorySize(), this.getEditorTitle());
@@ -827,7 +1021,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		Session session = sessions.remove(player.getUniqueId());
 
 		if (closeEvent != null) {
-			// Only save if caused by an inventory close event:
+			// Only save if caused by an inventory close event (i.e. if the session has not been 'aborted'):
 			this.saveEditor(session);
 		}
 	}
@@ -840,7 +1034,6 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	 */
 	protected void saveEditorPage(Session session) {
 		assert session != null;
-		// if (!session.dirtyPage) return; // Skip if not dirty
 		Inventory inventory = session.inventory;
 		int page = session.currentPage;
 		assert page >= 1;

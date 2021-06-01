@@ -218,6 +218,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Added: Players also have to have to confirm now when they delete a villager via the villager editor.
 * Added: Deleting a villager via the villager editor will print a message now.
 * Changed: When using the villager editor, we check more frequently now if the villager still exist, and close the editor if it does not.
+* Debug: When the shopkeeper editor is closed, we debug log the number of shopkeeper offers that have changed.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
@@ -246,6 +247,7 @@ API:
 * Optimization: Various lazily populated views provided by the shopkeeper registry return an empty iterator now when they are known to be empty.
 * Added: ShopkeeperTradeEvent#hasOfferedItem2() as a shortcut for checking if the trade involves two input items.
 * Added: PlayerShopkeeper#isNotifyOnTrades and PlayerShopkeeper#setNotifyOnTrades.
+* Fixed: We now call the ShopkeeperEditedEvent when the player closes the editor and at least one trade offer has changed.
 * Several Javadoc improvements and clarifications.
 
 Internal API:  
@@ -262,6 +264,8 @@ Internal API:
 * Added AbstractShopObject#getShopkeeper.
 * Shopkeepers can now provide a lazily evaluated map of possible message arguments. However, this is not yet used everywhere yet.
 * UIHandler#getUIType is final now.
+* The conversion between the editor's trading recipe drafts and the merchant's own representation of trade offers has been moved behind the new interface TradingRecipesAdapter in AbstractEditorHandler.
+* PlayerShopEditorHandler#createTradingRecipeDraft and #getPrice are no longer instance methods.
 
 Internal:  
 * The config key pattern is cached now.
@@ -312,6 +316,7 @@ Internal:
 * Fixed: The default 'missing argument' error message was not being used. However, this issue probably remained unnoticed until now, because most of the commands either use more specific missing argument error messages, or provide fallbacks when no arguments are provided.
 * Minor improvements to normalizing and matching enum names (used by command arguments, config settings, shopkeeper data, etc.).
 * Added a SoundEffect class to represent sound effects inside the config.
+* Previously, we would always trigger a save when the shopkeeper editor is closed. Now, we check which trades have actually changed and only trigger a save if the shopkeeper was modified.
 * Minor other internal code refactoring.
 
 Migration notes:  

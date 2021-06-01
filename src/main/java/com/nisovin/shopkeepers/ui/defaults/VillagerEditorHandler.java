@@ -1,8 +1,6 @@
 package com.nisovin.shopkeepers.ui.defaults;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -47,6 +45,61 @@ import com.nisovin.shopkeepers.util.Validate;
  */
 public final class VillagerEditorHandler extends AbstractEditorHandler {
 
+	// We compare the recipes from the editor with the original recipes and keep the original recipes with their
+	// original internal data if the items have not changed.
+	// TODO Somehow support changing/persisting: max-uses, uses, exp reward, villager xp reward, price multiplier?
+	// TODO The trades may change during the editor session, in which case the comparison between new and old recipes no
+	// longer works (trades may get reverted to the editor state).
+	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<MerchantRecipe> {
+
+		private final AbstractVillager villager;
+
+		private TradingRecipesAdapter(AbstractVillager villager) {
+			assert villager != null;
+			this.villager = villager;
+		}
+
+		@Override
+		public List<TradingRecipeDraft> getTradingRecipes() {
+			assert villager.isValid();
+			List<MerchantRecipe> merchantRecipes = villager.getRecipes();
+			List<TradingRecipeDraft> recipes = MerchantUtils.createTradingRecipeDrafts(merchantRecipes);
+			return recipes;
+		}
+
+		@Override
+		protected List<? extends MerchantRecipe> getOffers() {
+			assert villager.isValid();
+			return villager.getRecipes();
+		}
+
+		@Override
+		protected void setOffers(List<MerchantRecipe> newOffers) {
+			assert villager.isValid();
+
+			// Stop any current trading with the villager:
+			HumanEntity trader = villager.getTrader();
+			if (trader != null) {
+				trader.closeInventory();
+				// TODO Send a message to the player explaining that the villager's trades have changed?
+			}
+
+			// Apply the new trading recipes:
+			villager.setRecipes(newOffers);
+		}
+
+		@Override
+		protected MerchantRecipe createOffer(TradingRecipeDraft recipe) {
+			return MerchantUtils.createMerchantRecipe(recipe);
+		}
+
+		@Override
+		protected boolean areOffersEqual(MerchantRecipe oldOffer, MerchantRecipe newOffer) {
+			// Keep the old recipe (including all of its other internal data) if the items are still the same:
+			return MerchantUtils.MERCHANT_RECIPES_EQUAL_ITEMS.equals(oldOffer, newOffer);
+		}
+	}
+
 	private static final ConfirmationUIConfig CONFIRMATION_UI_CONFIG_DELETE_VILLAGER = new ConfirmationUIConfig() {
 
 		@Override
@@ -64,7 +117,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	private final String title; // Determined once during construction
 
 	public VillagerEditorHandler(AbstractVillager villager) {
-		super(SKDefaultUITypes.VILLAGER_EDITOR());
+		super(SKDefaultUITypes.VILLAGER_EDITOR(), new TradingRecipesAdapter(villager));
 		Validate.notNull(villager, "villager is null");
 		this.villager = villager;
 		String villagerName = villager.getName(); // Not null
@@ -572,13 +625,6 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	}
 
 	@Override
-	protected List<TradingRecipeDraft> getTradingRecipes() {
-		List<MerchantRecipe> merchantRecipes = villager.getRecipes();
-		List<TradingRecipeDraft> recipes = MerchantUtils.createTradingRecipeDrafts(merchantRecipes);
-		return recipes;
-	}
-
-	@Override
 	protected void saveRecipes(Session session) {
 		Player player = session.getPlayer();
 		// The villager might have been unloaded in the meantime. Our changes won't have any effect then:
@@ -587,38 +633,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			return;
 		}
 
-		// We compare the recipes from the editor with the original recipes and keep the original recipes with their
-		// original internal data if the items have no changed.
-		// TODO Somehow support changing/persisting: max-uses, uses, exp reward, villager xp reward, price multiplier?
-		// TODO The trades may change during the editor session..
-		List<MerchantRecipe> newRecipes = new ArrayList<>(villager.getRecipes());
-		int changedTrades = 0;
-		int index = 0;
-		for (TradingRecipeDraft recipe : session.getRecipes()) {
-			if (!recipe.isValid()) {
-				if (index < newRecipes.size()) {
-					newRecipes.set(index, null); // Mark as cleared
-					changedTrades += 1;
-				}
-			} else {
-				MerchantRecipe newRecipe = MerchantUtils.createMerchantRecipe(recipe);
-				if (index < newRecipes.size()) {
-					// Keep the old recipe (including all its other internal data) if the items are still the same:
-					MerchantRecipe oldRecipe = newRecipes.get(index);
-					if (!MerchantUtils.MERCHANT_RECIPES_EQUAL_ITEMS.equals(oldRecipe, newRecipe)) {
-						newRecipes.set(index, newRecipe);
-						changedTrades += 1;
-					} // Else: Keep the old recipe.
-				} else {
-					newRecipes.add(newRecipe);
-					changedTrades += 1;
-				}
-			}
-			index++;
-		}
-		// Remove null markers:
-		newRecipes.removeIf(Objects::isNull);
-
+		int changedTrades = tradingRecipesAdapter.updateTradingRecipes(player, session.getRecipes());
 		if (changedTrades == 0) {
 			// No changes:
 			TextUtils.sendMessage(player, Messages.noVillagerTradesChanged);
@@ -627,20 +642,11 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			TextUtils.sendMessage(player, Messages.villagerTradesChanged, "changedTrades", changedTrades);
 		}
 
-		// Stop any current trading with this villager:
-		HumanEntity trader = villager.getTrader();
-		if (trader != null) {
-			trader.closeInventory();
-		}
-
-		// Apply new trading recipes:
-		villager.setRecipes(newRecipes);
-
 		if (villager instanceof Villager) {
 			Villager regularVillager = (Villager) villager;
 
-			// We set the villager experience to at least 1, so that the villager does no longer automatically change
-			// its profession (and thereby its trades):
+			// We set the villager experience to at least 1, so that the villager no longer automatically changes its
+			// profession (and thereby its trades):
 			if (regularVillager.getVillagerExperience() == 0) {
 				regularVillager.setVillagerExperience(1);
 				TextUtils.sendMessage(player, Messages.setVillagerXp, "xp", 1);
