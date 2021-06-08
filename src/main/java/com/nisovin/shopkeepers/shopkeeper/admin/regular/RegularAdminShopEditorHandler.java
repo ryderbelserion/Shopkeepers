@@ -15,11 +15,11 @@ import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 
 public class RegularAdminShopEditorHandler extends EditorHandler {
 
-	private static class TradingRecipesUpdater extends DefaultTradingRecipesAdapter<TradeOffer> {
+	private static class TradingRecipesAdapter extends DefaultTradingRecipesAdapter<TradeOffer> {
 
 		private final SKRegularAdminShopkeeper shopkeeper;
 
-		private TradingRecipesUpdater(SKRegularAdminShopkeeper shopkeeper) {
+		private TradingRecipesAdapter(SKRegularAdminShopkeeper shopkeeper) {
 			assert shopkeeper != null;
 			this.shopkeeper = shopkeeper;
 		}
@@ -81,7 +81,7 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 	}
 
 	protected RegularAdminShopEditorHandler(SKRegularAdminShopkeeper shopkeeper) {
-		super(SKDefaultUITypes.EDITOR(), shopkeeper, new TradingRecipesUpdater(shopkeeper));
+		super(SKDefaultUITypes.EDITOR(), shopkeeper, new TradingRecipesAdapter(shopkeeper));
 	}
 
 	@Override
