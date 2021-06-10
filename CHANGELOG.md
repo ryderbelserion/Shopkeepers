@@ -219,6 +219,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Added: Deleting a villager via the villager editor will print a message now.
 * Changed: When using the villager editor, we check more frequently now if the villager still exist, and close the editor if it does not.
 * Debug: When the shopkeeper editor is closed, we debug log the number of shopkeeper offers that have changed.
+* Performance: When we require read-only access to the data of a Minecraft item stack, we try to avoid copying the item stack and instead access its data directly. This applies mostly when we match provided and required item stacks during trading.
 
 API:  
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.

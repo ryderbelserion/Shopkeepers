@@ -42,6 +42,26 @@ public final class MutableLong implements Comparable<Number> {
 		this.value = value;
 	}
 
+	/**
+	 * Increments the value.
+	 * 
+	 * @param amount
+	 *            the amount to increment
+	 */
+	public void increment(long amount) {
+		this.value += amount;
+	}
+
+	/**
+	 * Decrements the value.
+	 * 
+	 * @param amount
+	 *            the amount to decrement
+	 */
+	public void decrement(long amount) {
+		this.value -= amount;
+	}
+
 	@Override
 	public int compareTo(Number o) {
 		return Long.compare(value, o.longValue());

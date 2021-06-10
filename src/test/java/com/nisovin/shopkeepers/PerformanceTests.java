@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.lang.reflect.Field;
 import java.util.List;
 
 import org.bukkit.Material;
@@ -12,6 +13,7 @@ import org.junit.Test;
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.MutableLong;
 import com.nisovin.shopkeepers.util.TestItemStacks;
 
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
@@ -136,5 +138,78 @@ public class PerformanceTests extends AbstractBukkitTest {
 		testPerformance("  ", "matching CraftItemStack tags", warmupCount, testCount, () -> {
 			GameProfileSerializer.a(CraftItemStack.asNMSCopy(craftItemStack).getTag(), CraftItemStack.asNMSCopy(craftItemStack).getTag(), false);
 		});
+	}
+
+	@Test
+	public void testCraftItemStackReflectiveHandleVsCopyPerformance() throws Exception {
+		System.out.println("Testing reflective CraftItemStack.handle access vs asNMSCopy performance:");
+		int warmupCount = 10000;
+		int testCount = 10000000;
+
+		Field craftItemStackHandleField = CraftItemStack.class.getDeclaredField("handle");
+		craftItemStackHandleField.setAccessible(true);
+
+		ItemStack fullItemStack = TestItemStacks.createItemStackComplete();
+		ItemStack basicItemStack = TestItemStacks.createItemStackBasic();
+		CraftItemStack fullCraftItemStack = CraftItemStack.asCraftCopy(fullItemStack);
+		CraftItemStack basicCraftItemStack = CraftItemStack.asCraftCopy(basicItemStack);
+
+		// In order to avoid that the compiler optimizes these operations away, we increment this value during the
+		// tests:
+		MutableLong value = new MutableLong();
+
+		testPerformance("  ", "full reflective CraftItemStack.handle access", warmupCount, testCount, () -> {
+			try {
+				net.minecraft.server.v1_14_R1.ItemStack nmsItem = (net.minecraft.server.v1_14_R1.ItemStack) craftItemStackHandleField.get(fullCraftItemStack);
+				if (nmsItem != null) {
+					value.increment(1);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+
+		testPerformance("  ", "full CraftItemStack asNMSCopy", warmupCount, testCount, () -> {
+			net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(fullCraftItemStack);
+			if (nmsItem != null) {
+				value.increment(1);
+			}
+		});
+
+		testPerformance("  ", "full ItemStack asNMSCopy", warmupCount, testCount, () -> {
+			net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(fullItemStack);
+			if (nmsItem != null) {
+				value.increment(1);
+			}
+		});
+
+		testPerformance("  ", "basic reflective CraftItemStack.handle access", warmupCount, testCount, () -> {
+			try {
+				net.minecraft.server.v1_14_R1.ItemStack nmsItem = (net.minecraft.server.v1_14_R1.ItemStack) craftItemStackHandleField.get(basicCraftItemStack);
+				if (nmsItem != null) {
+					value.increment(1);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
+
+		testPerformance("  ", "basic CraftItemStack asNMSCopy", warmupCount, testCount, () -> {
+			net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(basicCraftItemStack);
+			if (nmsItem != null) {
+				value.increment(1);
+			}
+		});
+
+		testPerformance("  ", "basic ItemStack asNMSCopy", warmupCount, testCount, () -> {
+			net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(basicItemStack);
+			if (nmsItem != null) {
+				value.increment(1);
+			}
+		});
+
+		if (value.getValue() == 0) {
+			throw new IllegalStateException("Unexpected test outcome.");
+		}
 	}
 }

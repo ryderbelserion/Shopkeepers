@@ -42,6 +42,13 @@ import net.minecraft.server.v1_14_R1.PathfinderGoalSelector;
 
 public final class NMSHandler implements NMSCallProvider {
 
+	private Field craftItemStackHandleField;
+
+	public NMSHandler() throws Exception {
+		craftItemStackHandleField = CraftItemStack.class.getDeclaredField("handle");
+		craftItemStackHandleField.setAccessible(true);
+	}
+
 	@Override
 	public String getVersionId() {
 		return "1_14_R1";
@@ -128,6 +135,20 @@ public final class NMSHandler implements NMSCallProvider {
 		nmsRaider.t(canJoinRaid); // CanJoinRaid
 	}
 
+	// For CraftItemStacks, this first tries to retrieve the underlying NMS item stack without making a copy of it.
+	// Otherwise, this falls back to using CraftItemStack#asNMSCopy.
+	private net.minecraft.server.v1_14_R1.ItemStack asNMSItemStack(ItemStack itemStack) {
+		if (itemStack == null) return null;
+		if (itemStack instanceof CraftItemStack) {
+			try {
+				return (net.minecraft.server.v1_14_R1.ItemStack) craftItemStackHandleField.get(itemStack);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return CraftItemStack.asNMSCopy(itemStack);
+	}
+
 	@Override
 	public boolean matches(ItemStack provided, ItemStack required) {
 		if (provided == required) return true;
@@ -135,8 +156,8 @@ public final class NMSHandler implements NMSCallProvider {
 		if (ItemUtils.isEmpty(required)) return ItemUtils.isEmpty(provided);
 		else if (ItemUtils.isEmpty(provided)) return false;
 		if (provided.getType() != required.getType()) return false;
-		net.minecraft.server.v1_14_R1.ItemStack nmsProvided = CraftItemStack.asNMSCopy(provided);
-		net.minecraft.server.v1_14_R1.ItemStack nmsRequired = CraftItemStack.asNMSCopy(required);
+		net.minecraft.server.v1_14_R1.ItemStack nmsProvided = asNMSItemStack(provided);
+		net.minecraft.server.v1_14_R1.ItemStack nmsRequired = asNMSItemStack(required);
 		NBTTagCompound providedTag = nmsProvided.getTag();
 		NBTTagCompound requiredTag = nmsRequired.getTag();
 		// Compare the tags according to Minecraft's matching rules (imprecise):
@@ -187,7 +208,7 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public String getItemSNBT(ItemStack itemStack) {
 		if (itemStack == null) return null;
-		net.minecraft.server.v1_14_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(itemStack);
+		net.minecraft.server.v1_14_R1.ItemStack nmsItem = asNMSItemStack(itemStack);
 		NBTTagCompound itemNBT = nmsItem.save(new NBTTagCompound());
 		return itemNBT.toString();
 	}
