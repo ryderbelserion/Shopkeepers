@@ -58,7 +58,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 			itemStack.clone();
 		});
 
-		CraftItemStack craftItemStack = CraftItemStack.asCraftMirror(CraftItemStack.asNMSCopy(itemStack));
+		CraftItemStack craftItemStack = CraftItemStack.asCraftCopy(itemStack);
 		testPerformance("  ", "CraftItemStack#clone()", warmupCount, testCount, () -> {
 			craftItemStack.clone();
 		});
@@ -71,7 +71,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 		int testCount = 1000000;
 		ItemStack itemStack = TestItemStacks.createItemStackComplete();
 		ItemStack itemStackCopy = itemStack.clone();
-		CraftItemStack craftItemStack = CraftItemStack.asCraftMirror(CraftItemStack.asNMSCopy(itemStack));
+		CraftItemStack craftItemStack = CraftItemStack.asCraftCopy(itemStack);
 		CraftItemStack craftItemStackCopy = craftItemStack.clone();
 
 		testPerformance("  ", "ItemStack#isSimilar(ItemStack)", warmupCount, testCount, () -> {
@@ -101,7 +101,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 		Material type = itemStack.getType();
 		String displayName = itemStack.getItemMeta().getDisplayName();
 		List<String> lore = itemStack.getItemMeta().getLore();
-		CraftItemStack craftItemStack = CraftItemStack.asCraftMirror(CraftItemStack.asNMSCopy(itemStack));
+		CraftItemStack craftItemStack = CraftItemStack.asCraftCopy(itemStack);
 		NBTTagCompound tag = CraftItemStack.asNMSCopy(itemStack).getTag();
 		NBTTagCompound tagCopy = tag.clone();
 
@@ -114,7 +114,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 		});
 
 		testPerformance("  ", "ItemData#matches(CraftItemStack)", warmupCount, testCount, () -> {
-			itemData.matches(itemStack);
+			itemData.matches(craftItemStack);
 		});
 
 		testPerformance("  ", "matching NBT tags", warmupCount, testCount, () -> {
