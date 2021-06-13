@@ -219,6 +219,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Added: Deleting a villager via the villager editor will print a message now.
 * Changed: When using the villager editor, we check more frequently now if the villager still exist, and close the editor if it does not.
 * Debug: When the shopkeeper editor is closed, we debug log the number of shopkeeper offers that have changed.
+* Changed: Previously, we would always trigger a save when the shopkeeper editor was closed. Now, we check which trades have actually changed and only trigger a save if the shopkeeper was modified.
 * Performance: When we require read-only access to the data of a Minecraft item stack, we try to avoid copying the item stack and instead access its data directly. This applies mostly when we match provided and required item stacks during trading.
 
 API:  
@@ -319,7 +320,6 @@ Internal:
 * Fixed: The default 'missing argument' error message was not being used. However, this issue probably remained unnoticed until now, because most of the commands either use more specific missing argument error messages, or provide fallbacks when no arguments are provided.
 * Minor improvements to normalizing and matching enum names (used by command arguments, config settings, shopkeeper data, etc.).
 * Added a SoundEffect class to represent sound effects inside the config.
-* Previously, we would always trigger a save when the shopkeeper editor is closed. Now, we check which trades have actually changed and only trigger a save if the shopkeeper was modified.
 * Started to use annotations to mark which methods modify their input arguments. These annotations are not yet checked in any form, but are merely used for documentation purposes. More methods will be annotated as the time goes on.
 * Various other internal code refactoring.
 
