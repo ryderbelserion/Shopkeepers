@@ -4,6 +4,6 @@ public abstract class AbstractBukkitTest {
 
 	static {
 		// Setup dummy server prior to running tests:
-		DummyServer.setup();
+		ServerMock.setup();
 	}
 }
