@@ -30,6 +30,7 @@ import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.BookItems;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements BookPlayerShopkeeper {
 
@@ -191,7 +192,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	 *            the book meta, not <code>null</code>
 	 * @return <code>true</code> if the book meta corresponds to a dummy book item
 	 */
-	protected static boolean isDummyBook(BookMeta bookMeta) {
+	protected static boolean isDummyBook(@ReadOnly BookMeta bookMeta) {
 		assert bookMeta != null;
 		Generation generation = BookItems.getGeneration(bookMeta);
 		return (generation == Generation.TATTERED);

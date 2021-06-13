@@ -63,7 +63,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	// STATIC UTILITIES
 	// //////////
 
-	public static void saveToConfig(ConfigurationSection config, String node, Collection<? extends TradeOffer> offers) {
+	public static void saveToConfig(ConfigurationSection config, String node, @ReadOnly Collection<? extends TradeOffer> offers) {
 		ConfigurationSection offersSection = config.createSection(node);
 		int id = 1;
 		for (TradeOffer offer : offers) {
@@ -107,7 +107,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	}
 
 	// Note: Returns the same list instance if no items were migrated.
-	public static List<? extends TradeOffer> migrateItems(List<? extends TradeOffer> offers, String errorContext) {
+	public static List<? extends TradeOffer> migrateItems(@ReadOnly List<? extends TradeOffer> offers, String errorContext) {
 		if (offers == null) return null;
 		List<TradeOffer> migratedOffers = null;
 		final int size = offers.size();

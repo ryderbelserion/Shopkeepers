@@ -5,6 +5,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
 
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+
 /**
  * Utilities related to book items.
  */
@@ -18,7 +20,7 @@ public class BookItems {
 	 *            the item stack
 	 * @return <code>true</code> if the item is a written book
 	 */
-	public static boolean isWrittenBook(ItemStack itemStack) {
+	public static boolean isWrittenBook(@ReadOnly ItemStack itemStack) {
 		if (itemStack == null) return false;
 		if (itemStack.getType() != Material.WRITTEN_BOOK) return false;
 		// We also check the stack's size to ensure that it is not empty:
@@ -33,7 +35,7 @@ public class BookItems {
 	 *            the item stack
 	 * @return the book meta, or <code>null</code> if the given item is not a written book
 	 */
-	public static BookMeta getBookMeta(ItemStack itemStack) {
+	public static BookMeta getBookMeta(@ReadOnly ItemStack itemStack) {
 		if (!isWrittenBook(itemStack)) return null;
 		return (BookMeta) itemStack.getItemMeta(); // Not null
 	}
@@ -47,7 +49,7 @@ public class BookItems {
 	 *            the item stack
 	 * @return the book title, or <code>null</code> if the given item stack either is no written book or has no title
 	 */
-	public static String getBookTitle(ItemStack itemStack) {
+	public static String getBookTitle(@ReadOnly ItemStack itemStack) {
 		BookMeta bookMeta = getBookMeta(itemStack);
 		if (bookMeta == null) return null;
 		return getTitle(bookMeta);
@@ -60,7 +62,7 @@ public class BookItems {
 	 *            the book meta, not <code>null</code>
 	 * @return the book title, or <code>null</code> if the book has no title
 	 */
-	public static String getTitle(BookMeta bookMeta) {
+	public static String getTitle(@ReadOnly BookMeta bookMeta) {
 		Validate.notNull(bookMeta, "bookMeta is null");
 		// For our purposes, we ignore books with empty titles for now and therefore return null here for them as well.
 		// TODO Support them? They can't be created in vanilla Minecraft.
@@ -80,7 +82,7 @@ public class BookItems {
 	 *            the book meta, not <code>null</code>
 	 * @return the book generation, not <code>null</code>
 	 */
-	public static Generation getGeneration(BookMeta bookMeta) {
+	public static Generation getGeneration(@ReadOnly BookMeta bookMeta) {
 		Validate.notNull(bookMeta, "bookMeta is null");
 		Generation generation = bookMeta.getGeneration(); // Can be null
 		if (generation == null) {
@@ -149,7 +151,7 @@ public class BookItems {
 	 *            the item stack
 	 * @return <code>true</code> if the item stack is a copyable book
 	 */
-	public static boolean isCopyableBook(ItemStack itemStack) {
+	public static boolean isCopyableBook(@ReadOnly ItemStack itemStack) {
 		BookMeta bookMeta = getBookMeta(itemStack);
 		if (bookMeta == null) return false; // Not a written book
 		return isCopyable(bookMeta);
@@ -164,7 +166,7 @@ public class BookItems {
 	 *            the book meta, not <code>null</code>
 	 * @return <code>true</code> if the book can be copied
 	 */
-	public static boolean isCopyable(BookMeta bookMeta) {
+	public static boolean isCopyable(@ReadOnly BookMeta bookMeta) {
 		Validate.notNull(bookMeta, "bookMeta is null");
 		Generation generation = getGeneration(bookMeta);
 		return isCopyable(generation);
@@ -180,7 +182,7 @@ public class BookItems {
 	 *            the item stack
 	 * @return <code>true</code> if the item stack is a book copy
 	 */
-	public static boolean isBookCopy(ItemStack itemStack) {
+	public static boolean isBookCopy(@ReadOnly ItemStack itemStack) {
 		BookMeta bookMeta = getBookMeta(itemStack);
 		if (bookMeta == null) return false; // Not a written book
 		return isCopy(bookMeta);
@@ -195,7 +197,7 @@ public class BookItems {
 	 *            the book meta, not <code>null</code>
 	 * @return <code>true</code> if the book is a copy
 	 */
-	public static boolean isCopy(BookMeta bookMeta) {
+	public static boolean isCopy(@ReadOnly BookMeta bookMeta) {
 		Validate.notNull(bookMeta, "bookMeta is null");
 		Generation generation = getGeneration(bookMeta);
 		return isCopy(generation);
@@ -214,12 +216,11 @@ public class BookItems {
 	 *            the book item to copy
 	 * @return the book copy, or <code>null</code> if the given item is not a copyable book
 	 */
-	public static ItemStack copyBook(ItemStack bookItem) {
+	public static ItemStack copyBook(@ReadOnly ItemStack bookItem) {
 		if (!isWrittenBook(bookItem)) return null;
 
 		// Copy the book item:
-		ItemStack bookCopy = bookItem.clone();
-		bookCopy.setAmount(1); // Ensure a stack size of 1
+		ItemStack bookCopy = ItemUtils.copyWithAmount(bookItem, 1); // Ensure a stack size of 1
 
 		// Update the book generation:
 		// Getting the old generation from the book copy (instead of the original book item) avoids getting the ItemMeta

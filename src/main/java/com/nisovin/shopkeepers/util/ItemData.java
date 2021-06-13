@@ -12,8 +12,10 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+
 /**
- * An unmodifiable object which stores type and meta data information of an item.
+ * An immutable object that stores item type and meta data information.
  */
 public class ItemData implements Cloneable {
 
@@ -51,7 +53,7 @@ public class ItemData implements Cloneable {
 	private static final String TILE_ENTITY_BLOCK_MATERIAL_KEY = "blockMaterial";
 
 	// Only returns null if the input data is null.
-	public static ItemData deserialize(Object dataObject) throws ItemDataDeserializeException {
+	public static ItemData deserialize(@ReadOnly Object dataObject) throws ItemDataDeserializeException {
 		if (dataObject == null) return null;
 
 		String typeName = null;
@@ -153,14 +155,14 @@ public class ItemData implements Cloneable {
 
 	private final ItemStack dataItem;
 	// Cache serialized item meta data, to avoid doing it again for every comparison:
-	private Map<String, Object> serializedData = null; // Gets lazily initialized (only when actually needed)
+	private @ReadOnly Map<String, @ReadOnly Object> serializedData = null; // Gets lazily initialized (only when needed)
 
 	public ItemData(Material type) {
 		this(new ItemStack(type));
 	}
 
 	// The display name and lore are expected to use Minecraft's color codes.
-	public ItemData(Material type, String displayName, List<String> lore) {
+	public ItemData(Material type, String displayName, @ReadOnly List<String> lore) {
 		this(ItemUtils.createItemStack(type, 1, displayName, lore));
 	}
 
@@ -174,10 +176,13 @@ public class ItemData implements Cloneable {
 		return dataItem.getType();
 	}
 
-	// Creates a copy of this ItemData, but changes the item type.
-	// Any incompatible data gets removed.
+	// Creates a copy of this ItemData, but changes the item type. If the new type matches the previous type, the
+	// current ItemData is returned.
+	// Any incompatible meta data is removed.
 	public ItemData withType(Material type) {
-		assert type != null && type.isItem();
+		Validate.notNull(type, "type is null");
+		Validate.isTrue(type.isItem(), () -> "type is not an item: " + type);
+		if (this.getType() == type) return this;
 		ItemStack newDataItem = this.createItemStack();
 		newDataItem.setType(type);
 		return new ItemData(newDataItem);
@@ -207,7 +212,7 @@ public class ItemData implements Cloneable {
 		return dataItem.getItemMeta();
 	}
 
-	// amount of 1
+	// Creates an item stack with an amount of 1.
 	public ItemStack createItemStack() {
 		return dataItem.clone();
 	}
@@ -218,15 +223,15 @@ public class ItemData implements Cloneable {
 		return item;
 	}
 
-	public boolean isSimilar(ItemStack other) {
+	public boolean isSimilar(@ReadOnly ItemStack other) {
 		return dataItem.isSimilar(other);
 	}
 
-	public boolean matches(ItemStack item) {
+	public boolean matches(@ReadOnly ItemStack item) {
 		return this.matches(item, false); // Not matching partial lists
 	}
 
-	public boolean matches(ItemStack item, boolean matchPartialLists) {
+	public boolean matches(@ReadOnly ItemStack item, boolean matchPartialLists) {
 		// Same type and matching data:
 		return ItemUtils.matchesData(item, this.getType(), this.getSerializedData(), matchPartialLists);
 	}

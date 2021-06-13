@@ -17,6 +17,8 @@ import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.StringUtils;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 
 public abstract class PlayerShopEditorHandler extends EditorHandler {
 
@@ -152,7 +154,9 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		}
 	}
 
-	protected void handleUpdateTradeCostItemOnClick(InventoryClickEvent event, ItemStack currencyItem, ItemStack zeroCurrencyItem) {
+	// TODO Calling this method always requires the creation of new currency items. Change it to only create new
+	// currency items when they are actually needed.
+	protected void handleUpdateTradeCostItemOnClick(InventoryClickEvent event, @ReadWrite ItemStack currencyItem, @ReadOnly ItemStack zeroCurrencyItem) {
 		assert event.isCancelled();
 		// Ignore in certain situations:
 		if (ItemUtils.isEmpty(currencyItem)) return;
@@ -188,7 +192,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 	// Note: In case the cost is too large to represent, it sets the cost to zero.
 	// (So opening and closing the editor window will remove the offer, instead of setting the costs to a lower
 	// value than what was previously somehow specified)
-	protected static TradingRecipeDraft createTradingRecipeDraft(ItemStack resultItem, int cost) {
+	protected static TradingRecipeDraft createTradingRecipeDraft(@ReadOnly ItemStack resultItem, int cost) {
 		ItemStack highCostItem = null;
 		ItemStack lowCostItem = null;
 

@@ -33,6 +33,7 @@ import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SoundEffect;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 public class Settings extends Config {
 
@@ -449,13 +450,13 @@ public class Settings extends Config {
 
 	// CURRENCY
 
-	private static final Predicate<ItemStack> ANY_CURRENCY_ITEMS = Settings::isAnyCurrencyItem;
+	private static final Predicate<@ReadOnly ItemStack> ANY_CURRENCY_ITEMS = Settings::isAnyCurrencyItem;
 
-	public static Predicate<ItemStack> anyCurrencyItems() {
+	public static Predicate<@ReadOnly ItemStack> anyCurrencyItems() {
 		return ANY_CURRENCY_ITEMS;
 	}
 
-	public static boolean isAnyCurrencyItem(ItemStack itemStack) {
+	public static boolean isAnyCurrencyItem(@ReadOnly ItemStack itemStack) {
 		return isCurrencyItem(itemStack) || isHighCurrencyItem(itemStack);
 	}
 
@@ -464,7 +465,7 @@ public class Settings extends Config {
 		return currencyItem.createItemStack(amount);
 	}
 
-	public static boolean isCurrencyItem(ItemStack item) {
+	public static boolean isCurrencyItem(@ReadOnly ItemStack item) {
 		return currencyItem.matches(item);
 	}
 
@@ -478,7 +479,7 @@ public class Settings extends Config {
 		return highCurrencyItem.createItemStack(amount);
 	}
 
-	public static boolean isHighCurrencyItem(ItemStack item) {
+	public static boolean isHighCurrencyItem(@ReadOnly ItemStack item) {
 		if (!isHighCurrencyEnabled()) return false;
 		return highCurrencyItem.matches(item);
 	}
@@ -489,7 +490,7 @@ public class Settings extends Config {
 		return zeroCurrencyItem.createItemStack();
 	}
 
-	public static boolean isZeroCurrencyItem(ItemStack item) {
+	public static boolean isZeroCurrencyItem(@ReadOnly ItemStack item) {
 		if (zeroCurrencyItem.getType() == Material.AIR) {
 			return ItemUtils.isEmpty(item);
 		}
@@ -502,7 +503,7 @@ public class Settings extends Config {
 		return zeroHighCurrencyItem.createItemStack();
 	}
 
-	public static boolean isZeroHighCurrencyItem(ItemStack item) {
+	public static boolean isZeroHighCurrencyItem(@ReadOnly ItemStack item) {
 		if (zeroHighCurrencyItem.getType() == Material.AIR) {
 			return ItemUtils.isEmpty(item);
 		}

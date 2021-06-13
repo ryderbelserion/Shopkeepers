@@ -267,6 +267,7 @@ Internal API:
 * UIHandler#getUIType is final now.
 * The conversion between the editor's trading recipe drafts and the merchant's own representation of trade offers has been moved behind the new interface TradingRecipesAdapter in AbstractEditorHandler.
 * PlayerShopEditorHandler#createTradingRecipeDraft and #getPrice are no longer instance methods.
+* ItemData#withType may return the same ItemData instance now if the type has not changed.
 * Several internal references to the trade offer implementation classes have been replaced with references to the corresponding API interfaces. The internal return types of some shopkeeper methods for accessing these offers have changed.
 
 Internal:  
@@ -319,7 +320,8 @@ Internal:
 * Minor improvements to normalizing and matching enum names (used by command arguments, config settings, shopkeeper data, etc.).
 * Added a SoundEffect class to represent sound effects inside the config.
 * Previously, we would always trigger a save when the shopkeeper editor is closed. Now, we check which trades have actually changed and only trigger a save if the shopkeeper was modified.
-* Minor other internal code refactoring.
+* Started to use annotations to mark which methods modify their input arguments. These annotations are not yet checked in any form, but are merely used for documentation purposes. More methods will be annotated as the time goes on.
+* Various other internal code refactoring.
 
 Migration notes:  
 * The folder structure has changed:

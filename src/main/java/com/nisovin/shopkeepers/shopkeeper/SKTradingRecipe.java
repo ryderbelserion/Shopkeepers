@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 // Shares its implementation with TradingRecipeDraft, but returns copies of its items.
 public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe {
@@ -23,7 +24,7 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	 * @param item2
 	 *            the second buy item, can be empty
 	 */
-	public SKTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+	public SKTradingRecipe(@ReadOnly ItemStack resultItem, @ReadOnly ItemStack item1, @ReadOnly ItemStack item2) {
 		this(resultItem, item1, item2, false);
 	}
 
@@ -39,7 +40,7 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	 * @param outOfStock
 	 *            <code>true</code> if the recipe is out of stock
 	 */
-	public SKTradingRecipe(ItemStack resultItem, ItemStack item1, ItemStack item2, boolean outOfStock) {
+	public SKTradingRecipe(@ReadOnly ItemStack resultItem, @ReadOnly ItemStack item1, @ReadOnly ItemStack item2, boolean outOfStock) {
 		super(ItemUtils.cloneOrNullIfEmpty(resultItem), ItemUtils.cloneOrNullIfEmpty(item1), ItemUtils.cloneOrNullIfEmpty(item2));
 		Validate.isTrue(!ItemUtils.isEmpty(resultItem), "Result item cannot be empty!");
 		Validate.isTrue(!ItemUtils.isEmpty(item1), "Item1 cannot be empty!");

@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 /**
  * Similar to {@link TradingRecipe}, but each item can be empty.
@@ -35,7 +36,7 @@ public class TradingRecipeDraft {
 	 * @param item2
 	 *            the second buy item
 	 */
-	public TradingRecipeDraft(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+	public TradingRecipeDraft(@ReadOnly ItemStack resultItem, @ReadOnly ItemStack item1, @ReadOnly ItemStack item2) {
 		this.resultItem = ItemUtils.getNullIfEmpty(resultItem);
 		item1 = ItemUtils.getNullIfEmpty(item1);
 		item2 = ItemUtils.getNullIfEmpty(item2);

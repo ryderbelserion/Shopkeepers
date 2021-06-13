@@ -12,6 +12,7 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 public class SKPriceOffer implements PriceOffer {
 
@@ -81,7 +82,7 @@ public class SKPriceOffer implements PriceOffer {
 	// STATIC UTILITIES
 	// //////////
 
-	public static void saveToConfig(ConfigurationSection config, String node, Collection<? extends PriceOffer> offers) {
+	public static void saveToConfig(ConfigurationSection config, String node, @ReadOnly Collection<? extends PriceOffer> offers) {
 		ConfigurationSection offersSection = config.createSection(node);
 		int id = 1;
 		for (PriceOffer offer : offers) {
@@ -119,7 +120,7 @@ public class SKPriceOffer implements PriceOffer {
 	}
 
 	// Note: Returns the same list instance if no items were migrated.
-	public static List<? extends PriceOffer> migrateItems(List<? extends PriceOffer> offers, String errorContext) {
+	public static List<? extends PriceOffer> migrateItems(@ReadOnly List<? extends PriceOffer> offers, String errorContext) {
 		if (offers == null) return null;
 		List<PriceOffer> migratedOffers = null;
 		final int size = offers.size();

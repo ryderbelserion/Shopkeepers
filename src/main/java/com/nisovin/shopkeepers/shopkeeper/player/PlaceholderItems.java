@@ -10,6 +10,7 @@ import com.nisovin.shopkeepers.util.EnchantmentUtils;
 import com.nisovin.shopkeepers.util.EnchantmentUtils.EnchantmentEntry;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.PotionUtils;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 /**
  * Helper methods related to placeholder items.
@@ -42,7 +43,7 @@ public class PlaceholderItems {
 	 *            the item stack
 	 * @return <code>true</code> if the item stack is of the type used by placeholder items
 	 */
-	public static boolean isPlaceholderItemType(ItemStack itemStack) {
+	public static boolean isPlaceholderItemType(@ReadOnly ItemStack itemStack) {
 		if (itemStack == null) return false;
 		if (itemStack.getType() != Material.NAME_TAG) return false;
 		return true;
@@ -56,7 +57,7 @@ public class PlaceholderItems {
 	 *            the (potential) placeholder item
 	 * @return the substituted item stack, or <code>null</code> if the given item stack is not a valid placeholder
 	 */
-	public static ItemStack getSubstitutedItem(ItemStack placeholderItem) {
+	public static ItemStack getSubstitutedItem(@ReadOnly ItemStack placeholderItem) {
 		if (!isPlaceholderItemType(placeholderItem)) return null;
 
 		// Get the display name:
@@ -107,7 +108,7 @@ public class PlaceholderItems {
 	 *            the item stack
 	 * @return <code>true</code> if the item stack is a valid placeholder
 	 */
-	public static boolean isPlaceholderItem(ItemStack itemStack) {
+	public static boolean isPlaceholderItem(@ReadOnly ItemStack itemStack) {
 		return getSubstitutedItem(itemStack) != null;
 	}
 
@@ -121,7 +122,7 @@ public class PlaceholderItems {
 	 * @return either the substituted item stack, if the given item stack is a valid placeholder, or otherwise the given
 	 *         item stack itself
 	 */
-	public static ItemStack replace(ItemStack itemStack) {
+	public static ItemStack replace(@ReadOnly ItemStack itemStack) {
 		ItemStack substitutedItem = getSubstitutedItem(itemStack);
 		return (substitutedItem != null) ? substitutedItem : itemStack;
 	}
