@@ -337,11 +337,14 @@ enable-sign-post-shops: true
 # * https://docs.oracle.com/javase/9/docs/api/java/util/regex/Pattern.html
 # * http://www.regular-expressions.info/tutorial.html
 # Here are a few examples:
-# * "[A-Za-z0-9 ]{3,25}": The default. Allows letters and numbers, from 3 to 25
-# characters long.
+# * "[A-Za-z0-9 ]{3,25}": The default. Allows the letters A to Z, in both upper
+# and lower case, and the digits 0 to 9. The name has to consist of at least 3
+# characters and can be maximal 25 characters long.
 # * "[A-Za-z0-9& ]{3,25}": Same as the default, but also allows the ampersand
 # character which enables color codes.
-# * "\p{L}": Matches any letter, regardless of language.
+# * "[\p{L}0-9 ]{3,25}": Same as the default, but allows any letter to be used,
+# regardless of the language. If you encounter errors when the config is
+# loaded, make sure that your config file is encoded as UTF-8.
 # * ".*": Matches everything.
 # * Adding "(?i)" at the front enables case insensitive matching.
 # * "(?=X)": The name has to match "X" (X can be another embedded expression),
