@@ -168,6 +168,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	/**
 	 * Initializes the shopkeeper by loading its previously saved data from the given config section.
+	 * <p>
+	 * No assumptions are made regarding whether or not the given config section and its sub sections are mutable.
+	 * However, any other stored data elements (such as for example item stacks, etc.) and collections of data elements
+	 * are assumed to be immutable and the loaded shopkeeper may therefore directly store these elements without copying
+	 * them first.
 	 * 
 	 * @param configSection
 	 *            the config section
@@ -257,6 +262,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	/**
 	 * Loads the shopkeeper's saved data from the given config section.
+	 * <p>
+	 * No assumptions are made regarding whether or not the given config section and its sub sections are mutable.
+	 * However, any other stored data elements (such as for example item stacks, etc.) and collections of data elements
+	 * are assumed to be immutable and the loaded shopkeeper may therefore directly store these elements without copying
+	 * them first.
 	 * 
 	 * @param configSection
 	 *            the config section

@@ -3,12 +3,10 @@ package com.nisovin.shopkeepers.util.trading;
 import java.time.Instant;
 import java.util.Objects;
 
-import org.bukkit.inventory.ItemStack;
-
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Lazy;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -19,9 +17,6 @@ public class MergedTrades {
 
 	private final ShopkeeperTradeEvent initialTrade;
 	private final Instant timestamp = Instant.now();
-	private final Lazy<ItemStack> resultItem;
-	private final Lazy<ItemStack> offeredItem1;
-	private final Lazy<ItemStack> offeredItem2;
 	private int tradeCount = 1;
 
 	/**
@@ -34,9 +29,6 @@ public class MergedTrades {
 	public MergedTrades(ShopkeeperTradeEvent initialTrade) {
 		Validate.notNull(initialTrade, "initialTrade is null");
 		this.initialTrade = initialTrade;
-		resultItem = new Lazy<>(() -> initialTrade.getTradingRecipe().getResultItem());
-		offeredItem1 = new Lazy<>(() -> initialTrade.getOfferedItem1());
-		offeredItem2 = new Lazy<>(() -> initialTrade.getOfferedItem2());
 	}
 
 	/**
@@ -60,35 +52,29 @@ public class MergedTrades {
 	/**
 	 * Gets the result item of the trades. See {@link ShopkeeperTradeEvent#getTradingRecipe()} and
 	 * {@link TradingRecipe#getResultItem()}.
-	 * <p>
-	 * The returned {@link ItemStack} is cached and reused. It is not meant to be modified!
 	 * 
-	 * @return the result item
+	 * @return an unmodifiable view on the result item, not <code>null</code> or empty
 	 */
-	public ItemStack getResultItem() {
-		return resultItem.get();
+	public UnmodifiableItemStack getResultItem() {
+		return initialTrade.getTradingRecipe().getResultItem();
 	}
 
 	/**
 	 * Gets the first offered item of the trades. See {@link ShopkeeperTradeEvent#getOfferedItem1()}.
-	 * <p>
-	 * The returned {@link ItemStack} is cached and reused. It is not meant to be modified!
 	 * 
-	 * @return the first offered item
+	 * @return an unmodifiable view on the first offered item, not <code>null</code> or empty
 	 */
-	public ItemStack getOfferedItem1() {
-		return offeredItem1.get();
+	public UnmodifiableItemStack getOfferedItem1() {
+		return initialTrade.getOfferedItem1();
 	}
 
 	/**
 	 * Gets the second offered item of the trades. See {@link ShopkeeperTradeEvent#getOfferedItem2()}.
-	 * <p>
-	 * The returned {@link ItemStack} is cached and reused. It is not meant to be modified!
 	 * 
-	 * @return the second offered item, or <code>null</code>
+	 * @return an unmodifiable view on the second offered item, can be <code>null</code>
 	 */
-	public ItemStack getOfferedItem2() {
-		return offeredItem2.get();
+	public UnmodifiableItemStack getOfferedItem2() {
+		return initialTrade.getOfferedItem2();
 	}
 
 	/**
@@ -140,12 +126,12 @@ public class MergedTrades {
 			// the selected trading recipe changed throughout the trades caused by the same click event, the item
 			// stack sizes of the involved trading recipes (i.e. of the offered items and the result items) might
 			// have changed. We consider these to be a separate kinds of trades then.
-			int resultItemAmount = ItemUtils.getItemStackAmount(this.getResultItem());
-			int otherResultItemAmount = ItemUtils.getItemStackAmount(otherTrades.getResultItem());
+			int resultItemAmount = this.getResultItem().getAmount();
+			int otherResultItemAmount = otherTrades.getResultItem().getAmount();
 			if (resultItemAmount != otherResultItemAmount) return false;
 
-			int offeredItem1Amount = ItemUtils.getItemStackAmount(this.getOfferedItem1());
-			int otherOfferedItem1Amount = ItemUtils.getItemStackAmount(otherTrades.getOfferedItem1());
+			int offeredItem1Amount = this.getOfferedItem1().getAmount();
+			int otherOfferedItem1Amount = otherTrades.getOfferedItem1().getAmount();
 			if (offeredItem1Amount != otherOfferedItem1Amount) return false;
 
 			int offeredItem2Amount = ItemUtils.getItemStackAmount(this.getOfferedItem2());

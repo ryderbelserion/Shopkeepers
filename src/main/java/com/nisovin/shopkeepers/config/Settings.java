@@ -20,6 +20,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.lib.Config;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
 import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
@@ -322,19 +323,19 @@ public class Settings extends Config {
 				fileCharset = StandardCharsets.UTF_8;
 			}
 
-			// Ignore display name (which is used for specifying the new shopkeeper name):
-			namingItemData = new ItemData(ItemUtils.setDisplayName(nameItem.createItemStack(), null));
+			// Ignore (clear) the display name, which is used to specify the new shopkeeper name, but keep the lore:
+			namingItemData = new ItemData(UnmodifiableItemStack.of(ItemUtils.setDisplayName(nameItem.createItemStack(), null)));
 
 			// Button items:
-			nameButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(nameItem.createItemStack(), Messages.buttonName, Messages.buttonNameLore));
-			containerButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(containerItem.createItemStack(), Messages.buttonContainer, Messages.buttonContainerLore));
-			deleteButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(deleteItem.createItemStack(), Messages.buttonDelete, Messages.buttonDeleteLore));
-			hireButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(hireItem.createItemStack(), Messages.buttonHire, Messages.buttonHireLore));
+			nameButtonItem = new ItemData(nameItem, Messages.buttonName, Messages.buttonNameLore);
+			containerButtonItem = new ItemData(containerItem, Messages.buttonContainer, Messages.buttonContainerLore);
+			deleteButtonItem = new ItemData(deleteItem, Messages.buttonDelete, Messages.buttonDeleteLore);
+			hireButtonItem = new ItemData(hireItem, Messages.buttonHire, Messages.buttonHireLore);
 
 			// Note: These use the same item types as the corresponding shopkeeper buttons.
-			deleteVillagerButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(deleteItem.createItemStack(), Messages.buttonDeleteVillager, Messages.buttonDeleteVillagerLore));
-			nameVillagerButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(nameItem.createItemStack(), Messages.buttonNameVillager, Messages.buttonNameVillagerLore));
-			villagerInventoryButtonItem = new ItemData(ItemUtils.setDisplayNameAndLore(containerItem.createItemStack(), Messages.buttonVillagerInventory, Messages.buttonVillagerInventoryLore));
+			deleteVillagerButtonItem = new ItemData(deleteItem, Messages.buttonDeleteVillager, Messages.buttonDeleteVillagerLore);
+			nameVillagerButtonItem = new ItemData(nameItem, Messages.buttonNameVillager, Messages.buttonNameVillagerLore);
+			villagerInventoryButtonItem = new ItemData(containerItem, Messages.buttonVillagerInventory, Messages.buttonVillagerInventoryLore);
 
 			// Shop name pattern:
 			try {
@@ -460,6 +461,10 @@ public class Settings extends Config {
 		return isCurrencyItem(itemStack) || isHighCurrencyItem(itemStack);
 	}
 
+	public static boolean isAnyCurrencyItem(UnmodifiableItemStack itemStack) {
+		return isAnyCurrencyItem(ItemUtils.asItemStackOrNull(itemStack));
+	}
+
 	// Currency item:
 	public static ItemStack createCurrencyItem(int amount) {
 		return currencyItem.createItemStack(amount);
@@ -467,6 +472,10 @@ public class Settings extends Config {
 
 	public static boolean isCurrencyItem(@ReadOnly ItemStack item) {
 		return currencyItem.matches(item);
+	}
+
+	public static boolean isCurrencyItem(UnmodifiableItemStack item) {
+		return isCurrencyItem(ItemUtils.asItemStackOrNull(item));
 	}
 
 	// High currency item:
@@ -482,6 +491,10 @@ public class Settings extends Config {
 	public static boolean isHighCurrencyItem(@ReadOnly ItemStack item) {
 		if (!isHighCurrencyEnabled()) return false;
 		return highCurrencyItem.matches(item);
+	}
+
+	public static boolean isHighCurrencyItem(UnmodifiableItemStack item) {
+		return isHighCurrencyItem(ItemUtils.asItemStackOrNull(item));
 	}
 
 	// Zero currency item:

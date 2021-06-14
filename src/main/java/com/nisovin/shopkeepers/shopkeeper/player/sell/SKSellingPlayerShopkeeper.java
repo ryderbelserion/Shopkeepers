@@ -14,6 +14,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.sell.SellingPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
@@ -23,6 +24,7 @@ import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implements SellingPlayerShopkeeper {
 
@@ -94,8 +96,8 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 		List<? extends SKPriceOffer> offers = this.getOffers();
 		List<SKTradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(offer -> {
-			// Creating the trading recipe already copies the item, so there is no need to copy it here:
-			ItemStack tradedItem = offer.getInternalItem();
+			// Both the offer's and the trading recipe's items are immutable. So there is no need to copy the item.
+			UnmodifiableItemStack tradedItem = offer.getItem();
 			boolean outOfStock = !ItemUtils.containsAtLeast(containerContents, tradedItem, tradedItem.getAmount());
 			SKTradingRecipe recipe = this.createSellingRecipe(tradedItem, offer.getPrice(), outOfStock);
 			if (recipe != null) {
@@ -113,10 +115,10 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	}
 
 	@Override
-	public PriceOffer getOffer(ItemStack tradedItem) {
+	public PriceOffer getOffer(@ReadOnly ItemStack tradedItem) {
 		Validate.notNull(tradedItem, "tradedItem is null");
 		for (SKPriceOffer offer : this.getOffers()) {
-			if (offer.getInternalItem().isSimilar(tradedItem)) {
+			if (offer.getItem().isSimilar(tradedItem)) {
 				return offer;
 			}
 		}
@@ -124,16 +126,26 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	}
 
 	@Override
-	public void removeOffer(ItemStack tradedItem) {
+	public PriceOffer getOffer(UnmodifiableItemStack tradedItem) {
+		return this.getOffer(ItemUtils.asItemStackOrNull(tradedItem));
+	}
+
+	@Override
+	public void removeOffer(@ReadOnly ItemStack tradedItem) {
 		Validate.notNull(tradedItem, "tradedItem is null");
 		Iterator<? extends SKPriceOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
-			if (iterator.next().getInternalItem().isSimilar(tradedItem)) {
+			if (iterator.next().getItem().isSimilar(tradedItem)) {
 				iterator.remove();
 				this.markDirty();
 				break;
 			}
 		}
+	}
+
+	@Override
+	public void removeOffer(UnmodifiableItemStack tradedItem) {
+		this.removeOffer(ItemUtils.asItemStackOrNull(tradedItem));
 	}
 
 	@Override
@@ -147,14 +159,14 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	}
 
 	@Override
-	public void setOffers(List<? extends PriceOffer> offers) {
+	public void setOffers(@ReadOnly List<? extends PriceOffer> offers) {
 		Validate.notNull(offers, "Offers is null!");
 		Validate.noNullElements(offers, "Offers contains null elements!");
 		this._setOffers(offers);
 		this.markDirty();
 	}
 
-	private void _setOffers(List<? extends PriceOffer> offers) {
+	private void _setOffers(@ReadOnly List<? extends PriceOffer> offers) {
 		assert offers != null && !offers.contains(null);
 		this._clearOffers();
 		this._addOffers(offers);
@@ -173,22 +185,21 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 		SKPriceOffer skOffer = (SKPriceOffer) offer;
 
 		// Remove any previous offer for the same item:
-		ItemStack tradedItem = skOffer.getInternalItem();
-		this.removeOffer(tradedItem);
+		this.removeOffer(skOffer.getItem());
 
 		// Add the new offer:
 		offers.add(skOffer);
 	}
 
 	@Override
-	public void addOffers(List<? extends PriceOffer> offers) {
+	public void addOffers(@ReadOnly List<? extends PriceOffer> offers) {
 		Validate.notNull(offers, "Offers is null!");
 		Validate.noNullElements(offers, "Offers contains null elements!");
 		this._addOffers(offers);
 		this.markDirty();
 	}
 
-	private void _addOffers(List<? extends PriceOffer> offers) {
+	private void _addOffers(@ReadOnly List<? extends PriceOffer> offers) {
 		assert offers != null && !offers.contains(null);
 		// This replaces any previous offers for the same items:
 		offers.forEach(this::_addOffer);

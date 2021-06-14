@@ -19,11 +19,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.spigot.text.SpigotText;
 import com.nisovin.shopkeepers.text.HoverEventText;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.text.TextBuilder;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 /**
  * Text and messaging utilities.
@@ -256,13 +258,17 @@ public class TextUtils {
 		}
 	}
 
-	public static Text getItemText(ItemStack itemStack) {
+	public static Text getItemText(UnmodifiableItemStack itemStack) {
+		return getItemText(ItemUtils.asItemStackOrNull(itemStack));
+	}
+
+	public static Text getItemText(@ReadOnly ItemStack itemStack) {
 		return TextUtils.getItemHover(itemStack)
 				.child(getMaterialNameForDisplay(itemStack))
 				.getRoot();
 	}
 
-	public static TextBuilder getItemHover(ItemStack itemStack) {
+	public static TextBuilder getItemHover(@ReadOnly ItemStack itemStack) {
 		if (itemStack == null) {
 			return Text.text("");
 		}

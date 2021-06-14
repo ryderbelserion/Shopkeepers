@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
@@ -228,8 +229,8 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 
 	protected static int getPrice(TradingRecipeDraft recipe) {
 		if (recipe == null) return 0;
-		ItemStack lowCostItem = recipe.getItem1();
-		ItemStack highCostItem = recipe.getItem2();
+		UnmodifiableItemStack lowCostItem = recipe.getItem1();
+		UnmodifiableItemStack highCostItem = recipe.getItem2();
 		int price = 0;
 		if (lowCostItem != null && lowCostItem.getType() == Settings.currencyItem.getType() && lowCostItem.getAmount() > 0) {
 			price += lowCostItem.getAmount();

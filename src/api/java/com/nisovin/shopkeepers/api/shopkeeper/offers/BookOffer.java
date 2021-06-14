@@ -7,9 +7,24 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
  * <p>
  * Books are identified solely based on their title.
  * <p>
- * Instances of this can be created via {@link ShopkeepersAPI#createBookOffer(String, int)}.
+ * Instances of this are immutable. They can be created via {@link #createBookOffer(String, int)}.
  */
 public interface BookOffer {
+
+	/**
+	 * Creates a new {@link BookOffer}.
+	 * 
+	 * @param bookTitle
+	 *            the book title, not <code>null</code> or empty
+	 * @param price
+	 *            the price, has to be positive
+	 * @return the new offer
+	 */
+	public static BookOffer create(String bookTitle, int price) {
+		return ShopkeepersAPI.createBookOffer(bookTitle, price);
+	}
+
+	// ----
 
 	/**
 	 * Gets the title of the book being traded.

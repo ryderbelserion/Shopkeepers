@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
@@ -31,7 +32,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
 		// Get offer for the bought item:
-		ItemStack boughtItem = tradingRecipe.getItem1();
+		UnmodifiableItemStack boughtItem = tradingRecipe.getItem1();
 		PriceOffer offer = shopkeeper.getOffer(boughtItem);
 		if (offer == null) {
 			// Unexpected, because the recipes were created based on the shopkeeper's offers.
@@ -67,9 +68,8 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		int amountAfterTaxes = this.getAmountAfterTaxes(expectedBoughtItemAmount);
 		if (amountAfterTaxes > 0) {
 			// The item the trading player gave might slightly differ from the required item,
-			// but is still accepted, depending on the used item comparison logic and settings:
-			ItemStack receivedItem = tradeData.offeredItem1.clone(); // Create a copy, just in case
-			receivedItem.setAmount(amountAfterTaxes);
+			// but is still accepted, depending on the used item comparison logic and settings.
+			ItemStack receivedItem = ItemUtils.copyWithAmount(tradeData.offeredItem1, amountAfterTaxes);
 			if (ItemUtils.addItems(newContainerContents, receivedItem) != 0) {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 				this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");

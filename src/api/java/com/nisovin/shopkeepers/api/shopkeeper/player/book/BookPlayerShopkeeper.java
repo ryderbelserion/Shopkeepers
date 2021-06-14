@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
 /**
  * Sells copies of written books in exchange for currency items.
@@ -28,13 +29,22 @@ public interface BookPlayerShopkeeper extends PlayerShopkeeper {
 	public List<? extends BookOffer> getOffers();
 
 	/**
-	 * Gets the offer for a specific book item.
+	 * Gets the offer for the given book item.
 	 * 
 	 * @param bookItem
-	 *            the book item
-	 * @return the offer, or <code>null</code> if there is none for the specified item
+	 *            the book item, not <code>null</code>
+	 * @return the offer, or <code>null</code> if there is none for the given item
 	 */
 	public BookOffer getOffer(ItemStack bookItem);
+
+	/**
+	 * Gets the offer for the given book item.
+	 * 
+	 * @param bookItem
+	 *            the book item, not <code>null</code>
+	 * @return the offer, or <code>null</code> if there is none for the given item
+	 */
+	public BookOffer getOffer(UnmodifiableItemStack bookItem);
 
 	/**
 	 * Gets the offer for the book with the specified title.

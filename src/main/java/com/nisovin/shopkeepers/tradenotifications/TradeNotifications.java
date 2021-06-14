@@ -10,7 +10,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -18,11 +17,13 @@ import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.text.ClickEventText.Action;
 import com.nisovin.shopkeepers.text.Text;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Lazy;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
@@ -62,12 +63,10 @@ public class TradeNotifications implements Listener {
 		/**
 		 * Gets the result item of the trades. See {@link ShopkeeperTradeEvent#getTradingRecipe()} and
 		 * {@link TradingRecipe#getResultItem()}.
-		 * <p>
-		 * The returned {@link ItemStack} is cached and reused. It is not meant to be modified!
 		 * 
-		 * @return the result item
+		 * @return an unmodifiable view on the result item, not <code>null</code> or empty
 		 */
-		public ItemStack getResultItem() {
+		public UnmodifiableItemStack getResultItem() {
 			return mergedTrades.getResultItem();
 		}
 
@@ -75,43 +74,26 @@ public class TradeNotifications implements Listener {
 			return isResultItemCurrency.get();
 		}
 
-		public int getResultItemAmount() {
-			return this.getResultItem().getAmount();
-		}
-
 		/**
 		 * Gets the first offered item of the trades. See {@link ShopkeeperTradeEvent#getOfferedItem1()}.
-		 * <p>
-		 * The returned {@link ItemStack} is cached and reused. It is not meant to be modified!
 		 * 
-		 * @return the first offered item
+		 * @return an unmodifiable view on the first offered item, not <code>null</code> or empty
 		 */
-		public ItemStack getOfferedItem1() {
+		public UnmodifiableItemStack getOfferedItem1() {
 			return mergedTrades.getOfferedItem1();
-		}
-
-		public int getItem1Amount() {
-			return this.getOfferedItem1().getAmount();
-		}
-
-		private boolean hasOfferedItem2() {
-			return mergedTrades.getInitialTrade().hasOfferedItem2();
 		}
 
 		/**
 		 * Gets the second offered item of the trades. See {@link ShopkeeperTradeEvent#getOfferedItem2()}.
-		 * <p>
-		 * The returned {@link ItemStack} is cached and reused. It is not meant to be modified!
 		 * 
-		 * @return the second offered item, or <code>null</code>
+		 * @return an unmodifiable view on the second offered item, or <code>null</code>
 		 */
-		public ItemStack getOfferedItem2() {
+		public UnmodifiableItemStack getOfferedItem2() {
 			return mergedTrades.getOfferedItem2();
 		}
 
-		public int getItem2Amount() {
-			if (this.getOfferedItem2() == null) return 0;
-			return this.getOfferedItem2().getAmount();
+		private boolean hasOfferedItem2() {
+			return mergedTrades.getInitialTrade().hasOfferedItem2();
 		}
 
 		public int getTradeCount() {
@@ -133,11 +115,11 @@ public class TradeNotifications implements Listener {
 		msgArgs.put("player", player.getName());
 		msgArgs.put("playerId", (Supplier<Object>) () -> player.getUniqueId().toString());
 		msgArgs.put("resultItem", (Supplier<Object>) () -> TextUtils.getItemText(tradeContext.getResultItem()));
-		msgArgs.put("resultItemAmount", (Supplier<Object>) () -> tradeContext.getResultItemAmount());
+		msgArgs.put("resultItemAmount", (Supplier<Object>) () -> tradeContext.getResultItem().getAmount());
 		msgArgs.put("item1", (Supplier<Object>) () -> TextUtils.getItemText(tradeContext.getOfferedItem1()));
-		msgArgs.put("item1Amount", (Supplier<Object>) () -> tradeContext.getItem1Amount());
+		msgArgs.put("item1Amount", (Supplier<Object>) () -> tradeContext.getOfferedItem1().getAmount());
 		msgArgs.put("item2", (Supplier<Object>) () -> TextUtils.getItemText(tradeContext.getOfferedItem2()));
-		msgArgs.put("item2Amount", (Supplier<Object>) () -> tradeContext.getItem2Amount());
+		msgArgs.put("item2Amount", (Supplier<Object>) () -> ItemUtils.getItemStackAmount(tradeContext.getOfferedItem2()));
 		return msgArgs;
 	}
 

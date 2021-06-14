@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.debug.DebugOptions;
@@ -52,7 +53,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	protected int containerY;
 	protected int containerZ;
 	private boolean notifyOnTrades = DEFAULT_NOTIFY_ON_TRADES;
-	protected ItemStack hireCost = null; // Null if not for hire
+	protected UnmodifiableItemStack hireCost = null; // Null if not for hire
 
 	// Initial threshold between [1, CHECK_CONTAINER_PERIOD_SECONDS] for load balancing:
 	private final RateLimiter checkContainerLimiter = new RateLimiter(CHECK_CONTAINER_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
@@ -120,14 +121,15 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 		notifyOnTrades = configSection.getBoolean("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
 
-		hireCost = configSection.getItemStack("hirecost");
+		// The item is assumed to be immutable and therefore does not need to be copied.
+		UnmodifiableItemStack hireCost = UnmodifiableItemStack.of(configSection.getItemStack("hirecost"));
 		// Hire cost ItemStack is not null, but empty. -> Normalize to null:
 		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
 			Log.warning("Invalid (empty) hire cost! Disabling 'for hire' for shopkeeper at " + this.getPositionString());
 			hireCost = null;
 			this.markDirty();
 		}
-		ItemStack migratedHireCost = ItemUtils.migrateItemStack(hireCost);
+		UnmodifiableItemStack migratedHireCost = ItemUtils.migrateItemStack(hireCost);
 		if (!ItemUtils.isSimilar(hireCost, migratedHireCost)) {
 			if (ItemUtils.isEmpty(migratedHireCost) && !ItemUtils.isEmpty(hireCost)) {
 				// Migration failed:
@@ -141,6 +143,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			}
 			this.markDirty();
 		}
+		this.hireCost = hireCost;
 	}
 
 	@Override
@@ -302,21 +305,22 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void setForHire(ItemStack hireCost) {
-		this.markDirty();
 		if (ItemUtils.isEmpty(hireCost)) {
 			// Disable hiring:
 			this.hireCost = null;
 			this.setName("");
 		} else {
 			// Set for hire:
-			this.hireCost = hireCost.clone();
+			this.hireCost = ItemUtils.unmodifiableCloneIfModifiable(hireCost);
 			this.setName(Messages.forHireTitle);
 		}
+		// TODO Close any currently open hiring windows for players.
+		this.markDirty();
 	}
 
 	@Override
-	public ItemStack getHireCost() {
-		return (this.isForHire() ? hireCost.clone() : null);
+	public UnmodifiableItemStack getHireCost() {
+		return hireCost;
 	}
 
 	protected void _setContainer(int containerX, int containerY, int containerZ) {
@@ -433,17 +437,17 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
-	protected SKTradingRecipe createSellingRecipe(ItemStack itemBeingSold, int price, boolean outOfStock) {
+	protected final SKTradingRecipe createSellingRecipe(UnmodifiableItemStack itemBeingSold, int price, boolean outOfStock) {
 		int remainingPrice = price;
 
-		ItemStack item1 = null;
-		ItemStack item2 = null;
+		UnmodifiableItemStack item1 = null;
+		UnmodifiableItemStack item2 = null;
 
 		if (Settings.isHighCurrencyEnabled() && price > Settings.highCurrencyMinCost) {
 			int highCurrencyAmount = Math.min(price / Settings.highCurrencyValue, Settings.highCurrencyItem.getType().getMaxStackSize());
 			if (highCurrencyAmount > 0) {
 				remainingPrice -= (highCurrencyAmount * Settings.highCurrencyValue);
-				ItemStack highCurrencyItem = Settings.createHighCurrencyItem(highCurrencyAmount);
+				UnmodifiableItemStack highCurrencyItem = UnmodifiableItemStack.of(Settings.createHighCurrencyItem(highCurrencyAmount));
 				item1 = highCurrencyItem; // Using the first slot
 			}
 		}
@@ -456,7 +460,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				return null;
 			}
 
-			ItemStack currencyItem = Settings.createCurrencyItem(remainingPrice);
+			UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(Settings.createCurrencyItem(remainingPrice));
 			if (item1 == null) {
 				item1 = currencyItem;
 			} else {
@@ -468,14 +472,14 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
-	protected SKTradingRecipe createBuyingRecipe(ItemStack itemBeingBought, int price, boolean outOfStock) {
+	protected final SKTradingRecipe createBuyingRecipe(UnmodifiableItemStack itemBeingBought, int price, boolean outOfStock) {
 		if (price > Settings.currencyItem.getType().getMaxStackSize()) {
 			// Cannot represent this price with the used currency items:
 			Log.warning("Shopkeeper " + this.getIdString() + " at " + this.getPositionString()
 					+ " owned by " + this.getOwnerString() + " has an invalid cost!");
 			return null;
 		}
-		ItemStack currencyItem = Settings.createCurrencyItem(price);
+		UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(Settings.createCurrencyItem(price));
 		return new SKTradingRecipe(currencyItem, itemBeingBought, null, outOfStock);
 	}
 

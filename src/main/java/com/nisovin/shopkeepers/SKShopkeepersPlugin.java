@@ -17,6 +17,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.chatinput.ChatInput;
 import com.nisovin.shopkeepers.commands.Commands;
 import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
@@ -55,6 +56,7 @@ import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.util.ClassUtils;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.SKUnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
 import com.nisovin.shopkeepers.util.Validate;
 import com.nisovin.shopkeepers.villagers.RegularVillagers;
@@ -596,6 +598,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		return tradeNotifications;
 	}
 
+	// FACTORIES
+
+	@Override
+	public UnmodifiableItemStack createUnmodifiableItemStack(ItemStack itemStack) {
+		return SKUnmodifiableItemStack.of(itemStack);
+	}
+
 	// OFFERS FACTORY
 
 	@Override
@@ -604,7 +613,17 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	}
 
 	@Override
+	public PriceOffer createPriceOffer(UnmodifiableItemStack item, int price) {
+		return new SKPriceOffer(item, price);
+	}
+
+	@Override
 	public TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+		return new SKTradeOffer(resultItem, item1, item2);
+	}
+
+	@Override
+	public TradeOffer createTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
 		return new SKTradeOffer(resultItem, item1, item2);
 	}
 

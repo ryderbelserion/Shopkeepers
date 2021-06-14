@@ -3,20 +3,54 @@ package com.nisovin.shopkeepers.api.shopkeeper.offers;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
 /**
  * Stores information about an item stack being sold or bought for a certain price.
  * <p>
- * Instances of this can be created via {@link ShopkeepersAPI#createPriceOffer(ItemStack, int)}.
+ * Instances of this are immutable. They can be created via {@link #createPriceOffer(ItemStack, int)}.
  */
 public interface PriceOffer {
 
 	/**
+	 * Creates a new {@link PriceOffer}.
+	 * <p>
+	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable and therefore not
+	 * copied before it is stored by the price offer. Otherwise, it is first copied.
+	 * 
+	 * @param item
+	 *            the item being traded, not <code>null</code> or empty
+	 * @param price
+	 *            the price, has to be positive
+	 * @return the new offer
+	 */
+	public static PriceOffer create(ItemStack item, int price) {
+		return ShopkeepersAPI.createPriceOffer(item, price);
+	}
+
+	/**
+	 * Creates a new {@link PriceOffer}.
+	 * <p>
+	 * The given item stack is assumed to be immutable and therefore not copied before it is stored by the price offer.
+	 * 
+	 * @param item
+	 *            the item being traded, not <code>null</code> or empty
+	 * @param price
+	 *            the price, has to be positive
+	 * @return the new offer
+	 */
+	public static PriceOffer create(UnmodifiableItemStack item, int price) {
+		return ShopkeepersAPI.createPriceOffer(item, price);
+	}
+
+	// ----
+
+	/**
 	 * Gets the traded item.
 	 * 
-	 * @return a copy of the traded item, not <code>null</code> or empty
+	 * @return an unmodifiable view on the traded item, not <code>null</code> or empty
 	 */
-	public ItemStack getItem();
+	public UnmodifiableItemStack getItem();
 
 	/**
 	 * Gets the price.

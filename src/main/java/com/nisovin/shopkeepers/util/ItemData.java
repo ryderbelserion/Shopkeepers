@@ -12,6 +12,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 /**
@@ -147,29 +148,50 @@ public class ItemData implements Cloneable {
 		}
 
 		// Create ItemData:
-		ItemData itemData = new ItemData(dataItem);
+		// Unmodifiable wrapper: Avoids creating another item copy during construction.
+		ItemData itemData = new ItemData(UnmodifiableItemStack.of(dataItem));
 		return itemData;
 	}
 
 	/////
 
-	private final ItemStack dataItem;
+	private final UnmodifiableItemStack dataItem; // Has amount of 1
 	// Cache serialized item meta data, to avoid doing it again for every comparison:
 	private @ReadOnly Map<String, @ReadOnly Object> serializedData = null; // Gets lazily initialized (only when needed)
 
 	public ItemData(Material type) {
-		this(new ItemStack(type));
+		// Unmodifiable wrapper: Avoids creating another item copy during construction.
+		this(UnmodifiableItemStack.of(new ItemStack(type)));
 	}
 
 	// The display name and lore are expected to use Minecraft's color codes.
 	public ItemData(Material type, String displayName, @ReadOnly List<String> lore) {
-		this(ItemUtils.createItemStack(type, 1, displayName, lore));
+		// Unmodifiable wrapper: Avoids creating another item copy during construction.
+		this(UnmodifiableItemStack.of(ItemUtils.createItemStack(type, 1, displayName, lore)));
 	}
 
-	public ItemData(ItemStack dataItem) {
-		Validate.notNull(dataItem, "The given data ItemStack is null!");
-		this.dataItem = dataItem.clone();
-		this.dataItem.setAmount(1);
+	public ItemData(ItemData otherItemData, String displayName, @ReadOnly List<String> lore) {
+		// Unmodifiable wrapper: Avoids creating another item copy during construction.
+		this(UnmodifiableItemStack.of(ItemUtils.createItemStack(otherItemData, 1, displayName, lore)));
+	}
+
+	/**
+	 * Creates a new {@link ItemData} with the data of the given item stack.
+	 * <p>
+	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable and the
+	 * {@link ItemData} is allowed store it without making a copy of it first.
+	 * 
+	 * @param dataItem
+	 *            the data item, not <code>null</code>
+	 */
+	public ItemData(@ReadOnly ItemStack dataItem) {
+		this(ItemUtils.unmodifiableCopyWithAmount(dataItem, 1));
+	}
+
+	// dataItem is assumed to be immutable.
+	public ItemData(UnmodifiableItemStack dataItem) {
+		Validate.notNull(dataItem, "dataItem is null");
+		this.dataItem = ItemUtils.unmodifiableCopyWithAmount(dataItem.asItemStack(), 1);
 	}
 
 	public Material getType() {
@@ -185,7 +207,8 @@ public class ItemData implements Cloneable {
 		if (this.getType() == type) return this;
 		ItemStack newDataItem = this.createItemStack();
 		newDataItem.setType(type);
-		return new ItemData(newDataItem);
+		// Unmodifiable wrapper: Avoids creating another item copy during construction.
+		return new ItemData(UnmodifiableItemStack.of(newDataItem));
 	}
 
 	// Not null.
@@ -214,26 +237,36 @@ public class ItemData implements Cloneable {
 
 	// Creates an item stack with an amount of 1.
 	public ItemStack createItemStack() {
-		return dataItem.clone();
+		return this.createItemStack(1);
 	}
 
 	public ItemStack createItemStack(int amount) {
-		ItemStack item = this.createItemStack();
-		item.setAmount(amount);
-		return item;
+		return ItemUtils.copyWithAmount(dataItem, amount);
 	}
 
 	public boolean isSimilar(@ReadOnly ItemStack other) {
 		return dataItem.isSimilar(other);
 	}
 
+	public boolean isSimilar(UnmodifiableItemStack other) {
+		return other != null && other.isSimilar(dataItem);
+	}
+
 	public boolean matches(@ReadOnly ItemStack item) {
 		return this.matches(item, false); // Not matching partial lists
+	}
+
+	public boolean matches(UnmodifiableItemStack item) {
+		return this.matches(ItemUtils.asItemStackOrNull(item));
 	}
 
 	public boolean matches(@ReadOnly ItemStack item, boolean matchPartialLists) {
 		// Same type and matching data:
 		return ItemUtils.matchesData(item, this.getType(), this.getSerializedData(), matchPartialLists);
+	}
+
+	public boolean matches(UnmodifiableItemStack item, boolean matchPartialLists) {
+		return this.matches(ItemUtils.asItemStackOrNull(item), matchPartialLists);
 	}
 
 	public boolean matches(ItemData itemData) {

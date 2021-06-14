@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -40,7 +41,7 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		assert containerInventory != null & newContainerContents != null;
 
 		// Remove result items from container contents:
-		ItemStack resultItem = tradingRecipe.getResultItem();
+		UnmodifiableItemStack resultItem = tradingRecipe.getResultItem();
 		assert resultItem != null;
 		if (ItemUtils.removeItems(newContainerContents, resultItem) != 0) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStock);
@@ -58,18 +59,17 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		return true;
 	}
 
-	// The items the trading player gave might slightly differ from the required items,
-	// but are still accepted for the trade, depending on minecraft's item comparison and settings.
-	// Therefore we differ between require and offered items here.
-	// Returns false, if not all items could be added to the contents:
-	private boolean addItems(ItemStack[] contents, ItemStack requiredItem, ItemStack offeredItem) {
+	// We differentiate between the required and the offered items here, because the items that the trading player uses
+	// in the trade might be slightly different to the items that are required according to the trading recipe. But
+	// depending on Minecraft's item comparison rules and our settings, the items of the trading player might still be
+	// accepted for the trade.
+	// Returns false, if not all items could be added to the contents.
+	private boolean addItems(ItemStack[] contents, UnmodifiableItemStack requiredItem, ItemStack offeredItem) {
 		if (ItemUtils.isEmpty(requiredItem)) return true;
 		int amountAfterTaxes = this.getAmountAfterTaxes(requiredItem.getAmount());
 		if (amountAfterTaxes > 0) {
-			ItemStack receivedItem = offeredItem.clone(); // Create a copy, just in case
-			receivedItem.setAmount(amountAfterTaxes);
-			if (ItemUtils.addItems(contents, receivedItem) != 0) {
-				// Couldn't add all items to the contents:
+			if (ItemUtils.addItems(contents, offeredItem, amountAfterTaxes) != 0) {
+				// Could not add all items to the contents:
 				return false;
 			}
 		}

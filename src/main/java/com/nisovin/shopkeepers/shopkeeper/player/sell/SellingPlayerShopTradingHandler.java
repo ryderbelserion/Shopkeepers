@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.shopkeeper.player.sell;
 
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
@@ -30,7 +30,7 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
 		// Get offer for this type of item:
-		ItemStack soldItem = tradingRecipe.getResultItem();
+		UnmodifiableItemStack soldItem = tradingRecipe.getResultItem();
 		PriceOffer offer = shopkeeper.getOffer(soldItem);
 		if (offer == null) {
 			// Unexpected, because the recipes were created based on the shopkeeper's offers.

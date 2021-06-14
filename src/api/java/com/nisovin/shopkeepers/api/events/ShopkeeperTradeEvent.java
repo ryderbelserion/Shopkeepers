@@ -4,10 +4,10 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
 /**
  * This event is called whenever a player is about to trade with a shopkeeper. Canceling it will cause the trade to not
@@ -27,16 +27,14 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	private final Player player;
 	private final InventoryClickEvent clickEvent;
 	private final TradingRecipe tradingRecipe;
-	private final ItemStack offeredItem1;
-	private final ItemStack offeredItem2;
+	private final UnmodifiableItemStack offeredItem1;
+	private final UnmodifiableItemStack offeredItem2; // Can be null
 	private final boolean swappedItemOrder;
 	private boolean cancelled = false;
 
-	// The offered items are expected to be copies and their stack sizes are supposed to match those of the trading
-	// recipe.
-	public ShopkeeperTradeEvent(Shopkeeper shopkeeper, Player player, InventoryClickEvent clickEvent,
-								TradingRecipe tradingRecipe, ItemStack offeredItem1, ItemStack offeredItem2,
-								boolean swappedItemOrder) {
+	// The offered items are expected to be immutable and their stack sizes match the trading recipe items.
+	public ShopkeeperTradeEvent(Shopkeeper shopkeeper, Player player, InventoryClickEvent clickEvent, TradingRecipe tradingRecipe,
+								UnmodifiableItemStack offeredItem1, UnmodifiableItemStack offeredItem2, boolean swappedItemOrder) {
 		super(shopkeeper);
 		this.player = player;
 		this.clickEvent = clickEvent;
@@ -77,31 +75,32 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	}
 
 	/**
-	 * Gets a copy of the item offered by the player matching the first required item of the used trading recipe (not
-	 * necessarily the item in the first slot).
+	 * Gets an unmodifiable view on the item offered by the player that matches the first required item of the used
+	 * trading recipe. This is not necessarily the item in the first slot.
 	 * <p>
 	 * The type and stack size equal those of the required item of the trading recipe. The metadata however can differ,
 	 * but still be accepted for the trade depending on the item matching rules of the used Minecraft version and the
 	 * shopkeeper settings (i.e. with strict item comparisons being disabled).
 	 * 
-	 * @return a copy of the offered item that matches the first required item, not <code>null</code> or empty
+	 * @return an unmodifiable view on the offered item that matches the first required item, not <code>null</code> or
+	 *         empty
 	 */
-	public ItemStack getOfferedItem1() {
-		return offeredItem1.clone();
+	public UnmodifiableItemStack getOfferedItem1() {
+		return offeredItem1;
 	}
 
 	/**
-	 * Gets a copy of the item offered by the player matching the second required item of the used trading recipe (not
-	 * necessarily the item in the second slot).
+	 * Gets an unmodifiable view on the item offered by the player that matches the second required item of the used
+	 * trading recipe. This is not necessarily the item in the second slot.
 	 * <p>
 	 * The type and stack size equal those of the required item of the trading recipe. The metadata however can differ,
 	 * but still be accepted for the trade depending on the item matching rules of the used Minecraft version and the
 	 * shopkeeper settings (i.e. with strict item comparisons being disabled).
 	 * 
-	 * @return a copy of the offered item that matches the second required item, can be <code>null</code>
+	 * @return an unmodifiable view on the offered item that matches the second required item, can be <code>null</code>
 	 */
-	public ItemStack getOfferedItem2() {
-		return (offeredItem2 == null) ? null : offeredItem2.clone();
+	public UnmodifiableItemStack getOfferedItem2() {
+		return offeredItem2;
 	}
 
 	/**

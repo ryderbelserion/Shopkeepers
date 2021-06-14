@@ -52,6 +52,11 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 
 	/**
 	 * Recreates a shopkeeper of this type by loading its previously saved data from the given config section.
+	 * <p>
+	 * No assumptions are made regarding whether or not the given config section and its sub sections are mutable.
+	 * However, any other stored data elements (such as for example item stacks, etc.) and collections of data elements
+	 * are assumed to be immutable and the loaded shopkeeper may therefore directly store these elements without copying
+	 * them first.
 	 * 
 	 * @param id
 	 *            the shopkeeper id

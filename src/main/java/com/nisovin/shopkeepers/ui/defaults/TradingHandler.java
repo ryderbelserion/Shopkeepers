@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.Debug;
@@ -324,7 +325,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		InventoryAction action = clickEvent.getAction();
 
 		MerchantInventory merchantInventory = (MerchantInventory) clickEvent.getInventory();
-		ItemStack resultItem = merchantInventory.getItem(RESULT_ITEM_SLOT_ID);
+		UnmodifiableItemStack resultItem = UnmodifiableItemStack.of(merchantInventory.getItem(RESULT_ITEM_SLOT_ID));
 		ItemStack cursor = clickEvent.getCursor();
 
 		// Prevent unsupported types of special clicks:
@@ -373,7 +374,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		// TODO: Even though this is not available in vanilla Minecraft, maybe add a way to trade as often as possible,
 		// using up all the items in the player's inventory (i.e. being able to sell all items with one click)?
 		if (action == InventoryAction.PICKUP_ALL || action == InventoryAction.PICKUP_HALF) {
-			if (!isCursorEmpty && (!cursor.isSimilar(resultItem) || (cursor.getAmount() + resultItem.getAmount()) > cursor.getMaxStackSize())) {
+			if (!isCursorEmpty && (!resultItem.isSimilar(cursor) || (cursor.getAmount() + resultItem.getAmount()) > cursor.getMaxStackSize())) {
 				Log.debug("Not handling trade: The cursor cannot carry the resulting items.");
 				return;
 			} else {
@@ -381,7 +382,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 					// Add result items to cursor:
 					ItemStack resultCursor;
 					if (isCursorEmpty) {
-						resultCursor = resultItem; // No item copy required here
+						resultCursor = resultItem.asItemStack(); // No item copy required here
 					} else {
 						resultCursor = ItemUtils.increaseItemAmount(cursor, resultItem.getAmount());
 					}
@@ -413,7 +414,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			if (hotbarButton >= 0 && hotbarButton <= 8 && ItemUtils.isEmpty(playerInventory.getItem(hotbarButton))) {
 				if (this.handleTrade(tradeData)) {
 					// Set result items to hotbar slot:
-					playerInventory.setItem(hotbarButton, resultItem); // No item copy required here
+					playerInventory.setItem(hotbarButton, resultItem.asItemStack()); // No item copy required here
 
 					// Common apply trade:
 					this.commonApplyTrade(tradeData);
@@ -475,9 +476,10 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 					break;
 				}
 				// Compare result items:
-				ItemStack newResultItem = tradeData.tradingRecipe.getResultItem();
-				if (!resultItem.isSimilar(newResultItem)) {
-					// New result item doesn't match previous result item, abort trading (mimics Minecraft behavior):
+				UnmodifiableItemStack newResultItem = tradeData.tradingRecipe.getResultItem();
+				if (!newResultItem.isSimilar(resultItem)) {
+					// The new result item does not match the previous result item.
+					// Abort trading (mimics Minecraft behavior).
 					break;
 				}
 				// Update result item:
@@ -529,7 +531,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 		// As a safe-guard, check that the result item of the selected recipe actually matches the result item expected
 		// by the player:
-		ItemStack recipeResultItem = tradingRecipe.getResultItem();
+		UnmodifiableItemStack recipeResultItem = tradingRecipe.getResultItem();
 		if (!recipeResultItem.equals(resultItem)) {
 			// Unexpected, but may happen if some other plugin modifies the involved trades or items.
 			if (!silent) {
@@ -546,8 +548,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			return null;
 		}
 
-		ItemStack requiredItem1 = tradingRecipe.getItem1();
-		ItemStack requiredItem2 = tradingRecipe.getItem2();
+		UnmodifiableItemStack requiredItem1 = tradingRecipe.getItem1();
+		UnmodifiableItemStack requiredItem2 = tradingRecipe.getItem2();
 		assert !ItemUtils.isEmpty(requiredItem1);
 
 		// Use null here instead of air for consistent behavior with previous versions:
@@ -626,7 +628,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		return tradeData;
 	}
 
-	private boolean matches(ItemStack offeredItem1, ItemStack offeredItem2, ItemStack requiredItem1, ItemStack requiredItem2) {
+	private boolean matches(ItemStack offeredItem1, ItemStack offeredItem2, UnmodifiableItemStack requiredItem1, UnmodifiableItemStack requiredItem2) {
 		int offeredItem1Amount = ItemUtils.getItemStackAmount(offeredItem1);
 		int offeredItem2Amount = ItemUtils.getItemStackAmount(offeredItem2);
 		int requiredItem1Amount = ItemUtils.getItemStackAmount(requiredItem1);
@@ -681,19 +683,19 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		}
 
 		// Call trade event, giving other plugins a chance to cancel the trade before it gets applied:
-		// Prepare offered items for the event: Clone and ensure stack sizes matching the trading recipe.
-		ItemStack eventOfferedItem1 = tradeData.offeredItem1.clone();
-		ItemStack eventOfferedItem2 = ItemUtils.isEmpty(tradeData.offeredItem2) ? null : tradeData.offeredItem2.clone();
-		eventOfferedItem1.setAmount(tradeData.tradingRecipe.getItem1().getAmount());
+		// Prepare the offered items for the event: Clone and ensure that the stack sizes match the trading recipe.
+		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
+		ItemStack eventOfferedItem1 = ItemUtils.copyWithAmount(tradeData.offeredItem1, tradingRecipe.getItem1().getAmount());
+		ItemStack eventOfferedItem2 = ItemUtils.cloneOrNullIfEmpty(tradeData.offeredItem2);
 		if (eventOfferedItem2 != null) {
 			// Minecraft disables the trade if there is second offered item but the trade only expects a single item.
-			assert tradeData.tradingRecipe.getItem2() != null;
-			eventOfferedItem2.setAmount(tradeData.tradingRecipe.getItem2().getAmount());
+			assert tradingRecipe.getItem2() != null;
+			eventOfferedItem2.setAmount(tradingRecipe.getItem2().getAmount());
 		}
 
 		ShopkeeperTradeEvent tradeEvent = new ShopkeeperTradeEvent(this.getShopkeeper(), tradeData.tradingPlayer,
-				tradeData.clickEvent, tradeData.tradingRecipe, eventOfferedItem1, eventOfferedItem2,
-				tradeData.swappedItemOrder);
+				tradeData.clickEvent, tradingRecipe, UnmodifiableItemStack.of(eventOfferedItem1),
+				UnmodifiableItemStack.of(eventOfferedItem2), tradeData.swappedItemOrder);
 		Bukkit.getPluginManager().callEvent(tradeEvent);
 		if (tradeEvent.isCancelled()) {
 			Log.debug("The trade got cancelled by some other plugin.");
@@ -805,6 +807,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	protected void onTradeApplied(TradeData tradeData) {
 	}
 
+	// TODO Ensure a minimum amount of 1?
 	// Returns a value >= 0 and <= amount.
 	protected int getAmountAfterTaxes(int amount) {
 		assert amount >= 0;

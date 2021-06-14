@@ -14,6 +14,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.trade.TradingPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
@@ -94,7 +95,7 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 		List<? extends SKTradeOffer> offers = this.getOffers();
 		List<SKTradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(offer -> {
-			ItemStack resultItem = offer.getInternalResultItem();
+			UnmodifiableItemStack resultItem = offer.getResultItem();
 			boolean outOfStock = !ItemUtils.containsAtLeast(containerContents, resultItem, resultItem.getAmount());
 			SKTradingRecipe recipe = offer.toTradingRecipe(outOfStock);
 			recipes.add(recipe);
@@ -112,7 +113,7 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	public boolean hasOffer(ItemStack resultItem) {
 		Validate.notNull(resultItem, "resultItem is null");
 		for (SKTradeOffer offer : this.getOffers()) {
-			if (offer.getInternalResultItem().isSimilar(resultItem)) {
+			if (offer.getResultItem().isSimilar(resultItem)) {
 				return true;
 			}
 		}

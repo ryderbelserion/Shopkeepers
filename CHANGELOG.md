@@ -221,8 +221,15 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Debug: When the shopkeeper editor is closed, we debug log the number of shopkeeper offers that have changed.
 * Changed: Previously, we would always trigger a save when the shopkeeper editor was closed. Now, we check which trades have actually changed and only trigger a save if the shopkeeper was modified.
 * Performance: When we require read-only access to the data of a Minecraft item stack, we try to avoid copying the item stack and instead access its data directly. This applies mostly when we match provided and required item stacks during trading.
+* Performance: With the change to use unmodifiable item stacks, internally and throughout the API, we can now avoid copying item stacks in many situations.
+* Fixed: When handling a shopkeeper hire attempt, we first check now if the shop is still for hire.
 
 API:  
+* Breaking: Added UnmodifiableItemStack, which is a read-only wrapper around an item stacks.
+  * All methods that previously returned copies of internal item stacks will now return unmodifiable item stacks.
+  * If you actually require a Bukkit ItemStack, you can now decide to either create a copy of the item stack via UnmodifiableItemStack#copy(), or get an unmodifiable ItemStack view via UnmodifiableItemStack#asItemStack(). Note, however, that the latter has certain limitations and is quite unsafe to use. See its documentation for more information.
+  * Added various method variants that use UnmodifiableItemStack instead of ItemStack as parameter types.
+  * Some methods that require an item stack as input will now use the unmodifiability of the passed item stack as an indicator that the passed item stack can be assumed to be immutable and therefore does not need to be copied before it is stored. This behavior is clarified in the documentation of these methods.
 * Fixed: Renamed AdminShopkeeper#getTradePremission to #getTradePermission.
 * Renamed TradingOffer to TradeOffer.
 * Removed the factory methods for trading recipes from the API. Only the Shopkeepers plugin itself, and plugins using the internal API should be required to create trading recipes.
@@ -250,6 +257,8 @@ API:
 * Added: ShopkeeperTradeEvent#hasOfferedItem2() as a shortcut for checking if the trade involves two input items.
 * Added: PlayerShopkeeper#isNotifyOnTrades and PlayerShopkeeper#setNotifyOnTrades.
 * Fixed: We now call the ShopkeeperEditedEvent when the player closes the editor and at least one trade offer has changed.
+* API: Added factory methods to the TradeOffer, PriceOffer, and BookOffer interfaces. These are now preferred over the factory method found in ShopkeepersAPI and ShopkeepersPlugin.
+* API: Added TradeOffer#hasItem2() and TradingRecipe#hasItem2().
 * Several Javadoc improvements and clarifications.
 
 Internal API:  
@@ -270,6 +279,10 @@ Internal API:
 * PlayerShopEditorHandler#createTradingRecipeDraft and #getPrice are no longer instance methods.
 * ItemData#withType may return the same ItemData instance now if the type has not changed.
 * Several internal references to the trade offer implementation classes have been replaced with references to the corresponding API interfaces. The internal return types of some shopkeeper methods for accessing these offers have changed.
+* When loading a shopkeeper from a config section, any stored data elements (except sub sections) are assumed to be immutable and the shopkeeper is allowed to directly store these elements without copying them first.
+* Various workarounds for avoiding copying internal item stacks when it is not required, such as methods that directly return internally stored item stacks, have been removed, since they are no longer required.
+* AbstractPlayerShopkeeper#createSellingRecipe and #createBuyingRecipe are final now.
+* Small refactors of TrandingRecipeDraft: Added TradingRecipeDraft#asItem2(). #toTradingRecipe has been moved into SKTradeOffer. Some methods are final now.
 
 Internal:  
 * The config key pattern is cached now.
@@ -321,6 +334,9 @@ Internal:
 * Minor improvements to normalizing and matching enum names (used by command arguments, config settings, shopkeeper data, etc.).
 * Added a SoundEffect class to represent sound effects inside the config.
 * Started to use annotations to mark which methods modify their input arguments. These annotations are not yet checked in any form, but are merely used for documentation purposes. More methods will be annotated as the time goes on.
+* Added a document that collects some of the assumptions that are made about the server implementation and which the plugin relies on in order to work correctly.
+* Testing: Added a minimal mock for the shopkeepers plugin. This is required, because some tests need to be able to create unmodifiable item stacks, which requires the corresponding factory method to be bound to the Shopkeepers API.
+* Added utility methods to more compactly create ItemData instances based on another ItemData, but with different display name and lore.
 * Various other internal code refactoring.
 
 Migration notes:  

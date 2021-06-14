@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.book.BookPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
@@ -28,6 +29,7 @@ import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.BookItems;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Validate;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
@@ -117,8 +119,9 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 				bookItem = BookItems.copyBook(bookItem);
 			}
 			assert bookItem != null;
+			// Assert: bookItem is a copy.
 
-			SKTradingRecipe recipe = this.createSellingRecipe(bookItem, bookOffer.getPrice(), outOfStock);
+			SKTradingRecipe recipe = this.createSellingRecipe(UnmodifiableItemStack.of(bookItem), bookOffer.getPrice(), outOfStock);
 			if (recipe != null) {
 				recipes.add(recipe);
 			} // Else: Price is invalid (cannot be represented by currency items).
@@ -206,10 +209,16 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	public BookOffer getOffer(ItemStack bookItem) {
+	public BookOffer getOffer(@ReadOnly ItemStack bookItem) {
+		Validate.notNull(bookItem, "bookItem is null");
 		String bookTitle = BookItems.getBookTitle(bookItem);
 		if (bookTitle == null) return null; // Not a written book, or has no title
 		return this.getOffer(bookTitle);
+	}
+
+	@Override
+	public BookOffer getOffer(UnmodifiableItemStack bookItem) {
+		return this.getOffer(ItemUtils.asItemStackOrNull(bookItem));
 	}
 
 	@Override
@@ -247,14 +256,14 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	public void setOffers(List<? extends BookOffer> offers) {
+	public void setOffers(@ReadOnly List<? extends BookOffer> offers) {
 		Validate.notNull(offers, "Offers is null!");
 		Validate.noNullElements(offers, "Offers contains null elements!");
 		this._setOffers(offers);
 		this.markDirty();
 	}
 
-	private void _setOffers(List<? extends BookOffer> offers) {
+	private void _setOffers(@ReadOnly List<? extends BookOffer> offers) {
 		assert offers != null && !offers.contains(null);
 		this._clearOffers();
 		this._addOffers(offers);
@@ -281,14 +290,14 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	public void addOffers(List<? extends BookOffer> offers) {
+	public void addOffers(@ReadOnly List<? extends BookOffer> offers) {
 		Validate.notNull(offers, "Offers is null!");
 		Validate.noNullElements(offers, "Offers contains null elements!");
 		this._addOffers(offers);
 		this.markDirty();
 	}
 
-	private void _addOffers(List<? extends BookOffer> offers) {
+	private void _addOffers(@ReadOnly List<? extends BookOffer> offers) {
 		assert offers != null && !offers.contains(null);
 		// This replaces any previous offers for the same books:
 		offers.forEach(this::_addOffer);

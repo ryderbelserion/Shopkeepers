@@ -9,28 +9,61 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 // Shares its implementation with SKTradingRecipe, but always reports to not be out of stock.
 public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 
-	public SKTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+	/**
+	 * Creates a new {@link SKTradeOffer}.
+	 * <p>
+	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable and therefore not
+	 * copied before they are stored by the trade offer. Otherwise, they are first copied.
+	 * 
+	 * @param resultItem
+	 *            the result item, not empty
+	 * @param item1
+	 *            the first buy item, not empty
+	 * @param item2
+	 *            the second buy item, can be empty
+	 */
+	public SKTradeOffer(@ReadOnly ItemStack resultItem, @ReadOnly ItemStack item1, @ReadOnly ItemStack item2) {
 		super(resultItem, item1, item2);
 	}
 
 	/**
-	 * Creates a {@link TradingRecipe} for this trade offer.
+	 * Creates a new {@link SKTradeOffer}.
+	 * <p>
+	 * The given item stacks are assumed to be immutable and therefore not copied before they are stored by the trade
+	 * offer.
+	 * 
+	 * @param resultItem
+	 *            the result item, not empty
+	 * @param item1
+	 *            the first buy item, not empty
+	 * @param item2
+	 *            the second buy item, can be empty
+	 */
+	public SKTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
+		super(resultItem, item1, item2);
+	}
+
+	/**
+	 * Creates a {@link TradingRecipe} based on this trade offer.
 	 * 
 	 * @param outOfStock
 	 *            whether to mark the trading recipe as being out of stock
 	 * @return the trading recipe
 	 */
-	@Override
 	public SKTradingRecipe toTradingRecipe(boolean outOfStock) {
-		return super.toTradingRecipe(outOfStock);
+		// The items of both this trade offer and the new trading recipe are assumed to be immutable, so they do not
+		// need to be copied.
+		return new SKTradingRecipe(resultItem, item1, item2, outOfStock);
 	}
 
 	@Override
@@ -67,10 +100,10 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		ConfigurationSection offersSection = config.createSection(node);
 		int id = 1;
 		for (TradeOffer offer : offers) {
-			// Note: The items are clones.
-			ItemStack item1 = offer.getItem1();
-			ItemStack item2 = offer.getItem2();
-			ItemStack resultItem = offer.getResultItem();
+			// These items are assumed to be immutable.
+			UnmodifiableItemStack item1 = offer.getItem1();
+			UnmodifiableItemStack item2 = offer.getItem2();
+			UnmodifiableItemStack resultItem = offer.getResultItem();
 
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
 			offerSection.set("item1", item1);
@@ -80,6 +113,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		}
 	}
 
+	// Elements inside the config section are assumed to be immutable and can be reused without having to be copied.
 	public static List<? extends TradeOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
 		List<TradeOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
@@ -91,9 +125,11 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid trading offer section for " + key));
 					continue;
 				}
-				ItemStack resultItem = offerSection.getItemStack("resultItem");
-				ItemStack item1 = offerSection.getItemStack("item1");
-				ItemStack item2 = offerSection.getItemStack("item2");
+
+				// The item stacks are assumed to be immutable and therefore do not need to be copied.
+				UnmodifiableItemStack resultItem = UnmodifiableItemStack.of(offerSection.getItemStack("resultItem"));
+				UnmodifiableItemStack item1 = UnmodifiableItemStack.of(offerSection.getItemStack("item1"));
+				UnmodifiableItemStack item2 = UnmodifiableItemStack.of(offerSection.getItemStack("item2"));
 				if (ItemUtils.isEmpty(resultItem) || ItemUtils.isEmpty(item1)) {
 					// Invalid offer.
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid trading offer for " + key + ": item1 or resultItem is empty"));
@@ -118,12 +154,12 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 			boolean itemsMigrated = false;
 			boolean migrationFailed = false;
 
-			// Note: The items are clones.
-			ItemStack resultItem = offer.getResultItem();
-			ItemStack item1 = offer.getItem1();
-			ItemStack item2 = offer.getItem2();
+			// These items are assumed to be immutable.
+			UnmodifiableItemStack resultItem = offer.getResultItem();
+			UnmodifiableItemStack item1 = offer.getItem1();
+			UnmodifiableItemStack item2 = offer.getItem2();
 
-			ItemStack migratedResultItem = ItemUtils.migrateItemStack(resultItem);
+			UnmodifiableItemStack migratedResultItem = ItemUtils.migrateItemStack(resultItem);
 			if (!ItemUtils.isSimilar(resultItem, migratedResultItem)) {
 				if (ItemUtils.isEmpty(migratedResultItem) && !ItemUtils.isEmpty(resultItem)) {
 					migrationFailed = true;
@@ -131,7 +167,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				resultItem = migratedResultItem;
 				itemsMigrated = true;
 			}
-			ItemStack migratedItem1 = ItemUtils.migrateItemStack(item1);
+			UnmodifiableItemStack migratedItem1 = ItemUtils.migrateItemStack(item1);
 			if (!ItemUtils.isSimilar(item1, migratedItem1)) {
 				if (ItemUtils.isEmpty(migratedItem1) && !ItemUtils.isEmpty(item1)) {
 					migrationFailed = true;
@@ -139,7 +175,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				item1 = migratedItem1;
 				itemsMigrated = true;
 			}
-			ItemStack migratedItem2 = ItemUtils.migrateItemStack(item2);
+			UnmodifiableItemStack migratedItem2 = ItemUtils.migrateItemStack(item2);
 			if (!ItemUtils.isSimilar(item2, migratedItem2)) {
 				if (ItemUtils.isEmpty(migratedItem2) && !ItemUtils.isEmpty(item2)) {
 					migrationFailed = true;

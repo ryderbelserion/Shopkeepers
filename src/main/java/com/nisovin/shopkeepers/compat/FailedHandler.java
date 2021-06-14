@@ -125,10 +125,11 @@ public final class FailedHandler implements NMSCallProvider {
 			Object requiredTag = nmsGetTagMethod.invoke(nmsRequired);
 			return (Boolean) nmsAreNBTMatchingMethod.invoke(null, requiredTag, providedTag, false);
 		} catch (Exception e) {
-			// Fallback: Checking for metadata equality.
-			// Note: In this case the behavior of this method is no longer equivalent to minecraft's item comparison
-			// behavior!
-			return provided.isSimilar(required);
+			// Fallback: Check for metadata equality. In this case the behavior of this method is no longer equivalent
+			// to Minecraft's item comparison behavior!
+			// The direction of this check is important, because the required item stack might be an
+			// UnmodifiableItemStack.
+			return required.isSimilar(provided);
 		}
 	}
 

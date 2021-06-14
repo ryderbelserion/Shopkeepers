@@ -8,6 +8,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -16,29 +17,43 @@ import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 public class SKPriceOffer implements PriceOffer {
 
-	private final ItemStack item; // Not null or empty
+	private final UnmodifiableItemStack item; // Not null or empty, assumed immutable
 	private final int price; // > 0
 
+	/**
+	 * Creates a new {@link SKPriceOffer}.
+	 * <p>
+	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable and therefore not
+	 * copied before it is stored by the price offer. Otherwise, it is first copied.
+	 * 
+	 * @param item
+	 *            the item being traded, not <code>null</code> or empty
+	 * @param price
+	 *            the price, has to be positive
+	 */
 	public SKPriceOffer(ItemStack item, int price) {
-		Validate.isTrue(!ItemUtils.isEmpty(item), "Item cannot be empty!");
-		Validate.isTrue(price > 0, "Price has to be positive!");
-		this.item = item.clone();
+		this(ItemUtils.unmodifiableCloneIfModifiable(item), price);
+	}
+
+	/**
+	 * Creates a new {@link SKPriceOffer}.
+	 * <p>
+	 * The given item stack is assumed to be immutable and therefore not copied before it is stored by the price offer.
+	 * 
+	 * @param item
+	 *            the item being traded, not <code>null</code> or empty
+	 * @param price
+	 *            the price, has to be positive
+	 */
+	public SKPriceOffer(UnmodifiableItemStack item, int price) {
+		Validate.isTrue(!ItemUtils.isEmpty(item), "item is empty");
+		Validate.isTrue(price > 0, "price has to be positive");
+		this.item = item;
 		this.price = price;
 	}
 
 	@Override
-	public ItemStack getItem() {
-		return item.clone();
-	}
-
-	/**
-	 * Gets the traded item without making a copy of it first.
-	 * <p>
-	 * For internal use only. The item is expected to not be modified.
-	 * 
-	 * @return the item, not <code>null</code> or empty
-	 */
-	public ItemStack getInternalItem() {
+	public UnmodifiableItemStack getItem() {
 		return item;
 	}
 
@@ -86,7 +101,7 @@ public class SKPriceOffer implements PriceOffer {
 		ConfigurationSection offersSection = config.createSection(node);
 		int id = 1;
 		for (PriceOffer offer : offers) {
-			ItemStack item = offer.getItem(); // Is a clone.
+			UnmodifiableItemStack item = offer.getItem(); // Assumed immutable
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
 			offerSection.set("item", item);
 			offerSection.set("price", offer.getPrice());
@@ -94,6 +109,7 @@ public class SKPriceOffer implements PriceOffer {
 		}
 	}
 
+	// Elements inside the config section are assumed to be immutable and can be reused without having to be copied.
 	public static List<? extends PriceOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
 		List<PriceOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
@@ -101,7 +117,9 @@ public class SKPriceOffer implements PriceOffer {
 			for (String id : offersSection.getKeys(false)) {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(id);
 				if (offerSection == null) continue; // Invalid offer: Not a section.
-				ItemStack item = offerSection.getItemStack("item");
+
+				// The item stack is assumed to be immutable and therefore does not need to be copied.
+				UnmodifiableItemStack item = UnmodifiableItemStack.of(offerSection.getItemStack("item"));
 				int price = offerSection.getInt("price");
 				if (ItemUtils.isEmpty(item)) {
 					// Invalid offer.
@@ -131,8 +149,8 @@ public class SKPriceOffer implements PriceOffer {
 			boolean itemsMigrated = false;
 			boolean migrationFailed = false;
 
-			ItemStack item = offer.getItem(); // Note: Is a clone.
-			ItemStack migratedItem = ItemUtils.migrateItemStack(item);
+			UnmodifiableItemStack item = offer.getItem();
+			UnmodifiableItemStack migratedItem = ItemUtils.migrateItemStack(item);
 			if (!ItemUtils.isSimilar(item, migratedItem)) {
 				if (ItemUtils.isEmpty(migratedItem) && !ItemUtils.isEmpty(item)) {
 					migrationFailed = true;

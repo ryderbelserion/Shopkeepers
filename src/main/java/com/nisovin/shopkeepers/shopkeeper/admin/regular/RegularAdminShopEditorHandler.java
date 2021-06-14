@@ -9,9 +9,11 @@ import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
+import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class RegularAdminShopEditorHandler extends EditorHandler {
 
@@ -30,7 +32,7 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 			List<? extends TradeOffer> offers = shopkeeper.getOffers();
 			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size());
 			offers.forEach(offer -> {
-				// The offer returns copies of its items:
+				// The offer returns immutable items, so there is no need to copy them.
 				TradingRecipeDraft recipe = new TradingRecipeDraft(offer.getResultItem(), offer.getItem1(), offer.getItem2());
 				recipes.add(recipe);
 			});
@@ -50,9 +52,10 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 		@Override
 		protected TradeOffer createOffer(TradingRecipeDraft recipe) {
 			assert recipe != null && recipe.isValid();
-			ItemStack resultItem = recipe.getResultItem();
-			ItemStack item1 = recipe.getItem1();
-			ItemStack item2 = recipe.getItem2();
+			// We can reuse the trading recipe draft's items without copying them first.
+			UnmodifiableItemStack resultItem = recipe.getResultItem();
+			UnmodifiableItemStack item1 = recipe.getItem1();
+			UnmodifiableItemStack item2 = recipe.getItem2();
 			return ShopkeepersAPI.createTradeOffer(resultItem, item1, item2);
 		}
 
@@ -60,10 +63,11 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 		// items into the editor.
 		@Override
 		protected void handleInvalidTradingRecipe(Player player, TradingRecipeDraft invalidRecipe) {
-			// Return unused items to inventory:
-			ItemStack resultItem = invalidRecipe.getResultItem();
-			ItemStack item1 = invalidRecipe.getItem1();
-			ItemStack item2 = invalidRecipe.getItem2();
+			// Return unused items to the player's inventory:
+			// Inventory#addItem might modify the stack sizes of the input items, so we need to copy them.
+			ItemStack resultItem = ItemUtils.copyOrNull(invalidRecipe.getResultItem());
+			ItemStack item1 = ItemUtils.copyOrNull(invalidRecipe.getItem1());
+			ItemStack item2 = ItemUtils.copyOrNull(invalidRecipe.getItem2());
 			PlayerInventory playerInventory = player.getInventory();
 
 			// Note: If the items don't fit the inventory, we ignore them rather then dropping them. This is usually

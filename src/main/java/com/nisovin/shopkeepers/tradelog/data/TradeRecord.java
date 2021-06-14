@@ -2,9 +2,8 @@ package com.nisovin.shopkeepers.tradelog.data;
 
 import java.time.Instant;
 
-import org.bukkit.inventory.ItemStack;
-
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.Validate;
 import com.nisovin.shopkeepers.util.trading.MergedTrades;
 
@@ -29,12 +28,12 @@ public class TradeRecord {
 		ShopkeeperTradeEvent tradeEvent = trades.getInitialTrade();
 		PlayerRecord playerRecord = PlayerRecord.of(tradeEvent.getPlayer());
 		ShopRecord shopRecord = ShopRecord.of(tradeEvent.getShopkeeper());
-		// We reuse the items of the given MergedTrades:
-		ItemStack item1 = trades.getOfferedItem1();
-		ItemStack item2 = trades.getOfferedItem2();
-		ItemStack resultItem = trades.getResultItem();
+		// We reuse the immutable items of the given MergedTrades:
+		UnmodifiableItemStack resultItem = trades.getResultItem();
+		UnmodifiableItemStack item1 = trades.getOfferedItem1();
+		UnmodifiableItemStack item2 = trades.getOfferedItem2();
 		int tradeCount = trades.getTradeCount();
-		return new TradeRecord(timestamp, playerRecord, shopRecord, item1, item2, resultItem, tradeCount);
+		return new TradeRecord(timestamp, playerRecord, shopRecord, resultItem, item1, item2, tradeCount);
 	}
 
 	/**
@@ -49,11 +48,11 @@ public class TradeRecord {
 		Instant timestamp = Instant.now();
 		PlayerRecord playerRecord = PlayerRecord.of(tradeEvent.getPlayer());
 		ShopRecord shopRecord = ShopRecord.of(tradeEvent.getShopkeeper());
-		// These ItemStacks are clones:
-		ItemStack item1 = tradeEvent.getOfferedItem1();
-		ItemStack item2 = tradeEvent.getOfferedItem2();
-		ItemStack resultItem = tradeEvent.getTradingRecipe().getResultItem();
-		return new TradeRecord(timestamp, playerRecord, shopRecord, item1, item2, resultItem, 1);
+		// These items are immutable:
+		UnmodifiableItemStack resultItem = tradeEvent.getTradingRecipe().getResultItem();
+		UnmodifiableItemStack item1 = tradeEvent.getOfferedItem1();
+		UnmodifiableItemStack item2 = tradeEvent.getOfferedItem2();
+		return new TradeRecord(timestamp, playerRecord, shopRecord, resultItem, item1, item2, 1);
 	}
 
 	private final Instant timestamp; // Not null
@@ -63,24 +62,25 @@ public class TradeRecord {
 	// not necessarily be equal the items required by the trade (they only have to 'match' / be accepted). Their amounts
 	// match those of the trading recipe.
 	// The order in which the player provided the items in the trading interface is not recorded.
-	private final ItemStack item1; // Not null
-	private final ItemStack item2; // Can be null
-	private final ItemStack resultItem; // Not null
+	private final UnmodifiableItemStack resultItem; // Not null
+	private final UnmodifiableItemStack item1; // Not null
+	private final UnmodifiableItemStack item2; // Can be null
 	private final int tradeCount;
 
-	private TradeRecord(Instant timestamp, PlayerRecord player, ShopRecord shop, ItemStack item1, ItemStack item2, ItemStack resultItem, int tradeCount) {
+	private TradeRecord(Instant timestamp, PlayerRecord player, ShopRecord shop, UnmodifiableItemStack resultItem,
+						UnmodifiableItemStack item1, UnmodifiableItemStack item2, int tradeCount) {
 		Validate.notNull(timestamp, "timestamp is null");
 		Validate.notNull(player, "player is null");
 		Validate.notNull(shop, "shop is null");
-		Validate.notNull(item1, "item1 is null");
 		Validate.notNull(resultItem, "resultItem is null");
+		Validate.notNull(item1, "item1 is null");
 		Validate.isTrue(tradeCount > 0, "tradeCount has to be positive");
 		this.timestamp = timestamp;
 		this.player = player;
 		this.shop = shop;
+		this.resultItem = resultItem;
 		this.item1 = item1;
 		this.item2 = item2;
-		this.resultItem = resultItem;
 		this.tradeCount = tradeCount;
 	}
 
@@ -112,17 +112,26 @@ public class TradeRecord {
 	}
 
 	/**
-	 * Gets the first item provided by the player.
-	 * <p>
-	 * Due to Minecraft's fuzzy item matching rules, this may not necessarily perfectly match the corresponding item of
-	 * the used trading recipe.
+	 * Gets the result item.
 	 * <p>
 	 * In order to avoid excessive item copying, this returns the item stored by this record without copying it first.
 	 * However, it is only meant for read-only purposes. Do not modify it!
 	 * 
-	 * @return the first item involved in the trade, not <code>null</code>
+	 * @return an unmodifiable view on the result item, not <code>null</code>
 	 */
-	public ItemStack getItem1() {
+	public UnmodifiableItemStack getResultItem() {
+		return resultItem;
+	}
+
+	/**
+	 * Gets the first item provided by the player.
+	 * <p>
+	 * Due to Minecraft's fuzzy item matching rules, this may not necessarily perfectly match the corresponding item of
+	 * the used trading recipe.
+	 * 
+	 * @return an unmodifiable view on the first item involved in the trade, not <code>null</code>
+	 */
+	public UnmodifiableItemStack getItem1() {
 		return item1;
 	}
 
@@ -131,26 +140,11 @@ public class TradeRecord {
 	 * <p>
 	 * Due to Minecraft's fuzzy item matching rules, this may not necessarily perfectly match the corresponding item of
 	 * the used trading recipe.
-	 * <p>
-	 * In order to avoid excessive item copying, this returns the item stored by this record without copying it first.
-	 * However, it is only meant for read-only purposes. Do not modify it!
 	 * 
-	 * @return the second item involved in the trade, can be <code>null</code>
+	 * @return an unmodifiable view on the second item involved in the trade, can be <code>null</code>
 	 */
-	public ItemStack getItem2() {
+	public UnmodifiableItemStack getItem2() {
 		return item2;
-	}
-
-	/**
-	 * Gets the result item.
-	 * <p>
-	 * In order to avoid excessive item copying, this returns the item stored by this record without copying it first.
-	 * However, it is only meant for read-only purposes. Do not modify it!
-	 * 
-	 * @return the result item, not <code>null</code>
-	 */
-	public ItemStack getResultItem() {
-		return resultItem;
 	}
 
 	/**
@@ -171,12 +165,12 @@ public class TradeRecord {
 		builder.append(player);
 		builder.append(", shop=");
 		builder.append(shop);
+		builder.append(", resultItem=");
+		builder.append(resultItem);
 		builder.append(", item1=");
 		builder.append(item1);
 		builder.append(", item2=");
 		builder.append(item2);
-		builder.append(", resultItem=");
-		builder.append(resultItem);
 		builder.append(", tradeCount=");
 		builder.append(tradeCount);
 		builder.append("]");
@@ -190,9 +184,9 @@ public class TradeRecord {
 		result = prime * result + timestamp.hashCode();
 		result = prime * result + player.hashCode();
 		result = prime * result + shop.hashCode();
+		result = prime * result + resultItem.hashCode();
 		result = prime * result + item1.hashCode();
 		result = prime * result + ((item2 == null) ? 0 : item2.hashCode());
-		result = prime * result + resultItem.hashCode();
 		result = prime * result + tradeCount;
 		return result;
 	}
@@ -206,11 +200,11 @@ public class TradeRecord {
 		if (tradeCount != other.tradeCount) return false;
 		if (!player.equals(other.player)) return false;
 		if (!shop.equals(other.shop)) return false;
+		if (!resultItem.equals(other.resultItem)) return false;
 		if (!item1.equals(other.item1)) return false;
 		if (item2 == null) {
 			if (other.item2 != null) return false;
 		} else if (!item2.equals(other.item2)) return false;
-		if (!resultItem.equals(other.resultItem)) return false;
 		return true;
 	}
 }

@@ -15,6 +15,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
@@ -85,9 +86,10 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		@Override
 		protected TradeOffer createOffer(TradingRecipeDraft recipe) {
 			assert recipe != null && recipe.isValid();
-			ItemStack resultItem = recipe.getResultItem();
-			ItemStack item1 = recipe.getItem1();
-			ItemStack item2 = recipe.getItem2();
+			// We can reuse the trading recipe draft's items without copying them first.
+			UnmodifiableItemStack resultItem = recipe.getResultItem();
+			UnmodifiableItemStack item1 = recipe.getItem1();
+			UnmodifiableItemStack item2 = recipe.getItem2();
 
 			// Replace placeholder items, if any:
 			// Note: We also replace placeholder items in the buy items, because this allows the setup of trades before

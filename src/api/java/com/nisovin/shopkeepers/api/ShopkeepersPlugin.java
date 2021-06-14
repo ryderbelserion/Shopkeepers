@@ -17,6 +17,7 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
 public interface ShopkeepersPlugin extends Plugin {
 
@@ -127,11 +128,88 @@ public interface ShopkeepersPlugin extends Plugin {
 	 */
 	public Shopkeeper handleShopkeeperCreation(ShopCreationData shopCreationData);
 
+	// FACTORIES
+
+	/**
+	 * Creates an {@link UnmodifiableItemStack} for the given {@link ItemStack}.
+	 * <p>
+	 * If the given item stack is already an {@link UnmodifiableItemStack}, this returns the given item stack itself.
+	 * 
+	 * @param itemStack
+	 *            the item stack, can be <code>null</code>
+	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is <code>null</code>
+	 */
+	public UnmodifiableItemStack createUnmodifiableItemStack(ItemStack itemStack);
+
 	// OFFERS FACTORY
 
+	/**
+	 * Creates a new {@link PriceOffer}.
+	 * <p>
+	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable and therefore not
+	 * copied before it is stored by the price offer. Otherwise, it is first copied.
+	 * 
+	 * @param item
+	 *            the item being traded, not <code>null</code> or empty
+	 * @param price
+	 *            the price, has to be positive
+	 * @return the new offer
+	 */
 	public PriceOffer createPriceOffer(ItemStack item, int price);
 
+	/**
+	 * Creates a new {@link PriceOffer}.
+	 * <p>
+	 * The given item stack is assumed to be immutable and therefore not copied before it is stored by the price offer.
+	 * 
+	 * @param item
+	 *            the item being traded, not <code>null</code> or empty
+	 * @param price
+	 *            the price, has to be positive
+	 * @return the new offer
+	 */
+	public PriceOffer createPriceOffer(UnmodifiableItemStack item, int price);
+
+	/**
+	 * Creates a new {@link TradeOffer}.
+	 * <p>
+	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable and therefore not
+	 * copied before they are stored by the trade offer. Otherwise, they are first copied.
+	 * 
+	 * @param resultItem
+	 *            the result item, not empty
+	 * @param item1
+	 *            the first buy item, not empty
+	 * @param item2
+	 *            the second buy item, can be empty
+	 * @return the new offer
+	 */
 	public TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2);
 
+	/**
+	 * Creates a new {@link TradeOffer}.
+	 * <p>
+	 * The given item stacks are assumed to be immutable and therefore not copied before they are stored by the trade
+	 * offer.
+	 * 
+	 * @param resultItem
+	 *            the result item, not empty
+	 * @param item1
+	 *            the first buy item, not empty
+	 * @param item2
+	 *            the second buy item, can be empty
+	 * @return the new offer
+	 */
+	public TradeOffer createTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2);
+
+	/**
+	 * Creates a new {@link BookOffer}.
+	 * 
+	 * @param bookTitle
+	 *            the book title, not <code>null</code> or empty
+	 * @param price
+	 *            the price, has to be positive
+	 * @return the new offer
+	 */
 	public BookOffer createBookOffer(String bookTitle, int price);
 }

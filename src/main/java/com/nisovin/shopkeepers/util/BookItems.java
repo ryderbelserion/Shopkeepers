@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
 
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 /**
@@ -38,6 +39,17 @@ public class BookItems {
 	public static BookMeta getBookMeta(@ReadOnly ItemStack itemStack) {
 		if (!isWrittenBook(itemStack)) return null;
 		return (BookMeta) itemStack.getItemMeta(); // Not null
+	}
+
+	/**
+	 * Gets the {@link BookMeta} of the given item, if it is a {@link #isWrittenBook(ItemStack) written book}.
+	 * 
+	 * @param itemStack
+	 *            the item stack
+	 * @return the book meta, or <code>null</code> if the given item is not a written book
+	 */
+	public static BookMeta getBookMeta(UnmodifiableItemStack itemStack) {
+		return getBookMeta(ItemUtils.asItemStackOrNull(itemStack));
 	}
 
 	// BOOK TITLE

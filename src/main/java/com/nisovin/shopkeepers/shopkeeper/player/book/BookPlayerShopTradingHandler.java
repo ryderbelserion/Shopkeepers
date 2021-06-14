@@ -9,6 +9,7 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
@@ -36,7 +37,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		Player tradingPlayer = tradeData.tradingPlayer;
 		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
 
-		ItemStack bookItem = tradingRecipe.getResultItem();
+		UnmodifiableItemStack bookItem = tradingRecipe.getResultItem();
 		BookMeta bookMeta = BookItems.getBookMeta(bookItem);
 		if (bookMeta == null || !BookItems.isCopy(bookMeta)) {
 			// Unexpected, because the recipes were created based on the shopkeeper's offers.

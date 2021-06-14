@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
@@ -31,8 +32,8 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			List<? extends PriceOffer> offers = shopkeeper.getOffers();
 			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
 			offers.forEach(offer -> {
-				ItemStack tradedItem = offer.getItem(); // Copy
-				ItemStack currencyItem = Settings.createCurrencyItem(offer.getPrice());
+				UnmodifiableItemStack tradedItem = offer.getItem();
+				UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(Settings.createCurrencyItem(offer.getPrice()));
 				TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, tradedItem, null);
 				recipes.add(recipe);
 			});
@@ -85,7 +86,8 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			assert recipe != null && recipe.isValid();
 			assert recipe.getItem2() == null; // Cannot be set via the editor
 
-			ItemStack priceItem = recipe.getResultItem();
+			// We can reuse the trading recipe draft's items without copying them first.
+			UnmodifiableItemStack priceItem = recipe.getResultItem();
 			assert priceItem != null;
 			// Make sure that the item is actually currency, this just in case:
 			if (priceItem.getType() != Settings.currencyItem.getType()) {
@@ -94,7 +96,7 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			assert priceItem.getAmount() > 0;
 			int price = priceItem.getAmount();
 
-			ItemStack tradedItem = recipe.getItem1();
+			UnmodifiableItemStack tradedItem = recipe.getItem1();
 			assert tradedItem != null;
 			// Replace placeholder item, if this is one:
 			tradedItem = PlaceholderItems.replace(tradedItem);

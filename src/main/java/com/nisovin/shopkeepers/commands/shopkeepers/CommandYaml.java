@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
@@ -46,7 +47,9 @@ class CommandYaml extends PlayerCommand {
 
 		// Serialized ItemStack and ItemData:
 		String itemStackYaml = ConfigUtils.toConfigYaml("item-in-hand", itemInHand);
-		String itemDataYaml = ConfigUtils.toConfigYaml("item-in-hand-config-data", new ItemData(itemInHand).serialize());
+		// This ItemData object is only used temporarily, so there is no need to copy the item stack:
+		Object itemDataSerialized = new ItemData(UnmodifiableItemStack.of(itemInHand)).serialize();
+		String itemDataYaml = ConfigUtils.toConfigYaml("item-in-hand-config-data", itemDataSerialized);
 
 		String[] itemStackYamlLines = StringUtils.splitLines(itemStackYaml);
 		String[] itemDataYamlLines = StringUtils.splitLines(itemDataYaml);

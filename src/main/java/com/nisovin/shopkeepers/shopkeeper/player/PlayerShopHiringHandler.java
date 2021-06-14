@@ -5,15 +5,18 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHireEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
 import com.nisovin.shopkeepers.ui.defaults.HiringHandler;
 import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
+import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 
@@ -41,9 +44,10 @@ public class PlayerShopHiringHandler extends HiringHandler {
 		inventory.setItem(BUTTON_HIRE_1, hireItem);
 		inventory.setItem(BUTTON_HIRE_2, hireItem);
 
-		ItemStack hireCost = shopkeeper.getHireCost();
+		UnmodifiableItemStack hireCost = shopkeeper.getHireCost();
 		if (hireCost == null) return false;
-		inventory.setItem(HIRE_COST, hireCost);
+		// Inventory#setItem copies the item, so we do not need to copy it ourselves here.
+		inventory.setItem(HIRE_COST, hireCost.asItemStack());
 
 		player.openInventory(inventory);
 		return true;
@@ -72,31 +76,20 @@ public class PlayerShopHiringHandler extends HiringHandler {
 				return;
 			}
 
-			// Check if the player can afford it and calculate the resulting player inventory:
-			ItemStack[] newPlayerInventoryContents = player.getInventory().getContents();
-			ItemStack hireCost = shopkeeper.getHireCost();
-			for (int i = 0; i < newPlayerInventoryContents.length; i++) {
-				ItemStack item = newPlayerInventoryContents[i];
-				if (item != null && item.isSimilar(hireCost)) {
-					if (item.getAmount() > hireCost.getAmount()) {
-						ItemStack clonedItem = item.clone();
-						newPlayerInventoryContents[i] = clonedItem;
-						clonedItem.setAmount(item.getAmount() - hireCost.getAmount());
-						hireCost.setAmount(0);
-						break;
-					} else if (item.getAmount() == hireCost.getAmount()) {
-						newPlayerInventoryContents[i] = null;
-						hireCost.setAmount(0);
-						break;
-					} else {
-						hireCost.setAmount(hireCost.getAmount() - item.getAmount());
-						newPlayerInventoryContents[i] = null;
-					}
-				}
+			UnmodifiableItemStack hireCost = shopkeeper.getHireCost();
+			if (hireCost == null) {
+				// The shopkeeper is no longer for hire.
+				// TODO Maybe instead ensure that we always close all hiring UIs when the hiring item changes.
+				// TODO Send a feedback message to the player
+				this.getUISession(player).abortDelayed();
+				return;
 			}
 
-			if (hireCost.getAmount() != 0) {
-				// Not enough money:
+			// Check if the player can afford to hire the shopkeeper, and calculate the resulting player inventory:
+			PlayerInventory playerInventory = player.getInventory();
+			ItemStack[] newPlayerInventoryContents = playerInventory.getContents();
+			if (ItemUtils.removeItems(newPlayerInventoryContents, hireCost) != 0) {
+				// The player cannot afford to hire the shopkeeper:
 				TextUtils.sendMessage(player, Messages.cannotHire);
 				// Close window for this player:
 				this.getUISession(player).abortDelayed();
@@ -126,13 +119,13 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			}
 
 			// Hire the shopkeeper:
-			player.getInventory().setContents(newPlayerInventoryContents); // Apply inventory changes
+			ItemUtils.setContents(playerInventory, newPlayerInventoryContents); // Apply player inventory changes
 			shopkeeper.setForHire(null);
 			shopkeeper.setOwner(player);
 			shopkeeper.save();
 			TextUtils.sendMessage(player, Messages.hired);
 
-			// Close all open windows for this shopkeeper:
+			// Close all open windows for the shopkeeper:
 			shopkeeper.abortUISessionsDelayed();
 		}
 	}

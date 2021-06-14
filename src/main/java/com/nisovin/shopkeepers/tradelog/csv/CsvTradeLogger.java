@@ -19,11 +19,11 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.tradelog.TradeLogger;
 import com.nisovin.shopkeepers.tradelog.data.PlayerRecord;
@@ -291,12 +291,12 @@ public class CsvTradeLogger implements TradeLogger {
 	// Gson loads it as a double by default (without there being an easy way to change that). But since some parts of
 	// Bukkit's ItemStack deserialization have strict expectations regarding the type of data to deserialize, the
 	// deserialization from Json may fail for this data.
-	private String getItemMetadata(ItemStack itemStack) {
+	private String getItemMetadata(UnmodifiableItemStack itemStack) {
 		assert itemStack != null;
 		if (!logItemMetadata) return ""; // Disabled
 
 		// If the logging of item metadata is enabled, we not only store the item's ItemMeta (if it has any), but also
-		// its data version. We therefore serialize the complete ItemStack here, but then remove the item's type and
+		// its data version. We therefore serialize the complete item stack here, but then remove the item's type and
 		// amount again, since these properties are already getting stored separately.
 		Map<String, Object> itemData = itemStack.serialize(); // Assert: The returned Map is modifiable.
 		itemData.remove("type");
@@ -320,9 +320,9 @@ public class CsvTradeLogger implements TradeLogger {
 			shopOwnerName = shopOwner.getName();
 		}
 
-		ItemStack resultItem = trade.getResultItem();
-		ItemStack item1 = trade.getItem1();
-		ItemStack item2 = trade.getItem2(); // Can be null
+		UnmodifiableItemStack resultItem = trade.getResultItem();
+		UnmodifiableItemStack item1 = trade.getItem1();
+		UnmodifiableItemStack item2 = trade.getItem2(); // Can be null
 		String item2Type = "";
 		String item2Amount = "";
 		String item2Metadata = "";

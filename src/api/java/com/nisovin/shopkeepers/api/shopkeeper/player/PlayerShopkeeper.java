@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
 /**
  * A shopkeeper that is managed by a player. This shopkeeper draws its supplies from a container and will deposit
@@ -85,26 +86,29 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	/**
 	 * Checks whether this shopkeeper is for hire.
 	 * <p>
-	 * The shopkeeper is for hire if a hire cost has been specified.
+	 * The shopkeeper is for hire if a {@link #getHireCost() hiring cost item} is set.
 	 * 
 	 * @return <code>true</code> if this shopkeeper is for hire
 	 */
 	public boolean isForHire();
 
 	/**
-	 * Sets this shopkeeper for hire using the given hire cost.
+	 * Sets this shopkeeper for hire using the given hiring cost item.
+	 * <p>
+	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable and therefore not
+	 * copied before it is stored by the shopkeeper. Otherwise, it is first copied.
 	 * 
 	 * @param hireCost
-	 *            the hire cost item, or <code>null</code> or empty to disable hiring for this shopkeeper
+	 *            the hiring cost item, or <code>null</code> or empty to set this shopkeeper not for hire
 	 */
 	public void setForHire(ItemStack hireCost);
 
 	/**
-	 * Gets the hiring cost of this shopkeeper.
+	 * Gets the hiring cost item of this shopkeeper.
 	 * 
-	 * @return a copy of the hiring cost item, or <code>null</code> if this shop is not for hire
+	 * @return an unmodifiable view on the hiring cost item, or <code>null</code> if this shopkeeper is not for hire
 	 */
-	public ItemStack getHireCost();
+	public UnmodifiableItemStack getHireCost();
 
 	/**
 	 * Gets the container's x coordinate.

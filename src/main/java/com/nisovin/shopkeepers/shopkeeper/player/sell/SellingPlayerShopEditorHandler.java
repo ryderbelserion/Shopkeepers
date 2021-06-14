@@ -8,6 +8,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
@@ -31,7 +32,7 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			List<? extends PriceOffer> offers = shopkeeper.getOffers();
 			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
 			offers.forEach(offer -> {
-				ItemStack tradedItem = offer.getItem(); // Copy
+				ItemStack tradedItem = offer.getItem().asItemStack();
 				TradingRecipeDraft recipe = createTradingRecipeDraft(tradedItem, offer.getPrice());
 				recipes.add(recipe);
 			});
@@ -84,7 +85,8 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			int price = getPrice(recipe);
 			if (price <= 0) return null; // Invalid recipe
 
-			ItemStack resultItem = recipe.getResultItem();
+			// We can reuse the trading recipe draft's items without copying them first.
+			UnmodifiableItemStack resultItem = recipe.getResultItem();
 			// Replace placeholder item, if this is one:
 			// Note: We also replace placeholder items in selling shopkeepers, because this allows the setup of trades
 			// before the player has all of the required items.

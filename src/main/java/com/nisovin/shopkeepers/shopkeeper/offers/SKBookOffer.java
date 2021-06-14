@@ -79,6 +79,7 @@ public class SKBookOffer implements BookOffer {
 		}
 	}
 
+	// Elements inside the config section are assumed to be immutable and can be reused without having to be copied.
 	public static List<? extends BookOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
 		List<BookOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);

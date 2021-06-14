@@ -6,6 +6,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.EnchantmentUtils;
 import com.nisovin.shopkeepers.util.EnchantmentUtils.EnchantmentEntry;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -125,6 +126,20 @@ public class PlaceholderItems {
 	public static ItemStack replace(@ReadOnly ItemStack itemStack) {
 		ItemStack substitutedItem = getSubstitutedItem(itemStack);
 		return (substitutedItem != null) ? substitutedItem : itemStack;
+	}
+
+	/**
+	 * If the given item stack is a {@link #isPlaceholderItem(ItemStack) valid placeholder}, this returns the
+	 * {@link #getSubstitutedItem(ItemStack) substituted item stack}. Otherwise, this returns the given
+	 * {@link UnmodifiableItemStack} itself.
+	 * 
+	 * @param itemStack
+	 *            the (potential) placeholder item
+	 * @return either the substituted item stack, if the given item stack is a valid placeholder, or otherwise the given
+	 *         item stack itself
+	 */
+	public static UnmodifiableItemStack replace(UnmodifiableItemStack itemStack) {
+		return UnmodifiableItemStack.of(replace(ItemUtils.asItemStackOrNull(itemStack)));
 	}
 
 	private PlaceholderItems() {

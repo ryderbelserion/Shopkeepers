@@ -6,6 +6,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
 /**
  * Buys items in exchange for currency items.
@@ -26,23 +27,42 @@ public interface BuyingPlayerShopkeeper extends PlayerShopkeeper {
 	public List<? extends PriceOffer> getOffers();
 
 	/**
-	 * Gets the offer for a specific type of item.
+	 * Gets the offer for the given type of item.
 	 * 
 	 * @param tradedItem
-	 *            the item being bought
-	 * @return the offer, or <code>null</code> if there is none for the specified item
+	 *            the item being bought, not <code>null</code>
+	 * @return the offer, or <code>null</code> if there is none for the given item
 	 */
 	public PriceOffer getOffer(ItemStack tradedItem);
 
 	/**
-	 * Removes the offer for a specific type of item.
+	 * Gets the offer for the given type of item.
+	 * 
+	 * @param tradedItem
+	 *            the item being bought, not <code>null</code>
+	 * @return the offer, or <code>null</code> if there is none for the given item
+	 */
+	public PriceOffer getOffer(UnmodifiableItemStack tradedItem);
+
+	/**
+	 * Removes the offer for the given type of item.
 	 * <p>
 	 * This has no effect if no such offer exists.
 	 * 
 	 * @param tradedItem
-	 *            the item being bought
+	 *            the item being bought, not <code>null</code>
 	 */
 	public void removeOffer(ItemStack tradedItem);
+
+	/**
+	 * Removes the offer for the given type of item.
+	 * <p>
+	 * This has no effect if no such offer exists.
+	 * 
+	 * @param tradedItem
+	 *            the item being bought, not <code>null</code>
+	 */
+	public void removeOffer(UnmodifiableItemStack tradedItem);
 
 	/**
 	 * Clears the shopkeeper's offers.

@@ -11,6 +11,7 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.util.BookItems;
@@ -80,7 +81,8 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		@Override
 		protected BookOffer createOffer(TradingRecipeDraft recipe) {
 			assert recipe != null && recipe.isValid();
-			ItemStack bookItem = recipe.getResultItem();
+			// We can reuse the trading recipe draft's items without copying them first.
+			UnmodifiableItemStack bookItem = recipe.getResultItem();
 			BookMeta bookMeta = BookItems.getBookMeta(bookItem);
 			if (bookMeta == null) return null; // Invalid recipe (not a written book, unexpected)
 			if (!SKBookPlayerShopkeeper.isDummyBook(bookMeta) && !BookItems.isCopyable(bookMeta)) {

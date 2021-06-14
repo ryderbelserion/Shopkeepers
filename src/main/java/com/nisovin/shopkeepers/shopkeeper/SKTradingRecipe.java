@@ -3,11 +3,12 @@ package com.nisovin.shopkeepers.shopkeeper;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Validate;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
-// Shares its implementation with TradingRecipeDraft, but returns copies of its items.
+// Shares its implementation with TradingRecipeDraft.
 public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe {
 
 	private final boolean outOfStock;
@@ -16,6 +17,9 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	 * Creates a {@link SKTradingRecipe}.
 	 * <p>
 	 * The recipe is not out of stock.
+	 * <p>
+	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable and therefore not
+	 * copied before they are stored by the trading recipe. Otherwise, they are first copied.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -30,6 +34,9 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 
 	/**
 	 * Creates a {@link SKTradingRecipe}.
+	 * <p>
+	 * If the given item stacks are {@link UnmodifiableItemStack}s, they are assumed to be immutable and therefore not
+	 * copied before they are stored by the trading recipe. Otherwise, they are first copied.
 	 * 
 	 * @param resultItem
 	 *            the result item, not empty
@@ -41,58 +48,53 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 	 *            <code>true</code> if the recipe is out of stock
 	 */
 	public SKTradingRecipe(@ReadOnly ItemStack resultItem, @ReadOnly ItemStack item1, @ReadOnly ItemStack item2, boolean outOfStock) {
-		super(ItemUtils.cloneOrNullIfEmpty(resultItem), ItemUtils.cloneOrNullIfEmpty(item1), ItemUtils.cloneOrNullIfEmpty(item2));
-		Validate.isTrue(!ItemUtils.isEmpty(resultItem), "Result item cannot be empty!");
-		Validate.isTrue(!ItemUtils.isEmpty(item1), "Item1 cannot be empty!");
+		this(
+				ItemUtils.unmodifiableCloneIfModifiable(resultItem),
+				ItemUtils.unmodifiableCloneIfModifiable(item1),
+				ItemUtils.unmodifiableCloneIfModifiable(item2),
+				outOfStock
+		);
+	}
+
+	/**
+	 * Creates a {@link SKTradingRecipe}.
+	 * <p>
+	 * The recipe is not out of stock.
+	 * <p>
+	 * The given item stacks are assumed to be immutable and therefore not copied before they are stored by the trading
+	 * recipe.
+	 * 
+	 * @param resultItem
+	 *            the result item, not empty
+	 * @param item1
+	 *            the first buy item, not empty
+	 * @param item2
+	 *            the second buy item, can be empty
+	 */
+	public SKTradingRecipe(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
+		this(resultItem, item1, item2, false);
+	}
+
+	/**
+	 * Creates a {@link SKTradingRecipe}.
+	 * <p>
+	 * The given item stacks are assumed to be immutable and therefore not copied before they are stored by the trading
+	 * recipe.
+	 * 
+	 * @param resultItem
+	 *            the result item, not empty
+	 * @param item1
+	 *            the first buy item, not empty
+	 * @param item2
+	 *            the second buy item, can be empty
+	 * @param outOfStock
+	 *            <code>true</code> if the recipe is out of stock
+	 */
+	public SKTradingRecipe(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2, boolean outOfStock) {
+		super(resultItem, item1, item2);
+		Validate.isTrue(!ItemUtils.isEmpty(resultItem), "resultItem is empty");
+		Validate.isTrue(!ItemUtils.isEmpty(item1), "item1 is empty");
 		this.outOfStock = outOfStock;
-	}
-
-	@Override
-	public final ItemStack getResultItem() {
-		return resultItem.clone();
-	}
-
-	@Override
-	public final ItemStack getItem1() {
-		return item1.clone();
-	}
-
-	@Override
-	public final ItemStack getItem2() {
-		return (item2 == null) ? null : item2.clone();
-	}
-
-	/**
-	 * Gets the result item without making a copy of it first.
-	 * <p>
-	 * For internal use only. The item is expected to not be modified.
-	 * 
-	 * @return the result item, not <code>null</code> or empty
-	 */
-	public ItemStack getInternalResultItem() {
-		return super.getResultItem();
-	}
-
-	/**
-	 * Gets the first required item without making a copy of it first.
-	 * <p>
-	 * For internal use only. The item is expected to not be modified.
-	 * 
-	 * @return the first required item, not <code>null</code> or empty
-	 */
-	public ItemStack getInternalItem1() {
-		return super.getItem1();
-	}
-
-	/**
-	 * Gets the second required item without making a copy of it first.
-	 * <p>
-	 * For internal use only. The item is expected to not be modified.
-	 * 
-	 * @return the second required item, can be <code>null</code>
-	 */
-	public ItemStack getInternalItem2() {
-		return super.getItem2();
 	}
 
 	@Override

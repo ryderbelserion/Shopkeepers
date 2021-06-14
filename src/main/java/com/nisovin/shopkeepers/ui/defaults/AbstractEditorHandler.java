@@ -186,6 +186,9 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		 * be invalid according to these checks: If this is the case, no offer is added to the merchant for the given
 		 * trading recipe draft, any previous offer is removed, and
 		 * {@link #handleInvalidTradingRecipe(Player, TradingRecipeDraft)} is invoked.
+		 * <p>
+		 * Implementations of this method can assume that the given trading recipe draft and its items are no longer
+		 * used by the editor afterwards. Implementations are therefore allowed to reuse these objects.
 		 * 
 		 * @param recipe
 		 *            the trading recipe draft, not <code>null</code> or {@link TradingRecipeDraft#isValid() invalid}
@@ -342,9 +345,10 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	protected void setTradeColumn(Inventory inventory, int column, TradingRecipeDraft recipe) {
 		if (inventory == null) return;
-		inventory.setItem(column + RESULT_ITEM_OFFSET, recipe.getResultItem());
-		inventory.setItem(column + ITEM_1_OFFSET, recipe.getItem1());
-		inventory.setItem(column + ITEM_2_OFFSET, recipe.getItem2());
+		// The inventory implementations create NMS copies of the items, so we do not need to copy them ourselves here:
+		inventory.setItem(column + RESULT_ITEM_OFFSET, ItemUtils.asItemStackOrNull(recipe.getResultItem()));
+		inventory.setItem(column + ITEM_1_OFFSET, ItemUtils.asItemStackOrNull(recipe.getItem1()));
+		inventory.setItem(column + ITEM_2_OFFSET, ItemUtils.asItemStackOrNull(recipe.getItem2()));
 	}
 
 	// TODO Avoid creating new TradingRecipeDraft objects here and instead update the drafts of the session?
