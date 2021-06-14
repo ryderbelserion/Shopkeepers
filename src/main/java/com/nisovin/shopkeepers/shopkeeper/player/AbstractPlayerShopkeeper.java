@@ -20,6 +20,7 @@ import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
@@ -437,7 +438,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
-	protected final SKTradingRecipe createSellingRecipe(UnmodifiableItemStack itemBeingSold, int price, boolean outOfStock) {
+	protected final TradingRecipe createSellingRecipe(UnmodifiableItemStack itemBeingSold, int price, boolean outOfStock) {
 		int remainingPrice = price;
 
 		UnmodifiableItemStack item1 = null;
@@ -472,7 +473,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
-	protected final SKTradingRecipe createBuyingRecipe(UnmodifiableItemStack itemBeingBought, int price, boolean outOfStock) {
+	protected final TradingRecipe createBuyingRecipe(UnmodifiableItemStack itemBeingBought, int price, boolean outOfStock) {
 		if (price > Settings.currencyItem.getType().getMaxStackSize()) {
 			// Cannot represent this price with the used currency items:
 			Log.warning("Shopkeeper " + this.getIdString() + " at " + this.getPositionString()

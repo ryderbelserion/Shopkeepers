@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -25,7 +26,6 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
-import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.BookItems;
@@ -101,11 +101,11 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	public List<? extends SKTradingRecipe> getTradingRecipes(Player player) {
+	public List<? extends TradingRecipe> getTradingRecipes(Player player) {
 		Map<String, ItemStack> containerBooksByTitle = this.getCopyableBooksFromContainer();
 		boolean hasBlankBooks = this.hasContainerBlankBooks();
 		List<? extends BookOffer> offers = this.getOffers();
-		List<SKTradingRecipe> recipes = new ArrayList<>(offers.size());
+		List<TradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(bookOffer -> {
 			String bookTitle = bookOffer.getBookTitle();
 			ItemStack bookItem = containerBooksByTitle.get(bookTitle);
@@ -121,7 +121,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 			assert bookItem != null;
 			// Assert: bookItem is a copy.
 
-			SKTradingRecipe recipe = this.createSellingRecipe(UnmodifiableItemStack.of(bookItem), bookOffer.getPrice(), outOfStock);
+			TradingRecipe recipe = this.createSellingRecipe(UnmodifiableItemStack.of(bookItem), bookOffer.getPrice(), outOfStock);
 			if (recipe != null) {
 				recipes.add(recipe);
 			} // Else: Price is invalid (cannot be represented by currency items).

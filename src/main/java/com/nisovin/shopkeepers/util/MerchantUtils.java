@@ -19,12 +19,12 @@ public class MerchantUtils {
 	private MerchantUtils() {
 	}
 
-	public static SKTradingRecipe getSelectedTradingRecipe(MerchantInventory merchantInventory) {
+	public static TradingRecipe getSelectedTradingRecipe(MerchantInventory merchantInventory) {
 		MerchantRecipe merchantRecipe = merchantInventory.getSelectedRecipe();
 		return createTradingRecipe(merchantRecipe);
 	}
 
-	public static SKTradingRecipe createTradingRecipe(MerchantRecipe merchantRecipe) {
+	public static TradingRecipe createTradingRecipe(MerchantRecipe merchantRecipe) {
 		if (merchantRecipe == null) return null;
 		List<ItemStack> ingredients = merchantRecipe.getIngredients();
 		ItemStack item1 = ingredients.get(0);

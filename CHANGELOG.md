@@ -278,7 +278,7 @@ Internal API:
 * The conversion between the editor's trading recipe drafts and the merchant's own representation of trade offers has been moved behind the new interface TradingRecipesAdapter in AbstractEditorHandler.
 * PlayerShopEditorHandler#createTradingRecipeDraft and #getPrice are no longer instance methods.
 * ItemData#withType may return the same ItemData instance now if the type has not changed.
-* Several internal references to the trade offer implementation classes have been replaced with references to the corresponding API interfaces. The internal return types of some shopkeeper methods for accessing these offers have changed.
+* Several internal references to the trade offer and trading recipe implementation classes have been replaced with references to the corresponding API interfaces. The internal return types of some shopkeeper methods for accessing the offers have changed. AbstractShopkeeper#getTradingRecipes no longer requires returning SKTradingRecipes.
 * When loading a shopkeeper from a config section, any stored data elements (except sub sections) are assumed to be immutable and the shopkeeper is allowed to directly store these elements without copying them first.
 * Various workarounds for avoiding copying internal item stacks when it is not required, such as methods that directly return internally stored item stacks, have been removed, since they are no longer required.
 * AbstractPlayerShopkeeper#createSellingRecipe and #createBuyingRecipe are final now.

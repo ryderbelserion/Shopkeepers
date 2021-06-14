@@ -24,6 +24,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObject;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObjectType;
@@ -759,7 +760,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// TRADING
 
 	@Override
-	public abstract List<? extends SKTradingRecipe> getTradingRecipes(Player player);
+	public abstract List<? extends TradingRecipe> getTradingRecipes(Player player);
 
 	// USER INTERFACES
 

@@ -9,13 +9,13 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.regular.RegularAdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
-import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.util.Log;
@@ -83,10 +83,10 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	}
 
 	@Override
-	public List<? extends SKTradingRecipe> getTradingRecipes(Player player) {
+	public List<? extends TradingRecipe> getTradingRecipes(Player player) {
 		// SKTradeOffer extends SKTradingRecipe and reports to not be out-of-stock. Both SKTradeOffer and TradingRecipe
-		// are expected to be immutable (they return copies of their items). We can therefore reuse the offers as
-		// trading recipes, and don't have to create a new trading recipes for them.
+		// are immutable. We can therefore reuse the offers as trading recipes, and don't have to create new trading
+		// recipes for them.
 		return offersView;
 	}
 

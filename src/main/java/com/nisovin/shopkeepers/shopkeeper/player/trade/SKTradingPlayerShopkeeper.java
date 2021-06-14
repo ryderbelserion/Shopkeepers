@@ -18,7 +18,6 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
-import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -28,8 +27,8 @@ import com.nisovin.shopkeepers.util.Validate;
 public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implements TradingPlayerShopkeeper {
 
 	// There can be multiple different offers for the same kind of item:
-	private final List<SKTradeOffer> offers = new ArrayList<>();
-	private final List<? extends SKTradeOffer> offersView = Collections.unmodifiableList(offers);
+	private final List<TradeOffer> offers = new ArrayList<>();
+	private final List<? extends TradeOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a not yet initialized {@link SKTradingPlayerShopkeeper} (for use in sub-classes).
@@ -90,14 +89,14 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	}
 
 	@Override
-	public List<? extends SKTradingRecipe> getTradingRecipes(Player player) {
+	public List<? extends TradingRecipe> getTradingRecipes(Player player) {
 		ItemStack[] containerContents = this.getContainerContents(); // Empty if the container is not found
-		List<? extends SKTradeOffer> offers = this.getOffers();
-		List<SKTradingRecipe> recipes = new ArrayList<>(offers.size());
+		List<? extends TradeOffer> offers = this.getOffers();
+		List<TradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(offer -> {
 			UnmodifiableItemStack resultItem = offer.getResultItem();
 			boolean outOfStock = !ItemUtils.containsAtLeast(containerContents, resultItem, resultItem.getAmount());
-			SKTradingRecipe recipe = offer.toTradingRecipe(outOfStock);
+			TradingRecipe recipe = SKTradeOffer.toTradingRecipe(offer, outOfStock);
 			recipes.add(recipe);
 		});
 		return Collections.unmodifiableList(recipes);
@@ -106,13 +105,13 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	// OFFERS:
 
 	@Override
-	public List<? extends SKTradeOffer> getOffers() {
+	public List<? extends TradeOffer> getOffers() {
 		return offersView;
 	}
 
 	public boolean hasOffer(ItemStack resultItem) {
 		Validate.notNull(resultItem, "resultItem is null");
-		for (SKTradeOffer offer : this.getOffers()) {
+		for (TradeOffer offer : this.getOffers()) {
 			if (offer.getResultItem().isSimilar(resultItem)) {
 				return true;
 			}

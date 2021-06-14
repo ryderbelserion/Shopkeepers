@@ -53,19 +53,6 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		super(resultItem, item1, item2);
 	}
 
-	/**
-	 * Creates a {@link TradingRecipe} based on this trade offer.
-	 * 
-	 * @param outOfStock
-	 *            whether to mark the trading recipe as being out of stock
-	 * @return the trading recipe
-	 */
-	public SKTradingRecipe toTradingRecipe(boolean outOfStock) {
-		// The items of both this trade offer and the new trading recipe are assumed to be immutable, so they do not
-		// need to be copied.
-		return new SKTradingRecipe(resultItem, item1, item2, outOfStock);
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -95,6 +82,20 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	// //////////
 	// STATIC UTILITIES
 	// //////////
+
+	/**
+	 * Creates a {@link TradingRecipe} based on the given trade offer.
+	 * 
+	 * @param offer
+	 *            the trade offer
+	 * @param outOfStock
+	 *            whether to mark the trading recipe as being out of stock
+	 * @return the trading recipe
+	 */
+	public static TradingRecipe toTradingRecipe(TradeOffer offer, boolean outOfStock) {
+		// The items of the trade offer are immutable, so they do not need to be copied.
+		return new SKTradingRecipe(offer.getResultItem(), offer.getItem1(), offer.getItem2(), outOfStock);
+	}
 
 	public static void saveToConfig(ConfigurationSection config, String node, @ReadOnly Collection<? extends TradeOffer> offers) {
 		ConfigurationSection offersSection = config.createSection(node);

@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.sell.SellingPlayerShopkeeper;
@@ -18,7 +19,6 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
-import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.ItemUtils;
@@ -29,8 +29,8 @@ import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implements SellingPlayerShopkeeper {
 
 	// Contains only one offer for any specific type of item:
-	private final List<SKPriceOffer> offers = new ArrayList<>();
-	private final List<? extends SKPriceOffer> offersView = Collections.unmodifiableList(offers);
+	private final List<PriceOffer> offers = new ArrayList<>();
+	private final List<? extends PriceOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
 	 * Creates a not yet initialized {@link SKSellingPlayerShopkeeper} (for use in sub-classes).
@@ -91,15 +91,15 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	}
 
 	@Override
-	public List<? extends SKTradingRecipe> getTradingRecipes(Player player) {
+	public List<? extends TradingRecipe> getTradingRecipes(Player player) {
 		ItemStack[] containerContents = this.getContainerContents(); // Empty if the container is not found
-		List<? extends SKPriceOffer> offers = this.getOffers();
-		List<SKTradingRecipe> recipes = new ArrayList<>(offers.size());
+		List<? extends PriceOffer> offers = this.getOffers();
+		List<TradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(offer -> {
 			// Both the offer's and the trading recipe's items are immutable. So there is no need to copy the item.
 			UnmodifiableItemStack tradedItem = offer.getItem();
 			boolean outOfStock = !ItemUtils.containsAtLeast(containerContents, tradedItem, tradedItem.getAmount());
-			SKTradingRecipe recipe = this.createSellingRecipe(tradedItem, offer.getPrice(), outOfStock);
+			TradingRecipe recipe = this.createSellingRecipe(tradedItem, offer.getPrice(), outOfStock);
 			if (recipe != null) {
 				recipes.add(recipe);
 			} // Else: Price is invalid (cannot be represented by currency items).
@@ -110,14 +110,14 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	// OFFERS:
 
 	@Override
-	public List<? extends SKPriceOffer> getOffers() {
+	public List<? extends PriceOffer> getOffers() {
 		return offersView;
 	}
 
 	@Override
 	public PriceOffer getOffer(@ReadOnly ItemStack tradedItem) {
 		Validate.notNull(tradedItem, "tradedItem is null");
-		for (SKPriceOffer offer : this.getOffers()) {
+		for (PriceOffer offer : this.getOffers()) {
 			if (offer.getItem().isSimilar(tradedItem)) {
 				return offer;
 			}
@@ -133,7 +133,7 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	@Override
 	public void removeOffer(@ReadOnly ItemStack tradedItem) {
 		Validate.notNull(tradedItem, "tradedItem is null");
-		Iterator<? extends SKPriceOffer> iterator = offers.iterator();
+		Iterator<? extends PriceOffer> iterator = offers.iterator();
 		while (iterator.hasNext()) {
 			if (iterator.next().getItem().isSimilar(tradedItem)) {
 				iterator.remove();
