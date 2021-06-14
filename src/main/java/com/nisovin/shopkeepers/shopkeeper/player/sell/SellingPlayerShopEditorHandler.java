@@ -6,7 +6,6 @@ import java.util.List;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
@@ -92,7 +91,7 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			// before the player has all of the required items.
 			resultItem = PlaceholderItems.replace(resultItem);
 
-			return ShopkeepersAPI.createPriceOffer(resultItem, price);
+			return PriceOffer.create(resultItem, price);
 		}
 	}
 

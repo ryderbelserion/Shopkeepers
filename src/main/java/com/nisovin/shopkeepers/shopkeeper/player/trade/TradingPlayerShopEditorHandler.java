@@ -12,7 +12,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -98,7 +97,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			item1 = PlaceholderItems.replace(item1);
 			item2 = PlaceholderItems.replace(item2);
 
-			return ShopkeepersAPI.createTradeOffer(resultItem, item1, item2);
+			return TradeOffer.create(resultItem, item1, item2);
 		}
 	}
 

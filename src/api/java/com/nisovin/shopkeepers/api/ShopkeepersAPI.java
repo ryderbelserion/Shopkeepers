@@ -148,7 +148,9 @@ public final class ShopkeepersAPI {
 	 * @param itemStack
 	 *            the item stack, can be <code>null</code>
 	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is <code>null</code>
+	 * @deprecated Use {@link UnmodifiableItemStack#of(ItemStack)}
 	 */
+	@Deprecated
 	public static UnmodifiableItemStack createUnmodifiableItemStack(ItemStack itemStack) {
 		return getPlugin().createUnmodifiableItemStack(itemStack);
 	}
@@ -166,7 +168,9 @@ public final class ShopkeepersAPI {
 	 * @param price
 	 *            the price, has to be positive
 	 * @return the new offer
+	 * @deprecated Use {@link PriceOffer#create(ItemStack, int)}
 	 */
+	@Deprecated
 	public static PriceOffer createPriceOffer(ItemStack item, int price) {
 		return getPlugin().createPriceOffer(item, price);
 	}
@@ -181,7 +185,9 @@ public final class ShopkeepersAPI {
 	 * @param price
 	 *            the price, has to be positive
 	 * @return the new offer
+	 * @deprecated Use {@link PriceOffer#create(UnmodifiableItemStack, int)}
 	 */
+	@Deprecated
 	public static PriceOffer createPriceOffer(UnmodifiableItemStack item, int price) {
 		return getPlugin().createPriceOffer(item, price);
 	}
@@ -199,7 +205,9 @@ public final class ShopkeepersAPI {
 	 * @param item2
 	 *            the second buy item, can be empty
 	 * @return the new offer
+	 * @deprecated Use {@link TradeOffer#create(ItemStack, ItemStack, ItemStack)}
 	 */
+	@Deprecated
 	public static TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		return getPlugin().createTradeOffer(resultItem, item1, item2);
 	}
@@ -217,7 +225,9 @@ public final class ShopkeepersAPI {
 	 * @param item2
 	 *            the second buy item, can be empty
 	 * @return the new offer
+	 * @deprecated Use {@link TradeOffer#create(UnmodifiableItemStack, UnmodifiableItemStack, UnmodifiableItemStack)}
 	 */
+	@Deprecated
 	public static TradeOffer createTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
 		return getPlugin().createTradeOffer(resultItem, item1, item2);
 	}
@@ -230,7 +240,9 @@ public final class ShopkeepersAPI {
 	 * @param price
 	 *            the price, has to be positive
 	 * @return the new offer
+	 * @deprecated Use {@link BookOffer#create(String, int)}
 	 */
+	@Deprecated
 	public static BookOffer createBookOffer(String bookTitle, int price) {
 		return getPlugin().createBookOffer(bookTitle, price);
 	}

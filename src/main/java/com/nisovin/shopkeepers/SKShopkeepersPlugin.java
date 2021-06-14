@@ -600,6 +600,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// FACTORIES
 
+	@Deprecated
 	@Override
 	public UnmodifiableItemStack createUnmodifiableItemStack(ItemStack itemStack) {
 		return SKUnmodifiableItemStack.of(itemStack);
@@ -607,26 +608,31 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	// OFFERS FACTORY
 
+	@Deprecated
 	@Override
 	public PriceOffer createPriceOffer(ItemStack item, int price) {
 		return new SKPriceOffer(item, price);
 	}
 
+	@Deprecated
 	@Override
 	public PriceOffer createPriceOffer(UnmodifiableItemStack item, int price) {
 		return new SKPriceOffer(item, price);
 	}
 
+	@Deprecated
 	@Override
 	public TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
 		return new SKTradeOffer(resultItem, item1, item2);
 	}
 
+	@Deprecated
 	@Override
 	public TradeOffer createTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
 		return new SKTradeOffer(resultItem, item1, item2);
 	}
 
+	@Deprecated
 	@Override
 	public BookOffer createBookOffer(String bookTitle, int price) {
 		return new SKBookOffer(bookTitle, price);

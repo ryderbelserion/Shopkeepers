@@ -257,7 +257,7 @@ API:
 * Added: ShopkeeperTradeEvent#hasOfferedItem2() as a shortcut for checking if the trade involves two input items.
 * Added: PlayerShopkeeper#isNotifyOnTrades and PlayerShopkeeper#setNotifyOnTrades.
 * Fixed: We now call the ShopkeeperEditedEvent when the player closes the editor and at least one trade offer has changed.
-* API: Added factory methods to the TradeOffer, PriceOffer, and BookOffer interfaces. These are now preferred over the factory method found in ShopkeepersAPI and ShopkeepersPlugin.
+* API: Added factory methods to the TradeOffer, PriceOffer, and BookOffer interfaces. These are now preferred over the factory methods found in ShopkeepersAPI and ShopkeepersPlugin. The latter have been deprecated and may be removed in the future.
 * API: Added TradeOffer#hasItem2() and TradingRecipe#hasItem2().
 * Several Javadoc improvements and clarifications.
 

@@ -9,7 +9,6 @@ import java.util.Set;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
@@ -96,7 +95,7 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			int price = getPrice(recipe);
 			if (price <= 0) return null; // Invalid recipe
 
-			return ShopkeepersAPI.createBookOffer(bookTitle, price);
+			return BookOffer.create(bookTitle, price);
 		}
 	}
 

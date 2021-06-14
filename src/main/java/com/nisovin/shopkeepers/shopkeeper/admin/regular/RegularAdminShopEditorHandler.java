@@ -7,7 +7,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
@@ -56,7 +55,7 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 			UnmodifiableItemStack resultItem = recipe.getResultItem();
 			UnmodifiableItemStack item1 = recipe.getItem1();
 			UnmodifiableItemStack item2 = recipe.getItem2();
-			return ShopkeepersAPI.createTradeOffer(resultItem, item1, item2);
+			return TradeOffer.create(resultItem, item1, item2);
 		}
 
 		// TODO Remove this? Maybe handle the trades setup similar to the player trading shop: Copying the selected

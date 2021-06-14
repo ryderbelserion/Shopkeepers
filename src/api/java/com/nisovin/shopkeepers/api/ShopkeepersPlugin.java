@@ -138,7 +138,9 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * @param itemStack
 	 *            the item stack, can be <code>null</code>
 	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is <code>null</code>
+	 * @deprecated Use {@link UnmodifiableItemStack#of(ItemStack)}
 	 */
+	@Deprecated
 	public UnmodifiableItemStack createUnmodifiableItemStack(ItemStack itemStack);
 
 	// OFFERS FACTORY
@@ -154,7 +156,9 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * @param price
 	 *            the price, has to be positive
 	 * @return the new offer
+	 * @deprecated Use {@link PriceOffer#create(ItemStack, int)}
 	 */
+	@Deprecated
 	public PriceOffer createPriceOffer(ItemStack item, int price);
 
 	/**
@@ -167,7 +171,9 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * @param price
 	 *            the price, has to be positive
 	 * @return the new offer
+	 * @deprecated Use {@link PriceOffer#create(UnmodifiableItemStack, int)}
 	 */
+	@Deprecated
 	public PriceOffer createPriceOffer(UnmodifiableItemStack item, int price);
 
 	/**
@@ -183,7 +189,9 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * @param item2
 	 *            the second buy item, can be empty
 	 * @return the new offer
+	 * @deprecated Use {@link TradeOffer#create(ItemStack, ItemStack, ItemStack)}
 	 */
+	@Deprecated
 	public TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2);
 
 	/**
@@ -199,7 +207,9 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * @param item2
 	 *            the second buy item, can be empty
 	 * @return the new offer
+	 * @deprecated Use {@link TradeOffer#create(UnmodifiableItemStack, UnmodifiableItemStack, UnmodifiableItemStack)}
 	 */
+	@Deprecated
 	public TradeOffer createTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2);
 
 	/**
@@ -210,6 +220,8 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * @param price
 	 *            the price, has to be positive
 	 * @return the new offer
+	 * @deprecated Use {@link BookOffer#create(String, int)}
 	 */
+	@Deprecated
 	public BookOffer createBookOffer(String bookTitle, int price);
 }
