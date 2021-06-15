@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-# Print the current Java version for debugging purposes:
-# Java 8: 52 , Java 16: 60
-JAVA_CLASS_VERSION=$(javap -verbose java.lang.Runnable | grep "major version" | cut -d " " -f5)
-echo Current Java class version: $JAVA_CLASS_VERSION
-
 # We only re-build CraftBukkit/Spigot versions that are missing in the Maven cache.
 # Add entries here for every required version of CraftBukkit/Spigot.
 
