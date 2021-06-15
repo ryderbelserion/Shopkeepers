@@ -163,7 +163,10 @@ public class Settings extends Config {
 			"HOGLIN", // MC 1.16
 			"ZOGLIN", // MC 1.16
 			"STRIDER", // MC 1.16
-			"PIGLIN_BRUTE" // MC 1.16.2
+			"PIGLIN_BRUTE", // MC 1.16.2
+			"AXOLOTL", // MC 1.17
+			"GOAT", // MC 1.17
+			"GLOW_SQUID" // MC 1.17
 	), String::compareTo));
 
 	public static boolean disableGravity = false;

@@ -61,6 +61,10 @@ button-sign-variant: "&aSchild-Variante ändern"
 button-sign-variant-lore:
 - "Ändert den Holztyp"
 - "des Schildes"
+button-sign-glowing-text: "&aLeuchtender Text"
+button-sign-glowing-text-lore:
+- "Schaltet leuchtenden"
+- "Text an und aus"
 button-baby: "&aBaby-Variante umschalten"
 button-baby-lore:
 - "Wechselt zwischen der Kind- und"
@@ -179,6 +183,19 @@ button-shulker-color: "&aShulkerfarbe ändern"
 button-shulker-color-lore:
 - "Ändert die Farbe"
 - "des Shulkers"
+button-axolotl-variant: "&aAxolotl-Variante ändern"
+button-axolotl-variant-lore:
+- "Ändert das Aussehen"
+- "des Axolotls"
+button-glow-squid-dark: "&aLeuchten umschalten"
+button-glow-squid-dark-lore:
+- "Schaltet das Leuchten"
+- "des Leuchttintenfisches"
+- "an und aus"
+button-goat-screaming: "&aSchreiende Ziege umschalten"
+button-goat-screaming-lore:
+- "Schaltet zwischen einer normalen"
+- "und einer schreienden Ziege um"
 
 admin-sign-shop-line1: "&2[SHOP]"
 admin-sign-shop-line2: "&7{shopName}"

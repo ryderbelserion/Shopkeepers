@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.chatinput.ChatInput;
 import com.nisovin.shopkeepers.commands.Commands;
 import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
+import com.nisovin.shopkeepers.compat.MC_1_17_Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
@@ -253,6 +254,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		// Check for and initialize version dependent utilities:
 		MC_1_16_Utils.init();
+		MC_1_17_Utils.init();
 
 		// Inform about Spigot exclusive features:
 		if (SpigotFeatures.isSpigotAvailable()) {

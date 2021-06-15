@@ -21,7 +21,11 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
+import com.nisovin.shopkeepers.compat.MC_1_17_Utils;
+import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.property.BooleanProperty;
+import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
@@ -44,6 +48,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	private SignType signType = SignType.OAK; // Not null, not unsupported, default is OAK.
 	private boolean wallSign = true;
 	private BlockFace signFacing = BlockFace.SOUTH; // Not null
+	private final Property<Boolean> glowingTextProperty = new BooleanProperty(shopkeeper, "glowingText", false);
+
 	// Update the sign content at least once after plugin start, in case some settings have changed which affect the
 	// sign content:
 	private boolean updateSign = true;
@@ -132,6 +138,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 				shopkeeper.markDirty();
 			}
 		}
+
+		glowingTextProperty.load(configSection);
 	}
 
 	@Override
@@ -146,6 +154,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 		// Sign facing:
 		configSection.set("signFacing", signFacing.name());
+
+		glowingTextProperty.save(configSection);
 	}
 
 	public boolean isWallSign() {
@@ -304,6 +314,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			this.setupAdminShopSign(sign, (AdminShopkeeper) shopkeeper);
 		}
 
+		// Glowing text:
+		NMSManager.getProvider().setGlowingText(sign, this.isGlowingText());
+
 		// Apply sign changes:
 		sign.update(false, false);
 	}
@@ -396,6 +409,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	public List<EditorHandler.Button> createEditorButtons() {
 		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSignTypeEditorButton());
+		if (MC_1_17_Utils.isAvailable()) {
+			editorButtons.add(this.getGlowingTextEditorButton());
+		}
 		return editorButtons;
 	}
 
@@ -440,6 +456,57 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleSignType(backwards);
+				return true;
+			}
+		};
+	}
+
+	// GLOWING TEXT
+
+	public boolean isGlowingText() {
+		return glowingTextProperty.getValue();
+	}
+
+	public void setGlowingText(boolean glowing) {
+		glowingTextProperty.setValue(glowing);
+		shopkeeper.markDirty();
+		this.applyGlowingText();
+	}
+
+	protected void applyGlowingText() {
+		Sign sign = this.getSign();
+		if (sign == null) return; // Not spawned or no longer a sign
+
+		NMSManager.getProvider().setGlowingText(sign, this.isGlowingText());
+		// Sign block type is still the same (no force required), and we want to skip physics:
+		sign.update(false, false);
+	}
+
+	public void cycleGlowingText(boolean backwards) {
+		this.setGlowingText(!this.isGlowingText());
+	}
+
+	private ItemStack getGlowingTextEditorItem() {
+		ItemStack iconItem;
+		if (this.isGlowingText()) {
+			iconItem = new ItemStack(MC_1_17_Utils.MATERIAL_GLOW_INK_SAC);
+		} else {
+			iconItem = new ItemStack(Material.INK_SAC);
+		}
+		return ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSignGlowingText, Messages.buttonSignGlowingTextLore);
+	}
+
+	private EditorHandler.Button getGlowingTextEditorButton() {
+		return new EditorHandler.ShopkeeperActionButton() {
+			@Override
+			public ItemStack getIcon(EditorHandler.Session session) {
+				return getGlowingTextEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+				boolean backwards = clickEvent.isRightClick();
+				cycleGlowingText(backwards);
 				return true;
 			}
 		};

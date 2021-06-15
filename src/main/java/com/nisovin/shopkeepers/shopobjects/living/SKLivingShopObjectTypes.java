@@ -24,11 +24,14 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.living.LivingShopObjectTypes;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.living.types.AxolotlShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.BabyableShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ChestedHorseShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.CreeperShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.FoxShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.GlowSquidShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.GoatShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.HorseShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.LlamaShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.MagmaCubeShop;
@@ -136,6 +139,10 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> STRIDER: okay, shakes outside the nether, randomly spawns with passenger (gets cleared), randomly spawns with saddle (TODO)
 	 * # 1.16.2
 	 * <li> PIGLIN_BRUTE: okay, TODO add baby property
+	 * # 1.17
+	 * <li> AXOLOTL: okay, spawns with random variant in vanilla
+	 * <li> GLOW_SQUID: okay
+	 * <li> GOAT: okay, randomly spawns as screaming variant in vanilla
 	 * </ul>
 	 */
 
@@ -240,7 +247,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 		List<String> aliases = this.getAliases(entityType);
 		String permission = getPermission(entityType);
 
-		SKLivingShopObjectType<?> objectType;
+		SKLivingShopObjectType<?> objectType = null;
 		switch (entityType) {
 		case VILLAGER:
 			objectType = new SKLivingShopObjectType<VillagerShop>(livingShops, entityType, identifier, aliases, permission) {
@@ -403,6 +410,38 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 			};
 			break;
 		default:
+			switch (entityType.name()) {
+			case "AXOLOTL": // TODO Move up once we only support MC 1.17 upwards.
+				objectType = new SKLivingShopObjectType<AxolotlShop>(livingShops, entityType, identifier, aliases, permission) {
+					@Override
+					public AxolotlShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+						return new AxolotlShop(livingShops, this, shopkeeper, creationData);
+					}
+				};
+				break;
+			case "GLOW_SQUID": // TODO Move up once we only support MC 1.17 upwards.
+				objectType = new SKLivingShopObjectType<GlowSquidShop>(livingShops, entityType, identifier, aliases, permission) {
+					@Override
+					public GlowSquidShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+						return new GlowSquidShop(livingShops, this, shopkeeper, creationData);
+					}
+				};
+				break;
+			case "GOAT": // TODO Move up once we only support MC 1.17 upwards.
+				objectType = new SKLivingShopObjectType<GoatShop>(livingShops, entityType, identifier, aliases, permission) {
+					@Override
+					public GoatShop createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+						return new GoatShop(livingShops, this, shopkeeper, creationData);
+					}
+				};
+				break;
+			default:
+				break;
+			}
+			break;
+		}
+
+		if (objectType == null) {
 			Class<? extends Entity> entityClass = entityType.getEntityClass();
 			if (ChestedHorse.class.isAssignableFrom(entityType.getEntityClass())) {
 				objectType = new SKLivingShopObjectType<ChestedHorseShop<ChestedHorse>>(livingShops, entityType, identifier, aliases, permission) {
@@ -433,8 +472,8 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 					}
 				};
 			}
-			break;
 		}
+
 		assert objectType != null;
 		return objectType;
 	}

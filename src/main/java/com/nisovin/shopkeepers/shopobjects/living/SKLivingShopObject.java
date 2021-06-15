@@ -167,6 +167,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			// Note: Buttons are small enough to not be visible inside the entity's head (even for their baby variants).
 			equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
 		}
+
+		// Any version-specific preparation:
+		NMSManager.getProvider().prepareEntity(entity);
 	}
 
 	// Any clean up that needs to happen for the entity. The entity might not be fully setup yet.
@@ -230,9 +233,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			entity.setRemoveWhenFarAway(false);
 			entity.setCanPickupItems(false);
 
-			// This is also required so that certain Minecraft behaviors (eg. the panic behavior of nearby villagers) ignore the
-			// shopkeeper entities. Otherwise, the shopkeeper entities can be abused for mob farms (eg. villages spawn more iron
-			// golems when villagers are in panic due to nearby hostile mob shopkeepers).
+			// This is also required so that certain Minecraft behaviors (eg. the panic behavior of nearby villagers)
+			// ignore the shopkeeper entities. Otherwise, the shopkeeper entities can be abused for mob farms (eg.
+			// villages spawn more iron golems when villagers are in panic due to nearby hostile mob shopkeepers).
 			entity.setInvulnerable(true);
 
 			// Disable breeding:
@@ -245,6 +248,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 			// Set the entity to an adult if we don't support its baby property yet:
 			NMSManager.getProvider().setExclusiveAdult(entity);
+
+			// Any version-specific setup:
+			NMSManager.getProvider().setupSpawnedEntity(entity);
 
 			// Remove potion effects:
 			for (PotionEffect potionEffect : entity.getActivePotionEffects()) {
@@ -337,10 +343,11 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		}
 		if (Settings.disableGravity) {
 			this.setNoGravity(entity);
-			// When gravity is disabled, we may also able to disable collisions / the pushing of mobs via the noclip
+			// When gravity is disabled, we may also be able to disable collisions / the pushing of mobs via the noclip
 			// flag. However, this might not properly work for Vex, since they disable their noclip again after their
 			// movement.
 			// TODO Still required? Bukkit's setCollidable API might actually work now.
+			// But this might also provide a small performance benefit.
 			NMSManager.getProvider().setNoclip(entity);
 		}
 	}

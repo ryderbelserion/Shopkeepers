@@ -75,6 +75,8 @@ public class Messages extends Config {
 
 	public static String buttonSignVariant = c("&aChoose sign variant");
 	public static List<String> buttonSignVariantLore = c(Arrays.asList("Changes the sign's", "wood type"));
+	public static String buttonSignGlowingText = c("&aToggle glowing text");
+	public static List<String> buttonSignGlowingTextLore = c(Arrays.asList("Toggles glowing text", "on and off"));
 	public static String buttonBaby = c("&aToggle baby variant");
 	public static List<String> buttonBabyLore = c(Arrays.asList("Toggles between the mob's", "baby and adult variant"));
 	public static String buttonSitting = c("&aToggle sitting pose");
@@ -135,6 +137,12 @@ public class Messages extends Config {
 	public static List<String> buttonSnowmanPumpkinHeadLore = c(Arrays.asList("Toggles the snowman's", "pumpkin head"));
 	public static String buttonShulkerColor = c("&aChoose shulker color");
 	public static List<String> buttonShulkerColorLore = c(Arrays.asList("Changes the color", "of the shulker"));
+	public static String buttonAxolotlVariant = c("&aChoose axolotl variant");
+	public static List<String> buttonAxolotlVariantLore = c(Arrays.asList("Changes the axolotl's look"));
+	public static String buttonGlowSquidDark = c("&aToggle glow");
+	public static List<String> buttonGlowSquidDarkLore = c(Arrays.asList("Toggles the glow squid's", "glow on and off"));
+	public static String buttonGoatScreaming = c("&aToggle screaming goat");
+	public static List<String> buttonGoatScreamingLore = c(Arrays.asList("Toggles between a normal", "and a screaming goat"));
 
 	public static String adminSignShopLine1 = c("&2[SHOP]");
 	public static String adminSignShopLine2 = c("&7{shopName}");

@@ -2,8 +2,15 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.13.0 (TBA)
-### Supported MC versions: 1.16.5, 1.15.2, 1.14.4
+### Supported MC versions: 1.17, 1.16.5, 1.15.2, 1.14.4
 
+* Update for MC 1.17:
+  * Config: Added axolotls, glow squids, and goats to the by default enabled mob types.
+  * Added new editor features that are only available when using MC 1.17:
+    * Changing the axolotl variant.
+    * Toggling between a glowing and a dark glow squid.
+    * Toggling between a normal and a screaming goat. This editor option is only available if `silence-living-shop-entities` is disabled.
+    * Toggle glowing text for sign shops.
 * Messages have been separated from the config.
   * We always generate an 'en-default' language file. This file acts as a template for custom language files. It is not meant to be modified and is replaced with an up-to-date version on every plugin startup.
   * Config: Changed the default language from 'en' to 'en-default'. Existing configs get automatically migrated.
@@ -287,6 +294,12 @@ Internal API:
 * Small refactors of TrandingRecipeDraft: Added TradingRecipeDraft#asItem2(). #toTradingRecipe has been moved into SKTradeOffer. Some methods are final now.
 
 Internal:  
+* Building:
+  * We build against the Mojang-mapped CraftBukkit version now and remap the result to the mapping used by Spigot.
+  * Building requires JDK 16 now. The source code is still Java 8 compatible, but that might change in the future.
+* Added callbacks to apply version-specific preparations and setup when spawning shopkeeper entities. But these are not yet used for anything.
+* Refactor: Moved some general utility methods from 'MC_1_16Utils' to 'CompatUtils'.
+* Added StringProperty.
 * The config key pattern is cached now.
 * Major refactoring related to how the config and language files are loaded.
 * Refactoring related to how shopkeeper data is saved and loaded:
@@ -342,6 +355,7 @@ Internal:
 * Various other internal code refactoring.
 
 Migration notes:  
+* If you are upgrading to MC 1.17, you will have to manually add the new mob types (`AXOLOTL`, `GLOW_SQUID`, `GOAT`) to the `enabled-living-shops`.
 * The folder structure has changed:
   * The save file is stored inside a new 'data' folder now. If no save file exists at the new location and a previous save file is found at the old location, it is automatically moved.
   * Language files are located inside a new 'lang' folder now. Existing custom language files need to be manually moved!
@@ -446,6 +460,14 @@ Messages:
 * Added 'confirmation-ui-delete-villager-confirm-lore'.
 * Added 'villager-removed'.
 * Fixed: The german translation was missing translations for 'confirmation-expired' and 'nothing-to-confirm'.
+* Added 'button-sign-glowing-text'.
+* Added 'button-sign-glowing-text-lore'.
+* Added 'button-axolotl-variant'.
+* Added 'button-axolotl-variant-lore'.
+* Added 'button-glow-squid-dark'.
+* Added 'button-glow-squid-dark-lore'.
+* Added 'button-goat-screaming'.
+* Added 'button-goat-screaming-lore'.
 * Minor changes to the german translation.
 
 You will have to manually update your custom language files to adapt for these changes.

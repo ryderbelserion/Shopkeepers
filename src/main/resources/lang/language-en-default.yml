@@ -67,6 +67,10 @@ button-sign-variant: "&aChoose sign variant"
 button-sign-variant-lore:
 - "Changes the sign's"
 - "wood type"
+button-sign-glowing-text: "&aToggle glowing text"
+button-sign-glowing-text-lore:
+- "Toggles glowing text"
+- "on and off"
 button-baby: "&aToggle baby variant"
 button-baby-lore:
 - "Toggles between the mob's"
@@ -180,6 +184,17 @@ button-shulker-color: "&aChoose shulker color"
 button-shulker-color-lore:
 - "Changes the color"
 - "of the shulker"
+button-axolotl-variant: "&aChoose axolotl variant"
+button-axolotl-variant-lore:
+- "Changes the axolotl's look"
+button-glow-squid-dark: "&aToggle glow"
+button-glow-squid-dark-lore:
+- "Toggles the glow squid's"
+- "glow on and off"
+button-goat-screaming: "&aToggle screaming goat"
+button-goat-screaming-lore:
+- "Toggles between a normal"
+- "and a screaming goat"
 
 admin-sign-shop-line1: "&2[SHOP]"
 admin-sign-shop-line2: "&7{shopName}"

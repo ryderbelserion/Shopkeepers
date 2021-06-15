@@ -206,6 +206,7 @@ player-shopkeeper-inactive-days: 0
 # work and can cause all kinds of issues.
 enabled-living-shops:
 - VILLAGER
+- AXOLOTL
 - BEE
 - BLAZE
 - CAT
@@ -222,6 +223,8 @@ enabled-living-shops:
 - FOX
 - GHAST
 - GIANT
+- GLOW_SQUID
+- GOAT
 - HOGLIN
 - HORSE
 - HUSK

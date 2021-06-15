@@ -1,5 +1,5 @@
 jdk:
-- openjdk8
+- openjdk16
 
 # Only re-build CraftBukkit/Spigot versions that are missing in the cache
 # Add entries here for every required version of CraftBukkit

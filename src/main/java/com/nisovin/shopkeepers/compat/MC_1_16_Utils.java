@@ -9,11 +9,11 @@ import com.nisovin.shopkeepers.util.Log;
 // TODO This can be removed once we only support Bukkit 1.16.1 upwards.
 public class MC_1_16_Utils {
 
-	private static final EntityType zombifiedPiglin = getEntityType("ZOMBIFIED_PIGLIN");
-	private static final Material crimsonSign = getMaterial("CRIMSON_SIGN");
-	private static final Material crimsonWallSign = getMaterial("CRIMSON_WALL_SIGN");
-	private static final Material warpedSign = getMaterial("WARPED_SIGN");
-	private static final Material warpedWallSign = getMaterial("WARPED_WALL_SIGN");
+	private static final EntityType zombifiedPiglin = CompatUtils.getEntityType("ZOMBIFIED_PIGLIN");
+	private static final Material crimsonSign = CompatUtils.getMaterial("CRIMSON_SIGN");
+	private static final Material crimsonWallSign = CompatUtils.getMaterial("CRIMSON_WALL_SIGN");
+	private static final Material warpedSign = CompatUtils.getMaterial("WARPED_SIGN");
+	private static final Material warpedWallSign = CompatUtils.getMaterial("WARPED_WALL_SIGN");
 
 	private MC_1_16_Utils() {
 	}
@@ -44,27 +44,5 @@ public class MC_1_16_Utils {
 
 	public static Material getWarpedWallSign() {
 		return warpedWallSign;
-	}
-
-	private static EntityType getEntityType(String name) {
-		try {
-			EntityType entityType = EntityType.valueOf(name); // not null
-			Log.debug(DebugOptions.capabilities, "Server knows EntityType '" + name + "'.");
-			return entityType;
-		} catch (IllegalArgumentException e) {
-			Log.debug(DebugOptions.capabilities, "Server does not know EntityType '" + name + "'.");
-			return null;
-		}
-	}
-
-	private static Material getMaterial(String name) {
-		try {
-			Material material = Material.valueOf(name); // not null
-			Log.debug(DebugOptions.capabilities, "Server knows Material '" + name + "'.");
-			return material;
-		} catch (IllegalArgumentException e) {
-			Log.debug(DebugOptions.capabilities, "Server does not know Material '" + name + "'.");
-			return null;
-		}
 	}
 }

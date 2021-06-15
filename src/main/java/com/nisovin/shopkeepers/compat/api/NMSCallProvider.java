@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.compat.api;
 
 import org.bukkit.Material;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -37,11 +38,20 @@ public interface NMSCallProvider {
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid);
 
 	// Sets the entity as adult for mob types for which we don't support the baby property yet, i.e. because they are
-	// exclusive to the specific MC version:
+	// exclusive to the specific MC version and don't extend Ageable:
 	// TODO Remove this once there are no exclusive mobs anymore to which this applies (currently, once we only support
 	// MC 1.16.1. upwards)
 	public default void setExclusiveAdult(LivingEntity entity) {
 		// No exclusive mobs by default.
+	}
+
+	// Performs any version-specific setup that needs to happen before the entity is spawned. The available operations
+	// may be limited during this phase of the entity spawning.
+	public default void prepareEntity(Entity entity) {
+	}
+
+	// Performs any version-specific setup of the entity that needs to happens right after the entity was spawned.
+	public default void setupSpawnedEntity(Entity entity) {
 	}
 
 	public default boolean matches(@ReadOnly ItemStack provided, UnmodifiableItemStack required) {
@@ -76,4 +86,28 @@ public interface NMSCallProvider {
 	// Note: This might not necessarily match the name that is usually displayed for an ItemStack, but rather the
 	// translated item type name (for example for items such as different types of potions, skulls, etc.).
 	public String getItemTypeTranslationKey(Material material);
+
+	// MC 1.17 specific features
+	// TODO Remove this once we only support MC 1.17 and above.
+
+	public default void setAxolotlVariant(LivingEntity axolotl, String variantName) {
+		// Not supported by default.
+	}
+
+	public default String cycleAxolotlVariant(String variantName, boolean backwards) {
+		// Not supported by default.
+		return variantName;
+	}
+
+	public default void setGlowSquidDark(LivingEntity glowSquid, boolean dark) {
+		// Not supported by default.
+	}
+
+	public default void setScreamingGoat(LivingEntity goat, boolean screaming) {
+		// Not supported by default.
+	}
+
+	public default void setGlowingText(Sign sign, boolean glowingText) {
+		// Not supported by default.
+	}
 }

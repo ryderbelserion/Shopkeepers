@@ -16,7 +16,7 @@ git config --global --unset core.autocrlf
 
 # Build spigot
 echo "Building Spigot using Spigot Build Tools for minecraft version $1 (this might take a while)"
-java -Xmx1500M -jar BuildTools.jar --rev $1 --compile CRAFTBUKKIT,SPIGOT | grep Installing
+java -Xmx1500M -jar BuildTools.jar --rev $1 --compile CRAFTBUKKIT,SPIGOT --remapped | grep Installing
 
 # Reset autocrlf
 git config --global core.autocrlf $git_autocrlf
