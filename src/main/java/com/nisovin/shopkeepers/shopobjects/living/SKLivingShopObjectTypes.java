@@ -195,6 +195,9 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 
 	public SKLivingShopObjectTypes(LivingShops livingShops) {
 		this.livingShops = livingShops;
+	}
+
+	public void onRegisterDefaults() {
 		// First, create the enabled living object types, in the same order as specified in the config:
 		for (EntityType entityType : DerivedSettings.enabledLivingShops) {
 			assert entityType != null && entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType);

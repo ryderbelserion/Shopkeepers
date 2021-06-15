@@ -22,6 +22,10 @@ public class LivingShops {
 		livingEntityShopListener = new LivingEntityShopListener(plugin);
 	}
 
+	public void onRegisterDefaults() {
+		livingShopObjectTypes.onRegisterDefaults();
+	}
+
 	public void onEnable() {
 		livingEntityAI.onEnable();
 		livingEntityShopListener.onEnable();

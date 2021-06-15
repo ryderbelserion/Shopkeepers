@@ -155,6 +155,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	private void registerDefaults() {
 		Log.info("Registering defaults.");
+		livingShops.onRegisterDefaults();
 		uiRegistry.registerAll(defaultUITypes.getAllUITypes());
 		shopTypesRegistry.registerAll(defaultShopTypes.getAll());
 		shopObjectTypesRegistry.registerAll(defaultShopObjectTypes.getAll());

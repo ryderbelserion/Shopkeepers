@@ -223,6 +223,7 @@ However, if the shopkeeper actually moved from its previous spawn location and n
 * Performance: When we require read-only access to the data of a Minecraft item stack, we try to avoid copying the item stack and instead access its data directly. This applies mostly when we match provided and required item stacks during trading.
 * Performance: With the change to use unmodifiable item stacks, internally and throughout the API, we can now avoid copying item stacks in many situations.
 * Fixed: When handling a shopkeeper hire attempt, we first check now if the shop is still for hire.
+* Fixed: The living shop object types were not registered in the order specified inside the config.
 
 API:  
 * Breaking: Added UnmodifiableItemStack, which is a read-only wrapper around an item stacks.
