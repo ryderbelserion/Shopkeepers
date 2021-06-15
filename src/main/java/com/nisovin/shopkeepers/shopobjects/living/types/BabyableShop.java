@@ -32,9 +32,10 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	// TODO Remove special case once this is resolved differently.
 	protected boolean isBabyable() {
 		// Some mobs don't support the baby variant even though they are Ageable.
-		switch (this.getEntityType()) {
-		case PARROT:
-		case WANDERING_TRADER:
+		switch (this.getEntityType().name()) {
+		case "PARROT":
+		case "WANDERING_TRADER":
+		case "PIGLIN_BRUTE": // Added in MC 1.16.2
 			return false;
 		default:
 			return true;
