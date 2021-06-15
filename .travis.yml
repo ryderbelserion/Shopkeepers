@@ -13,8 +13,8 @@ cache:
   directories:
   - $HOME/.m2
 
-# Only re-build craftbukkit/spigot versions that are missing in the cache
-# Add entries here for every required version of craftbukkit
+# Only re-build CraftBukkit/Spigot versions that are missing in the cache
+# Add entries here for every required version of CraftBukkit
 before_install:
 - ./installSpigotDependencies.sh
 

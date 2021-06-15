@@ -297,6 +297,7 @@ Internal:
 * Building:
   * We build against the Mojang-mapped CraftBukkit version now and remap the result to the mapping used by Spigot.
   * Building requires JDK 16 now. The source code is still Java 8 compatible, but that might change in the future.
+  * Installing the Spigot dependencies via the `installSpigotDependencies` script requires both JDK 8 (to build older Spigot versions) and JDK 16 (to build versions 1.17 and above). We use Jabba to dynamically install and switch between these required JDK versions.
 * Added callbacks to apply version-specific preparations and setup when spawning shopkeeper entities. But these are not yet used for anything.
 * Refactor: Moved some general utility methods from 'MC_1_16Utils' to 'CompatUtils'.
 * Added StringProperty.
