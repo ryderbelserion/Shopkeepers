@@ -14,5 +14,5 @@ if [ -s $JABBA_SH ]; then
 fi
 
 echo Installing Jabba ...
-source ./installJabbaInstaller.sh --skip-rc
+source ./jabbaInstaller.sh --skip-rc
 [ -s "$JABBA_HOME/jabba.sh" ] && source "$JABBA_HOME/jabba.sh"
