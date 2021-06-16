@@ -27,10 +27,23 @@ source ./installJabba.sh
 jabba install $JDK_VERSION
 
 # Update environment variables:
-# TODO This has no effect on Windows currently.
-jabba use $JDK_VERSION
+# 'jabba use' does not work on msys currently.
+case "$OSTYPE" in
+    msys)
+    # Workaround for msys: Set JAVA_HOME and PATH manually.
+    # We need to prepare the path returned by Jabba for this to work in msys.
+    JABBA_JDK_HOME=$(jabba which --home $JDK_VERSION)
+    JABBA_JDK_HOME=${JABBA_JDK_HOME//\\/\\\\}
+    JABBA_JDK_HOME=$(cygpath -u $JABBA_JDK_HOME)
+    JAVA_HOME=$JABBA_JDK_HOME
+    PATH=$JABBA_JDK_HOME/bin:$PATH
+    ;;
+    *)
+    jabba use $JDK_VERSION
+    ;;
+esac
 
 # Verify that the expected Java version is used:
-#echo Java home: $JAVA_HOME
-#echo Path: $PATH
+echo Java home: $JAVA_HOME
+echo Path: $PATH
 echo Active Java version: $(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
