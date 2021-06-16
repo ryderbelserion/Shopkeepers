@@ -1,5 +1,6 @@
-jdk:
-- openjdk16
+# TODO This does not work yet.
+#jdk:
+#- openjdk16
 
 # Install missing Spigot dependencies.
 # Ensure that we use Java 16 to build the project, even if the build server does not support it yet.
@@ -7,6 +8,8 @@ before_install:
 - ./installSpigotDependencies.sh
 - sdk install java 16.0.1-open
 - sdk use java 16.0.1-open
+- java -version
+- source ./installJDK.sh 16
 - java -version
 
 install:
