@@ -4,7 +4,7 @@
 # Add entries here for every required version of CraftBukkit/Spigot.
 
 # The following versions require JDK 8 to build:
-./installJDK.sh 8
+source ./installJDK.sh 8
 
 if [ ! -f "$HOME/.m2/repository/org/bukkit/craftbukkit/1.14.4-R0.1-SNAPSHOT/craftbukkit-1.14.4-R0.1-SNAPSHOT.jar" ]; then ./installSpigot.sh 1.14.4 ; else echo "Not compiling Spigot 1.14.4 because it is already in our Maven repo" ; fi
 if [ ! -f "$HOME/.m2/repository/org/bukkit/craftbukkit/1.15.2-R0.1-SNAPSHOT/craftbukkit-1.15.2-R0.1-SNAPSHOT.jar" ]; then ./installSpigot.sh 1.15.2 ; else echo "Not compiling Spigot 1.15.2 because it is already in our Maven repo" ; fi
@@ -13,6 +13,6 @@ if [ ! -f "$HOME/.m2/repository/org/bukkit/craftbukkit/1.16.2-R0.1-SNAPSHOT/craf
 if [ ! -f "$HOME/.m2/repository/org/bukkit/craftbukkit/1.16.4-R0.1-SNAPSHOT/craftbukkit-1.16.4-R0.1-SNAPSHOT.jar" ]; then ./installSpigot.sh 1.16.4 ; else echo "Not compiling Spigot 1.16.4 because it is already in our Maven repo" ; fi
 
 # The following versions require JDK 16 to build:
-./installJDK.sh 16
+source ./installJDK.sh 16
 
 if [ ! -f "$HOME/.m2/repository/org/bukkit/craftbukkit/1.17-R0.1-SNAPSHOT/craftbukkit-1.17-R0.1-SNAPSHOT-remapped-mojang.jar" ]; then ./installSpigot.sh 1.17 ; else echo "Not compiling Spigot 1.17 because it is already in our Maven repo" ; fi

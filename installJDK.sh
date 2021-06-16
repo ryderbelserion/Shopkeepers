@@ -7,26 +7,30 @@ fi
 # Check for predefined JDK version aliases:
 case "$1" in
   8)
-    JAVA_VERSION="adopt@1.8.0-292"
+    JDK_VERSION="adopt@1.8.0-292"
     ;;
   16)
-    JAVA_VERSION="adopt@1.16.0-1"
+    JDK_VERSION="adopt@1.16.0-1"
     ;;
   *)
-    JAVA_VERSION=$1
+    JDK_VERSION=$1
     ;;
 esac
 
-echo Installing Java JDK: $JAVA_VERSION
+echo Installing Java JDK: $JDK_VERSION
 
 # We use Jabba to manage multiple JDK versions regardless of platform.
 # Install Jabba, if it is not already installed.
 ./installJabba.sh
 
 # Install the requested JDK version:
-./jabba install $JAVA_VERSION
+./jabba install $JDK_VERSION
 
-# Update environment variable:
-jabba_jdk_location=$(./jabba which --home "$JAVA_VERSION")
-echo ::set-env name=JAVA_HOME::$jabba_jdk_location
-echo ::add-path::$jabba_jdk_location/bin
+# Update environment variables:
+# TODO This has no effect on Windows currently.
+./jabba use $JDK_VERSION
+
+# Verify that the expected Java version is used:
+echo Java home: $JAVA_HOME
+echo Path: $PATH
+java --version
