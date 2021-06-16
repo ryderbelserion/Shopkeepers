@@ -21,16 +21,16 @@ echo Installing Java JDK: $JDK_VERSION
 
 # We use Jabba to manage multiple JDK versions regardless of platform.
 # Install Jabba, if it is not already installed.
-./installJabba.sh
+source ./installJabba.sh
 
 # Install the requested JDK version:
-./jabba install $JDK_VERSION
+jabba install $JDK_VERSION
 
 # Update environment variables:
 # TODO This has no effect on Windows currently.
-./jabba use $JDK_VERSION
+jabba use $JDK_VERSION
 
 # Verify that the expected Java version is used:
-echo Java home: $JAVA_HOME
-echo Path: $PATH
-java --version
+#echo Java home: $JAVA_HOME
+#echo Path: $PATH
+echo Active Java version: $(java -version 2>&1 | awk -F '"' '/version/ {print $2}')

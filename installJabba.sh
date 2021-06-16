@@ -1,34 +1,18 @@
 #!/usr/bin/env bash
+# This file needs to be sourced!
+
+# Default assumed home path. Might get changed during Jabba install.
+JABBA_HOME=~/.jabba
+JABBA_SH=$JABBA_HOME/jabba.sh
 
 # Skip if Jabba is already installed:
-if [[ -f "jabba" ]]; then
-  JABBA_VERSION=$(./jabba --version)
+if [ -s $JABBA_SH ]; then
+  source $JABBA_SH
+  JABBA_VERSION=$(jabba --version)
   echo Jabba is already installed: $JABBA_VERSION
-  exit 0
+  return
 fi
 
-# Install script does not support msys (MinGW). See https://github.com/shyiko/jabba/issues/535
-# But using the Jabba binary directly works as well.
-
-JABBA_VERSION=0.11.2
-echo Installing Jabba version ${JABBA_VERSION} ...
-
-echo OSTYPE: $OSTYPE
-case "$OSTYPE" in
-  linux*)
-    BINARY_URL=https://github.com/shyiko/jabba/releases/download/${JABBA_VERSION}/jabba-${JABBA_VERSION}-linux-amd64
-    ;;
-  darwin*)
-    BINARY_URL=https://github.com/shyiko/jabba/releases/download/${JABBA_VERSION}/jabba-${JABBA_VERSION}-darwin-amd64
-    ;;
-  msys)
-    BINARY_URL=https://github.com/shyiko/jabba/releases/download/${JABBA_VERSION}/jabba-${JABBA_VERSION}-windows-amd64.exe
-    ;;
-  *)
-    echo Unsupported OS: $OSTYPE
-    exit 1
-    ;;
-esac
-
-curl -L -o jabba "$BINARY_URL"
-chmod +x jabba
+echo Installing Jabba ...
+source ./installJabbaInstaller.sh --skip-rc
+[ -s "$JABBA_HOME/jabba.sh" ] && source "$JABBA_HOME/jabba.sh"
