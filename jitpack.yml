@@ -2,10 +2,10 @@ jdk:
 - openjdk16
 
 # Install missing Spigot dependencies.
-# Ensure that we use Java 16 to build the project, even if the build server does not support it yet.
 before_install:
 - ./installSpigotDependencies.sh
-- source ./installJDK.sh 16
 
+# Ensure that we use Java 16 to build the project, even if the build server does not support it yet.
 install:
+- source ./installJDK.sh 16
 - ./mvnw clean install
