@@ -44,6 +44,6 @@ case "$OSTYPE" in
 esac
 
 # Verify that the expected Java version is used:
-echo Java home: $JAVA_HOME
-echo Path: $PATH
+#echo Java home: $JAVA_HOME
+#echo Path: $PATH
 echo Active Java version: $(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
