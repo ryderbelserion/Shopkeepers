@@ -54,6 +54,7 @@ public class BlockVillagerSpawnListener implements Listener {
 	}
 
 	// LOW priority so that other plugins don't have to process those meant-to-be-removed entities.
+	// TODO Entity loading is deferred from chunk loading in MC 1.17 (https://hub.spigotmc.org/jira/browse/SPIGOT-6547).
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onChunkLoad(ChunkLoadEvent event) {
 		// Remove villagers that got spawned as part of chunk generation:
