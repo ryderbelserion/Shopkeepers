@@ -2,7 +2,7 @@
   <img src="https://github.com/Shopkeepers/Shopkeepers-Wiki/wiki/images/logos/shopkeepers_logo_small_with_text.png?raw=true" alt="Shopkeepers logo"/>
 </p>
 
-Shopkeepers [![Build Status](https://travis-ci.com/Shopkeepers/Shopkeepers.svg?branch=master)](https://travis-ci.com/Shopkeepers/Shopkeepers)
+Shopkeepers [![Build Status](https://github.com/Shopkeepers/Shopkeepers/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Shopkeepers/Shopkeepers/actions/workflows/build.yml)
 ===========
 
 Shopkeepers is a Bukkit plugin which allows you to set up custom villager shopkeepers that sell exactly what you want them to sell and for what price. 
