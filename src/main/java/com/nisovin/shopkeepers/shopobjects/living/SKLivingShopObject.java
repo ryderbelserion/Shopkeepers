@@ -173,13 +173,21 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	}
 
 	// Any clean up that needs to happen for the entity. The entity might not be fully setup yet.
-	protected void cleanUpEntity(E entity) {
+	protected void cleanUpEntity() {
 		assert entity != null;
+
 		// Disable AI:
 		this.cleanupAI();
 
 		// Remove metadata again:
 		ShopkeeperMetadata.remove(entity);
+
+		// Remove the entity (if it hasn't been removed already):
+		if (!entity.isDead()) {
+			entity.remove();
+		}
+
+		entity = null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -271,19 +279,20 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			this.onSpawn(entity);
 		} else {
 			// Failure:
-			// Reset entity:
-			E localEntity = this.entity;
-			this.cleanUpEntity(localEntity);
-			this.entity = null;
-
-			// TODO Config option to delete the shopkeeper on failed spawn attempt? Check for this during shop creation?
-
 			// Debug, if not already debugging and cooldown is over:
 			boolean debug = (Settings.debug && !debuggingSpawn && (System.currentTimeMillis() - lastSpawnDebugging) > (5 * 60 * 1000)
-					&& localEntity.isDead() && ChunkCoords.isChunkLoaded(localEntity.getLocation()));
+					&& entity.isDead() && ChunkCoords.isChunkLoaded(entity.getLocation()));
 
-			Log.warning("Failed to spawn shopkeeper entity: Entity dead: " + localEntity.isDead() + ", entity valid: " + localEntity.isValid()
-					+ ", chunk loaded: " + ChunkCoords.isChunkLoaded(localEntity.getLocation()) + ", debug -> " + debug);
+			// Due to an open Spigot 1.17 issue, entities report as 'invalid' after being spawned during chunk loads. In
+			// order to not spam with warnings, this warning has been replaced with a debug output for now.
+			// TODO Replace this with a warning again once the underlying issue has been resolved in Spigot.
+			Log.debug("Failed to spawn shopkeeper entity: Entity dead: " + entity.isDead() + ", entity valid: " + entity.isValid()
+					+ ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()) + ", debug -> " + debug);
+
+			// Reset the entity:
+			this.cleanUpEntity();
+
+			// TODO Config option to delete the shopkeeper on failed spawn attempt? Check for this during shop creation?
 
 			// Debug entity spawning:
 			if (debug) {
@@ -385,11 +394,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		if (entity == null) return;
 
 		// Clean up entity:
-		this.cleanUpEntity(entity);
-
-		// Remove entity:
-		entity.remove();
-		entity = null;
+		this.cleanUpEntity();
 		lastSpawnLocation = null;
 	}
 
