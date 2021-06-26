@@ -13,6 +13,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.configuration.Configuration;
@@ -649,5 +650,12 @@ public class Settings extends Config {
 		// Note: If tradeLogNextMergeTimeoutTicks is greater than or equal to tradeLogMergeDurationTicks, it has no
 		// effect. However, we do not print a warning in this case to allow tradeLogMergeDurationTicks to be easily
 		// adjusted inside the config without having to keep tradeLogNextMergeTimeoutTicks consistent.
+
+		// Temporary workaround for Mohist servers. See https://github.com/Shopkeepers/Shopkeepers/issues/738
+		// TODO This is supposed to be removed again once the underlying issue has been fixed by Mohist.
+		if (!disableInventoryVerification && Bukkit.getServer().getName().contains("Mohist")) {
+			Log.warning(this.getLogPrefix() + "Forcefully enabled 'disable-inventory-verification' to resolve a known incompatibility with Mohist servers.");
+			disableInventoryVerification = true;
+		}
 	}
 }
