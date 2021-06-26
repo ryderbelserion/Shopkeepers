@@ -1,6 +1,10 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
+## v2.13.2 (TBA)
+### Supported MC versions: 1.17, 1.16.5, 1.15.2, 1.14.4
+
+
 ## v2.13.1 (2021-06-26)
 ### Supported MC versions: 1.17, 1.16.5, 1.15.2, 1.14.4
 
