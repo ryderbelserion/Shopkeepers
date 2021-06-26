@@ -1,7 +1,7 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.13.1 (TBA)
+## v2.13.1 (2021-06-26)
 ### Supported MC versions: 1.17, 1.16.5, 1.15.2, 1.14.4
 
 * Fixed: Added a temporary workaround for an open server issue that caused shopkeeper entities to duplicate on MC 1.17. The warning that was printed about the spawning of shopkeeper entities apparently failing has been turned into a debug message for now. Shopkeeper entities may sometimes take a few second to spawn currently.
