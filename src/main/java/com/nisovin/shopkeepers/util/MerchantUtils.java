@@ -20,8 +20,19 @@ public class MerchantUtils {
 	private MerchantUtils() {
 	}
 
-	public static TradingRecipe getSelectedTradingRecipe(MerchantInventory merchantInventory) {
+	public static TradingRecipe getActiveTradingRecipe(MerchantInventory merchantInventory) {
 		MerchantRecipe merchantRecipe = merchantInventory.getSelectedRecipe();
+		return createTradingRecipe(merchantRecipe);
+	}
+
+	public static TradingRecipe getSelectedTradingRecipe(MerchantInventory merchantInventory) {
+		int selectedRecipeIndex = merchantInventory.getSelectedRecipeIndex();
+		List<MerchantRecipe> merchantRecipes = merchantInventory.getMerchant().getRecipes();
+		if (merchantRecipes.isEmpty()) {
+			return null;
+		}
+		// The index is expected to be in valid bounds:
+		MerchantRecipe merchantRecipe = merchantRecipes.get(selectedRecipeIndex);
 		return createTradingRecipe(merchantRecipe);
 	}
 

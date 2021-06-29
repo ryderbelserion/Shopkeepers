@@ -84,9 +84,9 @@ public class TradingCountListener implements Listener {
 		if (ItemUtils.isEmpty(resultItem)) {
 			return; // No trade available, ignoring
 		}
-		TradingRecipe usedRecipe = MerchantUtils.getSelectedTradingRecipe(inventory);
-		if (usedRecipe == null) {
-			return; // No used recipe found, ignoring
+		TradingRecipe activeRecipe = MerchantUtils.getActiveTradingRecipe(inventory);
+		if (activeRecipe == null) {
+			return; // No active recipe found, ignoring
 		}
 
 		// Start detecting trades:
@@ -114,13 +114,13 @@ public class TradingCountListener implements Listener {
 
 		MerchantInventory merchantInventory = (MerchantInventory) inventory;
 		// Find the recipe Minecraft is using for the trade (the active recipe gets updated after the statistic change):
-		TradingRecipe usedRecipe = MerchantUtils.getSelectedTradingRecipe(merchantInventory);
-		if (usedRecipe == null) {
-			Log.debug("Non-shopkeeper trade detection: Couldn't find the used trading recipe.");
+		TradingRecipe activeRecipe = MerchantUtils.getActiveTradingRecipe(merchantInventory);
+		if (activeRecipe == null) {
+			Log.debug("Non-shopkeeper trade detection: Could not find the active trading recipe.");
 			return;
 		}
 
 		tradeCounter++;
-		Log.debug(() -> "Detected non-shopkeeper trade (#" + tradeCounter + "): " + ItemUtils.getSimpleRecipeInfo(usedRecipe));
+		Log.debug(() -> "Detected non-shopkeeper trade (#" + tradeCounter + "): " + ItemUtils.getSimpleRecipeInfo(activeRecipe));
 	}
 }

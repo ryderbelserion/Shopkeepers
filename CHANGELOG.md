@@ -6,6 +6,7 @@ Date format: (YYYY-MM-DD)
 
 * Debug: When we print ItemStacks in YAML representation to the server console, we omit the trailing newline now. However, the `/shopkeeper yaml` command still sends additional empty lines in chat to make the output more readable.
 * Internal: We avoid copying item stacks in a few more cases.
+* Internal: Renamed MerchantUtils#getSelectedTradingRecipe() to #getActiveTradingRecipe() and adjusted a few related debug messages.
 
 ## v2.13.1 (2021-06-26)
 ### Supported MC versions: 1.17, 1.16.5, 1.15.2, 1.14.4

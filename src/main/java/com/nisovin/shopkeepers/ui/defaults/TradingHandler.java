@@ -518,12 +518,12 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		}
 
 		// Find (and validate) the recipe Minecraft is using for the trade:
-		TradingRecipe tradingRecipe = MerchantUtils.getSelectedTradingRecipe(merchantInventory);
+		TradingRecipe tradingRecipe = MerchantUtils.getActiveTradingRecipe(merchantInventory);
 		if (tradingRecipe == null) {
 			// Unexpected, since there is an item inside the result slot.
 			if (!silent) {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
-				Log.debug("Not handling trade: Could not find the used trading recipe!");
+				Log.debug("Not handling trade: Could not find the active trading recipe!");
 			}
 			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
@@ -537,7 +537,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			if (!silent) {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 				if (Debug.isDebugging()) {
-					Log.debug("Not handling trade: The trade result item does not match the expected item of the used trading recipe!");
+					Log.debug("Not handling trade: The trade result item does not match the expected item of the active trading recipe!");
 					String recipeResultItemYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline("recipeResultItem", recipeResultItem);
 					String resultItemYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline("resultItem", resultItem);
 					Log.debug(recipeResultItemYaml);
@@ -558,7 +558,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		boolean swappedItemOrder = false;
 
 		// Minecraft checks both combinations (item1, item2) and (item2, item1) when determining if a trading recipe
-		// matches, so we need to determine the used item order for the currently used trading recipe:
+		// matches, so we need to determine the used item order for the currently active trading recipe:
 		if (this.matches(offeredItem1, offeredItem2, requiredItem1, requiredItem2)) {
 			// Order is as-is.
 		} else if (this.matches(offeredItem1, offeredItem2, requiredItem2, requiredItem1)) {
@@ -574,7 +574,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			// the stricter isSimilar for the item comparison and the involved items are not strictly similar.
 			if (!silent) {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
-				Log.debug("Not handling trade: Could not match the offered items to the used trading recipe!");
+				Log.debug("Not handling trade: Could not match the offered items to the active trading recipe!");
 			}
 			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
@@ -600,7 +600,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 							Log.debug(errorMsg);
 						}
 
-						Log.debug("Used trading recipe: " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
+						Log.debug("Active trading recipe: " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
 						if (!item1Similar) {
 							Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("requiredItem1", requiredItem1));
 							Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("offeredItem1", offeredItem1));
