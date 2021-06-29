@@ -8,6 +8,7 @@ import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.MerchantRecipe;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 
@@ -26,28 +27,32 @@ public class MerchantUtils {
 
 	public static TradingRecipe createTradingRecipe(MerchantRecipe merchantRecipe) {
 		if (merchantRecipe == null) return null;
+		// The returned ingredients are copies of the internal item stacks:
 		List<ItemStack> ingredients = merchantRecipe.getIngredients();
-		ItemStack item1 = ingredients.get(0);
-		ItemStack item2 = null;
+		UnmodifiableItemStack item1 = UnmodifiableItemStack.of(ingredients.get(0));
+		UnmodifiableItemStack item2 = null;
 		if (ingredients.size() > 1) {
-			ItemStack buyItem2 = ingredients.get(1);
+			UnmodifiableItemStack buyItem2 = UnmodifiableItemStack.of(ingredients.get(1));
 			if (!ItemUtils.isEmpty(buyItem2)) {
 				item2 = buyItem2;
 			}
 		}
-		ItemStack resultItem = merchantRecipe.getResult();
+		// The returned result item is not copied, so we copy it ourselves:
+		UnmodifiableItemStack resultItem = UnmodifiableItemStack.of(merchantRecipe.getResult().clone());
 		return new SKTradingRecipe(resultItem, item1, item2);
 	}
 
 	public static TradingRecipeDraft createTradingRecipeDraft(MerchantRecipe merchantRecipe) {
 		if (merchantRecipe == null) return null;
+		// The returned ingredients are copies of the internal item stacks:
 		List<ItemStack> ingredients = merchantRecipe.getIngredients();
-		ItemStack item1 = ingredients.get(0);
-		ItemStack item2 = null;
+		UnmodifiableItemStack item1 = UnmodifiableItemStack.of(ingredients.get(0));
+		UnmodifiableItemStack item2 = null;
 		if (ingredients.size() > 1) {
-			item2 = ItemUtils.getNullIfEmpty(ingredients.get(1));
+			item2 = UnmodifiableItemStack.of(ItemUtils.getNullIfEmpty(ingredients.get(1)));
 		}
-		ItemStack resultItem = merchantRecipe.getResult();
+		// The returned result item is not copied, so we copy it ourselves:
+		UnmodifiableItemStack resultItem = UnmodifiableItemStack.of(merchantRecipe.getResult().clone());
 		return new TradingRecipeDraft(resultItem, item1, item2);
 	}
 
