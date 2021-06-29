@@ -538,8 +538,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 				if (Debug.isDebugging()) {
 					Log.debug("Not handling trade: The trade result item does not match the expected item of the used trading recipe!");
-					String recipeResultItemYaml = ConfigUtils.toConfigYaml("recipeResultItem", recipeResultItem);
-					String resultItemYaml = ConfigUtils.toConfigYaml("resultItem", resultItem);
+					String recipeResultItemYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline("recipeResultItem", recipeResultItem);
+					String resultItemYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline("resultItem", resultItem);
 					Log.debug(recipeResultItemYaml);
 					Log.debug(resultItemYaml);
 				}
@@ -602,16 +602,12 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 						Log.debug("Used trading recipe: " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
 						if (!item1Similar) {
-							String requiredItemYaml = ConfigUtils.toConfigYaml("requiredItem1", requiredItem1);
-							String offeredItemYaml = ConfigUtils.toConfigYaml("offeredItem1", offeredItem1);
-							Log.debug(requiredItemYaml);
-							Log.debug(offeredItemYaml);
+							Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("requiredItem1", requiredItem1));
+							Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("offeredItem1", offeredItem1));
 						}
 						if (!item2Similar.get()) {
-							String requiredItemYaml = ConfigUtils.toConfigYaml("requiredItem2", requiredItem2);
-							String offeredItemYaml = ConfigUtils.toConfigYaml("offeredItem2", offeredItem2);
-							Log.debug(requiredItemYaml);
-							Log.debug(offeredItemYaml);
+							Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("requiredItem2", requiredItem2));
+							Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("offeredItem2", offeredItem2));
 						}
 					}
 				}

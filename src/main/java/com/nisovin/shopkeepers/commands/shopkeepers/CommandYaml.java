@@ -46,10 +46,10 @@ class CommandYaml extends PlayerCommand {
 		}
 
 		// Serialized ItemStack and ItemData:
-		String itemStackYaml = ConfigUtils.toConfigYaml("item-in-hand", itemInHand);
+		String itemStackYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline("item-in-hand", itemInHand);
 		// This ItemData object is only used temporarily, so there is no need to copy the item stack:
 		Object itemDataSerialized = new ItemData(UnmodifiableItemStack.of(itemInHand)).serialize();
-		String itemDataYaml = ConfigUtils.toConfigYaml("item-in-hand-config-data", itemDataSerialized);
+		String itemDataYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline("item-in-hand-config-data", itemDataSerialized);
 
 		String[] itemStackYamlLines = StringUtils.splitLines(itemStackYaml);
 		String[] itemDataYamlLines = StringUtils.splitLines(itemDataYaml);
@@ -64,6 +64,7 @@ class CommandYaml extends PlayerCommand {
 			}
 		}
 
+		player.sendMessage("");
 		player.sendMessage(ChatColor.YELLOW + "Config item data:");
 		if (itemDataYamlLines.length > MAX_OUTPUT_LENGTH) {
 			player.sendMessage(ChatColor.GRAY + "The output is too large for the chat.");
@@ -73,6 +74,7 @@ class CommandYaml extends PlayerCommand {
 			}
 		}
 
+		player.sendMessage("");
 		player.sendMessage(ChatColor.GRAY + "Note: The output is also logged to the console for easier copying.");
 
 		// Print to console as multi-line messages:

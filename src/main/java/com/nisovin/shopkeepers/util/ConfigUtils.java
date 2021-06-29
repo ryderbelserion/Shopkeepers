@@ -144,6 +144,10 @@ public class ConfigUtils {
 		}
 	}
 
+	public static String toConfigYamlWithoutTrailingNewline(String key, Object object) {
+		return StringUtils.stripTrailingNewlines(toConfigYaml(key, object));
+	}
+
 	// The input is expected to be a serialized config Map.
 	@SuppressWarnings("unchecked")
 	public static <T> T fromConfigYaml(String yamlConfigString, String key) {
