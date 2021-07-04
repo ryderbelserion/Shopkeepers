@@ -339,17 +339,26 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		if (npc == null) return;
 
 		if (Settings.showNameplates && name != null && !name.isEmpty()) {
-			if (this.getEntityType() != EntityType.PLAYER) {
+			boolean isPlayerNPC = (this.getEntityType() == EntityType.PLAYER);
+			if (!isPlayerNPC) {
 				name = Messages.nameplatePrefix + name;
 			} // Else: The name (including the prefix) influence the NPC's skin, so we avoid adding the prefix.
 			name = this.prepareName(name);
 
-			// Set name and nameplate visibility:
+			// Set name:
 			npc.setName(name);
-			npc.data().setPersistent(NPC.NAMEPLATE_VISIBLE_METADATA, Settings.alwaysShowNameplates ? "true" : "hover");
+
+			// Update the nameplate visibility:
+			// Player NPC don't support the hover option (the nameplate is always shown regardless). Also, when using
+			// the hover option on player NPCs, the nameplate is limited to a length of 16. Whereas otherwise, depending
+			// on Citizens settings, player NPC either use scoreboards or holograms to display the NPC name, which are
+			// not affected by this length limitation.
+			npc.data().setPersistent(NPC.NAMEPLATE_VISIBLE_METADATA, Settings.alwaysShowNameplates || isPlayerNPC ? "true" : "hover");
 		} else {
-			// Remove name and nameplate:
+			// Remove the name:
 			npc.setName("");
+
+			// Update the nameplate visibility:
 			npc.data().setPersistent(NPC.NAMEPLATE_VISIBLE_METADATA, "false");
 		}
 	}
