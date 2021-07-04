@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
@@ -27,6 +28,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.Debug;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
@@ -509,10 +511,32 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	private TradeData checkForTrade(InventoryClickEvent clickEvent, boolean silent, boolean slientStrictItemComparison, boolean tradingContext) {
 		Player tradingPlayer = (Player) clickEvent.getWhoClicked();
 		MerchantInventory merchantInventory = (MerchantInventory) clickEvent.getView().getTopInventory();
+
+		// Use null here instead of air for consistent behavior with previous versions:
+		ItemStack offeredItem1 = ItemUtils.getNullIfEmpty(merchantInventory.getItem(BUY_ITEM_1_SLOT_ID));
+		ItemStack offeredItem2 = ItemUtils.getNullIfEmpty(merchantInventory.getItem(BUY_ITEM_2_SLOT_ID));
+
+		// Check for a result item:
 		ItemStack resultItem = merchantInventory.getItem(RESULT_ITEM_SLOT_ID);
 		if (ItemUtils.isEmpty(resultItem)) {
 			if (!silent) {
 				Log.debug("Not handling trade: There is no item in the clicked result slot (no trade available).");
+				if (Debug.isDebugging(DebugOptions.emptyTrades)) {
+					int selectedRecipeIndex = merchantInventory.getSelectedRecipeIndex();
+					Log.debug("Selected recipe index: " + selectedRecipeIndex);
+					TradingRecipe selectedTradingRecipe = MerchantUtils.getSelectedTradingRecipe(merchantInventory);
+					if (selectedTradingRecipe == null) {
+						// Can be null if the merchant has no trades at all.
+						Log.debug("No trading recipe selected (merchant has no trades).");
+					} else {
+						Log.debug("Selected trading recipe: ");
+						Log.debug("  " + ConfigUtils.toConfigYamlWithoutTrailingNewline("item1", selectedTradingRecipe.getItem1()));
+						Log.debug("  " + ConfigUtils.toConfigYamlWithoutTrailingNewline("item2", Optional.<Object>ofNullable(selectedTradingRecipe.getItem2()).orElse("<empty>")));
+						Log.debug("  " + ConfigUtils.toConfigYamlWithoutTrailingNewline("resultItem", selectedTradingRecipe.getResultItem()));
+					}
+					Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("offeredItem1", Optional.<Object>ofNullable(offeredItem1).orElse("<empty>")));
+					Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("offeredItem2", Optional.<Object>ofNullable(offeredItem2).orElse("<empty>")));
+				}
 			}
 			return null; // No trade available
 		}
@@ -552,13 +576,9 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		UnmodifiableItemStack requiredItem2 = tradingRecipe.getItem2();
 		assert !ItemUtils.isEmpty(requiredItem1);
 
-		// Use null here instead of air for consistent behavior with previous versions:
-		ItemStack offeredItem1 = ItemUtils.getNullIfEmpty(merchantInventory.getItem(BUY_ITEM_1_SLOT_ID));
-		ItemStack offeredItem2 = ItemUtils.getNullIfEmpty(merchantInventory.getItem(BUY_ITEM_2_SLOT_ID));
-		boolean swappedItemOrder = false;
-
 		// Minecraft checks both combinations (item1, item2) and (item2, item1) when determining if a trading recipe
 		// matches, so we need to determine the used item order for the currently active trading recipe:
+		boolean swappedItemOrder = false;
 		if (this.matches(offeredItem1, offeredItem2, requiredItem1, requiredItem2)) {
 			// Order is as-is.
 		} else if (this.matches(offeredItem1, offeredItem2, requiredItem2, requiredItem1)) {

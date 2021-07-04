@@ -32,6 +32,9 @@ debug: false
 # - 'item-conversions': Logs whenever we explicitly convert items to Spigot's
 #    data format. Note that this does not log when items get implicitly
 #    converted, which may happen under various circumstances.
+# - 'empty-trades': Logs detailed item information for the selected trade and
+#    the items in the input slots whenever a player clicks an empty trading
+#    result slot.
 debug-options: []
 # Whether to report anonymous usage statistics to https://bStats.org
 # All reported information can be found here:
