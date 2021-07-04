@@ -523,16 +523,15 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 				Log.debug("Not handling trade: There is no item in the clicked result slot (no trade available).");
 				if (Debug.isDebugging(DebugOptions.emptyTrades)) {
 					int selectedRecipeIndex = merchantInventory.getSelectedRecipeIndex();
-					Log.debug("Selected recipe index: " + selectedRecipeIndex);
+					Log.debug("Selected trading recipe index: " + selectedRecipeIndex);
 					TradingRecipe selectedTradingRecipe = MerchantUtils.getSelectedTradingRecipe(merchantInventory);
 					if (selectedTradingRecipe == null) {
 						// Can be null if the merchant has no trades at all.
 						Log.debug("No trading recipe selected (merchant has no trades).");
 					} else {
-						Log.debug("Selected trading recipe: ");
-						Log.debug("  " + ConfigUtils.toConfigYamlWithoutTrailingNewline("item1", selectedTradingRecipe.getItem1()));
-						Log.debug("  " + ConfigUtils.toConfigYamlWithoutTrailingNewline("item2", Optional.<Object>ofNullable(selectedTradingRecipe.getItem2()).orElse("<empty>")));
-						Log.debug("  " + ConfigUtils.toConfigYamlWithoutTrailingNewline("resultItem", selectedTradingRecipe.getResultItem()));
+						Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("recipeItem1", selectedTradingRecipe.getItem1()));
+						Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("recipeItem2", Optional.<Object>ofNullable(selectedTradingRecipe.getItem2()).orElse("<empty>")));
+						Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("recipeResultItem", selectedTradingRecipe.getResultItem()));
 					}
 					Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("offeredItem1", Optional.<Object>ofNullable(offeredItem1).orElse("<empty>")));
 					Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("offeredItem2", Optional.<Object>ofNullable(offeredItem2).orElse("<empty>")));
