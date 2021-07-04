@@ -255,10 +255,10 @@ public class CitizensShops {
 		if (npc == null) return null;
 
 		// Ensure that Citizens remembers the mob type:
-		npc.getTrait(MobType.class).setType(entityType);
+		npc.getOrAddTrait(MobType.class).setType(entityType);
 
 		// Look towards nearby players:
-		npc.getTrait(LookClose.class).lookClose(true);
+		npc.getOrAddTrait(LookClose.class).lookClose(true);
 
 		if (location != null) {
 			// This will log a debug message from Citizens if it cannot spawn the NPC currently, but will then later

@@ -144,7 +144,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		Entity entity = npc.getEntity(); // Null if not spawned
 		if (entity != null) return entity.getType();
 
-		return npc.getTrait(MobType.class).getType();
+		return npc.getOrAddTrait(MobType.class).getType();
 	}
 
 	// LIFE CYCLE
@@ -181,9 +181,10 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		if (destroyNPC) {
 			NPC npc = this.getNPC();
 			if (npc != null) {
-				if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
+				CitizensShopkeeperTrait shopkeeperTrait = npc.getTraitNullable(CitizensShopkeeperTrait.class);
+				if (shopkeeperTrait != null) {
 					// Let the trait handle NPC related cleanup (i.e. we only remove the trait in this case):
-					npc.getTrait(CitizensShopkeeperTrait.class).onShopkeeperDeletion(shopkeeper);
+					shopkeeperTrait.onShopkeeperDeletion(shopkeeper);
 				} else {
 					Log.debug(() -> "Removing Citizens NPC " + CitizensShops.getNPCIdString(npc)
 							+ " due to deletion of shopkeeper " + shopkeeper.getIdString());

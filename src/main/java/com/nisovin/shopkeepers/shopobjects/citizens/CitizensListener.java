@@ -168,12 +168,6 @@ class CitizensListener implements Listener {
 		pendingTraitAddition.reset(); // Handles any currently pending trait.
 	}
 
-	// null if the NPC does not contain the specified trait
-	private static Trait getTraitOrNull(NPC npc, Class<? extends Trait> traitClass) {
-		if (!npc.hasTrait(traitClass)) return null;
-		return npc.getTrait(traitClass);
-	}
-
 	// Handling of trait additions:
 
 	// Traits can also be added during NPC creation. This is called before these traits get added.
@@ -192,7 +186,7 @@ class CitizensListener implements Listener {
 		NPC npc = event.getNPC();
 		Trait eventTrait = event.getTrait();
 		Class<? extends Trait> traitClass = eventTrait.getClass();
-		Trait trait = getTraitOrNull(npc, traitClass);
+		Trait trait = npc.getTraitNullable(traitClass);
 		if (trait == null) {
 			// The trait got not removed again, probably by some other event handler:
 			return;
@@ -216,7 +210,7 @@ class CitizensListener implements Listener {
 		Player player = (Player) event.getCommandSender();
 		NPC npc = event.getNPC();
 		Class<? extends Trait> traitClass = event.getTraitClass();
-		Trait trait = getTraitOrNull(npc, traitClass);
+		Trait trait = npc.getTraitNullable(traitClass);
 		if (trait == null) {
 			// The trait got not removed again, probably by some other event handler:
 			return;
@@ -252,8 +246,8 @@ class CitizensListener implements Listener {
 	void onNPCRemoved(NPCRemoveEvent event) {
 		pendingTraitAddition.reset(); // Handles any currently pending trait
 		NPC npc = event.getNPC();
-		if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
-			CitizensShopkeeperTrait shopkeeperTrait = npc.getTrait(CitizensShopkeeperTrait.class);
+		CitizensShopkeeperTrait shopkeeperTrait = npc.getTraitNullable(CitizensShopkeeperTrait.class);
+		if (shopkeeperTrait != null) {
 			shopkeeperTrait.onTraitDeleted(null); // Handle without player
 		} else {
 			// Delete the corresponding shopkeeper(s):
