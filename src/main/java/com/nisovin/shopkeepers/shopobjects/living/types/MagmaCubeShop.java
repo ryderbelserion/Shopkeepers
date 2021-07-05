@@ -16,7 +16,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
-import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.MathUtils;
 import com.nisovin.shopkeepers.util.StringUtils;

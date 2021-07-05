@@ -18,7 +18,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityFallback;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.ui.defaults.VillagerEditorHandler;
+import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.PermissionUtils;
 
 /**

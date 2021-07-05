@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.ui.defaults.confirmations;
+package com.nisovin.shopkeepers.ui.confirmations;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -12,8 +12,8 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 

@@ -28,7 +28,7 @@ public abstract class AbstractTypeRegistry<T extends AbstractType> implements Ty
 	}
 
 	@Override
-	public void registerAll(Collection<T> types) {
+	public void registerAll(Collection<? extends T> types) {
 		if (types == null) return;
 		for (T type : types) {
 			if (type != null) {
@@ -48,7 +48,7 @@ public abstract class AbstractTypeRegistry<T extends AbstractType> implements Ty
 	protected abstract String getTypeName();
 
 	@Override
-	public Collection<T> getRegisteredTypes() {
+	public Collection<? extends T> getRegisteredTypes() {
 		return registeredTypesView;
 	}
 

@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.ui.defaults;
+package com.nisovin.shopkeepers.ui.trading;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,6 +33,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
+import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;

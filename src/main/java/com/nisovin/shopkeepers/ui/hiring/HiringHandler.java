@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.ui.defaults;
+package com.nisovin.shopkeepers.ui.hiring;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;

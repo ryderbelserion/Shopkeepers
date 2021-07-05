@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.EditorHandler;
 
 /**
  * Abstract base class for all shop object implementations.

@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.ui.defaults.confirmations;
+package com.nisovin.shopkeepers.ui.confirmations;
 
 import org.bukkit.entity.Player;
 

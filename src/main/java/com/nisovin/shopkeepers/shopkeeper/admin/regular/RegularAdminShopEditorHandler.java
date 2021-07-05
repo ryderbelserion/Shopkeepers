@@ -10,8 +10,8 @@ import org.bukkit.inventory.PlayerInventory;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
-import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
-import com.nisovin.shopkeepers.ui.defaults.SKDefaultUITypes;
+import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
+import com.nisovin.shopkeepers.ui.editor.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class RegularAdminShopEditorHandler extends EditorHandler {

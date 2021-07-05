@@ -1,10 +1,12 @@
-package com.nisovin.shopkeepers.ui.defaults;
+package com.nisovin.shopkeepers.ui.editor;
 
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 
 public final class EditorUIType extends AbstractUIType {
 
-	EditorUIType() {
+	public static final EditorUIType INSTANCE = new EditorUIType();
+
+	private EditorUIType() {
 		super("editor", null);
 	}
 }

@@ -10,7 +10,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObject;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
-import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.EditorHandler;
 
 // TODO Not yet used.
 public class SKVirtualShopObject extends AbstractShopObject implements VirtualShopObject {

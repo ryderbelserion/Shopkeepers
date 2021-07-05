@@ -6,9 +6,9 @@ public interface TypeRegistry<T extends Type> {
 
 	public void register(T type);
 
-	public void registerAll(Collection<T> types);
+	public void registerAll(Collection<? extends T> types);
 
-	public Collection<T> getRegisteredTypes();
+	public Collection<? extends T> getRegisteredTypes();
 
 	public T get(String identifier);
 

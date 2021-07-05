@@ -29,7 +29,7 @@ import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
-import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.EditorHandler;
 import com.nisovin.shopkeepers.util.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.EnumUtils;

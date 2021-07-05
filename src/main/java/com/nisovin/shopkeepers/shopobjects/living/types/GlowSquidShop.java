@@ -19,7 +19,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
-import com.nisovin.shopkeepers.ui.defaults.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.EditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 // TODO Use actual GlowSquid type once we only support Bukkit 1.17 upwards

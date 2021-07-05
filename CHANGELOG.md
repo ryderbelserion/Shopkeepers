@@ -9,10 +9,12 @@ Date format: (YYYY-MM-DD)
 * Fixed: Since v2.13.0, when not using the `always-show-nameplates` setting (i.e. the default case), the nameplates of Citizens player NPC shopkeepers were limited to a length of 16 and would otherwise not be displayed. The issue is that the Citizens 'hover' nameplate option does not work well for player NPCs. If you are upgrading and have issues with nameplates of previously created NPCs not showing, either use the shopkeeper editor to rename the NPC, or use the `/npc name` command to toggle the nameplate visibility.
 * We no longer open the trading interface if the shopkeeper has no offers. If the player can edit the shopkeeper, we print instructions on how to open the editor. This may also resolve an incompatibility with Bedrock players when using GeyserMC.
 * API: Added Shopkeeper#hasTradingRecipes(Player).
+* API: The type parameters of TypeRegistry#registerAll and #getRegisteredTypes were changed to be less specific.
 * Debug: When we print ItemStacks in YAML representation to the server console, we omit the trailing newline now. However, the `/shopkeeper yaml` command still sends additional empty lines in chat to make the output more readable.
 * Debug: Added debug option `empty-trades` that logs item information for the selected trading recipe and the input items whenever a player clicks an empty trading result slot.
 * Internal: We avoid copying item stacks in a few more cases.
 * Internal: Renamed MerchantUtils#getSelectedTradingRecipe() to #getActiveTradingRecipe() and adjusted a few related debug messages.
+* Internal: Minor refactors to the package hierarchy of the default UIs. The different UI types also setup their own singleton instances now.
 
 Added messages:  
 * `cannot-trade-no-offers`

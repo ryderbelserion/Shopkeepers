@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.ui.defaults;
+package com.nisovin.shopkeepers.ui.villagerEditor;
 
 import java.util.List;
 
@@ -28,8 +28,10 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
-import com.nisovin.shopkeepers.ui.defaults.confirmations.ConfirmationUI;
-import com.nisovin.shopkeepers.ui.defaults.confirmations.ConfirmationUIConfig;
+import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
+import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUI;
+import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUIConfig;
+import com.nisovin.shopkeepers.ui.editor.AbstractEditorHandler;
 import com.nisovin.shopkeepers.util.EnumUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -373,7 +375,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			private Profession profession = regularVillager.getProfession();
 
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				ItemStack iconItem;
 				switch (profession) {
 				case ARMORER:

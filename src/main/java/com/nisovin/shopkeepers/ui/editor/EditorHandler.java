@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.ui.defaults;
+package com.nisovin.shopkeepers.ui.editor;
 
 import java.util.List;
 
@@ -20,8 +20,8 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.ShopkeeperUIHandler;
-import com.nisovin.shopkeepers.ui.defaults.confirmations.ConfirmationUI;
-import com.nisovin.shopkeepers.ui.defaults.confirmations.ConfirmationUIConfig;
+import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUI;
+import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUIConfig;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;

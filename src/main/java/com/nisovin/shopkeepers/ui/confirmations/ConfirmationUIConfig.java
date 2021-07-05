@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.ui.defaults.confirmations;
+package com.nisovin.shopkeepers.ui.confirmations;
 
 import java.util.List;
 

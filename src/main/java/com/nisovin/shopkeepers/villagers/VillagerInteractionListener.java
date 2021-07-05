@@ -21,7 +21,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
-import com.nisovin.shopkeepers.ui.defaults.VillagerEditorHandler;
+import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;

@@ -1,26 +1,29 @@
-package com.nisovin.shopkeepers.ui.defaults;
+package com.nisovin.shopkeepers.ui;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
-import com.nisovin.shopkeepers.ui.AbstractUIType;
-import com.nisovin.shopkeepers.ui.defaults.confirmations.ConfirmationUIType;
+import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUIType;
+import com.nisovin.shopkeepers.ui.editor.EditorUIType;
+import com.nisovin.shopkeepers.ui.hiring.HiringUIType;
+import com.nisovin.shopkeepers.ui.trading.TradingUIType;
+import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorUIType;
 
 public class SKDefaultUITypes implements DefaultUITypes {
 
-	private final EditorUIType editorUIType = new EditorUIType();
-	private final TradingUIType tradingUIType = new TradingUIType();
-	private final HiringUIType hiringUIType = new HiringUIType();
-	private final VillagerEditorUIType villagerEditorUIType = new VillagerEditorUIType();
-	private final ConfirmationUIType confirmationUIType = new ConfirmationUIType();
+	private final EditorUIType editorUIType = EditorUIType.INSTANCE;
+	private final TradingUIType tradingUIType = TradingUIType.INSTANCE;
+	private final HiringUIType hiringUIType = HiringUIType.INSTANCE;
+	private final VillagerEditorUIType villagerEditorUIType = VillagerEditorUIType.INSTANCE;
+	private final ConfirmationUIType confirmationUIType = ConfirmationUIType.INSTANCE;
 
 	public SKDefaultUITypes() {
 	}
 
 	@Override
-	public List<AbstractUIType> getAllUITypes() {
+	public List<? extends AbstractUIType> getAllUITypes() {
 		List<AbstractUIType> defaults = new ArrayList<>();
 		defaults.add(editorUIType);
 		defaults.add(tradingUIType);
