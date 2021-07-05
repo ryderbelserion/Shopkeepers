@@ -91,6 +91,11 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	}
 
 	@Override
+	public boolean hasTradingRecipes(Player player) {
+		return !this.getOffers().isEmpty();
+	}
+
+	@Override
 	public List<? extends TradingRecipe> getTradingRecipes(Player player) {
 		ItemStack[] containerContents = this.getContainerContents(); // Empty if the container is not found
 		List<? extends PriceOffer> offers = this.getOffers();

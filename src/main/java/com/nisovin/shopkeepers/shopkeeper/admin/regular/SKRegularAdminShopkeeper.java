@@ -83,6 +83,11 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	}
 
 	@Override
+	public boolean hasTradingRecipes(Player player) {
+		return !this.getOffers().isEmpty();
+	}
+
+	@Override
 	public List<? extends TradingRecipe> getTradingRecipes(Player player) {
 		// SKTradeOffer extends SKTradingRecipe and reports to not be out-of-stock. Both SKTradeOffer and TradingRecipe
 		// are immutable. We can therefore reuse the offers as trading recipes, and don't have to create new trading

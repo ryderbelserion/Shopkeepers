@@ -160,6 +160,18 @@ public interface Shopkeeper {
 	// TRADING
 
 	/**
+	 * Checks whether this shopkeeper has {@link #getTradingRecipes(Player) trading recipes} for the given player.
+	 * <p>
+	 * Ignoring exceptional cases, this method is expected to behave consistently with
+	 * {@link #getTradingRecipes(Player)}, but will usually be cheaper to invoke.
+	 * 
+	 * @param player
+	 *            the trading player, or <code>null</code> to not take player-specific trading recipes into account
+	 * @return <code>true</code> if there are trading recipes for the given player
+	 */
+	public boolean hasTradingRecipes(Player player);
+
+	/**
 	 * Gets the shopkeeper's current trading recipes for the given player.
 	 * <p>
 	 * Depending on the type of this shopkeeper, this might access the world (eg. check container contents) in order to

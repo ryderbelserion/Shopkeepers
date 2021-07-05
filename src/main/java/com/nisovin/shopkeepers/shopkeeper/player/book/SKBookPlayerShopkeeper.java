@@ -101,6 +101,11 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
+	public boolean hasTradingRecipes(Player player) {
+		return !this.getOffers().isEmpty();
+	}
+
+	@Override
 	public List<? extends TradingRecipe> getTradingRecipes(Player player) {
 		Map<String, ItemStack> containerBooksByTitle = this.getCopyableBooksFromContainer();
 		boolean hasBlankBooks = this.hasContainerBlankBooks();

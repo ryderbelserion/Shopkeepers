@@ -760,6 +760,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// TRADING
 
 	@Override
+	public abstract boolean hasTradingRecipes(Player player);
+
+	@Override
 	public abstract List<? extends TradingRecipe> getTradingRecipes(Player player);
 
 	// USER INTERFACES
