@@ -220,6 +220,8 @@ public class Messages extends Config {
 
 	public static Text missingTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
 	public static Text missingCustomTradePerm = Text.parse("&7You do not have the permission to trade with this shop.");
+	public static Text cannotTradeNoOffers = Text.parse("&7This shop currently has no offers. Check again later!");
+	public static String noOffersOpenEditorDescription = c("&eYou can edit this shop by right clicking it while sneaking.");
 	public static Text cannotTradeWithOwnShop = Text.parse("&7You cannot trade with your own shop.");
 	public static Text cannotTradeWhileOwnerOnline = Text.parse("&7You cannot trade while the owner of this shop ('&e{owner}&7') is online.");
 	public static Text cannotTradeWithShopMissingContainer = Text.parse("&7You cannot trade with this shop, because its container is missing.");

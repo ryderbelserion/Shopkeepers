@@ -33,6 +33,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
+import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.ConfigUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Lazy;
@@ -140,6 +141,20 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			}
 			return false;
 		}
+		AbstractShopkeeper shopkeeper = this.getShopkeeper();
+		if (!shopkeeper.hasTradingRecipes(player)) {
+			if (!silent) {
+				Log.debug(() -> "Blocked trade window opening for " + player.getName() + ": Shopkeeper has no offers.");
+				TextUtils.sendMessage(player, Messages.cannotTradeNoOffers);
+
+				// If the player can edit the shopkeeper, send instructions on how to open the editor:
+				UIHandler editorHandler = shopkeeper.getUIHandler(SKDefaultUITypes.EDITOR());
+				if (editorHandler != null && editorHandler.canOpen(player, true)) {
+					TextUtils.sendMessage(player, Messages.noOffersOpenEditorDescription);
+				}
+			}
+			return false;
+		}
 		return true;
 	}
 
@@ -149,6 +164,11 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		String title = this.getInventoryTitle();
 		List<? extends TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
+		if (recipes.isEmpty()) {
+			Log.debug(() -> "Blocked trade window opening for " + player.getName() + ": Shopkeeper has no offers.");
+			TextUtils.sendMessage(player, Messages.cannotTradeNoOffers);
+			return false;
+		}
 		return this.openTradeWindow(title, recipes, player);
 	}
 
