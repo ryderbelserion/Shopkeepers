@@ -57,8 +57,9 @@ language: en-default
 # its default 'UTF-8'. It is not supported to dynamically change this encoding
 # after the save file has already been created.
 file-encoding: "UTF-8"
-# Whether the save file shall get written every time a shopkeeper was edited.
-# If disabled, saving will occur at 5 minute intervals and on plugin shutdown.
+# Whether to immediately save all shopkeeper data whenever a shopkeeper is
+# edited. If disabled, the shopkeeper data is saved in 5 minute intervals and
+# when the plugin is shut down.
 # If you have a large server with many players and/or many shopkeepers, it
 # might be a good idea to disable this for performance reasons.
 save-instantly: true
@@ -315,6 +316,12 @@ always-show-nameplates: false
 enable-citizen-shops: true
 # The entity type used by newly created Citizen NPC shopkeepers:
 default-citizen-npc-type: 'PLAYER'
+# Whether to immediately save all Citizens NPCs whenever the Shopkeepers plugin
+# modifies a Citizens NPC. If disabled, the Citizens plugin handles the saving
+# of the Citizens NPCs as usual: They are saved when the Citizens plugin shuts
+# down, periodically as configured in the Citizens config, and when manually
+# triggered via command by a player.
+save-citizen-npcs-instantly: false
 # Whether to automatically delete all invalid Citizen shopkeepers during plugin
 # startup. This includes for example Citizen shopkeepers that are attached to
 # the same Citizen NPC as another shopkeeper, or any shopkeepers for which the

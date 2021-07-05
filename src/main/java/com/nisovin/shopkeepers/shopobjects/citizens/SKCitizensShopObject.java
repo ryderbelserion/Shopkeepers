@@ -103,7 +103,10 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		// spawning will happen later once the world is loaded.
 		Location spawnLocation = this.getSpawnLocation(); // Can be null
 		// The NPC name is initially empty (works fine, even for player NPCs):
-		npcUniqueId = citizensShops.createNPC(spawnLocation, entityType, "");
+		NPC npc = citizensShops.createNPC(spawnLocation, entityType, "");
+		if (npc == null) return; // NPC creation failed for some reason
+
+		npcUniqueId = npc.getUniqueId();
 
 		// Empty initial name for non-player NPCs:
 		String name = "";
@@ -121,6 +124,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 		// Apply the name:
 		// This also applies the nameplate prefix and adjusts the nameplate visibility if required.
+		// This also triggers a save of the NPC data if required.
 		this.setName(name);
 
 		shopkeeper.markDirty();
@@ -189,6 +193,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 					Log.debug(() -> "Removing Citizens NPC " + CitizensShops.getNPCIdString(npc)
 							+ " due to deletion of shopkeeper " + shopkeeper.getIdString());
 					npc.destroy(); // The NPC was created by us, so we remove it again
+					citizensShops.onNPCEdited(npc);
 				}
 			} else {
 				// TODO: NPC not yet loaded or citizens not enabled: How to remove the citizens npc later?
@@ -296,6 +301,9 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			// This will log a debug message from Citizens if it cannot spawn the NPC currently, but will then later
 			// attempt to spawn it when the chunk gets loaded:
 			npc.spawn(expectedLocation);
+			// Note: We don't trigger a save of the Citizens NPC data if we only spawned the NPC / changed its stored
+			// location. Even if this data is not eventually saved by Citizens, we will be able to just spawn the NPC
+			// again.
 			return;
 		}
 		// Citizens returns a null location instead of a location with null world:
@@ -362,6 +370,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			// Update the nameplate visibility:
 			npc.data().setPersistent(NPC.NAMEPLATE_VISIBLE_METADATA, "false");
 		}
+
+		citizensShops.onNPCEdited(npc);
 	}
 
 	@Override

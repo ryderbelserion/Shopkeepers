@@ -3,10 +3,10 @@ package com.nisovin.shopkeepers.shopobjects.citizens;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -22,6 +22,8 @@ import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.TimeUtils;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;
@@ -248,9 +250,10 @@ public class CitizensShops {
 		}
 	}
 
-	// Returns the uuid of the created NPC, or null.
-	public UUID createNPC(Location location, EntityType entityType, String name) {
+	// Returns the created NPC, or null.
+	public NPC createNPC(Location location, EntityType entityType, String name) {
 		if (!this.isEnabled()) return null;
+
 		NPC npc = CitizensAPI.getNPCRegistry().createNPC(entityType, name);
 		if (npc == null) return null;
 
@@ -268,7 +271,26 @@ public class CitizensShops {
 			// The Citizens shop object will periodically check if the NPC has already been spawned (i.e. if it has no
 			// location assigned yet) and will otherwise attempt to spawn it.
 		}
-		return npc.getUniqueId();
+		return npc;
+	}
+
+	void onNPCEdited(NPC npc) {
+		if (Settings.saveCitizenNpcsInstantly) {
+			this.saveNPCs();
+		} // Else: Saving is controlled only by Citizens itself: Periodically, manually, and on shutdown.
+	}
+
+	public void saveNPCs() {
+		if (!this.isEnabled()) return;
+
+		long startNanos = System.nanoTime();
+		// TODO Saving is quite a heavy operation, but there is no API yet to trigger an asynchronous save. We therefore
+		// execute this command to trigger an asynchronous save. However, as a side effect, this will log messages to
+		// the server console.
+		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "citizens save -a");
+		// CitizensAPI.getNPCRegistry().saveToStore();
+		double durationMillis = TimeUtils.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
+		Log.debug(() -> "Saved Citizens NPCs (" + TextUtils.DECIMAL_FORMAT.format(durationMillis) + "ms)");
 	}
 
 	/**
@@ -359,17 +381,5 @@ public class CitizensShops {
 			}
 		}
 		return invalidShopkeepers.size();
-	}
-
-	// Unused
-	public void removeShopkeeperTraits() {
-		if (!this.isEnabled()) return;
-		Iterator<NPC> npcs = CitizensAPI.getNPCRegistry().iterator();
-		while (npcs.hasNext()) {
-			NPC npc = npcs.next();
-			if (npc.hasTrait(CitizensShopkeeperTrait.class)) {
-				npc.removeTrait(CitizensShopkeeperTrait.class);
-			}
-		}
 	}
 }

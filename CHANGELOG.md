@@ -5,6 +5,7 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.17, 1.16.5, 1.15.2, 1.14.4
 
 * Bumped Citizens dependency to v2.0.28.
+* Config: Added setting `save-citizen-npcs-instantly` (disabled by default), which triggers a save of all Citizens NPC data whenever the Shopkeepers plugin modifies a Citizens NPC. Saving the Citizens NPCs is quite a heavy operation. Since the Citizens API does not yet provide an API to trigger an asynchronous save, we trigger the asynchronous save by invoking the `/citizens save -a` command in the console. As a side effect, this will print command feedback in the console whenever the NPCs are saved this way.
 * Fixed: Since v2.13.0, when not using the `always-show-nameplates` setting (i.e. the default case), the nameplates of Citizens player NPC shopkeepers were limited to a length of 16 and would otherwise not be displayed. The issue is that the Citizens 'hover' nameplate option does not work well for player NPCs. If you are upgrading and have issues with nameplates of previously created NPCs not showing, either use the shopkeeper editor to rename the NPC, or use the `/npc name` command to toggle the nameplate visibility.
 * Debug: When we print ItemStacks in YAML representation to the server console, we omit the trailing newline now. However, the `/shopkeeper yaml` command still sends additional empty lines in chat to make the output more readable.
 * Debug: Added debug option `empty-trades` that logs item information for the selected trading recipe and the input items whenever a player clicks an empty trading result slot.

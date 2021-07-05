@@ -57,9 +57,11 @@ public class CitizensShopkeeperTrait extends Trait {
 	}
 
 	void onShopkeeperDeletion(Shopkeeper shopkeeper) {
+		NPC npc = this.getNPC();
 		Log.debug(() -> "Removing the 'shopkeeper' trait from Citizens NPC " + CitizensShops.getNPCIdString(npc)
 				+ " due to the deletion of shopkeeper " + shopkeeper.getIdString());
-		this.getNPC().removeTrait(CitizensShopkeeperTrait.class);
+		npc.removeTrait(CitizensShopkeeperTrait.class);
+		SKShopkeepersPlugin.getInstance().getCitizensShops().onNPCEdited(npc);
 	}
 
 	/**
@@ -74,6 +76,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	public void onTraitDeleted(Player player) {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		if (shopkeeper != null) {
+			NPC npc = this.getNPC();
 			Log.debug(() -> "Removing the shopkeeper " + shopkeeper.getId() + " due to the deletion of the 'shopkeeper' trait"
 					+ " from the Citizens NPC " + CitizensShops.getNPCIdString(npc));
 			assert shopkeeper.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN();
@@ -197,6 +200,8 @@ public class CitizensShopkeeperTrait extends Trait {
 				TextUtils.sendMessage(creator, ChatColor.RED + shopkeeperCreationError);
 			}
 
+			// Note: We don't trigger a save of the NPC data when the trait is manually added, so we also don't trigger
+			// a save when we remove the trait again here.
 			Bukkit.getScheduler().runTask(plugin, () -> npc.removeTrait(CitizensShopkeeperTrait.class));
 		}
 	}
