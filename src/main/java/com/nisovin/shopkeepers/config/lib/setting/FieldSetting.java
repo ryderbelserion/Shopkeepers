@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 import com.nisovin.shopkeepers.config.lib.Config;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.ClassUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -77,7 +77,7 @@ public class FieldSetting<T> implements Setting<T> {
 	public void setValue(T value) throws ValueLoadException {
 		if (value != null) {
 			Class<?> fieldType = field.getType();
-			if (!Utils.isAssignableFrom(fieldType, value.getClass())) {
+			if (!ClassUtils.isAssignableFrom(fieldType, value.getClass())) {
 				throw new ValueLoadException("Value is of wrong type: Got " + value.getClass().getName()
 						+ ", expected " + fieldType.getName());
 			}

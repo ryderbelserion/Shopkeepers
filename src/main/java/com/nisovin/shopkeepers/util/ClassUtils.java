@@ -3,15 +3,50 @@ package com.nisovin.shopkeepers.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 public class ClassUtils {
 
+	private ClassUtils() {
+	}
+
 	private static final String CLASS_FILE_EXTENSION = ".class";
 
-	private ClassUtils() {
+	private static final Map<Class<?>, Class<?>> PRIMITIVE_WRAPPERS;
+	static {
+		Map<Class<?>, Class<?>> primitiveWrappers = new HashMap<>();
+		primitiveWrappers.put(boolean.class, Boolean.class);
+		primitiveWrappers.put(byte.class, Byte.class);
+		primitiveWrappers.put(char.class, Character.class);
+		primitiveWrappers.put(double.class, Double.class);
+		primitiveWrappers.put(float.class, Float.class);
+		primitiveWrappers.put(int.class, Integer.class);
+		primitiveWrappers.put(long.class, Long.class);
+		primitiveWrappers.put(short.class, Short.class);
+		PRIMITIVE_WRAPPERS = Collections.unmodifiableMap(primitiveWrappers);
+	}
+
+	public static boolean isPrimitiveWrapperOf(Class<?> targetClass, Class<?> primitive) {
+		Validate.isTrue(primitive.isPrimitive(), "Second argument has to be a primitive!");
+		return (PRIMITIVE_WRAPPERS.get(primitive) == targetClass);
+	}
+
+	public static boolean isAssignableFrom(Class<?> to, Class<?> from) {
+		if (to.isAssignableFrom(from)) {
+			return true;
+		}
+		if (to.isPrimitive()) {
+			return isPrimitiveWrapperOf(from, to);
+		}
+		if (from.isPrimitive()) {
+			return isPrimitiveWrapperOf(to, from);
+		}
+		return false;
 	}
 
 	/**
