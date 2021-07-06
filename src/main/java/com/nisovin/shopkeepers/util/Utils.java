@@ -15,13 +15,10 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.Event.Result;
-import org.bukkit.event.HandlerList;
 import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.util.BlockIterator;
 import org.bukkit.util.NumberConversions;
 import org.bukkit.util.RayTraceResult;
@@ -30,15 +27,6 @@ import org.bukkit.util.Vector;
 public final class Utils {
 
 	private Utils() {
-	}
-
-	public static void printRegisteredListeners(Event event) {
-		HandlerList handlerList = event.getHandlers();
-		Log.info("Registered listeners for event " + event.getEventName() + ":");
-		for (RegisteredListener rl : handlerList.getRegisteredListeners()) {
-			Log.info(" - " + rl.getPlugin().getName() + " (" + rl.getListener().getClass().getName() + ")"
-					+ ", priority: " + rl.getPriority() + ", ignoring cancelled: " + rl.isIgnoringCancelled());
-		}
 	}
 
 	/**

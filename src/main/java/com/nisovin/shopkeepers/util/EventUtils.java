@@ -13,6 +13,9 @@ import org.bukkit.plugin.SimplePluginManager;
 
 public class EventUtils {
 
+	private EventUtils() {
+	}
+
 	/**
 	 * Gets the {@link HandlerList} for the specified type of event.
 	 * <p>
@@ -200,6 +203,12 @@ public class EventUtils {
 		}
 	}
 
-	private EventUtils() {
+	public static void printRegisteredListeners(Event event) {
+		HandlerList handlerList = event.getHandlers();
+		Log.info("Registered listeners for event " + event.getEventName() + ":");
+		for (RegisteredListener rl : handlerList.getRegisteredListeners()) {
+			Log.info(" - " + rl.getPlugin().getName() + " (" + rl.getListener().getClass().getName() + ")"
+					+ ", priority: " + rl.getPriority() + ", ignoring cancelled: " + rl.isIgnoringCancelled());
+		}
 	}
 }
