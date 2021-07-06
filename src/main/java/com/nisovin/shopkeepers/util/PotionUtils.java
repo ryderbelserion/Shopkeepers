@@ -106,19 +106,19 @@ public class PotionUtils {
 		List<String> words = Arrays.asList(input.split("_"));
 
 		// Remove common optional words:
-		Utils.replace(words, "potion", null);
-		Utils.replace(words, "of", null);
+		CollectionUtils.replace(words, "potion", null);
+		CollectionUtils.replace(words, "of", null);
 
 		// Determine the item type based on keywords:
 		Material itemType = null;
-		if (Utils.replace(words, "arrow", null)) {
+		if (CollectionUtils.replace(words, "arrow", null)) {
 			// Keywords: [tipped] [potion] arrow [of]
 			itemType = Material.TIPPED_ARROW;
-			Utils.replace(words, "tipped", null);
-		} else if (Utils.replace(words, "splash", null)) {
+			CollectionUtils.replace(words, "tipped", null);
+		} else if (CollectionUtils.replace(words, "splash", null)) {
 			// Keywords: splash [potion] [of]
 			itemType = Material.SPLASH_POTION;
-		} else if (Utils.replace(words, "lingering", null)) {
+		} else if (CollectionUtils.replace(words, "lingering", null)) {
 			// Keywords: lingering [potion] [of]
 			itemType = Material.LINGERING_POTION;
 		} else {
@@ -128,8 +128,8 @@ public class PotionUtils {
 		assert itemType != null;
 
 		// Long and strong potion variants:
-		boolean extended = Utils.replace(words, "long", null);
-		boolean upgraded = Utils.replace(words, "strong", null) || Utils.replace(words, "2", null) || Utils.replace(words, "ii", null);
+		boolean extended = CollectionUtils.replace(words, "long", null);
+		boolean upgraded = CollectionUtils.replace(words, "strong", null) || CollectionUtils.replace(words, "2", null) || CollectionUtils.replace(words, "ii", null);
 
 		// Parse the potion type from the remaining input:
 		input = words.stream().filter(Objects::nonNull).collect(Collectors.joining("_"));

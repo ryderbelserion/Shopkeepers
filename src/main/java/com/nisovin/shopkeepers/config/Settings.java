@@ -28,13 +28,13 @@ import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.MaxShopsPermission;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
+import com.nisovin.shopkeepers.util.CollectionUtils;
 import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SoundEffect;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
 public class Settings extends Config {
@@ -101,74 +101,77 @@ public class Settings extends Config {
 	 * Shop (Object) Types
 	 */
 	// Villager is the default and therefore first. The other entity types are alphabetically sorted.
-	public static List<String> enabledLivingShops = Utils.addAll(new ArrayList<>(Arrays.asList(EntityType.VILLAGER.name())), Utils.sort(Arrays.asList(
-			EntityType.COW.name(),
-			EntityType.MUSHROOM_COW.name(),
-			EntityType.SHEEP.name(),
-			EntityType.PIG.name(),
-			EntityType.CHICKEN.name(),
-			EntityType.OCELOT.name(),
-			EntityType.RABBIT.name(),
-			EntityType.WOLF.name(),
-			EntityType.SNOWMAN.name(),
-			EntityType.IRON_GOLEM.name(),
-			EntityType.BLAZE.name(),
-			EntityType.SILVERFISH.name(),
-			EntityType.POLAR_BEAR.name(), // MC 1.10
-			EntityType.SKELETON.name(),
-			EntityType.STRAY.name(), // MC 1.11
-			EntityType.WITHER_SKELETON.name(), // MC 1.11
-			EntityType.SPIDER.name(),
-			EntityType.CAVE_SPIDER.name(),
-			EntityType.CREEPER.name(),
-			EntityType.WITCH.name(),
-			EntityType.ENDERMAN.name(),
-			EntityType.ZOMBIE.name(),
-			EntityType.ZOMBIE_VILLAGER.name(), // MC 1.11
-			EntityType.HUSK.name(), // MC 1.11
-			EntityType.GIANT.name(),
-			EntityType.GHAST.name(),
-			EntityType.SLIME.name(),
-			EntityType.MAGMA_CUBE.name(),
-			EntityType.SQUID.name(),
-			EntityType.HORSE.name(),
-			EntityType.MULE.name(),
-			EntityType.DONKEY.name(),
-			EntityType.SKELETON_HORSE.name(),
-			EntityType.ZOMBIE_HORSE.name(),
-			EntityType.SHULKER.name(),
-			EntityType.EVOKER.name(), // MC 1.11
-			EntityType.VEX.name(), // MC 1.11
-			EntityType.VINDICATOR.name(), // MC 1.11
-			EntityType.ILLUSIONER.name(), // MC 1.12
-			EntityType.PARROT.name(), // MC 1.12
-			EntityType.TURTLE.name(), // MC 1.13
-			EntityType.PHANTOM.name(), // MC 1.13
-			EntityType.COD.name(), // MC 1.13
-			EntityType.SALMON.name(), // MC 1.13
-			EntityType.PUFFERFISH.name(), // MC 1.13
-			EntityType.TROPICAL_FISH.name(), // MC 1.13
-			EntityType.DROWNED.name(), // MC 1.13
-			EntityType.DOLPHIN.name(), // MC 1.13
-			EntityType.CAT.name(), // MC 1.14
-			EntityType.PANDA.name(), // MC 1.14
-			EntityType.PILLAGER.name(), // MC 1.14
-			EntityType.RAVAGER.name(), // MC 1.14
-			EntityType.LLAMA.name(), // MC 1.11
-			EntityType.TRADER_LLAMA.name(), // MC 1.14
-			EntityType.WANDERING_TRADER.name(), // MC 1.14
-			EntityType.FOX.name(), // MC 1.14
-			"BEE", // MC 1.15
-			"ZOMBIFIED_PIGLIN", // MC 1.16, replaced PIG_ZOMBIE
-			"PIGLIN", // MC 1.16
-			"HOGLIN", // MC 1.16
-			"ZOGLIN", // MC 1.16
-			"STRIDER", // MC 1.16
-			"PIGLIN_BRUTE", // MC 1.16.2
-			"AXOLOTL", // MC 1.17
-			"GOAT", // MC 1.17
-			"GLOW_SQUID" // MC 1.17
-	), String::compareTo));
+	public static List<String> enabledLivingShops = CollectionUtils.addAll(
+			new ArrayList<>(Arrays.asList(EntityType.VILLAGER.name())),
+			CollectionUtils.sort(Arrays.asList(
+					EntityType.COW.name(),
+					EntityType.MUSHROOM_COW.name(),
+					EntityType.SHEEP.name(),
+					EntityType.PIG.name(),
+					EntityType.CHICKEN.name(),
+					EntityType.OCELOT.name(),
+					EntityType.RABBIT.name(),
+					EntityType.WOLF.name(),
+					EntityType.SNOWMAN.name(),
+					EntityType.IRON_GOLEM.name(),
+					EntityType.BLAZE.name(),
+					EntityType.SILVERFISH.name(),
+					EntityType.POLAR_BEAR.name(), // MC 1.10
+					EntityType.SKELETON.name(),
+					EntityType.STRAY.name(), // MC 1.11
+					EntityType.WITHER_SKELETON.name(), // MC 1.11
+					EntityType.SPIDER.name(),
+					EntityType.CAVE_SPIDER.name(),
+					EntityType.CREEPER.name(),
+					EntityType.WITCH.name(),
+					EntityType.ENDERMAN.name(),
+					EntityType.ZOMBIE.name(),
+					EntityType.ZOMBIE_VILLAGER.name(), // MC 1.11
+					EntityType.HUSK.name(), // MC 1.11
+					EntityType.GIANT.name(),
+					EntityType.GHAST.name(),
+					EntityType.SLIME.name(),
+					EntityType.MAGMA_CUBE.name(),
+					EntityType.SQUID.name(),
+					EntityType.HORSE.name(),
+					EntityType.MULE.name(),
+					EntityType.DONKEY.name(),
+					EntityType.SKELETON_HORSE.name(),
+					EntityType.ZOMBIE_HORSE.name(),
+					EntityType.SHULKER.name(),
+					EntityType.EVOKER.name(), // MC 1.11
+					EntityType.VEX.name(), // MC 1.11
+					EntityType.VINDICATOR.name(), // MC 1.11
+					EntityType.ILLUSIONER.name(), // MC 1.12
+					EntityType.PARROT.name(), // MC 1.12
+					EntityType.TURTLE.name(), // MC 1.13
+					EntityType.PHANTOM.name(), // MC 1.13
+					EntityType.COD.name(), // MC 1.13
+					EntityType.SALMON.name(), // MC 1.13
+					EntityType.PUFFERFISH.name(), // MC 1.13
+					EntityType.TROPICAL_FISH.name(), // MC 1.13
+					EntityType.DROWNED.name(), // MC 1.13
+					EntityType.DOLPHIN.name(), // MC 1.13
+					EntityType.CAT.name(), // MC 1.14
+					EntityType.PANDA.name(), // MC 1.14
+					EntityType.PILLAGER.name(), // MC 1.14
+					EntityType.RAVAGER.name(), // MC 1.14
+					EntityType.LLAMA.name(), // MC 1.11
+					EntityType.TRADER_LLAMA.name(), // MC 1.14
+					EntityType.WANDERING_TRADER.name(), // MC 1.14
+					EntityType.FOX.name(), // MC 1.14
+					"BEE", // MC 1.15
+					"ZOMBIFIED_PIGLIN", // MC 1.16, replaced PIG_ZOMBIE
+					"PIGLIN", // MC 1.16
+					"HOGLIN", // MC 1.16
+					"ZOGLIN", // MC 1.16
+					"STRIDER", // MC 1.16
+					"PIGLIN_BRUTE", // MC 1.16.2
+					"AXOLOTL", // MC 1.17
+					"GOAT", // MC 1.17
+					"GLOW_SQUID" // MC 1.17
+			), String::compareTo)
+	);
 
 	public static boolean disableGravity = false;
 	public static int gravityChunkRange = 4;

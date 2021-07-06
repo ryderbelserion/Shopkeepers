@@ -5,10 +5,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.nisovin.shopkeepers.util.CollectionUtils;
 import com.nisovin.shopkeepers.util.Lazy;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -261,7 +261,7 @@ public class CsvFormatter {
 	 */
 	public String formatFields(Iterable<? extends Object> fields) {
 		Validate.notNull(fields, "fields is null");
-		return this.formatFields(Utils.stream(fields));
+		return this.formatFields(CollectionUtils.stream(fields));
 	}
 
 	/**

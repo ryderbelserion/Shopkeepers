@@ -30,9 +30,9 @@ import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringListValue;
 import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringValue;
 import com.nisovin.shopkeepers.config.lib.value.types.StringListValue;
 import com.nisovin.shopkeepers.config.lib.value.types.StringValue;
+import com.nisovin.shopkeepers.util.CollectionUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class Config {
@@ -62,7 +62,7 @@ public abstract class Config {
 
 		this.settings = new LinkedHashMap<>();
 		this.settingsView = Collections.unmodifiableCollection(settings.values());
-		for (Field field : Utils.toIterable(this.streamSettingFields())) {
+		for (Field field : CollectionUtils.toIterable(this.streamSettingFields())) {
 			String configKey = this.getConfigKey(field);
 			ValueType<?> valueType = this.setupValueType(field);
 			assert valueType != null;
