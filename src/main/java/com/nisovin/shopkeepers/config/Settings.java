@@ -28,14 +28,14 @@ import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.MaxShopsPermission;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
-import com.nisovin.shopkeepers.util.CollectionUtils;
-import com.nisovin.shopkeepers.util.EntityUtils;
-import com.nisovin.shopkeepers.util.ItemData;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.SoundEffect;
-import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
+import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
+import com.nisovin.shopkeepers.util.inventory.ItemData;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class Settings extends Config {
 

@@ -10,10 +10,10 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.util.ConversionUtils;
-import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.java.ConversionUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A permission node associated with a maximum player shops limit.

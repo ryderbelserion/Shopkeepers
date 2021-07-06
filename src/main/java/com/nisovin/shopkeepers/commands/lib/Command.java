@@ -16,12 +16,12 @@ import com.nisovin.shopkeepers.commands.lib.arguments.FallbackArgument;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.MapUtils;
-import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.MapUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class Command {
 

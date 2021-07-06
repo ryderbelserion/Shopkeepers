@@ -6,8 +6,8 @@ import java.util.Objects;
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Represents a number of consecutive trades that involved the same player, the same shopkeeper, and the same traded

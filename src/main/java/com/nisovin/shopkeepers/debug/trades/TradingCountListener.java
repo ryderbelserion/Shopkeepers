@@ -20,9 +20,9 @@ import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.config.Settings;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.MerchantUtils;
+import com.nisovin.shopkeepers.util.bukkit.MerchantUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
  * Tries to accurately detect individual trades handled by Minecraft by listening to corresponding changes of the

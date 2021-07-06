@@ -9,8 +9,8 @@ import org.bukkit.entity.Player;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
 
 /**
  * Provides suggestions for names of online players.

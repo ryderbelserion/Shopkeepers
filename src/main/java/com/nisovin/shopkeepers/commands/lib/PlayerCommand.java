@@ -6,7 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Base class for commands that can only be executed by players.

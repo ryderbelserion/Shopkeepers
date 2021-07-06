@@ -12,11 +12,11 @@ import org.bukkit.inventory.ItemStack;
 import org.junit.Test;
 
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
-import com.nisovin.shopkeepers.util.ItemData;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.MutableLong;
 import com.nisovin.shopkeepers.util.TestItemStacks;
-import com.nisovin.shopkeepers.util.TimeUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemData;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.MutableLong;
+import com.nisovin.shopkeepers.util.java.TimeUtils;
 
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;

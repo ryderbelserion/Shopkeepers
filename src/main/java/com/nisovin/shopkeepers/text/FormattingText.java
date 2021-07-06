@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.text;
 
 import org.bukkit.ChatColor;
 
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class FormattingText extends TextBuilder {
 

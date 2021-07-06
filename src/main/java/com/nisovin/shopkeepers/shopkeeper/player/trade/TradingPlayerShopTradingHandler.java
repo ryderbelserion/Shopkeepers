@@ -8,9 +8,9 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
-import com.nisovin.shopkeepers.util.InventoryUtils;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 

@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.util.text;
 
 import java.util.Map;
 
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 class CommonMessageArguments {
 

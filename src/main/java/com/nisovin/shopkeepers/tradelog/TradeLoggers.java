@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.tradelog.csv.CsvTradeLogger;
 import com.nisovin.shopkeepers.tradelog.data.TradeRecord;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.trading.MergedTrades;
 import com.nisovin.shopkeepers.util.trading.TradeMerger;
 import com.nisovin.shopkeepers.util.trading.TradeMerger.MergeMode;

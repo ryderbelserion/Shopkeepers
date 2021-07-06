@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.util.timer;
 
 import java.util.concurrent.TimeUnit;
 
-import com.nisovin.shopkeepers.util.TimeUtils;
+import com.nisovin.shopkeepers.util.java.TimeUtils;
 
 public class Timer implements Timings {
 

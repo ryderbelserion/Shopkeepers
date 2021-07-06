@@ -4,8 +4,8 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
  * Stores a value associated with a specific {@link Shopkeeper}.

@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.commands.lib;
 
 import java.util.List;
 
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A {@link Command} which simply calls {@link Command#sendHelp(org.bukkit.command.CommandSender)} of the given source

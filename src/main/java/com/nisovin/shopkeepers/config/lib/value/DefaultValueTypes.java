@@ -21,8 +21,8 @@ import com.nisovin.shopkeepers.config.lib.value.types.SoundEffectValue;
 import com.nisovin.shopkeepers.config.lib.value.types.StringValue;
 import com.nisovin.shopkeepers.config.lib.value.types.TextValue;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.ItemData;
-import com.nisovin.shopkeepers.util.SoundEffect;
+import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
+import com.nisovin.shopkeepers.util.inventory.ItemData;
 
 /**
  * Registry of default value types of settings.

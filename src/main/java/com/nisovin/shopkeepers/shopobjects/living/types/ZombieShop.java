@@ -18,7 +18,7 @@ import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use BabyableShop as base once there is a common interface for this inside Bukkit.
 public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {

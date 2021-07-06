@@ -11,9 +11,9 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class HiringHandler extends AbstractShopkeeperUIHandler {
 

@@ -7,8 +7,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 
-import com.nisovin.shopkeepers.util.LocationUtils;
-import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class CreatureForceSpawnListener implements Listener {
 

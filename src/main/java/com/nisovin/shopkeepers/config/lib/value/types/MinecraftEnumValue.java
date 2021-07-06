@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.config.lib.value.types;
 
-import com.nisovin.shopkeepers.util.MinecraftEnumUtils;
+import com.nisovin.shopkeepers.util.bukkit.MinecraftEnumUtils;
 
 /**
  * Extends {@link EnumValue}, but normalizes inputs via {@link MinecraftEnumUtils#normalizeEnumName(String)} when

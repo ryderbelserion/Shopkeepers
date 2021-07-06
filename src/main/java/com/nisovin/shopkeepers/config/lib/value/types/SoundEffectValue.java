@@ -3,9 +3,9 @@ package com.nisovin.shopkeepers.config.lib.value.types;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
-import com.nisovin.shopkeepers.util.SoundEffect;
-import com.nisovin.shopkeepers.util.SoundEffect.SoundEffectDeserializeException;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
+import com.nisovin.shopkeepers.util.bukkit.SoundEffect.SoundEffectDeserializeException;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class SoundEffectValue extends ValueType<SoundEffect> {
 

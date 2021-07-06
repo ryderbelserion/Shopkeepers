@@ -6,8 +6,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import com.nisovin.shopkeepers.api.types.TypeRegistry;
-import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public abstract class AbstractTypeRegistry<T extends AbstractType> implements TypeRegistry<T> {
 

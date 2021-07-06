@@ -4,8 +4,8 @@ import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.nisovin.shopkeepers.util.ConfigUtils;
-import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
  * Migrates the config from version 0 (pre versioning) to version 1.

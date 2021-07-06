@@ -10,7 +10,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Wraps a given {@link CommandArgument} and makes it optional.

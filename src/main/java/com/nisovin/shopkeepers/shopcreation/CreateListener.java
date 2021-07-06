@@ -37,14 +37,14 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.util.EventUtils;
-import com.nisovin.shopkeepers.util.InventoryUtils;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.MutableLong;
-import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.EventUtils;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.interaction.TestPlayerInteractEvent;
+import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.MutableLong;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
  * Handles the usage of the shop creation item.

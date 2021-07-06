@@ -9,8 +9,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class Confirmations {
 

@@ -4,8 +4,8 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.FallbackArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.TypedFallbackArgument;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils.TargetShopkeeperFilter;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeeperFilter;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A {@link FallbackArgument} that returns the targeted shopkeeper without consuming any arguments.

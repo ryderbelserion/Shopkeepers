@@ -1,7 +1,7 @@
 package com.nisovin.shopkeepers.playershops;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Functionality related to player shops.

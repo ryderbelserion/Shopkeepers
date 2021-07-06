@@ -51,10 +51,10 @@ import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
-import com.nisovin.shopkeepers.util.EventUtils;
-import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.bukkit.EventUtils;
 import com.nisovin.shopkeepers.util.interaction.InteractionUtils;
 import com.nisovin.shopkeepers.util.interaction.TestPlayerInteractEntityEvent;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 class LivingEntityShopListener implements Listener {
 

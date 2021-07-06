@@ -34,11 +34,11 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
-import com.nisovin.shopkeepers.util.CyclicCounter;
-import com.nisovin.shopkeepers.util.EntityUtils;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.RateLimiter;
-import com.nisovin.shopkeepers.util.WorldUtils;
+import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
+import com.nisovin.shopkeepers.util.bukkit.WorldUtils;
+import com.nisovin.shopkeepers.util.java.CyclicCounter;
+import com.nisovin.shopkeepers.util.java.RateLimiter;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntityShopObject implements LivingShopObject {
 

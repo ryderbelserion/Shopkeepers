@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.text.Text;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 public class TextTest extends AbstractBukkitTest {
 

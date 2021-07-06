@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
 import com.nisovin.shopkeepers.commands.lib.MissingArgumentException;
 import com.nisovin.shopkeepers.commands.lib.RequiresPlayerArgumentException;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A {@link FallbackArgument} that wraps two {@link CommandArgument command arguments}: If parsing the first command

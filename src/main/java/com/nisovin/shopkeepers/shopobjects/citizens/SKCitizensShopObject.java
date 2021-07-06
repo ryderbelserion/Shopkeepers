@@ -20,11 +20,11 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
-import com.nisovin.shopkeepers.util.ConversionUtils;
-import com.nisovin.shopkeepers.util.CyclicCounter;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.RateLimiter;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.ConversionUtils;
+import com.nisovin.shopkeepers.util.java.CyclicCounter;
+import com.nisovin.shopkeepers.util.java.RateLimiter;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 import net.citizensnpcs.api.CitizensAPI;
 import net.citizensnpcs.api.npc.NPC;

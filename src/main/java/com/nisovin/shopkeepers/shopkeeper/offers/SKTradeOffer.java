@@ -11,11 +11,11 @@ import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
-import com.nisovin.shopkeepers.util.ItemMigration;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.StringUtils;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.inventory.ItemMigration;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 // Shares its implementation with SKTradingRecipe, but always reports to not be out of stock.
 public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {

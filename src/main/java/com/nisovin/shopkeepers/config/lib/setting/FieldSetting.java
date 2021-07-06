@@ -5,8 +5,8 @@ import java.lang.reflect.Field;
 import com.nisovin.shopkeepers.config.lib.Config;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
-import com.nisovin.shopkeepers.util.ClassUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.ClassUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A {@link Setting} that wraps a {@link Field} of a config class.

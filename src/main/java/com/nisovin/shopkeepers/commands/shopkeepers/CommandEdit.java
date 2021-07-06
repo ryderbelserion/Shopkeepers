@@ -10,8 +10,8 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
+import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeeperFilter;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils.TargetShopkeeperFilter;
 
 class CommandEdit extends PlayerCommand {
 

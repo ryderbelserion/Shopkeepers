@@ -9,8 +9,8 @@ import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.util.ConversionUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.ConversionUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class EnumArgument<T extends Enum<T>> extends CommandArgument<T> {
 

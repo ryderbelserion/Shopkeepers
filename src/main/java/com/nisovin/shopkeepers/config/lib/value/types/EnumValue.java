@@ -3,8 +3,8 @@ package com.nisovin.shopkeepers.config.lib.value.types;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
-import com.nisovin.shopkeepers.util.EnumUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.EnumUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class EnumValue<E extends Enum<E>> extends ValueType<E> {
 

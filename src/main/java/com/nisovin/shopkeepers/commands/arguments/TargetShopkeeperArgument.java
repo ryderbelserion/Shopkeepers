@@ -12,9 +12,9 @@ import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils.TargetShopkeeperFilter;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils.TargetShopkeepersResult;
+import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils;
+import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeeperFilter;
+import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeepersResult;
 
 /**
  * A {@link CommandArgument} that returns the targeted shopkeeper without consuming any arguments.
@@ -48,7 +48,7 @@ public class TargetShopkeeperArgument extends CommandArgument<Shopkeeper> {
 		}
 
 		Player player = (Player) sender;
-		TargetShopkeepersResult result = ShopkeeperUtils.getTargetedShopkeepers(player, filter);
+		TargetShopkeepersResult result = ShopkeeperArgumentUtils.getTargetedShopkeepers(player, filter);
 		if (!result.isSuccess()) {
 			throw new ArgumentParseException(this, result.getErrorMessage());
 		} else {

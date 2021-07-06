@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.StringUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
 
 public class ShopTypeArgument extends CommandArgument<ShopType<?>> {
 

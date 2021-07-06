@@ -10,8 +10,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
-import com.nisovin.shopkeepers.util.EnchantmentUtils;
-import com.nisovin.shopkeepers.util.PotionUtils;
+import com.nisovin.shopkeepers.util.inventory.EnchantmentUtils;
+import com.nisovin.shopkeepers.util.inventory.PotionUtils;
 
 public class PlaceholderItemTests extends AbstractBukkitTest {
 

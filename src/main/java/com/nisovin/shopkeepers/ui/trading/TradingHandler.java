@@ -35,14 +35,14 @@ import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
-import com.nisovin.shopkeepers.util.ConfigUtils;
-import com.nisovin.shopkeepers.util.InventoryUtils;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Lazy;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.MerchantUtils;
-import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
+import com.nisovin.shopkeepers.util.bukkit.MerchantUtils;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.Lazy;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class TradingHandler extends AbstractShopkeeperUIHandler {
 

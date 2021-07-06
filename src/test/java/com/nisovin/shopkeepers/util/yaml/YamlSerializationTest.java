@@ -7,8 +7,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import com.nisovin.shopkeepers.util.AbstractItemStackSerializationTest;
-import com.nisovin.shopkeepers.util.ConfigUtils;
-import com.nisovin.shopkeepers.util.StringUtils;
+import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
 
 public class YamlSerializationTest extends AbstractItemStackSerializationTest {
 

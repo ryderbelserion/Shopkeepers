@@ -4,7 +4,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 import com.nisovin.shopkeepers.debug.DebugOptions;
-import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 class CompatUtils {
 

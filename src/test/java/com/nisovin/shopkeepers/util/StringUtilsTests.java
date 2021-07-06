@@ -3,6 +3,8 @@ package com.nisovin.shopkeepers.util;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.nisovin.shopkeepers.util.java.StringUtils;
+
 public class StringUtilsTests {
 
 	@Test

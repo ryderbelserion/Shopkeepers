@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
-import com.nisovin.shopkeepers.util.Pair;
+import com.nisovin.shopkeepers.util.java.Pair;
 
 /**
  * 

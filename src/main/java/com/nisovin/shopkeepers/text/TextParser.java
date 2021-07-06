@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.text;
 
 import org.bukkit.ChatColor;
 
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 class TextParser {
 

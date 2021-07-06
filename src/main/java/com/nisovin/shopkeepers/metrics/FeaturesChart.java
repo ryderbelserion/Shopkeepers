@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
-import com.nisovin.shopkeepers.util.MapUtils;
+import com.nisovin.shopkeepers.util.java.MapUtils;
 
 /**
  * Reports usage of various features.

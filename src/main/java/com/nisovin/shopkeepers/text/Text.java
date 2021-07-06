@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 import org.bukkit.ChatColor;
 
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**

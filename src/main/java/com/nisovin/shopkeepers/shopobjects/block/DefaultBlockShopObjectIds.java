@@ -4,8 +4,8 @@ import org.bukkit.block.Block;
 
 import com.nisovin.shopkeepers.api.shopobjects.block.BlockShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
-import com.nisovin.shopkeepers.util.BlockLocation;
-import com.nisovin.shopkeepers.util.MutableBlockLocation;
+import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
+import com.nisovin.shopkeepers.util.bukkit.MutableBlockLocation;
 
 /**
  * Produces the default {@link AbstractShopObject#getId() shop object ids} used by {@link BlockShopObjectType block shop

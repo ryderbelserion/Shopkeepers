@@ -5,8 +5,8 @@ import org.bukkit.Material;
 import com.nisovin.shopkeepers.config.lib.value.InvalidMaterialException;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class MaterialValue extends MinecraftEnumValue<Material> {
 

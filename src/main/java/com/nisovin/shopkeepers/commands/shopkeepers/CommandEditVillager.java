@@ -13,13 +13,13 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.EntityArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityArgument.TargetEntityFilter;
-import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityFallback;
+import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
-import com.nisovin.shopkeepers.util.PermissionUtils;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 
 /**
  * Opens the villager editor for the targeted (regular) villager or wandering trader.

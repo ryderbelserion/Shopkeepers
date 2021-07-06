@@ -13,7 +13,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.TypedFirstOfArgument;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils;
+import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils;
 
 public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 
@@ -64,7 +64,7 @@ public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 	 *             if the id is ambiguous
 	 */
 	public Shopkeeper getShopkeeper(String nameInput) throws IllegalArgumentException {
-		Stream<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.ShopkeeperNameMatchers.DEFAULT.match(nameInput);
+		Stream<? extends Shopkeeper> shopkeepers = ShopkeeperArgumentUtils.ShopkeeperNameMatchers.DEFAULT.match(nameInput);
 		Optional<? extends Shopkeeper> shopkeeper = shopkeepers.findFirst();
 		return shopkeeper.orElse(null);
 		// TODO deal with ambiguities

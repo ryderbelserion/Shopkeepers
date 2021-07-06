@@ -3,8 +3,7 @@ package com.nisovin.shopkeepers.compat;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
-import com.nisovin.shopkeepers.debug.DebugOptions;
-import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 // TODO This can be removed once we only support Bukkit 1.16.1 upwards.
 public class MC_1_16_Utils {

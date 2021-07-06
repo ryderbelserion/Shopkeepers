@@ -5,11 +5,11 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.configuration.Configuration;
 
-import com.nisovin.shopkeepers.util.ConfigUtils;
-import com.nisovin.shopkeepers.util.ItemData;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemData;
+import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
  * Migrates the config from version 1 to version 2.

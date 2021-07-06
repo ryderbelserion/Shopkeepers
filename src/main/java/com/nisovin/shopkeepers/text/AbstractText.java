@@ -5,8 +5,8 @@ import java.util.Map;
 
 import org.bukkit.ChatColor;
 
-import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**

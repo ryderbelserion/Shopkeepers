@@ -10,8 +10,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.world.ChunkLoadEvent;
 
 import com.nisovin.shopkeepers.config.Settings;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
  * Prevents spawning of regular villagers (including wandering traders).

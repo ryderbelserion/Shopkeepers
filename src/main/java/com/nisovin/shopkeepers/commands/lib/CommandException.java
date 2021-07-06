@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.commands.lib;
 import org.bukkit.command.CommandSender;
 
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * This exception is thrown during handling of a command when an error occurs or execution fails. The detail message of

@@ -3,8 +3,8 @@ package com.nisovin.shopkeepers.property;
 import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.util.ConversionUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.ConversionUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A {@link Property} that stores an enum value.

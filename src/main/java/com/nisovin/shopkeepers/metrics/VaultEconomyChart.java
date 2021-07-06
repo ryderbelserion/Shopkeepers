@@ -4,7 +4,7 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import com.nisovin.shopkeepers.util.StringUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
 
 import net.milkbowl.vault.economy.Economy;
 

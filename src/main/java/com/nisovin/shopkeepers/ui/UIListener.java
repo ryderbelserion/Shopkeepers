@@ -19,8 +19,8 @@ import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
-import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.interaction.TestPlayerInteractEvent;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 class UIListener implements Listener {
 

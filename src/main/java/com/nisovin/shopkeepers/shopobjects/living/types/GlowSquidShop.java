@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use actual GlowSquid type once we only support Bukkit 1.17 upwards
 public class GlowSquidShop extends SKLivingShopObject<Squid> {

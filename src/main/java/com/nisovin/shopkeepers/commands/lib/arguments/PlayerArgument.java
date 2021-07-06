@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.util.PlayerUtils;
+import com.nisovin.shopkeepers.commands.lib.util.PlayerArgumentUtils;
 
 /**
  * Accepts a player specified by either name (might not have to be exact, depending on the used matching function) or
@@ -84,7 +84,7 @@ public class PlayerArgument extends CommandArgument<Player> {
 	 */
 	public Player getPlayerByName(String nameInput) throws IllegalArgumentException {
 		// Name input may be both player name or display name:
-		Stream<Player> players = PlayerUtils.PlayerNameMatcher.EXACT.match(nameInput);
+		Stream<Player> players = PlayerArgumentUtils.PlayerNameMatcher.EXACT.match(nameInput);
 		Optional<Player> player = players.findFirst();
 		return player.orElse(null);
 		// TODO deal with ambiguities

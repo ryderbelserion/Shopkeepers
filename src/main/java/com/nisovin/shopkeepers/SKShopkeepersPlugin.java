@@ -56,11 +56,11 @@ import com.nisovin.shopkeepers.tradelog.TradeLoggers;
 import com.nisovin.shopkeepers.tradenotifications.TradeNotifications;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
-import com.nisovin.shopkeepers.util.ClassUtils;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.SKUnmodifiableItemStack;
-import com.nisovin.shopkeepers.util.SchedulerUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
+import com.nisovin.shopkeepers.util.inventory.SKUnmodifiableItemStack;
+import com.nisovin.shopkeepers.util.java.ClassUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 import com.nisovin.shopkeepers.villagers.RegularVillagers;
 
 public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin {
@@ -127,7 +127,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			if (className.equals("com.nisovin.shopkeepers.shopobjects.citizens.CitizensShopkeeperTrait")) return false;
 			if (className.equals("com.nisovin.shopkeepers.spigot.text.SpigotText$Internal")) return false;
 			return true;
-		});
+		}, this.getLogger());
 		if (success) {
 			long durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
 			Log.info("Loaded all plugin classes (" + durationMillis + " ms)");

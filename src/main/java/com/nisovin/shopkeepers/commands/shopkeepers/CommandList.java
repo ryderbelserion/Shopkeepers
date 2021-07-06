@@ -27,12 +27,12 @@ import com.nisovin.shopkeepers.commands.lib.arguments.PlayerUUIDArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerNameFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.TransformedArgument;
+import com.nisovin.shopkeepers.commands.lib.util.PlayerArgumentUtils;
+import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils;
+import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.OwnedPlayerShopsResult;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.PlayerUtils;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils.OwnedPlayerShopsResult;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 class CommandList extends Command {
 
@@ -146,13 +146,13 @@ class CommandList extends Command {
 			}
 
 			// Search for shops owned by the target player:
-			OwnedPlayerShopsResult ownedPlayerShopsResult = ShopkeeperUtils.getOwnedPlayerShops(targetPlayerUUID, targetPlayerName);
+			OwnedPlayerShopsResult ownedPlayerShopsResult = ShopkeeperArgumentUtils.getOwnedPlayerShops(targetPlayerUUID, targetPlayerName);
 			assert ownedPlayerShopsResult != null;
 
 			// If the input name is ambiguous, we print an error and require the player to be specified by uuid:
 			Map<UUID, String> matchingShopOwners = ownedPlayerShopsResult.getMatchingShopOwners();
 			assert matchingShopOwners != null;
-			if (PlayerUtils.handleAmbiguousPlayerName(sender, targetPlayerName, matchingShopOwners.entrySet())) {
+			if (PlayerArgumentUtils.handleAmbiguousPlayerName(sender, targetPlayerName, matchingShopOwners.entrySet())) {
 				return;
 			}
 

@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.commands.lib;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * An unmodifiable view on another {@link CommandContext}.

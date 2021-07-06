@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.commands.lib;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Tracks the parsing state of the input arguments passed during command invocation.

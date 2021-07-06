@@ -15,10 +15,10 @@ import com.nisovin.shopkeepers.text.PlaceholderText;
 import com.nisovin.shopkeepers.text.PlainText;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.text.TranslatableText;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;

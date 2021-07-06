@@ -10,9 +10,9 @@ import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectByIdArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectIdArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerNameArgument;
+import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.ShopkeeperUtils;
 
 /**
  * Determines a shopkeeper by the given name input.
@@ -55,7 +55,7 @@ public class ShopkeeperByNameArgument extends ObjectByIdArgument<String, Shopkee
 
 	@Override
 	public Shopkeeper getObject(String nameInput) throws ArgumentParseException {
-		Stream<? extends Shopkeeper> shopkeepers = ShopkeeperUtils.ShopkeeperNameMatchers.DEFAULT.match(nameInput);
+		Stream<? extends Shopkeeper> shopkeepers = ShopkeeperArgumentUtils.ShopkeeperNameMatchers.DEFAULT.match(nameInput);
 		Optional<? extends Shopkeeper> shopkeeper = shopkeepers.findFirst();
 		return shopkeeper.orElse(null);
 		// TODO deal with ambiguities

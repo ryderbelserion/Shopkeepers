@@ -9,8 +9,8 @@ import org.bukkit.entity.Raider;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public interface NMSCallProvider {
 

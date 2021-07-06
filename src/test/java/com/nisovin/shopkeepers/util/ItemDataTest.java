@@ -7,7 +7,9 @@ import org.bukkit.inventory.ItemStack;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.nisovin.shopkeepers.util.ItemData.ItemDataDeserializeException;
+import com.nisovin.shopkeepers.util.inventory.ItemData;
+import com.nisovin.shopkeepers.util.inventory.ItemData.ItemDataDeserializeException;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.yaml.YamlUtils;
 
 // Note: We test the ItemStack deserialization through ItemData. Since ItemData is defined by its stored ItemStack,

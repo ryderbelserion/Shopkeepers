@@ -30,10 +30,10 @@ import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringListValue;
 import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringValue;
 import com.nisovin.shopkeepers.config.lib.value.types.StringListValue;
 import com.nisovin.shopkeepers.config.lib.value.types.StringValue;
-import com.nisovin.shopkeepers.util.CollectionUtils;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.CollectionUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class Config {
 

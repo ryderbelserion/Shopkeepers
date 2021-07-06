@@ -8,9 +8,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
+import com.nisovin.shopkeepers.commands.lib.util.PlayerArgumentUtils;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.PlayerUtils;
 
 /**
  * Determines an online player by the given name input.
@@ -51,7 +51,7 @@ public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 	@Override
 	public Player getObject(String nameInput) throws ArgumentParseException {
 		// Name input may be both player name or display name:
-		Stream<Player> players = PlayerUtils.PlayerNameMatcher.EXACT.match(nameInput);
+		Stream<Player> players = PlayerArgumentUtils.PlayerNameMatcher.EXACT.match(nameInput);
 		Optional<Player> player = players.findFirst();
 		return player.orElse(null);
 		// TODO deal with ambiguities

@@ -10,7 +10,7 @@ import com.nisovin.shopkeepers.chatinput.ChatInput;
 import com.nisovin.shopkeepers.chatinput.ChatInput.Request;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 public class ShopkeeperNaming {
 

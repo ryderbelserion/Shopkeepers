@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.text;
 
 import java.util.function.Supplier;
 
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**

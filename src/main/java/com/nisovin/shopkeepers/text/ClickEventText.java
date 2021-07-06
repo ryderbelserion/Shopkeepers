@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.text;
 
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class ClickEventText extends TextBuilder {
 

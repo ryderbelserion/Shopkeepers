@@ -13,8 +13,8 @@ import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.RegisteredListener;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.util.EventUtils;
-import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.bukkit.EventUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
  * Registers event handlers for all currently known (i.e. loaded) types of events and then prints debug information

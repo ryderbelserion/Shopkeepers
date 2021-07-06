@@ -19,9 +19,9 @@ import com.nisovin.shopkeepers.commands.lib.arguments.BoundedIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.MathUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.TimeUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.MathUtils;
+import com.nisovin.shopkeepers.util.java.TimeUtils;
 
 /**
  * Measures the time it takes to despawn and respawn the active shopkeepers within the current chunk.

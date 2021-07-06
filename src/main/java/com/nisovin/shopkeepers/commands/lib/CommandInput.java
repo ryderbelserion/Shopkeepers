@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * General information about the command invocation.

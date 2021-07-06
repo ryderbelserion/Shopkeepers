@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.config.migration;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class ConfigMigrationHelper {
 

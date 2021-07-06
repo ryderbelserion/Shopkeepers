@@ -22,11 +22,11 @@ import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.ShopkeeperUIHandler;
 import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUI;
 import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUIConfig;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class EditorHandler extends AbstractEditorHandler implements ShopkeeperUIHandler {
 

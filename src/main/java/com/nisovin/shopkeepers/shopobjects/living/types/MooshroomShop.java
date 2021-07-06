@@ -17,9 +17,9 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
-import com.nisovin.shopkeepers.util.EnumUtils;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.EnumUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class MooshroomShop extends BabyableShop<MushroomCow> {
 

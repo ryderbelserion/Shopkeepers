@@ -7,7 +7,7 @@ import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
 import org.yaml.snakeyaml.representer.Representer;
 
-import com.nisovin.shopkeepers.util.StringUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
 
 /**
  * There are situations in which SnakeYaml uses the literal block style by default and thereby produces output with line

@@ -15,8 +15,8 @@ import com.nisovin.shopkeepers.commands.lib.arguments.BoundedDoubleArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.EntityUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 /**
  * Produces lots of damage events (with a damage of <code>0</code>) in quick succession.

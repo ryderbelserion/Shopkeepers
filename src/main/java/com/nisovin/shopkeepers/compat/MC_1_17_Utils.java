@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.compat;
 
 import org.bukkit.Material;
 
-import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 // TODO This can be removed once we only support Bukkit 1.17 upwards.
 public class MC_1_17_Utils {

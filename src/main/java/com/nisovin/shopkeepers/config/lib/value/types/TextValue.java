@@ -4,8 +4,8 @@ import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class TextValue extends ValueType<Text> {
 

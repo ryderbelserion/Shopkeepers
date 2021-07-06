@@ -4,7 +4,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.util.SKUnmodifiableItemStack;
+import com.nisovin.shopkeepers.util.inventory.SKUnmodifiableItemStack;
 
 /**
  * Mocks the Shopkeepers plugin functionality that is required during tests.

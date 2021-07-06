@@ -6,8 +6,8 @@ import java.util.List;
 import org.bukkit.configuration.Configuration;
 
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
-import com.nisovin.shopkeepers.util.ConversionUtils;
-import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.java.ConversionUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class ConfigMigrations {
 

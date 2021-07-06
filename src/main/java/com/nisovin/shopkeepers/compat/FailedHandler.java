@@ -11,8 +11,8 @@ import org.bukkit.entity.Raider;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.ServerUtils;
+import com.nisovin.shopkeepers.util.bukkit.ServerUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public final class FailedHandler implements NMSCallProvider {
 

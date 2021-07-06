@@ -7,11 +7,11 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.util.EnchantmentUtils;
-import com.nisovin.shopkeepers.util.EnchantmentUtils.EnchantmentEntry;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.PotionUtils;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.inventory.EnchantmentUtils;
+import com.nisovin.shopkeepers.util.inventory.EnchantmentUtils.EnchantmentEntry;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.inventory.PotionUtils;
 
 /**
  * Helper methods related to placeholder items.

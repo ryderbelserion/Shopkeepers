@@ -5,7 +5,7 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
-import com.nisovin.shopkeepers.util.Log;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class ShopkeeperEventHelper {
 

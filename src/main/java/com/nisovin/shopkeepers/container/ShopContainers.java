@@ -6,8 +6,8 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.Container;
 import org.bukkit.inventory.Inventory;
 
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Utilities related to shop containers.

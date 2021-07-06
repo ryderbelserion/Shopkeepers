@@ -13,8 +13,8 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
-import com.nisovin.shopkeepers.util.BookItems;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.inventory.BookItems;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 

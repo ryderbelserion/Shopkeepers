@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.ui.confirmations;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class ConfirmationUI {
 

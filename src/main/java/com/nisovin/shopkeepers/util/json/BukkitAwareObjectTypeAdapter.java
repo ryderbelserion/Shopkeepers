@@ -15,8 +15,8 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 import com.google.gson.stream.JsonWriter;
-import com.nisovin.shopkeepers.util.ConfigUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A Gson {@link TypeAdapter} that deserializes any kind of Json primitive (Objects/Maps, Lists, Strings, numbers,

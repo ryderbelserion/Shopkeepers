@@ -1,7 +1,7 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A {@link FallbackArgument} that accepts any String as fallback.

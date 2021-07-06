@@ -18,8 +18,8 @@ import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringListValue;
 import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringValue;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 @WithDefaultValueType(fieldType = String.class, valueType = ColoredStringValue.class)
 @WithValueTypeProvider(ColoredStringListValue.Provider.class)

@@ -32,15 +32,15 @@ import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUI;
 import com.nisovin.shopkeepers.ui.confirmations.ConfirmationUIConfig;
 import com.nisovin.shopkeepers.ui.editor.AbstractEditorHandler;
-import com.nisovin.shopkeepers.util.EnumUtils;
-import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.MathUtils;
-import com.nisovin.shopkeepers.util.MerchantUtils;
-import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.MerchantUtils;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.EnumUtils;
+import com.nisovin.shopkeepers.util.java.MathUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
  * An editor for regular villagers and wandering traders.

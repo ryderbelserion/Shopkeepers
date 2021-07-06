@@ -13,8 +13,8 @@ import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
-import com.nisovin.shopkeepers.util.Pair;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Pair;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A {@link CommandArgument} which stores the value for the first of the given command arguments which successfully

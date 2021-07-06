@@ -4,10 +4,10 @@ import com.nisovin.shopkeepers.config.lib.value.InvalidMaterialException;
 import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.ValueParseException;
 import com.nisovin.shopkeepers.config.lib.value.ValueType;
-import com.nisovin.shopkeepers.util.ItemData;
-import com.nisovin.shopkeepers.util.ItemData.ItemDataDeserializeException;
-import com.nisovin.shopkeepers.util.ItemData.InvalidItemTypeException;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.inventory.ItemData;
+import com.nisovin.shopkeepers.util.inventory.ItemData.InvalidItemTypeException;
+import com.nisovin.shopkeepers.util.inventory.ItemData.ItemDataDeserializeException;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class ItemDataValue extends ValueType<ItemData> {
 

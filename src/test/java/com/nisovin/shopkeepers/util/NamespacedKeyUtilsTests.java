@@ -4,6 +4,8 @@ import org.bukkit.NamespacedKey;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.nisovin.shopkeepers.util.bukkit.NamespacedKeyUtils;
+
 public class NamespacedKeyUtilsTests {
 
 	@Test

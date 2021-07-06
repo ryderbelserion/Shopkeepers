@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 class ShopCreationItemSelectionTask implements Runnable {
 

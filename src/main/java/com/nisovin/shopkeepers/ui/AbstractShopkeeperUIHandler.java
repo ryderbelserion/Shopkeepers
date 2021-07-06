@@ -1,7 +1,7 @@
 package com.nisovin.shopkeepers.ui;
 
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Basic implementation of {@link ShopkeeperUIHandler}.

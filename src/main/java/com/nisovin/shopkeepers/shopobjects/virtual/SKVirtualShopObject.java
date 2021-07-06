@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.shopobjects.virtual;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;

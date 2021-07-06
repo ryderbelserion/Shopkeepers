@@ -9,8 +9,8 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
-import com.nisovin.shopkeepers.util.Ticks;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.Ticks;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Merges sequentially triggered shopkeeper trades that involve the same player, shopkeeper, and items.

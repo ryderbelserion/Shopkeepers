@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
-import com.nisovin.shopkeepers.util.EntityUtils;
+import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 
 /**
  * A {@link CommandArgument} that returns the targeted entity without consuming any arguments.

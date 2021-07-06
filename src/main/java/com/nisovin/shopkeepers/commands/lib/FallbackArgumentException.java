@@ -1,7 +1,7 @@
 package com.nisovin.shopkeepers.commands.lib;
 
 import com.nisovin.shopkeepers.commands.lib.arguments.FallbackArgument;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Used by {@link FallbackArgument} to indicate that it wasn't able to parse the current argument, but that it may be

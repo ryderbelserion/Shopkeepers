@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.config.lib.value;
 import java.lang.reflect.Type;
 import java.util.function.Function;
 
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class ValueTypeProviders {
 

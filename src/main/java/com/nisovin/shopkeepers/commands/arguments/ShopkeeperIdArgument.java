@@ -8,7 +8,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.arguments.IntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectIdArgument;
-import com.nisovin.shopkeepers.util.ConversionUtils;
+import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
 /**
  * Provides suggestions for the ids of existing shopkeepers.

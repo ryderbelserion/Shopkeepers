@@ -8,9 +8,9 @@ import java.util.List;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.types.Type;
-import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.StringUtils;
-import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public abstract class AbstractType implements Type {
 

@@ -27,12 +27,12 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
-import com.nisovin.shopkeepers.util.CyclicCounter;
-import com.nisovin.shopkeepers.util.EntityUtils;
-import com.nisovin.shopkeepers.util.MutableChunkCoords;
-import com.nisovin.shopkeepers.util.RateLimiter;
-import com.nisovin.shopkeepers.util.Validate;
-import com.nisovin.shopkeepers.util.WorldUtils;
+import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
+import com.nisovin.shopkeepers.util.bukkit.MutableChunkCoords;
+import com.nisovin.shopkeepers.util.bukkit.WorldUtils;
+import com.nisovin.shopkeepers.util.java.CyclicCounter;
+import com.nisovin.shopkeepers.util.java.RateLimiter;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.timer.Timer;
 import com.nisovin.shopkeepers.util.timer.Timings;
 

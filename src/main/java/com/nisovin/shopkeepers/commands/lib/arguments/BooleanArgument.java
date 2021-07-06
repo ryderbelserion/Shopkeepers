@@ -10,7 +10,7 @@ import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.util.ConversionUtils;
+import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
 public class BooleanArgument extends CommandArgument<Boolean> {
 
