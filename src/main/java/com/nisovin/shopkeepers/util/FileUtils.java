@@ -60,8 +60,14 @@ public class FileUtils {
 		if (!Files.isWritable(directory)) {
 			throw new IOException("Missing write permission for directory " + directory);
 		}
-		if (!Files.isExecutable(directory)) {
-			throw new IOException("Missing execute (i.e. access) permission for directory " + directory);
+		try {
+			if (!Files.isExecutable(directory)) {
+				throw new IOException("Missing execute (i.e. access) permission for directory " + directory);
+			}
+		} catch (SecurityException e) {
+			// Some SecurityManager implementations blindly deny the 'execute' permission without differentiating
+			// between files and directories. This should have no effect on whether or not we can write to the
+			// directory, so we can safely ignore it.
 		}
 	}
 
