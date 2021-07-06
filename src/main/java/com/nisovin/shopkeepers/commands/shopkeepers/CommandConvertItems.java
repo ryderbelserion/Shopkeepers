@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -72,9 +73,9 @@ class CommandConvertItems extends Command {
 		// Note: This command converts all items, regardless of the 'convert-player-items' and related settings.
 		if (convertAll) {
 			// Handles content, armor and off hand items, cursor item, and inventory updating:
-			long start = System.nanoTime();
+			long startNanos = System.nanoTime();
 			convertedStacks = ItemUtils.convertItems(inventory, (item) -> true, true);
-			long durationMillis = (System.nanoTime() - start) / 1000000L;
+			long durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
 			final int finalConvertedStacks = convertedStacks;
 			// Note: The conversion always has some performance impact, even if no items got actually converted. We
 			// therefore always print the debug messages to allow debugging the item conversion times.
@@ -86,9 +87,9 @@ class CommandConvertItems extends Command {
 			// Only convert the held item:
 			ItemStack itemInHand = inventory.getItemInMainHand();
 			if (!ItemUtils.isEmpty(itemInHand)) {
-				long start = System.nanoTime();
+				long startNanos = System.nanoTime();
 				ItemStack convertedItem = ItemUtils.convertItem(itemInHand);
-				long durationMillis = (System.nanoTime() - start) / 1000000L;
+				long durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
 				if (!itemInHand.isSimilar(convertedItem)) {
 					convertedStacks = 1;
 					inventory.setItemInMainHand(convertedItem);

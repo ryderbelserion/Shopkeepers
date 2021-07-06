@@ -4,6 +4,7 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_14_R1.inventory.CraftItemStack;
@@ -15,6 +16,7 @@ import com.nisovin.shopkeepers.util.ItemData;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.MutableLong;
 import com.nisovin.shopkeepers.util.TestItemStacks;
+import com.nisovin.shopkeepers.util.TimeUtils;
 
 import net.minecraft.server.v1_14_R1.GameProfileSerializer;
 import net.minecraft.server.v1_14_R1.NBTTagCompound;
@@ -25,7 +27,7 @@ public class PerformanceTests extends AbstractBukkitTest {
 		ThreadMXBean threadMXBean = ManagementFactory.getThreadMXBean();
 		boolean cpuTimeSupported = threadMXBean.isCurrentThreadCpuTimeSupported();
 		if (!cpuTimeSupported) {
-			System.out.println(outputPrefix + "Note: Thread cpu time not supported!");
+			System.out.println(outputPrefix + "Note: Thread CPU time not supported!");
 		}
 
 		// warm up:
@@ -33,15 +35,16 @@ public class PerformanceTests extends AbstractBukkitTest {
 			function.run();
 		}
 
-		long start = System.nanoTime();
-		long cpuTimestart = (cpuTimeSupported ? threadMXBean.getCurrentThreadCpuTime() : 0);
+		long startNanos = System.nanoTime();
+		long cpuStartNanos = (cpuTimeSupported ? threadMXBean.getCurrentThreadCpuTime() : 0);
 		for (int i = 0; i < testCount; ++i) {
 			function.run();
 		}
-		long cpuTimeDuration = (cpuTimeSupported ? threadMXBean.getCurrentThreadCpuTime() : 0) - cpuTimestart;
-		long duration = System.nanoTime() - start;
+		long cpuDurationNanos = (cpuTimeSupported ? threadMXBean.getCurrentThreadCpuTime() : 0) - cpuStartNanos;
+		double cpuDurationMillis = TimeUtils.convert(cpuDurationNanos, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
+		double durationMillis = TimeUtils.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
 		System.out.println(outputPrefix + "Duration of '" + testName + "' (" + testCount + " runs): "
-				+ (duration / 1000000.0D) + " ms (CPU time: " + (cpuTimeDuration / 1000000.0D) + " ms)");
+				+ durationMillis + " ms (CPU time: " + cpuDurationMillis + " ms)");
 	}
 
 	@Test

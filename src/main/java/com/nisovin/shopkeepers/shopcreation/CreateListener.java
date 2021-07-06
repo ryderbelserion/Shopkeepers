@@ -54,13 +54,13 @@ class CreateListener implements Listener {
 	// right-clicks air while being in survival mode and targeting a block that is slightly further away than the block
 	// interaction range allows.
 	// By only handling one interaction event within a small time span, we ignore the additional left click air event.
-	private static final long INTERACTION_DELAY_MILLISECONDS = 50L;
+	private static final long INTERACTION_DELAY_MILLIS = 50L;
 
 	private final SKShopkeepersPlugin plugin;
 	private final ShopkeeperCreation shopkeeperCreation;
 
 	// By player UUID:
-	private final Map<UUID, MutableLong> lastHandledPlayerInteractions = new HashMap<>();
+	private final Map<UUID, MutableLong> lastHandledPlayerInteractionsMillis = new HashMap<>();
 
 	// Cached value whether the shop creation item selection message is enabled:
 	private boolean shopCreationItemSelectedMessageEnabled;
@@ -81,7 +81,7 @@ class CreateListener implements Listener {
 
 	void onDisable() {
 		HandlerList.unregisterAll(this);
-		lastHandledPlayerInteractions.clear();
+		lastHandledPlayerInteractionsMillis.clear();
 		ShopCreationItemSelectionTask.onDisable();
 	}
 
@@ -91,7 +91,7 @@ class CreateListener implements Listener {
 		UUID uniqueId = player.getUniqueId();
 
 		// Cleanup:
-		lastHandledPlayerInteractions.remove(uniqueId);
+		lastHandledPlayerInteractionsMillis.remove(uniqueId);
 		ShopCreationItemSelectionTask.cleanupAndCancel(player);
 	}
 
@@ -186,17 +186,17 @@ class CreateListener implements Listener {
 		// item, even if we don't actually handle the interaction then. This also avoids unrelated debug spam, since we
 		// only print debug output for interactions with the shop creation item.
 		UUID uniqueId = player.getUniqueId();
-		MutableLong lastHandledInteraction = lastHandledPlayerInteractions.computeIfAbsent(uniqueId, (uuid) -> new MutableLong());
-		long now = System.currentTimeMillis();
-		long timeDifferenceMillis = (now - lastHandledInteraction.getValue());
-		if (timeDifferenceMillis < INTERACTION_DELAY_MILLISECONDS) {
+		MutableLong lastHandledInteractionMillis = lastHandledPlayerInteractionsMillis.computeIfAbsent(uniqueId, (uuid) -> new MutableLong());
+		long nowMillis = System.currentTimeMillis();
+		long millisSinceLastInteraction = (nowMillis - lastHandledInteractionMillis.getValue());
+		if (millisSinceLastInteraction < INTERACTION_DELAY_MILLIS) {
 			Log.debug(() -> "Ignoring interaction of player " + player.getName() + ": Last handled interaction was "
-					+ timeDifferenceMillis + "ms ago");
+					+ millisSinceLastInteraction + "ms ago");
 			return;
 		}
 		// We only update the last interaction timestamp when we actually handle the event. This prevents that delays
 		// between individual events accumulate and that we always handle the event after the intended delay is over.
-		lastHandledInteraction.setValue(now);
+		lastHandledInteractionMillis.setValue(nowMillis);
 
 		// Get shop type:
 		ShopType<?> shopType = plugin.getShopTypeRegistry().getSelection(player);
@@ -332,9 +332,9 @@ class CreateListener implements Listener {
 	}
 
 	// Rate limiting of debug messages related to the PrepareAnvilEvent:
-	private static final long ANVIL_DEBUG_MESSAGE_THROTTLE_MILLISECONDS = 5000L; // 5 seconds
+	private static final long ANVIL_DEBUG_MESSAGE_THROTTLE_MILLIS = 5000L; // 5 seconds
 	private UUID lastAnvilDebugMessagePlayer = null;
-	private long lastAnvilDebugMessageTime = 0L; // System time in milliseconds
+	private long lastAnvilDebugMessageMillis = 0L;
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onPrepareAnvilEvent(PrepareAnvilEvent event) {
@@ -357,10 +357,10 @@ class CreateListener implements Listener {
 			// Rate limiting of debug messages (this event is called for every text change):
 			Player player = (Player) event.getView().getPlayer();
 			UUID playerUniqueId = player.getUniqueId();
-			long now = System.currentTimeMillis();
-			if (!playerUniqueId.equals(lastAnvilDebugMessagePlayer) || (now - lastAnvilDebugMessageTime) > ANVIL_DEBUG_MESSAGE_THROTTLE_MILLISECONDS) {
+			long nowMillis = System.currentTimeMillis();
+			if (!playerUniqueId.equals(lastAnvilDebugMessagePlayer) || (nowMillis - lastAnvilDebugMessageMillis) > ANVIL_DEBUG_MESSAGE_THROTTLE_MILLIS) {
 				lastAnvilDebugMessagePlayer = playerUniqueId;
-				lastAnvilDebugMessageTime = now;
+				lastAnvilDebugMessageMillis = nowMillis;
 				Log.debug(() -> "Preventing renaming of shop creation item by " + player.getName() + " (debug output is throttled)");
 			}
 		}

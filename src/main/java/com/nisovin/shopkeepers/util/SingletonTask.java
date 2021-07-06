@@ -71,17 +71,16 @@ public abstract class SingletonTask {
 	private boolean runAgainSync = false;
 
 	// Information and statistics about the last execution:
-	// If not noted otherwise, all times are captured via System#nanoTime and all durations are in milliseconds.
 	// These values get incrementally replaced during the next execution. So they are only valid during the period after
 	// the last execution (including inside the user callback), and the beginning of the next execution.
 	private boolean asyncExecution;
-	private long startTime;
-	private long preparationEndTime;
-	private long preparationDuration;
-	private long lockAcquireDuration;
-	private long executionDelay;
-	private long executionDuration;
-	private long totalDuration;
+	private long startTimeNanos;
+	private long preparationEndTimeNanos;
+	private long preparationDurationMillis;
+	private long lockAcquireDurationMillis;
+	private long executionDelayMillis;
+	private long executionDurationMillis;
+	private long totalDurationMillis;
 
 	public SingletonTask(Plugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
@@ -287,7 +286,7 @@ public abstract class SingletonTask {
 
 		// Keep track of information and statistics about this execution:
 		asyncExecution = async;
-		startTime = System.nanoTime();
+		startTimeNanos = System.nanoTime();
 
 		// User preparation:
 		state = State.PREPARING;
@@ -353,8 +352,8 @@ public abstract class SingletonTask {
 			}
 		};
 
-		preparationEndTime = System.nanoTime();
-		preparationDuration = TimeUnit.NANOSECONDS.toMillis(preparationEndTime - startTime);
+		preparationEndTimeNanos = System.nanoTime();
+		preparationDurationMillis = TimeUnit.NANOSECONDS.toMillis(preparationEndTimeNanos - startTimeNanos);
 		state = State.PENDING;
 
 		if (async) {
@@ -392,9 +391,9 @@ public abstract class SingletonTask {
 		if (asyncTask != null) {
 			// Asynchronous execution:
 			// Requires the lock for coordination with the main thread, and might have been cancelled.
-			final long lockAcquireStartTime = System.nanoTime();
+			final long lockAcquireStartTimeNanos = System.nanoTime();
 			synchronized (executionLock) {
-				final long localLockAcquireDuration = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - lockAcquireStartTime);
+				final long localLockAcquireDurationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - lockAcquireStartTimeNanos);
 
 				// If the async task has been cancelled, we skip the execution.
 				// In this case, the execution and callbacks are run on the main thread (when this execution got
@@ -408,7 +407,7 @@ public abstract class SingletonTask {
 
 				// We only set the timing information if this task has not been cancelled. Otherwise, another task might
 				// already be in progress.
-				lockAcquireDuration = localLockAcquireDuration;
+				lockAcquireDurationMillis = localLockAcquireDurationMillis;
 
 				// Actual execution:
 				this.doExecuteTask();
@@ -416,7 +415,7 @@ public abstract class SingletonTask {
 		} else {
 			// Synchronous execution:
 			// Does not require the lock.
-			lockAcquireDuration = 0L;
+			lockAcquireDurationMillis = 0L;
 
 			// Actual execution:
 			this.doExecuteTask();
@@ -427,8 +426,8 @@ public abstract class SingletonTask {
 	private void doExecuteTask() {
 		// Execution has started:
 		state = State.EXECUTING;
-		final long executionStartTime = System.nanoTime();
-		executionDelay = TimeUnit.NANOSECONDS.toMillis(executionStartTime - preparationEndTime);
+		final long executionStartTimeNanos = System.nanoTime();
+		executionDelayMillis = TimeUnit.NANOSECONDS.toMillis(executionStartTimeNanos - preparationEndTimeNanos);
 
 		// User execution:
 		this.execute();
@@ -436,9 +435,9 @@ public abstract class SingletonTask {
 		// Immediate (potentially async) callback:
 		internalCallback.run();
 
-		final long executionEndTime = System.nanoTime();
-		executionDuration = TimeUnit.NANOSECONDS.toMillis(executionEndTime - executionStartTime);
-		totalDuration = TimeUnit.NANOSECONDS.toMillis(executionEndTime - startTime);
+		final long executionEndTimeNanos = System.nanoTime();
+		executionDurationMillis = TimeUnit.NANOSECONDS.toMillis(executionEndTimeNanos - executionStartTimeNanos);
+		totalDurationMillis = TimeUnit.NANOSECONDS.toMillis(executionEndTimeNanos - startTimeNanos);
 	}
 
 	// EXECUTION INFORMATION AND STATISTICS
@@ -461,7 +460,7 @@ public abstract class SingletonTask {
 	 * @return the preparation duration in milliseconds
 	 */
 	public final long getPreparationDuration() {
-		return preparationDuration;
+		return preparationDurationMillis;
 	}
 
 	/**
@@ -475,7 +474,7 @@ public abstract class SingletonTask {
 	 * @return the duration in milliseconds it took to acquire the execution lock
 	 */
 	public final long getLockAcquireDuration() {
-		return lockAcquireDuration;
+		return lockAcquireDurationMillis;
 	}
 
 	/**
@@ -490,7 +489,7 @@ public abstract class SingletonTask {
 	 * @return the execution delay in milliseconds
 	 */
 	public final long getExecutionDelay() {
-		return executionDelay;
+		return executionDelayMillis;
 	}
 
 	/**
@@ -499,7 +498,7 @@ public abstract class SingletonTask {
 	 * @return the execution duration in milliseconds
 	 */
 	public final long getExecutionDuration() {
-		return executionDuration;
+		return executionDurationMillis;
 	}
 
 	/**
@@ -511,7 +510,7 @@ public abstract class SingletonTask {
 	 * @return the total execution duration in milliseconds
 	 */
 	public final long getTotalDuration() {
-		return totalDuration;
+		return totalDurationMillis;
 	}
 
 	/**
@@ -523,7 +522,7 @@ public abstract class SingletonTask {
 	 */
 	public final String getExecutionTimingString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(totalDuration).append("ms");
+		sb.append(totalDurationMillis).append("ms");
 		String details = this.getExecutionTimingDetailString();
 		if (!details.isEmpty()) {
 			sb.append(" (").append(details).append(")");
@@ -536,12 +535,12 @@ public abstract class SingletonTask {
 		StringBuilder sb = new StringBuilder();
 		boolean firstEntry = true;
 
-		if (preparationDuration > 0) {
+		if (preparationDurationMillis > 0) {
 			firstEntry = false;
-			sb.append("Preparation: ").append(preparationDuration).append("ms");
+			sb.append("Preparation: ").append(preparationDurationMillis).append("ms");
 		}
 
-		if (executionDelay > 0) {
+		if (executionDelayMillis > 0) {
 			if (!firstEntry) {
 				sb.append(", ");
 			}
@@ -552,15 +551,15 @@ public abstract class SingletonTask {
 			} else {
 				sb.append("Sync execution delay: ");
 			}
-			sb.append(executionDelay).append("ms");
+			sb.append(executionDelayMillis).append("ms");
 
 			// The lock acquire duration is part of the execution delay:
-			if (lockAcquireDuration > 0) {
-				sb.append(" (Lock delay: ").append(lockAcquireDuration).append("ms)");
+			if (lockAcquireDurationMillis > 0) {
+				sb.append(" (Lock delay: ").append(lockAcquireDurationMillis).append("ms)");
 			}
 		}
 
-		if (executionDuration > 0) {
+		if (executionDurationMillis > 0) {
 			if (!firstEntry) {
 				sb.append(", ");
 			}
@@ -571,7 +570,7 @@ public abstract class SingletonTask {
 			} else {
 				sb.append("Sync execution: ");
 			}
-			sb.append(executionDuration).append("ms");
+			sb.append(executionDurationMillis).append("ms");
 		}
 		return sb.toString();
 	}

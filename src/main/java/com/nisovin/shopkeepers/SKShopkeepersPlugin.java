@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -117,7 +118,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	private void loadAllPluginClasses() {
 		File pluginJarFile = this.getFile();
-		long start = System.nanoTime();
+		long startNanos = System.nanoTime();
 		boolean success = ClassUtils.loadAllClassesFromJar(pluginJarFile, className -> {
 			// Skip version dependent classes:
 			if (className.startsWith("com.nisovin.shopkeepers.compat.")) return false;
@@ -128,7 +129,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			return true;
 		});
 		if (success) {
-			long durationMillis = (System.nanoTime() - start) / 1000000L;
+			long durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
 			Log.info("Loaded all plugin classes (" + durationMillis + " ms)");
 		}
 	}

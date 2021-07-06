@@ -81,7 +81,7 @@ class CommandTestSpawn extends PlayerCommand {
 
 		player.sendMessage(ChatColor.GREEN + "Measuring the time it takes to respawn the active shopkeepers within this chunk ...");
 
-		long startTime = System.nanoTime();
+		long startTimeNanos = System.nanoTime();
 
 		long[] despawnTimesNanos = new long[repetitions];
 		long[] spawnTimesNanos = new long[repetitions];
@@ -105,7 +105,7 @@ class CommandTestSpawn extends PlayerCommand {
 		double maxSpawnTimeMillis = TimeUtils.convert(MathUtils.max(spawnTimesNanos), TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
 		double maxSpawnTimePerShopkeeperMillis = maxSpawnTimeMillis / activeShopkeepers.size();
 
-		double totalDurationMillis = TimeUtils.convert(System.nanoTime() - startTime, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
+		double totalDurationMillis = TimeUtils.convert(System.nanoTime() - startTimeNanos, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
 
 		// Result summary:
 		player.sendMessage(ChatColor.GREEN + "Shopkeepers: " + ChatColor.YELLOW + activeShopkeepers.size()
@@ -140,14 +140,14 @@ class CommandTestSpawn extends PlayerCommand {
 		Result result = new Result();
 
 		// Despawn the shopkeepers:
-		long despawnStart = System.nanoTime();
+		long despawnStartNanos = System.nanoTime();
 		for (AbstractShopkeeper shopkeeper : shopkeepers) {
 			shopkeeper.getShopObject().despawn();
 		}
-		result.despawnTimeNanos = System.nanoTime() - despawnStart;
+		result.despawnTimeNanos = System.nanoTime() - despawnStartNanos;
 
 		// Respawn the shopkeepers:
-		long spawnStart = System.nanoTime();
+		long spawnStartNanos = System.nanoTime();
 		int failedToSpawn = 0;
 		for (AbstractShopkeeper shopkeeper : shopkeepers) {
 			boolean success = shopkeeper.getShopObject().spawn();
@@ -155,7 +155,7 @@ class CommandTestSpawn extends PlayerCommand {
 				failedToSpawn++;
 			}
 		}
-		result.spawnTimeNanos = System.nanoTime() - spawnStart;
+		result.spawnTimeNanos = System.nanoTime() - spawnStartNanos;
 		result.failedToSpawn = failedToSpawn;
 		return result;
 	}

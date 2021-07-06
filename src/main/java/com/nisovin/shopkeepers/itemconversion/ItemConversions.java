@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.itemconversion;
 
+import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
@@ -76,12 +77,12 @@ public class ItemConversions {
 			Block containerBlock = playerShopkeeper.getContainer();
 			assert containerBlock != null;
 			if (ShopContainers.isSupportedContainer(containerBlock.getType())) {
-				long start = System.nanoTime();
+				long startNanos = System.nanoTime();
 				// Note: Returns the complete inventory for double chests.
 				Inventory containerInventory = ShopContainers.getInventory(containerBlock);
 				int convertedContainerStacks = convertAffectedItems(containerInventory);
 				// Note: Inventory changes are directly reflected by the container block in the world.
-				long durationMillis = (System.nanoTime() - start) / 1000000L;
+				long durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
 				// Note: The conversion always has some performance impact, even if no items got actually converted. We
 				// therefore always print the debug messages to allow debugging the item conversion times.
 				Log.debug(DebugOptions.itemConversions,
@@ -106,9 +107,9 @@ public class ItemConversions {
 		Validate.notNull(player, "player is null");
 		// Convert player inventory contents (includes armor and off hand slots, and cursor):
 		Inventory inventory = player.getInventory();
-		long start = System.nanoTime();
+		long startNanos = System.nanoTime();
 		int convertedStacks = convertAffectedItems(inventory);
-		long durationMillis = (System.nanoTime() - start) / 1000000L;
+		long durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
 		// Note: The conversion always has some performance impact, even if no items got actually converted. We
 		// therefore always print the debug messages to allow debugging the item conversion times.
 		Log.debug(DebugOptions.itemConversions,

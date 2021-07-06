@@ -18,7 +18,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.SchedulerUtils;
-import com.nisovin.shopkeepers.util.TimeUtils;
 import com.nisovin.shopkeepers.util.Validate;
 
 /**
@@ -109,7 +108,7 @@ public class PlayerInactivity {
 		int playerShopkeeperInactiveDays = Settings.playerShopkeeperInactiveDays;
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
 			Set<UUID> inactiveShopOwnerIds = new HashSet<>();
-			long now = System.currentTimeMillis();
+			long nowMillis = System.currentTimeMillis();
 			for (UUID shopOwnerId : shopOwnerIds) {
 				OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(shopOwnerId);
 				// Some servers may delete player data files, either regularly for all players (which breaks this
@@ -118,11 +117,11 @@ public class PlayerInactivity {
 				// don't delete their player shopkeepers.
 				if (!offlinePlayer.hasPlayedBefore()) continue;
 
-				long lastPlayed = offlinePlayer.getLastPlayed();
-				if (lastPlayed == 0) continue; // 0 if unknown (see reasoning above)
+				long lastPlayedMillis = offlinePlayer.getLastPlayed();
+				if (lastPlayedMillis == 0) continue; // 0 if unknown (see reasoning above)
 
-				long millisSinceLastPlayed = now - lastPlayed;
-				int daysSinceLastPlayed = (int) TimeUtils.convert(millisSinceLastPlayed, TimeUnit.MILLISECONDS, TimeUnit.DAYS);
+				long millisSinceLastPlayed = nowMillis - lastPlayedMillis;
+				int daysSinceLastPlayed = (int) TimeUnit.MILLISECONDS.toDays(millisSinceLastPlayed);
 				if (daysSinceLastPlayed >= playerShopkeeperInactiveDays) {
 					inactiveShopOwnerIds.add(shopOwnerId);
 				}

@@ -137,23 +137,23 @@ public class TradeMerger {
 		// copies from the event. By creating the new MergedTrades right away, instead of only afterwards when it is
 		// actually required, we can cache these once retrieved item copies. This is therefore cheaper most of the time.
 		MergedTrades newMergedTrades = new MergedTrades(tradeEvent);
-		long now = System.nanoTime();
+		long nowNanos = System.nanoTime();
 		if (previousTrades == null) {
 			// There are no previous trades to merge with.
 			previousTrades = newMergedTrades;
-			mergeEndNanos = now + mergeDurationNanos;
-			lastMergedTradeNanos = now;
+			mergeEndNanos = nowNanos + mergeDurationNanos;
+			lastMergedTradeNanos = nowNanos;
 			this.startDelayedTasks();
 		} else if (this.tryMergeTrades(previousTrades, newMergedTrades, mergeMode)) {
 			// The trade was merged with the previous trades.
-			lastMergedTradeNanos = now;
+			lastMergedTradeNanos = nowNanos;
 		} else {
 			// The trade could not be merged with the previous trades.
 			this.processPreviousTrades();
 			assert previousTrades == null;
 			previousTrades = newMergedTrades;
-			mergeEndNanos = now + mergeDurationNanos;
-			lastMergedTradeNanos = now;
+			mergeEndNanos = nowNanos + mergeDurationNanos;
+			lastMergedTradeNanos = nowNanos;
 			this.startDelayedTasks();
 		}
 	}
@@ -236,8 +236,8 @@ public class TradeMerger {
 		// this task once and then check afterwards whether there have been any trades in the meantime. If there has
 		// been another trade, a new next merge timeout task is started with a delay according to the remaining timeout
 		// duration for the last merged trade.
-		long now = System.nanoTime();
-		long nanosSinceLastMergedTrade = now - lastMergedTradeNanos;
+		long nowNanos = System.nanoTime();
+		long nanosSinceLastMergedTrade = nowNanos - lastMergedTradeNanos;
 		assert nanosSinceLastMergedTrade >= 0;
 		// If the server lagged, this may end up being negative:
 		long remainingTimeoutNanos = nextMergeTimeoutNanos - nanosSinceLastMergedTrade;
@@ -252,7 +252,7 @@ public class TradeMerger {
 
 		// We avoid starting a new task if the trade merging is expected to end earlier, or roughly at the same time (by
 		// up to NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS) as the task anyways:
-		if (mergeEndNanos <= now + remainingTimeoutNanos + NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS) {
+		if (mergeEndNanos <= nowNanos + remainingTimeoutNanos + NEXT_MERGE_TIMEOUT_THRESHOLD_NANOS) {
 			return;
 		}
 

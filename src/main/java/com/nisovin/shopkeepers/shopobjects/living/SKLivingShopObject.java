@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.shopobjects.living;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -63,7 +64,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	private Location lastSpawnLocation = null;
 	private int respawnAttempts = 0;
 	private boolean debuggingSpawn = false;
-	private static long lastSpawnDebugging = 0; // Shared among all living shopkeepers to prevent spam
+	// Shared among all living shopkeepers to prevent spam:
+	private static long lastSpawnDebugMillis = 0L;
+	private static final long SPAWN_DEBUG_THROTTLE_MILLIS = TimeUnit.MINUTES.toMillis(5);
 
 	// Initial threshold between [1, CHECK_PERIOD_SECONDS] for load balancing:
 	private final int checkingOffset = nextCheckingOffset.getAndIncrement();
@@ -280,7 +283,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		} else {
 			// Failure:
 			// Debug, if not already debugging and cooldown is over:
-			boolean debug = (Settings.debug && !debuggingSpawn && (System.currentTimeMillis() - lastSpawnDebugging) > (5 * 60 * 1000)
+			boolean debug = (Settings.debug && !debuggingSpawn && (System.currentTimeMillis() - lastSpawnDebugMillis) > SPAWN_DEBUG_THROTTLE_MILLIS
 					&& entity.isDead() && ChunkCoords.isChunkLoaded(entity.getLocation()));
 
 			// Due to an open Spigot 1.17 issue, entities report as 'invalid' after being spawned during chunk loads. In
@@ -301,7 +304,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 				// Try again and log event activity:
 				debuggingSpawn = true;
-				lastSpawnDebugging = System.currentTimeMillis();
+				lastSpawnDebugMillis = System.currentTimeMillis();
 				Log.info("Trying again and logging event activity ..");
 
 				// Log all events occurring during spawning, and their registered listeners:

@@ -3,6 +3,7 @@ package com.nisovin.shopkeepers.shopobjects.sign;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -43,6 +44,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	private static final int CHECK_PERIOD_SECONDS = 10;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);
+	private static final long RESPAWN_TIMEOUT_MILLIS = TimeUnit.MINUTES.toMillis(3);
 
 	protected final SignShops signShops;
 	private SignType signType = SignType.OAK; // Not null, not unsupported, default is OAK.
@@ -54,7 +56,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	// sign content:
 	private boolean updateSign = true;
 	private Block block = null;
-	private long lastFailedRespawnAttempt = 0;
+	private long lastFailedRespawnAttemptMillis = 0;
 
 	// Initial threshold between [1, CHECK_PERIOD_SECONDS] for load balancing:
 	private final RateLimiter checkLimiter = new RateLimiter(CHECK_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
@@ -201,7 +203,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 		// If re-spawning fails due to the sign dropping for some reason (ex. attached block missing) this could be
 		// abused (sign drop farming), therefore we limit the number of spawn attempts:
-		if (System.currentTimeMillis() - lastFailedRespawnAttempt < 3 * 60 * 1000L) {
+		if (System.currentTimeMillis() - lastFailedRespawnAttemptMillis < RESPAWN_TIMEOUT_MILLIS) {
 			Log.debug(() -> "Shopkeeper sign at " + shopkeeper.getPositionString() + " is on spawn cooldown.");
 			return false;
 		}
@@ -220,7 +222,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 		// In case sign placement has failed for some reason:
 		if (!ItemUtils.isSign(signBlock.getType())) {
-			lastFailedRespawnAttempt = System.currentTimeMillis();
+			lastFailedRespawnAttemptMillis = System.currentTimeMillis();
 			this.cleanUpBlock(signBlock);
 			return false;
 		}

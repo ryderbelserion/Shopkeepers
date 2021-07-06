@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -66,6 +67,7 @@ public class CsvTradeLogger implements TradeLogger {
 
 	private static final int SAVE_MAX_ATTEMPTS = 20;
 	private static final long SAVE_RETRY_DELAY_MILLIS = 25L;
+	private static final long SAVE_ERROR_MSG_THROTTLE_MILLIS = TimeUnit.MINUTES.toMillis(5);
 
 	private final Plugin plugin;
 	private final Path tradeLogsFolder;
@@ -147,7 +149,7 @@ public class CsvTradeLogger implements TradeLogger {
 		private List<TradeRecord> saving = new ArrayList<>();
 		private SaveContext saveContext = null;
 		private boolean saveSucceeded = false;
-		private long lastSaveErrorMsgTimestamp = 0L;
+		private long lastSaveErrorMsgMillis = 0L;
 
 		SaveTask(Plugin plugin) {
 			super(plugin);
@@ -193,8 +195,9 @@ public class CsvTradeLogger implements TradeLogger {
 				savePendingDelayed();
 
 				// Inform admins about the issue (throttled to once every 5 minutes):
-				if (Math.abs(System.currentTimeMillis() - lastSaveErrorMsgTimestamp) > (5 * 60 * 1000L)) {
-					lastSaveErrorMsgTimestamp = System.currentTimeMillis();
+				long nowMillis = System.currentTimeMillis();
+				if (Math.abs(nowMillis - lastSaveErrorMsgMillis) > SAVE_ERROR_MSG_THROTTLE_MILLIS) {
+					lastSaveErrorMsgMillis = nowMillis;
 					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Logging trades to the CSV trade log failed!"
 							+ " Please check the server logs and look into the issue!";
 					for (Player player : Bukkit.getOnlinePlayers()) {

@@ -123,9 +123,9 @@ public final class SchedulerUtils {
 						+ " remaining async tasks to finish ..");
 			}
 
-			final long asyncTasksTimeoutMillis = asyncTasksTimeoutSeconds * 1000L;
-			final long waitingStart = System.nanoTime();
-			long waitingDurationMillis = 0;
+			final long asyncTasksTimeoutMillis = TimeUnit.SECONDS.toMillis(asyncTasksTimeoutSeconds);
+			final long waitStartNanos = System.nanoTime();
+			long waitDurationMillis = 0;
 			do {
 				// Checking again every 5 milliseconds:
 				try {
@@ -138,15 +138,15 @@ public final class SchedulerUtils {
 				activeAsyncTasks = getActiveAsyncTasks(plugin);
 
 				// Update waiting duration and compare to timeout:
-				waitingDurationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - waitingStart);
-				if (waitingDurationMillis > asyncTasksTimeoutMillis) {
+				waitDurationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - waitStartNanos);
+				if (waitDurationMillis > asyncTasksTimeoutMillis) {
 					// Timeout reached, abort waiting..
 					break;
 				}
 			} while (activeAsyncTasks > 0);
 
-			if (waitingDurationMillis > 1 && logger != null) {
-				logger.info("Waited " + waitingDurationMillis + " ms for async tasks to finish.");
+			if (waitDurationMillis > 1 && logger != null) {
+				logger.info("Waited " + waitDurationMillis + " ms for async tasks to finish.");
 			}
 		}
 

@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.ui;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
@@ -127,7 +128,7 @@ class UIListener implements Listener {
 						+ ", shift=" + event.isShiftClick() + ", hotbar key=" + event.getHotbarButton()
 						+ ", left-or-right=" + (event.isLeftClick() ? "left" : (event.isRightClick() ? "right" : "unknown"))
 						+ ", click-type=" + event.getClick() + ", action=" + event.getAction()
-						+ ", time: " + (System.nanoTime() / 1000000L));
+						+ ", time: " + TimeUnit.NANOSECONDS.toMillis(System.nanoTime()));
 			}
 		}
 

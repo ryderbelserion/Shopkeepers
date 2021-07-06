@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.ui;
 
+import java.util.concurrent.TimeUnit;
+
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.inventory.InventoryAction;
@@ -25,8 +27,8 @@ public abstract class UIHandler {
 	private final AbstractUIType uiType;
 
 	// Heuristic detection of automatically triggered shift left-clicks:
-	private static final long AUTOMATIC_SHIFT_LEFT_CLICK_MS = 250L;
-	private long lastManualClick = 0L;
+	private static final long AUTOMATIC_SHIFT_LEFT_CLICK_NANOS = TimeUnit.MILLISECONDS.toNanos(250L);
+	private long lastManualClickNanos = 0L;
 	private int lastManualClickedSlotId = -1;
 	private boolean isAutomaticShiftLeftClick = false;
 
@@ -136,7 +138,7 @@ public abstract class UIHandler {
 	 * regular shift left-clicks by the player.
 	 * <p>
 	 * We use a heuristic to detect (and then possibly ignore) these automatically triggered clicks: We assume that any
-	 * shift left-clicks that occur within {@link UIHandler#AUTOMATIC_SHIFT_LEFT_CLICK_MS} on a slot different to the
+	 * shift left-clicks that occur within {@link UIHandler#AUTOMATIC_SHIFT_LEFT_CLICK_NANOS} on a slot different to the
 	 * previously clicked slot are automatically triggered.
 	 * <p>
 	 * Limitations (TODO): We cannot use a much lower time span (eg. limiting it to 1 or 2 ticks), because the
@@ -155,9 +157,9 @@ public abstract class UIHandler {
 	void informOnInventoryClickEarly(InventoryClickEvent event, Player player) {
 		// Heuristic detection of automatically triggered shift left-clicks:
 		isAutomaticShiftLeftClick = false; // reset
-		final long now = (System.nanoTime() / 1000000L);
+		final long nowNanos = System.nanoTime();
 		if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-			if (event.getRawSlot() != lastManualClickedSlotId && (now - lastManualClick) < AUTOMATIC_SHIFT_LEFT_CLICK_MS) {
+			if (event.getRawSlot() != lastManualClickedSlotId && (nowNanos - lastManualClickNanos) < AUTOMATIC_SHIFT_LEFT_CLICK_NANOS) {
 				isAutomaticShiftLeftClick = true;
 				Log.debug("  Detected automatically triggered shift left-click! (on different slot)");
 			}
@@ -165,7 +167,7 @@ public abstract class UIHandler {
 		// Note: We reset these for all types of clicks, because when quickly switching between shift and non-shift
 		// clicking we sometimes receive non-shift clicks that are followed by the automatic shift-clicks:
 		if (!isAutomaticShiftLeftClick) {
-			lastManualClick = now;
+			lastManualClickNanos = nowNanos;
 			lastManualClickedSlotId = event.getRawSlot();
 		}
 

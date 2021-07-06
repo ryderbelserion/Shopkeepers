@@ -15,6 +15,7 @@ Date format: (YYYY-MM-DD)
 * Internal: We avoid copying item stacks in a few more cases.
 * Internal: Renamed MerchantUtils#getSelectedTradingRecipe() to #getActiveTradingRecipe() and adjusted a few related debug messages.
 * Internal: Minor refactors to the package hierarchy of the default UIs. The different UI types also setup their own singleton instances now.
+* Internal: Various refactors related to time unit conversions.
 
 Added messages:  
 * `cannot-trade-no-offers`

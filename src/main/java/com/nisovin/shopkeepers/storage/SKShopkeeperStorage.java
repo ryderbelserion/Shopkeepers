@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -86,6 +87,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// Max total delay: 500ms
 	private static final int SAVING_MAX_ATTEMPTS = 20;
 	private static final long SAVING_ATTEMPTS_DELAY_MILLIS = 25;
+	private static final long SAVE_ERROR_MSG_THROTTLE_MILLIS = TimeUnit.MINUTES.toMillis(4);
 
 	private final SKShopkeepersPlugin plugin;
 	private final int minecraftDataVersion;
@@ -786,14 +788,14 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		// before they are used, either by the Bukkit Scheduler (when starting the async task and when going back to the
 		// main thread by starting a sync task), or/and via synchronization with the save task's lock.
 		private boolean savingSucceeded = false;
-		private long lastSavingErrorMsgTimestamp = 0L;
+		private long lastSaveErrorMsgMillis = 0L;
 
 		SaveTask(Plugin plugin) {
 			super(plugin);
 		}
 
 		void onDisable() {
-			lastSavingErrorMsgTimestamp = 0L;
+			lastSaveErrorMsgMillis = 0L;
 		}
 
 		@Override
@@ -1073,8 +1075,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 				// Inform admins about the saving issue:
 				// Error message throttle of 4 minutes (slightly less than the saving interval).
-				if (Math.abs(System.currentTimeMillis() - lastSavingErrorMsgTimestamp) > (4 * 60 * 1000L)) {
-					lastSavingErrorMsgTimestamp = System.currentTimeMillis();
+				long nowMillis = System.currentTimeMillis();
+				if (Math.abs(nowMillis - lastSaveErrorMsgMillis) > SAVE_ERROR_MSG_THROTTLE_MILLIS) {
+					lastSaveErrorMsgMillis = nowMillis;
 					String errorMsg = ChatColor.DARK_RED + "[Shopkeepers] " + ChatColor.RED + "Saving shopkeepers failed!"
 							+ " Please check the server logs and look into the issue!";
 					for (Player player : Bukkit.getOnlinePlayers()) {
