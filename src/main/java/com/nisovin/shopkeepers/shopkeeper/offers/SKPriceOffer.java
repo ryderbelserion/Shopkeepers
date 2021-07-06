@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
+import com.nisovin.shopkeepers.util.ItemMigration;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -150,7 +151,7 @@ public class SKPriceOffer implements PriceOffer {
 			boolean migrationFailed = false;
 
 			UnmodifiableItemStack item = offer.getItem();
-			UnmodifiableItemStack migratedItem = ItemUtils.migrateItemStack(item);
+			UnmodifiableItemStack migratedItem = ItemMigration.migrateItemStack(item);
 			if (!ItemUtils.isSimilar(item, migratedItem)) {
 				if (ItemUtils.isEmpty(migratedItem) && !ItemUtils.isEmpty(item)) {
 					migrationFailed = true;

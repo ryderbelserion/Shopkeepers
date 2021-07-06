@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
 import com.nisovin.shopkeepers.debug.DebugOptions;
+import com.nisovin.shopkeepers.itemconversion.ItemConversion;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
@@ -74,7 +75,7 @@ class CommandConvertItems extends Command {
 		if (convertAll) {
 			// Handles content, armor and off hand items, cursor item, and inventory updating:
 			long startNanos = System.nanoTime();
-			convertedStacks = ItemUtils.convertItems(inventory, (item) -> true, true);
+			convertedStacks = ItemConversion.convertItems(inventory, (item) -> true, true);
 			long durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
 			final int finalConvertedStacks = convertedStacks;
 			// Note: The conversion always has some performance impact, even if no items got actually converted. We
@@ -88,7 +89,7 @@ class CommandConvertItems extends Command {
 			ItemStack itemInHand = inventory.getItemInMainHand();
 			if (!ItemUtils.isEmpty(itemInHand)) {
 				long startNanos = System.nanoTime();
-				ItemStack convertedItem = ItemUtils.convertItem(itemInHand);
+				ItemStack convertedItem = ItemConversion.convertItem(itemInHand);
 				long durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
 				if (!itemInHand.isSimilar(convertedItem)) {
 					convertedStacks = 1;

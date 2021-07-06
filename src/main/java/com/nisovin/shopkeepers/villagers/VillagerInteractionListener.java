@@ -22,7 +22,7 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 
@@ -75,7 +75,7 @@ public class VillagerInteractionListener implements Listener {
 		// an attempt to resolve this incompatibility, we therefore cancel these off-hand interactions if the player
 		// already has some inventory open currently.
 		if (event.getHand() != EquipmentSlot.HAND) {
-			if (ItemUtils.hasInventoryOpen(player)) {
+			if (InventoryUtils.hasInventoryOpen(player)) {
 				event.setCancelled(true);
 				Log.debug("  off-hand interaction prevented due to open inventory");
 			}
@@ -148,7 +148,7 @@ public class VillagerInteractionListener implements Listener {
 		final int costs = Settings.hireOtherVillagersCosts;
 		if (costs > 0) {
 			ItemStack[] storageContents = playerInventory.getStorageContents();
-			if (!ItemUtils.containsAtLeast(storageContents, Settings.hireItem, costs)) {
+			if (!InventoryUtils.containsAtLeast(storageContents, Settings.hireItem, costs)) {
 				TextUtils.sendMessage(player, Messages.cannotHire);
 				Log.debug("    ..not holding enough hire items.");
 				return false;
@@ -164,9 +164,9 @@ public class VillagerInteractionListener implements Listener {
 				playerInventory.setItemInMainHand(null); // Remove item in hand
 				if (remaining < 0) {
 					// Remove remaining costs from inventory:
-					ItemUtils.removeItems(storageContents, Settings.hireItem, -remaining);
+					InventoryUtils.removeItems(storageContents, Settings.hireItem, -remaining);
 					// Apply the change to the player's inventory:
-					ItemUtils.setStorageContents(playerInventory, storageContents);
+					InventoryUtils.setStorageContents(playerInventory, storageContents);
 				}
 			}
 		}

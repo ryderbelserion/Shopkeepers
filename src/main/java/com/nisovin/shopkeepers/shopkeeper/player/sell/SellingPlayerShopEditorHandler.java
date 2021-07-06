@@ -12,6 +12,7 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 
 public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
@@ -53,7 +54,7 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 					continue;
 				}
 
-				if (ItemUtils.contains(newRecipes, containerItem)) {
+				if (InventoryUtils.contains(newRecipes, containerItem)) {
 					// We already added a new recipe for this item:
 					continue;
 				}

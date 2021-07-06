@@ -15,8 +15,7 @@ Date format: (YYYY-MM-DD)
 * Debug: Added debug option `empty-trades` that logs item information for the selected trading recipe and the input items whenever a player clicks an empty trading result slot.
 * Internal: We avoid copying item stacks in a few more cases.
 * Internal: Renamed MerchantUtils#getSelectedTradingRecipe() to #getActiveTradingRecipe() and adjusted a few related debug messages.
-* Internal: Minor refactors to the package hierarchy of the default UIs. The different UI types also setup their own singleton instances now.
-* Internal: Various refactors related to time unit conversions.
+* Internal: Various refactors related to the default UIs, time unit conversions, and item utilities.
 
 Added messages:  
 * `cannot-trade-no-offers`

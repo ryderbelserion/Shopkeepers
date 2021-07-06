@@ -14,6 +14,7 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.util.BookItems;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
@@ -66,7 +67,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		assert containerInventory != null & newContainerContents != null;
 
 		// Remove a blank book from the container contents:
-		if (ItemUtils.removeItems(newContainerContents, WRITABLE_BOOK_MATCHER, 1) != 0) {
+		if (InventoryUtils.removeItems(newContainerContents, WRITABLE_BOOK_MATCHER, 1) != 0) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientWritableBooks);
 			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain any writable (book-and-quill) items.");
 			return false;
@@ -79,12 +80,12 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			if (Settings.isHighCurrencyEnabled() && remaining > Settings.highCurrencyMinCost) {
 				int highCurrencyAmount = (remaining / Settings.highCurrencyValue);
 				if (highCurrencyAmount > 0) {
-					int remainingHighCurrency = ItemUtils.addItems(newContainerContents, Settings.createHighCurrencyItem(highCurrencyAmount));
+					int remainingHighCurrency = InventoryUtils.addItems(newContainerContents, Settings.createHighCurrencyItem(highCurrencyAmount));
 					remaining -= ((highCurrencyAmount - remainingHighCurrency) * Settings.highCurrencyValue);
 				}
 			}
 			if (remaining > 0) {
-				if (ItemUtils.addItems(newContainerContents, Settings.createCurrencyItem(remaining)) != 0) {
+				if (InventoryUtils.addItems(newContainerContents, Settings.createCurrencyItem(remaining)) != 0) {
 					TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 					this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 					return false;

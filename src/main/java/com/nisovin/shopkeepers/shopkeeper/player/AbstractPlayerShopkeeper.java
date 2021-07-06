@@ -32,6 +32,8 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.CyclicCounter;
+import com.nisovin.shopkeepers.util.InventoryUtils;
+import com.nisovin.shopkeepers.util.ItemMigration;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.RateLimiter;
@@ -130,7 +132,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			hireCost = null;
 			this.markDirty();
 		}
-		UnmodifiableItemStack migratedHireCost = ItemUtils.migrateItemStack(hireCost);
+		UnmodifiableItemStack migratedHireCost = ItemMigration.migrateItemStack(hireCost);
 		if (!ItemUtils.isSimilar(hireCost, migratedHireCost)) {
 			if (ItemUtils.isEmpty(migratedHireCost) && !ItemUtils.isEmpty(hireCost)) {
 				// Migration failed:
@@ -411,7 +413,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		Inventory containerInventory = this.getContainerInventory();
 		if (containerInventory == null) {
 			// Container not found:
-			return ItemUtils.emptyItemStackArray();
+			return InventoryUtils.emptyItemStackArray();
 		} else {
 			return containerInventory.getContents(); // Not null
 		}

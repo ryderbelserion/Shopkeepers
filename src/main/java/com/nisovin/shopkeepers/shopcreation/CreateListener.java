@@ -38,6 +38,7 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.EventUtils;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.MutableLong;
@@ -314,7 +315,7 @@ class CreateListener implements Listener {
 		Player player = event.getPlayer();
 		// We check the permission first since this check is fast:
 		if (PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) return;
-		ItemStack itemInHand = ItemUtils.getItem(player.getInventory(), event.getHand());
+		ItemStack itemInHand = InventoryUtils.getItem(player.getInventory(), event.getHand());
 		if (!Settings.isShopCreationItem(itemInHand)) return;
 
 		// Prevent the entity interaction:
@@ -365,7 +366,7 @@ class CreateListener implements Listener {
 			}
 		}
 		event.setResult(null);
-		ItemUtils.updateInventoryLater(anvilInventory);
+		InventoryUtils.updateInventoryLater(anvilInventory);
 		// TODO Inform the player? (This would require some per-player throttling)
 	}
 }

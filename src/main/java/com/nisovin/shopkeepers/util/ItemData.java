@@ -141,7 +141,7 @@ public class ItemData implements Cloneable {
 			}
 
 			// Deserialize ItemMeta:
-			ItemMeta itemMeta = ItemUtils.deserializeItemMeta(dataMap); // Can be null
+			ItemMeta itemMeta = ItemSerialization.deserializeItemMeta(dataMap); // Can be null
 
 			// Apply ItemMeta:
 			dataItem.setItemMeta(itemMeta);
@@ -216,7 +216,7 @@ public class ItemData implements Cloneable {
 		// Lazily cache the serialized data:
 		if (serializedData == null) {
 			ItemMeta itemMeta = dataItem.getItemMeta();
-			serializedData = ItemUtils.serializeItemMeta(itemMeta);
+			serializedData = ItemSerialization.serializeItemMeta(itemMeta);
 			if (serializedData == null) {
 				// Ensure that the field is not null after initialization:
 				serializedData = Collections.emptyMap();

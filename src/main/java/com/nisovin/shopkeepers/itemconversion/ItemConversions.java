@@ -125,7 +125,7 @@ public class ItemConversions {
 		Predicate<ItemStack> affectedItemsFilter = affectedItemsFilter();
 		if (affectedItemsFilter != NO_ITEMS_AFFECTED) {
 			// Convert items and update viewers if there have been changes:
-			convertedStacks = ItemUtils.convertItems(inventory, affectedItemsFilter, true);
+			convertedStacks = ItemConversion.convertItems(inventory, affectedItemsFilter, true);
 		}
 		return convertedStacks;
 	}

@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Validate;
 
@@ -100,7 +100,7 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 		List<TradingRecipe> recipes = new ArrayList<>(offers.size());
 		offers.forEach(offer -> {
 			UnmodifiableItemStack resultItem = offer.getResultItem();
-			boolean outOfStock = !ItemUtils.containsAtLeast(containerContents, resultItem, resultItem.getAmount());
+			boolean outOfStock = !InventoryUtils.containsAtLeast(containerContents, resultItem, resultItem.getAmount());
 			TradingRecipe recipe = SKTradeOffer.toTradingRecipe(offer, outOfStock);
 			recipes.add(recipe);
 		});

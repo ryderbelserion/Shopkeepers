@@ -36,6 +36,7 @@ import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.util.ConfigUtils;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Lazy;
 import com.nisovin.shopkeepers.util.Log;
@@ -361,7 +362,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			Log.debug(() -> "Prevented unsupported special click in trading window by " + playerName
 					+ " at " + shopkeeper.getPositionString() + ": " + action);
 			clickEvent.setCancelled(true);
-			ItemUtils.updateInventoryLater(player);
+			InventoryUtils.updateInventoryLater(player);
 			return;
 		}
 
@@ -378,7 +379,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 		// We are handling all types of clicks which might trigger a trade ourselves:
 		clickEvent.setCancelled(true);
-		ItemUtils.updateInventoryLater(player);
+		InventoryUtils.updateInventoryLater(player);
 
 		// Check for a trade and prepare trade data:
 		TradeData tradeData = this.checkForTrade(clickEvent, false);
@@ -472,7 +473,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 				Collections.reverse(contentsView);
 
 				// No item copy required here:
-				if (ItemUtils.addItems(newPlayerContents, resultItem) != 0) {
+				if (InventoryUtils.addItems(newPlayerContents, resultItem) != 0) {
 					// Not enough inventory space, abort trading:
 					break;
 				}
@@ -487,7 +488,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 				Collections.reverse(contentsView);
 
 				// Apply player inventory changes:
-				ItemUtils.setStorageContents(playerInventory, newPlayerContents);
+				InventoryUtils.setStorageContents(playerInventory, newPlayerContents);
 
 				// Common apply trade:
 				this.commonApplyTrade(tradeData);

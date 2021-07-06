@@ -8,6 +8,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
@@ -43,7 +44,7 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		// Remove result items from container contents:
 		UnmodifiableItemStack resultItem = tradingRecipe.getResultItem();
 		assert resultItem != null;
-		if (ItemUtils.removeItems(newContainerContents, resultItem) != 0) {
+		if (InventoryUtils.removeItems(newContainerContents, resultItem) != 0) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStock);
 			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain the required items.");
 			return false;
@@ -68,7 +69,7 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		if (ItemUtils.isEmpty(requiredItem)) return true;
 		int amountAfterTaxes = this.getAmountAfterTaxes(requiredItem.getAmount());
 		if (amountAfterTaxes > 0) {
-			if (ItemUtils.addItems(contents, offeredItem, amountAfterTaxes) != 0) {
+			if (InventoryUtils.addItems(contents, offeredItem, amountAfterTaxes) != 0) {
 				// Could not add all items to the contents:
 				return false;
 			}

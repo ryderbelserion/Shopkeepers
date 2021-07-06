@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.Validate;
@@ -103,7 +104,7 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 		offers.forEach(offer -> {
 			// Both the offer's and the trading recipe's items are immutable. So there is no need to copy the item.
 			UnmodifiableItemStack tradedItem = offer.getItem();
-			boolean outOfStock = !ItemUtils.containsAtLeast(containerContents, tradedItem, tradedItem.getAmount());
+			boolean outOfStock = !InventoryUtils.containsAtLeast(containerContents, tradedItem, tradedItem.getAmount());
 			TradingRecipe recipe = this.createSellingRecipe(tradedItem, offer.getPrice(), outOfStock);
 			if (recipe != null) {
 				recipes.add(recipe);

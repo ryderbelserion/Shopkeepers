@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.TypedFirstOfArgument;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 class CommandGiveCurrency extends Command {
@@ -85,8 +85,8 @@ class CommandGiveCurrency extends Command {
 
 		PlayerInventory inventory = targetPlayer.getInventory();
 		ItemStack[] contents = inventory.getStorageContents();
-		int remaining = ItemUtils.addItems(contents, item);
-		ItemUtils.setStorageContents(inventory, contents);
+		int remaining = InventoryUtils.addItems(contents, item);
+		InventoryUtils.setStorageContents(inventory, contents);
 		if (remaining > 0) {
 			item.setAmount(remaining);
 			targetPlayer.getWorld().dropItem(targetPlayer.getEyeLocation(), item);

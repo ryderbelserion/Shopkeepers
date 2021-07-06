@@ -11,6 +11,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
+import com.nisovin.shopkeepers.util.ItemMigration;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.StringUtils;
@@ -160,7 +161,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 			UnmodifiableItemStack item1 = offer.getItem1();
 			UnmodifiableItemStack item2 = offer.getItem2();
 
-			UnmodifiableItemStack migratedResultItem = ItemUtils.migrateItemStack(resultItem);
+			UnmodifiableItemStack migratedResultItem = ItemMigration.migrateItemStack(resultItem);
 			if (!ItemUtils.isSimilar(resultItem, migratedResultItem)) {
 				if (ItemUtils.isEmpty(migratedResultItem) && !ItemUtils.isEmpty(resultItem)) {
 					migrationFailed = true;
@@ -168,7 +169,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				resultItem = migratedResultItem;
 				itemsMigrated = true;
 			}
-			UnmodifiableItemStack migratedItem1 = ItemUtils.migrateItemStack(item1);
+			UnmodifiableItemStack migratedItem1 = ItemMigration.migrateItemStack(item1);
 			if (!ItemUtils.isSimilar(item1, migratedItem1)) {
 				if (ItemUtils.isEmpty(migratedItem1) && !ItemUtils.isEmpty(item1)) {
 					migrationFailed = true;
@@ -176,7 +177,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				item1 = migratedItem1;
 				itemsMigrated = true;
 			}
-			UnmodifiableItemStack migratedItem2 = ItemUtils.migrateItemStack(item2);
+			UnmodifiableItemStack migratedItem2 = ItemMigration.migrateItemStack(item2);
 			if (!ItemUtils.isSimilar(item2, migratedItem2)) {
 				if (ItemUtils.isEmpty(migratedItem2) && !ItemUtils.isEmpty(item2)) {
 					migrationFailed = true;

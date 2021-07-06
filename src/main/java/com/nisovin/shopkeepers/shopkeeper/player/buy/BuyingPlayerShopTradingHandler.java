@@ -9,6 +9,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Validate;
@@ -70,7 +71,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			// The item the trading player gave might slightly differ from the required item,
 			// but is still accepted, depending on the used item comparison logic and settings.
 			ItemStack receivedItem = ItemUtils.copyWithAmount(tradeData.offeredItem1, amountAfterTaxes);
-			if (ItemUtils.addItems(newContainerContents, receivedItem) != 0) {
+			if (InventoryUtils.addItems(newContainerContents, receivedItem) != 0) {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 				this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 				return false;

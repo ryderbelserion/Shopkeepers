@@ -8,7 +8,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
 
 public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
@@ -51,7 +51,7 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		assert containerInventory != null & newContainerContents != null;
 
 		// Remove result items from container contents:
-		if (ItemUtils.removeItems(newContainerContents, soldItem) != 0) {
+		if (InventoryUtils.removeItems(newContainerContents, soldItem) != 0) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStock);
 			this.debugPreventedTrade(tradingPlayer, "The shop's container does not contain the required items.");
 			return false;
@@ -67,12 +67,12 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			if (Settings.isHighCurrencyEnabled() && remaining > Settings.highCurrencyMinCost) {
 				int highCurrencyAmount = (remaining / Settings.highCurrencyValue);
 				if (highCurrencyAmount > 0) {
-					int remainingHighCurrency = ItemUtils.addItems(newContainerContents, Settings.createHighCurrencyItem(highCurrencyAmount));
+					int remainingHighCurrency = InventoryUtils.addItems(newContainerContents, Settings.createHighCurrencyItem(highCurrencyAmount));
 					remaining -= ((highCurrencyAmount - remainingHighCurrency) * Settings.highCurrencyValue);
 				}
 			}
 			if (remaining > 0) {
-				if (ItemUtils.addItems(newContainerContents, Settings.createCurrencyItem(remaining)) != 0) {
+				if (InventoryUtils.addItems(newContainerContents, Settings.createCurrencyItem(remaining)) != 0) {
 					TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 					this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 					return false;

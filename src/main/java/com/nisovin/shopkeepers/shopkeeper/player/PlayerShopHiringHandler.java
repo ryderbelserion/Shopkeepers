@@ -16,7 +16,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.hiring.HiringHandler;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.TextUtils;
 
@@ -88,7 +88,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			// Check if the player can afford to hire the shopkeeper, and calculate the resulting player inventory:
 			PlayerInventory playerInventory = player.getInventory();
 			ItemStack[] newPlayerInventoryContents = playerInventory.getContents();
-			if (ItemUtils.removeItems(newPlayerInventoryContents, hireCost) != 0) {
+			if (InventoryUtils.removeItems(newPlayerInventoryContents, hireCost) != 0) {
 				// The player cannot afford to hire the shopkeeper:
 				TextUtils.sendMessage(player, Messages.cannotHire);
 				// Close window for this player:
@@ -119,7 +119,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			}
 
 			// Hire the shopkeeper:
-			ItemUtils.setContents(playerInventory, newPlayerInventoryContents); // Apply player inventory changes
+			InventoryUtils.setContents(playerInventory, newPlayerInventoryContents); // Apply player inventory changes
 			shopkeeper.setForHire(null);
 			shopkeeper.setOwner(player);
 			shopkeeper.save();
