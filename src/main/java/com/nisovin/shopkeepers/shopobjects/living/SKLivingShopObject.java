@@ -38,7 +38,7 @@ import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.RateLimiter;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.WorldUtils;
 
 public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntityShopObject implements LivingShopObject {
 
@@ -136,7 +136,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			}
 		}
 
-		double distanceToGround = Utils.getCollisionDistanceToGround(spawnLocation, SPAWN_LOCATION_RANGE, collidableFluids);
+		double distanceToGround = WorldUtils.getCollisionDistanceToGround(spawnLocation, SPAWN_LOCATION_RANGE, collidableFluids);
 		if (distanceToGround == SPAWN_LOCATION_RANGE) {
 			// No collision within the checked range: Remove the initial offset from the spawn location.
 			distanceToGround = SPAWN_LOCATION_OFFSET;

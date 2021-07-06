@@ -35,10 +35,10 @@ import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.InventoryUtils;
 import com.nisovin.shopkeepers.util.ItemMigration;
 import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.LocationUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.RateLimiter;
 import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
 
 public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
@@ -193,7 +193,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				Location shopLocation = this.getShopObject().getLocation(); // Null if not spawned
 				// If within a certain range, drop the item at the shop's location, else drop at player's location:
 				Location dropLocation;
-				if (shopLocation != null && Utils.getDistanceSquared(shopLocation, playerLocation) <= 100) {
+				if (shopLocation != null && LocationUtils.getDistanceSquared(shopLocation, playerLocation) <= 100) {
 					dropLocation = shopLocation;
 				} else {
 					dropLocation = playerLocation;

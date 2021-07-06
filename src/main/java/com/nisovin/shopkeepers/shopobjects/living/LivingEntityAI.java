@@ -31,8 +31,8 @@ import com.nisovin.shopkeepers.util.CyclicCounter;
 import com.nisovin.shopkeepers.util.EntityUtils;
 import com.nisovin.shopkeepers.util.MutableChunkCoords;
 import com.nisovin.shopkeepers.util.RateLimiter;
-import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.Validate;
+import com.nisovin.shopkeepers.util.WorldUtils;
 import com.nisovin.shopkeepers.util.timer.Timer;
 import com.nisovin.shopkeepers.util.timer.Timings;
 
@@ -562,7 +562,7 @@ public class LivingEntityAI implements Listener {
 				}
 			}
 
-			entityData.distanceToGround = Utils.getCollisionDistanceToGround(entityLocation, gravityCollisionCheckRange, collidableFluids);
+			entityData.distanceToGround = WorldUtils.getCollisionDistanceToGround(entityLocation, gravityCollisionCheckRange, collidableFluids);
 			sharedLocation.setWorld(null); // Reset
 			boolean falling = (entityData.distanceToGround >= DISTANCE_TO_GROUND_THRESHOLD);
 			entityData.falling = falling;

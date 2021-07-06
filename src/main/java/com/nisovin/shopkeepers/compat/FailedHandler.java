@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.ItemUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.ServerUtils;
 
 public final class FailedHandler implements NMSCallProvider {
 
@@ -37,7 +37,7 @@ public final class FailedHandler implements NMSCallProvider {
 	private final Method obcGetHandleMethod;
 
 	public FailedHandler() throws Exception {
-		String cbVersion = Utils.getServerCBVersion();
+		String cbVersion = ServerUtils.getCraftBukkitVersion();
 		String nmsPackageString = "net.minecraft.server." + cbVersion + ".";
 		// String bukkitPackageString = "org.bukkit.";
 		String obcPackageString = "org.bukkit.craftbukkit." + cbVersion + ".";

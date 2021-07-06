@@ -15,8 +15,8 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.util.LocationUtils;
 import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Utils;
 import com.nisovin.shopkeepers.util.interaction.InteractionUtils;
 
 public class ShopkeeperCreation {
@@ -127,7 +127,7 @@ public class ShopkeeperCreation {
 		} else {
 			spawnBlock = targetBlock.getRelative(targetBlockFace);
 		}
-		Location spawnLocation = Utils.getBlockCenterLocation(spawnBlock);
+		Location spawnLocation = LocationUtils.getBlockCenterLocation(spawnBlock);
 		// Face towards player:
 		spawnLocation.setDirection(player.getEyeLocation().subtract(spawnLocation).toVector());
 		return spawnLocation;
