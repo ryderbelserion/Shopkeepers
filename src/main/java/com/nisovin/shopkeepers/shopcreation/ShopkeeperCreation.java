@@ -17,6 +17,7 @@ import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.TextUtils;
 import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.interaction.InteractionUtils;
 
 public class ShopkeeperCreation {
 
@@ -109,7 +110,7 @@ public class ShopkeeperCreation {
 		}
 
 		// Check if the player can access the container:
-		if (!Utils.checkBlockInteract(player, containerBlock)) { // checks access via dummy interact event
+		if (!InteractionUtils.checkBlockInteract(player, containerBlock)) { // checks access via dummy interact event
 			TextUtils.sendMessage(player, Messages.noContainerAccess);
 			return false;
 		}

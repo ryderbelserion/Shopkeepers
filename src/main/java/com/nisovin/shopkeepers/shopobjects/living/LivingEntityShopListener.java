@@ -53,8 +53,8 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.EventUtils;
 import com.nisovin.shopkeepers.util.Log;
-import com.nisovin.shopkeepers.util.TestPlayerInteractEntityEvent;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.interaction.InteractionUtils;
+import com.nisovin.shopkeepers.util.interaction.TestPlayerInteractEntityEvent;
 
 class LivingEntityShopListener implements Listener {
 
@@ -178,7 +178,7 @@ class LivingEntityShopListener implements Listener {
 
 		// Check the entity interaction result by calling another interact event:
 		if (Settings.checkShopInteractionResult) {
-			if (!Utils.checkEntityInteract(player, shopEntity)) {
+			if (!InteractionUtils.checkEntityInteract(player, shopEntity)) {
 				Log.debug("  Cancelled by another plugin");
 				return;
 			}

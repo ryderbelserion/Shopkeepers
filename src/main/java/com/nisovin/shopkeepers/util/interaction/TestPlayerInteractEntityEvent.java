@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.util;
+package com.nisovin.shopkeepers.util.interaction;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

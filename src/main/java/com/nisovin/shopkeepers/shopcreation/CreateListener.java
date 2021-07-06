@@ -43,8 +43,8 @@ import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.MutableLong;
 import com.nisovin.shopkeepers.util.PermissionUtils;
-import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
 import com.nisovin.shopkeepers.util.TextUtils;
+import com.nisovin.shopkeepers.util.interaction.TestPlayerInteractEvent;
 
 /**
  * Handles the usage of the shop creation item.

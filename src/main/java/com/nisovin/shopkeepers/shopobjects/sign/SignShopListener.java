@@ -30,9 +30,9 @@ import com.nisovin.shopkeepers.util.EventUtils;
 import com.nisovin.shopkeepers.util.ItemUtils;
 import com.nisovin.shopkeepers.util.Log;
 import com.nisovin.shopkeepers.util.MutableBlockLocation;
-import com.nisovin.shopkeepers.util.TestPlayerInteractEvent;
 import com.nisovin.shopkeepers.util.TextUtils;
-import com.nisovin.shopkeepers.util.Utils;
+import com.nisovin.shopkeepers.util.interaction.InteractionUtils;
+import com.nisovin.shopkeepers.util.interaction.TestPlayerInteractEvent;
 
 class SignShopListener implements Listener {
 
@@ -119,7 +119,7 @@ class SignShopListener implements Listener {
 
 		// Check the sign interaction result by calling another interact event:
 		if (Settings.checkShopInteractionResult) {
-			if (!Utils.checkBlockInteract(player, block)) {
+			if (!InteractionUtils.checkBlockInteract(player, block)) {
 				Log.debug("  Cancelled by another plugin");
 				return;
 			}
