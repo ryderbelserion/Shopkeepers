@@ -31,6 +31,7 @@ public class TradeLoggers implements Listener {
 	// the typically chosen merge durations to be small enough for this to not be an issue. Also, the order in which the
 	// trades took place is still preserved.
 	private TradeMerger tradeMerger;
+	private boolean enabled = false;
 
 	public TradeLoggers(Plugin plugin) {
 		Validate.notNull(plugin, "plugin is null");
@@ -38,6 +39,7 @@ public class TradeLoggers implements Listener {
 	}
 
 	public void onEnable() {
+		enabled = true;
 		int mergeDuration = Settings.tradeLogMergeDurationTicks;
 		if (mergeDuration == 1) {
 			// Only merge trades that are triggered by the same click event:
@@ -57,6 +59,9 @@ public class TradeLoggers implements Listener {
 	}
 
 	public void onDisable() {
+		if (!enabled) return;
+		enabled = false;
+
 		// Stop reacting to new trades:
 		HandlerList.unregisterAll(this);
 
