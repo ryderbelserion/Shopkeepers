@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.compat;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import org.bukkit.Material;
@@ -18,8 +17,7 @@ public final class FailedHandler implements NMSCallProvider {
 
 	// Minecraft
 	private final Class<?> nmsEntityClass;
-	private final Field nmsNoclipField;
-	private final Field nmsOnGroundField;
+	private final Method nmsEntitySetOnGroundMethod;
 
 	private final Class<?> nmsItemStackClass;
 	private final Method nmsGetTagMethod;
@@ -29,31 +27,28 @@ public final class FailedHandler implements NMSCallProvider {
 	private final Method nmsAreNBTMatchingMethod;
 
 	// CraftBukkit
-
 	private final Class<?> obcCraftItemStackClass;
 	private final Method obcAsNMSCopyMethod;
 
 	private final Class<?> obcCraftEntityClass;
 	private final Method obcGetHandleMethod;
 
+	// Bukkit
+	private final Method raiderSetCanJoinRaidMethod;
+
 	public FailedHandler() throws Exception {
 		String cbVersion = ServerUtils.getCraftBukkitVersion();
-		String nmsPackageString = "net.minecraft.server." + cbVersion + ".";
-		// String bukkitPackageString = "org.bukkit.";
 		String obcPackageString = "org.bukkit.craftbukkit." + cbVersion + ".";
 
 		// Minecraft
-		nmsItemStackClass = Class.forName(nmsPackageString + "ItemStack");
+		nmsItemStackClass = Class.forName("net.minecraft.world.item.ItemStack");
 		nmsGetTagMethod = nmsItemStackClass.getDeclaredMethod("getTag");
 
-		nmsEntityClass = Class.forName(nmsPackageString + "Entity");
-		nmsNoclipField = nmsEntityClass.getDeclaredField("noclip");
-		nmsNoclipField.setAccessible(true);
-		nmsOnGroundField = nmsEntityClass.getDeclaredField("onGround");
-		nmsOnGroundField.setAccessible(true);
+		nmsEntityClass = Class.forName("net.minecraft.world.entity.Entity");
+		nmsEntitySetOnGroundMethod = nmsEntityClass.getDeclaredMethod("setOnGround", boolean.class);
 
-		nmsGameProfileSerializerClass = Class.forName(nmsPackageString + "GameProfileSerializer");
-		nmsNBTBaseClass = Class.forName(nmsPackageString + "NBTBase");
+		nmsGameProfileSerializerClass = Class.forName("net.minecraft.nbt.GameProfileSerializer");
+		nmsNBTBaseClass = Class.forName("net.minecraft.nbt.NBTBase");
 		nmsAreNBTMatchingMethod = nmsGameProfileSerializerClass.getDeclaredMethod("a", nmsNBTBaseClass, nmsNBTBaseClass, boolean.class);
 
 		// CraftBukkit
@@ -62,6 +57,10 @@ public final class FailedHandler implements NMSCallProvider {
 
 		obcCraftEntityClass = Class.forName(obcPackageString + "entity.CraftEntity");
 		obcGetHandleMethod = obcCraftEntityClass.getDeclaredMethod("getHandle");
+
+		// Bukkit
+		// Only available on Bukkit 1.15.1 and upwards:
+		raiderSetCanJoinRaidMethod = Raider.class.getDeclaredMethod("setCanJoinRaid", boolean.class);
 	}
 
 	@Override
@@ -88,7 +87,7 @@ public final class FailedHandler implements NMSCallProvider {
 	public void setOnGround(Entity entity, boolean onGround) {
 		try {
 			Object mcEntity = obcGetHandleMethod.invoke(entity);
-			nmsOnGroundField.set(mcEntity, onGround);
+			nmsEntitySetOnGroundMethod.invoke(mcEntity, onGround);
 		} catch (Exception e) {
 			// Ignoring, since this is not that important if it doesn't work.
 		}
@@ -96,19 +95,16 @@ public final class FailedHandler implements NMSCallProvider {
 
 	@Override
 	public void setNoclip(Entity entity) {
-		try {
-			// When gravity gets disabled, we are able to also disable collisions/pushing of mobs via the noclip flag.
-			// This might not properly work for Vex, since they disable noclip again after their movement.
-			Object mcEntity = obcGetHandleMethod.invoke(entity);
-			nmsNoclipField.set(mcEntity, true);
-		} catch (Exception e) {
-			// This is optional, ignore if not possible for some reason.
-		}
+		// Not supported, but also not necessarily required (just provides a small performance benefit).
 	}
 
 	@Override
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
-		// Not supported :( Raider mobs might interfere with nearby raids TODO
+		try {
+			raiderSetCanJoinRaidMethod.invoke(raider, canJoinRaid);
+		} catch (Exception e) {
+			// Not supported. Raider mobs might interfere with nearby raids :(
+		}
 	}
 
 	@Override

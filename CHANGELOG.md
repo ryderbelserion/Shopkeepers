@@ -5,6 +5,7 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.17, 1.16.5, 1.15.2, 1.14.4
 
 * Building: Bumped the CraftBukkit dependencies for the 1_16_R2 and 1_16_R3 versions of Shopkeepers from 1.16.2-R0.1 and 1.16.4-R0.1 to 1.16.3-R0.1 and 1.16.5-R0.1 respectively. This has no effect on the server versions the plugin works on, but simplifies testing.
+* Fixed: The compatibility mode when running on an unsupported server version was no longer working.
 * Fixed: When the compatibility mode failed to enable, we would encounter an error during plugin disable due to the TradeLoggers component not having been enabled yet.
 * Bumped Citizens dependency to v2.0.28.
 * Config: Added setting `save-citizen-npcs-instantly` (disabled by default), which triggers a save of all Citizens NPC data whenever the Shopkeepers plugin modifies a Citizens NPC. Saving the Citizens NPCs is quite a heavy operation. Since the Citizens API does not yet provide an API to trigger an asynchronous save, we trigger the asynchronous save by invoking the `/citizens save -a` command in the console. As a side effect, this will print command feedback in the console whenever the NPCs are saved this way.
