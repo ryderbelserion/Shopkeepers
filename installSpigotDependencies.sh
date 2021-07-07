@@ -16,3 +16,4 @@ if [ ! -f "$HOME/.m2/repository/org/bukkit/craftbukkit/1.16.5-R0.1-SNAPSHOT/craf
 source ./installJDK.sh 16
 
 if [ ! -f "$HOME/.m2/repository/org/bukkit/craftbukkit/1.17-R0.1-SNAPSHOT/craftbukkit-1.17-R0.1-SNAPSHOT-remapped-mojang.jar" ]; then ./installSpigot.sh 1.17 ; else echo "Not compiling Spigot 1.17 because it is already in our Maven repo" ; fi
+if [ ! -f "$HOME/.m2/repository/org/bukkit/craftbukkit/1.17.1-R0.1-SNAPSHOT/craftbukkit-1.17.1-R0.1-SNAPSHOT-remapped-mojang.jar" ]; then ./installSpigot.sh 1.17.1 ; else echo "Not compiling Spigot 1.17.1 because it is already in our Maven repo" ; fi

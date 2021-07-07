@@ -2,8 +2,9 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.13.2 (TBA)
-### Supported MC versions: 1.17, 1.16.5, 1.15.2, 1.14.4
+### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
+* Updated for MC 1.17.1
 * Building: Bumped the CraftBukkit dependencies for the 1_16_R2 and 1_16_R3 versions of Shopkeepers from 1.16.2-R0.1 and 1.16.4-R0.1 to 1.16.3-R0.1 and 1.16.5-R0.1 respectively. This has no effect on the server versions the plugin works on, but simplifies testing.
 * Internal: We now use the server's mappings version to check if the plugin is compatible.
   * Previously, we used CraftBukkit's 'Minecraft Version' to determine compatibility (eg. '1_16_R3' for 1.16.5). However, Spigot will occasionally update its mappings without bumping the CraftBukkit version or this 'Minecraft Version'. With the new remapping of NMS code since 1.17, these mappings changes will forcefully break our compiled NMS code and then require an update (or at least a rebuild) of the Shopkeepers plugin.
