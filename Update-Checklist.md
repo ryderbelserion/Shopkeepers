@@ -8,6 +8,7 @@ Since our modules can currently only build against specific CraftBukkit versions
 To support the latest mappings version:
 * Update the mappings version of the corresponding CompatVersion in NMSManager.
 * Make sure that Maven resolves the latest CraftBukkit snapshot version (caching might prevent this).
+  * However, there are test cases that should catch if we attempt to build against an unexpected mappings version.
 * If necessary, update the current compat module code for the CraftBukkit version.
 * Rebuild the plugin. This should rebuild the compat module against the latest version of CraftBukkit with the latest mappings version.
 

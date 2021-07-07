@@ -54,6 +54,10 @@ public final class NMSHandler implements NMSCallProvider {
 		return "1_17_R1";
 	}
 
+	public Class<?> getCraftMagicNumbersClass() {
+		return CraftMagicNumbers.class;
+	}
+
 	@Override
 	public void overwriteLivingEntityAI(LivingEntity entity) {
 		// Example: Armor stands are living, but not insentient/Mob.
