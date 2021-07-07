@@ -24,7 +24,7 @@ import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 import net.minecraft.server.v1_15_R1.Entity;
 import net.minecraft.server.v1_15_R1.EntityHuman;

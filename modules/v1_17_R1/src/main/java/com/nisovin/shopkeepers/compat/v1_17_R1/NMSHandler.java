@@ -30,8 +30,8 @@ import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
-import com.nisovin.shopkeepers.util.EnumUtils;
-import com.nisovin.shopkeepers.util.ItemUtils;
+import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils; // GameProfileSerializer
