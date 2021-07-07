@@ -9,12 +9,20 @@ import org.bukkit.entity.Raider;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
+import com.nisovin.shopkeepers.compat.CompatVersion;
+import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public interface NMSCallProvider {
 
+	// The compat version string.
 	public String getVersionId();
+
+	// This is expected to not return null.
+	public default CompatVersion getCompatVersion() {
+		return NMSManager.getCompatVersion(this.getVersionId());
+	}
 
 	public void overwriteLivingEntityAI(LivingEntity entity);
 

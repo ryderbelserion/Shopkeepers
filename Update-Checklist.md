@@ -1,15 +1,29 @@
 # Update checklist
 
+## Mappings-only update
+
+I.e. the mappings version changed without there being a bump to the CraftBukkit version.
+Since our modules can currently only build against specific CraftBukkit versions, but not mappings versions, we are currently only able to support the latest mappings revision for each CraftBukkit version.
+
+To support the latest mappings version:
+* Update the mappings version of the corresponding CompatVersion in NMSManager.
+* Make sure that Maven resolves the latest CraftBukkit snapshot version (caching might prevent this).
+* If necessary, update the current compat module code for the CraftBukkit version.
+* Rebuild the plugin. This should rebuild the compat module against the latest version of CraftBukkit with the latest mappings version.
+
 ## Minecraft update
 
-* Add a new Maven module for the new Minecraft version:
-	* Copy an existing module and rename: Module folder, package folder and inside the pom (artifactId and name).
+* Add a new CompatVersion entry in NMSManager.
+	* Increment the revision number of the compat version (behind the 'R'). Note that for some minor Minecraft updates this version may not necessarily align with CraftBukkit's 'Minecraft Version'.
+
+* Add a new Maven module for the new compat version:
+	* Copy an existing module and rename: Module folder, package folders, and inside the pom (artifactId and name).
 	* Update the CraftBukkit dependency inside the pom of the new module.
 	* Add the module in the root pom.
 	* Add a dependency entry for the new module in the pom of the dist module.
 	* Update the NMSHandler class:
 		* Package name.
-		* Output of #getVersionId.
+		* Output of #getVersionId. This should match the compat version (not necessarily CraftBukkit's Minecraft version).
 		* Update all NMS version specific imports and references.
 		* Check all NMS version specific code:
 			* Methods or fields might no longer exist or might have been renamed.
