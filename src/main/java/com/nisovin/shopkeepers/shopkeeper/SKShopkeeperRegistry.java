@@ -1189,7 +1189,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 					Log.warning("Shopkeeper " + shopkeeper.getId() + " has been spawned but provides no object id!");
 				}
 			} else {
-				Log.warning("Failed to spawn shopkeeper " + shopkeeper.getId() + " at " + shopkeeper.getPositionString());
+				// Due to an open Spigot 1.17 issue, entities report as 'invalid' after being spawned during chunk
+				// loads. The shopkeepers plugin then assumes that the spawning failed. In order to not spam with
+				// warnings, this warning has been replaced with a debug output for now.
+				// TODO Replace this with a warning again once the underlying issue has been resolved in Spigot.
+				Log.debug("Failed to spawn shopkeeper " + shopkeeper.getId() + " at " + shopkeeper.getPositionString());
 			}
 		} else {
 			Log.debug(DebugOptions.shopkeeperActivation, () -> "Skipping spawning of shopkeeper " + shopkeeper.getId()

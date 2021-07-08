@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.13.3 (TBA)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
+* Fixed: There is an open Spigot 1.17 issue that sometimes causes the plugin to assume that it failed to spawn shopkeepers during chunk loads. In v2.13.1, we already turned a warning message related to this to a debug message in order to not spam the server log with warnings. But another message was missed and has now been turned into a debug message as well.
 
 ## v2.13.2 (2021-07-08)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
