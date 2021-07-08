@@ -1,11 +1,11 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.13.3 (TBA)
+## v2.13.3 (2021-07-08)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
 * Fixed: The 'style' property of horse shopkeepers was not getting saved anymore since v2.13.0 and caused migration warnings whenever the plugin attempted to load or save it. If you already upgraded, and don't have a backup of your save.yml file available, or don't want to revert to the backup's state, you may have to freshly edit the 'style' of your horse shopkeepers again.
-* Fixed: There is an open Spigot 1.17 issue that sometimes causes the plugin to assume that it failed to spawn shopkeepers during chunk loads. In v2.13.1, we already turned a warning message related to this to a debug message in order to not spam the server log with warnings. But another message was missed and has now been turned into a debug message as well.
+* Fixed: There is an open Spigot 1.17 issue that sometimes causes the plugin to assume that it failed to spawn shopkeepers during chunk loads. In v2.13.1, we already turned a warning message related to this into a debug message in order to not spam the server log with warnings. But another message was missed and has now been turned into a debug message as well.
 
 ## v2.13.2 (2021-07-08)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
