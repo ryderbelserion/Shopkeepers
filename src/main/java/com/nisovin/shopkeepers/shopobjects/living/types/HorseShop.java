@@ -72,7 +72,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	public void save(ConfigurationSection configSection) {
 		super.save(configSection);
 		colorProperty.save(configSection);
-		styleProperty.load(configSection);
+		styleProperty.save(configSection);
 		armorProperty.save(configSection);
 	}
 
