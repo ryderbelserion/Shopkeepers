@@ -18,6 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.api.user.User;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.compat.NMSManager;
@@ -84,6 +85,10 @@ public class TextUtils {
 
 	public static String getPlayerString(Player player) {
 		return getPlayerString(player.getName(), player.getUniqueId());
+	}
+
+	public static String getPlayerString(User user) {
+		return getPlayerString(user.getName(), user.getUniqueId());
 	}
 
 	public static String getPlayerString(String playerName, UUID playerUUID) {
