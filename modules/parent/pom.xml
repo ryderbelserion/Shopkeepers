@@ -1,11 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.nisovin.shopkeepers</groupId>
 	<artifactId>sk-parent</artifactId>
 	<packaging>pom</packaging>
-	<name>SK Parent</name>
+	<name>Shopkeepers Parent</name>
 	<version>${revision}</version>
 	<url>${shopkeepers.repository.url}</url>
 
@@ -57,9 +58,8 @@
 
 	<build>
 		<!-- Common plugin configuration -->
-		<!-- Default lifecycle bindings, that can be omitted in childs:
-		http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Built-in_Lifecycle_Bindings
-		-->
+		<!-- Default lifecycle bindings that can be omitted in childs: -->
+		<!-- http://maven.apache.org/guides/introduction/introduction-to-the-lifecycle.html#Built-in_Lifecycle_Bindings -->
 		<pluginManagement>
 			<plugins>
 				<plugin>
@@ -114,6 +114,7 @@
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>2.12.4</version>
 					<configuration>
+						<workingDirectory>target/test-output</workingDirectory>
 						<includes>
 							<include>**/Test*.java</include>
 							<include>**/*Test.java</include>
@@ -172,9 +173,8 @@
 				<version>1.14.4-R0.1-SNAPSHOT</version>
 				<scope>provided</scope>
 			</dependency>
-			<!-- Corresponding CraftBukkit version. Only required for testing.
-			Individual NMS modules can use more specific/later CraftBukkit versions.
-			-->
+			<!-- Corresponding CraftBukkit version. Only required for testing. Individual 
+				NMS modules can use more specific/later CraftBukkit versions. -->
 			<dependency>
 				<groupId>org.bukkit</groupId>
 				<artifactId>craftbukkit</artifactId>

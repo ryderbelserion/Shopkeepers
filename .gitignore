@@ -6,7 +6,6 @@
 .metadata
 bin/
 target/
-target-eclipse/
 tmp/
 *.tmp
 *.bak

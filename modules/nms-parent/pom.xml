@@ -11,7 +11,7 @@
 	</parent>
 	<artifactId>sk-nms-parent</artifactId>
 	<packaging>pom</packaging>
-	<name>SK NMS Parent</name>
+	<name>Shopkeepers NMS Parent</name>
 
 	<properties>
 		<!-- This needs to be specified by the child modules -->

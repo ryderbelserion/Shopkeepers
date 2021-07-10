@@ -11,7 +11,7 @@
 	</parent>
 	<artifactId>sk-v1_17_R1</artifactId>
 	<packaging>jar</packaging>
-	<name>SK for v1_17_R1</name>
+	<name>Shopkeepers v1_17_R1</name>
 
 	<properties>
 		<craftbukkit.version>1.17-R0.1-SNAPSHOT</craftbukkit.version>

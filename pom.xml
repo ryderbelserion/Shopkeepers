@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
@@ -10,7 +11,7 @@
 	</parent>
 	<artifactId>sk-root</artifactId>
 	<packaging>pom</packaging>
-	<name>SK Root</name>
+	<name>Shopkeepers Root</name>
 	<url>${shopkeepers.repository.url}</url>
 
 	<scm>
@@ -70,127 +71,4 @@
 		<module>modules/v1_17_R2</module>
 		<module>modules/dist</module>
 	</modules>
-
-	<repositories>
-		<repository>
-			<id>sk89q-repo</id>
-			<url>http://maven.sk89q.com/repo/</url>
-		</repository>
-		<!-- WorldGuard/Edit transitively requires paper dependencies -->
-		<repository>
-			<id>paper-repo</id>
-			<url>https://papermc.io/repo/repository/maven-public/</url>
-		</repository>
-		<repository>
-			<name>Citizens2 repository</name>
-			<id>everything</id>
-			<url>http://repo.citizensnpcs.co</url>
-		</repository>
-		<repository>
-			<id>vault-repo</id>
-			<url>http://nexus.hc.to/content/repositories/pub_releases</url>
-		</repository>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-		<repository>
-			<id>bstats-repo</id>
-			<url>https://repo.codemc.org/repository/maven-public</url>
-		</repository>
-	</repositories>
-
-	<!-- Main dependencies, placed in this parent so that the root eclipse project finds them -->
-	<dependencies>
-		<!-- Includes Bukkit, required for Spigot-specific (optional) features -->
-		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>craftbukkit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.hamcrest</groupId>
-			<artifactId>hamcrest-library</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sk89q.worldguard</groupId>
-			<artifactId>worldguard-legacy</artifactId>
-			<version>7.0.0-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.github.TownyAdvanced</groupId>
-			<artifactId>Towny</artifactId>
-			<version>0.96.2.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.citizensnpcs</groupId>
-			<artifactId>citizens</artifactId>
-			<version>2.0.28-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.milkbowl.vault</groupId>
-			<artifactId>VaultAPI</artifactId>
-			<version>1.6</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.bstats</groupId>
-			<artifactId>bstats-bukkit</artifactId>
-			<version>1.5</version>
-			<scope>compile</scope>
-		</dependency>
-	</dependencies>
-
-	<!-- Also compile at root to avoid some issues in Eclipse -->
-	<build>
-		<sourceDirectory>src/main/java</sourceDirectory>
-		<testSourceDirectory>src/test/java</testSourceDirectory>
-		<plugins>
-			<!-- Manually add sources of dependencies -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>add-additional-sources</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>src/api/java</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>compile</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
 </project>

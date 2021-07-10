@@ -1,16 +1,53 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>com.nisovin.shopkeepers</groupId>
-		<artifactId>sk-root</artifactId>
+		<artifactId>sk-parent</artifactId>
 		<version>${revision}</version>
-		<relativePath>../../</relativePath>
+		<relativePath>../parent/</relativePath>
 	</parent>
 	<artifactId>sk-main</artifactId>
 	<packaging>jar</packaging>
-	<name>SK Main</name>
+	<name>Shopkeepers Main</name>
+	<url>${shopkeepers.repository.url}</url>
+
+	<scm>
+		<connection>${shopkeepers.repository.connection}</connection>
+		<developerConnection>${shopkeepers.repository.developerConnection}</developerConnection>
+		<url>${shopkeepers.repository.url}</url>
+	</scm>
+
+	<repositories>
+		<repository>
+			<id>sk89q-repo</id>
+			<url>http://maven.sk89q.com/repo/</url>
+		</repository>
+		<!-- WorldGuard/Edit transitively requires paper dependencies -->
+		<repository>
+			<id>paper-repo</id>
+			<url>https://papermc.io/repo/repository/maven-public/</url>
+		</repository>
+		<repository>
+			<name>Citizens2 repository</name>
+			<id>everything</id>
+			<url>http://repo.citizensnpcs.co</url>
+		</repository>
+		<repository>
+			<id>vault-repo</id>
+			<url>http://nexus.hc.to/content/repositories/pub_releases</url>
+		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+		<repository>
+			<id>bstats-repo</id>
+			<url>https://repo.codemc.org/repository/maven-public</url>
+		</repository>
+	</repositories>
 
 	<dependencies>
 		<dependency>
@@ -20,19 +57,64 @@
 			<type>jar</type>
 			<scope>compile</scope>
 		</dependency>
+		<!-- Includes Bukkit, required for Spigot-specific (optional) features -->
+		<dependency>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.bukkit</groupId>
+			<artifactId>craftbukkit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-library</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.sk89q.worldguard</groupId>
+			<artifactId>worldguard-legacy</artifactId>
+			<version>7.0.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.github.TownyAdvanced</groupId>
+			<artifactId>Towny</artifactId>
+			<version>0.96.2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.citizensnpcs</groupId>
+			<artifactId>citizens</artifactId>
+			<version>2.0.28-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.milkbowl.vault</groupId>
+			<artifactId>VaultAPI</artifactId>
+			<version>1.6</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bstats</groupId>
+			<artifactId>bstats-bukkit</artifactId>
+			<version>1.5</version>
+			<scope>compile</scope>
+		</dependency>
 	</dependencies>
 
 	<build>
-		<sourceDirectory>target/filtered-sources/java</sourceDirectory>
-		<testSourceDirectory>${root.relativePath}/src/test/java</testSourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
 		<resources>
 			<resource>
-				<directory>${root.relativePath}/src/main/java</directory>
-				<targetPath>../filtered-sources/java</targetPath>
-				<filtering>true</filtering>
-			</resource>
-			<resource>
-				<directory>${root.relativePath}/src/main/resources</directory>
+				<directory>src/main/resources</directory>
 				<filtering>true</filtering>
 			</resource>
 			<resource>
@@ -45,21 +127,9 @@
 
 		<plugins>
 			<plugin>
-				<!-- Disable this parent plugin here -->
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>add-additional-sources</id>
-						<phase>none</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration>
-					<workingDirectory>target/test-server</workingDirectory>
 					<excludes>
 						<exclude>com/nisovin/shopkeepers/PerformanceTests.java</exclude>
 					</excludes>
