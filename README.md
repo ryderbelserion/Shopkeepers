@@ -5,7 +5,7 @@
 Shopkeepers [![Build Status](https://github.com/Shopkeepers/Shopkeepers/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/Shopkeepers/Shopkeepers/actions/workflows/build.yml)
 ===========
 
-Shopkeepers is a Bukkit plugin which allows you to set up custom villager shopkeepers that sell exactly what you want them to sell and for what price. 
+Shopkeepers is a Bukkit/[Spigot](https://www.spigotmc.org/wiki/spigot/) plugin that allows you to set up custom villager shopkeepers that sell exactly what you want them to sell and for what price. 
 You can set up admin shops, which have infinite supply, and you can also set up player shops, which pull supply from a container.
 
 **BukkitDev Page**: https://dev.bukkit.org/projects/shopkeepers  
@@ -18,33 +18,37 @@ You can set up admin shops, which have infinite supply, and you can also set up 
 Maven repository for releases: https://nexus.lichtspiele.org/repository/releases/  
 Maven repository for dev builds (snapshots): https://nexus.lichtspiele.org/repository/snapshots/  
 
-If the above Maven repository is not available, you can also use Jitpack: https://jitpack.io/#Shopkeepers/Shopkeepers/  
+If the above Maven repository is currently not available, you can also use Jitpack: https://jitpack.io/#Shopkeepers/Shopkeepers/  
 Maven Jitpack snapshots: https://jitpack.io/#Shopkeepers/Shopkeepers/master-SNAPSHOT  
+
+Cloning and Building
+----------------
+
+This section assumes that you have [Git](https://git-scm.com/) installed.
+
+We use Maven to compile and build the plugin. This repository comes with bash scripts to automatically install the required version of Maven, build the required [Spigot](https://www.spigotmc.org/wiki/spigot/) dependencies, and then use Maven to build Shopkeepers and produce a plugin and an API jar. To build Shopkeepers, just execute the following commands from within a bash console. If you are on Windows, you can install [Git-for-Windows](https://gitforwindows.org/) and then execute these commands from within the "Git Bash".
+
+```
+git clone https://github.com/Shopkeepers/Shopkeepers.git
+cd Shopkeepers
+./installSpigotDependencies.sh
+./build.sh
+```
+
+If everything went well, the `target` folder will contain a plugin jar that you can install on your server, as well as an API jar that can be used to by other plugin developers to develop addons.
 
 Pull Requests & Contributing
 ----------
 
-See [Contributing](CONTRIBUTING.md)
+To import the project into your favorite Java IDE, refer to your IDE's respective documentation on how to import Maven projects. For example, in Eclipse you can find this under **Import > Maven > Existing Maven Projects**. Select the root Shopkeepers folder and import all the Maven projects found by Eclipse.
 
-Build with Maven
-----------------
+The `root` project contains several module projects. The most important ones are:
+* `main`: This contains the core plugin code.
+* `api`: This contains all API code.
+* And several modules for the NMS / CraftBukkit version specific code of the supported server versions.
 
-This is the recommended and easy way to compile the plugin yourself and/or help to contribute to it.  
-Just check out the project to your machine and import it in Eclipse with **Import > Maven > Existing Maven Project**.  
-Then make sure that you have all Spigot and CraftBukkit dependencies installed in your local Maven repository. The simplest way to do this is to run the included **./installSpigotDependencies.sh** script.  
-Afterwards just right click the imported project and select **Run As > Maven install**.
+Shopkeepers requires serveral Spigot and CraftBukkit dependencies. The easiest way to automatically build and install these dependencies into your local Maven repository is to run the included `./installSpigotDependencies.sh` script.
 
-Build without Maven
--------------------
+To then build the project from within your IDE, refer to your IDE's respective documentation on how to build Maven projects. For Eclipse, right click the root project and select **Run As > Maven install**. We require Java 16 to build.
 
-If you really want to do it the old school way, you're free to import the project in Eclipse with **Import > General > Existing Project into Workspace**. You'll find that the project will instantly show some errors because it's missing its dependencies. You also need to make sure that you'll include the provided modules (NMSHandlers).
-
-**Here's how you do that:**
-* After importing the project right click on it and select **Properties**
-* Under **Java Build Path > Source** click on **Add Folder...** and add all provided modules:
-  * modules/v1_6_R3/src/main/java
-  * modules/v1_7_R1/src/main/java
-  * ...
-* Under **Java Build Path > Library** click on **Add External JARs...** and add the needed Spigot.jar files for the modules above. Information on how to get them: https://www.spigotmc.org/wiki/spigot/
-* After that you can create the plugin for example by right-clicking the project and selecting **Export > Java > JAR file** or another recommended way.
-
+For more information on creating pull requests and contributing code to the project see [Contributing](CONTRIBUTING.md).
