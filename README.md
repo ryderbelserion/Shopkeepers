@@ -9,6 +9,7 @@ Shopkeepers is a Bukkit/[Spigot](https://www.spigotmc.org/wiki/spigot/) plugin t
 You can set up admin shops, which have infinite supply, and you can also set up player shops, which pull supply from a container.
 
 **BukkitDev Page**: https://dev.bukkit.org/projects/shopkeepers  
+**Spigot Page**: https://www.spigotmc.org/resources/shopkeepers.80756/  
 **Wiki**: https://github.com/Shopkeepers/Shopkeepers-Wiki/wiki  
 **Translations** : https://github.com/Shopkeepers/Translations/  
 **Issue Tracker**: https://github.com/Shopkeepers/Shopkeepers/issues  
