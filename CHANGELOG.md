@@ -9,6 +9,7 @@ Date format: (YYYY-MM-DD)
 * Internal: Refactors related to the removal of shopkeepers of inactive players. Also, when shopkeepers of inactive players were removed, we immediately trigger a save now, even if the 'save-instantly' setting is disabled.
 * Internal: Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
 * Build: Removed the unused jenkins and release build profiles from Maven.
+* Build: All external Maven repositories are accessed via https now.
 
 ## v2.13.3 (2021-07-08)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
