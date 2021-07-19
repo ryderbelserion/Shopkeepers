@@ -10,6 +10,7 @@ Date format: (YYYY-MM-DD)
 * Internal: Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
 * Build: Removed the unused jenkins and release build profiles from Maven.
 * Build: All external Maven repositories are accessed via https now.
+* Build: Bumped the Vault dependency to version 1.7 and updated its repository.
 
 ## v2.13.3 (2021-07-08)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
