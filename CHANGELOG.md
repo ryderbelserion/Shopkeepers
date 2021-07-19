@@ -12,6 +12,7 @@ Date format: (YYYY-MM-DD)
 * Build: All external Maven repositories are accessed via https now.
 * Build: Bumped the Vault dependency to version 1.7 and updated its repository.
 * Build: Reduced the Citizens dependency to the 'citizens-main' portion of Citizens.
+* Build: Bumped the WorldGuard dependency to 7.0.0, updated the repository, and removed the no longer needed Paper repository.
 
 ## v2.13.3 (2021-07-08)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
