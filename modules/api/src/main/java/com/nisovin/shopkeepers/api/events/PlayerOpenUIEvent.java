@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.api.events;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -22,7 +23,19 @@ public class PlayerOpenUIEvent extends Event implements Cancellable {
 	private final boolean silentRequest;
 	private boolean cancelled = false;
 
+	/**
+	 * Creates a new {@link PlayerOpenUIEvent}.
+	 * 
+	 * @param uiType
+	 *            the UI type, not <code>null</code>
+	 * @param player
+	 *            the player, not <code>null</code>
+	 * @param silentRequest
+	 *            <code>true</code> if this is a silent UI request
+	 */
 	public PlayerOpenUIEvent(UIType uiType, Player player, boolean silentRequest) {
+		Validate.notNull(uiType, "uiType");
+		Validate.notNull(player, "player");
 		this.uiType = uiType;
 		this.player = player;
 		this.silentRequest = silentRequest;
@@ -85,6 +98,11 @@ public class PlayerOpenUIEvent extends Event implements Cancellable {
 		return handlers;
 	}
 
+	/**
+	 * Gets the {@link HandlerList} of this event.
+	 * 
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}

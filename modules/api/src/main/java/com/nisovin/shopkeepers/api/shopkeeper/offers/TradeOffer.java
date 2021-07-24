@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 /**
  * Stores information about one or two item stacks being traded for another item stack.
  * <p>
- * Instances of this are immutable. They can be created via {@link #createTradeOffer(ItemStack, ItemStack, ItemStack)}.
+ * Instances of this are immutable. They can be created via {@link #create(ItemStack, ItemStack, ItemStack)}.
  */
 public interface TradeOffer {
 

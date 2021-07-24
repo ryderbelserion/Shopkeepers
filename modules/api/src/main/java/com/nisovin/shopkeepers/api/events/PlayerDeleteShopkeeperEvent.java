@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.api.events;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -20,8 +21,17 @@ public class PlayerDeleteShopkeeperEvent extends ShopkeeperEvent implements Canc
 	private final Player player;
 	private boolean cancelled = false;
 
+	/**
+	 * Creates a new {@link PlayerDeleteShopkeeperEvent}.
+	 * 
+	 * @param shopkeeper
+	 *            the shopkeeper, not <code>null</code>
+	 * @param player
+	 *            the player, not <code>null</code>
+	 */
 	public PlayerDeleteShopkeeperEvent(Shopkeeper shopkeeper, Player player) {
 		super(shopkeeper);
+		Validate.notNull(player, "player");
 		this.player = player;
 	}
 
@@ -57,6 +67,11 @@ public class PlayerDeleteShopkeeperEvent extends ShopkeeperEvent implements Canc
 		return handlers;
 	}
 
+	/**
+	 * Gets the {@link HandlerList} of this event.
+	 * 
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}

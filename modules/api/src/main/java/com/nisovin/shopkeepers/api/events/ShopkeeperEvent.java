@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.api.events;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.event.Event;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -13,7 +14,14 @@ public abstract class ShopkeeperEvent extends Event {
 
 	protected final Shopkeeper shopkeeper;
 
-	public ShopkeeperEvent(Shopkeeper shopkeeper) {
+	/**
+	 * Creates a new {@link ShopkeeperEvent}.
+	 * 
+	 * @param shopkeeper
+	 *            the shopkeeper, not <code>null</code>
+	 */
+	protected ShopkeeperEvent(Shopkeeper shopkeeper) {
+		Validate.notNull(shopkeeper, "shopkeeper");
 		this.shopkeeper = shopkeeper;
 	}
 

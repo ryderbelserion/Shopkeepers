@@ -8,7 +8,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 /**
  * Stores information about an item stack being sold or bought for a certain price.
  * <p>
- * Instances of this are immutable. They can be created via {@link #createPriceOffer(ItemStack, int)}.
+ * Instances of this are immutable. They can be created via {@link #create(ItemStack, int)}.
  */
 public interface PriceOffer {
 

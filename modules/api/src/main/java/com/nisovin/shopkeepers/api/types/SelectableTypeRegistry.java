@@ -2,35 +2,64 @@ package com.nisovin.shopkeepers.api.types;
 
 import org.bukkit.entity.Player;
 
+/**
+ * A {@link TypeRegistry} that keeps track of {@link SelectableType SelectableTypes} and the selections of players.
+ *
+ * @param <T>
+ *            the type of {@link SelectableType} that is managed by this registry
+ */
 public interface SelectableTypeRegistry<T extends SelectableType> extends TypeRegistry<T> {
 
 	// SELECTION MANAGEMENT
 
 	/**
-	 * Gets the first select-able type for this player, starting at the default one.
+	 * Gets the first select-able type for the given player, starting at the default one.
 	 * 
 	 * @param player
-	 *            a player
-	 * @return the first select-able type for this player, or <code>null</code> if this player can't select or use any
-	 *         type at all
+	 *            the player, not <code>null</code>
+	 * @return the first select-able type for the given player, or <code>null</code> if the player cannot select any of
+	 *         the registered types
 	 */
 	public T getDefaultSelection(Player player);
 
 	/**
-	 * Gets the first select-able type for this player, starting at the currently selected one.
+	 * Gets the first select-able type for the given player, starting at the currently selected one.
 	 * 
 	 * @param player
-	 *            the player
-	 * @return the first select-able type for this player, or <code>null</code> if this player can't select or use any
-	 *         type at all
+	 *            the player, not <code>null</code>
+	 * @return the first select-able type for the given player, or <code>null</code> if the player cannot select any of
+	 *         the registered types
 	 */
 	public T getSelection(Player player);
 
+	/**
+	 * Modifies the given player's current selection to select the next type.
+	 * 
+	 * @param player
+	 *            the player, not <code>null</code>
+	 * @return the player's new selection, or <code>null</code> if the player cannot select any of the registered types
+	 */
 	public T selectNext(Player player);
 
+	/**
+	 * Modifies the given player's current selection to select the previous type.
+	 * 
+	 * @param player
+	 *            the player, not <code>null</code>
+	 * @return the player's new selection, or <code>null</code> if the player cannot select any of the registered types
+	 */
 	public T selectPrevious(Player player);
 
+	/**
+	 * Clears the given player's current selection.
+	 * 
+	 * @param player
+	 *            the player, not <code>null</code>
+	 */
 	public void clearSelection(Player player);
 
+	/**
+	 * Clears the current selections of all players.
+	 */
 	public void clearAllSelections();
 }

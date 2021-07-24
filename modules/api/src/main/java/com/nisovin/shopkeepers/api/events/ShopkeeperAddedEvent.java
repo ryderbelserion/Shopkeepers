@@ -15,22 +15,33 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
  */
 public class ShopkeeperAddedEvent extends ShopkeeperEvent {
 
+	/**
+	 * Indicates the cause of why a shopkeeper is added to the {@link ShopkeeperRegistry}.
+	 */
 	public enum Cause {
 		/**
-		 * The shopkeeper got freshly created.
+		 * The shopkeeper was freshly created.
 		 */
 		CREATED,
 		/**
-		 * The shopkeeper got loaded from the storage.
+		 * The shopkeeper was loaded from the storage.
 		 */
 		LOADED;
 	}
 
 	private final Cause cause;
 
+	/**
+	 * Creates a new {@link ShopkeeperAddedEvent}.
+	 * 
+	 * @param shopkeeper
+	 *            the shopkeeper, not <code>null</code>
+	 * @param cause
+	 *            the cause, not <code>null</code>
+	 */
 	public ShopkeeperAddedEvent(Shopkeeper shopkeeper, Cause cause) {
 		super(shopkeeper);
-		Validate.notNull(cause, "Cause is null!");
+		Validate.notNull(cause, "cause");
 		this.cause = cause;
 	}
 
@@ -50,6 +61,11 @@ public class ShopkeeperAddedEvent extends ShopkeeperEvent {
 		return handlers;
 	}
 
+	/**
+	 * Gets the {@link HandlerList} of this event.
+	 * 
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}

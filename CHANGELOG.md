@@ -6,7 +6,13 @@ Date format: (YYYY-MM-DD)
 
 * API: Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
 * API: Added User interface to represent players that the plugin knows about. However, this is not yet used throughout the API.
+* API: Various Javadoc additions, improvements, and fixes.
+* API: Deprecated DefaultShopTypes#getAdminShopType() and #ADMIN(), and added #getRegularAdminShopType() and #ADMIN_REGULAR() as alternatives.
+* API: Deprecated the previous constructors and factory methods of AdminShopCreationData and PlayerShopCreationData, and added corresponding alternatives that directly require an AdminShopType or PlayerShopType respectively.
+* API: Deprecated the superfluous LivingShopObjectTypes#getAliases(EntityType).
 * Internal: Refactors related to the removal of shopkeepers of inactive players. Also, when shopkeepers of inactive players were removed, we immediately trigger a save now, even if the 'save-instantly' setting is disabled.
+* Internal: Added validation for some constructor and method arguments in the API.
+* Internal: APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
 * Internal: Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
 * Build: Removed the unused jenkins and release build profiles from Maven.
 * Build: All external Maven repositories are accessed via https now.

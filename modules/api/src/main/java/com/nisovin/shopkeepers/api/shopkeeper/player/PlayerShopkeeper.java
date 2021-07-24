@@ -19,10 +19,18 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	 * Sets the owner of this shop.
 	 * 
 	 * @param player
-	 *            the owner of this shop
+	 *            the owner of this shop, not <code>null</code>
 	 */
 	public void setOwner(Player player);
 
+	/**
+	 * Sets the owner of this shop.
+	 * 
+	 * @param ownerUUID
+	 *            the owner's uuid, not <code>null</code>
+	 * @param ownerName
+	 *            the owner's name, not <code>null</code> or empty
+	 */
 	public void setOwner(UUID ownerUUID, String ownerName);
 
 	/**
@@ -135,23 +143,32 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	public int getChestZ();
 
 	/**
+	 * Sets the container's coordinates.
+	 * 
 	 * @param containerX
+	 *            the container's x coordinate
 	 * @param containerY
+	 *            the container's y coordinate
 	 * @param containerZ
+	 *            the container's z coordinate
 	 * @deprecated Use {@link #setContainer(int, int, int)}
 	 */
 	public void setChest(int containerX, int containerY, int containerZ);
 
 	/**
+	 * Gets the chest block.
 	 * 
-	 * @return
+	 * @return the chest block
 	 * @deprecated Use {@link #getContainer()}
 	 */
 	public Block getChest();
 
 	/**
+	 * Gets the amount of currency stored inside the shop's container.
+	 * <p>
+	 * Returns <code>0</code> if the container does not exist currently.
 	 * 
-	 * @return
+	 * @return the amount of currency inside the shop's container
 	 * @deprecated Use {@link #getCurrencyInContainer()}
 	 */
 	public int getCurrencyInChest();
@@ -177,6 +194,16 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	 */
 	public int getContainerZ();
 
+	/**
+	 * Sets the container's coordinates.
+	 * 
+	 * @param containerX
+	 *            the container's x coordinate
+	 * @param containerY
+	 *            the container's y coordinate
+	 * @param containerZ
+	 *            the container's z coordinate
+	 */
 	public void setContainer(int containerX, int containerY, int containerZ);
 
 	/**

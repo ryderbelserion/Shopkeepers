@@ -4,9 +4,15 @@ import java.util.List;
 
 import com.nisovin.shopkeepers.api.types.SelectableType;
 
+/**
+ * Information and logic that is common to all shopkeepers of this shop type.
+ * 
+ * @param <T>
+ *            the type of shopkeeper that is described by this shop type
+ */
 public interface ShopType<T extends Shopkeeper> extends SelectableType {
 
-	// override to enforce that each subtype actually specifies a non-default display name
+	// Override to enforce that each subtype actually specifies a non-default display name.
 	@Override
 	public abstract String getDisplayName();
 

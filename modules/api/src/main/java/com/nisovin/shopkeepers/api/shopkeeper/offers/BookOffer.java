@@ -7,7 +7,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
  * <p>
  * Books are identified solely based on their title.
  * <p>
- * Instances of this are immutable. They can be created via {@link #createBookOffer(String, int)}.
+ * Instances of this are immutable. They can be created via {@link #create(String, int)}.
  */
 public interface BookOffer {
 

@@ -4,6 +4,9 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
+/**
+ * Represents the UI session of a player for as long as the player has the UI open.
+ */
 public interface UISession {
 
 	/**

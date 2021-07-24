@@ -20,6 +20,11 @@ import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
+/**
+ * Convenient static accessors to the methods of {@link ShopkeepersPlugin}.
+ * <p>
+ * These accessors can only be used while the API is enabled.
+ */
 public final class ShopkeepersAPI {
 
 	private ShopkeepersAPI() {
@@ -27,6 +32,13 @@ public final class ShopkeepersAPI {
 
 	private static ShopkeepersPlugin plugin = null;
 
+	/**
+	 * Enables the Shopkeepers API.
+	 * 
+	 * @param plugin
+	 *            the plugin instance
+	 * @deprecated For internal use only
+	 */
 	public static void enable(ShopkeepersPlugin plugin) {
 		Validate.notNull(plugin, "Plugin is null!");
 		if (ShopkeepersAPI.plugin != null) {
@@ -35,6 +47,11 @@ public final class ShopkeepersAPI {
 		ShopkeepersAPI.plugin = plugin;
 	}
 
+	/**
+	 * Disables the Shopkeepers API.
+	 * 
+	 * @deprecated For internal use only
+	 */
 	public static void disable() {
 		if (ShopkeepersAPI.plugin == null) {
 			throw new IllegalStateException("API is already disabled!");
@@ -55,6 +72,13 @@ public final class ShopkeepersAPI {
 		return (plugin != null);
 	}
 
+	/**
+	 * Gets the {@link ShopkeepersPlugin} instance.
+	 * 
+	 * @return the plugin instance, not <code>null</code>
+	 * @throws IllegalStateException
+	 *             if the API is not enabled currently, eg. because the plugin is not enabled currently
+	 */
 	public static ShopkeepersPlugin getPlugin() {
 		if (plugin == null) {
 			throw new IllegalStateException("API is not enabled!");
@@ -70,6 +94,7 @@ public final class ShopkeepersAPI {
 	 * @param player
 	 *            the player
 	 * @return <code>false</code> if he cannot create shops at all, <code>true</code> otherwise
+	 * @see ShopkeepersPlugin#hasCreatePermission(Player)
 	 */
 	public static boolean hasCreatePermission(Player player) {
 		return getPlugin().hasCreatePermission(player);
@@ -77,35 +102,78 @@ public final class ShopkeepersAPI {
 
 	// SHOP TYPES
 
+	/**
+	 * Gets the {@link ShopTypesRegistry}.
+	 * 
+	 * @return the shop types registry
+	 * @see ShopkeepersPlugin#getShopTypeRegistry()
+	 */
 	public static ShopTypesRegistry<?> getShopTypeRegistry() {
 		return getPlugin().getShopTypeRegistry();
 	}
 
+	/**
+	 * Gets the {@link DefaultShopTypes}.
+	 * 
+	 * @return the default shop types
+	 * @see ShopkeepersPlugin#getDefaultShopTypes()
+	 */
 	public static DefaultShopTypes getDefaultShopTypes() {
 		return getPlugin().getDefaultShopTypes();
 	}
 
 	// SHOP OBJECT TYPES
 
+	/**
+	 * Gets the {@link ShopObjectTypesRegistry}.
+	 * 
+	 * @return the shop object types registry
+	 * @see ShopkeepersPlugin#getShopObjectTypeRegistry()
+	 */
 	public static ShopObjectTypesRegistry<?> getShopObjectTypeRegistry() {
 		return getPlugin().getShopObjectTypeRegistry();
 	}
 
+	/**
+	 * Gets the {@link DefaultShopObjectTypes}.
+	 * 
+	 * @return the default shop object types
+	 * @see ShopkeepersPlugin#getDefaultShopObjectTypes()
+	 */
 	public static DefaultShopObjectTypes getDefaultShopObjectTypes() {
 		return getPlugin().getDefaultShopObjectTypes();
 	}
+
 	// UI
 
+	/**
+	 * Gets the {@link UIRegistry}.
+	 * 
+	 * @return the UI registry
+	 * @see ShopkeepersPlugin#getUIRegistry()
+	 */
 	public static UIRegistry<?> getUIRegistry() {
 		return getPlugin().getUIRegistry();
 	}
 
+	/**
+	 * Gets the {@link DefaultUITypes}.
+	 * 
+	 * @return the default UI types
+	 * @see ShopkeepersPlugin#getDefaultUITypes()
+	 */
 	public static DefaultUITypes getDefaultUITypes() {
 		return getPlugin().getDefaultUITypes();
 	}
 
 	// SHOPKEEPER REGISTRY
 
+	/**
+	 * Gets the {@link ShopkeeperRegistry}.
+	 * 
+	 * @return the shopkeeper registry
+	 * @see ShopkeepersPlugin#getShopkeeperRegistry()
+	 */
 	public static ShopkeeperRegistry getShopkeeperRegistry() {
 		return getPlugin().getShopkeeperRegistry();
 	}
@@ -116,6 +184,7 @@ public final class ShopkeepersAPI {
 	 * Gets the {@link ShopkeeperStorage}.
 	 * 
 	 * @return the shopkeeper storage
+	 * @see ShopkeepersPlugin#getShopkeeperStorage()
 	 */
 	public static ShopkeeperStorage getShopkeeperStorage() {
 		return getPlugin().getShopkeeperStorage();
@@ -133,6 +202,7 @@ public final class ShopkeepersAPI {
 	 *            the shop creation data containing the necessary arguments (spawn location, object type, etc.) for
 	 *            creating this shopkeeper
 	 * @return the new shopkeeper, or <code>null</code> if the creation wasn't successful for some reason
+	 * @see ShopkeepersPlugin#handleShopkeeperCreation(ShopCreationData)
 	 */
 	public static Shopkeeper handleShopkeeperCreation(ShopCreationData shopCreationData) {
 		return getPlugin().handleShopkeeperCreation(shopCreationData);

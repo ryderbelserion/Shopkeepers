@@ -19,13 +19,13 @@ import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
  * Before evaluating the fallback, the context gets reset to the original state from before the parsing of this command
  * argument. If the parsing of the following command arguments succeeds, the parsing of the fallback gets invoked with
  * no remaining input arguments. If the parsing of the following command arguments fails, the arguments reader gets
- * reset to the original state before evaluating the fallback.</br>
+ * reset to the original state before evaluating the fallback.<br>
  * If the fallback succeeds and consumes arguments, the parsing restarts from there with the next command argument. If
  * the fallback succeeds but no arguments were consumed, any context changes from parsing the following command
  * arguments get applied and then the parsing either ends (either successfully, or with the parsing error from before
- * the fallback evaluation) or any other pending fallback gets evaluated.</br>
+ * the fallback evaluation) or any other pending fallback gets evaluated.<br>
  * If the fallback fails, the fallback's parsing error gets used and then parsing either ends with that error or any
- * other pending fallback gets evaluated.</br>
+ * other pending fallback gets evaluated.<br>
  * If there are remaining unparsed arguments after the fallback got evaluated (regardless of whether it failed or
  * succeeded), the original parsing error of this command argument is used and parsing either fails with that error or
  * any other pending fallback gets evaluated.

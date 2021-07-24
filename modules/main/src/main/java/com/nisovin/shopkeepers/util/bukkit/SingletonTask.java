@@ -188,7 +188,7 @@ public abstract class SingletonTask {
 	 * or {@link #syncCallback()}.
 	 */
 	/*
-	 * Implementation notes:</br>
+	 * Implementation notes:<br>
 	 * If an async execution has already been scheduled, but not yet started, the async execution is cancelled and then
 	 * run synchronously. This is because the Bukkit scheduler starts async tasks from within the main thread, which we
 	 * are blocking currently. Also note: We do not skip the execution in this case in order to ensure that progress

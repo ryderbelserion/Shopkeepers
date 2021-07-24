@@ -22,6 +22,9 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
  */
 public class ShopkeepersStartupEvent extends Event {
 
+	/**
+	 * Creates a new {@link ShopkeepersStartupEvent}.
+	 */
 	public ShopkeepersStartupEvent() {
 	}
 
@@ -32,6 +35,11 @@ public class ShopkeepersStartupEvent extends Event {
 		return handlers;
 	}
 
+	/**
+	 * Gets the {@link HandlerList} of this event.
+	 * 
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}

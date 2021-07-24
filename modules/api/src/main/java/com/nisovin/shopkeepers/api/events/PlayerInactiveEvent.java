@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.api.events;
 
 import java.util.Collection;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -12,6 +13,7 @@ import com.nisovin.shopkeepers.api.user.User;
 /**
  * This event is called whenever a player is detected to be inactive and their {@link PlayerShopkeeper
  * shopkeepers} are about to be deleted.
+ * TODO Rename UserInactiveEvent?
  */
 public class PlayerInactiveEvent extends Event implements Cancellable {
 
@@ -19,7 +21,17 @@ public class PlayerInactiveEvent extends Event implements Cancellable {
 	private final Collection<? extends PlayerShopkeeper> shopkeepers;
 	private boolean cancelled = false;
 
+	/**
+	 * Creates a new {@link PlayerInactiveEvent}.
+	 * 
+	 * @param user
+	 *            the inactive user, not <code>null</code>
+	 * @param shopkeepers
+	 *            the user's owned shopkeepers that are about to be deleted, not <code>null</code> but can be empty
+	 */
 	public PlayerInactiveEvent(User user, Collection<? extends PlayerShopkeeper> shopkeepers) {
+		Validate.notNull(user, "user");
+		Validate.notNull(shopkeepers, "shopkeepers");
 		this.user = user;
 		this.shopkeepers = shopkeepers;
 	}
@@ -39,7 +51,7 @@ public class PlayerInactiveEvent extends Event implements Cancellable {
 	 * The returned collection is modifiable: Removing shopkeepers from it will skip their deletion. Adding shopkeepers
 	 * to the list is not supported.
 	 * 
-	 * @return the shopkeepers that are about to be deleted
+	 * @return the shopkeepers that are about to be deleted, not <code>null</code> but may be empty
 	 */
 	public Collection<? extends PlayerShopkeeper> getShopkeepers() {
 		return shopkeepers;
@@ -68,6 +80,11 @@ public class PlayerInactiveEvent extends Event implements Cancellable {
 		return handlers;
 	}
 
+	/**
+	 * Gets the {@link HandlerList} of this event.
+	 * 
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}

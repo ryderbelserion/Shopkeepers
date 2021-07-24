@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.api.events;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -14,6 +15,9 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
  */
 public class ShopkeeperRemoveEvent extends ShopkeeperEvent {
 
+	/**
+	 * Indicates the cause of why a shopkeeper is being removed from the {@link ShopkeeperRegistry}.
+	 */
 	public enum Cause {
 		/**
 		 * The shopkeeper gets permanently deleted.
@@ -27,15 +31,24 @@ public class ShopkeeperRemoveEvent extends ShopkeeperEvent {
 
 	private final Cause cause;
 
+	/**
+	 * Creates a new {@link ShopkeeperRemoveEvent}.
+	 * 
+	 * @param shopkeeper
+	 *            the shopkeeper, not <code>null</code>
+	 * @param cause
+	 *            the cause, not <code>null</code>
+	 */
 	public ShopkeeperRemoveEvent(Shopkeeper shopkeeper, Cause cause) {
 		super(shopkeeper);
+		Validate.notNull(cause, "cause");
 		this.cause = cause;
 	}
 
 	/**
 	 * Gets the {@link Cause}.
 	 * 
-	 * @return the cause
+	 * @return the cause, not <code>null</code>
 	 */
 	public Cause getCause() {
 		return cause;
@@ -48,6 +61,11 @@ public class ShopkeeperRemoveEvent extends ShopkeeperEvent {
 		return handlers;
 	}
 
+	/**
+	 * Gets the {@link HandlerList} of this event.
+	 * 
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}

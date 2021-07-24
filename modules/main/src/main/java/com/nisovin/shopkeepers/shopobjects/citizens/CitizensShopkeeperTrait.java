@@ -160,7 +160,7 @@ public class CitizensShopkeeperTrait extends Trait {
 
 		String shopkeeperCreationError = null; // Null indicates success
 		if (location != null) {
-			ShopCreationData creationData = AdminShopCreationData.create(creator, DefaultShopTypes.ADMIN(), DefaultShopObjectTypes.CITIZEN(), location, null);
+			ShopCreationData creationData = AdminShopCreationData.create(creator, DefaultShopTypes.ADMIN_REGULAR(), DefaultShopObjectTypes.CITIZEN(), location, null);
 			creationData.setValue(SKCitizensShopObject.CREATION_DATA_NPC_UUID_KEY, npc.getUniqueId());
 
 			Shopkeeper shopkeeper = null;

@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
@@ -148,7 +149,7 @@ public class ShopkeepersCommand extends BaseCommand {
 		} else {
 			// Default shop type and shop object type:
 			if (shopType == null) {
-				shopType = DefaultShopTypes.ADMIN();
+				shopType = DefaultShopTypes.ADMIN_REGULAR();
 				// Note: Shop type permissions are checked afterwards during shop creation.
 			}
 		}
@@ -182,10 +183,10 @@ public class ShopkeepersCommand extends BaseCommand {
 		ShopCreationData shopCreationData;
 		if (isPlayerShopType) {
 			// Create player shopkeeper:
-			shopCreationData = PlayerShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace, targetBlock);
+			shopCreationData = PlayerShopCreationData.create(player, (PlayerShopType<?>) shopType, shopObjType, spawnLocation, targetBlockFace, targetBlock);
 		} else {
 			// Create admin shopkeeper:
-			shopCreationData = AdminShopCreationData.create(player, shopType, shopObjType, spawnLocation, targetBlockFace);
+			shopCreationData = AdminShopCreationData.create(player, (AdminShopType<?>) shopType, shopObjType, spawnLocation, targetBlockFace);
 		}
 		assert shopCreationData != null;
 

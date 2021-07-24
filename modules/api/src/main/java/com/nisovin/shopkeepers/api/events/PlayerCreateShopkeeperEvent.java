@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.api.events;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
@@ -19,14 +20,21 @@ public class PlayerCreateShopkeeperEvent extends Event implements Cancellable {
 	private final ShopCreationData creationData;
 	private boolean cancelled = false;
 
+	/**
+	 * Creates a new {@link PlayerCreateShopkeeperEvent}.
+	 * 
+	 * @param creationData
+	 *            the shop creation data, not <code>null</code>
+	 */
 	public PlayerCreateShopkeeperEvent(ShopCreationData creationData) {
+		Validate.notNull(creationData, "creationData");
 		this.creationData = creationData;
 	}
 
 	/**
 	 * Gets the {@link ShopCreationData}.
 	 * 
-	 * @return the shop creation data
+	 * @return the shop creation data, not <code>null</code>
 	 */
 	public ShopCreationData getShopCreationData() {
 		return creationData;
@@ -55,6 +63,11 @@ public class PlayerCreateShopkeeperEvent extends Event implements Cancellable {
 		return handlers;
 	}
 
+	/**
+	 * Gets the {@link HandlerList} of this event.
+	 * 
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}

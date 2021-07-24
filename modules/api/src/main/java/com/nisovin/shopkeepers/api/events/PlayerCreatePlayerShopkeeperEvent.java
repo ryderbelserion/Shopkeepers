@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.api.events;
 
+import org.apache.commons.lang.Validate;
+
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 
@@ -15,8 +17,17 @@ public class PlayerCreatePlayerShopkeeperEvent extends PlayerCreateShopkeeperEve
 
 	private int maxShopsLimit;
 
+	/**
+	 * Creates a new {@link PlayerCreatePlayerShopkeeperEvent}
+	 * 
+	 * @param creationData
+	 *            the shop creation data, not <code>null</code>
+	 * @param maxShopsLimit
+	 *            the max shops limit, not negative
+	 */
 	public PlayerCreatePlayerShopkeeperEvent(ShopCreationData creationData, int maxShopsLimit) {
 		super(creationData);
+		Validate.isTrue(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
 		this.maxShopsLimit = maxShopsLimit;
 	}
 
@@ -25,7 +36,7 @@ public class PlayerCreatePlayerShopkeeperEvent extends PlayerCreateShopkeeperEve
 	 * <p>
 	 * {@link Integer#MAX_VALUE} indicates no limit.
 	 * 
-	 * @return the owner's max shops limit
+	 * @return the owner's max shops limit, not negative
 	 */
 	public int getMaxShopsLimit() {
 		return maxShopsLimit;
@@ -40,12 +51,10 @@ public class PlayerCreatePlayerShopkeeperEvent extends PlayerCreateShopkeeperEve
 	 * {@link Integer#MAX_VALUE} indicates no limit.
 	 * 
 	 * @param maxShopsLimit
-	 *            the owner's max shops limit to use for this shopkeeper creation
+	 *            the owner's max shops limit to use for this shopkeeper creation, not negative
 	 */
 	public void setMaxShopsLimit(int maxShopsLimit) {
-		if (maxShopsLimit < 0) {
-			throw new IllegalArgumentException("maxShopsLimit cannot be negative!");
-		}
+		Validate.isTrue(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
 		this.maxShopsLimit = maxShopsLimit;
 	}
 }

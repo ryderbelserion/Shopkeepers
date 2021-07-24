@@ -22,7 +22,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
  * In order to avoid accidentally passing unmodifiable item stacks to code that is not aware that the item stack cannot
  * be modified, the API always exposes unmodifiable item stacks via this interface. Users of the API should not rely on
  * whether or not the implementation of this interface extends {@link ItemStack}. If an {@link ItemStack} view of this
- * unmodifiable item stack is required, use either {@link #copy()} to create a regular modifiable item stack copy with
+ * unmodifiable item stack is required, use either {@link #copy()} to create a normal modifiable item stack copy with
  * the same item data, or the less safe {@link #asItemStack()} (see its documentation for notes about its limitations).
  * <p>
  * The API uses this interface for at least two optimization purposes: Exposing unmodifiable views on internal immutable
@@ -32,16 +32,18 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
  * It is unsafe to pass an {@link #asItemStack() ItemStack view} of an unmodifiable item stack to a method that does not
  * explicitly state that it supports unmodifiable item stacks.
  * <p>
- * {@link #equals(Object)} compares two {@link UnmodifiableItemStack}s based on their underlying item stacks. To compare
- * the underlying item stack directly to another item stack, use {@link #isEqual(ItemStack)} instead. TODO
+ * {@link #equals(Object)} compares two {@link UnmodifiableItemStack}s based on their underlying item stacks, but can
+ * also be used to compare the {@link UnmodifiableItemStack} directly to a normal {@link ItemStack}. However, for some
+ * types of {@link ItemStack} this comparison may not be symmetrical. See {@link #equals(Object)} for more information
+ * on this limitation.
  * <p>
  * {@link #serialize()} is a read-only operation that delegates to {@link ItemStack#serialize()} of the underlying item
  * stack. In order to be able to directly serialize the underlying item stack with Bukkit's configuration serialization
  * API, without having to wrap this {@link UnmodifiableItemStack} in another serializable container, manually invoking
  * {@link #serialize()}, or first creating a copy of the underlying item stack, this interface extends
  * {@link ConfigurationSerializable}. However, both the serialization and deserialization of this type delegate to
- * {@link ItemStack}. Consequently, an {@link UnmodifiableItemStack} is serialized like a regular item stack and ends up
- * being deserialized as a regular modifiable {@link ItemStack}.
+ * {@link ItemStack}. Consequently, an {@link UnmodifiableItemStack} is serialized like a normal item stack and ends up
+ * being deserialized as a normal modifiable {@link ItemStack}.
  */
 public interface UnmodifiableItemStack extends ConfigurationSerializable {
 
@@ -92,7 +94,7 @@ public interface UnmodifiableItemStack extends ConfigurationSerializable {
 	 * {@link ItemStack#equals(Object)} will never consider the item stacks returned by this method to be equal to
 	 * itself, even if all the item stack data matches. Consequently, it is therefore not possible for the returned item
 	 * stack to implement {@link #isSimilar(ItemStack)} and {@link #equals(Object)} without violating the symmetry
-	 * requirement for at least {@code CraftItemStack}s.</br>
+	 * requirement for at least {@code CraftItemStack}s.<br>
 	 * However, instead of blocking these methods from being usable at all, or limited to comparisons with Bukkit's
 	 * {@link ItemStack}, both of which wouldn't resolve the issue either because the comparisons can still silently
 	 * fail without warning when performed in the opposite direction, they will work fine as long as the comparison is
@@ -117,25 +119,39 @@ public interface UnmodifiableItemStack extends ConfigurationSerializable {
 	public ItemStack asItemStack();
 
 	/**
-	 * See {@link ItemStack#getType()}.
+	 * Gets the item stack's type.
+	 * 
+	 * @return the item type, not <code>null</code>
+	 * @see ItemStack#getType()
 	 */
 	public Material getType();
 
 	/**
-	 * See {@link ItemStack#getAmount()}.
+	 * Gets the item stack's size.
+	 * 
+	 * @return the item stack size
+	 * @see ItemStack#getAmount()
 	 */
 	public int getAmount();
 
 	/**
-	 * See {@link ItemStack#getMaxStackSize()}.
+	 * Gets the item's max stack size.
+	 * 
+	 * @return the item's max stack size, or <code>-1</code> if the max stack size is not known
+	 * @see ItemStack#getMaxStackSize()
 	 */
 	public int getMaxStackSize();
 
 	/**
-	 * See {@link ItemStack#isSimilar(ItemStack)}.
+	 * Compares the item stacks, ignoring their amounts.
 	 * <p>
 	 * For some item stack implementations, this method is non-symmetric. See {@link #asItemStack()} for more
 	 * information about this limitation.
+	 * 
+	 * @param itemStack
+	 *            the item stack to compare with
+	 * @return <code>true</code> if the item stacks are similar
+	 * @see ItemStack#isSimilar(ItemStack)
 	 */
 	public boolean isSimilar(ItemStack itemStack);
 
@@ -179,32 +195,54 @@ public interface UnmodifiableItemStack extends ConfigurationSerializable {
 	public boolean equals(Object obj);
 
 	/**
-	 * See {@link ItemStack#containsEnchantment(Enchantment)}.
+	 * Checks if this item stack contains the given enchantment.
+	 * 
+	 * @param enchantment
+	 *            the enchantment
+	 * @return <code>true</code> if the item stack contains the specified enchantment
+	 * @see ItemStack#containsEnchantment(Enchantment)
 	 */
 	public boolean containsEnchantment(Enchantment enchantment);
 
 	/**
-	 * See {@link ItemStack#getEnchantmentLevel(Enchantment)}.
+	 * Gets the level of the specified enchantment on this item stack.
+	 * 
+	 * @param enchantment
+	 *            the enchantment
+	 * @return the level, or <code>0</code>
+	 * @see ItemStack#getEnchantmentLevel(Enchantment)
 	 */
 	public int getEnchantmentLevel(Enchantment enchantment);
 
 	/**
-	 * See {@link ItemStack#getEnchantments()}.
+	 * Gets a map of all the enchantments and their levels on this item stack.
+	 * 
+	 * @return the map of enchantments
+	 * @see ItemStack#getEnchantments()
 	 */
 	public Map<Enchantment, Integer> getEnchantments();
 
 	/**
-	 * See {@link ItemStack#serialize()}.
+	 * Creates a Map representation of this item stack.
+	 * 
+	 * @return a Map containing the current state of this item stack
+	 * @see ItemStack#serialize()
 	 */
 	public Map<String, Object> serialize();
 
 	/**
-	 * See {@link ItemStack#getItemMeta()}.
+	 * Get a copy of this item stack's {@link ItemMeta}.
+	 * 
+	 * @return the item meta, or <code>null</code> if this item stack does not support item meta
+	 * @see ItemStack#getItemMeta()
 	 */
 	public ItemMeta getItemMeta();
 
 	/**
-	 * See {@link ItemStack#hasItemMeta()}.
+	 * Checks if this item stack has item meta.
+	 * 
+	 * @return <code>true</code> if this item stack has item meta
+	 * @see ItemStack#hasItemMeta()
 	 */
 	public boolean hasItemMeta();
 }

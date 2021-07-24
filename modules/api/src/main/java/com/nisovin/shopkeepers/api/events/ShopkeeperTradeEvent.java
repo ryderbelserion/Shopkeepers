@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.api.events;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -32,34 +33,59 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	private final boolean swappedItemOrder;
 	private boolean cancelled = false;
 
-	// The offered items are expected to be immutable and their stack sizes match the trading recipe items.
+	/**
+	 * Creates a new {@link ShopkeeperTradeEvent}.
+	 * <p>
+	 * The offered items are expected to be immutable and their stack sizes match the trading recipe items.
+	 * 
+	 * @param shopkeeper
+	 *            the involved shopkeeper, not <code>null</code>
+	 * @param player
+	 *            the trading player, not <code>null</code>
+	 * @param clickEvent
+	 *            the click event that triggered the trade, not <code>null</code>
+	 * @param tradingRecipe
+	 *            the trading recipe, not <code>null</code>
+	 * @param offeredItem1
+	 *            the offered item that matches the first required item of the trading recipe, not <code>null</code> or
+	 *            empty
+	 * @param offeredItem2
+	 *            the offered item that matches the second required item of the trading recipe, can be <code>null</code>
+	 * @param swappedItemOrder
+	 *            <code>true</code> if the player provided the offered items in reverse order
+	 */
 	public ShopkeeperTradeEvent(Shopkeeper shopkeeper, Player player, InventoryClickEvent clickEvent, TradingRecipe tradingRecipe,
 								UnmodifiableItemStack offeredItem1, UnmodifiableItemStack offeredItem2, boolean swappedItemOrder) {
 		super(shopkeeper);
+		Validate.notNull(player, "player");
+		Validate.notNull(clickEvent, "clickEvent");
+		Validate.notNull(tradingRecipe, "tradingRecipe");
+		Validate.notNull(offeredItem1, "offeredItem1");
 		this.player = player;
 		this.clickEvent = clickEvent;
 		this.tradingRecipe = tradingRecipe;
 		this.offeredItem1 = offeredItem1;
-		this.offeredItem2 = offeredItem2;
+		this.offeredItem2 = offeredItem2; // Can be null
 		this.swappedItemOrder = swappedItemOrder;
 	}
 
 	/**
 	 * Gets the trading player.
 	 * 
-	 * @return the trading player
+	 * @return the trading player, not <code>null</code>
 	 */
 	public Player getPlayer() {
 		return player;
 	}
 
 	/**
-	 * Gets the {@link InventoryClickEvent} which originally triggered this trade.
-	 * 
+	 * Gets the {@link InventoryClickEvent} that triggered this trade.
 	 * <p>
-	 * Do not modify the click event (it has to be kept cancelled) or any of the involved items!
+	 * Note that a single inventory click event can trigger multiple consecutive trades.
+	 * <p>
+	 * Do not modify the click event or any of the involved items! It needs to remain cancelled.
 	 * 
-	 * @return the original {@link InventoryClickEvent}
+	 * @return the inventory click event, not <code>null</code>
 	 */
 	public InventoryClickEvent getClickEvent() {
 		return clickEvent;
@@ -68,7 +94,7 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	/**
 	 * Gets the trading recipe used by this trade.
 	 * 
-	 * @return the used trading recipe
+	 * @return the used trading recipe, not <code>null</code>
 	 */
 	public TradingRecipe getTradingRecipe() {
 		return tradingRecipe;
@@ -115,7 +141,7 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	}
 
 	/**
-	 * Whether the offered items are placed in reverse or regular order inside the trading slots of the merchant
+	 * Whether the offered items are placed in reverse or normal order inside the trading slots of the merchant
 	 * inventory.
 	 * <p>
 	 * Minecraft checks for matching trading recipes for both combinations.
@@ -149,6 +175,11 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 		return handlers;
 	}
 
+	/**
+	 * Gets the {@link HandlerList} of this event.
+	 * 
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}

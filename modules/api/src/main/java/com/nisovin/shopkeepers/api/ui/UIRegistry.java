@@ -9,6 +9,9 @@ import com.nisovin.shopkeepers.api.types.TypeRegistry;
 
 /**
  * Acts as registry for UI types and keeps track of which player has which UI currently opened.
+ *
+ * @param <T>
+ *            the internal type of {@link UIType} that is managed by this registry
  */
 public interface UIRegistry<T extends UIType> extends TypeRegistry<T> {
 
@@ -68,7 +71,12 @@ public interface UIRegistry<T extends UIType> extends TypeRegistry<T> {
 	public UISession getSession(Player player);
 
 	/**
-	 * @deprecated Use {@link #getSession(Player)} directly
+	 * Gets the currently open {@link UIType} for the specified player.
+	 * 
+	 * @param player
+	 *            the player
+	 * @return the UI type, or <code>null</code> if the player has no UI open currently
+	 * @deprecated Use {@link #getSession(Player)} instead
 	 */
 	public UIType getOpenUIType(Player player);
 

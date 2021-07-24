@@ -79,7 +79,7 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 
 	@Override
 	public RegularAdminShopType getType() {
-		return SKDefaultShopTypes.ADMIN();
+		return SKDefaultShopTypes.ADMIN_REGULAR();
 	}
 
 	@Override

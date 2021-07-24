@@ -35,6 +35,11 @@ public class SKDefaultShopTypes implements DefaultShopTypes {
 
 	@Override
 	public RegularAdminShopType getAdminShopType() {
+		return this.getRegularAdminShopType();
+	}
+
+	@Override
+	public RegularAdminShopType getRegularAdminShopType() {
 		return adminShopType;
 	}
 
@@ -58,14 +63,14 @@ public class SKDefaultShopTypes implements DefaultShopTypes {
 		return bookPlayerShopType;
 	}
 
-	// STATICS (for convenience):
+	// STATIC ACCESSORS (for convenience)
 
 	public static SKDefaultShopTypes getInstance() {
 		return SKShopkeepersPlugin.getInstance().getDefaultShopTypes();
 	}
 
-	public static RegularAdminShopType ADMIN() {
-		return getInstance().getAdminShopType();
+	public static RegularAdminShopType ADMIN_REGULAR() {
+		return getInstance().getRegularAdminShopType();
 	}
 
 	public static SellingPlayerShopType PLAYER_SELLING() {

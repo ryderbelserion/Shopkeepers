@@ -23,8 +23,6 @@ public interface ShopkeeperRegistry {
 	/**
 	 * Creates a shopkeeper from the given creation data and spawns it into the world.
 	 * 
-	 * @param id
-	 *            the shopkeepers id
 	 * @param creationData
 	 *            the shop creation data containing the necessary arguments (spawn location, object type, owner, etc.)
 	 *            for creating the shopkeeper

@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.api.events;
 
+import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
@@ -26,8 +27,23 @@ public class PlayerShopkeeperHireEvent extends ShopkeeperEvent implements Cancel
 	private int maxShopsLimit;
 	private boolean cancelled = false;
 
+	/**
+	 * Creates a new {@link PlayerShopkeeperHireEvent}.
+	 * 
+	 * @param shopkeeper
+	 *            the shopkeeper, not <code>null</code>
+	 * @param player
+	 *            the player, not <code>null</code>
+	 * @param newPlayerInventoryContents
+	 *            the new player inventory contents, not <code>null</code>
+	 * @param maxShopsLimit
+	 *            the player's max shops limit, not negative
+	 */
 	public PlayerShopkeeperHireEvent(PlayerShopkeeper shopkeeper, Player player, ItemStack[] newPlayerInventoryContents, int maxShopsLimit) {
 		super(shopkeeper);
+		Validate.notNull(player, "player");
+		Validate.notNull(newPlayerInventoryContents, "newPlayerInventoryContents");
+		Validate.isTrue(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
 		this.player = player;
 		this.newPlayerInventoryContents = newPlayerInventoryContents;
 		this.maxShopsLimit = maxShopsLimit;
@@ -65,7 +81,7 @@ public class PlayerShopkeeperHireEvent extends ShopkeeperEvent implements Cancel
 	 * <p>
 	 * {@link Integer#MAX_VALUE} indicates no limit.
 	 * 
-	 * @return the hiring player's max shops limit
+	 * @return the hiring player's max shops limit, not negative
 	 */
 	public int getMaxShopsLimit() {
 		return maxShopsLimit;
@@ -80,12 +96,10 @@ public class PlayerShopkeeperHireEvent extends ShopkeeperEvent implements Cancel
 	 * {@link Integer#MAX_VALUE} indicates no limit.
 	 * 
 	 * @param maxShopsLimit
-	 *            the hiring player's max shops limit to use for this hire
+	 *            the hiring player's max shops limit to use for this hire, not negative
 	 */
 	public void setMaxShopsLimit(int maxShopsLimit) {
-		if (maxShopsLimit < 0) {
-			throw new IllegalArgumentException("maxShopsLimit cannot be negative!");
-		}
+		Validate.isTrue(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
 		this.maxShopsLimit = maxShopsLimit;
 	}
 
@@ -112,6 +126,11 @@ public class PlayerShopkeeperHireEvent extends ShopkeeperEvent implements Cancel
 		return handlers;
 	}
 
+	/**
+	 * Gets the {@link HandlerList} of this event.
+	 * 
+	 * @return the handler list
+	 */
 	public static HandlerList getHandlerList() {
 		return handlers;
 	}

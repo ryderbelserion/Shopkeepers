@@ -19,57 +19,185 @@ import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UIRegistry;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
+/**
+ * The Shopkeepers plugin.
+ * <p>
+ * This is the main entry point to the Shopkeepers plugin API. See {@link ShopkeepersAPI} for convenient to use static
+ * accessors to the runtime instance and methods of this interface that can be used while the API is enabled, i.e. while
+ * the plugin is enabled.
+ */
 public interface ShopkeepersPlugin extends Plugin {
 
+	/**
+	 * Gets the {@link ShopkeepersPlugin} instance.
+	 * 
+	 * @return the plugin instance, not <code>null</code>
+	 * @throws IllegalStateException
+	 *             if the API is not enabled currently, eg. because the plugin is not enabled currently
+	 */
 	public static ShopkeepersPlugin getInstance() {
 		return ShopkeepersAPI.getPlugin();
 	}
 
 	// PERMISSIONS
 
+	/**
+	 * The <code>shopkeeper.help</code> permission.
+	 */
 	public static final String HELP_PERMISSION = "shopkeeper.help";
+	/**
+	 * The <code>shopkeeper.trade</code> permission.
+	 */
 	public static final String TRADE_PERMISSION = "shopkeeper.trade";
+	/**
+	 * The <code>shopkeeper.reload</code> permission.
+	 */
 	public static final String RELOAD_PERMISSION = "shopkeeper.reload";
+	/**
+	 * The <code>shopkeeper.debug</code> permission.
+	 */
 	public static final String DEBUG_PERMISSION = "shopkeeper.debug";
+	/**
+	 * The <code>shopkeeper.cleanup-citizen-shopkeepers</code> permission.
+	 */
 	public static final String CLEANUP_CITIZEN_SHOPKEEPERS = "shopkeeper.cleanup-citizen-shopkeepers";
 
+	/**
+	 * The <code>shopkeeper.list.own</code> permission.
+	 */
 	public static final String LIST_OWN_PERMISSION = "shopkeeper.list.own";
+	/**
+	 * The <code>shopkeeper.list.others</code> permission.
+	 */
 	public static final String LIST_OTHERS_PERMISSION = "shopkeeper.list.others";
+	/**
+	 * The <code>shopkeeper.list.admin</code> permission.
+	 */
 	public static final String LIST_ADMIN_PERMISSION = "shopkeeper.list.admin";
 
+	/**
+	 * The <code>shopkeeper.remove.own</code> permission.
+	 */
 	public static final String REMOVE_OWN_PERMISSION = "shopkeeper.remove.own";
+	/**
+	 * The <code>shopkeeper.remove.others</code> permission.
+	 */
 	public static final String REMOVE_OTHERS_PERMISSION = "shopkeeper.remove.others";
+	/**
+	 * The <code>shopkeeper.remove.admin</code> permission.
+	 */
 	public static final String REMOVE_ADMIN_PERMISSION = "shopkeeper.remove.admin";
 
+	/**
+	 * The <code>shopkeeper.remove-all.own</code> permission.
+	 */
 	public static final String REMOVE_ALL_OWN_PERMISSION = "shopkeeper.remove-all.own";
+	/**
+	 * The <code>shopkeeper.remove-all.others</code> permission.
+	 */
 	public static final String REMOVE_ALL_OTHERS_PERMISSION = "shopkeeper.remove-all.others";
+	/**
+	 * The <code>shopkeeper.remove-all.player</code> permission.
+	 */
 	public static final String REMOVE_ALL_PLAYER_PERMISSION = "shopkeeper.remove-all.player";
+	/**
+	 * The <code>shopkeeper.remove-all.admin</code> permission.
+	 */
 	public static final String REMOVE_ALL_ADMIN_PERMISSION = "shopkeeper.remove-all.admin";
 
+	/**
+	 * The <code>shopkeeper.notify.trades</code> permission.
+	 */
 	public static final String NOTIFY_TRADES_PERMISSION = "shopkeeper.notify.trades";
+	/**
+	 * The <code>shopkeeper.give</code> permission.
+	 */
 	public static final String GIVE_PERMISSION = "shopkeeper.give";
+	/**
+	 * The <code>shopkeeper.givecurrency</code> permission.
+	 */
 	public static final String GIVE_CURRENCY_PERMISSION = "shopkeeper.givecurrency";
+	/**
+	 * The <code>shopkeeper.convertitems.own</code> permission.
+	 */
 	public static final String CONVERT_ITEMS_OWN_PERMISSION = "shopkeeper.convertitems.own";
+	/**
+	 * The <code>shopkeeper.convertitems.others</code> permission.
+	 */
 	public static final String CONVERT_ITEMS_OTHERS_PERMISSION = "shopkeeper.convertitems.others";
+	/**
+	 * The <code>shopkeeper.remote</code> permission.
+	 */
 	public static final String REMOTE_PERMISSION = "shopkeeper.remote";
+	/**
+	 * The <code>shopkeeper.remote.otherplayers</code> permission.
+	 */
 	public static final String REMOTE_OTHER_PLAYERS_PERMISSION = "shopkeeper.remote.otherplayers";
+	/**
+	 * The <code>shopkeeper.remoteedit</code> permission.
+	 */
 	public static final String REMOTE_EDIT_PERMISSION = "shopkeeper.remoteedit";
+	/**
+	 * The <code>shopkeeper.transfer</code> permission.
+	 */
 	public static final String TRANSFER_PERMISSION = "shopkeeper.transfer";
+	/**
+	 * The <code>shopkeeper.settradeperm</code> permission.
+	 */
 	public static final String SET_TRADE_PERM_PERMISSION = "shopkeeper.settradeperm";
+	/**
+	 * The <code>shopkeeper.setforhire</code> permission.
+	 */
 	public static final String SET_FOR_HIRE_PERMISSION = "shopkeeper.setforhire";
+	/**
+	 * The <code>shopkeeper.hire</code> permission.
+	 */
 	public static final String HIRE_PERMISSION = "shopkeeper.hire";
+	/**
+	 * The <code>shopkeeper.edit-villagers</code> permission.
+	 */
 	public static final String EDIT_VILLAGERS_PERMISSION = "shopkeeper.edit-villagers";
+	/**
+	 * The <code>shopkeeper.edit-wandering-traders</code> permission.
+	 */
 	public static final String EDIT_WANDERING_TRADERS_PERMISSION = "shopkeeper.edit-wandering-traders";
+	/**
+	 * The <code>shopkeeper.bypass</code> permission.
+	 */
 	public static final String BYPASS_PERMISSION = "shopkeeper.bypass";
+	/**
+	 * The <code>shopkeeper.maxshops.unlimited</code> permission.
+	 */
 	public static final String MAXSHOPS_UNLIMITED_PERMISSION = "shopkeeper.maxshops.unlimited";
 
+	/**
+	 * The <code>shopkeeper.trade-notifications.admin</code> permission.
+	 */
 	public static final String TRADE_NOTIFICATIONS_ADMIN = "shopkeeper.trade-notifications.admin";
+	/**
+	 * The <code>shopkeeper.trade-notifications.player</code> permission.
+	 */
 	public static final String TRADE_NOTIFICATIONS_PLAYER = "shopkeeper.trade-notifications.player";
 
+	/**
+	 * The <code>shopkeeper.admin</code> permission.
+	 */
 	public static final String ADMIN_PERMISSION = "shopkeeper.admin";
+	/**
+	 * The <code>shopkeeper.player.sell</code> permission.
+	 */
 	public static final String PLAYER_SELL_PERMISSION = "shopkeeper.player.sell";
+	/**
+	 * The <code>shopkeeper.player.buy</code> permission.
+	 */
 	public static final String PLAYER_BUY_PERMISSION = "shopkeeper.player.buy";
+	/**
+	 * The <code>shopkeeper.player.trade</code> permission.
+	 */
 	public static final String PLAYER_TRADE_PERMISSION = "shopkeeper.player.trade";
+	/**
+	 * The <code>shopkeeper.player.book</code> permission.
+	 */
 	public static final String PLAYER_BOOK_PERMISSION = "shopkeeper.player.book";
 
 	/**
@@ -83,24 +211,59 @@ public interface ShopkeepersPlugin extends Plugin {
 
 	// SHOP TYPES
 
+	/**
+	 * Gets the {@link ShopTypesRegistry}.
+	 * 
+	 * @return the shop types registry
+	 */
 	public ShopTypesRegistry<?> getShopTypeRegistry();
 
+	/**
+	 * Gets the {@link DefaultShopTypes}.
+	 * 
+	 * @return the default shop types
+	 */
 	public DefaultShopTypes getDefaultShopTypes();
 
 	// SHOP OBJECT TYPES
 
+	/**
+	 * Gets the {@link ShopObjectTypesRegistry}.
+	 * 
+	 * @return the shop object types registry
+	 */
 	public ShopObjectTypesRegistry<?> getShopObjectTypeRegistry();
 
+	/**
+	 * Gets the {@link DefaultShopObjectTypes}.
+	 * 
+	 * @return the default shop object types
+	 */
 	public DefaultShopObjectTypes getDefaultShopObjectTypes();
 
 	// UI
 
+	/**
+	 * Gets the {@link UIRegistry}.
+	 * 
+	 * @return the UI registry
+	 */
 	public UIRegistry<?> getUIRegistry();
 
+	/**
+	 * Gets the {@link DefaultUITypes}.
+	 * 
+	 * @return the default UI types
+	 */
 	public DefaultUITypes getDefaultUITypes();
 
 	// SHOPKEEPER REGISTRY
 
+	/**
+	 * Gets the {@link ShopkeeperRegistry}.
+	 * 
+	 * @return the shopkeeper registry
+	 */
 	public ShopkeeperRegistry getShopkeeperRegistry();
 
 	// STORAGE

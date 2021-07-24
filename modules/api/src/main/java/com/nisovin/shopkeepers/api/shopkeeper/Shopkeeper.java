@@ -14,6 +14,9 @@ import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 
+/**
+ * A shopkeeper.
+ */
 public interface Shopkeeper {
 
 	// STORAGE
@@ -109,12 +112,32 @@ public interface Shopkeeper {
 	 */
 	public String getWorldName();
 
+	/**
+	 * Gets the x coordinate of the shopkeeper.
+	 * 
+	 * @return the x coordinate
+	 */
 	public int getX();
 
+	/**
+	 * Gets the y coordinate of the shopkeeper.
+	 * 
+	 * @return the y coordinate
+	 */
 	public int getY();
 
+	/**
+	 * Gets the z coordinate of the shopkeeper.
+	 * 
+	 * @return the z coordinate
+	 */
 	public int getZ();
 
+	/**
+	 * Gets a String representation of the shopkeeper's location.
+	 * 
+	 * @return the String representation
+	 */
 	public String getPositionString();
 
 	/**
@@ -146,6 +169,12 @@ public interface Shopkeeper {
 	 */
 	public String getName();
 
+	/**
+	 * Sets the name of the shopkeeper.
+	 * 
+	 * @param name
+	 *            the new name, or <code>null</code> or empty to clear the shopkeeper's name
+	 */
 	public void setName(String name);
 
 	// SHOP OBJECT

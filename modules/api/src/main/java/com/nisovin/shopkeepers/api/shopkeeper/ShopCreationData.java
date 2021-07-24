@@ -145,10 +145,11 @@ public abstract class ShopCreationData {
 	/**
 	 * Gets a previously set value for the specific key.
 	 * 
+	 * @param <T>
+	 *            the type of the value
 	 * @param key
 	 *            the key
-	 * @param value
-	 *            the value, or <code>null</code>
+	 * @return the value, or <code>null</code> if there is no value for the specified key
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getValue(String key) {
@@ -159,9 +160,12 @@ public abstract class ShopCreationData {
 	/**
 	 * Sets a value for the specified key.
 	 * 
+	 * @param <T>
+	 *            the type of the value
 	 * @param key
 	 *            the key
-	 * @return the value, or <code>null</code> to remove the value for the specified key
+	 * @param value
+	 *            the value, or <code>null</code> to remove the value for the specified key
 	 */
 	public <T> void setValue(String key, T value) {
 		if (value == null) {
