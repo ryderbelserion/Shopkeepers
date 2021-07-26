@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Immutable pair of values.
@@ -16,6 +17,10 @@ public class Pair<V1, V2> {
 	/**
 	 * Creates a {@link Pair} of the given values.
 	 * 
+	 * @param <V1>
+	 *            the type of the first value
+	 * @param <V2>
+	 *            the type of the second value
 	 * @param first
 	 *            the first value
 	 * @param second
@@ -27,9 +32,9 @@ public class Pair<V1, V2> {
 	}
 
 	@SafeVarargs
-	public static <A, B> Map<A, B> toMap(Pair<A, B>... pairs) {
-		Map<A, B> map = new LinkedHashMap<>();
-		for (Pair<A, B> pair : pairs) {
+	public static <V1, V2> Map<V1, V2> toMap(Pair<V1, V2>... pairs) {
+		Map<V1, V2> map = new LinkedHashMap<>();
+		for (Pair<V1, V2> pair : pairs) {
 			map.put(pair.getFirst(), pair.getSecond());
 		}
 		return map;
@@ -66,20 +71,14 @@ public class Pair<V1, V2> {
 		if (o == this) return true;
 		if (!(o instanceof Pair<?, ?>)) return false;
 		Pair<?, ?> other = (Pair<?, ?>) o;
-		Object otherFirst = other.getFirst();
-		if (first == null ? otherFirst != null : !first.equals(otherFirst)) {
-			return false;
-		}
-		Object otherSecond = other.getSecond();
-		if (second == null ? otherSecond != null : !second.equals(otherSecond)) {
-			return false;
-		}
+		if (!Objects.equals(first, other.getFirst())) return false;
+		if (!Objects.equals(second, other.getSecond())) return false;
 		return true;
 	}
 
 	@Override
 	public int hashCode() {
-		return (first == null ? 0 : first.hashCode()) + 17 * (second == null ? 0 : second.hashCode());
+		return Objects.hashCode(first) + 17 * Objects.hashCode(second);
 	}
 
 	@Override

@@ -6,6 +6,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * A {@link FallbackArgument} that returns a fixed value as fallback.
  * 
+ * @param <T>
+ *            the type of the parsed argument
  * @see FixedValueArgument
  */
 public class DefaultValueFallback<T> extends TypedFallbackArgument<T> {

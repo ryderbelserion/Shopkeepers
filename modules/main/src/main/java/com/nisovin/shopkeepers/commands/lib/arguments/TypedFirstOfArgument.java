@@ -15,6 +15,9 @@ import com.nisovin.shopkeepers.util.java.Pair;
  * 
  * A {@link CommandArgument} similar to {@link FirstOfArgument}, but which preserves the result type of its child
  * arguments. This requires all child arguments to parse a value of the same type.
+ * 
+ * @param <T>
+ *            the type of the parsed argument
  */
 public class TypedFirstOfArgument<T> extends FallbackArgument<T> {
 

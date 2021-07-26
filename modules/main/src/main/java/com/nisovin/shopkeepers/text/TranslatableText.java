@@ -52,8 +52,8 @@ public class TranslatableText extends TextBuilder {
 	 * Any non-{@link Text} argument gets first converted to a corresponding Text by using its {@link Object#toString()
 	 * String representation}. If the argument is a {@link Supplier} it will be invoked to obtain the actual argument.
 	 * <p>
-	 * Any {@link Text} translation arguments that are not yet {@link AbstractTextBuilder#isBuilt() built} may get built
-	 * by this method.
+	 * Any {@link Text} translation arguments that are not yet {@link TextBuilder#isBuilt() built} may get built by this
+	 * method.
 	 * 
 	 * @param translationArguments
 	 *            the translation arguments, or <code>null</code> or empty to unset

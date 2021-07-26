@@ -164,7 +164,8 @@ public class BlockFaceUtils {
 	 * Tries to find the nearest wall sign {@link BlockFace} facing towards the given direction.
 	 * 
 	 * @param direction
-	 * @return a valid wall sign face
+	 *            the direction
+	 * @return the corresponding wall sign face
 	 */
 	public static BlockFace toWallSignFace(Vector direction) {
 		assert direction != null;

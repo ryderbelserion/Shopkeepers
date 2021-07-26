@@ -659,9 +659,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * Update the {@link ChunkCoords} under which the shopkeeper is currently stored.
+	 * Update the {@link ChunkCoords} for which the shopkeeper is currently stored.
 	 * <p>
 	 * Internal use only!
+	 * 
+	 * @param chunkCoords
+	 *            the chunk coordinates
 	 */
 	public final void setLastChunkCoords(ChunkCoords chunkCoords) {
 		this.lastChunkCoords = chunkCoords;
@@ -878,7 +881,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * The ticking of shopkeepers in active chunks may be spread across multiple ticks and may therefore not happen for
 	 * all shopkeepers within the same tick.
 	 * <p>
-	 * If any of the ticked shopkeepers are marked as {@link Shopkeeper#isDirty() dirty}, a
+	 * If any of the ticked shopkeepers are marked as {@link AbstractShopkeeper#isDirty() dirty}, a
 	 * {@link ShopkeeperStorage#saveDelayed() delayed save} will subsequently be triggered.
 	 * <p>
 	 * Any changes to the shopkeeper's activation state or {@link AbstractShopObject#getId() shop object id} may only be

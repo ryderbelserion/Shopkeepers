@@ -277,6 +277,8 @@ public final class InventoryUtils {
 	 *            the contents to add the items to
 	 * @param item
 	 *            the item to add
+	 * @param amount
+	 *            the amount to add
 	 * @return the amount of items that could not be added, <code>0</code> on complete success
 	 */
 	public static int addItems(@ReadWrite ItemStack @ReadOnly [] contents, @ReadOnly ItemStack item, int amount) {

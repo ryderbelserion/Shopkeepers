@@ -22,6 +22,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * This can be useful when there would otherwise be ambiguities between different arguments.
  * <p>
  * Currently this might only function correctly for command arguments that consume exactly one input argument.
+ * 
+ * @param <T>
+ *            the type of the parsed argument
  */
 public class NamedArgument<T> extends FallbackArgument<T> {
 

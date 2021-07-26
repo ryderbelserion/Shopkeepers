@@ -81,7 +81,7 @@ public interface Text {
 	 * <p>
 	 * This takes into account:
 	 * <ul>
-	 * <li>Legacy color codes (starting with '&' or '§')
+	 * <li>Legacy color codes (starting with '{@literal &}' or '§')
 	 * <li>Placeholders
 	 * </ul>
 	 * <p>
@@ -283,6 +283,8 @@ public interface Text {
 	/**
 	 * Gets the root Text by following the chain of parents.
 	 * 
+	 * @param <T>
+	 *            the root text's expected type
 	 * @return the root Text, not <code>null</code>, may be this Text itself
 	 */
 	public <T extends Text> T getRoot();
@@ -329,8 +331,8 @@ public interface Text {
 	 * {@link Object#toString() String representation}. If the argument is a {@link Supplier} it will be invoked to
 	 * obtain the actual argument.
 	 * <p>
-	 * Any {@link Text} placeholder arguments that were not yet {@link AbstractTextBuilder#isBuilt() built} may get
-	 * built by this method.
+	 * Any {@link Text} placeholder arguments that were not yet {@link TextBuilder#isBuilt() built} may get built by
+	 * this method.
 	 * 
 	 * @param arguments
 	 *            the message arguments mapped by their placeholder keys

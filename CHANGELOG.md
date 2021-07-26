@@ -14,6 +14,7 @@ Date format: (YYYY-MM-DD)
 * Internal: Added validation for some constructor and method arguments in the API.
 * Internal: APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
 * Internal: Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
+* Internal: Various minor internal refactors and Javadoc fixes.
 * Build: Removed the unused jenkins and release build profiles from Maven.
 * Build: All external Maven repositories are accessed via https now.
 * Build: Bumped the Vault dependency to version 1.7 and updated its repository.

@@ -7,7 +7,7 @@ package com.nisovin.shopkeepers.util.java;
  * remaining threshold}. Each invocation of {@link #request()} or {@link #request(int)} represents one or more execution
  * requests and adjusts the {@link #getRemainingThreshold() remaining threshold} accordingly. Once the
  * {@link #getRemainingThreshold() remaining threshold} reaches {@code zero}, the execution is permitted and the
- * {@code remaining threshold} is reset to the {@link threshold}.
+ * {@code remaining threshold} is reset to the {@code threshold}.
  */
 public class RateLimiter {
 

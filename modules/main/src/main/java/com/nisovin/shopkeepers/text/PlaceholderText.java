@@ -8,7 +8,7 @@ import com.nisovin.shopkeepers.util.text.MessageArguments;
 /**
  * A {@link Text} that uses a dynamically set {@link #getPlaceholderArgument() placeholder argument} as its child.
  * <p>
- * If no placeholder argument is set this Text acts like a plain Text which simply consists of its
+ * If no placeholder argument is set this Text acts like a plain Text that consists of its
  * {@link #getFormattedPlaceholderKey() formatted placeholder key}.
  * <p>
  * The placeholder's {@link #getChild() child} cannot be set manually.
@@ -57,8 +57,7 @@ public class PlaceholderText extends TextBuilder {
 	 * Gets the argument {@link Text} that is currently assigned to this {@link PlaceholderText}.
 	 * <p>
 	 * This Text adopts all properties of the argument Text. If no placeholder argument is set this Text acts like a
-	 * plain Text which simply returns the {@link #getFormattedPlaceholderKey() formatted placeholder key} for its
-	 * {@link #getText() text}.
+	 * plain Text that consists of its {@link #getFormattedPlaceholderKey() formatted placeholder key}.
 	 * 
 	 * @return the argument Text, or <code>null</code> if no argument is set
 	 */
@@ -81,12 +80,11 @@ public class PlaceholderText extends TextBuilder {
 	 * Any non-{@link Text} argument gets first converted to a corresponding Text by using its {@link Object#toString()
 	 * String representation}. If the argument is a {@link Supplier} it will be invoked to obtain the actual argument.
 	 * <p>
-	 * If the argument is a {@link Text} that has not yet been {@link AbstractTextBuilder#isBuilt() built}, this method
-	 * may build it.
+	 * If the argument is a {@link Text} that has not yet been {@link TextBuilder#isBuilt() built}, this method may
+	 * build it.
 	 * 
 	 * @param placeholderArgument
 	 *            the argument Text, or <code>null</code> to unset the argument
-	 * @return this Text
 	 * @see #getPlaceholderArgument()
 	 */
 	public void setPlaceholderArgument(Object placeholderArgument) {

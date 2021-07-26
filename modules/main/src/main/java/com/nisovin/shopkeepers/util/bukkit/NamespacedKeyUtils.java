@@ -14,6 +14,21 @@ public class NamespacedKeyUtils {
 	public static final String MINECRAFT_NAMESPACE_PREFIX = NamespacedKey.MINECRAFT + NAMESPACED_KEY_SEPARATOR;
 
 	/**
+	 * Creates a new {@link NamespacedKey}.
+	 * 
+	 * @param namespace
+	 *            the namespace
+	 * @param key
+	 *            the key
+	 * @return the namespaced key
+	 * @throws IllegalArgumentException
+	 *             if the namespace or key are invalid
+	 */
+	public static NamespacedKey create(String namespace, String key) {
+		return new NamespacedKey(namespace, key);
+	}
+
+	/**
 	 * Parses a {@link NamespacedKey} from the given input String.
 	 * <p>
 	 * The given input String is formatted in a way that matches valid {@link NamespacedKey NamespacedKeys} (see
@@ -79,7 +94,7 @@ public class NamespacedKeyUtils {
 		// is invalid.
 		NamespacedKey namespacedKey;
 		try {
-			namespacedKey = new NamespacedKey(namespace, key);
+			namespacedKey = NamespacedKeyUtils.create(namespace, key);
 		} catch (IllegalArgumentException e) {
 			return null;
 		}

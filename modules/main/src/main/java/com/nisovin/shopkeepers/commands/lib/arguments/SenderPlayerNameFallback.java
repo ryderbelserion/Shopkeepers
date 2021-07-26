@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.commands.lib.RequiresPlayerArgumentException;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * A {@link PlayerFallbackArgument} that returns the sender's name if it' is a player, without consuming any arguments.
+ * A {@link FallbackArgument} that returns the sender's name if it is a player, without consuming any arguments.
  * <p>
  * If the sender is not a player, a {@link RequiresPlayerArgumentException} is thrown.
  */

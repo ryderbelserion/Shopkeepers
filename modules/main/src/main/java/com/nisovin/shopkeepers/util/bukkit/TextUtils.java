@@ -291,8 +291,9 @@ public class TextUtils {
 
 	/**
 	 * Formats the name of the given {@link Material} to a more user-friendly representation. This first attempts to use
-	 * a client-translatable Text, and if not available, falls back to using {@link #formatMaterialName(Material)}. If
-	 * the given material is <code>null</code>, this returns an empty Text.
+	 * a client-translatable Text, and if not available, falls back to using
+	 * {@link ItemUtils#formatMaterialName(Material)}. If the given material is <code>null</code>, this returns an empty
+	 * Text.
 	 * 
 	 * @param material
 	 *            the material

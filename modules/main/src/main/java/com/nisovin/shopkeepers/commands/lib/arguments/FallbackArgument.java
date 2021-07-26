@@ -33,6 +33,9 @@ import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
  * Just like regular {@link CommandArgument}s the fallback throws an {@link ArgumentParseException} if it is not
  * optional and cannot provide a fallback value. But throwing another {@link FallbackArgumentException} is not allowed
  * at this point and will lead to an error.
+ * 
+ * @param <T>
+ *            the type of the parsed argument
  */
 public abstract class FallbackArgument<T> extends CommandArgument<T> {
 	// TODO Integrate into CommandArgument? Some arguments with child arguments are only supposed to 'be' fallback

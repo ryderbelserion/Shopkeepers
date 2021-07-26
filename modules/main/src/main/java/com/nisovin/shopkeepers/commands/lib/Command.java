@@ -531,7 +531,7 @@ public abstract class Command {
 	 * <li>Checking if the {@link CommandSender} is accepted.
 	 * <li>Checking the command permission for the {@link CommandSender}.
 	 * <li>Parsing the command arguments.
-	 * <li>And finally executing this command via {@link #execute(CommandInput, CommandContext)}.
+	 * <li>And finally executing this command via {@link #execute(CommandInput, CommandContextView)}.
 	 * </ul>
 	 * 
 	 * @param input

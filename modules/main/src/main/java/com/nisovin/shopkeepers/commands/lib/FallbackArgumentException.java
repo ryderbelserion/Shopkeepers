@@ -41,6 +41,8 @@ public class FallbackArgumentException extends ArgumentParseException {
 	 * <p>
 	 * This follows the chain of {@link #getOriginalException() original exceptions} until it find the first one that is
 	 * not a {@link FallbackArgumentException} itself.
+	 * 
+	 * @return the root exception
 	 */
 	public ArgumentParseException getRootException() {
 		if (originalException instanceof FallbackArgumentException) {

@@ -36,6 +36,8 @@ public class Retry {
 	 * In case of success, the return value of the callable is returned. In case of failure, the exception thrown by the
 	 * callable during the last failed attempt is forwarded.
 	 * 
+	 * @param <T>
+	 *            the callable's return type
 	 * @param callable
 	 *            the callable to execute
 	 * @param maxAttempts
@@ -64,6 +66,8 @@ public class Retry {
 	 * failed attempts and to perform preparation for any subsequent reattempt. Any exception thrown by the
 	 * {@link Retry.Callback} itself will abort the retrying with that exception.
 	 * 
+	 * @param <T>
+	 *            the callable's return type
 	 * @param callable
 	 *            the callable to execute
 	 * @param maxAttempts

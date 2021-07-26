@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
  */
 public abstract class ShopkeeperEvent extends Event {
 
-	protected final Shopkeeper shopkeeper;
+	private final Shopkeeper shopkeeper;
 
 	/**
 	 * Creates a new {@link ShopkeeperEvent}.

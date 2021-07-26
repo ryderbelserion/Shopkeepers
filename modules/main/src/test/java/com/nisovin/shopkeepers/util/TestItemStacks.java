@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.attribute.AttributeModifier.Operation;
@@ -26,6 +25,8 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+
+import com.nisovin.shopkeepers.util.bukkit.NamespacedKeyUtils;
 
 /**
  * ItemStack definitions for test cases.
@@ -103,10 +104,10 @@ public class TestItemStacks {
 		((Repairable) itemMeta).setRepairCost(3);
 		// Note: This data ends up getting stored in an arbitrary order internally.
 		PersistentDataContainer customTags = itemMeta.getPersistentDataContainer();
-		customTags.set(new NamespacedKey("some_plugin", "some-key"), PersistentDataType.STRING, "some value");
+		customTags.set(NamespacedKeyUtils.create("some_plugin", "some-key"), PersistentDataType.STRING, "some value");
 		PersistentDataContainer customContainer = customTags.getAdapterContext().newPersistentDataContainer();
-		customContainer.set(new NamespacedKey("inner_plugin", "inner-key"), PersistentDataType.FLOAT, 0.3F);
-		customTags.set(new NamespacedKey("some_plugin", "some-other-key"), PersistentDataType.TAG_CONTAINER, customContainer);
+		customContainer.set(NamespacedKeyUtils.create("inner_plugin", "inner-key"), PersistentDataType.FLOAT, 0.3F);
+		customTags.set(NamespacedKeyUtils.create("some_plugin", "some-other-key"), PersistentDataType.TAG_CONTAINER, customContainer);
 		itemStack.setItemMeta(itemMeta);
 		return itemStack;
 	}

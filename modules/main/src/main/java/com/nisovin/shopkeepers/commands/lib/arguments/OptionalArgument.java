@@ -16,6 +16,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * Wraps a given {@link CommandArgument} and makes it optional.
  * <p>
  * If no value can be parsed, no {@link ArgumentParseException} is thrown, but <code>null</code> is returned instead.
+ * 
+ * @param <T>
+ *            the type of the parsed argument
  */
 public class OptionalArgument<T> extends FallbackArgument<T> {
 

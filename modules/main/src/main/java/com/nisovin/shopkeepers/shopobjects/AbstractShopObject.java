@@ -11,7 +11,6 @@ import org.bukkit.configuration.ConfigurationSection;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
@@ -24,7 +23,7 @@ import com.nisovin.shopkeepers.ui.editor.EditorHandler;
  * <p>
  * Implementation hints:<br>
  * <ul>
- * <li>Make sure to call {@link Shopkeeper#markDirty()} on every change of data that might need to be persisted.
+ * <li>Make sure to call {@link AbstractShopkeeper#markDirty()} on every change of data that might need to be persisted.
  * </ul>
  */
 public abstract class AbstractShopObject implements ShopObject {
@@ -203,7 +202,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * respawned, teleported back into place, and brought back into its expected state.
 	 * <p>
 	 * This is also called for shop objects that manage their spawning and despawning
-	 * {@link AbstractShopObjectType#isSpawnedWithChunks() manually}.
+	 * {@link AbstractShopObjectType#mustBeSpawned() manually}.
 	 * <p>
 	 * Any changes to the shopkeeper's activation state or {@link AbstractShopObject#getId() shop object id} may only be
 	 * processed after the ticking of all currently ticked shop objects completes.
@@ -214,8 +213,8 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * The ticking of shop objects in active chunks may be spread across multiple ticks and may therefore not happen for
 	 * all shopkeepers within the same tick.
 	 * <p>
-	 * If any of the shopkeepers whose shop objects are ticked are marked as {@link Shopkeeper#isDirty() dirty}, a
-	 * {@link ShopkeeperStorage#saveDelayed() delayed save} will subsequently be triggered.
+	 * If any of the shopkeepers whose shop objects are ticked are marked as {@link AbstractShopkeeper#isDirty() dirty},
+	 * a {@link ShopkeeperStorage#saveDelayed() delayed save} will subsequently be triggered.
 	 * <p>
 	 * If you are overriding this method, consider calling the parent class version of this method.
 	 */

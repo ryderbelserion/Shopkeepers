@@ -11,6 +11,9 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 
 /**
  * A {@link CommandArgument} that returns a fixed value without consuming any arguments.
+ * 
+ * @param <T>
+ *            the type of the parsed argument
  */
 public class FixedValueArgument<T> extends CommandArgument<T> {
 

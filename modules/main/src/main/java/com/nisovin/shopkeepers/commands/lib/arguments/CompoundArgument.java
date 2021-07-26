@@ -16,6 +16,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * An abstract {@link CommandArgument} which consists of multiple other command arguments which it parses its value
  * from.
+ * 
+ * @param <T>
+ *            the type of the parsed argument
  */
 public abstract class CompoundArgument<T> extends CommandArgument<T> {
 

@@ -50,14 +50,14 @@ public class NamespacedKeyUtilsTests {
 
 		// Custom namespace:
 		testParsing("custom:", null);
-		testParsing("custom:bla", new NamespacedKey("custom", "bla"));
-		testParsing("custom:bla_blubb", new NamespacedKey("custom", "bla_blubb"));
-		testParsing("custom:bla-blubb", new NamespacedKey("custom", "bla-blubb")); // Dash might be valid
-		testParsing("custom:bla blubb", new NamespacedKey("custom", "bla_blubb"));
-		testParsing("custom:bla.blubb", new NamespacedKey("custom", "bla.blubb"));
-		testParsing("custom:bla/blubb", new NamespacedKey("custom", "bla/blubb"));
-		testParsing(" custom:bla_blubb  ", new NamespacedKey("custom", "bla_blubb"));
-		testParsing("custom:bla_BluBB", new NamespacedKey("custom", "bla_blubb"));
+		testParsing("custom:bla", NamespacedKeyUtils.create("custom", "bla"));
+		testParsing("custom:bla_blubb", NamespacedKeyUtils.create("custom", "bla_blubb"));
+		testParsing("custom:bla-blubb", NamespacedKeyUtils.create("custom", "bla-blubb")); // Dash might be valid
+		testParsing("custom:bla blubb", NamespacedKeyUtils.create("custom", "bla_blubb"));
+		testParsing("custom:bla.blubb", NamespacedKeyUtils.create("custom", "bla.blubb"));
+		testParsing("custom:bla/blubb", NamespacedKeyUtils.create("custom", "bla/blubb"));
+		testParsing(" custom:bla_blubb  ", NamespacedKeyUtils.create("custom", "bla_blubb"));
+		testParsing("custom:bla_BluBB", NamespacedKeyUtils.create("custom", "bla_blubb"));
 	}
 
 	private void testParsing(String input, NamespacedKey expected) {

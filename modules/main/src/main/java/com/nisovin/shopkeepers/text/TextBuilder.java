@@ -89,8 +89,7 @@ public abstract class TextBuilder extends AbstractText {
 	/**
 	 * Sets the child Text.
 	 * <p>
-	 * The child Text may be an unbuilt {@link AbstractTextBuilder TextBuilder} as well. It gets built once this Text
-	 * gets built.
+	 * The child Text may be an unbuilt {@link TextBuilder} as well. It gets built once this Text gets built.
 	 * 
 	 * @param <T>
 	 *            the type of the child text

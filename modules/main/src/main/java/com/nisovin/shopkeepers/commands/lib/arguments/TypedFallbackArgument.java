@@ -18,6 +18,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <p>
  * Unlike {@link AnyFallbackArgument} this provides a value of a specific type. This requires the both original and the
  * fallback argument to be of the same type.
+ * 
+ * @param <T>
+ *            the type of the parsed argument
  */
 public class TypedFallbackArgument<T> extends FallbackArgument<T> {
 

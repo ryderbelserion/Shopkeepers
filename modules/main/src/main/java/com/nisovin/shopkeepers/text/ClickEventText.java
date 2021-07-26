@@ -15,7 +15,7 @@ public class ClickEventText extends TextBuilder {
 		OPEN_FILE,
 		/**
 		 * Causes the player to enter and send the specified text in chat. This can be used to execute commands
-		 * (starting with {@link /}). The player requires the corresponding command permission.
+		 * (starting with {@code /}). The player requires the corresponding command permission.
 		 */
 		RUN_COMMAND,
 		/**
