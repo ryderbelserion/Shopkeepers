@@ -29,7 +29,7 @@ To support the latest mappings version:
 		* Check all NMS version specific code:
 			* Methods or fields might no longer exist or might have been renamed.
 
-* Add a new build entry in 'installSpigotDependencies.sh'.
+* Add a new build entry in 'scripts/installSpigotDependencies.sh'.
 
 * New mobs:
 	* Test if they can be used for shopkeepers.

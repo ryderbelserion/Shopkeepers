@@ -2,9 +2,5 @@
 #jdk:
 #- openjdk16
 
-# Install missing Spigot dependencies.
-before_install:
-- ./installSpigotDependencies.sh
-
 install:
 - ./build.sh

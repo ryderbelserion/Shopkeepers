@@ -21,7 +21,6 @@ jobs:
       with:
         path: ~/.jabba
         key: ${{ runner.os }}-jabba
-    - run: ./installSpigotDependencies.sh
     - run: ./build.sh
     # Upload workflow artifacts to allow the inspection of build results.
     # These are only retained for a few days.

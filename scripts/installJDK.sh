@@ -19,9 +19,11 @@ esac
 
 echo Installing Java JDK: $JDK_VERSION
 
-# We use Jabba to manage multiple JDK versions regardless of platform.
-# Install Jabba, if it is not already installed.
-source ./installJabba.sh
+# We use Jabba to manage multiple JDK versions regardless of the platform.
+# Install Jabba if it is not already installed.
+pushd "$(dirname "$BASH_SOURCE")"
+source installJabba.sh
+popd
 
 # Install the requested JDK version:
 jabba install $JDK_VERSION
