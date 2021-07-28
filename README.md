@@ -32,7 +32,6 @@ We use Maven to compile and build the plugin. This repository comes with bash sc
 ```
 git clone https://github.com/Shopkeepers/Shopkeepers.git
 cd Shopkeepers
-./installSpigotDependencies.sh
 ./build.sh
 ```
 
@@ -48,7 +47,7 @@ The `root` project contains several module projects. The most important ones are
 * `api`: This contains all API code.
 * And several modules for the NMS / CraftBukkit version specific code of the supported server versions.
 
-Shopkeepers requires serveral Spigot and CraftBukkit dependencies. The easiest way to automatically build and install these dependencies into your local Maven repository is to run the included `./installSpigotDependencies.sh` script.
+Shopkeepers requires serveral Spigot and CraftBukkit dependencies. The easiest way to automatically build and install these dependencies into your local Maven repository is to run the included `./scripts/installSpigotDependencies.sh` script.
 
 To then build the project from within your IDE, refer to your IDE's respective documentation on how to build Maven projects. For Eclipse, right click the root project and select **Run As > Maven install**. We require Java 16 to build.
 
