@@ -4,25 +4,30 @@ Date format: (YYYY-MM-DD)
 ## v2.13.4 (TBA)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
-* API: Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
-* API: Added User interface to represent players that the plugin knows about. However, this is not yet used throughout the API.
-* API: Various Javadoc additions, improvements, and fixes.
-* API: Deprecated DefaultShopTypes#getAdminShopType() and #ADMIN(), and added #getRegularAdminShopType() and #ADMIN_REGULAR() as alternatives.
-* API: Deprecated the previous constructors and factory methods of AdminShopCreationData and PlayerShopCreationData, and added corresponding alternatives that directly require an AdminShopType or PlayerShopType respectively.
-* API: Deprecated the superfluous LivingShopObjectTypes#getAliases(EntityType).
-* Internal: Refactors related to the removal of shopkeepers of inactive players. Also, when shopkeepers of inactive players were removed, we immediately trigger a save now, even if the 'save-instantly' setting is disabled.
-* Internal: Added validation for some constructor and method arguments in the API.
-* Internal: APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
-* Internal: Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
-* Internal: Various minor internal refactors and Javadoc fixes.
-* Build: Removed the unused jenkins and release build profiles from Maven.
-* Build: All external Maven repositories are accessed via https now.
-* Build: Bumped the Vault dependency to version 1.7 and updated its repository.
-* Build: Reduced the Citizens dependency to the 'citizens-main' portion of Citizens.
-* Build: Bumped the WorldGuard dependency to 7.0.0, updated the repository, and removed the no longer needed Paper repository.
-* Build: Removed the no longer required Hamcrest library test dependency.
-* Build: Moved all auxiliary build scripts into a separate 'scripts' folder and made them less reliant on the directory they are called from.
-* Build: The primary 'build' script automatically invokes the 'installSpigotDependencies' script now.
+**API changes:**  
+* Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
+* Added User interface to represent players that the plugin knows about. However, this is not yet used throughout the API.
+* Various Javadoc additions, improvements, and fixes.
+* Deprecated DefaultShopTypes#getAdminShopType() and #ADMIN(), and added #getRegularAdminShopType() and #ADMIN_REGULAR() as alternatives.
+* Deprecated the previous constructors and factory methods of AdminShopCreationData and PlayerShopCreationData, and added corresponding alternatives that directly require an AdminShopType or PlayerShopType respectively.
+* Deprecated the superfluous LivingShopObjectTypes#getAliases(EntityType).
+
+**Various internal build changes:**  
+* Removed the unused jenkins and release build profiles from Maven.
+* All external Maven repositories are accessed via https now.
+* Bumped the Vault dependency to version 1.7 and updated its repository.
+* Reduced the Citizens dependency to the 'citizens-main' portion of Citizens.
+* Bumped the WorldGuard dependency to 7.0.0, updated the repository, and removed the no longer needed Paper repository.
+* Removed the no longer required Hamcrest library test dependency.
+* Moved all auxiliary build scripts into a separate 'scripts' folder and made them less reliant on the directory they are called from.
+* The primary 'build' script automatically invokes the 'installSpigotDependencies' script now.
+
+**Other internal changes:**  
+* Refactors related to the removal of shopkeepers of inactive players. Also, when shopkeepers of inactive players were removed, we immediately trigger a save now, even if the 'save-instantly' setting is disabled.
+* Added validation for some constructor and method arguments in the API.
+* APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
+* Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
+* Various minor internal refactors and Javadoc fixes.
 
 ## v2.13.3 (2021-07-08)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
