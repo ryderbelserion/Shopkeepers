@@ -24,7 +24,7 @@ jobs:
     - run: ./build.sh
     # Upload workflow artifacts to allow the inspection of build results.
     # These are only retained for a few days.
-    - run: mkdir staging && cp target/*.jar staging
+    - run: mkdir staging && cp build/*.jar staging
     - uses: actions/upload-artifact@v2
       with:
         path: staging
