@@ -27,7 +27,9 @@ Cloning and Building
 
 This section assumes that you have [Git](https://git-scm.com/) installed.
 
-We use Maven to compile and build the plugin. This repository comes with bash scripts to automatically install the required version of Maven, build the required [Spigot](https://www.spigotmc.org/wiki/spigot/) dependencies, and then use Maven to build Shopkeepers and produce a plugin and an API jar. To build Shopkeepers, just execute the following commands from within a bash console. If you are on Windows, you can install [Git-for-Windows](https://gitforwindows.org/) and then execute these commands from within the "Git Bash".
+We use Gradle to compile and build the plugin. This repository comes with Bash scripts to automatically install the required versions of Gradle and the Java SDK, build the required [Spigot](https://www.spigotmc.org/wiki/spigot/) dependencies, and then use Gradle to build Shopkeepers and produce a plugin, an API, and a 'main' jar. Unless you are a developer, you can ignore the latter two jars.
+
+To build Shopkeepers, just execute the following commands from within a Bash console. If you are on Windows, you can install [Git-for-Windows](https://gitforwindows.org/) and then execute these commands from within the "Git Bash".
 
 ```
 git clone https://github.com/Shopkeepers/Shopkeepers.git
@@ -35,20 +37,23 @@ cd Shopkeepers
 ./build.sh
 ```
 
-If everything went well, the `target` folder will contain a plugin jar that you can install on your server, as well as an API jar that can be used to by other plugin developers to develop addons.
+If everything went well, the `build` folder will contain a plugin jar that you can install on your server, as well as an API and 'main' jar that can be used to by other plugin developers to develop addons. The API jar contains the more stable but limited public API, whereas the 'main' jar contains the far less stable internal plugin code, excluding any server version specific code.
 
 Pull Requests & Contributing
 ----------
 
-To import the project into your favorite Java IDE, refer to your IDE's respective documentation on how to import Maven projects. For example, in Eclipse you can find this under **Import > Maven > Existing Maven Projects**. Select the root Shopkeepers folder and import all the Maven projects found by Eclipse.
+To import the project into your favorite Java IDE, refer to your IDE's respective documentation on how to import Gradle projects. For example, in Eclipse you can find this under **Import > Gradle > Existing Gradle Project**. Follow the instructions to select the root Shopkeepers folder and import all the Gradle projects found by Eclipse.
 
-The `root` project contains several module projects. The most important ones are:
+The root project contains several module projects. The most important ones are:
 * `main`: This contains the core plugin code.
 * `api`: This contains all API code.
 * And several modules for the NMS / CraftBukkit version specific code of the supported server versions.
 
 Shopkeepers requires serveral Spigot and CraftBukkit dependencies. The easiest way to automatically build and install these dependencies into your local Maven repository is to run the included `./scripts/installSpigotDependencies.sh` script.
 
-To then build the project from within your IDE, refer to your IDE's respective documentation on how to build Maven projects. For Eclipse, right click the root project and select **Run As > Maven install**. We require Java 16 to build.
+To build the project from within your IDE, refer to your IDE's respective documentation on how to build Gradle projects. For Eclipse, right click the root project, select **Run As > Run configurations...**, and then setup a 'Gradle Task' run configuration that executes the intended Gradle build tasks.  
+Some shortcuts have been defined for commonly used combinations of build tasks. For example, 'cleanBuild' will trigger a clean build and runs all tests. 'cleanInstall' will additionally install the built jars into your local Maven repository.  
+
+Note that we require Java 16 to build.
 
 For more information on creating pull requests and contributing code to the project see [Contributing](CONTRIBUTING.md).

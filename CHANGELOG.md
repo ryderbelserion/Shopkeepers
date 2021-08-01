@@ -4,6 +4,8 @@ Date format: (YYYY-MM-DD)
 ## v2.13.4 (TBA)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
+* Versioning: Snapshot builds will now include the Git hash in their plugin version.
+
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
 * Added User interface to represent players that the plugin knows about. However, this is not yet used throughout the API.
@@ -13,6 +15,9 @@ Date format: (YYYY-MM-DD)
 * Deprecated the superfluous LivingShopObjectTypes#getAliases(EntityType).
 
 **Various internal build changes:**  
+* Switched from Maven to Gradle.
+* The Maven publication of the Shopkeepers API also includes the API Javadocs now.
+* We also publish a 'ShopkeepersMain' artifact now that contains the internal plugin code, but omits all NMS modules. Any plugins that rely on these internals, but don't require the NMS modules, can now depend on this artifact as an alternative to depending on the complete plugin jar.
 * Removed the unused jenkins and release build profiles from Maven.
 * All external Maven repositories are accessed via https now.
 * Bumped the Vault dependency to version 1.7 and updated its repository.

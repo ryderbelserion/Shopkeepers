@@ -1,0 +1,31 @@
+[versions]
+# Lowest supported Bukkit version.
+bukkit = "1.14.4-R0.1-SNAPSHOT"
+# Corresponding Spigot version for optional Spigot-specific features.
+spigot = "1.14.4-R0.1-SNAPSHOT"
+# Corresponding CraftBukkit version. Only required for testing.
+# Individual NMS modules can use other CraftBukkit versions.
+craftbukkit = "1.14.4-R0.1-SNAPSHOT"
+
+worldguard = "7.0.0"
+towny = "0.96.2.0"
+citizens = "2.0.28-SNAPSHOT"
+vault = "1.7"
+bstats = "1.5"
+
+junit = "4.13.1"
+asm = "9.1"
+
+[libraries]
+bukkit = { module = "org.bukkit:bukkit", version.ref = "bukkit" }
+spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
+craftbukkit = { module = "org.bukkit:craftbukkit", version.ref = "craftbukkit" }
+
+worldguard-bukkit = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }
+towny = { module = "com.github.TownyAdvanced:Towny", version.ref = "towny" }
+citizens-main = { module = "net.citizensnpcs:citizens-main", version.ref = "citizens" }
+vault-api = { module = "net.milkbowl.vault:VaultAPI", version.ref = "vault" }
+bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
+
+junit = { module = "junit:junit", version.ref = "junit" }
+asm = { module = "org.ow2.asm:asm", version.ref = "asm" }

@@ -1,0 +1,44 @@
+plugins {
+	id 'java-library'
+	id 'maven-publish'
+}
+
+dependencies {
+	// compileOnly: Omits the dependency from the transitively inherited apiElements and runtimeElements.
+	// However, we need to manually add this dependency to our test dependencies if needed.
+	// Although consumers of this library require the Bukkit dependency, we expect them to declare Bukkit as one of their
+	// own dependencies anyways. If they require a more specific version or variant of Bukkit, our transitive Bukkit
+	// dependency would likely conflict with that and would then need to be manually ignored.
+	compileOnly libs.bukkit
+
+	testImplementation libs.bukkit
+	testImplementation libs.junit
+}
+
+java {
+	withJavadocJar()
+}
+
+javadocJar {
+	configureJarTask(project, it)
+}
+
+// Copies the project's jars into the build folder of the root project.
+task copyResults(type: Copy) {
+	from jar
+	from javadocJar
+	into rootProject.buildDir
+}
+
+assemble {
+	dependsOn copyResults
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) { publication ->
+			configureMavenPublication(project, publication)
+			from project.components.java
+		}
+	}
+}

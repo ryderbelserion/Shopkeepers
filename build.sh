@@ -8,7 +8,7 @@ pushd "$(dirname "$BASH_SOURCE")"
 # We require Java 16 to build:
 source scripts/installJDK.sh 16
 
-# Build via Maven:
-./mvnw clean install
+# Build via Gradle:
+./gradlew cleanInstall
 
 popd
