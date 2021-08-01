@@ -190,8 +190,8 @@ subprojects {
 				maven {
 					name 'lichtspieleNexus'
 					credentials {
-						username property('org.lichtspiele.nexus-username')
-						password property('org.lichtspiele.nexus-password')
+						username findProperty('org.lichtspiele.nexus-username') ?: 'UNSET'
+						password findProperty('org.lichtspiele.nexus-password') ?: 'UNSET'
 					}
 					if (project.isSnapshot) {
 						url 'https://nexus.lichtspiele.org/repository/snapshots/'
