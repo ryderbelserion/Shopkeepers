@@ -7,6 +7,8 @@ import org.bukkit.entity.Player;
 
 /**
  * Represents a player that the Shopkeepers plugin knows about.
+ * <p>
+ * The player may not be currently online.
  */
 public interface User {
 

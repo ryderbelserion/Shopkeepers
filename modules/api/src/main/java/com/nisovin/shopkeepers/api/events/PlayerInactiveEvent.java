@@ -11,9 +11,8 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.user.User;
 
 /**
- * This event is called whenever a player is detected to be inactive and their {@link PlayerShopkeeper
- * shopkeepers} are about to be deleted.
- * TODO Rename UserInactiveEvent?
+ * This event is called whenever a player is detected to be inactive and their {@link PlayerShopkeeper shopkeepers} are
+ * about to be deleted.
  */
 public class PlayerInactiveEvent extends Event implements Cancellable {
 
