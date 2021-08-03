@@ -30,8 +30,8 @@ ext.remapMojangToObfuscated = { inputFile, outputFile, craftbukkitVersion ->
 	println '  CraftBukkit version: ' + craftbukkitVersion
 	exec {
 		commandLine 'java',
-			'-cp', remappedMojang.replace('{craftbukkitVersion}', craftbukkitVersion),
-			'-jar', specialSource,
+			'-cp', "${specialSource};${remappedMojang}".replace('{craftbukkitVersion}', craftbukkitVersion),
+			'net.md_5.specialsource.SpecialSource',
 			'--live',
 			'-i', inputFile.path,
 			'-o', outputFile.path,
@@ -48,8 +48,8 @@ ext.remapObfuscatedToSpigot = { inputFile, outputFile, craftbukkitVersion ->
 	println '  CraftBukkit version: ' + craftbukkitVersion
 	exec {
 		commandLine 'java',
-			'-cp', remappedObf.replace('{craftbukkitVersion}', craftbukkitVersion),
-			'-jar', specialSource,
+			'-cp', "${specialSource};${remappedObf}".replace('{craftbukkitVersion}', craftbukkitVersion),
+			'net.md_5.specialsource.SpecialSource',
 			'--live',
 			'-i', inputFile.path,
 			'-o', outputFile.path,
