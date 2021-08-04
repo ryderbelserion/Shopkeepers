@@ -32,7 +32,7 @@ Date format: (YYYY-MM-DD)
 * Added validation for some constructor and method arguments in the API.
 * APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
 * Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
-* Various minor internal refactors and Javadoc fixes.
+* Various other minor internal refactors and Javadoc improvements.
 
 ## v2.13.3 (2021-07-08)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4

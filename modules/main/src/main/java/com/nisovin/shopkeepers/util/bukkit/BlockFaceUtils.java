@@ -9,15 +9,24 @@ import org.bukkit.util.Vector;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
+/**
+ * Utilities related to {@link BlockFace}.
+ */
 public class BlockFaceUtils {
 
 	private BlockFaceUtils() {
 	}
 
+	/**
+	 * Sets of directional {@link BlockFace BlockFaces}.
+	 */
 	public enum BlockFaceDirections {
-		// Order matters for operations like yaw to block face.
+		// Order matters for operations like yaw to BlockFace.
 		CARDINAL(Arrays.asList(BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST)),
-		INTERCARDINAL(Arrays.asList(BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST, BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST)),
+		INTERCARDINAL(
+				Arrays.asList(
+						BlockFace.SOUTH, BlockFace.SOUTH_WEST, BlockFace.WEST, BlockFace.NORTH_WEST,
+						BlockFace.NORTH, BlockFace.NORTH_EAST, BlockFace.EAST, BlockFace.SOUTH_EAST)),
 		SECONDARY_INTERCARDINAL(
 				Arrays.asList(
 						BlockFace.SOUTH, BlockFace.SOUTH_SOUTH_WEST, BlockFace.SOUTH_WEST, BlockFace.WEST_SOUTH_WEST,
@@ -25,75 +34,155 @@ public class BlockFaceUtils {
 						BlockFace.NORTH, BlockFace.NORTH_NORTH_EAST, BlockFace.NORTH_EAST, BlockFace.EAST_NORTH_EAST,
 						BlockFace.EAST, BlockFace.EAST_SOUTH_EAST, BlockFace.SOUTH_EAST, BlockFace.SOUTH_SOUTH_EAST));
 
-		private final List<BlockFace> directions;
+		private final List<BlockFace> blockFaces;
 
-		private BlockFaceDirections(List<BlockFace> directions) {
-			this.directions = Collections.unmodifiableList(directions);
+		private BlockFaceDirections(List<BlockFace> blockFaces) {
+			this.blockFaces = Collections.unmodifiableList(blockFaces);
 		}
 
-		public List<BlockFace> getDirections() {
-			return directions;
+		/**
+		 * Gets the {@link BlockFace BlockFaces} contained in this set.
+		 * 
+		 * @return the block faces
+		 */
+		public final List<BlockFace> getBlockFaces() {
+			return blockFaces;
+		}
+
+		/**
+		 * Gets the {@link BlockFace} within this set that corresponds most closely to the given yaw angle.
+		 * 
+		 * @param yaw
+		 *            the yaw angle
+		 * @return the corresponding block face
+		 */
+		public BlockFace fromYaw(float yaw) {
+			int blockFaceCount = blockFaces.size();
+			float anglePerBlockFace = 360.0F / blockFaceCount;
+			int blockFaceIndex = Math.round(yaw / anglePerBlockFace) % blockFaceCount;
+			if (blockFaceIndex < 0) blockFaceIndex += blockFaceCount;
+			return blockFaces.get(blockFaceIndex);
 		}
 	}
+
+	private static final List<BlockFace> BLOCK_SIDES = Collections.unmodifiableList(Arrays.asList(
+			BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST));
 
 	/**
-	 * Gets the horizontal {@link BlockFace} corresponding to the given yaw angle.
+	 * Gets the six {@link BlockFace BlockFaces} that correspond to the sides of a block.
 	 * 
-	 * @param yaw
-	 *            the yaw angle
-	 * @param blockFaceDirections
-	 *            the block face directions
-	 * @return the block face corresponding to the given yaw angle
+	 * @return the block faces that correspond to the sides of a block
 	 */
-	public static BlockFace yawToFace(float yaw, BlockFaceDirections blockFaceDirections) {
-		Validate.notNull(blockFaceDirections, "BlockFaceDirections is null!");
-		switch (blockFaceDirections) {
-		case CARDINAL:
-			return blockFaceDirections.getDirections().get(Math.round(yaw / 90.0f) & 3);
-		case INTERCARDINAL:
-			return blockFaceDirections.getDirections().get(Math.round(yaw / 45.0f) & 7);
-		case SECONDARY_INTERCARDINAL:
-			return blockFaceDirections.getDirections().get(Math.round(yaw / 22.5f) & 15);
-		default:
-			throw new IllegalArgumentException("Unsupported BlockFaceDirections: " + blockFaceDirections);
-		}
-	}
-
-	private static final List<BlockFace> BLOCK_SIDES = Collections.unmodifiableList(Arrays.asList(BlockFace.UP, BlockFace.DOWN,
-			BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST));
-
 	public static List<BlockFace> getBlockSides() {
 		return BLOCK_SIDES;
 	}
 
+	/**
+	 * Checks whether the given {@link BlockFace} is a {@link #getBlockSides() block side}.
+	 * 
+	 * @param blockFace
+	 *            the block face
+	 * @return <code>true</code> if the given block face is a block side
+	 */
 	public static boolean isBlockSide(BlockFace blockFace) {
 		return BLOCK_SIDES.contains(blockFace);
 	}
 
 	/**
-	 * Checks if the given {@link BlockFace} is valid to be used for a wall sign.
+	 * Gets the yaw angle that corresponds to the given horizontal {@link BlockFace}.
 	 * 
 	 * @param blockFace
 	 *            the block face
-	 * @return <code>true</code> if the given block face is a valid wall sign face
+	 * @return the corresponding yaw
 	 */
-	public static boolean isWallSignFace(BlockFace blockFace) {
-		return blockFace == BlockFace.NORTH || blockFace == BlockFace.SOUTH
-				|| blockFace == BlockFace.EAST || blockFace == BlockFace.WEST;
-	}
+	public static float getYaw(BlockFace blockFace) {
+		Validate.notNull(blockFace, "blockFace");
+		List<BlockFace> horizontalBlockFaces = BlockFaceDirections.SECONDARY_INTERCARDINAL.getBlockFaces();
+		int blockFaceIndex = horizontalBlockFaces.indexOf(blockFace);
+		Validate.isTrue(blockFaceIndex != -1, "Invalid BlockFace: " + blockFace);
 
-	public static BlockFace getSignPostFacing(float yaw) {
-		return yawToFace(yaw, BlockFaceDirections.SECONDARY_INTERCARDINAL);
-	}
-
-	public static boolean isSignPostFacing(BlockFace blockFace) {
-		return BlockFaceDirections.SECONDARY_INTERCARDINAL.getDirections().contains(blockFace);
+		float anglePerBlockFace = 360.0F / horizontalBlockFaces.size();
+		return blockFaceIndex * anglePerBlockFace;
 	}
 
 	/**
-	 * Determines the axis-aligned {@link BlockFace} for the given direction.
+	 * Gets the set of valid wall sign {@link BlockFace BlockFaces}.
+	 * 
+	 * @return the set of wall sign block faces
+	 */
+	public static BlockFaceDirections getWallSignBlockFaces() {
+		return BlockFaceDirections.CARDINAL;
+	}
+
+	/**
+	 * Gets the wall sign {@link BlockFace} that corresponds closest to the given yaw angle.
+	 * 
+	 * @param yaw
+	 *            the yaw angle
+	 * @return the corresponding wall sign block face
+	 */
+	public static BlockFace getWallSignFace(float yaw) {
+		return getWallSignBlockFaces().fromYaw(yaw);
+	}
+
+	/**
+	 * Gets the wall sign {@link BlockFace} that most closely faces towards the given direction.
+	 * 
+	 * @param direction
+	 *            the direction
+	 * @return the corresponding wall sign face
+	 */
+	public static BlockFace toWallSignFace(Vector direction) {
+		Validate.notNull(direction, "direction");
+		return getAxisAlignedBlockFace(direction.getX(), 0.0D, direction.getZ());
+	}
+
+	/**
+	 * Checks if the given {@link BlockFace} is a valid wall sign block face.
+	 * 
+	 * @param blockFace
+	 *            the block face
+	 * @return <code>true</code> if the given block face is a valid wall sign block face
+	 */
+	public static boolean isWallSignFace(BlockFace blockFace) {
+		return getWallSignBlockFaces().getBlockFaces().contains(blockFace);
+	}
+
+	/**
+	 * Gets the set of valid sign post {@link BlockFace BlockFaces}.
+	 * 
+	 * @return the set of sign post block faces
+	 */
+	public static BlockFaceDirections getSignPostBlockFaces() {
+		return BlockFaceDirections.SECONDARY_INTERCARDINAL;
+	}
+
+	/**
+	 * Gets the sign post {@link BlockFace} that corresponds closest to the given yaw angle.
+	 * 
+	 * @param yaw
+	 *            the yaw angle
+	 * @return the corresponding sign post block face
+	 */
+	public static BlockFace getSignPostFacing(float yaw) {
+		return getSignPostBlockFaces().fromYaw(yaw);
+	}
+
+	/**
+	 * Checks if the given {@link BlockFace} is a valid sign post block face.
+	 * 
+	 * @param blockFace
+	 *            the block face
+	 * @return <code>true</code> if the given block face is a valid sign post block face
+	 */
+	public static boolean isSignPostFacing(BlockFace blockFace) {
+		return getSignPostBlockFaces().getBlockFaces().contains(blockFace);
+	}
+
+	/**
+	 * Gets the axis-aligned {@link BlockFace} that most closely faces towards the given direction.
 	 * <p>
-	 * If modY is zero only {@link BlockFace}s facing horizontal will be returned.
+	 * If {@code modY} is zero, only horizontally facing block faces are considered.
 	 * <p>
 	 * This method takes into account that the values for EAST/WEST and NORTH/SOUTH were switched in some past version
 	 * of Bukkit. So it should also properly work with older Bukkit versions.
@@ -104,9 +193,9 @@ public class BlockFaceUtils {
 	 *            the y direction
 	 * @param modZ
 	 *            the z direction
-	 * @return the block face
+	 * @return the block face that most closely faces towards the given direction
 	 */
-	public static BlockFace getAxisBlockFace(double modX, double modY, double modZ) {
+	public static BlockFace getAxisAlignedBlockFace(double modX, double modY, double modZ) {
 		double xAbs = Math.abs(modX);
 		double yAbs = Math.abs(modY);
 		double zAbs = Math.abs(modZ);
@@ -158,17 +247,5 @@ public class BlockFaceUtils {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Tries to find the nearest wall sign {@link BlockFace} facing towards the given direction.
-	 * 
-	 * @param direction
-	 *            the direction
-	 * @return the corresponding wall sign face
-	 */
-	public static BlockFace toWallSignFace(Vector direction) {
-		assert direction != null;
-		return getAxisBlockFace(direction.getX(), 0.0D, direction.getZ());
 	}
 }
