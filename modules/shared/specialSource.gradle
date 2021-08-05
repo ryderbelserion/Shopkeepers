@@ -28,9 +28,10 @@ ext.remapMojangToObfuscated = { inputFile, outputFile, craftbukkitVersion ->
 	println '  Input: ' + inputFile.path
 	println '  Output: ' + outputFile.path
 	println '  CraftBukkit version: ' + craftbukkitVersion
+	def classpathSeparator = System.properties['path.separator']
 	exec {
 		commandLine 'java',
-			'-cp', "${specialSource};${remappedMojang}".replace('{craftbukkitVersion}', craftbukkitVersion),
+			'-cp', "${specialSource}${classpathSeparator}${remappedMojang}".replace('{craftbukkitVersion}', craftbukkitVersion),
 			'net.md_5.specialsource.SpecialSource',
 			'--live',
 			'-i', inputFile.path,
@@ -46,9 +47,10 @@ ext.remapObfuscatedToSpigot = { inputFile, outputFile, craftbukkitVersion ->
 	println '  Input: ' + inputFile.path
 	println '  Output: ' + outputFile.path
 	println '  CraftBukkit version: ' + craftbukkitVersion
+	def classpathSeparator = System.properties['path.separator']
 	exec {
 		commandLine 'java',
-			'-cp', "${specialSource};${remappedObf}".replace('{craftbukkitVersion}', craftbukkitVersion),
+			'-cp', "${specialSource}${classpathSeparator}${remappedObf}".replace('{craftbukkitVersion}', craftbukkitVersion),
 			'net.md_5.specialsource.SpecialSource',
 			'--live',
 			'-i', inputFile.path,
