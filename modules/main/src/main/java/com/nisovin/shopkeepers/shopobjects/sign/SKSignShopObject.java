@@ -49,7 +49,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	protected final SignShops signShops;
 	private SignType signType = SignType.OAK; // Not null, not unsupported, default is OAK.
 	private boolean wallSign = true;
-	private BlockFace signFacing = BlockFace.SOUTH; // Not null
 	private final Property<Boolean> glowingTextProperty = new BooleanProperty(shopkeeper, "glowingText", false);
 
 	// Update the sign content at least once after plugin start, in case some settings have changed which affect the
@@ -67,11 +66,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		if (creationData != null) {
 			BlockFace targetedBlockFace = creationData.getTargetedBlockFace();
 			if (targetedBlockFace == BlockFace.UP) {
-				this.wallSign = false;
-				this.signFacing = BlockFaceUtils.getSignPostFacing(creationData.getSpawnLocation().getYaw());
-			} else if (BlockFaceUtils.isWallSignFace(targetedBlockFace)) {
-				this.signFacing = targetedBlockFace;
-			}
+				this.wallSign = false; // Sign post
+			} // Else: Wall sign (default).
 		}
 	}
 
@@ -121,24 +117,26 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		}
 		wallSign = configSection.getBoolean("wallSign", true);
 
-		// Sign facing:
-		signFacing = BlockFace.SOUTH; // Default
+		// Migration from sign facing to shopkeeper yaw (pre v2.13.4):
+		// TODO Remove this migration again at some point.
 		String signFacingName = configSection.getString("signFacing");
-		if (signFacingName == null) {
-			Log.warning("Missing sign facing for shopkeeper " + shopkeeper.getId());
-			shopkeeper.markDirty();
-		} else {
+		if (signFacingName != null) {
+			BlockFace signFacing = BlockFace.SOUTH;
 			try {
 				signFacing = BlockFace.valueOf(signFacingName);
 			} catch (IllegalArgumentException e) {
-				Log.warning("Could not parse sign facing for shopkeeper " + shopkeeper.getId() + ": " + signFacingName);
-				shopkeeper.markDirty();
+				Log.warning("Could not parse sign facing for shopkeeper " + shopkeeper.getId() + " ('" + signFacingName
+						+ "'). Falling back to SOUTH.");
 			}
-			if (wallSign ? !BlockFaceUtils.isWallSignFace(signFacing) : !BlockFaceUtils.isSignPostFacing(signFacing)) {
-				Log.warning("Invalid sign facing for shopkeeper " + shopkeeper.getId() + ": " + signFacingName);
-				signFacing = BlockFace.SOUTH; // Fallback to default
-				shopkeeper.markDirty();
+			if (wallSign ? !BlockFaceUtils.isWallSignFacing(signFacing) : !BlockFaceUtils.isSignPostFacing(signFacing)) {
+				Log.warning("Invalid sign facing for shopkeeper " + shopkeeper.getId() + " ('" + signFacingName
+						+ "'). Falling back to SOUTH.");
+				signFacing = BlockFace.SOUTH;
 			}
+
+			Log.warning("Migrating sign facing (" + signFacing + ") to yaw for shopkeeper " + shopkeeper.getId());
+			float yaw = BlockFaceUtils.getYaw(signFacing);
+			shopkeeper.setYaw(yaw); // This also marks the shopkeeper as dirty
 		}
 
 		glowingTextProperty.load(configSection);
@@ -154,8 +152,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		// Wall sign vs sign post:
 		configSection.set("wallSign", wallSign);
 
-		// Sign facing:
-		configSection.set("signFacing", signFacing.name());
+		// Note: The sign facing is not saved, but instead derived from the shopkeeper's yaw.
 
 		glowingTextProperty.save(configSection);
 	}
@@ -165,7 +162,11 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	public BlockFace getSignFacing() {
-		return signFacing;
+		if (this.isWallSign()) {
+			return BlockFaceUtils.getWallSignFacings().fromYaw(shopkeeper.getYaw());
+		} else {
+			return BlockFaceUtils.getSignPostFacings().fromYaw(shopkeeper.getYaw());
+		}
 	}
 
 	// ACTIVATION
@@ -246,12 +247,12 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		if (wallSign) {
 			// Wall sign:
 			WallSign wallSignData = (WallSign) Bukkit.createBlockData(signMaterial);
-			wallSignData.setFacing(signFacing);
+			wallSignData.setFacing(this.getSignFacing());
 			signData = wallSignData;
 		} else {
 			// Sign post:
 			org.bukkit.block.data.type.Sign signPostData = (org.bukkit.block.data.type.Sign) Bukkit.createBlockData(signMaterial);
-			signPostData.setRotation(signFacing);
+			signPostData.setRotation(this.getSignFacing());
 			signData = signPostData;
 		}
 		return signData;

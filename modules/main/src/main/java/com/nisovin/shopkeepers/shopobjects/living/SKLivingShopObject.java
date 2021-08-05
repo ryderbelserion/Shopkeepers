@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -118,10 +117,10 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	// blocks like grass or non-full blocks like carpets or slabs might have been broken since the shopkeeper was
 	// created. We still want to place the shopkeeper nicely on the ground in those cases.
 	private Location getSpawnLocation() {
-		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		if (world == null) return null; // World not loaded
+		Location spawnLocation = shopkeeper.getLocation();
+		if (spawnLocation == null) return null; // World not loaded
 
-		Location spawnLocation = new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + SPAWN_LOCATION_OFFSET, shopkeeper.getZ() + 0.5D);
+		spawnLocation.add(0.5D, SPAWN_LOCATION_OFFSET, 0.5D); // Center of block
 
 		// The entity may be able to stand on certain types of fluids:
 		Set<Material> collidableFluids = EntityUtils.getCollidableFluids(this.getEntityType());
@@ -130,6 +129,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		// We don't check the spawn block itself but the block above in order to also spawn entities that are in shallow
 		// liquids on top of the liquid.
 		if (!collidableFluids.isEmpty()) {
+			World world = spawnLocation.getWorld();
+			assert world != null;
 			Block blockAbove = world.getBlockAt(shopkeeper.getX(), shopkeeper.getY() + 1, shopkeeper.getZ());
 			if (blockAbove.isLiquid()) {
 				collidableFluids = Collections.emptySet();

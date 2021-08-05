@@ -123,8 +123,6 @@ public abstract class ShopCreationData {
 
 	/**
 	 * The block face clicked or targeted during shop creation.
-	 * <p>
-	 * Used for example by sign shops to specify the direction the sign is facing.
 	 * 
 	 * @return the targeted block face, can be <code>null</code>
 	 */

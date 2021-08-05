@@ -2,9 +2,7 @@ package com.nisovin.shopkeepers.shopobjects.citizens;
 
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -245,10 +243,10 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	}
 
 	private Location getSpawnLocation() {
-		assert shopkeeper.getWorldName() != null;
-		World world = Bukkit.getWorld(shopkeeper.getWorldName());
-		if (world == null) return null; // World not loaded currently
-		return new Location(world, shopkeeper.getX() + 0.5D, shopkeeper.getY() + 0.5D, shopkeeper.getZ() + 0.5D);
+		Location spawnLocation = shopkeeper.getLocation();
+		if (spawnLocation == null) return null; // World not loaded currently
+		spawnLocation.add(0.5D, 0.5D, 0.5D); // Spawn at the center of the block
+		return spawnLocation;
 	}
 
 	@Override

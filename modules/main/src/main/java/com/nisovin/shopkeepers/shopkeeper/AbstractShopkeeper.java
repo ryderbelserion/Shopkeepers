@@ -111,11 +111,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private UUID uniqueId; // Not null after initialization
 	private AbstractShopObject shopObject; // Not null after initialization
 	// TODO Move location information into ShopObject?
-	// TODO Store yaw?
 	private String worldName; // Not empty, null for virtual shops
 	private int x;
 	private int y;
 	private int z;
+	private float yaw;
+
 	private ChunkCoords chunkCoords; // Null for virtual shops
 	// The ChunkCoords under which the shopkeeper is currently stored:
 	private ChunkCoords lastChunkCoords = null;
@@ -212,6 +213,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.x = 0;
 			this.y = 0;
 			this.z = 0;
+			this.yaw = 0.0F;
 		} else {
 			Location spawnLocation = shopCreationData.getSpawnLocation();
 			assert spawnLocation != null && spawnLocation.getWorld() != null;
@@ -219,6 +221,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.x = spawnLocation.getBlockX();
 			this.y = spawnLocation.getBlockY();
 			this.z = spawnLocation.getBlockZ();
+			this.yaw = spawnLocation.getYaw();
 		}
 		this.updateChunkCoords();
 
@@ -364,11 +367,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		int storedX = configSection.getInt("x");
 		int storedY = configSection.getInt("y");
 		int storedZ = configSection.getInt("z");
+		float storedYaw = (float) configSection.getDouble("yaw"); // 0 (south) if missing (eg. in pre 2.13.4 versions)
 
 		if (objectType instanceof VirtualShopObjectType) {
-			if (storedWorldName != null || storedX != 0 || storedY != 0 || storedZ != 0) {
-				Log.warning("Ignoring stored world and coordinates ("
-						+ TextUtils.getLocationString(StringUtils.getOrEmpty(storedWorldName), storedX, storedY, storedZ)
+			if (storedWorldName != null || storedX != 0 || storedY != 0 || storedZ != 0 || storedYaw != 0.0F) {
+				Log.warning("Ignoring stored location ("
+						+ TextUtils.getLocationString(StringUtils.getOrEmpty(storedWorldName), storedX, storedY, storedZ, storedYaw)
 						+ ") for virtual shopkeeper '" + id + "'!");
 				this.markDirty();
 			}
@@ -376,6 +380,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.x = 0;
 			this.y = 0;
 			this.z = 0;
+			this.yaw = 0.0F;
 		} else {
 			if (storedWorldName == null) {
 				throw new ShopkeeperCreateException("Missing world name for shopkeeper '" + id + "'!");
@@ -384,6 +389,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.x = storedX;
 			this.y = storedY;
 			this.z = storedZ;
+			this.yaw = storedYaw;
 		}
 		this.updateChunkCoords();
 
@@ -417,6 +423,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		configSection.set("x", x);
 		configSection.set("y", y);
 		configSection.set("z", z);
+		configSection.set("yaw", yaw);
 		configSection.set("type", this.getType().getIdentifier());
 
 		// Shop object:
@@ -597,6 +604,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
+	public float getYaw() {
+		return yaw;
+	}
+
+	@Override
 	public String getPositionString() {
 		if (worldName == null) return "[virtual]";
 		return TextUtils.getLocationString(worldName, x, y, z);
@@ -607,7 +619,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		if (worldName == null) return null;
 		World world = Bukkit.getWorld(worldName);
 		if (world == null) return null;
-		return new Location(world, x, y, z);
+		return new Location(world, x, y, z, yaw, 0.0F);
 	}
 
 	/**
@@ -631,11 +643,26 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		x = location.getBlockX();
 		y = location.getBlockY();
 		z = location.getBlockZ();
+		yaw = location.getYaw();
 		this.updateChunkCoords();
 		this.markDirty();
 
 		// Update shopkeeper in chunk map:
 		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperMoved(this);
+	}
+
+	/**
+	 * Sets the yaw of this shopkeeper.
+	 * <p>
+	 * This will not automatically rotate the shop object until the next time it is spawned or teleported.
+	 * 
+	 * @param yaw
+	 *            the new yaw
+	 */
+	public void setYaw(float yaw) {
+		Validate.isTrue(!this.isVirtual(), "Cannot set the yaw of a virtual shopkeeper!");
+		this.yaw = yaw;
+		this.markDirty();
 	}
 
 	@Override
@@ -711,6 +738,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		messageArguments.put("x", () -> this.getX());
 		messageArguments.put("y", () -> this.getY());
 		messageArguments.put("z", () -> this.getZ());
+		// TODO The decimal format is not localized. Move it into the language file?
+		messageArguments.put("yaw", () -> TextUtils.DECIMAL_FORMAT.format(this.getYaw()));
+		// TODO Rename to 'position'?
 		messageArguments.put("location", () -> this.getPositionString());
 		messageArguments.put("type", () -> this.getType().getIdentifier());
 		messageArguments.put("object_type", () -> this.getShopObject().getType().getIdentifier());

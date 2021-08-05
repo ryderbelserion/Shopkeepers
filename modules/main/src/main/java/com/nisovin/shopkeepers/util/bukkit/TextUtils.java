@@ -67,6 +67,10 @@ public class TextUtils {
 		return worldName + "," + x + "," + y + "," + z;
 	}
 
+	public static String getLocationString(String worldName, int x, int y, int z, double yaw) {
+		return worldName + "," + x + "," + y + "," + z + "," + DECIMAL_FORMAT.format(yaw);
+	}
+
 	public static String getLocationString(String worldName, double x, double y, double z) {
 		return worldName + "," + DECIMAL_FORMAT.format(x) + "," + DECIMAL_FORMAT.format(y) + "," + DECIMAL_FORMAT.format(z);
 	}

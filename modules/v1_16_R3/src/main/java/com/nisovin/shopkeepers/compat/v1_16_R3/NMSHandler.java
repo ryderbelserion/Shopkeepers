@@ -102,14 +102,31 @@ public final class NMSHandler implements NMSCallProvider {
 		EntityLiving mcLivingEntity = ((CraftLivingEntity) entity).getHandle();
 		// Example: Armor stands are living, but not insentient.
 		if (!(mcLivingEntity instanceof EntityInsentient)) return;
-		EntityInsentient mcInsentientEntity = (EntityInsentient) mcLivingEntity;
-		mcInsentientEntity.getEntitySenses().a(); // Clear sensing cache
-		// The sensing cache is reused for the indivual ticks.
+		EntityInsentient mcMob = (EntityInsentient) mcLivingEntity;
+
+		// Clear the sensing cache. This sensing cache is reused for the individual ticks.
+		mcMob.getEntitySenses().a();
 		for (int i = 0; i < ticks; ++i) {
-			mcInsentientEntity.goalSelector.doTick();
-			mcInsentientEntity.getControllerLook().a(); // Tick look controller
+			mcMob.goalSelector.doTick();
+			if (!mcMob.getControllerLook().c()) { // isHasWanted
+				// If there is no target to look at, the entity rotates towards its current body rotation.
+				// We reset the entity's body rotation here to the initial yaw it was spawned with, causing it to rotate
+				// back towards this initial direction whenever it has no target to look at anymore.
+				// This rotating back towards its initial orientation only works if the entity is still ticked: Since we
+				// only tick shopkeeper mobs near players, the entity may remain in its previous rotation whenever the
+				// last nearby player teleports away, until the ticking resumes when a player comes close again.
+
+				// Setting the body rotation also ensures that it initially matches the entity's intended yaw, because
+				// CraftBukkit itself does not automatically set the body rotation when spawning the entity (only its
+				// yRot and head rotation are set). Omitting this would therefore cause the entity to initially rotate
+				// towards some random direction if it is being ticked and has no target to look at.
+				mcMob.n(mcMob.yaw); // setYBodyRot
+			}
+			// Tick the look controller:
+			// This makes the entity's head (and indirectly also its body) rotate towards the current target.
+			mcMob.getControllerLook().a();
 		}
-		mcInsentientEntity.getEntitySenses().a(); // Clear sensing cache
+		mcMob.getEntitySenses().a(); // Clear the sensing cache
 	}
 
 	@Override

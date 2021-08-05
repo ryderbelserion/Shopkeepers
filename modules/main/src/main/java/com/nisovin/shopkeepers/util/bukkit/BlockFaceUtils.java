@@ -22,6 +22,7 @@ public class BlockFaceUtils {
 	 */
 	public enum BlockFaceDirections {
 		// Order matters for operations like yaw to BlockFace.
+		BLOCK_SIDES(Arrays.asList(BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST, BlockFace.UP, BlockFace.DOWN)),
 		CARDINAL(Arrays.asList(BlockFace.SOUTH, BlockFace.WEST, BlockFace.NORTH, BlockFace.EAST)),
 		INTERCARDINAL(
 				Arrays.asList(
@@ -50,6 +51,17 @@ public class BlockFaceUtils {
 		}
 
 		/**
+		 * Checks if this set contains the given {@link BlockFace}.
+		 * 
+		 * @param blockFace
+		 *            the block face to check for
+		 * @return <code>true</code> if this set contains the specified block face
+		 */
+		public final boolean contains(BlockFace blockFace) {
+			return blockFaces.contains(blockFace);
+		}
+
+		/**
 		 * Gets the {@link BlockFace} within this set that corresponds most closely to the given yaw angle.
 		 * 
 		 * @param yaw
@@ -57,6 +69,11 @@ public class BlockFaceUtils {
 		 * @return the corresponding block face
 		 */
 		public BlockFace fromYaw(float yaw) {
+			if (this == BLOCK_SIDES) {
+				// BLOCK_SIDES is CARDINAL with UP and DOWN, which are not relevant for yaw conversions.
+				return CARDINAL.fromYaw(yaw);
+			}
+
 			int blockFaceCount = blockFaces.size();
 			float anglePerBlockFace = 360.0F / blockFaceCount;
 			int blockFaceIndex = Math.round(yaw / anglePerBlockFace) % blockFaceCount;
@@ -65,16 +82,13 @@ public class BlockFaceUtils {
 		}
 	}
 
-	private static final List<BlockFace> BLOCK_SIDES = Collections.unmodifiableList(Arrays.asList(
-			BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.EAST, BlockFace.WEST));
-
 	/**
 	 * Gets the six {@link BlockFace BlockFaces} that correspond to the sides of a block.
 	 * 
 	 * @return the block faces that correspond to the sides of a block
 	 */
 	public static List<BlockFace> getBlockSides() {
-		return BLOCK_SIDES;
+		return BlockFaceDirections.BLOCK_SIDES.getBlockFaces();
 	}
 
 	/**
@@ -85,7 +99,7 @@ public class BlockFaceUtils {
 	 * @return <code>true</code> if the given block face is a block side
 	 */
 	public static boolean isBlockSide(BlockFace blockFace) {
-		return BLOCK_SIDES.contains(blockFace);
+		return BlockFaceDirections.BLOCK_SIDES.contains(blockFace);
 	}
 
 	/**
@@ -110,19 +124,8 @@ public class BlockFaceUtils {
 	 * 
 	 * @return the set of wall sign block faces
 	 */
-	public static BlockFaceDirections getWallSignBlockFaces() {
+	public static BlockFaceDirections getWallSignFacings() {
 		return BlockFaceDirections.CARDINAL;
-	}
-
-	/**
-	 * Gets the wall sign {@link BlockFace} that corresponds closest to the given yaw angle.
-	 * 
-	 * @param yaw
-	 *            the yaw angle
-	 * @return the corresponding wall sign block face
-	 */
-	public static BlockFace getWallSignFace(float yaw) {
-		return getWallSignBlockFaces().fromYaw(yaw);
 	}
 
 	/**
@@ -132,7 +135,7 @@ public class BlockFaceUtils {
 	 *            the direction
 	 * @return the corresponding wall sign face
 	 */
-	public static BlockFace toWallSignFace(Vector direction) {
+	public static BlockFace toWallSignFacing(Vector direction) {
 		Validate.notNull(direction, "direction");
 		return getAxisAlignedBlockFace(direction.getX(), 0.0D, direction.getZ());
 	}
@@ -144,8 +147,8 @@ public class BlockFaceUtils {
 	 *            the block face
 	 * @return <code>true</code> if the given block face is a valid wall sign block face
 	 */
-	public static boolean isWallSignFace(BlockFace blockFace) {
-		return getWallSignBlockFaces().getBlockFaces().contains(blockFace);
+	public static boolean isWallSignFacing(BlockFace blockFace) {
+		return getWallSignFacings().contains(blockFace);
 	}
 
 	/**
@@ -153,19 +156,8 @@ public class BlockFaceUtils {
 	 * 
 	 * @return the set of sign post block faces
 	 */
-	public static BlockFaceDirections getSignPostBlockFaces() {
+	public static BlockFaceDirections getSignPostFacings() {
 		return BlockFaceDirections.SECONDARY_INTERCARDINAL;
-	}
-
-	/**
-	 * Gets the sign post {@link BlockFace} that corresponds closest to the given yaw angle.
-	 * 
-	 * @param yaw
-	 *            the yaw angle
-	 * @return the corresponding sign post block face
-	 */
-	public static BlockFace getSignPostFacing(float yaw) {
-		return getSignPostBlockFaces().fromYaw(yaw);
 	}
 
 	/**
@@ -176,7 +168,7 @@ public class BlockFaceUtils {
 	 * @return <code>true</code> if the given block face is a valid sign post block face
 	 */
 	public static boolean isSignPostFacing(BlockFace blockFace) {
-		return getSignPostBlockFaces().getBlockFaces().contains(blockFace);
+		return getSignPostFacings().contains(blockFace);
 	}
 
 	/**

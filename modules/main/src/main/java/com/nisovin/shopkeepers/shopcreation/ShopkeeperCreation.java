@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.interaction.InteractionUtils;
@@ -128,8 +129,15 @@ public class ShopkeeperCreation {
 			spawnBlock = targetBlock.getRelative(targetBlockFace);
 		}
 		Location spawnLocation = LocationUtils.getBlockCenterLocation(spawnBlock);
-		// Face towards player:
-		spawnLocation.setDirection(player.getEyeLocation().subtract(spawnLocation).toVector());
+		if (targetBlockFace.getModY() == 0 && targetBlockFace != BlockFace.SELF) {
+			// Set the yaw of the spawn location to match the direction of the target block face:
+			// This is for example required for wall sign shopkeepers, but also allows placing living shopkeepers to be
+			// rotated precisely into a specific direction.
+			spawnLocation.setYaw(BlockFaceUtils.getYaw(targetBlockFace));
+		} else {
+			// Face towards the player:
+			spawnLocation.setDirection(player.getEyeLocation().subtract(spawnLocation).toVector());
+		}
 		return spawnLocation;
 	}
 }

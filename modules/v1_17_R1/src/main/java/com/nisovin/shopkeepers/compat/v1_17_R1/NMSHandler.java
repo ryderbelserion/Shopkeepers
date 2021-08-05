@@ -98,13 +98,30 @@ public final class NMSHandler implements NMSCallProvider {
 		// Example: Armor stands are living, but not insentient/Mob.
 		if (!(mcLivingEntity instanceof net.minecraft.world.entity.Mob)) return;
 		net.minecraft.world.entity.Mob mcMob = (net.minecraft.world.entity.Mob) mcLivingEntity;
-		mcMob.getSensing().tick(); // Clear sensing cache
-		// The sensing cache is reused for the individual ticks.
+
+		// Clear the sensing cache. This sensing cache is reused for the individual ticks.
+		mcMob.getSensing().tick();
 		for (int i = 0; i < ticks; ++i) {
 			mcMob.goalSelector.tick();
-			mcMob.getLookControl().tick(); // Tick look controller
+			if (!mcMob.getLookControl().isHasWanted()) {
+				// If there is no target to look at, the entity rotates towards its current body rotation.
+				// We reset the entity's body rotation here to the initial yaw it was spawned with, causing it to rotate
+				// back towards this initial direction whenever it has no target to look at anymore.
+				// This rotating back towards its initial orientation only works if the entity is still ticked: Since we
+				// only tick shopkeeper mobs near players, the entity may remain in its previous rotation whenever the
+				// last nearby player teleports away, until the ticking resumes when a player comes close again.
+
+				// Setting the body rotation also ensures that it initially matches the entity's intended yaw, because
+				// CraftBukkit itself does not automatically set the body rotation when spawning the entity (only its
+				// yRot and head rotation are set). Omitting this would therefore cause the entity to initially rotate
+				// towards some random direction if it is being ticked and has no target to look at.
+				mcMob.setYBodyRot(mcMob.getYRot());
+			}
+			// Tick the look controller:
+			// This makes the entity's head (and indirectly also its body) rotate towards the current target.
+			mcMob.getLookControl().tick();
 		}
-		mcMob.getSensing().tick(); // Clear sensing cache
+		mcMob.getSensing().tick(); // Clear the sensing cache
 	}
 
 	@Override

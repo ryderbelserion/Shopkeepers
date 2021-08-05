@@ -134,6 +134,17 @@ public interface Shopkeeper {
 	public int getZ();
 
 	/**
+	 * Gets the yaw of the shopkeeper, i.e. its horizontal orientation.
+	 * <p>
+	 * The yaw is set when the shopkeeper is created or repositioned. This is the default horizontal orientation that
+	 * the shopkeeper spawns its shop object in. If the shop object is able to rotate, this yaw may not match the shop
+	 * object's current yaw.
+	 * 
+	 * @return the yaw
+	 */
+	public float getYaw();
+
+	/**
 	 * Gets a String representation of the shopkeeper's location.
 	 * 
 	 * @return the String representation
