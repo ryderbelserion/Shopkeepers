@@ -39,7 +39,7 @@ jar {
 shadowJar {
 	configureJarTaskWithMavenMetadata(project, it)
 	// No classifier: Replaces the normal classifier-less jar file (if there is one).
-	classifier = ''
+	archiveClassifier = ''
 	configurations = [project.configurations.runtimeClasspath, project.configurations.shaded]
 	dependencies {
 		include(project(':shopkeepers-api'))
