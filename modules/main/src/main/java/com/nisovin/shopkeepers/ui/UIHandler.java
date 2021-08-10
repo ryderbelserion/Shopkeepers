@@ -124,6 +124,7 @@ public abstract class UIHandler {
 	 *            the inventory closing event, can be <code>null</code>
 	 */
 	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
+		// Callback for subclasses.
 	}
 
 	// Handling of interface window interactions
@@ -156,7 +157,7 @@ public abstract class UIHandler {
 	// Called by UIListener.
 	void informOnInventoryClickEarly(InventoryClickEvent event, Player player) {
 		// Heuristic detection of automatically triggered shift left-clicks:
-		isAutomaticShiftLeftClick = false; // reset
+		isAutomaticShiftLeftClick = false; // Reset
 		final long nowNanos = System.nanoTime();
 		if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
 			if (event.getRawSlot() != lastManualClickedSlotId && (nowNanos - lastManualClickNanos) < AUTOMATIC_SHIFT_LEFT_CLICK_NANOS) {
@@ -188,6 +189,7 @@ public abstract class UIHandler {
 	 * @see #onInventoryClickLate(InventoryClickEvent, Player)
 	 */
 	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
+		// Callback for subclasses.
 	}
 
 	// Called by UIListener.
@@ -206,6 +208,7 @@ public abstract class UIHandler {
 	 * @see #onInventoryClickEarly(InventoryClickEvent, Player)
 	 */
 	protected void onInventoryClickLate(InventoryClickEvent event, Player player) {
+		// Callback for subclasses.
 	}
 
 	// Called by UIListener.
@@ -227,6 +230,7 @@ public abstract class UIHandler {
 	 * @see #onInventoryDragLate(InventoryDragEvent, Player)
 	 */
 	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
+		// Callback for subclasses.
 	}
 
 	// Called by UIListener.
@@ -245,5 +249,6 @@ public abstract class UIHandler {
 	 * @see #onInventoryDragEarly(InventoryDragEvent, Player)
 	 */
 	protected void onInventoryDragLate(InventoryDragEvent event, Player player) {
+		// Callback for subclasses.
 	}
 }

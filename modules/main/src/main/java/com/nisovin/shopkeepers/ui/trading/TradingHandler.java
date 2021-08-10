@@ -230,6 +230,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 	@Override
 	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
+		// Callback for subclasses.
 	}
 
 	// TRADE PROCESSING
@@ -613,6 +614,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	 *            the trade
 	 */
 	protected void setupTrade(Trade trade) {
+		// Callback for subclasses.
 	}
 
 	// Returns true if the trade was not aborted and is now supposed to get applied.
@@ -722,6 +724,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	 *            the trade
 	 */
 	protected void onTradeAborted(Trade trade) {
+		// Callback for subclasses.
 	}
 
 	/**
@@ -736,6 +739,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	 *            the trade
 	 */
 	protected void preApplyTrade(Trade trade) {
+		// Callback for subclasses.
 	}
 
 	/**
@@ -751,6 +755,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	 *            the trade
 	 */
 	protected void onTradeApplied(Trade trade) {
+		// Callback for subclasses.
 	}
 
 	// TODO Ensure a minimum amount of 1?
