@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -400,7 +401,7 @@ public class Settings extends Config {
 
 		private AsyncSettings() {
 			this.debug = Settings.debug;
-			this.debugOptions = new ArrayList<>(Settings.debugOptions);
+			this.debugOptions = Collections.unmodifiableList(new ArrayList<>(Settings.debugOptions));
 			this.fileCharset = DerivedSettings.fileCharset;
 		}
 	}
