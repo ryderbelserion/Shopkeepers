@@ -892,6 +892,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 						try {
 							Thread.sleep(SAVING_ATTEMPTS_DELAY_MILLIS);
 						} catch (InterruptedException e) {
+							// Restore the interrupt status for anyone interested in it, but otherwise ignore the
+							// interrupt here, because we prefer to keep retrying to still save the data to disk after
+							// all:
+							Thread.currentThread().interrupt();
 						}
 					}
 				});
