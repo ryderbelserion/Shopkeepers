@@ -39,6 +39,7 @@ public final class ShopkeepersAPI {
 	 *            the plugin instance
 	 * @deprecated For internal use only
 	 */
+	@Deprecated
 	public static void enable(ShopkeepersPlugin plugin) {
 		Validate.notNull(plugin, "Plugin is null!");
 		if (ShopkeepersAPI.plugin != null) {
@@ -52,6 +53,7 @@ public final class ShopkeepersAPI {
 	 * 
 	 * @deprecated For internal use only
 	 */
+	@Deprecated
 	public static void disable() {
 		if (ShopkeepersAPI.plugin == null) {
 			throw new IllegalStateException("API is already disabled!");
