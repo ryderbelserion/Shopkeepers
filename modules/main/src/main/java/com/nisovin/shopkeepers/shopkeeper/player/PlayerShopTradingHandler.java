@@ -9,6 +9,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
+import com.nisovin.shopkeepers.ui.trading.Trade;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -49,10 +50,10 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 	}
 
 	@Override
-	protected boolean prepareTrade(TradeData tradeData) {
-		if (!super.prepareTrade(tradeData)) return false;
+	protected boolean prepareTrade(Trade trade) {
+		if (!super.prepareTrade(trade)) return false;
 		AbstractPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		Player tradingPlayer = tradeData.tradingPlayer;
+		Player tradingPlayer = trade.tradingPlayer;
 
 		// No trading with own shop:
 		if (Settings.preventTradingWithOwnShop && shopkeeper.isOwner(tradingPlayer)
@@ -89,8 +90,8 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 	}
 
 	@Override
-	protected void onTradeApplied(TradeData tradeData) {
-		super.onTradeApplied(tradeData);
+	protected void onTradeApplied(Trade trade) {
+		super.onTradeApplied(trade);
 
 		// Apply container content changes:
 		if (containerInventory != null && newContainerContents != null) {
@@ -102,8 +103,8 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 	}
 
 	@Override
-	protected void onTradeAborted(TradeData tradeData) {
-		super.onTradeAborted(tradeData);
+	protected void onTradeAborted(Trade trade) {
+		super.onTradeAborted(trade);
 		this.resetTradeState();
 	}
 

@@ -13,6 +13,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
+import com.nisovin.shopkeepers.ui.trading.Trade;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.BookItems;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
@@ -32,11 +33,11 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 	}
 
 	@Override
-	protected boolean prepareTrade(TradeData tradeData) {
-		if (!super.prepareTrade(tradeData)) return false;
+	protected boolean prepareTrade(Trade trade) {
+		if (!super.prepareTrade(trade)) return false;
 		SKBookPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		Player tradingPlayer = tradeData.tradingPlayer;
-		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
+		Player tradingPlayer = trade.tradingPlayer;
+		TradingRecipe tradingRecipe = trade.tradingRecipe;
 
 		UnmodifiableItemStack bookItem = tradingRecipe.getResultItem();
 		BookMeta bookMeta = BookItems.getBookMeta(bookItem);

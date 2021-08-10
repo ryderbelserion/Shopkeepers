@@ -9,6 +9,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
+import com.nisovin.shopkeepers.ui.trading.Trade;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -26,11 +27,11 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 	}
 
 	@Override
-	protected boolean prepareTrade(TradeData tradeData) {
-		if (!super.prepareTrade(tradeData)) return false;
+	protected boolean prepareTrade(Trade trade) {
+		if (!super.prepareTrade(trade)) return false;
 		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		Player tradingPlayer = tradeData.tradingPlayer;
-		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
+		Player tradingPlayer = trade.tradingPlayer;
+		TradingRecipe tradingRecipe = trade.tradingRecipe;
 
 		// Get offer for the bought item:
 		UnmodifiableItemStack boughtItem = tradingRecipe.getItem1();
@@ -70,7 +71,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		if (amountAfterTaxes > 0) {
 			// The item the trading player gave might slightly differ from the required item,
 			// but is still accepted, depending on the used item comparison logic and settings.
-			ItemStack receivedItem = ItemUtils.copyWithAmount(tradeData.offeredItem1, amountAfterTaxes);
+			ItemStack receivedItem = ItemUtils.copyWithAmount(trade.offeredItem1, amountAfterTaxes);
 			if (InventoryUtils.addItems(newContainerContents, receivedItem) != 0) {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 				this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");

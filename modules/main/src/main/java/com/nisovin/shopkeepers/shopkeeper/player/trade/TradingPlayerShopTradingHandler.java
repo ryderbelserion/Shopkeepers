@@ -8,6 +8,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
+import com.nisovin.shopkeepers.ui.trading.Trade;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -24,11 +25,11 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 	}
 
 	@Override
-	protected boolean prepareTrade(TradeData tradeData) {
-		if (!super.prepareTrade(tradeData)) return false;
+	protected boolean prepareTrade(Trade trade) {
+		if (!super.prepareTrade(trade)) return false;
 		SKTradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		Player tradingPlayer = tradeData.tradingPlayer;
-		TradingRecipe tradingRecipe = tradeData.tradingRecipe;
+		Player tradingPlayer = trade.tradingPlayer;
+		TradingRecipe tradingRecipe = trade.tradingRecipe;
 
 		// Find offer:
 		TradeOffer offer = shopkeeper.getOffer(tradingRecipe);
@@ -51,8 +52,8 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		}
 
 		// Add the traded items to the container contents:
-		if (!this.addItems(newContainerContents, tradingRecipe.getItem1(), tradeData.offeredItem1)
-				|| !this.addItems(newContainerContents, tradingRecipe.getItem2(), tradeData.offeredItem2)) {
+		if (!this.addItems(newContainerContents, tradingRecipe.getItem1(), trade.offeredItem1)
+				|| !this.addItems(newContainerContents, tradingRecipe.getItem2(), trade.offeredItem2)) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 			this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 			return false;
