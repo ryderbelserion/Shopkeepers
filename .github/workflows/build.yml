@@ -15,12 +15,11 @@ jobs:
       uses: actions/checkout@v2
       with:
         fetch-depth: 0  # SonarCloud: Shallow clones should be disabled for a better relevancy of analysis
-    # Our build scripts already install the required JDK versions themselves.
-    #- name: Set up JDK 16
-    #  uses: actions/setup-java@v2
-    #  with:
-    #    java-version: '16'
-    #    distribution: 'adopt'
+    - name: Set up JDK 16
+      uses: actions/setup-java@v2
+      with:
+        java-version: '16'
+        distribution: 'adopt'
     - name: Cache Maven packages
       uses: actions/cache@v2
       with:
