@@ -73,18 +73,19 @@ public class TypePatterns {
 				typePatterns[i] = TypePatterns.forClass(typeParameter);
 			}
 		}
+		// This results in an IllegalArgumentException if typeParameters is null:
 		return parameterized(clazz, typePatterns);
 	}
 
 	private static class ParameterizedTypePattern extends ClassTypePattern {
 
-		private final TypePattern[] typeParameters;
+		private final TypePattern[] typeParameters; // Not null
 
 		public ParameterizedTypePattern(Class<?> clazz, TypePattern... typeParameters) {
 			super(clazz);
 			Validate.notNull(typeParameters, "typeParameters is null");
-			Validate.notNull(typeParameters.length == 0, "typeParameters is empty");
-			this.typeParameters = (typeParameters == null) ? null : typeParameters.clone();
+			Validate.isTrue(typeParameters.length > 0, "typeParameters is empty");
+			this.typeParameters = typeParameters.clone();
 		}
 
 		@Override
