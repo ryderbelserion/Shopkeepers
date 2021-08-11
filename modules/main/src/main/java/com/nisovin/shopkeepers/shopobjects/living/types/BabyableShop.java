@@ -17,7 +17,9 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
-import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.Button;
+import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
@@ -67,8 +69,8 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	}
 
 	@Override
-	public List<EditorHandler.Button> createEditorButtons() {
-		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		if (this.isBabyable()) {
 			editorButtons.add(this.getBabyEditorButton());
 		}
@@ -110,10 +112,10 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 		return iconItem;
 	}
 
-	private EditorHandler.Button getBabyEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getBabyEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getBabyEditorItem();
 			}
 

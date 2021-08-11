@@ -30,7 +30,9 @@ import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
-import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.Button;
+import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
@@ -409,8 +411,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	// EDITOR ACTIONS
 
 	@Override
-	public List<EditorHandler.Button> createEditorButtons() {
-		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSignTypeEditorButton());
 		if (MC_1_17_Utils.isAvailable()) {
 			editorButtons.add(this.getGlowingTextEditorButton());
@@ -448,10 +450,10 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		return ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSignVariant, Messages.buttonSignVariantLore);
 	}
 
-	private EditorHandler.Button getSignTypeEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getSignTypeEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getSignTypeEditorItem();
 			}
 
@@ -499,10 +501,10 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		return ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSignGlowingText, Messages.buttonSignGlowingTextLore);
 	}
 
-	private EditorHandler.Button getGlowingTextEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getGlowingTextEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getGlowingTextEditorItem();
 			}
 

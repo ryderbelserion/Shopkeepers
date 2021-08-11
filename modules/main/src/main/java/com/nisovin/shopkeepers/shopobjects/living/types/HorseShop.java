@@ -21,7 +21,9 @@ import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
-import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.Button;
+import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
@@ -85,8 +87,8 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	@Override
-	public List<EditorHandler.Button> createEditorButtons() {
-		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getColorEditorButton());
 		editorButtons.add(this.getStyleEditorButton());
 		editorButtons.add(this.getArmorEditorButton());
@@ -144,10 +146,10 @@ public class HorseShop extends BabyableShop<Horse> {
 		return iconItem;
 	}
 
-	private EditorHandler.Button getColorEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getColorEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getColorEditorItem();
 			}
 
@@ -192,10 +194,10 @@ public class HorseShop extends BabyableShop<Horse> {
 		return iconItem;
 	}
 
-	private EditorHandler.Button getStyleEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getStyleEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getStyleEditorItem();
 			}
 
@@ -237,10 +239,10 @@ public class HorseShop extends BabyableShop<Horse> {
 		return iconItem;
 	}
 
-	private EditorHandler.Button getArmorEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getArmorEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getArmorEditorItem();
 			}
 

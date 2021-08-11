@@ -19,7 +19,9 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
-import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.Button;
+import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use actual GlowSquid type once we only support Bukkit 1.17 upwards
@@ -51,8 +53,8 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 	}
 
 	@Override
-	public List<EditorHandler.Button> createEditorButtons() {
-		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getDarkEditorButton());
 		return editorButtons;
 	}
@@ -89,10 +91,10 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 		return iconItem;
 	}
 
-	private EditorHandler.Button getDarkEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getDarkEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getDarkEditorItem();
 			}
 

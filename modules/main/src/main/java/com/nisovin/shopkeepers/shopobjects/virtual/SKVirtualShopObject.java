@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObject;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
-import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.Button;
 
 // TODO Not yet used.
 public class SKVirtualShopObject extends AbstractShopObject implements VirtualShopObject {
@@ -93,7 +93,7 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 	// EDITOR ACTIONS
 
 	@Override
-	public List<EditorHandler.Button> createEditorButtons() {
+	public List<Button> createEditorButtons() {
 		return super.createEditorButtons();
 	}
 }

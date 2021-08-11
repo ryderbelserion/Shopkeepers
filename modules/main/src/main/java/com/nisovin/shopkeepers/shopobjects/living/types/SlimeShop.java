@@ -16,7 +16,9 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
-import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.Button;
+import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -53,8 +55,8 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 	}
 
 	@Override
-	public List<EditorHandler.Button> createEditorButtons() {
-		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSizeEditorButton());
 		return editorButtons;
 	}
@@ -99,10 +101,10 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 		return iconItem;
 	}
 
-	private EditorHandler.Button getSizeEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getSizeEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getSizeEditorItem();
 			}
 

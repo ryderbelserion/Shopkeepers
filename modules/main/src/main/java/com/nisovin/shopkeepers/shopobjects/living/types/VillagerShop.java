@@ -20,7 +20,9 @@ import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
-import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.Button;
+import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
@@ -96,8 +98,8 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	@Override
-	public List<EditorHandler.Button> createEditorButtons() {
-		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getProfessionEditorButton());
 		editorButtons.add(this.getVillagerTypeEditorButton());
 		editorButtons.add(this.getVillagerLevelEditorButton());
@@ -182,10 +184,10 @@ public class VillagerShop extends BabyableShop<Villager> {
 		return iconItem;
 	}
 
-	private EditorHandler.Button getProfessionEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getProfessionEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getProfessionEditorItem();
 			}
 
@@ -250,10 +252,10 @@ public class VillagerShop extends BabyableShop<Villager> {
 		return iconItem;
 	}
 
-	private EditorHandler.Button getVillagerTypeEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getVillagerTypeEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getVillagerTypeEditorItem();
 			}
 
@@ -321,10 +323,10 @@ public class VillagerShop extends BabyableShop<Villager> {
 		return iconItem;
 	}
 
-	private EditorHandler.Button getVillagerLevelEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getVillagerLevelEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getVillagerLevelEditorItem();
 			}
 

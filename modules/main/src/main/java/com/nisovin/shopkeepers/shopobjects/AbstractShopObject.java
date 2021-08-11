@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
 
 /**
@@ -290,7 +291,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * 
 	 * @return the editor buttons
 	 */
-	public List<EditorHandler.Button> createEditorButtons() {
+	public List<Button> createEditorButtons() {
 		return new ArrayList<>(); // None by default, modifiable by subtypes
 	}
 }

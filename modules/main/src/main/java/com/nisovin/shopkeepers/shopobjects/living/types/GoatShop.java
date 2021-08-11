@@ -18,7 +18,9 @@ import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
-import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.Button;
+import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use actual Goal type once we only support Bukkit 1.17 upwards
@@ -50,8 +52,8 @@ public class GoatShop extends BabyableShop<Animals> {
 	}
 
 	@Override
-	public List<EditorHandler.Button> createEditorButtons() {
-		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		// The screaming option is hidden if shopkeeper mobs are silent.
 		if (!Settings.silenceLivingShopEntities) {
 			editorButtons.add(this.getScreamingEditorButton());
@@ -91,10 +93,10 @@ public class GoatShop extends BabyableShop<Animals> {
 		return iconItem;
 	}
 
-	private EditorHandler.Button getScreamingEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getScreamingEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getScreamingEditorItem();
 			}
 

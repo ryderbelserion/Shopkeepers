@@ -17,7 +17,9 @@ import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
-import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.ui.editor.Button;
+import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // Using Babyable as common super type of all sittable mobs for now.
@@ -49,8 +51,8 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 	}
 
 	@Override
-	public List<EditorHandler.Button> createEditorButtons() {
-		List<EditorHandler.Button> editorButtons = super.createEditorButtons();
+	public List<Button> createEditorButtons() {
+		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSittingEditorButton());
 		return editorButtons;
 	}
@@ -82,10 +84,10 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 		return iconItem;
 	}
 
-	private EditorHandler.Button getSittingEditorButton() {
-		return new EditorHandler.ShopkeeperActionButton() {
+	private Button getSittingEditorButton() {
+		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(EditorHandler.Session session) {
+			public ItemStack getIcon(Session session) {
 				return getSittingEditorItem();
 			}
 

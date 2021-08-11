@@ -11,7 +11,6 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperEditedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
-import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.config.Settings;
@@ -61,40 +60,6 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 	}
 
 	// EDITOR BUTTONS
-
-	// A button for simple one-click shopkeeper editing actions. Successful actions trigger a ShopkeeperEditedEvent and
-	// a save of the shopkeeper.
-	public static abstract class ShopkeeperActionButton extends ActionButton {
-
-		public ShopkeeperActionButton() {
-			this(false);
-		}
-
-		public ShopkeeperActionButton(boolean placeAtEnd) {
-			super(placeAtEnd);
-		}
-
-		@Override
-		protected boolean isApplicable(AbstractEditorHandler editorHandler) {
-			return super.isApplicable(editorHandler) && (editorHandler instanceof EditorHandler);
-		}
-
-		protected Shopkeeper getShopkeeper() {
-			assert this.getEditorHandler() instanceof EditorHandler;
-			return ((EditorHandler) this.getEditorHandler()).getShopkeeper();
-		}
-
-		@Override
-		protected void onActionSuccess(InventoryClickEvent clickEvent, Player player) {
-			Shopkeeper shopkeeper = this.getShopkeeper();
-
-			// Call event:
-			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
-
-			// Save:
-			shopkeeper.save();
-		}
-	}
 
 	@Override
 	protected ItemStack createTradeSetupIcon() {
