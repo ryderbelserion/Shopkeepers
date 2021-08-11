@@ -21,7 +21,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * An immutable object that stores item type and meta data information.
  */
-public class ItemData implements Cloneable {
+public class ItemData {
 
 	public static class ItemDataDeserializeException extends Exception {
 
@@ -308,11 +308,6 @@ public class ItemData implements Cloneable {
 		ItemData other = (ItemData) obj;
 		if (!dataItem.equals(other.dataItem)) return false;
 		return true;
-	}
-
-	@Override
-	public ItemData clone() {
-		return new ItemData(dataItem); // Clones the item internally
 	}
 
 	public Object serialize() {
