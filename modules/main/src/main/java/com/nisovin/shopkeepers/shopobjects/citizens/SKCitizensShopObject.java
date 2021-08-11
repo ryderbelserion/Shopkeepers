@@ -76,7 +76,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			String npcUniqueIdString = configSection.getString("npcId");
 			this.npcUniqueId = ConversionUtils.parseUUID(npcUniqueIdString);
 			if (npcUniqueId == null) {
-				Log.warning("Couldn't parse NPC unique id for shopkeeper " + shopkeeper.getId() + ": " + npcUniqueIdString);
+				Log.warning("Could not parse NPC unique id for shopkeeper " + shopkeeper.getId() + ": " + npcUniqueIdString);
 			}
 		}
 	}

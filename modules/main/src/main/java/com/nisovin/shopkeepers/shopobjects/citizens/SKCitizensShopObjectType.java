@@ -50,7 +50,7 @@ public class SKCitizensShopObjectType extends AbstractEntityShopObjectType<SKCit
 		return this.getObjectId(npcUniqueId);
 	}
 
-	public Object getObjectId(UUID npcUniqueId) {
+	Object getObjectId(UUID npcUniqueId) {
 		assert npcUniqueId != null;
 		return npcUniqueId;
 	}
