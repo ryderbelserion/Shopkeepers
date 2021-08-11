@@ -16,6 +16,8 @@ import com.nisovin.shopkeepers.util.java.StringUtils;
  */
 public class ShopkeeperNameArgument extends ObjectNameArgument {
 
+	public static final int DEFAULT_MINIMAL_COMPLETION_INPUT = ObjectNameArgument.DEFAULT_MINIMAL_COMPLETION_INPUT;
+
 	// Note: Not providing default argument filters that only accept existing shops, admin shops, or player shops,
 	// because this can be achieved more efficiently by using ShopkeeperByNameArgument instead.
 

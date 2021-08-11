@@ -18,6 +18,8 @@ import com.nisovin.shopkeepers.text.Text;
  */
 public class PlayerUUIDArgument extends ObjectUUIDArgument {
 
+	public static final int DEFAULT_MINIMAL_COMPLETION_INPUT = ObjectUUIDArgument.DEFAULT_MINIMAL_COMPLETION_INPUT;
+
 	// Note: Not providing a default argument filter that only accepts uuids of online players, because this can be
 	// achieved more efficiently by using PlayerByUUIDArgument instead.
 

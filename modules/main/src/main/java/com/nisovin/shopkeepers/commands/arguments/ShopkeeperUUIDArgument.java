@@ -16,6 +16,8 @@ import com.nisovin.shopkeepers.commands.lib.arguments.ObjectUUIDArgument;
  */
 public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 
+	public static final int DEFAULT_MINIMAL_COMPLETION_INPUT = ObjectUUIDArgument.DEFAULT_MINIMAL_COMPLETION_INPUT;
+
 	// Note: Not providing default argument filters that only accept existing shops, admin shops, or player shops,
 	// because this can be achieved more efficiently by using ShopkeeperByUUIDArgument instead.
 

@@ -15,6 +15,8 @@ import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
  */
 public class EntityUUIDArgument extends ObjectUUIDArgument {
 
+	public static final int DEFAULT_MINIMAL_COMPLETION_INPUT = ObjectUUIDArgument.DEFAULT_MINIMAL_COMPLETION_INPUT;
+
 	// Note: Not providing a default argument filter that only accepts uuids of existing entities, because this can be
 	// achieved more efficiently by using EntityByUUIDArgument instead.
 

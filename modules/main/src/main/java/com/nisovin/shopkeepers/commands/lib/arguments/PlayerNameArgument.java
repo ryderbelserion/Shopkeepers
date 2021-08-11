@@ -19,6 +19,8 @@ import com.nisovin.shopkeepers.util.java.StringUtils;
  */
 public class PlayerNameArgument extends ObjectNameArgument {
 
+	public static final int DEFAULT_MINIMAL_COMPLETION_INPUT = ObjectNameArgument.DEFAULT_MINIMAL_COMPLETION_INPUT;
+
 	// Note: Not providing a default argument filter that only accepts names of online players, because this can be
 	// achieved more efficiently by using PlayerByNameArgument instead.
 

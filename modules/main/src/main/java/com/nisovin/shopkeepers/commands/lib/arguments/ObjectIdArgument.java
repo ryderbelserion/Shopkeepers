@@ -31,13 +31,14 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 	protected static final Pattern ARGUMENTS_SEPARATOR_PATTERN = Pattern.compile(Command.ARGUMENTS_SEPARATOR, Pattern.LITERAL);
 
 	protected final CommandArgument<I> idArgument;
-	protected final ArgumentFilter<I> filter; // not null
+	protected final ArgumentFilter<I> filter; // Not null
 	// Completions are only provided after at least that many matching input characters:
-	protected final int minimalCompletionInput; // <= 0 to deactivate
+	protected final int minimalCompletionInput; // 0 to deactivate (provide completions even for empty prefix)
 
 	public ObjectIdArgument(String name, CommandArgument<I> idArgument, ArgumentFilter<I> filter, int minimalCompletionInput) {
 		super(name);
 		Validate.notNull(idArgument, "Id argument is null!");
+		Validate.isTrue(minimalCompletionInput >= 0, "minimalCompletionInput cannot be negative");
 		this.idArgument = idArgument;
 		idArgument.setParent(this);
 		this.filter = (filter == null) ? ArgumentFilter.acceptAny() : filter;
@@ -129,7 +130,7 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 		List<String> suggestions = new ArrayList<>();
 		for (I id : this.getCompletionSuggestions(idPrefix)) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;
-			if (!filter.test(id)) continue; // skip rejected ids
+			if (!filter.test(id)) continue; // Skip rejected ids
 
 			String idString = this.toString(id);
 			if (idString == null || idString.isEmpty()) continue; // Skip invalid id string
