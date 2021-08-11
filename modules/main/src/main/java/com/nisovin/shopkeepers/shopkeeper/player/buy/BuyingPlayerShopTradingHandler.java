@@ -52,7 +52,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		assert containerInventory != null & newContainerContents != null;
+		assert containerInventory != null && newContainerContents != null;
 
 		// Remove currency items from container contents:
 		int remaining = this.removeCurrency(newContainerContents, offer.getPrice());

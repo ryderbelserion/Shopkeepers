@@ -40,7 +40,7 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		assert containerInventory != null & newContainerContents != null;
+		assert containerInventory != null && newContainerContents != null;
 
 		// Remove result items from container contents:
 		UnmodifiableItemStack resultItem = tradingRecipe.getResultItem();

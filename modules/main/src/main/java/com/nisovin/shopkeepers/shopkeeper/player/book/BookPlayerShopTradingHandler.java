@@ -65,7 +65,7 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			return false;
 		}
 
-		assert containerInventory != null & newContainerContents != null;
+		assert containerInventory != null && newContainerContents != null;
 
 		// Remove a blank book from the container contents:
 		if (InventoryUtils.removeItems(newContainerContents, WRITABLE_BOOK_MATCHER, 1) != 0) {
