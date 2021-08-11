@@ -529,7 +529,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				continue; // Skip this shopkeeper
 			}
 
-			// If the shopkeeper got migrated or the data version has changed, mark as dirty:
+			// If the shopkeeper was migrated or the data version has changed, mark it as dirty:
+			// During plugin enable, after the shopkeepers have been loaded, a save is triggered if the storage was
+			// marked as dirty.
 			if (migrationResult == MigrationResult.MIGRATED || dataVersionChanged) {
 				shopkeeper.markDirty();
 			}

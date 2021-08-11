@@ -40,9 +40,11 @@ public interface Shopkeeper {
 	/**
 	 * Checks whether this shopkeeper instance is currently valid.
 	 * <p>
-	 * The shopkeeper is marked as 'invalid' once it is removed form the {@link ShopkeeperRegistry}.
+	 * The shopkeeper is marked as valid after it has been freshly created or loaded from the storage and then added to
+	 * the {@link ShopkeeperRegistry}. It is marked as 'invalid' once it is removed from the {@link ShopkeeperRegistry}
+	 * again, for example because it is being deleted or unloaded.
 	 * 
-	 * @return <code>true</code> if valid
+	 * @return <code>true</code> if the shopkeeper is currently valid
 	 */
 	public boolean isValid();
 

@@ -145,7 +145,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * Creates a shopkeeper.
 	 * <p>
 	 * Important: Depending on whether the shopkeeper gets freshly created or loaded, either
-	 * {@link #initOnCreation(ShopCreationData)} or {@link #initOnLoad(ConfigurationSection)} need to be called to
+	 * {@link #initOnCreation(ShopCreationData)} or {@link #initOnLoad(ConfigurationSection)} needs to be called to
 	 * complete the initialization.
 	 * 
 	 * @param id
@@ -162,6 +162,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the shop creation data
 	 * @throws ShopkeeperCreateException
 	 *             in case the shopkeeper could not be created
+	 * @see #loadFromCreationData(ShopCreationData)
 	 */
 	protected final void initOnCreation(ShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		this.loadFromCreationData(shopCreationData);
@@ -170,16 +171,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	/**
 	 * Initializes the shopkeeper by loading its previously saved data from the given config section.
-	 * <p>
-	 * No assumptions are made regarding whether or not the given config section and its sub sections are mutable.
-	 * However, any other stored data elements (such as for example item stacks, etc.) and collections of data elements
-	 * are assumed to be immutable and the loaded shopkeeper may therefore directly store these elements without copying
-	 * them first.
 	 * 
 	 * @param configSection
 	 *            the config section
 	 * @throws ShopkeeperCreateException
 	 *             in case the shopkeeper could not be loaded
+	 * @see #loadFromSaveData(ConfigurationSection)
 	 */
 	protected final void initOnLoad(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		this.loadFromSaveData(configSection);
@@ -266,16 +263,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	/**
 	 * Loads the shopkeeper's saved data from the given config section.
-	 * <p>
-	 * No assumptions are made regarding whether or not the given config section and its sub sections are mutable.
-	 * However, any other stored data elements (such as for example item stacks, etc.) and collections of data elements
-	 * are assumed to be immutable and the loaded shopkeeper may therefore directly store these elements without copying
-	 * them first.
 	 * 
 	 * @param configSection
 	 *            the config section
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper cannot be properly loaded
+	 * @see AbstractShopType#loadShopkeeper(int, ConfigurationSection)
 	 */
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		String uniqueIdString = configSection.getString("uniqueId", "");
