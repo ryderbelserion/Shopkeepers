@@ -8,6 +8,7 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class PlayerShopsLimit {
 
@@ -30,7 +31,7 @@ public class PlayerShopsLimit {
 	 *            this callback is invoked for invalid maximum shops permission options, not <code>null</code>
 	 */
 	public static void updateMaxShopsPermissions(Consumer<String> invalidPermissionOptionCallback) {
-		assert invalidPermissionOptionCallback != null;
+		Validate.notNull(invalidPermissionOptionCallback, "invalidPermissionOptionCallback");
 		String maxShopsPermissionOptions = Settings.maxShopsPermOptions;
 		List<MaxShopsPermission> maxShopsPermissions = DerivedSettings.maxShopsPermissions;
 

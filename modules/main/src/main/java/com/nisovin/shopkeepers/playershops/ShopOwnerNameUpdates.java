@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public class ShopOwnerNameUpdates implements Listener {
@@ -23,7 +24,7 @@ public class ShopOwnerNameUpdates implements Listener {
 	private final SKShopkeepersPlugin plugin;
 
 	public ShopOwnerNameUpdates(SKShopkeepersPlugin plugin) {
-		assert plugin != null;
+		Validate.notNull(plugin, "plugin");
 		this.plugin = plugin;
 	}
 

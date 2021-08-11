@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.hiring.HiringHandler;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public class PlayerShopHiringHandler extends HiringHandler {
@@ -37,6 +38,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 
 	@Override
 	protected boolean openWindow(Player player) {
+		Validate.notNull(player, "player");
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Inventory inventory = Bukkit.createInventory(player, 9, Messages.forHireTitle);
 

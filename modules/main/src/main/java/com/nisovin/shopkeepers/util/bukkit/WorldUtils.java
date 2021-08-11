@@ -12,6 +12,8 @@ import org.bukkit.util.NumberConversions;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
+import com.nisovin.shopkeepers.util.java.Validate;
+
 public class WorldUtils {
 
 	private WorldUtils() {
@@ -43,9 +45,11 @@ public class WorldUtils {
 	 *         specified range
 	 */
 	public static double getCollisionDistanceToGround(Location startLocation, double maxDistance, Set<Material> collidableFluids) {
-		assert collidableFluids != null;
+		Validate.notNull(startLocation, "startLocation");
+		Validate.notNull(collidableFluids, "collidableFluids");
 		World world = startLocation.getWorld();
-		assert world != null;
+		Validate.notNull(world, "startLocation's world is null");
+
 		// Setup re-used offset start location:
 		TEMP_START_LOCATION.setWorld(world);
 		TEMP_START_LOCATION.setX(startLocation.getX());

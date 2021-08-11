@@ -42,6 +42,7 @@ import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Lazy;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public class TradingHandler extends AbstractShopkeeperUIHandler {
@@ -61,7 +62,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
-		assert player != null;
+		Validate.notNull(player, "player");
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.TRADE_PERMISSION)) {
 			if (!silent) {
 				Log.debug(() -> "Blocked trade window opening for " + player.getName() + ": Missing trade permission.");
@@ -88,7 +89,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 	@Override
 	protected boolean openWindow(Player player) {
-		// Create and open trading window:
+		Validate.notNull(player, "player");
+		// Create and open the trading window:
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		String title = this.getInventoryTitle();
 		List<? extends TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);

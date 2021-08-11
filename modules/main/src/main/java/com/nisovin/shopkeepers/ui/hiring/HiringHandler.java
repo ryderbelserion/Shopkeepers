@@ -13,6 +13,7 @@ import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class HiringHandler extends AbstractShopkeeperUIHandler {
@@ -23,7 +24,7 @@ public abstract class HiringHandler extends AbstractShopkeeperUIHandler {
 
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
-		assert player != null;
+		Validate.notNull(player, "player");
 		// Check for hire permission:
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.HIRE_PERMISSION)) {
 			if (!silent) {

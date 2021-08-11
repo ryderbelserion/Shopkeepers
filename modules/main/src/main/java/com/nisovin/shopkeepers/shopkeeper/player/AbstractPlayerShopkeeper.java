@@ -215,6 +215,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void onPlayerInteraction(Player player) {
+		Validate.notNull(player, "player");
+
 		// Naming via item:
 		PlayerInventory playerInventory = player.getInventory();
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();

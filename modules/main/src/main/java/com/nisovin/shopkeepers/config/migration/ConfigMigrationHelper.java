@@ -2,12 +2,15 @@ package com.nisovin.shopkeepers.config.migration;
 
 import org.bukkit.configuration.ConfigurationSection;
 
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public class ConfigMigrationHelper {
 
 	// Returns true if there was a value set that got removed.
 	public static boolean removeSetting(ConfigurationSection config, String key) {
+		Validate.notNull(config, "config");
+		Validate.notNull(key, "key");
 		if (config.isSet(key)) {
 			Log.info("  Removing setting '" + key + "'. Previous value: " + config.get(key));
 			config.set(key, null);
@@ -18,7 +21,9 @@ public class ConfigMigrationHelper {
 
 	// Returns true if there has been a matching value that got replaced.
 	public static boolean migrateValue(ConfigurationSection config, String key, Object expectedOldValue, Object newValue) {
-		assert expectedOldValue != null;
+		Validate.notNull(config, "config");
+		Validate.notNull(key, "key");
+		Validate.notNull(expectedOldValue, "expectedOldValue");
 		if (config.isSet(key)) {
 			Object oldValue = config.get(key);
 			if (expectedOldValue.equals(oldValue)) {
@@ -32,7 +37,9 @@ public class ConfigMigrationHelper {
 
 	// Returns true if the setting got migrated.
 	public static boolean migrateSetting(ConfigurationSection config, String oldKey, String newKey) {
-		assert config != null && oldKey != null && newKey != null;
+		Validate.notNull(config, "config");
+		Validate.notNull(oldKey, "oldKey");
+		Validate.notNull(newKey, "newKey");
 		if (config.isSet(oldKey) && !config.isSet(newKey)) {
 			Object oldValue = config.get(oldKey);
 			Log.info("  Migrating setting '" + oldKey + "' to '" + newKey + "'. Value: " + oldValue);

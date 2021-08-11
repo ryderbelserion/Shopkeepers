@@ -16,8 +16,7 @@ public class MapUtils {
 	// Capacity for a HashMap/Set with the specified expected size and a load factor of >= 0.75 that prevents the
 	// Map/Set from resizing.
 	public static int getIdealHashMapCapacity(int expectedSize) {
-		Validate.isTrue(expectedSize >= 0, "Expected size cannot be negative!");
-		assert expectedSize >= 0;
+		Validate.isTrue(expectedSize >= 0, "expectedSize cannot be negative");
 		if (expectedSize < 3) {
 			return expectedSize + 1;
 		}

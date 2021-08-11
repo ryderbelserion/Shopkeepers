@@ -241,7 +241,7 @@ public class TextUtils {
 	 */
 
 	public static Text getPlayerText(Player player) {
-		assert player != null;
+		Validate.notNull(player, "player");
 		String playerName = player.getName();
 		String playerUUIDString = player.getUniqueId().toString();
 		return Text.hoverEvent(Text.of(playerUUIDString))

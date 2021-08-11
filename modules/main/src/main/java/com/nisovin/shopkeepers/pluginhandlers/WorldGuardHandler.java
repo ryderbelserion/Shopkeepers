@@ -6,6 +6,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
 import com.sk89q.worldguard.WorldGuard;
@@ -39,10 +40,12 @@ public class WorldGuardHandler {
 		Internal.registerAllowShopFlag();
 	}
 
-	public static boolean isShopAllowed(Player player, Location loc) {
+	public static boolean isShopAllowed(Player player, Location location) {
+		Validate.notNull(player, "player");
+		Validate.notNull(location, "location");
 		Plugin wgPlugin = getPlugin();
 		if (wgPlugin == null || !wgPlugin.isEnabled()) return true;
-		return Internal.isShopAllowed(wgPlugin, player, loc);
+		return Internal.isShopAllowed(wgPlugin, player, location);
 	}
 
 	// Separate class that gets only accessed if WorldGuard is present. Avoids class loading issues.
@@ -60,8 +63,8 @@ public class WorldGuardHandler {
 			}
 		}
 
-		public static boolean isShopAllowed(Plugin worldGuardPlugin, Player player, Location loc) {
-			assert worldGuardPlugin instanceof WorldGuardPlugin && worldGuardPlugin.isEnabled() && player != null && loc != null;
+		public static boolean isShopAllowed(Plugin worldGuardPlugin, Player player, Location location) {
+			assert worldGuardPlugin instanceof WorldGuardPlugin && worldGuardPlugin.isEnabled() && player != null && location != null;
 			WorldGuardPlugin wgPlugin = (WorldGuardPlugin) worldGuardPlugin;
 			RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
 
@@ -73,10 +76,10 @@ public class WorldGuardHandler {
 			if (shopFlag != null) {
 				// Check if shop flag is set:
 				if (shopFlag instanceof StateFlag) {
-					allowShopFlag = query.testState(BukkitAdapter.adapt(loc), wgPlugin.wrapPlayer(player), (StateFlag) shopFlag);
+					allowShopFlag = query.testState(BukkitAdapter.adapt(location), wgPlugin.wrapPlayer(player), (StateFlag) shopFlag);
 				} else if (shopFlag instanceof BooleanFlag) {
 					// Value might be null:
-					Boolean shopFlagValue = query.queryValue(BukkitAdapter.adapt(loc), wgPlugin.wrapPlayer(player), (BooleanFlag) shopFlag);
+					Boolean shopFlagValue = query.queryValue(BukkitAdapter.adapt(location), wgPlugin.wrapPlayer(player), (BooleanFlag) shopFlag);
 					allowShopFlag = (Boolean.TRUE.equals(shopFlagValue));
 				} else {
 					// Unknown flag type, assume unset.
@@ -90,7 +93,7 @@ public class WorldGuardHandler {
 				return allowShopFlag;
 			} else {
 				// Allow shops in regions where the shop flag is set OR the player can build:
-				return (allowShopFlag || query.testState(BukkitAdapter.adapt(loc), wgPlugin.wrapPlayer(player), Flags.BUILD));
+				return (allowShopFlag || query.testState(BukkitAdapter.adapt(location), wgPlugin.wrapPlayer(player), Flags.BUILD));
 			}
 		}
 

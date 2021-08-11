@@ -174,7 +174,8 @@ public class MathUtils {
 	 * @return the value within the specified range
 	 */
 	public static int rangeModulo(int value, int min, int max) {
-		assert min <= max; // Note: value can be outside the range.
+		Validate.isTrue(min <= max, "min > max");
+		// Note: value can be outside of this range.
 		int offset = min;
 		int range = max - min + 1;
 		int modulo = (value - offset) % range;

@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.TimeUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 import net.citizensnpcs.api.CitizensAPI;
@@ -75,7 +76,7 @@ public class CitizensShops {
 	private final Map<UUID, List<AbstractShopkeeper>> shopkeepersByNpcId = new HashMap<>();
 
 	public CitizensShops(SKShopkeepersPlugin plugin) {
-		assert plugin != null;
+		Validate.notNull(plugin, "plugin");
 		this.plugin = plugin;
 		this.citizensListener = new CitizensListener(plugin, this);
 	}

@@ -13,6 +13,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Registers event handlers at every event priority for a particular type of event and then invokes a callback whenever
@@ -34,7 +35,8 @@ public class EventDebugListener<E extends Event> implements Listener {
 	private final Map<EventPriority, EventExecutor> executors = new EnumMap<>(EventPriority.class);
 
 	public EventDebugListener(Class<E> eventClass, EventHandler<E> eventHandler) {
-		assert eventClass != null && eventHandler != null;
+		Validate.notNull(eventClass, "eventClass");
+		Validate.notNull(eventHandler, "eventHandler");
 		this.eventClass = eventClass;
 
 		// Create event executors for every event priority:

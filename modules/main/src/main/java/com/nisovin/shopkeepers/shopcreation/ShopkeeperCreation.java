@@ -19,6 +19,7 @@ import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.interaction.InteractionUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public class ShopkeeperCreation {
 
@@ -55,7 +56,8 @@ public class ShopkeeperCreation {
 	// RECENTLY PLACED CONTAINERS
 
 	public void addRecentlyPlacedContainer(Player player, Block container) {
-		assert player != null && container != null;
+		Validate.notNull(player, "player");
+		Validate.notNull(container, "container");
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedContainers.get(playerName);
 		if (recentlyPlaced == null) {
@@ -69,7 +71,8 @@ public class ShopkeeperCreation {
 	}
 
 	public boolean isRecentlyPlacedContainer(Player player, Block container) {
-		assert player != null && container != null;
+		Validate.notNull(player, "player");
+		Validate.notNull(container, "container");
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedContainers.get(playerName);
 		return recentlyPlaced != null && recentlyPlaced.contains(TextUtils.getLocationString(container));
@@ -78,18 +81,19 @@ public class ShopkeeperCreation {
 	// SELECTED CONTAINER
 
 	public void selectContainer(Player player, Block container) {
-		assert player != null;
+		Validate.notNull(player, "player");
 		String playerName = player.getName();
 		if (container == null) {
 			selectedContainer.remove(playerName);
 		} else {
+			// This is validated once the container is actually used:
 			assert ShopContainers.isSupportedContainer(container.getType());
 			selectedContainer.put(playerName, container);
 		}
 	}
 
 	public Block getSelectedContainer(Player player) {
-		assert player != null;
+		Validate.notNull(player, "player");
 		return selectedContainer.get(player.getName());
 	}
 
@@ -97,6 +101,8 @@ public class ShopkeeperCreation {
 
 	// Checks if the player can use the given container for a player shopkeeper:
 	public boolean handleCheckContainer(Player player, Block containerBlock) {
+		Validate.notNull(player, "player");
+		Validate.notNull(containerBlock, "containerBlock");
 		// Check if the container is already used by some other shopkeeper:
 		if (SKShopkeepersPlugin.getInstance().getProtectedContainers().isContainerProtected(containerBlock, null)) {
 			TextUtils.sendMessage(player, Messages.containerAlreadyInUse);
@@ -104,7 +110,7 @@ public class ShopkeeperCreation {
 		}
 
 		// Check for recently placed:
-		if (Settings.requireContainerRecentlyPlaced && !plugin.getShopkeeperCreation().isRecentlyPlacedContainer(player, containerBlock)) {
+		if (Settings.requireContainerRecentlyPlaced && !this.isRecentlyPlacedContainer(player, containerBlock)) {
 			// Container was not recently placed:
 			TextUtils.sendMessage(player, Messages.containerNotPlaced);
 			return false;
@@ -119,7 +125,9 @@ public class ShopkeeperCreation {
 	}
 
 	public Location determineSpawnLocation(Player player, Block targetBlock, BlockFace targetBlockFace) {
-		assert player != null && targetBlock != null && targetBlockFace != null;
+		Validate.notNull(player, "player");
+		Validate.notNull(targetBlock, "targetBlock");
+		Validate.notNull(targetBlockFace, "targetBlockFace");
 		// If the target block is passable (and not a liquid, which can only come up as target block when we try to
 		// place the shopkeeper on top of water or lava), spawn there, otherwise shift according to target block face:
 		Block spawnBlock;

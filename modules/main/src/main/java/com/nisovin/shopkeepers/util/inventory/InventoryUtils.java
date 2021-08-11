@@ -558,7 +558,7 @@ public final class InventoryUtils {
 
 	// This can for example be used during the handling of inventory interaction events.
 	public static void setItemDelayed(Inventory inventory, int slot, @ReadOnly ItemStack itemStack) {
-		assert inventory != null;
+		Validate.notNull(inventory, "inventory");
 		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
 			inventory.setItem(slot, itemStack); // This copies the item internally
 		});

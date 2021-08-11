@@ -5,6 +5,7 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.events.PlayerDeleteShopkeeperEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public class ShopkeeperEventHelper {
@@ -22,7 +23,8 @@ public class ShopkeeperEventHelper {
 	 * @return the {@link PlayerDeleteShopkeeperEvent}
 	 */
 	public static PlayerDeleteShopkeeperEvent callPlayerDeleteShopkeeperEvent(Shopkeeper shopkeeper, Player player) {
-		assert shopkeeper != null && player != null;
+		Validate.notNull(shopkeeper, "shopkeeper");
+		Validate.notNull(player, "player");
 		PlayerDeleteShopkeeperEvent event = new PlayerDeleteShopkeeperEvent(shopkeeper, player);
 		Bukkit.getPluginManager().callEvent(event);
 		if (event.isCancelled()) {

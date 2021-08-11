@@ -23,11 +23,12 @@ public class PermissionUtils {
 	 * @param permissible
 	 *            the permissible, not <code>null</code>
 	 * @param permission
-	 *            the permission
+	 *            the permission, not <code>null</code> or empty
 	 * @return <code>true</code> if the permissible has the specified permission, or <code>false</code> otherwise
 	 */
 	public static boolean hasPermission(Permissible permissible, String permission) {
-		assert permissible != null;
+		Validate.notNull(permissible, "permissible");
+		Validate.notEmpty(permission, "permission is null or empty");
 		boolean hasPermission = permissible.hasPermission(permission);
 		if (!hasPermission && (permissible instanceof Player)) {
 			Log.debug(() -> "Player '" + ((Player) permissible).getName() + "' does not have permission '" + permission + "'.");

@@ -717,9 +717,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		new ArrayList<>(this.getAllShopkeepers()).forEach(this::deleteShopkeeper);
 	}
 
-	// This does not get called for virtual shopkeepers.
+	// This is not called for virtual shopkeepers.
 	public void onShopkeeperMoved(AbstractShopkeeper shopkeeper) {
-		assert shopkeeper != null && !shopkeeper.isVirtual();
+		Validate.notNull(shopkeeper, "shopkeeper");
+		Validate.isTrue(!shopkeeper.isVirtual(), "shopkeeper is virtual");
+
 		ChunkCoords oldChunk = shopkeeper.getLastChunkCoords();
 		ChunkCoords newChunk = shopkeeper.getChunkCoords();
 		assert oldChunk != null && newChunk != null;
@@ -772,7 +774,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		private final ChunkShopkeepers chunkShopkeepers;
 
 		public ActivateChunkTask(ChunkShopkeepers chunkShopkeepers) {
-			assert chunkShopkeepers != null;
+			Validate.notNull(chunkShopkeepers, "chunkShopkeepers");
 			this.chunkShopkeepers = chunkShopkeepers;
 		}
 
@@ -1128,7 +1130,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		private final WorldShopkeepers worldShopkeepers;
 
 		public RespawnShopkeepersAfterWorldSaveTask(WorldShopkeepers worldShopkeepers) {
-			assert worldShopkeepers != null;
+			Validate.notNull(worldShopkeepers, "worldShopkeepers");
 			this.worldShopkeepers = worldShopkeepers;
 		}
 
@@ -1280,7 +1282,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// This can be used if the shopkeeper's object id has changed for some reason.
 	// This is not required to be called if the object id changes during spawning, despawning, or ticking.
 	public void onShopkeeperObjectIdChanged(AbstractShopkeeper shopkeeper) {
-		assert shopkeeper != null;
+		Validate.notNull(shopkeeper, "shopkeeper");
 		if (shopkeeper.getShopObject().getLastId() == null) {
 			// The shopkeeper has no entry in the active shopkeepers currently that would need to be updated.
 			return;

@@ -859,7 +859,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the interacting player
 	 */
 	public void onPlayerInteraction(Player player) {
-		assert player != null;
+		Validate.notNull(player, "player");
 		if (player.isSneaking()) {
 			// Open editor window:
 			this.openEditorWindow(player);

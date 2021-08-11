@@ -28,7 +28,7 @@ public class ItemConversions {
 	private final ItemConversionListener listener = new ItemConversionListener();
 
 	public ItemConversions(ShopkeepersPlugin plugin) {
-		assert plugin != null;
+		Validate.notNull(plugin, "plugin");
 		this.plugin = plugin;
 	}
 

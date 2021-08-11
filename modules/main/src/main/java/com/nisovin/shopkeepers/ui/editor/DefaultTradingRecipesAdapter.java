@@ -7,6 +7,7 @@ import java.util.Objects;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Default abstract skeleton implementation of a {@link TradingRecipesAdapter}.
@@ -43,8 +44,11 @@ public abstract class DefaultTradingRecipesAdapter<O> implements TradingRecipesA
 	 */
 	@Override
 	public int updateTradingRecipes(Player player, List<TradingRecipeDraft> recipes) {
-		assert player != null && recipes != null && !recipes.contains(null);
+		Validate.notNull(player, "player");
+		Validate.notNull(recipes, "recipes");
+		assert !recipes.contains(null);
 		assert this.getOffers() != null && !this.getOffers().contains(null);
+
 		List<O> newOffers = new ArrayList<>(this.getOffers());
 		final int oldOffersSize = newOffers.size();
 		int changedOffers = 0;

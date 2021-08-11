@@ -462,6 +462,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	@Override
 	public boolean openWindow(Player player) {
+		Validate.notNull(player, "player");
 		// Lazy setup:
 		this.setup();
 
@@ -581,7 +582,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
-		assert player != null;
+		Validate.notNull(player, "player");
 		// Permission for the type of shopkeeper is checked in the AdminShopkeeper specific EditorHandler.
 		// Owner is checked in the PlayerShopkeeper specific EditorHandler.
 		return true;

@@ -12,6 +12,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Utilities related to merchants and trading.
@@ -96,7 +97,8 @@ public class MerchantUtils {
 
 	public static MerchantRecipe createMerchantRecipe(TradingRecipeDraft recipe) {
 		if (recipe == null) return null;
-		assert recipe.isValid();
+		Validate.isTrue(recipe.isValid(), "recipe is not valid");
+
 		// CraftBukkit always fills both ingredients, possibly with empty ItemStacks. We do the same in order to be able
 		// to more easily compare merchant recipes.
 		// The items are already copied on various occasions (addIngredient, getIngredients, when converting to a

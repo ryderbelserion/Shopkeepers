@@ -598,7 +598,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	 *            the shopkeeper
 	 */
 	public void deleteShopkeeper(AbstractShopkeeper shopkeeper) {
-		assert shopkeeper != null;
+		Validate.notNull(shopkeeper, "shopkeeper");
 		// If the save task is currently running (and not in its synchronous post-processing callback), we defer the
 		// deletion of the shopkeeper's data:
 		if (saveTask.isRunning() && !saveTask.isPostProcessing()) {

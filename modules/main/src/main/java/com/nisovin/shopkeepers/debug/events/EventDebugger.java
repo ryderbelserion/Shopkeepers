@@ -6,6 +6,7 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.Debug;
 import com.nisovin.shopkeepers.debug.DebugOptions;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Tool to debug event handlers.
@@ -15,7 +16,7 @@ public class EventDebugger {
 	private final SKShopkeepersPlugin plugin;
 
 	public EventDebugger(SKShopkeepersPlugin plugin) {
-		assert plugin != null;
+		Validate.notNull(plugin, "plugin");
 		this.plugin = plugin;
 	}
 

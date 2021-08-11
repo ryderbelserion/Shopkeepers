@@ -5,6 +5,7 @@ import org.bukkit.event.HandlerList;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Features related to regular villagers.
@@ -17,7 +18,7 @@ public class RegularVillagers {
 	private final BlockZombieVillagerCuringListener blockZombieVillagerCuringListener;
 
 	public RegularVillagers(SKShopkeepersPlugin plugin) {
-		assert plugin != null;
+		Validate.notNull(plugin, "plugin");
 		this.plugin = plugin;
 		this.villagerInteractionListener = new VillagerInteractionListener(plugin);
 		this.blockVillagerSpawnListener = new BlockVillagerSpawnListener();

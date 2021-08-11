@@ -50,7 +50,7 @@ public abstract class UIHandler {
 	 * A shortcut for getting the given player's current UI session.
 	 * 
 	 * @param player
-	 *            the player
+	 *            the player, not <code>null</code>
 	 * @return the UI session, or <code>null</code> if there is none
 	 * @see UIRegistry#getUISession(Player)
 	 */
@@ -66,7 +66,7 @@ public abstract class UIHandler {
 	 * This gets for example called when a player requests this interface.
 	 * 
 	 * @param player
-	 *            the player
+	 *            the player, not <code>null</code>
 	 * @param silent
 	 *            <code>false</code> to inform the player when the access is denied
 	 * @return <code>true</code> if the given player is allowed to open this interface
@@ -80,7 +80,7 @@ public abstract class UIHandler {
 	 * should not rely on that.
 	 * 
 	 * @param player
-	 *            a player
+	 *            the player, not <code>null</code>
 	 * @return <code>true</code> if the interface window was successfully opened
 	 */
 	protected abstract boolean openWindow(Player player);
@@ -103,7 +103,7 @@ public abstract class UIHandler {
 	 * Checks if the player has this UI open currently.
 	 * 
 	 * @param player
-	 *            the player
+	 *            the player, not <code>null</code>
 	 * @return <code>true</code> if this UI is open currently
 	 */
 	protected final boolean isOpen(Player player) {
@@ -119,7 +119,7 @@ public abstract class UIHandler {
 	 * reason (eg. due to an {@link UISession#abort()}).
 	 * 
 	 * @param player
-	 *            the player
+	 *            the player, not <code>null</code>
 	 * @param closeEvent
 	 *            the inventory closing event, can be <code>null</code>
 	 */
@@ -183,9 +183,9 @@ public abstract class UIHandler {
 	 * event.
 	 * 
 	 * @param event
-	 *            the inventory click event
+	 *            the inventory click event, not <code>null</code>
 	 * @param player
-	 *            the clicking player
+	 *            the clicking player, not <code>null</code>
 	 * @see #onInventoryClickLate(InventoryClickEvent, Player)
 	 */
 	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
@@ -202,9 +202,9 @@ public abstract class UIHandler {
 	 * that are {@link #isOpen(Player) managed} by this UI handler.
 	 * 
 	 * @param event
-	 *            the inventory click event
+	 *            the inventory click event, not <code>null</code>
 	 * @param player
-	 *            the clicking player
+	 *            the clicking player, not <code>null</code>
 	 * @see #onInventoryClickEarly(InventoryClickEvent, Player)
 	 */
 	protected void onInventoryClickLate(InventoryClickEvent event, Player player) {
@@ -224,9 +224,9 @@ public abstract class UIHandler {
 	 * event.
 	 * 
 	 * @param event
-	 *            the inventory drag event
+	 *            the inventory drag event, not <code>null</code>
 	 * @param player
-	 *            the dragging player
+	 *            the dragging player, not <code>null</code>
 	 * @see #onInventoryDragLate(InventoryDragEvent, Player)
 	 */
 	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
@@ -243,9 +243,9 @@ public abstract class UIHandler {
 	 * that are {@link #isOpen(Player) managed} by this UI handler.
 	 * 
 	 * @param event
-	 *            the inventory drag event
+	 *            the inventory drag event, not <code>null</code>
 	 * @param player
-	 *            the dragging player
+	 *            the dragging player, not <code>null</code>
 	 * @see #onInventoryDragEarly(InventoryDragEvent, Player)
 	 */
 	protected void onInventoryDragLate(InventoryDragEvent event, Player player) {

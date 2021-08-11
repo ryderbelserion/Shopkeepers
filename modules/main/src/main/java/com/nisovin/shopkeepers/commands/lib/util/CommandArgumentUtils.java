@@ -5,6 +5,8 @@ import java.util.function.ObjIntConsumer;
 
 import org.bukkit.command.CommandSender;
 
+import com.nisovin.shopkeepers.util.java.Validate;
+
 public class CommandArgumentUtils {
 
 	private CommandArgumentUtils() {
@@ -23,7 +25,13 @@ public class CommandArgumentUtils {
 	// true if there are multiple matches.
 	public static <T> boolean handleAmbiguousInput(	CommandSender sender, String input, Iterable<T> matches, int maxEntries,
 													Runnable sendHeader, ObjIntConsumer<T> sendEntry, Runnable sendMore) {
-		assert sender != null && input != null && matches != null && sendHeader != null && sendEntry != null && sendMore != null;
+		Validate.notNull(sender, "sender");
+		Validate.notNull(input, "input");
+		Validate.notNull(matches, "matches");
+		Validate.notNull(sendHeader, "sendHeader");
+		Validate.notNull(sendEntry, "sendEntry");
+		Validate.notNull(sendMore, "sendMore");
+
 		Iterator<T> matchesIter = matches.iterator();
 		if (!matchesIter.hasNext()) return false; // Empty -> Not ambiguous.
 		T match = matchesIter.next();

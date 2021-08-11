@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
@@ -33,7 +34,7 @@ public class VillagerInteractionListener implements Listener {
 	private final ShopkeepersPlugin plugin;
 
 	public VillagerInteractionListener(ShopkeepersPlugin plugin) {
-		assert plugin != null;
+		Validate.notNull(plugin, "plugin");
 		this.plugin = plugin;
 	}
 

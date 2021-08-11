@@ -337,7 +337,8 @@ public final class ItemUtils {
 
 	// The display name and lore are expected to use Minecraft's color codes.
 	public static ItemStack createItemStack(Material type, int amount, String displayName, @ReadOnly List<String> lore) {
-		assert type != null && type.isItem();
+		assert type != null; // Checked by the ItemStack constructor
+		assert type.isItem();
 		// TODO Return null in case of type AIR?
 		ItemStack itemStack = new ItemStack(type, amount);
 		return setDisplayNameAndLore(itemStack, displayName, lore);
@@ -478,9 +479,8 @@ public final class ItemUtils {
 	}
 
 	public static int getDurability(@ReadOnly ItemStack itemStack) {
-		assert itemStack != null;
 		// Checking if the item is damageable is cheap in comparison to retrieving the ItemMeta:
-		if (!isDamageable(itemStack)) return 0;
+		if (!isDamageable(itemStack)) return 0; // Also returns 0 if itemStack is null
 
 		ItemMeta itemMeta = itemStack.getItemMeta();
 		if (itemMeta instanceof Damageable) { // Also checks for null ItemMeta
@@ -632,9 +632,8 @@ public final class ItemUtils {
 	}
 
 	public static boolean matchesData(@ReadOnly ItemStack item, Material dataType, @ReadOnly Map<String, @ReadOnly Object> data, boolean matchPartialLists) {
-		assert dataType != null;
 		if (item == null) return false;
-		if (item.getType() != dataType) return false;
+		if (item.getType() != dataType) return false; // Also returns false if dataType is null
 		if (data == null || data.isEmpty()) return true;
 		return matchesData(item.getItemMeta(), data, matchPartialLists);
 	}
