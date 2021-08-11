@@ -461,9 +461,9 @@ public class LivingEntityAI implements Listener {
 						chunkData.activeAI = true;
 						activeAIChunksCount++;
 					}
-				default:
-					// Not expected.
 					break;
+				default:
+					throw new IllegalStateException("Unexpected activation type: " + activationType);
 				}
 			}
 		}
