@@ -1,7 +1,7 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.13.4 (TBA)
+## v2.14.0 (TBA)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
 * Shopkeepers store the yaw angle now with which they are initially spawned.
@@ -21,6 +21,7 @@ Date format: (YYYY-MM-DD)
 * Deprecated DefaultShopTypes#getAdminShopType() and #ADMIN(), and added #getRegularAdminShopType() and #ADMIN_REGULAR() as alternatives.
 * Deprecated the previous constructors and factory methods of AdminShopCreationData and PlayerShopCreationData, and added corresponding alternatives that directly require an AdminShopType or PlayerShopType respectively.
 * Deprecated the superfluous LivingShopObjectTypes#getAliases(EntityType).
+* Removed various previously deprecated methods in UIRegistry, Shopkeeper, and PlayerShopkeeper.
 
 **Various internal build changes:**  
 * Switched from Maven to Gradle.

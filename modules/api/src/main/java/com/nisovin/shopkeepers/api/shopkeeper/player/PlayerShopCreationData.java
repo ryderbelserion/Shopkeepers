@@ -39,6 +39,7 @@ public class PlayerShopCreationData extends ShopCreationData {
 	 * @return the {@link PlayerShopCreationData}
 	 * @deprecated Use {@link #create(Player, PlayerShopType, ShopObjectType, Location, BlockFace, Block)} instead
 	 */
+	@Deprecated
 	public static PlayerShopCreationData create(Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
 												Location spawnLocation, BlockFace targetedBlockFace, Block shopContainer) {
 		return create(creator, toPlayerShopType(shopType), shopObjectType, spawnLocation, targetedBlockFace, shopContainer);
@@ -130,6 +131,7 @@ public class PlayerShopCreationData extends ShopCreationData {
 	 * @return the shop container
 	 * @deprecated {@link #getShopContainer()}
 	 */
+	@Deprecated
 	public Block getShopChest() {
 		return getShopContainer();
 	}

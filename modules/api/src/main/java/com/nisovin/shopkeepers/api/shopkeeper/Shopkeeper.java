@@ -259,14 +259,6 @@ public interface Shopkeeper {
 	public void abortUISessionsDelayed();
 
 	/**
-	 * {@link UISession#deactivateUI() Deactivates} all currently active UIs (trading, editing, hiring, etc.) involving
-	 * this shopkeeper and {@link UISession#abort() aborts} them within the next tick.
-	 * 
-	 * @deprecated Use {@link #abortUISessionsDelayed()}
-	 */
-	public void closeAllOpenWindows();
-
-	/**
 	 * Attempts to open the interface for the given {@link UIType} for the specified player.
 	 * <p>
 	 * This fails if this shopkeeper doesn't support the specified interface type, if the player cannot open this

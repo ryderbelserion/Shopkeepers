@@ -24,6 +24,7 @@ public interface DefaultShopTypes {
 	 * @return the default regular {@link AdminShopType}
 	 * @deprecated Use {@link #getRegularAdminShopType()} instead
 	 */
+	@Deprecated
 	public ShopType<?> getAdminShopType();
 
 	/**
@@ -78,6 +79,7 @@ public interface DefaultShopTypes {
 	 * @return the default regular {@link AdminShopType}
 	 * @deprecated Use {@link #ADMIN_REGULAR()} instead
 	 */
+	@Deprecated
 	public static ShopType<?> ADMIN() {
 		return ADMIN_REGULAR();
 	}

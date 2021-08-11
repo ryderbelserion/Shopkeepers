@@ -61,26 +61,6 @@ public interface UIRegistry<T extends UIType> extends TypeRegistry<T> {
 	public UISession getUISession(Player player);
 
 	/**
-	 * Gets the currently active {@link UISession} for the given player.
-	 * 
-	 * @param player
-	 *            the player
-	 * @return the UI session, or <code>null</code> if there is none
-	 * @deprecated {@link #getUISession(Player)}
-	 */
-	public UISession getSession(Player player);
-
-	/**
-	 * Gets the currently open {@link UIType} for the specified player.
-	 * 
-	 * @param player
-	 *            the player
-	 * @return the UI type, or <code>null</code> if the player has no UI open currently
-	 * @deprecated Use {@link #getSession(Player)} instead
-	 */
-	public UIType getOpenUIType(Player player);
-
-	/**
 	 * {@link UISession#abort() Aborts} all UI sessions.
 	 * <p>
 	 * This may not be safe to call during UI / inventory events.
@@ -105,34 +85,4 @@ public interface UIRegistry<T extends UIType> extends TypeRegistry<T> {
 	 *            the shopkeeper
 	 */
 	public void abortUISessionsDelayed(Shopkeeper shopkeeper);
-
-	/**
-	 * Closes all UI sessions involving the given {@link Shopkeeper}.
-	 * <p>
-	 * This may not be safe to call during UI / inventory events.
-	 * 
-	 * @param shopkeeper
-	 *            the shopkeeper
-	 * @deprecated {@link #abortUISessions(Shopkeeper)}
-	 */
-	public void closeAll(Shopkeeper shopkeeper);
-
-	/**
-	 * {@link UISession#deactivateUI() Deactivates} all UI sessions involving the given {@link Shopkeeper} and closes
-	 * them after a short delay (within the next tick).
-	 * 
-	 * @param shopkeeper
-	 *            the shopkeeper
-	 * @deprecated {@link #abortUISessionsDelayed(Shopkeeper)}
-	 */
-	public void closeAllDelayed(Shopkeeper shopkeeper);
-
-	/**
-	 * Closes all UI sessions.
-	 * <p>
-	 * This may not be safe to call during UI / inventory events.
-	 * 
-	 * @deprecated {@link #abortUISessions()}
-	 */
-	public void closeAll();
 }

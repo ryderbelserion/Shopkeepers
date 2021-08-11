@@ -808,12 +808,6 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		ShopkeepersPlugin.getInstance().getUIRegistry().abortUISessionsDelayed(this);
 	}
 
-	@Deprecated
-	@Override
-	public void closeAllOpenWindows() {
-		this.abortUISessionsDelayed();
-	}
-
 	/**
 	 * Registers an {@link UIHandler} which handles a specific type of user interface for this shopkeeper.
 	 * <p>

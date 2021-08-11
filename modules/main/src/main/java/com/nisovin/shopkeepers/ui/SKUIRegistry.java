@@ -180,19 +180,6 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 		return uiSessions.get(player.getUniqueId());
 	}
 
-	@Deprecated
-	@Override
-	public SKUISession getSession(Player player) {
-		return this.getUISession(player);
-	}
-
-	@Deprecated
-	@Override
-	public AbstractUIType getOpenUIType(Player player) {
-		SKUISession session = this.getUISession(player);
-		return (session != null) ? session.getUIType() : null;
-	}
-
 	void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
 		assert player != null;
 		UISession session = this.getUISession(player);
@@ -273,23 +260,5 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 				session.deactivateUI();
 			}
 		}
-	}
-
-	@Deprecated
-	@Override
-	public void closeAll(Shopkeeper shopkeeper) {
-		this.abortUISessions(shopkeeper);
-	}
-
-	@Deprecated
-	@Override
-	public void closeAllDelayed(Shopkeeper shopkeeper) {
-		this.abortUISessionsDelayed(shopkeeper);
-	}
-
-	@Deprecated
-	@Override
-	public void closeAll() {
-		this.abortUISessions();
 	}
 }

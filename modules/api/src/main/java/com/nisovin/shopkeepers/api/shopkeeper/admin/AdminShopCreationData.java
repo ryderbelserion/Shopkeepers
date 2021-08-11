@@ -35,6 +35,7 @@ public class AdminShopCreationData extends ShopCreationData {
 	 * @return the {@link AdminShopCreationData}
 	 * @deprecated Use {@link #create(Player, AdminShopType, ShopObjectType, Location, BlockFace)} instead
 	 */
+	@Deprecated
 	public static AdminShopCreationData create(	Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
 												Location spawnLocation, BlockFace targetedBlockFace) {
 		return create(creator, toAdminShopType(shopType), shopObjectType, spawnLocation, targetedBlockFace);
@@ -76,6 +77,7 @@ public class AdminShopCreationData extends ShopCreationData {
 	 * @deprecated Use {@link #AdminShopCreationData(Player, AdminShopType, ShopObjectType, Location, BlockFace)}
 	 *             instead
 	 */
+	@Deprecated
 	protected AdminShopCreationData(Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
 									Location spawnLocation, BlockFace targetedBlockFace) {
 		this(creator, toAdminShopType(shopType), shopObjectType, spawnLocation, targetedBlockFace);

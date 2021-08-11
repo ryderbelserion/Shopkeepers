@@ -18,6 +18,7 @@ public interface LivingShopObjectTypes {
 	 * @return the aliases, or an empty list of there is no shop object type for the given entity type
 	 * @deprecated Use {@link #get(EntityType)} and {@link LivingShopObjectType#getAliases()} instead.
 	 */
+	@Deprecated
 	public List<String> getAliases(EntityType entityType);
 
 	/**

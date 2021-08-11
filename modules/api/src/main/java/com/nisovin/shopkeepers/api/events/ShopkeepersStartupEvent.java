@@ -20,6 +20,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
  *             point. This event is only supposed to be used by plugin which need to hook into Shopkeepers startup
  *             process and know what they are doing.
  */
+@Deprecated
 public class ShopkeepersStartupEvent extends Event {
 
 	/**

@@ -210,6 +210,15 @@ public final class ItemUtils {
 		return UnmodifiableItemStack.of(getNullIfEmpty(itemStack));
 	}
 
+	/**
+	 * Returns an {@link ItemStack} view of the given unmodifiable item stack, or <code>null</code> if the given item
+	 * stack is <code>null</code>.
+	 * 
+	 * @param itemStack
+	 *            the unmodifiable item stack
+	 * @return the item stack view, or <code>null</code>
+	 * @deprecated See {@link UnmodifiableItemStack#asItemStack()}
+	 */
 	@Deprecated
 	public static ItemStack asItemStackOrNull(UnmodifiableItemStack itemStack) {
 		return (itemStack != null) ? itemStack.asItemStack() : null;

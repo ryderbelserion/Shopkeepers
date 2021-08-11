@@ -122,61 +122,6 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	 * Gets the container's x coordinate.
 	 * 
 	 * @return the container's x coordinate
-	 * @deprecated Use {@link #getContainerX()}
-	 */
-	public int getChestX();
-
-	/**
-	 * Gets the container's y coordinate.
-	 * 
-	 * @return the container's y coordinate
-	 * @deprecated Use {@link #getContainerY()}
-	 */
-	public int getChestY();
-
-	/**
-	 * Gets the container's z coordinate.
-	 * 
-	 * @return the container's z coordinate.
-	 * @deprecated Use {@link #getContainerZ()}
-	 */
-	public int getChestZ();
-
-	/**
-	 * Sets the container's coordinates.
-	 * 
-	 * @param containerX
-	 *            the container's x coordinate
-	 * @param containerY
-	 *            the container's y coordinate
-	 * @param containerZ
-	 *            the container's z coordinate
-	 * @deprecated Use {@link #setContainer(int, int, int)}
-	 */
-	public void setChest(int containerX, int containerY, int containerZ);
-
-	/**
-	 * Gets the chest block.
-	 * 
-	 * @return the chest block
-	 * @deprecated Use {@link #getContainer()}
-	 */
-	public Block getChest();
-
-	/**
-	 * Gets the amount of currency stored inside the shop's container.
-	 * <p>
-	 * Returns <code>0</code> if the container does not exist currently.
-	 * 
-	 * @return the amount of currency inside the shop's container
-	 * @deprecated Use {@link #getCurrencyInContainer()}
-	 */
-	public int getCurrencyInChest();
-
-	/**
-	 * Gets the container's x coordinate.
-	 * 
-	 * @return the container's x coordinate
 	 */
 	public int getContainerX();
 
@@ -239,16 +184,6 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	 * @return <code>true</code> if the interface was successfully opened
 	 */
 	public boolean openHireWindow(Player player);
-
-	/**
-	 * Attempts to open the container inventory of this shopkeeper for the specified player.
-	 * 
-	 * @param player
-	 *            the player
-	 * @return <code>true</code> if the interface was successfully opened
-	 * @deprecated {@link #openContainerWindow(Player)}
-	 */
-	public boolean openChestWindow(Player player);
 
 	/**
 	 * Attempts to open the container inventory of this shopkeeper for the specified player.
