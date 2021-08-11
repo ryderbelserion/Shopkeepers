@@ -21,6 +21,30 @@ public class MathUtils {
 	}
 
 	/**
+	 * Gets the sum of the given integers, clamped to {@link Integer#MAX_VALUE} and {@link Integer#MIN_VALUE} if an
+	 * overflow would occur.
+	 * 
+	 * @param x
+	 *            the first value
+	 * @param y
+	 *            the second value
+	 * @return the result
+	 */
+	public static int addSaturated(int x, int y) {
+		int result = x + y;
+		if (((x ^ result) & (y ^ result)) < 0) {
+			if (result < 0) {
+				// Overflow occurred:
+				return Integer.MAX_VALUE;
+			} else {
+				// Underflow occurred:
+				return Integer.MIN_VALUE;
+			}
+		}
+		return result;
+	}
+
+	/**
 	 * Calculates the closest value in the specified range.
 	 * 
 	 * @param value
