@@ -42,6 +42,7 @@ Date format: (YYYY-MM-DD)
 * Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
 * The save operations of the shopkeeper storage and the CSV trade logger will now restore any catched Thread interruption status for anyone interested in it. Other than that, these operations still ignore Thread interruptions, because we prefer to keep trying to still save the data to disk after all.
 * Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
+* Internal API: Moved various editor internal classes into their own files.
 * Various other minor internal refactors and Javadoc improvements.
 
 ## v2.13.3 (2021-07-08)
