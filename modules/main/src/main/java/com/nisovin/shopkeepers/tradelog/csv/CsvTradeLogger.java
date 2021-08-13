@@ -361,15 +361,16 @@ public class CsvTradeLogger implements TradeLogger {
 			Retry.retry((VoidCallable) () -> {
 				this.writeTradesToLogFile(saveContext);
 			}, SAVE_MAX_ATTEMPTS, (attemptNumber, exception, retry) -> {
-				// Trade logging failed. Log a compact description of the issue:
+				// Trade logging failed:
 				assert exception != null;
-				String issue = ThrowableUtils.getDescription(exception);
-				Log.severe("Failed to log trades to the CSV trade log (attempt " + attemptNumber + "): " + issue);
-
-				// In order to not spam with errors and stacktraces, we only print them once for the first failed saving
-				// attempt, and again for the last failed attempt:
+				// Don't spam with errors and stacktraces: Only print them once for the first failed saving attempt
+				// (and again for the last failed attempt), and otherwise log a compact description of the issue:
+				String errorMsg = "Failed to log trades to the CSV trade log (attempt " + attemptNumber + ")";
 				if (attemptNumber == 1) {
-					exception.printStackTrace();
+					Log.severe(errorMsg, exception);
+				} else {
+					String issue = ThrowableUtils.getDescription(exception);
+					Log.severe(errorMsg + ": " + issue);
 				}
 
 				// Try again after a small delay:

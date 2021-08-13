@@ -877,16 +877,16 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				Retry.retry((VoidCallable) () -> {
 					this.doSaveToFile(data);
 				}, SAVING_MAX_ATTEMPTS, (attemptNumber, exception, retry) -> {
-					// Handle problem situation:
+					// Saving failed:
 					assert exception != null;
-					// Log compact description:
-					String issue = ThrowableUtils.getDescription(exception);
-					Log.severe("Saving attempt " + attemptNumber + " failed: " + issue);
-
-					// Don't spam with errors and stacktraces, only print them once for the first failed saving attempt,
-					// and again for the last failed attempt:
+					// Don't spam with errors and stacktraces: Only print them once for the first failed saving attempt
+					// (and again for the last failed attempt), and otherwise log a compact description of the issue:
+					String errorMsg = "Failed to save shopkeepers (attempt " + attemptNumber + ")";
 					if (attemptNumber == 1) {
-						exception.printStackTrace();
+						Log.severe(errorMsg, exception);
+					} else {
+						String issue = ThrowableUtils.getDescription(exception);
+						Log.severe(errorMsg + ": " + issue);
 					}
 
 					// Try again after a small delay:

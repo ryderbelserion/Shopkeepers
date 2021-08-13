@@ -27,6 +27,7 @@ import org.bukkit.inventory.MerchantInventory;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 import net.minecraft.server.v1_16_R3.Entity;
 import net.minecraft.server.v1_16_R3.EntityHuman;
@@ -93,7 +94,7 @@ public final class NMSHandler implements NMSCallProvider {
 			Set<?> targets_d = (Set<?>) dField.get(targets);
 			targets_d.clear();
 		} catch (Exception e) {
-			e.printStackTrace();
+			Log.severe("Failed to override mob AI!", e);
 		}
 	}
 
@@ -169,7 +170,7 @@ public final class NMSHandler implements NMSCallProvider {
 			try {
 				return (net.minecraft.server.v1_16_R3.ItemStack) craftItemStackHandleField.get(itemStack);
 			} catch (Exception e) {
-				e.printStackTrace();
+				Log.severe("Failed to retrieve the underlying Minecraft ItemStack!", e);
 			}
 		}
 		return CraftItemStack.asNMSCopy(itemStack);

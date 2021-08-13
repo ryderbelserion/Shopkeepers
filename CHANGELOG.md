@@ -44,6 +44,7 @@ Date format: (YYYY-MM-DD)
 * The save operations of the shopkeeper storage and the CSV trade logger will now restore any catched Thread interruption status for anyone interested in it. Other than that, these operations still ignore Thread interruptions, because we prefer to keep trying to still save the data to disk after all.
 * Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
 * Internal API: Moved various editor internal classes into their own files.
+* In a few remaining cases, stack traces are no longer printed directly, but through the plugin logger.
 * Various other minor internal refactors and Javadoc improvements.
 
 ## v2.13.3 (2021-07-08)

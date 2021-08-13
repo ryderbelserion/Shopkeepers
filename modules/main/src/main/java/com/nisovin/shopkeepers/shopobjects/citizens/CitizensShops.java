@@ -166,11 +166,8 @@ public class CitizensShops {
 		shopkeeperTrait = TraitInfo.create(CitizensShopkeeperTrait.class).withName(CitizensShopkeeperTrait.TRAIT_NAME);
 		try {
 			CitizensAPI.getTraitFactory().registerTrait(shopkeeperTrait);
-		} catch (Throwable ex) {
-			Log.debug(() -> "Shopkeeper trait registration error: " + ex.getMessage());
-			if (Settings.debug) {
-				ex.printStackTrace();
-			}
+		} catch (Throwable e) {
+			Log.debug("Shopkeeper trait registration failed!", e);
 		}
 	}
 
@@ -178,11 +175,8 @@ public class CitizensShops {
 		if (shopkeeperTrait != null) {
 			try {
 				CitizensAPI.getTraitFactory().deregisterTrait(shopkeeperTrait);
-			} catch (Throwable ex) {
-				Log.debug(() -> "Shopkeeper trait unregistration error: " + ex.getMessage());
-				if (Settings.debug) {
-					ex.printStackTrace();
-				}
+			} catch (Throwable e) {
+				Log.debug("Shopkeeper trait deregistration failed!", e);
 			} finally {
 				shopkeeperTrait = null;
 			}
