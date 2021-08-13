@@ -24,7 +24,7 @@ public class PlaceholderText extends TextBuilder {
 
 	// Not intended for public use, use Text.placeholder(String) instead.
 	PlaceholderText(String placeholderKey) {
-		Validate.notEmpty(placeholderKey, "Placeholder key is null or empty!");
+		Validate.notEmpty(placeholderKey, "placeholderKey is null or empty");
 		this.placeholderKey = placeholderKey;
 		this.formattedPlaceholderKey = (PLACEHOLDER_PREFIX_CHAR + placeholderKey + PLACEHOLDER_SUFFIX_CHAR);
 	}
@@ -90,9 +90,9 @@ public class PlaceholderText extends TextBuilder {
 	public void setPlaceholderArgument(Object placeholderArgument) {
 		Text placeholderArgumentText = null;
 		if (placeholderArgument != null) {
-			Validate.isTrue(placeholderArgument != this, "Cannot set self as placeholder argument!");
+			Validate.isTrue(placeholderArgument != this, "placeholderArgument cannot be this Text itself");
 			placeholderArgumentText = Text.of(placeholderArgument);
-			Validate.isTrue(placeholderArgumentText.getParent() == null, "Cannot use non-root Text as placeholder argument!");
+			Validate.isTrue(placeholderArgumentText.getParent() == null, "placeholderArgument is a non-root Text");
 
 			// Build unbuilt argument:
 			buildIfRequired(placeholderArgumentText);

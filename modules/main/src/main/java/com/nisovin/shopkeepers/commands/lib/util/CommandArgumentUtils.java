@@ -25,12 +25,12 @@ public class CommandArgumentUtils {
 	// true if there are multiple matches.
 	public static <T> boolean handleAmbiguousInput(	CommandSender sender, String input, Iterable<T> matches, int maxEntries,
 													Runnable sendHeader, ObjIntConsumer<T> sendEntry, Runnable sendMore) {
-		Validate.notNull(sender, "sender");
-		Validate.notNull(input, "input");
-		Validate.notNull(matches, "matches");
-		Validate.notNull(sendHeader, "sendHeader");
-		Validate.notNull(sendEntry, "sendEntry");
-		Validate.notNull(sendMore, "sendMore");
+		Validate.notNull(sender, "sender is null");
+		Validate.notNull(input, "input is null");
+		Validate.notNull(matches, "matches is null");
+		Validate.notNull(sendHeader, "sendHeader is null");
+		Validate.notNull(sendEntry, "sendEntry is null");
+		Validate.notNull(sendMore, "sendMore is null");
 
 		Iterator<T> matchesIter = matches.iterator();
 		if (!matchesIter.hasNext()) return false; // Empty -> Not ambiguous.

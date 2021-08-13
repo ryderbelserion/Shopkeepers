@@ -113,7 +113,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	public void setProfession(Profession profession) {
-		Validate.notNull(profession, "Profession is null!");
+		Validate.notNull(profession, "profession is null");
 		professionProperty.setValue(profession);
 		shopkeeper.markDirty();
 		this.applyProfession(this.getEntity()); // Null if not spawned
@@ -207,7 +207,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	public void setVillagerType(Villager.Type villagerType) {
-		Validate.notNull(villagerType, "Villager type is null!");
+		Validate.notNull(villagerType, "villagerType is null");
 		villagerTypeProperty.setValue(villagerType);
 		shopkeeper.markDirty();
 		this.applyVillagerType(this.getEntity()); // Null if not spawned

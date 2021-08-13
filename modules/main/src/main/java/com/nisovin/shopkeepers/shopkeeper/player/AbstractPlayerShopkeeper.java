@@ -215,7 +215,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void onPlayerInteraction(Player player) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 
 		// Naming via item:
 		PlayerInventory playerInventory = player.getInventory();
@@ -257,8 +257,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void setOwner(UUID ownerUUID, String ownerName) {
-		Validate.notNull(ownerUUID, "Owner uuid is null!");
-		Validate.notEmpty(ownerName, "Owner name is empty!");
+		Validate.notNull(ownerUUID, "ownerUUID is null");
+		Validate.notEmpty(ownerName, "ownerName is null or empty");
 		this.markDirty();
 		this.ownerUUID = ownerUUID;
 		this.ownerName = ownerName;

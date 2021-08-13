@@ -38,8 +38,8 @@ public class ClickEventText extends TextBuilder {
 	private final String value; // Not null, can be empty
 
 	ClickEventText(Action action, String value) {
-		Validate.notNull(action, "Action is null!");
-		Validate.notNull(value, "Value is null!");
+		Validate.notNull(action, "action is null");
+		Validate.notNull(value, "value is null");
 		this.action = action;
 		this.value = value;
 	}

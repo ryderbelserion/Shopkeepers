@@ -13,7 +13,7 @@ public class InsertionText extends TextBuilder {
 	private final String insertion; // Not null or empty
 
 	InsertionText(String insertion) {
-		Validate.notEmpty(insertion, "Insertion is null or empty!");
+		Validate.notEmpty(insertion, "insertion is null or empty");
 		this.insertion = insertion;
 	}
 

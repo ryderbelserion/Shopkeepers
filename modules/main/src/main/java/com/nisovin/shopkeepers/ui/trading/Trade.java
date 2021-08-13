@@ -99,7 +99,7 @@ public final class Trade {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T get(String key) {
-		Validate.notNull(key, "key");
+		Validate.notNull(key, "key is null");
 		if (customData == null) return null;
 		return (T) customData.get(key);
 	}
@@ -117,7 +117,7 @@ public final class Trade {
 	 *            the value, or <code>null</code> to clear any previous value for the given key
 	 */
 	public <T> void set(String key, T value) {
-		Validate.notNull(key, "key");
+		Validate.notNull(key, "key is null");
 		if (value == null) {
 			// Clear the value for the given key:
 			if (customData != null) {

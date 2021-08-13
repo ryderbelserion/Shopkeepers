@@ -34,7 +34,7 @@ public class ClassUtils {
 	}
 
 	public static boolean isPrimitiveWrapperOf(Class<?> targetClass, Class<?> primitive) {
-		Validate.isTrue(primitive.isPrimitive(), "Second argument has to be a primitive!");
+		Validate.isTrue(primitive.isPrimitive(), "primitive is not a primitive type");
 		return (PRIMITIVE_WRAPPERS.get(primitive) == targetClass);
 	}
 

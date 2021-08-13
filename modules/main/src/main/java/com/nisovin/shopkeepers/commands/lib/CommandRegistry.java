@@ -23,7 +23,7 @@ public class CommandRegistry {
 	private Map<String, Command> commandsByAlias = null;
 
 	public CommandRegistry(Command parent) {
-		Validate.notNull(parent, "Parent is null!");
+		Validate.notNull(parent, "parent is null");
 		this.parent = parent;
 	}
 
@@ -32,8 +32,8 @@ public class CommandRegistry {
 	}
 
 	public void register(Command command) {
-		Validate.notNull(command, "Command is null!");
-		Validate.isTrue(command.getParent() == null, "The given command is already registered somewhere!");
+		Validate.notNull(command, "command is null");
+		Validate.isTrue(command.getParent() == null, "command has already been registered somewhere");
 
 		// Lazy initialization:
 		if (commands == null) {
@@ -41,11 +41,11 @@ public class CommandRegistry {
 			commandsByAlias = new LinkedHashMap<>();
 		}
 
-		Validate.isTrue(!commands.contains(command), "The given command is already registered!");
+		Validate.isTrue(!commands.contains(command), "command is already registered");
 
 		// Register command by name:
 		String name = CommandUtils.normalize(command.getName());
-		Validate.isTrue(!commandsByAlias.containsKey(name), "Another command is already registered for '" + name + "'!");
+		Validate.isTrue(!commandsByAlias.containsKey(name), "Another command with this name is already registered: " + name);
 		commandsByAlias.put(name, command);
 
 		// Register command aliases:
@@ -67,9 +67,9 @@ public class CommandRegistry {
 	}
 
 	public void unregister(Command command) {
-		Validate.notNull(command, "Command is null!");
-		Validate.isTrue(command.getParent() == parent, "The given command is not registered here!");
-		Validate.isTrue(commands.contains(command), "The given command is not registered here!");
+		Validate.notNull(command, "command is null");
+		Validate.isTrue(command.getParent() == parent, "command is registered somewhere else");
+		Validate.isTrue(commands.contains(command), "command is not registered here");
 
 		// Unregister by name:
 		String name = CommandUtils.normalize(command.getName());
@@ -110,7 +110,7 @@ public class CommandRegistry {
 	 * @return the command, or <code>null</code>
 	 */
 	public Command getCommand(String alias) {
-		Validate.notNull(alias, "Alias is null!");
+		Validate.notNull(alias, "alias is null");
 		if (commandsByAlias == null) {
 			return null;
 		}

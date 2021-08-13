@@ -29,8 +29,8 @@ public final class SKUser implements User {
 	private final String name;
 
 	private SKUser(UUID uniqueId, String name) {
-		Validate.notNull(uniqueId, "uniqueId");
-		Validate.notEmpty(name, "name");
+		Validate.notNull(uniqueId, "uniqueId is null");
+		Validate.notEmpty(name, "name is null or empty");
 		this.uniqueId = uniqueId;
 		this.name = name;
 	}

@@ -110,10 +110,10 @@ public class BlockFaceUtils {
 	 * @return the corresponding yaw
 	 */
 	public static float getYaw(BlockFace blockFace) {
-		Validate.notNull(blockFace, "blockFace");
+		Validate.notNull(blockFace, "blockFace is null");
 		List<BlockFace> horizontalBlockFaces = BlockFaceDirections.SECONDARY_INTERCARDINAL.getBlockFaces();
 		int blockFaceIndex = horizontalBlockFaces.indexOf(blockFace);
-		Validate.isTrue(blockFaceIndex != -1, "Invalid BlockFace: " + blockFace);
+		Validate.isTrue(blockFaceIndex != -1, "blockFace is not horizontal: " + blockFace);
 
 		float anglePerBlockFace = 360.0F / horizontalBlockFaces.size();
 		return blockFaceIndex * anglePerBlockFace;
@@ -136,7 +136,7 @@ public class BlockFaceUtils {
 	 * @return the corresponding wall sign face
 	 */
 	public static BlockFace toWallSignFacing(Vector direction) {
-		Validate.notNull(direction, "direction");
+		Validate.notNull(direction, "direction is null");
 		return getAxisAlignedBlockFace(direction.getX(), 0.0D, direction.getZ());
 	}
 

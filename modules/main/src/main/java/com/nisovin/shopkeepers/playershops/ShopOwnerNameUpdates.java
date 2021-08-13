@@ -24,7 +24,7 @@ public class ShopOwnerNameUpdates implements Listener {
 	private final SKShopkeepersPlugin plugin;
 
 	public ShopOwnerNameUpdates(SKShopkeepersPlugin plugin) {
-		Validate.notNull(plugin, "plugin");
+		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
 	}
 

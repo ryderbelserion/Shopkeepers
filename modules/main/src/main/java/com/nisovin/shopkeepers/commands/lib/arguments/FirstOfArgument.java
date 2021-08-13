@@ -44,15 +44,16 @@ public class FirstOfArgument extends FallbackArgument<Pair<? extends CommandArgu
 		super(name);
 
 		// Arguments:
-		Validate.notNull(arguments, "Arguments is null!");
+		Validate.notNull(arguments, "arguments is null");
+		Validate.isTrue(!arguments.isEmpty(), "arguments is empty");
 		List<CommandArgument<?>> argumentsList = new ArrayList<>(arguments.size());
 		this.arguments = Collections.unmodifiableList(argumentsList);
 		for (CommandArgument<?> argument : arguments) {
-			Validate.notNull(argument, "Contained argument is null!");
+			Validate.notNull(argument, "arguments contains null");
 			argument.setParent(this);
 			argumentsList.add(argument);
 		}
-		Validate.isTrue(this.arguments.size() != 0, "No arguments given!");
+		assert !this.arguments.isEmpty();
 
 		// Format:
 		if (joinFormats) {

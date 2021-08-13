@@ -10,7 +10,7 @@ public class CommandUtils {
 	}
 
 	public static String normalize(String label) {
-		Validate.notNull(label, "label");
+		Validate.notNull(label, "label is null");
 		return label.toLowerCase(Locale.ROOT);
 	}
 }

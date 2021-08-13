@@ -20,9 +20,9 @@ public class CommandException extends Exception {
 	}
 
 	private static String validateMessage(Text message) {
-		Validate.notNull(message, "Message is null!");
+		Validate.notNull(message, "message is null");
 		String plainMessage = message.toPlainText();
-		Validate.notEmpty(plainMessage, "Message is empty!");
+		Validate.notEmpty(plainMessage, "message is empty");
 		return plainMessage;
 	}
 

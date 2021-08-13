@@ -54,7 +54,7 @@ public class ShopkeeperArgumentUtils {
 		}
 
 		private TargetShopkeepersResult(Text errorMessage) {
-			Validate.notNull(errorMessage);
+			Validate.notNull(errorMessage, "errorMessage is null");
 			Validate.isTrue(!errorMessage.isPlainTextEmpty());
 			this.errorMessage = errorMessage;
 			this.shopkeepers = Collections.emptyList();
@@ -207,8 +207,8 @@ public class ShopkeeperArgumentUtils {
 		private final List<? extends PlayerShopkeeper> shops; // Not null, can be empty
 
 		public OwnedPlayerShopsResult(UUID playerUUID, String playerName, Map<UUID, String> matchingShopOwners, List<? extends PlayerShopkeeper> shops) {
-			Validate.isTrue(playerUUID != null || playerName != null, "The player uuid and name are both null!");
-			Validate.notNull(matchingShopOwners, "Matching shop owners map is null!");
+			Validate.isTrue(playerUUID != null || playerName != null, "playerUUID and playerName are both null");
+			Validate.notNull(matchingShopOwners, "matchingShopOwners is null");
 			this.playerUUID = playerUUID;
 			this.playerName = playerName;
 			this.matchingShopOwners = matchingShopOwners;
@@ -239,7 +239,7 @@ public class ShopkeeperArgumentUtils {
 	// uuids and names of all shop owners found that match the given target player name. If this contains more than one
 	// entry then the target player name is ambiguous. The result contains the shops of all those matching players then.
 	public static OwnedPlayerShopsResult getOwnedPlayerShops(UUID targetPlayerUUID, String targetPlayerName) {
-		Validate.isTrue(targetPlayerUUID != null || targetPlayerName != null, "The target player uuid and name are both null!");
+		Validate.isTrue(targetPlayerUUID != null || targetPlayerName != null, "targetPlayerUUID and targetPlayerName are both null");
 
 		// Keep track if there are multiple shop owners with matching name:
 		Map<UUID, String> matchingShopOwners = new LinkedHashMap<>();

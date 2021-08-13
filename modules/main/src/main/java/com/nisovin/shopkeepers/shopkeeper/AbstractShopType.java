@@ -84,7 +84,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 */
 	public abstract T createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException;
 
-	// Handles of shopkeeper creation by players.
+	// Handles the shopkeeper creation by players.
 	// Returns null in case of failure.
 	public T handleShopkeeperCreation(ShopCreationData shopCreationData) {
 		this.validateCreationData(shopCreationData);
@@ -92,7 +92,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 
 		// The creator, can not be null when creating a shopkeeper via this method:
 		Player creator = shopCreationData.getCreator();
-		Validate.notNull(creator, "Creator cannot be null!");
+		Validate.notNull(creator, "Creator of shopCreationData is null");
 
 		ShopType<?> shopType = shopCreationData.getShopType();
 		ShopObjectType<?> shopObjectType = shopCreationData.getShopObjectType();
@@ -175,13 +175,13 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	// Common functions that might be useful for sub-classes:
 
 	protected void validateCreationData(ShopCreationData shopCreationData) {
-		Validate.notNull(shopCreationData, "ShopCreationData is null!");
+		Validate.notNull(shopCreationData, "shopCreationData is null");
 		ShopType<?> shopType = shopCreationData.getShopType();
-		Validate.isTrue(this == shopType, "Expecting shop type " + this.getClass().getName()
-				+ ", but got " + shopType.getClass().getName());
+		Validate.isTrue(this == shopType, "ShopType of shopCreationData is not of type " + this.getClass().getName()
+				+ ", but: " + shopType.getClass().getName());
 	}
 
 	protected void validateConfigSection(ConfigurationSection configSection) {
-		Validate.notNull(configSection, "Config section is null!");
+		Validate.notNull(configSection, "configSection is null");
 	}
 }

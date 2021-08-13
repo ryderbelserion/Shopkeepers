@@ -581,10 +581,10 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	@Override
 	public AbstractShopkeeper handleShopkeeperCreation(ShopCreationData shopCreationData) {
-		Validate.notNull(shopCreationData, "CreationData is null!");
+		Validate.notNull(shopCreationData, "shopCreationData is null");
 		ShopType<?> rawShopType = shopCreationData.getShopType();
 		Validate.isTrue(rawShopType instanceof AbstractShopType,
-				"Expecting an AbstractShopType, got " + rawShopType.getClass().getName());
+				"ShopType of shopCreationData is not of type AbstractShopType, but: " + rawShopType.getClass().getName());
 		AbstractShopType<?> shopType = (AbstractShopType<?>) rawShopType;
 		// Forward to shop type:
 		return shopType.handleShopkeeperCreation(shopCreationData);

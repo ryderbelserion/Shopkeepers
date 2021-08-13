@@ -18,7 +18,7 @@ public class HelpCommand extends Command {
 
 	public HelpCommand(String name, List<String> aliases, Command helpSource) {
 		super(name, aliases);
-		Validate.notNull(helpSource);
+		Validate.notNull(helpSource, "helpSource is null");
 		this.helpSource = helpSource;
 	}
 

@@ -37,7 +37,7 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 
 	public ObjectIdArgument(String name, CommandArgument<I> idArgument, ArgumentFilter<I> filter, int minimalCompletionInput) {
 		super(name);
-		Validate.notNull(idArgument, "Id argument is null!");
+		Validate.notNull(idArgument, "idArgument is null");
 		Validate.isTrue(minimalCompletionInput >= 0, "minimalCompletionInput cannot be negative");
 		this.idArgument = idArgument;
 		idArgument.setParent(this);

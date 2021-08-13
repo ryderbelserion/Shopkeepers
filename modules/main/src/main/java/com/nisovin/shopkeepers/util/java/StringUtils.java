@@ -317,7 +317,7 @@ public class StringUtils {
 	public static <T> void addArgumentsToMap(Map<String, Object> argumentsMap, Object... argumentPairs) {
 		Validate.notNull(argumentsMap, "argumentsMap is null");
 		Validate.notNull(argumentPairs, "argumentPairs is null");
-		Validate.isTrue(argumentPairs.length % 2 == 0, "argumentPairs.length is not a multiple of 2");
+		Validate.isTrue(argumentPairs.length % 2 == 0, "Length of argumentPairs is not a multiple of 2");
 		int argumentsKeyLimit = argumentPairs.length - 1;
 		for (int i = 0; i < argumentsKeyLimit; i += 2) {
 			String key = (String) argumentPairs[i];
@@ -359,7 +359,7 @@ public class StringUtils {
 
 	// Creates and returns a new List:
 	public static List<String> replaceArguments(Collection<String> sources, Map<String, Object> arguments) {
-		Validate.notNull(sources, "sources is null!");
+		Validate.notNull(sources, "sources is null");
 		List<String> replaced = new ArrayList<>(sources.size());
 		for (String source : sources) {
 			replaced.add(replaceArguments(source, arguments)); // Checks arguments

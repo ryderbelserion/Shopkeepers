@@ -16,7 +16,7 @@ public class EventDebugger {
 	private final SKShopkeepersPlugin plugin;
 
 	public EventDebugger(SKShopkeepersPlugin plugin) {
-		Validate.notNull(plugin, "plugin");
+		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
 	}
 

@@ -71,7 +71,7 @@ public class SheepShop extends BabyableShop<Sheep> {
 	}
 
 	public void setColor(DyeColor color) {
-		Validate.notNull(color, "Color is null!");
+		Validate.notNull(color, "color is null");
 		colorProperty.setValue(color);
 		shopkeeper.markDirty();
 		this.applyColor(this.getEntity()); // Null if not spawned

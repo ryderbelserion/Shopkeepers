@@ -28,7 +28,7 @@ public class TypedFallbackArgument<T> extends FallbackArgument<T> {
 	private final AnyFallbackArgument anyFallbackArgument;
 
 	public TypedFallbackArgument(CommandArgument<T> argument, CommandArgument<T> fallbackArgument) {
-		super(Validate.notNull(argument).getName());
+		super(Validate.notNull(argument, "argument is null").getName());
 		this.anyFallbackArgument = new AnyFallbackArgument(argument, fallbackArgument);
 		this.anyFallbackArgument.setParent(this);
 	}

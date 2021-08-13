@@ -49,6 +49,6 @@ public class SenderPlayerFallback extends TypedFallbackArgument<Player> {
 	}
 
 	public SenderPlayerFallback(CommandArgument<Player> argument) {
-		super(argument, new SenderPlayerArgument(Validate.notNull(argument).getName()));
+		super(argument, new SenderPlayerArgument(Validate.notNull(argument, "argument is null").getName()));
 	}
 }

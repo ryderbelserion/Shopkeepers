@@ -215,8 +215,8 @@ public class TextUtils {
 	// SENDING
 
 	public static void sendMessage(CommandSender recipient, String message) {
-		Validate.notNull(recipient, "Recipient is null!");
-		Validate.notNull(message, "Message is null!");
+		Validate.notNull(recipient, "recipient is null");
+		Validate.notNull(message, "message is null");
 		// Skip sending if message is empty: Allows disabling of messages.
 		if (message.isEmpty()) return;
 
@@ -241,7 +241,7 @@ public class TextUtils {
 	 */
 
 	public static Text getPlayerText(Player player) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		String playerName = player.getName();
 		String playerUUIDString = player.getUniqueId().toString();
 		return Text.hoverEvent(Text.of(playerUUIDString))
@@ -336,16 +336,16 @@ public class TextUtils {
 	}
 
 	public static void sendMessage(CommandSender recipient, Text message, Map<String, Object> arguments) {
-		Validate.notNull(recipient, "Recipient is null!");
-		Validate.notNull(message, "Message is null!");
+		Validate.notNull(recipient, "recipient is null");
+		Validate.notNull(message, "message is null");
 		// Assign arguments and then send:
 		message.setPlaceholderArguments(arguments);
 		sendMessage(recipient, message);
 	}
 
 	public static void sendMessage(CommandSender recipient, Text message, Object... argumentPairs) {
-		Validate.notNull(recipient, "Recipient is null!");
-		Validate.notNull(message, "Message is null!");
+		Validate.notNull(recipient, "recipient is null");
+		Validate.notNull(message, "message is null");
 		// Assign arguments and then send:
 		message.setPlaceholderArguments(argumentPairs);
 		sendMessage(recipient, message);

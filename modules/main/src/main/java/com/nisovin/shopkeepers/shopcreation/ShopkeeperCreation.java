@@ -56,8 +56,8 @@ public class ShopkeeperCreation {
 	// RECENTLY PLACED CONTAINERS
 
 	public void addRecentlyPlacedContainer(Player player, Block container) {
-		Validate.notNull(player, "player");
-		Validate.notNull(container, "container");
+		Validate.notNull(player, "player is null");
+		Validate.notNull(container, "container is null");
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedContainers.get(playerName);
 		if (recentlyPlaced == null) {
@@ -71,8 +71,8 @@ public class ShopkeeperCreation {
 	}
 
 	public boolean isRecentlyPlacedContainer(Player player, Block container) {
-		Validate.notNull(player, "player");
-		Validate.notNull(container, "container");
+		Validate.notNull(player, "player is null");
+		Validate.notNull(container, "container is null");
 		String playerName = player.getName();
 		List<String> recentlyPlaced = recentlyPlacedContainers.get(playerName);
 		return recentlyPlaced != null && recentlyPlaced.contains(TextUtils.getLocationString(container));
@@ -81,7 +81,7 @@ public class ShopkeeperCreation {
 	// SELECTED CONTAINER
 
 	public void selectContainer(Player player, Block container) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		String playerName = player.getName();
 		if (container == null) {
 			selectedContainer.remove(playerName);
@@ -93,7 +93,7 @@ public class ShopkeeperCreation {
 	}
 
 	public Block getSelectedContainer(Player player) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		return selectedContainer.get(player.getName());
 	}
 
@@ -101,8 +101,8 @@ public class ShopkeeperCreation {
 
 	// Checks if the player can use the given container for a player shopkeeper:
 	public boolean handleCheckContainer(Player player, Block containerBlock) {
-		Validate.notNull(player, "player");
-		Validate.notNull(containerBlock, "containerBlock");
+		Validate.notNull(player, "player is null");
+		Validate.notNull(containerBlock, "containerBlock is null");
 		// Check if the container is already used by some other shopkeeper:
 		if (SKShopkeepersPlugin.getInstance().getProtectedContainers().isContainerProtected(containerBlock, null)) {
 			TextUtils.sendMessage(player, Messages.containerAlreadyInUse);
@@ -125,9 +125,9 @@ public class ShopkeeperCreation {
 	}
 
 	public Location determineSpawnLocation(Player player, Block targetBlock, BlockFace targetBlockFace) {
-		Validate.notNull(player, "player");
-		Validate.notNull(targetBlock, "targetBlock");
-		Validate.notNull(targetBlockFace, "targetBlockFace");
+		Validate.notNull(player, "player is null");
+		Validate.notNull(targetBlock, "targetBlock is null");
+		Validate.notNull(targetBlockFace, "targetBlockFace is null");
 		// If the target block is passable (and not a liquid, which can only come up as target block when we try to
 		// place the shopkeeper on top of water or lava), spawn there, otherwise shift according to target block face:
 		Block spawnBlock;

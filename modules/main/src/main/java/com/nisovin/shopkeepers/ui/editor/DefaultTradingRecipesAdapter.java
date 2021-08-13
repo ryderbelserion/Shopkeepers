@@ -44,9 +44,8 @@ public abstract class DefaultTradingRecipesAdapter<O> implements TradingRecipesA
 	 */
 	@Override
 	public int updateTradingRecipes(Player player, List<TradingRecipeDraft> recipes) {
-		Validate.notNull(player, "player");
-		Validate.notNull(recipes, "recipes");
-		assert !recipes.contains(null);
+		Validate.notNull(player, "player is null");
+		Validate.notNull(recipes, "recipes is null");
 		assert this.getOffers() != null && !this.getOffers().contains(null);
 
 		List<O> newOffers = new ArrayList<>(this.getOffers());
@@ -55,6 +54,7 @@ public abstract class DefaultTradingRecipesAdapter<O> implements TradingRecipesA
 		boolean clearedAtLeastOneOffer = false;
 		for (int index = 0; index < recipes.size(); index++) {
 			TradingRecipeDraft recipe = recipes.get(index);
+			Validate.notNull(recipe, "recipes contains null");
 			// The recipe is also considered invalid if the created offer is null:
 			O newOffer = recipe.isValid() ? this.createOffer(recipe) : null; // Null if invalid
 			if (newOffer == null) {

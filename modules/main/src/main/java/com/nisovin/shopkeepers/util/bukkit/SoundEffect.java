@@ -94,7 +94,7 @@ public final class SoundEffect {
 	 */
 	private SoundEffect(Sound sound, String soundName, SoundCategory category, Float pitch, Float volume) {
 		if (sound != null) {
-			Validate.isTrue(soundName == null, "sound and soundName cannot both be non-null");
+			Validate.isTrue(soundName == null, "sound and soundName are both non-null");
 		} else {
 			Validate.notNull(soundName, "sound and soundName are both null");
 		}
@@ -244,7 +244,7 @@ public final class SoundEffect {
 	public void play(Location location) {
 		Validate.notNull(location, "location is null");
 		World world = location.getWorld();
-		Validate.notNull(world, "The location has no world!");
+		Validate.notNull(world, "World of location is null");
 		if (this.isDisabled()) return;
 
 		if (sound != null) {

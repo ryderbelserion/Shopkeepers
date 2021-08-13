@@ -13,7 +13,7 @@ public class BoundedDoubleArgument extends DoubleArgument {
 
 	public BoundedDoubleArgument(String name, double min, double max) {
 		super(name);
-		Validate.isTrue(min <= max, "min > max!");
+		Validate.isTrue(min <= max, "min > max");
 		this.min = min;
 		this.max = max;
 	}

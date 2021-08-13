@@ -33,7 +33,7 @@ public class NamedArgument<T> extends FallbackArgument<T> {
 	private final CommandArgument<T> argument;
 
 	public NamedArgument(CommandArgument<T> argument) {
-		super(Validate.notNull(argument, "Argument is null!").getName());
+		super(Validate.notNull(argument, "argument is null").getName());
 		this.argument = argument;
 		argument.setParent(this);
 	}

@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public class Confirmations {
 
 	private static class ConfirmEntry {
+
 		private final Runnable action;
 		private final int taskId;
 
@@ -69,9 +70,9 @@ public class Confirmations {
 	}
 
 	public void awaitConfirmation(CommandSender sender, Runnable action, int timeoutTicks) {
-		Validate.notNull(sender, "Sender is null!");
-		Validate.notNull(action, "Action is null!");
-		Validate.isTrue(timeoutTicks > 0, "Timeout has to be positive!");
+		Validate.notNull(sender, "sender is null");
+		Validate.notNull(action, "action is null");
+		Validate.isTrue(timeoutTicks > 0, "timeoutTicks has to be positive");
 
 		int taskId = Bukkit.getScheduler().runTaskLater(plugin, () -> {
 			this.endConfirmation(sender);
@@ -87,7 +88,7 @@ public class Confirmations {
 
 	// Returns the action that was awaiting confirmation
 	public Runnable endConfirmation(CommandSender sender) {
-		Validate.notNull(sender, "Sender is null!");
+		Validate.notNull(sender, "sender is null");
 		ConfirmEntry entry = confirming.remove(this.getSenderKey(sender));
 		if (entry != null) {
 			// End confirmation task:
@@ -100,7 +101,7 @@ public class Confirmations {
 	}
 
 	public void handleConfirmation(CommandSender sender) {
-		Validate.notNull(sender, "Sender is null!");
+		Validate.notNull(sender, "sender is null");
 		Runnable action = this.endConfirmation(sender);
 		if (action != null) {
 			// Execute confirmed action:

@@ -84,8 +84,8 @@ public class CollectionUtils {
 	 * @see List#sort(Comparator)
 	 */
 	public static <E, L extends List<? extends E>> L sort(L list, Comparator<? super E> comparator) {
-		Validate.notNull(list, "list");
-		Validate.notNull(comparator, "comparator");
+		Validate.notNull(list, "list is null");
+		Validate.notNull(comparator, "comparator is null");
 		list.sort(comparator);
 		return list;
 	}
@@ -105,8 +105,8 @@ public class CollectionUtils {
 	 * @see Collection#addAll(Collection)
 	 */
 	public static <E, C extends Collection<? super E>> C addAll(C collection, Collection<? extends E> toAdd) {
-		Validate.notNull(collection, "collection");
-		Validate.notNull(toAdd, "toAdd");
+		Validate.notNull(collection, "collection is null");
+		Validate.notNull(toAdd, "toAdd is null");
 		collection.addAll(toAdd);
 		return collection;
 	}

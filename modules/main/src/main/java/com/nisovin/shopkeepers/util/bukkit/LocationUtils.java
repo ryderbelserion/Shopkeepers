@@ -58,12 +58,12 @@ public class LocationUtils {
 	 * @return the squared distance
 	 */
 	public static double getDistanceSquared(Location location1, Location location2) {
-		Validate.notNull(location1, "First location is null!");
-		Validate.notNull(location2, "Second location is null!");
+		Validate.notNull(location1, "location1 is null");
+		Validate.notNull(location2, "location2 is null");
 		World world1 = location1.getWorld();
 		World world2 = location2.getWorld();
-		Validate.notNull(world1, "World of first location is null!");
-		Validate.notNull(world2, "World of second location is null!");
+		Validate.notNull(world1, "World of location1 is null");
+		Validate.notNull(world2, "World of location2 is null");
 		if (world1 != world2) return Double.MAX_VALUE; // Different worlds
 		// Note: Not using Location#distanceSquared to avoid redundant precondition checks.
 		double dx = location1.getX() - location2.getX();
@@ -80,7 +80,7 @@ public class LocationUtils {
 	 * @return the block's center location
 	 */
 	public static Location getBlockCenterLocation(Block block) {
-		Validate.notNull(block, "Block is null!");
+		Validate.notNull(block, "block is null");
 		return block.getLocation().add(0.5D, 0.5D, 0.5D);
 	}
 }

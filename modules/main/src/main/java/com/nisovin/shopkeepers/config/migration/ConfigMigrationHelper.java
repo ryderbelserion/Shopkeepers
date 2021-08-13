@@ -9,8 +9,8 @@ public class ConfigMigrationHelper {
 
 	// Returns true if there was a value set that got removed.
 	public static boolean removeSetting(ConfigurationSection config, String key) {
-		Validate.notNull(config, "config");
-		Validate.notNull(key, "key");
+		Validate.notNull(config, "config is null");
+		Validate.notNull(key, "key is null");
 		if (config.isSet(key)) {
 			Log.info("  Removing setting '" + key + "'. Previous value: " + config.get(key));
 			config.set(key, null);
@@ -21,9 +21,9 @@ public class ConfigMigrationHelper {
 
 	// Returns true if there has been a matching value that got replaced.
 	public static boolean migrateValue(ConfigurationSection config, String key, Object expectedOldValue, Object newValue) {
-		Validate.notNull(config, "config");
-		Validate.notNull(key, "key");
-		Validate.notNull(expectedOldValue, "expectedOldValue");
+		Validate.notNull(config, "config is null");
+		Validate.notNull(key, "key is null");
+		Validate.notNull(expectedOldValue, "expectedOldValue is null");
 		if (config.isSet(key)) {
 			Object oldValue = config.get(key);
 			if (expectedOldValue.equals(oldValue)) {
@@ -37,9 +37,9 @@ public class ConfigMigrationHelper {
 
 	// Returns true if the setting got migrated.
 	public static boolean migrateSetting(ConfigurationSection config, String oldKey, String newKey) {
-		Validate.notNull(config, "config");
-		Validate.notNull(oldKey, "oldKey");
-		Validate.notNull(newKey, "newKey");
+		Validate.notNull(config, "config is null");
+		Validate.notNull(oldKey, "oldKey  is null");
+		Validate.notNull(newKey, "newKey  is null");
 		if (config.isSet(oldKey) && !config.isSet(newKey)) {
 			Object oldValue = config.get(oldKey);
 			Log.info("  Migrating setting '" + oldKey + "' to '" + newKey + "'. Value: " + oldValue);

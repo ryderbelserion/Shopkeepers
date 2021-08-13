@@ -13,6 +13,6 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public class DefaultValueFallback<T> extends TypedFallbackArgument<T> {
 
 	public DefaultValueFallback(CommandArgument<T> argument, T defaultValue) {
-		super(argument, new FixedValueArgument<>(Validate.notNull(argument).getName(), defaultValue));
+		super(argument, new FixedValueArgument<>(Validate.notNull(argument, "argument is null").getName(), defaultValue));
 	}
 }

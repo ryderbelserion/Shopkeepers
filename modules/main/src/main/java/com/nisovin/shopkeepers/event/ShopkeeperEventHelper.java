@@ -23,8 +23,8 @@ public class ShopkeeperEventHelper {
 	 * @return the {@link PlayerDeleteShopkeeperEvent}
 	 */
 	public static PlayerDeleteShopkeeperEvent callPlayerDeleteShopkeeperEvent(Shopkeeper shopkeeper, Player player) {
-		Validate.notNull(shopkeeper, "shopkeeper");
-		Validate.notNull(player, "player");
+		Validate.notNull(shopkeeper, "shopkeeper is null");
+		Validate.notNull(player, "player is null");
 		PlayerDeleteShopkeeperEvent event = new PlayerDeleteShopkeeperEvent(shopkeeper, player);
 		Bukkit.getPluginManager().callEvent(event);
 		if (event.isCancelled()) {

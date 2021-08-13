@@ -92,7 +92,7 @@ public class CatShop extends SittableShop<Cat> {
 	}
 
 	public void setCatType(Cat.Type catType) {
-		Validate.notNull(catType, "Cat type is null!");
+		Validate.notNull(catType, "catType is null");
 		catTypeProperty.setValue(catType);
 		shopkeeper.markDirty();
 		this.applyCatType(this.getEntity()); // Null if not spawned

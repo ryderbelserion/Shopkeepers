@@ -22,7 +22,7 @@ public class TranslatableText extends TextBuilder {
 	private List<Text> translationArguments = Collections.emptyList(); // Not null, can be empty, unmodifiable view
 
 	TranslatableText(String translationKey) {
-		Validate.notEmpty(translationKey, "Translation key is empty!");
+		Validate.notEmpty(translationKey, "translationKey is null or empty");
 		this.translationKey = translationKey;
 	}
 
@@ -65,11 +65,11 @@ public class TranslatableText extends TextBuilder {
 		} else {
 			List<Text> translationTextArguments = new ArrayList<>(translationArguments.size());
 			for (Object argument : translationArguments) {
-				Validate.notNull(argument, "One of the translation arguments is null!");
-				Validate.isTrue(argument != this, "Cannot set self as translation argument!");
+				Validate.notNull(argument, "translationArguments contains null");
+				Validate.isTrue(argument != this, "translationArguments contains this Text itself");
 
 				Text argumentText = Text.of(argument);
-				Validate.isTrue(argumentText.getParent() == null, "Cannot use non-root Text as translation argument!");
+				Validate.isTrue(argumentText.getParent() == null, "translationArguments contains a non-root Text");
 				translationTextArguments.add(argumentText);
 			}
 

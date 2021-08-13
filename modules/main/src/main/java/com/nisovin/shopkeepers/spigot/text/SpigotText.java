@@ -28,8 +28,8 @@ public class SpigotText {
 
 	// Note: This is not intended to be called directly, but only via TextUtils.
 	public static void sendMessage(CommandSender recipient, Text message) {
-		Validate.notNull(recipient, "recipient");
-		Validate.notNull(message, "message");
+		Validate.notNull(recipient, "recipient is null");
+		Validate.notNull(message, "message is null");
 		// Skip sending if the (plain) message is empty: Allows disabling of messages.
 		if (message.isPlainTextEmpty()) return;
 

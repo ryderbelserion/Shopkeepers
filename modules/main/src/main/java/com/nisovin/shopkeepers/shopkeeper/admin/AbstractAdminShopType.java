@@ -24,6 +24,6 @@ public abstract class AbstractAdminShopType<T extends AbstractAdminShopkeeper> e
 	protected void validateCreationData(ShopCreationData shopCreationData) {
 		super.validateCreationData(shopCreationData);
 		Validate.isTrue(shopCreationData instanceof AdminShopCreationData,
-				"Expecting AdminShopCreationData, got " + shopCreationData.getClass().getName());
+				"shopCreationData is not of type AdminShopCreationData, but: " + shopCreationData.getClass().getName());
 	}
 }

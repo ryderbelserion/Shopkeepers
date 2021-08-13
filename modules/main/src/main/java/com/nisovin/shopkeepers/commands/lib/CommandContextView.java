@@ -20,7 +20,7 @@ public class CommandContextView implements CommandContext {
 	 *            the underlying command context
 	 */
 	public CommandContextView(CommandContext context) {
-		Validate.notNull(context, "Context is null!");
+		Validate.notNull(context, "context is null");
 		this.context = context;
 	}
 

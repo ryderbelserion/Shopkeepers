@@ -413,8 +413,8 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	public void addButton(Button button) {
-		Validate.notNull(button, "Button is null");
-		Validate.isTrue(button.isApplicable(this), "The button is incompatible with this type of editor handler!");
+		Validate.notNull(button, "button is null");
+		Validate.isTrue(button.isApplicable(this), "button is not applicable to this editor handler");
 		button.setEditorHandler(this); // Validates that the button isn't used elsewhere yet
 		buttons.add(button);
 		dirtyButtons = true;
@@ -462,7 +462,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	@Override
 	public boolean openWindow(Player player) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		// Lazy setup:
 		this.setup();
 
@@ -582,7 +582,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		// Permission for the type of shopkeeper is checked in the AdminShopkeeper specific EditorHandler.
 		// Owner is checked in the PlayerShopkeeper specific EditorHandler.
 		return true;

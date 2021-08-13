@@ -19,6 +19,6 @@ public class TargetEntityFallback extends TypedFallbackArgument<Entity> {
 	}
 
 	public TargetEntityFallback(CommandArgument<Entity> argument, TargetEntityFilter filter) {
-		super(argument, new TargetEntityArgument(Validate.notNull(argument).getName(), filter));
+		super(argument, new TargetEntityArgument(Validate.notNull(argument, "argument is null").getName(), filter));
 	}
 }

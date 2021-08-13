@@ -38,7 +38,7 @@ public class BlockLocation {
 	 *            the z coordinate
 	 */
 	public BlockLocation(String worldName, int x, int y, int z) {
-		Validate.notEmpty(worldName, "worldName is empty");
+		Validate.notEmpty(worldName, "worldName is null or empty");
 		this.worldName = worldName;
 		this.x = x;
 		this.y = y;
@@ -102,7 +102,7 @@ public class BlockLocation {
 	 *            the world name, not <code>null</code> or empty
 	 */
 	protected void setWorldName(String worldName) {
-		Validate.notEmpty(worldName, "worldName is empty");
+		Validate.notEmpty(worldName, "worldName is null or empty");
 		this.worldName = worldName;
 	}
 

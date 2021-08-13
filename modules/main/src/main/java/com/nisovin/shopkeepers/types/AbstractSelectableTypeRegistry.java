@@ -123,7 +123,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 
 	@Override
 	public T getSelection(Player player) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		String playerName = player.getName();
 		T current = selections.get(playerName);
 		// If none is currently selected, let's search for the first type this player can use:
@@ -133,7 +133,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 
 	@Override
 	public T selectNext(Player player) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		String playerName = player.getName();
 		T current = selections.get(playerName);
 		T next = this.getNext(player, current);
@@ -149,7 +149,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 
 	@Override
 	public T selectPrevious(Player player) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		String playerName = player.getName();
 		T current = selections.get(playerName);
 		T prev = this.getPrevious(player, current);
@@ -170,7 +170,7 @@ public abstract class AbstractSelectableTypeRegistry<T extends AbstractSelectabl
 
 	@Override
 	public void clearSelection(Player player) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		String playerName = player.getName();
 		selections.remove(playerName);
 	}

@@ -45,10 +45,10 @@ public class WorldUtils {
 	 *         specified range
 	 */
 	public static double getCollisionDistanceToGround(Location startLocation, double maxDistance, Set<Material> collidableFluids) {
-		Validate.notNull(startLocation, "startLocation");
-		Validate.notNull(collidableFluids, "collidableFluids");
+		Validate.notNull(startLocation, "startLocation is null");
+		Validate.notNull(collidableFluids, "collidableFluids is null");
 		World world = startLocation.getWorld();
-		Validate.notNull(world, "startLocation's world is null");
+		Validate.notNull(world, "World of startLocation is null");
 
 		// Setup re-used offset start location:
 		TEMP_START_LOCATION.setWorld(world);

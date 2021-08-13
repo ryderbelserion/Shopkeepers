@@ -15,7 +15,7 @@ public class FallbackArgumentException extends ArgumentParseException {
 	private final ArgumentParseException originalException; // not null
 
 	public FallbackArgumentException(FallbackArgument<?> argument, ArgumentParseException originalException) {
-		super(argument, Validate.notNull(originalException, "Original exception is null!").getMessageText(), originalException.getCause());
+		super(argument, Validate.notNull(originalException, "originalException is null").getMessageText(), originalException.getCause());
 		this.originalException = originalException;
 	}
 

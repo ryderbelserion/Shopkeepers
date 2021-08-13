@@ -15,7 +15,7 @@ public class ArgumentsReader {
 	private int cursor = -1; // 0 points to the first argument
 
 	public ArgumentsReader(CommandInput commandInput) {
-		Validate.notNull(commandInput, "Command input is null!");
+		Validate.notNull(commandInput, "commandInput is null");
 		// CommandInput guarantees: not null, does not contain null, unmodifiable, arguments don't change during command
 		// processing, always returns the same list instance (important for identity-based checks)
 		this.args = commandInput.getArguments();
@@ -76,7 +76,7 @@ public class ArgumentsReader {
 	 *            the new cursor position
 	 */
 	public void setCursor(int cursor) {
-		Validate.isTrue(cursor >= -1 && cursor < args.size(), "Index out of bounds!");
+		Validate.isTrue(cursor >= -1 && cursor < args.size(), "cursor is out of bounds");
 		this.internalSetCursor(cursor);
 	}
 
@@ -217,9 +217,9 @@ public class ArgumentsReader {
 	 *            the other arguments reader
 	 */
 	public void setState(ArgumentsReader otherReader) {
-		Validate.notNull(otherReader, "The other arguments reader is null!");
+		Validate.notNull(otherReader, "otherReader is null");
 		// only applicable if the readers reference the same arguments:
-		Validate.isTrue(otherReader.args == this.args, "The other arguments reader references different arguments!");
+		Validate.isTrue(otherReader.args == this.args, "otherReader references different arguments");
 		this.internalSetCursor(otherReader.cursor);
 	}
 

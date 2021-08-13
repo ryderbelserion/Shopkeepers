@@ -114,8 +114,8 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 
 	@Override
 	public void setOffers(List<? extends TradeOffer> offers) {
-		Validate.notNull(offers, "Offers is null!");
-		Validate.noNullElements(offers, "Offers contains null elements!");
+		Validate.notNull(offers, "offers is null");
+		Validate.noNullElements(offers, "offers contains null");
 		this._setOffers(offers);
 		this.markDirty();
 	}
@@ -128,7 +128,7 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 
 	@Override
 	public void addOffer(TradeOffer offer) {
-		Validate.notNull(offer, "Offer is null!");
+		Validate.notNull(offer, "offer is null");
 		this._addOffer(offer);
 		this.markDirty();
 	}
@@ -144,8 +144,8 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 
 	@Override
 	public void addOffers(List<? extends TradeOffer> offers) {
-		Validate.notNull(offers, "Offers is null!");
-		Validate.noNullElements(offers, "Offers contains null elements!");
+		Validate.notNull(offers, "offers is null");
+		Validate.noNullElements(offers, "offers contains null");
 		this._addOffers(offers);
 		this.markDirty();
 	}

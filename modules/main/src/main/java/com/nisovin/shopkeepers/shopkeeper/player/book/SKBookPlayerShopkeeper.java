@@ -262,8 +262,8 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	@Override
 	public void setOffers(@ReadOnly List<? extends BookOffer> offers) {
-		Validate.notNull(offers, "Offers is null!");
-		Validate.noNullElements(offers, "Offers contains null elements!");
+		Validate.notNull(offers, "offers is null");
+		Validate.noNullElements(offers, "offers contains null");
 		this._setOffers(offers);
 		this.markDirty();
 	}
@@ -276,7 +276,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	@Override
 	public void addOffer(BookOffer offer) {
-		Validate.notNull(offer, "Offer is null!");
+		Validate.notNull(offer, "offer is null");
 		this._addOffer(offer);
 		this.markDirty();
 	}
@@ -296,8 +296,8 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	@Override
 	public void addOffers(@ReadOnly List<? extends BookOffer> offers) {
-		Validate.notNull(offers, "Offers is null!");
-		Validate.noNullElements(offers, "Offers contains null elements!");
+		Validate.notNull(offers, "offers is null");
+		Validate.noNullElements(offers, "offers contains null");
 		this._addOffers(offers);
 		this.markDirty();
 	}

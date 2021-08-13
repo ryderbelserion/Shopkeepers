@@ -38,7 +38,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 
 	@Override
 	protected boolean openWindow(Player player) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Inventory inventory = Bukkit.createInventory(player, 9, Messages.forHireTitle);
 

@@ -25,8 +25,8 @@ public class HoverEventText extends TextBuilder {
 	private final Text value; // Not null, can be empty
 
 	HoverEventText(Action action, Text value) {
-		Validate.notNull(action, "Action is null!");
-		Validate.notNull(value, "Value is null!");
+		Validate.notNull(action, "action is null");
+		Validate.notNull(value, "value is null");
 		this.action = action;
 		this.value = value;
 	}

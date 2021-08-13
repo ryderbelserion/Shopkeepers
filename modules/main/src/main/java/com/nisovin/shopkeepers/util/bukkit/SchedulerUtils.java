@@ -30,8 +30,8 @@ public final class SchedulerUtils {
 	}
 
 	private static void validatePluginTask(Plugin plugin, Runnable task) {
-		Validate.notNull(plugin, "Plugin is null!");
-		Validate.notNull(task, "Task is null!");
+		Validate.notNull(plugin, "plugin is null");
+		Validate.notNull(task, "task is null");
 	}
 
 	/**
@@ -115,8 +115,8 @@ public final class SchedulerUtils {
 	 * @return the number of remaining async tasks that are still running after waiting for the specified duration
 	 */
 	public static int awaitAsyncTasksCompletion(Plugin plugin, int asyncTasksTimeoutSeconds, Logger logger) {
-		Validate.notNull(plugin, "Plugin is null!");
-		Validate.isTrue(asyncTasksTimeoutSeconds >= 0, "asyncTasksTimeoutSeconds cannot be negative!");
+		Validate.notNull(plugin, "plugin is null");
+		Validate.isTrue(asyncTasksTimeoutSeconds >= 0, "asyncTasksTimeoutSeconds cannot be negative");
 
 		int activeAsyncTasks = getActiveAsyncTasks(plugin);
 		if (activeAsyncTasks > 0 && asyncTasksTimeoutSeconds > 0) {

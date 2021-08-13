@@ -85,8 +85,8 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 	// TODO Support iterating in reverse order, for nicer looking container contents?
 	// Returns the amount of currency that couldn't be removed, 0 on full success, negative if too much was removed.
 	protected int removeCurrency(ItemStack[] contents, int amount) {
-		Validate.notNull(contents);
-		Validate.isTrue(amount >= 0, "Amount cannot be negative!");
+		Validate.notNull(contents, "contents is null");
+		Validate.isTrue(amount >= 0, "amount cannot be negative");
 		if (amount == 0) return 0;
 		int remaining = amount;
 

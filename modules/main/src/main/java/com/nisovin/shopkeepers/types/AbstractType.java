@@ -33,13 +33,13 @@ public abstract class AbstractType implements Type {
 
 	protected AbstractType(String identifier, List<String> aliases, String permission) {
 		this.identifier = StringUtils.normalize(identifier);
-		Validate.notEmpty(this.identifier, "Empty identifier!");
+		Validate.notEmpty(this.identifier, "identifier is null or empty");
 		if (aliases == null || aliases.isEmpty()) {
 			this.aliases = Collections.emptyList();
 		} else {
 			List<String> normalizedAliases = new ArrayList<>(aliases.size());
 			for (String alias : aliases) {
-				Validate.notEmpty(alias, "Empty alias!");
+				Validate.notEmpty(alias, "aliases contains null or empty alias");
 				normalizedAliases.add(StringUtils.normalize(alias));
 			}
 			this.aliases = Collections.unmodifiableList(normalizedAliases);

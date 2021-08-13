@@ -17,8 +17,8 @@ public class SKBookOffer implements BookOffer {
 	private final int price; // > 0
 
 	public SKBookOffer(String bookTitle, int price) {
-		Validate.notEmpty(bookTitle, "Book title cannot be null or empty!");
-		Validate.isTrue(price > 0, "Price has to be positive!");
+		Validate.notEmpty(bookTitle, "bookTitle is null or empty");
+		Validate.isTrue(price > 0, "price has to be positive");
 		this.bookTitle = bookTitle;
 		this.price = price;
 	}

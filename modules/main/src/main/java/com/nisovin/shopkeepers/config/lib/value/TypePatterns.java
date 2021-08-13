@@ -69,7 +69,7 @@ public class TypePatterns {
 			typePatterns = new TypePattern[typeParameters.length];
 			for (int i = 0; i < typeParameters.length; ++i) {
 				Class<?> typeParameter = typeParameters[i];
-				Validate.notNull(typeParameter, "One of the typeParameters is null!");
+				Validate.notNull(typeParameter, "typeParameters contains null");
 				typePatterns[i] = TypePatterns.forClass(typeParameter);
 			}
 		}

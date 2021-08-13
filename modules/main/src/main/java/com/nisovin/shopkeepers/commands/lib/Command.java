@@ -87,7 +87,7 @@ public abstract class Command {
 	}
 
 	public Command(String name, List<String> aliases) {
-		Validate.notEmpty(name, "Command name is empty!");
+		Validate.notEmpty(name, "name is null or empty");
 		this.name = name;
 
 		// Validate and copy aliases:
@@ -97,8 +97,8 @@ public abstract class Command {
 			List<String> aliasesCopy = new ArrayList<>(aliases);
 			// Validate aliases:
 			for (String alias : aliasesCopy) {
-				Validate.notEmpty(alias, "Command contains empty alias!");
-				Validate.isTrue(!StringUtils.containsWhitespace(alias), "Command contains alias with whitespace!");
+				Validate.notEmpty(alias, "aliases contains null or empty alias");
+				Validate.isTrue(!StringUtils.containsWhitespace(alias), "aliases contains alias with whitespace");
 			}
 			this.aliases = Collections.unmodifiableList(aliasesCopy);
 		}
@@ -195,7 +195,7 @@ public abstract class Command {
 	 * @return <code>true</code> if the given {@link CommandSender} might be allowed to execute this command
 	 */
 	public boolean testPermission(CommandSender sender) {
-		Validate.notNull(sender);
+		Validate.notNull(sender, "sender is null");
 		return permission == null || PermissionUtils.hasPermission(sender, permission);
 	}
 
@@ -209,7 +209,7 @@ public abstract class Command {
 	 *             if the sender is not allowed to execute this command
 	 */
 	public void checkPermission(CommandSender sender) throws NoPermissionException {
-		Validate.notNull(sender);
+		Validate.notNull(sender, "sender is null");
 		if (!this.testPermission(sender)) {
 			throw this.noPermissionException();
 		}
@@ -227,7 +227,7 @@ public abstract class Command {
 	 *             if the sender does not have the permission
 	 */
 	public void checkPermission(CommandSender sender, String permission) throws NoPermissionException {
-		Validate.notNull(sender);
+		Validate.notNull(sender, "sender is null");
 		if (permission != null && !PermissionUtils.hasPermission(sender, permission)) {
 			throw this.noPermissionException();
 		}
@@ -251,7 +251,7 @@ public abstract class Command {
 	 * @return <code>true</code> of the command sender is accepted
 	 */
 	public boolean isAccepted(CommandSender sender) {
-		Validate.notNull(sender);
+		Validate.notNull(sender, "sender is null");
 		// By default all command senders are accepted:
 		return true;
 	}
@@ -270,7 +270,7 @@ public abstract class Command {
 	 *             if the given type of command sender is not accepted to execute this command
 	 */
 	public void checkCommandSource(CommandSender sender) throws CommandSourceRejectedException {
-		Validate.notNull(sender);
+		Validate.notNull(sender, "sender is null");
 		if (!this.isAccepted(sender)) {
 			throw new CommandSourceRejectedException(MSG_COMMAND_SOURCE_DENIED);
 		}
@@ -326,9 +326,9 @@ public abstract class Command {
 	 *            the argument
 	 */
 	protected final void addArgument(CommandArgument<?> argument) {
-		Validate.notNull(argument, "Argument is null!");
-		Validate.isTrue(this.getArgument(argument.getName()) == null, "There is already another argument with that name: " + argument.getName());
-		Validate.isTrue(argument.getParent() == null, "Cannot add argument with parent!");
+		Validate.notNull(argument, "argument is null");
+		Validate.isTrue(this.getArgument(argument.getName()) == null, "There is already another argument with this name: " + argument.getName());
+		Validate.isTrue(argument.getParent() == null, "argument already has a parent");
 		// Make sure that no parent can be set once the argument has been added:
 		argument.setParent(null); // Parent can only be set once
 		arguments.add(argument);
@@ -456,8 +456,8 @@ public abstract class Command {
 	 *            the command input
 	 */
 	public void handleCommand(CommandInput input) {
-		Validate.notNull(input, "Input is null!");
-		Validate.isTrue(input.getCommand() == this.getRootCommand(), "Input is meant for a different command!");
+		Validate.notNull(input, "input is null");
+		Validate.isTrue(input.getCommand() == this.getRootCommand(), "input is meant for a different command");
 
 		CommandSender sender = input.getSender();
 		CommandContext context = new SimpleCommandContext();
@@ -514,8 +514,8 @@ public abstract class Command {
 	 *             if command execution failed
 	 */
 	public void processCommand(CommandInput input) throws CommandException {
-		Validate.notNull(input, "Input is null!");
-		Validate.isTrue(input.getCommand() == this.getRootCommand(), "Input is meant for a different command!");
+		Validate.notNull(input, "input is null");
+		Validate.isTrue(input.getCommand() == this.getRootCommand(), "input is meant for a different command");
 
 		CommandContext context = new SimpleCommandContext();
 		ArgumentsReader argsReader = new ArgumentsReader(input);
@@ -931,8 +931,8 @@ public abstract class Command {
 	 *         <code>null</code> and not containing <code>null</code>)
 	 */
 	public List<String> handleTabCompletion(CommandInput input) {
-		Validate.notNull(input, "Input is null!");
-		Validate.isTrue(input.getCommand() == this.getRootCommand(), "Input is meant for a different command!");
+		Validate.notNull(input, "input is null");
+		Validate.isTrue(input.getCommand() == this.getRootCommand(), "input is meant for a different command");
 
 		CommandContext commandContext = new SimpleCommandContext();
 		ArgumentsReader argsReader = new ArgumentsReader(input);
@@ -1356,7 +1356,7 @@ public abstract class Command {
 	 *             if the sender is not allowed to view the help of this command
 	 */
 	public void sendHelp(CommandSender recipient) throws NoPermissionException {
-		Validate.notNull(recipient);
+		Validate.notNull(recipient, "recipient is null");
 
 		// Make sure the recipient has the required permission:
 		if (!this.hasHelpPermission(recipient)) {
@@ -1409,7 +1409,7 @@ public abstract class Command {
 	}
 
 	protected void sendChildCommandsHelp(CommandSender recipient, Text childUsageFormat, Text childDescFormat, Command command) {
-		Validate.notNull(recipient);
+		Validate.notNull(recipient, "recipient is null");
 		if (childUsageFormat == null || childUsageFormat.isPlainTextEmpty()) {
 			// Not including child commands at all:
 			return;

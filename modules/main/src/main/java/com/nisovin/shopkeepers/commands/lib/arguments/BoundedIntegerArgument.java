@@ -13,7 +13,7 @@ public class BoundedIntegerArgument extends IntegerArgument {
 
 	public BoundedIntegerArgument(String name, int min, int max) {
 		super(name);
-		Validate.isTrue(min <= max, "min > max!");
+		Validate.isTrue(min <= max, "min > max");
 		this.min = min;
 		this.max = max;
 	}

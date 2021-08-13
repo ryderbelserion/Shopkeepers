@@ -202,7 +202,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		ShopObjectType<?> shopObjectType = shopCreationData.getShopObjectType();
 		Validate.isTrue(shopObjectType instanceof AbstractShopObjectType,
-				"Expecting an AbstractShopObjectType, got " + shopObjectType.getClass().getName());
+				"ShopObjectType of shopCreationData is not of type AbstractShopObjectType, but: " + shopObjectType.getClass().getName());
 
 		if (shopObjectType instanceof VirtualShopObjectType) {
 			// Virtual shops ignore any potentially available spawn location:
@@ -409,6 +409,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the config section
 	 */
 	public void save(ConfigurationSection configSection) {
+		Validate.notNull(configSection, "configSection is null");
 		configSection.set("uniqueId", uniqueId.toString());
 		configSection.set("name", TextUtils.decolorize(name));
 		// Null world name gets stored as empty string:
@@ -625,10 +626,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the new stored location of this shopkeeper
 	 */
 	public void setLocation(Location location) {
-		Validate.isTrue(!this.isVirtual(), "Cannot set location of virtual shopkeeper!");
-		Validate.notNull(location, "Location is null!");
+		Validate.State.isTrue(!this.isVirtual(), "Cannot set location of virtual shopkeeper!");
+		Validate.notNull(location, "location is null");
 		World world = location.getWorld();
-		Validate.notNull(world, "Location's world is null!");
+		Validate.notNull(world, "World of location is null");
 
 		// TODO Changing the world is not safe (at least not for all types of shops)! Consider for example player shops
 		// which currently use the world name to locate their container.
@@ -653,7 +654,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the new yaw
 	 */
 	public void setYaw(float yaw) {
-		Validate.isTrue(!this.isVirtual(), "Cannot set the yaw of a virtual shopkeeper!");
+		Validate.State.isTrue(!this.isVirtual(), "Cannot set yaw of virtual shopkeeper!");
 		this.yaw = yaw;
 		this.markDirty();
 	}
@@ -817,7 +818,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the UI handler
 	 */
 	public void registerUIHandler(UIHandler uiHandler) {
-		Validate.notNull(uiHandler, "UI handler is null!");
+		Validate.notNull(uiHandler, "uiHandler is null");
 		uiHandlers.put(uiHandler.getUIType().getIdentifier(), uiHandler);
 	}
 
@@ -829,7 +830,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * @return the UI handler, or <code>null</code> if none is available
 	 */
 	public UIHandler getUIHandler(UIType uiType) {
-		Validate.notNull(uiType, "UI type is null!");
+		Validate.notNull(uiType, "uiType is null");
 		return uiHandlers.get(uiType.getIdentifier());
 	}
 
@@ -859,7 +860,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the interacting player
 	 */
 	public void onPlayerInteraction(Player player) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		if (player.isSneaking()) {
 			// Open editor window:
 			this.openEditorWindow(player);

@@ -31,7 +31,7 @@ public class CyclicCounter {
 	 *            the upper bound (exclusive), has to be greater than the lower bound
 	 */
 	public CyclicCounter(int lowerBound, int upperBound) {
-		Validate.isTrue(upperBound > lowerBound, "upperBound has to be greater than lowerBound");
+		Validate.isTrue(upperBound > lowerBound, "lowerBound <= upperBound");
 		this.lowerBound = lowerBound;
 		this.upperBound = upperBound;
 		this.value = lowerBound;
@@ -71,7 +71,7 @@ public class CyclicCounter {
 	 *            the new value, has to be within the lower bound (inclusive) and the upper bound (exclusive)
 	 */
 	public void setValue(int value) {
-		Validate.isTrue(value >= lowerBound && value < upperBound, "value out of bounds");
+		Validate.isTrue(value >= lowerBound && value < upperBound, "value is out of bounds");
 		this.value = value;
 	}
 

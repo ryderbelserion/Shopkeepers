@@ -34,7 +34,7 @@ public class VillagerInteractionListener implements Listener {
 	private final ShopkeepersPlugin plugin;
 
 	public VillagerInteractionListener(ShopkeepersPlugin plugin) {
-		Validate.notNull(plugin, "plugin");
+		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
 	}
 

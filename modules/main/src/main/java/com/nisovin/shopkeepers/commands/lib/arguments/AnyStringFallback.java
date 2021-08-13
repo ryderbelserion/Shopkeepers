@@ -15,6 +15,6 @@ public class AnyStringFallback extends TypedFallbackArgument<String> {
 	}
 
 	public AnyStringFallback(CommandArgument<String> argument, boolean joinRemainingArgs) {
-		super(argument, new StringArgument(Validate.notNull(argument).getName(), joinRemainingArgs));
+		super(argument, new StringArgument(Validate.notNull(argument, "argument is null").getName(), joinRemainingArgs));
 	}
 }

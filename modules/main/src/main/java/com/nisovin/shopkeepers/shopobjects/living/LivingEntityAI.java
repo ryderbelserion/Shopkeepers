@@ -190,10 +190,10 @@ public class LivingEntityAI implements Listener {
 	// ENTITIES
 
 	public void addEntity(LivingEntity entity) {
-		Validate.notNull(entity, "Entity is null!");
-		Validate.isTrue(entity.isValid(), "Entity is invalid!");
-		Validate.isTrue(!currentlyRunning, "Cannot add entities while the AI task is running!");
-		Validate.isTrue(!entities.containsKey(entity), "Entity is already added!");
+		Validate.notNull(entity, "entity is null");
+		Validate.isTrue(entity.isValid(), "entity is invalid");
+		Validate.State.isTrue(!currentlyRunning, "Cannot add entities while the AI task is running!");
+		Validate.isTrue(!entities.containsKey(entity), "entity is already added");
 
 		// Determine entity chunk (asserts that the entity won't move!):
 		// We assert that the chunk is loaded (checked above by isValid call).
@@ -234,7 +234,7 @@ public class LivingEntityAI implements Listener {
 	}
 
 	public void removeEntity(LivingEntity entity) {
-		Validate.isTrue(!currentlyRunning, "Cannot remove entities while the AI task is running!");
+		Validate.State.isTrue(!currentlyRunning, "Cannot remove entities while the AI task is running!");
 		// Remove entity:
 		EntityData entityData = entities.remove(entity);
 		if (entityData == null) return; // Entity was not contained

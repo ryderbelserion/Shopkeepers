@@ -158,7 +158,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		// Check permission:
 		if (villager instanceof WanderingTrader) {
 			if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.EDIT_WANDERING_TRADERS_PERMISSION)) {

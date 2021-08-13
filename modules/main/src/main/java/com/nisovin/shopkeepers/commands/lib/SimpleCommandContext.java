@@ -23,8 +23,8 @@ public class SimpleCommandContext implements CommandContext {
 
 	@Override
 	public void put(String key, Object value) {
-		Validate.notEmpty(key, "Key is empty!");
-		Validate.notNull(value, "Value is null!");
+		Validate.notEmpty(key, "key is null or empty");
+		Validate.notNull(value, "value is null");
 		values.put(key, value);
 	}
 

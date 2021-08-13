@@ -20,7 +20,7 @@ public class Validate {
 	}
 
 	public static <T> T notNull(T object) {
-		return notNull(object, "The validated object is null");
+		return notNull(object, "object is null");
 	}
 
 	public static <T> T notNull(T object, String errorMessage) {
@@ -38,7 +38,7 @@ public class Validate {
 	}
 
 	public static String notEmpty(String string) {
-		return notEmpty(string, "The validated string is null or empty");
+		return notEmpty(string, "string is null or empty");
 	}
 
 	public static String notEmpty(String string, String errorMessage) {
@@ -56,7 +56,7 @@ public class Validate {
 	}
 
 	public static boolean isTrue(boolean expression) {
-		return isTrue(expression, "The validated expression is false");
+		return isTrue(expression, "expression evaluates to false");
 	}
 
 	public static boolean isTrue(boolean expression, String errorMessage) {
@@ -74,7 +74,7 @@ public class Validate {
 	}
 
 	public static <T> T isTrue(T value, Predicate<T> predicate) {
-		return isTrue(value, predicate, "The validated predicate is false");
+		return isTrue(value, predicate, "predicate evaluates to false");
 	}
 
 	public static <T> T isTrue(T value, Predicate<T> predicate, String errorMessage) {
@@ -92,7 +92,7 @@ public class Validate {
 	}
 
 	public static double isFinite(double value) {
-		return isFinite(value, "The validated double is infinite or NaN)");
+		return isFinite(value, "value is not finite");
 	}
 
 	public static double isFinite(double value, String errorMessage) {
@@ -110,7 +110,7 @@ public class Validate {
 	}
 
 	public static double notNaN(double value) {
-		return notNaN(value, "The validated double is NaN)");
+		return notNaN(value, "value is NaN");
 	}
 
 	public static double notNaN(double value, String errorMessage) {
@@ -128,7 +128,7 @@ public class Validate {
 	}
 
 	public static float isFinite(float value) {
-		return isFinite(value, "The validated float is infinite or NaN)");
+		return isFinite(value, "value is not finite");
 	}
 
 	public static float isFinite(float value, String errorMessage) {
@@ -146,7 +146,7 @@ public class Validate {
 	}
 
 	public static float notNaN(float value) {
-		return notNaN(value, "The validated float is NaN)");
+		return notNaN(value, "value is NaN");
 	}
 
 	public static float notNaN(float value, String errorMessage) {
@@ -196,7 +196,7 @@ public class Validate {
 		}
 
 		public static <T> T notNull(T object) {
-			return notNull(object, "The validated object is null");
+			return notNull(object, "object is null");
 		}
 
 		public static <T> T notNull(T object, String errorMessage) {
@@ -214,7 +214,7 @@ public class Validate {
 		}
 
 		public static String notEmpty(String string) {
-			return notEmpty(string, "The validated string is null or empty");
+			return notEmpty(string, "string is null or empty");
 		}
 
 		public static String notEmpty(String string, String errorMessage) {
@@ -232,7 +232,7 @@ public class Validate {
 		}
 
 		public static boolean isTrue(boolean expression) {
-			return isTrue(expression, "The validated expression is false");
+			return isTrue(expression, "expression evaluates to false");
 		}
 
 		public static boolean isTrue(boolean expression, String errorMessage) {
@@ -250,7 +250,7 @@ public class Validate {
 		}
 
 		public static <T> T isTrue(T value, Predicate<T> predicate) {
-			return isTrue(value, predicate, "The validated predicate is false");
+			return isTrue(value, predicate, "predicate evaluates to false");
 		}
 
 		public static <T> T isTrue(T value, Predicate<T> predicate, String errorMessage) {
@@ -268,7 +268,7 @@ public class Validate {
 		}
 
 		public static double isFinite(double value) {
-			return isFinite(value, "The validated double is infinite or NaN)");
+			return isFinite(value, "value is not finite");
 		}
 
 		public static double isFinite(double value, String errorMessage) {
@@ -286,7 +286,7 @@ public class Validate {
 		}
 
 		public static double notNaN(double value) {
-			return notNaN(value, "The validated double is NaN)");
+			return notNaN(value, "value is NaN");
 		}
 
 		public static double notNaN(double value, String errorMessage) {
@@ -304,7 +304,7 @@ public class Validate {
 		}
 
 		public static float isFinite(float value) {
-			return isFinite(value, "The validated float is infinite or NaN)");
+			return isFinite(value, "value is not finite");
 		}
 
 		public static float isFinite(float value, String errorMessage) {
@@ -322,7 +322,7 @@ public class Validate {
 		}
 
 		public static float notNaN(float value) {
-			return notNaN(value, "The validated float is NaN)");
+			return notNaN(value, "value is NaN");
 		}
 
 		public static float notNaN(float value, String errorMessage) {

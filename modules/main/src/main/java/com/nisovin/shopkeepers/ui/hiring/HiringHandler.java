@@ -24,7 +24,7 @@ public abstract class HiringHandler extends AbstractShopkeeperUIHandler {
 
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		// Check for hire permission:
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.HIRE_PERMISSION)) {
 			if (!silent) {

@@ -30,13 +30,13 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public class AnyFallbackArgument extends FallbackArgument<Object> {
 
-	protected final CommandArgument<?> argument; // may be a fallback argument itself
+	protected final CommandArgument<?> argument; // May be a fallback argument itself
 	protected final CommandArgument<?> fallbackArgument;
 
 	public AnyFallbackArgument(CommandArgument<?> argument, CommandArgument<?> fallbackArgument) {
-		super(Validate.notNull(argument).getName());
-		Validate.notNull(fallbackArgument, "Fallback argument is null!");
-		Validate.isTrue(!(fallbackArgument instanceof FallbackArgument), "Fallback argument cannot be a FallbackArgument itself!");
+		super(Validate.notNull(argument, "argument is null").getName());
+		Validate.notNull(fallbackArgument, "fallbackArgument is null");
+		Validate.isTrue(!(fallbackArgument instanceof FallbackArgument), "fallbackArgument cannot be a FallbackArgument itself");
 		this.argument = argument;
 		this.fallbackArgument = fallbackArgument;
 

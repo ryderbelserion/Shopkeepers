@@ -18,7 +18,7 @@ public class EnumArgument<T extends Enum<T>> extends CommandArgument<T> {
 
 	public EnumArgument(String name, Class<T> clazz) {
 		super(name);
-		Validate.notNull(clazz);
+		Validate.notNull(clazz, "clazz is null");
 		this.clazz = clazz;
 	}
 

@@ -9,7 +9,7 @@ public class FormattingText extends TextBuilder {
 	private final ChatColor formatting; // Not null
 
 	FormattingText(ChatColor formatting) {
-		Validate.notNull(formatting, "Formatting is null!");
+		Validate.notNull(formatting, "formatting is null");
 		this.formatting = formatting;
 	}
 

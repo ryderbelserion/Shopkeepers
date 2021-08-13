@@ -18,7 +18,7 @@ public class RegularVillagers {
 	private final BlockZombieVillagerCuringListener blockZombieVillagerCuringListener;
 
 	public RegularVillagers(SKShopkeepersPlugin plugin) {
-		Validate.notNull(plugin, "plugin");
+		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
 		this.villagerInteractionListener = new VillagerInteractionListener(plugin);
 		this.blockVillagerSpawnListener = new BlockVillagerSpawnListener();

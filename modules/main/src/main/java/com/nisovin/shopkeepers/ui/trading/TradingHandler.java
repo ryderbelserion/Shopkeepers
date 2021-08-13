@@ -62,7 +62,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.TRADE_PERMISSION)) {
 			if (!silent) {
 				Log.debug(() -> "Blocked trade window opening for " + player.getName() + ": Missing trade permission.");
@@ -89,7 +89,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 	@Override
 	protected boolean openWindow(Player player) {
-		Validate.notNull(player, "player");
+		Validate.notNull(player, "player is null");
 		// Create and open the trading window:
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		String title = this.getInventoryTitle();

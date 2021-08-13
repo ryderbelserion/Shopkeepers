@@ -31,7 +31,7 @@ public class PlayerShopsLimit {
 	 *            this callback is invoked for invalid maximum shops permission options, not <code>null</code>
 	 */
 	public static void updateMaxShopsPermissions(Consumer<String> invalidPermissionOptionCallback) {
-		Validate.notNull(invalidPermissionOptionCallback, "invalidPermissionOptionCallback");
+		Validate.notNull(invalidPermissionOptionCallback, "invalidPermissionOptionCallback is null");
 		String maxShopsPermissionOptions = Settings.maxShopsPermOptions;
 		List<MaxShopsPermission> maxShopsPermissions = DerivedSettings.maxShopsPermissions;
 

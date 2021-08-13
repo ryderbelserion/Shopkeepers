@@ -79,7 +79,7 @@ public class Retry {
 	 *             forwarded exception thrown by the callable or the retry callback during the last failed attempt
 	 */
 	public static <T> T retry(Callable<T> callable, int maxAttempts, Retry.Callback retryCallback) throws Exception {
-		Validate.isTrue(maxAttempts > 0, "maxAttempts is less than 1");
+		Validate.isTrue(maxAttempts > 0, "maxAttempts has to be positive");
 		int currentAttempt = 0;
 		Exception lastException = null;
 		while (++currentAttempt <= maxAttempts) {

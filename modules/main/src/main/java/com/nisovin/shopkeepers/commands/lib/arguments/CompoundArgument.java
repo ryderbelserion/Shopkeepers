@@ -39,19 +39,20 @@ public abstract class CompoundArgument<T> extends CommandArgument<T> {
 	public CompoundArgument(String name, List<CommandArgument<?>> arguments, boolean joinFormats, boolean useReducedFormat) {
 		super(name);
 
-		// arguments:
-		Validate.notNull(arguments, "Arguments is null!");
+		// Arguments:
+		Validate.notNull(arguments, "arguments is null");
+		Validate.isTrue(!arguments.isEmpty(), "arguments is empty");
 		List<CommandArgument<?>> argumentsList = new ArrayList<>(arguments.size());
 		this.arguments = Collections.unmodifiableList(argumentsList);
 		for (CommandArgument<?> argument : arguments) {
-			Validate.notNull(argument, "A contained argument is null!");
+			Validate.notNull(argument, "arguments contains null");
 			// TODO This also excludes optional arguments.. allow fallbacks and handle them somehow? Maybe evaluate
 			// fallbacks immediately?
-			Validate.isTrue(!(argument instanceof FallbackArgument), "Cannot use fallback arguments in compound argument!");
+			Validate.isTrue(!(argument instanceof FallbackArgument), "arguments contains a FallbackArgument");
 			argument.setParent(this);
 			argumentsList.add(argument);
 		}
-		Validate.isTrue(this.arguments.size() != 0, "No arguments given!");
+		assert !this.arguments.isEmpty();
 
 		// Format:
 		// The reduced format can only be used in conjunction with joinFormats:

@@ -72,9 +72,9 @@ public class TradeMerger {
 	private long nextMergeTimeoutStartNanos;
 
 	public TradeMerger(Plugin plugin, MergeMode mergeMode, Consumer<MergedTrades> mergedTradesConsumer) {
-		Validate.notNull(plugin, "plugin");
-		Validate.notNull(mergeMode, "mergeMode");
-		Validate.notNull(mergedTradesConsumer, "mergedTradesConsumer");
+		Validate.notNull(plugin, "plugin is null");
+		Validate.notNull(mergeMode, "mergeMode is null");
+		Validate.notNull(mergedTradesConsumer, "mergedTradesConsumer is null");
 		this.plugin = plugin;
 		this.mergedTradesConsumer = mergedTradesConsumer;
 		this.mergeMode = mergeMode;
@@ -132,7 +132,7 @@ public class TradeMerger {
 	 *            the trade event
 	 */
 	public void mergeTrade(ShopkeeperTradeEvent tradeEvent) {
-		Validate.notNull(tradeEvent, "tradeEvent");
+		Validate.notNull(tradeEvent, "tradeEvent is null");
 		// In order to check if the trade can be merged with the previous trades, we most likely need to retrieve item
 		// copies from the event. By creating the new MergedTrades right away, instead of only afterwards when it is
 		// actually required, we can cache these once retrieved item copies. This is therefore cheaper most of the time.

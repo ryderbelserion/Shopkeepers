@@ -65,7 +65,7 @@ public class PandaShop extends BabyableShop<Panda> {
 	}
 
 	public void setGene(Panda.Gene gene) {
-		Validate.notNull(gene, "Gene is null!");
+		Validate.notNull(gene, "gene is null");
 		geneProperty.setValue(gene);
 		shopkeeper.markDirty();
 		this.applyGene(this.getEntity()); // Null if not spawned

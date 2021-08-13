@@ -112,6 +112,6 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 	protected void validateCreationData(ShopCreationData shopCreationData) {
 		super.validateCreationData(shopCreationData);
 		Validate.isTrue(shopCreationData instanceof PlayerShopCreationData,
-				"Expecting PlayerShopCreationData, got " + shopCreationData.getClass().getName());
+				"shopCreationData is not of type PlayerShopCreationData, but: " + shopCreationData.getClass().getName());
 	}
 }

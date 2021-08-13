@@ -41,8 +41,8 @@ public class WorldGuardHandler {
 	}
 
 	public static boolean isShopAllowed(Player player, Location location) {
-		Validate.notNull(player, "player");
-		Validate.notNull(location, "location");
+		Validate.notNull(player, "player is null");
+		Validate.notNull(location, "location is null");
 		Plugin wgPlugin = getPlugin();
 		if (wgPlugin == null || !wgPlugin.isEnabled()) return true;
 		return Internal.isShopAllowed(wgPlugin, player, location);

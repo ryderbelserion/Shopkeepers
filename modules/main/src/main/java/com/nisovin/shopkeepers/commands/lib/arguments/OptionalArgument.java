@@ -31,7 +31,7 @@ public class OptionalArgument<T> extends FallbackArgument<T> {
 
 	public OptionalArgument(CommandArgument<T> argument) {
 		super(argument.getName());
-		Validate.notNull(argument, "Argument is null!");
+		Validate.notNull(argument, "argument is null");
 		argument.setParent(this);
 		this.argument = argument;
 	}

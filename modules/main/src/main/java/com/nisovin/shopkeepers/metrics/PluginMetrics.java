@@ -15,7 +15,7 @@ public class PluginMetrics {
 	private final SKShopkeepersPlugin plugin;
 
 	public PluginMetrics(SKShopkeepersPlugin plugin) {
-		Validate.notNull(plugin, "plugin");
+		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
 	}
 

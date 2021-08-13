@@ -19,11 +19,11 @@ public abstract class AbstractTypeRegistry<T extends AbstractType> implements Ty
 
 	@Override
 	public void register(T type) {
-		Validate.notNull(type, "type");
+		Validate.notNull(type, "type is null");
 		String identifier = type.getIdentifier();
 		assert identifier != null && !identifier.isEmpty();
 		Validate.isTrue(!registeredTypes.containsKey(identifier),
-				"Another " + this.getTypeName() + " with identifier '" + identifier + "' is already registered!");
+				"A " + this.getTypeName() + " with this identifier is already registered: " + identifier);
 		registeredTypes.put(identifier, type);
 	}
 

@@ -80,7 +80,7 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	public void setFoxType(Fox.Type foxType) {
-		Validate.notNull(foxType, "Fox type is null!");
+		Validate.notNull(foxType, "foxType is null");
 		foxTypeProperty.setValue(foxType);
 		shopkeeper.markDirty();
 		this.applyFoxType(this.getEntity()); // Null if not spawned
@@ -133,7 +133,6 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	public void setSleeping(boolean sleeping) {
-		Validate.notNull(sleeping, "Sleeping is null!");
 		sleepingProperty.setValue(sleeping);
 		// Incompatible with crouching:
 		if (sleeping && this.isCrouching()) {
@@ -181,7 +180,6 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	public void setCrouching(boolean crouching) {
-		Validate.notNull(crouching, "Crouching is null!");
 		crouchingProperty.setValue(crouching);
 		// Incompatible with sleeping:
 		if (crouching && this.isSleeping()) {

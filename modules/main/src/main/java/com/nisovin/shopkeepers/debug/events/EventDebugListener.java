@@ -35,8 +35,8 @@ public class EventDebugListener<E extends Event> implements Listener {
 	private final Map<EventPriority, EventExecutor> executors = new EnumMap<>(EventPriority.class);
 
 	public EventDebugListener(Class<E> eventClass, EventHandler<E> eventHandler) {
-		Validate.notNull(eventClass, "eventClass");
-		Validate.notNull(eventHandler, "eventHandler");
+		Validate.notNull(eventClass, "eventClass is null");
+		Validate.notNull(eventHandler, "eventHandler is null");
 		this.eventClass = eventClass;
 
 		// Create event executors for every event priority:

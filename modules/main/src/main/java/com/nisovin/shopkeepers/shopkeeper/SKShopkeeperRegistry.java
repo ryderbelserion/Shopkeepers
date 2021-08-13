@@ -477,7 +477,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	@Override
 	public AbstractShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
-		Validate.notNull(creationData, "CreationData is null!");
+		Validate.notNull(creationData, "creationData is null");
 		AbstractShopType<?> abstractShopType = this.validateShopType(creationData.getShopType());
 
 		SKShopkeeperStorage shopkeeperStorage = this.getShopkeeperStorage();
@@ -519,9 +519,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// work as expected.
 	public AbstractShopkeeper loadShopkeeper(ShopType<?> shopType, int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
 		AbstractShopType<?> abstractShopType = this.validateShopType(shopType);
-		Validate.notNull(configSection, "Missing config section!");
-		Validate.isTrue(id >= 1, "Invalid id '" + id + "': Id has to be positive!");
-		Validate.isTrue(this.getShopkeeperById(id) == null, "There is already a shopkeeper existing with this id: " + id);
+		Validate.notNull(configSection, "configSection is null");
+		Validate.isTrue(id >= 1, "id has to be positive: " + id);
+		Validate.isTrue(this.getShopkeeperById(id) == null, "There already exists a shopkeeper with this id: " + id);
 
 		AbstractShopkeeper shopkeeper = abstractShopType.loadShopkeeper(id, configSection);
 		if (shopkeeper == null) {
@@ -531,7 +531,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		// Validate unique id:
 		if (this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) != null) {
-			throw new ShopkeeperCreateException("There is already a shopkeeper existing with this unique id: " + shopkeeper.getUniqueId());
+			throw new ShopkeeperCreateException("There already exists a shopkeeper with this unique id: " + shopkeeper.getUniqueId());
 		}
 
 		// Success:
@@ -542,9 +542,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	private AbstractShopType<?> validateShopType(ShopType<?> shopType) {
-		Validate.notNull(shopType, "Missing shop type!");
+		Validate.notNull(shopType, "shopType is null");
 		Validate.isTrue(shopType instanceof AbstractShopType,
-				"Expecting an AbstractShopType, got " + shopType.getClass().getName());
+				"shopType is not of type AbstractShopType, but: " + shopType.getClass().getName());
 		return (AbstractShopType<?>) shopType;
 	}
 
@@ -708,8 +708,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	public void deleteShopkeeper(AbstractShopkeeper shopkeeper) {
-		Validate.notNull(shopkeeper, "Shopkeeper is null!");
-		Validate.isTrue(shopkeeper.isValid(), "Shopkeeper is invalid!");
+		Validate.notNull(shopkeeper, "shopkeeper is null");
+		Validate.isTrue(shopkeeper.isValid(), "shopkeeper is invalid");
 		this.removeShopkeeper(shopkeeper, ShopkeeperRemoveEvent.Cause.DELETE);
 	}
 
@@ -719,7 +719,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	// This is not called for virtual shopkeepers.
 	public void onShopkeeperMoved(AbstractShopkeeper shopkeeper) {
-		Validate.notNull(shopkeeper, "shopkeeper");
+		Validate.notNull(shopkeeper, "shopkeeper is null");
 		Validate.isTrue(!shopkeeper.isVirtual(), "shopkeeper is virtual");
 
 		ChunkCoords oldChunk = shopkeeper.getLastChunkCoords();
@@ -774,7 +774,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		private final ChunkShopkeepers chunkShopkeepers;
 
 		public ActivateChunkTask(ChunkShopkeepers chunkShopkeepers) {
-			Validate.notNull(chunkShopkeepers, "chunkShopkeepers");
+			Validate.notNull(chunkShopkeepers, "chunkShopkeepers is null");
 			this.chunkShopkeepers = chunkShopkeepers;
 		}
 
@@ -1130,7 +1130,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		private final WorldShopkeepers worldShopkeepers;
 
 		public RespawnShopkeepersAfterWorldSaveTask(WorldShopkeepers worldShopkeepers) {
-			Validate.notNull(worldShopkeepers, "worldShopkeepers");
+			Validate.notNull(worldShopkeepers, "worldShopkeepers is null");
 			this.worldShopkeepers = worldShopkeepers;
 		}
 
@@ -1282,7 +1282,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// This can be used if the shopkeeper's object id has changed for some reason.
 	// This is not required to be called if the object id changes during spawning, despawning, or ticking.
 	public void onShopkeeperObjectIdChanged(AbstractShopkeeper shopkeeper) {
-		Validate.notNull(shopkeeper, "shopkeeper");
+		Validate.notNull(shopkeeper, "shopkeeper is null");
 		if (shopkeeper.getShopObject().getLastId() == null) {
 			// The shopkeeper has no entry in the active shopkeepers currently that would need to be updated.
 			return;
@@ -1327,7 +1327,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	@Override
 	public Collection<? extends AbstractPlayerShopkeeper> getPlayerShopkeepersByOwner(UUID ownerUUID) {
-		Validate.notNull(ownerUUID, "Owner UUID is null!");
+		Validate.notNull(ownerUUID, "ownerUUID is null");
 		// TODO Improve? Maybe keep an index of player shops? or even index by owner?
 		// Note: Already unmodifiable.
 		return new AbstractSet<AbstractPlayerShopkeeper>() {
@@ -1443,7 +1443,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	@Override
 	public Collection<? extends AbstractShopkeeper> getShopkeepersInChunk(ChunkCoords chunkCoords) {
-		Validate.notNull(chunkCoords, "ChunkCoords is null!");
+		Validate.notNull(chunkCoords, "chunkCoords is null");
 		String worldName = chunkCoords.getWorldName();
 		WorldShopkeepers worldEntry = shopkeepersByWorld.get(worldName);
 		if (worldEntry == null) return Collections.emptySet();
@@ -1455,9 +1455,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// BY LOCATION
 
 	public boolean isShopkeeperAtLocation(Location location) {
-		Validate.notNull(location, "Location is null!");
+		Validate.notNull(location, "location is null");
 		World world = location.getWorld();
-		Validate.notNull(world, "Location's world is null!");
+		Validate.notNull(world, "World of location is null");
 		String worldName = world.getName();
 		int x = location.getBlockX();
 		int y = location.getBlockY();
@@ -1475,9 +1475,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	@Override
 	public Collection<? extends AbstractShopkeeper> getShopkeepersAtLocation(Location location) {
-		Validate.notNull(location, "Location is null!");
+		Validate.notNull(location, "location is null");
 		World world = location.getWorld();
-		Validate.notNull(world, "Location's world is null!");
+		Validate.notNull(world, "World of location is null");
 		String worldName = world.getName();
 		int x = location.getBlockX();
 		int y = location.getBlockY();

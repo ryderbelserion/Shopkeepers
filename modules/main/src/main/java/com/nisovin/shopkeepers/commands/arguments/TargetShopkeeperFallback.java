@@ -20,6 +20,6 @@ public class TargetShopkeeperFallback extends TypedFallbackArgument<Shopkeeper> 
 	}
 
 	public TargetShopkeeperFallback(CommandArgument<Shopkeeper> argument, TargetShopkeeperFilter filter) {
-		super(argument, new TargetShopkeeperArgument(Validate.notNull(argument).getName(), filter));
+		super(argument, new TargetShopkeeperArgument(Validate.notNull(argument, "argument is null").getName(), filter));
 	}
 }

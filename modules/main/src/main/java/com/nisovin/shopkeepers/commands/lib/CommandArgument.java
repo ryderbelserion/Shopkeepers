@@ -34,8 +34,8 @@ public abstract class CommandArgument<T> {
 	public static final String OPTIONAL_FORMAT_SUFFIX = "]";
 
 	private final String name;
-	private String displayName = null; // null to use default (name), not empty
-	private Optional<CommandArgument<?>> parent = null; // null if not yet set, empty if it has no parent
+	private String displayName = null; // Null to use default (name), not empty
+	private Optional<CommandArgument<?>> parent = null; // Null if not yet set, empty if it has no parent
 
 	/**
 	 * Create a new {@link CommandArgument}.
@@ -49,8 +49,8 @@ public abstract class CommandArgument<T> {
 	 *            the argument's name
 	 */
 	public CommandArgument(String name) {
-		Validate.notEmpty(name, "Argument name is empty!");
-		Validate.isTrue(!StringUtils.containsWhitespace(name), "Argument name cannot contain whitespace!");
+		Validate.notEmpty(name, "name is null or empty");
+		Validate.isTrue(!StringUtils.containsWhitespace(name), "name contains whitespace");
 		this.name = name;
 	}
 
@@ -84,8 +84,8 @@ public abstract class CommandArgument<T> {
 	 */
 	public CommandArgument<T> setDisplayName(String displayName) {
 		if (displayName != null) {
-			Validate.notEmpty(displayName, "Display name is empty!");
-			Validate.isTrue(!StringUtils.containsWhitespace(displayName), "Display name cannot contain whitespace!");
+			Validate.notEmpty(displayName, "displayName is empty");
+			Validate.isTrue(!StringUtils.containsWhitespace(displayName), "displayName contains whitespace");
 		}
 		// Normalize default display name to null:
 		if (this.getName().equals(displayName)) {
@@ -105,9 +105,9 @@ public abstract class CommandArgument<T> {
 	 *            the parent argument, or <code>null</code> to indicate that this argument has no parent
 	 */
 	public final void setParent(CommandArgument<?> parent) {
-		Validate.isTrue(this.parent == null, "Parent has already been set!");
+		Validate.State.isTrue(this.parent == null, "Parent has already been set!");
 		Validate.isTrue(parent != this, "Cannot set parent to self!");
-		this.parent = Optional.ofNullable(parent); // can be empty
+		this.parent = Optional.ofNullable(parent); // Can be empty
 	}
 
 	/**

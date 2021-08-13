@@ -28,8 +28,8 @@ public class EnumUtils {
 	// current==null: nullable has to be true.
 	// Cycled through all values but none got accepted: Returns current value (can be null).
 	private static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, boolean nullable, T current, boolean backwards, Predicate<T> predicate) {
-		Validate.notNull(enumClass);
-		Validate.isTrue(current != null || nullable, "Not nullable, but current is null!");
+		Validate.notNull(enumClass, "enumClass is null");
+		Validate.isTrue(current != null || nullable, "Not nullable, but current is null");
 		predicate = PredicateUtils.orAlwaysTrue(predicate);
 		T[] values = enumClass.getEnumConstants();
 		int currentId = (current == null ? -1 : current.ordinal());

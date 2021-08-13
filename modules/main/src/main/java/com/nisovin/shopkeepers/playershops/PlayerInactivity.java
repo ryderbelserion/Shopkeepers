@@ -33,7 +33,7 @@ public class PlayerInactivity {
 	private final DeleteInactivePlayerShopsTask task;
 
 	public PlayerInactivity(SKShopkeepersPlugin plugin) {
-		Validate.notNull(plugin, "plugin");
+		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
 		this.task = new DeleteInactivePlayerShopsTask(plugin);
 	}
@@ -69,7 +69,7 @@ public class PlayerInactivity {
 		private BukkitTask task = null;
 
 		public DeleteInactivePlayerShopsTask(Plugin plugin) {
-			Validate.notNull(plugin, "plugin");
+			Validate.notNull(plugin, "plugin is null");
 			this.plugin = plugin;
 		}
 

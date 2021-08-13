@@ -40,8 +40,8 @@ public class TransformedArgument<T, R> extends FallbackArgument<R> {
 	private final ArgumentTransformer<T, R> transformer;
 
 	public TransformedArgument(CommandArgument<T> fromArgument, ArgumentTransformer<T, R> transformer) {
-		super(Validate.notNull(fromArgument, "From argument is null!").getName());
-		Validate.notNull(transformer, "Transformer is null!");
+		super(Validate.notNull(fromArgument, "fromArgument is null").getName());
+		Validate.notNull(transformer, "transformer is null");
 		this.fromArgument = fromArgument;
 		fromArgument.setParent(this);
 		this.transformer = transformer;

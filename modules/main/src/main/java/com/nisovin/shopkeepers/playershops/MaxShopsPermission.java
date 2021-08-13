@@ -61,8 +61,8 @@ public class MaxShopsPermission implements Comparable<MaxShopsPermission> {
 	 * @return the parsed list of {@link MaxShopsPermission}
 	 */
 	public static List<MaxShopsPermission> parseList(String maxShopsPermissionOptionsList, Consumer<String> invalidPermissionOptionCallback) {
-		Validate.notNull(maxShopsPermissionOptionsList, "maxShopsPermissionOptionsList");
-		Validate.notNull(invalidPermissionOptionCallback, "invalidPermissionOptionCallback");
+		Validate.notNull(maxShopsPermissionOptionsList, "maxShopsPermissionOptionsList is null");
+		Validate.notNull(invalidPermissionOptionCallback, "invalidPermissionOptionCallback is null");
 		String[] permissionOptions = StringUtils.removeWhitespace(maxShopsPermissionOptionsList).split(",");
 		List<MaxShopsPermission> maxShopsPermissions = new ArrayList<>(permissionOptions.length);
 		for (String permissionOption : permissionOptions) {
@@ -95,7 +95,7 @@ public class MaxShopsPermission implements Comparable<MaxShopsPermission> {
 	 */
 	public MaxShopsPermission(int maxShops, String permission) {
 		Validate.isTrue(maxShops > 0, "maxShops has to be positive");
-		Validate.notEmpty(permission, "permission is empty");
+		Validate.notEmpty(permission, "permission is null or empty");
 		this.maxShops = maxShops;
 		this.permission = permission;
 	}

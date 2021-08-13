@@ -76,7 +76,7 @@ public class CitizensShops {
 	private final Map<UUID, List<AbstractShopkeeper>> shopkeepersByNpcId = new HashMap<>();
 
 	public CitizensShops(SKShopkeepersPlugin plugin) {
-		Validate.notNull(plugin, "plugin");
+		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
 		this.citizensListener = new CitizensListener(plugin, this);
 	}

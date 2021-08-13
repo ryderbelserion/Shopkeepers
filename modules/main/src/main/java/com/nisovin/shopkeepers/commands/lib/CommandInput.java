@@ -25,11 +25,11 @@ public final class CommandInput {
 
 	// The arguments are expected to not change during the command processing.
 	public CommandInput(CommandSender sender, Command command, String commandAlias, List<String> arguments) {
-		Validate.notNull(sender, "Sender is null!");
-		Validate.notNull(command, "Command is null!");
-		Validate.notEmpty(commandAlias, "Command alias is empty!");
-		Validate.notNull(arguments, "Arguments is null!");
-		Validate.isTrue(!arguments.contains(null), "Arguments contains null!");
+		Validate.notNull(sender, "sender is null");
+		Validate.notNull(command, "command is null");
+		Validate.notEmpty(commandAlias, "commandAlias is null or empty");
+		Validate.notNull(arguments, "arguments is null");
+		Validate.isTrue(!arguments.contains(null), "arguments contains null");
 
 		this.sender = sender;
 		this.command = command;

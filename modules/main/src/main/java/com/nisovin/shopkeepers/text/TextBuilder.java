@@ -80,7 +80,7 @@ public abstract class TextBuilder extends AbstractText {
 
 	@Override
 	public Text setPlaceholderArguments(MessageArguments arguments) {
-		Validate.isTrue(this.isBuilt(), "Cannot set placeholder arguments for unbuilt Text!");
+		Validate.State.isTrue(this.isBuilt(), "Cannot set placeholder arguments of unbuilt Text!");
 		return super.setPlaceholderArguments(arguments);
 	}
 
@@ -459,7 +459,7 @@ public abstract class TextBuilder extends AbstractText {
 	 * @return this
 	 */
 	public TextBuilder copy(Text sourceText, boolean copyChilds) {
-		Validate.notNull(sourceText, "The given source Text is null!");
+		Validate.notNull(sourceText, "sourceText is null");
 		if (copyChilds) {
 			this.copyChild(sourceText);
 			this.copyNext(sourceText);

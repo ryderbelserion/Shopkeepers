@@ -24,7 +24,7 @@ public final class BufferedCommandContext extends SimpleCommandContext {
 	 */
 	public BufferedCommandContext(CommandContext context) {
 		super();
-		Validate.notNull(context, "Parent context is null!");
+		Validate.notNull(context, "context is null");
 		this.context = context;
 	}
 

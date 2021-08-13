@@ -28,7 +28,7 @@ public abstract class PlayerCommand extends Command {
 
 	@Override
 	public void checkCommandSource(CommandSender sender) throws CommandSourceRejectedException {
-		Validate.notNull(sender);
+		Validate.notNull(sender, "sender is null");
 		if (!this.isAccepted(sender)) {
 			throw createCommandSourceRejectedException(sender);
 		}

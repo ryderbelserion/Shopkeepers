@@ -81,8 +81,8 @@ public abstract class AbstractText implements Text {
 	 */
 	protected void setChild(Text child) {
 		if (child != null) {
-			Validate.isTrue(child != this, "Cannot set self as child!");
-			Validate.isTrue(child.getParent() == null, "The given child Text already has a parent!");
+			Validate.isTrue(child != this, "child cannot be this Text itself");
+			Validate.isTrue(child.getParent() == null, "child already has a parent");
 			((AbstractText) child).setParent(this);
 		}
 		if (this.child != null) {
@@ -108,8 +108,8 @@ public abstract class AbstractText implements Text {
 	 */
 	protected void setNext(Text next) {
 		if (next != null) {
-			Validate.isTrue(next != this, "Cannot set self as next!");
-			Validate.isTrue(next.getParent() == null, "The given next Text already has a parent!");
+			Validate.isTrue(next != this, "next cannot be this Text itself");
+			Validate.isTrue(next.getParent() == null, "next already has a parent");
 			((AbstractText) next).setParent(this);
 		}
 		if (this.next != null) {
