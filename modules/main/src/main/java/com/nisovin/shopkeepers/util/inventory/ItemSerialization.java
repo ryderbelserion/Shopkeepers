@@ -17,8 +17,8 @@ public class ItemSerialization {
 	}
 
 	public static Map<String, Object> serializeItemMeta(@ReadOnly ItemMeta itemMeta) {
-		// Check whether ItemMeta is empty; equivalent to ItemStack#hasItemMeta
-		if (itemMeta != null && !Bukkit.getItemFactory().equals(itemMeta, null)) {
+		// Check if ItemMeta is empty (equivalent to ItemStack#hasItemMeta):
+		if (!Bukkit.getItemFactory().equals(itemMeta, null)) {
 			return itemMeta.serialize(); // Assert: Not null or empty
 		} else {
 			return null;
