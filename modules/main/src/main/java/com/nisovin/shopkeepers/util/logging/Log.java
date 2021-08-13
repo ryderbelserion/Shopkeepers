@@ -48,11 +48,11 @@ public final class Log {
 	}
 
 	public static void debug(String message, Throwable throwable) {
-		debug(message, throwable);
+		debug(null, message, throwable);
 	}
 
 	public static void debug(Throwable throwable, Supplier<String> msgSupplier) {
-		debug(throwable, msgSupplier);
+		debug(null, throwable, msgSupplier);
 	}
 
 	public static void debug(String debugOption, String message) {
