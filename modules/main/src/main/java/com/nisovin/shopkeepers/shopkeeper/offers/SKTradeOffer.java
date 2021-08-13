@@ -187,6 +187,8 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 			}
 
 			if (itemsMigrated) {
+				// Lazily setup the list of migrated offers, and add the trades that were already processed but did not
+				// require migrations:
 				if (migratedOffers == null) {
 					migratedOffers = new ArrayList<>(size);
 					for (int j = 0; j < i; ++j) {
@@ -201,8 +203,13 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 							+ (i + 1) + ": " + offer.toString()));
 					continue; // Skip this offer
 				}
+
+				// Add the migrated offer to the list of migrated offers:
 				assert !ItemUtils.isEmpty(resultItem) && !ItemUtils.isEmpty(item1);
 				migratedOffers.add(new SKTradeOffer(resultItem, item1, item2));
+			} else if (migratedOffers != null) {
+				// Add the previous offer, which did not require any migrations, to the list of already migrated offers:
+				migratedOffers.add(offer);
 			}
 		}
 		return (migratedOffers == null) ? offers : migratedOffers;

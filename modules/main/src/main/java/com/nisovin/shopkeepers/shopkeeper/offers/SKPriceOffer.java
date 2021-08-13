@@ -161,6 +161,8 @@ public class SKPriceOffer implements PriceOffer {
 			}
 
 			if (itemsMigrated) {
+				// Lazily setup the list of migrated offers, and add the trades that were already processed but did not
+				// require migrations:
 				if (migratedOffers == null) {
 					migratedOffers = new ArrayList<>(size);
 					for (int j = 0; j < i; ++j) {
@@ -175,8 +177,13 @@ public class SKPriceOffer implements PriceOffer {
 							+ (i + 1) + ": " + offer.toString()));
 					continue; // Skip this offer
 				}
+
+				// Add the migrated offer to the list of migrated offers:
 				assert !ItemUtils.isEmpty(item);
 				migratedOffers.add(new SKPriceOffer(item, offer.getPrice()));
+			} else if (migratedOffers != null) {
+				// Add the previous offer, which did not require any migrations, to the list of already migrated offers:
+				migratedOffers.add(offer);
 			}
 		}
 		return (migratedOffers == null) ? offers : migratedOffers;

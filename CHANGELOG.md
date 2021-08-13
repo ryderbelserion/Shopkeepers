@@ -9,6 +9,7 @@ Date format: (YYYY-MM-DD)
   * Existing shopkeepers will have a yaw of 0, i.e. they keep facing south by default. In the future it will be possible to reposition shopkeepers and thereby also adjust the yaw of already existing shopkeepers.
   * Data: Sign shopkeepers no longer store their sign facing. Instead, this facing is now derived from the shopkeeper's yaw. Existing sign shops, for which the shopkeeper has previously not yet stored the yaw, will automatically migrate their currently stored sign facing to the shopkeeper's yaw.
   * Shopkeeper mobs will rotate back to their initial direction now when there is no player to look at. However, this requires a player to still be somewhat nearby, since only shopkeeper mobs with nearby players are ticked.
+* Fixed: Shopkeepers could lose some of their trades during item migrations. When an item was migrated, but the subsequent trades did not require any item migrations, these subsequent trades were lost. This issue could for example be encountered on a Paper server when setting up trades with items that have multiple enchantments: During the shopkeeper's item migrations, Paper might reorder the item's enchantments, which the Shopkeepers plugin detects as an item migration, but would result in any subsequent trades of the shopkeeper that did not require any migrations to be lost.
 * Versioning: Snapshot builds will now include the Git hash in their plugin version.
 
 **API changes:**  
