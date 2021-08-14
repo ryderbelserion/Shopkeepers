@@ -54,6 +54,8 @@ public class TextUtils {
 		DECIMAL_FORMAT_PRECISE.setGroupingUsed(false);
 	}
 
+	private static final String UNKNOWN_PLAYER = "[unknown]";
+
 	public static String getLocationString(Location location) {
 		return getLocationString(location.getWorld().getName(), location.getX(), location.getY(), location.getZ());
 	}
@@ -102,7 +104,7 @@ public class TextUtils {
 		} else if (playerUUID != null) {
 			return playerUUID.toString();
 		} else {
-			return "[unknown]";
+			return UNKNOWN_PLAYER;
 		}
 	}
 
@@ -114,7 +116,7 @@ public class TextUtils {
 		} else if (playerUUID != null) {
 			return playerUUID.toString();
 		} else {
-			return "[unknown]";
+			return UNKNOWN_PLAYER;
 		}
 	}
 
@@ -266,7 +268,7 @@ public class TextUtils {
 		} else if (playerUUID != null) {
 			return Text.of(playerUUID.toString());
 		} else {
-			return Text.of("[unknown]");
+			return Text.of(UNKNOWN_PLAYER);
 		}
 	}
 
