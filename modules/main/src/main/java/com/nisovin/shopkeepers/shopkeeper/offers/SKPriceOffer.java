@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -120,7 +121,7 @@ public class SKPriceOffer implements PriceOffer {
 				if (offerSection == null) continue; // Invalid offer: Not a section.
 
 				// The item stack is assumed to be immutable and therefore does not need to be copied.
-				UnmodifiableItemStack item = UnmodifiableItemStack.of(offerSection.getItemStack("item"));
+				UnmodifiableItemStack item = ConfigUtils.loadUnmodifiableItemStack(offerSection, "item");
 				int price = offerSection.getInt("price");
 				if (ItemUtils.isEmpty(item)) {
 					// Invalid offer.

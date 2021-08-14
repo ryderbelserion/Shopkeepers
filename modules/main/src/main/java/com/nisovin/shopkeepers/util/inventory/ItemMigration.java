@@ -14,7 +14,7 @@ public class ItemMigration {
 	private ItemMigration() {
 	}
 
-	// Use newItemStack.isSimilar(oldItemStack) to test whether the item was migrated.
+	// Use oldItemStack.isSimilar(migratedItemStack) to test if the item was migrated.
 	public static ItemStack migrateItemStack(@ReadOnly ItemStack itemStack) {
 		if (itemStack == null) return null;
 		if (DUMMY_INVENTORY == null) {

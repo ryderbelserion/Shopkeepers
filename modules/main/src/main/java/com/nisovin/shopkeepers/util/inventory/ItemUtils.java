@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
@@ -487,6 +488,19 @@ public final class ItemUtils {
 			return ((Damageable) itemMeta).getDamage();
 		} // Else: Unexpected, since we already checked that the item is damageable above.
 		return 0;
+	}
+
+	public static ItemStack ensureBukkitItemStack(ItemStack itemStack) {
+		if (itemStack == null) return null;
+		if (itemStack.getClass() == ItemStack.class) return itemStack;
+		// Similar to CraftItemStack#asBukkitCopy:
+		ItemStack bukkitItemStack = new ItemStack(itemStack.getType(), itemStack.getAmount());
+		ItemMeta itemMeta = itemStack.getItemMeta();
+		// Check if ItemMeta is empty (equivalent to ItemStack#hasItemMeta):
+		if (!Bukkit.getItemFactory().equals(itemMeta, null)) {
+			bukkitItemStack.setItemMeta(itemMeta);
+		}
+		return bukkitItemStack;
 	}
 
 	public static String getSimpleItemInfo(UnmodifiableItemStack item) {

@@ -12,6 +12,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -129,9 +130,9 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				}
 
 				// The item stacks are assumed to be immutable and therefore do not need to be copied.
-				UnmodifiableItemStack resultItem = UnmodifiableItemStack.of(offerSection.getItemStack("resultItem"));
-				UnmodifiableItemStack item1 = UnmodifiableItemStack.of(offerSection.getItemStack("item1"));
-				UnmodifiableItemStack item2 = UnmodifiableItemStack.of(offerSection.getItemStack("item2"));
+				UnmodifiableItemStack resultItem = ConfigUtils.loadUnmodifiableItemStack(offerSection, "resultItem");
+				UnmodifiableItemStack item1 = ConfigUtils.loadUnmodifiableItemStack(offerSection, "item1");
+				UnmodifiableItemStack item2 = ConfigUtils.loadUnmodifiableItemStack(offerSection, "item2");
 				if (ItemUtils.isEmpty(resultItem) || ItemUtils.isEmpty(item1)) {
 					// Invalid offer.
 					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid trading offer for " + key + ": item1 or resultItem is empty"));

@@ -33,6 +33,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.user.SKUser;
+import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
@@ -127,7 +128,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		notifyOnTrades = configSection.getBoolean("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
 
 		// The item is assumed to be immutable and therefore does not need to be copied.
-		UnmodifiableItemStack hireCost = UnmodifiableItemStack.of(configSection.getItemStack("hirecost"));
+		UnmodifiableItemStack hireCost = ConfigUtils.loadUnmodifiableItemStack(configSection, "hirecost");
 		// Hire cost ItemStack is not null, but empty. -> Normalize to null:
 		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
 			Log.warning("Invalid (empty) hire cost! Disabling 'for hire' for shopkeeper at " + this.getPositionString());

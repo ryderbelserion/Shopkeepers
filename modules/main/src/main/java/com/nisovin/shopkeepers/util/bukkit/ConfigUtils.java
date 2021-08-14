@@ -9,7 +9,9 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -27,6 +29,20 @@ public class ConfigUtils {
 			return null;
 		}
 		return material;
+	}
+
+	public static ItemStack loadItemStack(ConfigurationSection config, String key) {
+		// Spigot creates Bukkit ItemStacks, whereas Paper automatically replaces the deserialized Bukkit ItemStacks
+		// with CraftItemStacks. Some of our comparisons between ItemStacks and our UnmodifiableItemStack rely on the
+		// compared ItemStacks being Bukkit ItemStacks and not CraftItemStacks, because CraftItemStack does not consider
+		// custom ItemStack implementations as equal. In various cases we therefore assume that the deserialized
+		// ItemStacks are Bukkit ItemStacks. In order to ensure that this assumption also holds on Paper servers, we
+		// need to convert any CraftItemStacks back to Bukkit ItemStacks.
+		return ItemUtils.ensureBukkitItemStack(config.getItemStack(key));
+	}
+
+	public static UnmodifiableItemStack loadUnmodifiableItemStack(ConfigurationSection config, String key) {
+		return UnmodifiableItemStack.of(loadItemStack(config, key));
 	}
 
 	// The given top level section itself is not converted.
