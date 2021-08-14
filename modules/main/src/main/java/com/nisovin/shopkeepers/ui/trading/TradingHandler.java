@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
@@ -480,12 +479,12 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 						// Can be null if the merchant has no trades at all.
 						Log.debug("No trading recipe selected (merchant has no trades).");
 					} else {
-						Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("recipeItem1", selectedTradingRecipe.getItem1()));
-						Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("recipeItem2", Optional.<Object>ofNullable(selectedTradingRecipe.getItem2()).orElse("<empty>")));
-						Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("recipeResultItem", selectedTradingRecipe.getResultItem()));
+						debugLogItemStack("recipeItem1", selectedTradingRecipe.getItem1());
+						debugLogItemStack("recipeItem2", selectedTradingRecipe.getItem2());
+						debugLogItemStack("recipeResultItem", selectedTradingRecipe.getResultItem());
 					}
-					Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("offeredItem1", Optional.<Object>ofNullable(offeredItem1).orElse("<empty>")));
-					Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("offeredItem2", Optional.<Object>ofNullable(offeredItem2).orElse("<empty>")));
+					debugLogItemStack("offeredItem1", offeredItem1);
+					debugLogItemStack("offeredItem2", offeredItem2);
 				}
 			}
 			return null; // No trade available
@@ -512,10 +511,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 				if (Debug.isDebugging()) {
 					Log.debug("Not handling trade: The trade result item does not match the expected item of the active trading recipe!");
-					String recipeResultItemYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline("recipeResultItem", recipeResultItem);
-					String resultItemYaml = ConfigUtils.toConfigYamlWithoutTrailingNewline("resultItem", resultItem);
-					Log.debug(recipeResultItemYaml);
-					Log.debug(resultItemYaml);
+					debugLogItemStack("recipeResultItem", recipeResultItem);
+					debugLogItemStack("resultItem", resultItem);
 				}
 			}
 			this.clearResultSlotForInvalidTrade(merchantInventory);
@@ -572,12 +569,12 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 						Log.debug("Active trading recipe: " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
 						if (!item1Similar) {
-							Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("requiredItem1", requiredItem1));
-							Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("offeredItem1", offeredItem1));
+							debugLogItemStack("requiredItem1", requiredItem1);
+							debugLogItemStack("offeredItem1", offeredItem1);
 						}
 						if (!item2Similar.get()) {
-							Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("requiredItem2", requiredItem2));
-							Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline("offeredItem2", offeredItem2));
+							debugLogItemStack("requiredItem2", requiredItem2);
+							debugLogItemStack("offeredItem2", offeredItem2);
 						}
 					}
 				}
@@ -772,5 +769,14 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			taxes = (int) Math.floor(amount * (Settings.taxRate / 100.0D));
 		}
 		return Math.max(0, Math.min(amount - taxes, amount));
+	}
+
+	private static void debugLogItemStack(String itemStackName, UnmodifiableItemStack itemStack) {
+		debugLogItemStack(itemStackName, ItemUtils.asItemStackOrNull(itemStack));
+	}
+
+	private static void debugLogItemStack(String itemStackName, ItemStack itemStack) {
+		Object itemStackData = (itemStack != null) ? itemStack : "<empty>";
+		Log.debug(ConfigUtils.toConfigYamlWithoutTrailingNewline(itemStackName, itemStackData));
 	}
 }
