@@ -170,7 +170,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		// Get new item amount:
 		ItemStack clickedItem = event.getCurrentItem(); // Can be null
 		int currentItemAmount = 0;
-		boolean isCurrencyItem = ItemUtils.isSimilar(clickedItem, currencyItem);
+		boolean isCurrencyItem = ItemUtils.isSimilar(currencyItem, clickedItem);
 		if (isCurrencyItem) {
 			assert clickedItem != null;
 			currentItemAmount = clickedItem.getAmount();
