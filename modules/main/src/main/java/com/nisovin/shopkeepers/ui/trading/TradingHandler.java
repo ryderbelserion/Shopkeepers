@@ -59,12 +59,18 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		super(uiType, shopkeeper);
 	}
 
+	protected final void debugNotOpeningUI(Player player, String reason) {
+		Validate.notNull(player, "player is null");
+		Validate.notEmpty(reason, "reason is null or empty");
+		Log.debug(() -> "Not opening trading UI for " + player.getName() + ": " + reason);
+	}
+
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
 		Validate.notNull(player, "player is null");
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.TRADE_PERMISSION)) {
 			if (!silent) {
-				Log.debug(() -> "Blocked trade window opening for " + player.getName() + ": Missing trade permission.");
+				this.debugNotOpeningUI(player, "Missing trade permission.");
 				TextUtils.sendMessage(player, Messages.missingTradePerm);
 			}
 			return false;
@@ -72,7 +78,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		AbstractShopkeeper shopkeeper = this.getShopkeeper();
 		if (!shopkeeper.hasTradingRecipes(player)) {
 			if (!silent) {
-				Log.debug(() -> "Blocked trade window opening for " + player.getName() + ": Shopkeeper has no offers.");
+				this.debugNotOpeningUI(player, "Shopkeeper has no offers.");
 				TextUtils.sendMessage(player, Messages.cannotTradeNoOffers);
 
 				// If the player can edit the shopkeeper, send instructions on how to open the editor:
@@ -94,7 +100,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		String title = this.getInventoryTitle();
 		List<? extends TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
 		if (recipes.isEmpty()) {
-			Log.debug(() -> "Blocked trade window opening for " + player.getName() + ": Shopkeeper has no offers.");
+			this.debugNotOpeningUI(player, "Shopkeeper has no offers.");
 			TextUtils.sendMessage(player, Messages.cannotTradeNoOffers);
 			return false;
 		}

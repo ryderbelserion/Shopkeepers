@@ -13,7 +13,6 @@ import com.nisovin.shopkeepers.ui.trading.Trade;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
-import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class PlayerShopTradingHandler extends TradingHandler {
 
@@ -40,7 +39,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 			Player ownerPlayer = shopkeeper.getOwner();
 			if (ownerPlayer != null) {
 				if (!silent) {
-					Log.debug(() -> "Blocked trade window opening for " + player.getName() + ", because the shop owner is online.");
+					this.debugNotOpeningUI(player, "Shop owner is online.");
 					TextUtils.sendMessage(player, Messages.cannotTradeWhileOwnerOnline, "owner", ownerPlayer.getName());
 				}
 				return false;

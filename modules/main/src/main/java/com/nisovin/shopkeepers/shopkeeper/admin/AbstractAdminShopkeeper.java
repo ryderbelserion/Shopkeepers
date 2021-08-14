@@ -14,7 +14,6 @@ import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
-import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper implements AdminShopkeeper {
 
@@ -37,7 +36,7 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 			String tradePermission = this.getShopkeeper().getTradePermission();
 			if (tradePermission != null && !PermissionUtils.hasPermission(player, tradePermission)) {
 				if (!silent) {
-					Log.debug(() -> "Blocked trading UI opening for " + player.getName() + ": Missing custom trade permission '" + tradePermission + "'.");
+					this.debugNotOpeningUI(player, "Missing custom trade permission: " + tradePermission);
 					TextUtils.sendMessage(player, Messages.missingCustomTradePerm);
 				}
 				return false;
