@@ -39,6 +39,7 @@ Date format: (YYYY-MM-DD)
 * The primary 'build' script automatically invokes the 'installSpigotDependencies' script now.
 
 **Other internal changes:**  
+* Some groups of error messages of the shopkeeper storage are now logged as a single message.
 * Refactors related to the removal of shopkeepers of inactive players. Also, when shopkeepers of inactive players were removed, we immediately trigger a save now, even if the 'save-instantly' setting is disabled.
 * Added validation for some constructor and method arguments in the API.
 * APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.

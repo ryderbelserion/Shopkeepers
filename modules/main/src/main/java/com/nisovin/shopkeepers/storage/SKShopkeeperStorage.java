@@ -373,10 +373,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			Path oldTempSaveFile = this.getOldTempSaveFile();
 			if (Files.exists(oldTempSaveFile)) {
 				// Migrate old temporary save file instead:
-				Log.warning("Found no old save file, but an existing old temporary save file! ("
-						+ this.pluginDataRelative(oldTempSaveFile) + ")");
-				Log.warning("This might indicate an issue during a previous saving attempt!");
-				Log.warning("We try to migrate this temporary save file instead!");
+				Log.warning("Found no old save file, but an existing old temporary save file ("
+						+ this.pluginDataRelative(oldTempSaveFile) + ")!"
+						+ " This might indicate an issue during a previous saving attempt!"
+						+ " We try to migrate this temporary save file instead!");
 
 				oldSaveFile = oldTempSaveFile;
 			} else {
@@ -436,9 +436,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		if (!Files.exists(saveFile)) {
 			if (Files.exists(tempSaveFile)) {
 				// Load from temporary save file instead:
-				Log.warning("Found no save file, but an existing temporary save file! (" + this.pluginDataRelative(tempSaveFile) + ")");
-				Log.warning("This might indicate an issue during a previous saving attempt!");
-				Log.warning("We try to load the Shopkeepers data from this temporary save file instead!");
+				Log.warning("Found no save file, but an existing temporary save file (" + this.pluginDataRelative(tempSaveFile) + ")!"
+						+ " This might indicate an issue during a previous saving attempt!"
+						+ " We try to load the Shopkeepers data from this temporary save file instead!");
 
 				saveFile = tempSaveFile;
 			} else if (!this.migrateOldSaveFile()) {
@@ -995,18 +995,18 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				// Instead we try to rename it to make it the new 'old save data' and then continue the saving
 				// procedure.
 				Log.warning("Found an already existing temporary save file (" + pluginDataRelative(tempSaveFile)
-						+ "), but no old save file!");
-				Log.warning("This might indicate an issue during a previous saving attempt!");
-				Log.warning("We rename the temporary save file and interpret it as existing old save data,"
+						+ "), but no old save file!"
+						+ " This might indicate an issue during a previous saving attempt!"
+						+ " We rename the temporary save file and interpret it as existing old save data,"
 						+ " and then continue the saving!");
 
 				// Rename the temporary save file:
 				this.wrapException(() -> FileUtils.moveFile(tempSaveFile, saveFile, Log.getLogger()));
 			} else {
 				Log.warning("Found an already existing temporary save file (" + pluginDataRelative(tempSaveFile)
-						+ "), but also a regular save file!");
-				Log.warning("This might indicate an issue during a previous saving attempt!");
-				Log.warning("We delete the temporary save file and then continue the saving!");
+						+ "), but also a regular save file!"
+						+ " This might indicate an issue during a previous saving attempt!"
+						+ " We delete the temporary save file and then continue the saving!");
 
 				// Delete the old temporary save file:
 				this.wrapException(() -> FileUtils.delete(tempSaveFile));
