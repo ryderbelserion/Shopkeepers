@@ -46,6 +46,7 @@ Date format: (YYYY-MM-DD)
 * Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
 * Internal API: Moved various editor internal classes into their own files.
 * In a few remaining cases, stack traces are no longer printed directly, but through the plugin logger.
+* Slightly simplified how unmodifiable item stacks are compared with each other.
 * Various other minor internal refactors and Javadoc improvements.
 
 ## v2.13.3 (2021-07-08)

@@ -118,20 +118,15 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	// The given item stack might also be another unmodifiable item stack.
 	@Override
 	public boolean isSimilar(@ReadOnly ItemStack itemStack) {
-		if (this == itemStack) return true;
-		if (itemStack instanceof UnmodifiableItemStack) {
-			// This is expected to not modify or expose the passed item stack.
-			return itemStack.isSimilar(delegate);
-		} else {
-			return delegate.isSimilar(itemStack);
-		}
+		if (itemStack == this) return true;
+		return delegate.isSimilar(itemStack);
 	}
 
 	@Override
 	public boolean isSimilar(UnmodifiableItemStack itemStack) {
-		if (this == itemStack) return true;
-		// This is expected to not modify or expose the passed item stack.
-		return itemStack.isSimilar(delegate);
+		if (itemStack == null) return false;
+		if (itemStack == this) return true;
+		return delegate.isSimilar(itemStack.asItemStack());
 	}
 
 	// TODO This method cannot be correctly implemented for CraftItemStack, because CraftItemStack always returns false
@@ -140,13 +135,7 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	@Override
 	public boolean equals(@ReadOnly Object obj) {
 		if (this == obj) return true;
-		if (obj instanceof UnmodifiableItemStack) {
-			UnmodifiableItemStack other = (UnmodifiableItemStack) obj;
-			// This is expected to not modify or expose the passed item stack.
-			return other.equals(delegate);
-		} else {
-			return delegate.equals(obj);
-		}
+		return delegate.equals(obj);
 	}
 
 	@Override
