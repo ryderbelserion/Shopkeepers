@@ -488,7 +488,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 			Integer idInt = ConversionUtils.parseInt(key);
 			if (idInt == null || idInt <= 0) {
-				Log.warning("Failed to load shopkeeper '" + key + "': Invalid id: " + key);
+				this.failedToLoadShopkeeper(key, "Invalid id: " + key);
 				continue;
 			}
 			int id = idInt.intValue();
@@ -498,7 +498,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 			ConfigurationSection shopkeeperSection = saveData.getConfigurationSection(key);
 			if (shopkeeperSection == null) {
-				Log.warning("Failed to load shopkeeper '" + key + "': Invalid config section!");
+				this.failedToLoadShopkeeper(key, "Invalid config section!");
 				continue; // Skip this shopkeeper
 			}
 
@@ -512,7 +512,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			String shopTypeString = shopkeeperSection.getString("type");
 			AbstractShopType<?> shopType = plugin.getShopTypeRegistry().get(shopTypeString);
 			if (shopType == null) {
-				Log.warning("Failed to load shopkeeper '" + key + "': Unknown shop type: " + shopTypeString);
+				this.failedToLoadShopkeeper(key, "Unknown shop type: " + shopTypeString);
 				continue; // Skip this shopkeeper
 			}
 
@@ -522,10 +522,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				shopkeeper = shopkeeperRegistry.loadShopkeeper(shopType, id, shopkeeperSection);
 				assert shopkeeper != null && shopkeeper.isValid();
 			} catch (ShopkeeperCreateException e) {
-				Log.warning("Failed to load shopkeeper '" + key + "': " + e.getMessage());
+				this.failedToLoadShopkeeper(key, e.getMessage());
 				continue; // Skip this shopkeeper
 			} catch (Exception e) {
-				Log.warning("Failed to load shopkeeper '" + key + "'", e);
+				this.failedToLoadShopkeeper(key, "Unexpected error!", e);
 				continue; // Skip this shopkeeper
 			}
 
@@ -537,6 +537,14 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			}
 		}
 		return true;
+	}
+
+	private void failedToLoadShopkeeper(String idKey, String reason) {
+		this.failedToLoadShopkeeper(idKey, reason, null);
+	}
+
+	private void failedToLoadShopkeeper(String idKey, String reason, Throwable throwable) {
+		Log.warning("Failed to load shopkeeper '" + idKey + "': " + reason, throwable);
 	}
 
 	private enum MigrationResult {
