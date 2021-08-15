@@ -1231,6 +1231,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		assert shopkeeper != null;
 		if (tickingShopkeepers) {
 			// Defer activation until after ticking:
+			Log.debug(DebugOptions.shopkeeperActivation, () -> "Defering activation of shopkeeper " + shopkeeper.getId()
+					+ " until after shopkeeper ticking.");
 			pendingActivationChanges.put(shopkeeper, true); // Replaces any previous value for the shopkeeper
 			return;
 		}
@@ -1250,13 +1252,17 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		assert objectId != null;
 
 		// Activate the shopkeeper, if there isn't already another shopkeeper using the same object id:
+		Object finalObjectId = objectId;
+		Log.debug(DebugOptions.shopkeeperActivation, () -> "Activating shopkeeper " + shopkeeper.getId()
+				+ " with object id " + finalObjectId);
+
 		AbstractShopkeeper activeShopkeeper = activeShopkeepersByObjectId.putIfAbsent(objectId, shopkeeper);
 		if (activeShopkeeper != null) {
 			Log.warning("Detected shopkeepers (" + activeShopkeeper.getId() + " and " + shopkeeper.getId()
 					+ ") with duplicate object ids: " + objectId);
 			return;
 		} else {
-			shopObject.setLastId(objectId); // Remember object id
+			shopObject.setLastId(objectId); // Remember the object id
 		}
 	}
 
@@ -1269,10 +1275,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		if (tickingShopkeepers) {
 			// Defer deactivation until after ticking:
+			Log.debug(DebugOptions.shopkeeperActivation, () -> "Defering deactivation of shopkeeper " + shopkeeper.getId()
+					+ " until after shopkeeper ticking.");
 			pendingActivationChanges.put(shopkeeper, false); // Replaces any previous value for the shopkeeper
 			return;
 		}
 
+		Log.debug(DebugOptions.shopkeeperActivation, () -> "Deactivating shopkeeper " + shopkeeper.getId()
+				+ " with object id " + objectId);
 		assert activeShopkeepersByObjectId.get(objectId) == shopkeeper;
 		activeShopkeepersByObjectId.remove(objectId);
 		shopObject.setLastId(null);
