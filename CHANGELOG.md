@@ -11,8 +11,12 @@ Date format: (YYYY-MM-DD)
   * Shopkeeper mobs will rotate back to their initial direction now when there is no player to look at. However, this requires a player to still be somewhat nearby, since only shopkeeper mobs with nearby players are ticked.
 * Fixed: Shopkeepers could lose some of their trades during item migrations. When an item was migrated, but the subsequent trades did not require any item migrations, these subsequent trades were lost. This issue could for example be encountered on a Paper server when setting up trades with items that have multiple enchantments: During the shopkeeper's item migrations, Paper might reorder the item's enchantments, which the Shopkeepers plugin detects as an item migration, but would result in any subsequent trades of the shopkeeper that did not require any migrations to be lost.
 * Fixed: On Paper servers, various item comparisons were not working as expected. The issue was that Paper automatically converts any deserialized Bukkit item stacks to CraftItemStacks, which behave differently when being compared to our unmodifiable item stacks. One known effect of this was that the above issue of trades potentially being lost due to item migrations would be encountered more likely on Paper servers, because there any items with multiple enchantments would always trigger an item migration, even if the item did not actually change during the 'migration'. It also caused an unnecessary save of all shopkeeper data after every plugin reload. There may have been other issues caused by this as well.
+* When shopkeepers of inactive players are removed, we now trigger an immediate save, even if the 'save-instantly' setting is disabled.
 * Versioning: Snapshot builds will now include the Git hash in their plugin version.
 * Debug: The 'shopkeeper-activation' debug option will now log additional details about every single shopkeeper activation and deactivation, instead of only logging a summary about how many shopkeepers were activated per chunk.
+* Various minor changes to error and debug log messages:
+  * Some groups of error messages are now logged as a single message.
+  * In a few remaining cases, stack traces are no longer printed directly to the server log, but through the plugin logger.
 
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
@@ -40,15 +44,13 @@ Date format: (YYYY-MM-DD)
 * The primary 'build' script automatically invokes the 'installSpigotDependencies' script now.
 
 **Other internal changes:**  
-* Some groups of error messages of the shopkeeper storage are now logged as a single message.
-* Refactors related to the removal of shopkeepers of inactive players. Also, when shopkeepers of inactive players were removed, we immediately trigger a save now, even if the 'save-instantly' setting is disabled.
+* Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
+* Internal API: Moved various editor internal classes into their own files.
+* Refactors related to the removal of shopkeepers of inactive players.
 * Added validation for some constructor and method arguments in the API.
 * APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
 * Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
 * The save operations of the shopkeeper storage and the CSV trade logger will now restore any catched Thread interruption status for anyone interested in it. Other than that, these operations still ignore Thread interruptions, because we prefer to keep trying to still save the data to disk after all.
-* Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
-* Internal API: Moved various editor internal classes into their own files.
-* In a few remaining cases, stack traces are no longer printed directly, but through the plugin logger.
 * Slightly simplified how unmodifiable item stacks are compared with each other.
 * Various other minor internal refactors and Javadoc improvements.
 
