@@ -165,8 +165,8 @@ public class PlayerInactivity {
 						} else {
 							// Delete the shopkeepers:
 							shopkeepers.forEach(playerShop -> {
-								Log.info("Deleting shopkeeper " + playerShop.getIdString() + " at " + playerShop.getPositionString()
-										+ " owned by " + playerShop.getOwnerString() + " due to owner inactivity.");
+								Log.info(playerShop.getUniqueIdLogPrefix() + "Deletion due to inactivity of owner "
+										+ playerShop.getOwnerString());
 								playerShop.delete();
 							});
 						}

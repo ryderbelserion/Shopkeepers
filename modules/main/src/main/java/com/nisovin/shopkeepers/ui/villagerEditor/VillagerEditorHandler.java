@@ -163,8 +163,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		if (villager instanceof WanderingTrader) {
 			if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.EDIT_WANDERING_TRADERS_PERMISSION)) {
 				if (!silent) {
-					Log.debug(() -> "Blocked villager editor from opening for " + player.getName()
-							+ ": Missing edit-wandering-traders permission.");
+					this.debugNotOpeningUI(player, "Player is missing the edit-wandering-traders permission.");
 					TextUtils.sendMessage(player, Messages.missingEditWanderingTradersPerm);
 				}
 				return false;
@@ -172,8 +171,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		} else { // Regular villager
 			if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.EDIT_VILLAGERS_PERMISSION)) {
 				if (!silent) {
-					Log.debug(() -> "Blocked villager editor from opening for " + player.getName()
-							+ ": Missing edit-villagers permission.");
+					this.debugNotOpeningUI(player, "Player is missing the edit-villagers permission.");
 					TextUtils.sendMessage(player, Messages.missingEditVillagersPerm);
 				}
 				return false;
@@ -635,7 +633,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		Player player = session.getPlayer();
 		// The villager might have been unloaded in the meantime. Our changes won't have any effect then:
 		if (!this.checkVillagerExistence(player)) {
-			Log.debug("The villager edited by '" + player.getName() + "' no longer exists or has been unloaded.");
+			Log.debug("The villager edited by " + player.getName() + " no longer exists or has been unloaded.");
 			return;
 		}
 

@@ -14,7 +14,6 @@ import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
-import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class HiringHandler extends AbstractShopkeeperUIHandler {
 
@@ -28,7 +27,7 @@ public abstract class HiringHandler extends AbstractShopkeeperUIHandler {
 		// Check for hire permission:
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.HIRE_PERMISSION)) {
 			if (!silent) {
-				Log.debug(() -> "Blocked hire window opening for " + player.getName() + ": Missing hire permission.");
+				this.debugNotOpeningUI(player, "Player is missing the hire permission.");
 				TextUtils.sendMessage(player, Messages.missingHirePerm);
 			}
 			return false;

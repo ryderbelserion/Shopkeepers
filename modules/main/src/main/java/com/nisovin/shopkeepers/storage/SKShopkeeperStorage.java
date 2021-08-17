@@ -849,7 +849,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				// Error while saving shopkeeper data:
 				// Restore previous shopkeeper data and then skip this shopkeeper.
 				saveData.set(sectionKey, previousData);
-				Log.warning("Could not save shopkeeper '" + shopkeeper.getId() + "'!", e);
+				Log.warning(shopkeeper.getLogPrefix() + "Saving failed!", e);
 				// We remember the shopkeeper and keep it marked as dirty, so that the next save of all shopkeepers
 				// attempts to save it again.
 				// However, we won't automatically initiate a new save for this shopkeeper as the risk is high that

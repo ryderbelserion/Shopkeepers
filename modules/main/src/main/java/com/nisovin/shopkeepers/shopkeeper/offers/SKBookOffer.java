@@ -80,7 +80,8 @@ public class SKBookOffer implements BookOffer {
 	}
 
 	// Elements inside the config section are assumed to be immutable and can be reused without having to be copied.
-	public static List<? extends BookOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
+	public static List<? extends BookOffer> loadFromConfig(ConfigurationSection config, String node, String errorPrefix) {
+		if (errorPrefix == null) errorPrefix = "";
 		List<BookOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
@@ -91,12 +92,13 @@ public class SKBookOffer implements BookOffer {
 				int price = offerSection.getInt("price");
 				if (StringUtils.isEmpty(bookTitle)) {
 					// Invalid offer.
-					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer: book title is empty"));
+					Log.warning(errorPrefix + "Invalid book offer: Book title is empty.");
 					continue;
 				}
 				if (price <= 0) {
 					// Invalid offer.
-					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer for '" + bookTitle + "': price has to be positive but is " + price));
+					Log.warning(errorPrefix + "Invalid book offer for '" + bookTitle
+							+ "': Price has to be positive, but is " + price + ".");
 					continue;
 				}
 				offers.add(new SKBookOffer(bookTitle, price));
@@ -106,7 +108,8 @@ public class SKBookOffer implements BookOffer {
 	}
 
 	// TODO Legacy, remove again at some point (changed during MC 1.14.4).
-	public static List<? extends BookOffer> loadFromLegacyConfig(ConfigurationSection config, String node, String errorContext) {
+	public static List<? extends BookOffer> loadFromLegacyConfig(ConfigurationSection config, String node, String errorPrefix) {
+		if (errorPrefix == null) errorPrefix = "";
 		List<BookOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
@@ -115,15 +118,16 @@ public class SKBookOffer implements BookOffer {
 					// Found a config section instead of an integer. -> Probably already uses the new data format.
 					continue; // Skip
 				}
-				int price = offersSection.getInt(bookTitle);
 				if (StringUtils.isEmpty(bookTitle)) {
 					// Invalid offer.
-					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer: bookTitle is empty"));
+					Log.warning(errorPrefix + "Invalid book offer: Book title is empty.");
 					continue;
 				}
+				int price = offersSection.getInt(bookTitle);
 				if (price <= 0) {
 					// Invalid offer.
-					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid book offer for '" + bookTitle + "': price has to be positive but is " + price));
+					Log.warning(errorPrefix + "Invalid book offer for '" + bookTitle
+							+ "': Price has to be positive, but is " + price + ".");
 					continue;
 				}
 				offers.add(new SKBookOffer(bookTitle, price));

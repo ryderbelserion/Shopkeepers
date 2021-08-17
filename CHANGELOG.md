@@ -15,6 +15,8 @@ Date format: (YYYY-MM-DD)
 * Versioning: Snapshot builds will now include the Git hash in their plugin version.
 * Debug: The 'shopkeeper-activation' debug option will now log additional details about every single shopkeeper activation and deactivation, instead of only logging a summary about how many shopkeepers were activated per chunk.
 * Various minor changes to error and debug log messages:
+  * Some error and debug log messages have slightly changed.
+  * Log messages involving a specific shopkeeper are more consistently formatted now.
   * Some groups of error messages are now logged as a single message.
   * In a few remaining cases, stack traces are no longer printed directly to the server log, but through the plugin logger.
 
@@ -22,6 +24,7 @@ Date format: (YYYY-MM-DD)
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
 * Added User interface to represent players that the plugin knows about. However, this is not yet used throughout the API.
 * Added Shopkeeper#getYaw().
+* Added Shopkeeper#getLogPrefix(), #getUniqueIdLogPrefix(), and #getLocatedLogPrefix().
 * Shopkeeper#getLocation() will include the shopkeeper's yaw now.
 * ShopCreationData#getTargetedBlockFace() no longer determines the facing of sign shops. Instead, sign shops use the yaw of the spawn location now to derive their facing.
 * Various Javadoc additions, improvements, and fixes.
@@ -44,6 +47,8 @@ Date format: (YYYY-MM-DD)
 * The primary 'build' script automatically invokes the 'installSpigotDependencies' script now.
 
 **Other internal changes:**  
+* Internal API: The 'errorContext' parameters of the 'loadFromConfig' and 'migrateItems' methods of the various types of shop offers (SKTradeOffer, SKPriceOffer, SKBookOffer) are now log prefixes.
+* Internal API: CitizensShopkeeperTrair#getShopkeeper() returns an AbstractShopkeeper now.
 * Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
 * Internal API: Moved various editor internal classes into their own files.
 * Refactors related to the removal of shopkeepers of inactive players.

@@ -59,18 +59,12 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		super(uiType, shopkeeper);
 	}
 
-	protected final void debugNotOpeningUI(Player player, String reason) {
-		Validate.notNull(player, "player is null");
-		Validate.notEmpty(reason, "reason is null or empty");
-		Log.debug(() -> "Not opening trading UI for " + player.getName() + ": " + reason);
-	}
-
 	@Override
 	public boolean canOpen(Player player, boolean silent) {
 		Validate.notNull(player, "player is null");
 		if (!PermissionUtils.hasPermission(player, ShopkeepersPlugin.TRADE_PERMISSION)) {
 			if (!silent) {
-				this.debugNotOpeningUI(player, "Missing trade permission.");
+				this.debugNotOpeningUI(player, "Player is missing trade permission.");
 				TextUtils.sendMessage(player, Messages.missingTradePerm);
 			}
 			return false;
@@ -168,10 +162,10 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		List<? extends TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
 		List<MerchantRecipe> newMerchantRecipes = this.createMerchantRecipes(recipes);
 		if (MerchantUtils.MERCHANT_RECIPES_IGNORE_USES_EXCEPT_BLOCKED.equals(oldMerchantRecipes, newMerchantRecipes)) {
-			Log.debug(() -> "Trades are still up-to-date for player " + player.getName());
+			Log.debug(() -> shopkeeper.getLogPrefix() + "Trades are still up-to-date for player " + player.getName());
 			return; // Recipes did not change
 		}
-		Log.debug(() -> "Updating trades for player " + player.getName());
+		Log.debug(() -> shopkeeper.getLogPrefix() + "Updating trades for player " + player.getName());
 
 		// It is not safe to reduce the number of trading recipes for the player, so we may need to add dummy recipes:
 		this.ensureNoFewerRecipes(oldMerchantRecipes, newMerchantRecipes);
@@ -274,8 +268,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		String playerName = player.getName();
 		if (clickEvent.isCancelled()) {
-			Log.debug(() -> "Some plugin has cancelled the click in the trading window for "
-					+ playerName + " at " + shopkeeper.getPositionString() + ".");
+			Log.debug(() -> shopkeeper.getLogPrefix() + "Some plugin has cancelled the trading UI click of player "
+					+ playerName);
 			return;
 		}
 
@@ -293,8 +287,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			// For now: Only allowed if the item on the cursor and inside the result slot are different.
 			// TODO Maybe replicate the behavior of this inventory action, but limit its effect to the player's
 			// inventory?
-			Log.debug(() -> "Prevented unsupported special click in trading window by " + playerName
-					+ " at " + shopkeeper.getPositionString() + ": " + action);
+			Log.debug(() -> shopkeeper.getLogPrefix() + "Prevented unsupported type of trading UI click by player "
+					+ playerName + ": " + action);
 			clickEvent.setCancelled(true);
 			InventoryUtils.updateInventoryLater(player);
 			return;
@@ -333,7 +327,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		// using up all the items in the player's inventory (i.e. being able to sell all items with one click)?
 		if (action == InventoryAction.PICKUP_ALL || action == InventoryAction.PICKUP_HALF) {
 			if (!isCursorEmpty && (!resultItem.isSimilar(cursor) || (cursor.getAmount() + resultItem.getAmount()) > cursor.getMaxStackSize())) {
-				Log.debug("Not handling trade: The cursor cannot carry the resulting items.");
+				Log.debug(() -> shopkeeper.getLogPrefix() + "Not handling trade: The cursor cannot carry the resulting items.");
 				return;
 			} else {
 				if (this.handleTrade(trade)) {
@@ -465,6 +459,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	// Checks for an available trade and does some preparation in case a trade is found.
 	// Returns null if no trade could be prepared for some reason.
 	private Trade checkForTrade(InventoryClickEvent clickEvent, boolean silent, boolean slientStrictItemComparison, boolean tradingContext) {
+		Shopkeeper shopkeeper = this.getShopkeeper();
 		Player tradingPlayer = (Player) clickEvent.getWhoClicked();
 		MerchantInventory merchantInventory = (MerchantInventory) clickEvent.getView().getTopInventory();
 
@@ -476,7 +471,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		ItemStack resultItem = merchantInventory.getItem(RESULT_ITEM_SLOT_ID);
 		if (ItemUtils.isEmpty(resultItem)) {
 			if (!silent) {
-				Log.debug("Not handling trade: There is no item in the clicked result slot (no trade available).");
+				Log.debug(() -> shopkeeper.getLogPrefix()
+						+ "Not handling trade: There is no item in the clicked result slot (no trade available).");
 				if (Debug.isDebugging(DebugOptions.emptyTrades)) {
 					int selectedRecipeIndex = merchantInventory.getSelectedRecipeIndex();
 					Log.debug("Selected trading recipe index: " + selectedRecipeIndex);
@@ -502,7 +498,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			// Unexpected, since there is an item inside the result slot.
 			if (!silent) {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
-				Log.debug("Not handling trade: Could not find the active trading recipe!");
+				Log.debug(() -> shopkeeper.getLogPrefix() + "Not handling trade: Could not find the active trading recipe!");
 			}
 			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
@@ -516,7 +512,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			if (!silent) {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 				if (Debug.isDebugging()) {
-					Log.debug("Not handling trade: The trade result item does not match the expected item of the active trading recipe!");
+					Log.debug(shopkeeper.getLogPrefix() + "Not handling trade: The trade result item"
+							+ " does not match the expected item of the active trading recipe!");
 					debugLogItemStack("recipeResultItem", recipeResultItem);
 					debugLogItemStack("resultItem", resultItem);
 				}
@@ -547,7 +544,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			// the stricter isSimilar for the item comparison and the involved items are not strictly similar.
 			if (!silent) {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
-				Log.debug("Not handling trade: Could not match the offered items to the active trading recipe!");
+				Log.debug(() -> shopkeeper.getLogPrefix()
+						+ "Not handling trade: Could not match the offered items to the active trading recipe!");
 			}
 			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
@@ -570,7 +568,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 						if (tradingContext) {
 							this.debugPreventedTrade(tradingPlayer, errorMsg);
 						} else {
-							Log.debug(errorMsg);
+							Log.debug(shopkeeper.getLogPrefix() + errorMsg);
 						}
 
 						Log.debug("Active trading recipe: " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
@@ -607,8 +605,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	protected final void debugPreventedTrade(Player player, String reason) {
-		Log.debug(() -> "Prevented trade by " + player.getName() + " with shopkeeper at "
-				+ this.getShopkeeper().getPositionString() + ": " + reason);
+		Log.debug(() -> this.getShopkeeper().getLogPrefix() + "Prevented trade by " + player.getName() + ": " + reason);
 	}
 
 	/**
@@ -646,18 +643,21 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			eventOfferedItem2.setAmount(tradingRecipe.getItem2().getAmount());
 		}
 
-		ShopkeeperTradeEvent tradeEvent = new ShopkeeperTradeEvent(this.getShopkeeper(), trade.tradingPlayer,
+		Shopkeeper shopkeeper = this.getShopkeeper();
+		ShopkeeperTradeEvent tradeEvent = new ShopkeeperTradeEvent(shopkeeper, trade.tradingPlayer,
 				trade.clickEvent, tradingRecipe, UnmodifiableItemStack.of(eventOfferedItem1),
 				UnmodifiableItemStack.of(eventOfferedItem2), trade.swappedItemOrder);
 		Bukkit.getPluginManager().callEvent(tradeEvent);
 		if (tradeEvent.isCancelled()) {
-			Log.debug("The trade got cancelled by some other plugin.");
+			Log.debug(() -> shopkeeper.getLogPrefix() + "Some plugin cancelled the trade event of player "
+					+ trade.tradingPlayer.getName());
 			this.onTradeAborted(trade);
 			return false;
 		}
 		// Making sure that the click event is still cancelled:
 		if (!trade.clickEvent.isCancelled()) {
-			Log.warning("Some plugin tried to uncancel the click event during trade handling!");
+			Log.warning(shopkeeper.getLogPrefix()
+					+ "Some plugin tried to uncancel the inventory click event of the trade event!");
 			trade.clickEvent.setCancelled(true);
 		}
 
@@ -694,8 +694,8 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		this.onTradeApplied(trade);
 
 		// Log trade:
-		Log.debug(() -> "Trade (#" + tradeCounter + ") by " + trade.tradingPlayer.getName() + " with shopkeeper at "
-				+ this.getShopkeeper().getPositionString() + ": " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
+		Log.debug(() -> this.getShopkeeper().getLogPrefix() + "Trade (#" + tradeCounter + ") by "
+				+ trade.tradingPlayer.getName() + ": " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
 	}
 
 	/**

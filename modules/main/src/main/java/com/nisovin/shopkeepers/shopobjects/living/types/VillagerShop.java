@@ -37,7 +37,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 			// Migration from 'prof' key: TODO Added with 1.14 update, remove again at some point.
 			String professionName = configSection.getString("prof");
 			if (professionName != null) {
-				Log.warning("Shopkeeper " + shopkeeper.getId() + ": Migrated villager profession from key 'prof' to key 'profession'.");
+				Log.warning(shopkeeper.getLogPrefix() + "Migrated villager profession from key 'prof' to key 'profession'.");
 				configSection.set(this.key, professionName);
 				configSection.set("prof", null);
 				shopkeeper.markDirty();
@@ -53,8 +53,8 @@ public class VillagerShop extends BabyableShop<Villager> {
 					newProfessionName = Profession.ARMORER.name();
 				}
 				if (newProfessionName != null) {
-					Log.warning("Shopkeeper " + shopkeeper.getId() + ": Migrated villager profession from '" + professionName
-							+ "' to '" + newProfessionName + ".");
+					Log.warning(shopkeeper.getLogPrefix() + "Migrated villager profession from '"
+							+ professionName + "' to '" + newProfessionName + "'.");
 					configSection.set(this.key, newProfessionName);
 					shopkeeper.markDirty();
 				}

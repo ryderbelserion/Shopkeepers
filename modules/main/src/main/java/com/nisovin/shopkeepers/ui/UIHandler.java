@@ -58,6 +58,13 @@ public abstract class UIHandler {
 		return ShopkeepersPlugin.getInstance().getUIRegistry().getUISession(player);
 	}
 
+	protected void debugNotOpeningUI(Player player, String reason) {
+		Validate.notNull(player, "player is null");
+		Validate.notEmpty(reason, "reason is null or empty");
+		Log.debug(() -> "Not opening UI '" + this.getUIType().getIdentifier() + "' for player "
+				+ player.getName() + ": " + reason);
+	}
+
 	/**
 	 * Checks whether or not the given player can open this interface.
 	 * <p>

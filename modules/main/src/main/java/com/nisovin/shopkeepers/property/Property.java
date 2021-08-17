@@ -118,12 +118,12 @@ public abstract class Property<T> {
 	}
 
 	/**
-	 * Creates an {@link InvalidValueException} that is used when the value is missing when this property is loaded.
+	 * Creates an {@link InvalidValueException} that is used when the value for this property is missing.
 	 * 
 	 * @return the invalid value exception
 	 */
 	protected InvalidValueException missingValueError() {
-		return new InvalidValueException("Shopkeeper " + shopkeeper.getId() + ": Missing value for property '" + key + "'.");
+		return new InvalidValueException("Missing value.");
 	}
 
 	/**
@@ -135,8 +135,7 @@ public abstract class Property<T> {
 	 * @return the invalid value exception
 	 */
 	protected InvalidValueException invalidValueError(Object invalidValue) {
-		return new InvalidValueException("Shopkeeper " + shopkeeper.getId() + ": Invalid value '" + String.valueOf(invalidValue)
-				+ "' for property '" + key + "'.");
+		return new InvalidValueException("Invalid value: '" + String.valueOf(invalidValue) + "'.");
 	}
 
 	/**
@@ -171,7 +170,8 @@ public abstract class Property<T> {
 				throw this.missingValueError();
 			}
 		} catch (InvalidValueException e) {
-			Log.warning(e.getMessage() + " Using '" + this.toString(defaultValue) + "' now.");
+			Log.warning(this.getShopkeeper().getLogPrefix() + "Failed to load property '" + key + "': " + e.getMessage()
+					+ " Using the default value now: '" + this.toString(defaultValue) + "'");
 			shopkeeper.markDirty();
 			value = defaultValue;
 		}

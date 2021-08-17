@@ -76,7 +76,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			String npcUniqueIdString = configSection.getString("npcId");
 			this.npcUniqueId = ConversionUtils.parseUUID(npcUniqueIdString);
 			if (npcUniqueId == null) {
-				Log.warning("Could not parse NPC unique id for shopkeeper " + shopkeeper.getId() + ": " + npcUniqueIdString);
+				Log.warning(shopkeeper.getLogPrefix() + "Could not parse the unique Citizens NPC id: "
+						+ npcUniqueIdString);
 			}
 		}
 	}
@@ -94,7 +95,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	private void createNpcIfMissing() {
 		if (npcUniqueId != null || !citizensShops.isEnabled()) return;
 
-		Log.debug(() -> "Creating Citizens NPC for shopkeeper " + shopkeeper.getId());
+		Log.debug(() -> shopkeeper.getLogPrefix() + "Creating Citizens NPC.");
 
 		EntityType entityType = Settings.defaultCitizenNpcType;
 		// Note: The spawn location can be null if the world is not loaded currently. We can still create the NPC, but
@@ -188,8 +189,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 					// Let the trait handle NPC related cleanup (i.e. we only remove the trait in this case):
 					shopkeeperTrait.onShopkeeperDeletion(shopkeeper);
 				} else {
-					Log.debug(() -> "Removing Citizens NPC " + CitizensShops.getNPCIdString(npc)
-							+ " due to deletion of shopkeeper " + shopkeeper.getIdString());
+					Log.debug(() -> shopkeeper.getUniqueIdLogPrefix() + "Deleting Citizens NPC "
+							+ CitizensShops.getNPCIdString(npc) + " due to shopkeeper deletion.");
 					npc.destroy(); // The NPC was created by us, so we remove it again
 					citizensShops.onNPCEdited(npc);
 				}
@@ -204,7 +205,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	}
 
 	/**
-	 * Called when the corresponding Citizens NPC is about to get deleted.
+	 * Called when the corresponding Citizens NPC is about to be deleted.
 	 * 
 	 * @param player
 	 *            the player who deleted the NPC, can be <code>null</code> if not available
@@ -212,7 +213,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	void onNPCDeleted(Player player) {
 		NPC npc = this.getNPC();
 		assert npc != null;
-		Log.debug(() -> "Removing shopkeeper " + shopkeeper.getIdString() + " due to the deletion of Citizens NPC "
+		Log.debug(() -> shopkeeper.getUniqueIdLogPrefix() + "Deletion due to the deletion of Citizens NPC "
 				+ CitizensShops.getNPCIdString(npc) + (player == null ? "" : " by player " + TextUtils.getPlayerString(player)));
 		this.setKeepNPCOnDeletion(); // The NPC is already getting deleted, so we don't need to delete it.
 		shopkeeper.delete(player);
@@ -295,7 +296,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		Location currentLocation = npc.getStoredLocation();
 		if (currentLocation == null) {
 			assert !npc.isSpawned();
-			Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") had no location, attempting spawn");
+			Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Citizens NPC has no stored location. Attempting spawn.");
 			// This will log a debug message from Citizens if it cannot spawn the NPC currently, but will then later
 			// attempt to spawn it when the chunk gets loaded:
 			npc.spawn(expectedLocation);
@@ -316,7 +317,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			// shopkeepers).
 			// Note: Entity#isDead is sufficient to detect the entity removal. Checking the slightly more costly
 			// Entity#isValid is not required, since Citizens removes the entity on chunk unloads anyways.
-			Log.debug(() -> "Shopkeeper NPC (" + shopkeeper.getPositionString() + ") is missing, attempting respawn");
+			Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Citizens NPC is missing. Attempting respawn.");
 			// Note: We respawn the entity at its last known location, rather then the (expected) shopkeeper location.
 			// This will log a debug message from Citizens if it cannot spawn the NPC currently:
 			npc.spawn(currentLocation);
@@ -324,8 +325,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 		// Update the shopkeeper's location if the NPC is able to move:
 		if (!expectedLocation.getWorld().equals(currentLocation.getWorld()) || expectedLocation.distanceSquared(currentLocation) > 1.0D) {
-			Log.debug(DebugOptions.regularTickActivities, () -> "Shopkeeper NPC (" + shopkeeper.getPositionString()
-					+ ") moved, updating shopkeeper location");
+			Log.debug(DebugOptions.regularTickActivities, () -> shopkeeper.getLocatedLogPrefix()
+					+ "Citizens NPC moved. Updating shopkeeper location.");
 			shopkeeper.setLocation(currentLocation);
 		}
 	}

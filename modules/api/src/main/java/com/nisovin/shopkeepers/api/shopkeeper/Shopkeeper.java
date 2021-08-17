@@ -65,7 +65,6 @@ public interface Shopkeeper {
 
 	/**
 	 * Gets the shop's id.
-	 * 
 	 * <p>
 	 * This id is unique across all currently loaded shops, but there is no guarantee for it to be globally unique
 	 * across server sessions.
@@ -76,7 +75,6 @@ public interface Shopkeeper {
 
 	/**
 	 * Gets the shop's unique id.
-	 * 
 	 * <p>
 	 * This id is globally unique across all shopkeepers.
 	 * 
@@ -87,9 +85,39 @@ public interface Shopkeeper {
 	/**
 	 * Gets a String containing both the shopkeeper's id and unique id.
 	 * 
-	 * @return a string representation of this shopkeeper's id and unique id
+	 * @return a String representation of this shopkeeper's id and unique id
 	 */
 	public String getIdString();
+
+	/**
+	 * Gets a short prefix that can be used for log messages related to this shopkeeper.
+	 * <p>
+	 * Example: {@literal "Shopkeeper 12: "}.
+	 * 
+	 * @return the log prefix
+	 */
+	public String getLogPrefix();
+
+	/**
+	 * Gets a prefix that can be used for log messages related to this shopkeeper.
+	 * <p>
+	 * This prefix contains the shopkeeper's unique id. Example:
+	 * {@literal "Shopkeeper 12 (12345678-1234-1234-1234-1234567890ab): "}.
+	 * 
+	 * @return the log prefix
+	 */
+	public String getUniqueIdLogPrefix();
+
+	/**
+	 * Gets a prefix that can be used for log messages related to this shopkeeper.
+	 * <p>
+	 * This prefix contains the shopkeeper's location. Example: {@literal "Shopkeeper 12 at world,123,123,123: "}.
+	 * <p>
+	 * For {@link #isVirtual() virtual} shopkeepers, this prefix contains an indication that the shopkeeper is virtual.
+	 * 
+	 * @return the log prefix
+	 */
+	public String getLocatedLogPrefix();
 
 	/**
 	 * Gets the type of this shopkeeper (ex: admin, selling player, buying player, trading player, etc.).

@@ -56,9 +56,8 @@ public class ShopOwnerNameUpdates implements Listener {
 
 	// Updates owner names for the shopkeepers of the specified player:
 	private void updateShopkeepersForPlayer(UUID playerId, String playerName) {
-		Log.debug(DebugOptions.ownerNameUpdates,
-				() -> "Updating shopkeepers for: " + TextUtils.getPlayerString(playerName, playerId)
-		);
+		Log.debug(DebugOptions.ownerNameUpdates, () -> "Updating shopkeeper owner names for: "
+				+ TextUtils.getPlayerString(playerName, playerId));
 
 		boolean dirty = false;
 		ShopkeeperRegistry shopkeeperRegistry = plugin.getShopkeeperRegistry();
@@ -66,19 +65,17 @@ public class ShopOwnerNameUpdates implements Listener {
 			String ownerName = playerShop.getOwnerName();
 			if (!ownerName.equals(playerName)) {
 				// Update the stored name, because the player must have changed it:
-				Log.debug(DebugOptions.ownerNameUpdates,
-						() -> "  Updating owner name ('" + ownerName + "') of shopkeeper " + playerShop.getId()
-				);
+				Log.debug(DebugOptions.ownerNameUpdates, () -> playerShop.getLogPrefix() + "Updating owner name '"
+						+ ownerName + "' to '" + playerName + "'.");
 				playerShop.setOwner(playerId, playerName);
 				dirty = true;
 			} else if (!dirty) { // Dirty if we already found a shop with mismatching name
 				// The stored owner name matches the player's current name.
 				// Since we assume that the stored owner names among all shopkeepers are consistent, we can abort
 				// checking the remaining shops of this player.
-				Log.debug(DebugOptions.ownerNameUpdates,
-						() -> "  The stored owner name of shopkeeper " + playerShop.getId()
-								+ " matches the current player name. We skip checking other shopkeepers."
-				);
+				Log.debug(DebugOptions.ownerNameUpdates, () -> playerShop.getLogPrefix() + "Owner name '" + ownerName
+						+ "' is up-to-date. Assuming the owner names of all shopkeepers are consistent,"
+						+ " we skip checking all other shopkeepers.");
 				return;
 			}
 		}

@@ -34,6 +34,7 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
@@ -86,12 +87,12 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		// Migration from TreeSpecies to SignType:
 		// TODO Remove this again at some point.
 		if ("GENERIC".equals(signTypeName)) {
-			Log.warning("Migrating sign type of shopkeeper '" + shopkeeper.getId() + "' from '" + signTypeName
+			Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
 					+ "' to '" + SignType.OAK + "'.");
 			signTypeName = SignType.OAK.name();
 			shopkeeper.markDirty();
 		} else if ("REDWOOD".equals(signTypeName)) {
-			Log.warning("Migrating sign type of shopkeeper '" + shopkeeper.getId() + "' from '" + signTypeName
+			Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
 					+ "' to '" + SignType.SPRUCE + "'.");
 			signTypeName = SignType.SPRUCE.name();
 			shopkeeper.markDirty();
@@ -106,8 +107,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			}
 		} catch (Exception e) {
 			// Fallback to default:
-			Log.warning("Missing, invalid, or unsupported sign type '" + signTypeName + "' for shopkeeper "
-					+ shopkeeper.getId() + "'. Using '" + SignType.OAK + "' now.");
+			Log.warning(shopkeeper.getLogPrefix() + "Missing, invalid, or unsupported sign type '"
+					+ signTypeName + "'. Using '" + SignType.OAK + "' now.");
 			signType = SignType.OAK;
 			shopkeeper.markDirty();
 		}
@@ -127,17 +128,18 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			try {
 				signFacing = BlockFace.valueOf(signFacingName);
 			} catch (IllegalArgumentException e) {
-				Log.warning("Could not parse sign facing for shopkeeper " + shopkeeper.getId() + " ('" + signFacingName
-						+ "'). Falling back to SOUTH.");
+				Log.warning(shopkeeper.getLogPrefix() + "Could not parse sign facing '"
+						+ signFacingName + "'. Falling back to SOUTH.");
 			}
 			if (wallSign ? !BlockFaceUtils.isWallSignFacing(signFacing) : !BlockFaceUtils.isSignPostFacing(signFacing)) {
-				Log.warning("Invalid sign facing for shopkeeper " + shopkeeper.getId() + " ('" + signFacingName
-						+ "'). Falling back to SOUTH.");
+				Log.warning(shopkeeper.getLogPrefix() + "Invalid sign facing '" + signFacingName
+						+ "'. Falling back to SOUTH.");
 				signFacing = BlockFace.SOUTH;
 			}
 
-			Log.warning("Migrating sign facing (" + signFacing + ") to yaw for shopkeeper " + shopkeeper.getId());
 			float yaw = BlockFaceUtils.getYaw(signFacing);
+			Log.warning(shopkeeper.getLogPrefix() + "Migrating sign facing '" + signFacing
+					+ "' to yaw " + TextUtils.DECIMAL_FORMAT.format(yaw));
 			shopkeeper.setYaw(yaw); // This also marks the shopkeeper as dirty
 		}
 
@@ -207,7 +209,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		// If re-spawning fails due to the sign dropping for some reason (ex. attached block missing) this could be
 		// abused (sign drop farming), therefore we limit the number of spawn attempts:
 		if (System.currentTimeMillis() - lastFailedRespawnAttemptMillis < RESPAWN_TIMEOUT_MILLIS) {
-			Log.debug(() -> "Shopkeeper sign at " + shopkeeper.getPositionString() + " is on spawn cooldown.");
+			Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Sign is on spawn cooldown.");
 			return false;
 		}
 
@@ -364,7 +366,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		assert shopkeeper.getChunkCoords().isChunkLoaded();
 
 		if (!this.isActive()) {
-			Log.debug(() -> "Shopkeeper sign at " + shopkeeper.getPositionString() + " is missing! Attempting respawn.");
+			Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Sign is missing! Attempting respawn.");
 
 			// Cleanup any previously spawned block first:
 			if (this.isSpawned()) {
@@ -373,7 +375,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 			boolean success = this.spawn();
 			if (!success) {
-				Log.warning("Shopkeeper sign at " + shopkeeper.getPositionString() + " could not be spawned!");
+				Log.warning(shopkeeper.getLocatedLogPrefix() + "Sign could not be spawned!");
 			}
 			return;
 		}

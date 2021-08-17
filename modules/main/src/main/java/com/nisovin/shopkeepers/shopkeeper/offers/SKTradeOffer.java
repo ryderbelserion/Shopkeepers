@@ -15,7 +15,6 @@ import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 // Shares its implementation with SKTradingRecipe, but always reports to not be out of stock.
@@ -117,7 +116,8 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 	}
 
 	// Elements inside the config section are assumed to be immutable and can be reused without having to be copied.
-	public static List<? extends TradeOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
+	public static List<? extends TradeOffer> loadFromConfig(ConfigurationSection config, String node, String errorPrefix) {
+		if (errorPrefix == null) errorPrefix = "";
 		List<TradeOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
@@ -125,7 +125,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
 				if (offerSection == null) {
 					// Invalid offer: Not a section.
-					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid trading offer section for " + key));
+					Log.warning(errorPrefix + "Invalid trade offer section for " + key);
 					continue;
 				}
 
@@ -135,18 +135,18 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				UnmodifiableItemStack item2 = ConfigUtils.loadUnmodifiableItemStack(offerSection, "item2");
 				if (ItemUtils.isEmpty(resultItem) || ItemUtils.isEmpty(item1)) {
 					// Invalid offer.
-					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid trading offer for " + key + ": item1 or resultItem is empty"));
+					Log.warning(errorPrefix + "Invalid trade offer for " + key + ": item1 or resultItem is empty.");
 					continue;
 				}
 				offers.add(new SKTradeOffer(resultItem, item1, item2));
 			}
 		}
-
 		return offers;
 	}
 
 	// Note: Returns the same list instance if no items were migrated.
-	public static List<? extends TradeOffer> migrateItems(@ReadOnly List<? extends TradeOffer> offers, String errorContext) {
+	public static List<? extends TradeOffer> migrateItems(@ReadOnly List<? extends TradeOffer> offers, String errorPrefix) {
+		if (errorPrefix == null) errorPrefix = "";
 		if (offers == null) return null;
 		List<TradeOffer> migratedOffers = null;
 		final int size = offers.size();
@@ -200,8 +200,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				}
 
 				if (migrationFailed) {
-					Log.warning(StringUtils.prefix(errorContext, ": ", "Trading offer item migration failed for offer "
-							+ (i + 1) + ": " + offer.toString()));
+					Log.warning(errorPrefix + "Item migration failed for offer " + (i + 1) + ": " + offer);
 					continue; // Skip this offer
 				}
 

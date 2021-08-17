@@ -31,6 +31,7 @@ import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
@@ -475,6 +476,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		return plugin.getShopkeeperStorage();
 	}
 
+	private void validateUnusedShopkeeperUniqueId(Shopkeeper shopkeeper) throws ShopkeeperCreateException {
+		if (this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) != null) {
+			throw new ShopkeeperCreateException("There already exists a shopkeeper with the same unique id: "
+					+ shopkeeper.getUniqueId());
+		}
+	}
+
 	@Override
 	public AbstractShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
 		Validate.notNull(creationData, "creationData is null");
@@ -489,9 +497,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 
 		// Validate unique id:
-		if (this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) != null) {
-			throw new ShopkeeperCreateException("There is already a shopkeeper existing with this unique id: " + shopkeeper.getUniqueId());
-		}
+		this.validateUnusedShopkeeperUniqueId(shopkeeper);
 
 		// Success:
 
@@ -530,9 +536,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 
 		// Validate unique id:
-		if (this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) != null) {
-			throw new ShopkeeperCreateException("There already exists a shopkeeper with this unique id: " + shopkeeper.getUniqueId());
-		}
+		this.validateUnusedShopkeeperUniqueId(shopkeeper);
 
 		// Success:
 
@@ -586,13 +590,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		// else.
 		AbstractShopType<?> shopType = shopkeeper.getType();
 		if (!shopType.isEnabled()) {
-			Log.warning("Shop type '" + shopType.getIdentifier() + "' of shopkeeper " + shopkeeper.getId()
-					+ " is disabled! Consider deleting this shopkeeper.");
+			Log.warning(shopkeeper.getLogPrefix() + "Shop type '" + shopType.getIdentifier()
+					+ "' is disabled! Consider deleting this shopkeeper.");
 		}
 		AbstractShopObjectType<?> shopObjectType = shopkeeper.getShopObject().getType();
 		if (!shopObjectType.isEnabled()) {
-			Log.warning("Object type '" + shopObjectType.getIdentifier() + "' of shopkeeper " + shopkeeper.getId()
-					+ " is disabled! Consider changing its object type.");
+			Log.warning(shopkeeper.getLogPrefix() + "Object type '" + shopObjectType.getIdentifier()
+					+ "' is disabled! Consider changing the object type.");
 		}
 
 		// Inform shopkeeper:
@@ -609,9 +613,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		if (chunkEntry != null && chunkEntry.active) {
 			if (shopObjectType.mustBeSpawned()) {
 				if (chunkEntry.worldEntry.isWorldSaveRespawnPending() && shopObjectType.mustDespawnDuringWorldSave()) {
-					Log.debug(DebugOptions.shopkeeperActivation,
-							() -> "Skipping spawning of shopkeeper at " + shopkeeper.getPositionString() + " due to pending respawn after world save."
-					);
+					Log.debug(DebugOptions.shopkeeperActivation, () -> shopkeeper.getLocatedLogPrefix()
+							+ "Skipping spawning due to pending respawn after world save.");
 				} else {
 					// Spawn and activate the shopkeeper:
 					// In order to not have players wait for newly created shopkeepers, as well as for loaded
@@ -1188,18 +1191,18 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 				// Validation:
 				Object objectId = shopObject.getId();
 				if (objectId == null) {
-					Log.warning("Shopkeeper " + shopkeeper.getId() + " has been spawned but provides no object id!");
+					Log.warning(shopkeeper.getLogPrefix() + "Successfully spawned, but provides no object id!");
 				}
 			} else {
 				// Due to an open Spigot 1.17 issue, entities report as 'invalid' after being spawned during chunk
 				// loads. The shopkeepers plugin then assumes that the spawning failed. In order to not spam with
 				// warnings, this warning has been replaced with a debug output for now.
 				// TODO Replace this with a warning again once the underlying issue has been resolved in Spigot.
-				Log.debug("Failed to spawn shopkeeper " + shopkeeper.getId() + " at " + shopkeeper.getPositionString());
+				Log.debug(shopkeeper.getLocatedLogPrefix() + "Spawning failed!");
 			}
 		} else {
-			Log.debug(DebugOptions.shopkeeperActivation, () -> "Skipping spawning of shopkeeper " + shopkeeper.getId()
-					+ ": Object type '" + shopObjectType.getIdentifier() + "' is disabled.");
+			Log.debug(DebugOptions.shopkeeperActivation, () -> shopkeeper.getLogPrefix() + "Object type '"
+					+ shopObjectType.getIdentifier() + "' is disabled. Skipping spawning.");
 		}
 
 		// In either case, activate the shopkeeper:
@@ -1231,8 +1234,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		assert shopkeeper != null;
 		if (tickingShopkeepers) {
 			// Defer activation until after ticking:
-			Log.debug(DebugOptions.shopkeeperActivation, () -> "Defering activation of shopkeeper " + shopkeeper.getId()
-					+ " until after shopkeeper ticking.");
+			Log.debug(DebugOptions.shopkeeperActivation, () -> shopkeeper.getLogPrefix()
+					+ "Defering activation until after shopkeeper ticking.");
 			pendingActivationChanges.put(shopkeeper, true); // Replaces any previous value for the shopkeeper
 			return;
 		}
@@ -1253,13 +1256,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		// Activate the shopkeeper, if there isn't already another shopkeeper using the same object id:
 		Object finalObjectId = objectId;
-		Log.debug(DebugOptions.shopkeeperActivation, () -> "Activating shopkeeper " + shopkeeper.getId()
-				+ " with object id " + finalObjectId);
+		Log.debug(DebugOptions.shopkeeperActivation, () -> shopkeeper.getLogPrefix()
+				+ "Activating with object id '" + finalObjectId + "'.");
 
 		AbstractShopkeeper activeShopkeeper = activeShopkeepersByObjectId.putIfAbsent(objectId, shopkeeper);
 		if (activeShopkeeper != null) {
-			Log.warning("Detected shopkeepers (" + activeShopkeeper.getId() + " and " + shopkeeper.getId()
-					+ ") with duplicate object ids: " + objectId);
+			Log.warning(shopkeeper.getLogPrefix() + "Activation failed! Object id '" + objectId
+					+ "' is already used by shopkeeper " + activeShopkeeper.getId() + ".");
 			return;
 		} else {
 			shopObject.setLastId(objectId); // Remember the object id
@@ -1275,14 +1278,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		if (tickingShopkeepers) {
 			// Defer deactivation until after ticking:
-			Log.debug(DebugOptions.shopkeeperActivation, () -> "Defering deactivation of shopkeeper " + shopkeeper.getId()
-					+ " until after shopkeeper ticking.");
+			Log.debug(DebugOptions.shopkeeperActivation, () -> shopkeeper.getLogPrefix()
+					+ "Defering deactivation until after shopkeeper ticking.");
 			pendingActivationChanges.put(shopkeeper, false); // Replaces any previous value for the shopkeeper
 			return;
 		}
 
-		Log.debug(DebugOptions.shopkeeperActivation, () -> "Deactivating shopkeeper " + shopkeeper.getId()
-				+ " with object id " + objectId);
+		Log.debug(DebugOptions.shopkeeperActivation, () -> shopkeeper.getLogPrefix()
+				+ "Deactivating with object id '" + objectId + "'.");
 		assert activeShopkeepersByObjectId.get(objectId) == shopkeeper;
 		activeShopkeepersByObjectId.remove(objectId);
 		shopObject.setLastId(null);

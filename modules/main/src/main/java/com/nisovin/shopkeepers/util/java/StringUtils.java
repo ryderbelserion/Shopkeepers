@@ -282,11 +282,6 @@ public class StringUtils {
 		return sb.toString();
 	}
 
-	public static String prefix(String prefix, String delimiter, String message) {
-		if (StringUtils.isEmpty(prefix)) return message;
-		return prefix + (delimiter == null ? "" : delimiter) + message;
-	}
-
 	// ARGUMENTS REPLACEMENT
 
 	// Throws NPE if source, target, or replacement are null.

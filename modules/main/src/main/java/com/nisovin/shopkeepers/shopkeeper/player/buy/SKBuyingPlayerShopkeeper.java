@@ -69,10 +69,10 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
 		super.loadFromSaveData(configSection);
 		// Load offers:
-		List<? extends PriceOffer> offers = SKPriceOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId());
-		List<? extends PriceOffer> migratedOffers = SKPriceOffer.migrateItems(offers, "Shopkeeper " + this.getId());
+		List<? extends PriceOffer> offers = SKPriceOffer.loadFromConfig(configSection, "offers", this.getLogPrefix());
+		List<? extends PriceOffer> migratedOffers = SKPriceOffer.migrateItems(offers, this.getLogPrefix());
 		if (offers != migratedOffers) {
-			Log.debug(DebugOptions.itemMigrations, () -> "Shopkeeper " + this.getId() + ": Migrated items of trade offers.");
+			Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated items of trade offers.");
 			this.markDirty();
 		}
 		this._setOffers(migratedOffers);

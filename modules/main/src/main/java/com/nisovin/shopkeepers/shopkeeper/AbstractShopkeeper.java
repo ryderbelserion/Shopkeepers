@@ -60,6 +60,8 @@ import com.nisovin.shopkeepers.util.text.MessageArguments;
  */
 public abstract class AbstractShopkeeper implements Shopkeeper {
 
+	private static final String VIRTUAL_SHOPKEEPER_MARKER = "[virtual]";
+
 	/**
 	 * The ticking period of active shopkeepers and shop objects in ticks.
 	 */
@@ -202,7 +204,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		ShopObjectType<?> shopObjectType = shopCreationData.getShopObjectType();
 		Validate.isTrue(shopObjectType instanceof AbstractShopObjectType,
-				"ShopObjectType of shopCreationData is not of type AbstractShopObjectType, but: " + shopObjectType.getClass().getName());
+				"ShopObjectType of shopCreationData is not of type AbstractShopObjectType, but: "
+						+ shopObjectType.getClass().getName());
 
 		if (shopObjectType instanceof VirtualShopObjectType) {
 			// Virtual shops ignore any potentially available spawn location:
@@ -276,7 +279,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.uniqueId = UUID.fromString(uniqueIdString);
 		} catch (IllegalArgumentException e) {
 			if (!uniqueIdString.isEmpty()) {
-				Log.warning("Shopkeeper '" + id + "' has an invalid unique id '" + uniqueIdString + "'. Creating a new one.");
+				Log.warning(this.getLogPrefix() + "Invalid unique id ('" + uniqueIdString + "'). Generating a new one.");
 			}
 			this.uniqueId = UUID.randomUUID();
 			this.markDirty();
@@ -327,8 +330,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 						String catType = CatShop.fromOcelotType(ocelotType).name();
 						objectSection.set("catType", catType);
 						this.markDirty();
-						Log.warning("Migrated ocelot shopkeeper '" + id + "' of type '" + ocelotType
-								+ "' to cat shopkeeper of type '" + catType + "'.");
+						Log.warning(this.getLogPrefix() + "Migrated ocelot type '" + ocelotType
+								+ "' to cat type '" + catType + "'.");
 					}
 				} // Else: Stays ocelot.
 			}
@@ -337,7 +340,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			// Convert pig-zombie to zombified-piglin (but only if we run on MC 1.16 or above):
 			if (MC_1_16_Utils.getZombifiedPiglin() != null && objectTypeId.equals("pig-zombie")) {
 				objectTypeId = "zombified-piglin";
-				Log.warning("Migrated object type of shopkeeper '" + id + "' from 'pig-zombie' to 'zombified-piglin'.");
+				Log.warning(this.getLogPrefix() + "Migrated object type 'pig-zombie' to 'zombified-piglin'.");
 				this.markDirty();
 			}
 		}
@@ -350,7 +353,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 				// Mark dirty, so the correct id gets saved:
 				this.markDirty();
 			} else {
-				throw new ShopkeeperCreateException("Invalid object type for shopkeeper '" + id + "': " + objectTypeId);
+				throw new ShopkeeperCreateException("Invalid object type: " + objectTypeId);
 			}
 		}
 		assert objectType != null;
@@ -364,9 +367,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		if (objectType instanceof VirtualShopObjectType) {
 			if (storedWorldName != null || storedX != 0 || storedY != 0 || storedZ != 0 || storedYaw != 0.0F) {
-				Log.warning("Ignoring stored location ("
+				Log.warning(this.getLogPrefix() + "Ignoring stored location ("
 						+ TextUtils.getLocationString(StringUtils.getOrEmpty(storedWorldName), storedX, storedY, storedZ, storedYaw)
-						+ ") for virtual shopkeeper '" + id + "'!");
+						+ ") for virtual shopkeeper!");
 				this.markDirty();
 			}
 			this.worldName = null;
@@ -376,7 +379,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.yaw = 0.0F;
 		} else {
 			if (storedWorldName == null) {
-				throw new ShopkeeperCreateException("Missing world name for shopkeeper '" + id + "'!");
+				throw new ShopkeeperCreateException("Missing world name!");
 			}
 			this.worldName = storedWorldName;
 			this.x = storedX;
@@ -394,7 +397,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private AbstractShopObject createShopObject(AbstractShopObjectType<?> objectType, ShopCreationData shopCreationData) {
 		assert objectType != null;
 		AbstractShopObject shopObject = objectType.createObject(this, shopCreationData);
-		Validate.State.notNull(shopObject, "Shop object type '" + objectType.getIdentifier() + "' created null shop object for shopkeeper '" + id + "'!");
+		Validate.State.notNull(shopObject, this.getLogPrefix() + "Shop object type '" + objectType.getIdentifier()
+				+ "' created null shop object!");
 		return shopObject;
 	}
 
@@ -569,6 +573,25 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	@Override
+	public final String getLogPrefix() {
+		return "Shopkeeper " + id + ": ";
+	}
+
+	@Override
+	public final String getUniqueIdLogPrefix() {
+		return "Shopkeeper " + this.getIdString() + ": ";
+	}
+
+	@Override
+	public final String getLocatedLogPrefix() {
+		if (this.isVirtual()) {
+			return "Shopkeeper " + id + " " + VIRTUAL_SHOPKEEPER_MARKER + ": ";
+		} else {
+			return "Shopkeeper " + id + " at " + this.getPositionString() + ": ";
+		}
+	}
+
+	@Override
 	public abstract AbstractShopType<?> getType();
 
 	@Override
@@ -604,7 +627,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public String getPositionString() {
-		if (worldName == null) return "[virtual]";
+		if (worldName == null) return VIRTUAL_SHOPKEEPER_MARKER;
 		return TextUtils.getLocationString(worldName, x, y, z);
 	}
 
@@ -772,8 +795,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			return name;
 		}
 		String trimmedName = name.substring(0, MAX_NAME_LENGTH);
-		Log.warning("Name of shopkeeper " + id + " is longer than " + MAX_NAME_LENGTH
-				+ ". Trimming name '" + name + "' to '" + trimmedName + "'.");
+		Log.warning(this.getLogPrefix() + "Name is more than " + MAX_NAME_LENGTH + " characters long ('"
+				+ name + "'). Name is trimmed to '" + trimmedName + "'.");
 		return trimmedName;
 	}
 

@@ -108,7 +108,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			ownerUUID = UUID.fromString(configSection.getString("owner uuid"));
 		} catch (Exception e) {
 			// UUID is invalid or non-existent:
-			throw new ShopkeeperCreateException("Missing owner uuid!");
+			throw new ShopkeeperCreateException("Missing or invalid owner uuid!");
 		}
 		ownerName = configSection.getString("owner");
 		// TODO We no longer use the fallback name (since late 1.14.4). Remove the "unknown"-check again in the future
@@ -118,7 +118,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		}
 
 		if (!configSection.isInt("chestx") || !configSection.isInt("chesty") || !configSection.isInt("chestz")) {
-			throw new ShopkeeperCreateException("Missing container coordinate(s)");
+			throw new ShopkeeperCreateException("Missing or invalid container coordinates!");
 		}
 
 		// Update container:
@@ -131,7 +131,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		UnmodifiableItemStack hireCost = ConfigUtils.loadUnmodifiableItemStack(configSection, "hirecost");
 		// Hire cost ItemStack is not null, but empty. -> Normalize to null:
 		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
-			Log.warning("Invalid (empty) hire cost! Disabling 'for hire' for shopkeeper at " + this.getPositionString());
+			Log.warning(this.getLogPrefix() + "Hire cost item is empty! Disabling 'for hire'.");
 			hireCost = null;
 			this.markDirty();
 		}
@@ -139,13 +139,11 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		if (!ItemUtils.isSimilar(hireCost, migratedHireCost)) {
 			if (ItemUtils.isEmpty(migratedHireCost) && !ItemUtils.isEmpty(hireCost)) {
 				// Migration failed:
-				Log.warning("Shopkeeper " + this.getId() + ": Hire cost item migration failed: " + hireCost.toString());
+				Log.warning(this.getLogPrefix() + "Hire cost item migration failed: " + hireCost);
 				hireCost = null;
 			} else {
 				hireCost = migratedHireCost;
-				Log.debug(DebugOptions.itemMigrations,
-						() -> "Shopkeeper " + this.getId() + ": Migrated hire cost item."
-				);
+				Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated hire cost item.");
 			}
 			this.markDirty();
 		}
@@ -431,8 +429,10 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		if (remainingPrice > 0) {
 			if (remainingPrice > Settings.currencyItem.getType().getMaxStackSize()) {
 				// Cannot represent this price with the used currency items:
-				Log.warning("Shopkeeper " + this.getIdString() + " at " + this.getPositionString()
-						+ " owned by " + this.getOwnerString() + " has an invalid cost!");
+				// TODO Move this warning into the loading phase.
+				int maxPrice = getMaximumSellingPrice();
+				Log.warning(this.getLogPrefix() + "Skipping offer with invalid price (" + price + "). Maximum price is "
+						+ maxPrice + ".");
 				return null;
 			}
 
@@ -449,14 +449,24 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
 	protected final TradingRecipe createBuyingRecipe(UnmodifiableItemStack itemBeingBought, int price, boolean outOfStock) {
-		if (price > Settings.currencyItem.getType().getMaxStackSize()) {
+		int maxPrice = Settings.currencyItem.getType().getMaxStackSize();
+		if (price > maxPrice) {
 			// Cannot represent this price with the used currency items:
-			Log.warning("Shopkeeper " + this.getIdString() + " at " + this.getPositionString()
-					+ " owned by " + this.getOwnerString() + " has an invalid cost!");
+			// TODO Move this warning into the loading phase.
+			Log.warning(this.getLogPrefix() + "Skipping offer with invalid price (" + price + "). Maximum price is "
+					+ maxPrice + ".");
 			return null;
 		}
 		UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(Settings.createCurrencyItem(price));
 		return new SKTradingRecipe(currencyItem, itemBeingBought, null, outOfStock);
+	}
+
+	private static int getMaximumSellingPrice() {
+		int maxPrice = Settings.currencyItem.getType().getMaxStackSize();
+		if (Settings.isHighCurrencyEnabled()) {
+			maxPrice += Settings.highCurrencyItem.getType().getMaxStackSize() * Settings.highCurrencyValue;
+		}
+		return maxPrice;
 	}
 
 	// SHOPKEEPER UIs - Shortcuts for common UI types:

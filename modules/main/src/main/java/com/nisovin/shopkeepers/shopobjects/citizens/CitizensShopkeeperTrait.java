@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -39,7 +40,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	}
 
 	// Also returns null if the Shopkeepers plugin is not enabled currently.
-	public Shopkeeper getShopkeeper() {
+	public AbstractShopkeeper getShopkeeper() {
 		NPC npc = this.getNPC();
 		if (npc == null) return null; // Not yet attached
 
@@ -58,8 +59,8 @@ public class CitizensShopkeeperTrait extends Trait {
 
 	void onShopkeeperDeletion(Shopkeeper shopkeeper) {
 		NPC npc = this.getNPC();
-		Log.debug(() -> "Removing the 'shopkeeper' trait from Citizens NPC " + CitizensShops.getNPCIdString(npc)
-				+ " due to the deletion of shopkeeper " + shopkeeper.getIdString());
+		Log.debug(() -> shopkeeper.getUniqueIdLogPrefix() + "Removing the 'shopkeeper' trait from Citizens NPC "
+				+ CitizensShops.getNPCIdString(npc) + " due to shopkeeper deletion.");
 		npc.removeTrait(CitizensShopkeeperTrait.class);
 		SKShopkeepersPlugin.getInstance().getCitizensShops().onNPCEdited(npc);
 	}
@@ -77,8 +78,8 @@ public class CitizensShopkeeperTrait extends Trait {
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		if (shopkeeper != null) {
 			NPC npc = this.getNPC();
-			Log.debug(() -> "Removing the shopkeeper " + shopkeeper.getId() + " due to the deletion of the 'shopkeeper' trait"
-					+ " from the Citizens NPC " + CitizensShops.getNPCIdString(npc));
+			Log.debug(() -> shopkeeper.getUniqueIdLogPrefix() + "Deletion due to the removal of the 'shopkeeper' trait"
+					+ " from Citizens NPC " + CitizensShops.getNPCIdString(npc));
 			assert shopkeeper.getShopObject().getType() == DefaultShopObjectTypes.CITIZEN();
 			SKCitizensShopObject shopObject = (SKCitizensShopObject) shopkeeper.getShopObject();
 			shopObject.setKeepNPCOnDeletion();
@@ -147,7 +148,7 @@ public class CitizensShopkeeperTrait extends Trait {
 			return;
 		}
 
-		Log.debug(() -> "Creating shopkeeper for NPC " + CitizensShops.getNPCIdString(npc)
+		Log.debug(() -> "Creating shopkeeper for Citizens NPC " + CitizensShops.getNPCIdString(npc)
 				+ (creator != null ? " and player '" + creator.getName() + "'" : ""));
 
 		Location location = null;
@@ -178,19 +179,21 @@ public class CitizensShopkeeperTrait extends Trait {
 					shopkeeper.save();
 				} catch (ShopkeeperCreateException e) {
 					// Some issue identified during shopkeeper creation (possibly hinting to a bug):
-					Log.warning("Shopkeeper creation failed!", e);
+					Log.warning("Failed to create the shopkeeper for Citizens NPC "
+							+ CitizensShops.getNPCIdString(npc) + "!", e);
 				}
 			}
 
 			if (shopkeeper == null) {
 				// Shopkeeper creation failed:
 				// TODO Translation?
-				shopkeeperCreationError = "Shopkeeper creation via trait failed. Removing the trait again.";
+				shopkeeperCreationError = "Shopkeeper creation via the Citizens trait failed. Removing the trait again.";
 			}
 		} else {
 			// NPC did not provide any location. We cannot create a shopkeeper without location.
 			// TODO Translation?
-			shopkeeperCreationError = "Shopkeeper creation via trait failed due to missing NPC location. Removing the trait again.";
+			shopkeeperCreationError = "Shopkeeper creation via the Citizens trait failed due to missing NPC location."
+					+ " Removing the trait again.";
 		}
 
 		if (shopkeeperCreationError != null) {

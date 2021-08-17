@@ -13,7 +13,6 @@ import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -112,7 +111,8 @@ public class SKPriceOffer implements PriceOffer {
 	}
 
 	// Elements inside the config section are assumed to be immutable and can be reused without having to be copied.
-	public static List<? extends PriceOffer> loadFromConfig(ConfigurationSection config, String node, String errorContext) {
+	public static List<? extends PriceOffer> loadFromConfig(ConfigurationSection config, String node, String errorPrefix) {
+		if (errorPrefix == null) errorPrefix = "";
 		List<PriceOffer> offers = new ArrayList<>();
 		ConfigurationSection offersSection = config.getConfigurationSection(node);
 		if (offersSection != null) {
@@ -122,15 +122,16 @@ public class SKPriceOffer implements PriceOffer {
 
 				// The item stack is assumed to be immutable and therefore does not need to be copied.
 				UnmodifiableItemStack item = ConfigUtils.loadUnmodifiableItemStack(offerSection, "item");
-				int price = offerSection.getInt("price");
 				if (ItemUtils.isEmpty(item)) {
 					// Invalid offer.
-					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid price offer for " + id + ": item is empty"));
+					Log.warning(errorPrefix + "Invalid price offer for " + id + ": Item is empty.");
 					continue;
 				}
+				int price = offerSection.getInt("price");
 				if (price <= 0) {
 					// Invalid offer.
-					Log.warning(StringUtils.prefix(errorContext, ": ", "Invalid price offer for " + id + ": price has to be positive but is " + price));
+					Log.warning(errorPrefix + "Invalid price offer for " + id
+							+ ": Price has to be positive, but is " + price + ".");
 					continue;
 				}
 				offers.add(new SKPriceOffer(item, price));
@@ -140,7 +141,8 @@ public class SKPriceOffer implements PriceOffer {
 	}
 
 	// Note: Returns the same list instance if no items were migrated.
-	public static List<? extends PriceOffer> migrateItems(@ReadOnly List<? extends PriceOffer> offers, String errorContext) {
+	public static List<? extends PriceOffer> migrateItems(@ReadOnly List<? extends PriceOffer> offers, String errorPrefix) {
+		if (errorPrefix == null) errorPrefix = "";
 		if (offers == null) return null;
 		List<PriceOffer> migratedOffers = null;
 		final int size = offers.size();
@@ -174,8 +176,7 @@ public class SKPriceOffer implements PriceOffer {
 				}
 
 				if (migrationFailed) {
-					Log.warning(StringUtils.prefix(errorContext, ": ", "Trading offer item migration failed for offer "
-							+ (i + 1) + ": " + offer.toString()));
+					Log.warning(errorPrefix + "Item migration failed for offer " + (i + 1) + ": " + offer);
 					continue; // Skip this offer
 				}
 

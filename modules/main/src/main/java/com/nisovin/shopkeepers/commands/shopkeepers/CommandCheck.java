@@ -208,15 +208,15 @@ class CommandCheck extends Command {
 				if (shopObject.isActive()) {
 					Location location = shopObject.getLocation();
 					assert location != null;
-					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": active (" + TextUtils.getLocationString(location) + ")");
+					sender.sendMessage(shopkeeper.getLocatedLogPrefix() + "Active (" + TextUtils.getLocationString(location) + ")");
 				} else {
-					sender.sendMessage("Shopkeeper at " + shopkeeper.getPositionString() + ": INACTIVE!");
+					sender.sendMessage(shopkeeper.getLocatedLogPrefix() + "INACTIVE");
 				}
 			}
 		}
 
 		if (!isConsole && (listChunks || listActive)) {
-			sender.sendMessage("There might be more information getting printed if the command is run from the console.");
+			sender.sendMessage("More information is printed when the command is run from console.");
 		}
 	}
 }

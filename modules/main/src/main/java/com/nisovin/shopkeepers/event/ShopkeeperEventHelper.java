@@ -28,8 +28,8 @@ public class ShopkeeperEventHelper {
 		PlayerDeleteShopkeeperEvent event = new PlayerDeleteShopkeeperEvent(shopkeeper, player);
 		Bukkit.getPluginManager().callEvent(event);
 		if (event.isCancelled()) {
-			Log.debug(() -> "PlayerDeleteShopkeeperEvent was cancelled for player " + player.getName()
-					+ " and shopkeeper " + shopkeeper.getIdString() + " at " + shopkeeper.getPositionString());
+			Log.debug(() -> shopkeeper.getLogPrefix() + "PlayerDeleteShopkeeperEvent for player '" + player.getName()
+					+ "' was cancelled.");
 		}
 		return event;
 	}

@@ -79,13 +79,13 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		// Load offers:
 		this._clearOffers();
 		// TODO Remove legacy: Load offers from old format (bookTitle -> price mapping) (since late MC 1.14.4).
-		List<? extends BookOffer> legacyOffers = SKBookOffer.loadFromLegacyConfig(configSection, "offers", "Shopkeeper " + this.getId());
+		List<? extends BookOffer> legacyOffers = SKBookOffer.loadFromLegacyConfig(configSection, "offers", this.getLogPrefix());
 		if (!legacyOffers.isEmpty()) {
-			Log.info("Shopkeeper " + this.getId() + ": Importing old book offers.");
+			Log.info(this.getLogPrefix() + "Importing old book offers.");
 			this._addOffers(legacyOffers);
 			this.markDirty();
 		}
-		this._addOffers(SKBookOffer.loadFromConfig(configSection, "offers", "Shopkeeper " + this.getId()));
+		this._addOffers(SKBookOffer.loadFromConfig(configSection, "offers", this.getLogPrefix()));
 	}
 
 	@Override

@@ -142,7 +142,7 @@ public class TradingRecipeDraft {
 	}
 
 	public final boolean areItemsEqual(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
-		return areItemsEqual(ItemUtils.asItemStackOrNull(resultItem), ItemUtils.asItemStackOrNull(item1), ItemUtils.asItemStackOrNull(item2));
+		return this.areItemsEqual(ItemUtils.asItemStackOrNull(resultItem), ItemUtils.asItemStackOrNull(item1), ItemUtils.asItemStackOrNull(item2));
 	}
 
 	public final boolean areItemsEqual(TradingRecipeDraft otherRecipe) {

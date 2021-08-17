@@ -176,9 +176,9 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 		Player player = session.getPlayer();
 		int changedOffers = tradingRecipesAdapter.updateTradingRecipes(player, session.getRecipes());
 		if (changedOffers == 0) {
-			Log.debug("No shopkeeper offers changed.");
+			Log.debug(() -> shopkeeper.getLogPrefix() + "No offers have changed.");
 		} else {
-			Log.debug(() -> changedOffers + " shopkeeper offer(s) changed.");
+			Log.debug(() -> shopkeeper.getLogPrefix() + changedOffers + " offers have changed.");
 
 			// Call event:
 			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));

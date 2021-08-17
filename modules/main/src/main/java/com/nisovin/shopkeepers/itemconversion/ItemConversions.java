@@ -78,17 +78,18 @@ public class ItemConversions {
 			assert containerBlock != null;
 			if (ShopContainers.isSupportedContainer(containerBlock.getType())) {
 				long startNanos = System.nanoTime();
-				// Note: Returns the complete inventory for double chests.
+				// Returns the complete inventory for double chests.
+				// Inventory changes are directly reflected by the container block in the world.
 				Inventory containerInventory = ShopContainers.getInventory(containerBlock);
 				int convertedContainerStacks = convertAffectedItems(containerInventory);
-				// Note: Inventory changes are directly reflected by the container block in the world.
 				long durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
-				// Note: The conversion always has some performance impact, even if no items got actually converted. We
-				// therefore always print the debug messages to allow debugging the item conversion times.
+				// The conversion always has some performance impact, even if no items were actually converted. To
+				// enable debugging these item conversion timings, we always print this debug message, even if no items
+				// were converted.
 				Log.debug(DebugOptions.itemConversions,
-						() -> "Converted " + convertedContainerStacks + " affected item stacks in the container of shopkeeper "
-								+ shopkeeper.getId() + ", triggered by player '" + player.getName()
-								+ "' (took " + durationMillis + " ms)."
+						() -> shopkeeper.getLogPrefix() + "Player '" + player.getName() + "' triggered the conversion of "
+								+ convertedContainerStacks + " affected item stacks inside the shop container (took "
+								+ durationMillis + " ms)."
 				);
 				convertedStacks += convertedContainerStacks;
 			}

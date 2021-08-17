@@ -34,6 +34,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.bukkit.WorldUtils;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.RateLimiter;
@@ -449,7 +450,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	// True if the entity was respawned.
 	private boolean respawnInactiveEntity() {
 		assert !this.isActive();
-		Log.debug(() -> "Shopkeeper (" + shopkeeper.getPositionString() + ") is missing, attemtping respawn");
+		Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Entity is missing, attemtping respawn.");
 		if (entity != null) {
 			if (ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
 				// The chunk was silently unloaded before:
@@ -496,8 +497,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			// center of the spawn block, this ensures that we teleport it back into place whenever it changes its
 			// block.
 			// Teleport back:
-			Log.debug(DebugOptions.regularTickActivities, () -> "Shopkeeper (" + shopkeeper.getPositionString()
-					+ ") out of place, teleporting back");
+			Log.debug(DebugOptions.regularTickActivities, () -> shopkeeper.getLocatedLogPrefix()
+					+ "Entity moved (" + TextUtils.getLocationString(entityLoc) + "). Teleporting back.");
 			// We freshly determine a potentially new spawn location:
 			// The previous spawn location might no longer be ideal. For example, if the shopkeeper previously spawned
 			// slightly below its actual spawn location (due to there missing some block), players might want to reset

@@ -118,7 +118,7 @@ public class CitizensShops {
 			Log.debug("Citizen shops enabled, but Citizens plugin not found or disabled.");
 			return;
 		}
-		Log.info("Citizens found, enabling NPC shopkeepers.");
+		Log.info("Citizens found: Enabling NPC shopkeepers.");
 
 		// Register shopkeeper trait:
 		this.registerShopkeeperTrait();
@@ -315,11 +315,11 @@ public class CitizensShops {
 			SKCitizensShopObject citizensShop = (SKCitizensShopObject) shopkeeper.getShopObject();
 			UUID npcUniqueId = citizensShop.getNPCUniqueId();
 			if (npcUniqueId == null) {
-				// NPC wasn't created yet, which is only the case if a shopkeeper got somehow created without Citizens
-				// being enabled:
+				// The id of the associated Citizens NPC is missing. If the NPC wasn't created yet, maybe the shopkeeper
+				// was somehow created without the Citizens plugin being enabled.
 				invalidShopkeepers.add(shopkeeper);
 				if (!silent) {
-					Log.warning("Invalid Citizen shopkeeper " + shopkeeper.getId() + ": The NPC has not yet been created.");
+					Log.warning(shopkeeper.getLogPrefix() + "There is no Citizens NPC associated.");
 				}
 				return;
 			}
@@ -328,8 +328,7 @@ public class CitizensShops {
 				// There is no NPC with the stored NPC id:
 				invalidShopkeepers.add(shopkeeper);
 				if (!silent) {
-					Log.warning("Invalid Citizen shopkeeper " + shopkeeper.getId() + ": There is no NPC with unique id "
-							+ npcUniqueId);
+					Log.warning(shopkeeper.getLogPrefix() + "There is no Citizens NPC with unique id " + npcUniqueId);
 				}
 				return;
 			}
@@ -344,8 +343,8 @@ public class CitizensShops {
 					citizensShop.setKeepNPCOnDeletion();
 					invalidShopkeepers.add(shopkeeper);
 					if (!silent) {
-						Log.warning("Invalid Citizen shopkeeper " + shopkeeper.getId() + ": Shopkeeper "
-								+ mainShopkeeper.getId() + " is using the same NPC with unique id " + npcUniqueId);
+						Log.warning(shopkeeper.getLogPrefix() + "Shopkeeper " + mainShopkeeper.getId()
+								+ " is already using the same Citizens NPC with unique id " + npcUniqueId);
 					}
 					return;
 				}
@@ -368,10 +367,10 @@ public class CitizensShops {
 			} else {
 				// Only log a warning:
 				if (!silent) {
-					Log.warning("Found " + invalidShopkeepers.size() + " invalid Citizen shopkeepers!");
-					Log.warning("Either enable the setting 'delete-invalid-citizen-shopkeepers' inside the config, or use the "
-							+ "command '/shopkeepers cleanupCitizenShopkeepers' to automatically delete these shopkeepers and "
-							+ "get rid of these warnings.");
+					Log.warning("Found " + invalidShopkeepers.size() + " invalid Citizen shopkeepers!"
+							+ " Either enable the setting 'delete-invalid-citizen-shopkeepers' inside the config, or use the"
+							+ " command '/shopkeepers cleanupCitizenShopkeepers' to automatically delete these shopkeepers and"
+							+ " get rid of these warnings.");
 				}
 			}
 		}

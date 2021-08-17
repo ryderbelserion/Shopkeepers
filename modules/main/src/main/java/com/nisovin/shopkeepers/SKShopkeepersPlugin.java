@@ -122,7 +122,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		boolean success = ClassUtils.loadAllClassesFromJar(pluginJarFile, className -> {
 			// Skip version dependent classes:
 			if (className.startsWith("com.nisovin.shopkeepers.compat.")) return false;
-			// Skip classes which interact with optional dependencies:
+			// Skip classes that interact with optional dependencies:
 			if (className.equals("com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler$Internal")) return false;
 			if (className.equals("com.nisovin.shopkeepers.shopobjects.citizens.CitizensShopkeeperTrait")) return false;
 			if (className.equals("com.nisovin.shopkeepers.spigot.text.SpigotText$Internal")) return false;
