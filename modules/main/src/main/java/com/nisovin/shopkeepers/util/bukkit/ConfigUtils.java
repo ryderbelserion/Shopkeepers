@@ -96,7 +96,7 @@ public class ConfigUtils {
 		return dataMap;
 	}
 
-	// Expects the Map to contain a type key.
+	// Expects the Map to contain a type key, and any inner serializable data to already be deserialized.
 	@SuppressWarnings("unchecked")
 	public static <T extends ConfigurationSerializable> T deserialize(Map<String, Object> dataMap) {
 		if (dataMap == null) return null;
@@ -131,8 +131,7 @@ public class ConfigUtils {
 				serializeDeeply(innerSectionMap);
 				entry.setValue(innerSectionMap);
 			} else if (value instanceof ConfigurationSerializable) {
-				Map<String, Object> innerSerializableData = serialize((ConfigurationSerializable) value);
-				serializeDeeply(innerSerializableData);
+				Map<String, Object> innerSerializableData = serializeDeeply((ConfigurationSerializable) value);
 				entry.setValue(innerSerializableData);
 			}
 		});
