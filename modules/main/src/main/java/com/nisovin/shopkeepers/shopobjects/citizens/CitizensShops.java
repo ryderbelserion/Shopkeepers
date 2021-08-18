@@ -285,7 +285,7 @@ public class CitizensShops {
 		Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "citizens save -a");
 		// CitizensAPI.getNPCRegistry().saveToStore();
 		double durationMillis = TimeUtils.convert(System.nanoTime() - startNanos, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
-		Log.debug(() -> "Saved Citizens NPCs (" + TextUtils.DECIMAL_FORMAT.format(durationMillis) + "ms)");
+		Log.debug(() -> "Saved Citizens NPCs (" + TextUtils.DECIMAL_FORMAT.format(durationMillis) + " ms).");
 	}
 
 	/**

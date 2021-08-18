@@ -524,7 +524,7 @@ public abstract class SingletonTask {
 	 */
 	public final String getExecutionTimingString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(totalDurationMillis).append("ms");
+		sb.append(totalDurationMillis).append(" ms");
 		String details = this.getExecutionTimingDetailString();
 		if (!details.isEmpty()) {
 			sb.append(" (").append(details).append(")");
@@ -539,7 +539,7 @@ public abstract class SingletonTask {
 
 		if (preparationDurationMillis > 0) {
 			firstEntry = false;
-			sb.append("Preparation: ").append(preparationDurationMillis).append("ms");
+			sb.append("Preparation: ").append(preparationDurationMillis).append(" ms");
 		}
 
 		if (executionDelayMillis > 0) {
@@ -553,11 +553,11 @@ public abstract class SingletonTask {
 			} else {
 				sb.append("Sync execution delay: ");
 			}
-			sb.append(executionDelayMillis).append("ms");
+			sb.append(executionDelayMillis).append(" ms");
 
 			// The lock acquire duration is part of the execution delay:
 			if (lockAcquireDurationMillis > 0) {
-				sb.append(" (Lock delay: ").append(lockAcquireDurationMillis).append("ms)");
+				sb.append(" (Lock delay: ").append(lockAcquireDurationMillis).append(" ms)");
 			}
 		}
 
@@ -572,7 +572,7 @@ public abstract class SingletonTask {
 			} else {
 				sb.append("Sync execution: ");
 			}
-			sb.append(executionDurationMillis).append("ms");
+			sb.append(executionDurationMillis).append(" ms");
 		}
 		return sb.toString();
 	}

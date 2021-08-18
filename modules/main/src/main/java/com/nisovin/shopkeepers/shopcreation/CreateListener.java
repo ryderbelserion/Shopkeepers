@@ -192,7 +192,7 @@ class CreateListener implements Listener {
 		long millisSinceLastInteraction = (nowMillis - lastHandledInteractionMillis.getValue());
 		if (millisSinceLastInteraction < INTERACTION_DELAY_MILLIS) {
 			Log.debug(() -> "Ignoring interaction of player " + player.getName() + ": Last handled interaction was "
-					+ millisSinceLastInteraction + "ms ago");
+					+ millisSinceLastInteraction + " ms ago.");
 			return;
 		}
 		// We only update the last interaction timestamp when we actually handle the event. This prevents that delays

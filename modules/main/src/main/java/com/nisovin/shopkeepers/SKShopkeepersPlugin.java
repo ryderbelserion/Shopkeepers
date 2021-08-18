@@ -130,7 +130,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		}, this.getLogger());
 		if (success) {
 			long durationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startNanos);
-			Log.info("Loaded all plugin classes (" + durationMillis + " ms)");
+			Log.info("Loaded all plugin classes (" + durationMillis + " ms).");
 		}
 	}
 
