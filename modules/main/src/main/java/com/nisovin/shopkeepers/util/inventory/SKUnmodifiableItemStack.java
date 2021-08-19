@@ -51,6 +51,20 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 		this.delegate = itemStack;
 	}
 
+	/**
+	 * Gets the underlying {@link ItemStack}.
+	 * <p>
+	 * This method is only meant to be used for internal debugging or testing purposes! The caller is expected to not
+	 * modify or expose the returned item stack.
+	 * 
+	 * @return the underlying item stack
+	 * @deprecated For internal debugging and testing purposes only!
+	 */
+	@Deprecated
+	public ItemStack getInternalItemStack() {
+		return delegate;
+	}
+
 	private UnsupportedOperationException unmodifiableException() {
 		return new UnsupportedOperationException("This ItemStack cannot be modified!");
 	}
