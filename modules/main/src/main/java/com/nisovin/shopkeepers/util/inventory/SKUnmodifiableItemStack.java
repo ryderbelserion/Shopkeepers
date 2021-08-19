@@ -119,14 +119,26 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	@Override
 	public boolean isSimilar(@ReadOnly ItemStack itemStack) {
 		if (itemStack == this) return true;
-		return delegate.isSimilar(itemStack);
+		if (itemStack instanceof UnmodifiableItemStack) {
+			// If this unmodifiable item stack's delegate is a CraftItemStack and the given item stack is an
+			// UnmodifiableItemStack, invoking CraftItemStack#isSimilar(itemStack) may return a wrong result.
+			// Instead, we therefore want to compare the underlying delegate item stacks with each other. Unlike when
+			// comparing CraftItemStacks with unmodifiable item stacks, the order of this comparison does not matter.
+			// This is expected to not modify or expose the passed item stack:
+			return itemStack.isSimilar(delegate);
+		} else {
+			return delegate.isSimilar(itemStack);
+		}
 	}
 
 	@Override
 	public boolean isSimilar(UnmodifiableItemStack itemStack) {
 		if (itemStack == null) return false;
 		if (itemStack == this) return true;
-		return delegate.isSimilar(itemStack.asItemStack());
+		// Compare the underlying delegate item stacks:
+		// The order in which these delegate item stacks are compared does not matter.
+		// This is expected to not modify or expose the passed item stack:
+		return itemStack.isSimilar(delegate);
 	}
 
 	// TODO This method cannot be correctly implemented for CraftItemStack, because CraftItemStack always returns false
@@ -135,7 +147,15 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	@Override
 	public boolean equals(@ReadOnly Object obj) {
 		if (this == obj) return true;
-		return delegate.equals(obj);
+		if (obj instanceof UnmodifiableItemStack) {
+			UnmodifiableItemStack other = (UnmodifiableItemStack) obj;
+			// Compare the underlying delegate item stacks:
+			// The order in which these delegate item stacks are compared does not matter.
+			// This is expected to not modify or expose the passed item stack:
+			return other.equals(delegate);
+		} else {
+			return delegate.equals(obj);
+		}
 	}
 
 	@Override
