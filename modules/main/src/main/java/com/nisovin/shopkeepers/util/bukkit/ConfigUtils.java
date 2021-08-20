@@ -31,14 +31,24 @@ public class ConfigUtils {
 		return material;
 	}
 
+	// Additional processing whenever we load deserialized item stacks from a config.
 	public static ItemStack loadItemStack(ConfigurationSection config, String key) {
-		// Spigot creates Bukkit ItemStacks, whereas Paper automatically replaces the deserialized Bukkit ItemStacks
-		// with CraftItemStacks. Some of our comparisons between ItemStacks and our UnmodifiableItemStack rely on the
-		// compared ItemStacks being Bukkit ItemStacks and not CraftItemStacks, because CraftItemStack does not consider
-		// custom ItemStack implementations as equal. In various cases we therefore assume that the deserialized
-		// ItemStacks are Bukkit ItemStacks. In order to ensure that this assumption also holds on Paper servers, we
-		// need to convert any CraftItemStacks back to Bukkit ItemStacks.
-		return ItemUtils.ensureBukkitItemStack(config.getItemStack(key));
+		// Note: Spigot creates Bukkit ItemStacks, whereas Paper automatically replaces the deserialized Bukkit
+		// ItemStacks with CraftItemStacks. However, as long as the deserialized item stack is not compared directly to
+		// an unmodifiable item stack (at least not without first being wrapped into an unmodifiable item stack itself),
+		// and assuming that there are no inconsistencies in how CraftItemStacks and Bukkit ItemStacks are compared with
+		// each other, this difference should not be relevant to us.
+		ItemStack itemStack = config.getItemStack(key);
+
+		// TODO SPIGOT-6716, PAPER-6437: The order of stored enchantments of enchanted books is not consistent. On
+		// Paper, where the deserialized ItemStacks end up being CraftItemStacks, this difference in enchantment order
+		// can cause issues when these deserialized item stacks are compared to other CraftItemStacks. Converting these
+		// deserialized CraftItemStacks back to Bukkit ItemStacks ensures that the comparisons with other
+		// CraftItemStacks ignore the enchantment order.
+		if (itemStack != null && itemStack.getType() == Material.ENCHANTED_BOOK) {
+			itemStack = ItemUtils.ensureBukkitItemStack(itemStack);
+		}
+		return itemStack;
 	}
 
 	public static UnmodifiableItemStack loadUnmodifiableItemStack(ConfigurationSection config, String key) {
