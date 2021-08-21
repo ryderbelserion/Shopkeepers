@@ -19,6 +19,7 @@ Date format: (YYYY-MM-DD)
   * Log messages involving a specific shopkeeper are more consistently formatted now.
   * Some groups of error messages are now logged as a single message.
   * In a few remaining cases, stack traces are no longer printed directly to the server log, but through the plugin logger.
+* During the initial plugin startup, we now test if the server meets certain basic assumptions about its API implementation. In order to prevent damage due to unexpected server and plugin behavior, the plugin shuts itself down if any of these assumptions turn out to be incorrect. These tests are meant to be lightweight, but may be expanded in the future.
 
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.

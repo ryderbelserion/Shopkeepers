@@ -24,6 +24,7 @@ import com.nisovin.shopkeepers.commands.Commands;
 import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
 import com.nisovin.shopkeepers.compat.MC_1_17_Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.compat.ServerAssumptionsTest;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
 import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
@@ -262,6 +263,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 			Log.debug("Spigot-based server found: Enabling Spigot exclusive features.");
 		} else {
 			Log.info("No Spigot-based server found: Disabling Spigot exclusive features!");
+		}
+
+		// Test server assumptions:
+		if (!ServerAssumptionsTest.run()) {
+			Log.severe("Server incompatibility detected! Disabling the plugin!");
+			this.setEnabled(false); // Also calls onDisable
+			return;
 		}
 
 		// Register defaults (if not already setup during onLoad):
