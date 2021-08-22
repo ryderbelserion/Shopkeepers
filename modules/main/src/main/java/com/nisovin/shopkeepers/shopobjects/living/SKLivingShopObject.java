@@ -92,11 +92,6 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	@Override
 	public void load(ConfigurationSection configSection) {
 		super.load(configSection);
-		// Check for legacy uuid entry:
-		if (configSection.contains("uuid")) {
-			// Mark dirty to remove this entry with the next save:
-			shopkeeper.markDirty();
-		}
 	}
 
 	@Override

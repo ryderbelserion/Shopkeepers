@@ -21,6 +21,7 @@ Date format: (YYYY-MM-DD)
   * In a few remaining cases, stack traces are no longer printed directly to the server log, but through the plugin logger.
 * During the initial plugin startup, we now test if the server meets certain basic assumptions about its API implementation. In order to prevent damage due to unexpected server and plugin behavior, the plugin shuts itself down if any of these assumptions turn out to be incorrect. These tests are meant to be lightweight, but may be expanded in the future.
 * Debug: Added a debug log message whenever a player tries to set an invalid shop name.
+* Removed the 3 year old migration that checks for and removes entity uuids from the data of living entity shopkeepers.
 
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
