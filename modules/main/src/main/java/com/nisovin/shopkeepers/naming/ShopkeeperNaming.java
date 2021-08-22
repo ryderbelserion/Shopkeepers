@@ -11,6 +11,7 @@ import com.nisovin.shopkeepers.chatinput.ChatInput.Request;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class ShopkeeperNaming {
 
@@ -74,23 +75,28 @@ public class ShopkeeperNaming {
 		} else {
 			// Validate name:
 			if (!((AbstractShopkeeper) shopkeeper).isValidName(newName)) {
-				TextUtils.sendMessage(player, Messages.nameInvalid);
+				String newNameFinal = newName;
+				Log.debug(() -> shopkeeper.getLogPrefix() + "Player " + player.getName()
+						+ " tried to set an invalid name: '" + newNameFinal + "'");
+				TextUtils.sendMessage(player, Messages.nameInvalid, "name", newName);
 				return false;
 			}
 		}
 
-		// Apply new name:
+		// Apply the new name:
 		String oldName = shopkeeper.getName();
 		shopkeeper.setName(newName);
+		// Get the actual new name that has been set, in case the shopkeeper modified it:
+		newName = shopkeeper.getName();
 
-		// Compare to previous name:
-		if (oldName.equals(shopkeeper.getName())) {
-			TextUtils.sendMessage(player, Messages.nameHasNotChanged);
+		// Compare the new name to the previous name:
+		if (oldName.equals(newName)) {
+			TextUtils.sendMessage(player, Messages.nameHasNotChanged, "name", newName);
 			return false;
 		}
 
 		// Inform player:
-		TextUtils.sendMessage(player, Messages.nameSet);
+		TextUtils.sendMessage(player, Messages.nameSet, "name", newName);
 
 		// Close all open windows:
 		shopkeeper.abortUISessionsDelayed(); // TODO Really needed?

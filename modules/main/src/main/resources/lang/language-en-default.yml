@@ -227,10 +227,10 @@ too-many-shops: "&7You have already reached the limit of how many shops you can 
 no-player-shops-via-command: "&7Player shops can only be created via the shop creation item!"
 shop-create-fail: "&7You cannot create a shopkeeper there."
 
-type-new-name: "&aPlease type the shop's name into the chat.\n  &aType a dash (-) to remove the name."
-name-set: "&aThe shop's name has been set!"
+type-new-name: "&aPlease enter the shop's new name in chat.\n  &aEnter a dash (-) to remove the current name."
+name-set: "&aThe shop's name has been set to '&e{name}&a'!"
 name-has-not-changed: "&aThe shop's name has not changed."
-name-invalid: "&aThat name is not valid!"
+name-invalid: "&cInvalid shop name: '&e{name}&c'"
 nameplate-prefix: "&2"
 
 shop-type-disabled: "&7The shop type '&6{type}&7' is disabled."

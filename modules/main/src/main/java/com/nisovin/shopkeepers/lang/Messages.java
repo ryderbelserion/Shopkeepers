@@ -174,11 +174,11 @@ public class Messages extends Config {
 	public static Text noPlayerShopsViaCommand = Text.parse("&7Player shops can only be created via the shop creation item!");
 	public static Text shopCreateFail = Text.parse("&7You cannot create a shopkeeper there.");
 
-	public static Text typeNewName = Text.parse("&aPlease type the shop's name into the chat.\n"
-			+ "  &aType a dash (-) to remove the name.");
-	public static Text nameSet = Text.parse("&aThe shop's name has been set!");
+	public static Text typeNewName = Text.parse("&aPlease enter the shop's new name in chat.\n"
+			+ "  &aEnter a dash (-) to remove the current name.");
+	public static Text nameSet = Text.parse("&aThe shop's name has been set to '&e{name}&a'!");
 	public static Text nameHasNotChanged = Text.parse("&aThe shop's name has not changed.");
-	public static Text nameInvalid = Text.parse("&aThat name is not valid!");
+	public static Text nameInvalid = Text.parse("&cInvalid shop name: '&e{name}&c'");
 	public static String nameplatePrefix = c("&2");
 
 	public static Text shopTypeDisabled = Text.parse("&7The shop type '&6{type}&7' is disabled.");

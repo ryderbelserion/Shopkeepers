@@ -20,6 +20,7 @@ Date format: (YYYY-MM-DD)
   * Some groups of error messages are now logged as a single message.
   * In a few remaining cases, stack traces are no longer printed directly to the server log, but through the plugin logger.
 * During the initial plugin startup, we now test if the server meets certain basic assumptions about its API implementation. In order to prevent damage due to unexpected server and plugin behavior, the plugin shuts itself down if any of these assumptions turn out to be incorrect. These tests are meant to be lightweight, but may be expanded in the future.
+* Debug: Added a debug log message whenever a player tries to set an invalid shop name.
 
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
@@ -58,6 +59,9 @@ Date format: (YYYY-MM-DD)
 * Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
 * The save operations of the shopkeeper storage and the CSV trade logger will now restore any catched Thread interruption status for anyone interested in it. Other than that, these operations still ignore Thread interruptions, because we prefer to keep trying to still save the data to disk after all.
 * Various other minor internal refactors and Javadoc improvements.
+
+**Message changes:**  
+* Slightly changed the default messages of `type-new-name`, `name-set`, and `name-invalid`. These messages, as well as `name-has-not-changed`, can now access the new name via the argument `{name}`.
 
 ## v2.13.3 (2021-07-08)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
