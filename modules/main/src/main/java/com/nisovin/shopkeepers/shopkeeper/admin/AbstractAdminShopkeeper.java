@@ -77,17 +77,17 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	}
 
 	@Override
-	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
-		super.loadFromSaveData(configSection);
+	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		super.loadFromSaveData(shopkeeperData);
 		// Load trade permission:
-		tradePermission = configSection.getString("tradePerm", null);
+		tradePermission = shopkeeperData.getString("tradePerm", null);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
+	public void save(ConfigurationSection shopkeeperData) {
+		super.save(shopkeeperData);
 		// Save trade permission:
-		configSection.set("tradePerm", tradePermission);
+		shopkeeperData.set("tradePerm", tradePermission);
 	}
 
 	@Override

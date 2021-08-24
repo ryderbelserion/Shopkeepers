@@ -33,15 +33,15 @@ public class ParrotShop extends SittableShop<Parrot> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		variantProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		variantProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		variantProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		variantProperty.save(shopObjectData);
 	}
 
 	@Override

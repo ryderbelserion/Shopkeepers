@@ -69,11 +69,11 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
 
-		if (configSection.contains("npcId")) {
-			String npcUniqueIdString = configSection.getString("npcId");
+		if (shopObjectData.contains("npcId")) {
+			String npcUniqueIdString = shopObjectData.getString("npcId");
 			this.npcUniqueId = ConversionUtils.parseUUID(npcUniqueIdString);
 			if (npcUniqueId == null) {
 				Log.warning(shopkeeper.getLogPrefix() + "Could not parse the unique Citizens NPC id: "
@@ -83,10 +83,10 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
 		if (npcUniqueId != null) {
-			configSection.set("npcId", npcUniqueId.toString());
+			shopObjectData.set("npcId", npcUniqueId.toString());
 		}
 	}
 

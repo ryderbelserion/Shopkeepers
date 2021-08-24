@@ -44,9 +44,9 @@ public class RegularAdminShopType extends AbstractAdminShopType<SKRegularAdminSh
 	}
 
 	@Override
-	public SKRegularAdminShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
-		this.validateConfigSection(configSection);
-		SKRegularAdminShopkeeper shopkeeper = new SKRegularAdminShopkeeper(id, configSection);
+	public SKRegularAdminShopkeeper loadShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		this.validateShopkeeperData(shopkeeperData);
+		SKRegularAdminShopkeeper shopkeeper = new SKRegularAdminShopkeeper(id, shopkeeperData);
 		return shopkeeper;
 	}
 }

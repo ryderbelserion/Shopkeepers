@@ -63,19 +63,19 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		colorProperty.load(configSection);
-		styleProperty.load(configSection);
-		armorProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		colorProperty.load(shopObjectData);
+		styleProperty.load(shopObjectData);
+		armorProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		colorProperty.save(configSection);
-		styleProperty.save(configSection);
-		armorProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		colorProperty.save(shopObjectData);
+		styleProperty.save(shopObjectData);
+		armorProperty.save(shopObjectData);
 	}
 
 	@Override

@@ -31,15 +31,15 @@ public class PigShop extends BabyableShop<Pig> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		saddleProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		saddleProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		saddleProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		saddleProperty.save(shopObjectData);
 	}
 
 	@Override

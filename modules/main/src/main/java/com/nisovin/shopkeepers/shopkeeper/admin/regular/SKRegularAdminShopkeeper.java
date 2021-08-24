@@ -44,9 +44,9 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 		this.initOnCreation(shopCreationData);
 	}
 
-	protected SKRegularAdminShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+	protected SKRegularAdminShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
 		super(id);
-		this.initOnLoad(configSection);
+		this.initOnLoad(shopkeeperData);
 	}
 
 	@Override
@@ -58,10 +58,10 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	}
 
 	@Override
-	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
-		super.loadFromSaveData(configSection);
+	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		super.loadFromSaveData(shopkeeperData);
 		// Load offers:
-		List<? extends TradeOffer> offers = SKTradeOffer.loadFromConfig(configSection, "recipes", this.getLogPrefix());
+		List<? extends TradeOffer> offers = SKTradeOffer.loadFromConfig(shopkeeperData, "recipes", this.getLogPrefix());
 		List<? extends TradeOffer> migratedOffers = SKTradeOffer.migrateItems(offers, this.getLogPrefix());
 		if (offers != migratedOffers) {
 			Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated items of trade offers.");
@@ -71,10 +71,10 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
+	public void save(ConfigurationSection shopkeeperData) {
+		super.save(shopkeeperData);
 		// Save offers:
-		SKTradeOffer.saveToConfig(configSection, "recipes", this.getOffers());
+		SKTradeOffer.saveToConfig(shopkeeperData, "recipes", this.getOffers());
 	}
 
 	@Override

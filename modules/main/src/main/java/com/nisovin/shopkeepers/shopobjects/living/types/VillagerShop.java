@@ -70,19 +70,19 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		professionProperty.load(configSection);
-		villagerTypeProperty.load(configSection);
-		villagerLevelProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		professionProperty.load(shopObjectData);
+		villagerTypeProperty.load(shopObjectData);
+		villagerLevelProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		professionProperty.save(configSection);
-		villagerTypeProperty.save(configSection);
-		villagerLevelProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		professionProperty.save(shopObjectData);
+		villagerTypeProperty.save(shopObjectData);
+		villagerLevelProperty.save(shopObjectData);
 	}
 
 	@Override

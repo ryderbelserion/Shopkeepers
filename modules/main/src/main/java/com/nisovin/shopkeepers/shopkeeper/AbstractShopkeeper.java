@@ -161,7 +161,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * Initializes the shopkeeper by using the data from the given {@link ShopCreationData}.
 	 * 
 	 * @param shopCreationData
-	 *            the shop creation data
+	 *            the shop creation data, not <code>null</code>
 	 * @throws ShopkeeperCreateException
 	 *             in case the shopkeeper could not be created
 	 * @see #loadFromCreationData(ShopCreationData)
@@ -174,14 +174,14 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Initializes the shopkeeper by loading its previously saved data from the given config section.
 	 * 
-	 * @param configSection
-	 *            the config section
+	 * @param shopkeeperData
+	 *            the shopkeeper data, not <code>null</code>
 	 * @throws ShopkeeperCreateException
 	 *             in case the shopkeeper could not be loaded
 	 * @see #loadFromSaveData(ConfigurationSection)
 	 */
-	protected final void initOnLoad(ConfigurationSection configSection) throws ShopkeeperCreateException {
-		this.loadFromSaveData(configSection);
+	protected final void initOnLoad(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		this.loadFromSaveData(shopkeeperData);
 		this.commonSetup();
 	}
 
@@ -194,7 +194,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * Initializes the shopkeeper by using the data from the given {@link ShopCreationData}.
 	 * 
 	 * @param shopCreationData
-	 *            the shop creation data
+	 *            the shop creation data, not <code>null</code>
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper cannot be properly initialized
 	 */
@@ -267,14 +267,16 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Loads the shopkeeper's saved data from the given config section.
 	 * 
-	 * @param configSection
-	 *            the config section
+	 * @param shopkeeperData
+	 *            the shopkeeper data, not <code>null</code>
 	 * @throws ShopkeeperCreateException
-	 *             if the shopkeeper cannot be properly loaded
+	 *             if the shopkeeper data cannot be loaded
 	 * @see AbstractShopType#loadShopkeeper(int, ConfigurationSection)
 	 */
-	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
-		String uniqueIdString = configSection.getString("uniqueId", "");
+	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		Validate.notNull(shopkeeperData, "shopkeeperData is null");
+
+		String uniqueIdString = shopkeeperData.getString("uniqueId", "");
 		try {
 			this.uniqueId = UUID.fromString(uniqueIdString);
 		} catch (IllegalArgumentException e) {
@@ -285,19 +287,19 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.markDirty();
 		}
 
-		this.name = this.trimName(TextUtils.colorize(configSection.getString("name", "")));
+		this.name = this.trimName(TextUtils.colorize(shopkeeperData.getString("name", "")));
 
 		// Shop object:
 		String objectTypeId;
-		ConfigurationSection objectSection = configSection.getConfigurationSection("object");
-		if (objectSection == null) {
+		ConfigurationSection shopObjectData = shopkeeperData.getConfigurationSection("object");
+		if (shopObjectData == null) {
 			// Load from legacy data:
 			// TODO Remove again at some point.
-			objectTypeId = configSection.getString("object");
-			objectSection = configSection;
+			objectTypeId = shopkeeperData.getString("object");
+			shopObjectData = shopkeeperData;
 			this.markDirty();
 		} else {
-			objectTypeId = objectSection.getString("type");
+			objectTypeId = shopObjectData.getString("type");
 		}
 
 		// Convert legacy object identifiers:
@@ -318,17 +320,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			// MC 1.14:
 			// Convert ocelots to cats:
 			if (objectTypeId.equals("ocelot")) {
-				String ocelotType = objectSection.getString("catType");
+				String ocelotType = shopObjectData.getString("catType");
 				if (ocelotType != null) {
 					if (ocelotType.equals("WILD_OCELOT")) {
 						// Stays an ocelot, but remove cat type data:
-						objectSection.set("catType", null);
+						shopObjectData.set("catType", null);
 						this.markDirty();
 					} else {
 						// Convert to cat:
 						objectTypeId = "cat";
 						String catType = CatShop.fromOcelotType(ocelotType).name();
-						objectSection.set("catType", catType);
+						shopObjectData.set("catType", catType);
 						this.markDirty();
 						Log.warning(this.getLogPrefix() + "Migrated ocelot type '" + ocelotType
 								+ "' to cat type '" + catType + "'.");
@@ -359,16 +361,16 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		assert objectType != null;
 
 		// Normalize empty world name to null:
-		String storedWorldName = StringUtils.getNotEmpty(configSection.getString("world"));
-		int storedX = configSection.getInt("x");
-		int storedY = configSection.getInt("y");
-		int storedZ = configSection.getInt("z");
-		float storedYaw = (float) configSection.getDouble("yaw"); // 0 (south) if missing (eg. in pre 2.13.4 versions)
+		this.worldName = StringUtils.getNotEmpty(shopkeeperData.getString("world"));
+		this.x = shopkeeperData.getInt("x");
+		this.y = shopkeeperData.getInt("y");
+		this.z = shopkeeperData.getInt("z");
+		this.yaw = (float) shopkeeperData.getDouble("yaw"); // 0 (south) if missing (eg. in pre 2.13.4 versions)
 
 		if (objectType instanceof VirtualShopObjectType) {
-			if (storedWorldName != null || storedX != 0 || storedY != 0 || storedZ != 0 || storedYaw != 0.0F) {
+			if (worldName != null || x != 0 || y != 0 || z != 0 || yaw != 0.0F) {
 				Log.warning(this.getLogPrefix() + "Ignoring stored location ("
-						+ TextUtils.getLocationString(StringUtils.getOrEmpty(storedWorldName), storedX, storedY, storedZ, storedYaw)
+						+ TextUtils.getLocationString(StringUtils.getOrEmpty(worldName), x, y, z, yaw)
 						+ ") for virtual shopkeeper!");
 				this.markDirty();
 			}
@@ -378,19 +380,15 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.z = 0;
 			this.yaw = 0.0F;
 		} else {
-			if (storedWorldName == null) {
+			if (worldName == null) {
 				throw new ShopkeeperCreateException("Missing world name!");
 			}
-			this.worldName = storedWorldName;
-			this.x = storedX;
-			this.y = storedY;
-			this.z = storedZ;
-			this.yaw = storedYaw;
 		}
 		this.updateChunkCoords();
 
+		// Create and load the shop object:
 		this.shopObject = this.createShopObject(objectType, null);
-		this.shopObject.load(objectSection);
+		this.shopObject.load(shopObjectData);
 	}
 
 	// shopCreationData can be null if the shopkeeper is getting loaded.
@@ -403,30 +401,30 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * Saves the shopkeeper's data to the specified configuration section.
+	 * Saves the shopkeeper's data to the given {@link ConfigurationSection}.
 	 * <p>
-	 * Note: The serialization of the inserted data may happen asynchronously, so make sure that this is not a problem
-	 * (ex. only insert immutable objects, or always create copies of the data you insert and/or make sure to not modify
-	 * the inserted objects).
+	 * The serialization of the inserted data may happen asynchronously, so make sure that this is not a problem (i.e.
+	 * only insert immutable objects, or always create copies of the data you insert and/or make sure to not modify the
+	 * inserted objects).
 	 * 
-	 * @param configSection
-	 *            the config section
+	 * @param shopkeeperData
+	 *            the shopkeeper data, not <code>null</code>
 	 */
-	public void save(ConfigurationSection configSection) {
-		Validate.notNull(configSection, "configSection is null");
-		configSection.set("uniqueId", uniqueId.toString());
-		configSection.set("name", TextUtils.decolorize(name));
-		// Null world name gets stored as empty string:
-		configSection.set("world", StringUtils.getOrEmpty(worldName));
-		configSection.set("x", x);
-		configSection.set("y", y);
-		configSection.set("z", z);
-		configSection.set("yaw", yaw);
-		configSection.set("type", this.getType().getIdentifier());
+	public void save(ConfigurationSection shopkeeperData) {
+		Validate.notNull(shopkeeperData, "shopkeeperData is null");
+		shopkeeperData.set("uniqueId", uniqueId.toString());
+		shopkeeperData.set("name", TextUtils.decolorize(name));
+		// Null world name is stored as an empty String:
+		shopkeeperData.set("world", StringUtils.getOrEmpty(worldName));
+		shopkeeperData.set("x", x);
+		shopkeeperData.set("y", y);
+		shopkeeperData.set("z", z);
+		shopkeeperData.set("yaw", yaw);
+		shopkeeperData.set("type", this.getType().getIdentifier());
 
 		// Shop object:
-		ConfigurationSection objectSection = configSection.createSection("object");
-		shopObject.save(objectSection);
+		ConfigurationSection shopObjectData = shopkeeperData.createSection("object");
+		shopObject.save(shopObjectData);
 	}
 
 	@Override

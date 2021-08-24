@@ -41,17 +41,17 @@ public class CatShop extends SittableShop<Cat> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		catTypeProperty.load(configSection);
-		collarColorProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		catTypeProperty.load(shopObjectData);
+		collarColorProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		catTypeProperty.save(configSection);
-		collarColorProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		catTypeProperty.save(shopObjectData);
+		collarColorProperty.save(shopObjectData);
 	}
 
 	@Override

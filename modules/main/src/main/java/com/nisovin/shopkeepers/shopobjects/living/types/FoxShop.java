@@ -37,11 +37,11 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		foxTypeProperty.load(configSection);
-		sleepingProperty.load(configSection);
-		crouchingProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		foxTypeProperty.load(shopObjectData);
+		sleepingProperty.load(shopObjectData);
+		crouchingProperty.load(shopObjectData);
 		// Incompatible with each other:
 		if (this.isSleeping() && this.isCrouching()) {
 			this.setCrouching(false);
@@ -49,11 +49,11 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		foxTypeProperty.save(configSection);
-		sleepingProperty.save(configSection);
-		crouchingProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		foxTypeProperty.save(shopObjectData);
+		sleepingProperty.save(shopObjectData);
+		crouchingProperty.save(shopObjectData);
 	}
 
 	@Override

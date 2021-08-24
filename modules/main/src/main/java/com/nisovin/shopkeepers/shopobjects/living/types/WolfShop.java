@@ -40,17 +40,17 @@ public class WolfShop extends SittableShop<Wolf> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		angryProperty.load(configSection);
-		collarColorProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		angryProperty.load(shopObjectData);
+		collarColorProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		angryProperty.save(configSection);
-		collarColorProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		angryProperty.save(shopObjectData);
+		collarColorProperty.save(shopObjectData);
 	}
 
 	@Override

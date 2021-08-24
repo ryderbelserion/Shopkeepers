@@ -40,17 +40,17 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		colorProperty.load(configSection);
-		carpetColorProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		colorProperty.load(shopObjectData);
+		carpetColorProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		colorProperty.save(configSection);
-		carpetColorProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		colorProperty.save(shopObjectData);
+		carpetColorProperty.save(shopObjectData);
 	}
 
 	@Override

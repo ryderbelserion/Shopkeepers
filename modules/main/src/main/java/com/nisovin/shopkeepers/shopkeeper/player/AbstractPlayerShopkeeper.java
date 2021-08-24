@@ -102,33 +102,33 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
-		super.loadFromSaveData(configSection);
+	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		super.loadFromSaveData(shopkeeperData);
 		try {
-			ownerUUID = UUID.fromString(configSection.getString("owner uuid"));
+			ownerUUID = UUID.fromString(shopkeeperData.getString("owner uuid"));
 		} catch (Exception e) {
 			// UUID is invalid or non-existent:
 			throw new ShopkeeperCreateException("Missing or invalid owner uuid!");
 		}
-		ownerName = configSection.getString("owner");
+		ownerName = shopkeeperData.getString("owner");
 		// TODO We no longer use the fallback name (since late 1.14.4). Remove the "unknown"-check again in the future
 		// (as soon as possible, because it conflicts with any player actually named 'unknown').
 		if (ownerName == null || ownerName.isEmpty() || ownerName.equals("unknown")) {
 			throw new ShopkeeperCreateException("Missing owner name!");
 		}
 
-		if (!configSection.isInt("chestx") || !configSection.isInt("chesty") || !configSection.isInt("chestz")) {
+		if (!shopkeeperData.isInt("chestx") || !shopkeeperData.isInt("chesty") || !shopkeeperData.isInt("chestz")) {
 			throw new ShopkeeperCreateException("Missing or invalid container coordinates!");
 		}
 
 		// Update container:
 		// TODO Rename to storage keys to containerx/y/z?
-		this._setContainer(configSection.getInt("chestx"), configSection.getInt("chesty"), configSection.getInt("chestz"));
+		this._setContainer(shopkeeperData.getInt("chestx"), shopkeeperData.getInt("chesty"), shopkeeperData.getInt("chestz"));
 
-		notifyOnTrades = configSection.getBoolean("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
+		notifyOnTrades = shopkeeperData.getBoolean("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
 
 		// The item is assumed to be immutable and therefore does not need to be copied.
-		UnmodifiableItemStack hireCost = ConfigUtils.loadUnmodifiableItemStack(configSection, "hirecost");
+		UnmodifiableItemStack hireCost = ConfigUtils.loadUnmodifiableItemStack(shopkeeperData, "hirecost");
 		// Hire cost ItemStack is not null, but empty. -> Normalize to null:
 		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
 			Log.warning(this.getLogPrefix() + "Hire cost item is empty! Disabling 'for hire'.");
@@ -151,18 +151,18 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		configSection.set("owner uuid", ownerUUID.toString());
-		configSection.set("owner", ownerName);
-		configSection.set("chestx", containerX);
-		configSection.set("chesty", containerY);
-		configSection.set("chestz", containerZ);
+	public void save(ConfigurationSection shopkeeperData) {
+		super.save(shopkeeperData);
+		shopkeeperData.set("owner uuid", ownerUUID.toString());
+		shopkeeperData.set("owner", ownerName);
+		shopkeeperData.set("chestx", containerX);
+		shopkeeperData.set("chesty", containerY);
+		shopkeeperData.set("chestz", containerZ);
 		if (notifyOnTrades != DEFAULT_NOTIFY_ON_TRADES) {
-			configSection.set("notifyOnTrades", notifyOnTrades);
+			shopkeeperData.set("notifyOnTrades", notifyOnTrades);
 		} // Not storing the default value
 		if (hireCost != null) {
-			configSection.set("hirecost", hireCost);
+			shopkeeperData.set("hirecost", hireCost);
 		}
 	}
 

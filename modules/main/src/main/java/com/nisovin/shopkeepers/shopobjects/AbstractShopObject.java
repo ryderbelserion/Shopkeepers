@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Abstract base class for all shop object implementations.
@@ -51,21 +52,29 @@ public abstract class AbstractShopObject implements ShopObject {
 		return shopkeeper;
 	}
 
-	public void load(ConfigurationSection configSection) {
+	/**
+	 * Loads the shop object's data from the given {@link ConfigurationSection}.
+	 * 
+	 * @param shopObjectData
+	 *            the shop object data, not <code>null</code>
+	 */
+	public void load(ConfigurationSection shopObjectData) {
+		Validate.notNull(shopObjectData, "shopObjectData is null");
 	}
 
 	/**
-	 * Saves the shop object's data to the specified configuration section.
+	 * Saves the shop object's data to the given {@link ConfigurationSection}.
 	 * <p>
-	 * Note: The serialization of the inserted data may happen asynchronously, so make sure that this is not a problem
-	 * (ex. only insert immutable objects, or always create copies of the data you insert and/or make sure to not modify
-	 * the inserted objects).
+	 * The serialization of the inserted data may happen asynchronously, so make sure that this is not a problem (i.e.
+	 * only insert immutable objects, or always create copies of the data you insert and/or make sure to not modify the
+	 * inserted objects).
 	 * 
-	 * @param configSection
-	 *            the config section
+	 * @param shopObjectData
+	 *            the shop object data, not <code>null</code>
 	 */
-	public void save(ConfigurationSection configSection) {
-		configSection.set("type", this.getType().getIdentifier());
+	public void save(ConfigurationSection shopObjectData) {
+		Validate.notNull(shopObjectData, "shopObjectData is null");
+		shopObjectData.set("type", this.getType().getIdentifier());
 	}
 
 	/**

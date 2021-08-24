@@ -45,9 +45,9 @@ public class BookPlayerShopType extends AbstractPlayerShopType<SKBookPlayerShopk
 	}
 
 	@Override
-	public SKBookPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
-		this.validateConfigSection(configSection);
-		SKBookPlayerShopkeeper shopkeeper = new SKBookPlayerShopkeeper(id, configSection);
+	public SKBookPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		this.validateShopkeeperData(shopkeeperData);
+		SKBookPlayerShopkeeper shopkeeper = new SKBookPlayerShopkeeper(id, shopkeeperData);
 		return shopkeeper;
 	}
 }

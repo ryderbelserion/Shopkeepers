@@ -46,9 +46,9 @@ public class TradingPlayerShopType extends AbstractPlayerShopType<SKTradingPlaye
 	}
 
 	@Override
-	public SKTradingPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
-		this.validateConfigSection(configSection);
-		SKTradingPlayerShopkeeper shopkeeper = new SKTradingPlayerShopkeeper(id, configSection);
+	public SKTradingPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		this.validateShopkeeperData(shopkeeperData);
+		SKTradingPlayerShopkeeper shopkeeper = new SKTradingPlayerShopkeeper(id, shopkeeperData);
 		return shopkeeper;
 	}
 }

@@ -46,9 +46,9 @@ public class SellingPlayerShopType extends AbstractPlayerShopType<SKSellingPlaye
 	}
 
 	@Override
-	public SKSellingPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
-		this.validateConfigSection(configSection);
-		SKSellingPlayerShopkeeper shopkeeper = new SKSellingPlayerShopkeeper(id, configSection);
+	public SKSellingPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		this.validateShopkeeperData(shopkeeperData);
+		SKSellingPlayerShopkeeper shopkeeper = new SKSellingPlayerShopkeeper(id, shopkeeperData);
 		return shopkeeper;
 	}
 }

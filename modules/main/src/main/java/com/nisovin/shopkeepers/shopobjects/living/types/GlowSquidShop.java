@@ -35,15 +35,15 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		darkGlowSquidProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		darkGlowSquidProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		darkGlowSquidProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		darkGlowSquidProperty.save(shopObjectData);
 	}
 
 	@Override

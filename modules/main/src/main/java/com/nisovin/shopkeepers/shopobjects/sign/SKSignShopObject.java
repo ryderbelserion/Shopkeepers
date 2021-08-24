@@ -80,10 +80,10 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
 		// Sign (wood) type:
-		String signTypeName = configSection.getString("signType");
+		String signTypeName = shopObjectData.getString("signType");
 		// Migration from TreeSpecies to SignType:
 		// TODO Remove this again at some point.
 		if ("GENERIC".equals(signTypeName)) {
@@ -114,15 +114,15 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		}
 
 		// Wall sign vs sign post:
-		if (!configSection.isBoolean("wallSign")) {
+		if (!shopObjectData.isBoolean("wallSign")) {
 			// Missing value:
 			shopkeeper.markDirty();
 		}
-		wallSign = configSection.getBoolean("wallSign", true);
+		wallSign = shopObjectData.getBoolean("wallSign", true);
 
 		// Migration from sign facing to shopkeeper yaw (pre v2.13.4):
 		// TODO Remove this migration again at some point.
-		String signFacingName = configSection.getString("signFacing");
+		String signFacingName = shopObjectData.getString("signFacing");
 		if (signFacingName != null) {
 			BlockFace signFacing = BlockFace.SOUTH;
 			try {
@@ -143,22 +143,22 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			shopkeeper.setYaw(yaw); // This also marks the shopkeeper as dirty
 		}
 
-		glowingTextProperty.load(configSection);
+		glowingTextProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
 
 		// Sign type:
-		configSection.set("signType", signType.name());
+		shopObjectData.set("signType", signType.name());
 
 		// Wall sign vs sign post:
-		configSection.set("wallSign", wallSign);
+		shopObjectData.set("wallSign", wallSign);
 
 		// Note: The sign facing is not saved, but instead derived from the shopkeeper's yaw.
 
-		glowingTextProperty.save(configSection);
+		glowingTextProperty.save(shopObjectData);
 	}
 
 	public boolean isWallSign() {

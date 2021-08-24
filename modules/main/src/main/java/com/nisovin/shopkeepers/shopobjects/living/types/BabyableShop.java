@@ -45,18 +45,18 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
 		if (this.isBabyable()) {
-			babyProperty.load(configSection);
+			babyProperty.load(shopObjectData);
 		}
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
 		if (this.isBabyable()) {
-			babyProperty.save(configSection);
+			babyProperty.save(shopObjectData);
 		}
 	}
 

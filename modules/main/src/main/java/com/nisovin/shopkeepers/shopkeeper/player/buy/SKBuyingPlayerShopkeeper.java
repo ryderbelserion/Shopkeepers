@@ -49,9 +49,9 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 		this.initOnCreation(shopCreationData);
 	}
 
-	protected SKBuyingPlayerShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+	protected SKBuyingPlayerShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
 		super(id);
-		this.initOnLoad(configSection);
+		this.initOnLoad(shopkeeperData);
 	}
 
 	@Override
@@ -66,10 +66,10 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	}
 
 	@Override
-	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
-		super.loadFromSaveData(configSection);
+	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		super.loadFromSaveData(shopkeeperData);
 		// Load offers:
-		List<? extends PriceOffer> offers = SKPriceOffer.loadFromConfig(configSection, "offers", this.getLogPrefix());
+		List<? extends PriceOffer> offers = SKPriceOffer.loadFromConfig(shopkeeperData, "offers", this.getLogPrefix());
 		List<? extends PriceOffer> migratedOffers = SKPriceOffer.migrateItems(offers, this.getLogPrefix());
 		if (offers != migratedOffers) {
 			Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated items of trade offers.");
@@ -79,10 +79,10 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
+	public void save(ConfigurationSection shopkeeperData) {
+		super.save(shopkeeperData);
 		// Save offers:
-		SKPriceOffer.saveToConfig(configSection, "offers", this.getOffers());
+		SKPriceOffer.saveToConfig(shopkeeperData, "offers", this.getOffers());
 	}
 
 	@Override

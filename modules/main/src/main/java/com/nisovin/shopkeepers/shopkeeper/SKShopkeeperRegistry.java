@@ -513,8 +513,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	 *            the shop type
 	 * @param id
 	 *            the shopkeeper id
-	 * @param configSection
-	 *            the config section to load the shopkeeper data from
+	 * @param shopkeeperData
+	 *            the shopkeeper data
 	 * @return the loaded shopkeeper
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper could not be loaded
@@ -523,13 +523,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// other source, the storage would need to be made aware of the shopkeeper (eg. by marking the shopkeeper as dirty).
 	// Otherwise, certain operations (such as checking if a certain shopkeeper id is already in use) would no longer
 	// work as expected.
-	public AbstractShopkeeper loadShopkeeper(ShopType<?> shopType, int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+	public AbstractShopkeeper loadShopkeeper(ShopType<?> shopType, int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
 		AbstractShopType<?> abstractShopType = this.validateShopType(shopType);
-		Validate.notNull(configSection, "configSection is null");
+		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 		Validate.isTrue(id >= 1, "id has to be positive: " + id);
 		Validate.isTrue(this.getShopkeeperById(id) == null, "There already exists a shopkeeper with this id: " + id);
 
-		AbstractShopkeeper shopkeeper = abstractShopType.loadShopkeeper(id, configSection);
+		AbstractShopkeeper shopkeeper = abstractShopType.loadShopkeeper(id, shopkeeperData);
 		if (shopkeeper == null) {
 			// Invalid shop type implementation..
 			throw new ShopkeeperCreateException("ShopType '" + abstractShopType.getClass().getName() + "' loaded null shopkeeper!");

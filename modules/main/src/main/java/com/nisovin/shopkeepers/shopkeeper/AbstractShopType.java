@@ -63,13 +63,13 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 * 
 	 * @param id
 	 *            the shopkeeper id
-	 * @param configSection
-	 *            the config section
+	 * @param shopkeeperData
+	 *            the shopkeeper data
 	 * @return the created shopkeeper
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper could not be created (ex. due to invalid or missing data)
 	 */
-	public abstract T loadShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException;
+	public abstract T loadShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException;
 
 	/**
 	 * Creates a new shopkeeper of this type by using the data from the given {@link ShopCreationData}.
@@ -181,7 +181,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 				+ ", but: " + shopType.getClass().getName());
 	}
 
-	protected void validateConfigSection(ConfigurationSection configSection) {
-		Validate.notNull(configSection, "configSection is null");
+	protected void validateShopkeeperData(ConfigurationSection shopkeeperData) {
+		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 	}
 }

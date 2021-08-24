@@ -57,9 +57,9 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		this.initOnCreation(shopCreationData);
 	}
 
-	protected SKBookPlayerShopkeeper(int id, ConfigurationSection configSection) throws ShopkeeperCreateException {
+	protected SKBookPlayerShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
 		super(id);
-		this.initOnLoad(configSection);
+		this.initOnLoad(shopkeeperData);
 	}
 
 	@Override
@@ -74,25 +74,25 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	protected void loadFromSaveData(ConfigurationSection configSection) throws ShopkeeperCreateException {
-		super.loadFromSaveData(configSection);
+	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		super.loadFromSaveData(shopkeeperData);
 		// Load offers:
 		this._clearOffers();
 		// TODO Remove legacy: Load offers from old format (bookTitle -> price mapping) (since late MC 1.14.4).
-		List<? extends BookOffer> legacyOffers = SKBookOffer.loadFromLegacyConfig(configSection, "offers", this.getLogPrefix());
+		List<? extends BookOffer> legacyOffers = SKBookOffer.loadFromLegacyConfig(shopkeeperData, "offers", this.getLogPrefix());
 		if (!legacyOffers.isEmpty()) {
 			Log.info(this.getLogPrefix() + "Importing old book offers.");
 			this._addOffers(legacyOffers);
 			this.markDirty();
 		}
-		this._addOffers(SKBookOffer.loadFromConfig(configSection, "offers", this.getLogPrefix()));
+		this._addOffers(SKBookOffer.loadFromConfig(shopkeeperData, "offers", this.getLogPrefix()));
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
+	public void save(ConfigurationSection shopkeeperData) {
+		super.save(shopkeeperData);
 		// Save offers:
-		SKBookOffer.saveToConfig(configSection, "offers", this.getOffers());
+		SKBookOffer.saveToConfig(shopkeeperData, "offers", this.getOffers());
 	}
 
 	@Override

@@ -33,15 +33,15 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		sittingProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		sittingProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		sittingProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		sittingProperty.save(shopObjectData);
 	}
 
 	@Override

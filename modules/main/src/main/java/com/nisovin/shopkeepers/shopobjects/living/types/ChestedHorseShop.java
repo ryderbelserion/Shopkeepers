@@ -31,15 +31,15 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		carryingChestProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		carryingChestProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		carryingChestProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		carryingChestProperty.save(shopObjectData);
 	}
 
 	@Override

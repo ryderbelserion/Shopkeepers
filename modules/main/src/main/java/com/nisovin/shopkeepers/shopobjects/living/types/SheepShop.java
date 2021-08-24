@@ -36,17 +36,17 @@ public class SheepShop extends BabyableShop<Sheep> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		colorProperty.load(configSection);
-		shearedProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		colorProperty.load(shopObjectData);
+		shearedProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		colorProperty.save(configSection);
-		shearedProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		colorProperty.save(shopObjectData);
+		shearedProperty.save(shopObjectData);
 	}
 
 	@Override

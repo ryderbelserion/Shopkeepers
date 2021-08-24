@@ -34,15 +34,15 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
-		super.load(configSection);
-		rabbitTypeProperty.load(configSection);
+	public void load(ConfigurationSection shopObjectData) {
+		super.load(shopObjectData);
+		rabbitTypeProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
-		super.save(configSection);
-		rabbitTypeProperty.save(configSection);
+	public void save(ConfigurationSection shopObjectData) {
+		super.save(shopObjectData);
+		rabbitTypeProperty.save(shopObjectData);
 	}
 
 	@Override
