@@ -287,7 +287,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.markDirty();
 		}
 
-		this.name = this.trimName(TextUtils.colorize(shopkeeperData.getString("name", "")));
+		this._setName(shopkeeperData.getString("name"));
 
 		// Shop object:
 		String objectTypeId;
@@ -770,21 +770,24 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public void setName(String newName) {
-		// Prepare and apply new name:
-		String preparedName = newName;
-		if (preparedName == null) preparedName = "";
-		preparedName = TextUtils.colorize(preparedName);
-		preparedName = this.trimName(preparedName);
-		this.name = preparedName;
-
-		// Update shop object:
-		shopObject.setName(preparedName);
-		this.markDirty(); // Mark dirty
+		this._setName(newName);
+		this.markDirty();
 	}
 
-	public boolean isValidName(String name) {
-		return (name != null && name.length() <= MAX_NAME_LENGTH
-				&& Settings.DerivedSettings.shopNamePattern.matcher(name).matches());
+	private void _setName(String newName) {
+		// Prepare and apply the new name:
+		String preparedName = this.prepareName(newName);
+		this.name = preparedName;
+
+		// Update the name of the shop object:
+		shopObject.setName(preparedName);
+	}
+
+	private String prepareName(String name) {
+		String preparedName = (name != null) ? name : "";
+		preparedName = TextUtils.colorize(preparedName);
+		preparedName = this.trimName(preparedName);
+		return preparedName;
 	}
 
 	private String trimName(String name) {
@@ -796,6 +799,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		Log.warning(this.getLogPrefix() + "Name is more than " + MAX_NAME_LENGTH + " characters long ('"
 				+ name + "'). Name is trimmed to '" + trimmedName + "'.");
 		return trimmedName;
+	}
+
+	public boolean isValidName(String name) {
+		return (name != null && name.length() <= MAX_NAME_LENGTH
+				&& Settings.DerivedSettings.shopNamePattern.matcher(name).matches());
 	}
 
 	// SHOP OBJECT
