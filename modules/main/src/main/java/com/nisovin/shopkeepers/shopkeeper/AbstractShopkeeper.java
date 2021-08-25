@@ -276,6 +276,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 
+		// Migrate the shopkeeper data:
+		this.migrateShopkeeperData(shopkeeperData);
+
 		String uniqueIdString = shopkeeperData.getString("uniqueId", "");
 		try {
 			this.uniqueId = UUID.fromString(uniqueIdString);
@@ -289,74 +292,19 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		this._setName(shopkeeperData.getString("name"));
 
-		// Shop object:
-		String objectTypeId;
-		ConfigurationSection shopObjectData = shopkeeperData.getConfigurationSection("object");
-		if (shopObjectData == null) {
-			// Load from legacy data:
-			// TODO Remove again at some point.
-			objectTypeId = shopkeeperData.getString("object");
-			shopObjectData = shopkeeperData;
-			this.markDirty();
-		} else {
-			objectTypeId = shopObjectData.getString("type");
-		}
+		// Shop object data:
+		ConfigurationSection shopObjectData = this.getShopObjectData(shopkeeperData);
+		assert shopObjectData != null;
 
-		// Convert legacy object identifiers:
-		if (objectTypeId != null) {
-			// 'block' -> 'sign'
-			if (objectTypeId.equalsIgnoreCase("block")) {
-				objectTypeId = "sign";
-				this.markDirty();
-			}
+		// Migrate the shop object data:
+		this.migrateShopObjectData(shopObjectData);
 
-			// Normalize:
-			String normalizedOjectTypeId = StringUtils.normalize(objectTypeId);
-			if (!normalizedOjectTypeId.equals(objectTypeId)) {
-				objectTypeId = normalizedOjectTypeId;
-				this.markDirty();
-			}
-
-			// MC 1.14:
-			// Convert ocelots to cats:
-			if (objectTypeId.equals("ocelot")) {
-				String ocelotType = shopObjectData.getString("catType");
-				if (ocelotType != null) {
-					if (ocelotType.equals("WILD_OCELOT")) {
-						// Stays an ocelot, but remove cat type data:
-						shopObjectData.set("catType", null);
-						this.markDirty();
-					} else {
-						// Convert to cat:
-						objectTypeId = "cat";
-						String catType = CatShop.fromOcelotType(ocelotType).name();
-						shopObjectData.set("catType", catType);
-						this.markDirty();
-						Log.warning(this.getLogPrefix() + "Migrated ocelot type '" + ocelotType
-								+ "' to cat type '" + catType + "'.");
-					}
-				} // Else: Stays ocelot.
-			}
-
-			// MC 1.16:
-			// Convert pig-zombie to zombified-piglin (but only if we run on MC 1.16 or above):
-			if (MC_1_16_Utils.getZombifiedPiglin() != null && objectTypeId.equals("pig-zombie")) {
-				objectTypeId = "zombified-piglin";
-				Log.warning(this.getLogPrefix() + "Migrated object type 'pig-zombie' to 'zombified-piglin'.");
-				this.markDirty();
-			}
-		}
-
+		// Determine the shop object type:
+		String objectTypeId = this.getShopObjectTypeId(shopObjectData);
+		assert objectTypeId != null;
 		AbstractShopObjectType<?> objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(objectTypeId);
 		if (objectType == null) {
-			// Couldn't find object type by id, try to find object type via matching:
-			objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().match(objectTypeId);
-			if (objectType != null) {
-				// Mark dirty, so the correct id gets saved:
-				this.markDirty();
-			} else {
-				throw new ShopkeeperCreateException("Invalid object type: " + objectTypeId);
-			}
+			throw new ShopkeeperCreateException("Invalid object type: " + objectTypeId);
 		}
 		assert objectType != null;
 
@@ -391,6 +339,70 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.shopObject.load(shopObjectData);
 	}
 
+	private void migrateShopkeeperData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		assert shopkeeperData != null;
+	}
+
+	private ConfigurationSection getShopObjectData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		assert shopkeeperData != null;
+		ConfigurationSection shopObjectData = shopkeeperData.getConfigurationSection("object");
+		if (shopObjectData == null) {
+			throw new ShopkeeperCreateException("Missing object section!");
+		}
+		return shopObjectData;
+	}
+
+	private ConfigurationSection createEmptyShopObjectData(ConfigurationSection shopkeeperData) {
+		assert shopkeeperData != null;
+		return shopkeeperData.createSection("object");
+	}
+
+	private String getShopObjectTypeId(ConfigurationSection shopObjectData) throws ShopkeeperCreateException {
+		assert shopObjectData != null;
+		String objectTypeId = shopObjectData.getString("type");
+		if (StringUtils.isEmpty(objectTypeId)) {
+			throw new ShopkeeperCreateException("Missing object type id!");
+		}
+		return objectTypeId;
+	}
+
+	private void migrateShopObjectData(ConfigurationSection shopObjectData) throws ShopkeeperCreateException {
+		assert shopObjectData != null;
+		// Object type id migrations:
+		// TODO Remove again at some point
+		String objectTypeId = this.getShopObjectTypeId(shopObjectData);
+		assert objectTypeId != null;
+
+		// MC 1.14:
+		// Convert ocelots to cats:
+		if (objectTypeId.equals("ocelot")) {
+			String ocelotType = shopObjectData.getString("catType");
+			if (ocelotType != null) {
+				if (ocelotType.equals("WILD_OCELOT")) {
+					// Stays an ocelot, but remove cat type data:
+					shopObjectData.set("catType", null);
+					this.markDirty();
+				} else {
+					// Convert to cat:
+					objectTypeId = "cat";
+					String catType = CatShop.fromOcelotType(ocelotType).name();
+					shopObjectData.set("catType", catType);
+					this.markDirty();
+					Log.warning(this.getLogPrefix() + "Migrated ocelot type '" + ocelotType
+							+ "' to cat type '" + catType + "'.");
+				}
+			} // Else: Stays ocelot.
+		}
+
+		// MC 1.16:
+		// Convert pig-zombie to zombified-piglin (but only if we run on MC 1.16 or above):
+		if (MC_1_16_Utils.getZombifiedPiglin() != null && objectTypeId.equals("pig-zombie")) {
+			objectTypeId = "zombified-piglin";
+			Log.warning(this.getLogPrefix() + "Migrated object type 'pig-zombie' to 'zombified-piglin'.");
+			this.markDirty();
+		}
+	}
+
 	// shopCreationData can be null if the shopkeeper is getting loaded.
 	private AbstractShopObject createShopObject(AbstractShopObjectType<?> objectType, ShopCreationData shopCreationData) {
 		assert objectType != null;
@@ -423,7 +435,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		shopkeeperData.set("type", this.getType().getIdentifier());
 
 		// Shop object:
-		ConfigurationSection shopObjectData = shopkeeperData.createSection("object");
+		ConfigurationSection shopObjectData = this.createEmptyShopObjectData(shopkeeperData);
 		shopObject.save(shopObjectData);
 	}
 
