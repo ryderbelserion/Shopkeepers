@@ -76,23 +76,13 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	@Override
 	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
 		super.loadFromSaveData(shopkeeperData);
-		// Load offers:
-		this._clearOffers();
-		// TODO Remove legacy: Load offers from old format (bookTitle -> price mapping) (since late MC 1.14.4).
-		List<? extends BookOffer> legacyOffers = SKBookOffer.loadFromLegacyConfig(shopkeeperData, "offers", this.getLogPrefix());
-		if (!legacyOffers.isEmpty()) {
-			Log.info(this.getLogPrefix() + "Importing old book offers.");
-			this._addOffers(legacyOffers);
-			this.markDirty();
-		}
-		this._addOffers(SKBookOffer.loadFromConfig(shopkeeperData, "offers", this.getLogPrefix()));
+		this.loadOffers(shopkeeperData);
 	}
 
 	@Override
 	public void save(ConfigurationSection shopkeeperData) {
 		super.save(shopkeeperData);
-		// Save offers:
-		SKBookOffer.saveToConfig(shopkeeperData, "offers", this.getOffers());
+		this.saveOffers(shopkeeperData);
 	}
 
 	@Override
@@ -206,7 +196,25 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		return (generation == Generation.TATTERED);
 	}
 
-	// OFFERS:
+	// OFFERS
+
+	private void loadOffers(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		assert shopkeeperData != null;
+		this._clearOffers();
+		// TODO Remove legacy: Load offers from old format (bookTitle -> price mapping) (since late MC 1.14.4).
+		List<? extends BookOffer> legacyOffers = SKBookOffer.loadFromLegacyConfig(shopkeeperData, "offers", this.getLogPrefix());
+		if (!legacyOffers.isEmpty()) {
+			Log.info(this.getLogPrefix() + "Importing old book offers.");
+			this._addOffers(legacyOffers);
+			this.markDirty();
+		}
+		this._addOffers(SKBookOffer.loadFromConfig(shopkeeperData, "offers", this.getLogPrefix()));
+	}
+
+	private void saveOffers(ConfigurationSection shopkeeperData) {
+		assert shopkeeperData != null;
+		SKBookOffer.saveToConfig(shopkeeperData, "offers", this.getOffers());
+	}
 
 	@Override
 	public List<? extends BookOffer> getOffers() {

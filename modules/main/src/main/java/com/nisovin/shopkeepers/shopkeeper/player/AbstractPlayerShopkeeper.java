@@ -88,8 +88,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		assert owner != null;
 		assert container != null;
 
-		this.ownerUUID = owner.getUniqueId();
-		this.ownerName = owner.getName();
+		this._setOwner(owner.getUniqueId(), owner.getName());
 		this._setContainer(container.getX(), container.getY(), container.getZ());
 	}
 
@@ -104,66 +103,19 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	@Override
 	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
 		super.loadFromSaveData(shopkeeperData);
-		try {
-			ownerUUID = UUID.fromString(shopkeeperData.getString("owner uuid"));
-		} catch (Exception e) {
-			// UUID is invalid or non-existent:
-			throw new ShopkeeperCreateException("Missing or invalid owner uuid!");
-		}
-		ownerName = shopkeeperData.getString("owner");
-		// TODO We no longer use the fallback name (since late 1.14.4). Remove the "unknown"-check again in the future
-		// (as soon as possible, because it conflicts with any player actually named 'unknown').
-		if (ownerName == null || ownerName.isEmpty() || ownerName.equals("unknown")) {
-			throw new ShopkeeperCreateException("Missing owner name!");
-		}
-
-		if (!shopkeeperData.isInt("chestx") || !shopkeeperData.isInt("chesty") || !shopkeeperData.isInt("chestz")) {
-			throw new ShopkeeperCreateException("Missing or invalid container coordinates!");
-		}
-
-		// Update container:
-		// TODO Rename to storage keys to containerx/y/z?
-		this._setContainer(shopkeeperData.getInt("chestx"), shopkeeperData.getInt("chesty"), shopkeeperData.getInt("chestz"));
-
-		notifyOnTrades = shopkeeperData.getBoolean("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
-
-		// The item is assumed to be immutable and therefore does not need to be copied.
-		UnmodifiableItemStack hireCost = ConfigUtils.loadUnmodifiableItemStack(shopkeeperData, "hirecost");
-		// Hire cost ItemStack is not null, but empty. -> Normalize to null:
-		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
-			Log.warning(this.getLogPrefix() + "Hire cost item is empty! Disabling 'for hire'.");
-			hireCost = null;
-			this.markDirty();
-		}
-		UnmodifiableItemStack migratedHireCost = ItemMigration.migrateItemStack(hireCost);
-		if (!ItemUtils.isSimilar(hireCost, migratedHireCost)) {
-			if (ItemUtils.isEmpty(migratedHireCost) && !ItemUtils.isEmpty(hireCost)) {
-				// Migration failed:
-				Log.warning(this.getLogPrefix() + "Hire cost item migration failed: " + hireCost);
-				hireCost = null;
-			} else {
-				hireCost = migratedHireCost;
-				Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated hire cost item.");
-			}
-			this.markDirty();
-		}
-		this.hireCost = hireCost;
+		this.loadOwner(shopkeeperData);
+		this.loadContainer(shopkeeperData);
+		this.loadNotifyOnTrades(shopkeeperData);
+		this.loadForHire(shopkeeperData);
 	}
 
 	@Override
 	public void save(ConfigurationSection shopkeeperData) {
 		super.save(shopkeeperData);
-		shopkeeperData.set("owner uuid", ownerUUID.toString());
-		shopkeeperData.set("owner", ownerName);
-		shopkeeperData.set("chestx", containerX);
-		shopkeeperData.set("chesty", containerY);
-		shopkeeperData.set("chestz", containerZ);
-		if (notifyOnTrades != DEFAULT_NOTIFY_ON_TRADES) {
-			shopkeeperData.set("notifyOnTrades", notifyOnTrades);
-		} // Not storing the default value
-		if (hireCost != null) {
-			shopkeeperData.set("hirecost", hireCost);
-		}
+		this.saveOwner(shopkeeperData);
+		this.saveContainer(shopkeeperData);
+		this.saveNotifyOnTrades(shopkeeperData);
+		this.saveForHire(shopkeeperData);
 	}
 
 	@Override
@@ -249,6 +201,32 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		}
 	}
 
+	// OWNER
+
+	private void loadOwner(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		assert shopkeeperData != null;
+		UUID ownerUUID;
+		try {
+			ownerUUID = UUID.fromString(shopkeeperData.getString("owner uuid"));
+		} catch (Exception e) {
+			// UUID is invalid or non-existent:
+			throw new ShopkeeperCreateException("Missing or invalid owner uuid!");
+		}
+		String ownerName = shopkeeperData.getString("owner");
+		// TODO We no longer use the fallback name (since late 1.14.4). Remove the "unknown"-check again in the future
+		// (as soon as possible, because it conflicts with any player actually named 'unknown').
+		if (ownerName == null || ownerName.isEmpty() || ownerName.equals("unknown")) {
+			throw new ShopkeeperCreateException("Missing owner name!");
+		}
+		this._setOwner(ownerUUID, ownerName);
+	}
+
+	private void saveOwner(ConfigurationSection shopkeeperData) {
+		assert shopkeeperData != null;
+		shopkeeperData.set("owner uuid", ownerUUID.toString());
+		shopkeeperData.set("owner", ownerName);
+	}
+
 	@Override
 	public void setOwner(Player player) {
 		this.setOwner(player.getUniqueId(), player.getName());
@@ -256,9 +234,13 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void setOwner(UUID ownerUUID, String ownerName) {
+		this._setOwner(ownerUUID, ownerName);
+		this.markDirty();
+	}
+
+	private void _setOwner(UUID ownerUUID, String ownerName) {
 		Validate.notNull(ownerUUID, "ownerUUID is null");
 		Validate.notEmpty(ownerName, "ownerName is null or empty");
-		this.markDirty();
 		this.ownerUUID = ownerUUID;
 		this.ownerName = ownerName;
 
@@ -295,17 +277,70 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		return Bukkit.getPlayer(ownerUUID);
 	}
 
+	// TRADE NOTIFICATIONS
+
+	private void loadNotifyOnTrades(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		assert shopkeeperData != null;
+		boolean notifyOnTrades = shopkeeperData.getBoolean("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
+		this._setNotifyOnTrades(notifyOnTrades);
+	}
+
+	private void saveNotifyOnTrades(ConfigurationSection shopkeeperData) {
+		assert shopkeeperData != null;
+		// We only store this property if its value does not match the default value:
+		if (notifyOnTrades != DEFAULT_NOTIFY_ON_TRADES) {
+			shopkeeperData.set("notifyOnTrades", notifyOnTrades);
+		}
+	}
+
 	@Override
 	public boolean isNotifyOnTrades() {
 		return notifyOnTrades;
 	}
 
 	@Override
-	public void setNotifyOnTrades(boolean enabled) {
-		if (notifyOnTrades == enabled) return;
-
-		notifyOnTrades = enabled;
+	public void setNotifyOnTrades(boolean notifyOnTrades) {
+		if (this.notifyOnTrades == notifyOnTrades) return;
+		this._setNotifyOnTrades(notifyOnTrades);
 		this.markDirty();
+	}
+
+	private void _setNotifyOnTrades(boolean notifyOnTrades) {
+		this.notifyOnTrades = notifyOnTrades;
+	}
+
+	// HIRING
+
+	private void loadForHire(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		assert shopkeeperData != null;
+		// The item is assumed to be immutable and therefore does not need to be copied.
+		UnmodifiableItemStack hireCost = ConfigUtils.loadUnmodifiableItemStack(shopkeeperData, "hirecost");
+		// Hire cost ItemStack is not null, but empty. -> Normalize to null:
+		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
+			Log.warning(this.getLogPrefix() + "Hire cost item is empty! Disabling 'for hire'.");
+			hireCost = null;
+			this.markDirty();
+		}
+		UnmodifiableItemStack migratedHireCost = ItemMigration.migrateItemStack(hireCost);
+		if (!ItemUtils.isSimilar(hireCost, migratedHireCost)) {
+			if (ItemUtils.isEmpty(migratedHireCost) && !ItemUtils.isEmpty(hireCost)) {
+				// Migration failed:
+				Log.warning(this.getLogPrefix() + "Hire cost item migration failed: " + hireCost);
+				hireCost = null;
+			} else {
+				hireCost = migratedHireCost;
+				Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated hire cost item.");
+			}
+			this.markDirty();
+		}
+		this._setForHire(ItemUtils.asItemStackOrNull(hireCost));
+	}
+
+	private void saveForHire(ConfigurationSection shopkeeperData) {
+		assert shopkeeperData != null;
+		if (hireCost != null) {
+			shopkeeperData.set("hirecost", hireCost);
+		}
 	}
 
 	@Override
@@ -315,22 +350,49 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public void setForHire(ItemStack hireCost) {
+		this._setForHire(hireCost);
+		this.markDirty();
+	}
+
+	private void _setForHire(ItemStack hireCost) {
+		boolean isForHire = this.isForHire();
 		if (ItemUtils.isEmpty(hireCost)) {
 			// Disable hiring:
 			this.hireCost = null;
-			this.setName("");
+
+			// If the shopkeeper was previously for hire, reset its name:
+			if (isForHire) {
+				this.setName("");
+			}
 		} else {
 			// Set for hire:
 			this.hireCost = ItemUtils.unmodifiableCloneIfModifiable(hireCost);
 			this.setName(Messages.forHireTitle);
 		}
-		// TODO Close any currently open hiring windows for players.
-		this.markDirty();
+		// TODO Close any currently open hiring UIs for players.
 	}
 
 	@Override
 	public UnmodifiableItemStack getHireCost() {
 		return hireCost;
+	}
+
+	// CONTAINER
+
+	private void loadContainer(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		assert shopkeeperData != null;
+		// TODO Rename to storage keys to containerx/y/z?
+		if (!shopkeeperData.isInt("chestx") || !shopkeeperData.isInt("chesty") || !shopkeeperData.isInt("chestz")) {
+			throw new ShopkeeperCreateException("Missing or invalid container coordinates!");
+		}
+		this._setContainer(shopkeeperData.getInt("chestx"), shopkeeperData.getInt("chesty"), shopkeeperData.getInt("chestz"));
+	}
+
+	private void saveContainer(ConfigurationSection shopkeeperData) {
+		assert shopkeeperData != null;
+		shopkeeperData.set("chestx", containerX);
+		shopkeeperData.set("chesty", containerY);
+		shopkeeperData.set("chestz", containerZ);
 	}
 
 	protected void _setContainer(int containerX, int containerY, int containerZ) {

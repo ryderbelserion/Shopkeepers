@@ -51,15 +51,17 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	}
 
 	/**
-	 * Recreates a shopkeeper of this type by loading its previously saved data from the given config section.
+	 * Recreates a shopkeeper of this type by loading its previously saved data from the given
+	 * {@link ConfigurationSection}.
 	 * <p>
-	 * The given config section and its sub sections are assumed to be mutable. If they are modified, for example in the
-	 * course of migrations being carried out, the loaded shopkeeper needs to marked as
-	 * {@link AbstractShopkeeper#markDirty() dirty} in order for the storage to be made aware of these changes.
+	 * In the course of data migrations, this operation may modify the given config section and its sub sections. If
+	 * this is the case, the loaded shopkeeper needs to be marked as {@link AbstractShopkeeper#markDirty() dirty} in
+	 * order for the storage to be made aware of these changes.
 	 * <p>
 	 * Any stored data elements (such as for example item stacks, etc.) and collections of data elements are assumed to
-	 * not be used or modified in contexts outside of the loaded shopkeeper. The loaded shopkeeper may directly store
-	 * these elements without having to copy them first.
+	 * not be modified, neither by the loaded shopkeeper, nor in contexts outside of the loaded shopkeeper. If the
+	 * loaded shopkeeper can guarantee not to modify these data elements, it is allowed to directly store them without
+	 * copying them first.
 	 * 
 	 * @param id
 	 *            the shopkeeper id

@@ -265,7 +265,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// STORAGE
 
 	/**
-	 * Loads the shopkeeper's saved data from the given config section.
+	 * Loads the shopkeeper's saved data from the given {@link ConfigurationSection}.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
@@ -415,9 +415,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Saves the shopkeeper's data to the given {@link ConfigurationSection}.
 	 * <p>
-	 * The serialization of the inserted data may happen asynchronously, so make sure that this is not a problem (i.e.
-	 * only insert immutable objects, or always create copies of the data you insert and/or make sure to not modify the
-	 * inserted objects).
+	 * It is assumed that the data stored in the given config section does not change afterwards and can be serialized
+	 * asynchronously. The shopkeeper must therefore ensure that this data is not modified, for example by only
+	 * inserting immutable data, or always making copies of the inserted data.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>

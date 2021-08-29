@@ -73,23 +73,23 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	public Player getOwner();
 
 	/**
-	 * Checks whether the trade notifications for the shop owner are enabled for this shopkeeper.
+	 * Checks whether the shop owner is notified about trades of this shopkeeper.
 	 * <p>
 	 * This property only affects the trade notifications that are sent to the shop owner. It has no effect on the
 	 * general trade notifications that may be sent for this shopkeeper to other players.
 	 * 
-	 * @return <code>true</code> if the shop owner trade notifications are enabled
+	 * @return <code>true</code> if the shop owner is notified about trades of this shopkeeper
 	 */
 	public boolean isNotifyOnTrades();
 
 	/**
-	 * Sets whether the trade notifications for the shop owner are enabled for this shopkeeper.
+	 * Sets whether the shop owner is notified about trades of this shopkeeper.
 	 * 
-	 * @param enabled
-	 *            the new activation state
+	 * @param notifyOnTrades
+	 *            whether to notify the shop owner about trades
 	 * @see #isNotifyOnTrades()
 	 */
-	public void setNotifyOnTrades(boolean enabled);
+	public void setNotifyOnTrades(boolean notifyOnTrades);
 
 	/**
 	 * Checks whether this shopkeeper is for hire.

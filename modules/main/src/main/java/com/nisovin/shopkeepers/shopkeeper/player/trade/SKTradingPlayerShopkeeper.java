@@ -66,21 +66,13 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	@Override
 	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
 		super.loadFromSaveData(shopkeeperData);
-		// Load offers:
-		List<? extends TradeOffer> offers = SKTradeOffer.loadFromConfig(shopkeeperData, "offers", this.getLogPrefix());
-		List<? extends TradeOffer> migratedOffers = SKTradeOffer.migrateItems(offers, this.getLogPrefix());
-		if (offers != migratedOffers) {
-			Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated items of trade offers.");
-			this.markDirty();
-		}
-		this._setOffers(migratedOffers);
+		this.loadOffers(shopkeeperData);
 	}
 
 	@Override
 	public void save(ConfigurationSection shopkeeperData) {
 		super.save(shopkeeperData);
-		// Save offers:
-		SKTradeOffer.saveToConfig(shopkeeperData, "offers", this.getOffers());
+		this.saveOffers(shopkeeperData);
 	}
 
 	@Override
@@ -107,7 +99,23 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 		return Collections.unmodifiableList(recipes);
 	}
 
-	// OFFERS:
+	// OFFERS
+
+	private void loadOffers(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		assert shopkeeperData != null;
+		List<? extends TradeOffer> offers = SKTradeOffer.loadFromConfig(shopkeeperData, "offers", this.getLogPrefix());
+		List<? extends TradeOffer> migratedOffers = SKTradeOffer.migrateItems(offers, this.getLogPrefix());
+		if (offers != migratedOffers) {
+			Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated items of trade offers.");
+			this.markDirty();
+		}
+		this._setOffers(migratedOffers);
+	}
+
+	private void saveOffers(ConfigurationSection shopkeeperData) {
+		assert shopkeeperData != null;
+		SKTradeOffer.saveToConfig(shopkeeperData, "offers", this.getOffers());
+	}
 
 	@Override
 	public List<? extends TradeOffer> getOffers() {

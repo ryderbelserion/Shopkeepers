@@ -38,6 +38,7 @@ Date format: (YYYY-MM-DD)
 * Deprecated the previous constructors and factory methods of AdminShopCreationData and PlayerShopCreationData, and added corresponding alternatives that directly require an AdminShopType or PlayerShopType respectively.
 * Deprecated the superfluous LivingShopObjectTypes#getAliases(EntityType).
 * Removed various previously deprecated methods in UIRegistry, Shopkeeper, and PlayerShopkeeper.
+* PlayerShopkeeper#setForHire only resets the shopkeeper name now if the shopkeeper was previously for hire.
 
 **Various internal build changes:**  
 * Switched from Maven to Gradle.
@@ -62,6 +63,7 @@ Date format: (YYYY-MM-DD)
 * APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
 * Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
 * The save operations of the shopkeeper storage and the CSV trade logger will now restore any catched Thread interruption status for anyone interested in it. Other than that, these operations still ignore Thread interruptions, because we prefer to keep trying to still save the data to disk after all.
+* Admin shopkeepers normalize empty trade permissions in the save data to null now, similar to AdminShopkeeper#setTradePermission.
 * Various other minor internal refactors and Javadoc improvements.
 
 **Message changes:**  

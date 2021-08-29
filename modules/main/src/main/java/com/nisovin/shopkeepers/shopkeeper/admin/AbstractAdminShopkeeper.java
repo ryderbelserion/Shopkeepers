@@ -14,6 +14,7 @@ import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
 
 public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper implements AdminShopkeeper {
 
@@ -45,7 +46,7 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 		}
 	}
 
-	// Null indicates that no additional permission is required:
+	// Null if no additional trading permission is required. Not empty.
 	protected String tradePermission = null;
 
 	/**
@@ -79,14 +80,24 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	@Override
 	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
 		super.loadFromSaveData(shopkeeperData);
-		// Load trade permission:
-		tradePermission = shopkeeperData.getString("tradePerm", null);
+		this.loadTradePermission(shopkeeperData);
 	}
 
 	@Override
 	public void save(ConfigurationSection shopkeeperData) {
 		super.save(shopkeeperData);
-		// Save trade permission:
+		this.saveTradePermission(shopkeeperData);
+	}
+
+	// TRADE PERMISSION
+
+	private void loadTradePermission(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		assert shopkeeperData != null;
+		this._setTradePermission(shopkeeperData.getString("tradePerm"));
+	}
+
+	private void saveTradePermission(ConfigurationSection shopkeeperData) {
+		assert shopkeeperData != null;
 		shopkeeperData.set("tradePerm", tradePermission);
 	}
 
@@ -97,10 +108,11 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 
 	@Override
 	public void setTradePermission(String tradePermission) {
-		if (tradePermission != null && tradePermission.isEmpty()) {
-			tradePermission = null;
-		}
-		this.tradePermission = tradePermission;
+		this._setTradePermission(tradePermission);
 		this.markDirty();
+	}
+
+	private void _setTradePermission(String tradePermission) {
+		this.tradePermission = StringUtils.getNotEmpty(tradePermission);
 	}
 }

@@ -54,6 +54,14 @@ public abstract class AbstractShopObject implements ShopObject {
 
 	/**
 	 * Loads the shop object's data from the given {@link ConfigurationSection}.
+	 * <p>
+	 * In the course of data migrations, this operation may modify the given config section and its sub sections. If
+	 * this is the case, the shopkeeper needs to be marked as {@link AbstractShopkeeper#markDirty() dirty} in order for
+	 * the storage to be made aware of these changes.
+	 * <p>
+	 * Any stored data elements (such as for example item stacks, etc.) and collections of data elements are assumed to
+	 * not be modified, neither by the shop object, nor in contexts outside of the shop object. If the shop object can
+	 * guarantee not to modify these data elements, it is allowed to directly store them without copying them first.
 	 * 
 	 * @param shopObjectData
 	 *            the shop object data, not <code>null</code>
@@ -65,9 +73,9 @@ public abstract class AbstractShopObject implements ShopObject {
 	/**
 	 * Saves the shop object's data to the given {@link ConfigurationSection}.
 	 * <p>
-	 * The serialization of the inserted data may happen asynchronously, so make sure that this is not a problem (i.e.
-	 * only insert immutable objects, or always create copies of the data you insert and/or make sure to not modify the
-	 * inserted objects).
+	 * It is assumed that the data stored in the given config section does not change afterwards and can be serialized
+	 * asynchronously. The shop object must therefore ensure that this data is not modified, for example by only
+	 * inserting immutable data, or always making copies of the inserted data.
 	 * 
 	 * @param shopObjectData
 	 *            the shop object data, not <code>null</code>
