@@ -26,6 +26,8 @@ import com.nisovin.shopkeepers.compat.MC_1_17_Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.property.BooleanProperty;
+import com.nisovin.shopkeepers.property.EnumProperty;
+import com.nisovin.shopkeepers.property.InvalidValueException;
 import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
@@ -50,8 +52,38 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	private static final long RESPAWN_TIMEOUT_MILLIS = TimeUnit.MINUTES.toMillis(3);
 
 	protected final SignShops signShops;
-	private SignType signType = SignType.OAK; // Not null, not unsupported, default is OAK.
-	private boolean wallSign = true;
+
+	private final Property<SignType> signTypeProperty = new EnumProperty<SignType>(shopkeeper, SignType.class, "signType", SignType.OAK) {
+		@Override
+		protected void migrate(ConfigurationSection configSection) {
+			// Migration from TreeSpecies to SignType:
+			// TODO Remove this again at some point. Added in v2.10.0.
+			String signTypeName = configSection.getString(key);
+			if ("GENERIC".equals(signTypeName)) {
+				Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
+						+ "' to '" + SignType.OAK + "'.");
+				configSection.set(key, SignType.OAK.name());
+				shopkeeper.markDirty();
+			} else if ("REDWOOD".equals(signTypeName)) {
+				Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
+						+ "' to '" + SignType.SPRUCE + "'.");
+				configSection.set(key, SignType.SPRUCE.name());
+				shopkeeper.markDirty();
+			}
+		}
+
+		@Override
+		protected SignType loadValue(ConfigurationSection configSection) throws InvalidValueException {
+			SignType value = super.loadValue(configSection);
+			if (value == null) return null;
+			// Ensure that the loaded sign type is supported:
+			if (!value.isSupported()) {
+				throw new InvalidValueException("Unsupported sign type: '" + value.name() + "'.");
+			}
+			return value;
+		}
+	};
+	private final Property<Boolean> wallSignProperty = new BooleanProperty(shopkeeper, "wallSign", true);
 	private final Property<Boolean> glowingTextProperty = new BooleanProperty(shopkeeper, "glowingText", false);
 
 	// Update the sign content at least once after plugin start, in case some settings have changed which affect the
@@ -69,7 +101,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		if (creationData != null) {
 			BlockFace targetedBlockFace = creationData.getTargetedBlockFace();
 			if (targetedBlockFace == BlockFace.UP) {
-				this.wallSign = false; // Sign post
+				wallSignProperty.setValue(false); // Sign post
 			} // Else: Wall sign (default).
 		}
 	}
@@ -82,44 +114,15 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	@Override
 	public void load(ConfigurationSection shopObjectData) {
 		super.load(shopObjectData);
-		// Sign (wood) type:
-		String signTypeName = shopObjectData.getString("signType");
-		// Migration from TreeSpecies to SignType:
-		// TODO Remove this again at some point.
-		if ("GENERIC".equals(signTypeName)) {
-			Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
-					+ "' to '" + SignType.OAK + "'.");
-			signTypeName = SignType.OAK.name();
-			shopkeeper.markDirty();
-		} else if ("REDWOOD".equals(signTypeName)) {
-			Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
-					+ "' to '" + SignType.SPRUCE + "'.");
-			signTypeName = SignType.SPRUCE.name();
-			shopkeeper.markDirty();
-		}
+		signTypeProperty.load(shopObjectData);
+		wallSignProperty.load(shopObjectData);
+		glowingTextProperty.load(shopObjectData);
 
-		try {
-			signType = SignType.valueOf(signTypeName);
-			assert signType != null;
-			// Ensure that the loaded sign type is supported:
-			if (!signType.isSupported()) {
-				throw new RuntimeException("unsupported sign type");
-			}
-		} catch (Exception e) {
-			// Fallback to default:
-			Log.warning(shopkeeper.getLogPrefix() + "Missing, invalid, or unsupported sign type '"
-					+ signTypeName + "'. Using '" + SignType.OAK + "' now.");
-			signType = SignType.OAK;
-			shopkeeper.markDirty();
-		}
+		this.migrateSignFacingToYaw(shopObjectData);
+	}
 
-		// Wall sign vs sign post:
-		if (!shopObjectData.isBoolean("wallSign")) {
-			// Missing value:
-			shopkeeper.markDirty();
-		}
-		wallSign = shopObjectData.getBoolean("wallSign", true);
-
+	private void migrateSignFacingToYaw(ConfigurationSection shopObjectData) {
+		assert shopObjectData != null;
 		// Migration from sign facing to shopkeeper yaw (pre v2.13.4):
 		// TODO Remove this migration again at some point.
 		String signFacingName = shopObjectData.getString("signFacing");
@@ -131,7 +134,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 				Log.warning(shopkeeper.getLogPrefix() + "Could not parse sign facing '"
 						+ signFacingName + "'. Falling back to SOUTH.");
 			}
-			if (wallSign ? !BlockFaceUtils.isWallSignFacing(signFacing) : !BlockFaceUtils.isSignPostFacing(signFacing)) {
+			if (!this.isValidSignFacing(signFacing)) {
 				Log.warning(shopkeeper.getLogPrefix() + "Invalid sign facing '" + signFacingName
 						+ "'. Falling back to SOUTH.");
 				signFacing = BlockFace.SOUTH;
@@ -142,35 +145,15 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 					+ "' to yaw " + TextUtils.DECIMAL_FORMAT.format(yaw));
 			shopkeeper.setYaw(yaw); // This also marks the shopkeeper as dirty
 		}
-
-		glowingTextProperty.load(shopObjectData);
 	}
 
 	@Override
 	public void save(ConfigurationSection shopObjectData) {
 		super.save(shopObjectData);
-
-		// Sign type:
-		shopObjectData.set("signType", signType.name());
-
-		// Wall sign vs sign post:
-		shopObjectData.set("wallSign", wallSign);
-
-		// Note: The sign facing is not saved, but instead derived from the shopkeeper's yaw.
-
+		signTypeProperty.save(shopObjectData);
+		wallSignProperty.save(shopObjectData);
 		glowingTextProperty.save(shopObjectData);
-	}
-
-	public boolean isWallSign() {
-		return wallSign;
-	}
-
-	public BlockFace getSignFacing() {
-		if (this.isWallSign()) {
-			return BlockFaceUtils.getWallSignFacings().fromYaw(shopkeeper.getYaw());
-		} else {
-			return BlockFaceUtils.getSignPostFacings().fromYaw(shopkeeper.getYaw());
-		}
+		// Note: The sign facing is not saved, but instead derived from the shopkeeper's yaw.
 	}
 
 	// ACTIVATION
@@ -245,6 +228,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	private BlockData createBlockData() {
+		SignType signType = this.getSignType();
+		boolean wallSign = this.isWallSign();
 		Material signMaterial = getSignMaterial(signType, wallSign);
 		assert ItemUtils.isSign(signMaterial);
 		BlockData signData = null;
@@ -422,12 +407,40 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		return editorButtons;
 	}
 
+	// WALL SIGN (vs sign post)
+
+	public boolean isWallSign() {
+		return wallSignProperty.getValue();
+	}
+
+	// SIGN FACING
+
+	private boolean isValidSignFacing(BlockFace signFacing) {
+		if (this.isWallSign()) {
+			return BlockFaceUtils.isWallSignFacing(signFacing);
+		} else {
+			return BlockFaceUtils.isSignPostFacing(signFacing);
+		}
+	}
+
+	public BlockFace getSignFacing() {
+		if (this.isWallSign()) {
+			return BlockFaceUtils.getWallSignFacings().fromYaw(shopkeeper.getYaw());
+		} else {
+			return BlockFaceUtils.getSignPostFacings().fromYaw(shopkeeper.getYaw());
+		}
+	}
+
 	// SIGN TYPE
+
+	public SignType getSignType() {
+		return signTypeProperty.getValue();
+	}
 
 	public void setSignType(SignType signType) {
 		Validate.notNull(signType, "signType is null");
 		Validate.isTrue(signType.isSupported(), "signType is not supported");
-		this.signType = signType;
+		signTypeProperty.setValue(signType);
 		shopkeeper.markDirty();
 		this.applySignType();
 	}
@@ -444,11 +457,11 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	public void cycleSignType(boolean backwards) {
-		this.setSignType(EnumUtils.cycleEnumConstant(SignType.class, signType, backwards, SignType.IS_SUPPORTED));
+		this.setSignType(EnumUtils.cycleEnumConstant(SignType.class, this.getSignType(), backwards, SignType.IS_SUPPORTED));
 	}
 
 	private ItemStack getSignTypeEditorItem() {
-		ItemStack iconItem = new ItemStack(signType.getSignMaterial());
+		ItemStack iconItem = new ItemStack(this.getSignType().getSignMaterial());
 		return ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonSignVariant, Messages.buttonSignVariantLore);
 	}
 

@@ -170,7 +170,7 @@ public abstract class Property<T> {
 				throw this.missingValueError();
 			}
 		} catch (InvalidValueException e) {
-			Log.warning(this.getShopkeeper().getLogPrefix() + "Failed to load property '" + key + "': " + e.getMessage()
+			Log.warning(shopkeeper.getLogPrefix() + "Failed to load property '" + key + "': " + e.getMessage()
 					+ " Using the default value now: '" + this.toString(defaultValue) + "'");
 			shopkeeper.markDirty();
 			value = defaultValue;

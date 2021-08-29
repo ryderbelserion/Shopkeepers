@@ -58,6 +58,7 @@ Date format: (YYYY-MM-DD)
 * Internal API: CitizensShopkeeperTrair#getShopkeeper() returns an AbstractShopkeeper now.
 * Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
 * Internal API: Moved various editor internal classes into their own files.
+* Internal API: Added SKSignShopObject#getSignType().
 * Refactors related to the removal of shopkeepers of inactive players.
 * Added validation for some constructor and method arguments in the API.
 * APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
