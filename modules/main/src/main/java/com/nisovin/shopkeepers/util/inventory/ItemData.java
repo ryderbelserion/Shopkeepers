@@ -16,6 +16,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.MapUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -72,10 +73,7 @@ public class ItemData {
 			} else if (dataObject instanceof Map) {
 				// Make a (shallow) copy of the map, since we will later insert missing data and don't want to modify
 				// the original data from the config:
-				dataMap = new LinkedHashMap<>();
-				for (Entry<?, ?> entry : ((Map<?, ?>) dataObject).entrySet()) {
-					dataMap.put(entry.getKey().toString(), entry.getValue());
-				}
+				dataMap = MapUtils.toStringMap((Map<?, ?>) dataObject);
 			} else {
 				throw new ItemDataDeserializeException("Unknown item data representation: " + dataObject);
 			}
