@@ -23,7 +23,10 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class PigShop extends BabyableShop<Pig> {
 
-	private final Property<Boolean> saddleProperty = new BooleanProperty(shopkeeper, "saddle", false);
+	private final Property<Boolean> saddleProperty = new BooleanProperty()
+			.key("saddle")
+			.defaultValue(false)
+			.build(properties);
 
 	public PigShop(	LivingShops livingShops, SKLivingShopObjectType<PigShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -63,7 +66,6 @@ public class PigShop extends BabyableShop<Pig> {
 
 	public void setSaddle(boolean saddle) {
 		saddleProperty.setValue(saddle);
-		shopkeeper.markDirty();
 		this.applySaddle(this.getEntity()); // Null if not spawned
 	}
 

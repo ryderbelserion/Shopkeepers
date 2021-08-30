@@ -26,43 +26,51 @@ import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
-import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public class VillagerShop extends BabyableShop<Villager> {
 
-	private final Property<Profession> professionProperty = new EnumProperty<Profession>(shopkeeper, Profession.class, "profession", Profession.NONE) {
-		@Override
-		protected void migrate(ConfigurationSection configSection) {
-			// Migration from 'prof' key: TODO Added with 1.14 update, remove again at some point.
-			String professionName = configSection.getString("prof");
-			if (professionName != null) {
-				Log.warning(shopkeeper.getLogPrefix() + "Migrated villager profession from key 'prof' to key 'profession'.");
-				configSection.set(this.key, professionName);
-				configSection.set("prof", null);
-				shopkeeper.markDirty();
-			}
-
-			// MC 1.14 migration:
-			professionName = configSection.getString(this.key);
-			if (professionName != null) {
-				String newProfessionName = null;
-				if (professionName.equals("PRIEST")) {
-					newProfessionName = Profession.CLERIC.name();
-				} else if (professionName.equals("BLACKSMITH")) {
-					newProfessionName = Profession.ARMORER.name();
-				}
-				if (newProfessionName != null) {
-					Log.warning(shopkeeper.getLogPrefix() + "Migrated villager profession from '"
-							+ professionName + "' to '" + newProfessionName + "'.");
-					configSection.set(this.key, newProfessionName);
+	private final Property<Profession> professionProperty = new EnumProperty<Profession>(Profession.class)
+			.key("profession")
+			.defaultValue(Profession.NONE)
+			.migrator((property, configSection) -> {
+				// Migration from 'prof' key: TODO Added with 1.14 update, remove again at some point.
+				String professionName = configSection.getString("prof");
+				if (professionName != null) {
+					Log.warning(shopkeeper.getLogPrefix() + "Migrated villager profession from key 'prof' to key 'profession'.");
+					configSection.set(property.getKey(), professionName);
+					configSection.set("prof", null);
 					shopkeeper.markDirty();
 				}
-			}
-		}
-	};
-	private final Property<Villager.Type> villagerTypeProperty = new EnumProperty<>(shopkeeper, Villager.Type.class, "villagerType", Villager.Type.PLAINS);
-	private final IntegerProperty villagerLevelProperty = new IntegerProperty(shopkeeper, "villagerLevel", 1, 5, 1);
+
+				// MC 1.14 migration:
+				professionName = configSection.getString(property.getKey());
+				if (professionName != null) {
+					String newProfessionName = null;
+					if (professionName.equals("PRIEST")) {
+						newProfessionName = Profession.CLERIC.name();
+					} else if (professionName.equals("BLACKSMITH")) {
+						newProfessionName = Profession.ARMORER.name();
+					}
+					if (newProfessionName != null) {
+						Log.warning(shopkeeper.getLogPrefix() + "Migrated villager profession from '"
+								+ professionName + "' to '" + newProfessionName + "'.");
+						configSection.set(property.getKey(), newProfessionName);
+						shopkeeper.markDirty();
+					}
+				}
+			})
+			.build(properties);
+	private final Property<Villager.Type> villagerTypeProperty = new EnumProperty<>(Villager.Type.class)
+			.key("villagerType")
+			.defaultValue(Villager.Type.PLAINS)
+			.build(properties);
+	private final IntegerProperty villagerLevelProperty = new IntegerProperty()
+			.<IntegerProperty>key("villagerLevel")
+			.minValue(1)
+			.maxValue(5)
+			.defaultValue(1)
+			.build(properties);
 
 	public VillagerShop(LivingShops livingShops, SKLivingShopObjectType<VillagerShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -113,9 +121,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	public void setProfession(Profession profession) {
-		Validate.notNull(profession, "profession is null");
 		professionProperty.setValue(profession);
-		shopkeeper.markDirty();
 		this.applyProfession(this.getEntity()); // Null if not spawned
 	}
 
@@ -207,9 +213,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	public void setVillagerType(Villager.Type villagerType) {
-		Validate.notNull(villagerType, "villagerType is null");
 		villagerTypeProperty.setValue(villagerType);
-		shopkeeper.markDirty();
 		this.applyVillagerType(this.getEntity()); // Null if not spawned
 	}
 
@@ -275,9 +279,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	public void setVillagerLevel(int villagerLevel) {
-		Validate.isTrue(villagerLevelProperty.isInBounds(villagerLevel), () -> "villagerLevel is out of bounds: " + villagerLevel);
 		villagerLevelProperty.setValue(villagerLevel);
-		shopkeeper.markDirty();
 		this.applyVillagerLevel(this.getEntity()); // Null if not spawned
 	}
 

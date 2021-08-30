@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.sign;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,6 @@ import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.EnumProperty;
-import com.nisovin.shopkeepers.property.InvalidValueException;
 import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
@@ -53,38 +53,37 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	protected final SignShops signShops;
 
-	private final Property<SignType> signTypeProperty = new EnumProperty<SignType>(shopkeeper, SignType.class, "signType", SignType.OAK) {
-		@Override
-		protected void migrate(ConfigurationSection configSection) {
-			// Migration from TreeSpecies to SignType:
-			// TODO Remove this again at some point. Added in v2.10.0.
-			String signTypeName = configSection.getString(key);
-			if ("GENERIC".equals(signTypeName)) {
-				Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
-						+ "' to '" + SignType.OAK + "'.");
-				configSection.set(key, SignType.OAK.name());
-				shopkeeper.markDirty();
-			} else if ("REDWOOD".equals(signTypeName)) {
-				Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
-						+ "' to '" + SignType.SPRUCE + "'.");
-				configSection.set(key, SignType.SPRUCE.name());
-				shopkeeper.markDirty();
-			}
-		}
-
-		@Override
-		protected SignType loadValue(ConfigurationSection configSection) throws InvalidValueException {
-			SignType value = super.loadValue(configSection);
-			if (value == null) return null;
-			// Ensure that the loaded sign type is supported:
-			if (!value.isSupported()) {
-				throw new InvalidValueException("Unsupported sign type: '" + value.name() + "'.");
-			}
-			return value;
-		}
-	};
-	private final Property<Boolean> wallSignProperty = new BooleanProperty(shopkeeper, "wallSign", true);
-	private final Property<Boolean> glowingTextProperty = new BooleanProperty(shopkeeper, "glowingText", false);
+	private final Property<SignType> signTypeProperty = new EnumProperty<SignType>(SignType.class)
+			.key("signType")
+			.defaultValue(SignType.OAK)
+			.validator((property, value) -> {
+				Validate.isTrue(value.isSupported(), () -> "Unsupported sign type: '" + value.name() + "'.");
+			})
+			.migrator((property, configSection) -> {
+				// Migration from TreeSpecies to SignType:
+				// TODO Remove this again at some point. Added in v2.10.0.
+				String signTypeName = configSection.getString(property.getKey());
+				if ("GENERIC".equals(signTypeName)) {
+					Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
+							+ "' to '" + SignType.OAK + "'.");
+					configSection.set(property.getKey(), SignType.OAK.name());
+					shopkeeper.markDirty();
+				} else if ("REDWOOD".equals(signTypeName)) {
+					Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
+							+ "' to '" + SignType.SPRUCE + "'.");
+					configSection.set(property.getKey(), SignType.SPRUCE.name());
+					shopkeeper.markDirty();
+				}
+			})
+			.build(properties);
+	private final Property<Boolean> wallSignProperty = new BooleanProperty()
+			.key("wallSign")
+			.defaultValue(true)
+			.build(properties);
+	private final Property<Boolean> glowingTextProperty = new BooleanProperty()
+			.key("glowingText")
+			.defaultValue(false)
+			.build(properties);
 
 	// Update the sign content at least once after plugin start, in case some settings have changed which affect the
 	// sign content:
@@ -101,7 +100,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		if (creationData != null) {
 			BlockFace targetedBlockFace = creationData.getTargetedBlockFace();
 			if (targetedBlockFace == BlockFace.UP) {
-				wallSignProperty.setValue(false); // Sign post
+				// Sign post:
+				wallSignProperty.setValue(false, Collections.emptySet()); // Not marking dirty
 			} // Else: Wall sign (default).
 		}
 	}
@@ -438,10 +438,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	public void setSignType(SignType signType) {
-		Validate.notNull(signType, "signType is null");
-		Validate.isTrue(signType.isSupported(), "signType is not supported");
 		signTypeProperty.setValue(signType);
-		shopkeeper.markDirty();
 		this.applySignType();
 	}
 
@@ -489,7 +486,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	public void setGlowingText(boolean glowing) {
 		glowingTextProperty.setValue(glowing);
-		shopkeeper.markDirty();
 		this.applyGlowingText();
 	}
 

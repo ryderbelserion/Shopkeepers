@@ -27,7 +27,10 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 // TODO Use actual GlowSquid type once we only support Bukkit 1.17 upwards
 public class GlowSquidShop extends SKLivingShopObject<Squid> {
 
-	private final Property<Boolean> darkGlowSquidProperty = new BooleanProperty(shopkeeper, "darkGlowSquid", false);
+	private final Property<Boolean> darkGlowSquidProperty = new BooleanProperty()
+			.key("darkGlowSquid")
+			.defaultValue(false)
+			.build(properties);
 
 	public GlowSquidShop(	LivingShops livingShops, SKLivingShopObjectType<GlowSquidShop> livingObjectType,
 							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -67,7 +70,6 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 
 	public void setDark(boolean dark) {
 		darkGlowSquidProperty.setValue(dark);
-		shopkeeper.markDirty();
 		this.applyDark(this.getEntity()); // Null if not spawned
 	}
 

@@ -24,7 +24,10 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 
-	private final Property<Boolean> babyProperty = new BooleanProperty(shopkeeper, "baby", false);
+	private final Property<Boolean> babyProperty = new BooleanProperty()
+			.key("baby")
+			.defaultValue(false)
+			.build(properties);
 
 	public BabyableShop(LivingShops livingShops, SKLivingShopObjectType<? extends BabyableShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -86,7 +89,6 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	public void setBaby(boolean baby) {
 		if (!this.isBabyable()) return;
 		babyProperty.setValue(baby);
-		shopkeeper.markDirty();
 		this.applyBaby(this.getEntity()); // Null if not spawned
 	}
 

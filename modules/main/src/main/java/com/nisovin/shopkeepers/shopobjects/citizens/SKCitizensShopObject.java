@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.citizens;
 
+import java.util.Collections;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -41,14 +42,14 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	protected final CitizensShops citizensShops;
 
-	// Null if no NPC has been created for this shop object yet (eg. if Citizens was not enabled at the time this shop
-	// object has been created):
-	private final Property<UUID> npcUniqueIdProperty = new UUIDProperty(shopkeeper, "npcId", null) {
-		@Override
-		public boolean isNullable() {
-			return true;
-		}
-	};
+	// Null if there is no associated NPC, eg. because no NPC has been created yet for this shop object (eg. if Citizens
+	// was not enabled at the time this shop object has been created):
+	private final Property<UUID> npcUniqueIdProperty = new UUIDProperty()
+			.key("npcId")
+			.nullable()
+			.defaultValue(null)
+			.build(properties);
+
 	// Only used initially, when the shopkeeper is created by a player. If this name is not available when we create the
 	// NPC, we fall back to a different name.
 	private String creatorName = null;
@@ -64,7 +65,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		if (creationData != null) {
 			// Can be null here, as currently only NPC shopkeepers created by the shopkeeper trait provide the NPC's
 			// unique id via the creation data:
-			npcUniqueIdProperty.setValue(creationData.getValue(CREATION_DATA_NPC_UUID_KEY));
+			UUID npcId = creationData.getValue(CREATION_DATA_NPC_UUID_KEY);
+			npcUniqueIdProperty.setValue(npcId, Collections.emptySet()); // Not marking dirty
 			Player creator = creationData.getCreator();
 			this.creatorName = (creator != null) ? creator.getName() : null;
 		}
@@ -94,6 +96,10 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		return npcUniqueIdProperty.getValue();
 	}
 
+	private void setNPCUniqueId(UUID npcId) {
+		npcUniqueIdProperty.setValue(npcId); // Can be null
+	}
+
 	// NPC
 
 	private void createNpcIfMissing() {
@@ -109,7 +115,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		NPC npc = citizensShops.createNPC(spawnLocation, entityType, "");
 		if (npc == null) return; // NPC creation failed for some reason
 
-		npcUniqueIdProperty.setValue(npc.getUniqueId());
+		this.setNPCUniqueId(npc.getUniqueId());
 
 		// Empty initial name for non-player NPCs:
 		String name = "";
@@ -129,8 +135,6 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		// This also applies the nameplate prefix and adjusts the nameplate visibility if required.
 		// This also triggers a save of the NPC data if required.
 		this.setName(name);
-
-		shopkeeper.markDirty();
 	}
 
 	public NPC getNPC() {
@@ -200,8 +204,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 				// citizens NPC isn't present in the world (exception: deletion via commands..).
 			}
 		}
-		npcUniqueIdProperty.setValue(null);
-		shopkeeper.markDirty();
+		this.setNPCUniqueId(null);
 	}
 
 	/**

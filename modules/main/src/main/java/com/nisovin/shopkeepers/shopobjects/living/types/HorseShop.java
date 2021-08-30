@@ -48,14 +48,19 @@ public class HorseShop extends BabyableShop<Horse> {
 		}
 	}
 
-	private final Property<Horse.Color> colorProperty = new EnumProperty<>(shopkeeper, Horse.Color.class, "color", Horse.Color.BROWN);
-	private final Property<Horse.Style> styleProperty = new EnumProperty<>(shopkeeper, Horse.Style.class, "style", Horse.Style.NONE);
-	private final Property<HorseArmor> armorProperty = new EnumProperty<HorseArmor>(shopkeeper, HorseArmor.class, "armor", null) {
-		@Override
-		public boolean isNullable() {
-			return true; // Null indicates 'no armor'
-		}
-	};
+	private final Property<Horse.Color> colorProperty = new EnumProperty<>(Horse.Color.class)
+			.key("color")
+			.defaultValue(Horse.Color.BROWN)
+			.build(properties);
+	private final Property<Horse.Style> styleProperty = new EnumProperty<>(Horse.Style.class)
+			.key("style")
+			.defaultValue(Horse.Style.NONE)
+			.build(properties);
+	private final Property<HorseArmor> armorProperty = new EnumProperty<HorseArmor>(HorseArmor.class)
+			.key("armor")
+			.nullable() // Null indicates 'no armor'
+			.defaultValue(null)
+			.build(properties);
 
 	public HorseShop(	LivingShops livingShops, SKLivingShopObjectType<HorseShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -103,7 +108,6 @@ public class HorseShop extends BabyableShop<Horse> {
 
 	public void setColor(Horse.Color color) {
 		colorProperty.setValue(color);
-		shopkeeper.markDirty();
 		this.applyColor(this.getEntity()); // Null if not spawned
 	}
 
@@ -170,7 +174,6 @@ public class HorseShop extends BabyableShop<Horse> {
 
 	public void setStyle(Horse.Style style) {
 		styleProperty.setValue(style);
-		shopkeeper.markDirty();
 		this.applyStyle(this.getEntity()); // Null if not spawned
 	}
 
@@ -218,7 +221,6 @@ public class HorseShop extends BabyableShop<Horse> {
 
 	public void setArmor(HorseArmor armor) {
 		armorProperty.setValue(armor);
-		shopkeeper.markDirty();
 		this.applyArmor(this.getEntity()); // Null if not spawned
 	}
 

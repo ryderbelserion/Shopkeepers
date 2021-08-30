@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.property;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
 /**
@@ -12,25 +11,17 @@ public class BooleanProperty extends Property<Boolean> {
 
 	/**
 	 * Creates a new {@link BooleanProperty}.
-	 * 
-	 * @param shopkeeper
-	 *            the shopkeeper, not <code>null</code>
-	 * @param key
-	 *            the storage key, not <code>null</code> or empty
-	 * @param defaultValue
-	 *            the default value
 	 */
-	public BooleanProperty(AbstractShopkeeper shopkeeper, String key, Boolean defaultValue) {
-		super(shopkeeper, key, defaultValue);
+	public BooleanProperty() {
 	}
 
 	@Override
 	protected Boolean loadValue(ConfigurationSection configSection) throws InvalidValueException {
-		Object value = configSection.get(key);
+		Object value = configSection.get(this.getKey());
 		if (value == null) return null;
 		Boolean booleanValue = ConversionUtils.toBoolean(value);
 		if (booleanValue == null) {
-			throw this.invalidValueError(value);
+			throw new InvalidValueException("Failed to parse Boolean: '" + value + "'.");
 		} else {
 			return booleanValue;
 		}
@@ -38,6 +29,6 @@ public class BooleanProperty extends Property<Boolean> {
 
 	@Override
 	protected void saveValue(ConfigurationSection configSection, Boolean value) {
-		configSection.set(key, value);
+		configSection.set(this.getKey(), value);
 	}
 }

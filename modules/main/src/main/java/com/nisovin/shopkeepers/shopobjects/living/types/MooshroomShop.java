@@ -21,11 +21,13 @@ import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
-import com.nisovin.shopkeepers.util.java.Validate;
 
 public class MooshroomShop extends BabyableShop<MushroomCow> {
 
-	private final Property<MushroomCow.Variant> variantProperty = new EnumProperty<>(shopkeeper, MushroomCow.Variant.class, "variant", MushroomCow.Variant.RED);
+	private final Property<MushroomCow.Variant> variantProperty = new EnumProperty<>(MushroomCow.Variant.class)
+			.key("variant")
+			.defaultValue(MushroomCow.Variant.RED)
+			.build(properties);
 
 	public MooshroomShop(	LivingShops livingShops, SKLivingShopObjectType<MooshroomShop> livingObjectType,
 							AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -64,9 +66,7 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 	}
 
 	public void setVariant(MushroomCow.Variant variant) {
-		Validate.notNull(variant, "variant is null");
 		variantProperty.setValue(variant);
-		shopkeeper.markDirty();
 		this.applyVariant(this.getEntity()); // Null if not spawned
 	}
 

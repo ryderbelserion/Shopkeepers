@@ -23,12 +23,17 @@ import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
-import com.nisovin.shopkeepers.util.java.Validate;
 
 public class SheepShop extends BabyableShop<Sheep> {
 
-	private final Property<DyeColor> colorProperty = new EnumProperty<>(shopkeeper, DyeColor.class, "color", DyeColor.WHITE);
-	private final Property<Boolean> shearedProperty = new BooleanProperty(shopkeeper, "sheared", false);
+	private final Property<DyeColor> colorProperty = new EnumProperty<>(DyeColor.class)
+			.key("color")
+			.defaultValue(DyeColor.WHITE)
+			.build(properties);
+	private final Property<Boolean> shearedProperty = new BooleanProperty()
+			.key("sheared")
+			.defaultValue(false)
+			.build(properties);
 
 	public SheepShop(	LivingShops livingShops, SKLivingShopObjectType<SheepShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -71,9 +76,7 @@ public class SheepShop extends BabyableShop<Sheep> {
 	}
 
 	public void setColor(DyeColor color) {
-		Validate.notNull(color, "color is null");
 		colorProperty.setValue(color);
-		shopkeeper.markDirty();
 		this.applyColor(this.getEntity()); // Null if not spawned
 	}
 
@@ -116,7 +119,6 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 	public void setSheared(boolean sheared) {
 		shearedProperty.setValue(sheared);
-		shopkeeper.markDirty();
 		this.applySheared(this.getEntity()); // Null if not spawned
 	}
 

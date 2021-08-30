@@ -23,17 +23,18 @@ import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
-import com.nisovin.shopkeepers.util.java.Validate;
 
 public class CatShop extends SittableShop<Cat> {
 
-	private final Property<Cat.Type> catTypeProperty = new EnumProperty<>(shopkeeper, Cat.Type.class, "catType", Cat.Type.TABBY);
-	private final Property<DyeColor> collarColorProperty = new EnumProperty<DyeColor>(shopkeeper, DyeColor.class, "collarColor", null) {
-		@Override
-		public boolean isNullable() {
-			return true; // Null indicates 'no collar' / untamed
-		}
-	};
+	private final Property<Cat.Type> catTypeProperty = new EnumProperty<>(Cat.Type.class)
+			.key("catType")
+			.defaultValue(Cat.Type.TABBY)
+			.build(properties);
+	private final Property<DyeColor> collarColorProperty = new EnumProperty<DyeColor>(DyeColor.class)
+			.key("collarColor")
+			.nullable() // Null indicates 'no collar' / untamed
+			.defaultValue(null)
+			.build(properties);
 
 	public CatShop(	LivingShops livingShops, SKLivingShopObjectType<CatShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -92,9 +93,7 @@ public class CatShop extends SittableShop<Cat> {
 	}
 
 	public void setCatType(Cat.Type catType) {
-		Validate.notNull(catType, "catType is null");
 		catTypeProperty.setValue(catType);
-		shopkeeper.markDirty();
 		this.applyCatType(this.getEntity()); // Null if not spawned
 	}
 
@@ -176,7 +175,6 @@ public class CatShop extends SittableShop<Cat> {
 
 	public void setCollarColor(DyeColor collarColor) {
 		collarColorProperty.setValue(collarColor);
-		shopkeeper.markDirty();
 		this.applyCollarColor(this.getEntity()); // Null if not spawned
 	}
 

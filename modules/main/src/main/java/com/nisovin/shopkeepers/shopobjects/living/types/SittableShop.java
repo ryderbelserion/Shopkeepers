@@ -25,7 +25,10 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 // Using Babyable as common super type of all sittable mobs for now.
 public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> {
 
-	private final Property<Boolean> sittingProperty = new BooleanProperty(shopkeeper, "sitting", false);
+	private final Property<Boolean> sittingProperty = new BooleanProperty()
+			.key("sitting")
+			.defaultValue(false)
+			.build(properties);
 
 	public SittableShop(LivingShops livingShops, SKLivingShopObjectType<? extends SittableShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -65,7 +68,6 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 
 	public void setSitting(boolean sitting) {
 		sittingProperty.setValue(sitting);
-		shopkeeper.markDirty();
 		this.applySitting(this.getEntity()); // Null if not spawned
 	}
 

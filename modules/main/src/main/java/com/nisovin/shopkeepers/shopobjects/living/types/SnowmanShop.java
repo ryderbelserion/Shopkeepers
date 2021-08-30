@@ -24,7 +24,10 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class SnowmanShop extends SKLivingShopObject<Snowman> {
 
-	private final Property<Boolean> pumpkinHeadProperty = new BooleanProperty(shopkeeper, "pumpkinHead", true);
+	private final Property<Boolean> pumpkinHeadProperty = new BooleanProperty()
+			.key("pumpkinHead")
+			.defaultValue(true)
+			.build(properties);
 
 	public SnowmanShop(	LivingShops livingShops, SKLivingShopObjectType<SnowmanShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -64,7 +67,6 @@ public class SnowmanShop extends SKLivingShopObject<Snowman> {
 
 	public void setPumpkinHead(boolean pumpkinHead) {
 		pumpkinHeadProperty.setValue(pumpkinHead);
-		shopkeeper.markDirty();
 		this.applyPumpkinHead(this.getEntity()); // Null if not spawned
 	}
 

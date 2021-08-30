@@ -24,7 +24,10 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class CreeperShop extends SKLivingShopObject<Creeper> {
 
-	private final Property<Boolean> poweredProperty = new BooleanProperty(shopkeeper, "powered", false);
+	private final Property<Boolean> poweredProperty = new BooleanProperty()
+			.key("powered")
+			.defaultValue(false)
+			.build(properties);
 
 	public CreeperShop(	LivingShops livingShops, SKLivingShopObjectType<CreeperShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -64,7 +67,6 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 
 	public void setPowered(boolean powered) {
 		poweredProperty.setValue(powered);
-		shopkeeper.markDirty();
 		this.applyPowered(this.getEntity()); // Null if not spawned
 	}
 

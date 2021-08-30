@@ -23,13 +23,21 @@ import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
-import com.nisovin.shopkeepers.util.java.Validate;
 
 public class FoxShop extends SittableShop<Fox> {
 
-	private final Property<Fox.Type> foxTypeProperty = new EnumProperty<>(shopkeeper, Fox.Type.class, "foxType", Fox.Type.RED);
-	private final Property<Boolean> sleepingProperty = new BooleanProperty(shopkeeper, "sleeping", false);
-	private final Property<Boolean> crouchingProperty = new BooleanProperty(shopkeeper, "crouching", false);
+	private final Property<Fox.Type> foxTypeProperty = new EnumProperty<>(Fox.Type.class)
+			.key("foxType")
+			.defaultValue(Fox.Type.RED)
+			.build(properties);
+	private final Property<Boolean> sleepingProperty = new BooleanProperty()
+			.key("sleeping")
+			.defaultValue(false)
+			.build(properties);
+	private final Property<Boolean> crouchingProperty = new BooleanProperty()
+			.key("crouching")
+			.defaultValue(false)
+			.build(properties);
 
 	public FoxShop(	LivingShops livingShops, SKLivingShopObjectType<FoxShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -80,9 +88,7 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	public void setFoxType(Fox.Type foxType) {
-		Validate.notNull(foxType, "foxType is null");
 		foxTypeProperty.setValue(foxType);
-		shopkeeper.markDirty();
 		this.applyFoxType(this.getEntity()); // Null if not spawned
 	}
 
@@ -138,7 +144,6 @@ public class FoxShop extends SittableShop<Fox> {
 		if (sleeping && this.isCrouching()) {
 			this.setCrouching(false);
 		}
-		shopkeeper.markDirty();
 		this.applySleeping(this.getEntity()); // Null if not spawned
 	}
 
@@ -185,7 +190,6 @@ public class FoxShop extends SittableShop<Fox> {
 		if (crouching && this.isSleeping()) {
 			this.setSleeping(false);
 		}
-		shopkeeper.markDirty();
 		this.applyCrouching(this.getEntity()); // Null if not spawned
 	}
 

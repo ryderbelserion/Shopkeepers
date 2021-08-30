@@ -26,12 +26,11 @@ import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class ShulkerShop extends SKLivingShopObject<Shulker> {
 
-	private final Property<DyeColor> colorProperty = new EnumProperty<DyeColor>(shopkeeper, DyeColor.class, "color", null) {
-		@Override
-		public boolean isNullable() {
-			return true; // Null indicates default color
-		}
-	};
+	private final Property<DyeColor> colorProperty = new EnumProperty<DyeColor>(DyeColor.class)
+			.key("color")
+			.nullable() // Null indicates default color
+			.defaultValue(null)
+			.build(properties);
 
 	public ShulkerShop(	LivingShops livingShops, SKLivingShopObjectType<ShulkerShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -71,7 +70,6 @@ public class ShulkerShop extends SKLivingShopObject<Shulker> {
 
 	public void setColor(DyeColor color) {
 		colorProperty.setValue(color);
-		shopkeeper.markDirty();
 		this.applyColor(this.getEntity()); // Null if not spawned
 	}
 

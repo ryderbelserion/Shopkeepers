@@ -60,6 +60,7 @@ Date format: (YYYY-MM-DD)
 * Internal API: Moved various editor internal classes into their own files.
 * Internal API: Added SKSignShopObject#getSignType().
 * Refactors related to the removal of shopkeepers of inactive players.
+* Refactors related to shop object properties.
 * Added validation for some constructor and method arguments in the API.
 * APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
 * Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.

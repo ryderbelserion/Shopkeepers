@@ -2,51 +2,32 @@ package com.nisovin.shopkeepers.property;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * A {@link Property} that stores an {@link Integer} value.
+ * <p>
+ * It is possible to limit the property's value into specific {@link #getMinValue() lower} and {@link #getMaxValue()
+ * upper} bounds. If this property is {@link #isNullable() nullable} these bounds are only checked for
+ * non-<code>null</code> values.
  */
 public class IntegerProperty extends Property<Integer> {
 
-	private final int minValue;
-	private final int maxValue;
-
-	/**
-	 * Creates a new {@link IntegerProperty} with a minimum value of {@link Integer#MIN_VALUE} and maximum value of
-	 * {@link Integer#MAX_VALUE}.
-	 * 
-	 * @param shopkeeper
-	 *            the shopkeeper, not <code>null</code>
-	 * @param key
-	 *            the storage key, not <code>null</code> or empty
-	 * @param defaultValue
-	 *            the default value
-	 */
-	public IntegerProperty(AbstractShopkeeper shopkeeper, String key, Integer defaultValue) {
-		this(shopkeeper, key, Integer.MIN_VALUE, Integer.MAX_VALUE, defaultValue);
-	}
+	private int minValue = Integer.MIN_VALUE;
+	private int maxValue = Integer.MAX_VALUE;
 
 	/**
 	 * Creates a new {@link IntegerProperty}.
-	 * 
-	 * @param shopkeeper
-	 *            the shopkeeper, not <code>null</code>
-	 * @param key
-	 *            the storage key, not <code>null</code> or empty
-	 * @param minValue
-	 *            the minimum value
-	 * @param maxValue
-	 *            the maximum value
-	 * @param defaultValue
-	 *            the default value
 	 */
-	public IntegerProperty(AbstractShopkeeper shopkeeper, String key, int minValue, int maxValue, Integer defaultValue) {
-		super(shopkeeper, key, defaultValue);
-		this.minValue = minValue;
-		this.maxValue = maxValue;
+	public IntegerProperty() {
+	}
+
+	@Override
+	protected void postConstruct() {
+		super.postConstruct();
+		Validate.State.isTrue(minValue <= maxValue, () -> "Minimum value is greater than maximum value (min: "
+				+ minValue + ", max: " + maxValue + ")!");
 	}
 
 	/**
@@ -59,12 +40,48 @@ public class IntegerProperty extends Property<Integer> {
 	}
 
 	/**
+	 * Sets the minimum value of this property.
+	 * <p>
+	 * This method can only be called while the property has not yet been {@link #build(PropertyContainer) built}.
+	 * 
+	 * @param <P>
+	 *            the type of this property
+	 * @param minValue
+	 *            the minimum value
+	 * @return this property
+	 */
+	@SuppressWarnings("unchecked")
+	public final <P extends IntegerProperty> P minValue(int minValue) {
+		this.validateNotBuilt();
+		this.minValue = minValue;
+		return (P) this;
+	}
+
+	/**
 	 * Gets the maximum value.
 	 * 
 	 * @return the maximum value
 	 */
 	public final int getMaxValue() {
 		return maxValue;
+	}
+
+	/**
+	 * Sets the maximum value of this property.
+	 * <p>
+	 * This method can only be called while the property has not yet been {@link #build(PropertyContainer) built}.
+	 * 
+	 * @param <P>
+	 *            the type of this property
+	 * @param maxValue
+	 *            the maximum value
+	 * @return this property
+	 */
+	@SuppressWarnings("unchecked")
+	public final <P extends IntegerProperty> P maxValue(int maxValue) {
+		this.validateNotBuilt();
+		this.maxValue = maxValue;
+		return (P) this;
 	}
 
 	/**
@@ -79,29 +96,25 @@ public class IntegerProperty extends Property<Integer> {
 	}
 
 	@Override
-	public void setValue(Integer value) {
-		Validate.isTrue(value == null || this.isInBounds(value), "value is out of bounds");
-		super.setValue(value);
+	protected void internalValidateValue(Integer value) {
+		super.internalValidateValue(value);
+		Validate.isTrue(value == null || this.isInBounds(value), () -> "Value is out of bounds: " + value);
 	}
 
 	@Override
 	protected Integer loadValue(ConfigurationSection configSection) throws InvalidValueException {
-		Object value = configSection.get(key);
+		Object value = configSection.get(this.getKey());
 		if (value == null) return null;
 		Integer intValue = ConversionUtils.toInteger(value);
 		if (intValue == null) {
-			throw this.invalidValueError(value);
+			throw new InvalidValueException("Failed to parse Integer: '" + value + "'.");
 		} else {
-			// Check bounds:
-			if (!this.isInBounds(intValue)) {
-				throw this.invalidValueError(intValue);
-			}
 			return intValue;
 		}
 	}
 
 	@Override
 	protected void saveValue(ConfigurationSection configSection, Integer value) {
-		configSection.set(key, value);
+		configSection.set(this.getKey(), value);
 	}
 }

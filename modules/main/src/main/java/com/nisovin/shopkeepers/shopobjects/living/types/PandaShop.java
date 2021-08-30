@@ -21,12 +21,14 @@ import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
-import com.nisovin.shopkeepers.util.java.Validate;
 
 // TODO Pose (laying, sitting, eating, worried).
 public class PandaShop extends BabyableShop<Panda> {
 
-	private final Property<Panda.Gene> geneProperty = new EnumProperty<>(shopkeeper, Panda.Gene.class, "gene", Panda.Gene.NORMAL);
+	private final Property<Panda.Gene> geneProperty = new EnumProperty<>(Panda.Gene.class)
+			.key("gene")
+			.defaultValue(Panda.Gene.NORMAL)
+			.build(properties);
 
 	public PandaShop(	LivingShops livingShops, SKLivingShopObjectType<PandaShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -65,9 +67,7 @@ public class PandaShop extends BabyableShop<Panda> {
 	}
 
 	public void setGene(Panda.Gene gene) {
-		Validate.notNull(gene, "gene is null");
 		geneProperty.setValue(gene);
-		shopkeeper.markDirty();
 		this.applyGene(this.getEntity()); // Null if not spawned
 	}
 

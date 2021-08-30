@@ -21,14 +21,16 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.java.Validate;
 
 // TODO Use actual Axolotl type once we only support Bukkit 1.17 upwards
 // TODO Editor option to play dead?
 public class AxolotlShop extends BabyableShop<Animals> {
 
-	// Use correct enum type once we only support Bukkit 1.17 upwards
-	private final Property<String> variantProperty = new StringProperty(shopkeeper, "axolotlVariant", "LUCY");
+	// TODO Use correct enum type once we only support Bukkit 1.17 upwards
+	private final Property<String> variantProperty = new StringProperty()
+			.key("axolotlVariant")
+			.defaultValue("LUCY")
+			.build(properties);
 
 	public AxolotlShop(	LivingShops livingShops, SKLivingShopObjectType<AxolotlShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -67,9 +69,7 @@ public class AxolotlShop extends BabyableShop<Animals> {
 	}
 
 	public void setVariant(String variant) {
-		Validate.notNull(variant, "variant is null");
 		variantProperty.setValue(variant);
-		shopkeeper.markDirty();
 		this.applyVariant(this.getEntity()); // Null if not spawned
 	}
 

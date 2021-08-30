@@ -26,7 +26,10 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 // TODO Use actual Goal type once we only support Bukkit 1.17 upwards
 public class GoatShop extends BabyableShop<Animals> {
 
-	private final Property<Boolean> screamingProperty = new BooleanProperty(shopkeeper, "screaming", false);
+	private final Property<Boolean> screamingProperty = new BooleanProperty()
+			.key("screaming")
+			.defaultValue(false)
+			.build(properties);
 
 	public GoatShop(LivingShops livingShops, SKLivingShopObjectType<GoatShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -69,7 +72,6 @@ public class GoatShop extends BabyableShop<Animals> {
 
 	public void setScreaming(boolean screaming) {
 		screamingProperty.setValue(screaming);
-		shopkeeper.markDirty();
 		this.applyScreaming(this.getEntity()); // Null if not spawned
 	}
 

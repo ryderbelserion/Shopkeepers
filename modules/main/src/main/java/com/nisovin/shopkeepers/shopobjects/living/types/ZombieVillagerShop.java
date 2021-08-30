@@ -23,11 +23,13 @@ import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
-import com.nisovin.shopkeepers.util.java.Validate;
 
 public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 
-	private final Property<Profession> professionProperty = new EnumProperty<Profession>(shopkeeper, Profession.class, "profession", Profession.NONE);
+	private final Property<Profession> professionProperty = new EnumProperty<Profession>(Profession.class)
+			.key("profession")
+			.defaultValue(Profession.NONE)
+			.build(properties);
 
 	public ZombieVillagerShop(	LivingShops livingShops, SKLivingShopObjectType<ZombieVillagerShop> livingObjectType,
 								AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -66,9 +68,7 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 	}
 
 	public void setProfession(Profession profession) {
-		Validate.notNull(profession, "profession is null");
 		professionProperty.setValue(profession);
-		shopkeeper.markDirty();
 		this.applyProfession(this.getEntity()); // Null if not spawned
 	}
 

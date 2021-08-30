@@ -22,14 +22,18 @@ import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
-import com.nisovin.shopkeepers.util.java.Validate;
 
 public class SlimeShop extends SKLivingShopObject<Slime> {
 
 	// Note: Minecraft actually allows slimes with sizes up to 256 (internally stored as 0 - 255). However, at these
 	// sizes the slime is not properly rendered anymore, cannot be interacted with, and it becomes laggy.
 	// We limit it to 10 since this seems to be a more reasonable limit.
-	private final IntegerProperty sizeProperty = new IntegerProperty(shopkeeper, "slimeSize", 1, 10, 1);
+	private final IntegerProperty sizeProperty = new IntegerProperty()
+			.<IntegerProperty>key("slimeSize")
+			.minValue(1)
+			.maxValue(10)
+			.defaultValue(1)
+			.build(properties);
 
 	public SlimeShop(	LivingShops livingShops, SKLivingShopObjectType<SlimeShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -68,9 +72,7 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 	}
 
 	public void setSize(int size) {
-		Validate.isTrue(sizeProperty.isInBounds(size), () -> "size is out of bounds: " + size);
 		sizeProperty.setValue(size);
-		shopkeeper.markDirty();
 		this.applySize(this.getEntity()); // Null if not spawned
 	}
 

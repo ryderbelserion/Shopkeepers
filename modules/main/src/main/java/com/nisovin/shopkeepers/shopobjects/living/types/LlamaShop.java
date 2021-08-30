@@ -26,13 +26,15 @@ import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
-	private final Property<Llama.Color> colorProperty = new EnumProperty<>(shopkeeper, Llama.Color.class, "color", Llama.Color.CREAMY);
-	private final Property<DyeColor> carpetColorProperty = new EnumProperty<DyeColor>(shopkeeper, DyeColor.class, "carpetColor", null) {
-		@Override
-		public boolean isNullable() {
-			return true; // Null indicates 'no carpet'
-		}
-	};
+	private final Property<Llama.Color> colorProperty = new EnumProperty<>(Llama.Color.class)
+			.key("color")
+			.defaultValue(Llama.Color.CREAMY)
+			.build(properties);
+	private final Property<DyeColor> carpetColorProperty = new EnumProperty<DyeColor>(DyeColor.class)
+			.key("carpetColor")
+			.nullable() // Null indicates 'no carpet'
+			.defaultValue(null)
+			.build(properties);
 
 	public LlamaShop(	LivingShops livingShops, SKLivingShopObjectType<? extends LlamaShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -76,7 +78,6 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
 	public void setColor(Llama.Color color) {
 		colorProperty.setValue(color);
-		shopkeeper.markDirty();
 		this.applyColor(this.getEntity()); // Null if not spawned
 	}
 
@@ -134,7 +135,6 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
 	public void setCarpetColor(DyeColor carpetColor) {
 		carpetColorProperty.setValue(carpetColor);
-		shopkeeper.markDirty();
 		this.applyCarpetColor(this.getEntity()); // Null if not spawned
 	}
 

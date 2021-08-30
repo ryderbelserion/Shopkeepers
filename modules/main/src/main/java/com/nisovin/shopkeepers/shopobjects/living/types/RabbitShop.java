@@ -22,11 +22,13 @@ import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
-import com.nisovin.shopkeepers.util.java.Validate;
 
 public class RabbitShop extends BabyableShop<Rabbit> {
 
-	private final Property<Rabbit.Type> rabbitTypeProperty = new EnumProperty<>(shopkeeper, Rabbit.Type.class, "rabbitType", Rabbit.Type.BROWN);
+	private final Property<Rabbit.Type> rabbitTypeProperty = new EnumProperty<>(Rabbit.Type.class)
+			.key("rabbitType")
+			.defaultValue(Rabbit.Type.BROWN)
+			.build(properties);
 
 	public RabbitShop(	LivingShops livingShops, SKLivingShopObjectType<RabbitShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -65,9 +67,7 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 	}
 
 	public void setRabbitType(Rabbit.Type rabbitType) {
-		Validate.notNull(rabbitType, "rabbitType is null");
 		rabbitTypeProperty.setValue(rabbitType);
-		shopkeeper.markDirty();
 		this.applyRabbitType(this.getEntity()); // Null if not spawned
 	}
 

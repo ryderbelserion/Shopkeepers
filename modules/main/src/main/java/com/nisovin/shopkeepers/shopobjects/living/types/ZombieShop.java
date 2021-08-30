@@ -25,7 +25,10 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 // TODO Use BabyableShop as base once there is a common interface for this inside Bukkit.
 public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 
-	private final Property<Boolean> babyProperty = new BooleanProperty(shopkeeper, "baby", false);
+	private final Property<Boolean> babyProperty = new BooleanProperty()
+			.key("baby")
+			.defaultValue(false)
+			.build(properties);
 
 	public ZombieShop(	LivingShops livingShops, SKLivingShopObjectType<? extends ZombieShop<E>> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -65,7 +68,6 @@ public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 
 	public void setBaby(boolean baby) {
 		babyProperty.setValue(baby);
-		shopkeeper.markDirty();
 		this.applyBaby(this.getEntity()); // Null if not spawned
 	}
 

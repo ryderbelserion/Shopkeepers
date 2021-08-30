@@ -2,7 +2,6 @@ package com.nisovin.shopkeepers.property;
 
 import org.bukkit.configuration.ConfigurationSection;
 
-import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -19,28 +18,21 @@ public class EnumProperty<E extends Enum<E>> extends Property<E> {
 	/**
 	 * Creates a new {@link EnumProperty}.
 	 * 
-	 * @param shopkeeper
-	 *            the shopkeeper, not <code>null</code>
 	 * @param enumType
 	 *            the enum's class, not <code>null</code>
-	 * @param key
-	 *            the storage key, not <code>null</code> or empty
-	 * @param defaultValue
-	 *            the default value
 	 */
-	public EnumProperty(AbstractShopkeeper shopkeeper, Class<E> enumType, String key, E defaultValue) {
-		super(shopkeeper, key, defaultValue);
+	public EnumProperty(Class<E> enumType) {
 		Validate.notNull(enumType, "enumType is null");
 		this.enumType = enumType;
 	}
 
 	@Override
 	protected E loadValue(ConfigurationSection configSection) throws InvalidValueException {
-		String valueName = configSection.getString(key);
+		String valueName = configSection.getString(this.getKey());
 		if (valueName == null) return null;
 		E enumValue = ConversionUtils.parseEnum(enumType, valueName);
 		if (enumValue == null) {
-			throw this.invalidValueError(valueName);
+			throw new InvalidValueException("Failed to parse " + enumType.getSimpleName() + ": '" + valueName + "'.");
 		} else {
 			return enumValue;
 		}
@@ -48,6 +40,6 @@ public class EnumProperty<E extends Enum<E>> extends Property<E> {
 
 	@Override
 	protected void saveValue(ConfigurationSection configSection, E value) {
-		configSection.set(key, (value == null) ? null : value.name());
+		configSection.set(this.getKey(), (value == null) ? null : value.name());
 	}
 }

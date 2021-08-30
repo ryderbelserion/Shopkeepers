@@ -26,13 +26,15 @@ import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class WolfShop extends SittableShop<Wolf> {
 
-	private final Property<Boolean> angryProperty = new BooleanProperty(shopkeeper, "angry", false);
-	private final Property<DyeColor> collarColorProperty = new EnumProperty<DyeColor>(shopkeeper, DyeColor.class, "collarColor", null) {
-		@Override
-		public boolean isNullable() {
-			return true; // Null to indicate 'no collar' / untamed
-		}
-	};
+	private final Property<Boolean> angryProperty = new BooleanProperty()
+			.key("angry")
+			.defaultValue(false)
+			.build(properties);
+	private final Property<DyeColor> collarColorProperty = new EnumProperty<DyeColor>(DyeColor.class)
+			.key("collarColor")
+			.nullable() // Null indicates 'no collar' / untamed
+			.defaultValue(null)
+			.build(properties);
 
 	public WolfShop(LivingShops livingShops, SKLivingShopObjectType<WolfShop> livingObjectType,
 					AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -76,7 +78,6 @@ public class WolfShop extends SittableShop<Wolf> {
 
 	public void setAngry(boolean angry) {
 		angryProperty.setValue(angry);
-		shopkeeper.markDirty();
 		this.applyAngry(this.getEntity()); // Null if not spawned
 	}
 
@@ -118,7 +119,6 @@ public class WolfShop extends SittableShop<Wolf> {
 
 	public void setCollarColor(DyeColor collarColor) {
 		collarColorProperty.setValue(collarColor);
-		shopkeeper.markDirty();
 		this.applyCollarColor(this.getEntity()); // Null if not spawned
 	}
 
