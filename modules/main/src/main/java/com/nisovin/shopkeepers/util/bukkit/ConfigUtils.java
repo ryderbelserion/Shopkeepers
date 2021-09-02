@@ -111,11 +111,14 @@ public class ConfigUtils {
 		});
 	}
 
-	public static void setAll(ConfigurationSection configSection, Map<String, Object> map) {
+	public static void setAll(ConfigurationSection configSection, Map<?, ?> map) {
 		Validate.notNull(configSection, "configSection is null");
 		if (map != null) {
 			map.entrySet().forEach(entry -> {
-				configSection.set(entry.getKey(), entry.getValue());
+				Object key = entry.getKey();
+				Object value = entry.getValue();
+				String stringKey = StringUtils.toStringOrNull(key);
+				configSection.set(stringKey, value);
 			});
 		}
 	}
@@ -175,7 +178,7 @@ public class ConfigUtils {
 	// Note: If the given map is the data of a serialized ConfigurationSerializable, and it includes its serialized type
 	// key, the produced Yaml output may not be loadable again as a YamlConfiguration, because it will deserialize as a
 	// ConfigurationSerializable instead of a Map.
-	public static String toFlatConfigYaml(Map<String, Object> map) {
+	public static String toFlatConfigYaml(Map<?, ?> map) {
 		YamlConfiguration yamlConfig = YAML_CONFIG.get();
 		try {
 			setAll(yamlConfig, map);
