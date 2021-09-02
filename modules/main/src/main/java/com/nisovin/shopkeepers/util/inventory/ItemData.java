@@ -8,7 +8,6 @@ import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -16,7 +15,6 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
-import com.nisovin.shopkeepers.util.java.MapUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -68,16 +66,12 @@ public class ItemData {
 			typeName = (String) dataObject;
 			assert typeName != null;
 		} else {
-			if (dataObject instanceof ConfigurationSection) {
-				dataMap = ((ConfigurationSection) dataObject).getValues(false); // Returns a (shallow) copy
-			} else if (dataObject instanceof Map) {
-				// Make a (shallow) copy of the map, since we will later insert missing data and don't want to modify
-				// the original data from the config:
-				dataMap = MapUtils.toStringMap((Map<?, ?>) dataObject);
-			} else {
+			// This creates a (shallow) copy of the Map, since we will later insert missing data and don't want to
+			// modify the original data inside the config:
+			dataMap = ConfigUtils.loadStringMap(dataObject);
+			if (dataMap == null) {
 				throw new ItemDataDeserializeException("Unknown item data representation: " + dataObject);
 			}
-			assert dataMap != null; // Assert: dataMap is a (shallow) copy
 
 			Object typeData = dataMap.get("type");
 			if (typeData != null) {

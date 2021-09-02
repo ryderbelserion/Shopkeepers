@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.MapUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -53,6 +54,28 @@ public class ConfigUtils {
 
 	public static UnmodifiableItemStack loadUnmodifiableItemStack(ConfigurationSection config, String key) {
 		return UnmodifiableItemStack.of(loadItemStack(config, key));
+	}
+
+	// This creates a (shallow) copy of the Map.
+	public static Map<String, Object> loadStringMap(Object dataObject) {
+		if (dataObject instanceof Map) {
+			return MapUtils.toStringMap((Map<?, ?>) dataObject);
+		} else if (dataObject instanceof ConfigurationSection) {
+			return ((ConfigurationSection) dataObject).getValues(false);
+		} else {
+			return null;
+		}
+	}
+
+	// This returns the original Map if the given object is already a Map.
+	public static Map<?, ?> loadMap(Object dataObject) {
+		if (dataObject instanceof Map) {
+			return (Map<?, ?>) dataObject;
+		} else if (dataObject instanceof ConfigurationSection) {
+			return ((ConfigurationSection) dataObject).getValues(false);
+		} else {
+			return null;
+		}
 	}
 
 	// The given top level section itself is not converted.

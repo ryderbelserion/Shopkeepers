@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
@@ -394,15 +393,10 @@ public final class SoundEffect {
 			return new SoundEffect(sound, soundName, null, null, null);
 		}
 
-		Map<?, ?> dataMap;
-		if (dataObject instanceof ConfigurationSection) {
-			dataMap = ((ConfigurationSection) dataObject).getValues(false);
-		} else if (dataObject instanceof Map) {
-			dataMap = (Map<?, ?>) dataObject;
-		} else {
+		Map<?, ?> dataMap = ConfigUtils.loadMap(dataObject);
+		if (dataMap == null) {
 			throw new SoundEffectDeserializeException("Unexpected data: " + dataObject);
 		}
-		assert dataMap != null;
 
 		// Sound name:
 		String soundName = null;
