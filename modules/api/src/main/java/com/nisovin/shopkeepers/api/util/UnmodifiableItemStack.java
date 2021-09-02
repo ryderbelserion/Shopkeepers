@@ -70,6 +70,17 @@ public interface UnmodifiableItemStack extends ConfigurationSerializable {
 	public ItemStack copy();
 
 	/**
+	 * Creates a shallow copy of this unmodifiable item stack, i.e. another {@link UnmodifiableItemStack} that is backed
+	 * by the same underlying item stack as this unmodifiable item stack.
+	 * <p>
+	 * This can be useful in cases in which an unmodifiable item stack with a different object identity is required, but
+	 * a full copy of the underlying item stack is not necessary.
+	 * 
+	 * @return the shallow copy
+	 */
+	public UnmodifiableItemStack shallowCopy();
+
+	/**
 	 * Returns an {@link ItemStack} view of this unmodifiable item stack.
 	 * <p>
 	 * This is not the same as {@link #copy()}, nor does this return the underlying item stack itself. Instead, this

@@ -32,6 +32,14 @@ public class ConfigUtils {
 		return material;
 	}
 
+	// Additional processing whenever we save an item stack to a config.
+	// itemStack can be null.
+	public static void saveItemStack(ConfigurationSection config, String key, UnmodifiableItemStack itemStack) {
+		// Shallow copy: Prevents SnakeYaml from representing the item stack using anchors and aliases if the same item
+		// stack instance is saved to the same Yaml document multiple times in different contexts.
+		config.set(key, ItemUtils.shallowCopy(itemStack));
+	}
+
 	// Additional processing whenever we load deserialized item stacks from a config.
 	public static ItemStack loadItemStack(ConfigurationSection config, String key) {
 		// Note: Spigot creates Bukkit ItemStacks, whereas Paper automatically replaces the deserialized Bukkit

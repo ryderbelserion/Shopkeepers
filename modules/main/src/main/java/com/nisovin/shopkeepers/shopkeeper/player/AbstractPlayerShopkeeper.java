@@ -338,9 +338,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	private void saveForHire(ConfigurationSection shopkeeperData) {
 		assert shopkeeperData != null;
-		if (hireCost != null) {
-			shopkeeperData.set("hirecost", hireCost);
-		}
+		ConfigUtils.saveItemStack(shopkeeperData, "hirecost", hireCost);
 	}
 
 	@Override

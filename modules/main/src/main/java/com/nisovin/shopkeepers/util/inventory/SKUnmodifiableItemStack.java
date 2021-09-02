@@ -80,6 +80,11 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	}
 
 	@Override
+	public UnmodifiableItemStack shallowCopy() {
+		return UnmodifiableItemStack.of(delegate);
+	}
+
+	@Override
 	public ItemStack asItemStack() {
 		return this;
 	}

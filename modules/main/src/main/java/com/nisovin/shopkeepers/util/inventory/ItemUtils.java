@@ -201,6 +201,10 @@ public final class ItemUtils {
 		return (itemStack != null) ? itemStack.copy() : null;
 	}
 
+	public static UnmodifiableItemStack shallowCopy(UnmodifiableItemStack itemStack) {
+		return (itemStack != null) ? itemStack.shallowCopy() : null;
+	}
+
 	public static UnmodifiableItemStack unmodifiableCloneIfModifiable(@ReadOnly ItemStack itemStack) {
 		if (itemStack == null) return null;
 		if (itemStack instanceof UnmodifiableItemStack) return (UnmodifiableItemStack) itemStack;

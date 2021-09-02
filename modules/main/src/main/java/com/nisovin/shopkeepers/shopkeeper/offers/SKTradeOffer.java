@@ -108,9 +108,9 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 			UnmodifiableItemStack resultItem = offer.getResultItem();
 
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
-			offerSection.set("item1", item1);
-			offerSection.set("item2", item2);
-			offerSection.set("resultItem", resultItem);
+			ConfigUtils.saveItemStack(offerSection, "item1", item1);
+			ConfigUtils.saveItemStack(offerSection, "item2", item2);
+			ConfigUtils.saveItemStack(offerSection, "resultItem", resultItem);
 			id++;
 		}
 	}

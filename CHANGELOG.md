@@ -25,6 +25,7 @@ Date format: (YYYY-MM-DD)
   * We no longer check for and remove entity uuids from the data of living entity shopkeepers.
   * The object data of shopkeepers is expected to be located in its own dedicated 'object' section.
   * The stored object type identifiers of shopkeepers are expected to perfectly match the registered shop object types. They are no longer normalized and fuzzy matched.
+* All item stacks are now (shallow) copied before they are saved to the shopkeeper data. This prevents SnakeYaml from representing the item stacks using anchors and aliases (a Yaml feature) inside the shopkeepers save file if the same item stack instances would otherwise be saved multiple times in different contexts.
 
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
@@ -33,6 +34,7 @@ Date format: (YYYY-MM-DD)
 * Added Shopkeeper#getLogPrefix(), #getUniqueIdLogPrefix(), and #getLocatedLogPrefix().
 * Shopkeeper#getLocation() will include the shopkeeper's yaw now.
 * ShopCreationData#getTargetedBlockFace() no longer determines the facing of sign shops. Instead, sign shops use the yaw of the spawn location now to derive their facing.
+* Added UnmodifiableItemStack#shallowCopy().
 * Various Javadoc additions, improvements, and fixes.
 * Deprecated DefaultShopTypes#getAdminShopType() and #ADMIN(), and added #getRegularAdminShopType() and #ADMIN_REGULAR() as alternatives.
 * Deprecated the previous constructors and factory methods of AdminShopCreationData and PlayerShopCreationData, and added corresponding alternatives that directly require an AdminShopType or PlayerShopType respectively.

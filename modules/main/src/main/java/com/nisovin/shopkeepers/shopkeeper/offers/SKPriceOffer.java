@@ -104,7 +104,7 @@ public class SKPriceOffer implements PriceOffer {
 		for (PriceOffer offer : offers) {
 			UnmodifiableItemStack item = offer.getItem(); // Assumed immutable
 			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
-			offerSection.set("item", item);
+			ConfigUtils.saveItemStack(offerSection, "item", item);
 			offerSection.set("price", offer.getPrice());
 			id++;
 		}
