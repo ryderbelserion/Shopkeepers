@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.api;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import com.nisovin.shopkeepers.api.internal.InternalShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.DefaultShopTypes;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopTypesRegistry;
@@ -30,37 +30,6 @@ public final class ShopkeepersAPI {
 	private ShopkeepersAPI() {
 	}
 
-	private static ShopkeepersPlugin plugin = null;
-
-	/**
-	 * Enables the Shopkeepers API.
-	 * 
-	 * @param plugin
-	 *            the plugin instance
-	 * @deprecated For internal use only
-	 */
-	@Deprecated
-	public static void enable(ShopkeepersPlugin plugin) {
-		Validate.notNull(plugin, "Plugin is null!");
-		if (ShopkeepersAPI.plugin != null) {
-			throw new IllegalStateException("API is already enabled!");
-		}
-		ShopkeepersAPI.plugin = plugin;
-	}
-
-	/**
-	 * Disables the Shopkeepers API.
-	 * 
-	 * @deprecated For internal use only
-	 */
-	@Deprecated
-	public static void disable() {
-		if (ShopkeepersAPI.plugin == null) {
-			throw new IllegalStateException("API is already disabled!");
-		}
-		ShopkeepersAPI.plugin = null;
-	}
-
 	/**
 	 * Checks whether the API has already been enabled.
 	 * <p>
@@ -71,7 +40,7 @@ public final class ShopkeepersAPI {
 	 * @return <code>true</code> if enabled
 	 */
 	public static boolean isEnabled() {
-		return (plugin != null);
+		return InternalShopkeepersAPI.isEnabled();
 	}
 
 	/**
@@ -82,10 +51,7 @@ public final class ShopkeepersAPI {
 	 *             if the API is not enabled currently, eg. because the plugin is not enabled currently
 	 */
 	public static ShopkeepersPlugin getPlugin() {
-		if (plugin == null) {
-			throw new IllegalStateException("API is not enabled!");
-		}
-		return plugin;
+		return InternalShopkeepersAPI.getPlugin();
 	}
 
 	// PERMISSIONS
@@ -211,23 +177,6 @@ public final class ShopkeepersAPI {
 	}
 
 	// FACTORIES
-
-	/**
-	 * Creates an {@link UnmodifiableItemStack} for the given {@link ItemStack}.
-	 * <p>
-	 * If the given item stack is already an {@link UnmodifiableItemStack}, this returns the given item stack itself.
-	 * 
-	 * @param itemStack
-	 *            the item stack, can be <code>null</code>
-	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is <code>null</code>
-	 * @deprecated Use {@link UnmodifiableItemStack#of(ItemStack)}
-	 */
-	@Deprecated
-	public static UnmodifiableItemStack createUnmodifiableItemStack(ItemStack itemStack) {
-		return getPlugin().createUnmodifiableItemStack(itemStack);
-	}
-
-	// OFFER FACTORIES
 
 	/**
 	 * Creates a new {@link PriceOffer}.

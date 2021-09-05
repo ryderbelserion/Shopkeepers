@@ -41,6 +41,8 @@ Date format: (YYYY-MM-DD)
 * Deprecated the superfluous LivingShopObjectTypes#getAliases(EntityType).
 * Removed various previously deprecated methods in UIRegistry, Shopkeeper, and PlayerShopkeeper.
 * PlayerShopkeeper#setForHire only resets the shopkeeper name now if the shopkeeper was previously for hire.
+* Various internal methods that are not meant to be called by API users have been moved from public API classes into separate 'ApiInternals' and 'InternalShopkeepersAPI' classes.
+* Removed the recently added but immediately deprecated factory method for unmodifiable item stacks from ShopkeepersPlugin again.
 
 **Various internal build changes:**  
 * Switched from Maven to Gradle.

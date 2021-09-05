@@ -6,19 +6,15 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
-import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeepersStartupEvent;
+import com.nisovin.shopkeepers.api.internal.ApiInternals;
+import com.nisovin.shopkeepers.api.internal.InternalShopkeepersAPI;
+import com.nisovin.shopkeepers.api.internal.InternalShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
-import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
-import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.chatinput.ChatInput;
 import com.nisovin.shopkeepers.commands.Commands;
 import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
@@ -31,6 +27,7 @@ import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
 import com.nisovin.shopkeepers.container.protection.RemoveShopOnContainerBreak;
 import com.nisovin.shopkeepers.debug.events.EventDebugger;
 import com.nisovin.shopkeepers.debug.trades.TradingCountListener;
+import com.nisovin.shopkeepers.internals.SKApiInternals;
 import com.nisovin.shopkeepers.itemconversion.ItemConversions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.metrics.PluginMetrics;
@@ -43,9 +40,6 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.SKShopTypesRegistry;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
-import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
-import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
-import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShops;
@@ -58,13 +52,12 @@ import com.nisovin.shopkeepers.tradenotifications.TradeNotifications;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.SKUIRegistry;
 import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
-import com.nisovin.shopkeepers.util.inventory.SKUnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.java.ClassUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 import com.nisovin.shopkeepers.villagers.RegularVillagers;
 
-public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin {
+public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepersPlugin {
 
 	private static final int ASYNC_TASKS_TIMEOUT_SECONDS = 10;
 
@@ -73,6 +66,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 	public static SKShopkeepersPlugin getInstance() {
 		return plugin;
 	}
+
+	private final ApiInternals apiInternals = new SKApiInternals();
 
 	// Shop types and shop object types registry:
 	private final SKShopTypesRegistry shopTypesRegistry = new SKShopTypesRegistry();
@@ -173,7 +168,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		Log.setLogger(this.getLogger()); // Setup logger early
 		// Setting plugin reference early, so it is also available for any code running here:
 		plugin = this;
-		ShopkeepersAPI.enable(this);
+		InternalShopkeepersAPI.enable(this);
 
 		// Loading all plugin classes up front ensures that we don't run into missing classes (usually during shutdown)
 		// when the plugin jar gets replaced during runtime (eg. for hot reloads):
@@ -218,7 +213,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		if (plugin == null) {
 			alreadySetup = false;
 			plugin = this;
-			ShopkeepersAPI.enable(this);
+			InternalShopkeepersAPI.enable(this);
 		}
 
 		// Validate that this server is running a minimum required version:
@@ -444,7 +439,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 		HandlerList.unregisterAll(this);
 		Bukkit.getScheduler().cancelTasks(this);
 
-		ShopkeepersAPI.disable();
+		InternalShopkeepersAPI.disable();
 		plugin = null;
 	}
 
@@ -469,6 +464,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 		shopkeeperCreation.onPlayerQuit(player);
 		commands.onPlayerQuit(player);
+	}
+
+	@Override
+	public ApiInternals getApiInternals() {
+		return apiInternals;
 	}
 
 	// SHOPKEEPER REGISTRY
@@ -608,45 +608,5 @@ public class SKShopkeepersPlugin extends JavaPlugin implements ShopkeepersPlugin
 
 	public TradeNotifications getTradeNotifications() {
 		return tradeNotifications;
-	}
-
-	// FACTORIES
-
-	@Deprecated
-	@Override
-	public UnmodifiableItemStack createUnmodifiableItemStack(ItemStack itemStack) {
-		return SKUnmodifiableItemStack.of(itemStack);
-	}
-
-	// OFFERS FACTORY
-
-	@Deprecated
-	@Override
-	public PriceOffer createPriceOffer(ItemStack item, int price) {
-		return new SKPriceOffer(item, price);
-	}
-
-	@Deprecated
-	@Override
-	public PriceOffer createPriceOffer(UnmodifiableItemStack item, int price) {
-		return new SKPriceOffer(item, price);
-	}
-
-	@Deprecated
-	@Override
-	public TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		return new SKTradeOffer(resultItem, item1, item2);
-	}
-
-	@Deprecated
-	@Override
-	public TradeOffer createTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
-		return new SKTradeOffer(resultItem, item1, item2);
-	}
-
-	@Deprecated
-	@Override
-	public BookOffer createBookOffer(String bookTitle, int price) {
-		return new SKBookOffer(bookTitle, price);
 	}
 }

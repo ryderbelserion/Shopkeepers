@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.api.shopkeeper.offers;
 
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.internal.ApiInternals;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
 /**
@@ -25,7 +25,7 @@ public interface PriceOffer {
 	 * @return the new offer
 	 */
 	public static PriceOffer create(ItemStack item, int price) {
-		return ShopkeepersAPI.createPriceOffer(item, price);
+		return ApiInternals.getInstance().createPriceOffer(item, price);
 	}
 
 	/**
@@ -40,7 +40,7 @@ public interface PriceOffer {
 	 * @return the new offer
 	 */
 	public static PriceOffer create(UnmodifiableItemStack item, int price) {
-		return ShopkeepersAPI.createPriceOffer(item, price);
+		return ApiInternals.getInstance().createPriceOffer(item, price);
 	}
 
 	// ----

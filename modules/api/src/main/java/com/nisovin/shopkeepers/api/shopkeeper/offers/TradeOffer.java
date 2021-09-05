@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.api.shopkeeper.offers;
 
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.internal.ApiInternals;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 
@@ -28,7 +28,7 @@ public interface TradeOffer {
 	 * @return the new offer
 	 */
 	public static TradeOffer create(ItemStack resultItem, ItemStack item1, ItemStack item2) {
-		return ShopkeepersAPI.createTradeOffer(resultItem, item1, item2);
+		return ApiInternals.getInstance().createTradeOffer(resultItem, item1, item2);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public interface TradeOffer {
 	 * @return the new offer
 	 */
 	public static TradeOffer create(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
-		return ShopkeepersAPI.createTradeOffer(resultItem, item1, item2);
+		return ApiInternals.getInstance().createTradeOffer(resultItem, item1, item2);
 	}
 
 	// ----

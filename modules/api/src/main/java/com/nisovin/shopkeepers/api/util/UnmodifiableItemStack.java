@@ -8,7 +8,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.internal.ApiInternals;
 
 /**
  * An unmodifiable view on an {@link ItemStack}.
@@ -57,7 +57,7 @@ public interface UnmodifiableItemStack extends ConfigurationSerializable {
 	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is <code>null</code>
 	 */
 	public static UnmodifiableItemStack of(ItemStack itemStack) {
-		return ShopkeepersAPI.createUnmodifiableItemStack(itemStack);
+		return ApiInternals.getInstance().createUnmodifiableItemStack(itemStack);
 	}
 
 	// ----

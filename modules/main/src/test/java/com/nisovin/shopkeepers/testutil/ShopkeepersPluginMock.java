@@ -1,21 +1,20 @@
 package com.nisovin.shopkeepers.testutil;
 
-import org.bukkit.inventory.ItemStack;
-
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
-import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.util.inventory.SKUnmodifiableItemStack;
+import com.nisovin.shopkeepers.api.internal.ApiInternals;
+import com.nisovin.shopkeepers.api.internal.InternalShopkeepersAPI;
+import com.nisovin.shopkeepers.api.internal.InternalShopkeepersPlugin;
+import com.nisovin.shopkeepers.internals.SKApiInternals;
 
 /**
  * Mocks the Shopkeepers plugin functionality that is required during tests.
  */
-class ShopkeepersPluginMock extends ProxyHandler<ShopkeepersPlugin> {
+class ShopkeepersPluginMock extends ProxyHandler<InternalShopkeepersPlugin> {
 
 	// Static initializer: Ensures that this is only setup once across all tests.
 	static {
 		// Setup the plugin mock as API provider:
-		ShopkeepersPlugin pluginMock = new ShopkeepersPluginMock().newProxy();
-		ShopkeepersAPI.enable(pluginMock);
+		InternalShopkeepersPlugin pluginMock = new ShopkeepersPluginMock().newProxy();
+		InternalShopkeepersAPI.enable(pluginMock);
 	}
 
 	// Calling this method ensures that the static initializer is invoked.
@@ -23,13 +22,14 @@ class ShopkeepersPluginMock extends ProxyHandler<ShopkeepersPlugin> {
 	}
 
 	private ShopkeepersPluginMock() {
-		super(ShopkeepersPlugin.class);
+		super(InternalShopkeepersPlugin.class);
 	}
 
 	@Override
 	protected void setupMethodHandlers() throws Exception {
-		this.addHandler(ShopkeepersPlugin.class.getMethod("createUnmodifiableItemStack", ItemStack.class), (proxy, args) -> {
-			return SKUnmodifiableItemStack.of((ItemStack) args[0]);
+		ApiInternals apiInternals = new SKApiInternals();
+		this.addHandler(InternalShopkeepersPlugin.class.getMethod("getApiInternals"), (proxy, args) -> {
+			return apiInternals;
 		});
 	}
 }

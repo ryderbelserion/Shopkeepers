@@ -294,21 +294,6 @@ public interface ShopkeepersPlugin extends Plugin {
 	// FACTORIES
 
 	/**
-	 * Creates an {@link UnmodifiableItemStack} for the given {@link ItemStack}.
-	 * <p>
-	 * If the given item stack is already an {@link UnmodifiableItemStack}, this returns the given item stack itself.
-	 * 
-	 * @param itemStack
-	 *            the item stack, can be <code>null</code>
-	 * @return the unmodifiable item stack, or <code>null</code> if the given item stack is <code>null</code>
-	 * @deprecated Use {@link UnmodifiableItemStack#of(ItemStack)}
-	 */
-	@Deprecated
-	public UnmodifiableItemStack createUnmodifiableItemStack(ItemStack itemStack);
-
-	// OFFERS FACTORY
-
-	/**
 	 * Creates a new {@link PriceOffer}.
 	 * <p>
 	 * If the given item stack is an {@link UnmodifiableItemStack}, it is assumed to be immutable and therefore not
@@ -322,7 +307,9 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * @deprecated Use {@link PriceOffer#create(ItemStack, int)}
 	 */
 	@Deprecated
-	public PriceOffer createPriceOffer(ItemStack item, int price);
+	public default PriceOffer createPriceOffer(ItemStack item, int price) {
+		return PriceOffer.create(item, price);
+	}
 
 	/**
 	 * Creates a new {@link PriceOffer}.
@@ -337,7 +324,9 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * @deprecated Use {@link PriceOffer#create(UnmodifiableItemStack, int)}
 	 */
 	@Deprecated
-	public PriceOffer createPriceOffer(UnmodifiableItemStack item, int price);
+	public default PriceOffer createPriceOffer(UnmodifiableItemStack item, int price) {
+		return PriceOffer.create(item, price);
+	}
 
 	/**
 	 * Creates a new {@link TradeOffer}.
@@ -355,7 +344,9 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * @deprecated Use {@link TradeOffer#create(ItemStack, ItemStack, ItemStack)}
 	 */
 	@Deprecated
-	public TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2);
+	public default TradeOffer createTradeOffer(ItemStack resultItem, ItemStack item1, ItemStack item2) {
+		return TradeOffer.create(resultItem, item1, item2);
+	}
 
 	/**
 	 * Creates a new {@link TradeOffer}.
@@ -373,7 +364,9 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * @deprecated Use {@link TradeOffer#create(UnmodifiableItemStack, UnmodifiableItemStack, UnmodifiableItemStack)}
 	 */
 	@Deprecated
-	public TradeOffer createTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2);
+	public default TradeOffer createTradeOffer(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
+		return TradeOffer.create(resultItem, item1, item2);
+	}
 
 	/**
 	 * Creates a new {@link BookOffer}.
@@ -386,5 +379,7 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * @deprecated Use {@link BookOffer#create(String, int)}
 	 */
 	@Deprecated
-	public BookOffer createBookOffer(String bookTitle, int price);
+	public default BookOffer createBookOffer(String bookTitle, int price) {
+		return BookOffer.create(bookTitle, price);
+	}
 }

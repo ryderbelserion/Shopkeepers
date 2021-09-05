@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.api.shopkeeper.offers;
 
-import com.nisovin.shopkeepers.api.ShopkeepersAPI;
+import com.nisovin.shopkeepers.api.internal.ApiInternals;
 
 /**
  * Stores information about a certain book being traded for a certain price.
@@ -21,7 +21,7 @@ public interface BookOffer {
 	 * @return the new offer
 	 */
 	public static BookOffer create(String bookTitle, int price) {
-		return ShopkeepersAPI.createBookOffer(bookTitle, price);
+		return ApiInternals.getInstance().createBookOffer(bookTitle, price);
 	}
 
 	// ----
