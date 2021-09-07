@@ -28,7 +28,7 @@ class CommandEdit extends PlayerCommand {
 
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
-				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, true),
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER),
 				TargetShopkeeperFilter.ANY
 		));
 	}

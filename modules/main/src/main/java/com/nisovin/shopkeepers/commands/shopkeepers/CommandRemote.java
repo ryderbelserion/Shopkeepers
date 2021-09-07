@@ -34,7 +34,7 @@ class CommandRemote extends Command {
 
 		// Arguments:
 		this.addArgument(new TargetShopkeeperFallback(
-				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER, true),
+				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER),
 				TargetShopkeeperFilter.ANY
 		));
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
