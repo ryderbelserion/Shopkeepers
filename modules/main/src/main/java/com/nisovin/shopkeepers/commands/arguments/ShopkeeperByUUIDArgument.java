@@ -28,12 +28,12 @@ public class ShopkeeperByUUIDArgument extends ObjectByIdArgument<UUID, Shopkeepe
 	}
 
 	public ShopkeeperByUUIDArgument(String name, ArgumentFilter<Shopkeeper> filter, int minimalCompletionInput) {
-		super(name, filter, minimalCompletionInput);
+		super(name, filter, new IdArgumentArgs(minimalCompletionInput));
 	}
 
 	@Override
-	protected ObjectIdArgument<UUID> createIdArgument(String name, int minimalCompletionInput) {
-		return new ShopkeeperUUIDArgument(name, ArgumentFilter.acceptAny(), minimalCompletionInput) {
+	protected ObjectIdArgument<UUID> createIdArgument(String name, IdArgumentArgs args) {
+		return new ShopkeeperUUIDArgument(name, ArgumentFilter.acceptAny(), args.minimalCompletionInput) {
 			@Override
 			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 				return ShopkeeperByUUIDArgument.this.getCompletionSuggestions(input, context, idPrefix);

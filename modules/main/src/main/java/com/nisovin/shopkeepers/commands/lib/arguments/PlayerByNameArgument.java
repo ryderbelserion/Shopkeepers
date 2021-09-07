@@ -28,12 +28,12 @@ public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 	}
 
 	public PlayerByNameArgument(String name, ArgumentFilter<Player> filter, int minimalCompletionInput) {
-		super(name, filter, minimalCompletionInput);
+		super(name, filter, new IdArgumentArgs(minimalCompletionInput));
 	}
 
 	@Override
-	protected ObjectIdArgument<String> createIdArgument(String name, int minimalCompletionInput) {
-		return new PlayerNameArgument(name, ArgumentFilter.acceptAny(), minimalCompletionInput) {
+	protected ObjectIdArgument<String> createIdArgument(String name, IdArgumentArgs args) {
+		return new PlayerNameArgument(name, ArgumentFilter.acceptAny(), args.minimalCompletionInput) {
 			@Override
 			protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 				return PlayerByNameArgument.this.getCompletionSuggestions(input, context, idPrefix);

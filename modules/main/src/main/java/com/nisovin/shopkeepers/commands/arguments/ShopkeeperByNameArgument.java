@@ -21,8 +21,6 @@ import com.nisovin.shopkeepers.text.Text;
  */
 public class ShopkeeperByNameArgument extends ObjectByIdArgument<String, Shopkeeper> {
 
-	private final boolean joinRemainingArgs;
-
 	public ShopkeeperByNameArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
@@ -32,13 +30,12 @@ public class ShopkeeperByNameArgument extends ObjectByIdArgument<String, Shopkee
 	}
 
 	public ShopkeeperByNameArgument(String name, boolean joinRemainingArgs, ArgumentFilter<Shopkeeper> filter, int minimalCompletionInput) {
-		super(name, filter, minimalCompletionInput);
-		this.joinRemainingArgs = joinRemainingArgs;
+		super(name, filter, new IdArgumentArgs(minimalCompletionInput, joinRemainingArgs));
 	}
 
 	@Override
-	protected ObjectIdArgument<String> createIdArgument(String name, int minimalCompletionInput) {
-		return new ShopkeeperNameArgument(name, joinRemainingArgs, ArgumentFilter.acceptAny(), minimalCompletionInput) {
+	protected ObjectIdArgument<String> createIdArgument(String name, IdArgumentArgs args) {
+		return new ShopkeeperNameArgument(name, args.joinRemainingArgs, ArgumentFilter.acceptAny(), args.minimalCompletionInput) {
 			@Override
 			protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 				return ShopkeeperByNameArgument.this.getCompletionSuggestions(input, context, idPrefix);

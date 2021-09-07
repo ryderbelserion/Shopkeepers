@@ -63,6 +63,7 @@ Date format: (YYYY-MM-DD)
 * Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
 * Internal API: Moved various editor internal classes into their own files.
 * Internal API: Added SKSignShopObject#getSignType().
+* Fixed: The ShopkeeperByName command argument did not take the 'joinRemainingArgs' argument into account.
 * Refactors related to the removal of shopkeepers of inactive players.
 * Refactors related to shop object properties.
 * Added validation for some constructor and method arguments in the API.

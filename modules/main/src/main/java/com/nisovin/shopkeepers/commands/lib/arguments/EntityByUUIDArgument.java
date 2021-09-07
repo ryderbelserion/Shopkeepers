@@ -24,12 +24,12 @@ public class EntityByUUIDArgument extends ObjectByIdArgument<UUID, Entity> {
 	}
 
 	public EntityByUUIDArgument(String name, ArgumentFilter<Entity> filter, int minimalCompletionInput) {
-		super(name, filter, minimalCompletionInput);
+		super(name, filter, new IdArgumentArgs(minimalCompletionInput));
 	}
 
 	@Override
-	protected ObjectIdArgument<UUID> createIdArgument(String name, int minimalCompletionInput) {
-		return new EntityUUIDArgument(name, ArgumentFilter.acceptAny(), minimalCompletionInput) {
+	protected ObjectIdArgument<UUID> createIdArgument(String name, IdArgumentArgs args) {
+		return new EntityUUIDArgument(name, ArgumentFilter.acceptAny(), args.minimalCompletionInput) {
 			@Override
 			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 				return EntityByUUIDArgument.this.getCompletionSuggestions(input, context, idPrefix);

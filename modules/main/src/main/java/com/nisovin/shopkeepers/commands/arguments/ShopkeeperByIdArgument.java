@@ -27,12 +27,12 @@ public class ShopkeeperByIdArgument extends ObjectByIdArgument<Integer, Shopkeep
 	}
 
 	public ShopkeeperByIdArgument(String name, ArgumentFilter<Shopkeeper> filter, int minimalCompletionInput) {
-		super(name, filter, minimalCompletionInput);
+		super(name, filter, new IdArgumentArgs(minimalCompletionInput));
 	}
 
 	@Override
-	protected ObjectIdArgument<Integer> createIdArgument(String name, int minimalCompletionInput) {
-		return new ShopkeeperIdArgument(name, ArgumentFilter.acceptAny(), minimalCompletionInput) {
+	protected ObjectIdArgument<Integer> createIdArgument(String name, IdArgumentArgs args) {
+		return new ShopkeeperIdArgument(name, ArgumentFilter.acceptAny(), args.minimalCompletionInput) {
 			@Override
 			protected Iterable<Integer> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 				return ShopkeeperByIdArgument.this.getCompletionSuggestions(input, context, idPrefix);

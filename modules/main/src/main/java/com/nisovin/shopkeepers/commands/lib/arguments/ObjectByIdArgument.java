@@ -25,11 +25,26 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 	protected final ArgumentFilter<O> filter; // Not null
 	protected final ObjectIdArgument<I> idArgument;
 
-	public ObjectByIdArgument(String name, ArgumentFilter<O> filter, int minimalCompletionInput) {
+	public ObjectByIdArgument(String name, ArgumentFilter<O> filter, IdArgumentArgs idArgumentArgs) {
 		super(name);
 		this.filter = (filter == null) ? ArgumentFilter.acceptAny() : filter;
-		this.idArgument = this.createIdArgument(name + ":id", minimalCompletionInput);
+		this.idArgument = this.createIdArgument(name + ":id", idArgumentArgs);
 		this.idArgument.setParent(this);
+	}
+
+	protected static class IdArgumentArgs {
+
+		public final int minimalCompletionInput;
+		public final boolean joinRemainingArgs;
+
+		public IdArgumentArgs(int minimalCompletionInput) {
+			this(minimalCompletionInput, false);
+		}
+
+		public IdArgumentArgs(int minimalCompletionInput, boolean joinRemainingArgs) {
+			this.minimalCompletionInput = minimalCompletionInput;
+			this.joinRemainingArgs = joinRemainingArgs;
+		}
 	}
 
 	// Implementation note: Usually we don't use an id filter here. Instead we filter directly which objects are
@@ -37,7 +52,7 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 	// ObjectIdArgument#getCompletionSuggestions(String) implementation to
 	// ObjectByIdArgument#getCompletionSuggestions(String), which should take this argument's object filter into
 	// account.
-	protected abstract ObjectIdArgument<I> createIdArgument(String name, int minimalCompletionInput);
+	protected abstract ObjectIdArgument<I> createIdArgument(String name, IdArgumentArgs args);
 
 	@Override
 	public Text getMissingArgumentErrorMsg() {
@@ -86,7 +101,7 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 	 * <p>
 	 * The given command input and context can be used to limit the scope of the considered objects.
 	 * <p>
-	 * The id-argument created by {@link #createIdArgument(String, int)} should delegate to this method.
+	 * The id-argument created by {@link #createIdArgument(String, IdArgumentArgs)} should delegate to this method.
 	 * 
 	 * @param input
 	 *            the command input, not <code>null</code>
