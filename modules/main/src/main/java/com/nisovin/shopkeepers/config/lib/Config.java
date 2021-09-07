@@ -48,7 +48,12 @@ public abstract class Config {
 	protected Config() {
 	}
 
-	protected String getLogPrefix() {
+	/**
+	 * A short prefix for log messages related to this config.
+	 * 
+	 * @return the log prefix, not <code>null</code>, can be empty
+	 */
+	public String getLogPrefix() {
 		return "Config: ";
 	}
 

@@ -482,7 +482,7 @@ public class Messages extends Config {
 	}
 
 	@Override
-	protected String getLogPrefix() {
+	public String getLogPrefix() {
 		return "Language: ";
 	}
 
