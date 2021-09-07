@@ -6,6 +6,8 @@ import java.util.function.Predicate;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectNameArgument;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -59,12 +61,12 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 					if (normalized.startsWith(normalizedNamePrefix)) {
 						return normalizedWithCase;
 					}
-					return null; // no match
+					return null; // No match
 				}).filter(name -> name != null)::iterator;
 	}
 
 	@Override
-	protected Iterable<String> getCompletionSuggestions(String idPrefix) {
+	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 		return getDefaultCompletionSuggestions(idPrefix, (shopkeeper) -> true);
 	}
 }

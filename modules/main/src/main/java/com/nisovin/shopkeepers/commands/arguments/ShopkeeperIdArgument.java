@@ -6,6 +6,8 @@ import java.util.function.Predicate;
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.IntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectIdArgument;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
@@ -69,7 +71,7 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 	}
 
 	@Override
-	protected Iterable<Integer> getCompletionSuggestions(String idPrefix) {
+	protected Iterable<Integer> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 		return getDefaultCompletionSuggestions(idPrefix, (shopkeeper) -> true);
 	}
 }

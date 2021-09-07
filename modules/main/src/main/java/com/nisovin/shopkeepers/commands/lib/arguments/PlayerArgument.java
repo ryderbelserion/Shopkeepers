@@ -40,18 +40,18 @@ public class PlayerArgument extends CommandArgument<Player> {
 		this.filter = (filter == null) ? ArgumentFilter.acceptAny() : filter;
 		this.playerNameArgument = new PlayerByNameArgument(name + ":name", filter, minimalNameCompletionInput) {
 			@Override
-			public Player getObject(String nameInput) throws ArgumentParseException {
+			public Player getObject(CommandInput input, CommandContextView context, String nameInput) throws ArgumentParseException {
 				return PlayerArgument.this.getPlayerByName(nameInput);
 			}
 
 			@Override
-			protected Iterable<String> getCompletionSuggestions(String idPrefix) {
+			protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 				return PlayerArgument.this.getNameCompletionSuggestions(idPrefix);
 			}
 		};
 		this.playerUUIDArgument = new PlayerByUUIDArgument(name + ":uuid", filter, minimalUUIDCompletionInput) {
 			@Override
-			protected Iterable<UUID> getCompletionSuggestions(String idPrefix) {
+			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 				return PlayerArgument.this.getUUIDCompletionSuggestions(idPrefix);
 			}
 		};

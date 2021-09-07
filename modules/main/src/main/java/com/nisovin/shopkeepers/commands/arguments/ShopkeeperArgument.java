@@ -44,7 +44,7 @@ public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 		this.shopIdArgument = new ShopkeeperByIdArgument(name + ":id", filter);
 		this.shopNameArgument = new ShopkeeperByNameArgument(name + ":name", joinRemainingArgs, filter, minimalNameCompletionInput) {
 			@Override
-			public Shopkeeper getObject(String nameInput) throws ArgumentParseException {
+			public Shopkeeper getObject(CommandInput input, CommandContextView context, String nameInput) throws ArgumentParseException {
 				return ShopkeeperArgument.this.getShopkeeper(nameInput);
 			}
 		};

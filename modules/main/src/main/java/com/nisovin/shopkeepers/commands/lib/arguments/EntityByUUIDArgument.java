@@ -7,6 +7,8 @@ import org.bukkit.entity.Entity;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 
 /**
  * Determines an existing entity by the given UUID input.
@@ -29,19 +31,19 @@ public class EntityByUUIDArgument extends ObjectByIdArgument<UUID, Entity> {
 	protected ObjectIdArgument<UUID> createIdArgument(String name, int minimalCompletionInput) {
 		return new EntityUUIDArgument(name, ArgumentFilter.acceptAny(), minimalCompletionInput) {
 			@Override
-			protected Iterable<UUID> getCompletionSuggestions(String idPrefix) {
-				return EntityByUUIDArgument.this.getCompletionSuggestions(idPrefix);
+			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
+				return EntityByUUIDArgument.this.getCompletionSuggestions(input, context, idPrefix);
 			}
 		};
 	}
 
 	@Override
-	protected Entity getObject(UUID uuid) throws ArgumentParseException {
+	protected Entity getObject(CommandInput input, CommandContextView context, UUID uuid) throws ArgumentParseException {
 		return Bukkit.getEntity(uuid);
 	}
 
 	@Override
-	protected Iterable<UUID> getCompletionSuggestions(String idPrefix) {
+	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 		return EntityUUIDArgument.getDefaultCompletionSuggestions(idPrefix, filter);
 	}
 }

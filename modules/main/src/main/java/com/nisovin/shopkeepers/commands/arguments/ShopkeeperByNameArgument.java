@@ -7,6 +7,8 @@ import java.util.stream.Stream;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectByIdArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectIdArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerNameArgument;
@@ -38,8 +40,8 @@ public class ShopkeeperByNameArgument extends ObjectByIdArgument<String, Shopkee
 	protected ObjectIdArgument<String> createIdArgument(String name, int minimalCompletionInput) {
 		return new ShopkeeperNameArgument(name, joinRemainingArgs, ArgumentFilter.acceptAny(), minimalCompletionInput) {
 			@Override
-			protected Iterable<String> getCompletionSuggestions(String idPrefix) {
-				return ShopkeeperByNameArgument.this.getCompletionSuggestions(idPrefix);
+			protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
+				return ShopkeeperByNameArgument.this.getCompletionSuggestions(input, context, idPrefix);
 			}
 		};
 	}
@@ -54,7 +56,7 @@ public class ShopkeeperByNameArgument extends ObjectByIdArgument<String, Shopkee
 	}
 
 	@Override
-	public Shopkeeper getObject(String nameInput) throws ArgumentParseException {
+	public Shopkeeper getObject(CommandInput input, CommandContextView context, String nameInput) throws ArgumentParseException {
 		Stream<? extends Shopkeeper> shopkeepers = ShopkeeperArgumentUtils.ShopkeeperNameMatchers.DEFAULT.match(nameInput);
 		Optional<? extends Shopkeeper> shopkeeper = shopkeepers.findFirst();
 		return shopkeeper.orElse(null);
@@ -62,7 +64,7 @@ public class ShopkeeperByNameArgument extends ObjectByIdArgument<String, Shopkee
 	}
 
 	@Override
-	protected Iterable<String> getCompletionSuggestions(String idPrefix) {
+	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 		return ShopkeeperNameArgument.getDefaultCompletionSuggestions(idPrefix, filter);
 	}
 }

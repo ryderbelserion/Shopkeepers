@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.util.PlayerArgumentUtils;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
@@ -33,8 +35,8 @@ public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 	protected ObjectIdArgument<String> createIdArgument(String name, int minimalCompletionInput) {
 		return new PlayerNameArgument(name, ArgumentFilter.acceptAny(), minimalCompletionInput) {
 			@Override
-			protected Iterable<String> getCompletionSuggestions(String idPrefix) {
-				return PlayerByNameArgument.this.getCompletionSuggestions(idPrefix);
+			protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
+				return PlayerByNameArgument.this.getCompletionSuggestions(input, context, idPrefix);
 			}
 		};
 	}
@@ -49,7 +51,7 @@ public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 	}
 
 	@Override
-	public Player getObject(String nameInput) throws ArgumentParseException {
+	public Player getObject(CommandInput input, CommandContextView context, String nameInput) throws ArgumentParseException {
 		// Name input may be both player name or display name:
 		Stream<Player> players = PlayerArgumentUtils.PlayerNameMatcher.EXACT.match(nameInput);
 		Optional<Player> player = players.findFirst();
@@ -58,7 +60,7 @@ public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 	}
 
 	@Override
-	protected Iterable<String> getCompletionSuggestions(String idPrefix) {
+	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 		// Note: Whether or not to include display name suggestions usually depends on whether or not the the used
 		// matching function considers display names
 		return PlayerNameArgument.getDefaultCompletionSuggestions(idPrefix, filter, true);

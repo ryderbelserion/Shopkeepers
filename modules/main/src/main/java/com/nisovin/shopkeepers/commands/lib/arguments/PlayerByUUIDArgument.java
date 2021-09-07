@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
 
@@ -32,8 +34,8 @@ public class PlayerByUUIDArgument extends ObjectByIdArgument<UUID, Player> {
 	protected ObjectIdArgument<UUID> createIdArgument(String name, int minimalCompletionInput) {
 		return new PlayerUUIDArgument(name, ArgumentFilter.acceptAny(), minimalCompletionInput) {
 			@Override
-			protected Iterable<UUID> getCompletionSuggestions(String idPrefix) {
-				return PlayerByUUIDArgument.this.getCompletionSuggestions(idPrefix);
+			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
+				return PlayerByUUIDArgument.this.getCompletionSuggestions(input, context, idPrefix);
 			}
 		};
 	}
@@ -48,12 +50,12 @@ public class PlayerByUUIDArgument extends ObjectByIdArgument<UUID, Player> {
 	}
 
 	@Override
-	protected Player getObject(UUID uuid) throws ArgumentParseException {
+	protected Player getObject(CommandInput input, CommandContextView context, UUID uuid) throws ArgumentParseException {
 		return Bukkit.getPlayer(uuid);
 	}
 
 	@Override
-	protected Iterable<UUID> getCompletionSuggestions(String idPrefix) {
+	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 		return PlayerUUIDArgument.getDefaultCompletionSuggestions(idPrefix, filter);
 	}
 }

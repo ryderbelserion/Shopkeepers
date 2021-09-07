@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -82,7 +84,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	}
 
 	@Override
-	protected Iterable<String> getCompletionSuggestions(String idPrefix) {
+	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 		return getDefaultCompletionSuggestions(idPrefix, (player) -> true, true);
 	}
 }

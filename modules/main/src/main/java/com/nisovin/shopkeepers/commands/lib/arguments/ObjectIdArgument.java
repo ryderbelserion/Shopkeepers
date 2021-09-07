@@ -20,8 +20,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <p>
  * By default this argument accepts any identifier that can be parsed by the wrapped identifier argument.
  * <p>
- * Sub-classes need to override {@link #getCompletionSuggestions(String)} and {@link #toString(Object)} to provide
- * completion suggestions for partial inputs matching known ids.
+ * Sub-classes need to override {@link #getCompletionSuggestions(CommandInput, CommandContextView, String)} and
+ * {@link #toString(Object)} to provide completion suggestions for partial inputs matching known ids.
  *
  * @param <I>
  *            the identifier type
@@ -68,14 +68,20 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 	/**
 	 * Gets the completion suggestions for the given id prefix.
 	 * <p>
+	 * The given command input and context can be used to limit the scope of the considered ids.
+	 * <p>
 	 * Before these suggestions get actually used, they may first have to also pass the id filter used by this
 	 * {@link ObjectIdArgument}.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param idPrefix
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions
 	 */
-	protected abstract Iterable<I> getCompletionSuggestions(String idPrefix);
+	protected abstract Iterable<I> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix);
 
 	// This gets applied to convert id completion suggestions to Strings.
 	protected abstract String toString(I id);
@@ -87,7 +93,7 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 			return Collections.emptyList();
 		}
 
-		// try to parse id:
+		// Try to parse id:
 		int startIndex = argsReader.getCursor() + 1; // inclusive
 		try {
 			idArgument.parseValue(input, context, argsReader);
@@ -114,11 +120,11 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 		}
 
 		// Get completion suggestions:
-		return this.complete(idPrefix, argsCount);
+		return this.complete(input, context, idPrefix, argsCount);
 	}
 
 	// argsCount: The number of arguments the id prefix consist of (>= 1).
-	protected List<String> complete(String idPrefix, int argsCount) {
+	protected List<String> complete(CommandInput input, CommandContextView context, String idPrefix, int argsCount) {
 		// Some types of object id arguments may want to provide suggestions even if there are no remaining args (empty
 		// partial input), while others might want to limit their suggestions to the case that there is at least a
 		// minimum sized input (eg. if there are lots of candidate ids):
@@ -128,7 +134,7 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 		}
 
 		List<String> suggestions = new ArrayList<>();
-		for (I id : this.getCompletionSuggestions(idPrefix)) {
+		for (I id : this.getCompletionSuggestions(input, context, idPrefix)) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;
 			if (!filter.test(id)) continue; // Skip rejected ids
 

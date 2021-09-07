@@ -38,7 +38,7 @@ public class EntityArgument extends CommandArgument<Entity> {
 		this.filter = (filter == null) ? ArgumentFilter.acceptAny() : filter;
 		this.entityUUIDArgument = new EntityByUUIDArgument(name + ":uuid", filter, minimalUUIDCompletionInput) {
 			@Override
-			protected Iterable<UUID> getCompletionSuggestions(String idPrefix) {
+			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 				return EntityArgument.this.getUUIDCompletionSuggestions(idPrefix);
 			}
 		};

@@ -6,6 +6,8 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectByIdArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectIdArgument;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -32,8 +34,8 @@ public class ShopkeeperByIdArgument extends ObjectByIdArgument<Integer, Shopkeep
 	protected ObjectIdArgument<Integer> createIdArgument(String name, int minimalCompletionInput) {
 		return new ShopkeeperIdArgument(name, ArgumentFilter.acceptAny(), minimalCompletionInput) {
 			@Override
-			protected Iterable<Integer> getCompletionSuggestions(String idPrefix) {
-				return ShopkeeperByIdArgument.this.getCompletionSuggestions(idPrefix);
+			protected Iterable<Integer> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
+				return ShopkeeperByIdArgument.this.getCompletionSuggestions(input, context, idPrefix);
 			}
 		};
 	}
@@ -48,12 +50,12 @@ public class ShopkeeperByIdArgument extends ObjectByIdArgument<Integer, Shopkeep
 	}
 
 	@Override
-	protected Shopkeeper getObject(Integer id) throws ArgumentParseException {
+	protected Shopkeeper getObject(CommandInput input, CommandContextView context, Integer id) throws ArgumentParseException {
 		return ShopkeepersAPI.getShopkeeperRegistry().getShopkeeperById(id);
 	}
 
 	@Override
-	protected Iterable<Integer> getCompletionSuggestions(String idPrefix) {
+	protected Iterable<Integer> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 		return ShopkeeperIdArgument.getDefaultCompletionSuggestions(idPrefix, filter);
 	}
 }

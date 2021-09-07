@@ -7,6 +7,8 @@ import java.util.function.Predicate;
 import org.bukkit.entity.Entity;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 
 /**
  * Argument for entity UUIDs.
@@ -51,7 +53,7 @@ public class EntityUUIDArgument extends ObjectUUIDArgument {
 	}
 
 	@Override
-	protected Iterable<UUID> getCompletionSuggestions(String idPrefix) {
+	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 		return getDefaultCompletionSuggestions(idPrefix, (entity) -> true);
 	}
 }

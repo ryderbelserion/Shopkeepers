@@ -22,7 +22,7 @@ import com.nisovin.shopkeepers.text.Text;
  */
 public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 
-	protected final ArgumentFilter<O> filter; // not null
+	protected final ArgumentFilter<O> filter; // Not null
 	protected final ObjectIdArgument<I> idArgument;
 
 	public ObjectByIdArgument(String name, ArgumentFilter<O> filter, int minimalCompletionInput) {
@@ -48,20 +48,26 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 
 	/**
 	 * Gets the object corresponding to the given id.
+	 * <p>
+	 * The given command input and context can be used to limit the scope of the considered objects.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param id
 	 *            the id
 	 * @return the corresponding object, or <code>null</code>
 	 * @throws ArgumentParseException
 	 *             if the id is ambiguous
 	 */
-	protected abstract O getObject(I id) throws ArgumentParseException;
+	protected abstract O getObject(CommandInput input, CommandContextView context, I id) throws ArgumentParseException;
 
 	@Override
 	public O parseValue(CommandInput input, CommandContextView context, ArgumentsReader argsReader) throws ArgumentParseException {
 		// Parse id: This deals with invalid and missing input.
 		I id = idArgument.parseValue(input, context, argsReader);
-		O object = this.getObject(id);
+		O object = this.getObject(input, context, id);
 		if (object == null) {
 			// No corresponding object found:
 			throw this.invalidArgumentError(idArgument.toString(id));
@@ -78,13 +84,19 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 	 * <p>
 	 * This should take this argument's object filter into account.
 	 * <p>
+	 * The given command input and context can be used to limit the scope of the considered objects.
+	 * <p>
 	 * The id-argument created by {@link #createIdArgument(String, int)} should delegate to this method.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param idPrefix
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions
 	 */
-	protected abstract Iterable<I> getCompletionSuggestions(String idPrefix);
+	protected abstract Iterable<I> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix);
 
 	@Override
 	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {

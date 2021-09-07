@@ -1,12 +1,15 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
 import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
+import com.nisovin.shopkeepers.commands.lib.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 
 /**
  * Base class for arguments that accept a name as identifier for some type of objects.
  * <p>
  * By default this argument accepts any String. But unlike {@link StringArgument} this class uses
- * {@link #getCompletionSuggestions(String)} to provide completions for partial inputs.
+ * {@link #getCompletionSuggestions(CommandInput, CommandContextView, String)} to provide completions for partial
+ * inputs.
  */
 public abstract class ObjectNameArgument extends ObjectIdArgument<String> {
 
