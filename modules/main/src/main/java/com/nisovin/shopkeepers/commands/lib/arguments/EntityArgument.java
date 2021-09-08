@@ -39,7 +39,7 @@ public class EntityArgument extends CommandArgument<Entity> {
 		this.entityUUIDArgument = new EntityByUUIDArgument(name + ":uuid", filter, minimalUUIDCompletionInput) {
 			@Override
 			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return EntityArgument.this.getUUIDCompletionSuggestions(idPrefix);
+				return EntityArgument.this.getUUIDCompletionSuggestions(input, context, idPrefix);
 			}
 		};
 		this.firstOfArgument = new TypedFirstOfArgument<>(name + ":firstOf", Arrays.asList(entityUUIDArgument), false, false);
@@ -62,11 +62,15 @@ public class EntityArgument extends CommandArgument<Entity> {
 	 * <p>
 	 * This should take this argument's entity filter into account.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param idPrefix
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions
 	 */
-	protected Iterable<UUID> getUUIDCompletionSuggestions(String idPrefix) {
-		return EntityUUIDArgument.getDefaultCompletionSuggestions(idPrefix, filter);
+	protected Iterable<UUID> getUUIDCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
+		return EntityUUIDArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter);
 	}
 }

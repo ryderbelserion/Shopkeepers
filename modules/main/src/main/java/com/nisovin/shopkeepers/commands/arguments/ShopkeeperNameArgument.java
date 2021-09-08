@@ -41,13 +41,18 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 	/**
 	 * Gets the default name completion suggestions.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param namePrefix
 	 *            the name prefix, may be empty, not <code>null</code>
 	 * @param shopkeeperFilter
 	 *            only suggestions for shopkeepers accepted by this predicate get included
 	 * @return the shopkeeper name completion suggestions
 	 */
-	public static Iterable<String> getDefaultCompletionSuggestions(String namePrefix, Predicate<Shopkeeper> shopkeeperFilter) {
+	public static Iterable<String> getDefaultCompletionSuggestions(	CommandInput input, CommandContextView context,
+																	String namePrefix, Predicate<Shopkeeper> shopkeeperFilter) {
 		// Strips color, normalizes whitespace, converts to lowercase:
 		String normalizedNamePrefix = StringUtils.normalize(TextUtils.stripColor(namePrefix));
 		// TODO Improve by using a TreeMap for the prefix matching?
@@ -67,6 +72,6 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 
 	@Override
 	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(idPrefix, (shopkeeper) -> true);
+		return getDefaultCompletionSuggestions(input, context, idPrefix, (shopkeeper) -> true);
 	}
 }

@@ -51,6 +51,10 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	/**
 	 * Gets the default name completion suggestions.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param namePrefix
 	 *            the name prefix, may be empty, not <code>null</code>
 	 * @param playerFilter
@@ -59,7 +63,9 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	 *            <code>true</code> to include display name suggestions
 	 * @return the player name completion suggestions
 	 */
-	public static Iterable<String> getDefaultCompletionSuggestions(String namePrefix, Predicate<Player> playerFilter, boolean includeDisplayNames) {
+	public static Iterable<String> getDefaultCompletionSuggestions(	CommandInput input, CommandContextView context,
+																	String namePrefix, Predicate<Player> playerFilter,
+																	boolean includeDisplayNames) {
 		// Assumption: Name prefix does not contain color codes (users are not expected to specify color codes).
 		// Normalizes whitespace and converts to lowercase:
 		String normalizedNamePrefix = StringUtils.normalize(namePrefix);
@@ -85,6 +91,6 @@ public class PlayerNameArgument extends ObjectNameArgument {
 
 	@Override
 	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(idPrefix, (player) -> true, true);
+		return getDefaultCompletionSuggestions(input, context, idPrefix, (player) -> true, true);
 	}
 }

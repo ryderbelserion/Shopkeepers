@@ -42,13 +42,18 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 	/**
 	 * Gets the default uuid completion suggestions.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param uuidPrefix
 	 *            the uuid prefix, may be empty, not <code>null</code>
 	 * @param shopkeeperFilter
 	 *            only suggestions for shopkeepers accepted by this predicate get included
 	 * @return the shopkeeper uuid completion suggestions
 	 */
-	public static Iterable<UUID> getDefaultCompletionSuggestions(String uuidPrefix, Predicate<Shopkeeper> shopkeeperFilter) {
+	public static Iterable<UUID> getDefaultCompletionSuggestions(	CommandInput input, CommandContextView context,
+																	String uuidPrefix, Predicate<Shopkeeper> shopkeeperFilter) {
 		String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
 		// TODO Improve by using a TreeMap for the prefix matching?
 		return ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers().stream()
@@ -62,6 +67,6 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 
 	@Override
 	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(idPrefix, (shopkeeper) -> true);
+		return getDefaultCompletionSuggestions(input, context, idPrefix, (shopkeeper) -> true);
 	}
 }

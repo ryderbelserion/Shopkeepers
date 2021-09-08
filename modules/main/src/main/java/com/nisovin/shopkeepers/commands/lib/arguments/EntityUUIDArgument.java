@@ -41,19 +41,24 @@ public class EntityUUIDArgument extends ObjectUUIDArgument {
 	/**
 	 * Gets the default uuid completion suggestions.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param uuidPrefix
 	 *            the uuid prefix, may be empty, not <code>null</code>
 	 * @param filter
 	 *            only suggestions for entities accepted by this predicate get included
 	 * @return the entity uuid completion suggestions
 	 */
-	public static Iterable<UUID> getDefaultCompletionSuggestions(String uuidPrefix, Predicate<Entity> filter) {
+	public static Iterable<UUID> getDefaultCompletionSuggestions(	CommandInput input, CommandContextView context,
+																	String uuidPrefix, Predicate<Entity> filter) {
 		// TODO Actually provide UUID suggestions? Maybe for nearby or targeted entities?
 		return Collections.emptyList();
 	}
 
 	@Override
 	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(idPrefix, (entity) -> true);
+		return getDefaultCompletionSuggestions(input, context, idPrefix, (entity) -> true);
 	}
 }

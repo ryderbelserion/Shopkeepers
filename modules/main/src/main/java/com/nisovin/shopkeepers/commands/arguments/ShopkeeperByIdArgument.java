@@ -56,6 +56,6 @@ public class ShopkeeperByIdArgument extends ObjectByIdArgument<Integer, Shopkeep
 
 	@Override
 	protected Iterable<Integer> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return ShopkeeperIdArgument.getDefaultCompletionSuggestions(idPrefix, filter);
+		return ShopkeeperIdArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter);
 	}
 }

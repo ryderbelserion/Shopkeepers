@@ -46,13 +46,13 @@ public class PlayerArgument extends CommandArgument<Player> {
 
 			@Override
 			protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return PlayerArgument.this.getNameCompletionSuggestions(idPrefix);
+				return PlayerArgument.this.getNameCompletionSuggestions(input, context, idPrefix);
 			}
 		};
 		this.playerUUIDArgument = new PlayerByUUIDArgument(name + ":uuid", filter, minimalUUIDCompletionInput) {
 			@Override
 			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return PlayerArgument.this.getUUIDCompletionSuggestions(idPrefix);
+				return PlayerArgument.this.getUUIDCompletionSuggestions(input, context, idPrefix);
 			}
 		};
 		this.firstOfArgument = new TypedFirstOfArgument<>(name + ":firstOf", Arrays.asList(playerNameArgument, playerUUIDArgument), false, false);
@@ -74,7 +74,8 @@ public class PlayerArgument extends CommandArgument<Player> {
 	 * Gets a {@link Player} which matches the given name input.
 	 * <p>
 	 * This can be overridden if a different behavior is required. You may also want to override
-	 * {@link #getNameCompletionSuggestions(String)} and {@link #getUUIDCompletionSuggestions(String)} then.
+	 * {@link #getNameCompletionSuggestions(CommandInput, CommandContextView, String)} and
+	 * {@link #getUUIDCompletionSuggestions(CommandInput, CommandContextView, String)} then.
 	 * 
 	 * @param nameInput
 	 *            the name input
@@ -95,14 +96,18 @@ public class PlayerArgument extends CommandArgument<Player> {
 	 * <p>
 	 * This should take this argument's player filter into account.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param idPrefix
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions
 	 */
-	protected Iterable<String> getNameCompletionSuggestions(String idPrefix) {
+	protected Iterable<String> getNameCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
 		// Note: Whether or not to include display name suggestions usually depends on whether or not the the used
 		// matching function considers display names
-		return PlayerNameArgument.getDefaultCompletionSuggestions(idPrefix, filter, true);
+		return PlayerNameArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter, true);
 	}
 
 	/**
@@ -110,11 +115,15 @@ public class PlayerArgument extends CommandArgument<Player> {
 	 * <p>
 	 * This should take this argument's player filter into account.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param idPrefix
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions
 	 */
-	protected Iterable<UUID> getUUIDCompletionSuggestions(String idPrefix) {
-		return PlayerUUIDArgument.getDefaultCompletionSuggestions(idPrefix, filter);
+	protected Iterable<UUID> getUUIDCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
+		return PlayerUUIDArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter);
 	}
 }

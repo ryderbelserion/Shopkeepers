@@ -50,13 +50,18 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 	/**
 	 * Gets the default uuid completion suggestions.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param uuidPrefix
 	 *            the uuid prefix, may be empty, not <code>null</code>
 	 * @param playerFilter
 	 *            only suggestions for players accepted by this predicate get included
 	 * @return the player uuid completion suggestions
 	 */
-	public static Iterable<UUID> getDefaultCompletionSuggestions(String uuidPrefix, Predicate<Player> playerFilter) {
+	public static Iterable<UUID> getDefaultCompletionSuggestions(	CommandInput input, CommandContextView context,
+																	String uuidPrefix, Predicate<Player> playerFilter) {
 		String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
 		return Bukkit.getOnlinePlayers().stream()
 				.filter(playerFilter)
@@ -69,6 +74,6 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 
 	@Override
 	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(idPrefix, (player) -> true);
+		return getDefaultCompletionSuggestions(input, context, idPrefix, (player) -> true);
 	}
 }

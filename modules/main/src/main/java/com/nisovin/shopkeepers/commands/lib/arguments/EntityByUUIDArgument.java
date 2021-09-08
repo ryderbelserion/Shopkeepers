@@ -44,6 +44,6 @@ public class EntityByUUIDArgument extends ObjectByIdArgument<UUID, Entity> {
 
 	@Override
 	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return EntityUUIDArgument.getDefaultCompletionSuggestions(idPrefix, filter);
+		return EntityUUIDArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter);
 	}
 }

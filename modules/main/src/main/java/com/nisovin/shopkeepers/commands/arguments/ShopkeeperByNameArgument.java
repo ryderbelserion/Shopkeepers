@@ -62,6 +62,6 @@ public class ShopkeeperByNameArgument extends ObjectByIdArgument<String, Shopkee
 
 	@Override
 	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return ShopkeeperNameArgument.getDefaultCompletionSuggestions(idPrefix, filter);
+		return ShopkeeperNameArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter);
 	}
 }

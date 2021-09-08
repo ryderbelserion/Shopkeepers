@@ -49,13 +49,18 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 	/**
 	 * Gets the default id completion suggestions.
 	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
 	 * @param idPrefix
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @param shopkeeperFilter
 	 *            only suggestions for shopkeepers accepted by this predicate get included
 	 * @return the shopkeeper id completion suggestions
 	 */
-	public static Iterable<Integer> getDefaultCompletionSuggestions(String idPrefix, Predicate<Shopkeeper> shopkeeperFilter) {
+	public static Iterable<Integer> getDefaultCompletionSuggestions(CommandInput input, CommandContextView context,
+																	String idPrefix, Predicate<Shopkeeper> shopkeeperFilter) {
 		// If idPrefix is not a valid number, we can skip checking all shopkeepers:
 		// Note: Empty check is required to not abort in case there is empty partial input but the used
 		// minimalCompletionInput parameter is 0
@@ -72,6 +77,6 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 
 	@Override
 	protected Iterable<Integer> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(idPrefix, (shopkeeper) -> true);
+		return getDefaultCompletionSuggestions(input, context, idPrefix, (shopkeeper) -> true);
 	}
 }
