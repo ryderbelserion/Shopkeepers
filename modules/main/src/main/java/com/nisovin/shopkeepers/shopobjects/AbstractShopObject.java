@@ -157,11 +157,9 @@ public abstract class AbstractShopObject implements ShopObject {
 	public abstract Object getId();
 
 	/**
-	 * This has to be invoked whenever the id of this shop object has changed.
+	 * This has to be invoked whenever the id of this shop object might have changed.
 	 * <p>
-	 * This is not required to be called if the object id changes due to spawning or during ticking.
-	 * <p>
-	 * This updates the id by which the shopkeeper is currently stored by inside the shopkeeper registry.
+	 * This updates the id by which the shopkeeper is currently stored inside the shopkeeper registry.
 	 */
 	protected final void onIdChanged() {
 		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperObjectIdChanged(shopkeeper);
@@ -189,8 +187,10 @@ public abstract class AbstractShopObject implements ShopObject {
 	/**
 	 * Spawns the shop object into the world at its spawn location.
 	 * <p>
-	 * This may have no effect if the shop object has already been spawned. To respawn the shop object, use
-	 * {@link #despawn()} first.
+	 * This may have no effect if the shop object has already been spawned. To respawn this shop object if is is
+	 * currently already spawned, one can use {@link #respawn()}.
+	 * <p>
+	 * This needs to call {@link #onIdChanged()} if the shop object was successfully spawned.
 	 * 
 	 * @return <code>false</code> if the spawning failed, or <code>true</code> if the shop object either is already
 	 *         spawned or has successfully been spawned
@@ -201,8 +201,24 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * Removes this shop object from the world.
 	 * <p>
 	 * This has no effect if the shop object is not spawned currently.
+	 * <p>
+	 * This needs to call {@link #onIdChanged()} if the shop object was successfully despawned.
 	 */
 	public abstract void despawn();
+
+	/**
+	 * Respawns this shop object.
+	 * <p>
+	 * This is the same as calling both {@link #despawn()} and then {@link #spawn()}, but only if this shop object is
+	 * currently already {@link #isSpawned() spawned}.
+	 * 
+	 * @return <code>true</code> if the shop object was successfully respawned
+	 */
+	public final boolean respawn() {
+		if (!this.isSpawned()) return false;
+		this.despawn();
+		return this.spawn();
+	}
 
 	@Override
 	public abstract Location getLocation();
@@ -227,8 +243,8 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * This is also called for shop objects that manage their spawning and despawning
 	 * {@link AbstractShopObjectType#mustBeSpawned() manually}.
 	 * <p>
-	 * Any changes to the shopkeeper's activation state or {@link AbstractShopObject#getId() shop object id} may only be
-	 * processed after the ticking of all currently ticked shop objects completes.
+	 * Any changes to the shopkeeper's activation state or {@link AbstractShopObject#getId() shop object id} might only
+	 * be processed after the ticking of all currently ticked shop objects completes.
 	 * <p>
 	 * If the checks to perform are potentially heavy or not required to happen every second, the shop object may decide
 	 * to only run it every X invocations.

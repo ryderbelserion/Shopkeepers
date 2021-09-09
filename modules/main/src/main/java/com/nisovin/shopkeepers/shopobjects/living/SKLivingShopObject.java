@@ -277,6 +277,13 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 			// Apply sub type:
 			this.onSpawn(entity);
+
+			// Reset respawn attempts counter and tick rate:
+			respawnAttempts = 0;
+			this.resetTickRate();
+
+			// Inform about the object id change:
+			this.onIdChanged();
 		} else {
 			// Failure:
 			// Debug, if not already debugging and cooldown is over:
@@ -323,12 +330,6 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 				debuggingSpawn = false;
 				Log.info(".. Done. Successful: " + success);
 			}
-		}
-
-		if (success) {
-			// Reset respawn attempts counter and tick rate:
-			respawnAttempts = 0;
-			this.resetTickRate();
 		}
 		return success;
 	}
@@ -396,6 +397,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		// Clean up entity:
 		this.cleanUpEntity();
 		lastSpawnLocation = null;
+
+		// Inform about the object id change:
+		this.onIdChanged();
 	}
 
 	@Override

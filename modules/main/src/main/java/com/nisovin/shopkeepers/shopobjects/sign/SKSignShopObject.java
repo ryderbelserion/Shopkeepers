@@ -224,6 +224,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		updateSign = false;
 		this.updateSign();
 
+		// Inform about the object id change:
+		this.onIdChanged();
+
 		return true;
 	}
 
@@ -263,6 +266,9 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		// Remove the sign:
 		block.setType(Material.AIR, false);
 		this.block = null;
+
+		// Inform about the object id change:
+		this.onIdChanged();
 	}
 
 	// Any clean up that needs to happen for the block.
@@ -354,9 +360,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Sign is missing! Attempting respawn.");
 
 			// Cleanup any previously spawned block first:
-			if (this.isSpawned()) {
-				this.despawn();
-			}
+			this.despawn();
 
 			boolean success = this.spawn();
 			if (!success) {

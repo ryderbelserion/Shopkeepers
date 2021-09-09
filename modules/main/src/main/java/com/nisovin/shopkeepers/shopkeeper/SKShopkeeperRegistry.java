@@ -440,11 +440,6 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			AbstractShopObject shopObject = shopkeeper.getShopObject();
 			if (tickShopObject) {
 				shopObject.tick();
-
-				// If the shop object had to be respawned, its id might have changed.
-				if (!shopObject.getLastId().equals(shopObject.getId())) {
-					onShopkeeperObjectIdChanged(shopkeeper);
-				}
 			}
 
 			if (visualizeTicks) {
@@ -1212,11 +1207,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// This also deactivates the shopkeeper.
 	private void despawnShopkeeper(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
+		this.deactivateShopkeeper(shopkeeper);
 		spawnQueue.remove(shopkeeper);
 		AbstractShopObject shopObject = shopkeeper.getShopObject();
 		assert shopObject.getType().mustBeSpawned();
 		shopObject.despawn();
-		this.deactivateShopkeeper(shopkeeper);
 	}
 
 	// The object id that is used for shopkeepers in active chunks that could not be spawned or report to not be active:
@@ -1292,12 +1287,18 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	// Updates the shopkeeper's entry in the active shopkeepers.
-	// This can be used if the shopkeeper's object id has changed for some reason.
-	// This is not required to be called if the object id changes during spawning, despawning, or ticking.
+	// Called by the shop object whenever its id might have changed, such as when it spawns or despawns.
+	// This has no effect if the shopkeeper has not yet been added to the 'active' shopkeepers.
 	public void onShopkeeperObjectIdChanged(AbstractShopkeeper shopkeeper) {
 		Validate.notNull(shopkeeper, "shopkeeper is null");
-		if (shopkeeper.getShopObject().getLastId() == null) {
+		Object lastObjectId = shopkeeper.getShopObject().getLastId();
+		if (lastObjectId == null) {
 			// The shopkeeper has no entry in the active shopkeepers currently that would need to be updated.
+			return;
+		}
+		Object currentObjectId = shopkeeper.getShopObject().getId();
+		if (lastObjectId.equals(currentObjectId)) {
+			// The current object id equals the last object id, so there is no need to update the entry.
 			return;
 		}
 		if (this.isPendingDeactivation(shopkeeper)) {

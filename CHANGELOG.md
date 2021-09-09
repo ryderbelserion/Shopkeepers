@@ -28,6 +28,7 @@ Date format: (YYYY-MM-DD)
 * All item stacks are now (shallow) copied before they are saved to the shopkeeper data. This prevents SnakeYaml from representing the item stacks using anchors and aliases (a Yaml feature) inside the shopkeepers save file if the same item stack instances would otherwise be saved multiple times in different contexts.
 * For consistency among commands, and to avoid certain ambiguous command parsing cases, the "edit", "remote", and "remove" commands no longer merge trailing arguments to derive the target shopkeeper name. It is still possible to target shopkeepers with names that consist of multiple words by using a dash as word separator instead of a space.
 * Shopkeeper and entity command arguments now propose the ids of targeted shopkeepers and entities.
+* Fixed: The "testSpawn" debug command would respawn the shopkeepers in the executing player's chunk, but would not immediately update their object id registrations. The shop objects will now automatically and immediately inform the shopkeeper registry about those object id changes.
 
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
@@ -65,6 +66,9 @@ Date format: (YYYY-MM-DD)
 * Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
 * Internal API: Moved various editor internal classes into their own files.
 * Internal API: Added SKSignShopObject#getSignType().
+* Internal API: It is now the responsibility of the shop object to inform about object id changes, even when the shop object is being spawned, despawned, or ticked.
+* Internal API: Added AbstractShopObject#respawn().
+* Shopkeepers are now deactivated before they are despawned. This avoids having to process the object id change of the shop object being despawned when the shopkeeper is going to be deactivated anyways.
 * Fixed: The ShopkeeperByName command argument did not take the 'joinRemainingArgs' argument into account.
 * Refactors related to the removal of shopkeepers of inactive players.
 * Refactors related to shop object properties.
