@@ -26,19 +26,20 @@ public class ShopkeeperByNameArgument extends ObjectByIdArgument<String, Shopkee
 	}
 
 	public ShopkeeperByNameArgument(String name, ArgumentFilter<Shopkeeper> filter) {
-		this(name, false, filter, PlayerNameArgument.DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, false, filter, PlayerNameArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public ShopkeeperByNameArgument(String name, boolean joinRemainingArgs, ArgumentFilter<Shopkeeper> filter, int minimalCompletionInput) {
-		super(name, filter, new IdArgumentArgs(minimalCompletionInput, joinRemainingArgs));
+	public ShopkeeperByNameArgument(String name, boolean joinRemainingArgs, ArgumentFilter<Shopkeeper> filter,
+									int minimumCompletionInput) {
+		super(name, filter, new IdArgumentArgs(minimumCompletionInput, joinRemainingArgs));
 	}
 
 	@Override
 	protected ObjectIdArgument<String> createIdArgument(String name, IdArgumentArgs args) {
-		return new ShopkeeperNameArgument(name, args.joinRemainingArgs, ArgumentFilter.acceptAny(), args.minimalCompletionInput) {
+		return new ShopkeeperNameArgument(name, args.joinRemainingArgs, ArgumentFilter.acceptAny(), args.minimumCompletionInput) {
 			@Override
 			protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return ShopkeeperByNameArgument.this.getCompletionSuggestions(input, context, idPrefix);
+				return ShopkeeperByNameArgument.this.getCompletionSuggestions(input, context, minimumCompletionInput, idPrefix);
 			}
 		};
 	}
@@ -61,7 +62,8 @@ public class ShopkeeperByNameArgument extends ObjectByIdArgument<String, Shopkee
 	}
 
 	@Override
-	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return ShopkeeperNameArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter);
+	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context,
+														int minimumCompletionInput, String idPrefix) {
+		return ShopkeeperNameArgument.getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, filter);
 	}
 }

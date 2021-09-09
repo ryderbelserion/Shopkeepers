@@ -14,6 +14,7 @@ import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
@@ -43,11 +44,11 @@ public class ShopkeeperArgumentUtils {
 
 	public static final class TargetShopkeepersResult {
 
-		private final List<Shopkeeper> shopkeepers;
+		private final List<? extends Shopkeeper> shopkeepers;
 		private final Text errorMessage;
 		// assert: !shopkeepers.isEmpty || errorMessage != null
 
-		private TargetShopkeepersResult(List<Shopkeeper> shopkeepers) {
+		private TargetShopkeepersResult(List<? extends Shopkeeper> shopkeepers) {
 			Validate.isTrue(shopkeepers != null && !shopkeepers.isEmpty());
 			this.shopkeepers = shopkeepers;
 			this.errorMessage = null;
@@ -64,7 +65,7 @@ public class ShopkeeperArgumentUtils {
 			return (errorMessage == null);
 		}
 
-		public List<Shopkeeper> getShopkeepers() {
+		public List<? extends Shopkeeper> getShopkeepers() {
 			return shopkeepers;
 		}
 
@@ -132,7 +133,7 @@ public class ShopkeeperArgumentUtils {
 	}
 
 	// If the filter is null, any shopkeeper type can be returned.
-	public static TargetShopkeepersResult getTargetedShopkeepers(Player player, TargetShopkeeperFilter shopkeeperFilter) {
+	public static TargetShopkeepersResult findTargetedShopkeepers(Player player, TargetShopkeeperFilter shopkeeperFilter) {
 		if (shopkeeperFilter == null) shopkeeperFilter = TargetShopkeeperFilter.ANY;
 		Location playerLoc = player.getEyeLocation();
 		World world = playerLoc.getWorld();
@@ -195,6 +196,25 @@ public class ShopkeeperArgumentUtils {
 
 		// No targeted shopkeeper found:
 		return new TargetShopkeepersResult(shopkeeperFilter.getNoTargetErrorMsg());
+	}
+
+	public static List<? extends Shopkeeper> getTargetedShopkeepers(Player player, TargetShopkeeperFilter shopkeeperFilter) {
+		TargetShopkeepersResult result = findTargetedShopkeepers(player, shopkeeperFilter);
+		if (result.isSuccess()) {
+			assert !result.getShopkeepers().isEmpty();
+			return result.getShopkeepers();
+		} else {
+			return Collections.emptyList();
+		}
+	}
+
+	// Returns an empty list if the command sender is not a player.
+	public static List<? extends Shopkeeper> getTargetedShopkeepers(CommandSender sender, TargetShopkeeperFilter shopkeeperFilter) {
+		if (sender instanceof Player) {
+			return getTargetedShopkeepers((Player) sender, shopkeeperFilter);
+		} else {
+			return Collections.emptyList();
+		}
 	}
 
 	public static class OwnedPlayerShopsResult {

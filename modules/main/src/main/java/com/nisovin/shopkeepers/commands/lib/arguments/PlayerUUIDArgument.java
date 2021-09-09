@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -12,6 +13,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
+import com.nisovin.shopkeepers.util.java.PredicateUtils;
 
 /**
  * Provides suggestions for the UUIDs of online players.
@@ -20,7 +22,7 @@ import com.nisovin.shopkeepers.text.Text;
  */
 public class PlayerUUIDArgument extends ObjectUUIDArgument {
 
-	public static final int DEFAULT_MINIMAL_COMPLETION_INPUT = ObjectUUIDArgument.DEFAULT_MINIMAL_COMPLETION_INPUT;
+	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = ObjectUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT;
 
 	// Note: Not providing a default argument filter that only accepts uuids of online players, because this can be
 	// achieved more efficiently by using PlayerByUUIDArgument instead.
@@ -30,11 +32,11 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 	}
 
 	public PlayerUUIDArgument(String name, ArgumentFilter<UUID> filter) {
-		this(name, filter, DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public PlayerUUIDArgument(String name, ArgumentFilter<UUID> filter, int minimalCompletionInput) {
-		super(name, filter, minimalCompletionInput);
+	public PlayerUUIDArgument(String name, ArgumentFilter<UUID> filter, int minimumCompletionInput) {
+		super(name, filter, minimumCompletionInput);
 	}
 
 	@Override
@@ -54,6 +56,8 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 	 *            the command input, not <code>null</code>
 	 * @param context
 	 *            the command context, not <code>null</code>
+	 * @param minimumCompletionInput
+	 *            the minimum input length before completion suggestions are provided
 	 * @param uuidPrefix
 	 *            the uuid prefix, may be empty, not <code>null</code>
 	 * @param playerFilter
@@ -61,7 +65,13 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 	 * @return the player uuid completion suggestions
 	 */
 	public static Iterable<UUID> getDefaultCompletionSuggestions(	CommandInput input, CommandContextView context,
-																	String uuidPrefix, Predicate<Player> playerFilter) {
+																	int minimumCompletionInput, String uuidPrefix,
+																	Predicate<Player> playerFilter) {
+		// Only provide suggestions if there is a minimum length input:
+		if (uuidPrefix.length() < minimumCompletionInput) {
+			return Collections.emptyList();
+		}
+
 		String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
 		return Bukkit.getOnlinePlayers().stream()
 				.filter(playerFilter)
@@ -74,6 +84,6 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 
 	@Override
 	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(input, context, idPrefix, (player) -> true);
+		return getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, PredicateUtils.alwaysTrue());
 	}
 }

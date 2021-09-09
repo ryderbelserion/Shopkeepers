@@ -35,14 +35,17 @@ public class ShopkeeperArgument extends CommandArgument<Shopkeeper> {
 	}
 
 	public ShopkeeperArgument(String name, boolean joinRemainingArgs, ArgumentFilter<Shopkeeper> filter) {
-		this(name, joinRemainingArgs, filter, ShopkeeperNameArgument.DEFAULT_MINIMAL_COMPLETION_INPUT, ShopkeeperUUIDArgument.DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, joinRemainingArgs, filter,
+				ShopkeeperNameArgument.DEFAULT_MINIMUM_COMPLETION_INPUT,
+				ShopkeeperUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public ShopkeeperArgument(String name, boolean joinRemainingArgs, ArgumentFilter<Shopkeeper> filter, int minimalNameCompletionInput, int minimalUUIDCompletionInput) {
+	public ShopkeeperArgument(	String name, boolean joinRemainingArgs, ArgumentFilter<Shopkeeper> filter,
+								int minimumNameCompletionInput, int minimumUUIDCompletionInput) {
 		super(name);
-		this.shopUUIDArgument = new ShopkeeperByUUIDArgument(name + ":uuid", filter, minimalUUIDCompletionInput);
+		this.shopUUIDArgument = new ShopkeeperByUUIDArgument(name + ":uuid", filter, minimumUUIDCompletionInput);
 		this.shopIdArgument = new ShopkeeperByIdArgument(name + ":id", filter);
-		this.shopNameArgument = new ShopkeeperByNameArgument(name + ":name", joinRemainingArgs, filter, minimalNameCompletionInput) {
+		this.shopNameArgument = new ShopkeeperByNameArgument(name + ":name", joinRemainingArgs, filter, minimumNameCompletionInput) {
 			@Override
 			public Shopkeeper getObject(CommandInput input, CommandContextView context, String nameInput) throws ArgumentParseException {
 				return ShopkeeperArgument.this.getShopkeeper(nameInput);

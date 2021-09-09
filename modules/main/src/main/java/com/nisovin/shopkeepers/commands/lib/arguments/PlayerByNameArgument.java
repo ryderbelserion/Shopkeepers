@@ -24,19 +24,19 @@ public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 	}
 
 	public PlayerByNameArgument(String name, ArgumentFilter<Player> filter) {
-		this(name, filter, PlayerNameArgument.DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, filter, PlayerNameArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public PlayerByNameArgument(String name, ArgumentFilter<Player> filter, int minimalCompletionInput) {
-		super(name, filter, new IdArgumentArgs(minimalCompletionInput));
+	public PlayerByNameArgument(String name, ArgumentFilter<Player> filter, int minimumCompletionInput) {
+		super(name, filter, new IdArgumentArgs(minimumCompletionInput));
 	}
 
 	@Override
 	protected ObjectIdArgument<String> createIdArgument(String name, IdArgumentArgs args) {
-		return new PlayerNameArgument(name, ArgumentFilter.acceptAny(), args.minimalCompletionInput) {
+		return new PlayerNameArgument(name, ArgumentFilter.acceptAny(), args.minimumCompletionInput) {
 			@Override
 			protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return PlayerByNameArgument.this.getCompletionSuggestions(input, context, idPrefix);
+				return PlayerByNameArgument.this.getCompletionSuggestions(input, context, minimumCompletionInput, idPrefix);
 			}
 		};
 	}
@@ -60,9 +60,10 @@ public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 	}
 
 	@Override
-	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
+	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context,
+														int minimumCompletionInput, String idPrefix) {
 		// Note: Whether or not to include display name suggestions usually depends on whether or not the the used
 		// matching function considers display names
-		return PlayerNameArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter, true);
+		return PlayerNameArgument.getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, filter, true);
 	}
 }

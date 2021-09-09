@@ -24,19 +24,19 @@ public class ShopkeeperByUUIDArgument extends ObjectByIdArgument<UUID, Shopkeepe
 	}
 
 	public ShopkeeperByUUIDArgument(String name, ArgumentFilter<Shopkeeper> filter) {
-		this(name, filter, ShopkeeperUUIDArgument.DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, filter, ShopkeeperUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public ShopkeeperByUUIDArgument(String name, ArgumentFilter<Shopkeeper> filter, int minimalCompletionInput) {
-		super(name, filter, new IdArgumentArgs(minimalCompletionInput));
+	public ShopkeeperByUUIDArgument(String name, ArgumentFilter<Shopkeeper> filter, int minimumCompletionInput) {
+		super(name, filter, new IdArgumentArgs(minimumCompletionInput));
 	}
 
 	@Override
 	protected ObjectIdArgument<UUID> createIdArgument(String name, IdArgumentArgs args) {
-		return new ShopkeeperUUIDArgument(name, ArgumentFilter.acceptAny(), args.minimalCompletionInput) {
+		return new ShopkeeperUUIDArgument(name, ArgumentFilter.acceptAny(), args.minimumCompletionInput) {
 			@Override
 			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return ShopkeeperByUUIDArgument.this.getCompletionSuggestions(input, context, idPrefix);
+				return ShopkeeperByUUIDArgument.this.getCompletionSuggestions(input, context, minimumCompletionInput, idPrefix);
 			}
 		};
 	}
@@ -56,7 +56,8 @@ public class ShopkeeperByUUIDArgument extends ObjectByIdArgument<UUID, Shopkeepe
 	}
 
 	@Override
-	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return ShopkeeperUUIDArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter);
+	protected Iterable<UUID> getCompletionSuggestions(	CommandInput input, CommandContextView context,
+														int minimumCompletionInput, String idPrefix) {
+		return ShopkeeperUUIDArgument.getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, filter);
 	}
 }

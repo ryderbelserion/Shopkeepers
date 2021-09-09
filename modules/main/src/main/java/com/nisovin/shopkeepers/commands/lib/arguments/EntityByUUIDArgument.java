@@ -20,19 +20,19 @@ public class EntityByUUIDArgument extends ObjectByIdArgument<UUID, Entity> {
 	}
 
 	public EntityByUUIDArgument(String name, ArgumentFilter<Entity> filter) {
-		this(name, filter, EntityUUIDArgument.DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, filter, EntityUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public EntityByUUIDArgument(String name, ArgumentFilter<Entity> filter, int minimalCompletionInput) {
-		super(name, filter, new IdArgumentArgs(minimalCompletionInput));
+	public EntityByUUIDArgument(String name, ArgumentFilter<Entity> filter, int minimumCompletionInput) {
+		super(name, filter, new IdArgumentArgs(minimumCompletionInput));
 	}
 
 	@Override
 	protected ObjectIdArgument<UUID> createIdArgument(String name, IdArgumentArgs args) {
-		return new EntityUUIDArgument(name, ArgumentFilter.acceptAny(), args.minimalCompletionInput) {
+		return new EntityUUIDArgument(name, ArgumentFilter.acceptAny(), args.minimumCompletionInput) {
 			@Override
 			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return EntityByUUIDArgument.this.getCompletionSuggestions(input, context, idPrefix);
+				return EntityByUUIDArgument.this.getCompletionSuggestions(input, context, minimumCompletionInput, idPrefix);
 			}
 		};
 	}
@@ -43,7 +43,8 @@ public class EntityByUUIDArgument extends ObjectByIdArgument<UUID, Entity> {
 	}
 
 	@Override
-	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return EntityUUIDArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter);
+	protected Iterable<UUID> getCompletionSuggestions(	CommandInput input, CommandContextView context,
+														int minimumCompletionInput, String idPrefix) {
+		return EntityUUIDArgument.getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, filter);
 	}
 }

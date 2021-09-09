@@ -23,19 +23,19 @@ public class PlayerByUUIDArgument extends ObjectByIdArgument<UUID, Player> {
 	}
 
 	public PlayerByUUIDArgument(String name, ArgumentFilter<Player> filter) {
-		this(name, filter, PlayerUUIDArgument.DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, filter, PlayerUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public PlayerByUUIDArgument(String name, ArgumentFilter<Player> filter, int minimalCompletionInput) {
-		super(name, filter, new IdArgumentArgs(minimalCompletionInput));
+	public PlayerByUUIDArgument(String name, ArgumentFilter<Player> filter, int minimumCompletionInput) {
+		super(name, filter, new IdArgumentArgs(minimumCompletionInput));
 	}
 
 	@Override
 	protected ObjectIdArgument<UUID> createIdArgument(String name, IdArgumentArgs args) {
-		return new PlayerUUIDArgument(name, ArgumentFilter.acceptAny(), args.minimalCompletionInput) {
+		return new PlayerUUIDArgument(name, ArgumentFilter.acceptAny(), args.minimumCompletionInput) {
 			@Override
 			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return PlayerByUUIDArgument.this.getCompletionSuggestions(input, context, idPrefix);
+				return PlayerByUUIDArgument.this.getCompletionSuggestions(input, context, minimumCompletionInput, idPrefix);
 			}
 		};
 	}
@@ -55,7 +55,8 @@ public class PlayerByUUIDArgument extends ObjectByIdArgument<UUID, Player> {
 	}
 
 	@Override
-	protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return PlayerUUIDArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter);
+	protected Iterable<UUID> getCompletionSuggestions(	CommandInput input, CommandContextView context,
+														int minimumCompletionInput, String idPrefix) {
+		return PlayerUUIDArgument.getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, filter);
 	}
 }

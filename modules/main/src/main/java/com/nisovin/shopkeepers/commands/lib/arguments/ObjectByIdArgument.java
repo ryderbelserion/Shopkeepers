@@ -34,15 +34,15 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 
 	protected static class IdArgumentArgs {
 
-		public final int minimalCompletionInput;
+		public final int minimumCompletionInput;
 		public final boolean joinRemainingArgs;
 
-		public IdArgumentArgs(int minimalCompletionInput) {
-			this(minimalCompletionInput, false);
+		public IdArgumentArgs(int minimumCompletionInput) {
+			this(minimumCompletionInput, false);
 		}
 
-		public IdArgumentArgs(int minimalCompletionInput, boolean joinRemainingArgs) {
-			this.minimalCompletionInput = minimalCompletionInput;
+		public IdArgumentArgs(int minimumCompletionInput, boolean joinRemainingArgs) {
+			this.minimumCompletionInput = minimumCompletionInput;
 			this.joinRemainingArgs = joinRemainingArgs;
 		}
 	}
@@ -107,11 +107,13 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 	 *            the command input, not <code>null</code>
 	 * @param context
 	 *            the command context, not <code>null</code>
+	 * @param the
+	 *            minimum input length before completion suggestions are provided
 	 * @param idPrefix
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions
 	 */
-	protected abstract Iterable<I> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix);
+	protected abstract Iterable<I> getCompletionSuggestions(CommandInput input, CommandContextView context, int minimumCompletionInput, String idPrefix);
 
 	@Override
 	public List<String> complete(CommandInput input, CommandContextView context, ArgumentsReader argsReader) {

@@ -13,18 +13,18 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
  */
 public abstract class ObjectNameArgument extends ObjectIdArgument<String> {
 
-	public static final int DEFAULT_MINIMAL_COMPLETION_INPUT = 0;
+	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = 0;
 
 	public ObjectNameArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
 	public ObjectNameArgument(String name, ArgumentFilter<String> filter) {
-		this(name, false, filter, DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, false, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public ObjectNameArgument(String name, boolean joinRemainingArgs, ArgumentFilter<String> filter, int minimalCompletionInput) {
-		super(name, new StringArgument(name + ":string", joinRemainingArgs), filter, minimalCompletionInput);
+	public ObjectNameArgument(String name, boolean joinRemainingArgs, ArgumentFilter<String> filter, int minimumCompletionInput) {
+		super(name, new StringArgument(name + ":string", joinRemainingArgs), filter, minimumCompletionInput);
 	}
 
 	@Override

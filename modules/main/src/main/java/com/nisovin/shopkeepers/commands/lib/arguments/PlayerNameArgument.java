@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
+import java.util.Collections;
 import java.util.Locale;
 import java.util.function.Predicate;
 
@@ -12,6 +13,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.PredicateUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
 /**
@@ -21,7 +23,7 @@ import com.nisovin.shopkeepers.util.java.StringUtils;
  */
 public class PlayerNameArgument extends ObjectNameArgument {
 
-	public static final int DEFAULT_MINIMAL_COMPLETION_INPUT = ObjectNameArgument.DEFAULT_MINIMAL_COMPLETION_INPUT;
+	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = ObjectNameArgument.DEFAULT_MINIMUM_COMPLETION_INPUT;
 
 	// Note: Not providing a default argument filter that only accepts names of online players, because this can be
 	// achieved more efficiently by using PlayerByNameArgument instead.
@@ -31,12 +33,12 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	}
 
 	public PlayerNameArgument(String name, ArgumentFilter<String> filter) {
-		this(name, filter, DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
 	// Joining remaining args doesn't make much sense for player names (and we normalize whitespace in display names).
-	public PlayerNameArgument(String name, ArgumentFilter<String> filter, int minimalCompletionInput) {
-		super(name, false, filter, minimalCompletionInput);
+	public PlayerNameArgument(String name, ArgumentFilter<String> filter, int minimumCompletionInput) {
+		super(name, false, filter, minimumCompletionInput);
 	}
 
 	@Override
@@ -55,6 +57,8 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	 *            the command input, not <code>null</code>
 	 * @param context
 	 *            the command context, not <code>null</code>
+	 * @param minimumCompletionInput
+	 *            the minimum prefix length before completion suggestions are provided
 	 * @param namePrefix
 	 *            the name prefix, may be empty, not <code>null</code>
 	 * @param playerFilter
@@ -64,8 +68,13 @@ public class PlayerNameArgument extends ObjectNameArgument {
 	 * @return the player name completion suggestions
 	 */
 	public static Iterable<String> getDefaultCompletionSuggestions(	CommandInput input, CommandContextView context,
-																	String namePrefix, Predicate<Player> playerFilter,
-																	boolean includeDisplayNames) {
+																	int minimumCompletionInput, String namePrefix,
+																	Predicate<Player> playerFilter, boolean includeDisplayNames) {
+		// Only provide suggestions if there is a minimum length input:
+		if (namePrefix.length() < minimumCompletionInput) {
+			return Collections.emptyList();
+		}
+
 		// Assumption: Name prefix does not contain color codes (users are not expected to specify color codes).
 		// Normalizes whitespace and converts to lowercase:
 		String normalizedNamePrefix = StringUtils.normalize(namePrefix);
@@ -91,6 +100,6 @@ public class PlayerNameArgument extends ObjectNameArgument {
 
 	@Override
 	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(input, context, idPrefix, (player) -> true, true);
+		return getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, PredicateUtils.alwaysTrue(), true);
 	}
 }

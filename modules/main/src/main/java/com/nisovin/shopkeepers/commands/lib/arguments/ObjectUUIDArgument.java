@@ -15,18 +15,18 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
  */
 public abstract class ObjectUUIDArgument extends ObjectIdArgument<UUID> {
 
-	public static final int DEFAULT_MINIMAL_COMPLETION_INPUT = 3;
+	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = 3;
 
 	public ObjectUUIDArgument(String name) {
 		this(name, ArgumentFilter.acceptAny());
 	}
 
 	public ObjectUUIDArgument(String name, ArgumentFilter<UUID> filter) {
-		this(name, filter, DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public ObjectUUIDArgument(String name, ArgumentFilter<UUID> filter, int minimalCompletionInput) {
-		super(name, new UUIDArgument(name + ":uuid"), filter, minimalCompletionInput);
+	public ObjectUUIDArgument(String name, ArgumentFilter<UUID> filter, int minimumCompletionInput) {
+		super(name, new UUIDArgument(name + ":uuid"), filter, minimumCompletionInput);
 	}
 
 	@Override

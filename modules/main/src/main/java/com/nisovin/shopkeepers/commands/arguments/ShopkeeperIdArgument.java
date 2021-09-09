@@ -1,7 +1,11 @@
 package com.nisovin.shopkeepers.commands.arguments;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import org.bukkit.command.CommandSender;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
@@ -10,7 +14,10 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.IntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.ObjectIdArgument;
+import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils;
+import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeeperFilter;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
+import com.nisovin.shopkeepers.util.java.PredicateUtils;
 
 /**
  * Provides suggestions for the ids of existing shopkeepers.
@@ -20,7 +27,7 @@ import com.nisovin.shopkeepers.util.java.ConversionUtils;
 public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 
 	// We don't show suggestions for empty input (would simply list a bunch of random ids).
-	public static final int DEFAULT_MINIMAL_COMPLETION_INPUT = 1;
+	public static final int DEFAULT_MINIMUM_COMPLETION_INPUT = 1;
 
 	// Note: Not providing default argument filters that only accept existing shops, admin shops, or player shops,
 	// because this can be achieved more efficiently by using ShopkeeperByIdArgument instead.
@@ -30,11 +37,11 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 	}
 
 	public ShopkeeperIdArgument(String name, ArgumentFilter<Integer> filter) {
-		this(name, filter, DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, filter, DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public ShopkeeperIdArgument(String name, ArgumentFilter<Integer> filter, int minimalCompletionInput) {
-		super(name, new IntegerArgument(name + ":id"), filter, minimalCompletionInput);
+	public ShopkeeperIdArgument(String name, ArgumentFilter<Integer> filter, int minimumCompletionInput) {
+		super(name, new IntegerArgument(name + ":id"), filter, minimumCompletionInput);
 	}
 
 	// Using the regular 'missing argument' message.
@@ -48,35 +55,51 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 
 	/**
 	 * Gets the default id completion suggestions.
+	 * <p>
+	 * This always suggests the id of the targeted shopkeeper(s), regardless of the {@code minimumCompletionInput}
+	 * argument.
 	 * 
 	 * @param input
 	 *            the command input, not <code>null</code>
 	 * @param context
 	 *            the command context, not <code>null</code>
+	 * @param minimumCompletionInput
+	 *            the minimum input length before completion suggestions are provided
 	 * @param idPrefix
 	 *            the id prefix, may be empty, not <code>null</code>
-	 * @param shopkeeperFilter
-	 *            only suggestions for shopkeepers accepted by this predicate get included
+	 * @param filter
+	 *            only suggestions for shopkeepers accepted by this predicate are included, not <code>null</code>
 	 * @return the shopkeeper id completion suggestions
 	 */
 	public static Iterable<Integer> getDefaultCompletionSuggestions(CommandInput input, CommandContextView context,
-																	String idPrefix, Predicate<Shopkeeper> shopkeeperFilter) {
-		// If idPrefix is not a valid number, we can skip checking all shopkeepers:
-		// Note: Empty check is required to not abort in case there is empty partial input but the used
-		// minimalCompletionInput parameter is 0
+																	int minimumCompletionInput, String idPrefix,
+																	Predicate<Shopkeeper> filter) {
+		// If idPrefix is not empty but not a valid number, we can skip checking for completions:
 		if (!idPrefix.isEmpty() && ConversionUtils.parseInt(idPrefix) == null) {
 			return Collections.emptyList();
 		}
+
+		// Suggestion for the id(s) of the targeted shopkeeper(s):
+		CommandSender sender = input.getSender();
+		List<? extends Shopkeeper> targetedShopkeepers = ShopkeeperArgumentUtils.getTargetedShopkeepers(sender, TargetShopkeeperFilter.ANY);
+		Stream<? extends Shopkeeper> shopkeepersStream = targetedShopkeepers.stream();
+
+		// Only provide other suggestions if there is a minimum length input:
+		if (idPrefix.length() >= minimumCompletionInput) {
+			shopkeepersStream = Stream.concat(shopkeepersStream, ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers().stream()
+					.filter(shopkeeper -> !targetedShopkeepers.contains(shopkeeper)));
+		}
+
 		// Note: No normalization required.
 		// TODO Prefer short ids (eg. input "2", suggest "20", "21", "22",.. instead of "200", "201", "202",..)
-		return ShopkeepersAPI.getShopkeeperRegistry().getAllShopkeepers().stream()
-				.filter(shopkeeperFilter)
+		return shopkeepersStream
+				.filter(filter)
 				.map(shopkeeper -> shopkeeper.getId())
 				.filter(id -> id.toString().startsWith(idPrefix))::iterator;
 	}
 
 	@Override
 	protected Iterable<Integer> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return getDefaultCompletionSuggestions(input, context, idPrefix, (shopkeeper) -> true);
+		return getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, PredicateUtils.alwaysTrue());
 	}
 }

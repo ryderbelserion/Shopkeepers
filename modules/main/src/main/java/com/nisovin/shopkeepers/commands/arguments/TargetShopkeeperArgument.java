@@ -48,7 +48,7 @@ public class TargetShopkeeperArgument extends CommandArgument<Shopkeeper> {
 		}
 
 		Player player = (Player) sender;
-		TargetShopkeepersResult result = ShopkeeperArgumentUtils.getTargetedShopkeepers(player, filter);
+		TargetShopkeepersResult result = ShopkeeperArgumentUtils.findTargetedShopkeepers(player, filter);
 		if (!result.isSuccess()) {
 			throw new ArgumentParseException(this, result.getErrorMessage());
 		} else {

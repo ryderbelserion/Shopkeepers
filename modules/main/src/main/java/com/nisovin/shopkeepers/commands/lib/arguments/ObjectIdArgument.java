@@ -32,17 +32,25 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 
 	protected final CommandArgument<I> idArgument;
 	protected final ArgumentFilter<I> filter; // Not null
-	// Completions are only provided after at least that many matching input characters:
-	protected final int minimalCompletionInput; // 0 to deactivate (provide completions even for empty prefix)
 
-	public ObjectIdArgument(String name, CommandArgument<I> idArgument, ArgumentFilter<I> filter, int minimalCompletionInput) {
+	// Some types of object id arguments may want to provide suggestions even for an empty partial input, while others
+	// might want to limit their suggestions to the case that there is at least a minimum sized input (eg. if there
+	// would otherwise be lots of candidate ids to suggest). This setting controls how many characters the input has to
+	// at least consist of in order for the argument to provide completion suggestions.
+	// However, some arguments may ignore this setting for some of their suggestions (Example: An entity uuid argument
+	// may want to always suggest the uuid of the targeted entity, but only suggest other entity uuids if the input is a
+	// certain length).
+	// Set this to 0 to deactivate it (i.e. to provide completions even for empty prefixes).
+	protected final int minimumCompletionInput;
+
+	public ObjectIdArgument(String name, CommandArgument<I> idArgument, ArgumentFilter<I> filter, int minimumCompletionInput) {
 		super(name);
 		Validate.notNull(idArgument, "idArgument is null");
-		Validate.isTrue(minimalCompletionInput >= 0, "minimalCompletionInput cannot be negative");
+		Validate.isTrue(minimumCompletionInput >= 0, "minimumCompletionInput cannot be negative");
 		this.idArgument = idArgument;
 		idArgument.setParent(this);
 		this.filter = (filter == null) ? ArgumentFilter.acceptAny() : filter;
-		this.minimalCompletionInput = minimalCompletionInput;
+		this.minimumCompletionInput = minimumCompletionInput;
 	}
 
 	@Override
@@ -64,24 +72,6 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 		}
 		return id;
 	}
-
-	/**
-	 * Gets the completion suggestions for the given id prefix.
-	 * <p>
-	 * The given command input and context can be used to limit the scope of the considered ids.
-	 * <p>
-	 * Before these suggestions get actually used, they may first have to also pass the id filter used by this
-	 * {@link ObjectIdArgument}.
-	 * 
-	 * @param input
-	 *            the command input, not <code>null</code>
-	 * @param context
-	 *            the command context, not <code>null</code>
-	 * @param idPrefix
-	 *            the id prefix, may be empty, not <code>null</code>
-	 * @return the suggestions
-	 */
-	protected abstract Iterable<I> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix);
 
 	// This gets applied to convert id completion suggestions to Strings.
 	protected abstract String toString(I id);
@@ -125,14 +115,8 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 
 	// argsCount: The number of arguments the id prefix consist of (>= 1).
 	protected List<String> complete(CommandInput input, CommandContextView context, String idPrefix, int argsCount) {
-		// Some types of object id arguments may want to provide suggestions even if there are no remaining args (empty
-		// partial input), while others might want to limit their suggestions to the case that there is at least a
-		// minimum sized input (eg. if there are lots of candidate ids):
-		if (idPrefix.length() < minimalCompletionInput) {
-			// Only provide suggestions if there is a minimal length input.
-			return Collections.emptyList();
-		}
-
+		// Note: We don't check the minimumCompletionInput here but let getCompletionSuggestions handle it, because the
+		// argument may want to ignore the minimumCompletionInput for some of its suggestions.
 		List<String> suggestions = new ArrayList<>();
 		for (I id : this.getCompletionSuggestions(input, context, idPrefix)) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;
@@ -154,4 +138,24 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 		}
 		return Collections.unmodifiableList(suggestions);
 	}
+
+	/**
+	 * Gets the completion suggestions for the given id prefix.
+	 * <p>
+	 * The given command input and context can be used to limit the scope of the considered ids.
+	 * <p>
+	 * This should take this argument's {@link #minimumCompletionInput} into account.
+	 * <p>
+	 * Before these suggestions are actually used, they may first have to also pass the id filter used by this
+	 * {@link ObjectIdArgument}.
+	 * 
+	 * @param input
+	 *            the command input, not <code>null</code>
+	 * @param context
+	 *            the command context, not <code>null</code>
+	 * @param idPrefix
+	 *            the id prefix, may be empty, not <code>null</code>
+	 * @return the suggestions, not <code>null</code>
+	 */
+	protected abstract Iterable<I> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix);
 }

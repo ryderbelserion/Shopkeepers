@@ -30,16 +30,17 @@ public class EntityArgument extends CommandArgument<Entity> {
 	}
 
 	public EntityArgument(String name, ArgumentFilter<Entity> filter) {
-		this(name, filter, EntityUUIDArgument.DEFAULT_MINIMAL_COMPLETION_INPUT);
+		this(name, filter, EntityUUIDArgument.DEFAULT_MINIMUM_COMPLETION_INPUT);
 	}
 
-	public EntityArgument(String name, ArgumentFilter<Entity> filter, int minimalUUIDCompletionInput) {
+	public EntityArgument(String name, ArgumentFilter<Entity> filter, int minimumUUIDCompletionInput) {
 		super(name);
 		this.filter = (filter == null) ? ArgumentFilter.acceptAny() : filter;
-		this.entityUUIDArgument = new EntityByUUIDArgument(name + ":uuid", filter, minimalUUIDCompletionInput) {
+		this.entityUUIDArgument = new EntityByUUIDArgument(name + ":uuid", filter, minimumUUIDCompletionInput) {
 			@Override
-			protected Iterable<UUID> getCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-				return EntityArgument.this.getUUIDCompletionSuggestions(input, context, idPrefix);
+			protected Iterable<UUID> getCompletionSuggestions(	CommandInput input, CommandContextView context,
+																int minimumCompletionInput, String idPrefix) {
+				return EntityArgument.this.getUUIDCompletionSuggestions(input, context, minimumCompletionInput, idPrefix);
 			}
 		};
 		this.firstOfArgument = new TypedFirstOfArgument<>(name + ":firstOf", Arrays.asList(entityUUIDArgument), false, false);
@@ -66,11 +67,14 @@ public class EntityArgument extends CommandArgument<Entity> {
 	 *            the command input, not <code>null</code>
 	 * @param context
 	 *            the command context, not <code>null</code>
+	 * @param minimumCompletionInput
+	 *            the minimum input length before completion suggestions are provided
 	 * @param idPrefix
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions
 	 */
-	protected Iterable<UUID> getUUIDCompletionSuggestions(CommandInput input, CommandContextView context, String idPrefix) {
-		return EntityUUIDArgument.getDefaultCompletionSuggestions(input, context, idPrefix, filter);
+	protected Iterable<UUID> getUUIDCompletionSuggestions(	CommandInput input, CommandContextView context,
+															int minimumCompletionInput, String idPrefix) {
+		return EntityUUIDArgument.getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, filter);
 	}
 }
