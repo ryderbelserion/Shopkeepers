@@ -85,9 +85,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			.defaultValue(false)
 			.build(properties);
 
-	// Update the sign content at least once after plugin start, in case some settings have changed which affect the
-	// sign content:
-	private boolean updateSign = true;
 	private Block block = null;
 	private long lastFailedRespawnAttemptMillis = 0;
 
@@ -220,8 +217,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		// Assign metadata for easy identification by other plugins:
 		ShopkeeperMetadata.apply(block);
 
-		// Init sign content:
-		updateSign = false;
+		// Setup sign:
 		this.updateSign();
 
 		// Inform about the object id change:
@@ -299,10 +295,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	private void updateSign() {
 		Sign sign = this.getSign();
-		if (sign == null) {
-			updateSign = true; // Request update, once the sign is available again
-			return;
-		}
+		if (sign == null) return; // Not spawned or no longer a sign
 
 		// Setup sign contents:
 		if (shopkeeper instanceof PlayerShopkeeper) {
@@ -358,21 +351,13 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 		if (!this.isActive()) {
 			Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Sign is missing! Attempting respawn.");
-
-			// Cleanup any previously spawned block first:
+			// Cleanup any previously spawned block, and then respawn:
 			this.despawn();
-
 			boolean success = this.spawn();
 			if (!success) {
 				Log.warning(shopkeeper.getLocatedLogPrefix() + "Sign could not be spawned!");
 			}
 			return;
-		}
-
-		// Update sign content if requested:
-		if (updateSign) {
-			updateSign = false;
-			this.updateSign();
 		}
 	}
 

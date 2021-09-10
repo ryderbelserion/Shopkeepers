@@ -77,6 +77,7 @@ Date format: (YYYY-MM-DD)
 * Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
 * The save operations of the shopkeeper storage and the CSV trade logger will now restore any catched Thread interruption status for anyone interested in it. Other than that, these operations still ignore Thread interruptions, because we prefer to keep trying to still save the data to disk after all.
 * Admin shopkeepers normalize empty trade permissions in the save data to null now, similar to AdminShopkeeper#setTradePermission.
+* Removed an old update mechanism for sign shops: If the sign block is not available at the time it is meant to be updated, this would update the sign later, once it is available again. This mechanism should no longer be required: The sign is already updated whenever it is spawned, and we dynamically spawn and despawn the sign with chunk loads, and dynamically respawn it if it is detected to be missing.
 * Various other minor internal refactors and Javadoc improvements.
 
 **Message changes:**  
