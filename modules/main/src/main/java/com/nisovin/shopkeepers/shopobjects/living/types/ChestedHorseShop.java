@@ -26,6 +26,7 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 	private final Property<Boolean> carryingChestProperty = new BooleanProperty()
 			.key("carryingChest")
 			.defaultValue(false)
+			.onValueChanged(this::applyCarryingChest)
 			.build(properties);
 
 	public ChestedHorseShop(LivingShops livingShops, SKLivingShopObjectType<? extends ChestedHorseShop<E>> livingObjectType,
@@ -46,9 +47,9 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 	}
 
 	@Override
-	protected void onSpawn(E entity) {
-		super.onSpawn(entity);
-		this.applyCarryingChest(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyCarryingChest();
 	}
 
 	@Override
@@ -66,15 +67,15 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 
 	public void setCarryingChest(boolean carryingChest) {
 		carryingChestProperty.setValue(carryingChest);
-		this.applyCarryingChest(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCarryingChest() {
 		this.setCarryingChest(!this.isCarryingChest());
 	}
 
-	private void applyCarryingChest(E entity) {
-		if (entity == null) return;
+	private void applyCarryingChest() {
+		E entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setCarryingChest(this.isCarryingChest());
 	}
 

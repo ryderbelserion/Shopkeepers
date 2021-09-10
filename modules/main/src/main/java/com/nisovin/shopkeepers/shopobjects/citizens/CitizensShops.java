@@ -183,9 +183,8 @@ public class CitizensShops {
 		}
 	}
 
-	void registerCitizensShopkeeper(SKCitizensShopObject citizensShop) {
+	void registerCitizensShopkeeper(SKCitizensShopObject citizensShop, UUID npcId) {
 		assert citizensShop != null;
-		UUID npcId = citizensShop.getNPCUniqueId();
 		if (npcId == null) return;
 
 		AbstractShopkeeper shopkeeper = citizensShop.getShopkeeper();
@@ -194,9 +193,8 @@ public class CitizensShops {
 		shopkeepersByNpcId.computeIfAbsent(npcId, key -> new ArrayList<>(1)).add(shopkeeper);
 	}
 
-	void unregisterCitizensShopkeeper(SKCitizensShopObject citizensShop) {
+	void unregisterCitizensShopkeeper(SKCitizensShopObject citizensShop, UUID npcId) {
 		assert citizensShop != null;
-		UUID npcId = citizensShop.getNPCUniqueId();
 		if (npcId == null) return;
 
 		AbstractShopkeeper shopkeeper = citizensShop.getShopkeeper();

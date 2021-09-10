@@ -29,6 +29,7 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 	private final Property<Profession> professionProperty = new EnumProperty<Profession>(Profession.class)
 			.key("profession")
 			.defaultValue(Profession.NONE)
+			.onValueChanged(this::applyProfession)
 			.build(properties);
 
 	public ZombieVillagerShop(	LivingShops livingShops, SKLivingShopObjectType<ZombieVillagerShop> livingObjectType,
@@ -49,9 +50,9 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 	}
 
 	@Override
-	protected void onSpawn(ZombieVillager entity) {
-		super.onSpawn(entity);
-		this.applyProfession(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyProfession();
 	}
 
 	@Override
@@ -69,15 +70,15 @@ public class ZombieVillagerShop extends ZombieShop<ZombieVillager> {
 
 	public void setProfession(Profession profession) {
 		professionProperty.setValue(profession);
-		this.applyProfession(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleProfession(boolean backwards) {
 		this.setProfession(EnumUtils.cycleEnumConstant(Profession.class, this.getProfession(), backwards));
 	}
 
-	private void applyProfession(ZombieVillager entity) {
-		if (entity == null) return;
+	private void applyProfession() {
+		ZombieVillager entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setVillagerProfession(this.getProfession());
 	}
 

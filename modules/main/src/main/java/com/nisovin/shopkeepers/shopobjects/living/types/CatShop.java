@@ -29,11 +29,13 @@ public class CatShop extends SittableShop<Cat> {
 	private final Property<Cat.Type> catTypeProperty = new EnumProperty<>(Cat.Type.class)
 			.key("catType")
 			.defaultValue(Cat.Type.TABBY)
+			.onValueChanged(this::applyCatType)
 			.build(properties);
 	private final Property<DyeColor> collarColorProperty = new EnumProperty<DyeColor>(DyeColor.class)
 			.key("collarColor")
 			.nullable() // Null indicates 'no collar' / untamed
 			.defaultValue(null)
+			.onValueChanged(this::applyCollarColor)
 			.build(properties);
 
 	public CatShop(	LivingShops livingShops, SKLivingShopObjectType<CatShop> livingObjectType,
@@ -56,10 +58,10 @@ public class CatShop extends SittableShop<Cat> {
 	}
 
 	@Override
-	protected void onSpawn(Cat entity) {
-		super.onSpawn(entity);
-		this.applyCatType(entity);
-		this.applyCollarColor(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyCatType();
+		this.applyCollarColor();
 	}
 
 	@Override
@@ -94,15 +96,15 @@ public class CatShop extends SittableShop<Cat> {
 
 	public void setCatType(Cat.Type catType) {
 		catTypeProperty.setValue(catType);
-		this.applyCatType(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCatType(boolean backwards) {
 		this.setCatType(EnumUtils.cycleEnumConstant(Cat.Type.class, this.getCatType(), backwards));
 	}
 
-	private void applyCatType(Cat entity) {
-		if (entity == null) return;
+	private void applyCatType() {
+		Cat entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setCatType(this.getCatType());
 	}
 
@@ -175,15 +177,15 @@ public class CatShop extends SittableShop<Cat> {
 
 	public void setCollarColor(DyeColor collarColor) {
 		collarColorProperty.setValue(collarColor);
-		this.applyCollarColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCollarColor(boolean backwards) {
 		this.setCollarColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, this.getCollarColor(), backwards));
 	}
 
-	private void applyCollarColor(Cat entity) {
-		if (entity == null) return;
+	private void applyCollarColor() {
+		Cat entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		DyeColor collarColor = this.getCollarColor();
 		if (collarColor == null) {
 			// No collar / untamed:

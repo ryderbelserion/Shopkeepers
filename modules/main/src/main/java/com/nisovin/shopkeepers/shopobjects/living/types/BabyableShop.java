@@ -27,6 +27,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	private final Property<Boolean> babyProperty = new BooleanProperty()
 			.key("baby")
 			.defaultValue(false)
+			.onValueChanged(this::applyBaby)
 			.build(properties);
 
 	public BabyableShop(LivingShops livingShops, SKLivingShopObjectType<? extends BabyableShop<E>> livingObjectType,
@@ -64,11 +65,9 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	}
 
 	@Override
-	protected void onSpawn(E entity) {
-		super.onSpawn(entity);
-		if (this.isBabyable()) {
-			this.applyBaby(entity);
-		}
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyBaby();
 	}
 
 	@Override
@@ -89,16 +88,16 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	public void setBaby(boolean baby) {
 		if (!this.isBabyable()) return;
 		babyProperty.setValue(baby);
-		this.applyBaby(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleBaby() {
 		this.setBaby(!this.isBaby());
 	}
 
-	private void applyBaby(E entity) {
-		if (entity == null) return;
+	private void applyBaby() {
 		if (!this.isBabyable()) return;
+		E entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		if (this.isBaby()) {
 			entity.setBaby();
 		} else {

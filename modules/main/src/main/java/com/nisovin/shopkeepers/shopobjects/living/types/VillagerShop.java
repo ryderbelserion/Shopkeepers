@@ -60,16 +60,19 @@ public class VillagerShop extends BabyableShop<Villager> {
 					}
 				}
 			})
+			.onValueChanged(this::applyProfession)
 			.build(properties);
 	private final Property<Villager.Type> villagerTypeProperty = new EnumProperty<>(Villager.Type.class)
 			.key("villagerType")
 			.defaultValue(Villager.Type.PLAINS)
+			.onValueChanged(this::applyVillagerType)
 			.build(properties);
 	private final IntegerProperty villagerLevelProperty = new IntegerProperty()
 			.<IntegerProperty>key("villagerLevel")
 			.minValue(1)
 			.maxValue(5)
 			.defaultValue(1)
+			.onValueChanged(this::applyVillagerLevel)
 			.build(properties);
 
 	public VillagerShop(LivingShops livingShops, SKLivingShopObjectType<VillagerShop> livingObjectType,
@@ -94,15 +97,16 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	@Override
-	protected void onSpawn(Villager entity) {
-		super.onSpawn(entity);
+	protected void onSpawn() {
+		super.onSpawn();
 		// TODO I wasn't able to reproduce this myself yet, but according to some reports villager shopkeepers would
 		// sometimes lose their profession. Setting their experience to something above 0 is an attempt to resolve this.
 		// Related (but shouldn't apply here since we use NoAI mobs): https://hub.spigotmc.org/jira/browse/SPIGOT-4776
+		Villager entity = this.getEntity();
 		entity.setVillagerExperience(1);
-		this.applyProfession(entity);
-		this.applyVillagerType(entity);
-		this.applyVillagerLevel(entity);
+		this.applyProfession();
+		this.applyVillagerType();
+		this.applyVillagerLevel();
 	}
 
 	@Override
@@ -122,15 +126,15 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 	public void setProfession(Profession profession) {
 		professionProperty.setValue(profession);
-		this.applyProfession(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleProfession(boolean backwards) {
 		this.setProfession(EnumUtils.cycleEnumConstant(Profession.class, this.getProfession(), backwards));
 	}
 
-	private void applyProfession(Villager entity) {
-		if (entity == null) return;
+	private void applyProfession() {
+		Villager entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setProfession(this.getProfession());
 	}
 
@@ -214,15 +218,15 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 	public void setVillagerType(Villager.Type villagerType) {
 		villagerTypeProperty.setValue(villagerType);
-		this.applyVillagerType(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleVillagerType(boolean backwards) {
 		this.setVillagerType(EnumUtils.cycleEnumConstant(Villager.Type.class, this.getVillagerType(), backwards));
 	}
 
-	private void applyVillagerType(Villager entity) {
-		if (entity == null) return;
+	private void applyVillagerType() {
+		Villager entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setVillagerType(this.getVillagerType());
 	}
 
@@ -280,7 +284,6 @@ public class VillagerShop extends BabyableShop<Villager> {
 
 	public void setVillagerLevel(int villagerLevel) {
 		villagerLevelProperty.setValue(villagerLevel);
-		this.applyVillagerLevel(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleVillagerLevel(boolean backwards) {
@@ -295,8 +298,9 @@ public class VillagerShop extends BabyableShop<Villager> {
 		this.setVillagerLevel(nextLevel);
 	}
 
-	private void applyVillagerLevel(Villager entity) {
-		if (entity == null) return;
+	private void applyVillagerLevel() {
+		Villager entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setVillagerLevel(this.getVillagerLevel());
 	}
 

@@ -28,6 +28,7 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 	private final Property<Rabbit.Type> rabbitTypeProperty = new EnumProperty<>(Rabbit.Type.class)
 			.key("rabbitType")
 			.defaultValue(Rabbit.Type.BROWN)
+			.onValueChanged(this::applyRabbitType)
 			.build(properties);
 
 	public RabbitShop(	LivingShops livingShops, SKLivingShopObjectType<RabbitShop> livingObjectType,
@@ -48,9 +49,9 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 	}
 
 	@Override
-	protected void onSpawn(Rabbit entity) {
-		super.onSpawn(entity);
-		this.applyRabbitType(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyRabbitType();
 	}
 
 	@Override
@@ -68,15 +69,15 @@ public class RabbitShop extends BabyableShop<Rabbit> {
 
 	public void setRabbitType(Rabbit.Type rabbitType) {
 		rabbitTypeProperty.setValue(rabbitType);
-		this.applyRabbitType(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleRabbitType(boolean backwards) {
 		this.setRabbitType(EnumUtils.cycleEnumConstant(Rabbit.Type.class, this.getRabbitType(), backwards));
 	}
 
-	private void applyRabbitType(Rabbit entity) {
-		if (entity == null) return;
+	private void applyRabbitType() {
+		Rabbit entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		Rabbit.Type rabbitType = this.getRabbitType();
 		if (rabbitType == Rabbit.Type.THE_KILLER_BUNNY) {
 			// Special handling if the rabbit type is the killer rabbit:

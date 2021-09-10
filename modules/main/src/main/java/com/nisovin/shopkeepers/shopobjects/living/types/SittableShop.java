@@ -28,6 +28,7 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 	private final Property<Boolean> sittingProperty = new BooleanProperty()
 			.key("sitting")
 			.defaultValue(false)
+			.onValueChanged(this::applySitting)
 			.build(properties);
 
 	public SittableShop(LivingShops livingShops, SKLivingShopObjectType<? extends SittableShop<E>> livingObjectType,
@@ -48,9 +49,9 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 	}
 
 	@Override
-	protected void onSpawn(E entity) {
-		super.onSpawn(entity);
-		this.applySitting(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applySitting();
 	}
 
 	@Override
@@ -68,15 +69,15 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 
 	public void setSitting(boolean sitting) {
 		sittingProperty.setValue(sitting);
-		this.applySitting(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleSitting() {
 		this.setSitting(!this.isSitting());
 	}
 
-	private void applySitting(Sittable entity) {
-		if (entity == null) return;
+	private void applySitting() {
+		Sittable entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setSitting(this.isSitting());
 	}
 

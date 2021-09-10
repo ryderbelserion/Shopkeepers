@@ -28,6 +28,7 @@ public class PandaShop extends BabyableShop<Panda> {
 	private final Property<Panda.Gene> geneProperty = new EnumProperty<>(Panda.Gene.class)
 			.key("gene")
 			.defaultValue(Panda.Gene.NORMAL)
+			.onValueChanged(this::applyGene)
 			.build(properties);
 
 	public PandaShop(	LivingShops livingShops, SKLivingShopObjectType<PandaShop> livingObjectType,
@@ -48,9 +49,9 @@ public class PandaShop extends BabyableShop<Panda> {
 	}
 
 	@Override
-	protected void onSpawn(Panda entity) {
-		super.onSpawn(entity);
-		this.applyGene(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyGene();
 	}
 
 	@Override
@@ -68,15 +69,15 @@ public class PandaShop extends BabyableShop<Panda> {
 
 	public void setGene(Panda.Gene gene) {
 		geneProperty.setValue(gene);
-		this.applyGene(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleGene(boolean backwards) {
 		this.setGene(EnumUtils.cycleEnumConstant(Panda.Gene.class, this.getGene(), backwards));
 	}
 
-	private void applyGene(Panda entity) {
-		if (entity == null) return;
+	private void applyGene() {
+		Panda entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		Panda.Gene gene = this.getGene();
 		entity.setMainGene(gene);
 		entity.setHiddenGene(gene);

@@ -29,11 +29,13 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	private final Property<Llama.Color> colorProperty = new EnumProperty<>(Llama.Color.class)
 			.key("color")
 			.defaultValue(Llama.Color.CREAMY)
+			.onValueChanged(this::applyColor)
 			.build(properties);
 	private final Property<DyeColor> carpetColorProperty = new EnumProperty<DyeColor>(DyeColor.class)
 			.key("carpetColor")
 			.nullable() // Null indicates 'no carpet'
 			.defaultValue(null)
+			.onValueChanged(this::applyCarpetColor)
 			.build(properties);
 
 	public LlamaShop(	LivingShops livingShops, SKLivingShopObjectType<? extends LlamaShop<E>> livingObjectType,
@@ -56,10 +58,10 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	}
 
 	@Override
-	protected void onSpawn(E entity) {
-		super.onSpawn(entity);
-		this.applyColor(entity);
-		this.applyCarpetColor(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyColor();
+		this.applyCarpetColor();
 	}
 
 	@Override
@@ -78,15 +80,15 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
 	public void setColor(Llama.Color color) {
 		colorProperty.setValue(color);
-		this.applyColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleColor(boolean backwards) {
 		this.setColor(EnumUtils.cycleEnumConstant(Llama.Color.class, this.getColor(), backwards));
 	}
 
-	private void applyColor(E entity) {
-		if (entity == null) return;
+	private void applyColor() {
+		E entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setColor(this.getColor());
 	}
 
@@ -135,15 +137,15 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
 	public void setCarpetColor(DyeColor carpetColor) {
 		carpetColorProperty.setValue(carpetColor);
-		this.applyCarpetColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCarpetColor(boolean backwards) {
 		this.setCarpetColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, this.getCarpetColor(), backwards));
 	}
 
-	private void applyCarpetColor(E entity) {
-		if (entity == null) return;
+	private void applyCarpetColor() {
+		E entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		DyeColor carpetColor = this.getCarpetColor();
 		entity.getInventory().setDecor(carpetColor == null ? null : new ItemStack(ItemUtils.getCarpetType(carpetColor)));
 	}

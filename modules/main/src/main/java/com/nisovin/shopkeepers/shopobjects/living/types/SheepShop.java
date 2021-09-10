@@ -29,10 +29,12 @@ public class SheepShop extends BabyableShop<Sheep> {
 	private final Property<DyeColor> colorProperty = new EnumProperty<>(DyeColor.class)
 			.key("color")
 			.defaultValue(DyeColor.WHITE)
+			.onValueChanged(this::applyColor)
 			.build(properties);
 	private final Property<Boolean> shearedProperty = new BooleanProperty()
 			.key("sheared")
 			.defaultValue(false)
+			.onValueChanged(this::applySheared)
 			.build(properties);
 
 	public SheepShop(	LivingShops livingShops, SKLivingShopObjectType<SheepShop> livingObjectType,
@@ -55,10 +57,10 @@ public class SheepShop extends BabyableShop<Sheep> {
 	}
 
 	@Override
-	protected void onSpawn(Sheep entity) {
-		super.onSpawn(entity);
-		this.applyColor(entity);
-		this.applySheared(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyColor();
+		this.applySheared();
 	}
 
 	@Override
@@ -77,15 +79,15 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 	public void setColor(DyeColor color) {
 		colorProperty.setValue(color);
-		this.applyColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleColor(boolean backwards) {
 		this.setColor(EnumUtils.cycleEnumConstant(DyeColor.class, this.getColor(), backwards));
 	}
 
-	private void applyColor(Sheep entity) {
-		if (entity == null) return;
+	private void applyColor() {
+		Sheep entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setColor(this.getColor());
 	}
 
@@ -119,15 +121,15 @@ public class SheepShop extends BabyableShop<Sheep> {
 
 	public void setSheared(boolean sheared) {
 		shearedProperty.setValue(sheared);
-		this.applySheared(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleSheared() {
 		this.setSheared(!this.isSheared());
 	}
 
-	private void applySheared(Sheep entity) {
-		if (entity == null) return;
+	private void applySheared() {
+		Sheep entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setSheared(this.isSheared());
 	}
 

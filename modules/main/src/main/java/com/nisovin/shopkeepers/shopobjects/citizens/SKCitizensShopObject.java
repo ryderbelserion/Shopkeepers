@@ -48,6 +48,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			.key("npcId")
 			.nullable()
 			.defaultValue(null)
+			.onValueChanged((property, oldValue, newValue, updateFlags) -> this.onNPCUniqueIdChanged(oldValue, newValue))
 			.build(properties);
 
 	// Only used initially, when the shopkeeper is created by a player. If this name is not available when we create the
@@ -98,6 +99,19 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	private void setNPCUniqueId(UUID npcId) {
 		npcUniqueIdProperty.setValue(npcId); // Can be null
+	}
+
+	private void onNPCUniqueIdChanged(UUID oldValue, UUID newValue) {
+		// Update registrations:
+		if (shopkeeper.isValid()) {
+			if (oldValue != null) {
+				citizensShops.unregisterCitizensShopkeeper(SKCitizensShopObject.this, oldValue);
+			}
+			if (newValue != null) {
+				citizensShops.registerCitizensShopkeeper(SKCitizensShopObject.this, newValue);
+			}
+			SKCitizensShopObject.this.onIdChanged();
+		}
 	}
 
 	// NPC
@@ -168,7 +182,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		this.createNpcIfMissing();
 
 		// Register:
-		citizensShops.registerCitizensShopkeeper(this);
+		citizensShops.registerCitizensShopkeeper(this, this.getNPCUniqueId());
 	}
 
 	@Override
@@ -176,7 +190,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		super.remove();
 
 		// Unregister:
-		citizensShops.unregisterCitizensShopkeeper(this);
+		citizensShops.unregisterCitizensShopkeeper(this, this.getNPCUniqueId());
 	}
 
 	@Override

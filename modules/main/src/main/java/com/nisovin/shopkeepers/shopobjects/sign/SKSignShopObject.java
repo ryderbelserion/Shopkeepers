@@ -75,14 +75,17 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 					shopkeeper.markDirty();
 				}
 			})
+			.onValueChanged(this::applySignType)
 			.build(properties);
 	private final Property<Boolean> wallSignProperty = new BooleanProperty()
 			.key("wallSign")
 			.defaultValue(true)
+			.onValueChanged(this::respawn)
 			.build(properties);
 	private final Property<Boolean> glowingTextProperty = new BooleanProperty()
 			.key("glowingText")
 			.defaultValue(false)
+			.onValueChanged(this::applyGlowingText)
 			.build(properties);
 
 	private Block block = null;
@@ -428,7 +431,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	public void setSignType(SignType signType) {
 		signTypeProperty.setValue(signType);
-		this.applySignType();
 	}
 
 	protected void applySignType() {
@@ -475,7 +477,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 
 	public void setGlowingText(boolean glowing) {
 		glowingTextProperty.setValue(glowing);
-		this.applyGlowingText();
 	}
 
 	protected void applyGlowingText() {

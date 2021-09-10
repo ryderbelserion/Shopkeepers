@@ -29,14 +29,17 @@ public class FoxShop extends SittableShop<Fox> {
 	private final Property<Fox.Type> foxTypeProperty = new EnumProperty<>(Fox.Type.class)
 			.key("foxType")
 			.defaultValue(Fox.Type.RED)
+			.onValueChanged(this::applyFoxType)
 			.build(properties);
 	private final Property<Boolean> sleepingProperty = new BooleanProperty()
 			.key("sleeping")
 			.defaultValue(false)
+			.onValueChanged(this::applySleeping)
 			.build(properties);
 	private final Property<Boolean> crouchingProperty = new BooleanProperty()
 			.key("crouching")
 			.defaultValue(false)
+			.onValueChanged(this::applyCrouching)
 			.build(properties);
 
 	public FoxShop(	LivingShops livingShops, SKLivingShopObjectType<FoxShop> livingObjectType,
@@ -65,11 +68,11 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	@Override
-	protected void onSpawn(Fox entity) {
-		super.onSpawn(entity);
-		this.applyFoxType(entity);
-		this.applySleeping(entity);
-		this.applyCrouching(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyFoxType();
+		this.applySleeping();
+		this.applyCrouching();
 	}
 
 	@Override
@@ -89,15 +92,15 @@ public class FoxShop extends SittableShop<Fox> {
 
 	public void setFoxType(Fox.Type foxType) {
 		foxTypeProperty.setValue(foxType);
-		this.applyFoxType(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleFoxType(boolean backwards) {
 		this.setFoxType(EnumUtils.cycleEnumConstant(Fox.Type.class, this.getFoxType(), backwards));
 	}
 
-	private void applyFoxType(Fox entity) {
-		if (entity == null) return;
+	private void applyFoxType() {
+		Fox entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setFoxType(this.getFoxType());
 	}
 
@@ -144,15 +147,15 @@ public class FoxShop extends SittableShop<Fox> {
 		if (sleeping && this.isCrouching()) {
 			this.setCrouching(false);
 		}
-		this.applySleeping(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleSleeping() {
 		this.setSleeping(!this.isSleeping());
 	}
 
-	private void applySleeping(Fox entity) {
-		if (entity == null) return;
+	private void applySleeping() {
+		Fox entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setSleeping(this.isSleeping());
 	}
 
@@ -190,15 +193,15 @@ public class FoxShop extends SittableShop<Fox> {
 		if (crouching && this.isSleeping()) {
 			this.setSleeping(false);
 		}
-		this.applyCrouching(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCrouching() {
 		this.setCrouching(!this.isCrouching());
 	}
 
-	private void applyCrouching(Fox entity) {
-		if (entity == null) return;
+	private void applyCrouching() {
+		Fox entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setCrouching(this.isCrouching());
 	}
 

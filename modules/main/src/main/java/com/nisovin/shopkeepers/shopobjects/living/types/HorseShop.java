@@ -51,15 +51,18 @@ public class HorseShop extends BabyableShop<Horse> {
 	private final Property<Horse.Color> colorProperty = new EnumProperty<>(Horse.Color.class)
 			.key("color")
 			.defaultValue(Horse.Color.BROWN)
+			.onValueChanged(this::applyColor)
 			.build(properties);
 	private final Property<Horse.Style> styleProperty = new EnumProperty<>(Horse.Style.class)
 			.key("style")
 			.defaultValue(Horse.Style.NONE)
+			.onValueChanged(this::applyStyle)
 			.build(properties);
 	private final Property<HorseArmor> armorProperty = new EnumProperty<HorseArmor>(HorseArmor.class)
 			.key("armor")
 			.nullable() // Null indicates 'no armor'
 			.defaultValue(null)
+			.onValueChanged(this::applyArmor)
 			.build(properties);
 
 	public HorseShop(	LivingShops livingShops, SKLivingShopObjectType<HorseShop> livingObjectType,
@@ -84,11 +87,11 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	@Override
-	protected void onSpawn(Horse entity) {
-		super.onSpawn(entity);
-		this.applyColor(entity);
-		this.applyStyle(entity);
-		this.applyArmor(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyColor();
+		this.applyStyle();
+		this.applyArmor();
 	}
 
 	@Override
@@ -108,15 +111,15 @@ public class HorseShop extends BabyableShop<Horse> {
 
 	public void setColor(Horse.Color color) {
 		colorProperty.setValue(color);
-		this.applyColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleColor(boolean backwards) {
 		this.setColor(EnumUtils.cycleEnumConstant(Horse.Color.class, this.getColor(), backwards));
 	}
 
-	private void applyColor(Horse entity) {
-		if (entity == null) return;
+	private void applyColor() {
+		Horse entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setColor(this.getColor());
 	}
 
@@ -174,15 +177,15 @@ public class HorseShop extends BabyableShop<Horse> {
 
 	public void setStyle(Horse.Style style) {
 		styleProperty.setValue(style);
-		this.applyStyle(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleStyle(boolean backwards) {
 		this.setStyle(EnumUtils.cycleEnumConstant(Horse.Style.class, this.getStyle(), backwards));
 	}
 
-	private void applyStyle(Horse entity) {
-		if (entity == null) return;
+	private void applyStyle() {
+		Horse entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setStyle(this.getStyle());
 	}
 
@@ -221,15 +224,15 @@ public class HorseShop extends BabyableShop<Horse> {
 
 	public void setArmor(HorseArmor armor) {
 		armorProperty.setValue(armor);
-		this.applyArmor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleArmor(boolean backwards) {
 		this.setArmor(EnumUtils.cycleEnumConstantNullable(HorseArmor.class, this.getArmor(), backwards));
 	}
 
-	private void applyArmor(Horse entity) {
-		if (entity == null) return;
+	private void applyArmor() {
+		Horse entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		HorseArmor armor = this.getArmor();
 		entity.getInventory().setArmor(armor == null ? null : new ItemStack(armor.getMaterial()));
 	}

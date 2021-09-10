@@ -30,6 +30,7 @@ public class AxolotlShop extends BabyableShop<Animals> {
 	private final Property<String> variantProperty = new StringProperty()
 			.key("axolotlVariant")
 			.defaultValue("LUCY")
+			.onValueChanged(this::applyVariant)
 			.build(properties);
 
 	public AxolotlShop(	LivingShops livingShops, SKLivingShopObjectType<AxolotlShop> livingObjectType,
@@ -50,9 +51,9 @@ public class AxolotlShop extends BabyableShop<Animals> {
 	}
 
 	@Override
-	protected void onSpawn(Animals entity) {
-		super.onSpawn(entity);
-		this.applyVariant(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyVariant();
 	}
 
 	@Override
@@ -70,7 +71,6 @@ public class AxolotlShop extends BabyableShop<Animals> {
 
 	public void setVariant(String variant) {
 		variantProperty.setValue(variant);
-		this.applyVariant(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleVariant(boolean backwards) {
@@ -78,8 +78,9 @@ public class AxolotlShop extends BabyableShop<Animals> {
 		// this.setVariant(EnumUtils.cycleEnumConstant(Axolotl.Variant.class, this.getVariant(), backwards));
 	}
 
-	private void applyVariant(Animals entity) {
-		if (entity == null) return;
+	private void applyVariant() {
+		Animals entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		NMSManager.getProvider().setAxolotlVariant(this.getEntity(), this.getVariant());
 		// entity.setVariant(this.getVariant());
 	}

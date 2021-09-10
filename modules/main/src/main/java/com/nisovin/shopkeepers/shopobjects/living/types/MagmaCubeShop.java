@@ -33,6 +33,7 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 			.minValue(1)
 			.maxValue(10)
 			.defaultValue(1)
+			.onValueChanged(this::applySize)
 			.build(properties);
 
 	public MagmaCubeShop(	LivingShops livingShops, SKLivingShopObjectType<MagmaCubeShop> livingObjectType,
@@ -53,9 +54,9 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 	}
 
 	@Override
-	protected void onSpawn(MagmaCube entity) {
-		super.onSpawn(entity);
-		this.applySize(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applySize();
 	}
 
 	@Override
@@ -73,7 +74,6 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 
 	public void setSize(int size) {
 		sizeProperty.setValue(size);
-		this.applySize(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleSize(boolean backwards) {
@@ -88,8 +88,9 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 		this.setSize(nextSize);
 	}
 
-	private void applySize(MagmaCube entity) {
-		if (entity == null) return;
+	private void applySize() {
+		MagmaCube entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		// Note: Minecraft will also adjust some of the magma cube's attributes, but these should not affect us.
 		entity.setSize(this.getSize());
 	}

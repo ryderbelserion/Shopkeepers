@@ -33,6 +33,7 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 			.minValue(1)
 			.maxValue(10)
 			.defaultValue(1)
+			.onValueChanged(this::applySize)
 			.build(properties);
 
 	public SlimeShop(	LivingShops livingShops, SKLivingShopObjectType<SlimeShop> livingObjectType,
@@ -53,9 +54,9 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 	}
 
 	@Override
-	protected void onSpawn(Slime entity) {
-		super.onSpawn(entity);
-		this.applySize(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applySize();
 	}
 
 	@Override
@@ -73,7 +74,6 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 
 	public void setSize(int size) {
 		sizeProperty.setValue(size);
-		this.applySize(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleSize(boolean backwards) {
@@ -88,8 +88,9 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 		this.setSize(nextSize);
 	}
 
-	private void applySize(Slime entity) {
-		if (entity == null) return;
+	private void applySize() {
+		Slime entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		// Note: Minecraft will also adjust some of the slime's attributes, but these should not affect us.
 		entity.setSize(this.getSize());
 	}

@@ -27,6 +27,7 @@ public class SnowmanShop extends SKLivingShopObject<Snowman> {
 	private final Property<Boolean> pumpkinHeadProperty = new BooleanProperty()
 			.key("pumpkinHead")
 			.defaultValue(true)
+			.onValueChanged(this::applyPumpkinHead)
 			.build(properties);
 
 	public SnowmanShop(	LivingShops livingShops, SKLivingShopObjectType<SnowmanShop> livingObjectType,
@@ -47,9 +48,9 @@ public class SnowmanShop extends SKLivingShopObject<Snowman> {
 	}
 
 	@Override
-	protected void onSpawn(Snowman entity) {
-		super.onSpawn(entity);
-		this.applyPumpkinHead(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyPumpkinHead();
 	}
 
 	@Override
@@ -67,15 +68,15 @@ public class SnowmanShop extends SKLivingShopObject<Snowman> {
 
 	public void setPumpkinHead(boolean pumpkinHead) {
 		pumpkinHeadProperty.setValue(pumpkinHead);
-		this.applyPumpkinHead(this.getEntity()); // Null if not spawned
 	}
 
 	public void cyclePumpkinHead() {
 		this.setPumpkinHead(!this.hasPumpkinHead());
 	}
 
-	private void applyPumpkinHead(Snowman entity) {
-		if (entity == null) return;
+	private void applyPumpkinHead() {
+		Snowman entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setDerp(!this.hasPumpkinHead());
 	}
 

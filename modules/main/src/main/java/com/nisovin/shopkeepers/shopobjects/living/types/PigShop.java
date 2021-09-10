@@ -26,6 +26,7 @@ public class PigShop extends BabyableShop<Pig> {
 	private final Property<Boolean> saddleProperty = new BooleanProperty()
 			.key("saddle")
 			.defaultValue(false)
+			.onValueChanged(this::applySaddle)
 			.build(properties);
 
 	public PigShop(	LivingShops livingShops, SKLivingShopObjectType<PigShop> livingObjectType,
@@ -46,9 +47,9 @@ public class PigShop extends BabyableShop<Pig> {
 	}
 
 	@Override
-	protected void onSpawn(Pig entity) {
-		super.onSpawn(entity);
-		this.applySaddle(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applySaddle();
 	}
 
 	@Override
@@ -66,15 +67,15 @@ public class PigShop extends BabyableShop<Pig> {
 
 	public void setSaddle(boolean saddle) {
 		saddleProperty.setValue(saddle);
-		this.applySaddle(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleSaddle() {
 		this.setSaddle(!this.hasSaddle());
 	}
 
-	private void applySaddle(Pig entity) {
-		if (entity == null) return;
+	private void applySaddle() {
+		Pig entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setSaddle(this.hasSaddle());
 	}
 

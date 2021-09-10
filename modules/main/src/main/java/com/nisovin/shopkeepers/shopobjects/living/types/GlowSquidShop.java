@@ -30,6 +30,7 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 	private final Property<Boolean> darkGlowSquidProperty = new BooleanProperty()
 			.key("darkGlowSquid")
 			.defaultValue(false)
+			.onValueChanged(this::applyDark)
 			.build(properties);
 
 	public GlowSquidShop(	LivingShops livingShops, SKLivingShopObjectType<GlowSquidShop> livingObjectType,
@@ -50,9 +51,9 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 	}
 
 	@Override
-	protected void onSpawn(Squid entity) {
-		super.onSpawn(entity);
-		this.applyDark(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyDark();
 	}
 
 	@Override
@@ -70,15 +71,15 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 
 	public void setDark(boolean dark) {
 		darkGlowSquidProperty.setValue(dark);
-		this.applyDark(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleDark(boolean backwards) {
 		this.setDark(!this.isDark());
 	}
 
-	private void applyDark(Squid entity) {
-		if (entity == null) return;
+	private void applyDark() {
+		Squid entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		NMSManager.getProvider().setGlowSquidDark(this.getEntity(), this.isDark());
 	}
 

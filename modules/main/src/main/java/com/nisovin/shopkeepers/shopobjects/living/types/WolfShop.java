@@ -29,11 +29,13 @@ public class WolfShop extends SittableShop<Wolf> {
 	private final Property<Boolean> angryProperty = new BooleanProperty()
 			.key("angry")
 			.defaultValue(false)
+			.onValueChanged(this::applyAngry)
 			.build(properties);
 	private final Property<DyeColor> collarColorProperty = new EnumProperty<DyeColor>(DyeColor.class)
 			.key("collarColor")
 			.nullable() // Null indicates 'no collar' / untamed
 			.defaultValue(null)
+			.onValueChanged(this::applyCollarColor)
 			.build(properties);
 
 	public WolfShop(LivingShops livingShops, SKLivingShopObjectType<WolfShop> livingObjectType,
@@ -56,10 +58,10 @@ public class WolfShop extends SittableShop<Wolf> {
 	}
 
 	@Override
-	protected void onSpawn(Wolf entity) {
-		super.onSpawn(entity);
-		this.applyAngry(entity);
-		this.applyCollarColor(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyAngry();
+		this.applyCollarColor();
 	}
 
 	@Override
@@ -78,15 +80,15 @@ public class WolfShop extends SittableShop<Wolf> {
 
 	public void setAngry(boolean angry) {
 		angryProperty.setValue(angry);
-		this.applyAngry(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleAngry() {
 		this.setAngry(!this.isAngry());
 	}
 
-	private void applyAngry(Wolf entity) {
-		if (entity == null) return;
+	private void applyAngry() {
+		Wolf entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setAngry(this.isAngry());
 	}
 
@@ -119,15 +121,15 @@ public class WolfShop extends SittableShop<Wolf> {
 
 	public void setCollarColor(DyeColor collarColor) {
 		collarColorProperty.setValue(collarColor);
-		this.applyCollarColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleCollarColor(boolean backwards) {
 		this.setCollarColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, this.getCollarColor(), backwards));
 	}
 
-	private void applyCollarColor(Wolf entity) {
-		if (entity == null) return;
+	private void applyCollarColor() {
+		Wolf entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		DyeColor collarColor = this.getCollarColor();
 		if (collarColor == null) {
 			// No collar / untamed:

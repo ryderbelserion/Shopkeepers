@@ -29,6 +29,7 @@ public class GoatShop extends BabyableShop<Animals> {
 	private final Property<Boolean> screamingProperty = new BooleanProperty()
 			.key("screaming")
 			.defaultValue(false)
+			.onValueChanged(this::applyScreaming)
 			.build(properties);
 
 	public GoatShop(LivingShops livingShops, SKLivingShopObjectType<GoatShop> livingObjectType,
@@ -49,9 +50,9 @@ public class GoatShop extends BabyableShop<Animals> {
 	}
 
 	@Override
-	protected void onSpawn(Animals entity) {
-		super.onSpawn(entity);
-		this.applyScreaming(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyScreaming();
 	}
 
 	@Override
@@ -72,15 +73,15 @@ public class GoatShop extends BabyableShop<Animals> {
 
 	public void setScreaming(boolean screaming) {
 		screamingProperty.setValue(screaming);
-		this.applyScreaming(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleScreaming(boolean backwards) {
 		this.setScreaming(!this.isScreaming());
 	}
 
-	private void applyScreaming(Animals entity) {
-		if (entity == null) return;
+	private void applyScreaming() {
+		Animals entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		NMSManager.getProvider().setScreamingGoat(this.getEntity(), this.isScreaming());
 	}
 

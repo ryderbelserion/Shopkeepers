@@ -27,6 +27,7 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 	private final Property<MushroomCow.Variant> variantProperty = new EnumProperty<>(MushroomCow.Variant.class)
 			.key("variant")
 			.defaultValue(MushroomCow.Variant.RED)
+			.onValueChanged(this::applyVariant)
 			.build(properties);
 
 	public MooshroomShop(	LivingShops livingShops, SKLivingShopObjectType<MooshroomShop> livingObjectType,
@@ -47,9 +48,9 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 	}
 
 	@Override
-	protected void onSpawn(MushroomCow entity) {
-		super.onSpawn(entity);
-		this.applyVariant(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyVariant();
 	}
 
 	@Override
@@ -67,15 +68,15 @@ public class MooshroomShop extends BabyableShop<MushroomCow> {
 
 	public void setVariant(MushroomCow.Variant variant) {
 		variantProperty.setValue(variant);
-		this.applyVariant(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleVariant(boolean backwards) {
 		this.setVariant(EnumUtils.cycleEnumConstant(MushroomCow.Variant.class, this.getVariant(), backwards));
 	}
 
-	private void applyVariant(MushroomCow entity) {
-		if (entity == null) return;
+	private void applyVariant() {
+		MushroomCow entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setVariant(this.getVariant());
 	}
 

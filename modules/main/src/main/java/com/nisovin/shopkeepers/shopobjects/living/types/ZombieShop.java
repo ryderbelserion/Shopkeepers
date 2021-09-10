@@ -28,6 +28,7 @@ public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 	private final Property<Boolean> babyProperty = new BooleanProperty()
 			.key("baby")
 			.defaultValue(false)
+			.onValueChanged(this::applyBaby)
 			.build(properties);
 
 	public ZombieShop(	LivingShops livingShops, SKLivingShopObjectType<? extends ZombieShop<E>> livingObjectType,
@@ -48,9 +49,9 @@ public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 	}
 
 	@Override
-	protected void onSpawn(E entity) {
-		super.onSpawn(entity);
-		this.applyBaby(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyBaby();
 	}
 
 	@Override
@@ -68,15 +69,15 @@ public class ZombieShop<E extends Zombie> extends SKLivingShopObject<E> {
 
 	public void setBaby(boolean baby) {
 		babyProperty.setValue(baby);
-		this.applyBaby(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleBaby() {
 		this.setBaby(!this.isBaby());
 	}
 
-	private void applyBaby(E entity) {
-		if (entity == null) return;
+	private void applyBaby() {
+		E entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setBaby(this.isBaby());
 	}
 

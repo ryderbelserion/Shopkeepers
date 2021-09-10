@@ -27,6 +27,7 @@ public class ParrotShop extends SittableShop<Parrot> {
 	private final Property<Parrot.Variant> variantProperty = new EnumProperty<>(Parrot.Variant.class)
 			.key("parrotVariant")
 			.defaultValue(Parrot.Variant.RED)
+			.onValueChanged(this::applyVariant)
 			.build(properties);
 
 	public ParrotShop(	LivingShops livingShops, SKLivingShopObjectType<ParrotShop> livingObjectType,
@@ -47,9 +48,9 @@ public class ParrotShop extends SittableShop<Parrot> {
 	}
 
 	@Override
-	protected void onSpawn(Parrot entity) {
-		super.onSpawn(entity);
-		this.applyVariant(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyVariant();
 	}
 
 	@Override
@@ -67,15 +68,15 @@ public class ParrotShop extends SittableShop<Parrot> {
 
 	public void setVariant(Parrot.Variant variant) {
 		variantProperty.setValue(variant);
-		this.applyVariant(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleVariant(boolean backwards) {
 		this.setVariant(EnumUtils.cycleEnumConstant(Parrot.Variant.class, this.getVariant(), backwards));
 	}
 
-	private void applyVariant(Parrot entity) {
-		if (entity == null) return;
+	private void applyVariant() {
+		Parrot entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setVariant(this.getVariant());
 	}
 

@@ -30,6 +30,7 @@ public class ShulkerShop extends SKLivingShopObject<Shulker> {
 			.key("color")
 			.nullable() // Null indicates default color
 			.defaultValue(null)
+			.onValueChanged(this::applyColor)
 			.build(properties);
 
 	public ShulkerShop(	LivingShops livingShops, SKLivingShopObjectType<ShulkerShop> livingObjectType,
@@ -50,9 +51,9 @@ public class ShulkerShop extends SKLivingShopObject<Shulker> {
 	}
 
 	@Override
-	protected void onSpawn(Shulker entity) {
-		super.onSpawn(entity);
-		this.applyColor(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyColor();
 	}
 
 	@Override
@@ -70,15 +71,15 @@ public class ShulkerShop extends SKLivingShopObject<Shulker> {
 
 	public void setColor(DyeColor color) {
 		colorProperty.setValue(color);
-		this.applyColor(this.getEntity()); // Null if not spawned
 	}
 
 	public void cycleColor(boolean backwards) {
 		this.setColor(EnumUtils.cycleEnumConstantNullable(DyeColor.class, this.getColor(), backwards));
 	}
 
-	private void applyColor(Shulker entity) {
-		if (entity == null) return;
+	private void applyColor() {
+		Shulker entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setColor(this.getColor());
 	}
 

@@ -276,7 +276,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			}
 
 			// Apply sub type:
-			this.onSpawn(entity);
+			this.onSpawn();
 
 			// Reset respawn attempts counter and tick rate:
 			respawnAttempts = 0;
@@ -334,8 +334,13 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		return success;
 	}
 
-	// Gets called after the entity was spawned. Can be used to apply any additionally configured mob-specific setup.
-	protected void onSpawn(E entity) {
+	/**
+	 * This method is called right after the entity was spawned.
+	 * <p>
+	 * It can be used to apply additional mob type specific setup.
+	 */
+	protected void onSpawn() {
+		assert this.getEntity() != null;
 		// Nothing to do by default.
 	}
 

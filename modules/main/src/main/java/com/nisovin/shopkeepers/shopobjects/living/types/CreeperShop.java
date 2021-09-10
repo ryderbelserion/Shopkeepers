@@ -27,6 +27,7 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 	private final Property<Boolean> poweredProperty = new BooleanProperty()
 			.key("powered")
 			.defaultValue(false)
+			.onValueChanged(this::applyPowered)
 			.build(properties);
 
 	public CreeperShop(	LivingShops livingShops, SKLivingShopObjectType<CreeperShop> livingObjectType,
@@ -47,9 +48,9 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 	}
 
 	@Override
-	protected void onSpawn(Creeper entity) {
-		super.onSpawn(entity);
-		this.applyPowered(entity);
+	protected void onSpawn() {
+		super.onSpawn();
+		this.applyPowered();
 	}
 
 	@Override
@@ -67,15 +68,15 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 
 	public void setPowered(boolean powered) {
 		poweredProperty.setValue(powered);
-		this.applyPowered(this.getEntity()); // Null if not spawned
 	}
 
 	public void cyclePowered() {
 		this.setPowered(!this.isPowered());
 	}
 
-	private void applyPowered(Creeper entity) {
-		if (entity == null) return;
+	private void applyPowered() {
+		Creeper entity = this.getEntity();
+		if (entity == null) return; // Not spawned
 		entity.setPowered(this.isPowered());
 	}
 
