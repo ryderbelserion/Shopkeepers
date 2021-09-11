@@ -70,6 +70,7 @@ Date format: (YYYY-MM-DD)
 * Internal API: Added AbstractShopObject#respawn().
 * Shopkeepers are now deactivated before they are despawned. This avoids having to process the object id change of the shop object being despawned when the shopkeeper is going to be deactivated anyways.
 * Fixed: The ShopkeeperByName command argument did not take the 'joinRemainingArgs' argument into account.
+* Fixed: The parsing of command arguments failed in cases in which command arguments depend on the context provided by fallbacks of earlier arguments.
 * Refactors related to the removal of shopkeepers of inactive players.
 * Refactors related to shop object properties.
 * Added validation for some constructor and method arguments in the API.

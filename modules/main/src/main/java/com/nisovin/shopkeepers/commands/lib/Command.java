@@ -580,8 +580,14 @@ public abstract class Command {
 		public int currentArgumentIndex = 0;
 		public ArgumentParseException currentParseException = null;
 
-		// linked list:
+		// Latest fallback. Recursively holds references to earlier fallbacks.
 		public Fallback pendingFallback = null;
+		// If present and parsing fails, this exception overrides any other exception that would otherwise be thrown.
+		// This exception is usually associated with an earlier command argument that initially failed to parse but was
+		// later able to restart the parsing due to a successful fallback. This exception is usually expected to be a
+		// more relevant root cause of why the parsing eventually failed.
+		private ArgumentParseException overrideParseException = null;
+		private int overrideParseExceptionArgumentIndex = -1;
 
 		protected ParsingContext(CommandInput input, CommandContext context, ArgumentsReader argsReader, int argumentsCount) {
 			assert input != null && context != null && argsReader != null && argumentsCount >= 0;
@@ -601,6 +607,15 @@ public abstract class Command {
 
 		public boolean hasUnparsedCommandArguments() {
 			return (currentArgumentIndex < (argumentsCount - 1));
+		}
+
+		public void setOverrideParseException(int argumentIndex, ArgumentParseException overrideParseException) {
+			// The currently set override parse exception cannot be replaced by later command arguments.
+			if (this.overrideParseException != null && argumentIndex > overrideParseExceptionArgumentIndex) {
+				return;
+			}
+			this.overrideParseException = overrideParseException;
+			this.overrideParseExceptionArgumentIndex = argumentIndex;
 		}
 	}
 
@@ -743,13 +758,19 @@ public abstract class Command {
 		Fallback fallback = parsingContext.getPendingFallback();
 		if (fallback == null) { // No pending fallback(s)
 			if (parseException != null) {
-				throw parseException; // Parsing failed at the current argument
+				// Parsing failed at the current argument.
+				// Check for an override parse exception:
+				if (parsingContext.overrideParseException != null) {
+					throw parsingContext.overrideParseException;
+				} else {
+					throw parseException;
+				}
 			} else {
 				return; // Parsing successful, continue with the next argument (if any)
 			}
 		}
 
-		// Note: We attempt to fully parse all comamnd arguments after the fallback before evaluating the fallback.
+		// Note: We attempt to fully parse all command arguments after the fallback before evaluating the fallback.
 		// Evaluating the fallback right after the first subsequent command argument either failed or was able to parse
 		// arguments is not sufficient.
 		// Consider for example the command "/list [player] [page]" with inputs "/list 2" and "/list 123 2":
@@ -785,7 +806,7 @@ public abstract class Command {
 		// Note: If some command argument after the fallback was able to parse something, the args reader might no
 		// longer match the state from before the fallback. If parsing past the fallback failed, reset the args reader
 		// to the state from before the fallback:
-		ArgumentsReader prevArgsState = argsReader.createSnapshot(); // capture current args reader state
+		ArgumentsReader prevArgsState = argsReader.createSnapshot(); // Capture current args reader state
 		if (parsingFailed) {
 			argsReader.setState(fallback.getOriginalArgsReader());
 		} else {
@@ -793,6 +814,10 @@ public abstract class Command {
 			// consume.
 			assert !currentParsingFailed && !hasUnparsedCommandArguments && !argsReader.hasNext();
 		}
+
+		// Reset the override parse exception if the index of the current fallback argument is smaller than the index of
+		// the command argument that previously set the override parse exception:
+		parsingContext.setOverrideParseException(fallback.argumentIndex, null);
 
 		// Parse fallback:
 		FallbackArgument<?> fallbackArgument = fallback.getFallbackArgument();
@@ -815,56 +840,79 @@ public abstract class Command {
 
 		if (hasRemainingArgs && !fallbackConsumedArgs) {
 			// There are arguments remaining but the fallback did not consume any of them.
-			// Continuing would either use the fallback error (if the fallback failed), or the parsing error that lead
-			// to the evaluation of the current fallback (otherwise there would be no remaining args).
-			// In most cases however we will want to use the original (root) parsing error of the current fallback
-			// argument instead. Consider for example the command "/list [player, default:self] [page, default:1]" with
-			// input "/list a 2", 'a' being an invalid player name: The player name fallback got evaluated as result of
-			// an 'invalid page argument' error, and the fallback will produce 'self' as the default value, which in the
-			// end leads to the 'invalid page argument' error to propagate. By using the original parsing exception, we
-			// instead get the expected 'invalid player' error in this case.
+			// Unless the fallback succeeded and restarting the parsing from the current argument would now succeed as
+			// well, it is very likely that continuing would either use the fallback error (if the fallback failed), or
+			// the parsing error that lead to the evaluation of the current fallback (otherwise there would be no
+			// remaining args).
+			// In most cases, however, we will want to use the original (root) parsing error of the current fallback
+			// argument instead. Consider for example the command "/list [player, default: self] [page, default: 1]"
+			// with input "/list a 2", 'a' being an invalid player name: The player name fallback is evaluated as result
+			// of an 'invalid page argument' error, and the fallback will produce 'self' as the default value. Simply
+			// restarting the parsing from here would result in the 'invalid page argument' error to be propagated.
+			// Instead, by remembering the original root parsing exception and using it if the following page argument
+			// still fails to parse, we get the expected 'invalid player' error in this case.
 
-			// Regardless of whether or not the parsing of the fallback succeeded, we consider the parsing to have
-			// failed at this fallback argument with the original root exception:
-			parsingContext.currentArgumentIndex = fallback.argumentIndex;
-			parsingContext.currentParseException = fallback.exception.getRootException();
-			this.handleFallbacks(parsingContext);
-			return;
+			// However, simply aborting the parsing here right away with the root parsing exception is not an option:
+			// There are cases in which the following command arguments depend on context provided by the current
+			// fallback. So if the fallback succeeded, even if it did not consume any arguments, we need to restart the
+			// parsing in order to check if the following command arguments are now able to successfully parse the
+			// remaining arguments.
+
+			if (fallbackError != null) {
+				// Use the original root exception in place of the fallback error:
+				fallbackError = fallback.exception.getRootException();
+			} else {
+				// Remember the original root exception before we restart the parsing. If the parsing still ends up
+				// failing, this root exception will replace any other parsing exception that would otherwise be thrown.
+				parsingContext.setOverrideParseException(fallback.argumentIndex, fallback.exception.getRootException());
+			}
 		}
-		assert !hasRemainingArgs || fallbackConsumedArgs;
 
 		if (fallbackError != null) {
-			// Fallback argument failed:
+			// Fallback argument failed.
 			parsingContext.currentArgumentIndex = fallback.argumentIndex;
 			parsingContext.currentParseException = fallbackError;
-			// If there is another pending fallback, evaluate it (otherwise parsing fails with this fallback error):
+			// If there is another pending fallback, evaluate it. Otherwise, parsing fails with this fallback error.
 			this.handleFallbacks(parsingContext);
 			return;
 		} else {
-			if (fallbackConsumedArgs) {
-				// The fallback did consume arguments: Freshly restart parsing from the next argument after the fallback
-				parsingContext.currentArgumentIndex = fallback.argumentIndex;
-				// Note: Any buffered context changes that happened since the fallback get disregarded
-				return;
-			} else {
-				// Fallback succeeded, but no arguments were consumed by it, resulting in the same situation as before
+			// The fallback successfully parsed something.
+			// Heuristic: If the following arguments did previously already successfully parse with no arguments
+			// remaining, we assume that they do not depend on the new context provided by the current fallback and that
+			// restarting the parsing would result in the same outcome as before. We can therefore apply the previously
+			// captured state and skip parsing these arguments again.
+			// TODO One can easily construct examples in which this heuristic fails (eg. if the context is optional, but
+			// would result in a different outcome when present). Remove this heuristic?
+			if (!parsingFailed) {
 				// Apply buffered context changes that happened after the fallback argument:
 				fallback.getBufferedContext().applyBuffer();
 				// Restore the previous args state (from before the evaluation of this fallback):
 				argsReader.setState(prevArgsState);
 
-				// If there is another pending fallback, evaluate it:
-				// If there is no other pending fallback, this will either lead to a parsing error (if parsing of the
-				// current argument failed), or to parsing success
+				// If there are other pending fallbacks, evaluate them. Otherwise, this leads to parsing success.
 				this.handleFallbacks(parsingContext);
 				return;
 			}
+
+			// Freshly restart the parsing from the next command argument after the fallback.
+			// Any buffered context changes that happened after the fallback argument are disregarded.
+			// Note: Even if the fallback did not consume any arguments and parsing of the following command arguments
+			// previously failed, the parsing might succeed now if the following command arguments depend on context
+			// that is provided by the current fallback.
+			parsingContext.currentArgumentIndex = fallback.argumentIndex;
+			parsingContext.currentParseException = null;
+			return;
 		}
 	}
 
 	private void handleUnparsedArguments(ParsingContext parsingContext) throws ArgumentParseException {
 		ArgumentsReader argsReader = parsingContext.argsReader;
 		if (argsReader.getRemainingSize() == 0) return; // No unparsed arguments
+
+		// Check for an override exception:
+		if (parsingContext.overrideParseException != null) {
+			throw parsingContext.overrideParseException;
+		}
 
 		// Remaining unexpected/unparsed arguments:
 		String firstUnparsedArg = argsReader.peek();
@@ -1042,6 +1090,8 @@ public abstract class Command {
 			} catch (FallbackArgumentException e) {
 				// Parsing failed, but registered a fallback:
 				// Check for completions, but continue parsing.
+				// TODO Also include suggestions for the following arguments with the fallback evaluated? (Eg. if the
+				// following arguments depend on context provided by the fallback argument).
 				argsReader.setState(argsReaderState);
 				suggestions.addAll(argument.complete(input, contextView, argsReader));
 				argsReader.setState(argsReaderState);
