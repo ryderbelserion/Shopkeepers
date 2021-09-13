@@ -28,7 +28,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
-import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
@@ -509,17 +508,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				continue;
 			}
 
-			String shopTypeString = shopkeeperSection.getString("type");
-			AbstractShopType<?> shopType = plugin.getShopTypeRegistry().get(shopTypeString);
-			if (shopType == null) {
-				this.failedToLoadShopkeeper(key, "Unknown shop type: " + shopTypeString);
-				continue; // Skip this shopkeeper
-			}
-
 			// Load shopkeeper:
 			AbstractShopkeeper shopkeeper;
 			try {
-				shopkeeper = shopkeeperRegistry.loadShopkeeper(shopType, id, shopkeeperSection);
+				shopkeeper = shopkeeperRegistry.loadShopkeeper(id, shopkeeperSection);
 				assert shopkeeper != null && shopkeeper.isValid();
 			} catch (ShopkeeperCreateException e) {
 				this.failedToLoadShopkeeper(key, e.getMessage());

@@ -481,14 +481,18 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	@Override
 	public AbstractShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
 		Validate.notNull(creationData, "creationData is null");
-		AbstractShopType<?> abstractShopType = this.validateShopType(creationData.getShopType());
+		ShopType<?> shopType = creationData.getShopType();
+		assert shopType != null;
+		Validate.isTrue(shopType instanceof AbstractShopType,
+				"shopType is not of type AbstractShopType, but: " + shopType.getClass().getName());
+		AbstractShopType<?> abstractShopType = (AbstractShopType<?>) shopType;
 
 		SKShopkeeperStorage shopkeeperStorage = this.getShopkeeperStorage();
 		int id = shopkeeperStorage.getNextShopkeeperId();
 		AbstractShopkeeper shopkeeper = abstractShopType.createShopkeeper(id, creationData);
 		if (shopkeeper == null) {
 			// Invalid shop type implementation..
-			throw new ShopkeeperCreateException("ShopType '" + abstractShopType.getClass().getName() + "' created null shopkeeper!");
+			throw new ShopkeeperCreateException("ShopType '" + shopType.getClass().getName() + "' created null shopkeeper!");
 		}
 
 		// Validate unique id:
@@ -504,8 +508,6 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	/**
 	 * Recreates a shopkeeper by loading its previously saved data from the given config section.
 	 * 
-	 * @param shopType
-	 *            the shop type
 	 * @param id
 	 *            the shopkeeper id
 	 * @param shopkeeperData
@@ -518,16 +520,21 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// other source, the storage would need to be made aware of the shopkeeper (eg. by marking the shopkeeper as dirty).
 	// Otherwise, certain operations (such as checking if a certain shopkeeper id is already in use) would no longer
 	// work as expected.
-	public AbstractShopkeeper loadShopkeeper(ShopType<?> shopType, int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
-		AbstractShopType<?> abstractShopType = this.validateShopType(shopType);
+	public AbstractShopkeeper loadShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 		Validate.isTrue(id >= 1, "id has to be positive: " + id);
 		Validate.isTrue(this.getShopkeeperById(id) == null, "There already exists a shopkeeper with this id: " + id);
 
-		AbstractShopkeeper shopkeeper = abstractShopType.loadShopkeeper(id, shopkeeperData);
+		String shopTypeId = shopkeeperData.getString("type");
+		AbstractShopType<?> shopType = plugin.getShopTypeRegistry().get(shopTypeId);
+		if (shopType == null) {
+			throw new ShopkeeperCreateException("Unknown shop type: " + shopTypeId);
+		}
+
+		AbstractShopkeeper shopkeeper = shopType.loadShopkeeper(id, shopkeeperData);
 		if (shopkeeper == null) {
 			// Invalid shop type implementation..
-			throw new ShopkeeperCreateException("ShopType '" + abstractShopType.getClass().getName() + "' loaded null shopkeeper!");
+			throw new ShopkeeperCreateException("ShopType '" + shopType.getClass().getName() + "' loaded null shopkeeper!");
 		}
 
 		// Validate unique id:
@@ -538,13 +545,6 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		// Add the shopkeeper to the registry and spawn it:
 		this.addShopkeeper(shopkeeper, ShopkeeperAddedEvent.Cause.LOADED);
 		return shopkeeper;
-	}
-
-	private AbstractShopType<?> validateShopType(ShopType<?> shopType) {
-		Validate.notNull(shopType, "shopType is null");
-		Validate.isTrue(shopType instanceof AbstractShopType,
-				"shopType is not of type AbstractShopType, but: " + shopType.getClass().getName());
-		return (AbstractShopType<?>) shopType;
 	}
 
 	// ADD / REMOVE
