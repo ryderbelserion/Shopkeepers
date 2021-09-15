@@ -64,14 +64,14 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	}
 
 	@Override
-	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
-		super.loadFromSaveData(shopkeeperData);
+	public void loadDynamicState(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		super.loadDynamicState(shopkeeperData);
 		this.loadOffers(shopkeeperData);
 	}
 
 	@Override
-	public void save(ConfigurationSection shopkeeperData) {
-		super.save(shopkeeperData);
+	public void saveDynamicState(ConfigurationSection shopkeeperData) {
+		super.saveDynamicState(shopkeeperData);
 		this.saveOffers(shopkeeperData);
 	}
 

@@ -101,8 +101,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
-		super.loadFromSaveData(shopkeeperData);
+	public void loadDynamicState(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		super.loadDynamicState(shopkeeperData);
 		this.loadOwner(shopkeeperData);
 		this.loadContainer(shopkeeperData);
 		this.loadNotifyOnTrades(shopkeeperData);
@@ -110,8 +110,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public void save(ConfigurationSection shopkeeperData) {
-		super.save(shopkeeperData);
+	public void saveDynamicState(ConfigurationSection shopkeeperData) {
+		super.saveDynamicState(shopkeeperData);
 		this.saveOwner(shopkeeperData);
 		this.saveContainer(shopkeeperData);
 		this.saveNotifyOnTrades(shopkeeperData);

@@ -68,6 +68,7 @@ Date format: (YYYY-MM-DD)
 * Internal API: Added SKSignShopObject#getSignType().
 * Internal API: It is now the responsibility of the shop object to inform about object id changes, even when the shop object is being spawned, despawned, or ticked.
 * Internal API: Added AbstractShopObject#respawn().
+* Internal API: Added the possibility to save and load a shopkeeper's dynamic state.
 * Shopkeepers are now deactivated before they are despawned. This avoids having to process the object id change of the shop object being despawned when the shopkeeper is going to be deactivated anyways.
 * Fixed: The ShopkeeperByName command argument did not take the 'joinRemainingArgs' argument into account.
 * Fixed: The parsing of command arguments failed in cases in which command arguments depend on the context provided by fallbacks of earlier arguments.

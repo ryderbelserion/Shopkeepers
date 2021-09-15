@@ -78,14 +78,14 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	}
 
 	@Override
-	protected void loadFromSaveData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
-		super.loadFromSaveData(shopkeeperData);
+	public void loadDynamicState(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		super.loadDynamicState(shopkeeperData);
 		this.loadTradePermission(shopkeeperData);
 	}
 
 	@Override
-	public void save(ConfigurationSection shopkeeperData) {
-		super.save(shopkeeperData);
+	public void saveDynamicState(ConfigurationSection shopkeeperData) {
+		super.saveDynamicState(shopkeeperData);
 		this.saveTradePermission(shopkeeperData);
 	}
 

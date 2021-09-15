@@ -21,6 +21,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.events.ShopkeeperRemoveEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
@@ -266,6 +267,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	/**
 	 * Loads the shopkeeper's saved data from the given {@link ConfigurationSection}.
+	 * <p>
+	 * This also loads the shopkeeper's {@link #loadDynamicState(ConfigurationSection) dynamic state}.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
@@ -290,22 +293,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.markDirty();
 		}
 
-		this._setName(shopkeeperData.getString("name"));
-
 		// Shop object data:
 		ConfigurationSection shopObjectData = this.getShopObjectData(shopkeeperData);
 		assert shopObjectData != null;
 
-		// Migrate the shop object data:
-		this.migrateShopObjectData(shopObjectData);
-
 		// Determine the shop object type:
-		String objectTypeId = this.getShopObjectTypeId(shopObjectData);
-		assert objectTypeId != null;
-		AbstractShopObjectType<?> objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(objectTypeId);
-		if (objectType == null) {
-			throw new ShopkeeperCreateException("Invalid object type: " + objectTypeId);
-		}
+		AbstractShopObjectType<?> objectType = this.getShopObjectType(shopObjectData);
 		assert objectType != null;
 
 		// Normalize empty world name to null:
@@ -334,13 +327,48 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		}
 		this.updateChunkCoords();
 
-		// Create and load the shop object:
+		// Create the shop object:
 		this.shopObject = this.createShopObject(objectType, null);
-		this.shopObject.load(shopObjectData);
+
+		// Load the dynamic shopkeeper and shop object state:
+		this.loadDynamicState(shopkeeperData);
 	}
 
-	private void migrateShopkeeperData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	/**
+	 * Applies data migrations to the given shopkeeper data.
+	 * <p>
+	 * This also migrates the contained shop object data.
+	 * 
+	 * @param shopkeeperData
+	 *            the shopkeeper data, not <code>null</code>
+	 * @throws ShopkeeperCreateException
+	 *             if the shopkeeper data is missing entries or contains invalid entries that cannot be migrated
+	 */
+	protected void migrateShopkeeperData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
 		assert shopkeeperData != null;
+		// Migrate the shop object data:
+		ConfigurationSection shopObjectData = this.getShopObjectData(shopkeeperData);
+		assert shopObjectData != null;
+		this.migrateShopObjectData(shopObjectData);
+	}
+
+	private String getShopTypeId(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		assert shopkeeperData != null;
+		String shopTypeId = shopkeeperData.getString("type");
+		if (StringUtils.isEmpty(shopTypeId)) {
+			throw new ShopkeeperCreateException("Missing shop type id!");
+		}
+		return shopTypeId;
+	}
+
+	private AbstractShopType<?> getShopType(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		assert shopkeeperData != null;
+		String shopTypeId = this.getShopTypeId(shopkeeperData);
+		AbstractShopType<?> shopType = SKShopkeepersPlugin.getInstance().getShopTypeRegistry().get(shopTypeId);
+		if (shopType == null) {
+			throw new ShopkeeperCreateException("Unknown shop type: " + shopTypeId);
+		}
+		return shopType;
 	}
 
 	private ConfigurationSection getShopObjectData(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
@@ -364,6 +392,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			throw new ShopkeeperCreateException("Missing object type id!");
 		}
 		return objectTypeId;
+	}
+
+	private AbstractShopObjectType<?> getShopObjectType(ConfigurationSection shopObjectData) throws ShopkeeperCreateException {
+		assert shopObjectData != null;
+		String objectTypeId = this.getShopObjectTypeId(shopObjectData);
+		assert objectTypeId != null;
+		AbstractShopObjectType<?> objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(objectTypeId);
+		if (objectType == null) {
+			throw new ShopkeeperCreateException("Invalid object type: " + objectTypeId);
+		}
+		return objectType;
 	}
 
 	private void migrateShopObjectData(ConfigurationSection shopObjectData) throws ShopkeeperCreateException {
@@ -413,7 +452,54 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * Saves the shopkeeper's data to the given {@link ConfigurationSection}.
+	 * Loads the shopkeeper's dynamic state from the given {@link ConfigurationSection}.
+	 * <p>
+	 * The given shopkeeper data is expected to contain the shopkeeper's shop type identifier. If the given data was
+	 * originally meant for a different shop type, loading fails. Any other non-dynamic shopkeeper data that the given
+	 * {@link ConfigurationSection} may contain is silently ignored. If the given shopkeeper data contains data for a
+	 * shop object of a different type, the given object data is silently ignored as well.
+	 * <p>
+	 * This operation is expected to not modify the given config section. Any stored data elements (such as for example
+	 * item stacks, etc.) and collections of data elements are assumed to not be modified, neither by the shopkeeper,
+	 * nor in contexts outside of the shopkeeper. If the shopkeeper can guarantee not to modify these data elements, it
+	 * is allowed to directly store them without copying them first.
+	 * 
+	 * @param shopkeeperData
+	 *            the shopkeeper data, not <code>null</code>
+	 * @throws ShopkeeperCreateException
+	 *             if the data cannot be loaded
+	 * @see #saveDynamicState(ConfigurationSection)
+	 * @see #loadFromSaveData(ConfigurationSection)
+	 */
+	public void loadDynamicState(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+		Validate.notNull(shopkeeperData, "shopkeeperData is null");
+		ShopType<?> shopType = this.getShopType(shopkeeperData);
+		assert shopType != null;
+		if (shopType != this.getType()) {
+			throw new ShopkeeperCreateException("Shopkeeper data is for a different shop type (expected: "
+					+ this.getType().getIdentifier() + ", actual: " + shopType.getIdentifier() + ")!");
+		}
+
+		this._setName(shopkeeperData.getString("name"));
+
+		// Shop object:
+		ConfigurationSection shopObjectData = this.getShopObjectData(shopkeeperData);
+		assert shopObjectData != null;
+		AbstractShopObjectType<?> objectType = this.getShopObjectType(shopObjectData);
+		assert objectType != null;
+		if (objectType == shopObject.getType()) {
+			shopObject.load(shopObjectData);
+		} else {
+			// Skip shop object data.
+			Log.debug(() -> this.getLogPrefix() + "Ignoring shop object data of different type (expected: "
+					+ shopObject.getType().getIdentifier() + ", actual: " + objectType.getIdentifier() + ")!");
+		}
+	}
+
+	/**
+	 * Saves the shopkeeper's state to the given {@link ConfigurationSection}.
+	 * <p>
+	 * This also includes the shopkeeper's {@link #saveDynamicState(ConfigurationSection) dynamic state}.
 	 * <p>
 	 * It is assumed that the data stored in the given config section does not change afterwards and can be serialized
 	 * asynchronously. The shopkeeper must therefore ensure that this data is not modified, for example by only
@@ -424,15 +510,41 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 */
 	public void save(ConfigurationSection shopkeeperData) {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
+		// Note: The shop type is already saved as part of the dynamic state. However, saving it here as well ensures
+		// that it is the first data entry.
+		shopkeeperData.set("type", this.getType().getIdentifier());
 		shopkeeperData.set("uniqueId", uniqueId.toString());
-		shopkeeperData.set("name", TextUtils.decolorize(name));
 		// Null world name is stored as an empty String:
 		shopkeeperData.set("world", StringUtils.getOrEmpty(worldName));
 		shopkeeperData.set("x", x);
 		shopkeeperData.set("y", y);
 		shopkeeperData.set("z", z);
 		shopkeeperData.set("yaw", yaw);
+
+		// Dynamic shopkeeper and shop object data:
+		this.saveDynamicState(shopkeeperData);
+	}
+
+	/**
+	 * Saves the shopkeeper's dynamic state to the given {@link ConfigurationSection}.
+	 * <p>
+	 * The dynamic state comprises at least every portion of state that the shop owner, an admin, an API user, or the
+	 * shopkeeper itself might dynamically change at runtime. State that is currently part of the non-dynamic portion,
+	 * such as the shopkeeper's type, location, or object type, might be moved to the dynamic portion in the future.
+	 * <p>
+	 * The saved dynamic state can be loaded again via {@link #loadDynamicState(ConfigurationSection)}.
+	 * <p>
+	 * It is assumed that the data stored in the given config section does not change afterwards and can be serialized
+	 * asynchronously. The shopkeeper must therefore ensure that this data is not modified, for example by only
+	 * inserting immutable data, or always making copies of the inserted data.
+	 * 
+	 * @param shopkeeperData
+	 *            the shopkeeper data, not <code>null</code>
+	 */
+	public void saveDynamicState(ConfigurationSection shopkeeperData) {
+		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 		shopkeeperData.set("type", this.getType().getIdentifier());
+		shopkeeperData.set("name", TextUtils.decolorize(name));
 
 		// Shop object:
 		ConfigurationSection shopObjectData = this.createEmptyShopObjectData(shopkeeperData);
