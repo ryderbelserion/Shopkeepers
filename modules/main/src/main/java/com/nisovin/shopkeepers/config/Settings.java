@@ -17,13 +17,13 @@ import java.util.regex.PatternSyntaxException;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
-import org.bukkit.configuration.Configuration;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.lib.Config;
+import com.nisovin.shopkeepers.config.lib.ConfigData;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
 import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -543,12 +543,12 @@ public class Settings extends Config {
 
 		// Load config:
 		plugin.reloadConfig();
-		Configuration config = plugin.getConfig();
+		ConfigData configData = ConfigData.of(plugin.getConfig());
 
 		// Load settings from config:
 		boolean configChanged = false;
 		try {
-			configChanged = loadConfig(config);
+			configChanged = loadConfig(configData);
 		} catch (ConfigLoadException e) {
 			// Config loading failed with a severe issue:
 			return e;
@@ -562,24 +562,24 @@ public class Settings extends Config {
 		return null; // Config loaded successfully
 	}
 
-	// Returns true, if the config has changed and needs to be saved.
-	private static boolean loadConfig(Configuration config) throws ConfigLoadException {
+	// Returns true if the config data has changed and needs to be saved.
+	private static boolean loadConfig(ConfigData configData) throws ConfigLoadException {
 		boolean configChanged = false;
 
 		// Perform config migrations:
-		boolean migrated = ConfigMigrations.applyMigrations(config);
+		boolean migrated = ConfigMigrations.applyMigrations(configData);
 		if (migrated) {
 			configChanged = true;
 		}
 
 		// Insert default values for settings missing inside the config:
-		boolean insertedDefaults = Settings.INSTANCE.insertMissingDefaultValues(config);
+		boolean insertedDefaults = Settings.INSTANCE.insertMissingDefaultValues(configData);
 		if (insertedDefaults) {
 			configChanged = true;
 		}
 
 		// Load and validate settings:
-		Settings.INSTANCE.load(config);
+		Settings.INSTANCE.load(configData);
 
 		onSettingsChanged();
 		return configChanged;

@@ -11,9 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.nisovin.shopkeepers.config.lib.annotation.Colored;
 import com.nisovin.shopkeepers.config.lib.annotation.Uncolored;
 import com.nisovin.shopkeepers.config.lib.annotation.WithDefaultValueType;
@@ -31,6 +28,7 @@ import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringValue;
 import com.nisovin.shopkeepers.config.lib.value.types.StringListValue;
 import com.nisovin.shopkeepers.config.lib.value.types.StringValue;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.java.CollectionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -292,32 +290,32 @@ public abstract class Config {
 
 	// SAVING
 
-	public void save(ConfigurationSection config) {
-		Validate.notNull(config, "config is null");
+	public void save(DataContainer dataContainer) {
+		Validate.notNull(dataContainer, "dataContainer is null");
 		for (Setting<?> setting : this.getSettings()) {
-			this.saveSetting(config, setting);
+			this.saveSetting(dataContainer, setting);
 		}
 	}
 
-	protected <T> void saveSetting(ConfigurationSection config, Setting<T> setting) {
+	protected <T> void saveSetting(DataContainer dataContainer, Setting<T> setting) {
 		assert setting.getConfig() == this;
 		String configKey = setting.getConfigKey();
 		ValueType<T> valueType = setting.getValueType();
 		T value = setting.getValue();
-		valueType.save(config, configKey, value);
+		valueType.save(dataContainer, configKey, value);
 	}
 
 	// LOADING
 
-	public void load(ConfigurationSection config) throws ConfigLoadException {
-		Validate.notNull(config, "config is null");
+	public void load(ConfigData configData) throws ConfigLoadException {
+		Validate.notNull(configData, "dataContainer is null");
 		for (Setting<?> setting : this.getSettings()) {
-			this.loadSetting(config, setting);
+			this.loadSetting(configData, setting);
 		}
 		this.validateSettings();
 	}
 
-	protected <T> void loadSetting(ConfigurationSection config, Setting<T> setting) throws ConfigLoadException {
+	protected <T> void loadSetting(ConfigData configData, Setting<T> setting) throws ConfigLoadException {
 		assert setting.getConfig() == this;
 		String configKey = setting.getConfigKey();
 		ValueType<T> valueType = setting.getValueType();
@@ -325,13 +323,13 @@ public abstract class Config {
 			T value = null;
 
 			// Handle missing value:
-			if (!config.isSet(configKey)) {
+			if (!configData.contains(configKey)) {
 				// We use the default value, if there is one:
-				value = this.getDefaultValue(config, setting); // Can be null
-				this.onValueMissing(config, setting, value);
+				value = this.getDefaultValue(configData, setting); // Can be null
+				this.onValueMissing(configData, setting, value);
 			} else {
 				// Load value:
-				value = valueType.load(config, configKey);
+				value = valueType.load(configData, configKey);
 				assert value != null; // We expect an exception if the value cannot be loaded
 			}
 
@@ -340,11 +338,11 @@ public abstract class Config {
 				setting.setValue(value);
 			} // Else: Retain previous value.
 		} catch (ValueLoadException e) {
-			this.onValueLoadException(config, setting, e);
+			this.onValueLoadException(configData, setting, e);
 		}
 	}
 
-	protected <T> void onValueMissing(ConfigurationSection config, Setting<T> setting, T defaultValue) throws ConfigLoadException {
+	protected <T> void onValueMissing(ConfigData configData, Setting<T> setting, T defaultValue) throws ConfigLoadException {
 		String configKey = setting.getConfigKey();
 		if (defaultValue == null) {
 			Log.warning(this.msgMissingValue(configKey));
@@ -361,7 +359,7 @@ public abstract class Config {
 		return this.getLogPrefix() + "Using default value for missing config entry: " + configKey;
 	}
 
-	protected <T> void onValueLoadException(ConfigurationSection config, Setting<T> setting, ValueLoadException e) throws ConfigLoadException {
+	protected <T> void onValueLoadException(ConfigData configData, Setting<T> setting, ValueLoadException e) throws ConfigLoadException {
 		String configKey = setting.getConfigKey();
 		Log.warning(this.msgValueLoadException(configKey, e));
 		for (String extraMessage : e.getExtraMessages()) {
@@ -383,18 +381,15 @@ public abstract class Config {
 
 	// Checks whether there are default values available.
 	// This has to be consistent with #getDefaultValue.
-	protected boolean hasDefaultValues(ConfigurationSection config) {
-		return config instanceof Configuration && ((Configuration) config).getDefaults() != null;
+	protected boolean hasDefaultValues(ConfigData configData) {
+		return (configData.getDefaults() != null);
 	}
 
 	// Returns null if there is no default value.
 	@SuppressWarnings("unchecked")
-	protected <T> T getDefaultValue(ConfigurationSection config, Setting<T> setting) {
+	protected <T> T getDefaultValue(ConfigData configData, Setting<T> setting) {
 		assert setting.getConfig() == this;
-		Configuration defaults = null;
-		if (config instanceof Configuration) {
-			defaults = ((Configuration) config).getDefaults();
-		}
+		DataContainer defaults = configData.getDefaults();
 		if (defaults == null) {
 			// No default config values available.
 			return null;
@@ -405,7 +400,7 @@ public abstract class Config {
 
 		// Load default value:
 		try {
-			// Note: This can return null if the default config does not contain a default value for this setting.
+			// Note: This can return null if the config data does not provide a default value for this setting.
 			return (T) valueType.load(defaults, configKey);
 		} catch (ValueLoadException e) {
 			Log.warning(this.msgDefaultValueLoadException(configKey, e));
@@ -418,15 +413,15 @@ public abstract class Config {
 	}
 
 	/**
-	 * Inserts the default values for missing settings into the given config.
+	 * Inserts the default values for missing settings into the given {@link ConfigData}.
 	 * 
-	 * @param config
-	 *            the config
+	 * @param configData
+	 *            the config data, not <code>null</code>
 	 * @return <code>true</code> if any default values have been inserted
 	 */
-	protected boolean insertMissingDefaultValues(ConfigurationSection config) {
-		Validate.notNull(config, "config is null");
-		if (!this.hasDefaultValues(config)) {
+	protected boolean insertMissingDefaultValues(ConfigData configData) {
+		Validate.notNull(configData, "configData is null");
+		if (!this.hasDefaultValues(configData)) {
 			// No default config values available.
 			return false;
 		}
@@ -434,7 +429,7 @@ public abstract class Config {
 		// Initialize missing settings with their default value:
 		boolean configChanged = false;
 		for (Setting<?> setting : this.getSettings()) {
-			if (this.insertMissingDefaultValue(config, setting)) {
+			if (this.insertMissingDefaultValue(configData, setting)) {
 				configChanged = true;
 			}
 		}
@@ -442,16 +437,16 @@ public abstract class Config {
 	}
 
 	// Returns true if the default value got inserted.
-	protected <T> boolean insertMissingDefaultValue(ConfigurationSection config, Setting<T> setting) {
+	protected <T> boolean insertMissingDefaultValue(ConfigData configData, Setting<T> setting) {
 		assert setting.getConfig() == this;
-		assert this.hasDefaultValues(config);
+		assert this.hasDefaultValues(configData);
 		String configKey = setting.getConfigKey();
-		if (config.isSet(configKey)) return false; // Not missing.
+		if (configData.contains(configKey)) return false; // Not missing.
 
 		Log.warning(this.msgInsertingDefault(configKey));
 
 		// Get default value:
-		T defaultValue = this.getDefaultValue(config, setting);
+		T defaultValue = this.getDefaultValue(configData, setting);
 		if (defaultValue == null) {
 			Log.warning(this.msgMissingDefault(configKey));
 			return false;
@@ -459,7 +454,7 @@ public abstract class Config {
 
 		// Save default value to config:
 		ValueType<T> valueType = setting.getValueType();
-		valueType.save(config, configKey, defaultValue);
+		valueType.save(configData, configKey, defaultValue);
 		return true;
 	}
 

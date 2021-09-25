@@ -2,8 +2,6 @@ package com.nisovin.shopkeepers.property;
 
 import java.util.UUID;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
 /**
@@ -18,19 +16,24 @@ public class UUIDProperty extends Property<UUID> {
 	}
 
 	@Override
-	protected UUID loadValue(ConfigurationSection configSection) throws InvalidValueException {
-		String uuidString = configSection.getString(this.getKey());
-		if (uuidString == null) return null;
+	protected UUID deserializeValue(Object dataObject) throws InvalidValueException {
+		assert dataObject != null;
+		if (!(dataObject instanceof String)) {
+			throw new InvalidValueException("UUID data is not of type String, but "
+					+ dataObject.getClass().getName() + ".");
+		}
+
+		String uuidString = (String) dataObject;
 		UUID uuid = ConversionUtils.parseUUID(uuidString);
 		if (uuid == null) {
-			throw new InvalidValueException("Failed to parse UUID: '" + uuidString + "'.");
+			throw new InvalidValueException("Failed to parse UUID from '" + uuidString + "'.");
 		} else {
 			return uuid;
 		}
 	}
 
 	@Override
-	protected void saveValue(ConfigurationSection configSection, UUID value) {
-		configSection.set(this.getKey(), (value == null) ? null : value.toString());
+	protected Object serializeValue(UUID value) {
+		return value.toString();
 	}
 }

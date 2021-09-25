@@ -4,9 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -68,37 +67,41 @@ public class SKBookOffer implements BookOffer {
 	// STATIC UTILITIES
 	// //////////
 
-	public static void saveToConfig(ConfigurationSection config, String node, Collection<? extends BookOffer> offers) {
-		ConfigurationSection offersSection = config.createSection(node);
+	public static void save(DataContainer dataContainer, String node, Collection<? extends BookOffer> offers) {
+		DataContainer offerListData = dataContainer.createContainer(node);
 		int id = 1;
 		for (BookOffer offer : offers) {
-			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
-			offerSection.set("book", offer.getBookTitle());
-			offerSection.set("price", offer.getPrice());
+			DataContainer offerData = offerListData.createContainer(String.valueOf(id));
+			offerData.set("book", offer.getBookTitle());
+			offerData.set("price", offer.getPrice());
 			id++;
 		}
 	}
 
-	// Elements inside the config section are assumed to be immutable and can be reused without having to be copied.
-	public static List<? extends BookOffer> loadFromConfig(ConfigurationSection config, String node, String errorPrefix) {
+	// Elements inside the data container are assumed to be immutable and can be reused without having to be copied.
+	public static List<? extends BookOffer> load(DataContainer dataContainer, String node, String errorPrefix) {
 		if (errorPrefix == null) errorPrefix = "";
 		List<BookOffer> offers = new ArrayList<>();
-		ConfigurationSection offersSection = config.getConfigurationSection(node);
-		if (offersSection != null) {
-			for (String key : offersSection.getKeys(false)) {
-				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
-				if (offerSection == null) continue; // Invalid offer: Not a section.
-				String bookTitle = offerSection.getString("book");
-				int price = offerSection.getInt("price");
+		DataContainer offerListData = dataContainer.getContainer(node);
+		if (offerListData != null) {
+			for (String id : offerListData.getKeys()) {
+				DataContainer offerData = offerListData.getContainer(id);
+				if (offerData == null) {
+					// Invalid offer: Not a container.
+					Log.warning(errorPrefix + "Invalid data for book offer " + id);
+					continue;
+				}
+				String bookTitle = offerData.getString("book");
+				int price = offerData.getInt("price");
 				if (StringUtils.isEmpty(bookTitle)) {
 					// Invalid offer.
-					Log.warning(errorPrefix + "Invalid book offer: Book title is empty.");
+					Log.warning(errorPrefix + "Invalid book offer " + id + ": Book title is empty.");
 					continue;
 				}
 				if (price <= 0) {
 					// Invalid offer.
-					Log.warning(errorPrefix + "Invalid book offer for '" + bookTitle
-							+ "': Price has to be positive, but is " + price + ".");
+					Log.warning(errorPrefix + "Invalid book offer " + id + ": Price has to be positive, but is "
+							+ price + ".");
 					continue;
 				}
 				offers.add(new SKBookOffer(bookTitle, price));
@@ -108,14 +111,14 @@ public class SKBookOffer implements BookOffer {
 	}
 
 	// TODO Legacy, remove again at some point (changed during MC 1.14.4).
-	public static List<? extends BookOffer> loadFromLegacyConfig(ConfigurationSection config, String node, String errorPrefix) {
+	public static List<? extends BookOffer> loadFromLegacyData(DataContainer dataContainer, String node, String errorPrefix) {
 		if (errorPrefix == null) errorPrefix = "";
 		List<BookOffer> offers = new ArrayList<>();
-		ConfigurationSection offersSection = config.getConfigurationSection(node);
-		if (offersSection != null) {
-			for (String bookTitle : offersSection.getKeys(false)) {
-				if (offersSection.isConfigurationSection(bookTitle)) {
-					// Found a config section instead of an integer. -> Probably already uses the new data format.
+		DataContainer offerListData = dataContainer.getContainer(node);
+		if (offerListData != null) {
+			for (String bookTitle : offerListData.getKeys()) {
+				if (offerListData.isContainer(bookTitle)) {
+					// Found a container instead of an integer. -> Probably already uses the new data format.
 					continue; // Skip
 				}
 				if (StringUtils.isEmpty(bookTitle)) {
@@ -123,7 +126,7 @@ public class SKBookOffer implements BookOffer {
 					Log.warning(errorPrefix + "Invalid book offer: Book title is empty.");
 					continue;
 				}
-				int price = offersSection.getInt(bookTitle);
+				int price = offerListData.getInt(bookTitle);
 				if (price <= 0) {
 					// Invalid offer.
 					Log.warning(errorPrefix + "Invalid book offer for '" + bookTitle

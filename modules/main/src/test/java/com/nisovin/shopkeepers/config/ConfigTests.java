@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.bukkit.configuration.Configuration;
-import org.bukkit.configuration.MemoryConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,29 +15,34 @@ import org.junit.Test;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 
 public class ConfigTests extends AbstractBukkitTest {
 
-	private Configuration loadConfigFromResource(String resourcePath) {
+	private DataContainer loadConfigFromResource(String resourcePath) {
 		InputStream configResource = this.getClass().getClassLoader().getResourceAsStream(resourcePath);
-		return YamlConfiguration.loadConfiguration(new InputStreamReader(configResource));
+		Configuration config = YamlConfiguration.loadConfiguration(new InputStreamReader(configResource));
+		// In order to be able to compare the contents of this loaded config with the data of an in-memory serialized
+		// config, we need to convert all config sections to Maps:
+		Map<String, Object> configData = config.getValues(false); // Modifiable shallow copy
+		ConfigUtils.convertSectionsToMaps(configData);
+		return DataContainer.of(configData); // Map-based data container
 	}
 
 	@Test
 	public void testDefaultConfigConsistency() {
 		// Expected default config:
-		MemoryConfiguration expectedDefaultConfig = new MemoryConfiguration();
+		DataContainer expectedDefaultConfig = DataContainer.create();
 		Settings.getInstance().save(expectedDefaultConfig);
-		Set<String> expectedKeysSet = expectedDefaultConfig.getKeys(false);
+		Set<String> expectedKeysSet = expectedDefaultConfig.getKeys();
 		List<String> expectedKeys = new ArrayList<>(expectedKeysSet);
-		Map<String, Object> expectedValues = expectedDefaultConfig.getValues(false);
+		Map<String, ?> expectedValues = expectedDefaultConfig.getValues();
 
 		// Actual default config:
-		Configuration defaultConfig = this.loadConfigFromResource("config.yml");
-		Set<String> actualKeysSet = defaultConfig.getKeys(false);
+		DataContainer defaultConfig = this.loadConfigFromResource("config.yml");
+		Set<String> actualKeysSet = defaultConfig.getKeys();
 		List<String> actualKeys = new ArrayList<>(actualKeysSet);
-		Map<String, Object> actualValues = defaultConfig.getValues(false);
-		ConfigUtils.convertSectionsToMaps(actualValues);
+		Map<String, ?> actualValues = defaultConfig.getValues();
 
 		// Check for missing keys:
 		for (String expectedKey : expectedKeys) {
@@ -65,11 +69,11 @@ public class ConfigTests extends AbstractBukkitTest {
 	@Test
 	public void testDefaultLanguageFilesConsistency() {
 		// Expected default language file:
-		MemoryConfiguration expectedDefaultLanguageFile = new MemoryConfiguration();
+		DataContainer expectedDefaultLanguageFile = DataContainer.create();
 		Messages.getInstance().save(expectedDefaultLanguageFile);
-		Set<String> expectedKeysSet = expectedDefaultLanguageFile.getKeys(false);
+		Set<String> expectedKeysSet = expectedDefaultLanguageFile.getKeys();
 		List<String> expectedKeys = new ArrayList<>(expectedKeysSet);
-		Map<String, Object> expectedValues = expectedDefaultLanguageFile.getValues(false);
+		Map<String, ?> expectedValues = expectedDefaultLanguageFile.getValues();
 
 		// Actual default language files:
 		String[] languageFilePaths = new String[] {
@@ -77,8 +81,8 @@ public class ConfigTests extends AbstractBukkitTest {
 			"lang/language-de.yml"
 		};
 		for (String languageFilePath : languageFilePaths) {
-			Configuration languageFile = this.loadConfigFromResource(languageFilePath);
-			Set<String> actualKeysSet = languageFile.getKeys(false);
+			DataContainer languageFile = this.loadConfigFromResource(languageFilePath);
+			Set<String> actualKeysSet = languageFile.getKeys();
 			List<String> actualKeys = new ArrayList<>(actualKeysSet);
 
 			// Check for missing keys:
@@ -99,8 +103,7 @@ public class ConfigTests extends AbstractBukkitTest {
 
 			if (languageFilePath.equals("lang/language-en-default.yml")) {
 				// Compare values:
-				Map<String, Object> actualValues = languageFile.getValues(false);
-				ConfigUtils.convertSectionsToMaps(actualValues);
+				Map<String, ?> actualValues = languageFile.getValues();
 
 				// Compare values:
 				for (String expectedKey : expectedKeys) {

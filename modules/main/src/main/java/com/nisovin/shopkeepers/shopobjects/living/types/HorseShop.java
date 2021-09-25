@@ -7,7 +7,6 @@ import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Horse;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -19,6 +18,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
@@ -71,7 +71,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	@Override
-	public void load(ConfigurationSection shopObjectData) {
+	public void load(ShopObjectData shopObjectData) {
 		super.load(shopObjectData);
 		colorProperty.load(shopObjectData);
 		styleProperty.load(shopObjectData);
@@ -79,7 +79,7 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	@Override
-	public void save(ConfigurationSection shopObjectData) {
+	public void save(ShopObjectData shopObjectData) {
 		super.save(shopObjectData);
 		colorProperty.save(shopObjectData);
 		styleProperty.save(shopObjectData);

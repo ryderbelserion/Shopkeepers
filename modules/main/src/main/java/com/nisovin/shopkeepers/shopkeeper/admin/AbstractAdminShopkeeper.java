@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.shopkeeper.admin;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -10,6 +9,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
@@ -78,25 +78,25 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	}
 
 	@Override
-	public void loadDynamicState(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	public void loadDynamicState(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		super.loadDynamicState(shopkeeperData);
 		this.loadTradePermission(shopkeeperData);
 	}
 
 	@Override
-	public void saveDynamicState(ConfigurationSection shopkeeperData) {
+	public void saveDynamicState(ShopkeeperData shopkeeperData) {
 		super.saveDynamicState(shopkeeperData);
 		this.saveTradePermission(shopkeeperData);
 	}
 
 	// TRADE PERMISSION
 
-	private void loadTradePermission(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	private void loadTradePermission(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		assert shopkeeperData != null;
 		this._setTradePermission(shopkeeperData.getString("tradePerm"));
 	}
 
-	private void saveTradePermission(ConfigurationSection shopkeeperData) {
+	private void saveTradePermission(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
 		shopkeeperData.set("tradePerm", tradePermission);
 	}

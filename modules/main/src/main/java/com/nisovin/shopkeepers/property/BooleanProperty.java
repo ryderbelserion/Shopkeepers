@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.property;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
 /**
@@ -16,19 +14,18 @@ public class BooleanProperty extends Property<Boolean> {
 	}
 
 	@Override
-	protected Boolean loadValue(ConfigurationSection configSection) throws InvalidValueException {
-		Object value = configSection.get(this.getKey());
-		if (value == null) return null;
-		Boolean booleanValue = ConversionUtils.toBoolean(value);
-		if (booleanValue == null) {
-			throw new InvalidValueException("Failed to parse Boolean: '" + value + "'.");
+	protected Boolean deserializeValue(Object dataObject) throws InvalidValueException {
+		assert dataObject != null;
+		Boolean value = ConversionUtils.toBoolean(dataObject);
+		if (value == null) {
+			throw new InvalidValueException("Failed to parse Boolean from '" + dataObject + "'.");
 		} else {
-			return booleanValue;
+			return value;
 		}
 	}
 
 	@Override
-	protected void saveValue(ConfigurationSection configSection, Boolean value) {
-		configSection.set(this.getKey(), value);
+	protected Object serializeValue(Boolean value) {
+		return value;
 	}
 }

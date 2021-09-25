@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.UUID;
 
 import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -20,6 +19,7 @@ import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.property.UUIDProperty;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
@@ -79,13 +79,13 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	}
 
 	@Override
-	public void load(ConfigurationSection shopObjectData) {
+	public void load(ShopObjectData shopObjectData) {
 		super.load(shopObjectData);
 		npcUniqueIdProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection shopObjectData) {
+	public void save(ShopObjectData shopObjectData) {
 		super.save(shopObjectData);
 		npcUniqueIdProperty.save(shopObjectData);
 	}

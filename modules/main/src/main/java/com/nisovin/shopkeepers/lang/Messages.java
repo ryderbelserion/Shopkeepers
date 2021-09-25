@@ -5,12 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.YamlConfiguration;
-
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.lib.Config;
+import com.nisovin.shopkeepers.config.lib.ConfigData;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
 import com.nisovin.shopkeepers.config.lib.annotation.WithDefaultValueType;
 import com.nisovin.shopkeepers.config.lib.annotation.WithValueTypeProvider;
@@ -18,6 +16,8 @@ import com.nisovin.shopkeepers.config.lib.value.ValueLoadException;
 import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringListValue;
 import com.nisovin.shopkeepers.config.lib.value.types.ColoredStringValue;
 import com.nisovin.shopkeepers.text.Text;
+import com.nisovin.shopkeepers.util.data.persistence.DataStore;
+import com.nisovin.shopkeepers.util.data.persistence.bukkit.BukkitConfigDataStore;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -456,11 +456,11 @@ public class Messages extends Config {
 			Log.info("Loading language file: " + languageFile.getName());
 			try {
 				// Load language config:
-				YamlConfiguration languageConfig = new YamlConfiguration();
+				DataStore languageConfig = BukkitConfigDataStore.ofNewYamlConfig();
 				languageConfig.load(languageFile);
 
 				// Load messages:
-				INSTANCE.load(languageConfig);
+				INSTANCE.load(ConfigData.of(languageConfig));
 
 				// Also update the derived settings:
 				Settings.onSettingsChanged();
@@ -517,10 +517,10 @@ public class Messages extends Config {
 	}
 
 	@Override
-	public void load(ConfigurationSection config) throws ConfigLoadException {
-		Validate.notNull(config, "config is null");
+	public void load(ConfigData configData) throws ConfigLoadException {
+		Validate.notNull(configData, "configData is null");
 		// Check for unexpected (possibly no longer existing) message keys:
-		Set<String> configKeys = config.getKeys(true);
+		Set<String> configKeys = configData.getKeys();
 		for (String configKey : configKeys) {
 			if (this.getSetting(configKey) == null) {
 				Log.warning(this.getLogPrefix() + "Unknown message: " + configKey);
@@ -528,6 +528,6 @@ public class Messages extends Config {
 		}
 
 		// Load the config:
-		super.load(config);
+		super.load(configData);
 	}
 }

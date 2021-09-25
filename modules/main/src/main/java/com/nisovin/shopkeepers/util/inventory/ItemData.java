@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.util.inventory;
 
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -15,6 +14,8 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -60,32 +61,24 @@ public class ItemData {
 		if (dataObject == null) return null;
 
 		String typeName = null;
-		Map<String, Object> dataMap = null;
+		DataContainer data = null;
 		if (dataObject instanceof String) {
-			// Load from compact representation (no additional item data):
+			// Load from compact representation (no additional item meta data):
 			typeName = (String) dataObject;
-			assert typeName != null;
 		} else {
-			// This creates a (shallow) copy of the Map, since we will later insert missing data and don't want to
-			// modify the original data inside the config:
-			dataMap = ConfigUtils.loadStringMap(dataObject);
-			if (dataMap == null) {
-				throw new ItemDataDeserializeException("Unknown item data representation: " + dataObject);
+			data = DataContainer.of(dataObject);
+			if (data == null) {
+				throw new ItemDataDeserializeException("Invalid item data: " + dataObject);
 			}
 
-			Object typeData = dataMap.get("type");
-			if (typeData != null) {
-				typeName = typeData.toString();
-			}
-			if (typeName == null) {
-				// Missing item type information:
+			typeName = data.getString("type");
+			if (StringUtils.isEmpty(typeName)) {
 				throw new ItemDataDeserializeException("Missing item type");
 			}
-			assert typeName != null;
 
 			// Skip the meta data loading if no further data (besides the item type) is given:
-			if (dataMap.size() <= 1) {
-				dataMap = null;
+			if (data.size() <= 1) {
+				data = null;
 			}
 		}
 		assert typeName != null;
@@ -105,14 +98,17 @@ public class ItemData {
 		ItemStack dataItem = new ItemStack(type);
 
 		// Load additional meta data:
-		if (dataMap != null) {
-			// Prepare for meta data deserialization (assumes dataMap is modifiable):
-			// Note: Additional information does not need to be removed, but simply gets ignored (eg. item type).
+		if (data != null) {
+			// Prepare the data for the meta data deserialization:
+			// We (shallow) copy the data to a new Map, because we will have to insert additional data for the ItemMeta
+			// to be deserializable, and don't want to modify the given original data.
+			// Note: Additional information (eg. the item type) does not need to be removed, but is simply ignored.
+			Map<String, Object> itemMetaData = data.getValuesCopy();
 
 			// Recursively replace all config sections with Maps, because the ItemMeta deserialization expects Maps:
-			ConfigUtils.convertSectionsToMaps(dataMap);
+			ConfigUtils.convertSectionsToMaps(itemMetaData);
 
-			// Determine meta type by creating the serialization of a dummy item meta:
+			// Determine the meta type by creating the serialization of a dummy item meta:
 			ItemMeta dummyItemMeta = dataItem.getItemMeta(); // Can be null
 			if (dummyItemMeta == null) {
 				throw new ItemDataDeserializeException("Items of type " + type.name() + " do not support meta data!");
@@ -120,25 +116,25 @@ public class ItemData {
 			dummyItemMeta.setDisplayName("dummy name"); // Ensure item meta is not empty
 			Object metaType = dummyItemMeta.serialize().get(META_TYPE_KEY);
 			if (metaType == null) {
-				throw new IllegalStateException("Could not determine meta type with key '" + META_TYPE_KEY + "'!");
+				throw new IllegalStateException("Could not determine the meta type of " + dummyItemMeta.getClass().getName() + "!");
 			}
 			// Insert meta type:
-			dataMap.put(META_TYPE_KEY, metaType);
+			itemMetaData.put(META_TYPE_KEY, metaType);
 
 			// Convert color codes for display name and lore:
-			Object displayNameData = dataMap.get(DISPLAY_NAME_KEY);
+			Object displayNameData = itemMetaData.get(DISPLAY_NAME_KEY);
 			if (displayNameData instanceof String) { // Also checks for null
-				dataMap.put(DISPLAY_NAME_KEY, TextUtils.colorize((String) displayNameData));
+				itemMetaData.put(DISPLAY_NAME_KEY, TextUtils.colorize((String) displayNameData));
 			}
-			Object loreData = dataMap.get(LORE_KEY);
-			if (loreData instanceof List) { // Also checks for null
-				dataMap.put(LORE_KEY, TextUtils.colorizeUnknown((List<?>) loreData));
+			List<?> loreData = data.getList(LORE_KEY); // Null if the data is not a list
+			if (loreData != null) {
+				itemMetaData.put(LORE_KEY, TextUtils.colorizeUnknown(loreData));
 			}
 
-			// Deserialize ItemMeta:
-			ItemMeta itemMeta = ItemSerialization.deserializeItemMeta(dataMap); // Can be null
+			// Deserialize the ItemMeta:
+			ItemMeta itemMeta = ItemSerialization.deserializeItemMeta(itemMetaData); // Can be null
 
-			// Apply ItemMeta:
+			// Apply the ItemMeta:
 			dataItem.setItemMeta(itemMeta);
 		}
 
@@ -309,8 +305,8 @@ public class ItemData {
 			return dataItem.getType().name();
 		}
 
-		Map<String, Object> dataMap = new LinkedHashMap<>();
-		dataMap.put("type", dataItem.getType().name());
+		DataContainer data = DataContainer.create();
+		data.set("type", dataItem.getType().name());
 
 		for (Entry<String, Object> entry : serializedData.entrySet()) {
 			String key = entry.getKey();
@@ -342,9 +338,9 @@ public class ItemData {
 				}
 			}
 
-			// Move into data map: Avoiding a deep copy, since it is assumed to not be needed.
-			dataMap.put(key, value);
+			// Move into data container: Avoiding a deep copy, since it is assumed to not be needed.
+			data.set(key, value);
 		}
-		return dataMap;
+		return data.serialize();
 	}
 }

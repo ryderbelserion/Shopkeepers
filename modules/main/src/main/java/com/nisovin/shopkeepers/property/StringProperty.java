@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.property;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
 /**
@@ -16,21 +14,21 @@ public class StringProperty extends Property<String> {
 	}
 
 	@Override
-	protected String loadValue(ConfigurationSection configSection) throws InvalidValueException {
-		Object value = configSection.get(this.getKey());
-		if (value == null) return null;
-		String stringValue = ConversionUtils.toString(value);
-		if (stringValue == null) {
+	protected String deserializeValue(Object dataObject) throws InvalidValueException {
+		assert dataObject != null;
+		String value = ConversionUtils.toString(dataObject);
+		if (value == null) {
 			// Unlikely. Only the case if the object's toString method returned null. Printing the object as String in
 			// the error message won't be useful then either.
-			throw new InvalidValueException("Failed to load String from object of type " + value.getClass().getName() + ".");
+			throw new InvalidValueException("Failed to convert data of type "
+					+ dataObject.getClass().getName() + " to String.");
 		} else {
-			return stringValue;
+			return value;
 		}
 	}
 
 	@Override
-	protected void saveValue(ConfigurationSection configSection, String value) {
-		configSection.set(this.getKey(), value);
+	protected Object serializeValue(String value) {
+		return value;
 	}
 }

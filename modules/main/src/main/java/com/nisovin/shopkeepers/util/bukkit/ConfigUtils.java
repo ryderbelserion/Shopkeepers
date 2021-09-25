@@ -3,17 +3,12 @@ package com.nisovin.shopkeepers.util.bukkit;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.java.MapUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -22,89 +17,32 @@ public class ConfigUtils {
 	// Shared and reused YAML config:
 	private static final ThreadLocal<YamlConfiguration> YAML_CONFIG = ThreadLocal.withInitial(() -> new YamlConfiguration());
 
-	public static Material loadMaterial(ConfigurationSection config, String key) {
-		String materialName = config.getString(key); // Note: Takes defaults into account.
-		if (materialName == null) return null;
-		Material material = ItemUtils.parseMaterial(materialName); // Can be null
-		if (material != null && material.isLegacy()) {
-			return null;
-		}
-		return material;
-	}
-
-	// Additional processing whenever we save an item stack to a config.
-	// itemStack can be null.
-	public static void saveItemStack(ConfigurationSection config, String key, UnmodifiableItemStack itemStack) {
-		// Shallow copy: Prevents SnakeYaml from representing the item stack using anchors and aliases if the same item
-		// stack instance is saved to the same Yaml document multiple times in different contexts.
-		config.set(key, ItemUtils.shallowCopy(itemStack));
-	}
-
-	// Additional processing whenever we load deserialized item stacks from a config.
-	public static ItemStack loadItemStack(ConfigurationSection config, String key) {
-		// Note: Spigot creates Bukkit ItemStacks, whereas Paper automatically replaces the deserialized Bukkit
-		// ItemStacks with CraftItemStacks. However, as long as the deserialized item stack is not compared directly to
-		// an unmodifiable item stack (at least not without first being wrapped into an unmodifiable item stack itself),
-		// and assuming that there are no inconsistencies in how CraftItemStacks and Bukkit ItemStacks are compared with
-		// each other, this difference should not be relevant to us.
-		ItemStack itemStack = config.getItemStack(key);
-
-		// TODO SPIGOT-6716, PAPER-6437: The order of stored enchantments of enchanted books is not consistent. On
-		// Paper, where the deserialized ItemStacks end up being CraftItemStacks, this difference in enchantment order
-		// can cause issues when these deserialized item stacks are compared to other CraftItemStacks. Converting these
-		// deserialized CraftItemStacks back to Bukkit ItemStacks ensures that the comparisons with other
-		// CraftItemStacks ignore the enchantment order.
-		if (itemStack != null && itemStack.getType() == Material.ENCHANTED_BOOK) {
-			itemStack = ItemUtils.ensureBukkitItemStack(itemStack);
-		}
-		return itemStack;
-	}
-
-	public static UnmodifiableItemStack loadUnmodifiableItemStack(ConfigurationSection config, String key) {
-		return UnmodifiableItemStack.of(loadItemStack(config, key));
-	}
-
-	// This creates a (shallow) copy of the Map.
-	public static Map<String, Object> loadStringMap(Object dataObject) {
-		if (dataObject instanceof Map) {
-			return MapUtils.toStringMap((Map<?, ?>) dataObject);
-		} else if (dataObject instanceof ConfigurationSection) {
-			return ((ConfigurationSection) dataObject).getValues(false);
-		} else {
-			return null;
-		}
-	}
-
-	// This returns the original Map if the given object is already a Map.
-	public static Map<?, ?> loadMap(Object dataObject) {
-		if (dataObject instanceof Map) {
-			return (Map<?, ?>) dataObject;
-		} else if (dataObject instanceof ConfigurationSection) {
-			return ((ConfigurationSection) dataObject).getValues(false);
-		} else {
-			return null;
-		}
-	}
-
-	// The given top level section itself is not converted.
-	public static void convertSectionsToMaps(ConfigurationSection section) {
-		section.getValues(false).entrySet().forEach(entry -> {
+	// The given root config section itself is not converted.
+	public static void convertSubSectionsToMaps(ConfigurationSection rootSection) {
+		rootSection.getValues(false).entrySet().forEach(entry -> {
 			Object value = entry.getValue();
 			if (value instanceof ConfigurationSection) {
-				// Recursively replace sections with maps:
+				// Recursively replace config sections with maps:
 				Map<String, Object> innerSectionMap = ((ConfigurationSection) value).getValues(false);
 				convertSectionsToMaps(innerSectionMap);
-				section.set(entry.getKey(), innerSectionMap);
+				rootSection.set(entry.getKey(), innerSectionMap);
 			}
 		});
 	}
 
+	// Also converts the given root config section.
+	public static Map<String, Object> convertSectionsToMaps(ConfigurationSection rootSection) {
+		Map<String, Object> sectionMap = rootSection.getValues(false);
+		convertSectionsToMaps(sectionMap);
+		return sectionMap;
+	}
+
 	// This requires the given Map to be modifiable.
-	public static void convertSectionsToMaps(Map<String, Object> sectionMap) {
-		sectionMap.entrySet().forEach(entry -> {
+	public static void convertSectionsToMaps(Map<String, Object> rootMap) {
+		rootMap.entrySet().forEach(entry -> {
 			Object value = entry.getValue();
 			if (value instanceof ConfigurationSection) {
-				// Recursively replace sections with maps:
+				// Recursively replace config sections with maps:
 				Map<String, Object> innerSectionMap = ((ConfigurationSection) value).getValues(false);
 				convertSectionsToMaps(innerSectionMap);
 				entry.setValue(innerSectionMap);

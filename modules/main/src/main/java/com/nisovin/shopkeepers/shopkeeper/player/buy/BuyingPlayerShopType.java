@@ -3,13 +3,12 @@ package com.nisovin.shopkeepers.shopkeeper.player.buy;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 
 public class BuyingPlayerShopType extends AbstractPlayerShopType<SKBuyingPlayerShopkeeper> {
@@ -46,7 +45,7 @@ public class BuyingPlayerShopType extends AbstractPlayerShopType<SKBuyingPlayerS
 	}
 
 	@Override
-	public SKBuyingPlayerShopkeeper loadShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	public SKBuyingPlayerShopkeeper loadShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		this.validateShopkeeperData(shopkeeperData);
 		SKBuyingPlayerShopkeeper shopkeeper = new SKBuyingPlayerShopkeeper(id, shopkeeperData);
 		return shopkeeper;

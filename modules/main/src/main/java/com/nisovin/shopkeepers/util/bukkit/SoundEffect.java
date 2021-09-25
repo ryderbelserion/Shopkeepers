@@ -1,14 +1,12 @@
 package com.nisovin.shopkeepers.util.bukkit;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.SoundCategory;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -40,6 +38,11 @@ public final class SoundEffect {
 	 * A {@link SoundEffect} that does not play any sound.
 	 */
 	public static final SoundEffect EMPTY = new SoundEffect("");
+
+	private static final String DATA_KEY_SOUND = "sound";
+	private static final String DATA_KEY_CATEGORY = "category";
+	private static final String DATA_KEY_VOLUME = "volume";
+	private static final String DATA_KEY_PITCH = "pitch";
 
 	private static final SoundCategory DEFAULT_CATEGORY = SoundCategory.MASTER;
 	private static final float DEFAULT_PITCH = 1.0f;
@@ -350,32 +353,32 @@ public final class SoundEffect {
 			return serializedSound;
 		}
 
-		Map<String, Object> data = new LinkedHashMap<>();
-		data.put("sound", serializedSound);
+		DataContainer data = DataContainer.create();
+		data.set(DATA_KEY_SOUND, serializedSound);
 		if (category != null) {
-			data.put("category", category.name());
+			data.set(DATA_KEY_CATEGORY, category.name());
 		}
 
 		// Note: We store these float values as doubles, because SnakeYaml produces doubles when reading the values from
 		// a config. Storing them as floats here would break tests cases that compare this serialized data with the
 		// deserialized data returned by SnakeYaml.
 		if (pitch != null) {
-			data.put("pitch", (double) pitch);
+			data.set(DATA_KEY_PITCH, (double) pitch);
 		}
 		if (volume != null) {
-			data.put("volume", (double) volume);
+			data.set(DATA_KEY_VOLUME, (double) volume);
 		}
-		return data;
+		return data.serialize();
 	}
 
 	/**
-	 * Deserializes a {@link SoundEffect} from the given data.
+	 * Reconstructs a {@link SoundEffect} from the given data.
 	 * 
 	 * @param dataObject
 	 *            the data, can be <code>null</code>
 	 * @return the sound effect, only <code>null</code> if the input data is <code>null</code>
 	 * @throws SoundEffectDeserializeException
-	 *             if the deserialization fails
+	 *             if the sound effect cannot be reconstructed
 	 */
 	public static SoundEffect deserialize(Object dataObject) throws SoundEffectDeserializeException {
 		if (dataObject == null) return null;
@@ -393,35 +396,32 @@ public final class SoundEffect {
 			return new SoundEffect(sound, soundName, null, null, null);
 		}
 
-		Map<?, ?> dataMap = ConfigUtils.loadMap(dataObject);
-		if (dataMap == null) {
-			throw new SoundEffectDeserializeException("Unexpected data: " + dataObject);
+		DataContainer data = DataContainer.of(dataObject);
+		if (data == null) {
+			throw new SoundEffectDeserializeException("Invalid sound effect data: " + dataObject);
 		}
 
 		// Sound name:
-		String soundName = null;
-		Sound sound = null;
-		Object soundData = dataMap.get("sound");
-		if (soundData != null) {
-			if (soundData instanceof String) {
-				soundName = (String) soundData; // Can be empty
-
-				// Check if the sound name matches a known Sound:
-				sound = ConversionUtils.toEnum(Sound.class, soundName); // Can be null
-				if (sound != null) {
-					// We use the Sound instead of the sound name.
-					soundName = null;
-				}
-			} else {
-				throw new SoundEffectDeserializeException("Invalid sound: " + soundData);
-			}
-		} else {
+		Object soundData = data.get(DATA_KEY_SOUND);
+		if (soundData == null) {
 			throw new SoundEffectDeserializeException("Missing sound");
+		}
+		if (!(soundData instanceof String)) {
+			throw new SoundEffectDeserializeException("Invalid sound: " + soundData);
+		}
+
+		String soundName = (String) soundData; // Can be empty
+
+		// Check if the sound name matches a known Sound:
+		Sound sound = ConversionUtils.toEnum(Sound.class, soundName); // Can be null
+		if (sound != null) {
+			// We use the Sound instead of the sound name.
+			soundName = null;
 		}
 
 		// Sound category:
 		SoundCategory category = null;
-		Object categoryData = dataMap.get("category");
+		Object categoryData = data.get(DATA_KEY_CATEGORY);
 		if (categoryData != null) {
 			category = ConversionUtils.toEnum(SoundCategory.class, categoryData);
 			if (category == null) {
@@ -431,7 +431,7 @@ public final class SoundEffect {
 
 		// Pitch:
 		Float pitch = null;
-		Object pitchData = dataMap.get("pitch");
+		Object pitchData = data.get(DATA_KEY_PITCH);
 		if (pitchData != null) {
 			pitch = ConversionUtils.toFloat(pitchData);
 			if (pitch == null) {
@@ -441,7 +441,7 @@ public final class SoundEffect {
 
 		// Volume:
 		Float volume = null;
-		Object volumeData = dataMap.get("volume");
+		Object volumeData = data.get(DATA_KEY_VOLUME);
 		if (volumeData != null) {
 			volume = ConversionUtils.toFloat(volumeData);
 			if (volume == null) {

@@ -14,7 +14,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -30,6 +29,7 @@ import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
 import com.nisovin.shopkeepers.ui.editor.Button;
@@ -37,6 +37,7 @@ import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
@@ -59,19 +60,19 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			.validator((property, value) -> {
 				Validate.isTrue(value.isSupported(), () -> "Unsupported sign type: '" + value.name() + "'.");
 			})
-			.migrator((property, configSection) -> {
+			.migrator((property, shopObjectData) -> {
 				// Migration from TreeSpecies to SignType:
 				// TODO Remove this again at some point. Added in v2.10.0.
-				String signTypeName = configSection.getString(property.getKey());
+				String signTypeName = shopObjectData.getString(property.getKey());
 				if ("GENERIC".equals(signTypeName)) {
 					Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
 							+ "' to '" + SignType.OAK + "'.");
-					configSection.set(property.getKey(), SignType.OAK.name());
+					shopObjectData.set(property.getKey(), SignType.OAK.name());
 					shopkeeper.markDirty();
 				} else if ("REDWOOD".equals(signTypeName)) {
 					Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
 							+ "' to '" + SignType.SPRUCE + "'.");
-					configSection.set(property.getKey(), SignType.SPRUCE.name());
+					shopObjectData.set(property.getKey(), SignType.SPRUCE.name());
 					shopkeeper.markDirty();
 				}
 			})
@@ -112,7 +113,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	@Override
-	public void load(ConfigurationSection shopObjectData) {
+	public void load(ShopObjectData shopObjectData) {
 		super.load(shopObjectData);
 		signTypeProperty.load(shopObjectData);
 		wallSignProperty.load(shopObjectData);
@@ -121,7 +122,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		this.migrateSignFacingToYaw(shopObjectData);
 	}
 
-	private void migrateSignFacingToYaw(ConfigurationSection shopObjectData) {
+	private void migrateSignFacingToYaw(DataContainer shopObjectData) {
 		assert shopObjectData != null;
 		// Migration from sign facing to shopkeeper yaw (pre v2.13.4):
 		// TODO Remove this migration again at some point.
@@ -148,7 +149,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	@Override
-	public void save(ConfigurationSection shopObjectData) {
+	public void save(ShopObjectData shopObjectData) {
 		super.save(shopObjectData);
 		signTypeProperty.save(shopObjectData);
 		wallSignProperty.save(shopObjectData);

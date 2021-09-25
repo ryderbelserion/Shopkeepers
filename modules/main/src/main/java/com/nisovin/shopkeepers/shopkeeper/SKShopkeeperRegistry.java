@@ -20,7 +20,6 @@ import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -506,7 +505,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	/**
-	 * Recreates a shopkeeper by loading its previously saved data from the given config section.
+	 * Recreates a shopkeeper by loading its previously saved data from the given {@link ShopkeeperData}.
 	 * 
 	 * @param id
 	 *            the shopkeeper id
@@ -520,7 +519,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// other source, the storage would need to be made aware of the shopkeeper (eg. by marking the shopkeeper as dirty).
 	// Otherwise, certain operations (such as checking if a certain shopkeeper id is already in use) would no longer
 	// work as expected.
-	public AbstractShopkeeper loadShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	public AbstractShopkeeper loadShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 		Validate.isTrue(id >= 1, "id has to be positive: " + id);
 		Validate.isTrue(this.getShopkeeperById(id) == null, "There already exists a shopkeeper with this id: " + id);

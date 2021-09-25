@@ -25,6 +25,7 @@ Date format: (YYYY-MM-DD)
   * We no longer check for and remove entity uuids from the data of living entity shopkeepers.
   * The object data of shopkeepers is expected to be located in its own dedicated 'object' section.
   * The stored object type identifiers of shopkeepers are expected to perfectly match the registered shop object types. They are no longer normalized and fuzzy matched.
+* We no longer generate a new unique id if the shopkeeper data is missing the shopkeeper's unique id. Instead, the loading of the shopkeeper fails now in this case.
 * All item stacks are now (shallow) copied before they are saved to the shopkeeper data. This prevents SnakeYaml from representing the item stacks using anchors and aliases (a Yaml feature) inside the shopkeepers save file if the same item stack instances would otherwise be saved multiple times in different contexts.
 * For consistency among commands, and to avoid certain ambiguous command parsing cases, the "edit", "remote", and "remove" commands no longer merge trailing arguments to derive the target shopkeeper name. It is still possible to target shopkeepers with names that consist of multiple words by using a dash as word separator instead of a space.
 * Shopkeeper and entity command arguments now propose the ids of targeted shopkeepers and entities.
@@ -69,11 +70,17 @@ Date format: (YYYY-MM-DD)
 * Internal API: It is now the responsibility of the shop object to inform about object id changes, even when the shop object is being spawned, despawned, or ticked.
 * Internal API: Added AbstractShopObject#respawn().
 * Internal API: Added the possibility to save and load a shopkeeper's dynamic state.
+* Internal API: Instead of using Bukkit's ConfigurationSection interface, we now use our own DataContainer interface to represent data in memory.
+  * Most uses of ConfigurationSection have been replaced with DataContainer, such as for representing config, language file, shopkeeper, and shop object data.
+  * A ConfigData interface extends DataContainer to provide access to default config values.
+  * ShopkeeperData and ShopObjectData wrappers extend DataContainer with common convenience methods that were previously located inside AbstractShopkeeper to interact with the shopkeeper and shop object data.
+* Internal API: Various refactors related to shop object properties.
+* Internal API: The loading and saving methods of shopkeeper offers have been renamed.
+* We now log a warning when we encounter a shopkeeper offer with invalid data. Previously, these offers were silently skipped.
 * Shopkeepers are now deactivated before they are despawned. This avoids having to process the object id change of the shop object being despawned when the shopkeeper is going to be deactivated anyways.
 * Fixed: The ShopkeeperByName command argument did not take the 'joinRemainingArgs' argument into account.
 * Fixed: The parsing of command arguments failed in cases in which command arguments depend on the context provided by fallbacks of earlier arguments.
 * Refactors related to the removal of shopkeepers of inactive players.
-* Refactors related to shop object properties.
 * Added validation for some constructor and method arguments in the API.
 * APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
 * Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.

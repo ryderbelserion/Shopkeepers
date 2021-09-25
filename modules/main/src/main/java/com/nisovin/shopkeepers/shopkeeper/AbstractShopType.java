@@ -6,7 +6,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -51,12 +50,11 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	}
 
 	/**
-	 * Recreates a shopkeeper of this type by loading its previously saved data from the given
-	 * {@link ConfigurationSection}.
+	 * Recreates a shopkeeper of this type by loading its previously saved data from the given {@link ShopkeeperData}.
 	 * <p>
-	 * In the course of data migrations, this operation may modify the given config section and its sub sections. If
-	 * this is the case, the loaded shopkeeper needs to be marked as {@link AbstractShopkeeper#markDirty() dirty} in
-	 * order for the storage to be made aware of these changes.
+	 * In the course of data migrations, this operation may modify the given {@link ShopkeeperData} and its sub data
+	 * containers. If this is the case, the loaded shopkeeper needs to be marked as
+	 * {@link AbstractShopkeeper#markDirty() dirty} in order for the storage to be made aware of these changes.
 	 * <p>
 	 * Any stored data elements (such as for example item stacks, etc.) and collections of data elements are assumed to
 	 * not be modified, neither by the loaded shopkeeper, nor in contexts outside of the loaded shopkeeper. If the
@@ -71,7 +69,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper could not be created (ex. due to invalid or missing data)
 	 */
-	public abstract T loadShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException;
+	public abstract T loadShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException;
 
 	/**
 	 * Creates a new shopkeeper of this type by using the data from the given {@link ShopCreationData}.
@@ -183,7 +181,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 				+ ", but: " + shopType.getClass().getName());
 	}
 
-	protected void validateShopkeeperData(ConfigurationSection shopkeeperData) {
+	protected void validateShopkeeperData(ShopkeeperData shopkeeperData) {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 	}
 }

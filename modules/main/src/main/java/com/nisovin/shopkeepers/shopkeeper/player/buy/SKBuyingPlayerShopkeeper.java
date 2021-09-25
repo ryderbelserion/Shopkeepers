@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,6 +18,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
@@ -49,7 +49,7 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 		this.initOnCreation(shopCreationData);
 	}
 
-	protected SKBuyingPlayerShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	protected SKBuyingPlayerShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		super(id);
 		this.initOnLoad(shopkeeperData);
 	}
@@ -66,13 +66,13 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	}
 
 	@Override
-	public void loadDynamicState(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	public void loadDynamicState(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		super.loadDynamicState(shopkeeperData);
 		this.loadOffers(shopkeeperData);
 	}
 
 	@Override
-	public void saveDynamicState(ConfigurationSection shopkeeperData) {
+	public void saveDynamicState(ShopkeeperData shopkeeperData) {
 		super.saveDynamicState(shopkeeperData);
 		this.saveOffers(shopkeeperData);
 	}
@@ -106,9 +106,9 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 
 	// OFFERS
 
-	private void loadOffers(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	private void loadOffers(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		assert shopkeeperData != null;
-		List<? extends PriceOffer> offers = SKPriceOffer.loadFromConfig(shopkeeperData, "offers", this.getLogPrefix());
+		List<? extends PriceOffer> offers = SKPriceOffer.load(shopkeeperData, "offers", this.getLogPrefix());
 		List<? extends PriceOffer> migratedOffers = SKPriceOffer.migrateItems(offers, this.getLogPrefix());
 		if (offers != migratedOffers) {
 			Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated items of trade offers.");
@@ -117,9 +117,9 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 		this._setOffers(migratedOffers);
 	}
 
-	private void saveOffers(ConfigurationSection shopkeeperData) {
+	private void saveOffers(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		SKPriceOffer.saveToConfig(shopkeeperData, "offers", this.getOffers());
+		SKPriceOffer.save(shopkeeperData, "offers", this.getOffers());
 	}
 
 	@Override

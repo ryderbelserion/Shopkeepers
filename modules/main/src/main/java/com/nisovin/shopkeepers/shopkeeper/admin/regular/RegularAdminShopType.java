@@ -2,12 +2,11 @@ package com.nisovin.shopkeepers.shopkeeper.admin.regular;
 
 import java.util.List;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopType;
 
 public class RegularAdminShopType extends AbstractAdminShopType<SKRegularAdminShopkeeper> {
@@ -44,7 +43,7 @@ public class RegularAdminShopType extends AbstractAdminShopType<SKRegularAdminSh
 	}
 
 	@Override
-	public SKRegularAdminShopkeeper loadShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	public SKRegularAdminShopkeeper loadShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		this.validateShopkeeperData(shopkeeperData);
 		SKRegularAdminShopkeeper shopkeeper = new SKRegularAdminShopkeeper(id, shopkeeperData);
 		return shopkeeper;

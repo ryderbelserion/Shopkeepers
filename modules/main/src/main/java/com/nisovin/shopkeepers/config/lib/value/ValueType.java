@@ -1,9 +1,8 @@
 package com.nisovin.shopkeepers.config.lib.value;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.nisovin.shopkeepers.config.lib.annotation.WithDefaultValueType;
 import com.nisovin.shopkeepers.config.lib.annotation.WithValueType;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 
 /**
  * Defines how values of this type are loaded from and saved to configs.
@@ -21,15 +20,15 @@ public abstract class ValueType<T> {
 
 	// LOAD
 
-	public T load(ConfigurationSection config, String key) throws ValueLoadException {
-		Object configValue = config.get(key);
+	public T load(DataContainer dataContainer, String key) throws ValueLoadException {
+		Object configValue = dataContainer.get(key);
 		return this.load(configValue);
 	}
 
-	public T load(ConfigurationSection config, String key, T defaultValue) {
+	public T load(DataContainer dataContainer, String key, T defaultValue) {
 		T value = null;
 		try {
-			value = this.load(config, key);
+			value = this.load(dataContainer, key);
 		} catch (ValueLoadException e) {
 		}
 		if (value == null) {
@@ -44,10 +43,10 @@ public abstract class ValueType<T> {
 
 	// SAVE
 
-	// A value of null will clear the config entry.
-	public void save(ConfigurationSection config, String key, T value) {
+	// A value of null will clear the data entry.
+	public void save(DataContainer dataContainer, String key, T value) {
 		Object configValue = this.save(value); // Can be null
-		config.set(key, configValue);
+		dataContainer.set(key, configValue);
 	}
 
 	public abstract Object save(T value);

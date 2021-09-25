@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopobjects.living.types;
 import java.util.List;
 
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Creeper;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -14,6 +13,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.property.BooleanProperty;
 import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObject;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
@@ -36,13 +36,13 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 	}
 
 	@Override
-	public void load(ConfigurationSection shopObjectData) {
+	public void load(ShopObjectData shopObjectData) {
 		super.load(shopObjectData);
 		poweredProperty.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ConfigurationSection shopObjectData) {
+	public void save(ShopObjectData shopObjectData) {
 		super.save(shopObjectData);
 		poweredProperty.save(shopObjectData);
 	}

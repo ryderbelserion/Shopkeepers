@@ -6,7 +6,6 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
-import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
@@ -58,11 +57,11 @@ public abstract class AbstractShopObject implements ShopObject {
 	}
 
 	/**
-	 * Loads the shop object's data from the given {@link ConfigurationSection}.
+	 * Loads the shop object's data from the given {@link ShopObjectData}.
 	 * <p>
-	 * In the course of data migrations, this operation may modify the given config section and its sub sections. If
-	 * this is the case, the shopkeeper needs to be marked as {@link AbstractShopkeeper#markDirty() dirty} in order for
-	 * the storage to be made aware of these changes.
+	 * In the course of data migrations, this operation may modify the given {@link ShopObjectData} and its sub data
+	 * containers. If this is the case, the shopkeeper needs to be marked as {@link AbstractShopkeeper#markDirty()
+	 * dirty} in order for the storage to be made aware of these changes.
 	 * <p>
 	 * Any stored data elements (such as for example item stacks, etc.) and collections of data elements are assumed to
 	 * not be modified, neither by the shop object, nor in contexts outside of the shop object. If the shop object can
@@ -71,21 +70,21 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * @param shopObjectData
 	 *            the shop object data, not <code>null</code>
 	 */
-	public void load(ConfigurationSection shopObjectData) {
+	public void load(ShopObjectData shopObjectData) {
 		Validate.notNull(shopObjectData, "shopObjectData is null");
 	}
 
 	/**
-	 * Saves the shop object's data to the given {@link ConfigurationSection}.
+	 * Saves the shop object's data to the given {@link ShopObjectData}.
 	 * <p>
-	 * It is assumed that the data stored in the given config section does not change afterwards and can be serialized
-	 * asynchronously. The shop object must therefore ensure that this data is not modified, for example by only
-	 * inserting immutable data, or always making copies of the inserted data.
+	 * It is assumed that the data stored in the given {@link ShopObjectData} does not change afterwards and can be
+	 * serialized asynchronously. The shop object must therefore ensure that this data is not modified, for example by
+	 * only inserting immutable data, or always making copies of the inserted data.
 	 * 
 	 * @param shopObjectData
 	 *            the shop object data, not <code>null</code>
 	 */
-	public void save(ConfigurationSection shopObjectData) {
+	public void save(ShopObjectData shopObjectData) {
 		Validate.notNull(shopObjectData, "shopObjectData is null");
 		shopObjectData.set("type", this.getType().getIdentifier());
 	}

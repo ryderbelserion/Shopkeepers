@@ -3,9 +3,8 @@ package com.nisovin.shopkeepers.config.migration;
 import java.util.Arrays;
 import java.util.List;
 
-import org.bukkit.configuration.Configuration;
-
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -26,18 +25,18 @@ public class ConfigMigrations {
 		return migrations.size();
 	}
 
-	// Returns true if any migrations got applied (if the config has potentially been modified)
-	public static boolean applyMigrations(Configuration config) throws ConfigLoadException {
+	// Returns true if any migrations were applied (if the config data might have changed)
+	public static boolean applyMigrations(DataContainer configData) throws ConfigLoadException {
 		// No migrations are required if the config is empty (missing entries will get generated from defaults):
-		if (config.getKeys(false).isEmpty()) return false;
+		if (configData.isEmpty()) return false;
 
 		// Parse config version:
 		int configVersion;
-		Object rawConfigVersion = config.get(CONFIG_VERSION_KEY, null); // Explicit default is important here
-		if (rawConfigVersion == null) {
+		if (!configData.contains(CONFIG_VERSION_KEY)) {
 			Log.info("Missing config version. Assuming version '" + FIRST_VERSION + "'.");
 			configVersion = FIRST_VERSION;
 		} else {
+			Object rawConfigVersion = configData.get(CONFIG_VERSION_KEY);
 			Integer configVersionI = ConversionUtils.toInteger(rawConfigVersion);
 			if (configVersionI == null) { // Parsing failed
 				throw new ConfigLoadException("Could not parse config version: " + rawConfigVersion);
@@ -48,7 +47,7 @@ public class ConfigMigrations {
 
 		// Check bounds:
 		if (configVersion < FIRST_VERSION) {
-			throw new ConfigLoadException("Invalid config version: " + rawConfigVersion);
+			throw new ConfigLoadException("Invalid config version: " + configVersion);
 		}
 		if (configVersion > getLatestVersion()) {
 			throw new ConfigLoadException("Invalid config version: " + configVersion + " (the latest version is " + getLatestVersion() + ")");
@@ -62,13 +61,13 @@ public class ConfigMigrations {
 			Log.info("Migrating config from version " + version + " to version " + nextVersion + " ..");
 			if (migration != null) {
 				try {
-					migration.apply(config);
+					migration.apply(configData);
 				} catch (Exception e) {
 					throw new ConfigLoadException("Config migration failed with an error!", e);
 				}
 			}
 			// Update config version:
-			config.set(CONFIG_VERSION_KEY, nextVersion);
+			configData.set(CONFIG_VERSION_KEY, nextVersion);
 			migrated = true;
 			Log.info("Config migrated to version " + nextVersion + "." + (migration == null ? " (no changes)" : ""));
 		}

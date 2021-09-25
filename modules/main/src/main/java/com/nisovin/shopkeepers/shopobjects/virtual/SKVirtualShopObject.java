@@ -3,12 +3,12 @@ package com.nisovin.shopkeepers.shopobjects.virtual;
 import java.util.List;
 
 import org.bukkit.Location;
-import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObject;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.ui.editor.Button;
 
 // TODO Not yet used.
@@ -27,12 +27,12 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 	}
 
 	@Override
-	public void load(ConfigurationSection configSection) {
+	public void load(ShopObjectData configSection) {
 		super.load(configSection);
 	}
 
 	@Override
-	public void save(ConfigurationSection configSection) {
+	public void save(ShopObjectData configSection) {
 		super.save(configSection);
 	}
 

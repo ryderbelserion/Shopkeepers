@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.config.migration;
 
-import org.bukkit.configuration.Configuration;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 
 public interface ConfigMigration {
 
@@ -10,8 +10,8 @@ public interface ConfigMigration {
 	 * If an issue prevents the migration of individual config entries, it is usually preferred to log a warning and
 	 * continue the migration, instead of aborting the migration or throwing an exception.
 	 * 
-	 * @param config
-	 *            the current config
+	 * @param configData
+	 *            the current config data
 	 */
-	public void apply(Configuration config);
+	public void apply(DataContainer configData);
 }

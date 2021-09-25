@@ -182,11 +182,7 @@ public class ConversionUtils {
 	// CONVERT OBJECTS:
 
 	public static String toString(Object object) {
-		if (object instanceof String) {
-			return (String) object;
-		} else {
-			return (object != null) ? object.toString() : null;
-		}
+		return (object != null) ? object.toString() : null;
 	}
 
 	public static Boolean toBoolean(Object object) {

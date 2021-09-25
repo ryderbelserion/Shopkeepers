@@ -4,8 +4,7 @@ import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
-import org.bukkit.configuration.ConfigurationSection;
-
+import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -168,7 +167,7 @@ public abstract class Property<T> {
 		this.validateNotBuilt();
 		Validate.State.isTrue(this.key == null, "A key has already been set!");
 		Validate.notEmpty(key, "key is null or empty");
-		// TODO Validate that the key is valid for use as config key?
+		// TODO Validate that the key is valid for use as data key?
 		this.key = key;
 		return (P) this;
 	}
@@ -408,7 +407,7 @@ public abstract class Property<T> {
 	}
 
 	/**
-	 * Converts the given value into a String that can for example be used in exception messages, or to represent the
+	 * Converts the given value to a String that can for example be used in exception messages, or to represent the
 	 * value to a user.
 	 * 
 	 * @param value
@@ -434,8 +433,8 @@ public abstract class Property<T> {
 	 * This method can only be called once (it is not possible to register multiple migrators), and only while the
 	 * property has not yet been {@link #build(PropertyContainer) built}.
 	 * <p>
-	 * The given migrator is invoked by {@link #load(ConfigurationSection)} and can be used to apply data migrations to
-	 * the involved config section before the property attempts to load the value.
+	 * The given migrator is invoked by {@link #load(DataContainer)} and can be used to apply data migrations to the
+	 * involved data container before the property attempts to load the value.
 	 * 
 	 * @param <P>
 	 *            the type of this property
@@ -453,30 +452,41 @@ public abstract class Property<T> {
 	}
 
 	/**
-	 * Loads the value of this property from the given {@link ConfigurationSection}.
+	 * Loads the value of this property from the given {@link DataContainer}.
 	 * <p>
 	 * This first invokes the registered {@link #migrator(PropertyMigrator) migrator} to apply any necessary data
-	 * migrations and then delegates the actual loading to {@link #loadValue(ConfigurationSection)}.
+	 * migrations and then uses {@link #deserializeValue(Object)} to reconstruct the property value from the data stored
+	 * at the property's {@link #getKey() key}.
 	 * <p>
 	 * If the value cannot be loaded for some reason, a warning is logged, the {@link #getDefaultValue() default value}
 	 * is used, and the {@link #getContainer() container} is marked as {@link AbstractPropertyContainer#markDirty()
 	 * dirty}.
 	 * 
-	 * @param configSection
-	 *            the configuration section, not <code>null</code>
+	 * @param dataContainer
+	 *            the data container, not <code>null</code>
 	 */
-	public final void load(ConfigurationSection configSection) {
-		Validate.notNull(configSection, "configSection is null");
+	public final void load(DataContainer dataContainer) {
+		Validate.notNull(dataContainer, "dataContainer is null");
 		if (migrator != null) {
-			migrator.migrate(this, configSection);
+			migrator.migrate(this, dataContainer);
 		}
 
-		T value = null;
 		try {
-			value = this.loadValue(configSection);
-			if (value == null && !this.isNullable()) {
-				throw this.missingValueError();
+			T value;
+			Object dataObject = dataContainer.get(key);
+			if (dataObject == null) {
+				if (!this.isNullable()) {
+					throw this.missingValueError();
+				} else {
+					value = null;
+				}
+			} else {
+				// This is expected to throw an exception if it cannot reconstruct the original value:
+				value = this.deserializeValue(dataObject);
+				Validate.notNull(value, () -> "Property of type " + this.getClass().getName()
+						+ " deserialized data <" + dataObject + "> to null!");
 			}
+
 			// This may throw an exception if the loaded value is invalid:
 			// TODO Allow callers to pass UpdateFlags to this method?
 			this.setValue(value, Collections.emptySet()); // Does not mark the container dirty
@@ -490,36 +500,41 @@ public abstract class Property<T> {
 	}
 
 	/**
-	 * Loads the value for this property from the given {@link ConfigurationSection}.
+	 * Reconstructs the value for this property from the given data object.
 	 * <p>
-	 * This method does not ensure that the loaded value is valid according to {@link #validateValue(Object)}.
+	 * This method does not ensure that the reconstructed value is valid according to {@link #validateValue(Object)}.
 	 * 
-	 * @param configSection
-	 *            the configuration section, not <code>null</code>
-	 * @return the loaded value, or <code>null</code> if the value is not present
+	 * @param dataObject
+	 *            the data object, not <code>null</code>
+	 * @return the reconstructed value, not <code>null</code>
 	 * @throws InvalidValueException
-	 *             if the value can not be loaded
+	 *             if the value can not be reconstructed
 	 */
-	protected abstract T loadValue(ConfigurationSection configSection) throws InvalidValueException;
+	protected abstract T deserializeValue(Object dataObject) throws InvalidValueException;
 
 	/**
-	 * Saves the value of this property into the given {@link ConfigurationSection}.
+	 * Saves the value of this property into the given {@link DataContainer}.
 	 * 
-	 * @param configSection
-	 *            the configuration section, not <code>null</code>
+	 * @param dataContainer
+	 *            the data container, not <code>null</code>
 	 */
-	public final void save(ConfigurationSection configSection) {
-		Validate.notNull(configSection, "configSection is null");
-		this.saveValue(configSection, this.getValue());
+	public final void save(DataContainer dataContainer) {
+		Validate.notNull(dataContainer, "dataContainer is null");
+		if (value == null) return; // Nothing to save
+		Object serialized = this.serializeValue(value);
+		Validate.notNull(serialized, () -> "Property '" + key + "' of type " + this.getClass().getName()
+				+ " serialized value <" + value + "> to null!");
+		dataContainer.set(key, serialized);
 	}
 
 	/**
-	 * Saves the given value for this property into the given {@link ConfigurationSection}.
+	 * Converts the given value to a representation that can be serialized as described by {@link DataContainer}.
+	 * <p>
+	 * The value can be reconstructed from the serialized representation via {@link #deserializeValue(Object)}.
 	 * 
-	 * @param configSection
-	 *            the configuration section, not <code>null</code>
 	 * @param value
-	 *            the value, can be <code>null</code>
+	 *            the value, not <code>null</code>
+	 * @return the serialized representation, not <code>null</code>
 	 */
-	protected abstract void saveValue(ConfigurationSection configSection, T value);
+	protected abstract Object serializeValue(T value);
 }

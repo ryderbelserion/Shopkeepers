@@ -13,9 +13,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
@@ -30,9 +27,11 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
-import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
 import com.nisovin.shopkeepers.util.bukkit.SingletonTask;
+import com.nisovin.shopkeepers.util.data.persistence.DataStore;
+import com.nisovin.shopkeepers.util.data.persistence.bukkit.BukkitConfigDataStore;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.FileUtils;
 import com.nisovin.shopkeepers.util.java.Retry;
@@ -97,11 +96,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	/* Data */
 	/*
-	 * Holds the data that gets used by the current/next (possibly async) save.
+	 * Holds the data that is used by the current/next (possibly async) save.
 	 * This also contains any data of shopkeepers that could not be loaded correctly.
 	 * This cannot be modified while an async save is in progress.
 	 */
-	private final FileConfiguration saveData = new YamlConfiguration();
+	private final BukkitConfigDataStore saveData = BukkitConfigDataStore.ofNewYamlConfig();
+
 	private int maxUsedShopkeeperId = 0;
 	private int nextShopkeeperId = 1;
 
@@ -279,7 +279,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private boolean isUnusedId(int id) {
 		// Check if there is data for a shopkeeper with this id (this includes shopkeepers that could not be loaded for
 		// some reason, or are currently not loaded):
-		if (saveData.isSet(String.valueOf(id))) return false;
+		if (saveData.contains(String.valueOf(id))) return false;
 
 		// Check the unsaved deleted shopkeepers: As long as their deletion has not yet been persisted, we block their
 		// ids from being reused. This also applies if these deleted shopkeepers are currently being saved.
@@ -338,10 +338,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// LOADING
 
 	/**
-	 * Clears and sets up the empty save data file configuration.
+	 * Clears and sets up the empty save data.
 	 */
 	private void clearSaveData() {
-		ConfigUtils.clearConfigSection(saveData);
+		saveData.clear();
 		maxUsedShopkeeperId = 0;
 		nextShopkeeperId = 1;
 
@@ -462,7 +462,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			return false; // Disable without save
 		}
 
-		Set<String> keys = saveData.getKeys(false);
+		Set<String> keys = saveData.getKeys();
 		// Contains at least the (missing) data-version entry:
 		assert keys.contains(DATA_VERSION_KEY);
 		int shopkeepersCount = (keys.size() - 1);
@@ -495,14 +495,14 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				maxUsedShopkeeperId = id;
 			}
 
-			ConfigurationSection shopkeeperSection = saveData.getConfigurationSection(key);
-			if (shopkeeperSection == null) {
-				this.failedToLoadShopkeeper(key, "Invalid config section!");
+			ShopkeeperData shopkeeperData = ShopkeeperData.of(saveData.getContainer(key));
+			if (shopkeeperData == null) {
+				this.failedToLoadShopkeeper(key, "Invalid shopkeeper data!");
 				continue; // Skip this shopkeeper
 			}
 
 			// Perform common migrations:
-			MigrationResult migrationResult = this.migrateShopkeeperData(id, shopkeeperSection, dataVersion);
+			MigrationResult migrationResult = this.migrateShopkeeperData(id, shopkeeperData, dataVersion);
 			if (migrationResult == MigrationResult.FAILED) {
 				// Migration failed, skip this shopkeeper
 				continue;
@@ -511,7 +511,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Load shopkeeper:
 			AbstractShopkeeper shopkeeper;
 			try {
-				shopkeeper = shopkeeperRegistry.loadShopkeeper(id, shopkeeperSection);
+				shopkeeper = shopkeeperRegistry.loadShopkeeper(id, shopkeeperData);
 				assert shopkeeper != null && shopkeeper.isValid();
 			} catch (ShopkeeperCreateException e) {
 				this.failedToLoadShopkeeper(key, e.getMessage());
@@ -546,14 +546,14 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	}
 
 	// Validates and performs migration of the save data.
-	private MigrationResult migrateShopkeeperData(int id, ConfigurationSection shopkeeperSection, String dataVersion) {
+	private MigrationResult migrateShopkeeperData(int id, ShopkeeperData shopkeeperData, String dataVersion) {
 		MigrationResult migrationResult = MigrationResult.NOTHING_MIGRATED;
 
 		// Convert legacy shop type identifiers:
-		String shopTypeString = shopkeeperSection.getString("type");
+		String shopTypeString = shopkeeperData.getString("type");
 		if (shopTypeString != null && shopTypeString.equalsIgnoreCase("player")) {
 			Log.info("Migrating type of shopkeeper '" + id + "' from 'player' to 'sell'.");
-			shopkeeperSection.set("type", "sell");
+			shopkeeperData.set("type", "sell");
 			migrationResult = MigrationResult.MIGRATED;
 		}
 
@@ -614,11 +614,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Check if there is data for the deleted shopkeeper. If there is no data for it, we can assume right away
 			// that the shopkeeper has been deleted from the storage, and that there is also no data for it on disk,
 			// even without waiting for the next save.
-			boolean shopkeeperDataExists = saveData.isSet(key);
+			boolean shopkeeperDataExists = saveData.contains(key);
 
 			if (shopkeeperDataExists) {
 				// Remove the shopkeeper's data:
-				saveData.set(key, null);
+				saveData.remove(key);
 
 				// The next save removes the data from the save file on disk:
 				unsavedDeletedShopkeepers.add(shopkeeperId);
@@ -811,7 +811,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Setup the file header:
 			// This replaces any previously existing and loaded header and thereby ensures that it is always up-to-date
 			// after we have saved the file.
-			saveData.options().header(HEADER);
+			saveData.getConfig().options().header(HEADER);
 
 			// Reset the pendingSaveRequest flag here (and not just after a successful save), so that we can track any
 			// save requests that occur in the meantime, which require another save later:
@@ -824,7 +824,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			savingDirtyShopkeepers = dirtyShopkeepers;
 			dirtyShopkeepers = newDirtyShopkeepers;
 
-			// Store the data of dirty shopkeepers into the memory configuration:
+			// Save the data of dirty shopkeepers:
 			assert failedToSave.isEmpty();
 			savingDirtyShopkeepers.forEach(this::saveShopkeeper);
 		}
@@ -832,15 +832,16 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		private void saveShopkeeper(AbstractShopkeeper shopkeeper) {
 			// Note: The shopkeeper might no longer be valid (loaded).
 			assert shopkeeper.isDirty();
-			String sectionKey = String.valueOf(shopkeeper.getId());
-			Object previousData = saveData.get(sectionKey);
-			ConfigurationSection newSection = saveData.createSection(sectionKey); // Replaces the previous section
+			String key = String.valueOf(shopkeeper.getId());
+			Object previousData = saveData.get(key);
+			// Replaces the previous shopkeeper data:
+			ShopkeeperData newData = ShopkeeperData.of(saveData.createContainer(key));
 			try {
-				shopkeeper.save(newSection);
+				shopkeeper.save(newData);
 			} catch (Exception e) {
 				// Error while saving shopkeeper data:
 				// Restore previous shopkeeper data and then skip this shopkeeper.
-				saveData.set(sectionKey, previousData);
+				saveData.set(key, previousData);
 				Log.warning(shopkeeper.getLogPrefix() + "Saving failed!", e);
 				// We remember the shopkeeper and keep it marked as dirty, so that the next save of all shopkeepers
 				// attempts to save it again.
@@ -861,15 +862,15 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		// Returns true if the saving was successful.
-		private boolean saveToFile(FileConfiguration config) {
+		private boolean saveToFile(DataStore saveData) {
 			try {
 				// Serialize data to String:
 				// TODO Do this on the main thread? Bukkit's serialization API is not strictly thread-safe..
-				// However, this should usually not be an issue if the serialized objects inside the config are not
+				// However, this should usually not be an issue if the serialized objects inside the save data are not
 				// accessed externally, and do not rely on external state during serialization.
 				String data;
 				try {
-					data = config.saveToString();
+					data = saveData.saveToString();
 				} catch (Exception e) {
 					throw new ShopkeeperStorageSaveException("Could not serialize shopkeeper data!", e);
 				}

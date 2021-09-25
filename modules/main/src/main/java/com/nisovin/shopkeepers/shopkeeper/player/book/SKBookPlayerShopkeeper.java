@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -26,6 +25,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
@@ -57,7 +57,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 		this.initOnCreation(shopCreationData);
 	}
 
-	protected SKBookPlayerShopkeeper(int id, ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	protected SKBookPlayerShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		super(id);
 		this.initOnLoad(shopkeeperData);
 	}
@@ -74,13 +74,13 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	public void loadDynamicState(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	public void loadDynamicState(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		super.loadDynamicState(shopkeeperData);
 		this.loadOffers(shopkeeperData);
 	}
 
 	@Override
-	public void saveDynamicState(ConfigurationSection shopkeeperData) {
+	public void saveDynamicState(ShopkeeperData shopkeeperData) {
 		super.saveDynamicState(shopkeeperData);
 		this.saveOffers(shopkeeperData);
 	}
@@ -198,22 +198,22 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	// OFFERS
 
-	private void loadOffers(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	private void loadOffers(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		assert shopkeeperData != null;
 		this._clearOffers();
 		// TODO Remove legacy: Load offers from old format (bookTitle -> price mapping) (since late MC 1.14.4).
-		List<? extends BookOffer> legacyOffers = SKBookOffer.loadFromLegacyConfig(shopkeeperData, "offers", this.getLogPrefix());
+		List<? extends BookOffer> legacyOffers = SKBookOffer.loadFromLegacyData(shopkeeperData, "offers", this.getLogPrefix());
 		if (!legacyOffers.isEmpty()) {
 			Log.info(this.getLogPrefix() + "Importing old book offers.");
 			this._addOffers(legacyOffers);
 			this.markDirty();
 		}
-		this._addOffers(SKBookOffer.loadFromConfig(shopkeeperData, "offers", this.getLogPrefix()));
+		this._addOffers(SKBookOffer.load(shopkeeperData, "offers", this.getLogPrefix()));
 	}
 
-	private void saveOffers(ConfigurationSection shopkeeperData) {
+	private void saveOffers(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		SKBookOffer.saveToConfig(shopkeeperData, "offers", this.getOffers());
+		SKBookOffer.save(shopkeeperData, "offers", this.getOffers());
 	}
 
 	@Override

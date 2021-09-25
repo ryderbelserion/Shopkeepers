@@ -7,7 +7,6 @@ import java.util.function.Supplier;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -32,8 +31,9 @@ import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.user.SKUser;
-import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
+import com.nisovin.shopkeepers.util.bukkit.DataUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
@@ -101,7 +101,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public void loadDynamicState(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	public void loadDynamicState(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		super.loadDynamicState(shopkeeperData);
 		this.loadOwner(shopkeeperData);
 		this.loadContainer(shopkeeperData);
@@ -110,7 +110,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public void saveDynamicState(ConfigurationSection shopkeeperData) {
+	public void saveDynamicState(ShopkeeperData shopkeeperData) {
 		super.saveDynamicState(shopkeeperData);
 		this.saveOwner(shopkeeperData);
 		this.saveContainer(shopkeeperData);
@@ -203,7 +203,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// OWNER
 
-	private void loadOwner(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	private void loadOwner(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		assert shopkeeperData != null;
 		UUID ownerUUID;
 		try {
@@ -221,7 +221,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		this._setOwner(ownerUUID, ownerName);
 	}
 
-	private void saveOwner(ConfigurationSection shopkeeperData) {
+	private void saveOwner(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
 		shopkeeperData.set("owner uuid", ownerUUID.toString());
 		shopkeeperData.set("owner", ownerName);
@@ -279,13 +279,13 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// TRADE NOTIFICATIONS
 
-	private void loadNotifyOnTrades(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	private void loadNotifyOnTrades(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		assert shopkeeperData != null;
 		boolean notifyOnTrades = shopkeeperData.getBoolean("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
 		this._setNotifyOnTrades(notifyOnTrades);
 	}
 
-	private void saveNotifyOnTrades(ConfigurationSection shopkeeperData) {
+	private void saveNotifyOnTrades(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
 		// We only store this property if its value does not match the default value:
 		if (notifyOnTrades != DEFAULT_NOTIFY_ON_TRADES) {
@@ -311,10 +311,10 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// HIRING
 
-	private void loadForHire(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	private void loadForHire(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		assert shopkeeperData != null;
 		// The item is assumed to be immutable and therefore does not need to be copied.
-		UnmodifiableItemStack hireCost = ConfigUtils.loadUnmodifiableItemStack(shopkeeperData, "hirecost");
+		UnmodifiableItemStack hireCost = DataUtils.loadUnmodifiableItemStack(shopkeeperData, "hirecost");
 		// Hire cost ItemStack is not null, but empty. -> Normalize to null:
 		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
 			Log.warning(this.getLogPrefix() + "Hire cost item is empty! Disabling 'for hire'.");
@@ -336,9 +336,9 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		this._setForHire(ItemUtils.asItemStackOrNull(hireCost));
 	}
 
-	private void saveForHire(ConfigurationSection shopkeeperData) {
+	private void saveForHire(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		ConfigUtils.saveItemStack(shopkeeperData, "hirecost", hireCost);
+		DataUtils.saveItemStack(shopkeeperData, "hirecost", hireCost);
 	}
 
 	@Override
@@ -377,16 +377,16 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// CONTAINER
 
-	private void loadContainer(ConfigurationSection shopkeeperData) throws ShopkeeperCreateException {
+	private void loadContainer(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		assert shopkeeperData != null;
 		// TODO Rename to storage keys to containerx/y/z?
-		if (!shopkeeperData.isInt("chestx") || !shopkeeperData.isInt("chesty") || !shopkeeperData.isInt("chestz")) {
+		if (!shopkeeperData.isNumber("chestx") || !shopkeeperData.isNumber("chesty") || !shopkeeperData.isNumber("chestz")) {
 			throw new ShopkeeperCreateException("Missing or invalid container coordinates!");
 		}
 		this._setContainer(shopkeeperData.getInt("chestx"), shopkeeperData.getInt("chesty"), shopkeeperData.getInt("chestz"));
 	}
 
-	private void saveContainer(ConfigurationSection shopkeeperData) {
+	private void saveContainer(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
 		shopkeeperData.set("chestx", containerX);
 		shopkeeperData.set("chesty", containerY);

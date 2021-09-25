@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
-import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
+import com.nisovin.shopkeepers.util.bukkit.DataUtils;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -98,39 +98,43 @@ public class SKPriceOffer implements PriceOffer {
 	// STATIC UTILITIES
 	// //////////
 
-	public static void saveToConfig(ConfigurationSection config, String node, @ReadOnly Collection<? extends PriceOffer> offers) {
-		ConfigurationSection offersSection = config.createSection(node);
+	public static void save(DataContainer dataContainer, String node, @ReadOnly Collection<? extends PriceOffer> offers) {
+		DataContainer offerListData = dataContainer.createContainer(node);
 		int id = 1;
 		for (PriceOffer offer : offers) {
 			UnmodifiableItemStack item = offer.getItem(); // Assumed immutable
-			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
-			ConfigUtils.saveItemStack(offerSection, "item", item);
-			offerSection.set("price", offer.getPrice());
+			DataContainer offerData = offerListData.createContainer(String.valueOf(id));
+			DataUtils.saveItemStack(offerData, "item", item);
+			offerData.set("price", offer.getPrice());
 			id++;
 		}
 	}
 
-	// Elements inside the config section are assumed to be immutable and can be reused without having to be copied.
-	public static List<? extends PriceOffer> loadFromConfig(ConfigurationSection config, String node, String errorPrefix) {
+	// Elements inside the data container are assumed to be immutable and can be reused without having to be copied.
+	public static List<? extends PriceOffer> load(DataContainer dataContainer, String node, String errorPrefix) {
 		if (errorPrefix == null) errorPrefix = "";
 		List<PriceOffer> offers = new ArrayList<>();
-		ConfigurationSection offersSection = config.getConfigurationSection(node);
-		if (offersSection != null) {
-			for (String id : offersSection.getKeys(false)) {
-				ConfigurationSection offerSection = offersSection.getConfigurationSection(id);
-				if (offerSection == null) continue; // Invalid offer: Not a section.
-
-				// The item stack is assumed to be immutable and therefore does not need to be copied.
-				UnmodifiableItemStack item = ConfigUtils.loadUnmodifiableItemStack(offerSection, "item");
-				if (ItemUtils.isEmpty(item)) {
-					// Invalid offer.
-					Log.warning(errorPrefix + "Invalid price offer for " + id + ": Item is empty.");
+		DataContainer offerListData = dataContainer.getContainer(node);
+		if (offerListData != null) {
+			for (String id : offerListData.getKeys()) {
+				DataContainer offerData = offerListData.getContainer(id);
+				if (offerData == null) {
+					// Invalid offer: Not a container.
+					Log.warning(errorPrefix + "Invalid data for price offer " + id);
 					continue;
 				}
-				int price = offerSection.getInt("price");
+
+				// The item stack is assumed to be immutable and therefore does not need to be copied.
+				UnmodifiableItemStack item = DataUtils.loadUnmodifiableItemStack(offerData, "item");
+				if (ItemUtils.isEmpty(item)) {
+					// Invalid offer.
+					Log.warning(errorPrefix + "Invalid price offer " + id + ": Item is empty.");
+					continue;
+				}
+				int price = offerData.getInt("price");
 				if (price <= 0) {
 					// Invalid offer.
-					Log.warning(errorPrefix + "Invalid price offer for " + id
+					Log.warning(errorPrefix + "Invalid price offer " + id
 							+ ": Price has to be positive, but is " + price + ".");
 					continue;
 				}
@@ -176,7 +180,7 @@ public class SKPriceOffer implements PriceOffer {
 				}
 
 				if (migrationFailed) {
-					Log.warning(errorPrefix + "Item migration failed for offer " + (i + 1) + ": " + offer);
+					Log.warning(errorPrefix + "Item migration failed for price offer " + (i + 1) + ": " + offer);
 					continue; // Skip this offer
 				}
 

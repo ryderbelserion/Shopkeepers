@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
@@ -12,7 +11,8 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
-import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
+import com.nisovin.shopkeepers.util.bukkit.DataUtils;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -98,8 +98,8 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		return new SKTradingRecipe(offer.getResultItem(), offer.getItem1(), offer.getItem2(), outOfStock);
 	}
 
-	public static void saveToConfig(ConfigurationSection config, String node, @ReadOnly Collection<? extends TradeOffer> offers) {
-		ConfigurationSection offersSection = config.createSection(node);
+	public static void save(DataContainer dataContainer, String node, @ReadOnly Collection<? extends TradeOffer> offers) {
+		DataContainer offerListData = dataContainer.createContainer(node);
 		int id = 1;
 		for (TradeOffer offer : offers) {
 			// These items are assumed to be immutable.
@@ -107,35 +107,35 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 			UnmodifiableItemStack item2 = offer.getItem2();
 			UnmodifiableItemStack resultItem = offer.getResultItem();
 
-			ConfigurationSection offerSection = offersSection.createSection(String.valueOf(id));
-			ConfigUtils.saveItemStack(offerSection, "item1", item1);
-			ConfigUtils.saveItemStack(offerSection, "item2", item2);
-			ConfigUtils.saveItemStack(offerSection, "resultItem", resultItem);
+			DataContainer offerData = offerListData.createContainer(String.valueOf(id));
+			DataUtils.saveItemStack(offerData, "item1", item1);
+			DataUtils.saveItemStack(offerData, "item2", item2);
+			DataUtils.saveItemStack(offerData, "resultItem", resultItem);
 			id++;
 		}
 	}
 
-	// Elements inside the config section are assumed to be immutable and can be reused without having to be copied.
-	public static List<? extends TradeOffer> loadFromConfig(ConfigurationSection config, String node, String errorPrefix) {
+	// Elements inside the data container are assumed to be immutable and can be reused without having to be copied.
+	public static List<? extends TradeOffer> load(DataContainer dataContainer, String node, String errorPrefix) {
 		if (errorPrefix == null) errorPrefix = "";
 		List<TradeOffer> offers = new ArrayList<>();
-		ConfigurationSection offersSection = config.getConfigurationSection(node);
-		if (offersSection != null) {
-			for (String key : offersSection.getKeys(false)) {
-				ConfigurationSection offerSection = offersSection.getConfigurationSection(key);
-				if (offerSection == null) {
-					// Invalid offer: Not a section.
-					Log.warning(errorPrefix + "Invalid trade offer section for " + key);
+		DataContainer offerListData = dataContainer.getContainer(node);
+		if (offerListData != null) {
+			for (String id : offerListData.getKeys()) {
+				DataContainer offerData = offerListData.getContainer(id);
+				if (offerData == null) {
+					// Invalid offer: Not a container.
+					Log.warning(errorPrefix + "Invalid data for trade offer " + id);
 					continue;
 				}
 
 				// The item stacks are assumed to be immutable and therefore do not need to be copied.
-				UnmodifiableItemStack resultItem = ConfigUtils.loadUnmodifiableItemStack(offerSection, "resultItem");
-				UnmodifiableItemStack item1 = ConfigUtils.loadUnmodifiableItemStack(offerSection, "item1");
-				UnmodifiableItemStack item2 = ConfigUtils.loadUnmodifiableItemStack(offerSection, "item2");
+				UnmodifiableItemStack resultItem = DataUtils.loadUnmodifiableItemStack(offerData, "resultItem");
+				UnmodifiableItemStack item1 = DataUtils.loadUnmodifiableItemStack(offerData, "item1");
+				UnmodifiableItemStack item2 = DataUtils.loadUnmodifiableItemStack(offerData, "item2");
 				if (ItemUtils.isEmpty(resultItem) || ItemUtils.isEmpty(item1)) {
 					// Invalid offer.
-					Log.warning(errorPrefix + "Invalid trade offer for " + key + ": item1 or resultItem is empty.");
+					Log.warning(errorPrefix + "Invalid trade offer " + id + ": item1 or resultItem is empty.");
 					continue;
 				}
 				offers.add(new SKTradeOffer(resultItem, item1, item2));
@@ -200,7 +200,7 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 				}
 
 				if (migrationFailed) {
-					Log.warning(errorPrefix + "Item migration failed for offer " + (i + 1) + ": " + offer);
+					Log.warning(errorPrefix + "Item migration failed for trade offer " + (i + 1) + ": " + offer);
 					continue; // Skip this offer
 				}
 

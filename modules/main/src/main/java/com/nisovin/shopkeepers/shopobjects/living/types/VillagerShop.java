@@ -5,7 +5,6 @@ import java.util.List;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Villager.Profession;
@@ -18,6 +17,7 @@ import com.nisovin.shopkeepers.property.EnumProperty;
 import com.nisovin.shopkeepers.property.IntegerProperty;
 import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
@@ -33,18 +33,18 @@ public class VillagerShop extends BabyableShop<Villager> {
 	private final Property<Profession> professionProperty = new EnumProperty<Profession>(Profession.class)
 			.key("profession")
 			.defaultValue(Profession.NONE)
-			.migrator((property, configSection) -> {
+			.migrator((property, shopObjectData) -> {
 				// Migration from 'prof' key: TODO Added with 1.14 update, remove again at some point.
-				String professionName = configSection.getString("prof");
+				String professionName = shopObjectData.getString("prof");
 				if (professionName != null) {
 					Log.warning(shopkeeper.getLogPrefix() + "Migrated villager profession from key 'prof' to key 'profession'.");
-					configSection.set(property.getKey(), professionName);
-					configSection.set("prof", null);
+					shopObjectData.set(property.getKey(), professionName);
+					shopObjectData.remove("prof");
 					shopkeeper.markDirty();
 				}
 
 				// MC 1.14 migration:
-				professionName = configSection.getString(property.getKey());
+				professionName = shopObjectData.getString(property.getKey());
 				if (professionName != null) {
 					String newProfessionName = null;
 					if (professionName.equals("PRIEST")) {
@@ -55,7 +55,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 					if (newProfessionName != null) {
 						Log.warning(shopkeeper.getLogPrefix() + "Migrated villager profession from '"
 								+ professionName + "' to '" + newProfessionName + "'.");
-						configSection.set(property.getKey(), newProfessionName);
+						shopObjectData.set(property.getKey(), newProfessionName);
 						shopkeeper.markDirty();
 					}
 				}
@@ -81,7 +81,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	@Override
-	public void load(ConfigurationSection shopObjectData) {
+	public void load(ShopObjectData shopObjectData) {
 		super.load(shopObjectData);
 		professionProperty.load(shopObjectData);
 		villagerTypeProperty.load(shopObjectData);
@@ -89,7 +89,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	@Override
-	public void save(ConfigurationSection shopObjectData) {
+	public void save(ShopObjectData shopObjectData) {
 		super.save(shopObjectData);
 		professionProperty.save(shopObjectData);
 		villagerTypeProperty.save(shopObjectData);

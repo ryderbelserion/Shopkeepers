@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.property;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -102,19 +100,18 @@ public class IntegerProperty extends Property<Integer> {
 	}
 
 	@Override
-	protected Integer loadValue(ConfigurationSection configSection) throws InvalidValueException {
-		Object value = configSection.get(this.getKey());
-		if (value == null) return null;
-		Integer intValue = ConversionUtils.toInteger(value);
-		if (intValue == null) {
-			throw new InvalidValueException("Failed to parse Integer: '" + value + "'.");
+	protected Integer deserializeValue(Object dataObject) throws InvalidValueException {
+		assert dataObject != null;
+		Integer value = ConversionUtils.toInteger(dataObject);
+		if (value == null) {
+			throw new InvalidValueException("Failed to parse Integer from '" + dataObject + "'.");
 		} else {
-			return intValue;
+			return value;
 		}
 	}
 
 	@Override
-	protected void saveValue(ConfigurationSection configSection, Integer value) {
-		configSection.set(this.getKey(), value);
+	protected Object serializeValue(Integer value) {
+		return value;
 	}
 }

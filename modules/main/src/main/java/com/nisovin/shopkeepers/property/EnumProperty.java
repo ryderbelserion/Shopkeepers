@@ -1,7 +1,5 @@
 package com.nisovin.shopkeepers.property;
 
-import org.bukkit.configuration.ConfigurationSection;
-
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -27,19 +25,24 @@ public class EnumProperty<E extends Enum<E>> extends Property<E> {
 	}
 
 	@Override
-	protected E loadValue(ConfigurationSection configSection) throws InvalidValueException {
-		String valueName = configSection.getString(this.getKey());
-		if (valueName == null) return null;
-		E enumValue = ConversionUtils.parseEnum(enumType, valueName);
-		if (enumValue == null) {
-			throw new InvalidValueException("Failed to parse " + enumType.getSimpleName() + ": '" + valueName + "'.");
+	protected E deserializeValue(Object dataObject) throws InvalidValueException {
+		assert dataObject != null;
+		if (!(dataObject instanceof String)) {
+			throw new InvalidValueException(enumType.getSimpleName() + " data is not of type String, but "
+					+ dataObject.getClass().getName() + ".");
+		}
+
+		String valueName = (String) dataObject;
+		E value = ConversionUtils.parseEnum(enumType, valueName);
+		if (value == null) {
+			throw new InvalidValueException("Failed to parse " + enumType.getSimpleName() + " from '" + valueName + "'.");
 		} else {
-			return enumValue;
+			return value;
 		}
 	}
 
 	@Override
-	protected void saveValue(ConfigurationSection configSection, E value) {
-		configSection.set(this.getKey(), (value == null) ? null : value.name());
+	protected Object serializeValue(E value) {
+		return value.name();
 	}
 }
