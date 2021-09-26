@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.property;
 
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -100,11 +101,11 @@ public class IntegerProperty extends Property<Integer> {
 	}
 
 	@Override
-	protected Integer deserializeValue(Object dataObject) throws InvalidValueException {
+	protected Integer deserializeValue(Object dataObject) throws InvalidDataException {
 		assert dataObject != null;
 		Integer value = ConversionUtils.toInteger(dataObject);
 		if (value == null) {
-			throw new InvalidValueException("Failed to parse Integer from '" + dataObject + "'.");
+			throw new InvalidDataException("Failed to parse Integer from '" + dataObject + "'.");
 		} else {
 			return value;
 		}

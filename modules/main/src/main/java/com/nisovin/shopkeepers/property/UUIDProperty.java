@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.property;
 
 import java.util.UUID;
 
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
 /**
@@ -16,17 +17,17 @@ public class UUIDProperty extends Property<UUID> {
 	}
 
 	@Override
-	protected UUID deserializeValue(Object dataObject) throws InvalidValueException {
+	protected UUID deserializeValue(Object dataObject) throws InvalidDataException {
 		assert dataObject != null;
 		if (!(dataObject instanceof String)) {
-			throw new InvalidValueException("UUID data is not of type String, but "
+			throw new InvalidDataException("UUID data is not of type String, but "
 					+ dataObject.getClass().getName() + ".");
 		}
 
 		String uuidString = (String) dataObject;
 		UUID uuid = ConversionUtils.parseUUID(uuidString);
 		if (uuid == null) {
-			throw new InvalidValueException("Failed to parse UUID from '" + uuidString + "'.");
+			throw new InvalidDataException("Failed to parse UUID from '" + uuidString + "'.");
 		} else {
 			return uuid;
 		}

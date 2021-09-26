@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.property;
 
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 
 /**
@@ -14,13 +15,13 @@ public class StringProperty extends Property<String> {
 	}
 
 	@Override
-	protected String deserializeValue(Object dataObject) throws InvalidValueException {
+	protected String deserializeValue(Object dataObject) throws InvalidDataException {
 		assert dataObject != null;
 		String value = ConversionUtils.toString(dataObject);
 		if (value == null) {
 			// Unlikely. Only the case if the object's toString method returned null. Printing the object as String in
 			// the error message won't be useful then either.
-			throw new InvalidValueException("Failed to convert data of type "
+			throw new InvalidDataException("Failed to convert data of type "
 					+ dataObject.getClass().getName() + " to String.");
 		} else {
 			return value;

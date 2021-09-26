@@ -5,6 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -419,12 +420,12 @@ public abstract class Property<T> {
 	}
 
 	/**
-	 * Creates an {@link InvalidValueException} that is used when the value for this property is missing.
+	 * Creates an {@link InvalidDataException} that is used when the value for this property is missing.
 	 * 
-	 * @return the invalid value exception
+	 * @return the {@link InvalidDataException} for a missing value
 	 */
-	protected InvalidValueException missingValueError() {
-		return new InvalidValueException("Missing value.");
+	protected InvalidDataException missingValueError() {
+		return new InvalidDataException("Missing value.");
 	}
 
 	/**
@@ -507,10 +508,10 @@ public abstract class Property<T> {
 	 * @param dataObject
 	 *            the data object, not <code>null</code>
 	 * @return the reconstructed value, not <code>null</code>
-	 * @throws InvalidValueException
+	 * @throws InvalidDataException
 	 *             if the value can not be reconstructed
 	 */
-	protected abstract T deserializeValue(Object dataObject) throws InvalidValueException;
+	protected abstract T deserializeValue(Object dataObject) throws InvalidDataException;
 
 	/**
 	 * Saves the value of this property into the given {@link DataContainer}.

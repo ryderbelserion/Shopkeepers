@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.property;
 
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -25,17 +26,17 @@ public class EnumProperty<E extends Enum<E>> extends Property<E> {
 	}
 
 	@Override
-	protected E deserializeValue(Object dataObject) throws InvalidValueException {
+	protected E deserializeValue(Object dataObject) throws InvalidDataException {
 		assert dataObject != null;
 		if (!(dataObject instanceof String)) {
-			throw new InvalidValueException(enumType.getSimpleName() + " data is not of type String, but "
+			throw new InvalidDataException(enumType.getSimpleName() + " data is not of type String, but "
 					+ dataObject.getClass().getName() + ".");
 		}
 
 		String valueName = (String) dataObject;
 		E value = ConversionUtils.parseEnum(enumType, valueName);
 		if (value == null) {
-			throw new InvalidValueException("Failed to parse " + enumType.getSimpleName() + " from '" + valueName + "'.");
+			throw new InvalidDataException("Failed to parse " + enumType.getSimpleName() + " from '" + valueName + "'.");
 		} else {
 			return value;
 		}
