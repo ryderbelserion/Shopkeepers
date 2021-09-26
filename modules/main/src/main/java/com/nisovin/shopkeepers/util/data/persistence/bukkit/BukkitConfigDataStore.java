@@ -7,7 +7,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import com.nisovin.shopkeepers.util.data.ConfigBasedDataContainer;
 import com.nisovin.shopkeepers.util.data.persistence.DataStore;
 import com.nisovin.shopkeepers.util.data.persistence.DataStoreBase;
-import com.nisovin.shopkeepers.util.data.persistence.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.persistence.InvalidDataFormatException;
 
 /**
  * A {@link DataStore} that uses a Bukkit {@link FileConfiguration} to store, save, and load the data.
@@ -55,11 +55,11 @@ public class BukkitConfigDataStore extends ConfigBasedDataContainer implements D
 	}
 
 	@Override
-	public void loadFromString(String data) throws InvalidDataException {
+	public void loadFromString(String data) throws InvalidDataFormatException {
 		try {
 			this.getConfig().loadFromString(data);
 		} catch (InvalidConfigurationException e) {
-			throw new InvalidDataException("Failed to load data as Bukkit config!", e);
+			throw new InvalidDataFormatException("Failed to load data as Bukkit config!", e);
 		}
 	}
 

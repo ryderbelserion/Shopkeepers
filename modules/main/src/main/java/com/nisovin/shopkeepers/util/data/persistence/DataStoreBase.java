@@ -22,19 +22,19 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public interface DataStoreBase extends DataStore {
 
 	@Override
-	public default void load(File file) throws IOException, InvalidDataException {
+	public default void load(File file) throws IOException, InvalidDataFormatException {
 		Validate.notNull(file, "file is null");
 		this.load(file.toPath());
 	}
 
 	@Override
-	public default void load(Path path) throws IOException, InvalidDataException {
+	public default void load(Path path) throws IOException, InvalidDataFormatException {
 		Validate.notNull(path, "path is null");
 		this.load(Files.newBufferedReader(path, StandardCharsets.UTF_8));
 	}
 
 	@Override
-	public default void load(Reader reader) throws IOException, InvalidDataException {
+	public default void load(Reader reader) throws IOException, InvalidDataFormatException {
 		Validate.notNull(reader, "reader is null");
 		BufferedReader bufferedReader;
 		if (reader instanceof BufferedReader) {

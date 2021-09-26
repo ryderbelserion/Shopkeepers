@@ -26,10 +26,10 @@ public interface DataStore extends DataContainer {
 	 *            the file, not <code>null</code>
 	 * @throws IOException
 	 *             if the file cannot be read
-	 * @throws InvalidDataException
+	 * @throws InvalidDataFormatException
 	 *             if the content of the specified file is not in a supported format
 	 */
-	public void load(File file) throws IOException, InvalidDataException;
+	public void load(File file) throws IOException, InvalidDataFormatException;
 
 	/**
 	 * Loads the contents of this data container from the file at the specified {@link Path}.
@@ -43,10 +43,10 @@ public interface DataStore extends DataContainer {
 	 *            the file path, not <code>null</code>
 	 * @throws IOException
 	 *             if the file cannot be read
-	 * @throws InvalidDataException
+	 * @throws InvalidDataFormatException
 	 *             if the content of the specified file is not in a supported format
 	 */
-	public void load(Path path) throws IOException, InvalidDataException;
+	public void load(Path path) throws IOException, InvalidDataFormatException;
 
 	/**
 	 * Loads the contents of this data container from the given {@link Reader}.
@@ -60,10 +60,10 @@ public interface DataStore extends DataContainer {
 	 *            the reader, not <code>null</code>
 	 * @throws IOException
 	 *             if the reader cannot be read
-	 * @throws InvalidDataException
+	 * @throws InvalidDataFormatException
 	 *             if the content of the given reader is not in a supported format
 	 */
-	public void load(Reader reader) throws IOException, InvalidDataException;
+	public void load(Reader reader) throws IOException, InvalidDataFormatException;
 
 	/**
 	 * Loads the contents of this data container from the given {@link String}.
@@ -73,10 +73,10 @@ public interface DataStore extends DataContainer {
 	 * 
 	 * @param data
 	 *            the data String, not <code>null</code>
-	 * @throws InvalidDataException
+	 * @throws InvalidDataFormatException
 	 *             if the content of the given String is not in a supported format
 	 */
-	public void loadFromString(String data) throws InvalidDataException;
+	public void loadFromString(String data) throws InvalidDataFormatException;
 
 	/**
 	 * Saves the contents of this data container to the specified {@link File}.
