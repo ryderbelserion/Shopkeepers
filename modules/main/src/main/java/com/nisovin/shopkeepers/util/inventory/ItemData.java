@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.util.inventory;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -56,23 +57,57 @@ public class ItemData {
 	// Special case: Omitting 'blockMaterial' for empty TILE_ENTITY item meta.
 	private static final String TILE_ENTITY_BLOCK_MATERIAL_KEY = "blockMaterial";
 
+	// Entries are lazily added and then cached:
+	// The mapped value can be null for items that do not support item meta.
+	private static final Map<Material, String> META_TYPE_BY_ITEM_TYPE = new HashMap<>();
+
+	// Returns null for items that do not support ItemMeta.
+	private static String getMetaType(Material itemType) {
+		Validate.notNull(itemType, "itemType is null");
+		// Check the cache:
+		String metaType = META_TYPE_BY_ITEM_TYPE.get(itemType);
+		if (metaType != null) {
+			return metaType;
+		}
+		assert metaType == null;
+		if (META_TYPE_BY_ITEM_TYPE.containsKey(itemType)) {
+			// Item type is mapped to null. -> Item does not support item meta.
+			return null;
+		}
+
+		// Determine the meta type from the item's serialized ItemMeta:
+		ItemMeta itemMeta = new ItemStack(itemType).getItemMeta(); // Can be null
+		if (itemMeta != null) {
+			metaType = (String) itemMeta.serialize().get(META_TYPE_KEY);
+			if (metaType == null) {
+				throw new IllegalStateException("Could not determine the meta type of "
+						+ itemMeta.getClass().getName() + "!");
+			}
+		} // Else: Item does not support meta data. metaType remains null.
+
+		// Cache the meta type (can be null if the item does not support ItemMeta):
+		META_TYPE_BY_ITEM_TYPE.put(itemType, metaType);
+
+		return metaType; // Can be null
+	}
+
 	// Only returns null if the input data is null.
 	public static ItemData deserialize(@ReadOnly Object dataObject) throws ItemDataDeserializeException {
 		if (dataObject == null) return null;
 
-		String typeName = null;
+		String itemTypeName = null;
 		DataContainer data = null;
 		if (dataObject instanceof String) {
 			// Load from compact representation (no additional item meta data):
-			typeName = (String) dataObject;
+			itemTypeName = (String) dataObject;
 		} else {
 			data = DataContainer.of(dataObject);
 			if (data == null) {
 				throw new ItemDataDeserializeException("Invalid item data: " + dataObject);
 			}
 
-			typeName = data.getString("type");
-			if (StringUtils.isEmpty(typeName)) {
+			itemTypeName = data.getString("type");
+			if (StringUtils.isEmpty(itemTypeName)) {
 				throw new ItemDataDeserializeException("Missing item type");
 			}
 
@@ -81,21 +116,21 @@ public class ItemData {
 				data = null;
 			}
 		}
-		assert typeName != null;
+		assert itemTypeName != null;
 
 		// Assuming up-to-date material name (performs no conversions besides basic formatting):
-		Material type = ItemUtils.parseMaterial(typeName); // Can be null
-		if (type == null) {
-			throw new InvalidItemTypeException("Unknown item type: " + typeName);
-		} else if (type.isLegacy()) {
-			throw new InvalidItemTypeException("Unsupported legacy item type: " + typeName);
-		} else if (!type.isItem()) {
+		Material itemType = ItemUtils.parseMaterial(itemTypeName); // Can be null
+		if (itemType == null) {
+			throw new InvalidItemTypeException("Unknown item type: " + itemTypeName);
+		} else if (itemType.isLegacy()) {
+			throw new InvalidItemTypeException("Unsupported legacy item type: " + itemTypeName);
+		} else if (!itemType.isItem()) {
 			// Note: AIR is a valid item type. It is for example used for empty slots in inventories.
-			throw new InvalidItemTypeException("Invalid item type: " + typeName);
+			throw new InvalidItemTypeException("Invalid item type: " + itemTypeName);
 		}
 
 		// Create item stack (still misses meta data):
-		ItemStack dataItem = new ItemStack(type);
+		ItemStack dataItem = new ItemStack(itemType);
 
 		// Load additional meta data:
 		if (data != null) {
@@ -108,16 +143,12 @@ public class ItemData {
 			// Recursively replace all config sections with Maps, because the ItemMeta deserialization expects Maps:
 			ConfigUtils.convertSectionsToMaps(itemMetaData);
 
-			// Determine the meta type by creating the serialization of a dummy item meta:
-			ItemMeta dummyItemMeta = dataItem.getItemMeta(); // Can be null
-			if (dummyItemMeta == null) {
-				throw new ItemDataDeserializeException("Items of type " + type.name() + " do not support meta data!");
-			}
-			dummyItemMeta.setDisplayName("dummy name"); // Ensure item meta is not empty
-			Object metaType = dummyItemMeta.serialize().get(META_TYPE_KEY);
+			// Determine the meta type:
+			String metaType = getMetaType(itemType);
 			if (metaType == null) {
-				throw new IllegalStateException("Could not determine the meta type of " + dummyItemMeta.getClass().getName() + "!");
+				throw new ItemDataDeserializeException("Items of type " + itemType.name() + " do not support meta data!");
 			}
+
 			// Insert meta type:
 			itemMetaData.put(META_TYPE_KEY, metaType);
 
