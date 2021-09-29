@@ -20,6 +20,7 @@ import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -64,7 +65,7 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	}
 
 	@Override
-	public void loadDynamicState(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	public void loadDynamicState(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		super.loadDynamicState(shopkeeperData);
 		this.loadOffers(shopkeeperData);
 	}
@@ -101,7 +102,7 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 
 	// OFFERS
 
-	private void loadOffers(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	private void loadOffers(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
 		List<? extends TradeOffer> offers = SKTradeOffer.load(shopkeeperData, "offers", this.getLogPrefix());
 		List<? extends TradeOffer> migratedOffers = SKTradeOffer.migrateItems(offers, this.getLogPrefix());

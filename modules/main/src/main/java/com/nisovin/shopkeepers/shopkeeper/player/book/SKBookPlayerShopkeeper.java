@@ -29,6 +29,7 @@ import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.BookItems;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -74,7 +75,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	}
 
 	@Override
-	public void loadDynamicState(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	public void loadDynamicState(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		super.loadDynamicState(shopkeeperData);
 		this.loadOffers(shopkeeperData);
 	}
@@ -198,7 +199,7 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	// OFFERS
 
-	private void loadOffers(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	private void loadOffers(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
 		this._clearOffers();
 		// TODO Remove legacy: Load offers from old format (bookTitle -> price mapping) (since late MC 1.14.4).

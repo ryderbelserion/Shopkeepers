@@ -44,6 +44,7 @@ import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.bukkit.ColorUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -183,7 +184,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * @see #loadFromSaveData(ShopkeeperData)
 	 */
 	protected final void initOnLoad(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
-		this.loadFromSaveData(shopkeeperData);
+		try {
+			this.loadFromSaveData(shopkeeperData);
+		} catch (InvalidDataException e) {
+			throw new ShopkeeperCreateException(e.getMessage(), e);
+		}
 		this.commonSetup();
 	}
 
@@ -274,10 +279,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
 	 * @throws ShopkeeperCreateException
+	 *             if the shopkeeper cannot be properly initialized
+	 * @throws InvalidDataException
 	 *             if the shopkeeper data cannot be loaded
 	 * @see AbstractShopType#loadShopkeeper(int, ShopkeeperData)
 	 */
-	protected void loadFromSaveData(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	protected void loadFromSaveData(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException, InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 
 		// Migrate the shopkeeper data:
@@ -285,12 +292,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		String uniqueIdString = shopkeeperData.getString("uniqueId");
 		if (StringUtils.isEmpty(uniqueIdString)) {
-			throw new ShopkeeperCreateException("Missing unique id!");
+			throw new InvalidDataException("Missing unique id!");
 		}
 		try {
 			this.uniqueId = ConversionUtils.parseUUID(uniqueIdString);
 		} catch (IllegalArgumentException e) {
-			throw new ShopkeeperCreateException("Invalid unique id ('" + uniqueIdString + "')!");
+			throw new InvalidDataException("Invalid unique id ('" + uniqueIdString + "')!");
 		}
 
 		// Shop object data:
@@ -322,7 +329,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			this.yaw = 0.0F;
 		} else {
 			if (worldName == null) {
-				throw new ShopkeeperCreateException("Missing world name!");
+				throw new InvalidDataException("Missing world name!");
 			}
 		}
 		this.updateChunkCoords();
@@ -341,10 +348,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
-	 * @throws ShopkeeperCreateException
-	 *             if the shopkeeper data is missing entries or contains invalid entries that cannot be migrated
+	 * @throws InvalidDataException
+	 *             if the shopkeeper data cannot be migrated
 	 */
-	protected void migrateShopkeeperData(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	protected void migrateShopkeeperData(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
 		// Migrate the shop object data:
 		ShopObjectData shopObjectData = shopkeeperData.getShopObjectData();
@@ -352,7 +359,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.migrateShopObjectData(shopObjectData);
 	}
 
-	private void migrateShopObjectData(ShopObjectData shopObjectData) throws ShopkeeperCreateException {
+	private void migrateShopObjectData(ShopObjectData shopObjectData) throws InvalidDataException {
 		assert shopObjectData != null;
 		// Object type id migrations:
 		// TODO Remove again at some point
@@ -413,17 +420,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
-	 * @throws ShopkeeperCreateException
+	 * @throws InvalidDataException
 	 *             if the data cannot be loaded
 	 * @see #saveDynamicState(ShopkeeperData)
 	 * @see #loadFromSaveData(ShopkeeperData)
 	 */
-	public void loadDynamicState(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	public void loadDynamicState(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 		ShopType<?> shopType = shopkeeperData.getShopType();
 		assert shopType != null;
 		if (shopType != this.getType()) {
-			throw new ShopkeeperCreateException("Shopkeeper data is for a different shop type (expected: "
+			throw new InvalidDataException("Shopkeeper data is for a different shop type (expected: "
 					+ this.getType().getIdentifier() + ", actual: " + shopType.getIdentifier() + ")!");
 		}
 

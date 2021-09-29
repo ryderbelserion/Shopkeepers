@@ -14,6 +14,7 @@ import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
 public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper implements AdminShopkeeper {
@@ -78,7 +79,7 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	}
 
 	@Override
-	public void loadDynamicState(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	public void loadDynamicState(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		super.loadDynamicState(shopkeeperData);
 		this.loadTradePermission(shopkeeperData);
 	}
@@ -91,7 +92,7 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 
 	// TRADE PERMISSION
 
-	private void loadTradePermission(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	private void loadTradePermission(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
 		this._setTradePermission(shopkeeperData.getString("tradePerm"));
 	}

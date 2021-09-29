@@ -76,6 +76,7 @@ Date format: (YYYY-MM-DD)
   * ShopkeeperData and ShopObjectData wrappers extend DataContainer with common convenience methods that were previously located inside AbstractShopkeeper to interact with the shopkeeper and shop object data.
 * Internal API: Various refactors related to shop object properties.
 * Internal API: The loading and saving methods of shopkeeper offers have been renamed.
+* Internal API: Various uses of ShopkeeperCreateException have been replaced with the better fitting InvalidDataException.
 * We now log a warning when we encounter a shopkeeper offer with invalid data. Previously, these offers were silently skipped.
 * Shopkeepers are now deactivated before they are despawned. This avoids having to process the object id change of the shop object being despawned when the shopkeeper is going to be deactivated anyways.
 * Fixed: The ShopkeeperByName command argument did not take the 'joinRemainingArgs' argument into account.

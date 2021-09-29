@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.shopobjects;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.data.DelegateDataContainer;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
 /**
@@ -42,13 +42,13 @@ public class ShopObjectData extends DelegateDataContainer {
 	 * Gets the shop object type identifier.
 	 * 
 	 * @return the shop object type identifier, not <code>null</code> or empty
-	 * @throws ShopkeeperCreateException
+	 * @throws InvalidDataException
 	 *             if the shop object type identifier could not be found
 	 */
-	public final String getShopObjectTypeId() throws ShopkeeperCreateException {
+	public final String getShopObjectTypeId() throws InvalidDataException {
 		String objectTypeId = this.getString(DATA_KEY_SHOP_OBJECT_TYPE);
 		if (StringUtils.isEmpty(objectTypeId)) {
-			throw new ShopkeeperCreateException("Missing shop object type id!");
+			throw new InvalidDataException("Missing shop object type id!");
 		}
 		return objectTypeId;
 	}
@@ -58,15 +58,15 @@ public class ShopObjectData extends DelegateDataContainer {
 	 * identifier}.
 	 * 
 	 * @return the shop object type, not <code>null</code>
-	 * @throws ShopkeeperCreateException
+	 * @throws InvalidDataException
 	 *             if no valid shop object type identifier could be found
 	 */
-	public final AbstractShopObjectType<?> getShopObjectType() throws ShopkeeperCreateException {
+	public final AbstractShopObjectType<?> getShopObjectType() throws InvalidDataException {
 		String objectTypeId = this.getShopObjectTypeId();
 		assert objectTypeId != null;
 		AbstractShopObjectType<?> objectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(objectTypeId);
 		if (objectType == null) {
-			throw new ShopkeeperCreateException("Invalid shop object type: " + objectTypeId);
+			throw new InvalidDataException("Invalid shop object type: " + objectTypeId);
 		}
 		return objectType;
 	}

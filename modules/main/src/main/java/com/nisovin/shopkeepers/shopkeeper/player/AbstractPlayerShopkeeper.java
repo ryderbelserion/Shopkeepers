@@ -36,6 +36,7 @@ import com.nisovin.shopkeepers.user.SKUser;
 import com.nisovin.shopkeepers.util.bukkit.DataUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -101,7 +102,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public void loadDynamicState(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	public void loadDynamicState(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		super.loadDynamicState(shopkeeperData);
 		this.loadOwner(shopkeeperData);
 		this.loadContainer(shopkeeperData);
@@ -203,20 +204,20 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// OWNER
 
-	private void loadOwner(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	private void loadOwner(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
 		UUID ownerUUID;
 		try {
 			ownerUUID = UUID.fromString(shopkeeperData.getString("owner uuid"));
 		} catch (Exception e) {
 			// UUID is invalid or non-existent:
-			throw new ShopkeeperCreateException("Missing or invalid owner uuid!");
+			throw new InvalidDataException("Missing or invalid owner uuid!");
 		}
 		String ownerName = shopkeeperData.getString("owner");
 		// TODO We no longer use the fallback name (since late 1.14.4). Remove the "unknown"-check again in the future
 		// (as soon as possible, because it conflicts with any player actually named 'unknown').
 		if (ownerName == null || ownerName.isEmpty() || ownerName.equals("unknown")) {
-			throw new ShopkeeperCreateException("Missing owner name!");
+			throw new InvalidDataException("Missing owner name!");
 		}
 		this._setOwner(ownerUUID, ownerName);
 	}
@@ -279,7 +280,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// TRADE NOTIFICATIONS
 
-	private void loadNotifyOnTrades(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	private void loadNotifyOnTrades(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
 		boolean notifyOnTrades = shopkeeperData.getBoolean("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
 		this._setNotifyOnTrades(notifyOnTrades);
@@ -311,7 +312,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// HIRING
 
-	private void loadForHire(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	private void loadForHire(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
 		// The item is assumed to be immutable and therefore does not need to be copied.
 		UnmodifiableItemStack hireCost = DataUtils.loadUnmodifiableItemStack(shopkeeperData, "hirecost");
@@ -377,11 +378,11 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// CONTAINER
 
-	private void loadContainer(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	private void loadContainer(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
 		// TODO Rename to storage keys to containerx/y/z?
 		if (!shopkeeperData.isNumber("chestx") || !shopkeeperData.isNumber("chesty") || !shopkeeperData.isNumber("chestz")) {
-			throw new ShopkeeperCreateException("Missing or invalid container coordinates!");
+			throw new InvalidDataException("Missing or invalid container coordinates!");
 		}
 		this._setContainer(shopkeeperData.getInt("chestx"), shopkeeperData.getInt("chesty"), shopkeeperData.getInt("chestz"));
 	}
