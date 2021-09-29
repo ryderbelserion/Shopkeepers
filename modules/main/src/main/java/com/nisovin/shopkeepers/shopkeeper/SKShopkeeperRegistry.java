@@ -48,6 +48,7 @@ import com.nisovin.shopkeepers.shopobjects.entity.DefaultEntityShopObjectIds;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
 import com.nisovin.shopkeepers.util.bukkit.MutableChunkCoords;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -524,11 +525,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		Validate.isTrue(id >= 1, "id has to be positive: " + id);
 		Validate.isTrue(this.getShopkeeperById(id) == null, "There already exists a shopkeeper with this id: " + id);
 
-		String shopTypeId = shopkeeperData.getString("type");
-		AbstractShopType<?> shopType = plugin.getShopTypeRegistry().get(shopTypeId);
-		if (shopType == null) {
-			throw new ShopkeeperCreateException("Unknown shop type: " + shopTypeId);
+		AbstractShopType<?> shopType;
+		try {
+			shopType = shopkeeperData.getShopType();
+		} catch (InvalidDataException e) {
+			throw new ShopkeeperCreateException(e.getMessage(), e);
 		}
+		assert shopType != null;
 
 		AbstractShopkeeper shopkeeper = shopType.loadShopkeeper(id, shopkeeperData);
 		if (shopkeeper == null) {
