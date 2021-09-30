@@ -127,6 +127,18 @@ public interface DataContainer {
 	}
 
 	/**
+	 * Gets a {@link DataValue} view on the value for the given key.
+	 * <p>
+	 * The returned {@link DataValue} reads and writes through to the entry of this data container for the given key.
+	 * 
+	 * @param key
+	 *            the key, not <code>null</code> or empty
+	 * @return the {@link DataValue} view for the specified value, not <code>null</code> even if the specified value is
+	 *         not present
+	 */
+	public DataValue getDataValue(String key);
+
+	/**
 	 * Gets the value for the given key.
 	 * 
 	 * @param key
@@ -485,9 +497,10 @@ public interface DataContainer {
 	 * If the given value is <code>null</code>, this will remove the currently stored value for the given key by
 	 * delegating the method call to {@link #remove(String)}.
 	 * <p>
-	 * Because {@link DataContainer}s themselves are not guaranteed to be serializable and storing a data container
-	 * instead of its {@link #serialize() serialized form} is a common overlooked error, this method catches this error
-	 * early by not allowing to store data containers.
+	 * Because {@link DataContainer}s and {@link DataValue}s themselves are not guaranteed to be serializable and
+	 * storing them instead of their {@link #serialize() serialized form} or underlying {@link DataValue#get()
+	 * value} is a common overlooked error, this method catches this error early by not allowing to store
+	 * {@link DataContainer}s or {@link DataValue}s.
 	 * 
 	 * @param key
 	 *            the key, not <code>null</code> or empty

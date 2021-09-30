@@ -43,7 +43,7 @@ public class ConfigBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	protected void setInternal(String key, Object value) {
+	protected void internalSet(String key, Object value) {
 		config.set(key, value);
 	}
 

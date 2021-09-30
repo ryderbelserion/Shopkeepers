@@ -19,6 +19,11 @@ public abstract class AbstractDataContainer implements DataContainer {
 	}
 
 	@Override
+	public DataValue getDataValue(String key) {
+		return new DataContainerValue(this, key);
+	}
+
+	@Override
 	public boolean isOfType(String key, Class<?> type) {
 		Validate.notNull(type, "type is null");
 		Object value = this.get(key);
@@ -75,13 +80,14 @@ public abstract class AbstractDataContainer implements DataContainer {
 		if (value == null) {
 			this.remove(key);
 		} else {
-			// Storing a DataContainer instead of its serialized form is a common error:
+			// Storing a DataContainer or DataValue instead of its serialized form is a common error:
 			Validate.isTrue(!(value instanceof DataContainer), "Cannot insert DataContainer!");
-			// Note: The contents of this data container may be loaded from a storage format that supports additional
-			// types of values. The validation of values loaded from some storage is not the responsibility of this data
-			// container, but of the clients that read values from this data container. We therefore don't validate or
-			// filter the inserted values here.
-			this.setInternal(key, value);
+			Validate.isTrue(!(value instanceof DataValue), "Cannot insert DataValue!");
+			// Note: The contents of this DataContainer may be loaded from a storage format that supports additional
+			// types of values. The validation of values loaded from some storage is not the responsibility of this
+			// DataContainer, but of the clients that read values from this DataContainer. We therefore do not validate
+			// or filter the inserted values here.
+			this.internalSet(key, value);
 		}
 	}
 
@@ -93,7 +99,7 @@ public abstract class AbstractDataContainer implements DataContainer {
 	 * @param value
 	 *            the value, not <code>null</code>
 	 */
-	protected abstract void setInternal(String key, Object value);
+	protected abstract void internalSet(String key, Object value);
 
 	@Override
 	public void setAll(Map<?, ?> values) {

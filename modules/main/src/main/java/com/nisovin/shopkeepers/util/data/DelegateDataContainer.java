@@ -34,7 +34,7 @@ public class DelegateDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	protected void setInternal(String key, Object value) {
+	protected void internalSet(String key, Object value) {
 		// Not expected to be called, because we override #set(String, Object).
 		throw new IllegalStateException("This method is not expected to be called!");
 	}

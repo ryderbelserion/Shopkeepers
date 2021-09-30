@@ -49,7 +49,7 @@ public class MapBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public void setInternal(String key, Object value) {
+	public void internalSet(String key, Object value) {
 		dataMap.put(key, value);
 	}
 
