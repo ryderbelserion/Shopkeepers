@@ -134,7 +134,7 @@ public interface DataContainer {
 	 * @return the value, or <code>null</code> if there is no value for the given key
 	 */
 	public default Object get(String key) {
-		return this.get(key, null);
+		return this.getOrDefault(key, null);
 	}
 
 	/**
@@ -148,7 +148,7 @@ public interface DataContainer {
 	 *            the default value, can be <code>null</code>
 	 * @return the value, or the given default value if there is no value for the given key
 	 */
-	public Object get(String key, Object defaultValue);
+	public Object getOrDefault(String key, Object defaultValue);
 
 	/**
 	 * Checks if the value for the given key is present and of the specified type.
@@ -161,7 +161,7 @@ public interface DataContainer {
 	 *            the expected type of the stored value
 	 * @return <code>true</code> if the value is present and of the specified type
 	 */
-	public boolean isType(String key, Class<?> type);
+	public boolean isOfType(String key, Class<?> type);
 
 	/**
 	 * Gets the value of the specified type for the given key.
@@ -172,16 +172,16 @@ public interface DataContainer {
 	 *            the key, not <code>null</code> or empty
 	 * @param type
 	 *            the expected type of the stored value
-	 * @return the value, or <code>null</code> if there is no value of the specified type for the given key
+	 * @return the value, or <code>null</code> if the value is not of the specified type
 	 */
-	public default <T> T getTyped(String key, Class<T> type) {
-		return this.getTyped(key, type, null);
+	public default <T> T getOfType(String key, Class<T> type) {
+		return this.getOfTypeOrDefault(key, type, null);
 	}
 
 	/**
 	 * Gets the value of the specified type for the given key.
 	 * <p>
-	 * If there is no value of the specified type for the given key, this returns the specified default value.
+	 * If the value for the given key is not of the specified type, this returns the specified default value.
 	 * 
 	 * @param <T>
 	 *            the expected type of the stored value
@@ -191,9 +191,9 @@ public interface DataContainer {
 	 *            the expected type of the stored value
 	 * @param defaultValue
 	 *            the default value, can be <code>null</code>
-	 * @return the value, or the given default value if there is no value of the specified type for the given key
+	 * @return the value, or the given default value if the value is not of the specified type
 	 */
-	public <T> T getTyped(String key, Class<T> type, T defaultValue);
+	public <T> T getOfTypeOrDefault(String key, Class<T> type, T defaultValue);
 
 	/**
 	 * Checks if the value for the given key is present and a {@link String}.
@@ -217,7 +217,7 @@ public interface DataContainer {
 	 * @return the String, or <code>null</code> if the value cannot be converted to a String
 	 */
 	public default String getString(String key) {
-		return this.getString(key, null);
+		return this.getStringOrDefault(key, null);
 	}
 
 	/**
@@ -232,7 +232,7 @@ public interface DataContainer {
 	 *            the default value, can be <code>null</code>
 	 * @return the String, or the given default value if the value cannot be converted to a String
 	 */
-	public String getString(String key, String defaultValue);
+	public String getStringOrDefault(String key, String defaultValue);
 
 	/**
 	 * Checks if the value for the given key is present and a {@link Number}.
@@ -256,7 +256,7 @@ public interface DataContainer {
 	 * @return the Integer (not <code>null</code>), or <code>0</code> if the value cannot be converted to an Integer
 	 */
 	public default int getInt(String key) {
-		return this.getInt(key, 0);
+		return this.getIntOrDefault(key, 0);
 	}
 
 	/**
@@ -272,7 +272,7 @@ public interface DataContainer {
 	 * @return the Integer (not <code>null</code>), or the given default value if the value cannot be converted to an
 	 *         Integer
 	 */
-	public int getInt(String key, int defaultValue);
+	public int getIntOrDefault(String key, int defaultValue);
 
 	/**
 	 * Gets the value for the given key converted to a {@link Long}.
@@ -282,7 +282,7 @@ public interface DataContainer {
 	 * @return the Long (not <code>null</code>), or <code>0L</code> if the value cannot be converted to a Long
 	 */
 	public default long getLong(String key) {
-		return this.getLong(key, 0L);
+		return this.getLongOrDefault(key, 0L);
 	}
 
 	/**
@@ -297,7 +297,7 @@ public interface DataContainer {
 	 *            the default value
 	 * @return the Long (not <code>null</code>), or the given default value if the value cannot be converted to a Long
 	 */
-	public long getLong(String key, long defaultValue);
+	public long getLongOrDefault(String key, long defaultValue);
 
 	/**
 	 * Gets the value for the given key converted to a {@link Float}.
@@ -307,7 +307,7 @@ public interface DataContainer {
 	 * @return the Float (not <code>null</code>), or <code>0.0F</code> if the value cannot be converted to a Float
 	 */
 	public default float getFloat(String key) {
-		return this.getFloat(key, 0.0F);
+		return this.getFloatOrDefault(key, 0.0F);
 	}
 
 	/**
@@ -322,7 +322,7 @@ public interface DataContainer {
 	 *            the default value
 	 * @return the Float (not <code>null</code>), or the given default value if the value cannot be converted to a Float
 	 */
-	public float getFloat(String key, float defaultValue);
+	public float getFloatOrDefault(String key, float defaultValue);
 
 	/**
 	 * Gets the value for the given key converted to a {@link Double}.
@@ -332,7 +332,7 @@ public interface DataContainer {
 	 * @return the Double (not <code>null</code>), or <code>0.0D</code> if the value cannot be converted to a Double
 	 */
 	public default double getDouble(String key) {
-		return this.getDouble(key, 0.0D);
+		return this.getDoubleOrDefault(key, 0.0D);
 	}
 
 	/**
@@ -348,7 +348,7 @@ public interface DataContainer {
 	 * @return the Double (not <code>null</code>), or the given default value if the value cannot be converted to a
 	 *         Double
 	 */
-	public double getDouble(String key, double defaultValue);
+	public double getDoubleOrDefault(String key, double defaultValue);
 
 	/**
 	 * Checks if the value for the given key is present and a {@link Boolean}.
@@ -372,7 +372,7 @@ public interface DataContainer {
 	 * @return the Boolean (not <code>null</code>), or <code>false</code> if the value cannot be converted to a Boolean
 	 */
 	public default boolean getBoolean(String key) {
-		return this.getBoolean(key, false);
+		return this.getBooleanOrDefault(key, false);
 	}
 
 	/**
@@ -388,7 +388,7 @@ public interface DataContainer {
 	 * @return the Boolean (not <code>null</code>), or the given default value if the value cannot be converted to a
 	 *         Boolean
 	 */
-	public boolean getBoolean(String key, boolean defaultValue);
+	public boolean getBooleanOrDefault(String key, boolean defaultValue);
 
 	/**
 	 * Checks if the value for the given key is present and a {@link List}.
@@ -403,28 +403,28 @@ public interface DataContainer {
 	}
 
 	/**
-	 * Gets the {@link List} for the given key.
+	 * Gets the value for the given key as a {@link List}.
 	 * 
 	 * @param key
 	 *            the key, not <code>null</code> or empty
-	 * @return the list, or <code>null</code> if there is no list for the given key
+	 * @return the List, or <code>null</code> if the value is not a List
 	 */
 	public default List<?> getList(String key) {
-		return this.getList(key, null);
+		return this.getListOrDefault(key, null);
 	}
 
 	/**
-	 * Gets the {@link List} for the given key.
+	 * Gets the value for the given key as a {@link List}.
 	 * <p>
-	 * If there is no list for the given key, this returns the specified default value.
+	 * If the value for the given key is not a List, this returns the specified default value.
 	 * 
 	 * @param key
 	 *            the key, not <code>null</code> or empty
 	 * @param defaultValue
 	 *            the default value, can be <code>null</code>
-	 * @return the list, or the given default value if there is no list for the given key
+	 * @return the List, or the given default value if the value is not a List
 	 */
-	public default List<?> getList(String key, List<?> defaultValue) {
+	public default List<?> getListOrDefault(String key, List<?> defaultValue) {
 		Object value = this.get(key);
 		if (value instanceof List) {
 			return (List<?>) value;
@@ -485,9 +485,9 @@ public interface DataContainer {
 	 * If the given value is <code>null</code>, this will remove the currently stored value for the given key by
 	 * delegating the method call to {@link #remove(String)}.
 	 * <p>
-	 * Because {@link DataContainer}s themselves are not guaranteed to be serializable and inserting a data container
+	 * Because {@link DataContainer}s themselves are not guaranteed to be serializable and storing a data container
 	 * instead of its {@link #serialize() serialized form} is a common overlooked error, this method catches this error
-	 * early by not allowing the insertion of data containers.
+	 * early by not allowing to store data containers.
 	 * 
 	 * @param key
 	 *            the key, not <code>null</code> or empty

@@ -24,8 +24,8 @@ public class DelegateDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Object get(String key, Object defaultValue) {
-		return dataContainer.get(key, defaultValue);
+	public Object getOrDefault(String key, Object defaultValue) {
+		return dataContainer.getOrDefault(key, defaultValue);
 	}
 
 	@Override

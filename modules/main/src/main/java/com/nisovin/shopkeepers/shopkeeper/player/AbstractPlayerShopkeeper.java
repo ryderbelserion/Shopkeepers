@@ -282,7 +282,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	private void loadNotifyOnTrades(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		boolean notifyOnTrades = shopkeeperData.getBoolean("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
+		boolean notifyOnTrades = shopkeeperData.getBooleanOrDefault("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
 		this._setNotifyOnTrades(notifyOnTrades);
 	}
 

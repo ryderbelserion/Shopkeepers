@@ -36,7 +36,7 @@ public class ConfigBasedDataContainer extends AbstractDataContainer {
 	}
 
 	@Override
-	public Object get(String key, Object defaultValue) {
+	public Object getOrDefault(String key, Object defaultValue) {
 		Validate.notEmpty(key, "key is empty");
 		Object value = config.get(key, null);
 		return (value != null) ? value : defaultValue;

@@ -473,7 +473,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		Log.info("Loading data of " + shopkeepersCount + " shopkeepers..");
-		String dataVersion = saveData.getString(DATA_VERSION_KEY, MISSING_DATA_VERSION);
+		String dataVersion = saveData.getStringOrDefault(DATA_VERSION_KEY, MISSING_DATA_VERSION);
 		boolean dataVersionChanged = (!currentDataVersion.getCombinded().equals(dataVersion));
 		if (dataVersionChanged) {
 			Log.info("The data version has changed from '" + dataVersion + "' to '" + currentDataVersion.getCombinded()

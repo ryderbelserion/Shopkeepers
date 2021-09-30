@@ -58,9 +58,9 @@ public class ConfigMigration1 implements ConfigMigration {
 		boolean migrated = false;
 
 		// Migrate material, if present:
-		String itemTypeName = configData.getString(itemTypeKey, null);
+		String itemTypeName = configData.getString(itemTypeKey);
 		if (itemTypeName != null) {
-			int itemData = configData.getInt(itemDataKey, 0);
+			int itemData = configData.getInt(itemDataKey);
 			// We no longer check for legacy materials:
 			Material itemType = DataUtils.loadMaterial(configData, itemTypeKey);
 			if (itemType == null) {

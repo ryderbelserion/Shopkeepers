@@ -41,7 +41,7 @@ public class DataUtils {
 		// an unmodifiable item stack (at least not without first being wrapped into an unmodifiable item stack itself),
 		// and assuming that there are no inconsistencies in how CraftItemStacks and Bukkit ItemStacks are compared with
 		// each other, this difference should not be relevant to us.
-		ItemStack itemStack = dataContainer.getTyped(key, ItemStack.class);
+		ItemStack itemStack = dataContainer.getOfType(key, ItemStack.class);
 
 		// TODO SPIGOT-6716, PAPER-6437: The order of stored enchantments of enchanted books is not consistent. On
 		// Paper, where the deserialized ItemStacks end up being CraftItemStacks, this difference in enchantment order

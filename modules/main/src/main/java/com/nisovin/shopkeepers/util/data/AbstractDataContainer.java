@@ -19,7 +19,7 @@ public abstract class AbstractDataContainer implements DataContainer {
 	}
 
 	@Override
-	public boolean isType(String key, Class<?> type) {
+	public boolean isOfType(String key, Class<?> type) {
 		Validate.notNull(type, "type is null");
 		Object value = this.get(key);
 		return type.isInstance(value);
@@ -27,44 +27,44 @@ public abstract class AbstractDataContainer implements DataContainer {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T getTyped(String key, Class<T> type, T defaultValue) {
+	public <T> T getOfTypeOrDefault(String key, Class<T> type, T defaultValue) {
 		Validate.notNull(type, "type is null");
 		Object value = this.get(key);
 		return type.isInstance(value) ? (T) value : defaultValue;
 	}
 
 	@Override
-	public String getString(String key, String defaultValue) {
+	public String getStringOrDefault(String key, String defaultValue) {
 		String value = ConversionUtils.toString(this.get(key));
 		return (value != null) ? value : defaultValue;
 	}
 
 	@Override
-	public int getInt(String key, int defaultValue) {
+	public int getIntOrDefault(String key, int defaultValue) {
 		Integer value = ConversionUtils.toInteger(this.get(key));
 		return (value != null) ? value : defaultValue;
 	}
 
 	@Override
-	public long getLong(String key, long defaultValue) {
+	public long getLongOrDefault(String key, long defaultValue) {
 		Long value = ConversionUtils.toLong(this.get(key));
 		return (value != null) ? value : defaultValue;
 	}
 
 	@Override
-	public float getFloat(String key, float defaultValue) {
+	public float getFloatOrDefault(String key, float defaultValue) {
 		Float value = ConversionUtils.toFloat(this.get(key));
 		return (value != null) ? value : defaultValue;
 	}
 
 	@Override
-	public double getDouble(String key, double defaultValue) {
+	public double getDoubleOrDefault(String key, double defaultValue) {
 		Double value = ConversionUtils.toDouble(this.get(key));
 		return (value != null) ? value : defaultValue;
 	}
 
 	@Override
-	public boolean getBoolean(String key, boolean defaultValue) {
+	public boolean getBooleanOrDefault(String key, boolean defaultValue) {
 		Boolean value = ConversionUtils.toBoolean(this.get(key));
 		return (value != null) ? value : defaultValue;
 	}
@@ -75,7 +75,7 @@ public abstract class AbstractDataContainer implements DataContainer {
 		if (value == null) {
 			this.remove(key);
 		} else {
-			// Inserting a DataContainer instead of its serialized form is a common error:
+			// Storing a DataContainer instead of its serialized form is a common error:
 			Validate.isTrue(!(value instanceof DataContainer), "Cannot insert DataContainer!");
 			// Note: The contents of this data container may be loaded from a storage format that supports additional
 			// types of values. The validation of values loaded from some storage is not the responsibility of this data
