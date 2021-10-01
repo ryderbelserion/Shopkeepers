@@ -9,46 +9,46 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public class DataContainerValue extends AbstractDataValue {
 
-	protected final DataContainer container;
-	protected final String key;
+	protected final DataContainer dataContainer;
+	protected final String dataKey;
 
 	/**
 	 * Creates a new {@link DataContainerValue}.
 	 * 
-	 * @param container
+	 * @param dataContainer
 	 *            the underlying data container not <code>null</code>
-	 * @param key
+	 * @param dataKey
 	 *            the data key, not <code>null</code> or empty
 	 */
-	public DataContainerValue(DataContainer container, String key) {
-		Validate.notNull(container, "container is null");
-		Validate.notEmpty(key, "key is empty");
-		this.container = container;
-		this.key = key;
+	public DataContainerValue(DataContainer dataContainer, String dataKey) {
+		Validate.notNull(dataContainer, "dataContainer is null");
+		Validate.notEmpty(dataKey, "dataKey is empty");
+		this.dataContainer = dataContainer;
+		this.dataKey = dataKey;
 	}
 
 	@Override
 	public Object getOrDefault(Object defaultValue) {
-		return container.getOrDefault(key, defaultValue);
+		return dataContainer.getOrDefault(dataKey, defaultValue);
 	}
 
 	@Override
 	protected void internalSet(Object value) {
-		container.set(key, value);
+		dataContainer.set(dataKey, value);
 	}
 
 	@Override
 	public void clear() {
-		container.remove(key);
+		dataContainer.remove(dataKey);
 	}
 
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("DataContainerValue [container=");
-		builder.append(container);
-		builder.append(", key=");
-		builder.append(key);
+		builder.append("DataContainerValue [dataContainer=");
+		builder.append(dataContainer);
+		builder.append(", dataKey=");
+		builder.append(dataKey);
 		builder.append(", value=");
 		builder.append(this.get());
 		builder.append("]");

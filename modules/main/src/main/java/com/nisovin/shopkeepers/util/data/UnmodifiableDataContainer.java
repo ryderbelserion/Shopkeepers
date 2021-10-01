@@ -33,13 +33,4 @@ public final class UnmodifiableDataContainer extends DelegateDataContainer {
 	public DataContainer asView() {
 		return this;
 	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("UnmodifiableDataContainer [dataContainer=");
-		builder.append(dataContainer);
-		builder.append("]");
-		return builder.toString();
-	}
 }

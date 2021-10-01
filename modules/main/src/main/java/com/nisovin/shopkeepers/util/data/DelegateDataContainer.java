@@ -77,7 +77,8 @@ public class DelegateDataContainer extends AbstractDataContainer {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("DelegateDataContainer [dataContainer=");
+		builder.append(this.getClass().getName());
+		builder.append(" [dataContainer=");
 		builder.append(dataContainer);
 		builder.append("]");
 		return builder.toString();

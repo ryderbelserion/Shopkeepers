@@ -105,13 +105,4 @@ public class ShopkeeperData extends DelegateDataContainer {
 		shopObjectData = ShopObjectData.of(this.createContainer(DATA_KEY_SHOP_OBJECT));
 		return shopObjectData;
 	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("ShopkeeperData [data=");
-		builder.append(dataContainer);
-		builder.append("]");
-		return builder.toString();
-	}
 }

@@ -70,13 +70,4 @@ public class ShopObjectData extends DelegateDataContainer {
 		}
 		return objectType;
 	}
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("ShopObjectData [data=");
-		builder.append(dataContainer);
-		builder.append("]");
-		return builder.toString();
-	}
 }

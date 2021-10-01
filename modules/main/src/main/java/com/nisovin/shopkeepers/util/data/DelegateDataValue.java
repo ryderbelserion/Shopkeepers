@@ -44,7 +44,8 @@ public class DelegateDataValue extends AbstractDataValue {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("DelegateDataValue [dataValue=");
+		builder.append(this.getClass().getName());
+		builder.append(" [dataValue=");
 		builder.append(dataValue);
 		builder.append("]");
 		return builder.toString();
