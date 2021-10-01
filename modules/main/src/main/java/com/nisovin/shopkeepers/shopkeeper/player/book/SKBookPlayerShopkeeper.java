@@ -29,6 +29,7 @@ import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.data.DataValue;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.BookItems;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -199,22 +200,25 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 
 	// OFFERS
 
+	private static final String DATA_KEY_OFFERS = "offers";
+
 	private void loadOffers(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
 		this._clearOffers();
+		DataValue offerListData = shopkeeperData.getDataValue(DATA_KEY_OFFERS);
 		// TODO Remove legacy: Load offers from old format (bookTitle -> price mapping) (since late MC 1.14.4).
-		List<? extends BookOffer> legacyOffers = SKBookOffer.loadFromLegacyData(shopkeeperData, "offers", this.getLogPrefix());
+		List<? extends BookOffer> legacyOffers = SKBookOffer.loadFromLegacyData(offerListData);
 		if (!legacyOffers.isEmpty()) {
 			Log.info(this.getLogPrefix() + "Importing old book offers.");
 			this._addOffers(legacyOffers);
 			this.markDirty();
 		}
-		this._addOffers(SKBookOffer.load(shopkeeperData, "offers", this.getLogPrefix()));
+		this._addOffers(SKBookOffer.loadOffers(offerListData));
 	}
 
 	private void saveOffers(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		SKBookOffer.save(shopkeeperData, "offers", this.getOffers());
+		SKBookOffer.saveOffers(shopkeeperData.getDataValue(DATA_KEY_OFFERS), this.getOffers());
 	}
 
 	@Override

@@ -11,10 +11,11 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.DataUtils;
 import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.DataValue;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
-import com.nisovin.shopkeepers.util.logging.Log;
 
 public class SKPriceOffer implements PriceOffer {
 
@@ -98,8 +99,14 @@ public class SKPriceOffer implements PriceOffer {
 	// STATIC UTILITIES
 	// //////////
 
-	public static void save(DataContainer dataContainer, String node, @ReadOnly Collection<? extends PriceOffer> offers) {
-		DataContainer offerListData = dataContainer.createContainer(node);
+	public static void saveOffers(DataValue dataValue, @ReadOnly Collection<? extends PriceOffer> offers) {
+		Validate.notNull(dataValue, "dataValue is null");
+		if (offers == null) {
+			dataValue.clear();
+			return;
+		}
+
+		DataContainer offerListData = dataValue.createContainer();
 		int id = 1;
 		for (PriceOffer offer : offers) {
 			UnmodifiableItemStack item = offer.getItem(); // Assumed immutable
@@ -110,49 +117,65 @@ public class SKPriceOffer implements PriceOffer {
 		}
 	}
 
-	// Elements inside the data container are assumed to be immutable and can be reused without having to be copied.
-	public static List<? extends PriceOffer> load(DataContainer dataContainer, String node, String errorPrefix) {
-		if (errorPrefix == null) errorPrefix = "";
-		List<PriceOffer> offers = new ArrayList<>();
-		DataContainer offerListData = dataContainer.getContainer(node);
-		if (offerListData != null) {
-			for (String id : offerListData.getKeys()) {
-				DataContainer offerData = offerListData.getContainer(id);
-				if (offerData == null) {
-					// Invalid offer: Not a container.
-					Log.warning(errorPrefix + "Invalid data for price offer " + id);
-					continue;
-				}
+	// Elements inside the data are assumed to be immutable and can be reused without having to be copied.
+	public static List<? extends PriceOffer> loadOffers(DataValue dataValue) throws InvalidDataException {
+		Validate.notNull(dataValue, "dataValue is null");
 
-				// The item stack is assumed to be immutable and therefore does not need to be copied.
-				UnmodifiableItemStack item = DataUtils.loadUnmodifiableItemStack(offerData, "item");
-				if (ItemUtils.isEmpty(item)) {
-					// Invalid offer.
-					Log.warning(errorPrefix + "Invalid price offer " + id + ": Item is empty.");
-					continue;
-				}
-				int price = offerData.getInt("price");
-				if (price <= 0) {
-					// Invalid offer.
-					Log.warning(errorPrefix + "Invalid price offer " + id
-							+ ": Price has to be positive, but is " + price + ".");
-					continue;
-				}
-				offers.add(new SKPriceOffer(item, price));
+		if (!dataValue.isPresent()) {
+			// No data -> Return an empty list of offers.
+			return new ArrayList<>(0);
+		}
+
+		DataContainer offerListData = dataValue.getContainer();
+		if (offerListData == null) {
+			throw new InvalidDataException("Invalid price offer list data: " + dataValue.get());
+		}
+
+		List<PriceOffer> offers = new ArrayList<>();
+		for (String id : offerListData.getKeys()) {
+			DataContainer offerData = offerListData.getContainer(id);
+			if (offerData == null) {
+				// Data is not a container.
+				throw new InvalidDataException("Invalid data for price offer " + id);
 			}
+
+			// The item stack is assumed to be immutable and therefore does not need to be copied.
+			UnmodifiableItemStack item = DataUtils.loadUnmodifiableItemStack(offerData, "item");
+			if (ItemUtils.isEmpty(item)) {
+				throw new InvalidDataException("Invalid price offer " + id + ": Item is empty.");
+			}
+			int price = offerData.getInt("price");
+			if (price <= 0) {
+				throw new InvalidDataException("Invalid price offer " + id + ": Price has to be positive, but is " + price + ".");
+			}
+			offers.add(new SKPriceOffer(item, price));
 		}
 		return offers;
 	}
 
+	// Returns true if the data has changed due to migrations.
+	public static boolean migrateOffers(DataValue dataValue) throws InvalidDataException {
+		List<? extends PriceOffer> offers = loadOffers(dataValue);
+		List<? extends PriceOffer> migratedOffers = migrateItems(offers);
+		if (offers == migratedOffers) {
+			// Nothing migrated.
+			return false;
+		}
+
+		// Write back the migrated data:
+		saveOffers(dataValue, migratedOffers);
+		return true;
+	}
+
 	// Note: Returns the same list instance if no items were migrated.
-	public static List<? extends PriceOffer> migrateItems(@ReadOnly List<? extends PriceOffer> offers, String errorPrefix) {
-		if (errorPrefix == null) errorPrefix = "";
-		if (offers == null) return null;
+	private static List<? extends PriceOffer> migrateItems(@ReadOnly List<? extends PriceOffer> offers) throws InvalidDataException {
+		Validate.notNull(offers, "offers is null");
+		Validate.noNullElements(offers, "offers contains null");
 		List<PriceOffer> migratedOffers = null;
 		final int size = offers.size();
 		for (int i = 0; i < size; ++i) {
 			PriceOffer offer = offers.get(i);
-			if (offer == null) continue; // Skip invalid entries
+			assert offer != null;
 
 			boolean itemsMigrated = false;
 			boolean migrationFailed = false;
@@ -162,9 +185,14 @@ public class SKPriceOffer implements PriceOffer {
 			if (!ItemUtils.isSimilar(item, migratedItem)) {
 				if (ItemUtils.isEmpty(migratedItem) && !ItemUtils.isEmpty(item)) {
 					migrationFailed = true;
+				} else {
+					item = migratedItem;
+					itemsMigrated = true;
 				}
-				item = migratedItem;
-				itemsMigrated = true;
+			}
+
+			if (migrationFailed) {
+				throw new InvalidDataException("Item migration failed for price offer " + (i + 1) + ": " + offer);
 			}
 
 			if (itemsMigrated) {
@@ -177,11 +205,6 @@ public class SKPriceOffer implements PriceOffer {
 						if (oldOffer == null) continue; // Skip invalid entries
 						migratedOffers.add(oldOffer);
 					}
-				}
-
-				if (migrationFailed) {
-					Log.warning(errorPrefix + "Item migration failed for price offer " + (i + 1) + ": " + offer);
-					continue; // Skip this offer
 				}
 
 				// Add the migrated offer to the list of migrated offers:

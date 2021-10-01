@@ -18,6 +18,7 @@ import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
+import com.nisovin.shopkeepers.util.data.DataValue;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -90,20 +91,22 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 
 	// OFFERS
 
+	private static final String DATA_KEY_OFFERS = "recipes";
+
 	private void loadOffers(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		List<? extends TradeOffer> offers = SKTradeOffer.load(shopkeeperData, "recipes", this.getLogPrefix());
-		List<? extends TradeOffer> migratedOffers = SKTradeOffer.migrateItems(offers, this.getLogPrefix());
-		if (offers != migratedOffers) {
+		DataValue offerListData = shopkeeperData.getDataValue(DATA_KEY_OFFERS);
+		if (SKTradeOffer.migrateOffers(offerListData)) {
 			Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated items of trade offers.");
 			this.markDirty();
 		}
-		this._setOffers(migratedOffers);
+
+		this._setOffers(SKTradeOffer.loadOffers(offerListData));
 	}
 
 	private void saveOffers(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		SKTradeOffer.save(shopkeeperData, "recipes", this.getOffers());
+		SKTradeOffer.saveOffers(shopkeeperData.getDataValue(DATA_KEY_OFFERS), this.getOffers());
 	}
 
 	@Override

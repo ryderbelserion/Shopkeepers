@@ -11,6 +11,7 @@ Date format: (YYYY-MM-DD)
   * Shopkeeper mobs will rotate back to their initial direction now when there is no player to look at. However, this requires a player to still be somewhat nearby, since only shopkeeper mobs with nearby players are ticked.
 * Fixed: Shopkeepers could lose some of their trades during item migrations. When an item was migrated, but the subsequent trades did not require any item migrations, these subsequent trades were lost. However, it was relatively unlikely to encounter this issue in practice. An exception to this is in combination with the following Paper-specific issue that only affects trades with certain enchanted book items.
 * Fixed: On Paper servers, the comparisons of enchanted book items with multiple stored enchantments were not working as expected. The issue was caused by the server reordering the stored enchantments in some cases, as well as Paper automatically converting any deserialized Bukkit item stacks to CraftItemStacks, which behave differently when being compared to other CraftItemStacks. One known effect of this was that the above issue of trades potentially being lost due to item migrations would be encountered more likely on Paper servers, because the reordering of these stored enchantments would be detected as an 'item migration' by the Shopkeepers plugin. It also caused an unnecessary save of all shopkeeper data after every plugin reload.
+* Invalid trade offer data and failed trade offer item migrations will now prevent the shopkeeper from loading. Previously, some kinds of invalid data were silently ignored, and others only resulted in a warning being logged and the affected trade offer to be skipped. This could lead to the loss of data for these invalid trade offers. Now, this invalid data is retained for a server admin to investigate the issue.
 * When shopkeepers of inactive players are removed, we now trigger an immediate save, even if the 'save-instantly' setting is disabled.
 * Versioning: Snapshot builds will now include the Git hash in their plugin version.
 * Debug: The 'shopkeeper-activation' debug option will now log additional details about every single shopkeeper activation and deactivation, instead of only logging a summary about how many shopkeepers were activated per chunk.
@@ -62,7 +63,7 @@ Date format: (YYYY-MM-DD)
 * The primary 'build' script automatically invokes the 'installSpigotDependencies' script now.
 
 **Other internal changes:**  
-* Internal API: The 'errorContext' parameters of the 'loadFromConfig' and 'migrateItems' methods of the various types of shop offers (SKTradeOffer, SKPriceOffer, SKBookOffer) are now log prefixes.
+* Internal API: Various changes to the loading, saving, and migration methods of shopkeeper offers.
 * Internal API: CitizensShopkeeperTrair#getShopkeeper() returns an AbstractShopkeeper now.
 * Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
 * Internal API: Moved various editor internal classes into their own files.
@@ -75,9 +76,7 @@ Date format: (YYYY-MM-DD)
   * A ConfigData interface extends DataContainer to provide access to default config values.
   * ShopkeeperData and ShopObjectData wrappers extend DataContainer with common convenience methods that were previously located inside AbstractShopkeeper to interact with the shopkeeper and shop object data.
 * Internal API: Various refactors related to shop object properties.
-* Internal API: The loading and saving methods of shopkeeper offers have been renamed.
 * Internal API: Various uses of ShopkeeperCreateException have been replaced with the better fitting InvalidDataException.
-* We now log a warning when we encounter a shopkeeper offer with invalid data. Previously, these offers were silently skipped.
 * Shopkeepers are now deactivated before they are despawned. This avoids having to process the object id change of the shop object being despawned when the shopkeeper is going to be deactivated anyways.
 * Fixed: The ShopkeeperByName command argument did not take the 'joinRemainingArgs' argument into account.
 * Fixed: The parsing of command arguments failed in cases in which command arguments depend on the context provided by fallbacks of earlier arguments.

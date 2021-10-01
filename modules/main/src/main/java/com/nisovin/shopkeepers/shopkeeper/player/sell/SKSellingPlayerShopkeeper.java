@@ -22,6 +22,7 @@ import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
+import com.nisovin.shopkeepers.util.data.DataValue;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -108,20 +109,22 @@ public class SKSellingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 
 	// OFFERS
 
+	private static final String DATA_KEY_OFFERS = "offers";
+
 	private void loadOffers(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		List<? extends PriceOffer> offers = SKPriceOffer.load(shopkeeperData, "offers", this.getLogPrefix());
-		List<? extends PriceOffer> migratedOffers = SKPriceOffer.migrateItems(offers, this.getLogPrefix());
-		if (offers != migratedOffers) {
+		DataValue offerListData = shopkeeperData.getDataValue(DATA_KEY_OFFERS);
+		if (SKPriceOffer.migrateOffers(offerListData)) {
 			Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated items of trade offers.");
 			this.markDirty();
 		}
-		this._setOffers(migratedOffers);
+
+		this._setOffers(SKPriceOffer.loadOffers(offerListData));
 	}
 
 	private void saveOffers(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		SKPriceOffer.save(shopkeeperData, "offers", this.getOffers());
+		SKPriceOffer.saveOffers(shopkeeperData.getDataValue(DATA_KEY_OFFERS), this.getOffers());
 	}
 
 	@Override

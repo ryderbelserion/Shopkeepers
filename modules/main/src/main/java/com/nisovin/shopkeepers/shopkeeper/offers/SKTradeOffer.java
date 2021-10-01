@@ -13,9 +13,11 @@ import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.DataUtils;
 import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.DataValue;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
-import com.nisovin.shopkeepers.util.logging.Log;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 // Shares its implementation with SKTradingRecipe, but always reports to not be out of stock.
 public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
@@ -98,8 +100,14 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		return new SKTradingRecipe(offer.getResultItem(), offer.getItem1(), offer.getItem2(), outOfStock);
 	}
 
-	public static void save(DataContainer dataContainer, String node, @ReadOnly Collection<? extends TradeOffer> offers) {
-		DataContainer offerListData = dataContainer.createContainer(node);
+	public static void saveOffers(DataValue dataValue, @ReadOnly Collection<? extends TradeOffer> offers) {
+		Validate.notNull(dataValue, "dataValue is null");
+		if (offers == null) {
+			dataValue.clear();
+			return;
+		}
+
+		DataContainer offerListData = dataValue.createContainer();
 		int id = 1;
 		for (TradeOffer offer : offers) {
 			// These items are assumed to be immutable.
@@ -115,44 +123,63 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		}
 	}
 
-	// Elements inside the data container are assumed to be immutable and can be reused without having to be copied.
-	public static List<? extends TradeOffer> load(DataContainer dataContainer, String node, String errorPrefix) {
-		if (errorPrefix == null) errorPrefix = "";
-		List<TradeOffer> offers = new ArrayList<>();
-		DataContainer offerListData = dataContainer.getContainer(node);
-		if (offerListData != null) {
-			for (String id : offerListData.getKeys()) {
-				DataContainer offerData = offerListData.getContainer(id);
-				if (offerData == null) {
-					// Invalid offer: Not a container.
-					Log.warning(errorPrefix + "Invalid data for trade offer " + id);
-					continue;
-				}
+	// Elements inside the data are assumed to be immutable and can be reused without having to be copied.
+	public static List<? extends TradeOffer> loadOffers(DataValue dataValue) throws InvalidDataException {
+		Validate.notNull(dataValue, "dataValue is null");
 
-				// The item stacks are assumed to be immutable and therefore do not need to be copied.
-				UnmodifiableItemStack resultItem = DataUtils.loadUnmodifiableItemStack(offerData, "resultItem");
-				UnmodifiableItemStack item1 = DataUtils.loadUnmodifiableItemStack(offerData, "item1");
-				UnmodifiableItemStack item2 = DataUtils.loadUnmodifiableItemStack(offerData, "item2");
-				if (ItemUtils.isEmpty(resultItem) || ItemUtils.isEmpty(item1)) {
-					// Invalid offer.
-					Log.warning(errorPrefix + "Invalid trade offer " + id + ": item1 or resultItem is empty.");
-					continue;
-				}
-				offers.add(new SKTradeOffer(resultItem, item1, item2));
+		if (!dataValue.isPresent()) {
+			// No data -> Return an empty list of offers.
+			return new ArrayList<>(0);
+		}
+
+		DataContainer offerListData = dataValue.getContainer();
+		if (offerListData == null) {
+			throw new InvalidDataException("Invalid trade offer list data: " + dataValue.get());
+		}
+
+		List<TradeOffer> offers = new ArrayList<>();
+		for (String id : offerListData.getKeys()) {
+			DataContainer offerData = offerListData.getContainer(id);
+			if (offerData == null) {
+				// Data is not a container.
+				throw new InvalidDataException("Invalid data for trade offer " + id);
 			}
+
+			// The item stacks are assumed to be immutable and therefore do not need to be copied.
+			UnmodifiableItemStack resultItem = DataUtils.loadUnmodifiableItemStack(offerData, "resultItem");
+			UnmodifiableItemStack item1 = DataUtils.loadUnmodifiableItemStack(offerData, "item1");
+			UnmodifiableItemStack item2 = DataUtils.loadUnmodifiableItemStack(offerData, "item2");
+			if (ItemUtils.isEmpty(resultItem) || ItemUtils.isEmpty(item1)) {
+				throw new InvalidDataException("Invalid trade offer " + id + ": item1 or resultItem is empty.");
+			}
+			offers.add(new SKTradeOffer(resultItem, item1, item2));
 		}
 		return offers;
 	}
 
+	// Returns true if the data has changed due to migrations.
+	public static boolean migrateOffers(DataValue dataValue) throws InvalidDataException {
+		List<? extends TradeOffer> offers = loadOffers(dataValue);
+		List<? extends TradeOffer> migratedOffers = migrateItems(offers);
+		if (offers == migratedOffers) {
+			// Nothing migrated.
+			return false;
+		}
+
+		// Write back the migrated data:
+		saveOffers(dataValue, migratedOffers);
+		return true;
+	}
+
 	// Note: Returns the same list instance if no items were migrated.
-	public static List<? extends TradeOffer> migrateItems(@ReadOnly List<? extends TradeOffer> offers, String errorPrefix) {
-		if (errorPrefix == null) errorPrefix = "";
-		if (offers == null) return null;
+	private static List<? extends TradeOffer> migrateItems(@ReadOnly List<? extends TradeOffer> offers) throws InvalidDataException {
+		Validate.notNull(offers, "offers is null");
+		Validate.noNullElements(offers, "offers contains null");
 		List<TradeOffer> migratedOffers = null;
 		final int size = offers.size();
 		for (int i = 0; i < size; ++i) {
 			TradeOffer offer = offers.get(i);
-			if (offer == null) continue; // Skip invalid entries
+			assert offer != null;
 
 			boolean itemsMigrated = false;
 			boolean migrationFailed = false;
@@ -166,25 +193,32 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 			if (!ItemUtils.isSimilar(resultItem, migratedResultItem)) {
 				if (ItemUtils.isEmpty(migratedResultItem) && !ItemUtils.isEmpty(resultItem)) {
 					migrationFailed = true;
+				} else {
+					resultItem = migratedResultItem;
+					itemsMigrated = true;
 				}
-				resultItem = migratedResultItem;
-				itemsMigrated = true;
 			}
 			UnmodifiableItemStack migratedItem1 = ItemMigration.migrateItemStack(item1);
 			if (!ItemUtils.isSimilar(item1, migratedItem1)) {
 				if (ItemUtils.isEmpty(migratedItem1) && !ItemUtils.isEmpty(item1)) {
 					migrationFailed = true;
+				} else {
+					item1 = migratedItem1;
+					itemsMigrated = true;
 				}
-				item1 = migratedItem1;
-				itemsMigrated = true;
 			}
 			UnmodifiableItemStack migratedItem2 = ItemMigration.migrateItemStack(item2);
 			if (!ItemUtils.isSimilar(item2, migratedItem2)) {
 				if (ItemUtils.isEmpty(migratedItem2) && !ItemUtils.isEmpty(item2)) {
 					migrationFailed = true;
+				} else {
+					item2 = migratedItem2;
+					itemsMigrated = true;
 				}
-				item2 = migratedItem2;
-				itemsMigrated = true;
+			}
+
+			if (migrationFailed) {
+				throw new InvalidDataException("Item migration failed for trade offer " + (i + 1) + ": " + offer);
 			}
 
 			if (itemsMigrated) {
@@ -197,11 +231,6 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 						if (oldOffer == null) continue; // Skip invalid entries
 						migratedOffers.add(oldOffer);
 					}
-				}
-
-				if (migrationFailed) {
-					Log.warning(errorPrefix + "Item migration failed for trade offer " + (i + 1) + ": " + offer);
-					continue; // Skip this offer
 				}
 
 				// Add the migrated offer to the list of migrated offers:
