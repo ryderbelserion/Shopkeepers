@@ -55,6 +55,11 @@ import org.bukkit.configuration.serialization.ConfigurationSerializable;
 public interface DataContainer {
 
 	/**
+	 * An empty and immutable {@link DataContainer} instance.
+	 */
+	public static final DataContainer EMPTY = create().asView();
+
+	/**
 	 * Creates a new empty {@link DataContainer}.
 	 * 
 	 * @return the new data container
