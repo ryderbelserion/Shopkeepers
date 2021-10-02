@@ -476,6 +476,19 @@ public interface DataContainer {
 	}
 
 	/**
+	 * Gets a {@link DataContainer} that uses a {@link #getDataValue(String) DataValue} to dynamically read and write to
+	 * the value that is stored for the given key.
+	 * 
+	 * @param key
+	 *            the key, not <code>null</code> or empty
+	 * @return the data container, not <code>null</code>
+	 * @see DataValueContainer
+	 */
+	public default DataContainer getDataValueContainer(String key) {
+		return DataValueContainer.of(this.getDataValue(key));
+	}
+
+	/**
 	 * Creates a new empty {@link DataContainer} and stores its {@link #serialize() serialized form} for the given key.
 	 * <p>
 	 * The returned data container reads and writes through to its stored serialized form.
@@ -603,14 +616,19 @@ public interface DataContainer {
 	/**
 	 * Gets a serializable representation of this data container.
 	 * <p>
-	 * Unlike the data container itself, the returned object is suited for serialization. The returned object can be
-	 * turned into a data container again via {@link #of(Object)}.
+	 * Unlike this data container itself, the returned object is suited for serialization. Usually, the returned object
+	 * can be turned into a data container again via {@link #of(Object)}. However, the exact type of this data container
+	 * may not be preserved, and there are cases in which the returned data may not necessarily represent a valid data
+	 * container (see below).
 	 * <p>
-	 * The returned serializable representation is not a snapshot of the current contents of this data container, but a
-	 * dynamic view: Further modifications of this data container write through to the returned serializable
-	 * representation.
+	 * If the returned data represents a valid data container, it is not a snapshot of the current contents of this data
+	 * container, but a dynamic view: Further modifications of this data container write through to the returned
+	 * serializable representation.
+	 * <p>
+	 * If this data container is a view around some dynamic data source, this may also return <code>null</code> (eg. if
+	 * the underlying data source is not present currently), or data that cannot be turned into a data container again.
 	 * 
-	 * @return the serializable representation, not <code>null</code>
+	 * @return the serializable representation, can be <code>null</code> in certain cases
 	 */
 	public Object serialize();
 }
