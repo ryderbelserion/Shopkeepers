@@ -52,8 +52,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	private static final int CHECK_CONTAINER_PERIOD_SECONDS = 5;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_CONTAINER_PERIOD_SECONDS + 1);
 
-	protected UUID ownerUUID; // Not null after successful initialization
-	protected String ownerName; // Not null after successful initialization
+	protected User owner; // Not null after successful initialization
 	// TODO Store container world separately? Currently it uses the shopkeeper world.
 	// This would allow the container and shopkeeper to be located in different worlds, and virtual player shops.
 	protected int containerX;
@@ -224,13 +223,19 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	private void saveOwner(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		shopkeeperData.set("owner uuid", ownerUUID.toString());
-		shopkeeperData.set("owner", ownerName);
+		shopkeeperData.set("owner uuid", this.getOwnerUUID());
+		shopkeeperData.set("owner", this.getOwnerName());
 	}
 
 	@Override
 	public void setOwner(Player player) {
 		this.setOwner(player.getUniqueId(), player.getName());
+	}
+
+	// TODO Add to API
+	public void setOwner(User owner) {
+		this._setOwner(owner);
+		this.markDirty();
 	}
 
 	@Override
@@ -240,42 +245,44 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	private void _setOwner(UUID ownerUUID, String ownerName) {
-		Validate.notNull(ownerUUID, "ownerUUID is null");
-		Validate.notEmpty(ownerName, "ownerName is null or empty");
-		this.ownerUUID = ownerUUID;
-		this.ownerName = ownerName;
+		this._setOwner(SKUser.of(ownerUUID, ownerName));
+	}
+
+	private void _setOwner(User owner) {
+		Validate.notNull(owner, "owner is null");
+		this.owner = owner;
 
 		// Inform the shop object:
 		this.getShopObject().onShopOwnerChanged();
 	}
 
 	public User getOwnerUser() {
-		return SKUser.of(ownerUUID, ownerName);
+		return owner;
 	}
 
 	@Override
 	public UUID getOwnerUUID() {
-		return ownerUUID;
+		return owner.getUniqueId();
 	}
 
 	@Override
 	public String getOwnerName() {
-		return ownerName;
+		return owner.getLastKnownName();
 	}
 
 	@Override
 	public String getOwnerString() {
-		return TextUtils.getPlayerString(ownerName, ownerUUID);
+		return TextUtils.getPlayerString(owner);
 	}
 
 	@Override
 	public boolean isOwner(Player player) {
-		return player.getUniqueId().equals(ownerUUID);
+		return player.getUniqueId().equals(this.getOwnerUUID());
 	}
 
 	@Override
 	public Player getOwner() {
-		return Bukkit.getPlayer(ownerUUID);
+		return Bukkit.getPlayer(this.getOwnerUUID());
 	}
 
 	// TRADE NOTIFICATIONS
