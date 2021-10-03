@@ -48,7 +48,7 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	}
 
 	// Null if no additional trading permission is required. Not empty.
-	protected String tradePermission = null;
+	private String tradePermission = null;
 
 	/**
 	 * Creates a not yet initialized {@link AbstractAdminShopkeeper} (for use in sub-classes).

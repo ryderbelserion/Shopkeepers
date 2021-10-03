@@ -70,6 +70,7 @@ Date format: (YYYY-MM-DD)
 * Internal API: Added SKSignShopObject#getSignType().
 * Internal API: It is now the responsibility of the shop object to inform about object id changes, even when the shop object is being spawned, despawned, or ticked.
 * Internal API: Added AbstractShopObject#respawn().
+* Internal API: Various internal fields of AbstractPlayerShopkeeper and AbstractAdminShopkeeper are no longer directly accessible by subclasses, but need to be accessed via their respective getters and setters now.
 * Internal API: Added the possibility to save and load a shopkeeper's dynamic state.
 * Internal API: Instead of using Bukkit's ConfigurationSection interface, we now use our own DataContainer interface to represent data in memory.
   * Most uses of ConfigurationSection have been replaced with DataContainer, such as for representing config, language file, shopkeeper, and shop object data.

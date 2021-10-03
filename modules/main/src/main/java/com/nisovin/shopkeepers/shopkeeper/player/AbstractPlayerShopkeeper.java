@@ -52,14 +52,14 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	private static final int CHECK_CONTAINER_PERIOD_SECONDS = 5;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_CONTAINER_PERIOD_SECONDS + 1);
 
-	protected User owner; // Not null after successful initialization
+	private User owner; // Not null after successful initialization
 	// TODO Store container world separately? Currently it uses the shopkeeper world.
 	// This would allow the container and shopkeeper to be located in different worlds, and virtual player shops.
-	protected int containerX;
-	protected int containerY;
-	protected int containerZ;
+	private int containerX;
+	private int containerY;
+	private int containerZ;
 	private boolean notifyOnTrades = DEFAULT_NOTIFY_ON_TRADES;
-	protected UnmodifiableItemStack hireCost = null; // Null if not for hire
+	private UnmodifiableItemStack hireCost = null; // Null if not for hire
 
 	// Initial threshold between [1, CHECK_CONTAINER_PERIOD_SECONDS] for load balancing:
 	private final RateLimiter checkContainerLimiter = new RateLimiter(CHECK_CONTAINER_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
