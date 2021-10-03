@@ -94,7 +94,7 @@ public class TextUtils {
 	}
 
 	public static String getPlayerString(User user) {
-		return getPlayerString(user.getName(), user.getUniqueId());
+		return getPlayerString(user.getLastKnownName(), user.getUniqueId());
 	}
 
 	public static String getPlayerString(String playerName, UUID playerUUID) {
