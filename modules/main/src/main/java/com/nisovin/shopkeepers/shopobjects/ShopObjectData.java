@@ -53,8 +53,13 @@ public class ShopObjectData extends DelegateDataContainer {
 	 *             if the shop object type identifier could not be found
 	 */
 	public final String getShopObjectTypeId() throws InvalidDataException {
-		String objectTypeId = this.getString(DATA_KEY_SHOP_OBJECT_TYPE);
-		if (StringUtils.isEmpty(objectTypeId)) {
+		Object data = this.get(DATA_KEY_SHOP_OBJECT_TYPE);
+		if (data != null && !(data instanceof String)) {
+			throw new InvalidDataException("Invalid shop object type id data!");
+		}
+
+		String objectTypeId = StringUtils.getNotEmpty((String) data);
+		if (objectTypeId == null) {
 			throw new InvalidDataException("Missing shop object type id!");
 		}
 		return objectTypeId;
