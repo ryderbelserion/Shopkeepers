@@ -66,7 +66,7 @@ class SignShopListener implements Listener {
 	// Null to clear
 	void cancelNextBlockPhysics(Block block) {
 		if (block == null) {
-			cancelNextBlockPhysics.unsetWorldName();
+			cancelNextBlockPhysics.setWorldName(null);
 		} else {
 			cancelNextBlockPhysics.set(block);
 		}
