@@ -75,8 +75,7 @@ public class ItemConversions {
 		if (shopkeeper instanceof PlayerShopkeeper) {
 			PlayerShopkeeper playerShopkeeper = (PlayerShopkeeper) shopkeeper;
 			Block containerBlock = playerShopkeeper.getContainer();
-			assert containerBlock != null;
-			if (ShopContainers.isSupportedContainer(containerBlock.getType())) {
+			if (containerBlock != null && ShopContainers.isSupportedContainer(containerBlock.getType())) {
 				long startNanos = System.nanoTime();
 				// Returns the complete inventory for double chests.
 				// Inventory changes are directly reflected by the container block in the world.

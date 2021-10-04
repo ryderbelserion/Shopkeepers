@@ -27,14 +27,17 @@ import com.nisovin.shopkeepers.api.user.User;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
+import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.user.SKUser;
+import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.DataUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
+import com.nisovin.shopkeepers.util.bukkit.MutableBlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
@@ -53,11 +56,10 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_CONTAINER_PERIOD_SECONDS + 1);
 
 	private User owner; // Not null after successful initialization
-	// TODO Store container world separately? Currently it uses the shopkeeper world.
-	// This would allow the container and shopkeeper to be located in different worlds, and virtual player shops.
-	private int containerX;
-	private int containerY;
-	private int containerZ;
+	// The world name of this BlockLocation matches the shopkeeper world name.
+	// TODO Allow the container to be located in a world different to that of the shopkeeper? This could also be useful
+	// for virtual player shops, which don't have a world themselves, but would still need a container block in a world.
+	private BlockLocation container; // Immutable BlockLocation
 	private boolean notifyOnTrades = DEFAULT_NOTIFY_ON_TRADES;
 	private UnmodifiableItemStack hireCost = null; // Null if not for hire
 
@@ -122,16 +124,16 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	protected void onAdded(ShopkeeperAddedEvent.Cause cause) {
 		super.onAdded(cause);
 
-		// Register protected container:
-		SKShopkeepersPlugin.getInstance().getProtectedContainers().addContainer(this.getWorldName(), containerX, containerY, containerZ, this);
+		// Enable the container protection:
+		this.protectContainer();
 	}
 
 	@Override
 	protected void onRemoval(ShopkeeperRemoveEvent.Cause cause) {
 		super.onRemoval(cause);
 
-		// Unregister previously protected container:
-		SKShopkeepersPlugin.getInstance().getProtectedContainers().removeContainer(this.getWorldName(), containerX, containerY, containerZ, this);
+		// Disable the container protection:
+		this.unprotectContainer();
 	}
 
 	@Override
@@ -396,41 +398,57 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	private void saveContainer(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		shopkeeperData.set("chestx", containerX);
-		shopkeeperData.set("chesty", containerY);
-		shopkeeperData.set("chestz", containerZ);
+		shopkeeperData.set("chestx", container.getX());
+		shopkeeperData.set("chesty", container.getY());
+		shopkeeperData.set("chestz", container.getZ());
+	}
+
+	private void protectContainer() {
+		ProtectedContainers protectedContainers = SKShopkeepersPlugin.getInstance().getProtectedContainers();
+		protectedContainers.addContainer(container, this);
+	}
+
+	private void unprotectContainer() {
+		ProtectedContainers protectedContainers = SKShopkeepersPlugin.getInstance().getProtectedContainers();
+		protectedContainers.removeContainer(container, this);
 	}
 
 	protected void _setContainer(int containerX, int containerY, int containerZ) {
+		this._setContainer(new BlockLocation(this.getWorldName(), containerX, containerY, containerZ));
+	}
+
+	protected void _setContainer(BlockLocation container) {
+		Validate.notNull(container, "container is null");
 		if (this.isValid()) {
-			// Unregister previously protected container:
-			SKShopkeepersPlugin.getInstance().getProtectedContainers().removeContainer(this.getWorldName(), containerX, containerY, containerZ, this);
+			// Disable the protection for the previous container:
+			this.unprotectContainer();
 		}
 
 		// Update container:
-		this.containerX = containerX;
-		this.containerY = containerY;
-		this.containerZ = containerZ;
+		// Ensure that the container's world name matches the shopkeeper world name:
+		MutableBlockLocation newContainer = container.mutableCopy();
+		newContainer.setWorldName(this.getWorldName());
+		this.container = newContainer.immutable();
 
 		if (this.isValid()) {
-			// Register new protected container:
-			SKShopkeepersPlugin.getInstance().getProtectedContainers().addContainer(this.getWorldName(), containerX, containerY, containerZ, this);
+			// Enable the protection for the new container:
+			this.protectContainer();
 		}
 	}
 
 	@Override
 	public int getContainerX() {
-		return containerX;
+		return container.getX();
 	}
 
 	@Override
 	public int getContainerY() {
-		return containerY;
+		return container.getY();
 	}
 
 	@Override
 	public int getContainerZ() {
-		return containerZ;
+		return container.getZ();
 	}
 
 	@Override
@@ -441,13 +459,13 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	@Override
 	public Block getContainer() {
-		return Bukkit.getWorld(this.getWorldName()).getBlockAt(containerX, containerY, containerZ);
+		return container.getBlock();
 	}
 
 	// Returns null if the container could not be found.
 	public Inventory getContainerInventory() {
 		Block container = this.getContainer();
-		if (ShopContainers.isSupportedContainer(container.getType())) {
+		if (container != null && ShopContainers.isSupportedContainer(container.getType())) {
 			return ShopContainers.getInventory(container); // Not null
 		}
 		return null;
@@ -574,7 +592,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 			// This checks if the block is still a valid container:
 			Block containerBlock = this.getContainer();
-			if (!ShopContainers.isSupportedContainer(containerBlock.getType())) {
+			if (containerBlock != null && !ShopContainers.isSupportedContainer(containerBlock.getType())) {
 				// Note: If this shopkeeper got deleted due to the chest being broken, we will trigger a delayed save
 				// after the ticking of the shopkeepers.
 				SKShopkeepersPlugin.getInstance().getRemoveShopOnContainerBreak().handleBlockBreakage(containerBlock);

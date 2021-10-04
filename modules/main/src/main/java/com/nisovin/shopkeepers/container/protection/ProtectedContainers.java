@@ -89,34 +89,29 @@ public class ProtectedContainers {
 		protectedContainers.clear();
 	}
 
-	private BlockLocation createKey(String worldName, int x, int y, int z) {
-		return new BlockLocation(worldName, x, y, z);
-	}
-
 	private BlockLocation getSharedKey(String worldName, int x, int y, int z) {
 		sharedBlockLocation.set(worldName, x, y, z);
 		return sharedBlockLocation;
 	}
 
-	public void addContainer(String worldName, int x, int y, int z, PlayerShopkeeper shopkeeper) {
+	public void addContainer(BlockLocation location, PlayerShopkeeper shopkeeper) {
+		Validate.notNull(location, "location is null");
 		Validate.notNull(shopkeeper, "shopkeeper is null");
-		BlockLocation key = this.createKey(worldName, x, y, z);
-		List<PlayerShopkeeper> shopkeepers = protectedContainers.computeIfAbsent(key, k -> new ArrayList<>(1));
+		List<PlayerShopkeeper> shopkeepers = protectedContainers.computeIfAbsent(location.immutable(), key -> new ArrayList<>(1));
 		shopkeepers.add(shopkeeper);
 	}
 
-	public void removeContainer(String worldName, int x, int y, int z, PlayerShopkeeper shopkeeper) {
+	public void removeContainer(BlockLocation location, PlayerShopkeeper shopkeeper) {
+		Validate.notNull(location, "location is null");
 		Validate.notNull(shopkeeper, "shopkeeper is null");
-		BlockLocation key = this.getSharedKey(worldName, x, y, z);
-		// Note: We either update the value, or remove it. We don't insert a new value. The Map implementation removes
-		// the corresponding node or updates its value. It does not store the provided key in either of these cases. We
-		// can therefore safely use the shared key here.
-		protectedContainers.computeIfPresent(key, (k, shopkeepers) -> {
+		// This operation either updates the value inside the Map, or removes it. It does not insert a new entry for the
+		// passed key. We can therefore safely use the given location, without first creating an immutable copy of it.
+		protectedContainers.computeIfPresent(location, (key, shopkeepers) -> {
 			shopkeepers.remove(shopkeeper);
 			if (shopkeepers.isEmpty()) {
 				return null; // Removes the mapping
 			} else {
-				return shopkeepers; // Keeps the mapping
+				return shopkeepers; // Keeps the updated mapping
 			}
 		});
 	}

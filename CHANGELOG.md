@@ -31,6 +31,8 @@ Date format: (YYYY-MM-DD)
 * For consistency among commands, and to avoid certain ambiguous command parsing cases, the "edit", "remote", and "remove" commands no longer merge trailing arguments to derive the target shopkeeper name. It is still possible to target shopkeepers with names that consist of multiple words by using a dash as word separator instead of a space.
 * Shopkeeper and entity command arguments now propose the ids of targeted shopkeepers and entities.
 * Fixed: The "testSpawn" debug command would respawn the shopkeepers in the executing player's chunk, but would not immediately update their object id registrations. The shop objects will now automatically and immediately inform the shopkeeper registry about those object id changes.
+* Fixed: When changing the container location of a player shop via the API, the protection for the previous container was not properly disabled.
+* Fixed: Any code that retrieves the container block of a player shopkeeper accounts now for the fact that the block might be null. This was only really an issue when another plugin invokes internal operations that require the container block to be available in a situation in which it might not be available currently.
 
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
@@ -48,6 +50,7 @@ Date format: (YYYY-MM-DD)
 * PlayerShopkeeper#setForHire only resets the shopkeeper name now if the shopkeeper was previously for hire.
 * Various internal methods that are not meant to be called by API users have been moved from public API classes into separate 'ApiInternals' and 'InternalShopkeepersAPI' classes.
 * Removed the recently added but immediately deprecated factory method for unmodifiable item stacks from ShopkeepersPlugin again.
+* Clarified that the block returned by PlayerShopkeeper#getContainer() can be null if the container's world is not loaded currently.
 
 **Various internal build changes:**  
 * Switched from Maven to Gradle.
@@ -63,6 +66,7 @@ Date format: (YYYY-MM-DD)
 * The primary 'build' script automatically invokes the 'installSpigotDependencies' script now.
 
 **Other internal changes:**  
+* Internal API: ProtectedContainers requires a BlockLocation now when adding or removing a container protection.
 * Internal API: Various changes to the loading, saving, and migration methods of shopkeeper offers.
 * Internal API: CitizensShopkeeperTrair#getShopkeeper() returns an AbstractShopkeeper now.
 * Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.

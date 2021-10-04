@@ -154,12 +154,12 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	/**
 	 * Gets the block of the shop's container.
 	 * <p>
-	 * This does not necessarily have to be a chest, but could be another type of supported shop container as well.
+	 * This does not necessarily have to be a chest, but could also be another type of supported shop container.
 	 * <p>
 	 * The block might not actually be a valid container type currently (for example if something has broken or changed
 	 * the type of the block in the meantime).
 	 * 
-	 * @return the shop's container block
+	 * @return the shop's container block, or <code>null</code> if the container's world is not loaded currently
 	 */
 	public Block getContainer();
 
