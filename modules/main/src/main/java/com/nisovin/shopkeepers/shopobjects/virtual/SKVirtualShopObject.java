@@ -10,6 +10,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.ui.editor.Button;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 
 // TODO Not yet used.
 public class SKVirtualShopObject extends AbstractShopObject implements VirtualShopObject {
@@ -27,7 +28,7 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 	}
 
 	@Override
-	public void load(ShopObjectData configSection) {
+	public void load(ShopObjectData configSection) throws InvalidDataException {
 		super.load(configSection);
 	}
 

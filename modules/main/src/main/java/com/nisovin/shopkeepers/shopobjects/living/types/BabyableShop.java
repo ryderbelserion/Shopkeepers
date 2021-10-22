@@ -20,6 +20,7 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
@@ -49,7 +50,7 @@ public class BabyableShop<E extends Ageable> extends SKLivingShopObject<E> {
 	}
 
 	@Override
-	public void load(ShopObjectData shopObjectData) {
+	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
 		if (this.isBabyable()) {
 			babyProperty.load(shopObjectData);

@@ -36,6 +36,7 @@ import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.bukkit.WorldUtils;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.RateLimiter;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -90,7 +91,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	}
 
 	@Override
-	public void load(ShopObjectData shopObjectData) {
+	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
 	}
 

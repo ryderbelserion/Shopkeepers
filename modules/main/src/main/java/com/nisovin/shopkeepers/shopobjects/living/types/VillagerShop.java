@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
@@ -81,7 +82,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	@Override
-	public void load(ShopObjectData shopObjectData) {
+	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
 		professionProperty.load(shopObjectData);
 		villagerTypeProperty.load(shopObjectData);

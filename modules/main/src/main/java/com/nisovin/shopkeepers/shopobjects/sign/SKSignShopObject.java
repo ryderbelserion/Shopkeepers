@@ -38,6 +38,7 @@ import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
@@ -113,7 +114,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	@Override
-	public void load(ShopObjectData shopObjectData) {
+	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
 		signTypeProperty.load(shopObjectData);
 		wallSignProperty.load(shopObjectData);

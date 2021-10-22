@@ -19,6 +19,7 @@ import com.nisovin.shopkeepers.property.ShopkeeperPropertyContainer;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -69,8 +70,10 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * 
 	 * @param shopObjectData
 	 *            the shop object data, not <code>null</code>
+	 * @throws InvalidDataException
+	 *             if the data cannot be loaded
 	 */
-	public void load(ShopObjectData shopObjectData) {
+	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		Validate.notNull(shopObjectData, "shopObjectData is null");
 	}
 

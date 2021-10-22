@@ -22,6 +22,7 @@ import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.RateLimiter;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -79,7 +80,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	}
 
 	@Override
-	public void load(ShopObjectData shopObjectData) {
+	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
 		npcUniqueIdProperty.load(shopObjectData);
 	}

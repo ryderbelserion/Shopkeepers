@@ -19,6 +19,7 @@ import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
@@ -35,7 +36,7 @@ public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 	}
 
 	@Override
-	public void load(ShopObjectData shopObjectData) {
+	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
 		carryingChestProperty.load(shopObjectData);
 	}
