@@ -561,6 +561,60 @@ public interface DataContainer {
 	public void clear();
 
 	/**
+	 * Loads the value for the given {@link DataAccessor}.
+	 * 
+	 * @param <T>
+	 *            the type of the value
+	 * @param accessor
+	 *            the data accessor, not <code>null</code>
+	 * @return the value, can be <code>null</code>
+	 * @throws InvalidDataException
+	 *             if the value cannot be loaded (optional)
+	 * @see DataAccessor#load(DataContainer)
+	 */
+	public <T> T get(DataAccessor<T> accessor) throws InvalidDataException;
+
+	/**
+	 * Loads the value for the given {@link DataAccessor}, but returns <code>null</code> if the {@link DataAccessor}
+	 * throws a {@link MissingDataException}.
+	 * 
+	 * @param <T>
+	 *            the type of the value
+	 * @param accessor
+	 *            the data accessor, not <code>null</code>
+	 * @return the value, can be <code>null</code>
+	 * @throws InvalidDataException
+	 *             if the value cannot be loaded (optional)
+	 */
+	public <T> T getOrNullIfMissing(DataAccessor<T> accessor) throws InvalidDataException;
+
+	/**
+	 * Loads the value for the given {@link DataAccessor}, but returns <code>null</code> if the {@link DataAccessor}
+	 * throws any kind of {@link InvalidDataException}.
+	 * 
+	 * @param <T>
+	 *            the type of the value
+	 * @param accessor
+	 *            the data accessor, not <code>null</code>
+	 * @return the value, or <code>null</code> if the data accessor either returns <code>null</code> or cannot load the
+	 *         value
+	 */
+	public <T> T getOrNull(DataAccessor<T> accessor);
+
+	/**
+	 * Saves the given value for the given {@link DataAccessor} to this data container.
+	 * 
+	 * @param <T>
+	 *            the type of the value
+	 * @param accessor
+	 *            the data accessor, not <code>null</code>
+	 * @param value
+	 *            the value, can be <code>null</code>
+	 * @see DataAccessor#save(DataContainer, Object)
+	 */
+	public <T> void set(DataAccessor<T> accessor, T value);
+
+	/**
 	 * Gets the number of values that are stored in this data container.
 	 * 
 	 * @return the number of values

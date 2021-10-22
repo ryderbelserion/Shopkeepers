@@ -112,6 +112,38 @@ public abstract class AbstractDataContainer implements DataContainer {
 	}
 
 	@Override
+	public <T> T get(DataAccessor<T> accessor) throws InvalidDataException {
+		Validate.notNull(accessor, "accessor is null");
+		return accessor.load(this);
+	}
+
+	@Override
+	public <T> T getOrNullIfMissing(DataAccessor<T> accessor) throws InvalidDataException {
+		Validate.notNull(accessor, "accessor is null");
+		try {
+			return accessor.load(this);
+		} catch (MissingDataException e) {
+			return null;
+		}
+	}
+
+	@Override
+	public <T> T getOrNull(DataAccessor<T> accessor) {
+		Validate.notNull(accessor, "accessor is null");
+		try {
+			return accessor.load(this);
+		} catch (InvalidDataException e) {
+			return null;
+		}
+	}
+
+	@Override
+	public <T> void set(DataAccessor<T> accessor, T value) {
+		Validate.notNull(accessor, "accessor is null");
+		accessor.save(this, value);
+	}
+
+	@Override
 	public DataContainer asView() {
 		if (view == null) {
 			view = new UnmodifiableDataContainer(this);
