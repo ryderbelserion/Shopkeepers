@@ -12,8 +12,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.compat.MC_1_17_Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.BooleanProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -23,14 +21,21 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use actual GlowSquid type once we only support Bukkit 1.17 upwards
 public class GlowSquidShop extends SKLivingShopObject<Squid> {
 
-	private final Property<Boolean> darkGlowSquidProperty = new BooleanProperty()
-			.key("darkGlowSquid")
+	public static final Property<Boolean> DARK = new BasicProperty<Boolean>()
+			.dataKeyAccessor("darkGlowSquid", BooleanSerializers.LENIENT)
 			.defaultValue(false)
+			.build();
+
+	private final PropertyValue<Boolean> darkGlowSquidProperty = new PropertyValue<>(DARK)
 			.onValueChanged(this::applyDark)
 			.build(properties);
 

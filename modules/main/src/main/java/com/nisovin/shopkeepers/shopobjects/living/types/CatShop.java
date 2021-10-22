@@ -12,8 +12,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.EnumProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -22,20 +20,30 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class CatShop extends SittableShop<Cat> {
 
-	private final Property<Cat.Type> catTypeProperty = new EnumProperty<>(Cat.Type.class)
-			.key("catType")
+	public static final Property<Cat.Type> CAT_TYPE = new BasicProperty<Cat.Type>()
+			.dataKeyAccessor("catType", EnumSerializers.lenient(Cat.Type.class))
 			.defaultValue(Cat.Type.TABBY)
-			.onValueChanged(this::applyCatType)
-			.build(properties);
-	private final Property<DyeColor> collarColorProperty = new EnumProperty<DyeColor>(DyeColor.class)
-			.key("collarColor")
+			.build();
+
+	public static final Property<DyeColor> COLLAR_COLOR = new BasicProperty<DyeColor>()
+			.dataKeyAccessor("collarColor", EnumSerializers.lenient(DyeColor.class))
 			.nullable() // Null indicates 'no collar' / untamed
 			.defaultValue(null)
+			.build();
+
+	private final PropertyValue<Cat.Type> catTypeProperty = new PropertyValue<>(CAT_TYPE)
+			.onValueChanged(this::applyCatType)
+			.build(properties);
+	private final PropertyValue<DyeColor> collarColorProperty = new PropertyValue<>(COLLAR_COLOR)
 			.onValueChanged(this::applyCollarColor)
 			.build(properties);
 

@@ -10,8 +10,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.EnumProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -20,15 +18,22 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 // TODO Pose (laying, sitting, eating, worried).
 public class PandaShop extends BabyableShop<Panda> {
 
-	private final Property<Panda.Gene> geneProperty = new EnumProperty<>(Panda.Gene.class)
-			.key("gene")
+	public static final Property<Panda.Gene> GENE = new BasicProperty<Panda.Gene>()
+			.dataKeyAccessor("gene", EnumSerializers.lenient(Panda.Gene.class))
 			.defaultValue(Panda.Gene.NORMAL)
+			.build();
+
+	private final PropertyValue<Panda.Gene> geneProperty = new PropertyValue<>(GENE)
 			.onValueChanged(this::applyGene)
 			.build(properties);
 

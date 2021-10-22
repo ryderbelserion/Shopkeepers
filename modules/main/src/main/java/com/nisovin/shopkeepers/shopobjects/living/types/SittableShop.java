@@ -11,8 +11,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.BooleanProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -21,14 +19,21 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // Using Babyable as common super type of all sittable mobs for now.
 public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> {
 
-	private final Property<Boolean> sittingProperty = new BooleanProperty()
-			.key("sitting")
+	public static final Property<Boolean> SITTING = new BasicProperty<Boolean>()
+			.dataKeyAccessor("sitting", BooleanSerializers.LENIENT)
 			.defaultValue(false)
+			.build();
+
+	private final PropertyValue<Boolean> sittingProperty = new PropertyValue<>(SITTING)
 			.onValueChanged(this::applySitting)
 			.build(properties);
 

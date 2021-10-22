@@ -10,8 +10,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.EnumProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -20,14 +18,21 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class ParrotShop extends SittableShop<Parrot> {
 
-	private final Property<Parrot.Variant> variantProperty = new EnumProperty<>(Parrot.Variant.class)
-			.key("parrotVariant")
+	public static final Property<Parrot.Variant> VARIANT = new BasicProperty<Parrot.Variant>()
+			.dataKeyAccessor("parrotVariant", EnumSerializers.lenient(Parrot.Variant.class))
 			.defaultValue(Parrot.Variant.RED)
+			.build();
+
+	private final PropertyValue<Parrot.Variant> variantProperty = new PropertyValue<>(VARIANT)
 			.onValueChanged(this::applyVariant)
 			.build(properties);
 

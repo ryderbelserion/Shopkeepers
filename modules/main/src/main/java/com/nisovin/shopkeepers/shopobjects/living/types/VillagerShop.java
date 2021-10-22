@@ -13,9 +13,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.EnumProperty;
-import com.nisovin.shopkeepers.property.IntegerProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -24,6 +21,12 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.validation.java.IntegerValidators;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.NumberSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
@@ -31,48 +34,32 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public class VillagerShop extends BabyableShop<Villager> {
 
-	private final Property<Profession> professionProperty = new EnumProperty<Profession>(Profession.class)
-			.key("profession")
+	private static final String DATA_KEY_PROFESSION = "profession";
+	public static final Property<Profession> PROFESSION = new BasicProperty<Profession>()
+			.dataKeyAccessor(DATA_KEY_PROFESSION, EnumSerializers.lenient(Profession.class))
 			.defaultValue(Profession.NONE)
-			.migrator((property, shopObjectData) -> {
-				// Migration from 'prof' key: TODO Added with 1.14 update, remove again at some point.
-				String professionName = shopObjectData.getString("prof");
-				if (professionName != null) {
-					Log.warning(shopkeeper.getLogPrefix() + "Migrated villager profession from key 'prof' to key 'profession'.");
-					shopObjectData.set(property.getKey(), professionName);
-					shopObjectData.remove("prof");
-					shopkeeper.markDirty();
-				}
+			.build();
 
-				// MC 1.14 migration:
-				professionName = shopObjectData.getString(property.getKey());
-				if (professionName != null) {
-					String newProfessionName = null;
-					if (professionName.equals("PRIEST")) {
-						newProfessionName = Profession.CLERIC.name();
-					} else if (professionName.equals("BLACKSMITH")) {
-						newProfessionName = Profession.ARMORER.name();
-					}
-					if (newProfessionName != null) {
-						Log.warning(shopkeeper.getLogPrefix() + "Migrated villager profession from '"
-								+ professionName + "' to '" + newProfessionName + "'.");
-						shopObjectData.set(property.getKey(), newProfessionName);
-						shopkeeper.markDirty();
-					}
-				}
-			})
+	public static final Property<Villager.Type> VILLAGER_TYPE = new BasicProperty<Villager.Type>()
+			.dataKeyAccessor("villagerType", EnumSerializers.lenient(Villager.Type.class))
+			.defaultValue(Villager.Type.PLAINS)
+			.build();
+
+	public static final int MIN_VILLAGER_LEVEL = 1;
+	public static final int MAX_VILLAGER_LEVEL = 5;
+	public static final Property<Integer> VILLAGER_LEVEL = new BasicProperty<Integer>()
+			.dataKeyAccessor("villagerLevel", NumberSerializers.INTEGER)
+			.validator(IntegerValidators.bounded(MIN_VILLAGER_LEVEL, MAX_VILLAGER_LEVEL))
+			.defaultValue(1)
+			.build();
+
+	private final PropertyValue<Profession> professionProperty = new PropertyValue<>(PROFESSION)
 			.onValueChanged(this::applyProfession)
 			.build(properties);
-	private final Property<Villager.Type> villagerTypeProperty = new EnumProperty<>(Villager.Type.class)
-			.key("villagerType")
-			.defaultValue(Villager.Type.PLAINS)
+	private final PropertyValue<Villager.Type> villagerTypeProperty = new PropertyValue<>(VILLAGER_TYPE)
 			.onValueChanged(this::applyVillagerType)
 			.build(properties);
-	private final IntegerProperty villagerLevelProperty = new IntegerProperty()
-			.<IntegerProperty>key("villagerLevel")
-			.minValue(1)
-			.maxValue(5)
-			.defaultValue(1)
+	private final PropertyValue<Integer> villagerLevelProperty = new PropertyValue<>(VILLAGER_LEVEL)
 			.onValueChanged(this::applyVillagerLevel)
 			.build(properties);
 
@@ -295,7 +282,7 @@ public class VillagerShop extends BabyableShop<Villager> {
 		} else {
 			nextLevel = villagerLevel + 1;
 		}
-		nextLevel = MathUtils.rangeModulo(nextLevel, villagerLevelProperty.getMinValue(), villagerLevelProperty.getMaxValue());
+		nextLevel = MathUtils.rangeModulo(nextLevel, MIN_VILLAGER_LEVEL, MAX_VILLAGER_LEVEL);
 		this.setVillagerLevel(nextLevel);
 	}
 

@@ -15,8 +15,6 @@ import org.bukkit.inventory.meta.BannerMeta;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.EnumProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -25,6 +23,10 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
@@ -49,20 +51,29 @@ public class HorseShop extends BabyableShop<Horse> {
 		}
 	}
 
-	private final Property<Horse.Color> colorProperty = new EnumProperty<>(Horse.Color.class)
-			.key("color")
+	public static final Property<Horse.Color> COLOR = new BasicProperty<Horse.Color>()
+			.dataKeyAccessor("color", EnumSerializers.lenient(Horse.Color.class))
 			.defaultValue(Horse.Color.BROWN)
-			.onValueChanged(this::applyColor)
-			.build(properties);
-	private final Property<Horse.Style> styleProperty = new EnumProperty<>(Horse.Style.class)
-			.key("style")
+			.build();
+
+	public static final Property<Horse.Style> STYLE = new BasicProperty<Horse.Style>()
+			.dataKeyAccessor("style", EnumSerializers.lenient(Horse.Style.class))
 			.defaultValue(Horse.Style.NONE)
-			.onValueChanged(this::applyStyle)
-			.build(properties);
-	private final Property<HorseArmor> armorProperty = new EnumProperty<HorseArmor>(HorseArmor.class)
-			.key("armor")
+			.build();
+
+	public static final Property<HorseArmor> ARMOR = new BasicProperty<HorseArmor>()
+			.dataKeyAccessor("armor", EnumSerializers.lenient(HorseArmor.class))
 			.nullable() // Null indicates 'no armor'
 			.defaultValue(null)
+			.build();
+
+	private final PropertyValue<Horse.Color> colorProperty = new PropertyValue<>(COLOR)
+			.onValueChanged(this::applyColor)
+			.build(properties);
+	private final PropertyValue<Horse.Style> styleProperty = new PropertyValue<>(STYLE)
+			.onValueChanged(this::applyStyle)
+			.build(properties);
+	private final PropertyValue<HorseArmor> armorProperty = new PropertyValue<>(ARMOR)
 			.onValueChanged(this::applyArmor)
 			.build(properties);
 

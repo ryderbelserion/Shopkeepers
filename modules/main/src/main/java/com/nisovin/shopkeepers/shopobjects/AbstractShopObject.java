@@ -14,12 +14,12 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
-import com.nisovin.shopkeepers.property.PropertyContainer;
-import com.nisovin.shopkeepers.property.ShopkeeperPropertyContainer;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperPropertyValuesHolder;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValuesHolder;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -33,7 +33,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public abstract class AbstractShopObject implements ShopObject {
 
 	protected final AbstractShopkeeper shopkeeper; // Not null
-	protected final PropertyContainer properties; // Not null
+	protected final PropertyValuesHolder properties; // Not null
 
 	private Object lastId = null;
 	private boolean tickActivity = false;
@@ -42,7 +42,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	protected AbstractShopObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		assert shopkeeper != null;
 		this.shopkeeper = shopkeeper;
-		properties = new ShopkeeperPropertyContainer(shopkeeper);
+		this.properties = new ShopkeeperPropertyValuesHolder(shopkeeper);
 	}
 
 	@Override

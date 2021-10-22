@@ -10,7 +10,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.IntegerProperty;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -20,6 +19,11 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.validation.java.IntegerValidators;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.NumberSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -29,11 +33,15 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 	// Note: Minecraft actually allows slimes with sizes up to 256 (internally stored as 0 - 255). However, at these
 	// sizes the slime is not properly rendered anymore, cannot be interacted with, and it becomes laggy.
 	// We limit it to 10 since this seems to be a more reasonable limit.
-	private final IntegerProperty sizeProperty = new IntegerProperty()
-			.<IntegerProperty>key("slimeSize")
-			.minValue(1)
-			.maxValue(10)
+	public static final int MIN_SIZE = 1;
+	public static final int MAX_SIZE = 10;
+	public static final Property<Integer> SIZE = new BasicProperty<Integer>()
+			.dataKeyAccessor("slimeSize", NumberSerializers.INTEGER)
+			.validator(IntegerValidators.bounded(MIN_SIZE, MAX_SIZE))
 			.defaultValue(1)
+			.build();
+
+	private final PropertyValue<Integer> sizeProperty = new PropertyValue<>(SIZE)
 			.onValueChanged(this::applySize)
 			.build(properties);
 
@@ -85,7 +93,7 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 		} else {
 			nextSize = size + 1;
 		}
-		nextSize = MathUtils.rangeModulo(nextSize, sizeProperty.getMinValue(), sizeProperty.getMaxValue());
+		nextSize = MathUtils.rangeModulo(nextSize, MIN_SIZE, MAX_SIZE);
 		this.setSize(nextSize);
 	}
 

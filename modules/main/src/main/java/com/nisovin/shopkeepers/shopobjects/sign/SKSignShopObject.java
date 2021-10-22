@@ -25,9 +25,6 @@ import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
 import com.nisovin.shopkeepers.compat.MC_1_17_Utils;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.BooleanProperty;
-import com.nisovin.shopkeepers.property.EnumProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
@@ -39,6 +36,11 @@ import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
@@ -49,44 +51,38 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public class SKSignShopObject extends AbstractBlockShopObject implements SignShopObject {
 
+	private static final String DATA_KEY_SIGN_TYPE = "signType";
+	public static final Property<SignType> SIGN_TYPE = new BasicProperty<SignType>()
+			.dataKeyAccessor(DATA_KEY_SIGN_TYPE, EnumSerializers.lenient(SignType.class))
+			.validator((property, value) -> {
+				Validate.isTrue(value.isSupported(), () -> "Unsupported sign type: '" + value.name() + "'.");
+			})
+			.defaultValue(SignType.OAK)
+			.build();
+
+	public static final Property<Boolean> WALL_SIGN = new BasicProperty<Boolean>()
+			.dataKeyAccessor("wallSign", BooleanSerializers.LENIENT)
+			.defaultValue(true)
+			.build();
+
+	public static final Property<Boolean> GLOWING_TEXT = new BasicProperty<Boolean>()
+			.dataKeyAccessor("glowingText", BooleanSerializers.LENIENT)
+			.defaultValue(false)
+			.build();
+
 	private static final int CHECK_PERIOD_SECONDS = 10;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);
 	private static final long RESPAWN_TIMEOUT_MILLIS = TimeUnit.MINUTES.toMillis(3);
 
 	protected final SignShops signShops;
 
-	private final Property<SignType> signTypeProperty = new EnumProperty<SignType>(SignType.class)
-			.key("signType")
-			.defaultValue(SignType.OAK)
-			.validator((property, value) -> {
-				Validate.isTrue(value.isSupported(), () -> "Unsupported sign type: '" + value.name() + "'.");
-			})
-			.migrator((property, shopObjectData) -> {
-				// Migration from TreeSpecies to SignType:
-				// TODO Remove this again at some point. Added in v2.10.0.
-				String signTypeName = shopObjectData.getString(property.getKey());
-				if ("GENERIC".equals(signTypeName)) {
-					Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
-							+ "' to '" + SignType.OAK + "'.");
-					shopObjectData.set(property.getKey(), SignType.OAK.name());
-					shopkeeper.markDirty();
-				} else if ("REDWOOD".equals(signTypeName)) {
-					Log.warning(shopkeeper.getLogPrefix() + "Migrating sign type from '" + signTypeName
-							+ "' to '" + SignType.SPRUCE + "'.");
-					shopObjectData.set(property.getKey(), SignType.SPRUCE.name());
-					shopkeeper.markDirty();
-				}
-			})
+	private final PropertyValue<SignType> signTypeProperty = new PropertyValue<>(SIGN_TYPE)
 			.onValueChanged(this::applySignType)
 			.build(properties);
-	private final Property<Boolean> wallSignProperty = new BooleanProperty()
-			.key("wallSign")
-			.defaultValue(true)
+	private final PropertyValue<Boolean> wallSignProperty = new PropertyValue<>(WALL_SIGN)
 			.onValueChanged(this::respawn)
 			.build(properties);
-	private final Property<Boolean> glowingTextProperty = new BooleanProperty()
-			.key("glowingText")
-			.defaultValue(false)
+	private final PropertyValue<Boolean> glowingTextProperty = new PropertyValue<>(GLOWING_TEXT)
 			.onValueChanged(this::applyGlowingText)
 			.build(properties);
 

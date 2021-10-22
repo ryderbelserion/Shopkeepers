@@ -10,8 +10,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.BooleanProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -20,13 +18,20 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class ChestedHorseShop<E extends ChestedHorse> extends BabyableShop<E> {
 
-	private final Property<Boolean> carryingChestProperty = new BooleanProperty()
-			.key("carryingChest")
+	public static final Property<Boolean> CARRYING_CHEST = new BasicProperty<Boolean>()
+			.dataKeyAccessor("carryingChest", BooleanSerializers.LENIENT)
 			.defaultValue(false)
+			.build();
+
+	private final PropertyValue<Boolean> carryingChestProperty = new PropertyValue<>(CARRYING_CHEST)
 			.onValueChanged(this::applyCarryingChest)
 			.build(properties);
 

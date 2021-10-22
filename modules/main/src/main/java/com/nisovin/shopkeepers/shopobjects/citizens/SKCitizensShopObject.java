@@ -15,14 +15,16 @@ import com.nisovin.shopkeepers.api.shopobjects.citizens.CitizensShopObject;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.Property;
-import com.nisovin.shopkeepers.property.UUIDProperty;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.UUIDSerializers;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.RateLimiter;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -37,18 +39,20 @@ import net.citizensnpcs.api.trait.trait.MobType;
  */
 public class SKCitizensShopObject extends AbstractEntityShopObject implements CitizensShopObject {
 
+	// Null if there is no associated NPC, eg. because no NPC has been created yet for the shop object (eg. if Citizens
+	// was not enabled at the time the shop object has been created):
+	public static final Property<UUID> NPC_UNIQUE_ID = new BasicProperty<UUID>()
+			.dataKeyAccessor("npcId", UUIDSerializers.LENIENT)
+			.nullable()
+			.defaultValue(null)
+			.build();
 	public static final String CREATION_DATA_NPC_UUID_KEY = "CitizensNpcUUID";
 	private static final int CHECK_PERIOD_SECONDS = 10;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);
 
 	protected final CitizensShops citizensShops;
 
-	// Null if there is no associated NPC, eg. because no NPC has been created yet for this shop object (eg. if Citizens
-	// was not enabled at the time this shop object has been created):
-	private final Property<UUID> npcUniqueIdProperty = new UUIDProperty()
-			.key("npcId")
-			.nullable()
-			.defaultValue(null)
+	private final PropertyValue<UUID> npcUniqueIdProperty = new PropertyValue<>(NPC_UNIQUE_ID)
 			.onValueChanged((property, oldValue, newValue, updateFlags) -> this.onNPCUniqueIdChanged(oldValue, newValue))
 			.build(properties);
 

@@ -11,8 +11,6 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.Property;
-import com.nisovin.shopkeepers.property.StringProperty;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -21,6 +19,11 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.validation.java.StringValidators;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 // TODO Use actual Axolotl type once we only support Bukkit 1.17 upwards
@@ -28,9 +31,13 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 public class AxolotlShop extends BabyableShop<Animals> {
 
 	// TODO Use correct enum type once we only support Bukkit 1.17 upwards
-	private final Property<String> variantProperty = new StringProperty()
-			.key("axolotlVariant")
+	public static final Property<String> VARIANT = new BasicProperty<String>()
+			.dataKeyAccessor("axolotlVariant", StringSerializers.STRICT)
+			.validator(StringValidators.NON_EMPTY) // TODO Validate that the value is a valid axolotl type
 			.defaultValue("LUCY")
+			.build();
+
+	private final PropertyValue<String> variantProperty = new PropertyValue<>(VARIANT)
 			.onValueChanged(this::applyVariant)
 			.build(properties);
 

@@ -11,9 +11,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.BooleanProperty;
-import com.nisovin.shopkeepers.property.EnumProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -22,24 +19,38 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class FoxShop extends SittableShop<Fox> {
 
-	private final Property<Fox.Type> foxTypeProperty = new EnumProperty<>(Fox.Type.class)
-			.key("foxType")
+	public static final Property<Fox.Type> FOX_TYPE = new BasicProperty<Fox.Type>()
+			.dataKeyAccessor("foxType", EnumSerializers.lenient(Fox.Type.class))
 			.defaultValue(Fox.Type.RED)
+			.build();
+
+	public static final Property<Boolean> SLEEPING = new BasicProperty<Boolean>()
+			.dataKeyAccessor("sleeping", BooleanSerializers.LENIENT)
+			.defaultValue(false)
+			.build();
+
+	public static final Property<Boolean> CROUCHING = new BasicProperty<Boolean>()
+			.dataKeyAccessor("crouching", BooleanSerializers.LENIENT)
+			.defaultValue(false)
+			.build();
+
+	private final PropertyValue<Fox.Type> foxTypeProperty = new PropertyValue<>(FOX_TYPE)
 			.onValueChanged(this::applyFoxType)
 			.build(properties);
-	private final Property<Boolean> sleepingProperty = new BooleanProperty()
-			.key("sleeping")
-			.defaultValue(false)
+	private final PropertyValue<Boolean> sleepingProperty = new PropertyValue<>(SLEEPING)
 			.onValueChanged(this::applySleeping)
 			.build(properties);
-	private final Property<Boolean> crouchingProperty = new BooleanProperty()
-			.key("crouching")
-			.defaultValue(false)
+	private final PropertyValue<Boolean> crouchingProperty = new PropertyValue<>(CROUCHING)
 			.onValueChanged(this::applyCrouching)
 			.build(properties);
 

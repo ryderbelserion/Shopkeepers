@@ -12,8 +12,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.EnumProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -22,20 +20,30 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 
-	private final Property<Llama.Color> colorProperty = new EnumProperty<>(Llama.Color.class)
-			.key("color")
+	public static final Property<Llama.Color> COLOR = new BasicProperty<Llama.Color>()
+			.dataKeyAccessor("color", EnumSerializers.lenient(Llama.Color.class))
 			.defaultValue(Llama.Color.CREAMY)
-			.onValueChanged(this::applyColor)
-			.build(properties);
-	private final Property<DyeColor> carpetColorProperty = new EnumProperty<DyeColor>(DyeColor.class)
-			.key("carpetColor")
+			.build();
+
+	public static final Property<DyeColor> CARPET_COLOR = new BasicProperty<DyeColor>()
+			.dataKeyAccessor("carpetColor", EnumSerializers.lenient(DyeColor.class))
 			.nullable() // Null indicates 'no carpet'
 			.defaultValue(null)
+			.build();
+
+	private final PropertyValue<Llama.Color> colorProperty = new PropertyValue<>(COLOR)
+			.onValueChanged(this::applyColor)
+			.build(properties);
+	private final PropertyValue<DyeColor> carpetColorProperty = new PropertyValue<>(CARPET_COLOR)
 			.onValueChanged(this::applyCarpetColor)
 			.build(properties);
 

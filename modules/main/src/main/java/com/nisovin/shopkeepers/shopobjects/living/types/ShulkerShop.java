@@ -11,8 +11,6 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.property.EnumProperty;
-import com.nisovin.shopkeepers.property.Property;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
@@ -22,15 +20,22 @@ import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class ShulkerShop extends SKLivingShopObject<Shulker> {
 
-	private final Property<DyeColor> colorProperty = new EnumProperty<DyeColor>(DyeColor.class)
-			.key("color")
+	public static final Property<DyeColor> COLOR = new BasicProperty<DyeColor>()
+			.dataKeyAccessor("color", EnumSerializers.lenient(DyeColor.class))
 			.nullable() // Null indicates default color
 			.defaultValue(null)
+			.build();
+
+	private final PropertyValue<DyeColor> colorProperty = new PropertyValue<>(COLOR)
 			.onValueChanged(this::applyColor)
 			.build(properties);
 
