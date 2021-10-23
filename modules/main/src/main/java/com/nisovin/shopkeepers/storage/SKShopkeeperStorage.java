@@ -760,22 +760,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 	}
 
-	/**
-	 * Thrown when the saving of shopkeepers data to the storage failed.
-	 */
-	public static class ShopkeeperStorageSaveException extends Exception {
-
-		private static final long serialVersionUID = 3348780528378613697L;
-
-		public ShopkeeperStorageSaveException(String message) {
-			super(message);
-		}
-
-		public ShopkeeperStorageSaveException(String message, Throwable cause) {
-			super(message, cause);
-		}
-	}
-
 	private class SaveTask extends SingletonTask {
 
 		// Previously dirty shopkeepers that we currently attempt to save. This Set is only modified synchronously, so
