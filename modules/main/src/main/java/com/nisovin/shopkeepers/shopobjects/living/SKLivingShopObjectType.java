@@ -15,19 +15,31 @@ import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> extends AbstractEntityShopObjectType<T> implements LivingShopObjectType<T> {
+public final class SKLivingShopObjectType<T extends SKLivingShopObject<?>> extends AbstractEntityShopObjectType<T> implements LivingShopObjectType<T> {
+
+	@FunctionalInterface
+	public static interface ShopObjectConstructor<T extends SKLivingShopObject<?>> {
+
+		public T create(LivingShops livingShops, SKLivingShopObjectType<T> shopObjectType,
+						AbstractShopkeeper shopkeeper, ShopCreationData creationData);
+	}
 
 	private static final String PERMISSION_ALL_ENTITY_TYPES = "shopkeeper.entity.*";
 
 	protected final LivingShops livingShops;
 	protected final EntityType entityType;
+	private final ShopObjectConstructor<T> shopObjectConstructor;
 
-	protected SKLivingShopObjectType(LivingShops livingShops, EntityType entityType, String identifier, List<String> aliases, String permission) {
+	protected SKLivingShopObjectType(	LivingShops livingShops, EntityType entityType, String identifier,
+										List<String> aliases, String permission,
+										ShopObjectConstructor<T> shopObjectConstructor) {
 		super(identifier, aliases, permission);
 		Validate.isTrue(entityType.isAlive(), "entityType is not alive");
 		Validate.isTrue(entityType.isSpawnable(), "entityType is not spawnable");
+		Validate.notNull(shopObjectConstructor, "shopObjectConstructor is null");
 		this.livingShops = livingShops;
 		this.entityType = entityType;
+		this.shopObjectConstructor = shopObjectConstructor;
 	}
 
 	@Override
@@ -63,5 +75,9 @@ public abstract class SKLivingShopObjectType<T extends SKLivingShopObject<?>> ex
 	}
 
 	@Override
-	public abstract T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData);
+	public final T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
+		T shopObject = shopObjectConstructor.create(livingShops, this, shopkeeper, creationData);
+		Validate.State.notNull(shopObject, () -> "SKLivingShopObjectType for entity type '" + entityType + "' created null shop object!");
+		return shopObject;
+	}
 }
