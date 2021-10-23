@@ -46,14 +46,14 @@ import com.nisovin.shopkeepers.util.logging.Log;
  * Implementation notes:
  * <ul>
  * <li>There can at most be one thread doing file IO at the same time.
- * <li>Saving preparation always happens on the server's main thread. There can at most be one save getting prepared at
+ * <li>Saving preparation always happens on the server's main thread. At most one save can be prepared and processed at
  * the same time.
- * <li>If there is a request for an <b>async</b> save while an async save is already in progress, a flag gets set to
- * indicate this after the current async save is finished.
+ * <li>If there is a request for another <b>async</b> save while an async save is already in progress, a flag is set to
+ * indicate that another save needs to take place once the current async save completes.
  * <li>If there is a request for a <b>sync</b> save while an async save is already in progress, the main thread waits
  * for the async save to finish (or aborts it), before preparing the next save.
- * <li>It is not safe to externally edit the save file while the plugin is running, since it might overwrite the save
- * file at any time.
+ * <li>It is not safe to externally edit the save file while the plugin is running, because the plugin might still store
+ * unsaved shopkeeper data in memory or overwrite the save file with new contents at any time.
  * </ul>
  */
 public class SKShopkeeperStorage implements ShopkeeperStorage {
@@ -490,9 +490,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				this.failedToLoadShopkeeper(key, "Invalid id: " + key);
 				continue;
 			}
-			int id = idInt.intValue();
-			if (id > maxUsedShopkeeperId) {
-				maxUsedShopkeeperId = id;
+			int shopkeeperId = idInt.intValue();
+			if (shopkeeperId > maxUsedShopkeeperId) {
+				maxUsedShopkeeperId = shopkeeperId;
 			}
 
 			ShopkeeperData shopkeeperData = ShopkeeperData.of(saveData.getContainer(key));
@@ -502,16 +502,16 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			}
 
 			// Perform common migrations:
-			MigrationResult migrationResult = this.migrateShopkeeperData(id, shopkeeperData, dataVersion);
+			MigrationResult migrationResult = this.migrateShopkeeperData(shopkeeperId, shopkeeperData, dataVersion);
 			if (migrationResult == MigrationResult.FAILED) {
 				// Migration failed, skip this shopkeeper
 				continue;
 			}
 
-			// Load shopkeeper:
+			// Load the shopkeeper:
 			AbstractShopkeeper shopkeeper;
 			try {
-				shopkeeper = shopkeeperRegistry.loadShopkeeper(id, shopkeeperData);
+				shopkeeper = shopkeeperRegistry.loadShopkeeper(shopkeeperId, shopkeeperData);
 				assert shopkeeper != null && shopkeeper.isValid();
 			} catch (ShopkeeperCreateException e) {
 				this.failedToLoadShopkeeper(key, e.getMessage());
