@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.shopobjects.living;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -49,7 +49,8 @@ import com.nisovin.shopkeepers.shopobjects.living.types.ZombieVillagerShop;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
+public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
+
 	/*
 	 * Notes about individual differences and issues for specific entity types:
 	 * All non-listed entity types are completely untested and therefore 'experimental' as well.
@@ -155,14 +156,18 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 
 	private static final Map<EntityType, List<String>> ALIASES; // Deeply unmodifiable
 
-	private static List<String> prepareAliases(List<String> aliases) {
-		return Collections.unmodifiableList(StringUtils.normalize(aliases));
-	}
-
 	static {
 		Map<EntityType, List<String>> aliases = new HashMap<>();
 		aliases.put(EntityType.MUSHROOM_COW, prepareAliases(Arrays.asList("mooshroom", "mooshroom-cow", "mushroom")));
 		ALIASES = Collections.unmodifiableMap(aliases);
+	}
+
+	private static List<String> prepareAliases(List<String> aliases) {
+		return Collections.unmodifiableList(StringUtils.normalize(aliases));
+	}
+
+	private static List<String> getAliasesFor(EntityType entityType) {
+		return ALIASES.getOrDefault(entityType, Collections.emptyList());
 	}
 
 	// PERMISSIONS
@@ -194,44 +199,66 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	// ----
 
 	private final LivingShops livingShops;
-	// Order is specified by the 'enabled-living-shops' config setting:
-	private final Map<EntityType, SKLivingShopObjectType<?>> objectTypes = new LinkedHashMap<>();
-	private final Collection<SKLivingShopObjectType<?>> objectTypesView = Collections.unmodifiableCollection(objectTypes.values());
+	private final Map<EntityType, SKLivingShopObjectType<?>> objectTypes; // Unordered, unmodifiable
 
-	public SKLivingShopObjectTypes(LivingShops livingShops) {
+	// Order is specified by the 'enabled-living-shops' config setting:
+	private final List<SKLivingShopObjectType<?>> orderedObjectTypes = new ArrayList<>();
+	private final List<SKLivingShopObjectType<?>> orderedObjectTypesView = Collections.unmodifiableList(orderedObjectTypes);
+
+	SKLivingShopObjectTypes(LivingShops livingShops) {
 		this.livingShops = livingShops;
+		this.objectTypes = this.createShopObjectTypes();
 	}
 
-	public void onRegisterDefaults() {
-		// First, create the enabled living object types, in the same order as specified in the config:
-		for (EntityType entityType : DerivedSettings.enabledLivingShops) {
-			assert entityType != null && entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType);
-			objectTypes.put(entityType, this.createLivingShopObjectType(entityType));
-		}
-
-		// Register object types for all other remaining living entity types:
+	private Map<EntityType, SKLivingShopObjectType<?>> createShopObjectTypes() {
+		Map<EntityType, SKLivingShopObjectType<?>> objectTypes = new HashMap<>();
 		for (EntityType entityType : EntityType.values()) {
-			if (entityType.isAlive() && entityType.isSpawnable() && !objectTypes.containsKey(entityType)) {
+			if (entityType.isAlive() && entityType.isSpawnable()) {
 				objectTypes.put(entityType, this.createLivingShopObjectType(entityType));
 			}
 		}
+		return Collections.unmodifiableMap(objectTypes);
+	}
 
+	public void onRegisterDefaults() {
+		this.reorderShopObjectTypes();
+		this.registerPermissions();
+	}
+
+	private void reorderShopObjectTypes() {
+		// Update the order of the living shop object types based on how they are ordered inside the config:
+		orderedObjectTypes.clear();
+
+		// Add the enabled living shop object types, in the same order as specified inside the config:
+		for (EntityType entityType : DerivedSettings.enabledLivingShops) {
+			assert entityType != null && entityType.isAlive() && entityType.isSpawnable() && this.get(entityType) != null;
+			orderedObjectTypes.add(this.get(entityType));
+		}
+
+		// Add all remaining living shop object types:
+		objectTypes.values().forEach(objectType -> {
+			if (!DerivedSettings.enabledLivingShops.contains(objectType.getEntityType())) {
+				orderedObjectTypes.add(objectType);
+			}
+		});
+	}
+
+	private void registerPermissions() {
 		// Register the dynamic mob type specific permissions for all living shop object types, if they are not already
 		// registered:
 		// Note: These permissions are registered once, and then never unregistered again until the next server restart
 		// or full reload. This is not a problem.
-		objectTypesView.forEach(shopObjectType -> registerPermission(shopObjectType));
+		orderedObjectTypesView.forEach(shopObjectType -> registerPermission(shopObjectType));
 	}
 
 	@Override
 	public List<String> getAliases(EntityType entityType) {
-		List<String> aliases = ALIASES.get(entityType);
-		return (aliases != null) ? aliases : Collections.emptyList();
+		return getAliasesFor(entityType);
 	}
 
 	@Override
 	public Collection<SKLivingShopObjectType<?>> getAll() {
-		return objectTypesView;
+		return orderedObjectTypesView;
 	}
 
 	@Override
@@ -242,7 +269,7 @@ public class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	private SKLivingShopObjectType<?> createLivingShopObjectType(EntityType entityType) {
 		assert entityType.isAlive() && entityType.isSpawnable();
 		String identifier = getIdentifier(entityType);
-		List<String> aliases = this.getAliases(entityType);
+		List<String> aliases = getAliasesFor(entityType);
 		String permission = getPermission(entityType);
 
 		SKLivingShopObjectType<?> objectType = null;

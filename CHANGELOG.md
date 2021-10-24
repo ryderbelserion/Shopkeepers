@@ -33,6 +33,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: The "testSpawn" debug command would respawn the shopkeepers in the executing player's chunk, but would not immediately update their object id registrations. The shop objects will now automatically and immediately inform the shopkeeper registry about those object id changes.
 * Fixed: When changing the container location of a player shop via the API, the protection for the previous container was not properly disabled.
 * Fixed: Any code that retrieves the container block of a player shopkeeper accounts now for the fact that the block might be null. This was only really an issue when another plugin invokes internal operations that require the container block to be available in a situation in which it might not be available currently.
+* Fixed: The order of the enabled living shop object types was not updated on plugin reloads based on their order inside the config.
 
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
