@@ -119,9 +119,8 @@ public abstract class AbstractDataContainer implements DataContainer {
 
 	@Override
 	public <T> T getOrNullIfMissing(DataAccessor<T> accessor) throws InvalidDataException {
-		Validate.notNull(accessor, "accessor is null");
 		try {
-			return accessor.load(this);
+			return this.get(accessor);
 		} catch (MissingDataException e) {
 			return null;
 		}
@@ -131,7 +130,7 @@ public abstract class AbstractDataContainer implements DataContainer {
 	public <T> T getOrNull(DataAccessor<T> accessor) {
 		Validate.notNull(accessor, "accessor is null");
 		try {
-			return accessor.load(this);
+			return this.get(accessor);
 		} catch (InvalidDataException e) {
 			return null;
 		}
