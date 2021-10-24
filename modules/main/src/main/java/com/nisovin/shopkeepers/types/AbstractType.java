@@ -82,5 +82,15 @@ public abstract class AbstractType implements Type {
 		return identifier.equals(displayName);
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append(this.getClass().getName());
+		builder.append(" [identifier=");
+		builder.append(identifier);
+		builder.append("]");
+		return builder.toString();
+	}
+
 	// Not overriding equals and hashCode: Only the exact same type instance is considered equal.
 }
