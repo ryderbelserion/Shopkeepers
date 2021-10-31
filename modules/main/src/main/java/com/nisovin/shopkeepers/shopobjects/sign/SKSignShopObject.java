@@ -22,7 +22,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
-import com.nisovin.shopkeepers.compat.MC_1_17_Utils;
+import com.nisovin.shopkeepers.compat.MC_1_17;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -391,7 +391,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	public List<Button> createEditorButtons() {
 		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getSignTypeEditorButton());
-		if (MC_1_17_Utils.isAvailable()) {
+		if (MC_1_17.isAvailable()) {
 			editorButtons.add(this.getGlowingTextEditorButton());
 		}
 		return editorButtons;
@@ -493,7 +493,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	private ItemStack getGlowingTextEditorItem() {
 		ItemStack iconItem;
 		if (this.isGlowingText()) {
-			iconItem = new ItemStack(MC_1_17_Utils.MATERIAL_GLOW_INK_SAC);
+			iconItem = new ItemStack(MC_1_17.GLOW_INK_SAC);
 		} else {
 			iconItem = new ItemStack(Material.INK_SAC);
 		}

@@ -34,6 +34,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: When changing the container location of a player shop via the API, the protection for the previous container was not properly disabled.
 * Fixed: Any code that retrieves the container block of a player shopkeeper accounts now for the fact that the block might be null. This was only really an issue when another plugin invokes internal operations that require the container block to be available in a situation in which it might not be available currently.
 * Fixed: The order of the enabled living shop object types was not updated on plugin reloads based on their order inside the config.
+* Debug: Removed the debug option 'capabilities' again. We already always log whether or not server version specific features are enabled. This also resolves an internal issue related to whether or not the config has already been loaded at the time this debug option is checked.
 
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.

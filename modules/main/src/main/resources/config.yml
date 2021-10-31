@@ -10,7 +10,6 @@ config-version: 4
 # The initial debugging state of the plugin.
 debug: false
 # Additional debugging options.
-# - 'capabilities': Logs details of the server version dependent capabilities.
 # - 'log-all-events': Logs all events.
 # - 'print-listeners': Prints the registered listeners for the first call of
 #    each event.

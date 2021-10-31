@@ -4,7 +4,7 @@ import java.util.function.Predicate;
 
 import org.bukkit.Material;
 
-import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
+import com.nisovin.shopkeepers.compat.MC_1_16;
 
 public enum SignType {
 
@@ -16,8 +16,8 @@ public enum SignType {
 	JUNGLE(Material.JUNGLE_SIGN, Material.JUNGLE_WALL_SIGN),
 	ACACIA(Material.ACACIA_SIGN, Material.ACACIA_WALL_SIGN),
 	DARK_OAK(Material.DARK_OAK_SIGN, Material.DARK_OAK_WALL_SIGN),
-	CRIMSON(MC_1_16_Utils.getCrimsonSign(), MC_1_16_Utils.getCrimsonWallSign()),
-	WARPED(MC_1_16_Utils.getWarpedSign(), MC_1_16_Utils.getWarpedWallSign());
+	CRIMSON(MC_1_16.CRIMSON_SIGN, MC_1_16.CRIMSON_WALL_SIGN),
+	WARPED(MC_1_16.WARPED_SIGN, MC_1_16.WARPED_WALL_SIGN);
 
 	public static final Predicate<SignType> IS_SUPPORTED = SignType::isSupported;
 

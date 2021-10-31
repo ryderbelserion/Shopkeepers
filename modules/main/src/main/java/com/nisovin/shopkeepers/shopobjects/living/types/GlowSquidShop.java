@@ -9,7 +9,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.compat.MC_1_17_Utils;
+import com.nisovin.shopkeepers.compat.MC_1_17;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -94,7 +94,7 @@ public class GlowSquidShop extends SKLivingShopObject<Squid> {
 		if (this.isDark()) {
 			iconItem = new ItemStack(Material.INK_SAC);
 		} else {
-			iconItem = new ItemStack(MC_1_17_Utils.MATERIAL_GLOW_INK_SAC);
+			iconItem = new ItemStack(MC_1_17.GLOW_INK_SAC);
 		}
 		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonGlowSquidDark, Messages.buttonGlowSquidDarkLore);
 		return iconItem;

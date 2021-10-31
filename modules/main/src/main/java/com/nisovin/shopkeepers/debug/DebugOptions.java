@@ -9,8 +9,6 @@ public final class DebugOptions {
 	private static final Set<String> allOptions = new LinkedHashSet<>();
 	private static final Set<String> allOptionsView = Collections.unmodifiableSet(allOptions);
 
-	// Logs details of the server version dependent capabilities.
-	public static final String capabilities = add("capabilities");
 	// Logs all events (spams!). Starts slightly delayed. Subsequent calls of the same event get combined into a
 	// single logging entry to slightly reduce spam.
 	public static final String logAllEvents = add("log-all-events");
