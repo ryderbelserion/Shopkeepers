@@ -10,7 +10,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopType;
 
-public class RegularAdminShopType extends AbstractAdminShopType<SKRegularAdminShopkeeper> {
+public final class RegularAdminShopType extends AbstractAdminShopType<SKRegularAdminShopkeeper> {
 
 	public RegularAdminShopType() {
 		super("admin", Collections.emptyList(), ShopkeepersPlugin.ADMIN_PERMISSION);

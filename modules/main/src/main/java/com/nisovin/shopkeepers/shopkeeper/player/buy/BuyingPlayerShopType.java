@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 
-public class BuyingPlayerShopType extends AbstractPlayerShopType<SKBuyingPlayerShopkeeper> {
+public final class BuyingPlayerShopType extends AbstractPlayerShopType<SKBuyingPlayerShopkeeper> {
 
 	public BuyingPlayerShopType() {
 		super("buy", Arrays.asList("buying"), ShopkeepersPlugin.PLAYER_BUY_PERMISSION);

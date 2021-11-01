@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 
-public class TradingPlayerShopType extends AbstractPlayerShopType<SKTradingPlayerShopkeeper> {
+public final class TradingPlayerShopType extends AbstractPlayerShopType<SKTradingPlayerShopkeeper> {
 
 	public TradingPlayerShopType() {
 		super("trade", Arrays.asList("trading"), ShopkeepersPlugin.PLAYER_TRADE_PERMISSION);

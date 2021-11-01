@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 
 // TODO Not yet used.
-public class SKVirtualShopObjectType extends AbstractShopObjectType<SKVirtualShopObject> implements VirtualShopObjectType<SKVirtualShopObject> {
+public final class SKVirtualShopObjectType extends AbstractShopObjectType<SKVirtualShopObject> implements VirtualShopObjectType<SKVirtualShopObject> {
 
 	private final VirtualShops virtualShops;
 

@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 
-public class BookPlayerShopType extends AbstractPlayerShopType<SKBookPlayerShopkeeper> {
+public final class BookPlayerShopType extends AbstractPlayerShopType<SKBookPlayerShopkeeper> {
 
 	public BookPlayerShopType() {
 		super("book", Collections.emptyList(), ShopkeepersPlugin.PLAYER_BOOK_PERMISSION);
