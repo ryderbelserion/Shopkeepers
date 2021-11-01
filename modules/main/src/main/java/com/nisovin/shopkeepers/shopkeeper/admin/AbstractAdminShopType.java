@@ -10,10 +10,6 @@ import com.nisovin.shopkeepers.util.java.Validate;
 
 public abstract class AbstractAdminShopType<T extends AbstractAdminShopkeeper> extends AbstractShopType<T> implements AdminShopType<T> {
 
-	protected AbstractAdminShopType(String identifier, String permission) {
-		super(identifier, permission);
-	}
-
 	protected AbstractAdminShopType(String identifier, List<String> aliases, String permission) {
 		super(identifier, aliases, permission);
 	}

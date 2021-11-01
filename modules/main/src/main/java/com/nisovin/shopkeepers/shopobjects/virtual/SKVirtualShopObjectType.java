@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.virtual;
 
+import java.util.Collections;
+
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
@@ -14,7 +16,7 @@ public class SKVirtualShopObjectType extends AbstractShopObjectType<SKVirtualSho
 	private final VirtualShops virtualShops;
 
 	public SKVirtualShopObjectType(VirtualShops virtualShops) {
-		super("virtual", "shopkeeper.virtual");
+		super("virtual", Collections.emptyList(), "shopkeeper.virtual");
 		this.virtualShops = virtualShops;
 	}
 

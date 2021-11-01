@@ -22,10 +22,6 @@ import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 public abstract class AbstractShopObjectType<T extends AbstractShopObject> extends AbstractSelectableType implements ShopObjectType<T> {
 
-	protected AbstractShopObjectType(String identifier, String permission) {
-		super(identifier, permission);
-	}
-
 	protected AbstractShopObjectType(String identifier, List<String> aliases, String permission) {
 		super(identifier, aliases, permission);
 	}

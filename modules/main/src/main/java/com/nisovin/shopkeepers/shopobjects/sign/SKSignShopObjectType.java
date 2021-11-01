@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.sign;
 
+import java.util.Collections;
+
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 
@@ -15,7 +17,7 @@ public class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShop
 	private final SignShops signShops;
 
 	public SKSignShopObjectType(SignShops signShops) {
-		super("sign", "shopkeeper.sign");
+		super("sign", Collections.emptyList(), "shopkeeper.sign");
 		this.signShops = signShops;
 	}
 

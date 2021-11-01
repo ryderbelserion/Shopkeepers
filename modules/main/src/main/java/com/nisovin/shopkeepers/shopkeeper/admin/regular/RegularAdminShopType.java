@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopkeeper.admin.regular;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -12,7 +13,7 @@ import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopType;
 public class RegularAdminShopType extends AbstractAdminShopType<SKRegularAdminShopkeeper> {
 
 	public RegularAdminShopType() {
-		super("admin", ShopkeepersPlugin.ADMIN_PERMISSION);
+		super("admin", Collections.emptyList(), ShopkeepersPlugin.ADMIN_PERMISSION);
 	}
 
 	@Override

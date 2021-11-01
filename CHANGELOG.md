@@ -84,6 +84,7 @@ Date format: (YYYY-MM-DD)
   * ShopkeeperData and ShopObjectData wrappers extend DataContainer with common convenience methods that were previously located inside AbstractShopkeeper to interact with the shopkeeper and shop object data.
 * Internal API: Various refactors related to shop object properties.
 * Internal API: Various uses of ShopkeeperCreateException have been replaced with the better fitting InvalidDataException.
+* Internal API: Minor changes to the shop and shop object type constructors.
 * Major refactors to the internal properties API.
 * Minor changes to how shop object property changes are applied to the spawned shop object. Shop objects also properly take into account now that their properties might get dynamically loaded at runtime.
 * Shopkeepers are now deactivated before they are despawned. This avoids having to process the object id change of the shop object being despawned when the shopkeeper is going to be deactivated anyways.

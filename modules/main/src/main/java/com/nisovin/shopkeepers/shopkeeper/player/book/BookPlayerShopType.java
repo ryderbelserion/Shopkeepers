@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopkeeper.player.book;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
@@ -13,7 +14,7 @@ import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 public class BookPlayerShopType extends AbstractPlayerShopType<SKBookPlayerShopkeeper> {
 
 	public BookPlayerShopType() {
-		super("book", ShopkeepersPlugin.PLAYER_BOOK_PERMISSION);
+		super("book", Collections.emptyList(), ShopkeepersPlugin.PLAYER_BOOK_PERMISSION);
 	}
 
 	@Override

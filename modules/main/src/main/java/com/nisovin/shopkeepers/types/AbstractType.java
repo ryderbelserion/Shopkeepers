@@ -28,13 +28,14 @@ public abstract class AbstractType implements Type {
 	protected final String permission; // Can be null
 
 	protected AbstractType(String identifier, String permission) {
-		this(identifier, null, permission);
+		this(identifier, Collections.emptyList(), permission);
 	}
 
 	protected AbstractType(String identifier, List<String> aliases, String permission) {
 		this.identifier = StringUtils.normalize(identifier);
 		Validate.notEmpty(this.identifier, "identifier is null or empty");
-		if (aliases == null || aliases.isEmpty()) {
+		Validate.notNull(aliases, "aliases is null");
+		if (aliases.isEmpty()) {
 			this.aliases = Collections.emptyList();
 		} else {
 			List<String> normalizedAliases = new ArrayList<>(aliases.size());

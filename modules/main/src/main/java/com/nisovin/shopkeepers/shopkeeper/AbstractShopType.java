@@ -23,10 +23,6 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class AbstractShopType<T extends AbstractShopkeeper> extends AbstractSelectableType implements ShopType<T> {
 
-	protected AbstractShopType(String identifier, String permission) {
-		super(identifier, permission);
-	}
-
 	protected AbstractShopType(String identifier, List<String> aliases, String permission) {
 		super(identifier, aliases, permission);
 	}

@@ -12,10 +12,6 @@ import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 
 public abstract class AbstractEntityShopObjectType<T extends AbstractEntityShopObject> extends AbstractShopObjectType<T> implements EntityShopObjectType<T> {
 
-	protected AbstractEntityShopObjectType(String identifier, String permission) {
-		super(identifier, permission);
-	}
-
 	protected AbstractEntityShopObjectType(String identifier, List<String> aliases, String permission) {
 		super(identifier, aliases, permission);
 	}
