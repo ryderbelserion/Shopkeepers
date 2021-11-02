@@ -87,6 +87,14 @@ public interface Property<T> extends DataAccessor<T> {
 	public DataAccessor<T> getDataAccessor();
 
 	/**
+	 * Gets a {@link DataAccessor} that saves and loads values for this property just like the property itself, except
+	 * that the saved and loaded values are not {@link #validateValue(Object) validated}.
+	 * 
+	 * @return the unvalidated property data accessor, not <code>null</code>
+	 */
+	public DataAccessor<T> unvalidated();
+
+	/**
 	 * Saves the given property value to the given {@link DataContainer}.
 	 * <p>
 	 * This {@link #validateValue(Object) validates} the given value prior to storing its serialized data in the given

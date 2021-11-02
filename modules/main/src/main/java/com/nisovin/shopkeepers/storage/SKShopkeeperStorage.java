@@ -839,7 +839,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			}
 
 			// Remove the separately stored shopkeeper id from the shopkeeper data:
-			newData.set(AbstractShopkeeper.ID.getDataAccessor(), null);
+			newData.set(AbstractShopkeeper.ID.unvalidated(), null);
 
 			// We transferred the shopkeeper's data into the storage. Reset the shopkeeper's dirty flag:
 			shopkeeper.onSave();

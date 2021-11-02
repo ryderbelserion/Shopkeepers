@@ -34,6 +34,17 @@ public class BasicProperty<T> implements Property<T> {
 	private PropertyValidator<? super T> validator = null;
 	private StringConverter<? super T> stringConverter = StringConverter.DEFAULT;
 	private DataAccessor<T> dataAccessor;
+	private final DataAccessor<T> unvalidated = new DataAccessor<T>() {
+		@Override
+		public void save(DataContainer dataContainer, T value) {
+			BasicProperty.this.saveUnvalidated(dataContainer, value);
+		}
+
+		@Override
+		public T load(DataContainer dataContainer) throws InvalidDataException {
+			return BasicProperty.this.loadUnvalidated(dataContainer);
+		}
+	};
 
 	private boolean built = false;
 
@@ -322,6 +333,11 @@ public class BasicProperty<T> implements Property<T> {
 		return dataAccessor;
 	}
 
+	@Override
+	public final DataAccessor<T> unvalidated() {
+		return unvalidated;
+	}
+
 	/**
 	 * Sets the {@link DataAccessor} that is used to save and load values for this property.
 	 * <p>
@@ -373,8 +389,12 @@ public class BasicProperty<T> implements Property<T> {
 
 	@Override
 	public final void save(DataContainer dataContainer, T value) {
-		Validate.notNull(dataContainer, "dataContainer is null");
 		this.validateValue(value);
+		this.saveUnvalidated(dataContainer, value);
+	}
+
+	private void saveUnvalidated(DataContainer dataContainer, T value) {
+		Validate.notNull(dataContainer, "dataContainer is null");
 		try {
 			if (value == null) {
 				this.saveValue(dataContainer, null);
@@ -410,12 +430,20 @@ public class BasicProperty<T> implements Property<T> {
 
 	@Override
 	public final T load(DataContainer dataContainer) throws MissingDataException, InvalidDataException {
+		T value = this.loadUnvalidated(dataContainer);
+		try {
+			this.validateValue(value);
+		} catch (Exception e) {
+			throw new InvalidDataException(this.loadingFailedErrorMessage(e.getMessage()), e);
+		}
+		return value;
+	}
+
+	private T loadUnvalidated(DataContainer dataContainer) throws MissingDataException, InvalidDataException {
 		Validate.notNull(dataContainer, "dataContainer is null");
 		try {
 			try {
-				T value = this.loadValue(dataContainer);
-				this.validateValue(value);
-				return value;
+				return this.loadValue(dataContainer);
 			} catch (MissingDataException e) {
 				if (useDefaultIfMissing) {
 					// This implies that there is a valid default value.
@@ -431,7 +459,7 @@ public class BasicProperty<T> implements Property<T> {
 			// Other exception types are not preserved, but callers can figure out the original exception type via the
 			// exception cause.
 			throw new MissingDataException(this.loadingFailedErrorMessage(e.getMessage()), e);
-		} catch (Exception e) {
+		} catch (InvalidDataException e) {
 			throw new InvalidDataException(this.loadingFailedErrorMessage(e.getMessage()), e);
 		}
 	}
