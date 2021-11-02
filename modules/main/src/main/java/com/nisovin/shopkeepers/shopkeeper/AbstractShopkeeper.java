@@ -33,19 +33,29 @@ import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
-import com.nisovin.shopkeepers.compat.MC_1_16_Utils;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
-import com.nisovin.shopkeepers.shopobjects.living.types.CatShop;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.bukkit.ColorUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
-import com.nisovin.shopkeepers.util.java.ConversionUtils;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.DataKeyAccessor;
+import com.nisovin.shopkeepers.util.data.property.EmptyDataPredicates;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.validation.java.IntegerValidators;
+import com.nisovin.shopkeepers.util.data.property.validation.java.StringValidators;
+import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.ColoredStringSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.DataContainerSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.NumberSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.UUIDSerializers;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -272,7 +282,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// STORAGE
 
 	/**
-	 * Loads the shopkeeper's saved data from the given {@link ShopkeeperData}.
+	 * Loads the shopkeeper's saved state from the given {@link ShopkeeperData}.
 	 * <p>
 	 * This also loads the shopkeeper's {@link #loadDynamicState(ShopkeeperData) dynamic state}.
 	 * 
@@ -287,37 +297,26 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	protected void loadFromSaveData(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException, InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 
-		// Migrate the shopkeeper data:
-		this.migrateShopkeeperData(shopkeeperData);
-
-		String uniqueIdString = shopkeeperData.getString("uniqueId");
-		if (StringUtils.isEmpty(uniqueIdString)) {
-			throw new InvalidDataException("Missing unique id!");
-		}
-		try {
-			this.uniqueId = ConversionUtils.parseUUID(uniqueIdString);
-		} catch (IllegalArgumentException e) {
-			throw new InvalidDataException("Invalid unique id ('" + uniqueIdString + "')!");
-		}
+		this.uniqueId = shopkeeperData.get(UNIQUE_ID);
 
 		// Shop object data:
-		ShopObjectData shopObjectData = shopkeeperData.getShopObjectData();
+		ShopObjectData shopObjectData = shopkeeperData.get(SHOP_OBJECT_DATA);
 		assert shopObjectData != null;
 
 		// Determine the shop object type:
-		AbstractShopObjectType<?> objectType = shopObjectData.getShopObjectType();
+		AbstractShopObjectType<?> objectType = shopObjectData.get(AbstractShopObject.SHOP_OBJECT_TYPE);
 		assert objectType != null;
 
-		// Normalize empty world name to null:
-		this.worldName = StringUtils.getNotEmpty(shopkeeperData.getString("world"));
-		this.x = shopkeeperData.getInt("x");
-		this.y = shopkeeperData.getInt("y");
-		this.z = shopkeeperData.getInt("z");
-		this.yaw = shopkeeperData.getFloat("yaw"); // 0 (south) if missing (eg. in pre 2.13.4 versions)
+		// Note: An empty world name is normalized to null.
+		this.worldName = shopkeeperData.get(WORLD_NAME);
+		this.x = shopkeeperData.get(LOCATION_X);
+		this.y = shopkeeperData.get(LOCATION_Y);
+		this.z = shopkeeperData.get(LOCATION_Z);
+		this.yaw = shopkeeperData.get(YAW);
 
 		if (objectType instanceof VirtualShopObjectType) {
 			if (worldName != null || x != 0 || y != 0 || z != 0 || yaw != 0.0F) {
-				Log.warning(this.getLogPrefix() + "Ignoring stored location ("
+				Log.warning(this.getLogPrefix() + "Clearing stored location ("
 						+ TextUtils.getLocationString(StringUtils.getOrEmpty(worldName), x, y, z, yaw)
 						+ ") for virtual shopkeeper!");
 				this.markDirty();
@@ -339,61 +338,6 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		// Load the dynamic shopkeeper and shop object state:
 		this.loadDynamicState(shopkeeperData);
-	}
-
-	/**
-	 * Applies data migrations to the given shopkeeper data.
-	 * <p>
-	 * This also migrates the contained shop object data.
-	 * 
-	 * @param shopkeeperData
-	 *            the shopkeeper data, not <code>null</code>
-	 * @throws InvalidDataException
-	 *             if the shopkeeper data cannot be migrated
-	 */
-	protected void migrateShopkeeperData(ShopkeeperData shopkeeperData) throws InvalidDataException {
-		assert shopkeeperData != null;
-		// Migrate the shop object data:
-		ShopObjectData shopObjectData = shopkeeperData.getShopObjectData();
-		assert shopObjectData != null;
-		this.migrateShopObjectData(shopObjectData);
-	}
-
-	private void migrateShopObjectData(ShopObjectData shopObjectData) throws InvalidDataException {
-		assert shopObjectData != null;
-		// Object type id migrations:
-		// TODO Remove again at some point
-		String objectTypeId = shopObjectData.getShopObjectTypeId();
-		assert objectTypeId != null;
-
-		// MC 1.14:
-		// Convert ocelots to cats:
-		if (objectTypeId.equals("ocelot")) {
-			String ocelotType = shopObjectData.getString("catType");
-			if (ocelotType != null) {
-				if (ocelotType.equals("WILD_OCELOT")) {
-					// Stays an ocelot, but remove cat type data:
-					shopObjectData.set("catType", null);
-					this.markDirty();
-				} else {
-					// Convert to cat:
-					objectTypeId = "cat";
-					String catType = CatShop.fromOcelotType(ocelotType).name();
-					shopObjectData.set("catType", catType);
-					this.markDirty();
-					Log.warning(this.getLogPrefix() + "Migrated ocelot type '" + ocelotType
-							+ "' to cat type '" + catType + "'.");
-				}
-			} // Else: Stays ocelot.
-		}
-
-		// MC 1.16:
-		// Convert pig-zombie to zombified-piglin (but only if we run on MC 1.16 or above):
-		if (MC_1_16_Utils.getZombifiedPiglin() != null && objectTypeId.equals("pig-zombie")) {
-			objectTypeId = "zombified-piglin";
-			Log.warning(this.getLogPrefix() + "Migrated object type 'pig-zombie' to 'zombified-piglin'.");
-			this.markDirty();
-		}
 	}
 
 	// shopCreationData can be null if the shopkeeper is getting loaded.
@@ -427,26 +371,26 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 */
 	public void loadDynamicState(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
-		ShopType<?> shopType = shopkeeperData.getShopType();
+		ShopType<?> shopType = shopkeeperData.get(SHOP_TYPE);
 		assert shopType != null;
 		if (shopType != this.getType()) {
 			throw new InvalidDataException("Shopkeeper data is for a different shop type (expected: "
-					+ this.getType().getIdentifier() + ", actual: " + shopType.getIdentifier() + ")!");
+					+ this.getType().getIdentifier() + ", got: " + shopType.getIdentifier() + ")!");
 		}
 
-		this._setName(shopkeeperData.getString("name"));
+		this._setName(shopkeeperData.get(NAME));
 
 		// Shop object:
-		ShopObjectData shopObjectData = shopkeeperData.getShopObjectData();
+		ShopObjectData shopObjectData = shopkeeperData.get(SHOP_OBJECT_DATA);
 		assert shopObjectData != null;
-		AbstractShopObjectType<?> objectType = shopObjectData.getShopObjectType();
+		AbstractShopObjectType<?> objectType = shopObjectData.get(AbstractShopObject.SHOP_OBJECT_TYPE);
 		assert objectType != null;
 		if (objectType == shopObject.getType()) {
 			shopObject.load(shopObjectData);
 		} else {
 			// Skip shop object data.
 			Log.debug(() -> this.getLogPrefix() + "Ignoring shop object data of different type (expected: "
-					+ shopObject.getType().getIdentifier() + ", actual: " + objectType.getIdentifier() + ")!");
+					+ shopObject.getType().getIdentifier() + ", got: " + objectType.getIdentifier() + ")!");
 		}
 	}
 
@@ -464,16 +408,15 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 */
 	public void save(ShopkeeperData shopkeeperData) {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
-		// Note: The shop type is already saved as part of the dynamic state. However, saving it here as well ensures
-		// that it is the first data entry.
-		shopkeeperData.set("type", this.getType().getIdentifier());
-		shopkeeperData.set("uniqueId", uniqueId.toString());
-		// Null world name is stored as an empty String:
-		shopkeeperData.set("world", StringUtils.getOrEmpty(worldName));
-		shopkeeperData.set("x", x);
-		shopkeeperData.set("y", y);
-		shopkeeperData.set("z", z);
-		shopkeeperData.set("yaw", yaw);
+		shopkeeperData.set(UNIQUE_ID, uniqueId);
+
+		if (!this.isVirtual()) {
+			shopkeeperData.set(WORLD_NAME, worldName);
+			shopkeeperData.set(LOCATION_X, x);
+			shopkeeperData.set(LOCATION_Y, y);
+			shopkeeperData.set(LOCATION_Z, z);
+			shopkeeperData.set(YAW, yaw);
+		}
 
 		// Dynamic shopkeeper and shop object data:
 		this.saveDynamicState(shopkeeperData);
@@ -497,12 +440,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 */
 	public void saveDynamicState(ShopkeeperData shopkeeperData) {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
-		shopkeeperData.set("type", this.getType().getIdentifier());
-		shopkeeperData.set("name", TextUtils.decolorize(name));
+		shopkeeperData.set(SHOP_TYPE, this.getType());
+		shopkeeperData.set(NAME, name);
 
 		// Shop object:
-		ShopObjectData shopObjectData = shopkeeperData.createEmptyShopObjectData();
+		ShopObjectData shopObjectData = ShopObjectData.of(DataContainer.create());
 		shopObject.save(shopObjectData);
+		shopkeeperData.set(SHOP_OBJECT_DATA, shopObjectData);
 	}
 
 	@Override
@@ -631,7 +575,76 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		shopObject.delete();
 	}
 
+	// SHOP TYPE
+
+	private static final String DATA_KEY_SHOP_TYPE = "type";
+
+	/**
+	 * Shop type id.
+	 */
+	public static final Property<String> SHOP_TYPE_ID = new BasicProperty<String>()
+			.name("shop-type-id")
+			.dataKeyAccessor(DATA_KEY_SHOP_TYPE, StringSerializers.STRICT)
+			.validator(StringValidators.NON_EMPTY)
+			.build();
+
+	/**
+	 * Shop type, derived from the serialized {@link #SHOP_TYPE_ID shop type id}.
+	 */
+	public static final Property<AbstractShopType<?>> SHOP_TYPE = new BasicProperty<AbstractShopType<?>>()
+			.dataKeyAccessor(DATA_KEY_SHOP_TYPE, new DataSerializer<AbstractShopType<?>>() {
+				@Override
+				public Object serialize(AbstractShopType<?> value) {
+					Validate.notNull(value, "value is null");
+					return value.getIdentifier();
+				}
+
+				@Override
+				public AbstractShopType<?> deserialize(Object data) throws InvalidDataException {
+					String shopTypeId = StringSerializers.STRICT_NON_EMPTY.deserialize(data);
+					AbstractShopType<?> shopType = SKShopkeepersPlugin.getInstance().getShopTypeRegistry().get(shopTypeId);
+					if (shopType == null) {
+						throw new InvalidDataException("Unknown shop type: " + shopTypeId);
+					}
+					return shopType;
+				}
+			})
+			.build();
+
+	@Override
+	public abstract AbstractShopType<?> getType();
+
 	// ATTRIBUTES
+
+	public static final Property<UUID> UNIQUE_ID = new BasicProperty<UUID>()
+			.dataKeyAccessor("uniqueId", UUIDSerializers.LENIENT)
+			.build();
+	public static final Property<String> WORLD_NAME = new BasicProperty<String>()
+			.dataAccessor(new DataKeyAccessor<>("world", StringSerializers.SCALAR)
+					.emptyDataPredicate(EmptyDataPredicates.EMPTY_STRING)
+			)
+			.nullable() // For virtual shopkeepers
+			.build();
+	public static final Property<Integer> LOCATION_X = new BasicProperty<Integer>()
+			.dataKeyAccessor("x", NumberSerializers.INTEGER)
+			.useDefaultIfMissing() // For virtual shopkeepers
+			.defaultValue(0)
+			.build();
+	public static final Property<Integer> LOCATION_Y = new BasicProperty<Integer>()
+			.dataKeyAccessor("y", NumberSerializers.INTEGER)
+			.useDefaultIfMissing() // For virtual shopkeepers
+			.defaultValue(0)
+			.build();
+	public static final Property<Integer> LOCATION_Z = new BasicProperty<Integer>()
+			.dataKeyAccessor("z", NumberSerializers.INTEGER)
+			.useDefaultIfMissing() // For virtual shopkeepers
+			.defaultValue(0)
+			.build();
+	public static final Property<Float> YAW = new BasicProperty<Float>()
+			.dataKeyAccessor("yaw", NumberSerializers.FLOAT)
+			.useDefaultIfMissing() // For virtual shopkeepers, and if missing (eg. in pre 2.13.4 versions)
+			.defaultValue(0.0F) // South
+			.build();
 
 	@Override
 	public int getId() {
@@ -666,9 +679,6 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			return "Shopkeeper " + id + " at " + this.getPositionString() + ": ";
 		}
 	}
-
-	@Override
-	public abstract AbstractShopType<?> getType();
 
 	@Override
 	public final boolean isVirtual() {
@@ -841,6 +851,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	// NAMING
 
+	public static final Property<String> NAME = new BasicProperty<String>()
+			.dataKeyAccessor("name", ColoredStringSerializers.SCALAR)
+			.useDefaultIfMissing()
+			.defaultValue("")
+			.build();
+
 	@Override
 	public String getName() {
 		return name;
@@ -885,6 +901,23 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	// SHOP OBJECT
+
+	/**
+	 * Shop object data.
+	 */
+	public static final Property<ShopObjectData> SHOP_OBJECT_DATA = new BasicProperty<ShopObjectData>()
+			.dataKeyAccessor("object", new DataSerializer<ShopObjectData>() {
+				@Override
+				public Object serialize(ShopObjectData value) {
+					return DataContainerSerializers.DEFAULT.serialize(value);
+				}
+
+				@Override
+				public ShopObjectData deserialize(Object data) throws InvalidDataException {
+					return ShopObjectData.of(DataContainerSerializers.DEFAULT.deserialize(data));
+				}
+			})
+			.build();
 
 	@Override
 	public AbstractShopObject getShopObject() {

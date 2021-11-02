@@ -15,18 +15,17 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.buy.BuyingPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
-import com.nisovin.shopkeepers.util.data.DataValue;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
-import com.nisovin.shopkeepers.util.logging.Log;
 
 public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implements BuyingPlayerShopkeeper {
 
@@ -109,21 +108,20 @@ public class SKBuyingPlayerShopkeeper extends AbstractPlayerShopkeeper implement
 	// OFFERS
 
 	private static final String DATA_KEY_OFFERS = "offers";
+	public static final Property<List<? extends PriceOffer>> OFFERS = new BasicProperty<List<? extends PriceOffer>>()
+			.dataKeyAccessor(DATA_KEY_OFFERS, SKPriceOffer.LIST_SERIALIZER)
+			.useDefaultIfMissing()
+			.defaultValue(Collections.emptyList())
+			.build();
 
 	private void loadOffers(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		DataValue offerListData = shopkeeperData.getDataValue(DATA_KEY_OFFERS);
-		if (SKPriceOffer.migrateOffers(offerListData)) {
-			Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated items of trade offers.");
-			this.markDirty();
-		}
-
-		this._setOffers(SKPriceOffer.loadOffers(offerListData));
+		this._setOffers(shopkeeperData.get(OFFERS));
 	}
 
 	private void saveOffers(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		SKPriceOffer.saveOffers(shopkeeperData.getDataValue(DATA_KEY_OFFERS), this.getOffers());
+		shopkeeperData.set(OFFERS, this.getOffers());
 	}
 
 	@Override

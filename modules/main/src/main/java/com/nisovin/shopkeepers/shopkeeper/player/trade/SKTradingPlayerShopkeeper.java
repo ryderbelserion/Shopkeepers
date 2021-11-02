@@ -14,17 +14,16 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.trade.TradingPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
-import com.nisovin.shopkeepers.util.data.DataValue;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
-import com.nisovin.shopkeepers.util.logging.Log;
 
 public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implements TradingPlayerShopkeeper {
 
@@ -104,21 +103,20 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	// OFFERS
 
 	private static final String DATA_KEY_OFFERS = "offers";
+	public static final Property<List<? extends TradeOffer>> OFFERS = new BasicProperty<List<? extends TradeOffer>>()
+			.dataKeyAccessor(DATA_KEY_OFFERS, SKTradeOffer.LIST_SERIALIZER)
+			.useDefaultIfMissing()
+			.defaultValue(Collections.emptyList())
+			.build();
 
 	private void loadOffers(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		DataValue offerListData = shopkeeperData.getDataValue(DATA_KEY_OFFERS);
-		if (SKTradeOffer.migrateOffers(offerListData)) {
-			Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated items of trade offers.");
-			this.markDirty();
-		}
-
-		this._setOffers(SKTradeOffer.loadOffers(offerListData));
+		this._setOffers(shopkeeperData.get(OFFERS));
 	}
 
 	private void saveOffers(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		SKTradeOffer.saveOffers(shopkeeperData.getDataValue(DATA_KEY_OFFERS), this.getOffers());
+		shopkeeperData.set(OFFERS, this.getOffers());
 	}
 
 	@Override

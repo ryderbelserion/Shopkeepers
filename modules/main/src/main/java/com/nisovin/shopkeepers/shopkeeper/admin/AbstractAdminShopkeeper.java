@@ -15,6 +15,11 @@ import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.DataKeyAccessor;
+import com.nisovin.shopkeepers.util.data.property.EmptyDataPredicates;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
 public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper implements AdminShopkeeper {
@@ -92,14 +97,22 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 
 	// TRADE PERMISSION
 
+	public static final Property<String> TRADE_PERMISSION = new BasicProperty<String>()
+			.dataAccessor(new DataKeyAccessor<>("tradePerm", StringSerializers.SCALAR)
+					.emptyDataPredicate(EmptyDataPredicates.EMPTY_STRING)
+			)
+			.nullable() // Null if no additional trading permission is required
+			.defaultValue(null)
+			.build();
+
 	private void loadTradePermission(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		this._setTradePermission(shopkeeperData.getString("tradePerm"));
+		this._setTradePermission(shopkeeperData.get(TRADE_PERMISSION));
 	}
 
 	private void saveTradePermission(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		shopkeeperData.set("tradePerm", tradePermission);
+		shopkeeperData.set(TRADE_PERMISSION, tradePermission);
 	}
 
 	@Override

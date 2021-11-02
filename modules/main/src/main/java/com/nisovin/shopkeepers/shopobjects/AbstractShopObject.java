@@ -19,7 +19,12 @@ import com.nisovin.shopkeepers.shopkeeper.ShopkeeperPropertyValuesHolder;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.validation.java.StringValidators;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValuesHolder;
+import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
+import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -31,6 +36,40 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * </ul>
  */
 public abstract class AbstractShopObject implements ShopObject {
+
+	private static final String DATA_KEY_SHOP_OBJECT_TYPE = "type";
+
+	/**
+	 * Shop object type id.
+	 */
+	public static final Property<String> SHOP_OBJECT_TYPE_ID = new BasicProperty<String>()
+			.name("type-id")
+			.dataKeyAccessor(DATA_KEY_SHOP_OBJECT_TYPE, StringSerializers.STRICT)
+			.validator(StringValidators.NON_EMPTY)
+			.build();
+
+	/**
+	 * Shop object type, derived from the serialized {@link #SHOP_OBJECT_TYPE_ID shop object type id}.
+	 */
+	public static final Property<AbstractShopObjectType<?>> SHOP_OBJECT_TYPE = new BasicProperty<AbstractShopObjectType<?>>()
+			.dataKeyAccessor(DATA_KEY_SHOP_OBJECT_TYPE, new DataSerializer<AbstractShopObjectType<?>>() {
+				@Override
+				public Object serialize(AbstractShopObjectType<?> value) {
+					Validate.notNull(value, "value is null");
+					return value.getIdentifier();
+				}
+
+				@Override
+				public AbstractShopObjectType<?> deserialize(Object data) throws InvalidDataException {
+					String shopObjectTypeId = StringSerializers.STRICT_NON_EMPTY.deserialize(data);
+					AbstractShopObjectType<?> shopObjectType = SKShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().get(shopObjectTypeId);
+					if (shopObjectType == null) {
+						throw new InvalidDataException("Unknown shop object type: " + shopObjectTypeId);
+					}
+					return shopObjectType;
+				}
+			})
+			.build();
 
 	protected final AbstractShopkeeper shopkeeper; // Not null
 	protected final PropertyValuesHolder properties; // Not null
@@ -59,10 +98,6 @@ public abstract class AbstractShopObject implements ShopObject {
 
 	/**
 	 * Loads the shop object's data from the given {@link ShopObjectData}.
-	 * <p>
-	 * In the course of data migrations, this operation may modify the given {@link ShopObjectData} and its sub data
-	 * containers. If this is the case, the shopkeeper needs to be marked as {@link AbstractShopkeeper#markDirty()
-	 * dirty} in order for the storage to be made aware of these changes.
 	 * <p>
 	 * Any stored data elements (such as for example item stacks, etc.) and collections of data elements are assumed to
 	 * not be modified, neither by the shop object, nor in contexts outside of the shop object. If the shop object can

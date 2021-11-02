@@ -35,11 +35,21 @@ import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.user.SKUser;
 import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
-import com.nisovin.shopkeepers.util.bukkit.DataUtils;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.MutableBlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.data.DataAccessor;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.validation.bukkit.ItemStackValidators;
+import com.nisovin.shopkeepers.util.data.property.validation.java.StringValidators;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.ItemStackSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.NumberSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.UUIDSerializers;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -50,8 +60,6 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implements PlayerShopkeeper {
 
-	private static final boolean DEFAULT_NOTIFY_ON_TRADES = true;
-
 	private static final int CHECK_CONTAINER_PERIOD_SECONDS = 5;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_CONTAINER_PERIOD_SECONDS + 1);
 
@@ -60,7 +68,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	// TODO Allow the container to be located in a world different to that of the shopkeeper? This could also be useful
 	// for virtual player shops, which don't have a world themselves, but would still need a container block in a world.
 	private BlockLocation container; // Immutable BlockLocation
-	private boolean notifyOnTrades = DEFAULT_NOTIFY_ON_TRADES;
+	private boolean notifyOnTrades = NOTIFY_ON_TRADES.getDefaultValue();
 	private UnmodifiableItemStack hireCost = null; // Null if not for hire
 
 	// Initial threshold between [1, CHECK_CONTAINER_PERIOD_SECONDS] for load balancing:
@@ -205,28 +213,44 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// OWNER
 
+	public static final Property<UUID> OWNER_UNIQUE_ID = new BasicProperty<UUID>()
+			.dataKeyAccessor("owner uuid", UUIDSerializers.LENIENT)
+			.build();
+	public static final Property<String> OWNER_NAME = new BasicProperty<String>()
+			.dataKeyAccessor("owner", StringSerializers.SCALAR)
+			.validator(StringValidators.NON_EMPTY)
+			.validator((property, value) -> {
+				// TODO We no longer use the fallback name (since late 1.14.4). Remove the "unknown"-check again in the
+				// future (as soon as possible, because it conflicts with any player actually named 'unknown').
+				Validate.isTrue(!value.equals("unknown"), "Invalid owner name: 'unknown'");
+			})
+			.build();
+	public static final Property<User> OWNER = new BasicProperty<User>()
+			.name("owner")
+			.dataAccessor(new DataAccessor<User>() {
+				@Override
+				public void save(DataContainer dataContainer, User value) {
+					dataContainer.set(OWNER_UNIQUE_ID, value.getUniqueId());
+					dataContainer.set(OWNER_NAME, value.getLastKnownName());
+				}
+
+				@Override
+				public User load(DataContainer dataContainer) throws InvalidDataException {
+					UUID ownerUniqueId = dataContainer.get(OWNER_UNIQUE_ID);
+					String ownerName = dataContainer.get(OWNER_NAME);
+					return SKUser.of(ownerUniqueId, ownerName);
+				}
+			})
+			.build();
+
 	private void loadOwner(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		UUID ownerUUID;
-		try {
-			ownerUUID = UUID.fromString(shopkeeperData.getString("owner uuid"));
-		} catch (Exception e) {
-			// UUID is invalid or non-existent:
-			throw new InvalidDataException("Missing or invalid owner uuid!");
-		}
-		String ownerName = shopkeeperData.getString("owner");
-		// TODO We no longer use the fallback name (since late 1.14.4). Remove the "unknown"-check again in the future
-		// (as soon as possible, because it conflicts with any player actually named 'unknown').
-		if (ownerName == null || ownerName.isEmpty() || ownerName.equals("unknown")) {
-			throw new InvalidDataException("Missing owner name!");
-		}
-		this._setOwner(ownerUUID, ownerName);
+		this._setOwner(shopkeeperData.get(OWNER));
 	}
 
 	private void saveOwner(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		shopkeeperData.set("owner uuid", this.getOwnerUUID());
-		shopkeeperData.set("owner", this.getOwnerName());
+		shopkeeperData.set(OWNER, owner);
 	}
 
 	@Override
@@ -289,18 +313,20 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// TRADE NOTIFICATIONS
 
+	public static final Property<Boolean> NOTIFY_ON_TRADES = new BasicProperty<Boolean>()
+			.dataKeyAccessor("notifyOnTrades", BooleanSerializers.LENIENT)
+			.defaultValue(true)
+			.omitIfDefault()
+			.build();
+
 	private void loadNotifyOnTrades(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		boolean notifyOnTrades = shopkeeperData.getBooleanOrDefault("notifyOnTrades", DEFAULT_NOTIFY_ON_TRADES);
-		this._setNotifyOnTrades(notifyOnTrades);
+		this._setNotifyOnTrades(shopkeeperData.get(NOTIFY_ON_TRADES));
 	}
 
 	private void saveNotifyOnTrades(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		// We only store this property if its value does not match the default value:
-		if (notifyOnTrades != DEFAULT_NOTIFY_ON_TRADES) {
-			shopkeeperData.set("notifyOnTrades", notifyOnTrades);
-		}
+		shopkeeperData.set(NOTIFY_ON_TRADES, notifyOnTrades);
 	}
 
 	@Override
@@ -321,34 +347,21 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// HIRING
 
+	public static final Property<UnmodifiableItemStack> HIRE_COST_ITEM = new BasicProperty<UnmodifiableItemStack>()
+			.dataKeyAccessor("hirecost", ItemStackSerializers.UNMODIFIABLE)
+			.validator(ItemStackValidators.Unmodifiable.NON_EMPTY)
+			.nullable() // Null if the shop is not for hire
+			.defaultValue(null)
+			.build();
+
 	private void loadForHire(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		// The item is assumed to be immutable and therefore does not need to be copied.
-		UnmodifiableItemStack hireCost = DataUtils.loadUnmodifiableItemStack(shopkeeperData, "hirecost");
-		// Hire cost ItemStack is not null, but empty. -> Normalize to null:
-		if (hireCost != null && ItemUtils.isEmpty(hireCost)) {
-			Log.warning(this.getLogPrefix() + "Hire cost item is empty! Disabling 'for hire'.");
-			hireCost = null;
-			this.markDirty();
-		}
-		UnmodifiableItemStack migratedHireCost = ItemMigration.migrateItemStack(hireCost);
-		if (!ItemUtils.isSimilar(hireCost, migratedHireCost)) {
-			if (ItemUtils.isEmpty(migratedHireCost) && !ItemUtils.isEmpty(hireCost)) {
-				// Migration failed:
-				Log.warning(this.getLogPrefix() + "Hire cost item migration failed: " + hireCost);
-				hireCost = null;
-			} else {
-				hireCost = migratedHireCost;
-				Log.debug(DebugOptions.itemMigrations, () -> this.getLogPrefix() + "Migrated hire cost item.");
-			}
-			this.markDirty();
-		}
-		this._setForHire(ItemUtils.asItemStackOrNull(hireCost));
+		this._setForHire(ItemUtils.asItemStackOrNull(shopkeeperData.get(HIRE_COST_ITEM)));
 	}
 
 	private void saveForHire(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		DataUtils.saveItemStack(shopkeeperData, "hirecost", hireCost);
+		shopkeeperData.set(HIRE_COST_ITEM, hireCost);
 	}
 
 	@Override
@@ -387,20 +400,46 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// CONTAINER
 
+	// TODO Rename the storage keys to containerx/y/z?
+	// TODO Change to a list of containers?
+	// TODO Store container world independently of shopkeeper world?
+	public static final Property<Integer> CONTAINER_X = new BasicProperty<Integer>()
+			.dataKeyAccessor("chestx", NumberSerializers.INTEGER)
+			.build();
+	public static final Property<Integer> CONTAINER_Y = new BasicProperty<Integer>()
+			.dataKeyAccessor("chesty", NumberSerializers.INTEGER)
+			.build();
+	public static final Property<Integer> CONTAINER_Z = new BasicProperty<Integer>()
+			.dataKeyAccessor("chestz", NumberSerializers.INTEGER)
+			.build();
+	public static final Property<BlockLocation> CONTAINER = new BasicProperty<BlockLocation>()
+			.name("container")
+			.dataAccessor(new DataAccessor<BlockLocation>() {
+				@Override
+				public void save(DataContainer dataContainer, BlockLocation value) {
+					dataContainer.set(CONTAINER_X, value.getX());
+					dataContainer.set(CONTAINER_Y, value.getY());
+					dataContainer.set(CONTAINER_Z, value.getZ());
+				}
+
+				@Override
+				public BlockLocation load(DataContainer dataContainer) throws InvalidDataException {
+					int containerX = dataContainer.get(CONTAINER_X);
+					int containerY = dataContainer.get(CONTAINER_Y);
+					int containerZ = dataContainer.get(CONTAINER_Z);
+					return new BlockLocation(containerX, containerY, containerZ);
+				}
+			})
+			.build();
+
 	private void loadContainer(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;
-		// TODO Rename to storage keys to containerx/y/z?
-		if (!shopkeeperData.isNumber("chestx") || !shopkeeperData.isNumber("chesty") || !shopkeeperData.isNumber("chestz")) {
-			throw new InvalidDataException("Missing or invalid container coordinates!");
-		}
-		this._setContainer(shopkeeperData.getInt("chestx"), shopkeeperData.getInt("chesty"), shopkeeperData.getInt("chestz"));
+		this._setContainer(shopkeeperData.get(CONTAINER));
 	}
 
 	private void saveContainer(ShopkeeperData shopkeeperData) {
 		assert shopkeeperData != null;
-		shopkeeperData.set("chestx", container.getX());
-		shopkeeperData.set("chesty", container.getY());
-		shopkeeperData.set("chestz", container.getZ());
+		shopkeeperData.set(CONTAINER, container);
 	}
 
 	private void protectContainer() {

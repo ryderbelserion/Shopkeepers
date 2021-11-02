@@ -527,7 +527,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		AbstractShopType<?> shopType;
 		try {
-			shopType = shopkeeperData.getShopType();
+			shopType = shopkeeperData.get(AbstractShopkeeper.SHOP_TYPE);
 		} catch (InvalidDataException e) {
 			throw new ShopkeeperCreateException(e.getMessage(), e);
 		}

@@ -34,10 +34,6 @@ public class DataUtils {
 		return ItemUtils.shallowCopy(itemStack);
 	}
 
-	public static void saveItemStack(DataContainer dataContainer, String key, UnmodifiableItemStack itemStack) {
-		dataContainer.set(key, serializeItemStack(itemStack));
-	}
-
 	// Additional processing whenever we load deserialized item stacks.
 	public static ItemStack deserializeItemStack(ItemStack loadedItemStack) {
 		// Note: Spigot creates Bukkit ItemStacks, whereas Paper automatically replaces the deserialized Bukkit
@@ -55,14 +51,5 @@ public class DataUtils {
 			loadedItemStack = ItemUtils.ensureBukkitItemStack(loadedItemStack);
 		}
 		return loadedItemStack;
-	}
-
-	public static ItemStack loadItemStack(DataContainer dataContainer, String key) {
-		ItemStack itemStack = dataContainer.getOfType(key, ItemStack.class);
-		return deserializeItemStack(itemStack);
-	}
-
-	public static UnmodifiableItemStack loadUnmodifiableItemStack(DataContainer dataContainer, String key) {
-		return UnmodifiableItemStack.of(loadItemStack(dataContainer, key));
 	}
 }

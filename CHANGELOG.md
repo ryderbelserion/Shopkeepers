@@ -11,7 +11,8 @@ Date format: (YYYY-MM-DD)
   * Shopkeeper mobs will rotate back to their initial direction now when there is no player to look at. However, this requires a player to still be somewhat nearby, since only shopkeeper mobs with nearby players are ticked.
 * Fixed: Shopkeepers could lose some of their trades during item migrations. When an item was migrated, but the subsequent trades did not require any item migrations, these subsequent trades were lost. However, it was relatively unlikely to encounter this issue in practice. An exception to this is in combination with the following Paper-specific issue that only affects trades with certain enchanted book items.
 * Fixed: On Paper servers, the comparisons of enchanted book items with multiple stored enchantments were not working as expected. The issue was caused by the server reordering the stored enchantments in some cases, as well as Paper automatically converting any deserialized Bukkit item stacks to CraftItemStacks, which behave differently when being compared to other CraftItemStacks. One known effect of this was that the above issue of trades potentially being lost due to item migrations would be encountered more likely on Paper servers, because the reordering of these stored enchantments would be detected as an 'item migration' by the Shopkeepers plugin. It also caused an unnecessary save of all shopkeeper data after every plugin reload.
-* Invalid trade offer data and failed trade offer item migrations will now prevent the shopkeeper from loading. Previously, some kinds of invalid data were silently ignored, and others only resulted in a warning being logged and the affected trade offer to be skipped. This could lead to the loss of data for these invalid trade offers. Now, this invalid data is retained for a server admin to investigate the issue.
+* Data: Various kinds of invalid shopkeeper data and failed data migrations that have previously been ignored or only triggered a warning are now checked for and will prevent the shopkeeper from loading. Most notably, this includes the data of shopkeeper offers, and the hire cost item of player shops. Previously, this invalid data would be cleared. Now, it is retained for a server admin to investigate the issue.
+* Data: It is invalid now to mix legacy and non-legacy book offer data (changed during late MC 1.14.4).
 * When shopkeepers of inactive players are removed, we now trigger an immediate save, even if the 'save-instantly' setting is disabled.
 * Versioning: Snapshot builds will now include the Git hash in their plugin version.
 * Debug: The 'shopkeeper-activation' debug option will now log additional details about every single shopkeeper activation and deactivation, instead of only logging a summary about how many shopkeepers were activated per chunk.
@@ -22,12 +23,12 @@ Date format: (YYYY-MM-DD)
   * In a few remaining cases, stack traces are no longer printed directly to the server log, but through the plugin logger.
 * During the initial plugin startup, we now test if the server meets certain basic assumptions about its API implementation. In order to prevent damage due to unexpected server and plugin behavior, the plugin shuts itself down if any of these assumptions turn out to be incorrect. These tests are meant to be lightweight, but may be expanded in the future.
 * Debug: Added a debug log message whenever a player tries to set an invalid shop name.
-* Removed various 3 year old data migrations:
+* Data: Removed various 3 year old data migrations:
   * We no longer check for and remove entity uuids from the data of living entity shopkeepers.
   * The object data of shopkeepers is expected to be located in its own dedicated 'object' section.
   * The stored object type identifiers of shopkeepers are expected to perfectly match the registered shop object types. They are no longer normalized and fuzzy matched.
-* We no longer generate a new unique id if the shopkeeper data is missing the shopkeeper's unique id. Instead, the loading of the shopkeeper fails now in this case.
-* All item stacks are now (shallow) copied before they are saved to the shopkeeper data. This prevents SnakeYaml from representing the item stacks using anchors and aliases (a Yaml feature) inside the shopkeepers save file if the same item stack instances would otherwise be saved multiple times in different contexts.
+* Data: We no longer generate a new unique id if the shopkeeper data is missing the shopkeeper's unique id. Instead, the loading of the shopkeeper fails now in this case.
+* Data: All item stacks are now (shallow) copied before they are saved to the shopkeeper data. This prevents SnakeYaml from representing the item stacks using anchors and aliases (a Yaml feature) inside the shopkeepers save file if the same item stack instances would otherwise be saved multiple times in different contexts.
 * For consistency among commands, and to avoid certain ambiguous command parsing cases, the "edit", "remote", and "remove" commands no longer merge trailing arguments to derive the target shopkeeper name. It is still possible to target shopkeepers with names that consist of multiple words by using a dash as word separator instead of a space.
 * Shopkeeper and entity command arguments now propose the ids of targeted shopkeepers and entities.
 * Fixed: The "testSpawn" debug command would respawn the shopkeepers in the executing player's chunk, but would not immediately update their object id registrations. The shop objects will now automatically and immediately inform the shopkeeper registry about those object id changes.
@@ -69,7 +70,8 @@ Date format: (YYYY-MM-DD)
 
 **Other internal changes:**  
 * Internal API: ProtectedContainers requires a BlockLocation now when adding or removing a container protection.
-* Internal API: Various changes to the loading, saving, and migration methods of shopkeeper offers.
+* Internal API: Various changes to the loading, saving, and migration of shop offers. They use the new internal data serialization and property APIs now to save and load their data.
+* Internal API: Removed various no longer needed utility methods related to the saving and loading of item stacks.
 * Internal API: CitizensShopkeeperTrair#getShopkeeper() returns an AbstractShopkeeper now.
 * Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
 * Internal API: Moved various editor internal classes into their own files.
@@ -85,7 +87,9 @@ Date format: (YYYY-MM-DD)
 * Internal API: Various refactors related to shop object properties.
 * Internal API: Various uses of ShopkeeperCreateException have been replaced with the better fitting InvalidDataException.
 * Internal API: Minor changes to the shop and shop object type constructors.
+* Various changes to the internal representation and handling of shopkeeper data, shop object data, and data migrations.
 * Major refactors to the internal properties API.
+* Data: The world, coordinates, and yaw are now omitted from the save data of virtual shopkeepers. However, this has no effect yet, since virtual shopkeepers are not yet properly supported.
 * Minor changes to how shop object property changes are applied to the spawned shop object. Shop objects also properly take into account now that their properties might get dynamically loaded at runtime.
 * Shopkeepers are now deactivated before they are despawned. This avoids having to process the object id change of the shop object being despawned when the shopkeeper is going to be deactivated anyways.
 * Fixed: The ShopkeeperByName command argument did not take the 'joinRemainingArgs' argument into account.

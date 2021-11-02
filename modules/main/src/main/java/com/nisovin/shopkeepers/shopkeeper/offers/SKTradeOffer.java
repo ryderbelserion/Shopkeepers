@@ -1,23 +1,32 @@
 package com.nisovin.shopkeepers.shopkeeper.offers;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
-import com.nisovin.shopkeepers.util.bukkit.DataUtils;
 import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.data.DataValue;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.MissingDataException;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.validation.bukkit.ItemStackValidators;
+import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.ItemStackSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.DataContainerSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemMigration;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 // Shares its implementation with SKTradingRecipe, but always reports to not be out of stock.
 public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
@@ -100,81 +109,132 @@ public class SKTradeOffer extends SKTradingRecipe implements TradeOffer {
 		return new SKTradingRecipe(offer.getResultItem(), offer.getItem1(), offer.getItem2(), outOfStock);
 	}
 
-	public static void saveOffers(DataValue dataValue, @ReadOnly Collection<? extends TradeOffer> offers) {
+	private static final Property<UnmodifiableItemStack> RESULT_ITEM = new BasicProperty<UnmodifiableItemStack>()
+			.dataKeyAccessor("resultItem", ItemStackSerializers.UNMODIFIABLE)
+			.validator(ItemStackValidators.Unmodifiable.NON_EMPTY)
+			.build();
+	private static final Property<UnmodifiableItemStack> ITEM1 = new BasicProperty<UnmodifiableItemStack>()
+			.dataKeyAccessor("item1", ItemStackSerializers.UNMODIFIABLE)
+			.validator(ItemStackValidators.Unmodifiable.NON_EMPTY)
+			.build();
+	private static final Property<UnmodifiableItemStack> ITEM2 = new BasicProperty<UnmodifiableItemStack>()
+			.dataKeyAccessor("item2", ItemStackSerializers.UNMODIFIABLE)
+			.validator(ItemStackValidators.Unmodifiable.NON_EMPTY)
+			.nullable()
+			.defaultValue(null)
+			.build();
+
+	/**
+	 * A {@link DataSerializer} for values of type {@link TradeOffer}.
+	 */
+	public static final DataSerializer<TradeOffer> SERIALIZER = new DataSerializer<TradeOffer>() {
+		@Override
+		public Object serialize(TradeOffer value) {
+			Validate.notNull(value, "value is null");
+			DataContainer offerData = DataContainer.create();
+			// The items are assumed to be immutable.
+			offerData.set(RESULT_ITEM, value.getResultItem());
+			offerData.set(ITEM1, value.getItem1());
+			offerData.set(ITEM2, value.getItem2()); // Can be null
+			return offerData.serialize();
+		}
+
+		@Override
+		public TradeOffer deserialize(Object data) throws InvalidDataException {
+			DataContainer offerData = DataContainerSerializers.DEFAULT.deserialize(data);
+			try {
+				// The item stacks are assumed to be immutable and therefore do not need to be copied.
+				UnmodifiableItemStack resultItem = offerData.get(RESULT_ITEM);
+				UnmodifiableItemStack item1 = offerData.get(ITEM1);
+				UnmodifiableItemStack item2 = offerData.get(ITEM2); // Can be null
+				return new SKTradeOffer(resultItem, item1, item2);
+			} catch (MissingDataException e) {
+				throw new InvalidDataException(e.getMessage(), e);
+			}
+		}
+	};
+
+	/**
+	 * A {@link DataSerializer} for lists of {@link TradeOffer}s.
+	 * <p>
+	 * All contained elements are expected to not be <code>null</code>.
+	 */
+	public static final DataSerializer<@ReadOnly List<? extends TradeOffer>> LIST_SERIALIZER = new DataSerializer<List<? extends TradeOffer>>() {
+		@Override
+		public Object serialize(List<? extends TradeOffer> value) {
+			Validate.notNull(value, "value is null");
+			DataContainer offerListData = DataContainer.create();
+			int id = 1;
+			for (TradeOffer offer : value) {
+				Validate.notNull(offer, "list of offers contains null");
+				offerListData.set(String.valueOf(id), SERIALIZER.serialize(offer));
+				id++;
+			}
+			return offerListData.serialize();
+		}
+
+		@Override
+		public List<? extends TradeOffer> deserialize(Object data) throws InvalidDataException {
+			DataContainer offerListData = DataContainerSerializers.DEFAULT.deserialize(data);
+			Set<String> keys = offerListData.getKeys();
+			List<TradeOffer> offers = new ArrayList<>(keys.size());
+			for (String id : keys) {
+				Object offerData = offerListData.get(id);
+				TradeOffer offer;
+				try {
+					offer = SERIALIZER.deserialize(offerData);
+				} catch (InvalidDataException e) {
+					throw new InvalidDataException("Invalid trade offer " + id + ": " + e.getMessage(), e);
+				}
+				offers.add(offer);
+			}
+			return offers;
+		}
+	};
+
+	public static void saveOffers(DataValue dataValue, @ReadOnly List<? extends TradeOffer> offers) {
 		Validate.notNull(dataValue, "dataValue is null");
 		if (offers == null) {
 			dataValue.clear();
 			return;
 		}
 
-		DataContainer offerListData = dataValue.createContainer();
-		int id = 1;
-		for (TradeOffer offer : offers) {
-			// These items are assumed to be immutable.
-			UnmodifiableItemStack item1 = offer.getItem1();
-			UnmodifiableItemStack item2 = offer.getItem2();
-			UnmodifiableItemStack resultItem = offer.getResultItem();
-
-			DataContainer offerData = offerListData.createContainer(String.valueOf(id));
-			DataUtils.saveItemStack(offerData, "item1", item1);
-			DataUtils.saveItemStack(offerData, "item2", item2);
-			DataUtils.saveItemStack(offerData, "resultItem", resultItem);
-			id++;
-		}
+		Object offerListData = LIST_SERIALIZER.serialize(offers);
+		dataValue.set(offerListData);
 	}
 
-	// Elements inside the data are assumed to be immutable and can be reused without having to be copied.
 	public static List<? extends TradeOffer> loadOffers(DataValue dataValue) throws InvalidDataException {
 		Validate.notNull(dataValue, "dataValue is null");
 
 		if (!dataValue.isPresent()) {
-			// No data -> Return an empty list of offers.
-			return new ArrayList<>(0);
+			// No data. -> Return an empty list of offers.
+			return Collections.emptyList();
 		}
 
-		DataContainer offerListData = dataValue.getContainer();
-		if (offerListData == null) {
-			throw new InvalidDataException("Invalid trade offer list data: " + dataValue.get());
-		}
-
-		List<TradeOffer> offers = new ArrayList<>();
-		for (String id : offerListData.getKeys()) {
-			DataContainer offerData = offerListData.getContainer(id);
-			if (offerData == null) {
-				// Data is not a container.
-				throw new InvalidDataException("Invalid data for trade offer " + id);
-			}
-
-			// The item stacks are assumed to be immutable and therefore do not need to be copied.
-			UnmodifiableItemStack resultItem = DataUtils.loadUnmodifiableItemStack(offerData, "resultItem");
-			UnmodifiableItemStack item1 = DataUtils.loadUnmodifiableItemStack(offerData, "item1");
-			UnmodifiableItemStack item2 = DataUtils.loadUnmodifiableItemStack(offerData, "item2");
-			if (ItemUtils.isEmpty(resultItem) || ItemUtils.isEmpty(item1)) {
-				throw new InvalidDataException("Invalid trade offer " + id + ": item1 or resultItem is empty.");
-			}
-			offers.add(new SKTradeOffer(resultItem, item1, item2));
-		}
-		return offers;
+		Object offerListData = dataValue.get();
+		return LIST_SERIALIZER.deserialize(offerListData);
 	}
 
 	// Returns true if the data has changed due to migrations.
-	public static boolean migrateOffers(DataValue dataValue) throws InvalidDataException {
+	public static boolean migrateOffers(DataValue dataValue, String logPrefix) throws InvalidDataException {
+		Validate.notNull(logPrefix, "logPrefix is null");
 		List<? extends TradeOffer> offers = loadOffers(dataValue);
 		List<? extends TradeOffer> migratedOffers = migrateItems(offers);
 		if (offers == migratedOffers) {
-			// Nothing migrated.
+			// No offers were migrated.
 			return false;
 		}
 
-		// Write back the migrated data:
+		// Write back the migrated offers:
 		saveOffers(dataValue, migratedOffers);
+		Log.debug(DebugOptions.itemMigrations, () -> logPrefix + "Migrated items of trade offers.");
 		return true;
 	}
 
 	// Note: Returns the same list instance if no items were migrated.
 	private static List<? extends TradeOffer> migrateItems(@ReadOnly List<? extends TradeOffer> offers) throws InvalidDataException {
 		Validate.notNull(offers, "offers is null");
-		Validate.noNullElements(offers, "offers contains null");
+		assert !offers.contains(null);
 		List<TradeOffer> migratedOffers = null;
 		final int size = offers.size();
 		for (int i = 0; i < size; ++i) {
