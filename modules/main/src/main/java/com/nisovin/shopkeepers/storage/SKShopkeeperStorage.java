@@ -501,6 +501,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				continue; // Skip this shopkeeper
 			}
 
+			// Insert the separately stored shopkeeper id back into the shopkeeper data:
+			shopkeeperData.set(AbstractShopkeeper.ID, shopkeeperId);
+
 			// Perform common migrations:
 			MigrationResult migrationResult = this.migrateShopkeeperData(shopkeeperId, shopkeeperData, dataVersion);
 			if (migrationResult == MigrationResult.FAILED) {
@@ -511,7 +514,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Load the shopkeeper:
 			AbstractShopkeeper shopkeeper;
 			try {
-				shopkeeper = shopkeeperRegistry.loadShopkeeper(shopkeeperId, shopkeeperData);
+				shopkeeper = shopkeeperRegistry.loadShopkeeper(shopkeeperData);
 				assert shopkeeper != null && shopkeeper.isValid();
 			} catch (ShopkeeperCreateException e) {
 				this.failedToLoadShopkeeper(key, e.getMessage());
@@ -818,7 +821,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			assert shopkeeper.isDirty();
 			String key = String.valueOf(shopkeeper.getId());
 			Object previousData = saveData.get(key);
-			// Replaces the previous shopkeeper data:
+			// This replaces the previous shopkeeper data:
 			ShopkeeperData newData = ShopkeeperData.of(saveData.createContainer(key));
 			try {
 				shopkeeper.save(newData);
@@ -834,6 +837,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				failedToSave.add(shopkeeper);
 				return;
 			}
+
+			// Remove the separately stored shopkeeper id from the shopkeeper data:
+			newData.set(AbstractShopkeeper.ID.getDataAccessor(), null);
 
 			// We transferred the shopkeeper's data into the storage. Reset the shopkeeper's dirty flag:
 			shopkeeper.onSave();

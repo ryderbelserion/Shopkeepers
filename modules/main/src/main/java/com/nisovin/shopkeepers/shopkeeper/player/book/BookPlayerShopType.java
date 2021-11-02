@@ -45,9 +45,8 @@ public final class BookPlayerShopType extends AbstractPlayerShopType<SKBookPlaye
 	}
 
 	@Override
-	public SKBookPlayerShopkeeper loadShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	public SKBookPlayerShopkeeper loadShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		this.validateShopkeeperData(shopkeeperData);
-		SKBookPlayerShopkeeper shopkeeper = new SKBookPlayerShopkeeper(id, shopkeeperData);
-		return shopkeeper;
+		return new SKBookPlayerShopkeeper(shopkeeperData);
 	}
 }

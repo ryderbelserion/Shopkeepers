@@ -59,20 +59,16 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	 * Creates a not yet initialized {@link AbstractAdminShopkeeper} (for use in sub-classes).
 	 * <p>
 	 * See {@link AbstractShopkeeper} for details on initialization.
-	 * 
-	 * @param id
-	 *            the shopkeeper id
 	 */
-	protected AbstractAdminShopkeeper(int id) {
-		super(id);
+	protected AbstractAdminShopkeeper() {
 	}
 
 	/**
 	 * Expects an {@link AdminShopCreationData}.
 	 */
 	@Override
-	protected void loadFromCreationData(ShopCreationData shopCreationData) throws ShopkeeperCreateException {
-		super.loadFromCreationData(shopCreationData);
+	protected void loadFromCreationData(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+		super.loadFromCreationData(id, shopCreationData);
 	}
 
 	@Override

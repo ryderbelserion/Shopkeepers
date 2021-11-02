@@ -78,20 +78,16 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	 * Creates a not yet initialized {@link AbstractPlayerShopkeeper} (for use in sub-classes).
 	 * <p>
 	 * See {@link AbstractShopkeeper} for details on initialization.
-	 * 
-	 * @param id
-	 *            the shopkeeper id
 	 */
-	protected AbstractPlayerShopkeeper(int id) {
-		super(id);
+	protected AbstractPlayerShopkeeper() {
 	}
 
 	/**
 	 * Expects a {@link PlayerShopCreationData}.
 	 */
 	@Override
-	protected void loadFromCreationData(ShopCreationData shopCreationData) throws ShopkeeperCreateException {
-		super.loadFromCreationData(shopCreationData);
+	protected void loadFromCreationData(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+		super.loadFromCreationData(id, shopCreationData);
 		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) shopCreationData;
 		Player owner = playerShopCreationData.getCreator();
 		Block container = playerShopCreationData.getShopContainer();

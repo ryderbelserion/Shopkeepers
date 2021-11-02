@@ -46,21 +46,15 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	 * Creates a not yet initialized {@link SKBookPlayerShopkeeper} (for use in sub-classes).
 	 * <p>
 	 * See {@link AbstractShopkeeper} for details on initialization.
-	 * 
-	 * @param id
-	 *            the shopkeeper id
 	 */
-	protected SKBookPlayerShopkeeper(int id) {
-		super(id);
+	protected SKBookPlayerShopkeeper() {
 	}
 
 	protected SKBookPlayerShopkeeper(int id, PlayerShopCreationData shopCreationData) throws ShopkeeperCreateException {
-		super(id);
-		this.initOnCreation(shopCreationData);
+		this.initOnCreation(id, shopCreationData);
 	}
 
-	protected SKBookPlayerShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
-		super(id);
+	protected SKBookPlayerShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		this.initOnLoad(shopkeeperData);
 	}
 

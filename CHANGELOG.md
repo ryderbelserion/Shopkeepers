@@ -87,6 +87,7 @@ Date format: (YYYY-MM-DD)
 * Internal API: Various refactors related to shop object properties.
 * Internal API: Various uses of ShopkeeperCreateException have been replaced with the better fitting InvalidDataException.
 * Internal API: Minor changes to the shop and shop object type constructors.
+* Internal API: Minor changes to the shopkeeper constructors and loading methods, since the shopkeeper id is now passed around together with the other shopkeeper data.
 * Various changes to the internal representation and handling of shopkeeper data, shop object data, and data migrations.
 * Major refactors to the internal properties API.
 * Data: The world, coordinates, and yaw are now omitted from the save data of virtual shopkeepers. However, this has no effect yet, since virtual shopkeepers are not yet properly supported.

@@ -32,21 +32,15 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	 * Creates a not yet initialized {@link SKRegularAdminShopkeeper} (for use in sub-classes).
 	 * <p>
 	 * See {@link AbstractShopkeeper} for details on initialization.
-	 * 
-	 * @param id
-	 *            the shopkeeper id
 	 */
-	protected SKRegularAdminShopkeeper(int id) {
-		super(id);
+	protected SKRegularAdminShopkeeper() {
 	}
 
 	protected SKRegularAdminShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
-		super(id);
-		this.initOnCreation(shopCreationData);
+		this.initOnCreation(id, shopCreationData);
 	}
 
-	protected SKRegularAdminShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
-		super(id);
+	protected SKRegularAdminShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		this.initOnLoad(shopkeeperData);
 	}
 

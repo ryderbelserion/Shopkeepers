@@ -471,7 +471,11 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		return plugin.getShopkeeperStorage();
 	}
 
-	private void validateUnusedShopkeeperUniqueId(Shopkeeper shopkeeper) throws ShopkeeperCreateException {
+	private void validateUnusedShopkeeperIds(Shopkeeper shopkeeper) throws ShopkeeperCreateException {
+		if (this.getShopkeeperById(shopkeeper.getId()) != null) {
+			throw new ShopkeeperCreateException("There already exists a shopkeeper with the same id: "
+					+ shopkeeper.getId());
+		}
 		if (this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) != null) {
 			throw new ShopkeeperCreateException("There already exists a shopkeeper with the same unique id: "
 					+ shopkeeper.getUniqueId());
@@ -495,8 +499,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			throw new ShopkeeperCreateException("ShopType '" + shopType.getClass().getName() + "' created null shopkeeper!");
 		}
 
-		// Validate unique id:
-		this.validateUnusedShopkeeperUniqueId(shopkeeper);
+		// Validate shopkeeper ids:
+		this.validateUnusedShopkeeperIds(shopkeeper);
 
 		// Success:
 
@@ -508,11 +512,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	/**
 	 * Recreates a shopkeeper by loading its previously saved data from the given {@link ShopkeeperData}.
 	 * 
-	 * @param id
-	 *            the shopkeeper id
 	 * @param shopkeeperData
 	 *            the shopkeeper data
-	 * @return the loaded shopkeeper
+	 * @return the loaded shopkeeper, not <code>null</code>
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper could not be loaded
 	 */
@@ -520,10 +522,8 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	// other source, the storage would need to be made aware of the shopkeeper (eg. by marking the shopkeeper as dirty).
 	// Otherwise, certain operations (such as checking if a certain shopkeeper id is already in use) would no longer
 	// work as expected.
-	public AbstractShopkeeper loadShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	public AbstractShopkeeper loadShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
-		Validate.isTrue(id >= 1, "id has to be positive: " + id);
-		Validate.isTrue(this.getShopkeeperById(id) == null, "There already exists a shopkeeper with this id: " + id);
 
 		AbstractShopType<?> shopType;
 		try {
@@ -533,14 +533,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 		assert shopType != null;
 
-		AbstractShopkeeper shopkeeper = shopType.loadShopkeeper(id, shopkeeperData);
+		AbstractShopkeeper shopkeeper = shopType.loadShopkeeper(shopkeeperData);
 		if (shopkeeper == null) {
 			// Invalid shop type implementation..
 			throw new ShopkeeperCreateException("ShopType '" + shopType.getClass().getName() + "' loaded null shopkeeper!");
 		}
 
-		// Validate unique id:
-		this.validateUnusedShopkeeperUniqueId(shopkeeper);
+		// Validate shopkeeper ids:
+		this.validateUnusedShopkeeperIds(shopkeeper);
 
 		// Success:
 

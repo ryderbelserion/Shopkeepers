@@ -45,9 +45,8 @@ public final class SellingPlayerShopType extends AbstractPlayerShopType<SKSellin
 	}
 
 	@Override
-	public SKSellingPlayerShopkeeper loadShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	public SKSellingPlayerShopkeeper loadShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
 		this.validateShopkeeperData(shopkeeperData);
-		SKSellingPlayerShopkeeper shopkeeper = new SKSellingPlayerShopkeeper(id, shopkeeperData);
-		return shopkeeper;
+		return new SKSellingPlayerShopkeeper(shopkeeperData);
 	}
 }

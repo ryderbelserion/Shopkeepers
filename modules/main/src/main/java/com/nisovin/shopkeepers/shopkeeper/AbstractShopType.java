@@ -57,15 +57,13 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 * loaded shopkeeper can guarantee not to modify these data elements, it is allowed to directly store them without
 	 * copying them first.
 	 * 
-	 * @param id
-	 *            the shopkeeper id
 	 * @param shopkeeperData
-	 *            the shopkeeper data
-	 * @return the created shopkeeper
+	 *            the shopkeeper data, not <code>null</code>
+	 * @return the loaded shopkeeper, not <code>null</code>
 	 * @throws ShopkeeperCreateException
-	 *             if the shopkeeper could not be created (ex. due to invalid or missing data)
+	 *             if the shopkeeper could not be created (eg. due to invalid or missing data)
 	 */
-	public abstract T loadShopkeeper(int id, ShopkeeperData shopkeeperData) throws ShopkeeperCreateException;
+	public abstract T loadShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException;
 
 	/**
 	 * Creates a new shopkeeper of this type by using the data from the given {@link ShopCreationData}.
@@ -73,10 +71,10 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 * @param id
 	 *            the shopkeeper id
 	 * @param shopCreationData
-	 *            the shop creation data
-	 * @return the created shopkeeper
+	 *            the shop creation data, not <code>null</code>
+	 * @return the created shopkeeper, not <code>null</code>
 	 * @throws ShopkeeperCreateException
-	 *             if the shopkeeper could not be created (ex. due to invalid or missing data)
+	 *             if the shopkeeper could not be created (eg. due to invalid or missing data)
 	 */
 	public abstract T createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException;
 

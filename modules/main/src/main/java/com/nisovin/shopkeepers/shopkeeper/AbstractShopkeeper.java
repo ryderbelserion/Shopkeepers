@@ -122,8 +122,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		nextTickingGroup.reset();
 	}
 
-	private final int id;
-	private UUID uniqueId; // Not null after initialization
+	private int id; // Valid and constant after initialization
+	private UUID uniqueId; // Not null and constant after initialization
 	private AbstractShopObject shopObject; // Not null after initialization
 	// TODO Move location information into ShopObject?
 	private String worldName; // Not empty, null for virtual shops
@@ -160,27 +160,25 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * Creates a shopkeeper.
 	 * <p>
 	 * Important: Depending on whether the shopkeeper gets freshly created or loaded, either
-	 * {@link #initOnCreation(ShopCreationData)} or {@link #initOnLoad(ShopkeeperData)} needs to be called to complete
-	 * the initialization.
-	 * 
-	 * @param id
-	 *            the shopkeeper id
+	 * {@link #initOnCreation(int, ShopCreationData)} or {@link #initOnLoad(ShopkeeperData)} needs to be called to
+	 * complete the initialization.
 	 */
-	protected AbstractShopkeeper(int id) {
-		this.id = id;
+	protected AbstractShopkeeper() {
 	}
 
 	/**
 	 * Initializes the shopkeeper by using the data from the given {@link ShopCreationData}.
 	 * 
+	 * @param id
+	 *            the shopkeeper id
 	 * @param shopCreationData
 	 *            the shop creation data, not <code>null</code>
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper can not be created
 	 * @see #loadFromCreationData(ShopCreationData)
 	 */
-	protected final void initOnCreation(ShopCreationData shopCreationData) throws ShopkeeperCreateException {
-		this.loadFromCreationData(shopCreationData);
+	protected final void initOnCreation(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+		this.loadFromCreationData(id, shopCreationData);
 		this.commonSetup();
 	}
 
@@ -210,13 +208,16 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Initializes the shopkeeper by using the data from the given {@link ShopCreationData}.
 	 * 
+	 * @param id
+	 *            the shopkeeper id
 	 * @param shopCreationData
 	 *            the shop creation data, not <code>null</code>
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper cannot be properly initialized
 	 */
-	protected void loadFromCreationData(ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	protected void loadFromCreationData(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		assert shopCreationData != null;
+		this.id = id;
 		this.uniqueId = UUID.randomUUID();
 
 		ShopObjectType<?> shopObjectType = shopCreationData.getShopObjectType();
@@ -297,6 +298,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	protected void loadFromSaveData(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException, InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 
+		this.id = shopkeeperData.get(ID);
 		this.uniqueId = shopkeeperData.get(UNIQUE_ID);
 
 		// Shop object data:
@@ -408,6 +410,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 */
 	public void save(ShopkeeperData shopkeeperData) {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
+		shopkeeperData.set(ID, id);
 		shopkeeperData.set(UNIQUE_ID, uniqueId);
 
 		if (!this.isVirtual()) {
@@ -616,6 +619,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	// ATTRIBUTES
 
+	public static final Property<Integer> ID = new BasicProperty<Integer>()
+			.dataKeyAccessor("id", NumberSerializers.INTEGER)
+			.validator(IntegerValidators.POSITIVE)
+			.build();
 	public static final Property<UUID> UNIQUE_ID = new BasicProperty<UUID>()
 			.dataKeyAccessor("uniqueId", UUIDSerializers.LENIENT)
 			.build();
