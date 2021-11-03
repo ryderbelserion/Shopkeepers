@@ -25,6 +25,7 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
 import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
 import com.nisovin.shopkeepers.container.protection.RemoveShopOnContainerBreak;
+import com.nisovin.shopkeepers.debug.Debug;
 import com.nisovin.shopkeepers.debug.events.EventDebugger;
 import com.nisovin.shopkeepers.debug.trades.TradingCountListener;
 import com.nisovin.shopkeepers.internals.SKApiInternals;
@@ -40,6 +41,7 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.SKShopTypesRegistry;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShops;
@@ -334,6 +336,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 		// Enable shopkeeper registry:
 		shopkeeperRegistry.onEnable();
+
+		// Debug log the registered shopkeeper data migrations:
+		if (Debug.isDebugging()) {
+			ShopkeeperDataMigrator.logRegisteredMigrations();
+		}
 
 		// Load shopkeepers from saved data:
 		boolean loadingSuccessful = shopkeeperStorage.reload();
