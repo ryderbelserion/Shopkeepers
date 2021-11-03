@@ -1,8 +1,7 @@
-package com.nisovin.shopkeepers.util.data;
+package com.nisovin.shopkeepers.util.data.serialization;
 
 /**
- * A general-purpose exception that can be used by any component that reads data from a {@link DataContainer} to
- * indicate that there is some issue with the read data.
+ * A general-purpose exception that can be used to indicate that there is an issue with some given data.
  */
 public class InvalidDataException extends Exception {
 

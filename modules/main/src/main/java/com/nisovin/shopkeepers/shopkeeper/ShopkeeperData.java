@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.shopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.data.DelegateDataContainer;
-import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 
 /**
  * A wrapper around the {@link DataContainer} that contains a shopkeeper's data.

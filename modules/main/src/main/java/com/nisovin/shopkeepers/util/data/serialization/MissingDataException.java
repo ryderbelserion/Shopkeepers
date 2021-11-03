@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.util.data;
+package com.nisovin.shopkeepers.util.data.serialization;
 
 /**
  * A specialization of {@link InvalidDataException} for cases in which some required data is missing.

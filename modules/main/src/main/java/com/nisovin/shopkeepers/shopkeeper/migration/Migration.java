@@ -1,7 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.migration;
 
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
-import com.nisovin.shopkeepers.util.data.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**

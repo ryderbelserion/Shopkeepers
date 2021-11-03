@@ -1,6 +1,6 @@
-package com.nisovin.shopkeepers.util.data;
+package com.nisovin.shopkeepers.util.data.serialization;
 
-import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
+import com.nisovin.shopkeepers.util.data.DataContainer;
 
 /**
  * Provides operations to save and load a particular kind of value to and from a given {@link DataContainer}.

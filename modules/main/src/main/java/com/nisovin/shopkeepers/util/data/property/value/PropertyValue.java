@@ -5,9 +5,9 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.nisovin.shopkeepers.util.data.DataContainer;
-import com.nisovin.shopkeepers.util.data.InvalidDataException;
-import com.nisovin.shopkeepers.util.data.MissingDataException;
 import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.MissingDataException;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 

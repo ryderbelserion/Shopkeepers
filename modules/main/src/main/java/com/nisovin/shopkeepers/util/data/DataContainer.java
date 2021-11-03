@@ -7,6 +7,10 @@ import java.util.Set;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
+import com.nisovin.shopkeepers.util.data.serialization.DataAccessor;
+import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.MissingDataException;
+
 /**
  * A container of data elements that are indexed by {@link String} keys.
  * <p>

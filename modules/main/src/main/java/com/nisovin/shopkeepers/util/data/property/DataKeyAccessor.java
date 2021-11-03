@@ -2,11 +2,11 @@ package com.nisovin.shopkeepers.util.data.property;
 
 import java.util.function.Predicate;
 
-import com.nisovin.shopkeepers.util.data.DataAccessor;
 import com.nisovin.shopkeepers.util.data.DataContainer;
-import com.nisovin.shopkeepers.util.data.InvalidDataException;
-import com.nisovin.shopkeepers.util.data.MissingDataException;
+import com.nisovin.shopkeepers.util.data.serialization.DataAccessor;
 import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
+import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.MissingDataException;
 import com.nisovin.shopkeepers.util.java.PredicateUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
