@@ -13,6 +13,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
+import com.nisovin.shopkeepers.util.bukkit.EventUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -55,6 +56,10 @@ public class ChatInput implements Listener {
 
 	public void onEnable() {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
+		// Ensure that our chat event handler is always executed first:
+		// Otherwise, we might run into conflicts with other chat plugins that also use the lowest event priority and
+		// that might modify the chat message before we were able to process it (for example by injecting color codes).
+		EventUtils.enforceExecuteFirst(AsyncPlayerChatEvent.class, EventPriority.LOWEST, this);
 	}
 
 	public void onDisable() {
