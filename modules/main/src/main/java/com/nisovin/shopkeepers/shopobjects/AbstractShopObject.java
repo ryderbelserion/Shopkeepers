@@ -13,6 +13,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
+import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
@@ -102,6 +103,9 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * <p>
 	 * The data is expected to already have been {@link ShopkeeperData#migrate(String) migrated}.
 	 * <p>
+	 * The given shop object data is expected to contain the shop object's type identifier. Loading fails if the given
+	 * data was originally meant for a different shop object type.
+	 * <p>
 	 * Any stored data elements (such as for example item stacks, etc.) and collections of data elements are assumed to
 	 * not be modified, neither by the shop object, nor in contexts outside of the shop object. If the shop object can
 	 * guarantee not to modify these data elements, it is allowed to directly store them without copying them first.
@@ -113,6 +117,12 @@ public abstract class AbstractShopObject implements ShopObject {
 	 */
 	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		Validate.notNull(shopObjectData, "shopObjectData is null");
+		ShopObjectType<?> shopObjectType = shopObjectData.get(SHOP_OBJECT_TYPE);
+		assert shopObjectType != null;
+		if (shopObjectType != this.getType()) {
+			throw new InvalidDataException("Shop object data is for a different shop object type (expected: "
+					+ this.getType().getIdentifier() + ", got: " + shopObjectType.getIdentifier() + ")!");
+		}
 	}
 
 	/**
