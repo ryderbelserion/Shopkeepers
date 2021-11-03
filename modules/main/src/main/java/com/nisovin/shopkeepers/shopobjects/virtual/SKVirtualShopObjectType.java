@@ -16,7 +16,7 @@ public final class SKVirtualShopObjectType extends AbstractShopObjectType<SKVirt
 	private final VirtualShops virtualShops;
 
 	public SKVirtualShopObjectType(VirtualShops virtualShops) {
-		super("virtual", Collections.emptyList(), "shopkeeper.virtual");
+		super("virtual", Collections.emptyList(), "shopkeeper.virtual", SKVirtualShopObject.class);
 		this.virtualShops = virtualShops;
 	}
 

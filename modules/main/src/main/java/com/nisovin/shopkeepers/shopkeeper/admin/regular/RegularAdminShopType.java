@@ -13,7 +13,8 @@ import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopType;
 public final class RegularAdminShopType extends AbstractAdminShopType<SKRegularAdminShopkeeper> {
 
 	public RegularAdminShopType() {
-		super("admin", Collections.emptyList(), ShopkeepersPlugin.ADMIN_PERMISSION);
+		super("admin", Collections.emptyList(), ShopkeepersPlugin.ADMIN_PERMISSION,
+				SKRegularAdminShopkeeper.class);
 	}
 
 	@Override

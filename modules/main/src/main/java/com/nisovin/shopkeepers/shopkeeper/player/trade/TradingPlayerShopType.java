@@ -14,7 +14,8 @@ import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 public final class TradingPlayerShopType extends AbstractPlayerShopType<SKTradingPlayerShopkeeper> {
 
 	public TradingPlayerShopType() {
-		super("trade", Arrays.asList("trading"), ShopkeepersPlugin.PLAYER_TRADE_PERMISSION);
+		super("trade", Arrays.asList("trading"), ShopkeepersPlugin.PLAYER_TRADE_PERMISSION,
+				SKTradingPlayerShopkeeper.class);
 	}
 
 	@Override

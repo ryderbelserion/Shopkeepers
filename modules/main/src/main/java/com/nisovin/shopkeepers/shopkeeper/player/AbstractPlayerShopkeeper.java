@@ -33,6 +33,9 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKTradingRecipe;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
+import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
+import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
+import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.user.SKUser;
 import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
@@ -349,6 +352,34 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 			.nullable() // Null if the shop is not for hire
 			.defaultValue(null)
 			.build();
+
+	static {
+		// Register shopkeeper data migrations:
+		ShopkeeperDataMigrator.registerMigration(new Migration("hire-cost-item",
+				MigrationPhase.ofShopkeeperClass(AbstractPlayerShopkeeper.class)) {
+			@Override
+			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+				UnmodifiableItemStack hireCost = shopkeeperData.get(HIRE_COST_ITEM);
+				if (hireCost == null) return false; // Nothing to migrate
+
+				assert !ItemUtils.isEmpty(hireCost);
+				UnmodifiableItemStack migratedHireCost = ItemMigration.migrateItemStack(hireCost);
+				if (ItemUtils.isSimilar(hireCost, migratedHireCost)) {
+					// Nothing migrated.
+					return false;
+				}
+
+				if (ItemUtils.isEmpty(migratedHireCost)) {
+					throw new InvalidDataException("Hire cost item migration failed: " + hireCost);
+				}
+
+				// Write back the migrated hire cost item:
+				shopkeeperData.set(HIRE_COST_ITEM, migratedHireCost);
+				Log.debug(DebugOptions.itemMigrations, () -> logPrefix + "Migrated hire cost item.");
+				return true;
+			}
+		});
+	}
 
 	private void loadForHire(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;

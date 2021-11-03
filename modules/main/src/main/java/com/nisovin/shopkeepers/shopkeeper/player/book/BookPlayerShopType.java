@@ -14,7 +14,8 @@ import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 public final class BookPlayerShopType extends AbstractPlayerShopType<SKBookPlayerShopkeeper> {
 
 	public BookPlayerShopType() {
-		super("book", Collections.emptyList(), ShopkeepersPlugin.PLAYER_BOOK_PERMISSION);
+		super("book", Collections.emptyList(), ShopkeepersPlugin.PLAYER_BOOK_PERMISSION,
+				SKBookPlayerShopkeeper.class);
 	}
 
 	@Override

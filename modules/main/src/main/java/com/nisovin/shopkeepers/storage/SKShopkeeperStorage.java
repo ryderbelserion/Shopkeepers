@@ -30,6 +30,7 @@ import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
 import com.nisovin.shopkeepers.util.bukkit.SingletonTask;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.persistence.DataStore;
 import com.nisovin.shopkeepers.util.data.persistence.bukkit.BukkitConfigDataStore;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
@@ -504,11 +505,13 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// Insert the separately stored shopkeeper id back into the shopkeeper data:
 			shopkeeperData.set(AbstractShopkeeper.ID, shopkeeperId);
 
-			// Perform common migrations:
-			MigrationResult migrationResult = this.migrateShopkeeperData(shopkeeperId, shopkeeperData, dataVersion);
-			if (migrationResult == MigrationResult.FAILED) {
-				// Migration failed, skip this shopkeeper
-				continue;
+			// Perform data migrations:
+			boolean migrated = false;
+			try {
+				migrated = shopkeeperData.migrate(AbstractShopkeeper.getLogPrefix(shopkeeperId));
+			} catch (InvalidDataException e) {
+				this.failedToLoadShopkeeper(key, "Shopkeeper data migration failed!", e);
+				continue; // Skip this shopkeeper
 			}
 
 			// Load the shopkeeper:
@@ -527,7 +530,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// If the shopkeeper was migrated or the data version has changed, mark it as dirty:
 			// During plugin enable, after the shopkeepers have been loaded, a save is triggered if the storage was
 			// marked as dirty.
-			if (migrationResult == MigrationResult.MIGRATED || dataVersionChanged) {
+			if (migrated || dataVersionChanged) {
 				shopkeeper.markDirty();
 			}
 		}
@@ -540,27 +543,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	private void failedToLoadShopkeeper(String idKey, String reason, Throwable throwable) {
 		Log.warning("Failed to load shopkeeper '" + idKey + "': " + reason, throwable);
-	}
-
-	private enum MigrationResult {
-		NOTHING_MIGRATED,
-		MIGRATED,
-		FAILED,
-	}
-
-	// Validates and performs migration of the save data.
-	private MigrationResult migrateShopkeeperData(int id, ShopkeeperData shopkeeperData, String dataVersion) {
-		MigrationResult migrationResult = MigrationResult.NOTHING_MIGRATED;
-
-		// Convert legacy shop type identifiers:
-		String shopTypeString = shopkeeperData.getString("type");
-		if (shopTypeString != null && shopTypeString.equalsIgnoreCase("player")) {
-			Log.info("Migrating type of shopkeeper '" + id + "' from 'player' to 'sell'.");
-			shopkeeperData.set("type", "sell");
-			migrationResult = MigrationResult.MIGRATED;
-		}
-
-		return migrationResult;
 	}
 
 	// SHOPKEEPER DATA CHANGES

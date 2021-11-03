@@ -16,6 +16,9 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
+import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
+import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
@@ -90,6 +93,17 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 			.useDefaultIfMissing()
 			.defaultValue(Collections.emptyList())
 			.build();
+
+	static {
+		// Register shopkeeper data migrations:
+		ShopkeeperDataMigrator.registerMigration(new Migration("admin-offers",
+				MigrationPhase.ofShopkeeperClass(SKRegularAdminShopkeeper.class)) {
+			@Override
+			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+				return SKTradeOffer.migrateOffers(shopkeeperData.getDataValue(DATA_KEY_OFFERS), logPrefix);
+			}
+		});
+	}
 
 	private void loadOffers(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;

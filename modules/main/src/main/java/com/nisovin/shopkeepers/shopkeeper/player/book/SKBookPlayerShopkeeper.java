@@ -26,6 +26,9 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
+import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
+import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
+import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopkeeper;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
@@ -200,6 +203,17 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 			.useDefaultIfMissing()
 			.defaultValue(Collections.emptyList())
 			.build();
+
+	static {
+		// Register shopkeeper data migrations:
+		ShopkeeperDataMigrator.registerMigration(new Migration("book-offers",
+				MigrationPhase.ofShopkeeperClass(SKBookPlayerShopkeeper.class)) {
+			@Override
+			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+				return SKBookOffer.migrateOffers(shopkeeperData.getDataValue(DATA_KEY_OFFERS), logPrefix);
+			}
+		});
+	}
 
 	private void loadOffers(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		assert shopkeeperData != null;

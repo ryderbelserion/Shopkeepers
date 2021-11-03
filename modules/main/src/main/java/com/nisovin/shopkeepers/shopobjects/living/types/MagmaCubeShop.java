@@ -40,6 +40,7 @@ public class MagmaCubeShop extends SKLivingShopObject<MagmaCube> {
 			.validator(IntegerValidators.bounded(MIN_SIZE, MAX_SIZE))
 			.defaultValue(1)
 			.build();
+
 	private final PropertyValue<Integer> sizeProperty = new PropertyValue<>(SIZE)
 			.onValueChanged(this::applySize)
 			.build(properties);

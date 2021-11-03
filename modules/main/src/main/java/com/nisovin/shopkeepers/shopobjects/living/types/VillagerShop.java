@@ -14,6 +14,10 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
+import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
+import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
+import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
@@ -52,6 +56,44 @@ public class VillagerShop extends BabyableShop<Villager> {
 			.validator(IntegerValidators.bounded(MIN_VILLAGER_LEVEL, MAX_VILLAGER_LEVEL))
 			.defaultValue(1)
 			.build();
+
+	static {
+		// Register shopkeeper data migrations:
+		ShopkeeperDataMigrator.registerMigration(new Migration("villager-profession",
+				MigrationPhase.ofShopObjectClass(VillagerShop.class)) {
+			@Override
+			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+				ShopObjectData shopObjectData = shopkeeperData.get(AbstractShopkeeper.SHOP_OBJECT_DATA);
+				boolean migrated = false;
+				// Migration from 'prof' key: TODO Added with 1.14 update, remove again at some point.
+				String professionName = shopObjectData.getString("prof");
+				if (professionName != null) {
+					Log.warning(logPrefix + "Migrated villager profession from key 'prof' to key 'profession'.");
+					shopObjectData.remove("prof");
+					shopObjectData.set(DATA_KEY_PROFESSION, professionName);
+					migrated = true;
+				}
+
+				// MC 1.14 migration:
+				professionName = shopObjectData.getString(DATA_KEY_PROFESSION);
+				if (professionName != null) {
+					Profession newProfession = null;
+					if (professionName.equals("PRIEST")) {
+						newProfession = Profession.CLERIC;
+					} else if (professionName.equals("BLACKSMITH")) {
+						newProfession = Profession.ARMORER;
+					}
+					if (newProfession != null) {
+						Log.warning(logPrefix + "Migrated villager profession from '"
+								+ professionName + "' to '" + newProfession.name() + "'.");
+						shopObjectData.set(PROFESSION, newProfession);
+						migrated = true;
+					}
+				}
+				return migrated;
+			}
+		});
+	}
 
 	private final PropertyValue<Profession> professionProperty = new PropertyValue<>(PROFESSION)
 			.onValueChanged(this::applyProfession)

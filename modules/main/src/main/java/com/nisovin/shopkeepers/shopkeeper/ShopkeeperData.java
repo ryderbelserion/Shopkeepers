@@ -1,7 +1,9 @@
 package com.nisovin.shopkeepers.shopkeeper;
 
+import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.data.DelegateDataContainer;
+import com.nisovin.shopkeepers.util.data.InvalidDataException;
 
 /**
  * A wrapper around the {@link DataContainer} that contains a shopkeeper's data.
@@ -41,5 +43,19 @@ public class ShopkeeperData extends DelegateDataContainer {
 	 */
 	protected ShopkeeperData(DataContainer dataContainer) {
 		super(dataContainer);
+	}
+
+	/**
+	 * Applies migrations to this shopkeeper data.
+	 * 
+	 * @param logPrefix
+	 *            a context specific log prefix, can be empty, not <code>null</code>
+	 * @return <code>true</code> if the data has changed as a result of these migrations
+	 * @throws InvalidDataException
+	 *             if the data is invalid and cannot be migrated
+	 * @see ShopkeeperDataMigrator#migrate(ShopkeeperData, String)
+	 */
+	public final boolean migrate(String logPrefix) throws InvalidDataException {
+		return ShopkeeperDataMigrator.migrate(this, logPrefix);
 	}
 }

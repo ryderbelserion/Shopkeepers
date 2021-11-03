@@ -26,8 +26,8 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper> extends AbstractShopType<T> implements PlayerShopType<T> {
 
-	protected AbstractPlayerShopType(String identifier, List<String> aliases, String permission) {
-		super(identifier, aliases, permission);
+	protected AbstractPlayerShopType(String identifier, List<String> aliases, String permission, Class<T> shopkeeperType) {
+		super(identifier, aliases, permission, shopkeeperType);
 	}
 
 	@Override

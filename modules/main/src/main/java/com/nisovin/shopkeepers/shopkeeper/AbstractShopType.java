@@ -23,8 +23,21 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public abstract class AbstractShopType<T extends AbstractShopkeeper> extends AbstractSelectableType implements ShopType<T> {
 
-	protected AbstractShopType(String identifier, List<String> aliases, String permission) {
+	private final Class<T> shopkeeperClass;
+
+	protected AbstractShopType(String identifier, List<String> aliases, String permission, Class<T> shopkeeperClass) {
 		super(identifier, aliases, permission);
+		Validate.notNull(shopkeeperClass, "shopkeeperClass is null");
+		this.shopkeeperClass = shopkeeperClass;
+	}
+
+	/**
+	 * Gets the concrete and most specific class of the shopkeepers that are created by this {@link ShopType}.
+	 * 
+	 * @return the concrete shopkeeper class, not <code>null</code>
+	 */
+	public final Class<T> getShopkeeperClass() {
+		return shopkeeperClass;
 	}
 
 	@Override

@@ -26,6 +26,10 @@ import com.nisovin.shopkeepers.compat.MC_1_17;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
+import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
+import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
+import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
@@ -34,7 +38,6 @@ import com.nisovin.shopkeepers.ui.editor.Session;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
-import com.nisovin.shopkeepers.util.data.DataContainer;
 import com.nisovin.shopkeepers.util.data.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
@@ -69,6 +72,79 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 			.dataKeyAccessor("glowingText", BooleanSerializers.LENIENT)
 			.defaultValue(false)
 			.build();
+
+	static {
+		// Register shopkeeper data migrations:
+
+		// Migration from TreeSpecies to SignType.
+		// TODO Remove this again at some point. Added in v2.10.0.
+		ShopkeeperDataMigrator.registerMigration(new Migration("sign-type",
+				MigrationPhase.ofShopObjectClass(SKSignShopObject.class)) {
+			@Override
+			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+				boolean migrated = false;
+				ShopObjectData shopObjectData = shopkeeperData.get(AbstractShopkeeper.SHOP_OBJECT_DATA);
+				String signTypeName = shopObjectData.getString(DATA_KEY_SIGN_TYPE);
+				if ("GENERIC".equals(signTypeName)) {
+					Log.warning(logPrefix + "Migrating sign type from '" + signTypeName + "' to '"
+							+ SignType.OAK + "'.");
+					shopObjectData.set(SIGN_TYPE, SignType.OAK);
+					migrated = true;
+				} else if ("REDWOOD".equals(signTypeName)) {
+					Log.warning(logPrefix + "Migrating sign type from '" + signTypeName + "' to '"
+							+ SignType.SPRUCE + "'.");
+					shopObjectData.set(SIGN_TYPE, SignType.SPRUCE);
+					migrated = true;
+				}
+				return migrated;
+			}
+		});
+
+		// Migration from sign facing to shopkeeper yaw (pre v2.13.4):
+		// TODO Remove this migration again at some point.
+		ShopkeeperDataMigrator.registerMigration(new Migration("sign-facing-to-yaw",
+				MigrationPhase.ofShopObjectClass(SKSignShopObject.class)) {
+			@Override
+			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+				boolean migrated = false;
+				ShopObjectData shopObjectData = shopkeeperData.get(AbstractShopkeeper.SHOP_OBJECT_DATA);
+				String signFacingName = shopObjectData.getString("signFacing");
+				if (signFacingName != null) {
+					BlockFace signFacing = BlockFace.SOUTH;
+					try {
+						signFacing = BlockFace.valueOf(signFacingName);
+					} catch (IllegalArgumentException e) {
+						Log.warning(logPrefix + "Could not parse sign facing '" + signFacingName
+								+ "'. Falling back to SOUTH.");
+					}
+
+					// Validate the sign facing:
+					if (!this.isValidSignFacing(shopObjectData, signFacing)) {
+						Log.warning(logPrefix + "Invalid sign facing '" + signFacingName
+								+ "'. Falling back to SOUTH.");
+						signFacing = BlockFace.SOUTH;
+					}
+
+					float yaw = BlockFaceUtils.getYaw(signFacing);
+					Log.warning(logPrefix + "Migrating sign facing '" + signFacing
+							+ "' to yaw " + TextUtils.DECIMAL_FORMAT.format(yaw));
+					shopkeeperData.set(AbstractShopkeeper.YAW, yaw);
+					migrated = true;
+				}
+				return migrated;
+			}
+
+			private boolean isValidSignFacing(ShopObjectData shopObjectData, BlockFace signFacing) throws InvalidDataException {
+				Boolean wallSign = shopObjectData.getOrNullIfMissing(WALL_SIGN); // Can be null
+				if (wallSign == null) return true; // Skip the validation
+				if (wallSign) {
+					return BlockFaceUtils.isWallSignFacing(signFacing);
+				} else {
+					return BlockFaceUtils.isSignPostFacing(signFacing);
+				}
+			}
+		});
+	}
 
 	private static final int CHECK_PERIOD_SECONDS = 10;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);
@@ -115,34 +191,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		signTypeProperty.load(shopObjectData);
 		wallSignProperty.load(shopObjectData);
 		glowingTextProperty.load(shopObjectData);
-
-		this.migrateSignFacingToYaw(shopObjectData);
-	}
-
-	private void migrateSignFacingToYaw(DataContainer shopObjectData) {
-		assert shopObjectData != null;
-		// Migration from sign facing to shopkeeper yaw (pre v2.13.4):
-		// TODO Remove this migration again at some point.
-		String signFacingName = shopObjectData.getString("signFacing");
-		if (signFacingName != null) {
-			BlockFace signFacing = BlockFace.SOUTH;
-			try {
-				signFacing = BlockFace.valueOf(signFacingName);
-			} catch (IllegalArgumentException e) {
-				Log.warning(shopkeeper.getLogPrefix() + "Could not parse sign facing '"
-						+ signFacingName + "'. Falling back to SOUTH.");
-			}
-			if (!this.isValidSignFacing(signFacing)) {
-				Log.warning(shopkeeper.getLogPrefix() + "Invalid sign facing '" + signFacingName
-						+ "'. Falling back to SOUTH.");
-				signFacing = BlockFace.SOUTH;
-			}
-
-			float yaw = BlockFaceUtils.getYaw(signFacing);
-			Log.warning(shopkeeper.getLogPrefix() + "Migrating sign facing '" + signFacing
-					+ "' to yaw " + TextUtils.DECIMAL_FORMAT.format(yaw));
-			shopkeeper.setYaw(yaw); // This also marks the shopkeeper as dirty
-		}
 	}
 
 	@Override
@@ -404,14 +452,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	// SIGN FACING
-
-	private boolean isValidSignFacing(BlockFace signFacing) {
-		if (this.isWallSign()) {
-			return BlockFaceUtils.isWallSignFacing(signFacing);
-		} else {
-			return BlockFaceUtils.isSignPostFacing(signFacing);
-		}
-	}
 
 	public BlockFace getSignFacing() {
 		if (this.isWallSign()) {

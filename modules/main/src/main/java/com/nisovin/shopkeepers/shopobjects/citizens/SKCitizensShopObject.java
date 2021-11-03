@@ -46,6 +46,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			.nullable()
 			.defaultValue(null)
 			.build();
+
 	public static final String CREATION_DATA_NPC_UUID_KEY = "CitizensNpcUUID";
 	private static final int CHECK_PERIOD_SECONDS = 10;
 	private static final CyclicCounter nextCheckingOffset = new CyclicCounter(1, CHECK_PERIOD_SECONDS + 1);

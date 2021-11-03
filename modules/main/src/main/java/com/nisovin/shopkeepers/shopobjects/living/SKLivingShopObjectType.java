@@ -31,9 +31,9 @@ public final class SKLivingShopObjectType<T extends SKLivingShopObject<?>> exten
 	private final ShopObjectConstructor<T> shopObjectConstructor;
 
 	protected SKLivingShopObjectType(	LivingShops livingShops, EntityType entityType, String identifier,
-										List<String> aliases, String permission,
+										List<String> aliases, String permission, Class<T> shopObjectType,
 										ShopObjectConstructor<T> shopObjectConstructor) {
-		super(identifier, aliases, permission);
+		super(identifier, aliases, permission, shopObjectType);
 		Validate.isTrue(entityType.isAlive(), "entityType is not alive");
 		Validate.isTrue(entityType.isSpawnable(), "entityType is not spawnable");
 		Validate.notNull(shopObjectConstructor, "shopObjectConstructor is null");

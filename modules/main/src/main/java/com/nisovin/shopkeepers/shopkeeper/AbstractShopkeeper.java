@@ -122,6 +122,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		nextTickingGroup.reset();
 	}
 
+	/**
+	 * Gets a short prefix that can be used for log messages related to the shopkeeper with the given id.
+	 * 
+	 * @param shopkeeperId
+	 *            the shopkeeper id
+	 * @return the log prefix, not <code>null</code>
+	 */
+	public static String getLogPrefix(int shopkeeperId) {
+		return "Shopkeeper " + shopkeeperId + ": ";
+	}
+
 	private int id; // Valid and constant after initialization
 	private UUID uniqueId; // Not null and constant after initialization
 	private AbstractShopObject shopObject; // Not null after initialization
@@ -286,6 +297,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * Loads the shopkeeper's saved state from the given {@link ShopkeeperData}.
 	 * <p>
 	 * This also loads the shopkeeper's {@link #loadDynamicState(ShopkeeperData) dynamic state}.
+	 * <p>
+	 * This assumes that the given shopkeeper data has already been {@link ShopkeeperData#migrate(String) migrated}.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
@@ -353,6 +366,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	/**
 	 * Loads the shopkeeper's dynamic state from the given {@link ShopkeeperData}.
+	 * <p>
+	 * The data is expected to already have been {@link ShopkeeperData#migrate(String) migrated}.
 	 * <p>
 	 * The given shopkeeper data is expected to contain the shopkeeper's shop type identifier. If the given data was
 	 * originally meant for a different shop type, loading fails. Any other non-dynamic shopkeeper data that the given
@@ -670,7 +685,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public final String getLogPrefix() {
-		return "Shopkeeper " + id + ": ";
+		return getLogPrefix(id);
 	}
 
 	@Override

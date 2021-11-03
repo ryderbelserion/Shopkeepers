@@ -47,6 +47,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.WolfShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieVillagerShop;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.java.ClassUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
 public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
@@ -276,97 +277,97 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 		switch (entityType) {
 		case VILLAGER:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, VillagerShop::new);
+					permission, VillagerShop.class, VillagerShop::new);
 			break;
 		case PIG:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, PigShop::new);
+					permission, PigShop.class, PigShop::new);
 			break;
 		case CREEPER:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, CreeperShop::new);
+					permission, CreeperShop.class, CreeperShop::new);
 			break;
 		case CAT:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, CatShop::new);
+					permission, CatShop.class, CatShop::new);
 			break;
 		case RABBIT:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, RabbitShop::new);
+					permission, RabbitShop.class, RabbitShop::new);
 			break;
 		case SHEEP:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, SheepShop::new);
+					permission, SheepShop.class, SheepShop::new);
 			break;
 		case ZOMBIE:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, ZombieShop<Zombie>::new);
+					permission, ClassUtils.parameterized(ZombieShop.class), ZombieShop<Zombie>::new);
 			break;
 		case ZOMBIE_VILLAGER:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, ZombieVillagerShop::new);
+					permission, ZombieVillagerShop.class, ZombieVillagerShop::new);
 			break;
 		case FOX:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, FoxShop::new);
+					permission, FoxShop.class, FoxShop::new);
 			break;
 		case PARROT:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, ParrotShop::new);
+					permission, ParrotShop.class, ParrotShop::new);
 			break;
 		case WOLF:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, WolfShop::new);
+					permission, WolfShop.class, WolfShop::new);
 			break;
 		case HORSE:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, HorseShop::new);
+					permission, HorseShop.class, HorseShop::new);
 			break;
 		case LLAMA:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, LlamaShop<Llama>::new);
+					permission, ClassUtils.parameterized(LlamaShop.class), LlamaShop<Llama>::new);
 			break;
 		case TRADER_LLAMA:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, LlamaShop<TraderLlama>::new);
+					permission, ClassUtils.parameterized(LlamaShop.class), LlamaShop<TraderLlama>::new);
 			break;
 		case PANDA:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, PandaShop::new);
+					permission, PandaShop.class, PandaShop::new);
 			break;
 		case MUSHROOM_COW:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, MooshroomShop::new);
+					permission, MooshroomShop.class, MooshroomShop::new);
 			break;
 		case SLIME:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, SlimeShop::new);
+					permission, SlimeShop.class, SlimeShop::new);
 			break;
 		case MAGMA_CUBE:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, MagmaCubeShop::new);
+					permission, MagmaCubeShop.class, MagmaCubeShop::new);
 			break;
 		case SNOWMAN:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, SnowmanShop::new);
+					permission, SnowmanShop.class, SnowmanShop::new);
 			break;
 		case SHULKER:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-					permission, ShulkerShop::new);
+					permission, ShulkerShop.class, ShulkerShop::new);
 			break;
 		default:
 			switch (entityType.name()) {
 			case "AXOLOTL": // TODO Move up once we only support MC 1.17 upwards.
 				objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-						permission, AxolotlShop::new);
+						permission, AxolotlShop.class, AxolotlShop::new);
 				break;
 			case "GLOW_SQUID": // TODO Move up once we only support MC 1.17 upwards.
 				objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-						permission, GlowSquidShop::new);
+						permission, GlowSquidShop.class, GlowSquidShop::new);
 				break;
 			case "GOAT": // TODO Move up once we only support MC 1.17 upwards.
 				objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-						permission, GoatShop::new);
+						permission, GoatShop.class, GoatShop::new);
 				break;
 			default:
 				break;
@@ -378,16 +379,16 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 			Class<? extends Entity> entityClass = entityType.getEntityClass();
 			if (ChestedHorse.class.isAssignableFrom(entityType.getEntityClass())) {
 				objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-						permission, ChestedHorseShop<ChestedHorse>::new);
+						permission, ClassUtils.parameterized(ChestedHorseShop.class), ChestedHorseShop<ChestedHorse>::new);
 			} else if (Zombie.class.isAssignableFrom(entityClass)) {
 				objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-						permission, ZombieShop<Zombie>::new);
+						permission, ClassUtils.parameterized(ZombieShop.class), ZombieShop<Zombie>::new);
 			} else if (Ageable.class.isAssignableFrom(entityType.getEntityClass())) {
 				objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-						permission, BabyableShop<Ageable>::new);
+						permission, ClassUtils.parameterized(BabyableShop.class), BabyableShop<Ageable>::new);
 			} else {
 				objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
-						permission, SKLivingShopObject::new);
+						permission, ClassUtils.parameterized(SKLivingShopObject.class), SKLivingShopObject::new);
 			}
 		}
 

@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperPropertyValuesHolder;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
@@ -98,6 +99,8 @@ public abstract class AbstractShopObject implements ShopObject {
 
 	/**
 	 * Loads the shop object's data from the given {@link ShopObjectData}.
+	 * <p>
+	 * The data is expected to already have been {@link ShopkeeperData#migrate(String) migrated}.
 	 * <p>
 	 * Any stored data elements (such as for example item stacks, etc.) and collections of data elements are assumed to
 	 * not be modified, neither by the shop object, nor in contexts outside of the shop object. If the shop object can

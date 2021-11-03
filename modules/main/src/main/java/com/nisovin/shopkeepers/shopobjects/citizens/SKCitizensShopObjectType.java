@@ -18,7 +18,7 @@ public final class SKCitizensShopObjectType extends AbstractEntityShopObjectType
 	private final CitizensShops citizensShops;
 
 	public SKCitizensShopObjectType(CitizensShops citizensShops) {
-		super("citizen", Arrays.asList("npc"), "shopkeeper.citizen");
+		super("citizen", Arrays.asList("npc"), "shopkeeper.citizen", SKCitizensShopObject.class);
 		this.citizensShops = citizensShops;
 	}
 

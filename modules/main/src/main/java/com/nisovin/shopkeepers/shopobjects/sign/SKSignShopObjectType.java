@@ -17,7 +17,7 @@ public final class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSi
 	private final SignShops signShops;
 
 	public SKSignShopObjectType(SignShops signShops) {
-		super("sign", Collections.emptyList(), "shopkeeper.sign");
+		super("sign", Collections.emptyList(), "shopkeeper.sign", SKSignShopObject.class);
 		this.signShops = signShops;
 	}
 

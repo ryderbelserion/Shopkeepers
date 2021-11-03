@@ -19,11 +19,25 @@ import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public abstract class AbstractShopObjectType<T extends AbstractShopObject> extends AbstractSelectableType implements ShopObjectType<T> {
 
-	protected AbstractShopObjectType(String identifier, List<String> aliases, String permission) {
+	private final Class<T> shopObjectClass;
+
+	protected AbstractShopObjectType(String identifier, List<String> aliases, String permission, Class<T> shopObjectClass) {
 		super(identifier, aliases, permission);
+		Validate.notNull(shopObjectClass, "shopObjectClass is null");
+		this.shopObjectClass = shopObjectClass;
+	}
+
+	/**
+	 * Gets the concrete and most specific class of the shop objects that are created by this {@link ShopObjectType}.
+	 * 
+	 * @return the concrete shop object class, not <code>null</code>
+	 */
+	public final Class<T> getShopObjectClass() {
+		return shopObjectClass;
 	}
 
 	@Override

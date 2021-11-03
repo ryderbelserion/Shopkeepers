@@ -52,6 +52,54 @@ public class ClassUtils {
 	}
 
 	/**
+	 * Casts the given {@link Class} to a class with a more specific type parameter.
+	 * <p>
+	 * This is especially useful when working with class literals of generic types: These class literals are raw,
+	 * unparameterized types, but a method may require a class literal as argument with a type parameter that matches
+	 * some specific parameterization.
+	 * 
+	 * @param <T>
+	 *            the input type parameter type
+	 * @param <U>
+	 *            the output type parameter type
+	 * @param clazz
+	 *            the input class
+	 * @return the casted class
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T, U extends T> Class<U> parameterized(Class<T> clazz) {
+		return (Class<U>) clazz;
+	}
+
+	/**
+	 * Gets the {@link Class#getSimpleName() simple name} of the given class, but accounts for
+	 * {@link Class#isAnonymousClass() anonymous} classes and arrays with anonymous component types.
+	 * <p>
+	 * If the given class is {@link Class#isAnonymousClass() anonymous}, this returns the last segment (after the last
+	 * dot) of the {@link Class#getName() full class name}.
+	 * <p>
+	 * If the given class represents an array, this returns the {@link #getSimpleTypeName(Class) simple type name} of
+	 * the component type with "[]" appended.
+	 * 
+	 * @param clazz
+	 *            the class, not <code>null</code>
+	 * @return the simple type name, not <code>null</code> or empty
+	 */
+	public static String getSimpleTypeName(Class<?> clazz) {
+		Validate.notNull(clazz, "clazz is null");
+		if (clazz.isArray()) {
+			return getSimpleTypeName(clazz.getComponentType()) + "[]";
+		}
+
+		if (clazz.isAnonymousClass()) {
+			String name = clazz.getName();
+			return name.substring(name.lastIndexOf('.') + 1);
+		}
+
+		return clazz.getSimpleName();
+	}
+
+	/**
 	 * Loads all classes from the given jar file.
 	 * 
 	 * @param jarFile
