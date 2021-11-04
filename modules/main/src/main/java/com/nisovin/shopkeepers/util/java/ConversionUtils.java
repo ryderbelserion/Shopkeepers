@@ -100,7 +100,7 @@ public class ConversionUtils {
 
 	public static <E extends Enum<E>> E parseEnum(Class<E> enumType, String enumName) {
 		Validate.notNull(enumType, "enumType is null");
-		if (enumName == null) return null;
+		if (enumName == null || enumName.isEmpty()) return null;
 
 		// Try to parse the enum value without normalizing the enum name first (in case the enum does not adhere to the
 		// expected normalized format):

@@ -43,16 +43,10 @@ public final class ItemUtils {
 	 * 
 	 * @param input
 	 *            the input String
-	 * @return the parsed Material, or <code>null</code>
+	 * @return the parsed {@link Material}, or <code>null</code> if the material cannot be parsed
 	 */
 	public static Material parseMaterial(String input) {
-		if (input == null) return null;
-		// Format the input:
-		String materialName = MinecraftEnumUtils.normalizeEnumName(input);
-
-		// Lookup the material:
-		Material material = Material.getMaterial(materialName);
-		return material;
+		return MinecraftEnumUtils.parseEnum(Material.class, input);
 	}
 
 	/**

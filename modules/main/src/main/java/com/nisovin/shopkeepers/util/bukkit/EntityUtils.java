@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -21,7 +20,6 @@ import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
 
 import com.nisovin.shopkeepers.util.java.PredicateUtils;
-import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -55,16 +53,15 @@ public class EntityUtils {
 		}
 	}
 
-	public static EntityType matchEntityType(String entityTypeId) {
-		if (StringUtils.isEmpty(entityTypeId)) return null;
-		// Get by Bukkit id:
-		String normalizedEntityTypeId = entityTypeId.trim().toUpperCase(Locale.ROOT).replace('-', '_').replace(' ', '_');
-		try {
-			return EntityType.valueOf(normalizedEntityTypeId);
-		} catch (IllegalArgumentException e) {
-			// Unknown entity type:
-			return null;
-		}
+	/**
+	 * Parses the {@link EntityType} from the given name.
+	 * 
+	 * @param entityTypeName
+	 *            the entity type name, can be <code>null</code>
+	 * @return the parsed {@link EntityType}, or <code>null</code> if the entity type cannot be parsed
+	 */
+	public static EntityType parseEntityType(String entityTypeName) {
+		return MinecraftEnumUtils.parseEnum(EntityType.class, entityTypeName);
 	}
 
 	public static void printEntityCounts(Chunk chunk) {

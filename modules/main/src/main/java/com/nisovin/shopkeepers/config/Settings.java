@@ -364,7 +364,7 @@ public class Settings extends Config {
 			enabledLivingShops.clear();
 			boolean foundInvalidEntityType = false;
 			for (String entityTypeId : Settings.enabledLivingShops) {
-				EntityType entityType = EntityUtils.matchEntityType(entityTypeId);
+				EntityType entityType = EntityUtils.parseEntityType(entityTypeId);
 				if (entityType == null || !entityType.isAlive() || !entityType.isSpawnable()) {
 					foundInvalidEntityType = true;
 					if ("PIG_ZOMBIE".equals(entityTypeId)) {
