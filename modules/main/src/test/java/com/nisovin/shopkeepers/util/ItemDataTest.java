@@ -7,8 +7,8 @@ import org.bukkit.inventory.ItemStack;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.inventory.ItemData;
-import com.nisovin.shopkeepers.util.inventory.ItemData.ItemDataDeserializeException;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.yaml.YamlUtils;
 
@@ -34,13 +34,12 @@ public class ItemDataTest extends AbstractItemStackSerializationTest {
 		} catch (InvalidConfigurationException e) {
 		}
 		Object serialized = yamlConfig.get("item"); // Can be null
-		ItemData deserialized;
+		if (serialized == null) return null;
 		try {
-			deserialized = ItemData.deserialize(serialized);
-		} catch (ItemDataDeserializeException e) {
+			return ItemData.SERIALIZER.deserialize(serialized);
+		} catch (InvalidDataException e) {
 			throw new RuntimeException(e);
 		}
-		return deserialized;
 	}
 
 	@Override

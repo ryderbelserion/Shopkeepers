@@ -16,39 +16,26 @@ import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.DataContainer;
-import com.nisovin.shopkeepers.util.java.StringUtils;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.property.validation.bukkit.MaterialValidators;
+import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
+import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.MissingDataException;
+import com.nisovin.shopkeepers.util.data.serialization.bukkit.MinecraftEnumSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.DataContainerSerializers;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * An immutable object that stores item type and meta data information.
  */
-public class ItemData {
+public final class ItemData {
 
-	public static class ItemDataDeserializeException extends Exception {
-
-		private static final long serialVersionUID = -6637983932875623362L;
-
-		public ItemDataDeserializeException(String message) {
-			super(message);
-		}
-
-		public ItemDataDeserializeException(String message, Throwable cause) {
-			super(message, cause);
-		}
-	}
-
-	public static class InvalidItemTypeException extends ItemDataDeserializeException {
-
-		private static final long serialVersionUID = -6123823171023440870L;
-
-		public InvalidItemTypeException(String message) {
-			super(message);
-		}
-
-		public InvalidItemTypeException(String message, Throwable cause) {
-			super(message, cause);
-		}
-	}
+	private static final Property<Material> ITEM_TYPE = new BasicProperty<Material>()
+			.dataKeyAccessor("type", MinecraftEnumSerializers.Materials.LENIENT)
+			.validator(MaterialValidators.IS_ITEM)
+			.validator(MaterialValidators.NON_LEGACY)
+			.build();
 
 	private static final String META_TYPE_KEY = "meta-type";
 	private static final String DISPLAY_NAME_KEY = "display-name";
@@ -91,95 +78,139 @@ public class ItemData {
 		return metaType; // Can be null
 	}
 
-	// Only returns null if the input data is null.
-	public static ItemData deserialize(@ReadOnly Object dataObject) throws ItemDataDeserializeException {
-		if (dataObject == null) return null;
-
-		String itemTypeName = null;
-		DataContainer data = null;
-		if (dataObject instanceof String) {
-			// Load from compact representation (no additional item meta data):
-			itemTypeName = (String) dataObject;
-		} else {
-			data = DataContainer.of(dataObject);
-			if (data == null) {
-				throw new ItemDataDeserializeException("Invalid item data: " + dataObject);
+	/**
+	 * A {@link DataSerializer} for values of type {@link ItemData}.
+	 */
+	public static final DataSerializer<ItemData> SERIALIZER = new DataSerializer<ItemData>() {
+		@Override
+		public Object serialize(ItemData value) {
+			Validate.notNull(value, "value is null");
+			Map<String, Object> serializedMetaData = value.getSerializedMetaData();
+			if (serializedMetaData.isEmpty()) {
+				// Use a more compact representation if there is no additional item data:
+				return value.dataItem.getType().name();
 			}
 
-			itemTypeName = data.getString("type");
-			if (StringUtils.isEmpty(itemTypeName)) {
-				throw new ItemDataDeserializeException("Missing item type");
+			DataContainer itemDataData = DataContainer.create();
+			itemDataData.set(ITEM_TYPE, value.dataItem.getType());
+
+			for (Entry<String, Object> metaEntry : serializedMetaData.entrySet()) {
+				String metaKey = metaEntry.getKey();
+				Object metaValue = metaEntry.getValue();
+
+				// We omit any data that can be easily restored during deserialization:
+				// Omit meta type key:
+				if (META_TYPE_KEY.equals(metaKey)) continue;
+
+				// Omit 'blockMaterial' for empty TILE_ENTITY item meta:
+				if (TILE_ENTITY_BLOCK_MATERIAL_KEY.equals(metaKey)) {
+					// Check if specific meta type only contains unspecific meta data:
+					ItemMeta specificItemMeta = value.dataItem.getItemMeta();
+					// TODO Relies on some material with unspecific item meta.
+					ItemMeta unspecificItemMeta = Bukkit.getItemFactory().asMetaFor(specificItemMeta, Material.STONE);
+					if (Bukkit.getItemFactory().equals(unspecificItemMeta, specificItemMeta)) {
+						continue; // Skip 'blockMaterial' entry
+					}
+				}
+
+				// Use alternative color codes for display name and lore:
+				if (DISPLAY_NAME_KEY.equals(metaKey)) {
+					if (metaValue instanceof String) {
+						metaValue = TextUtils.decolorize((String) metaValue);
+					}
+				} else if (LORE_KEY.equals(metaKey)) {
+					if (metaValue instanceof List) {
+						metaValue = TextUtils.decolorizeUnknown((List<?>) metaValue);
+					}
+				}
+
+				// Insert the entry into the data container:
+				// A deep copy is assumed to not be needed.
+				itemDataData.set(metaKey, metaValue);
 			}
-
-			// Skip the meta data loading if no further data (besides the item type) is given:
-			if (data.size() <= 1) {
-				data = null;
-			}
-		}
-		assert itemTypeName != null;
-
-		// Assuming up-to-date material name (performs no conversions besides basic formatting):
-		Material itemType = ItemUtils.parseMaterial(itemTypeName); // Can be null
-		if (itemType == null) {
-			throw new InvalidItemTypeException("Unknown item type: " + itemTypeName);
-		} else if (itemType.isLegacy()) {
-			throw new InvalidItemTypeException("Unsupported legacy item type: " + itemTypeName);
-		} else if (!itemType.isItem()) {
-			// Note: AIR is a valid item type. It is for example used for empty slots in inventories.
-			throw new InvalidItemTypeException("Invalid item type: " + itemTypeName);
-		}
-
-		// Create item stack (still misses meta data):
-		ItemStack dataItem = new ItemStack(itemType);
-
-		// Load additional meta data:
-		if (data != null) {
-			// Prepare the data for the meta data deserialization:
-			// We (shallow) copy the data to a new Map, because we will have to insert additional data for the ItemMeta
-			// to be deserializable, and don't want to modify the given original data.
-			// Note: Additional information (eg. the item type) does not need to be removed, but is simply ignored.
-			Map<String, Object> itemMetaData = data.getValuesCopy();
-
-			// Recursively replace all config sections with Maps, because the ItemMeta deserialization expects Maps:
-			ConfigUtils.convertSectionsToMaps(itemMetaData);
-
-			// Determine the meta type:
-			String metaType = getMetaType(itemType);
-			if (metaType == null) {
-				throw new ItemDataDeserializeException("Items of type " + itemType.name() + " do not support meta data!");
-			}
-
-			// Insert meta type:
-			itemMetaData.put(META_TYPE_KEY, metaType);
-
-			// Convert color codes for display name and lore:
-			Object displayNameData = itemMetaData.get(DISPLAY_NAME_KEY);
-			if (displayNameData instanceof String) { // Also checks for null
-				itemMetaData.put(DISPLAY_NAME_KEY, TextUtils.colorize((String) displayNameData));
-			}
-			List<?> loreData = data.getList(LORE_KEY); // Null if the data is not a list
-			if (loreData != null) {
-				itemMetaData.put(LORE_KEY, TextUtils.colorizeUnknown(loreData));
-			}
-
-			// Deserialize the ItemMeta:
-			ItemMeta itemMeta = ItemSerialization.deserializeItemMeta(itemMetaData); // Can be null
-
-			// Apply the ItemMeta:
-			dataItem.setItemMeta(itemMeta);
+			return itemDataData.serialize();
 		}
 
-		// Create ItemData:
-		// Unmodifiable wrapper: Avoids creating another item copy during construction.
-		ItemData itemData = new ItemData(UnmodifiableItemStack.of(dataItem));
-		return itemData;
-	}
+		@Override
+		public ItemData deserialize(Object data) throws InvalidDataException {
+			Validate.notNull(data, "data is null");
+			Material itemType;
+			DataContainer itemDataData = null;
+			if (data instanceof String) {
+				// Reconstruct from compact representation (no additional item meta data):
+				itemType = MinecraftEnumSerializers.Materials.LENIENT.deserialize((String) data);
+				try {
+					ITEM_TYPE.validateValue(itemType);
+				} catch (Exception e) {
+					throw new InvalidDataException(e.getMessage(), e);
+				}
+			} else {
+				itemDataData = DataContainerSerializers.DEFAULT.deserialize(data);
+				try {
+					itemType = itemDataData.get(ITEM_TYPE);
+				} catch (MissingDataException e) {
+					throw new InvalidDataException(e.getMessage(), e);
+				}
+
+				// Skip the meta data loading if no further data (besides the item type) is given:
+				if (itemDataData.size() <= 1) {
+					itemDataData = null;
+				}
+			}
+			assert itemType != null;
+
+			// Create item stack (still misses meta data):
+			ItemStack dataItem = new ItemStack(itemType);
+
+			// Load additional meta data:
+			if (itemDataData != null) {
+				// Prepare the data for the meta data deserialization:
+				// We (shallow) copy the data to a new Map, because we will have to insert additional data for the
+				// ItemMeta to be deserializable, and don't want to modify the given original data.
+				// Note: Additional information (eg. the item type) does not need to be removed, but is simply ignored.
+				Map<String, Object> itemMetaData = itemDataData.getValuesCopy();
+
+				// Recursively replace all config sections with Maps, because the ItemMeta deserialization expects Maps:
+				ConfigUtils.convertSectionsToMaps(itemMetaData);
+
+				// Determine the meta type:
+				String metaType = getMetaType(itemType);
+				if (metaType == null) {
+					throw new InvalidDataException("Items of type " + itemType.name() + " do not support meta data!");
+				}
+
+				// Insert meta type:
+				itemMetaData.put(META_TYPE_KEY, metaType);
+
+				// Convert color codes for display name and lore:
+				Object displayNameData = itemMetaData.get(DISPLAY_NAME_KEY);
+				if (displayNameData instanceof String) { // Also checks for null
+					itemMetaData.put(DISPLAY_NAME_KEY, TextUtils.colorize((String) displayNameData));
+				}
+				List<?> loreData = itemDataData.getList(LORE_KEY); // Null if the data is not a list
+				if (loreData != null) {
+					itemMetaData.put(LORE_KEY, TextUtils.colorizeUnknown(loreData));
+				}
+
+				// Deserialize the ItemMeta:
+				ItemMeta itemMeta = ItemSerialization.deserializeItemMeta(itemMetaData); // Can be null
+
+				// Apply the ItemMeta:
+				dataItem.setItemMeta(itemMeta);
+			}
+
+			// Create ItemData:
+			// Unmodifiable wrapper: Avoids creating another item copy during construction.
+			ItemData itemData = new ItemData(UnmodifiableItemStack.of(dataItem));
+			return itemData;
+		}
+	};
 
 	/////
 
 	private final UnmodifiableItemStack dataItem; // Has amount of 1
-	// Cache serialized item meta data, to avoid doing it again for every comparison:
-	private @ReadOnly Map<String, @ReadOnly Object> serializedData = null; // Gets lazily initialized (only when needed)
+	// Cache serialized item meta data, to avoid serializing it again for every comparison:
+	private @ReadOnly Map<String, @ReadOnly Object> serializedMetaData = null; // Gets lazily initialized when needed
 
 	public ItemData(Material type) {
 		// Unmodifiable wrapper: Avoids creating another item copy during construction.
@@ -234,22 +265,22 @@ public class ItemData {
 	}
 
 	// Not null.
-	private Map<String, Object> getSerializedData() {
+	private Map<String, Object> getSerializedMetaData() {
 		// Lazily cache the serialized data:
-		if (serializedData == null) {
+		if (serializedMetaData == null) {
 			ItemMeta itemMeta = dataItem.getItemMeta();
-			serializedData = ItemSerialization.serializeItemMeta(itemMeta);
-			if (serializedData == null) {
+			serializedMetaData = ItemSerialization.serializeItemMeta(itemMeta);
+			if (serializedMetaData == null) {
 				// Ensure that the field is not null after initialization:
-				serializedData = Collections.emptyMap();
+				serializedMetaData = Collections.emptyMap();
 			}
 		}
-		assert serializedData != null;
-		return serializedData;
+		assert serializedMetaData != null;
+		return serializedMetaData;
 	}
 
 	public boolean hasItemMeta() {
-		return !this.getSerializedData().isEmpty(); // Equivalent to dataItem.hasItemMeta()
+		return !this.getSerializedMetaData().isEmpty(); // Equivalent to dataItem.hasItemMeta()
 	}
 
 	public ItemMeta getItemMeta() {
@@ -284,7 +315,7 @@ public class ItemData {
 
 	public boolean matches(@ReadOnly ItemStack item, boolean matchPartialLists) {
 		// Same type and matching data:
-		return ItemUtils.matchesData(item, this.getType(), this.getSerializedData(), matchPartialLists);
+		return ItemUtils.matchesData(item, this.getType(), this.getSerializedMetaData(), matchPartialLists);
 	}
 
 	public boolean matches(UnmodifiableItemStack item, boolean matchPartialLists) {
@@ -299,7 +330,7 @@ public class ItemData {
 	public boolean matches(ItemData itemData, boolean matchPartialLists) {
 		if (itemData == null) return false;
 		if (itemData.getType() != this.getType()) return false;
-		return ItemUtils.matchesData(itemData.getSerializedData(), this.getSerializedData(), matchPartialLists);
+		return ItemUtils.matchesData(itemData.getSerializedMetaData(), this.getSerializedMetaData(), matchPartialLists);
 	}
 
 	@Override
@@ -330,48 +361,6 @@ public class ItemData {
 	}
 
 	public Object serialize() {
-		Map<String, Object> serializedData = this.getSerializedData();
-		if (serializedData.isEmpty()) {
-			// Use a more compact representation if there is no additional item data:
-			return dataItem.getType().name();
-		}
-
-		DataContainer data = DataContainer.create();
-		data.set("type", dataItem.getType().name());
-
-		for (Entry<String, Object> entry : serializedData.entrySet()) {
-			String key = entry.getKey();
-			Object value = entry.getValue();
-
-			// Omitting any data which can be easily restored during deserialization:
-			// Omit meta type key:
-			if (META_TYPE_KEY.equals(key)) continue;
-
-			// Omit 'blockMaterial' for empty TILE_ENTITY item meta:
-			if (TILE_ENTITY_BLOCK_MATERIAL_KEY.equals(key)) {
-				// Check if specific meta type only contains unspecific meta data:
-				ItemMeta specificItemMeta = dataItem.getItemMeta();
-				// TODO Relies on some material with unspecific item meta.
-				ItemMeta unspecificItemMeta = Bukkit.getItemFactory().asMetaFor(specificItemMeta, Material.STONE);
-				if (Bukkit.getItemFactory().equals(unspecificItemMeta, specificItemMeta)) {
-					continue; // Skip 'blockMaterial' entry
-				}
-			}
-
-			// Use alternative color codes for display name and lore:
-			if (DISPLAY_NAME_KEY.equals(key)) {
-				if (value instanceof String) {
-					value = TextUtils.decolorize((String) value);
-				}
-			} else if (LORE_KEY.equals(key)) {
-				if (value instanceof List) {
-					value = TextUtils.decolorizeUnknown((List<?>) value);
-				}
-			}
-
-			// Move into data container: Avoiding a deep copy, since it is assumed to not be needed.
-			data.set(key, value);
-		}
-		return data.serialize();
+		return SERIALIZER.serialize(this);
 	}
 }

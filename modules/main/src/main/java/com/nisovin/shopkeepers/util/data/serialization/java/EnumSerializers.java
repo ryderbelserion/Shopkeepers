@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class EnumSerializers {
 
-	private static abstract class EnumSerializer<E extends Enum<E>> implements DataSerializer<E> {
+	public static abstract class EnumSerializer<E extends Enum<E>> implements DataSerializer<E> {
 
 		protected final Class<E> enumType;
 

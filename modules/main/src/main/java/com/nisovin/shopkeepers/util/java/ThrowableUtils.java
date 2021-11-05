@@ -8,6 +8,25 @@ public class ThrowableUtils {
 	}
 
 	/**
+	 * Gets the root cause of the given {@link Throwable}, or the given {@link Throwable} itself if it has no cause.
+	 * <p>
+	 * This method assumes that there are no cycles in the cause chain!
+	 * 
+	 * @param throwable
+	 *            the throwable to get the root cause of, not <code>null</code>
+	 * @return the root cause, not <code>null</code>
+	 */
+	public static Throwable getRootCause(Throwable throwable) {
+		Validate.notNull(throwable, "throwable is null");
+		Throwable current = throwable;
+		Throwable cause;
+		while ((cause = current.getCause()) != null) {
+			current = cause;
+		}
+		return current;
+	}
+
+	/**
 	 * Creates a short description of this {@link Throwable}.
 	 * <p>
 	 * This recursively searches the {@link Throwable} and its chain of causes for a detail message that is neither
