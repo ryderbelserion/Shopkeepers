@@ -7,7 +7,14 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.util.data.DataContainer;
-import com.nisovin.shopkeepers.util.java.ConversionUtils;
+import com.nisovin.shopkeepers.util.data.property.BasicProperty;
+import com.nisovin.shopkeepers.util.data.property.Property;
+import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
+import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.java.DataContainerSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.NumberSerializers;
+import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -23,9 +30,9 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * differently (Minecraft uses two different packets for them). Even if two sound effects refer to the same sound, one
  * by {@link Sound} and the other by sound name, they are not considered equal.
  * <p>
- * When {@link #deserialize(Object) deserializing} a {@link SoundEffect}, we first try to map a given sound name to a
- * server-known {@link Sound}. This means that if the sound effect was using a sound name instead of a {@link Sound}
- * before being serialized, the deserialized sound effect may not be equal to the previously serialized sound effect.
+ * When deserializing a {@link SoundEffect}, we first try to map a given sound name to a server-known {@link Sound}.
+ * This means that if the sound effect was using a sound name instead of a {@link Sound} before being serialized, the
+ * deserialized sound effect may not be equal to the previously serialized sound effect.
  * <p>
  * The {@link #getSoundName() sound name} can be empty to indicate that the sound effect shall not be played. This
  * allows plugin users to disable certain sound effects inside the config, and allows the plugin to differentiate
@@ -39,17 +46,86 @@ public final class SoundEffect {
 	 */
 	public static final SoundEffect EMPTY = new SoundEffect("");
 
-	private static final String DATA_KEY_SOUND = "sound";
-	private static final String DATA_KEY_CATEGORY = "category";
-	private static final String DATA_KEY_VOLUME = "volume";
-	private static final String DATA_KEY_PITCH = "pitch";
-
-	private static final SoundCategory DEFAULT_CATEGORY = SoundCategory.MASTER;
-	private static final float DEFAULT_PITCH = 1.0f;
-	private static final float DEFAULT_VOLUME = 1.0f;
+	private static final Property<String> SOUND_NAME = new BasicProperty<String>()
+			.dataKeyAccessor("sound", StringSerializers.SCALAR)
+			.build();
+	private static final Property<SoundCategory> CATEGORY = new BasicProperty<SoundCategory>()
+			.dataKeyAccessor("category", EnumSerializers.lenient(SoundCategory.class))
+			.nullable() // Optional
+			.defaultValue(SoundCategory.MASTER)
+			.build();
+	private static final Property<Float> PITCH = new BasicProperty<Float>()
+			.dataKeyAccessor("pitch", NumberSerializers.FLOAT)
+			.nullable() // Optional
+			.defaultValue(1.0f)
+			.build();
+	private static final Property<Float> VOLUME = new BasicProperty<Float>()
+			.dataKeyAccessor("volume", NumberSerializers.FLOAT)
+			.nullable() // Optional
+			.defaultValue(1.0f)
+			.build();
 
 	// Sound effects with a volume below this value are not played.
 	private static final float MIN_VOLUME = 0.001f;
+
+	/**
+	 * A {@link DataSerializer} for values of type {@link SoundEffect}.
+	 */
+	public static final DataSerializer<SoundEffect> SERIALIZER = new DataSerializer<SoundEffect>() {
+		@Override
+		public Object serialize(SoundEffect value) {
+			Validate.notNull(value, "value is null");
+			Sound sound = value.getSound();
+			String soundName = value.getSoundName();
+			SoundCategory category = value.getCategory();
+			Float pitch = value.getPitch();
+			Float volume = value.getVolume();
+
+			// Sound and sound name are both serialized as String:
+			String serializedSound = (sound != null) ? sound.name() : soundName;
+
+			// Use a compact representation if only the sound / sound name is specified:
+			if (category == null && pitch == null && volume == null) {
+				return serializedSound;
+			}
+
+			DataContainer soundEffectData = DataContainer.create();
+			soundEffectData.set(SOUND_NAME, serializedSound);
+			soundEffectData.set(CATEGORY, category);
+			soundEffectData.set(PITCH, pitch);
+			soundEffectData.set(VOLUME, volume);
+			return soundEffectData.serialize();
+		}
+
+		@Override
+		public SoundEffect deserialize(Object data) throws InvalidDataException {
+			Validate.notNull(data, "data is null");
+			String soundName = null;
+			SoundCategory category = null;
+			Float pitch = null;
+			Float volume = null;
+
+			if (data instanceof String) {
+				// Compact representation:
+				soundName = (String) data; // Can be empty
+			} else {
+				DataContainer soundEffectData = DataContainerSerializers.DEFAULT.deserialize(data);
+				soundName = soundEffectData.get(SOUND_NAME); // Can be empty
+				category = soundEffectData.get(CATEGORY);
+				pitch = soundEffectData.get(PITCH);
+				volume = soundEffectData.get(VOLUME);
+			}
+
+			// Check if the sound name matches a known Sound:
+			Sound sound = MinecraftEnumUtils.parseEnum(Sound.class, soundName); // Can be null
+			if (sound != null) {
+				// We use the Sound instead of the sound name.
+				soundName = null;
+			}
+
+			return new SoundEffect(sound, soundName, category, pitch, volume);
+		}
+	};
 
 	// Either sound or soundName is not null. Sound name is used when referring to a sound that is not known to the
 	// server and might only exist on (certain) clients.
@@ -181,7 +257,7 @@ public final class SoundEffect {
 	 * @return the sound category, not <code>null</code>
 	 */
 	public SoundCategory getEffectiveCategory() {
-		return (category != null) ? category : DEFAULT_CATEGORY;
+		return (category != null) ? category : CATEGORY.getDefaultValue();
 	}
 
 	/**
@@ -201,7 +277,7 @@ public final class SoundEffect {
 	 * @return the pitch
 	 */
 	public float getEffectivePitch() {
-		return (pitch != null) ? pitch : DEFAULT_PITCH;
+		return (pitch != null) ? pitch : PITCH.getDefaultValue();
 	}
 
 	/**
@@ -221,7 +297,7 @@ public final class SoundEffect {
 	 * @return the volume
 	 */
 	public float getEffectiveVolume() {
-		return (volume != null) ? volume : DEFAULT_VOLUME;
+		return (volume != null) ? volume : VOLUME.getDefaultValue();
 	}
 
 	/**
@@ -345,123 +421,6 @@ public final class SoundEffect {
 	 * @return the serialized {@link SoundEffect}
 	 */
 	public Object serialize() {
-		// Sound and sound name are both serialized as String:
-		String serializedSound = (sound != null) ? sound.name() : soundName;
-
-		// Use a compact representation if only the sound / sound name is specified:
-		if (category == null && pitch == null && volume == null) {
-			return serializedSound;
-		}
-
-		DataContainer data = DataContainer.create();
-		data.set(DATA_KEY_SOUND, serializedSound);
-		if (category != null) {
-			data.set(DATA_KEY_CATEGORY, category.name());
-		}
-
-		// Note: We store these float values as doubles, because SnakeYaml produces doubles when reading the values from
-		// a config. Storing them as floats here would break tests cases that compare this serialized data with the
-		// deserialized data returned by SnakeYaml.
-		if (pitch != null) {
-			data.set(DATA_KEY_PITCH, (double) pitch);
-		}
-		if (volume != null) {
-			data.set(DATA_KEY_VOLUME, (double) volume);
-		}
-		return data.serialize();
-	}
-
-	/**
-	 * Reconstructs a {@link SoundEffect} from the given data.
-	 * 
-	 * @param dataObject
-	 *            the data, can be <code>null</code>
-	 * @return the sound effect, only <code>null</code> if the input data is <code>null</code>
-	 * @throws SoundEffectDeserializeException
-	 *             if the sound effect cannot be reconstructed
-	 */
-	public static SoundEffect deserialize(Object dataObject) throws SoundEffectDeserializeException {
-		if (dataObject == null) return null;
-		if (dataObject instanceof String) {
-			// Compact representation:
-			String soundName = (String) dataObject; // Can be empty
-
-			// Check if the sound name matches a known Sound:
-			Sound sound = ConversionUtils.toEnum(Sound.class, soundName); // Can be null
-			if (sound != null) {
-				// We use the Sound instead of the sound name.
-				soundName = null;
-			}
-
-			return new SoundEffect(sound, soundName, null, null, null);
-		}
-
-		DataContainer data = DataContainer.of(dataObject);
-		if (data == null) {
-			throw new SoundEffectDeserializeException("Invalid sound effect data: " + dataObject);
-		}
-
-		// Sound name:
-		Object soundData = data.get(DATA_KEY_SOUND);
-		if (soundData == null) {
-			throw new SoundEffectDeserializeException("Missing sound");
-		}
-		if (!(soundData instanceof String)) {
-			throw new SoundEffectDeserializeException("Invalid sound: " + soundData);
-		}
-
-		String soundName = (String) soundData; // Can be empty
-
-		// Check if the sound name matches a known Sound:
-		Sound sound = ConversionUtils.toEnum(Sound.class, soundName); // Can be null
-		if (sound != null) {
-			// We use the Sound instead of the sound name.
-			soundName = null;
-		}
-
-		// Sound category:
-		SoundCategory category = null;
-		Object categoryData = data.get(DATA_KEY_CATEGORY);
-		if (categoryData != null) {
-			category = ConversionUtils.toEnum(SoundCategory.class, categoryData);
-			if (category == null) {
-				throw new SoundEffectDeserializeException("Invalid category: " + categoryData);
-			}
-		}
-
-		// Pitch:
-		Float pitch = null;
-		Object pitchData = data.get(DATA_KEY_PITCH);
-		if (pitchData != null) {
-			pitch = ConversionUtils.toFloat(pitchData);
-			if (pitch == null) {
-				throw new SoundEffectDeserializeException("Invalid pitch: " + pitchData);
-			}
-		}
-
-		// Volume:
-		Float volume = null;
-		Object volumeData = data.get(DATA_KEY_VOLUME);
-		if (volumeData != null) {
-			volume = ConversionUtils.toFloat(volumeData);
-			if (volume == null) {
-				throw new SoundEffectDeserializeException("Invalid volume: " + volumeData);
-			}
-		}
-
-		return new SoundEffect(sound, soundName, category, pitch, volume);
-	}
-
-	public static class SoundEffectDeserializeException extends Exception {
-
-		private static final long serialVersionUID = -1767923835012773616L;
-
-		public SoundEffectDeserializeException(String message) {
-			super(message);
-		}
-
-		public SoundEffectDeserializeException(String message, Throwable cause) {
-			super(message, cause);
-		}
+		return SERIALIZER.serialize(this);
 	}
 }
