@@ -74,6 +74,15 @@ public final class NumberSerializers {
 	 */
 	public static final DataSerializer<Float> FLOAT = new NumberSerializer<Float>(Float.class) {
 		@Override
+		public Object serialize(Float value) {
+			Validate.notNull(value, "value is null");
+			// Note: We convert float values to doubles, because SnakeYaml produces doubles when it reads floating point
+			// numbers. Storing the value here as double simplifies the creation of test cases that compare the
+			// serialized data in memory with the data read by SnakeYaml.
+			return value.doubleValue();
+		}
+
+		@Override
 		public Float deserializeNumber(Object data) throws InvalidDataException {
 			return ConversionUtils.toFloat(data);
 		}
