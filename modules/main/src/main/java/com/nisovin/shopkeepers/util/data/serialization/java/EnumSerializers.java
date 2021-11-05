@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Default {@link DataSerializer}s for {@link Enum} values.
  */
-public abstract class EnumSerializers {
+public final class EnumSerializers {
 
 	private static abstract class EnumSerializer<E extends Enum<E>> implements DataSerializer<E> {
 
@@ -30,9 +30,9 @@ public abstract class EnumSerializers {
 			return StringSerializers.STRICT_NON_EMPTY.deserialize(data);
 		}
 
-		protected final InvalidDataException invalidEnumValueNameError(String valueName) {
+		protected InvalidDataException unknownEnumValueError(String valueName) {
 			assert valueName != null;
-			return new InvalidDataException("Failed to parse " + enumType.getSimpleName() + " from '" + valueName + "'!");
+			return new InvalidDataException("Unknown " + enumType.getSimpleName() + ": " + valueName);
 		}
 
 		@Override
@@ -61,7 +61,7 @@ public abstract class EnumSerializers {
 				String valueName = this.deserializeEnumValueName(data);
 				E value = EnumUtils.valueOf(enumType, valueName);
 				if (value == null) {
-					throw this.invalidEnumValueNameError(valueName);
+					throw this.unknownEnumValueError(valueName);
 				} else {
 					return value;
 				}
@@ -73,8 +73,9 @@ public abstract class EnumSerializers {
 	 * Gets a {@link DataSerializer} for values of the specified enum.
 	 * <p>
 	 * During {@link DataSerializer#deserialize(Object) deserialization}, this {@link DataSerializer} first tries to
-	 * find an exact match for a given serialized enum value name. In case of failure, it attempts to find a matching
-	 * enum value by formatting the serialized enum value name so that it matches the usual formatting used by enums.
+	 * find an enum value whose name perfectly matches the given serialized enum value name, and otherwise tries to find
+	 * a matching enum value by {@link EnumUtils#normalizeEnumName(String) formatting} the given serialized enum value
+	 * name so that it matches the usual enum formatting.
 	 * 
 	 * @param <E>
 	 *            the enum type
@@ -89,7 +90,7 @@ public abstract class EnumSerializers {
 				String valueName = this.deserializeEnumValueName(data);
 				E value = ConversionUtils.parseEnum(enumType, valueName);
 				if (value == null) {
-					throw this.invalidEnumValueNameError(valueName);
+					throw this.unknownEnumValueError(valueName);
 				} else {
 					return value;
 				}
