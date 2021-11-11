@@ -397,17 +397,18 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		this._setName(shopkeeperData.get(NAME));
 
-		// Shop object:
-		ShopObjectData shopObjectData = shopkeeperData.get(SHOP_OBJECT_DATA);
-		assert shopObjectData != null;
-		AbstractShopObjectType<?> objectType = shopObjectData.get(AbstractShopObject.SHOP_OBJECT_TYPE);
-		assert objectType != null;
-		if (objectType == shopObject.getType()) {
-			shopObject.load(shopObjectData);
-		} else {
-			// Skip shop object data.
-			Log.debug(() -> this.getLogPrefix() + "Ignoring shop object data of different type (expected: "
-					+ shopObject.getType().getIdentifier() + ", got: " + objectType.getIdentifier() + ")!");
+		// Optional shop object data:
+		ShopObjectData shopObjectData = shopkeeperData.getOrNullIfMissing(SHOP_OBJECT_DATA);
+		if (shopObjectData != null) {
+			AbstractShopObjectType<?> objectType = shopObjectData.get(AbstractShopObject.SHOP_OBJECT_TYPE);
+			assert objectType != null;
+			if (objectType == shopObject.getType()) {
+				shopObject.load(shopObjectData);
+			} else {
+				// Skipping the incompatible shop object data.
+				Log.debug(() -> this.getLogPrefix() + "Ignoring shop object data of different type (expected: "
+						+ shopObject.getType().getIdentifier() + ", got: " + objectType.getIdentifier() + ")!");
+			}
 		}
 	}
 
