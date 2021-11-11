@@ -37,6 +37,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: The order of the enabled living shop object types was not updated on plugin reloads based on their order inside the config.
 * Debug: Removed the debug option 'capabilities' again. We already always log whether or not server version specific features are enabled. This also resolves an internal issue related to whether or not the config has already been loaded at the time this debug option is checked.
 * Fixed: In order to resolve compatibility issues with plugins that modify chat messages at lowest event priority, we now enforce that our chat input event handler always executes first. This should resolve compatibility issues with shopkeeper names not being considered valid, because some other plugin injected color codes into the player's chat message before we were able to process it.
+* Fixed: Since Bukkit 1.16.5, the data version was no longer guaranteed to be the first entry of the save file, and the log message for the number of loaded shopkeepers has been off by one if the save file did not contain any data version yet.
 
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.

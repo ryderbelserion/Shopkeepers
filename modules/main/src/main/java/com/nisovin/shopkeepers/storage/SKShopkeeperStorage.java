@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
@@ -74,7 +75,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// The stored and compared data version is a simple concatenation of these two data versions.
 
 	private static final int SHOPKEEPERS_DATA_VERSION = 2;
-	private static final String MISSING_DATA_VERSION = "-";
+	private static final String MISSING_DATA_VERSION = "<missing>";
 	private static final String DATA_VERSION_KEY = "data-version";
 
 	private static final String HEADER = "This file is not intended to be manually modified! If you want to manually edit this"
@@ -338,19 +339,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// LOADING
 
 	/**
-	 * Clears and sets up the empty save data.
+	 * Clears the in-memory save data and resets any corresponding state of this storage.
 	 */
 	private void clearSaveData() {
 		saveData.clear();
 		maxUsedShopkeeperId = 0;
 		nextShopkeeperId = 1;
-
-		// Setup data version as first / top entry:
-		// Explicitly setting the 'missing data version' value here ensures that the data version will be the first
-		// entry in the save file, even if it is missing in the actual file currently (without having to move all loaded
-		// shopkeeper entries around later).
-		// It gets replaced with the actual data version during loading.
-		saveData.set(DATA_VERSION_KEY, MISSING_DATA_VERSION);
 	}
 
 	// We previously stored the save file within the plugin's root folder. If no save file exist at the expected
@@ -453,8 +447,9 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		try {
-			// Load with the specified encoding:
+			// Load the save data with the specified encoding:
 			try (Reader reader = Files.newBufferedReader(saveFile, DerivedSettings.fileCharset)) {
+				// Since Bukkit 1.16.5, this automatically clears the save data before loading the new entries.
 				saveData.load(reader);
 			}
 		} catch (Exception e) {
@@ -462,28 +457,39 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			return false; // Disable without save
 		}
 
+		// Insert the data version as the first (top) entry:
+		// Explicitly setting the 'missing data version' value here ensures that the data version will be the first
+		// entry in the save file, even if it is missing in the save file currently. If a data version is present in the
+		// loaded data, the 'missing data version' value is replaced with the actual data version afterwards.
+		Map<String, Object> saveDataEntries = saveData.getValuesCopy();
+		saveData.clear();
+		saveData.set(DATA_VERSION_KEY, MISSING_DATA_VERSION);
+		saveData.setAll(saveDataEntries);
+
 		Set<String> keys = saveData.getKeys();
-		// Contains at least the (missing) data-version entry:
+		// Contains at least the data-version entry:
 		assert keys.contains(DATA_VERSION_KEY);
 		int shopkeepersCount = (keys.size() - 1);
 		if (shopkeepersCount == 0) {
-			// No shopkeeper data exists yet. Silently setup/update data version and abort:
+			// No shopkeeper data exists yet. Silently update the data version and abort:
 			saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombinded());
 			return true;
 		}
 
-		Log.info("Loading data of " + shopkeepersCount + " shopkeepers..");
+		Log.info("Loading the data of " + shopkeepersCount + " shopkeepers ...");
+
+		// Check and update the data version:
 		String dataVersion = saveData.getStringOrDefault(DATA_VERSION_KEY, MISSING_DATA_VERSION);
 		boolean dataVersionChanged = (!currentDataVersion.getCombinded().equals(dataVersion));
 		if (dataVersionChanged) {
 			Log.info("The data version has changed from '" + dataVersion + "' to '" + currentDataVersion.getCombinded()
-					+ "': We update the saved data for all loaded shopkeepers.");
+					+ "': The saved data of all shopkeepers is updated.");
 			// Update the data version:
 			saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombinded());
 		}
 
 		for (String key : keys) {
-			if (key.equals(DATA_VERSION_KEY)) continue;
+			if (key.equals(DATA_VERSION_KEY)) continue; // Skip the data version entry
 
 			Integer idInt = ConversionUtils.parseInt(key);
 			if (idInt == null || idInt <= 0) {
