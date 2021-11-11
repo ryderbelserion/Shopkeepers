@@ -1,7 +1,8 @@
 package com.nisovin.shopkeepers.api.shopkeeper;
 
 /**
- * This exception is thrown when a shopkeeper cannot be created, or recreated from its save data.
+ * This exception is thrown when the {@link ShopkeeperRegistry#createShopkeeper(ShopCreationData) creation} of a new
+ * shopkeeper fails for some reason.
  */
 public class ShopkeeperCreateException extends Exception {
 

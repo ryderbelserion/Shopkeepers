@@ -4,11 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
-import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.player.AbstractPlayerShopType;
 
 public final class BuyingPlayerShopType extends AbstractPlayerShopType<SKBuyingPlayerShopkeeper> {
@@ -39,15 +35,7 @@ public final class BuyingPlayerShopType extends AbstractPlayerShopType<SKBuyingP
 	}
 
 	@Override
-	public SKBuyingPlayerShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
-		this.validateCreationData(shopCreationData);
-		SKBuyingPlayerShopkeeper shopkeeper = new SKBuyingPlayerShopkeeper(id, (PlayerShopCreationData) shopCreationData);
-		return shopkeeper;
-	}
-
-	@Override
-	public SKBuyingPlayerShopkeeper loadShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
-		this.validateShopkeeperData(shopkeeperData);
-		return new SKBuyingPlayerShopkeeper(shopkeeperData);
+	protected SKBuyingPlayerShopkeeper createNewShopkeeper() {
+		return new SKBuyingPlayerShopkeeper();
 	}
 }

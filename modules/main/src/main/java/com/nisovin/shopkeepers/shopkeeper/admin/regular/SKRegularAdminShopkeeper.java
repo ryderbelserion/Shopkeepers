@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
-import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.admin.regular.RegularAdminShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
@@ -32,19 +30,11 @@ public class SKRegularAdminShopkeeper extends AbstractAdminShopkeeper implements
 	private final List<? extends SKTradeOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
-	 * Creates a not yet initialized {@link SKRegularAdminShopkeeper} (for use in sub-classes).
+	 * Creates a not yet initialized {@link SKRegularAdminShopkeeper}.
 	 * <p>
 	 * See {@link AbstractShopkeeper} for details on initialization.
 	 */
 	protected SKRegularAdminShopkeeper() {
-	}
-
-	protected SKRegularAdminShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
-		this.initOnCreation(id, shopCreationData);
-	}
-
-	protected SKRegularAdminShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
-		this.initOnLoad(shopkeeperData);
 	}
 
 	@Override

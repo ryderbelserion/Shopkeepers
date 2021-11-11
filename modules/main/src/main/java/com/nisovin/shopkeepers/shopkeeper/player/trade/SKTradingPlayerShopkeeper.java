@@ -7,10 +7,8 @@ import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
-import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.trade.TradingPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -35,19 +33,11 @@ public class SKTradingPlayerShopkeeper extends AbstractPlayerShopkeeper implemen
 	private final List<? extends TradeOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
-	 * Creates a not yet initialized {@link SKTradingPlayerShopkeeper} (for use in sub-classes).
+	 * Creates a new and not yet initialized {@link SKTradingPlayerShopkeeper}.
 	 * <p>
 	 * See {@link AbstractShopkeeper} for details on initialization.
 	 */
 	protected SKTradingPlayerShopkeeper() {
-	}
-
-	protected SKTradingPlayerShopkeeper(int id, PlayerShopCreationData shopCreationData) throws ShopkeeperCreateException {
-		this.initOnCreation(id, shopCreationData);
-	}
-
-	protected SKTradingPlayerShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
-		this.initOnLoad(shopkeeperData);
 	}
 
 	@Override

@@ -14,12 +14,11 @@ public abstract class AbstractAdminShopType<T extends AbstractAdminShopkeeper> e
 		super(identifier, aliases, permission, shopkeeperType);
 	}
 
-	// Common functions that might be useful for sub-classes:
-
 	@Override
 	protected void validateCreationData(ShopCreationData shopCreationData) {
 		super.validateCreationData(shopCreationData);
 		Validate.isTrue(shopCreationData instanceof AdminShopCreationData,
-				"shopCreationData is not of type AdminShopCreationData, but: " + shopCreationData.getClass().getName());
+				() -> "shopCreationData is not of type " + AdminShopCreationData.class.getName()
+						+ ", but: " + shopCreationData.getClass().getName());
 	}
 }

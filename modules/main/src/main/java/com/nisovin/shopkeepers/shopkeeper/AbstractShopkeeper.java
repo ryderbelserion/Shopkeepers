@@ -133,6 +133,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		return "Shopkeeper " + shopkeeperId + ": ";
 	}
 
+	private boolean initialized = false;
+
 	private int id; // Valid and constant after initialization
 	private UUID uniqueId; // Not null and constant after initialization
 	private AbstractShopObject shopObject; // Not null after initialization
@@ -178,37 +180,51 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * Initializes the shopkeeper by using the data from the given {@link ShopCreationData}.
+	 * Initializes this shopkeeper based on the given {@link ShopCreationData}.
+	 * <p>
+	 * This operation will mark the shopkeeper as {@link #markDirty() dirty}.
 	 * 
 	 * @param id
 	 *            the shopkeeper id
 	 * @param shopCreationData
 	 *            the shop creation data, not <code>null</code>
 	 * @throws ShopkeeperCreateException
-	 *             if the shopkeeper can not be created
-	 * @see #loadFromCreationData(ShopCreationData)
+	 *             if the initialization fails (eg. due to invalid or missing data)
+	 * @see AbstractShopType#createShopkeeper(int, ShopCreationData)
+	 * @see #loadFromCreationData(int, ShopCreationData)
 	 */
-	protected final void initOnCreation(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
+	final void initOnCreation(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		this.loadFromCreationData(id, shopCreationData);
 		this.commonSetup();
 	}
 
 	/**
-	 * Initializes the shopkeeper by loading its previously saved state from the given {@link ShopkeeperData}.
+	 * Initializes this shopkeeper by loading its previously saved state from the given {@link ShopkeeperData}.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
-	 * @throws ShopkeeperCreateException
-	 *             if the shopkeeper can not be loaded
+	 * @throws InvalidDataException
+	 *             if the shopkeeper cannot be loaded
+	 * @see AbstractShopType#loadShopkeeper(ShopkeeperData)
 	 * @see #loadFromSaveData(ShopkeeperData)
 	 */
-	protected final void initOnLoad(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
-		try {
-			this.loadFromSaveData(shopkeeperData);
-		} catch (InvalidDataException e) {
-			throw new ShopkeeperCreateException(e.getMessage(), e);
-		}
+	final void initOnLoad(ShopkeeperData shopkeeperData) throws InvalidDataException {
+		this.loadFromSaveData(shopkeeperData);
 		this.commonSetup();
+	}
+
+	private void initialize() {
+		Validate.State.isTrue(!initialized, "The shopkeeper has already been initialized!");
+		initialized = true;
+	}
+
+	/**
+	 * Checks if this shopkeeper has already been initialized.
+	 * 
+	 * @return <code>true</code> if this shopkeeper has already been initialized
+	 */
+	final boolean isInitialized() {
+		return initialized;
 	}
 
 	private void commonSetup() {
@@ -217,7 +233,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * Initializes the shopkeeper by using the data from the given {@link ShopCreationData}.
+	 * Initializes this shopkeeper based on the given {@link ShopCreationData}.
 	 * 
 	 * @param id
 	 *            the shopkeeper id
@@ -225,11 +241,19 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the shop creation data, not <code>null</code>
 	 * @throws ShopkeeperCreateException
 	 *             if the shopkeeper cannot be properly initialized
+	 * @see AbstractShopType#createShopkeeper(int, ShopCreationData)
 	 */
 	protected void loadFromCreationData(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
-		assert shopCreationData != null;
+		this.getType().validateCreationData(shopCreationData);
+		this.initialize();
+
 		this.id = id;
 		this.uniqueId = UUID.randomUUID();
+
+		if (shopCreationData.getShopType() != this.getType()) {
+			throw new ShopkeeperCreateException("The shopCreationData is for a different shop type (expected: "
+					+ this.getType().getIdentifier() + ", got: " + shopCreationData.getShopType().getIdentifier() + ")!");
+		}
 
 		ShopObjectType<?> shopObjectType = shopCreationData.getShopObjectType();
 		Validate.isTrue(shopObjectType instanceof AbstractShopObjectType,
@@ -294,25 +318,30 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// STORAGE
 
 	/**
-	 * Loads the shopkeeper's saved state from the given {@link ShopkeeperData}.
+	 * Initializes this shopkeeper by loading its previously saved state from the given {@link ShopkeeperData}.
+	 * <p>
+	 * The data is expected to already have been {@link ShopkeeperData#migrate(String) migrated}.
 	 * <p>
 	 * This also loads the shopkeeper's {@link #loadDynamicState(ShopkeeperData) dynamic state}.
-	 * <p>
-	 * This assumes that the given shopkeeper data has already been {@link ShopkeeperData#migrate(String) migrated}.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
-	 * @throws ShopkeeperCreateException
-	 *             if the shopkeeper cannot be properly initialized
 	 * @throws InvalidDataException
 	 *             if the shopkeeper data cannot be loaded
-	 * @see AbstractShopType#loadShopkeeper(int, ShopkeeperData)
+	 * @see AbstractShopType#loadShopkeeper(ShopkeeperData)
 	 */
-	protected void loadFromSaveData(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException, InvalidDataException {
+	protected void loadFromSaveData(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
+		this.initialize();
 
 		this.id = shopkeeperData.get(ID);
 		this.uniqueId = shopkeeperData.get(UNIQUE_ID);
+
+		AbstractShopType<?> shopType = shopkeeperData.get(SHOP_TYPE);
+		if (shopType != this.getType()) {
+			throw new InvalidDataException("The shopkeeper data is for a different shop type (expected: "
+					+ this.getType().getIdentifier() + ", got: " + shopType.getIdentifier() + ")!");
+		}
 
 		// Shop object data:
 		ShopObjectData shopObjectData = shopkeeperData.get(SHOP_OBJECT_DATA);
@@ -331,16 +360,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		if (objectType instanceof VirtualShopObjectType) {
 			if (worldName != null || x != 0 || y != 0 || z != 0 || yaw != 0.0F) {
-				Log.warning(this.getLogPrefix() + "Clearing stored location ("
-						+ TextUtils.getLocationString(StringUtils.getOrEmpty(worldName), x, y, z, yaw)
-						+ ") for virtual shopkeeper!");
-				this.markDirty();
+				// TODO Allow virtual shopkeeper to store a location? This could later enable us to allow users to
+				// dynamically change the shop object type, including from virtual to non-virtual.
+				throw new InvalidDataException("Shopkeeper is virtual, but stores a non-empty location: "
+						+ TextUtils.getLocationString(StringUtils.getOrEmpty(worldName), x, y, z, yaw));
 			}
-			this.worldName = null;
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
-			this.yaw = 0.0F;
 		} else {
 			if (worldName == null) {
 				throw new InvalidDataException("Missing world name!");
@@ -374,24 +398,23 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * {@link ShopkeeperData} may contain is silently ignored. If the given shopkeeper data contains data for a shop
 	 * object of a different type, the given object data is silently ignored as well.
 	 * <p>
-	 * This operation is expected to not modify the given {@link ShopkeeperData} Any stored data elements (such as for
-	 * example item stacks, etc.) and collections of data elements are assumed to not be modified, neither by the
-	 * shopkeeper, nor in contexts outside of the shopkeeper. If the shopkeeper can guarantee not to modify these data
-	 * elements, it is allowed to directly store them without copying them first.
+	 * This operation does not modify the given {@link ShopkeeperData}. Any stored data elements (such as for example
+	 * item stacks, etc.) and collections of data elements are assumed to not be modified, neither by the shopkeeper,
+	 * nor in contexts outside of the shopkeeper. If the shopkeeper can guarantee not to modify these data elements, it
+	 * is allowed to directly store them without copying them first.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
 	 * @throws InvalidDataException
 	 *             if the data cannot be loaded
 	 * @see #saveDynamicState(ShopkeeperData)
-	 * @see #loadFromSaveData(ShopkeeperData)
 	 */
 	public void loadDynamicState(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 		ShopType<?> shopType = shopkeeperData.get(SHOP_TYPE);
 		assert shopType != null;
 		if (shopType != this.getType()) {
-			throw new InvalidDataException("Shopkeeper data is for a different shop type (expected: "
+			throw new InvalidDataException("The shopkeeper data is for a different shop type (expected: "
 					+ this.getType().getIdentifier() + ", got: " + shopType.getIdentifier() + ")!");
 		}
 

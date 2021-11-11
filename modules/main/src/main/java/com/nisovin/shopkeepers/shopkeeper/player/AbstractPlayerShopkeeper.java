@@ -78,7 +78,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	private final RateLimiter checkContainerLimiter = new RateLimiter(CHECK_CONTAINER_PERIOD_SECONDS, nextCheckingOffset.getAndIncrement());
 
 	/**
-	 * Creates a not yet initialized {@link AbstractPlayerShopkeeper} (for use in sub-classes).
+	 * Creates a new and not yet initialized {@link AbstractPlayerShopkeeper}.
 	 * <p>
 	 * See {@link AbstractShopkeeper} for details on initialization.
 	 */

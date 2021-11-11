@@ -14,10 +14,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BookMeta.Generation;
 
-import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
-import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.player.book.BookPlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
@@ -46,19 +44,11 @@ public class SKBookPlayerShopkeeper extends AbstractPlayerShopkeeper implements 
 	private final List<? extends BookOffer> offersView = Collections.unmodifiableList(offers);
 
 	/**
-	 * Creates a not yet initialized {@link SKBookPlayerShopkeeper} (for use in sub-classes).
+	 * Creates a new and not yet initialized {@link SKBookPlayerShopkeeper}.
 	 * <p>
 	 * See {@link AbstractShopkeeper} for details on initialization.
 	 */
 	protected SKBookPlayerShopkeeper() {
-	}
-
-	protected SKBookPlayerShopkeeper(int id, PlayerShopCreationData shopCreationData) throws ShopkeeperCreateException {
-		this.initOnCreation(id, shopCreationData);
-	}
-
-	protected SKBookPlayerShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
-		this.initOnLoad(shopkeeperData);
 	}
 
 	@Override

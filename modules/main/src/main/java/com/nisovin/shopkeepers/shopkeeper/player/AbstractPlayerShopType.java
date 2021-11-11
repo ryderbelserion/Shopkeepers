@@ -31,6 +31,14 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 	}
 
 	@Override
+	protected void validateCreationData(ShopCreationData shopCreationData) {
+		super.validateCreationData(shopCreationData);
+		Validate.isTrue(shopCreationData instanceof PlayerShopCreationData,
+				() -> "shopCreationData is not of type " + PlayerShopCreationData.class.getName()
+						+ ", but: " + shopCreationData.getClass().getName());
+	}
+
+	@Override
 	protected boolean handleSpecificShopkeeperCreation(ShopCreationData shopCreationData) {
 		assert shopCreationData instanceof PlayerShopCreationData; // Shop creation data gets validated first
 		PlayerShopCreationData playerShopCreationData = (PlayerShopCreationData) shopCreationData;
@@ -100,14 +108,5 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 			}
 		}
 		return true;
-	}
-
-	// Common functions that might be useful for sub-classes:
-
-	@Override
-	protected void validateCreationData(ShopCreationData shopCreationData) {
-		super.validateCreationData(shopCreationData);
-		Validate.isTrue(shopCreationData instanceof PlayerShopCreationData,
-				"shopCreationData is not of type PlayerShopCreationData, but: " + shopCreationData.getClass().getName());
 	}
 }

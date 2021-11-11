@@ -471,17 +471,6 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		return plugin.getShopkeeperStorage();
 	}
 
-	private void validateUnusedShopkeeperIds(Shopkeeper shopkeeper) throws ShopkeeperCreateException {
-		if (this.getShopkeeperById(shopkeeper.getId()) != null) {
-			throw new ShopkeeperCreateException("There already exists a shopkeeper with the same id: "
-					+ shopkeeper.getId());
-		}
-		if (this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) != null) {
-			throw new ShopkeeperCreateException("There already exists a shopkeeper with the same unique id: "
-					+ shopkeeper.getUniqueId());
-		}
-	}
-
 	@Override
 	public AbstractShopkeeper createShopkeeper(ShopCreationData creationData) throws ShopkeeperCreateException {
 		Validate.notNull(creationData, "creationData is null");
@@ -493,14 +482,16 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 		SKShopkeeperStorage shopkeeperStorage = this.getShopkeeperStorage();
 		int id = shopkeeperStorage.getNextShopkeeperId();
+
 		AbstractShopkeeper shopkeeper = abstractShopType.createShopkeeper(id, creationData);
-		if (shopkeeper == null) {
-			// Invalid shop type implementation..
-			throw new ShopkeeperCreateException("ShopType '" + shopType.getClass().getName() + "' created null shopkeeper!");
-		}
+		assert shopkeeper != null;
 
 		// Validate shopkeeper ids:
-		this.validateUnusedShopkeeperIds(shopkeeper);
+		try {
+			this.validateUnusedShopkeeperIds(shopkeeper);
+		} catch (RuntimeException e) {
+			throw new ShopkeeperCreateException(e.getMessage(), e);
+		}
 
 		// Success:
 
@@ -515,38 +506,41 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	 * @param shopkeeperData
 	 *            the shopkeeper data
 	 * @return the loaded shopkeeper, not <code>null</code>
-	 * @throws ShopkeeperCreateException
-	 *             if the shopkeeper could not be loaded
+	 * @throws InvalidDataException
+	 *             if the shopkeeper data could not be loaded
 	 */
 	// Internal method: This is only supposed to be called by the built-in storage currently. If the data comes from any
 	// other source, the storage would need to be made aware of the shopkeeper (eg. by marking the shopkeeper as dirty).
 	// Otherwise, certain operations (such as checking if a certain shopkeeper id is already in use) would no longer
 	// work as expected.
-	public AbstractShopkeeper loadShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
+	public AbstractShopkeeper loadShopkeeper(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 
-		AbstractShopType<?> shopType;
-		try {
-			shopType = shopkeeperData.get(AbstractShopkeeper.SHOP_TYPE);
-		} catch (InvalidDataException e) {
-			throw new ShopkeeperCreateException(e.getMessage(), e);
-		}
+		AbstractShopType<?> shopType = shopkeeperData.get(AbstractShopkeeper.SHOP_TYPE);
 		assert shopType != null;
 
 		AbstractShopkeeper shopkeeper = shopType.loadShopkeeper(shopkeeperData);
-		if (shopkeeper == null) {
-			// Invalid shop type implementation..
-			throw new ShopkeeperCreateException("ShopType '" + shopType.getClass().getName() + "' loaded null shopkeeper!");
-		}
+		assert shopkeeper != null;
 
 		// Validate shopkeeper ids:
-		this.validateUnusedShopkeeperIds(shopkeeper);
+		try {
+			this.validateUnusedShopkeeperIds(shopkeeper);
+		} catch (RuntimeException e) {
+			throw new InvalidDataException(e.getMessage(), e);
+		}
 
 		// Success:
 
 		// Add the shopkeeper to the registry and spawn it:
 		this.addShopkeeper(shopkeeper, ShopkeeperAddedEvent.Cause.LOADED);
 		return shopkeeper;
+	}
+
+	private void validateUnusedShopkeeperIds(Shopkeeper shopkeeper) {
+		Validate.isTrue(this.getShopkeeperById(shopkeeper.getId()) == null,
+				() -> "There already exists a shopkeeper with the same id: " + shopkeeper.getId());
+		Validate.isTrue(this.getShopkeeperByUniqueId(shopkeeper.getUniqueId()) == null,
+				() -> "There already exists a shopkeeper with the same unique id: " + shopkeeper.getUniqueId());
 	}
 
 	// ADD / REMOVE

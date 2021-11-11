@@ -4,10 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.admin.AbstractAdminShopType;
 
 public final class RegularAdminShopType extends AbstractAdminShopType<SKRegularAdminShopkeeper> {
@@ -38,15 +35,7 @@ public final class RegularAdminShopType extends AbstractAdminShopType<SKRegularA
 	}
 
 	@Override
-	public SKRegularAdminShopkeeper createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
-		this.validateCreationData(shopCreationData);
-		SKRegularAdminShopkeeper shopkeeper = new SKRegularAdminShopkeeper(id, shopCreationData);
-		return shopkeeper;
-	}
-
-	@Override
-	public SKRegularAdminShopkeeper loadShopkeeper(ShopkeeperData shopkeeperData) throws ShopkeeperCreateException {
-		this.validateShopkeeperData(shopkeeperData);
-		return new SKRegularAdminShopkeeper(shopkeeperData);
+	protected SKRegularAdminShopkeeper createNewShopkeeper()  {
+		return new SKRegularAdminShopkeeper();
 	}
 }

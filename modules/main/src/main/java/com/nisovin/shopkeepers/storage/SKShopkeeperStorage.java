@@ -20,7 +20,6 @@ import org.bukkit.scheduler.BukkitTask;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
-import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.config.Settings;
@@ -519,7 +518,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			try {
 				shopkeeper = shopkeeperRegistry.loadShopkeeper(shopkeeperData);
 				assert shopkeeper != null && shopkeeper.isValid();
-			} catch (ShopkeeperCreateException e) {
+			} catch (InvalidDataException e) {
 				this.failedToLoadShopkeeper(key, e.getMessage());
 				continue; // Skip this shopkeeper
 			} catch (Exception e) {
