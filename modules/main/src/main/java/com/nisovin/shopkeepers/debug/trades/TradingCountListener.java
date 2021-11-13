@@ -20,8 +20,10 @@ import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.util.bukkit.EventUtils;
 import com.nisovin.shopkeepers.util.bukkit.MerchantUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
@@ -48,7 +50,15 @@ public class TradingCountListener implements Listener {
 	private BukkitTask stopListeningTask = null;
 
 	public TradingCountListener(ShopkeepersPlugin plugin) {
+		Validate.notNull(plugin, "plugin is null");
 		this.plugin = plugin;
+	}
+
+	public void onEnable() {
+		Bukkit.getPluginManager().registerEvents(this, plugin);
+
+		// Ensure that our statistic increment event handler is always executed first:
+		EventUtils.enforceExecuteFirst(PlayerStatisticIncrementEvent.class, EventPriority.LOWEST, this);
 	}
 
 	private void startListeningForTrades(Player tradingPlayer) {

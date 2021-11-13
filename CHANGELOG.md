@@ -98,6 +98,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: The ShopkeeperByName command argument did not take the 'joinRemainingArgs' argument into account.
 * Fixed: The parsing of command arguments failed in cases in which command arguments depend on the context provided by fallbacks of earlier arguments.
 * Refactors related to the removal of shopkeepers of inactive players.
+* We now enforce for all of our event handlers at lowest priority that they are executed first.
 * Added validation for some constructor and method arguments in the API.
 * APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
 * Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.

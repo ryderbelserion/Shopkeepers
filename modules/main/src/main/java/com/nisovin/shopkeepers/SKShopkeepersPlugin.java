@@ -296,7 +296,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// Register events:
 		PluginManager pm = Bukkit.getPluginManager();
 		pm.registerEvents(new PlayerJoinQuitListener(this), this);
-		pm.registerEvents(new TradingCountListener(this), this);
+		new TradingCountListener(this).onEnable();
 
 		// DEFAULT SHOP OBJECT TYPES
 

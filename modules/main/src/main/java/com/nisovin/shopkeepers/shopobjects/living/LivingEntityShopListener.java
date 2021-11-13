@@ -68,10 +68,11 @@ class LivingEntityShopListener implements Listener {
 
 	void onEnable() {
 		Bukkit.getPluginManager().registerEvents(this, plugin);
-		// Ensure that our interact event handler is always executed first, even after plugin reloads:
+		// Ensure that our interact event handlers are always executed first, even after plugin reloads:
 		// In order to not change the order among the already registered event handlers of our own plugin, we move them
-		// all together to the front of the handler list.
+		// all together to the front of their handler lists.
 		EventUtils.enforceExecuteFirst(PlayerInteractEntityEvent.class, EventPriority.LOWEST, plugin);
+		EventUtils.enforceExecuteFirst(PlayerInteractAtEntityEvent.class, EventPriority.LOWEST, plugin);
 	}
 
 	void onDisable() {

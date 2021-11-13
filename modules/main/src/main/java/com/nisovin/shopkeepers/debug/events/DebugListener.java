@@ -34,6 +34,11 @@ public class DebugListener implements Listener {
 					debugListener.handleEvent(event);
 				}
 			}, EventPriority.LOWEST, SKShopkeepersPlugin.getInstance(), false));
+
+			// Ensure that our debug event handlers are executed first:
+			EventUtils.enforceExecuteFirst(handlerList, null, EventPriority.LOWEST,
+					registeredListener -> registeredListener.getListener() == debugListener,
+					false);
 		}
 		return debugListener;
 	}
