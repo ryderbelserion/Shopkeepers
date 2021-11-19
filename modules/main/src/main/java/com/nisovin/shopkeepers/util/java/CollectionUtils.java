@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.util.java;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -152,6 +153,78 @@ public class CollectionUtils {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Returns a new list that contains both the elements of the given {@link Collection} and the given object.
+	 * 
+	 * @param <E>
+	 *            the element type
+	 * @param collection
+	 *            the collection, not <code>null</code>
+	 * @param toAdd
+	 *            the object to add, can be <code>null</code>
+	 * @return the new list, not <code>null</code>
+	 */
+	public static <E> List<E> copyAndAdd(Collection<? extends E> collection, E toAdd) {
+		Validate.notNull(collection, "collection is null");
+		List<E> newList = new ArrayList<>(collection.size() + 1);
+		newList.addAll(collection);
+		newList.add(toAdd);
+		return newList;
+	}
+
+	/**
+	 * Returns a new unmodifiable list that contains both the elements of the given {@link Collection} and the given
+	 * object.
+	 * 
+	 * @param <E>
+	 *            the element type
+	 * @param collection
+	 *            the collection, not <code>null</code>
+	 * @param toAdd
+	 *            the object to add, can be <code>null</code>
+	 * @return the new list, not <code>null</code>
+	 */
+	public static <E> List<E> unmodifiableCopyAndAdd(Collection<? extends E> collection, E toAdd) {
+		List<E> newList = copyAndAdd(collection, toAdd);
+		return Collections.unmodifiableList(newList);
+	}
+
+	/**
+	 * Returns a new list that contains the elements of both of the given {@link Collection}s.
+	 * 
+	 * @param <E>
+	 *            the element type
+	 * @param collection
+	 *            the collection, not <code>null</code>
+	 * @param toAdd
+	 *            the objects to add, not <code>null</code>
+	 * @return the new list, not <code>null</code>
+	 */
+	public static <E> List<E> copyAndAddAll(Collection<? extends E> collection, Collection<? extends E> toAdd) {
+		Validate.notNull(collection, "collection is null");
+		Validate.notNull(toAdd, "toAdd is null");
+		List<E> newList = new ArrayList<>(collection.size() + toAdd.size());
+		newList.addAll(collection);
+		newList.addAll(toAdd);
+		return newList;
+	}
+
+	/**
+	 * Returns a new unmodifiable list that contains the elements of both of the given {@link Collection}s.
+	 * 
+	 * @param <E>
+	 *            the element type
+	 * @param collection
+	 *            the collection, not <code>null</code>
+	 * @param toAdd
+	 *            the objects to add, not <code>null</code>
+	 * @return the new list, not <code>null</code>
+	 */
+	public static <E> List<E> unmodifiableCopyAndAddAll(Collection<? extends E> collection, Collection<? extends E> toAdd) {
+		List<E> newList = copyAndAddAll(collection, toAdd);
+		return Collections.unmodifiableList(newList);
 	}
 
 	// Note: Doesn't work for primitive arrays.

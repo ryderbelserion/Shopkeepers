@@ -1,5 +1,7 @@
 package com.nisovin.shopkeepers.config;
 
+import static com.nisovin.shopkeepers.testutil.matchers.IsDataFuzzyEqual.dataFuzzyEqualTo;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -52,8 +54,8 @@ public class ConfigTests extends AbstractBukkitTest {
 			// Compare values:
 			Object expectedValue = expectedValues.get(expectedKey);
 			Object actualValue = actualValues.get(expectedKey);
-			Assert.assertEquals("The value for key '" + expectedKey + "' of the default config does not match the expected value!",
-					expectedValue, actualValue);
+			Assert.assertThat("The value for key '" + expectedKey + "' of the default config does not match the expected value!",
+					actualValue, dataFuzzyEqualTo(expectedValue));
 		}
 
 		// Check for unexpected keys:

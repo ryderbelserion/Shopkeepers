@@ -66,7 +66,6 @@ Date format: (YYYY-MM-DD)
 * Bumped the Vault dependency to version 1.7 and updated its repository.
 * Reduced the Citizens dependency to the 'citizens-main' portion of Citizens.
 * Bumped the WorldGuard dependency to 7.0.0, updated the repository, and removed the no longer needed Paper repository.
-* Removed the no longer required Hamcrest library test dependency.
 * Moved all auxiliary build scripts into a separate 'scripts' folder and made them less reliant on the directory they are called from.
 * The primary 'build' script automatically invokes the 'installSpigotDependencies' script now.
 

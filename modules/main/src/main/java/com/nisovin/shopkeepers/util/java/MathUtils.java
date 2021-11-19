@@ -2,9 +2,53 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class MathUtils {
+/**
+ * Math and number helper functions.
+ */
+public final class MathUtils {
 
-	private MathUtils() {
+	/**
+	 * The default maximum difference between two floating point numbers that are still considered equal in a fuzzy
+	 * comparison.
+	 */
+	public static final double EPSILON = 0.00001D;
+
+	/**
+	 * Checks if the given values are roughly equal, using {@link #EPSILON} as the maximum tolerance.
+	 * 
+	 * @param a
+	 *            the first value
+	 * @param b
+	 *            the second value
+	 * @return <code>true</code> if the values are considered equal
+	 * @see #fuzzyEquals(double, double, double)
+	 */
+	public static boolean fuzzyEquals(double a, double b) {
+		return fuzzyEquals(a, b, EPSILON);
+	}
+
+	/**
+	 * Checks if the given values are roughly equal within the given {@code tolerance}.
+	 * <p>
+	 * Notes on the comparison of special values:
+	 * <ul>
+	 * <li>All {@link Double#NaN} values are considered equal.
+	 * <li>{@link Double#POSITIVE_INFINITY} and {@link Double#NEGATIVE_INFINITY} are each considered equal to
+	 * themselves.
+	 * <li>Positive and negative zero are considered equal.
+	 * </ul>
+	 * 
+	 * @param a
+	 *            the first value
+	 * @param b
+	 *            the second value
+	 * @param tolerance
+	 *            the maximum difference between both values to still be considered equal
+	 * @return <code>true</code> if the values are considered equal
+	 */
+	public static boolean fuzzyEquals(double a, double b, double tolerance) {
+		return Double.compare(a, b) == 0 // Accounts for NaN and infinities
+				|| Math.abs(a - b) <= tolerance;
 	}
 
 	/**
@@ -181,5 +225,8 @@ public class MathUtils {
 		int modulo = (value - offset) % range;
 		if (modulo < 0) modulo += range;
 		return offset + modulo;
+	}
+
+	private MathUtils() {
 	}
 }

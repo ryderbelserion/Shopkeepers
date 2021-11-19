@@ -28,6 +28,7 @@ dependencies {
 
 	testImplementation libs.spigot.api
 	testImplementation libs.junit
+	testImplementation libs.hamcrest
 	testImplementation libs.craftbukkit
 }
 

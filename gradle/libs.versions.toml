@@ -14,6 +14,7 @@ vault = "1.7"
 bstats = "1.5"
 
 junit = "4.13.1"
+hamcrest = "1.3"
 asm = "9.1"
 
 [libraries]
@@ -28,4 +29,5 @@ vault-api = { module = "net.milkbowl.vault:VaultAPI", version.ref = "vault" }
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
+hamcrest = { module = "org.hamcrest:hamcrest-library", version.ref = "hamcrest" }
 asm = { module = "org.ow2.asm:asm", version.ref = "asm" }
