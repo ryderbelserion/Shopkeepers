@@ -195,6 +195,24 @@ button-goat-screaming: "&aToggle screaming goat"
 button-goat-screaming-lore:
 - "Toggles between a normal"
 - "and a screaming goat"
+button-tropical-fish-pattern: "&aChoose variant"
+button-tropical-fish-pattern-lore:
+- "Changes the shape and pattern"
+- "of the tropical fish."
+- "Currently: &e{pattern}"
+button-tropical-fish-body-color: "&aChoose body color"
+button-tropical-fish-body-color-lore:
+- "Changes the body color"
+- "of the tropical fish"
+button-tropical-fish-pattern-color: "&aChoose pattern color"
+button-tropical-fish-pattern-color-lore:
+- "Changes the pattern color"
+- "of the tropical fish"
+button-puffer-fish-puff-state: "&aChoose puff state"
+button-puffer-fish-puff-state-lore:
+- "Changes the puff state"
+- "of the puffer fish."
+- "Currently: &e{puffState}"
 
 admin-sign-shop-line1: "&2[SHOP]"
 admin-sign-shop-line2: "&7{shopName}"

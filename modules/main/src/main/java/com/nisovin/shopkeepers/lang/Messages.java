@@ -143,6 +143,14 @@ public class Messages extends Config {
 	public static List<String> buttonGlowSquidDarkLore = c(Arrays.asList("Toggles the glow squid's", "glow on and off"));
 	public static String buttonGoatScreaming = c("&aToggle screaming goat");
 	public static List<String> buttonGoatScreamingLore = c(Arrays.asList("Toggles between a normal", "and a screaming goat"));
+	public static String buttonTropicalFishPattern = c("&aChoose variant");
+	public static List<String> buttonTropicalFishPatternLore = c(Arrays.asList("Changes the shape and pattern", "of the tropical fish.", "Currently: &e{pattern}"));
+	public static String buttonTropicalFishBodyColor = c("&aChoose body color");
+	public static List<String> buttonTropicalFishBodyColorLore = c(Arrays.asList("Changes the body color", "of the tropical fish"));
+	public static String buttonTropicalFishPatternColor = c("&aChoose pattern color");
+	public static List<String> buttonTropicalFishPatternColorLore = c(Arrays.asList("Changes the pattern color", "of the tropical fish"));
+	public static String buttonPufferFishPuffState = c("&aChoose puff state");
+	public static List<String> buttonPufferFishPuffStateLore = c(Arrays.asList("Changes the puff state", "of the puffer fish.", "Currently: &e{puffState}"));
 
 	public static String adminSignShopLine1 = c("&2[SHOP]");
 	public static String adminSignShopLine2 = c("&7{shopName}");

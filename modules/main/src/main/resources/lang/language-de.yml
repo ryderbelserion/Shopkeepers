@@ -196,6 +196,24 @@ button-goat-screaming: "&aSchreiende Ziege umschalten"
 button-goat-screaming-lore:
 - "Schaltet zwischen einer normalen"
 - "und einer schreienden Ziege um"
+button-tropical-fish-pattern: "&aVariante ändern"
+button-tropical-fish-pattern-lore:
+- "Ändert die Form und das"
+- "Muster des Tropenfisches."
+- "Aktuell: &e{pattern}"
+button-tropical-fish-body-color: "&aKörperfarbe ändern"
+button-tropical-fish-body-color-lore:
+- "Ändert die Körperfarbe"
+- "des Tropenfisches"
+button-tropical-fish-pattern-color: "&aMusterfarbe ändern"
+button-tropical-fish-pattern-color-lore:
+- "Ändert die Musterfarbe"
+- "des Tropenfisches"
+button-puffer-fish-puff-state: "&aAufgeblasen-Zustand ändern"
+button-puffer-fish-puff-state-lore:
+- "Ändert den Aufgeblasen-Zustand"
+- "des Kugelfisches."
+- "Aktuell: &e{puffState}"
 
 admin-sign-shop-line1: "&2[SHOP]"
 admin-sign-shop-line2: "&7{shopName}"

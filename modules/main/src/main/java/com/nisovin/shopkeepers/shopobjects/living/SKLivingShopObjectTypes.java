@@ -37,11 +37,13 @@ import com.nisovin.shopkeepers.shopobjects.living.types.MooshroomShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PandaShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ParrotShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.PigShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.PufferFishShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.RabbitShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SheepShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ShulkerShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SlimeShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SnowmanShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.TropicalFishShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.WolfShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieShop;
@@ -57,7 +59,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * All non-listed entity types are completely untested and therefore 'experimental' as well.
 	 * 
 	 * <ul>
-	 * <li> VILLAGER: okay, default, MC 1.14: shake their head when clicked (TODO might be a upstream bug)
+	 * <li> VILLAGER: okay, default, MC 1.14: shake their head when clicked (TODO might be an upstream bug)
 	 * <li> BAT: experimental: requires NoAI, sleeping by default, but starts flying when 'hit'
 	 * <li> BLAZE: experimental: starts flying upwards -> requires NoAI, seems okay
 	 * <li> CAVE_SPIDER: okay
@@ -114,7 +116,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> PARROT: okay, dances, spawns with random color
 	 * # 1.13
 	 * <li> TURTLE: okay
-	 * <li> PHANTOM: okay, burns in sun
+	 * <li> PHANTOM: burns in sun, can be pushed around (probably client-sided) before it teleports back, does not rotate towards nearby players
 	 * <li> COD: okay
 	 * <li> SALMON: okay
 	 * <li> PUFFERFISH: okay
@@ -354,6 +356,14 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 		case SHULKER:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
 					permission, ShulkerShop.class, ShulkerShop::new);
+			break;
+		case TROPICAL_FISH:
+			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
+					permission, TropicalFishShop.class, TropicalFishShop::new);
+			break;
+		case PUFFERFISH:
+			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
+					permission, PufferFishShop.class, PufferFishShop::new);
 			break;
 		default:
 			switch (entityType.name()) {

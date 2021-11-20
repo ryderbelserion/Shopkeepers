@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.14.0 (TBA)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
+* Added editor options to change the puff state of puffer fish, as well as the pattern and colors of tropical fish.
 * Shopkeepers store the yaw angle now with which they are initially spawned.
   * When placing a shopkeeper on top of a block, the yaw angle is chosen so that the shopkeeper faces towards the player who is creating the shopkeeper. When placing a shopkeeper against the side of a block, the shopkeeper is rotated according to the direction of the targeted block side.
   * Existing shopkeepers will have a yaw of 0, i.e. they keep facing south by default. In the future it will be possible to reposition shopkeepers and thereby also adjust the yaw of already existing shopkeepers.
@@ -110,6 +111,14 @@ Date format: (YYYY-MM-DD)
 
 **Message changes:**  
 * Slightly changed the default messages of `type-new-name`, `name-set`, and `name-invalid`. These messages, as well as `name-has-not-changed`, can now access the new name via the argument `{name}`.
+* Added `button-tropical-fish-pattern`.
+* Added `button-tropical-fish-pattern-lore`.
+* Added `button-tropical-fish-body-color`.
+* Added `button-tropical-fish-body-color-lore`.
+* Added `button-tropical-fish-pattern-color`.
+* Added `button-tropical-fish-pattern-color-lore`.
+* Added `button-puffer-fish-puff-state`.
+* Added `button-puffer-fish-puff-state-lore`.
 
 ## v2.13.3 (2021-07-08)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
