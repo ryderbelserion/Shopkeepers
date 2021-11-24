@@ -1464,25 +1464,6 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	// BY LOCATION
 
-	public boolean isShopkeeperAtLocation(Location location) {
-		Validate.notNull(location, "location is null");
-		World world = location.getWorld();
-		Validate.notNull(world, "World of location is null");
-		String worldName = world.getName();
-		int x = location.getBlockX();
-		int y = location.getBlockY();
-		int z = location.getBlockZ();
-
-		ChunkCoords chunkCoords = ChunkCoords.fromBlock(worldName, x, z);
-		for (AbstractShopkeeper shopkeeper : this.getShopkeepersInChunk(chunkCoords)) {
-			assert worldName.equals(shopkeeper.getWorldName());
-			if (shopkeeper.getX() == x && shopkeeper.getY() == y && shopkeeper.getZ() == z) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	@Override
 	public Collection<? extends AbstractShopkeeper> getShopkeepersAtLocation(Location location) {
 		Validate.notNull(location, "location is null");
