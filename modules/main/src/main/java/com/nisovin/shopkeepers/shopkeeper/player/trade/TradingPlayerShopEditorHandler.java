@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
@@ -14,12 +13,13 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.ui.editor.DefaultTradingRecipesAdapter;
-import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
@@ -114,7 +114,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected void handlePlayerInventoryClick(Session session, InventoryClickEvent event) {
+	protected void handlePlayerInventoryClick(EditorSession editorSession, InventoryClickEvent event) {
 		// Assert: Event cancelled.
 		// Clicking in player inventory:
 		if (event.isShiftClick()) return; // Ignoring shift clicks
@@ -135,7 +135,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected void handleTradesClick(Session session, InventoryClickEvent event) {
+	protected void handleTradesClick(EditorSession editorSession, InventoryClickEvent event) {
 		int rawSlot = event.getRawSlot();
 		assert this.isTradesArea(rawSlot);
 		assert this.isResultRow(rawSlot) || this.isItem1Row(rawSlot) || this.isItem2Row(rawSlot);
@@ -156,7 +156,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
+	protected void onInventoryDragEarly(UISession uiSession, InventoryDragEvent event) {
 		event.setCancelled(true);
 		ItemStack cursor = event.getOldCursor();
 		// Assert: Cursor item is already a clone.

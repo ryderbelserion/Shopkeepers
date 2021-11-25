@@ -22,27 +22,27 @@ public abstract class ActionButton extends Button {
 	}
 
 	@Override
-	protected final void onClick(InventoryClickEvent clickEvent, Player player) {
+	protected final void onClick(EditorSession editorSession, InventoryClickEvent clickEvent) {
 		if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return; // Ignore double clicks
 
 		// Run action:
-		boolean success = this.runAction(clickEvent, player);
+		boolean success = this.runAction(editorSession, clickEvent);
 		if (!success) return;
 
 		// Post-processing:
-		this.onActionSuccess(clickEvent, player);
+		this.onActionSuccess(editorSession, clickEvent);
 
 		// Play sound:
-		this.playButtonClickSound(player, success);
+		this.playButtonClickSound(editorSession.getPlayer(), success);
 
 		// Icon might have changed:
 		this.updateIcon();
 	}
 
 	// Returns true on success:
-	protected abstract boolean runAction(InventoryClickEvent clickEvent, Player player);
+	protected abstract boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent);
 
-	protected void onActionSuccess(InventoryClickEvent clickEvent, Player player) {
+	protected void onActionSuccess(EditorSession editorSession, InventoryClickEvent clickEvent) {
 		// Nothing by default.
 	}
 }

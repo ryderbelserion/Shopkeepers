@@ -7,6 +7,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.ui.AbstractShopkeeperUIHandler;
@@ -41,19 +42,19 @@ public abstract class HiringHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	@Override
-	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
+	protected void onInventoryClose(UISession uiSession, InventoryCloseEvent closeEvent) {
 		// Nothing to do by default.
 	}
 
 	@Override
-	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
-		assert event != null && player != null;
+	protected void onInventoryClickEarly(UISession uiSession, InventoryClickEvent event) {
+		assert uiSession != null && event != null;
 		event.setCancelled(true);
 	}
 
 	@Override
-	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
-		assert event != null && player != null;
+	protected void onInventoryDragEarly(UISession uiSession, InventoryDragEvent event) {
+		assert uiSession != null && event != null;
 		event.setCancelled(true);
 	}
 }

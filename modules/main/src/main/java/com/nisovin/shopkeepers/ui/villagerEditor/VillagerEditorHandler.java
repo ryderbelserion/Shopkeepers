@@ -24,6 +24,7 @@ import org.bukkit.potion.PotionType;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -35,7 +36,7 @@ import com.nisovin.shopkeepers.ui.editor.AbstractEditorHandler;
 import com.nisovin.shopkeepers.ui.editor.ActionButton;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.DefaultTradingRecipesAdapter;
-import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.util.bukkit.MerchantUtils;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -134,17 +135,17 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		return villager;
 	}
 
-	private boolean checkVillagerExistence(Player player) {
-		return this.checkVillagerExistence(player, false, true);
+	private boolean checkVillagerExistence(EditorSession editorSession) {
+		return this.checkVillagerExistence(editorSession, false, true);
 	}
 
-	private boolean checkVillagerExistence(Player player, boolean silent, boolean closeEditor) {
+	private boolean checkVillagerExistence(EditorSession editorSession, boolean silent, boolean closeEditor) {
 		if (!villager.isValid()) {
 			if (!silent) {
-				TextUtils.sendMessage(player, Messages.villagerNoLongerExists);
+				TextUtils.sendMessage(editorSession.getPlayer(), Messages.villagerNoLongerExists);
 			}
 			if (closeEditor) {
-				this.getUISession(player).abortDelayed();
+				editorSession.getUISession().abortDelayed();
 			}
 			return false;
 		}
@@ -181,14 +182,14 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	}
 
 	@Override
-	public boolean openWindow(Player player) {
-		boolean result = super.openWindow(player);
+	public boolean openWindow(UISession uiSession) {
+		boolean result = super.openWindow(uiSession);
 		return result;
 	}
 
 	@Override
-	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
-		super.onInventoryClose(player, closeEvent);
+	protected void onInventoryClose(UISession uiSession, InventoryCloseEvent closeEvent) {
+		super.onInventoryClose(uiSession, closeEvent);
 	}
 
 	// BUTTONS
@@ -219,31 +220,34 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	protected Button createDeleteButton() {
 		return new ActionButton(true) {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				return DerivedSettings.deleteVillagerButtonItem.createItemStack();
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				if (!checkVillagerExistence(player)) return false;
-				getUISession(player).closeDelayedAndRunTask(() -> requestConfirmationDeleteVillager(player));
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				if (!checkVillagerExistence(editorSession)) return false;
+				editorSession.getUISession().closeDelayedAndRunTask(() -> {
+					requestConfirmationDeleteVillager(editorSession);
+				});
 				return true;
 			}
 		};
 	}
 
-	private void requestConfirmationDeleteVillager(Player player) {
+	private void requestConfirmationDeleteVillager(EditorSession editorSession) {
+		Player player = editorSession.getPlayer();
 		ConfirmationUI.requestConfirmation(player, CONFIRMATION_UI_CONFIG_DELETE_VILLAGER, () -> {
 			// Delete confirmed.
 			if (!player.isValid()) return;
-			if (!checkVillagerExistence(player)) return;
+			if (!checkVillagerExistence(editorSession)) return;
 
 			villager.remove();
 			TextUtils.sendMessage(player, Messages.villagerRemoved);
 		}, () -> {
 			// Delete cancelled.
 			if (!player.isValid()) return;
-			if (!checkVillagerExistence(player)) return;
+			if (!checkVillagerExistence(editorSession)) return;
 
 			// Try to open the editor again:
 			// Note: This may currently not remember the previous editor state (such as the selected trades page).
@@ -254,19 +258,20 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	protected Button createNamingButton() {
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				return DerivedSettings.nameVillagerButtonItem.createItemStack();
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				getUISession(player).closeDelayedAndRunTask(() -> {
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				editorSession.getUISession().closeDelayedAndRunTask(() -> {
+					Player player = editorSession.getPlayer();
 					if (!player.isValid()) return;
-					if (!checkVillagerExistence(player)) return;
+					if (!checkVillagerExistence(editorSession)) return;
 
 					// Start naming:
-					SKShopkeepersPlugin.getInstance().getChatInput().request(player, (message) -> {
-						renameVillager(player, message);
+					SKShopkeepersPlugin.getInstance().getChatInput().request(player, message -> {
+						renameVillager(editorSession, message);
 					});
 					TextUtils.sendMessage(player, Messages.typeNewVillagerName);
 				});
@@ -275,9 +280,11 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 		};
 	}
 
-	private void renameVillager(Player player, String newName) {
-		assert player != null && newName != null;
-		if (!this.checkVillagerExistence(player)) return;
+	private void renameVillager(EditorSession editorSession, String newName) {
+		assert editorSession != null && newName != null;
+		if (!this.checkVillagerExistence(editorSession)) return;
+
+		Player player = editorSession.getPlayer();
 
 		// Prepare the new name:
 		newName = newName.trim();
@@ -315,15 +322,16 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	protected Button createContainerButton() {
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				return DerivedSettings.villagerInventoryButtonItem.createItemStack();
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				getUISession(player).closeDelayedAndRunTask(() -> {
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				editorSession.getUISession().closeDelayedAndRunTask(() -> {
+					Player player = editorSession.getPlayer();
 					if (!player.isValid()) return;
-					if (!checkVillagerExistence(player)) return;
+					if (!checkVillagerExistence(editorSession)) return;
 
 					// We cannot open the villagers inventory directly. Instead we create custom inventory with its
 					// contents. However, any changes in the inventory are not reflected in the villager.
@@ -347,15 +355,15 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	protected Button getBabyEditorButton() {
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem = new ItemStack(Material.EGG);
 				ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonBaby, Messages.buttonBabyLore);
 				return iconItem;
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				if (!checkVillagerExistence(player)) return false;
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				if (!checkVillagerExistence(editorSession)) return false;
 				if (villager.isAdult()) {
 					villager.setBaby();
 				} else {
@@ -377,7 +385,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			private Profession profession = regularVillager.getProfession();
 
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem;
 				switch (profession) {
 				case ARMORER:
@@ -434,8 +442,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				if (!checkVillagerExistence(player)) return false;
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				if (!checkVillagerExistence(editorSession)) return false;
 
 				boolean backwards = clickEvent.isRightClick();
 				// Changing the profession will change the trades. Closing the editor view will replace the new trades
@@ -449,6 +457,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 				// change its profession:
 				if (regularVillager.getVillagerExperience() == 0) {
 					regularVillager.setVillagerExperience(1);
+					Player player = editorSession.getPlayer();
 					TextUtils.sendMessage(player, Messages.setVillagerXp, "xp", 1);
 				}
 				return true;
@@ -464,7 +473,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			private Villager.Type villagerType = regularVillager.getVillagerType();
 
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem = new ItemStack(Material.LEATHER_CHESTPLATE);
 				switch (villagerType) {
 				default:
@@ -495,8 +504,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				if (!checkVillagerExistence(player)) return false;
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				if (!checkVillagerExistence(editorSession)) return false;
 
 				boolean backwards = clickEvent.isRightClick();
 				villagerType = EnumUtils.cycleEnumConstant(Villager.Type.class, villagerType, backwards);
@@ -514,7 +523,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			private int villagerLevel = regularVillager.getVillagerLevel();
 
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem;
 				switch (regularVillager.getVillagerLevel()) {
 				default:
@@ -541,8 +550,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				if (!checkVillagerExistence(player)) return false;
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				if (!checkVillagerExistence(editorSession)) return false;
 
 				boolean backwards = clickEvent.isRightClick();
 				if (backwards) {
@@ -563,7 +572,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			private boolean hasAI = villager.hasAI();
 
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem;
 				if (hasAI) {
 					iconItem = new ItemStack(Material.JACK_O_LANTERN);
@@ -576,8 +585,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				if (!checkVillagerExistence(player)) return false;
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				if (!checkVillagerExistence(editorSession)) return false;
 
 				hasAI = !hasAI;
 				villager.setAI(hasAI);
@@ -592,7 +601,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			private boolean invulnerable = villager.isInvulnerable();
 
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				ItemStack iconItem;
 				if (invulnerable) {
 					iconItem = new ItemStack(Material.POTION);
@@ -608,8 +617,8 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				if (!checkVillagerExistence(player)) return false;
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				if (!checkVillagerExistence(editorSession)) return false;
 
 				invulnerable = !invulnerable;
 				villager.setInvulnerable(invulnerable);
@@ -629,15 +638,15 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	}
 
 	@Override
-	protected void saveRecipes(Session session) {
-		Player player = session.getPlayer();
+	protected void saveRecipes(EditorSession editorSession) {
+		Player player = editorSession.getPlayer();
 		// The villager might have been unloaded in the meantime. Our changes won't have any effect then:
-		if (!this.checkVillagerExistence(player)) {
+		if (!this.checkVillagerExistence(editorSession)) {
 			Log.debug("The villager edited by " + player.getName() + " no longer exists or has been unloaded.");
 			return;
 		}
 
-		int changedTrades = tradingRecipesAdapter.updateTradingRecipes(player, session.getRecipes());
+		int changedTrades = tradingRecipesAdapter.updateTradingRecipes(player, editorSession.getRecipes());
 		if (changedTrades == 0) {
 			// No changes:
 			TextUtils.sendMessage(player, Messages.noVillagerTradesChanged);

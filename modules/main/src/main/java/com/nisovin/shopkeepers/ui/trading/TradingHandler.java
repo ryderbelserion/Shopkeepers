@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperTradeEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
@@ -87,9 +88,10 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	@Override
-	protected boolean openWindow(Player player) {
-		Validate.notNull(player, "player is null");
+	protected boolean openWindow(UISession uiSession) {
+		Validate.notNull(uiSession, "uiSession is null");
 		// Create and open the trading window:
+		Player player = uiSession.getPlayer();
 		Shopkeeper shopkeeper = this.getShopkeeper();
 		String title = this.getInventoryTitle();
 		List<? extends TradingRecipe> recipes = shopkeeper.getTradingRecipes(player);
@@ -230,7 +232,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	@Override
-	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
+	protected void onInventoryClose(UISession uiSession, InventoryCloseEvent closeEvent) {
 		// Callback for subclasses.
 	}
 
@@ -259,17 +261,18 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 
 	// Late processing, so that other plugins can cancel the trading without having to rely on Shopkeepers' API.
 	@Override
-	protected void onInventoryClickLate(InventoryClickEvent clickEvent, Player player) {
-		assert clickEvent != null && player != null;
+	protected void onInventoryClickLate(UISession uiSession, InventoryClickEvent clickEvent) {
+		assert uiSession != null && clickEvent != null;
 		// Note: This expects that there are no other click-events while this event is getting processed.
 		// Reset trade counter:
 		tradeCounter = 0;
 
+		Player player = uiSession.getPlayer();
 		Shopkeeper shopkeeper = this.getShopkeeper();
-		String playerName = player.getName();
+
 		if (clickEvent.isCancelled()) {
 			Log.debug(() -> shopkeeper.getLogPrefix() + "Some plugin has cancelled the trading UI click of player "
-					+ playerName);
+					+ player.getName());
 			return;
 		}
 
@@ -288,7 +291,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			// TODO Maybe replicate the behavior of this inventory action, but limit its effect to the player's
 			// inventory?
 			Log.debug(() -> shopkeeper.getLogPrefix() + "Prevented unsupported type of trading UI click by player "
-					+ playerName + ": " + action);
+					+ player.getName() + ": " + action);
 			clickEvent.setCancelled(true);
 			InventoryUtils.updateInventoryLater(player);
 			return;

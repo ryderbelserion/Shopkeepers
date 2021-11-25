@@ -9,6 +9,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -17,7 +18,7 @@ import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.editor.ActionButton;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
-import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.ui.editor.TradingRecipesAdapter;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
@@ -59,15 +60,16 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		}
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				return Settings.createContainerButtonItem();
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				// Closing the UI also triggers a save of the current editor state:
-				getUISession(player).closeDelayedAndRunTask(() -> {
+				editorSession.getUISession().closeDelayedAndRunTask(() -> {
 					// Open the shop container inventory:
+					Player player = editorSession.getPlayer();
 					PlayerShopkeeper shopkeeper = getShopkeeper();
 					if (!player.isValid() || !shopkeeper.isValid()) return;
 					shopkeeper.openContainerWindow(player);
@@ -83,7 +85,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		}
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				AbstractPlayerShopkeeper shopkeeper = (AbstractPlayerShopkeeper) this.getShopkeeper();
 				ItemStack iconItem = Settings.tradeNotificationsItem.createItemStack();
 				String state = shopkeeper.isNotifyOnTrades() ? Messages.stateEnabled : Messages.stateDisabled;
@@ -94,7 +96,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				AbstractPlayerShopkeeper shopkeeper = (AbstractPlayerShopkeeper) this.getShopkeeper();
 				shopkeeper.setNotifyOnTrades(!shopkeeper.isNotifyOnTrades());
 				return true;
@@ -103,25 +105,25 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 	}
 
 	@Override
-	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
+	protected void onInventoryDragEarly(UISession uiSession, InventoryDragEvent event) {
 		// Cancel all inventory clicks and handle everything on our own:
 		// TODO Maybe allow certain inventory actions which only affect the player's inventory?
 		event.setCancelled(true);
-		super.onInventoryDragEarly(event, player);
+		super.onInventoryDragEarly(uiSession, event);
 	}
 
 	@Override
-	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
+	protected void onInventoryClickEarly(UISession uiSession, InventoryClickEvent event) {
 		// Cancel all inventory clicks and handle everything on our own:
 		// TODO Maybe allow certain inventory actions which only affect the player's inventory (like moving items
 		// around)?
 		event.setCancelled(true);
-		super.onInventoryClickEarly(event, player);
+		super.onInventoryClickEarly(uiSession, event);
 	}
 
 	@Override
-	protected void handleTradesClick(Session session, InventoryClickEvent event) {
-		super.handleTradesClick(session, event);
+	protected void handleTradesClick(EditorSession editorSession, InventoryClickEvent event) {
+		super.handleTradesClick(editorSession, event);
 		int rawSlot = event.getRawSlot();
 		if (this.isItem1Row(rawSlot)) {
 			// Change low cost:

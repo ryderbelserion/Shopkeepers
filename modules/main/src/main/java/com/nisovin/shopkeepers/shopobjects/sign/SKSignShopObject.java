@@ -14,7 +14,6 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.block.data.type.WallSign;
-import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -34,7 +33,7 @@ import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObject;
 import com.nisovin.shopkeepers.ui.editor.Button;
-import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -494,12 +493,12 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	private Button getSignTypeEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				return getSignTypeEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleSignType(backwards);
 				return true;
@@ -543,12 +542,12 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	private Button getGlowingTextEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				return getGlowingTextEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleGlowingText(backwards);
 				return true;

@@ -54,7 +54,7 @@ public abstract class Button {
 		return editorHandler;
 	}
 
-	public abstract ItemStack getIcon(Session session);
+	public abstract ItemStack getIcon(EditorSession editorSession);
 
 	// Updates the icon in all sessions.
 	// Note: Cannot deal with changes to the registered buttons (the button's slot) while the inventory is open.
@@ -71,5 +71,5 @@ public abstract class Button {
 		}
 	}
 
-	protected abstract void onClick(InventoryClickEvent clickEvent, Player player);
+	protected abstract void onClick(EditorSession editorSession, InventoryClickEvent clickEvent);
 }

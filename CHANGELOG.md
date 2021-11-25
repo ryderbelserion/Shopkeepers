@@ -39,6 +39,7 @@ Date format: (YYYY-MM-DD)
 * Debug: Removed the debug option 'capabilities' again. We already always log whether or not server version specific features are enabled. This also resolves an internal issue related to whether or not the config has already been loaded at the time this debug option is checked.
 * Fixed: In order to resolve compatibility issues with plugins that modify chat messages at lowest event priority, we now enforce that our chat input event handler always executes first. This should resolve compatibility issues with shopkeeper names not being considered valid, because some other plugin injected color codes into the player's chat message before we were able to process it.
 * Fixed: Since Bukkit 1.16.5, the data version was no longer guaranteed to be the first entry of the save file, and the log message for the number of loaded shopkeepers has been off by one if the save file did not contain any data version yet.
+* Fixed: We now check if the UI session is still valid before handling an inventory event at the HIGH event priority. Previously, the UI session was simply expected to still be valid. But this assumption can be violated by plugins that (incorrectly per API documentation) close the inventory during the handling of an inventory event.
 
 **API changes:**  
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
@@ -71,12 +72,13 @@ Date format: (YYYY-MM-DD)
 * The primary 'build' script automatically invokes the 'installSpigotDependencies' script now.
 
 **Other internal changes:**  
+* Internal API: Various internal UI, editor UI, and trading UI related refactors.
+  * Changed how the trading UI handler represents the trade that is currently being processed.
+  * Moved various editor internal classes into their own files.
 * Internal API: ProtectedContainers requires a BlockLocation now when adding or removing a container protection.
 * Internal API: Various changes to the loading, saving, and migration of shop offers. They use the new internal data serialization and property APIs now to save and load their data.
 * Internal API: Removed various no longer needed utility methods related to the saving and loading of item stacks.
 * Internal API: CitizensShopkeeperTrair#getShopkeeper() returns an AbstractShopkeeper now.
-* Internal API: Refactors related to how the trading UI handler represents the trade that is currently being processed.
-* Internal API: Moved various editor internal classes into their own files.
 * Internal API: Added SKSignShopObject#getSignType().
 * Internal API: It is now the responsibility of the shop object to inform about object id changes, even when the shop object is being spawned, despawned, or ticked.
 * Internal API: Added AbstractShopObject#respawn().

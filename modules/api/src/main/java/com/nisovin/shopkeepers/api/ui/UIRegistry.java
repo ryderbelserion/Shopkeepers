@@ -8,7 +8,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.types.TypeRegistry;
 
 /**
- * Acts as registry for UI types and keeps track of which player has which UI currently opened.
+ * Registry of {@link UIType}s, and keeps track of the active {@link UISession}s of all players.
  *
  * @param <T>
  *            the internal type of {@link UIType} that is managed by this registry
@@ -16,73 +16,74 @@ import com.nisovin.shopkeepers.api.types.TypeRegistry;
 public interface UIRegistry<T extends UIType> extends TypeRegistry<T> {
 
 	/**
-	 * Gets all currently active UI sessions.
+	 * Gets all currently active {@link UISession}s.
 	 * 
-	 * @return an unmodifiable view on the current UI sessions
+	 * @return an unmodifiable view on the current {@link UISession}s
 	 */
 	public Collection<? extends UISession> getUISessions();
 
 	/**
-	 * Gets all currently active UI sessions involving the given {@link Shopkeeper}.
+	 * Gets all currently active {@link UISession}s that involve the specified {@link Shopkeeper}.
 	 * 
 	 * @param shopkeeper
-	 *            the shopkeeper
-	 * @return an unmodifiable view on the current UI sessions
+	 *            the shopkeeper, not <code>null</code>
+	 * @return an unmodifiable view on the current {@link UISession}s
 	 */
 	public Collection<? extends UISession> getUISessions(Shopkeeper shopkeeper);
 
 	/**
-	 * Gets all currently active UI sessions involving the given {@link Shopkeeper} and the specified {@link UIType}.
+	 * Gets all currently active {@link UISession}s of the specified {@link UIType} that involve the specified
+	 * {@link Shopkeeper}.
 	 * 
 	 * @param shopkeeper
-	 *            the shopkeeper
+	 *            the shopkeeper, not <code>null</code>
 	 * @param uiType
-	 *            the UI type
-	 * @return an unmodifiable view on the current UI sessions
+	 *            the UI type, not <code>null</code>
+	 * @return an unmodifiable view on the current {@link UISession}s
 	 */
 	public Collection<? extends UISession> getUISessions(Shopkeeper shopkeeper, UIType uiType);
 
 	/**
-	 * Gets all currently active UI sessions involving the specified {@link UIType}.
+	 * Gets all currently active {@link UISession}s of the specified {@link UIType}.
 	 * 
 	 * @param uiType
-	 *            the UI type
-	 * @return an unmodifiable view on the current UI sessions
+	 *            the UI type, not <code>null</code>
+	 * @return an unmodifiable view on the current {@link UISession}s
 	 */
 	public Collection<? extends UISession> getUISessions(UIType uiType);
 
 	/**
-	 * Gets the currently active {@link UISession} for the given player.
+	 * Gets the currently active {@link UISession} of the specified player.
 	 * 
 	 * @param player
-	 *            the player
-	 * @return the UI session, or <code>null</code> if there is none
+	 *            the player, not <code>null</code>
+	 * @return the {@link UISession}, or <code>null</code> if there is none
 	 */
 	public UISession getUISession(Player player);
 
 	/**
-	 * {@link UISession#abort() Aborts} all UI sessions.
+	 * {@link UISession#abort() Aborts} all {@link UISession}s.
 	 * <p>
 	 * This may not be safe to call during UI / inventory events.
 	 */
 	public void abortUISessions();
 
 	/**
-	 * {@link UISession#abort() Aborts} all UI sessions involving the given {@link Shopkeeper}.
+	 * {@link UISession#abort() Aborts} all {@link UISession}s that involve the specified {@link Shopkeeper}.
 	 * <p>
 	 * This may not be safe to call during UI / inventory events.
 	 * 
 	 * @param shopkeeper
-	 *            the shopkeeper
+	 *            the shopkeeper, not <code>null</code>
 	 */
 	public void abortUISessions(Shopkeeper shopkeeper);
 
 	/**
-	 * {@link UISession#deactivateUI() Deactivates} all UIs involving the given {@link Shopkeeper} and
-	 * {@link UISession#abort() aborts} the UI sessions after a short delay (within the next tick).
+	 * {@link UISession#deactivateUI() Deactivates} all UIs that involve the specified {@link Shopkeeper} and
+	 * {@link UISession#abort() aborts} the {@link UISession}s after a short delay (within the next tick).
 	 * 
 	 * @param shopkeeper
-	 *            the shopkeeper
+	 *            the shopkeeper, not <code>null</code>
 	 */
 	public void abortUISessionsDelayed(Shopkeeper shopkeeper);
 }

@@ -88,13 +88,15 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 	protected Button createDeleteButton() {
 		return new ActionButton(true) {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				return Settings.createDeleteButtonItem();
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
-				getUISession(player).closeDelayedAndRunTask(() -> requestConfirmationDeleteShop(player));
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				editorSession.getUISession().closeDelayedAndRunTask(() -> {
+					requestConfirmationDeleteShop(editorSession.getPlayer());
+				});
 				return true;
 			}
 		};
@@ -153,16 +155,17 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				return Settings.createNameButtonItem();
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				// Also triggers save:
-				getUISession(player).closeDelayed();
+				editorSession.getUISession().closeDelayed();
 
 				// Start naming:
+				Player player = editorSession.getPlayer();
 				SKShopkeepersPlugin.getInstance().getShopkeeperNaming().startNaming(player, shopkeeper);
 				TextUtils.sendMessage(player, Messages.typeNewName);
 				return true;
@@ -171,10 +174,10 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 	}
 
 	@Override
-	protected void saveRecipes(Session session) {
+	protected void saveRecipes(EditorSession editorSession) {
 		assert shopkeeper.isValid(); // UI sessions are aborted (i.e. not saved) when the shopkeeper is removed
-		Player player = session.getPlayer();
-		int changedOffers = tradingRecipesAdapter.updateTradingRecipes(player, session.getRecipes());
+		Player player = editorSession.getPlayer();
+		int changedOffers = tradingRecipesAdapter.updateTradingRecipes(player, editorSession.getRecipes());
 		if (changedOffers == 0) {
 			Log.debug(() -> shopkeeper.getLogPrefix() + "No offers have changed.");
 		} else {

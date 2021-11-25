@@ -5,34 +5,43 @@ import java.util.List;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * The editor state of a player.
  */
-public class Session {
+public class EditorSession {
 
-	private final Player player;
+	private final UISession uiSession;
 	private final List<TradingRecipeDraft> recipes;
 	private final Inventory inventory;
 	private int currentPage = 1;
 
-	protected Session(Player player, List<TradingRecipeDraft> recipes, Inventory inventory) {
-		Validate.notNull(player, "player is null");
+	protected EditorSession(UISession uiSession, List<TradingRecipeDraft> recipes, Inventory inventory) {
+		Validate.notNull(uiSession, "uiSession is null");
 		Validate.notNull(recipes, "recipes is null");
 		Validate.notNull(inventory, "inventory is null");
-		this.player = player;
+		this.uiSession = uiSession;
 		this.recipes = recipes;
 		this.inventory = inventory;
 	}
 
+	public final UISession getUISession() {
+		return uiSession;
+	}
+
 	public final Player getPlayer() {
-		return player;
+		return uiSession.getPlayer();
 	}
 
 	public final Inventory getInventory() {
 		return inventory;
+	}
+
+	public final void updateInventory() {
+		this.getPlayer().updateInventory();
 	}
 
 	// Starts at 1.

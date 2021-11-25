@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.entity.Wolf;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +15,7 @@ import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
 import com.nisovin.shopkeepers.ui.editor.Button;
-import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
@@ -110,12 +109,12 @@ public class WolfShop extends SittableShop<Wolf> {
 	private Button getAngryEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				return getAngryEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				cycleAngry();
 				return true;
 			}
@@ -164,12 +163,12 @@ public class WolfShop extends SittableShop<Wolf> {
 	private Button getCollarColorEditorButton() {
 		return new ShopkeeperActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				return getCollarColorEditorItem();
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleCollarColor(backwards);
 				return true;

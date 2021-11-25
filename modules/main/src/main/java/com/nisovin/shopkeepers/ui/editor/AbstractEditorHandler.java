@@ -19,6 +19,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
@@ -75,7 +76,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	protected final TradingRecipesAdapter tradingRecipesAdapter;
 
-	private final Map<UUID, Session> sessions = new HashMap<>();
+	private final Map<UUID, EditorSession> editorSessions = new HashMap<>();
 
 	protected AbstractEditorHandler(AbstractUIType uiType, TradingRecipesAdapter tradingRecipesAdapter) {
 		super(uiType);
@@ -197,8 +198,8 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected Button createPrevPageButton() {
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
-				int page = session.getCurrentPage();
+			public ItemStack getIcon(EditorSession editorSession) {
+				int page = editorSession.getCurrentPage();
 				if (page <= 1) return null;
 				return createPrevPageIcon(page);
 			}
@@ -211,25 +212,22 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				// Ignore double clicks:
 				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return false;
 
-				Session session = getSession(player);
-				if (session == null) return false;
-
 				// Save the current page:
-				saveEditorPage(session);
+				saveEditorPage(editorSession);
 
 				// Switch to previous page:
-				int currentPage = session.getCurrentPage();
+				int currentPage = editorSession.getCurrentPage();
 				int newPage = Math.max(1, currentPage - 1);
 				if (newPage == currentPage) return false; // Page has not changed
 
 				// Update page:
-				session.setPage(newPage);
-				setupPage(player, newPage);
-				player.updateInventory();
+				editorSession.setPage(newPage);
+				setupPage(editorSession, newPage);
+				editorSession.updateInventory();
 				return true;
 			}
 		};
@@ -238,8 +236,8 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected Button createNextPageButton() {
 		return new ActionButton() {
 			@Override
-			public ItemStack getIcon(Session session) {
-				int page = session.getCurrentPage();
+			public ItemStack getIcon(EditorSession editorSession) {
+				int page = editorSession.getCurrentPage();
 				if (page >= getMaxTradesPages()) return null;
 				return createNextPageIcon(page);
 			}
@@ -252,25 +250,22 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			}
 
 			@Override
-			protected boolean runAction(InventoryClickEvent clickEvent, Player player) {
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				// Ignore double clicks:
 				if (clickEvent.getClick() == ClickType.DOUBLE_CLICK) return false;
 
-				Session session = getSession(player);
-				if (session == null) return false;
-
 				// Save the current page:
-				saveEditorPage(session);
+				saveEditorPage(editorSession);
 
 				// Switch to next page:
-				int currentPage = session.getCurrentPage();
+				int currentPage = editorSession.getCurrentPage();
 				int newPage = Math.min(getMaxTradesPages(), currentPage + 1);
 				if (newPage == currentPage) return false; // Page has not changed
 
 				// Update page:
-				session.setPage(newPage);
-				setupPage(player, newPage);
-				player.updateInventory();
+				editorSession.setPage(newPage);
+				setupPage(editorSession, newPage);
+				editorSession.updateInventory();
 				return true;
 			}
 		};
@@ -279,13 +274,13 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected Button createCurrentPageButton() {
 		return new Button() {
 			@Override
-			public ItemStack getIcon(Session session) {
-				int page = session.getCurrentPage();
+			public ItemStack getIcon(EditorSession editorSession) {
+				int page = editorSession.getCurrentPage();
 				return createCurrentPageIcon(page);
 			}
 
 			@Override
-			protected void onClick(InventoryClickEvent clickEvent, Player player) {
+			protected void onClick(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				// Current page button: Does nothing.
 			}
 		};
@@ -294,12 +289,12 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	protected Button createTradeSetupButton() {
 		return new Button() {
 			@Override
-			public ItemStack getIcon(Session session) {
+			public ItemStack getIcon(EditorSession editorSession) {
 				return createTradeSetupIcon();
 			}
 
 			@Override
-			protected void onClick(InventoryClickEvent clickEvent, Player player) {
+			protected void onClick(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				// Trade setup button: Does nothing.
 			}
 		};
@@ -439,30 +434,32 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	// PLAYER SESSIONS
 
 	/**
-	 * Creates a new {@link Session}.
+	 * Creates a new {@link EditorSession}.
 	 * <p>
 	 * The given list of recipes is not copied, but edited directly.
 	 * 
-	 * @param player
-	 *            the editing player, not <code>null</code>
+	 * @param uiSession
+	 *            the UI session of the editing player, not <code>null</code>
 	 * @param recipes
 	 *            the trading recipe drafts, not <code>null</code> and expected to be modifiable
 	 * @param inventory
 	 *            the editor inventory, not <code>null</code>
-	 * @return the session, not <code>null</code>
+	 * @return the editor session, not <code>null</code>
 	 */
-	protected Session createSession(Player player, List<TradingRecipeDraft> recipes, Inventory inventory) {
-		return new Session(player, recipes, inventory);
+	protected EditorSession createEditorSession(UISession uiSession, List<TradingRecipeDraft> recipes, Inventory inventory) {
+		return new EditorSession(uiSession, recipes, inventory);
 	}
 
-	protected Session getSession(Player player) {
+	protected EditorSession getEditorSession(Player player) {
 		if (player == null) return null;
-		return sessions.get(player.getUniqueId());
+		return editorSessions.get(player.getUniqueId());
 	}
 
 	@Override
-	public boolean openWindow(Player player) {
-		Validate.notNull(player, "player is null");
+	public boolean openWindow(UISession uiSession) {
+		Validate.notNull(uiSession, "uiSession is null");
+		Player player = uiSession.getPlayer();
+
 		// Lazy setup:
 		this.setup();
 
@@ -471,30 +468,29 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 		// Create inventory:
 		Inventory inventory = Bukkit.createInventory(player, this.getInventorySize(), this.getEditorTitle());
-		Session session = this.createSession(player, recipes, inventory);
-		sessions.put(player.getUniqueId(), session);
+		EditorSession editorSession = this.createEditorSession(uiSession, recipes, inventory);
+		editorSessions.put(player.getUniqueId(), editorSession);
 
 		// Setup and open first page:
-		this.setupPage(player, 1);
+		this.setupPage(editorSession, 1);
 		player.openInventory(inventory);
 		return true;
 	}
 
 	protected abstract String getEditorTitle();
 
-	protected void setupPage(Player player, int page) {
-		Session session = this.getSession(player);
-		if (session == null) return; // Expecting a valid session
+	protected void setupPage(EditorSession editorSession, int page) {
+		assert editorSession != null;
 
 		// Setup inventory:
-		this.setupTradeColumns(session);
-		this.setupTradesPageBar(session);
-		this.setupButtons(session);
+		this.setupTradeColumns(editorSession);
+		this.setupTradesPageBar(editorSession);
+		this.setupButtons(editorSession);
 	}
 
-	protected void setupTradeColumns(Session session) {
-		assert session != null;
-		Inventory inventory = session.getInventory();
+	protected void setupTradeColumns(EditorSession editorSession) {
+		assert editorSession != null;
+		Inventory inventory = editorSession.getInventory();
 
 		// clear trades area:
 		for (int i = TRADES_ROW_1_START; i <= TRADES_ROW_1_END; ++i) {
@@ -508,9 +504,9 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		}
 
 		// Insert trades:
-		int page = session.getCurrentPage();
+		int page = editorSession.getCurrentPage();
 		assert page >= 1;
-		List<TradingRecipeDraft> recipes = session.getRecipes();
+		List<TradingRecipeDraft> recipes = editorSession.getRecipes();
 		int recipesPerPage = COLUMNS_PER_ROW;
 		int startIndex = (page - 1) * recipesPerPage;
 		for (int column = 0, i = startIndex; column < COLUMNS_PER_ROW && i < recipes.size(); ++column, ++i) {
@@ -519,9 +515,9 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		}
 	}
 
-	protected void setupTradesPageBar(Session session) {
-		assert session != null;
-		Inventory inventory = session.getInventory();
+	protected void setupTradesPageBar(EditorSession editorSession) {
+		assert editorSession != null;
+		Inventory inventory = editorSession.getInventory();
 		// Clear page bar area:
 		for (int i = TRADES_PAGE_BAR_START; i <= TRADES_PAGE_BAR_END; ++i) {
 			inventory.setItem(i, null);
@@ -532,7 +528,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		for (int i = 0; i < buttons.length; ++i) {
 			Button button = buttons[i];
 			if (button == null) continue;
-			ItemStack icon = button.getIcon(session);
+			ItemStack icon = button.getIcon(editorSession);
 			if (icon == null) continue;
 			inventory.setItem(button.getSlot(), icon);
 		}
@@ -540,20 +536,20 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	// Note: This cannot deal with new button rows being required due to newly added buttons (which would require
 	// creating and freshly open a new inventory, resulting in flicker).
-	protected void updateButtons(Session session) {
-		this.setupButtons(session);
+	protected void updateButtons(EditorSession editorSession) {
+		this.setupButtons(editorSession);
 	}
 
 	void updateButtonsInAllSessions() {
-		for (Session session : sessions.values()) {
-			this.updateButtons(session);
-			session.getPlayer().updateInventory();
-		}
+		editorSessions.values().forEach(editorSession -> {
+			this.updateButtons(editorSession);
+			editorSession.updateInventory();
+		});
 	}
 
 	// Also used to refresh all button icons in an already open inventory.
-	protected void setupButtons(Session session) {
-		Inventory inventory = session.getInventory();
+	protected void setupButtons(EditorSession editorSession) {
+		Inventory inventory = editorSession.getInventory();
 		final int inventorySize = inventory.getSize();
 		Button[] buttons = this.getBakedButtons();
 		for (int buttonIndex = 0; buttonIndex < buttons.length; ++buttonIndex) {
@@ -563,7 +559,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 			ItemStack icon = null;
 			Button button = buttons[buttonIndex];
 			if (button != null) {
-				icon = button.getIcon(session);
+				icon = button.getIcon(editorSession);
 			}
 			// Null will clear the slot (required if this is called to refresh the buttons in an already setup
 			// inventory):
@@ -573,11 +569,11 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	void updateButtonInAllSessions(Button button) {
 		int slot = button.getSlot();
-		for (Session session : sessions.values()) {
-			ItemStack icon = button.getIcon(session);
-			session.getInventory().setItem(slot, icon);
-			session.getPlayer().updateInventory();
-		}
+		editorSessions.values().forEach(editorSession -> {
+			ItemStack icon = button.getIcon(editorSession);
+			editorSession.getInventory().setItem(slot, icon);
+			editorSession.updateInventory();
+		});
 	}
 
 	@Override
@@ -594,7 +590,8 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
+	protected void onInventoryDragEarly(UISession uiSession, InventoryDragEvent event) {
+		assert uiSession != null && event != null;
 		// Dragging is allowed by default only inside the player inventory and the trades area:
 		if (event.isCancelled()) return; // Already cancelled
 		InventoryView view = event.getView();
@@ -608,59 +605,57 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
-		assert event != null && player != null;
+	protected void onInventoryClickEarly(UISession uiSession, InventoryClickEvent event) {
+		assert uiSession != null && event != null;
 		if (this.isAutomaticShiftLeftClick()) {
 			// Ignore automatically triggered shift left-clicks:
 			return;
 		}
 
-		Session session = this.getSession(player);
-		assert session != null;
+		EditorSession editorSession = this.getEditorSession(uiSession.getPlayer());
+		assert editorSession != null;
 
 		int rawSlot = event.getRawSlot();
 		if (this.isTradesArea(rawSlot)) {
 			// Trades area:
-			this.handleTradesClick(session, event);
+			this.handleTradesClick(editorSession, event);
 		} else if (this.isTradesPageBar(rawSlot)) {
 			// Trades page bar:
-			this.handleTradesPageBarClick(session, event);
+			this.handleTradesPageBarClick(editorSession, event);
 		} else if (this.isButtonArea(rawSlot)) {
 			// Editor buttons:
-			this.handleButtonClick(session, event);
+			this.handleButtonClick(editorSession, event);
 		} else if (this.isPlayerInventory(event.getView(), event.getSlotType(), rawSlot)) {
 			// Player inventory:
-			this.handlePlayerInventoryClick(session, event);
+			this.handlePlayerInventoryClick(editorSession, event);
 		}
 	}
 
-	protected void handleTradesClick(Session session, InventoryClickEvent event) {
+	protected void handleTradesClick(EditorSession editorSession, InventoryClickEvent event) {
 		assert this.isTradesArea(event.getRawSlot());
 	}
 
-	protected void handleTradesPageBarClick(Session session, InventoryClickEvent event) {
+	protected void handleTradesPageBarClick(EditorSession editorSession, InventoryClickEvent event) {
 		assert this.isTradesPageBar(event.getRawSlot());
 		event.setCancelled(true);
-		Player player = session.getPlayer();
 		int rawSlot = event.getRawSlot();
 		Button button = this._getTradesPageBarButton(rawSlot);
 		if (button != null) {
-			button.onClick(event, player);
+			button.onClick(editorSession, event);
 		}
 	}
 
-	protected void handleButtonClick(Session session, InventoryClickEvent event) {
+	protected void handleButtonClick(EditorSession editorSession, InventoryClickEvent event) {
 		assert this.isButtonArea(event.getRawSlot());
 		event.setCancelled(true);
-		Player player = session.getPlayer();
 		int rawSlot = event.getRawSlot();
 		Button button = this._getButton(rawSlot);
 		if (button != null) {
-			button.onClick(event, player);
+			button.onClick(editorSession, event);
 		}
 	}
 
-	protected void handlePlayerInventoryClick(Session session, InventoryClickEvent event) {
+	protected void handlePlayerInventoryClick(EditorSession editorSession, InventoryClickEvent event) {
 		assert this.isPlayerInventory(event.getView(), event.getSlotType(), event.getRawSlot());
 	}
 
@@ -701,28 +696,29 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
+	protected void onInventoryClose(UISession uiSession, InventoryCloseEvent closeEvent) {
 		// Cleanup session:
-		Session session = sessions.remove(player.getUniqueId());
+		Player player = uiSession.getPlayer();
+		EditorSession editorSession = editorSessions.remove(player.getUniqueId());
 
 		if (closeEvent != null) {
 			// Only save if caused by an inventory close event (i.e. if the session has not been 'aborted'):
-			this.saveEditor(session);
+			this.saveEditor(editorSession);
 		}
 	}
 
 	/**
-	 * Saves the current page of the editor interface to the session.
+	 * Saves the current page of the editor interface to the given {@link EditorSession}.
 	 * 
-	 * @param session
-	 *            the session
+	 * @param editorSession
+	 *            the editor session, not <code>null</code>
 	 */
-	protected void saveEditorPage(Session session) {
-		assert session != null;
-		Inventory inventory = session.getInventory();
-		int page = session.getCurrentPage();
+	protected void saveEditorPage(EditorSession editorSession) {
+		assert editorSession != null;
+		Inventory inventory = editorSession.getInventory();
+		int page = editorSession.getCurrentPage();
 		assert page >= 1;
-		List<TradingRecipeDraft> recipes = session.getRecipes();
+		List<TradingRecipeDraft> recipes = editorSession.getRecipes();
 
 		int recipesPerPage = COLUMNS_PER_ROW;
 		int startIndex = (page - 1) * recipesPerPage;
@@ -743,23 +739,23 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	/**
 	 * Saves the current state of the editor interface.
 	 * 
-	 * @param session
-	 *            the session
+	 * @param editorSession
+	 *            the editor session, not <code>null</code>
 	 */
-	protected void saveEditor(Session session) {
-		assert session != null;
+	protected void saveEditor(EditorSession editorSession) {
+		assert editorSession != null;
 		// Save the current editor page from the UI to the session:
-		this.saveEditorPage(session);
+		this.saveEditorPage(editorSession);
 
 		// Save the recipes from the session:
-		this.saveRecipes(session);
+		this.saveRecipes(editorSession);
 	}
 
 	/**
-	 * Saves (i.e. applies) the trading recipes of the given session.
+	 * Saves (i.e. applies) the trading recipes of the given {@link EditorSession}.
 	 * 
-	 * @param session
-	 *            the session
+	 * @param editorSession
+	 *            the editor session, not <code>null</code>
 	 */
-	protected abstract void saveRecipes(Session session);
+	protected abstract void saveRecipes(EditorSession editorSession);
 }

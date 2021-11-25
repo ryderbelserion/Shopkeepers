@@ -1,18 +1,20 @@
 package com.nisovin.shopkeepers.ui;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventPriority;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.inventory.InventoryView;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.api.ui.UIRegistry;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.config.Settings;
@@ -46,18 +48,6 @@ public abstract class UIHandler {
 		return uiType;
 	}
 
-	/**
-	 * A shortcut for getting the given player's current UI session.
-	 * 
-	 * @param player
-	 *            the player, not <code>null</code>
-	 * @return the UI session, or <code>null</code> if there is none
-	 * @see UIRegistry#getUISession(Player)
-	 */
-	protected final UISession getUISession(Player player) {
-		return ShopkeepersPlugin.getInstance().getUIRegistry().getUISession(player);
-	}
-
 	protected void debugNotOpeningUI(Player player, String reason) {
 		Validate.notNull(player, "player is null");
 		Validate.notEmpty(reason, "reason is null or empty");
@@ -81,16 +71,18 @@ public abstract class UIHandler {
 	public abstract boolean canOpen(Player player, boolean silent);
 
 	/**
-	 * Opens the interface window for the given player.
+	 * Opens the interface window for the player of the given {@link UISession}.
 	 * <p>
 	 * Generally {@link #canOpen(Player, boolean)} should be checked before calling this method. However, this method
 	 * should not rely on that.
+	 * <p>
+	 * If opening the window fails, the given {@link UISession} will be ended.
 	 * 
-	 * @param player
-	 *            the player, not <code>null</code>
+	 * @param uiSession
+	 *            the {@link UISession}, not <code>null</code>
 	 * @return <code>true</code> if the interface window was successfully opened
 	 */
-	protected abstract boolean openWindow(Player player);
+	protected abstract boolean openWindow(UISession uiSession);
 
 	/**
 	 * Checks whether or not the given inventory view is managed by this UI handler.
@@ -120,21 +112,110 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Gets called when this UI gets closed for a player.
+	 * This is called when an {@link UISession} handled by this {@link UIHandler} has ended.
 	 * <p>
-	 * The corresponding inventory close event might be <code>null</code> if the UI session is ended for a different
-	 * reason (eg. due to an {@link UISession#abort()}).
+	 * If the {@link UISession} has ended not due to a received {@link InventoryCloseEvent} but for another reason (eg.
+	 * due to a call to {@link UISession#abort()}), the provided inventory close event argument is <code>null</code>.
+	 * <p>
+	 * This is also called when the UI session has ended because {@link #openWindow(UISession)} could not successfully
+	 * open the UI window.
 	 * 
-	 * @param player
-	 *            the player, not <code>null</code>
+	 * @param uiSession
+	 *            the {@link UISession}, not <code>null</code>
 	 * @param closeEvent
-	 *            the inventory closing event, can be <code>null</code>
+	 *            the corresponding inventory close event, can be <code>null</code>
 	 */
-	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
+	protected void onInventoryClose(UISession uiSession, InventoryCloseEvent closeEvent) {
 		// Callback for subclasses.
 	}
 
 	// Handling of interface window interactions
+
+	/**
+	 * Additionally requested types of {@link InventoryEvent}s.
+	 * <p>
+	 * By default, only {@link InventoryClickEvent}, {@link InventoryDragEvent}, and {@link InventoryCloseEvent} are
+	 * forwarded to {@link UIHandler}s. This method can be overridden by {@link UIHandler}s to request callbacks for
+	 * additional types of inventory events via {@link #onInventoryEventEarly(UISession, InventoryEvent)} and
+	 * {@link #onInventoryEventLate(UISession, InventoryEvent)}.
+	 * <p>
+	 * It is only effective to request event types for which a corresponding normally registered event handler would
+	 * also be able to receive respective events. For example, it has no effect to request the base type
+	 * {@link InventoryEvent}, because the various subtypes use their own {@link HandlerList}s to keep track of
+	 * registered event handlers. The way the Bukkit event system works is that any called event is only forwarded to
+	 * event handlers that have been registered at the closest {@link HandlerList} in the event's type hierarchy.
+	 * <p>
+	 * The returned Set of requested event types is expected to not change over time but be fixed.
+	 * 
+	 * @return the additionally requested inventory event types, not <code>null</code>
+	 */
+	protected Set<Class<? extends InventoryEvent>> getAdditionalInventoryEvents() {
+		return Collections.emptySet();
+	}
+
+	// Called by UIListener.
+	void informOnInventoryEventEarly(UISession uiSession, InventoryEvent event) {
+		this.onInventoryEventEarly(uiSession, event);
+
+		// Invoke dedicated event handling methods:
+		if (event instanceof InventoryClickEvent) {
+			this.informOnInventoryClickEarly(uiSession, (InventoryClickEvent) event);
+		} else if (event instanceof InventoryDragEvent) {
+			this.informOnInventoryDragEarly(uiSession, (InventoryDragEvent) event);
+		}
+	}
+
+	/**
+	 * Called early ({@link EventPriority#HIGH}) for handled {@link InventoryEvent}s for inventory views that are
+	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
+	 * <p>
+	 * This method is only guaranteed to be called for inventory events that are either handled by default, or that have
+	 * been explicitly requested by this {@link UIHandler} via {@link #getAdditionalInventoryEvents()}. However, it is
+	 * possible that this method may also be called for inventory events that have not been explicitly requested by this
+	 * {@link UIHandler}. The {@link UIHandler} should therefore take care to ignore any unexpected types of inventory
+	 * events.
+	 * 
+	 * @param uiSession
+	 *            the {@link UISession}, not <code>null</code>
+	 * @param event
+	 *            the inventory event, not <code>null</code>
+	 * @see #onInventoryEventLate(UISession, InventoryEvent)
+	 */
+	protected void onInventoryEventEarly(UISession uiSession, InventoryEvent event) {
+		// Callback for subclasses.
+	}
+
+	// Called by UIListener.
+	void informOnInventoryEventLate(UISession uiSession, InventoryEvent event) {
+		this.onInventoryEventLate(uiSession, event);
+
+		// Invoke dedicated event handling methods:
+		if (event instanceof InventoryClickEvent) {
+			this.informOnInventoryClickLate(uiSession, (InventoryClickEvent) event);
+		} else if (event instanceof InventoryDragEvent) {
+			this.informOnInventoryDragLate(uiSession, (InventoryDragEvent) event);
+		}
+	}
+
+	/**
+	 * Called early ({@link EventPriority#LOW}) for handled {@link InventoryEvent}s for inventory views that are
+	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
+	 * <p>
+	 * This method is only guaranteed to be called for inventory events that are either handled by default, or that have
+	 * been explicitly requested by this {@link UIHandler} via {@link #getAdditionalInventoryEvents()}. However, it is
+	 * possible that this method may also be called for inventory events that have not been explicitly requested by this
+	 * {@link UIHandler}. The {@link UIHandler} should therefore take care to ignore any unexpected types of inventory
+	 * events.
+	 * 
+	 * @param uiSession
+	 *            the {@link UISession}, not <code>null</code>
+	 * @param event
+	 *            the inventory event, not <code>null</code>
+	 * @see #onInventoryEventEarly(UISession, InventoryEvent)
+	 */
+	protected void onInventoryEventLate(UISession uiSession, InventoryEvent event) {
+		// Callback for subclasses.
+	}
 
 	/**
 	 * Returns whether the currently handled inventory click is, according to our heuristic, an automatically triggered
@@ -161,8 +242,7 @@ public abstract class UIHandler {
 		return isAutomaticShiftLeftClick;
 	}
 
-	// Called by UIListener.
-	void informOnInventoryClickEarly(InventoryClickEvent event, Player player) {
+	private void informOnInventoryClickEarly(UISession uiSession, InventoryClickEvent event) {
 		// Heuristic detection of automatically triggered shift left-clicks:
 		isAutomaticShiftLeftClick = false; // Reset
 		final long nowNanos = System.nanoTime();
@@ -179,83 +259,80 @@ public abstract class UIHandler {
 			lastManualClickedSlotId = event.getRawSlot();
 		}
 
-		this.onInventoryClickEarly(event, player);
+		this.onInventoryClickEarly(uiSession, event);
 	}
 
 	/**
-	 * Called early ({@link EventPriority#LOW}) for {@link InventoryClickEvent InventoryClickEvents} for inventory views
-	 * that are {@link #isOpen(Player) managed} by this UI handler.
+	 * Called early ({@link EventPriority#LOW}) for {@link InventoryClickEvent}s for inventory views that are
+	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
 	 * <p>
 	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
 	 * event.
 	 * 
+	 * @param uiSession
+	 *            the {@link UISession}, not <code>null</code>
 	 * @param event
 	 *            the inventory click event, not <code>null</code>
-	 * @param player
-	 *            the clicking player, not <code>null</code>
-	 * @see #onInventoryClickLate(InventoryClickEvent, Player)
+	 * @see #onInventoryClickLate(UISession, InventoryClickEvent)
 	 */
-	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
+	protected void onInventoryClickEarly(UISession uiSession, InventoryClickEvent event) {
 		// Callback for subclasses.
 	}
 
-	// Called by UIListener.
-	void informOnInventoryClickLate(InventoryClickEvent event, Player player) {
-		this.onInventoryClickLate(event, player);
+	private void informOnInventoryClickLate(UISession uiSession, InventoryClickEvent event) {
+		this.onInventoryClickLate(uiSession, event);
 	}
 
 	/**
-	 * Called late ({@link EventPriority#HIGH}) for {@link InventoryClickEvent InventoryClickEvents} for inventory views
-	 * that are {@link #isOpen(Player) managed} by this UI handler.
+	 * Called late ({@link EventPriority#HIGH}) for {@link InventoryClickEvent}s for inventory views that are
+	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
 	 * 
+	 * @param uiSession
+	 *            the {@link UISession}, not <code>null</code>
 	 * @param event
 	 *            the inventory click event, not <code>null</code>
-	 * @param player
-	 *            the clicking player, not <code>null</code>
-	 * @see #onInventoryClickEarly(InventoryClickEvent, Player)
+	 * @see #onInventoryClickEarly(UISession, InventoryClickEvent)
 	 */
-	protected void onInventoryClickLate(InventoryClickEvent event, Player player) {
+	protected void onInventoryClickLate(UISession uiSession, InventoryClickEvent event) {
 		// Callback for subclasses.
 	}
 
-	// Called by UIListener.
-	void informOnInventoryDragEarly(InventoryDragEvent event, Player player) {
-		this.onInventoryDragEarly(event, player);
+	private void informOnInventoryDragEarly(UISession uiSession, InventoryDragEvent event) {
+		this.onInventoryDragEarly(uiSession, event);
 	}
 
 	/**
-	 * Called early ({@link EventPriority#LOW}) for {@link InventoryDragEvent InventoryDragEvents} for inventory views
-	 * that are {@link #isOpen(Player) managed} by this UI handler.
+	 * Called early ({@link EventPriority#LOW}) for {@link InventoryDragEvent}s for inventory views that are
+	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
 	 * <p>
 	 * Any UI potentially canceling the event should consider doing so early in order for other plugins to ignore the
 	 * event.
 	 * 
+	 * @param uiSession
+	 *            the {@link UISession}, not <code>null</code>
 	 * @param event
 	 *            the inventory drag event, not <code>null</code>
-	 * @param player
-	 *            the dragging player, not <code>null</code>
-	 * @see #onInventoryDragLate(InventoryDragEvent, Player)
+	 * @see #onInventoryDragLate(UISession, InventoryDragEvent)
 	 */
-	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
+	protected void onInventoryDragEarly(UISession uiSession, InventoryDragEvent event) {
 		// Callback for subclasses.
 	}
 
-	// Called by UIListener.
-	void informOnInventoryDragLate(InventoryDragEvent event, Player player) {
-		this.onInventoryDragLate(event, player);
+	private void informOnInventoryDragLate(UISession uiSession, InventoryDragEvent event) {
+		this.onInventoryDragLate(uiSession, event);
 	}
 
 	/**
-	 * Called late ({@link EventPriority#HIGH}) for {@link InventoryDragEvent InventoryDragEvents} for inventory views
-	 * that are {@link #isOpen(Player) managed} by this UI handler.
+	 * Called late ({@link EventPriority#HIGH}) for {@link InventoryDragEvent}s for inventory views that are
+	 * {@link #isOpen(Player) managed} by this {@link UIHandler}.
 	 * 
+	 * @param uiSession
+	 *            the {@link UISession}, not <code>null</code>
 	 * @param event
 	 *            the inventory drag event, not <code>null</code>
-	 * @param player
-	 *            the dragging player, not <code>null</code>
-	 * @see #onInventoryDragEarly(InventoryDragEvent, Player)
+	 * @see #onInventoryDragEarly(UISession, InventoryDragEvent)
 	 */
-	protected void onInventoryDragLate(InventoryDragEvent event, Player player) {
+	protected void onInventoryDragLate(UISession uiSession, InventoryDragEvent event) {
 		// Callback for subclasses.
 	}
 }

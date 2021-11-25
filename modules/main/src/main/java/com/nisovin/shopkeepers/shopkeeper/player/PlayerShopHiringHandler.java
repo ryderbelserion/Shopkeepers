@@ -10,6 +10,7 @@ import org.bukkit.inventory.PlayerInventory;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.PlayerShopkeeperHireEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
@@ -37,8 +38,9 @@ public class PlayerShopHiringHandler extends HiringHandler {
 	}
 
 	@Override
-	protected boolean openWindow(Player player) {
-		Validate.notNull(player, "player is null");
+	protected boolean openWindow(UISession uiSession) {
+		Validate.notNull(uiSession, "uiSession is null");
+		Player player = uiSession.getPlayer();
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Inventory inventory = Bukkit.createInventory(player, 9, Messages.forHireTitle);
 
@@ -56,13 +58,14 @@ public class PlayerShopHiringHandler extends HiringHandler {
 	}
 
 	@Override
-	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
-		super.onInventoryClickEarly(event, player);
+	protected void onInventoryClickEarly(UISession uiSession, InventoryClickEvent event) {
+		super.onInventoryClickEarly(uiSession, event);
 		if (this.isAutomaticShiftLeftClick()) {
 			// Ignore automatically triggered shift left-clicks:
 			return;
 		}
 
+		Player player = uiSession.getPlayer();
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 		int slot = event.getRawSlot();
 		if (slot == BUTTON_HIRE_1 || slot == BUTTON_HIRE_2) {
@@ -74,7 +77,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 					|| !this.getShopkeeper().getShopObject().getType().hasPermission(player))) {
 				// Missing permission to hire this type of shopkeeper:
 				TextUtils.sendMessage(player, Messages.cannotHireShopType);
-				this.getUISession(player).abortDelayed();
+				uiSession.abortDelayed();
 				return;
 			}
 
@@ -83,7 +86,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 				// The shopkeeper is no longer for hire.
 				// TODO Maybe instead ensure that we always close all hiring UIs when the hiring item changes.
 				// TODO Send a feedback message to the player
-				this.getUISession(player).abortDelayed();
+				uiSession.abortDelayed();
 				return;
 			}
 
@@ -94,7 +97,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 				// The player cannot afford to hire the shopkeeper:
 				TextUtils.sendMessage(player, Messages.cannotHire);
 				// Close window for this player:
-				this.getUISession(player).abortDelayed();
+				uiSession.abortDelayed();
 				return;
 			}
 
@@ -105,7 +108,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 			if (hireEvent.isCancelled()) {
 				Log.debug("PlayerShopkeeperHireEvent was cancelled!");
 				// Close window for this player:
-				this.getUISession(player).abortDelayed();
+				uiSession.abortDelayed();
 				return;
 			}
 
@@ -115,7 +118,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 				int count = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getPlayerShopkeepersByOwner(player.getUniqueId()).size();
 				if (count >= maxShopsLimit) {
 					TextUtils.sendMessage(player, Messages.tooManyShops);
-					this.getUISession(player).abortDelayed();
+					uiSession.abortDelayed();
 					return;
 				}
 			}

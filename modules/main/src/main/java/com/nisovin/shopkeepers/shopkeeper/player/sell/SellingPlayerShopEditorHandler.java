@@ -13,7 +13,7 @@ import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.ui.editor.DefaultTradingRecipesAdapter;
-import com.nisovin.shopkeepers.ui.editor.Session;
+import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
@@ -108,14 +108,14 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
-	protected void handleTradesClick(Session session, InventoryClickEvent event) {
+	protected void handleTradesClick(EditorSession editorSession, InventoryClickEvent event) {
 		assert this.isTradesArea(event.getRawSlot());
 		int rawSlot = event.getRawSlot();
 		if (this.isResultRow(rawSlot)) {
 			// Handle changing sell stack size:
 			this.handleUpdateItemAmountOnClick(event, 1);
 		} else {
-			super.handleTradesClick(session, event);
+			super.handleTradesClick(editorSession, event);
 		}
 	}
 }

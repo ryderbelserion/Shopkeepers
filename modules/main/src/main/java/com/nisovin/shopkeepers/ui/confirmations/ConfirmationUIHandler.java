@@ -11,6 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
@@ -51,7 +52,8 @@ public class ConfirmationUIHandler extends UIHandler {
 	}
 
 	@Override
-	protected boolean openWindow(Player player) {
+	protected boolean openWindow(UISession uiSession) {
+		Player player = uiSession.getPlayer();
 		Inventory inventory = Bukkit.createInventory(player, INVENTORY_SIZE, config.getTitle());
 
 		ItemStack confirmItem = new ItemStack(Material.LIME_STAINED_GLASS_PANE);
@@ -67,8 +69,8 @@ public class ConfirmationUIHandler extends UIHandler {
 	}
 
 	@Override
-	protected void onInventoryClickEarly(InventoryClickEvent event, Player player) {
-		assert event != null && player != null;
+	protected void onInventoryClickEarly(UISession uiSession, InventoryClickEvent event) {
+		assert uiSession != null && event != null;
 		event.setCancelled(true);
 		if (this.isAutomaticShiftLeftClick()) {
 			// Ignore automatically triggered shift left-clicks:
@@ -78,23 +80,24 @@ public class ConfirmationUIHandler extends UIHandler {
 		int slot = event.getRawSlot();
 		if (slot == SLOT_CONFIRM) {
 			playerDecided = true;
-			this.getUISession(player).closeDelayedAndRunTask(action);
+			uiSession.closeDelayedAndRunTask(action);
 		} else if (slot == SLOT_CANCEL) {
 			playerDecided = true;
-			this.getUISession(player).closeDelayedAndRunTask(onCancelled);
+			uiSession.closeDelayedAndRunTask(onCancelled);
 		}
 	}
 
 	@Override
-	protected void onInventoryDragEarly(InventoryDragEvent event, Player player) {
-		assert event != null && player != null;
+	protected void onInventoryDragEarly(UISession uiSession, InventoryDragEvent event) {
+		assert uiSession != null && event != null;
 		event.setCancelled(true);
 	}
 
 	@Override
-	protected void onInventoryClose(Player player, InventoryCloseEvent closeEvent) {
-		assert player != null;
+	protected void onInventoryClose(UISession uiSession, InventoryCloseEvent closeEvent) {
+		assert uiSession != null;
 		if (!playerDecided) {
+			Player player = uiSession.getPlayer();
 			TextUtils.sendMessage(player, Messages.confirmationUiAborted);
 		}
 	}

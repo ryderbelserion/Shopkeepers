@@ -1,12 +1,15 @@
 package com.nisovin.shopkeepers.util.bukkit;
 
 import java.lang.reflect.Method;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredListener;
 import org.bukkit.plugin.SimplePluginManager;
@@ -17,6 +20,49 @@ import com.nisovin.shopkeepers.util.logging.Log;
 public class EventUtils {
 
 	private EventUtils() {
+	}
+
+	/**
+	 * Sets the {@link Cancellable#setCancelled(boolean) cancellation state} of the given {@link Event} if it is
+	 * {@link Cancellable}.
+	 * 
+	 * @param event
+	 *            the event, can be <code>null</code>
+	 * @param cancel
+	 *            the cancellation state to set
+	 * @return <code>true</code> if the cancellation state has been set, <code>false</code> otherwise
+	 */
+	public static boolean setCancelled(Event event, boolean cancel) {
+		if (event instanceof Cancellable) {
+			((Cancellable) event).setCancelled(cancel);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Creates a new {@link EventExecutor} that forwards events of the specified type to the given {@link Consumer}.
+	 * 
+	 * @param <E>
+	 *            the event type
+	 * @param eventClass
+	 *            the event class, not <code>null</code>
+	 * @param eventConsumer
+	 *            the consumer that handles the events, not <code>null</code>
+	 * @return the event executor, not <code>null</code>
+	 */
+	@SuppressWarnings("unchecked")
+	public static <E extends Event> EventExecutor eventExecutor(Class<E> eventClass, Consumer<E> eventConsumer) {
+		Validate.notNull(eventClass, "eventClass is null");
+		Validate.notNull(eventConsumer, "eventConsumer is null");
+		return (listener, event) -> {
+			if (!eventClass.isAssignableFrom(event.getClass())) {
+				return;
+			}
+			// We already checked that the event class is assignment compatible, so this unchecked cast is safe:
+			eventConsumer.accept((E) event);
+		};
 	}
 
 	/**
