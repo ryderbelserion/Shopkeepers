@@ -30,8 +30,8 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 	protected boolean prepareTrade(Trade trade) {
 		if (!super.prepareTrade(trade)) return false;
 		SKBuyingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		Player tradingPlayer = trade.tradingPlayer;
-		TradingRecipe tradingRecipe = trade.tradingRecipe;
+		Player tradingPlayer = trade.getTradingPlayer();
+		TradingRecipe tradingRecipe = trade.getTradingRecipe();
 
 		// Get offer for the bought item:
 		UnmodifiableItemStack boughtItem = tradingRecipe.getItem1();
@@ -71,7 +71,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		if (amountAfterTaxes > 0) {
 			// The item the trading player gave might slightly differ from the required item,
 			// but is still accepted, depending on the used item comparison logic and settings.
-			ItemStack receivedItem = ItemUtils.copyWithAmount(trade.offeredItem1, amountAfterTaxes);
+			ItemStack receivedItem = ItemUtils.copyWithAmount(trade.getOfferedItem1(), amountAfterTaxes);
 			if (InventoryUtils.addItems(newContainerContents, receivedItem) != 0) {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 				this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");

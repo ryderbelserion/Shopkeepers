@@ -10,6 +10,7 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.trading.Trade;
+import com.nisovin.shopkeepers.ui.trading.TradingContext;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -52,7 +53,7 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 	protected boolean prepareTrade(Trade trade) {
 		if (!super.prepareTrade(trade)) return false;
 		AbstractPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		Player tradingPlayer = trade.tradingPlayer;
+		Player tradingPlayer = trade.getTradingPlayer();
 
 		// No trading with own shop:
 		if (Settings.preventTradingWithOwnShop && shopkeeper.isOwner(tradingPlayer)
@@ -102,8 +103,8 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 	}
 
 	@Override
-	protected void onTradeAborted(Trade trade) {
-		super.onTradeAborted(trade);
+	protected void onTradeAborted(TradingContext tradingContext, Trade trade, boolean silent) {
+		super.onTradeAborted(tradingContext, trade, silent);
 		this.resetTradeState();
 	}
 

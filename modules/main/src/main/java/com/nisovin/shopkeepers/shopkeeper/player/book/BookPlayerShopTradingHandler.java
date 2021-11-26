@@ -36,8 +36,8 @@ public class BookPlayerShopTradingHandler extends PlayerShopTradingHandler {
 	protected boolean prepareTrade(Trade trade) {
 		if (!super.prepareTrade(trade)) return false;
 		SKBookPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		Player tradingPlayer = trade.tradingPlayer;
-		TradingRecipe tradingRecipe = trade.tradingRecipe;
+		Player tradingPlayer = trade.getTradingPlayer();
+		TradingRecipe tradingRecipe = trade.getTradingRecipe();
 
 		UnmodifiableItemStack bookItem = tradingRecipe.getResultItem();
 		BookMeta bookMeta = BookItems.getBookMeta(bookItem);

@@ -1,84 +1,54 @@
 package com.nisovin.shopkeepers.ui.trading;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantInventory;
 import org.bukkit.inventory.PlayerInventory;
 
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
+import com.nisovin.shopkeepers.util.java.KeyValueStore;
+import com.nisovin.shopkeepers.util.java.MapBasedKeyValueStore;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Information about a trade that is currently being processed.
  */
 public final class Trade {
-	/**
-	 * The inventory click event which originally triggered the trade.
-	 * <p>
-	 * Do not modify this event or any of the involved items! This has to be kept cancelled!
-	 */
-	public final InventoryClickEvent clickEvent;
-	/**
-	 * The involved merchant inventory.
-	 */
-	public final MerchantInventory merchantInventory;
-	/**
-	 * The trading player.
-	 */
-	public final Player tradingPlayer;
-	/**
-	 * The involved player inventory.
-	 */
-	public final PlayerInventory playerInventory;
-	/**
-	 * The used trading recipe.
-	 */
-	public final TradingRecipe tradingRecipe;
-	/**
-	 * The item offered by the player matching the first required item of the used trading recipe (not necessarily the
-	 * item in the first slot), not <code>null</code> or empty.
-	 * <p>
-	 * The type equals that of the required item from the trading recipe. The metadata however can differ, but still be
-	 * accepted for the trade depending on the item matching rules of the used Minecraft version and the shopkeeper
-	 * settings (ex. strict item comparison disabled).
-	 * <p>
-	 * This item stack is not a copy and might be modified once the trade is applied! The stack size matches the
-	 * original stack size of the item used by the player.
-	 */
-	public final ItemStack offeredItem1;
-	/**
-	 * The item offered by the player matching the second required item of the used trading recipe (not necessarily the
-	 * item in the second slot), can be <code>null</code>.
-	 * <p>
-	 * The type equals that of the required item from the trading recipe. The metadata however can differ, but still be
-	 * accepted for the trade depending on the item matching rules of the used Minecraft version and the shopkeeper
-	 * settings (ex. strict item comparison disabled).
-	 * <p>
-	 * This item stack is not a copy and might be modified once the trade is applied! The stack size matches the
-	 * original stack size of the item used by the player.
-	 */
-	public final ItemStack offeredItem2;
-	/**
-	 * Whether the <code>offeredItem1</code> and <code>offeredItem2</code> are placed in reverse or regular order inside
-	 * the trading slots of the merchant inventory.
-	 */
-	public final boolean swappedItemOrder;
-	/**
-	 * Arbitrary additional information related to this trade.
-	 */
-	private Map<String, Object> customData = null;
 
-	Trade(	InventoryClickEvent clickEvent, MerchantInventory merchantInventory, Player tradingPlayer,
-			TradingRecipe tradingRecipe, ItemStack offeredItem1, ItemStack offeredItem2, boolean swappedItemOrder) {
-		assert clickEvent != null && merchantInventory != null && tradingPlayer != null && tradingRecipe != null && offeredItem1 != null;
-		this.clickEvent = clickEvent;
-		this.merchantInventory = merchantInventory;
-		this.tradingPlayer = tradingPlayer;
-		this.playerInventory = tradingPlayer.getInventory();
+	private final TradingContext tradingContext;
+	private final int tradeNumber;
+	private final TradingRecipe tradingRecipe;
+	private final ItemStack offeredItem1;
+	private final ItemStack offeredItem2;
+	private final boolean swappedItemOrder;
+	private final KeyValueStore metadata = new MapBasedKeyValueStore();
+
+	/**
+	 * Creates a new {@link Trade}.
+	 * 
+	 * @param tradingContext
+	 *            the trading context, not <code>null</code>
+	 * @param tradeNumber
+	 *            the trade number
+	 * @param tradingRecipe
+	 *            the used trading recipe, not <code>null</code>
+	 * @param offeredItem1
+	 *            the first offered item, not <code>null</code> or empty
+	 * @param offeredItem2
+	 *            the second offered item, can be <code>null</code>
+	 * @param swappedItemOrder
+	 *            <code>true</code> if the offered items are placed in reverse order inside the merchant inventory
+	 */
+	Trade(	TradingContext tradingContext, int tradeNumber, TradingRecipe tradingRecipe,
+			ItemStack offeredItem1, ItemStack offeredItem2, boolean swappedItemOrder) {
+		Validate.notNull(tradingContext, "tradingContext is null");
+		Validate.isTrue(tradeNumber >= 1, "tradeNumber is less than 1");
+		Validate.notNull(tradingRecipe, "tradingRecipe is null");
+		Validate.notNull(offeredItem1, "offeredItem1 is null");
+		this.tradingContext = tradingContext;
+		this.tradeNumber = tradeNumber;
 		this.tradingRecipe = tradingRecipe;
 		this.offeredItem1 = offeredItem1;
 		this.offeredItem2 = offeredItem2;
@@ -86,48 +56,142 @@ public final class Trade {
 	}
 
 	/**
-	 * Gets the value for the specified key.
-	 * <p>
-	 * In combination with {@link #set(String, Object)} this allows the {@link Trade} to store additional arbitrary
-	 * data.
+	 * Gets the {@link TradingContext}.
 	 * 
-	 * @param <T>
-	 *            the expected type of the value
-	 * @param key
-	 *            the key, not <code>null</code>
-	 * @return the value, or <code>null</code> if there is no value for the specified key
+	 * @return the trading context, not <code>null</code>
 	 */
-	@SuppressWarnings("unchecked")
-	public <T> T get(String key) {
-		Validate.notNull(key, "key is null");
-		if (customData == null) return null;
-		return (T) customData.get(key);
+	public TradingContext getTradingContext() {
+		return tradingContext;
 	}
 
 	/**
-	 * Stores the given value under the specified key.
-	 * <p>
-	 * In combination with {@link #get(String)} this allows the {@link Trade} to store additional arbitrary data.
+	 * Gets the involved {@link Shopkeeper}.
 	 * 
-	 * @param <T>
-	 *            the type of the value
-	 * @param key
-	 *            the key, not <code>null</code>
-	 * @param value
-	 *            the value, or <code>null</code> to clear any previous value for the given key
+	 * @return the shopkeeper, not <code>null</code>
 	 */
-	public <T> void set(String key, T value) {
-		Validate.notNull(key, "key is null");
-		if (value == null) {
-			// Clear the value for the given key:
-			if (customData != null) {
-				customData.remove(key);
-			}
-		} else {
-			if (customData == null) {
-				customData = new HashMap<>();
-			}
-			customData.put(key, value);
-		}
+	public Shopkeeper getShopkeeper() {
+		return tradingContext.getShopkeeper();
+	}
+
+	/**
+	 * Gets the involved {@link InventoryClickEvent}.
+	 * <p>
+	 * Do not modify this event or any of the involved items! The event has to be kept cancelled!
+	 * 
+	 * @return the inventory click event, not <code>null</code>
+	 */
+	public InventoryClickEvent getInventoryClickEvent() {
+		return tradingContext.getInventoryClickEvent();
+	}
+
+	/**
+	 * Gets the involved {@link MerchantInventory}.
+	 * 
+	 * @return the merchant inventory, not <code>null</code>
+	 */
+	public MerchantInventory getMerchantInventory() {
+		return tradingContext.getMerchantInventory();
+	}
+
+	/**
+	 * Gets the trading {@link Player}.
+	 * 
+	 * @return the trading player, not <code>null</code>
+	 */
+	public Player getTradingPlayer() {
+		return tradingContext.getTradingPlayer();
+	}
+
+	/**
+	 * Gets the {@link PlayerInventory} of the trading player.
+	 * 
+	 * @return the player inventory, not <code>null</code>
+	 */
+	public PlayerInventory getPlayerInventory() {
+		return tradingContext.getPlayerInventory();
+	}
+
+	/**
+	 * Gets the number of this trade among the trades that are triggered by the same inventory click.
+	 * <p>
+	 * This returns {@code 1} if this is the first trade that is being processed.
+	 * 
+	 * @return the number of this trade
+	 */
+	public int getTradeNumber() {
+		return tradeNumber;
+	}
+
+	/**
+	 * Gets the used {@link TradingRecipe}.
+	 * 
+	 * @return the trading recipe, not <code>null</code>
+	 */
+	public TradingRecipe getTradingRecipe() {
+		return tradingRecipe;
+	}
+
+	/**
+	 * Gets the item offered by the player that matches the first required item of the {@link #getTradingRecipe() used
+	 * trading recipe}.
+	 * <p>
+	 * Due to the possibility of the input items being matched to the required items in {@link #isItemOrderSwapped()
+	 * reverse order}, the returned item stack is not necessarily the item in the first input slot of the merchant
+	 * inventory.
+	 * <p>
+	 * The type of the returned item equals that of the first required item of the used trading recipe, but its metadata
+	 * might be different. However, depending on the item matching rules of the used Minecraft version and the
+	 * Shopkeepers settings (eg. with strict item comparisons being disabled), the offered item might still be accepted
+	 * for the trade nevertheless.
+	 * <p>
+	 * The returned item stack is not a copy and might get modified once the trade is applied! The item stack size
+	 * matches the original stack size of the item used by the player.
+	 * 
+	 * @return the offered item that matches the first required item, not <code>null</code> or empty
+	 */
+	public ItemStack getOfferedItem1() {
+		return offeredItem1;
+	}
+
+	/**
+	 * Gets the item offered by the player that matches the second required item of the {@link #getTradingRecipe() used
+	 * trading recipe}.
+	 * <p>
+	 * Due to the possibility of the input items being matched to the required items in {@link #isItemOrderSwapped()
+	 * reverse order}, the returned item stack is not necessarily the item in the second input slot of the merchant
+	 * inventory.
+	 * <p>
+	 * The type of the returned item equals that of the second required item of the used trading recipe, but its
+	 * metadata might be different. However, depending on the item matching rules of the used Minecraft version and the
+	 * Shopkeepers settings (eg. with strict item comparisons being disabled), the offered item might still be accepted
+	 * for the trade nevertheless.
+	 * <p>
+	 * The returned item stack is not a copy and might get modified once the trade is applied! The item stack size
+	 * matches the original stack size of the item used by the player.
+	 * 
+	 * @return the offered item that matches the second required item, or <code>null</code> if the trade requires no
+	 *         second item
+	 */
+	public ItemStack getOfferedItem2() {
+		return offeredItem2;
+	}
+
+	/**
+	 * Gets whether the {@link #getOfferedItem1() first} and {@link #getOfferedItem2() second} offered items are placed
+	 * in reverse order inside the input slots of the merchant inventory.
+	 * 
+	 * @return <code>true</code> if the input items are matched in reverse order to the used trading recipe
+	 */
+	public boolean isItemOrderSwapped() {
+		return swappedItemOrder;
+	}
+
+	/**
+	 * Gets the {@link KeyValueStore} that stores additional arbitrary metadata related to this {@link Trade}.
+	 * 
+	 * @return the metadata key-value store, not <code>null</code>
+	 */
+	public KeyValueStore getMetadata() {
+		return metadata;
 	}
 }

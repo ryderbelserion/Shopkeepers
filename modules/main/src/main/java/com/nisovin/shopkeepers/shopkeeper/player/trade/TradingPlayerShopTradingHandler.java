@@ -28,8 +28,8 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 	protected boolean prepareTrade(Trade trade) {
 		if (!super.prepareTrade(trade)) return false;
 		SKTradingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		Player tradingPlayer = trade.tradingPlayer;
-		TradingRecipe tradingRecipe = trade.tradingRecipe;
+		Player tradingPlayer = trade.getTradingPlayer();
+		TradingRecipe tradingRecipe = trade.getTradingRecipe();
 
 		// Find offer:
 		TradeOffer offer = shopkeeper.getOffer(tradingRecipe);
@@ -52,8 +52,8 @@ public class TradingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		}
 
 		// Add the traded items to the container contents:
-		if (!this.addItems(newContainerContents, tradingRecipe.getItem1(), trade.offeredItem1)
-				|| !this.addItems(newContainerContents, tradingRecipe.getItem2(), trade.offeredItem2)) {
+		if (!this.addItems(newContainerContents, tradingRecipe.getItem1(), trade.getOfferedItem1())
+				|| !this.addItems(newContainerContents, tradingRecipe.getItem2(), trade.getOfferedItem2())) {
 			TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 			this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 			return false;

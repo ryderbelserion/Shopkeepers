@@ -27,8 +27,8 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 	protected boolean prepareTrade(Trade trade) {
 		if (!super.prepareTrade(trade)) return false;
 		SKSellingPlayerShopkeeper shopkeeper = this.getShopkeeper();
-		Player tradingPlayer = trade.tradingPlayer;
-		TradingRecipe tradingRecipe = trade.tradingRecipe;
+		Player tradingPlayer = trade.getTradingPlayer();
+		TradingRecipe tradingRecipe = trade.getTradingRecipe();
 
 		// Get offer for this type of item:
 		UnmodifiableItemStack soldItem = tradingRecipe.getResultItem();
