@@ -5,6 +5,7 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
 * Added editor options to change the puff state of puffer fish, as well as the pattern and colors of tropical fish.
+* Added sound effects when a trade succeeds or fails. These sound effects can be changed or disabled (by setting their volume to zero) via the config settings `trade-succeeded-sound` and `trade-failed-sound`.
 * Shopkeepers store the yaw angle now with which they are initially spawned.
   * When placing a shopkeeper on top of a block, the yaw angle is chosen so that the shopkeeper faces towards the player who is creating the shopkeeper. When placing a shopkeeper against the side of a block, the shopkeeper is rotated according to the direction of the targeted block side.
   * Existing shopkeepers will have a yaw of 0, i.e. they keep facing south by default. In the future it will be possible to reposition shopkeepers and thereby also adjust the yaw of already existing shopkeepers.

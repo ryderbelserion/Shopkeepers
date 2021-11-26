@@ -465,6 +465,17 @@ use-strict-item-comparison: false
 # statistics whenever a player opens the trading menu and trades with a
 # shopkeeper.
 increment-villager-statistics: false
+# This sound effect is played to players when they trigger a successful trade.
+trade-succeeded-sound:
+  sound: UI_BUTTON_CLICK
+  pitch: 2.0
+  volume: 0.3
+# This sound effect is played to players when their trade attempt fails for any
+# reason.
+trade-failed-sound:
+  sound: BLOCK_BARREL_CLOSE
+  pitch: 2.0
+  volume: 0.5
 
 # The percentage that should be removed from player shop earnings.
 tax-rate: 0

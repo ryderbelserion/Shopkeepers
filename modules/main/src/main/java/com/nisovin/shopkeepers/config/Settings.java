@@ -251,6 +251,8 @@ public class Settings extends Config {
 	public static boolean preventTradingWhileOwnerIsOnline = false;
 	public static boolean useStrictItemComparison = false;
 	public static boolean incrementVillagerStatistics = false;
+	public static SoundEffect tradeSucceededSound = new SoundEffect(Sound.UI_BUTTON_CLICK).withPitch(2.0f).withVolume(0.3f);
+	public static SoundEffect tradeFailedSound = new SoundEffect(Sound.BLOCK_BARREL_CLOSE).withPitch(2.0f).withVolume(0.5f);
 
 	public static int taxRate = 0;
 	public static boolean taxRoundUp = false;

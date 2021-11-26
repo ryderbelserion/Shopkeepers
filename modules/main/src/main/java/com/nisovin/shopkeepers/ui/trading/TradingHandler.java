@@ -715,6 +715,12 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		// Shopkeeper-specific application of the trade:
 		this.onTradeApplied(trade);
 
+		// Play a sound effect if this is the first trade triggered by the inventory click:
+		boolean silent = (trade.getTradeNumber() > 1);
+		if (!silent) {
+			Settings.tradeSucceededSound.play(player);
+		}
+
 		// Log trade:
 		Log.debug(() -> this.getShopkeeper().getLogPrefix() + "Trade (#" + trade.getTradeNumber() + ") by "
 				+ player.getName() + ": " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
@@ -765,7 +771,10 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	 *            <code>true</code> to skip any actions that might be noticeable by players on the server
 	 */
 	protected void onTradeAborted(TradingContext tradingContext, Trade trade, boolean silent) {
-		// Callback for subclasses.
+		// Play a sound effect, but only if this has been the first trade attempt triggered by the inventory click:
+		if (!silent && tradingContext.getTradeCount() == 1) {
+			Settings.tradeFailedSound.play(tradingContext.getTradingPlayer());
+		}
 	}
 
 	/**
