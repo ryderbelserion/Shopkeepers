@@ -247,9 +247,7 @@ public class SKUIRegistry extends AbstractTypeRegistry<AbstractUIType> implement
 	@Override
 	public void abortUISessions() {
 		// Copy to prevent concurrent modifications:
-		for (UISession session : new ArrayList<>(this.getUISessions())) {
-			session.abort();
-		}
+		new ArrayList<>(this.getUISessions()).forEach(SKUISession::abort);
 		assert uiSessions.isEmpty();
 	}
 
