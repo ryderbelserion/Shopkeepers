@@ -76,6 +76,7 @@ class UIListener implements Listener {
 
 	void onDisable() {
 		HandlerList.unregisterAll(this);
+		handledEventTypes.clear(); // Reset
 	}
 
 	// Note: It is safe to dynamically register event handlers for new types of not yet handled events: Bukkit takes a
