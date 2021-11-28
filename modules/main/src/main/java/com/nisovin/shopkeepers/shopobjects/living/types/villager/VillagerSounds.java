@@ -56,7 +56,7 @@ public class VillagerSounds extends TradingListener {
 	/**
 	 * Sound effects are only played if the trading player is within this range of the villager.
 	 */
-	private static final int TRADING_PLAYER_MAX_DISTANCE = 16;
+	private static final int TRADING_PLAYER_MAX_DISTANCE = 8;
 	private static final int TRADING_PLAYER_MAX_DISTANCE_SQ = TRADING_PLAYER_MAX_DISTANCE * TRADING_PLAYER_MAX_DISTANCE;
 
 	protected final Shopkeeper shopkeeper;
