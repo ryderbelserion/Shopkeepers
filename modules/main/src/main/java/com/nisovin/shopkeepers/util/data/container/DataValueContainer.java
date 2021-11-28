@@ -1,8 +1,9 @@
-package com.nisovin.shopkeepers.util.data;
+package com.nisovin.shopkeepers.util.data.container;
 
 import java.util.Map;
 import java.util.Set;
 
+import com.nisovin.shopkeepers.util.data.container.value.DataValue;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**

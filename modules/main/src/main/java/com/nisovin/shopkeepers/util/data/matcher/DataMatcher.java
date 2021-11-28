@@ -10,7 +10,7 @@ import java.util.Objects;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.path.DataPath;
 import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.Validate;

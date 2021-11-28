@@ -3,8 +3,8 @@ package com.nisovin.shopkeepers.config.lib;
 import org.bukkit.configuration.Configuration;
 
 import com.nisovin.shopkeepers.config.lib.bukkit.BukkitConfigData;
-import com.nisovin.shopkeepers.util.data.ConfigBasedDataContainer;
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.ConfigBasedDataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 
 /**
  * A {@link DataContainer} that stores configuration data and provides additional configuration specific functionality,

@@ -1,6 +1,8 @@
-package com.nisovin.shopkeepers.util.data;
+package com.nisovin.shopkeepers.util.data.container.value;
 
 import java.util.List;
+
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 
 /**
  * A container for a single non-<code>null</code> value of data.

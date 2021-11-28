@@ -5,8 +5,8 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import com.nisovin.shopkeepers.config.lib.ConfigData;
 import com.nisovin.shopkeepers.config.lib.SimpleConfigData;
-import com.nisovin.shopkeepers.util.data.ConfigBasedDataContainer;
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.ConfigBasedDataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 
 /**
  * A {@link ConfigData} implementation that extracts its default values from an underlying Bukkit {@link Configuration}

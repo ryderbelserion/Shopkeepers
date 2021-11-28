@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.util.data.serialization;
 
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.property.Property;
 
 /**

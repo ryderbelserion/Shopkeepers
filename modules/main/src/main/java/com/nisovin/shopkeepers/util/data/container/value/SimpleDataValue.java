@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.util.data;
+package com.nisovin.shopkeepers.util.data.container.value;
 
 /**
  * A simple {@link DataValue} implementation that is not bound to any underlying data structure, but stores the value

@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.config.migration;
 
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 
 /**
  * Migrates the config from version 3 to version 4.

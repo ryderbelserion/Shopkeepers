@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.util.data;
+package com.nisovin.shopkeepers.util.data.container;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

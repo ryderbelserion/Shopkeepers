@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.config.migration;
 import org.bukkit.Material;
 
 import com.nisovin.shopkeepers.util.bukkit.DataUtils;
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 /**

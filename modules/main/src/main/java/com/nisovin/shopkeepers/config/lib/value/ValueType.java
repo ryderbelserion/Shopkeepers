@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.config.lib.value;
 
 import com.nisovin.shopkeepers.config.lib.annotation.WithDefaultValueType;
 import com.nisovin.shopkeepers.config.lib.annotation.WithValueType;
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 
 /**
  * Defines how values of this type are loaded from and saved to configs.

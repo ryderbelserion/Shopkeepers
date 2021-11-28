@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.util.data;
+package com.nisovin.shopkeepers.util.data.container;
 
 /**
  * An unmodifiable view of another {@link DataContainer}.

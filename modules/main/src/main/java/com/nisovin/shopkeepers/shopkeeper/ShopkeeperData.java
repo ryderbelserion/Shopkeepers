@@ -1,8 +1,8 @@
 package com.nisovin.shopkeepers.shopkeeper;
 
 import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
-import com.nisovin.shopkeepers.util.data.DataContainer;
-import com.nisovin.shopkeepers.util.data.DelegateDataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DelegateDataContainer;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 
 /**

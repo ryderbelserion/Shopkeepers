@@ -1,7 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects;
 
-import com.nisovin.shopkeepers.util.data.DataContainer;
-import com.nisovin.shopkeepers.util.data.DelegateDataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DelegateDataContainer;
 
 /**
  * A wrapper around the {@link DataContainer} that contains a shop object's data.

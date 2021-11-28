@@ -4,7 +4,7 @@ import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import com.nisovin.shopkeepers.util.data.ConfigBasedDataContainer;
+import com.nisovin.shopkeepers.util.data.container.ConfigBasedDataContainer;
 import com.nisovin.shopkeepers.util.data.persistence.DataStore;
 import com.nisovin.shopkeepers.util.data.persistence.DataStoreBase;
 import com.nisovin.shopkeepers.util.data.persistence.InvalidDataFormatException;

@@ -1,7 +1,7 @@
 package com.nisovin.shopkeepers.config.lib;
 
-import com.nisovin.shopkeepers.util.data.DataContainer;
-import com.nisovin.shopkeepers.util.data.DelegateDataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DelegateDataContainer;
 
 /**
  * A basic {@link ConfigData} implementation.

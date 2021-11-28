@@ -6,7 +6,7 @@ import java.io.Reader;
 import java.io.Writer;
 import java.nio.file.Path;
 
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 
 /**
  * A {@link DataContainer} that provides means to save and load the stored data to and from some concrete storage

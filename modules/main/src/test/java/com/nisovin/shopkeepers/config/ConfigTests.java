@@ -17,7 +17,7 @@ import org.junit.Test;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 
 public class ConfigTests extends AbstractBukkitTest {
 

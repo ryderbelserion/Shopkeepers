@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.util.data.property;
 import java.util.List;
 import java.util.function.Predicate;
 
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 
 /**
  * Default {@link Predicate}s that evaluate if some data object is empty.

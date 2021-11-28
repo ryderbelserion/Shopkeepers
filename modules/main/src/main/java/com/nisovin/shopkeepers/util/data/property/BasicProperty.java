@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.util.data.property;
 
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.property.validation.ChainedPropertyValidator;
 import com.nisovin.shopkeepers.util.data.property.validation.PropertyValidator;
 import com.nisovin.shopkeepers.util.data.serialization.DataAccessor;

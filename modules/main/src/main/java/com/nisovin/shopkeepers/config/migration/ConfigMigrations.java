@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
-import com.nisovin.shopkeepers.util.data.DataContainer;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.logging.Log;
 

@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.util.data;
+package com.nisovin.shopkeepers.util.data.container.value;
 
 /**
  * An unmodifiable view of another {@link DataValue}.
