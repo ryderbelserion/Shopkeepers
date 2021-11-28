@@ -11,6 +11,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
@@ -20,9 +22,12 @@ import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.living.LivingShops;
 import com.nisovin.shopkeepers.shopobjects.living.SKLivingShopObjectType;
+import com.nisovin.shopkeepers.shopobjects.living.types.villager.VillagerSounds;
+import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
+import com.nisovin.shopkeepers.ui.trading.TradingHandler;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.validation.java.IntegerValidators;
@@ -104,9 +109,12 @@ public class VillagerShop extends BabyableShop<Villager> {
 			.onValueChanged(this::applyVillagerLevel)
 			.build(properties);
 
+	private final VillagerSounds villagerSounds;
+
 	public VillagerShop(LivingShops livingShops, SKLivingShopObjectType<VillagerShop> livingObjectType,
 						AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
 		super(livingShops, livingObjectType, shopkeeper, creationData);
+		villagerSounds = new VillagerSounds(this);
 	}
 
 	@Override
@@ -126,6 +134,19 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	@Override
+	public void setup() {
+		super.setup();
+
+		if (Settings.simulateVillagerTradingSounds) {
+			UIHandler tradingUIHandler = shopkeeper.getUIHandler(DefaultUITypes.TRADING());
+			if (tradingUIHandler instanceof TradingHandler) {
+				TradingHandler tradingHandler = (TradingHandler) tradingUIHandler;
+				tradingHandler.addListener(villagerSounds);
+			}
+		}
+	}
+
+	@Override
 	protected void onSpawn() {
 		super.onSpawn();
 		// TODO I wasn't able to reproduce this myself yet, but according to some reports villager shopkeepers would
@@ -133,9 +154,22 @@ public class VillagerShop extends BabyableShop<Villager> {
 		// Related (but shouldn't apply here since we use NoAI mobs): https://hub.spigotmc.org/jira/browse/SPIGOT-4776
 		Villager entity = this.getEntity();
 		entity.setVillagerExperience(1);
+		if (Settings.simulateVillagerTradingSounds || Settings.simulateVillagerAmbientSounds) {
+			entity.setSilent(true);
+		}
 		this.applyProfession();
 		this.applyVillagerType();
 		this.applyVillagerLevel();
+	}
+
+	@Override
+	public void tick() {
+		super.tick();
+
+		// Ambient sounds:
+		if (Settings.simulateVillagerAmbientSounds) {
+			villagerSounds.tick();
+		}
 	}
 
 	@Override

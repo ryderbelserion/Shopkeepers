@@ -45,6 +45,7 @@ import com.nisovin.shopkeepers.shopobjects.living.types.SlimeShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.SnowmanShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.TropicalFishShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.VillagerShop;
+import com.nisovin.shopkeepers.shopobjects.living.types.WanderingTraderShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.WolfShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieShop;
 import com.nisovin.shopkeepers.shopobjects.living.types.ZombieVillagerShop;
@@ -280,6 +281,10 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 		case VILLAGER:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
 					permission, VillagerShop.class, VillagerShop::new);
+			break;
+		case WANDERING_TRADER:
+			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,
+					permission, WanderingTraderShop.class, WanderingTraderShop::new);
 			break;
 		case PIG:
 			objectType = new SKLivingShopObjectType<>(livingShops, entityType, identifier, aliases,

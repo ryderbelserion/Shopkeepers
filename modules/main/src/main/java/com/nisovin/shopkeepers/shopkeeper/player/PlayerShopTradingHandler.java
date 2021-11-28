@@ -103,8 +103,8 @@ public abstract class PlayerShopTradingHandler extends TradingHandler {
 	}
 
 	@Override
-	protected void onTradeAborted(TradingContext tradingContext, Trade trade, boolean silent) {
-		super.onTradeAborted(tradingContext, trade, silent);
+	protected void onTradeAborted(TradingContext tradingContext, boolean silent) {
+		super.onTradeAborted(tradingContext, silent);
 		this.resetTradeState();
 	}
 

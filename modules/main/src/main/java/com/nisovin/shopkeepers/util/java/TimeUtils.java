@@ -2,10 +2,12 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.concurrent.TimeUnit;
 
-public class TimeUtils {
+public final class TimeUtils {
 
-	private TimeUtils() {
-	}
+	/**
+	 * The number of nanoseconds in one second.
+	 */
+	public static final long NANOS_PER_SECOND = TimeUnit.SECONDS.toNanos(1);
 
 	/**
 	 * Converts a duration between the given {@link TimeUnit time units} while preserving double precision.
@@ -28,5 +30,8 @@ public class TimeUtils {
 		} else {
 			return duration * to.convert(1, from);
 		}
+	}
+
+	private TimeUtils() {
 	}
 }

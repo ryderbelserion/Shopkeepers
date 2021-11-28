@@ -307,8 +307,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * This gets called after {@link #setup()} and might be used to perform any setup that is intended to definitely
-	 * happen last.
+	 * This is called after {@link #setup()} and can be used to perform any setup that needs to happen last.
 	 */
 	protected void postSetup() {
 		// Inform shop object:

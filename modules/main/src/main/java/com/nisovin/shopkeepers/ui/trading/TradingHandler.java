@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Statistic;
@@ -11,7 +12,9 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.TradeSelectEvent;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
@@ -47,14 +50,34 @@ import com.nisovin.shopkeepers.util.logging.Log;
 
 public class TradingHandler extends AbstractShopkeeperUIHandler {
 
+	private static final Set<Class<? extends InventoryEvent>> ADDITIONAL_INVENTORY_EVENTS = Collections.singleton(TradeSelectEvent.class);
+
 	// Those slot ids match both raw slot ids and regular slot ids for the merchant inventory view with the merchant
 	// inventory at the top:
 	protected static final int BUY_ITEM_1_SLOT_ID = 0;
 	protected static final int BUY_ITEM_2_SLOT_ID = 1;
 	protected static final int RESULT_ITEM_SLOT_ID = 2;
 
+	private final List<TradingListener> tradingListeners = new ArrayList<>();
+
 	public TradingHandler(AbstractUIType uiType, AbstractShopkeeper shopkeeper) {
 		super(uiType, shopkeeper);
+	}
+
+	@Override
+	protected Set<Class<? extends InventoryEvent>> getAdditionalInventoryEvents() {
+		return ADDITIONAL_INVENTORY_EVENTS;
+	}
+
+	/**
+	 * Registers the given {@link TradingListener}.
+	 * 
+	 * @param listener
+	 *            the listener, not <code>null</code>
+	 */
+	public final void addListener(TradingListener listener) {
+		Validate.notNull(listener, "listener is null");
+		tradingListeners.add(listener);
 	}
 
 	@Override
@@ -256,10 +279,21 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	// });
 	// }
 
+	@Override
+	protected void onInventoryEventEarly(UISession uiSession, InventoryEvent event) {
+		if (event instanceof TradeSelectEvent) {
+			// Inform listeners:
+			tradingListeners.forEach(listener -> listener.onTradeSelect(uiSession, (TradeSelectEvent) event));
+		}
+	}
+
 	// Late processing, so that other plugins can cancel the trading without having to rely on Shopkeepers' API.
 	@Override
 	protected void onInventoryClickLate(UISession uiSession, InventoryClickEvent clickEvent) {
 		assert uiSession != null && clickEvent != null;
+
+		// Inform listeners:
+		tradingListeners.forEach(listener -> listener.onInventoryClick(uiSession, clickEvent));
 
 		Player player = uiSession.getPlayer();
 		Shopkeeper shopkeeper = this.getShopkeeper();
@@ -505,7 +539,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 				TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeUnexpectedTrade);
 				Log.debug(() -> shopkeeper.getLogPrefix() + "Not handling trade: Could not find the active trading recipe!");
 			}
-			this.onTradeAborted(tradingContext, null, silent);
+			this.onTradeAborted(tradingContext, silent);
 			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
 		}
@@ -524,7 +558,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 					debugLogItemStack("resultItem", resultItem);
 				}
 			}
-			this.onTradeAborted(tradingContext, null, silent);
+			this.onTradeAborted(tradingContext, silent);
 			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
 		}
@@ -554,7 +588,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 				Log.debug(() -> shopkeeper.getLogPrefix()
 						+ "Not handling trade: Could not match the offered items to the active trading recipe!");
 			}
-			this.onTradeAborted(tradingContext, null, silent);
+			this.onTradeAborted(tradingContext, silent);
 			this.clearResultSlotForInvalidTrade(merchantInventory);
 			return null;
 		}
@@ -590,7 +624,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 						}
 					}
 				}
-				this.onTradeAborted(tradingContext, null, slientStrictItemComparison);
+				this.onTradeAborted(tradingContext, slientStrictItemComparison);
 				this.clearResultSlotForInvalidTrade(merchantInventory);
 				return null;
 			}
@@ -646,7 +680,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		// Check and prepare the trade:
 		if (!this.prepareTrade(trade)) {
 			// The trade got cancelled for some shopkeeper-specific reason:
-			this.onTradeAborted(trade.getTradingContext(), trade, false);
+			this.onTradeAborted(trade.getTradingContext(), false);
 			return false;
 		}
 
@@ -671,7 +705,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		if (tradeEvent.isCancelled()) {
 			Log.debug(() -> shopkeeper.getLogPrefix() + "Some plugin cancelled the trade event of player "
 					+ tradingPlayer.getName());
-			this.onTradeAborted(trade.getTradingContext(), trade, false);
+			this.onTradeAborted(trade.getTradingContext(), false);
 			return false;
 		}
 		// Making sure that the click event is still cancelled:
@@ -721,6 +755,9 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			Settings.tradeSucceededSound.play(player);
 		}
 
+		// Inform listeners:
+		tradingListeners.forEach(listener -> listener.onTradeCompleted(trade, silent));
+
 		// Log trade:
 		Log.debug(() -> this.getShopkeeper().getLogPrefix() + "Trade (#" + trade.getTradeNumber() + ") by "
 				+ player.getName() + ": " + ItemUtils.getSimpleRecipeInfo(tradingRecipe));
@@ -752,25 +789,25 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	 * This is not called for cancelled {@link InventoryClickEvent}s, or inventory actions that are ignored because they
 	 * would not result in a trade in vanilla Minecraft either.
 	 * <p>
-	 * This can also be called very early in the trade processing, for trade attempts for which no corresponding valid
-	 * {@link Trade} instance could be created. If no corresponding {@link Trade} object has been created yet, the
-	 * {@link TradingContext}'s {@link TradingContext#getTradeCount() trade count} and
-	 * {@link TradingContext#getCurrentTrade() current trade} do not reflect the aborted trade attempt.
+	 * If available, the corresponding {@link Trade} instance can be retrieved via
+	 * {@link TradingContext#getCurrentTrade()}. However, trade attempts can also be aborted before a corresponding
+	 * valid {@link Trade} instance could be created. {@link TradingContext#getCurrentTrade()} will then return
+	 * <code>null</code>. {@link TradingContext#getTradeCount()} will always reflect the aborted trade attempt.
 	 * <p>
-	 * This is also called for trades that are aborted by {@link #prepareTrade(Trade)} and can be used to perform any
+	 * This is also called for trades that were aborted by {@link #prepareTrade(Trade)} and can be used to perform any
 	 * necessary cleanup.
 	 * <p>
 	 * When a trade has been cancelled, no further trades will be processed for the same {@link TradingContext}.
 	 * 
 	 * @param tradingContext
 	 *            the trading context, not <code>null</code>
-	 * @param trade
-	 *            the trade, or <code>null</code> if the trade was cancelled because no corresponding valid
-	 *            {@link Trade} instance could be created
 	 * @param silent
 	 *            <code>true</code> to skip any actions that might be noticeable by players on the server
 	 */
-	protected void onTradeAborted(TradingContext tradingContext, Trade trade, boolean silent) {
+	protected void onTradeAborted(TradingContext tradingContext, boolean silent) {
+		// Inform listeners:
+		tradingListeners.forEach(listener -> listener.onTradeAborted(tradingContext, silent));
+
 		// Play a sound effect, but only if this has been the first trade attempt triggered by the inventory click:
 		if (!silent && tradingContext.getTradeCount() == 1) {
 			Settings.tradeFailedSound.play(tradingContext.getTradingPlayer());

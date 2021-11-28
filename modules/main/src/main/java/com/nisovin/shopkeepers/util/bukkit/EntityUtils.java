@@ -23,10 +23,7 @@ import com.nisovin.shopkeepers.util.java.PredicateUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public class EntityUtils {
-
-	private EntityUtils() {
-	}
+public final class EntityUtils {
 
 	private static final Set<Material> LAVA = Collections.singleton(Material.LAVA);
 
@@ -182,5 +179,8 @@ public class EntityUtils {
 			return rayTraceResult.getHitEntity(); // Can be null
 		}
 		return null;
+	}
+
+	private EntityUtils() {
 	}
 }

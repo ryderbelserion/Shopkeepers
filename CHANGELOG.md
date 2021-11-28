@@ -5,7 +5,16 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
 * Added editor options to change the puff state of puffer fish, as well as the pattern and colors of tropical fish.
-* Added sound effects when a trade succeeds or fails. These sound effects can be changed or disabled (by setting their volume to zero) via the config settings `trade-succeeded-sound` and `trade-failed-sound`.
+* Added sound effects when a trade succeeds or fails.
+  * Config: These sound effects can be changed or disabled (by setting their volume to zero) via the new config settings `trade-succeeded-sound` and `trade-failed-sound`.
+* Added settings to simulate the trading sounds of vanilla villagers and wandering traders.
+  * Config: Added setting `simulate-villager-trading-sounds` (default: `true`)
+  * Config: Added setting `simulate-villager-ambient-sounds` (default: `false`)
+  * Config: Added setting `simulate-wandering-trader-trading-sounds` (default: `true`)
+  * Config: Added setting `simulate-wandering-trader-ambient-sounds` (default: `false`)
+  * Config: Added setting `simulate-villager-trading-sounds-only-for-the-trading-player` (default: `true`)
+  * By default, we now simulate the trading sounds of villagers and wandering traders for the trading player. These sounds are only played if the trading player is in the vicinity of the shopkeeper. Trading remotely will not play these sounds.
+  * Debug: Debug output for these simulated villager sounds can be enabled via the existing debug option `regular-tick-activities`.
 * Shopkeepers store the yaw angle now with which they are initially spawned.
   * When placing a shopkeeper on top of a block, the yaw angle is chosen so that the shopkeeper faces towards the player who is creating the shopkeeper. When placing a shopkeeper against the side of a block, the shopkeeper is rotated according to the direction of the targeted block side.
   * Existing shopkeepers will have a yaw of 0, i.e. they keep facing south by default. In the future it will be possible to reposition shopkeepers and thereby also adjust the yaw of already existing shopkeepers.
@@ -75,6 +84,7 @@ Date format: (YYYY-MM-DD)
 **Other internal changes:**  
 * Internal API: Various internal UI, editor UI, and trading UI related refactors.
   * Changed how the trading UI handler represents the trade that is currently being processed.
+  * It is now possible to register TradingListeners with the TradingHandler that are informed on various events during the trade handling.
   * Moved various editor internal classes into their own files.
 * Internal API: ProtectedContainers requires a BlockLocation now when adding or removing a container protection.
 * Internal API: Various changes to the loading, saving, and migration of shop offers. They use the new internal data serialization and property APIs now to save and load their data.

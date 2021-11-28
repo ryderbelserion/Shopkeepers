@@ -15,12 +15,11 @@ debug: false
 #    each event.
 # - 'shopkeeper-activation': Enables debugging output related to shopkeeper
 #    activation.
-# - 'regular-tick-activities': Enables debug output related to shopkeeper
-#    ticking activities that may be considered non-exceptional, and might occur
-#    regularly and therefore cause debug spam otherwise. This includes, for
-#    example, the activity of teleporting shopkeepers back into place, or
-#    updating a shopkeeper's location when a mobile shopkeeper NPC moved
-#    around.
+# - 'regular-tick-activities': Enables debug output for regular shopkeeper
+#    activities and behaviors that would otherwise cause debug spam when being
+#    enabled by default. This includes for example the activity of teleporting
+#    shopkeepers back into place, updating their location when they are mobile
+#    and moved around, or behaviors such as the playing of sound effects.
 # - 'visualize-shopkeeper-ticks': Visualizes the ticking activities of
 #    shopkeepers in-game.
 # - 'commands': Enables additional commands related debugging output.
@@ -461,10 +460,32 @@ prevent-trading-while-owner-is-online: false
 # will prevent the trade once the player tries to pickup the item from the
 # trading result slot.
 use-strict-item-comparison: false
+
 # Whether to increment Minecraft's talked-to-villager and traded-with-villager
 # statistics whenever a player opens the trading menu and trades with a
 # shopkeeper.
 increment-villager-statistics: false
+# Whether to mimic Minecraft's normal villager trading sounds whenever a player
+# trades with a villager shopkeeper. This only applies to villager shopkeepers
+# and ignores the 'silence-living-shop-entities' setting.
+simulate-villager-trading-sounds: true
+# Whether to simulate villager ambient sounds for villager shopkeepers. This
+# ignores the 'silence-living-shop-entities' setting.
+simulate-villager-ambient-sounds: false
+# Whether to mimic Minecraft's normal wandering trader trading sounds whenever
+# a player trades with a wandering trader shopkeeper. This only applies to
+# wandering trader shopkeepers and ignores the 'silence-living-shop-entities'
+# setting.
+simulate-wandering-trader-trading-sounds: true
+# Whether to simulate wandering trader ambient sounds for wandering trader
+# shopkeepers. This ignores the 'silence-living-shop-entities' setting.
+simulate-wandering-trader-ambient-sounds: false
+# Whether to play the simulated trading sounds of villager and wandering trader
+# shopkeepers only to the trading player, instead of broadcasting them to all
+# nearby players as it is the case in vanilla Minecraft. This does not affect
+# the simulated ambient sounds.
+simulate-trading-sounds-only-for-the-trading-player: true
+
 # This sound effect is played to players when they trigger a successful trade.
 trade-succeeded-sound:
   sound: UI_BUTTON_CLICK
