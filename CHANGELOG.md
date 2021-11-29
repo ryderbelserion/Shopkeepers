@@ -4,6 +4,17 @@ Date format: (YYYY-MM-DD)
 ## v2.14.0 (TBA)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
+* Added the option for admins to create and restore snapshots of shopkeepers.
+  * Each snapshot captures the shopkeeper's dynamic state (i.e. its trades, shop object configuration, etc.), a timestamp, and is associated with an uniqe name that is provided when the snapshot is created.
+  * The name can currently be at most 64 characters long and not contain any color codes.
+  * The externally stored NPC state of Citizens NPC shopkeepers is not captured currently.
+  * This feature is currently meant to only be used by admins and third-party plugins. Shop owners are not yet able to create and restore snapshots of their own shops.
+  * The shopkeeper data of snapshots is automatically migrated during plugin startup, just like the shopkeeper's normal data.
+  * Shopkeeper snapshots are currently expected to be used sparsely. In order to guard against the unnoticed creation of excessive amounts of snapshots, we log a warning whenever a shopkeeper has more than 10 snapshots.
+  * When formatting the timestamp of a snapshot for display, we currently use the server's default time zone. There is no option in Shopkeepers yet to use a different timezone. If you want to use a different timezone for formatting the timestamps, you can change your server's default timezone via the JVM command line argument `-Duser.timezone=America/New_York` when you start your server.
+  * Command: Added commands `/shopkeeper snapshot [list|create|remove|restore]` to manage shopkeeper snapshots.
+  * Permission: Added permission `shopkeeper.snapshot` (default: op) which provides access to the new snapshot commands.
+* API: API additions to manage the snapshots of a shopkeeper.
 * Added editor options to change the puff state of puffer fish, as well as the pattern and colors of tropical fish.
 * Added sound effects when a trade succeeds or fails.
   * Config: These sound effects can be changed or disabled (by setting their volume to zero) via the new config settings `trade-succeeded-sound` and `trade-failed-sound`.
@@ -132,6 +143,27 @@ Date format: (YYYY-MM-DD)
 * Added `button-tropical-fish-pattern-color-lore`.
 * Added `button-puffer-fish-puff-state`.
 * Added `button-puffer-fish-puff-state-lore`.
+* Added `date-time-format`.
+* Added `shop-no-longer-exists`.
+* Added `snapshot-list-header`.
+* Added `snapshot-list-entry`.
+* Added `invalid-snapshot-id`.
+* Added `invalid-snapshot-name`.
+* Added `snapshot-name-too-long`.
+* Added `snapshot-name-invalid`.
+* Added `snapshot-name-already-exists`.
+* Added `snapshot-created`.
+* Added `confirm-remove-snapshot`.
+* Added `confirm-remove-all-snapshots`.
+* Added `action-aborted-snapshots-changed`.
+* Added `snapshot-removed`.
+* Added `snapshot-removed-all`.
+* Added `snapshot-restore-failed`.
+* Added `snapshot-restored`.
+* Added `command-description-snapshot-list`.
+* Added `command-description-snapshot-create`.
+* Added `command-description-snapshot-remove`.
+* Added `command-description-snapshot-restore`.
 
 ## v2.13.3 (2021-07-08)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4

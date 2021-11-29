@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.api.internal;
 
 import org.bukkit.inventory.ItemStack;
 
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperSnapshot;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
@@ -113,4 +114,24 @@ public interface ApiInternals {
 	 * @see BookOffer#create(String, int)
 	 */
 	public BookOffer createBookOffer(String bookTitle, int price);
+
+	// SHOPKEEPER SNAPSHOTS
+
+	/**
+	 * Gets the maximum length of {@link ShopkeeperSnapshot} names.
+	 * 
+	 * @return the maximum snapshot name length
+	 * @see ShopkeeperSnapshot#getMaxNameLength()
+	 */
+	public int getShopkeeperSnapshotMaxNameLength();
+
+	/**
+	 * Checks if the given {@link ShopkeeperSnapshot} name is valid.
+	 * 
+	 * @param name
+	 *            the name
+	 * @return <code>true</code> if the name is valid
+	 * @see ShopkeeperSnapshot#isNameValid(String)
+	 */
+	public boolean isShopkeeperSnapshotNameValid(String name);
 }

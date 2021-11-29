@@ -96,6 +96,9 @@ permissions:
     shopkeeper.setforhire:
         description: Set a shopkeeper to be for hire
         default: op
+    shopkeeper.snapshot:
+        description: Access shopkeeper snapshot commands
+        default: op
     shopkeeper.edit-villagers:
         description: Edit regular villagers
         default: op

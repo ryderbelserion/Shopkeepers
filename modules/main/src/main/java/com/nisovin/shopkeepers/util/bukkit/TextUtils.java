@@ -123,6 +123,11 @@ public class TextUtils {
 	public static final char COLOR_CHAR_ALTERNATIVE = '&';
 	private static final Pattern STRIP_COLOR_ALTERNATIVE_PATTERN = Pattern.compile("(?i)" + String.valueOf(COLOR_CHAR_ALTERNATIVE) + "[0-9A-FK-OR]");
 
+	// Only checks for the Minecraft color code character, not the alternative color code character.
+	public static boolean containsColorChar(String text) {
+		return StringUtils.contains(text, ChatColor.COLOR_CHAR);
+	}
+
 	// Reverse of ChatColor#translateAlternateColorCodes:
 	public static String translateColorCodesToAlternative(char altColorChar, String textToTranslate) {
 		char[] b = textToTranslate.toCharArray();

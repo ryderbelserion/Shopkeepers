@@ -154,6 +154,10 @@ public interface ShopkeepersPlugin extends Plugin {
 	 */
 	public static final String HIRE_PERMISSION = "shopkeeper.hire";
 	/**
+	 * The <code>shopkeeper.snapshot</code> permission.
+	 */
+	public static final String SNAPSHOT_PERMISSION = "shopkeeper.snapshot";
+	/**
 	 * The <code>shopkeeper.edit-villagers</code> permission.
 	 */
 	public static final String EDIT_VILLAGERS_PERMISSION = "shopkeeper.edit-villagers";

@@ -1,6 +1,9 @@
 package com.nisovin.shopkeepers.shopkeeper;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +26,9 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperLoadException;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
+import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperSnapshot;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObject;
@@ -34,6 +39,9 @@ import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
+import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
+import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -98,6 +106,11 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// and on shop object specific limits.
 	public static final int MAX_NAME_LENGTH = 128;
 
+	/**
+	 * We log a warning when a shopkeeper has more than this amount of snapshots.
+	 */
+	private static final int SNAPSHOTS_WARNING_LIMIT = 10;
+
 	// Shopkeeper tick visualization:
 	// Particles of different colors indicate the different ticking groups.
 	// Note: The client seems to randomly change the color slightly each time a dust particle is spawned.
@@ -149,6 +162,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// The ChunkCoords under which the shopkeeper is currently stored:
 	private ChunkCoords lastChunkCoords = null;
 	private String name = ""; // Not null, can be empty
+
+	private final List<SKShopkeeperSnapshot> snapshots = new ArrayList<>();
+	private final List<? extends SKShopkeeperSnapshot> snapshotsView = Collections.unmodifiableList(snapshots);
 
 	// Map of dynamically evaluated message arguments:
 	private final Map<String, Supplier<Object>> messageArgumentsMap = new HashMap<>();
@@ -336,11 +352,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.id = shopkeeperData.get(ID);
 		this.uniqueId = shopkeeperData.get(UNIQUE_ID);
 
-		AbstractShopType<?> shopType = shopkeeperData.get(SHOP_TYPE);
-		if (shopType != this.getType()) {
-			throw new InvalidDataException("The shopkeeper data is for a different shop type (expected: "
-					+ this.getType().getIdentifier() + ", got: " + shopType.getIdentifier() + ")!");
-		}
+		AbstractShopType<?> shopType = this.getAndValidateShopType(shopkeeperData);
+		assert shopType != null;
 
 		// Shop object data:
 		ShopObjectData shopObjectData = shopkeeperData.get(SHOP_OBJECT_DATA);
@@ -374,8 +387,21 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		// Create the shop object:
 		this.shopObject = this.createShopObject(objectType, null);
 
+		this.loadSnapshots(shopkeeperData);
+
 		// Load the dynamic shopkeeper and shop object state:
 		this.loadDynamicState(shopkeeperData);
+	}
+
+	private AbstractShopType<?> getAndValidateShopType(ShopkeeperData shopkeeperData) throws InvalidDataException {
+		assert shopkeeperData != null;
+		AbstractShopType<?> shopType = shopkeeperData.get(SHOP_TYPE);
+		assert shopType != null;
+		if (shopType != this.getType()) {
+			throw new InvalidDataException("The shopkeeper data is for a different shop type (expected: "
+					+ this.getType().getIdentifier() + ", got: " + shopType.getIdentifier() + ")!");
+		}
+		return shopType;
 	}
 
 	// shopCreationData can be null if the shopkeeper is getting loaded.
@@ -410,12 +436,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 */
 	public void loadDynamicState(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
-		ShopType<?> shopType = shopkeeperData.get(SHOP_TYPE);
+		ShopType<?> shopType = this.getAndValidateShopType(shopkeeperData);
 		assert shopType != null;
-		if (shopType != this.getType()) {
-			throw new InvalidDataException("The shopkeeper data is for a different shop type (expected: "
-					+ this.getType().getIdentifier() + ", got: " + shopType.getIdentifier() + ")!");
-		}
 
 		this._setName(shopkeeperData.get(NAME));
 
@@ -461,6 +483,9 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		// Dynamic shopkeeper and shop object data:
 		this.saveDynamicState(shopkeeperData);
+
+		// Snapshots:
+		this.saveSnapshots(shopkeeperData);
 	}
 
 	/**
@@ -967,6 +992,162 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	@Override
 	public AbstractShopObject getShopObject() {
 		return shopObject;
+	}
+
+	// SNAPSHOTS
+
+	public static final Property<List<? extends SKShopkeeperSnapshot>> SNAPSHOTS = new BasicProperty<List<? extends SKShopkeeperSnapshot>>()
+			.dataKeyAccessor("snapshots", SKShopkeeperSnapshot.LIST_SERIALIZER)
+			.useDefaultIfMissing()
+			.defaultValue(Collections.emptyList())
+			.build();
+
+	static {
+		ShopkeeperDataMigrator.registerMigration(new Migration("snapshots", MigrationPhase.DEFAULT) {
+			@Override
+			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+				List<? extends SKShopkeeperSnapshot> snapshots = shopkeeperData.get(SNAPSHOTS);
+				if (snapshots.isEmpty()) return false;
+
+				int shopkeeperId = shopkeeperData.get(ID);
+				String shopkeeperPrefix = getLogPrefix(shopkeeperId);
+
+				boolean migrated = false;
+				int snapshotId = 1;
+				for (SKShopkeeperSnapshot snapshot : snapshots) {
+					String snapshotLogPrefix = shopkeeperPrefix + "Snapshot " + snapshotId + " ('" + snapshot.getName() + "'): ";
+					migrated |= snapshot.getShopkeeperData().migrate(snapshotLogPrefix);
+					snapshotId++;
+				}
+				return migrated;
+			}
+		});
+	}
+
+	private void loadSnapshots(ShopkeeperData shopkeeperData) throws InvalidDataException {
+		assert shopkeeperData != null;
+		List<? extends SKShopkeeperSnapshot> loadedSnapshots = shopkeeperData.get(SNAPSHOTS);
+		snapshots.clear();
+		try {
+			// Applies additional shopkeeper specific validations:
+			loadedSnapshots.forEach(this::_addSnapshot);
+		} catch (IllegalArgumentException e) {
+			int snapshotId = this.getSnapshots().size() + 1;
+			ShopkeeperSnapshot snapshot = loadedSnapshots.get(snapshotId - 1);
+			String snapshotLogPrefix = "Snapshot " + snapshotId + " ('" + snapshot.getName() + "'): ";
+			throw new InvalidDataException(snapshotLogPrefix + e.getMessage(), e);
+		}
+		this.checkSnapshotsCountLimit();
+	}
+
+	private void checkSnapshotsCountLimit() {
+		int snapshotsCount = this.getSnapshots().size();
+		if (snapshotsCount > SNAPSHOTS_WARNING_LIMIT) {
+			Log.warning(this.getLogPrefix() + "This shopkeeper has has more than "
+					+ SNAPSHOTS_WARNING_LIMIT + " snapshots (" + snapshotsCount
+					+ ")! Consider to delete no longer needed snapshots to save memory and storage space.");
+		}
+	}
+
+	private void saveSnapshots(ShopkeeperData shopkeeperData) {
+		assert shopkeeperData != null;
+		shopkeeperData.set(SNAPSHOTS, snapshotsView);
+	}
+
+	@Override
+	public List<? extends ShopkeeperSnapshot> getSnapshots() {
+		return snapshotsView;
+	}
+
+	@Override
+	public ShopkeeperSnapshot getSnapshot(int index) {
+		return snapshotsView.get(index);
+	}
+
+	@Override
+	public int getSnapshotIndex(String name) {
+		String normalizedName = StringUtils.normalize(name);
+		if (StringUtils.isEmpty(normalizedName)) return -1;
+		for (int index = 0; index < snapshotsView.size(); index++) {
+			ShopkeeperSnapshot snapshot = snapshotsView.get(index);
+			String normalizedSnapshotName = StringUtils.normalize(snapshot.getName());
+			if (normalizedSnapshotName.equals(normalizedName)) {
+				return index;
+			}
+		}
+		return -1;
+	}
+
+	@Override
+	public ShopkeeperSnapshot getSnapshot(String name) {
+		int index = this.getSnapshotIndex(name);
+		return (index != -1) ? this.getSnapshot(index) : null;
+	}
+
+	@Override
+	public ShopkeeperSnapshot createSnapshot(String name) {
+		// The name is validated during the creation of the snapshot.
+		Instant timestamp = Instant.now();
+		ShopkeeperData dynamicShopkeeperData = ShopkeeperData.of(DataContainer.create());
+		this.saveDynamicState(dynamicShopkeeperData);
+		return new SKShopkeeperSnapshot(name, timestamp, dynamicShopkeeperData);
+	}
+
+	@Override
+	public void addSnapshot(ShopkeeperSnapshot snapshot) {
+		this._addSnapshot(snapshot);
+		this.checkSnapshotsCountLimit();
+		this.markDirty();
+	}
+
+	private void _addSnapshot(ShopkeeperSnapshot snapshot) {
+		Validate.notNull(snapshot, "snapshot is null");
+		Validate.isTrue(snapshot instanceof SKShopkeeperSnapshot, () -> "snapshot is not of type "
+				+ SKShopkeeperSnapshot.class.getName() + ", but " + snapshot.getClass().getName());
+		SKShopkeeperSnapshot skSnapshot = (SKShopkeeperSnapshot) snapshot;
+		try {
+			this.getAndValidateShopType(skSnapshot.getShopkeeperData());
+		} catch (InvalidDataException e) {
+			Validate.error(e.getMessage());
+		}
+
+		// The name is assumed to be valid, since it has already been validated during the creation of the snapshot.
+		String snapshotName = snapshot.getName();
+		Validate.isTrue(this.getSnapshot(snapshotName) == null,
+				() -> "There already exists a snapshot with this name: " + snapshotName);
+
+		snapshots.add(skSnapshot);
+	}
+
+	@Override
+	public ShopkeeperSnapshot removeSnapshot(int index) {
+		ShopkeeperSnapshot snapshot = snapshots.remove(index);
+		this.markDirty();
+		return snapshot;
+	}
+
+	@Override
+	public void removeAllSnapshots() {
+		snapshots.clear();
+		this.markDirty();
+	}
+
+	@Override
+	public void applySnapshot(ShopkeeperSnapshot snapshot) throws ShopkeeperLoadException {
+		Validate.notNull(snapshot, "snapshot is null");
+		// Note: The given snapshot is not necessarily stored by or based on this shopkeeper. Its application may fail
+		// if it is not compatible with this shopkeeper.
+		// TODO Inform players.
+		SKShopkeepersPlugin.getInstance().getUIRegistry().abortUISessions(this);
+		try {
+			this.loadDynamicState(((SKShopkeeperSnapshot) snapshot).getShopkeeperData());
+		} catch (InvalidDataException e) {
+			throw new ShopkeeperLoadException(e.getMessage(), e);
+		}
+		// Note: We don't respawn the shop object here. Loading the data is expected to already update any currently
+		// spawned object, similar to when a player manually edits the shop object. This also avoids the brief visual
+		// glitching that would be caused by the shopkeeper object being respawned.
+		this.markDirty();
 	}
 
 	// TRADING

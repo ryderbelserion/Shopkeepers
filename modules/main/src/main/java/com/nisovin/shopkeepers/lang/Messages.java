@@ -26,6 +26,8 @@ import com.nisovin.shopkeepers.util.logging.Log;
 public class Messages extends Config {
 
 	// TODO Replace all with Text? Will require converting back to String, especially for texts used by items.
+	public static String dateTimeFormat = c("yyyy-MM-dd HH:mm:ss");
+
 	public static String shopTypeAdminRegular = c("Admin shop");
 	public static String shopTypeSelling = c("Selling shop");
 	public static String shopTypeBuying = c("Buying shop");
@@ -338,6 +340,7 @@ public class Messages extends Config {
 
 	public static Text shopRemoved = Text.parse("&aThe shopkeeper has been removed.");
 	public static Text shopAlreadyRemoved = Text.parse("&7The shopkeeper has already been removed.");
+	public static Text shopNoLongerExists = Text.parse("&7The shopkeeper no longer exists.");
 	public static Text shopRemovalCancelled = Text.parse("&cA plugin has prevented the removal of the shopkeeper.");
 
 	public static Text shopsAlreadyRemoved = Text.parse("&e{shopsCount}&7 of the shops have already been removed.");
@@ -367,6 +370,22 @@ public class Messages extends Config {
 	public static String confirmationUiCancel = c("&4Cancel");
 	public static List<String> confirmationUiCancelLore = c(Arrays.asList("This will abort the", "current action."));
 	public static Text confirmationUiAborted = Text.parse("&7Confirmation aborted.");
+
+	public static Text snapshotListHeader = Text.parse("&9Shop &e{shop_id} &9has &e{snapshotsCount} &9snapshots: &e(Page {page} of {maxPage})");
+	public static Text snapshotListEntry = Text.parse("  &e{id}) &2{name}&8 (&7{timestamp}&8)");
+	public static Text invalidSnapshotId = Text.parse("&cInvalid snapshot id: &e{id}");
+	public static Text invalidSnapshotName = Text.parse("&cNo snapshot found with name '&e{name}&c'.");
+	public static Text snapshotNameTooLong = Text.parse("&cThe snapshot name can be a maximum of &e{maxLength}&c characters long: &e{name}");
+	public static Text snapshotNameInvalid = Text.parse("&cInvalid snapshot name: &e{name}");
+	public static Text snapshotNameAlreadyExists = Text.parse("&cThere already exists another snapshot with this name: &e{name}");
+	public static Text snapshotCreated = Text.parse("&aNew snapshot created: &e({id}) &2{name} &8(&7{timestamp}&8)");
+	public static Text confirmRemoveSnapshot = Text.parse("&cYou are about to irrevocably delete the specified snapshot!");
+	public static Text confirmRemoveAllSnapshots = Text.parse("&cYou are about to irrevocably delete all snapshots of the specified shopkeeper (&6{snapshotsCount}&c)!");
+	public static Text actionAbortedSnapshotsChanged = Text.parse("&cAction aborted! The snapshots have changed in the meantime. Try again.");
+	public static Text snapshotRemoved = Text.parse("&aSnapshot deleted: &e({id}) &2{name} &8(&7{timestamp}&8)");
+	public static Text snapshotRemovedAll = Text.parse("&aAll &e{snapshotsCount} &asnapshots of shop &e{shop_id}&a have been deleted.");
+	public static Text snapshotRestoreFailed = Text.parse("&cFailed to restore snapshot: &e({id}) &2{name} &8(&7{timestamp}&8)");
+	public static Text snapshotRestored = Text.parse("&aSnapshot restored: &e({id}) &2{name} &8(&7{timestamp}&8)");
 
 	public static Text noPermission = Text.parse("&cYou don't have the permission to do that.");
 
@@ -407,6 +426,10 @@ public class Messages extends Config {
 	public static Text commandDescriptionTransfer = Text.parse("Transfers the ownership of a shop.");
 	public static Text commandDescriptionSettradeperm = Text.parse("Sets, removes (-) or displays (?) the trading permission.");
 	public static Text commandDescriptionSetforhire = Text.parse("Sets one of your shops for sale.");
+	public static Text commandDescriptionSnapshotList = Text.parse("Lists the snapshots of a shop.");
+	public static Text commandDescriptionSnapshotCreate = Text.parse("Creates a new shop snapshot.");
+	public static Text commandDescriptionSnapshotRemove = Text.parse("Removes a specific or all snapshots of a shop.");
+	public static Text commandDescriptionSnapshotRestore = Text.parse("Restores a specific shop snapshot.");
 	public static Text commandDescriptionEditVillager = Text.parse("Opens the editor for the target villager.");
 
 	/////

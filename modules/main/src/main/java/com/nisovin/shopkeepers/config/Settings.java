@@ -4,6 +4,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -300,6 +302,8 @@ public class Settings extends Config {
 	// Stores derived settings which get setup after loading the config.
 	public static class DerivedSettings {
 
+		public static DateTimeFormatter dateTimeFormatter;
+
 		public static Charset fileCharset;
 
 		public static ItemData namingItemData;
@@ -328,6 +332,15 @@ public class Settings extends Config {
 
 		// Gets called after setting values have changed (eg. after the config has been loaded):
 		private static void setup() {
+			// TODO This formatter uses the server's default time zone. Allow configuring the time zone?
+			try {
+				dateTimeFormatter = DateTimeFormatter.ofPattern(Messages.dateTimeFormat).withZone(ZoneId.systemDefault());
+			} catch (IllegalArgumentException e) {
+				Log.warning(Messages.getInstance().getLogPrefix() + "'date-time-format' is not a valid format pattern ('" + Messages.dateTimeFormat + "'). Reverting to default.");
+				Messages.dateTimeFormat = "yyyy-MM-dd HH:mm:ss";
+				dateTimeFormatter = DateTimeFormatter.ofPattern(Messages.dateTimeFormat).withZone(ZoneId.systemDefault());
+			}
+
 			// Charset derived from specified file encoding:
 			if (StringUtils.isEmpty(fileEncoding)) {
 				Log.warning(INSTANCE.getLogPrefix() + "'file-encoding' is empty. Using default 'UTF-8'.");

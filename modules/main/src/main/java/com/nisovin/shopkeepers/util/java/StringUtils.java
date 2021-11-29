@@ -79,6 +79,22 @@ public class StringUtils {
 	}
 
 	/**
+	 * Checks if the given {@link String} contains the specified character.
+	 * <p>
+	 * This is a shortcut for invoking {@link String#indexOf(int)} and checking if the return value does not equal
+	 * {@code -1}.
+	 * 
+	 * @param string
+	 *            the String
+	 * @param character
+	 *            the character
+	 * @return <code>true</code> if the String contains the given character
+	 */
+	public static boolean contains(String string, int character) {
+		return string != null && string.indexOf(character) != -1;
+	}
+
+	/**
 	 * Normalizes the given identifier.
 	 * <p>
 	 * This trims leading and trailing whitespace and converts all remaining whitespace and underscores to dashes

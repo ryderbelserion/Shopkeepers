@@ -32,6 +32,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.CommandRegistry;
 import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
+import com.nisovin.shopkeepers.commands.shopkeepers.snapshot.CommandSnapshot;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
@@ -84,6 +85,7 @@ public class ShopkeepersCommand extends BaseCommand {
 		childCommands.register(new CommandTransfer());
 		childCommands.register(new CommandSetTradePerm());
 		childCommands.register(new CommandSetForHire());
+		childCommands.register(new CommandSnapshot(confirmations));
 		childCommands.register(new CommandEditVillager());
 		// Hidden commands:
 		childCommands.register(new CommandConfirm(confirmations));

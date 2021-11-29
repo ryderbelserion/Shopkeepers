@@ -227,6 +227,107 @@ public interface Shopkeeper {
 	 */
 	public ShopObject getShopObject();
 
+	// SNAPSHOTS
+
+	/**
+	 * Gets the shopkeeper's {@link ShopkeeperSnapshot snapshots}.
+	 * 
+	 * @return an unmodifiable view on the snapshots, not <code>null</code>, can be empty
+	 */
+	public List<? extends ShopkeeperSnapshot> getSnapshots();
+
+	/**
+	 * Gets the {@link ShopkeeperSnapshot snapshot} at the specified index.
+	 * 
+	 * @param index
+	 *            the snapshot's index, starting at <code>0</code> for the first snapshot
+	 * @return the snapshot, not <code>null</code>
+	 * @throws IndexOutOfBoundsException
+	 *             if there is no snapshot for the specified index
+	 */
+	public ShopkeeperSnapshot getSnapshot(int index);
+
+	/**
+	 * Gets the index of the {@link ShopkeeperSnapshot snapshot} with the specified name.
+	 * <p>
+	 * The name comparison is case-insensitive and normalizes whitespace and other common word separators.
+	 * 
+	 * @param name
+	 *            the snapshot name
+	 * @return the snapshot index, or <code>-1</code> if no snapshot with the specified name is found
+	 */
+	public int getSnapshotIndex(String name);
+
+	/**
+	 * Gets the {@link ShopkeeperSnapshot snapshot} with the specified name.
+	 * <p>
+	 * The name comparison is case-insensitive and normalizes whitespace and other common word separators.
+	 * 
+	 * @param name
+	 *            the snapshot name
+	 * @return the snapshot, or <code>null</code> if no snapshot with the specified name is found
+	 */
+	public ShopkeeperSnapshot getSnapshot(String name);
+
+	/**
+	 * Creates a new {@link ShopkeeperSnapshot snapshot} of this shopkeeper's dynamic state.
+	 * <p>
+	 * This does not automatically {@link #addSnapshot(ShopkeeperSnapshot) add} the newly created snapshot to this
+	 * shopkeeper.
+	 * 
+	 * @param name
+	 *            the name of the new snapshot, has to be {@link ShopkeeperSnapshot#isNameValid(String) valid}
+	 * @return the newly created snapshot, not <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if there already exists another snapshot with the same name (case-insensitive and with word
+	 *             separators normalized)
+	 */
+	public ShopkeeperSnapshot createSnapshot(String name);
+
+	/**
+	 * Adds the given snapshot to this shopkeeper.
+	 * 
+	 * @param snapshot
+	 *            the snapshot, not <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if the given snapshot is not compatible with this shopkeeper (e.g. if it contains data for a
+	 *             different type of shopkeeper)
+	 * @throws IllegalArgumentException
+	 *             if there already exists another snapshot with the same name (case-insensitive and with word
+	 *             separators normalized)
+	 */
+	public void addSnapshot(ShopkeeperSnapshot snapshot);
+
+	/**
+	 * Removes the {@link ShopkeeperSnapshot snapshot} at the specified index.
+	 * 
+	 * @param index
+	 *            the snapshot's index, starting at <code>0</code> for the first snapshot
+	 * @return the removed snapshot, not <code>null</code>
+	 * @throws IndexOutOfBoundsException
+	 *             if there is no snapshot for the specified index
+	 */
+	public ShopkeeperSnapshot removeSnapshot(int index);
+
+	/**
+	 * Removes all {@link #getSnapshots() snapshots}.
+	 */
+	public void removeAllSnapshots();
+
+	/**
+	 * Applies the given {@link ShopkeeperSnapshot} to this shopkeeper.
+	 * <p>
+	 * It is also possible to apply the snapshot of another shopkeeper if the other shopkeeper is of the same
+	 * {@link #getType() type}. If the snapshot contains data for a shop object of a different type, the snapshot's
+	 * object data is silently ignored and the shopkeeper's shop object retains its current state.
+	 * 
+	 * @param snapshot
+	 *            the snapshot, not <code>null</code>
+	 * @throws ShopkeeperLoadException
+	 *             if the snapshot cannot be applied
+	 */
+	public void applySnapshot(ShopkeeperSnapshot snapshot) throws ShopkeeperLoadException;
+
 	// TRADING
 
 	/**

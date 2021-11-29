@@ -7,6 +7,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
+import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperSnapshot;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKBookOffer;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKPriceOffer;
 import com.nisovin.shopkeepers.shopkeeper.offers.SKTradeOffer;
@@ -50,5 +51,17 @@ public class SKApiInternals implements ApiInternals {
 	@Override
 	public BookOffer createBookOffer(String bookTitle, int price) {
 		return new SKBookOffer(bookTitle, price);
+	}
+
+	// SHOPKEEPER SNAPSHOTS
+
+	@Override
+	public int getShopkeeperSnapshotMaxNameLength() {
+		return SKShopkeeperSnapshot.MAX_NAME_LENGTH;
+	}
+
+	@Override
+	public boolean isShopkeeperSnapshotNameValid(String name) {
+		return SKShopkeeperSnapshot.isNameValid(name);
 	}
 }
