@@ -115,6 +115,9 @@ public class MapBasedDataContainer extends AbstractDataContainer {
 
 	@Override
 	public boolean equals(Object obj) {
-		return dataMap.equals(obj);
+		if (obj == this) return true;
+		if (!(obj instanceof DataContainer)) return false;
+		DataContainer otherContainer = (DataContainer) obj;
+		return dataMap.equals(otherContainer.getValues());
 	}
 }
