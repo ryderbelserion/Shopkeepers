@@ -435,7 +435,7 @@ public class Messages extends Config {
 	/////
 
 	private static final String LANG_FOLDER = "lang";
-	private static final String DEFAULT_LANGUAGE = "en-default";
+	public static final String DEFAULT_LANGUAGE = "en-default";
 
 	public static File getLangFolder() {
 		return new File(SKShopkeepersPlugin.getInstance().getDataFolder(), LANG_FOLDER);
@@ -446,8 +446,12 @@ public class Messages extends Config {
 	}
 
 	// Relative to the plugin's data folder:
-	private static String getLanguageFilePath(String language) {
+	public static String getLanguageFilePath(String language) {
 		return LANG_FOLDER + "/" + getLanguageFileName(language);
+	}
+
+	public static String getDefaultLanguageFilePath() {
+		return getLanguageFilePath(DEFAULT_LANGUAGE);
 	}
 
 	private static File getLanguageFile(String language) {
@@ -460,7 +464,7 @@ public class Messages extends Config {
 	 * language file.
 	 */
 	private static void saveDefaultLanguageFile() {
-		String languageFilePath = getLanguageFilePath(DEFAULT_LANGUAGE);
+		String languageFilePath = getDefaultLanguageFilePath();
 		SKShopkeepersPlugin plugin = SKShopkeepersPlugin.getInstance();
 		assert plugin.getResource(languageFilePath) != null;
 		plugin.saveResource(languageFilePath, true);

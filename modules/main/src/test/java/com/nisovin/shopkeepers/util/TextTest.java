@@ -13,6 +13,7 @@ import org.bukkit.configuration.Configuration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.junit.Test;
 
+import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -24,8 +25,9 @@ public class TextTest extends AbstractBukkitTest {
 	public void testRealMessageConversions() throws IOException {
 		// Load default language file:
 		Configuration config;
+		String languageFilePath = Messages.getDefaultLanguageFilePath();
 		ClassLoader classLoader = this.getClass().getClassLoader();
-		try (Reader reader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream("lang/language-en-default.yml")))) {
+		try (Reader reader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream(languageFilePath)))) {
 			config = YamlConfiguration.loadConfiguration(reader);
 		}
 
