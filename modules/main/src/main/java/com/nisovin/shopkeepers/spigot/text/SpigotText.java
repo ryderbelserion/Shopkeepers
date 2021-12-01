@@ -205,15 +205,14 @@ public class SpigotText {
 				assert translationKey != null;
 
 				// Convert translation arguments:
-				Object[] translationArgsArray = null;
 				List<Text> translationArgs = translatableText.getTranslationArguments();
 				assert translationArgs != null;
-				translationArgsArray = new Object[translationArgs.size()];
+				Object[] spigotTranslationArgs = new Object[translationArgs.size()];
 				for (int i = 0; i < translationArgs.size(); ++i) {
-					translationArgsArray[i] = toSpigot(translationArgs.get(i));
+					spigotTranslationArgs[i] = toSpigot(translationArgs.get(i));
 				}
 
-				component = new TranslatableComponent(translationKey, translationArgs);
+				component = new TranslatableComponent(translationKey, spigotTranslationArgs);
 				parent.addExtra(component);
 				textStyle.apply(component);
 				current = null;
