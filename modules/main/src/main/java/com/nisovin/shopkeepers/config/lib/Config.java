@@ -122,7 +122,7 @@ public abstract class Config {
 		return true;
 	}
 
-	// TODO Support for sections, eg. by inner classes?
+	// TODO Support for sections, e.g. by inner classes?
 	// TODO Support @Key annotation.
 	protected String getConfigKey(Field field) {
 		return ConfigHelper.toConfigKey(field.getName());
@@ -320,7 +320,7 @@ public abstract class Config {
 		String configKey = setting.getConfigKey();
 		ValueType<T> valueType = setting.getValueType();
 		try {
-			T value = null;
+			T value;
 
 			// Handle missing value:
 			if (!configData.contains(configKey)) {

@@ -395,7 +395,7 @@ public class CsvTradeLogger implements TradeLogger {
 	 * Goals:
 	 * - Reliably log all trades.
 	 * - Log trades in the order in which they occurred.
-	 * - Log trades atomically, i.e. not partially, intertwined, or duplicated (eg. if we retry failed log attempts).
+	 * - Log trades atomically, i.e. not partially, intertwined, or duplicated (e.g. if we retry failed log attempts).
 	 * 
 	 * Measures:
 	 * - We write to the log files via a single thread only, and assume that no other processes write to them
@@ -481,7 +481,7 @@ public class CsvTradeLogger implements TradeLogger {
 
 			// If the file is new or empty, write the CSV header:
 			if (isEmpty) {
-				// Note: A BOM should not be required for UTF-8, and it is actually recommended to omit it.
+				// Note: A BOM should not be required for UTF-8, and it is actually recommended omitting it.
 				writer.write(csv.formatRecord(CSV_HEADER));
 				writer.flush();
 			}

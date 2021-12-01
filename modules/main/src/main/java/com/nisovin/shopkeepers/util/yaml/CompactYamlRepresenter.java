@@ -38,9 +38,9 @@ public class CompactYamlRepresenter extends YamlRepresenter { // Extends Bukkit'
 		}
 		assert style != null;
 
-		// Only the double quoted style is guaranteed to not output line breaks, but escape them instead:
+		// Only the double-quoted style is guaranteed to not output line breaks, but escape them instead:
 		if (style != ScalarStyle.DOUBLE_QUOTED && StringUtils.containsNewline(value)) {
-			// The value contains newline characters but is not double quoted. Enforce the use of the double quoted
+			// The value contains newline characters but is not double-quoted. Enforce the use of the double-quoted
 			// style:
 			style = ScalarStyle.DOUBLE_QUOTED;
 		} // Else: Stick to the default representation:

@@ -26,8 +26,6 @@ public abstract class AbstractItemStackSerializationTest extends AbstractBukkitT
 
 	@Test
 	public void testItemStackDeserialization() {
-		this.createTestItemStacks().forEach(itemStack -> {
-			this.testDeserialization(itemStack);
-		});
+		this.createTestItemStacks().forEach(this::testDeserialization);
 	}
 }

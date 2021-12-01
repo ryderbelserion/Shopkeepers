@@ -24,7 +24,7 @@ public final class ShopkeeperDataMigrator {
 	 * Registers the given {@link Migration}.
 	 * <p>
 	 * Each migration is expected to be registered only once, and then never unregistered again. The name of the
-	 * migration needs to be unique among all other registered migrations.
+	 * migration needs to be unique among all registered migrations.
 	 * 
 	 * @param migration
 	 *            the migration, not <code>null</code>

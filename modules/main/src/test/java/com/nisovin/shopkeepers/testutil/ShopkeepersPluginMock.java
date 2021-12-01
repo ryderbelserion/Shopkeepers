@@ -12,7 +12,7 @@ class ShopkeepersPluginMock extends ProxyHandler<InternalShopkeepersPlugin> {
 
 	// Static initializer: Ensures that this is only setup once across all tests.
 	static {
-		// Setup the plugin mock as API provider:
+		// Set up the plugin mock as API provider:
 		InternalShopkeepersPlugin pluginMock = new ShopkeepersPluginMock().newProxy();
 		InternalShopkeepersAPI.enable(pluginMock);
 	}

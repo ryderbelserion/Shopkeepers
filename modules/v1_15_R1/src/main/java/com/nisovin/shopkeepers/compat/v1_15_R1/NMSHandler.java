@@ -41,7 +41,7 @@ import net.minecraft.server.v1_15_R1.PathfinderGoalSelector;
 
 public final class NMSHandler implements NMSCallProvider {
 
-	private Field craftItemStackHandleField;
+	private final Field craftItemStackHandleField;
 
 	public NMSHandler() throws Exception {
 		craftItemStackHandleField = CraftItemStack.class.getDeclaredField("handle");

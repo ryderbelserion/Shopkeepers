@@ -57,7 +57,7 @@ To support the latest mappings version:
 
 * New MerchantRecipe properties:
 	* Update the comparator in MerchantUtils.
-	* Check the MerchentRecipe constructions in MerchantUtils.
+	* Check the MerchantRecipe constructions in MerchantUtils.
 
 * If there are major differences, consider dropping support for older Minecraft versions.
 	* Remove corresponding modules.

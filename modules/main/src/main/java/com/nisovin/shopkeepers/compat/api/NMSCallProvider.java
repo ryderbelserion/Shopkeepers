@@ -58,7 +58,7 @@ public interface NMSCallProvider {
 	public default void prepareEntity(Entity entity) {
 	}
 
-	// Performs any version-specific setup of the entity that needs to happens right after the entity was spawned.
+	// Performs any version-specific setup of the entity that needs to happen right after the entity was spawned.
 	public default void setupSpawnedEntity(Entity entity) {
 	}
 
@@ -70,7 +70,7 @@ public interface NMSCallProvider {
 	 * Checks if the <code>provided</code> item stack fulfills the requirements of a trading recipe requiring the given
 	 * <code>required</code> item stack.
 	 * <p>
-	 * This mimics Minecraft's item comparison: This checks if the item stacks are either both emtpy, or of same type
+	 * This mimics Minecraft's item comparison: This checks if the item stacks are either both empty, or of same type
 	 * and the provided item stack's metadata contains all the contents of the required item stack's metadata (with any
 	 * list metadata being equal).
 	 * 

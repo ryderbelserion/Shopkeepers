@@ -1,7 +1,7 @@
 # Versioning scheme
 
 The versioning scheme used by this software is similar to Semantic Versioning (https://semver.org/), with the following differences:
-* Additionally to ```Major``` for **backwards incompatible changes** (regarding API and behavior), we have an ```Epoch``` component at the beginning, which can be used to denote **especially significant** backwards incompatible changes (ex. a complete rewrite of the software, or to emphasize the effort or impact of an update). The ```Epoch``` component might not get incremented very often, or may for some software even stay the same during its complete lifetime.
+* In addition to ```Major``` for **backwards incompatible changes** (regarding API and behavior), we have an ```Epoch``` component at the beginning, which can be used to denote **especially significant** backwards incompatible changes (ex. a complete rewrite of the software, or to emphasize the effort or impact of an update). The ```Epoch``` component might not get incremented very often, or may for some software even stay the same during its complete lifetime.
 * We don't differentiate between the ```Minor``` and the ``` Patch``` components: We use a single ```Minor``` component for all types of **backwards compatible changes** (ex. feature additions, deprecations, bug fixes, corrected documentation).
 
 Just like in Semantic Versioning, we can:

@@ -46,7 +46,7 @@ public class PlayerArgumentUtils {
 			@Override
 			public Stream<Player> match(String input) {
 				if (StringUtils.isEmpty(input)) return Stream.empty();
-				// Note: This is case insensitive.
+				// Note: This is case-insensitive.
 				// Assumption: Player names are unique regardless of case.
 				Player exactMatch = Bukkit.getPlayerExact(input);
 				return (exactMatch != null) ? Stream.of(exactMatch) : Stream.empty();
@@ -62,7 +62,7 @@ public class PlayerArgumentUtils {
 		public static final PlayerNameMatcher EXACT = new AbstractPlayerNameMatcher() {
 			@Override
 			protected boolean checkExactMatchFirst() {
-				// We check for exact matches later anyways so we can avoid this.
+				// We check for exact matches later anyways, so we can avoid this.
 				return false;
 			}
 
@@ -99,7 +99,7 @@ public class PlayerArgumentUtils {
 
 			// Check for an exact match first:
 			if (this.checkExactMatchFirst()) {
-				Player exactMatch = Bukkit.getPlayerExact(input); // Case insensitive
+				Player exactMatch = Bukkit.getPlayerExact(input); // Case-insensitive
 				if (exactMatch != null) return Stream.of(exactMatch);
 			}
 

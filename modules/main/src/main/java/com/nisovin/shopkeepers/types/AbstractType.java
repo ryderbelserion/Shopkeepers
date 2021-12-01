@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public abstract class AbstractType implements Type {
 
 	/**
-	 * An unique identifier.
+	 * A unique identifier.
 	 * <p>
 	 * Make sure that the identifier (and its {@link StringUtils#normalize(String) normalization}) are unique among all
 	 * other {@link Type types} of the same context.

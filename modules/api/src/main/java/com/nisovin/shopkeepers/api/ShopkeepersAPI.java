@@ -33,7 +33,7 @@ public final class ShopkeepersAPI {
 	/**
 	 * Checks whether the API has already been enabled.
 	 * <p>
-	 * If this is called early during plugin startup (eg. during the {@link Plugin#onLoad() loading phase} of plugins,
+	 * If this is called early during plugin startup (e.g. during the {@link Plugin#onLoad() loading phase} of plugins,
 	 * or while the Shopkeepers plugin itself is still getting enabled), the API may not yet be safe for use even if
 	 * this returns <code>true</code>.
 	 * 
@@ -48,7 +48,7 @@ public final class ShopkeepersAPI {
 	 * 
 	 * @return the plugin instance, not <code>null</code>
 	 * @throws IllegalStateException
-	 *             if the API is not enabled currently, eg. because the plugin is not enabled currently
+	 *             if the API is not enabled currently, e.g. because the plugin is not enabled currently
 	 */
 	public static ShopkeepersPlugin getPlugin() {
 		return InternalShopkeepersAPI.getPlugin();

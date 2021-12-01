@@ -82,10 +82,8 @@ public class ItemConversion {
 		}
 
 		if (convertedStacks > 0 && updateViewers) {
-			// Update inventory viewers and owner:
-			if (updateViewers) {
-				InventoryUtils.updateInventoryLater(inventory);
-			}
+			// Update inventory owner and viewers:
+			InventoryUtils.updateInventoryLater(inventory);
 		}
 		return convertedStacks;
 	}

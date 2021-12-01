@@ -11,8 +11,8 @@ import com.nisovin.shopkeepers.util.data.property.Property;
  * check if they can reconstruct the original value of the target type. Any validation of the deserialized value is
  * better handled by higher level components, such as {@link Property properties}.
  * <p>
- * Similarly, {@link #deserialize(Object)} shall not throw any {@link MissingDataException}s. The decision as to whether
- * a deserialized value should be regarded as empty and therefore treated as if it is missing is also better made by
+ * Similarly, {@link #deserialize(Object)} shall not throw any {@link MissingDataException}s. The decision whether a
+ * deserialized value should be regarded as empty and therefore treated as if it is missing is also better made by
  * higher level components.
  * 
  * @param <T>

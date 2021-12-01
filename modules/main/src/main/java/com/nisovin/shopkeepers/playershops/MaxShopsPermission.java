@@ -45,7 +45,7 @@ public class MaxShopsPermission implements Comparable<MaxShopsPermission> {
 		// Using the String representation of the parsed integer instead of the original String ensures that the result
 		// is always the expected integer representation and not affected by any lenient parsing rules (such as for
 		// example the optionally allowed '+' sign character for positive integers):
-		String permission = PERMISSION_PREFIX + maxShops.toString();
+		String permission = PERMISSION_PREFIX + maxShops;
 		return new MaxShopsPermission(maxShops, permission);
 	}
 

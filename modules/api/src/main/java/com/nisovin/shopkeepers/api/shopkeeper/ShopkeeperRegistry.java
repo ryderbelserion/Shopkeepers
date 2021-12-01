@@ -150,7 +150,7 @@ public interface ShopkeeperRegistry {
 	 * <p>
 	 * Chunks get activated and deactivated when they get loaded and unloaded. During activation, the shopkeepers
 	 * located inside the chunk get spawned. However, to not spawn shopkeepers for chunks that stay loaded only briefly,
-	 * the activation of chunks may be deferred. Consequently this may not return chunks even if they are currently
+	 * the activation of chunks may be deferred. Consequently, this may not return chunks even if they are currently
 	 * already loaded.
 	 * 
 	 * @param worldName
@@ -259,8 +259,8 @@ public interface ShopkeeperRegistry {
 	 * {@link #isChunkActive(ChunkCoords) active}, or if the block could not be placed with its intended state, this may
 	 * or may not return <code>false</code> for that block.
 	 * <p>
-	 * In order to get the shopkeepers at a specific location (regardless of whether that chunk is currently loaded and
-	 * whether the shopkeepers inside of it have already been spawned) use {@link #getShopkeepersAtLocation(Location)}
+	 * In order to get the shopkeepers at a specific location, regardless of whether that chunk is currently loaded and
+	 * whether the shopkeepers inside it have already been spawned, use {@link #getShopkeepersAtLocation(Location)}
 	 * instead.
 	 * 
 	 * @param block

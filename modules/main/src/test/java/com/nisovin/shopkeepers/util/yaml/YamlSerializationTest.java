@@ -37,9 +37,7 @@ public class YamlSerializationTest extends AbstractItemStackSerializationTest {
 
 	@Test
 	public void testCompactItemStackSerialization() {
-		this.createTestItemStacks().forEach(itemStack -> {
-			this.testCompactSerialization(itemStack);
-		});
+		this.createTestItemStacks().forEach(this::testCompactSerialization);
 	}
 
 	@Test
@@ -53,9 +51,7 @@ public class YamlSerializationTest extends AbstractItemStackSerializationTest {
 	// Our Yaml instance should be configured to produce the same output as Bukkit's YamlConfiguration
 	@Test
 	public void testYamlMirrorsBukkit() {
-		this.createTestItemStacks().forEach(itemStack -> {
-			this.testYamlMirrorsBukkit(itemStack);
-		});
+		this.createTestItemStacks().forEach(this::testYamlMirrorsBukkit);
 	}
 
 	private void testYamlMirrorsBukkit(ItemStack itemStack) {

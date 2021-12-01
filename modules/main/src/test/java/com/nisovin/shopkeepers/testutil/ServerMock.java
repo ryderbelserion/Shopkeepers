@@ -19,7 +19,7 @@ class ServerMock extends ProxyHandler<Server> {
 
 	// Static initializer: Ensures that this is only setup once across all tests.
 	static {
-		// Setup the server mock as Bukkit API provider:
+		// Set up the server mock as Bukkit API provider:
 		Server serverMock = new ServerMock().newProxy();
 		Bukkit.setServer(serverMock);
 	}

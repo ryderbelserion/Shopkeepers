@@ -5,7 +5,7 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 // TODO Not yet used.
 public class VirtualShops {
 
-	// TODO Not all shopkeeper types might support virtual shops (eg. player shops require a world to locate the
+	// TODO Not all shopkeeper types might support virtual shops (e.g. player shops require a world to locate the
 	// container currently).
 	// -> Add a flag to ShopType and validation somewhere (shop creation and shop loading).
 	// And/Or: Store player shop container world separately.

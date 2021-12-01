@@ -95,7 +95,7 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 			// Replace placeholder items, if any:
 			// Note: We also replace placeholder items in the buy items, because this allows the setup of trades before
-			// the player has all of the required items.
+			// the player has all the required items.
 			resultItem = PlaceholderItems.replace(resultItem);
 			item1 = PlaceholderItems.replace(item1);
 			item2 = PlaceholderItems.replace(item2);

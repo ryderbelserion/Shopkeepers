@@ -46,7 +46,7 @@ public final class SchedulerUtils {
 	/**
 	 * Schedules the given task to be run on the primary thread if required.
 	 * <p>
-	 * If the current thread is already the primary thread, the task will be run immediately. Otherwise it attempts to
+	 * If the current thread is already the primary thread, the task will be run immediately. Otherwise, it attempts to
 	 * schedule the task to run on the server's primary thread. However, if the plugin is <code>null</code> or disabled,
 	 * the task won't be scheduled.
 	 * 
@@ -127,11 +127,11 @@ public final class SchedulerUtils {
 
 			final long asyncTasksTimeoutMillis = TimeUnit.SECONDS.toMillis(asyncTasksTimeoutSeconds);
 			final long waitStartNanos = System.nanoTime();
-			long waitDurationMillis = 0;
+			long waitDurationMillis = 0L;
 			do {
 				// Checking again every 5 milliseconds:
 				try {
-					Thread.sleep(5);
+					Thread.sleep(5L);
 				} catch (InterruptedException e) {
 					// Ignore, but reset interrupt flag:
 					Thread.currentThread().interrupt();

@@ -41,7 +41,7 @@ public class CsvFormatter {
 	 * <li>Use an empty String to represent <code>null</code> fields.
 	 * </ul>
 	 * <p>
-	 * With the exception of escaping newlines, this default configuration conforms to the CSV format described by
+	 * Except for the escaping of newlines, this default configuration conforms to the CSV format described by
 	 * {@code https://tools.ietf.org/html/rfc4180}.
 	 * <p>
 	 * The default configuration can be changed after construction. However, some configurations may result in output
@@ -259,7 +259,7 @@ public class CsvFormatter {
 	 *            the fields, not <code>null</code>
 	 * @return the CSV-formatted fields
 	 */
-	public String formatFields(Iterable<? extends Object> fields) {
+	public String formatFields(Iterable<?> fields) {
 		Validate.notNull(fields, "fields is null");
 		return this.formatFields(CollectionUtils.stream(fields));
 	}
@@ -271,7 +271,7 @@ public class CsvFormatter {
 	 *            the fields, not <code>null</code>
 	 * @return the CSV-formatted fields
 	 */
-	private String formatFields(Stream<? extends Object> fields) {
+	private String formatFields(Stream<?> fields) {
 		assert fields != null;
 		return fields
 				.map(StringUtils::toStringOrNull)
@@ -303,7 +303,7 @@ public class CsvFormatter {
 	 *            the fields, not <code>null</code>
 	 * @return the CSV record
 	 */
-	public String formatRecord(Iterable<? extends Object> fields) {
+	public String formatRecord(Iterable<?> fields) {
 		return this.formatFields(fields) + recordSeparator;
 	}
 

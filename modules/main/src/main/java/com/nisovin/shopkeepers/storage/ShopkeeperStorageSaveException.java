@@ -1,7 +1,9 @@
 package com.nisovin.shopkeepers.storage;
 
+import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
+
 /**
- * Thrown when the {@link SKShopkeeperStorage} fails to save the shopkeepers data.
+ * Thrown when the {@link ShopkeeperStorage} fails to save the data of a shopkeeper.
  */
 public class ShopkeeperStorageSaveException extends Exception {
 

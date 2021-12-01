@@ -7,7 +7,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 
 /**
- * Base class for arguments that accept an UUID as identifier for some type of objects.
+ * Base class for arguments that accept a UUID as identifier for some type of objects.
  * <p>
  * By default this argument accepts any UUID. But unlike {@link UUIDArgument} this class uses
  * {@link #getCompletionSuggestions(CommandInput, CommandContextView, String)} to provide completions for partial

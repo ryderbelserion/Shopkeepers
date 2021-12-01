@@ -42,7 +42,7 @@ class CommandGiveCurrency extends Command {
 
 		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
-		this.addArgument(new DefaultValueFallback<String>(new TypedFirstOfArgument<>(ARGUMENT_CURRENCY_TYPE, Arrays.asList(
+		this.addArgument(new DefaultValueFallback<>(new TypedFirstOfArgument<>(ARGUMENT_CURRENCY_TYPE, Arrays.asList(
 				new LiteralArgument(ARGUMENT_CURRENCY_LOW),
 				new LiteralArgument(ARGUMENT_CURRENCY_HIGH))),
 				ARGUMENT_CURRENCY_LOW));

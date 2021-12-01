@@ -5,11 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.event.Event;
-import org.bukkit.event.EventException;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.RegisteredListener;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -23,16 +21,13 @@ import com.nisovin.shopkeepers.util.logging.Log;
 public class DebugListener implements Listener {
 
 	public static DebugListener register(boolean logAllEvents, boolean printListeners) {
-		// TODO Might only log events whose classes got loaded yet (eg. with registered listeners).
+		// TODO Might only log events whose classes got loaded yet (e.g. with registered listeners).
 		Log.info("Registering DebugListener.");
 		DebugListener debugListener = new DebugListener(logAllEvents, printListeners);
 		List<HandlerList> allHandlerLists = HandlerList.getHandlerLists();
 		for (HandlerList handlerList : allHandlerLists) {
-			handlerList.register(new RegisteredListener(debugListener, new EventExecutor() {
-				@Override
-				public void execute(Listener listener, Event event) throws EventException {
-					debugListener.handleEvent(event);
-				}
+			handlerList.register(new RegisteredListener(debugListener, (listener, event) -> {
+				debugListener.handleEvent(event);
 			}, EventPriority.LOWEST, SKShopkeepersPlugin.getInstance(), false));
 
 			// Ensure that our debug event handlers are executed first:

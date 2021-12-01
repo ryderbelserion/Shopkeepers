@@ -17,7 +17,7 @@ public class FixedValuesArgument extends CommandArgument<Object> {
 
 	private final Map<String, ? extends Object> values;
 
-	public FixedValuesArgument(String name, Map<String, ? extends Object> values) {
+	public FixedValuesArgument(String name, Map<String, ?> values) {
 		super(name);
 		Validate.notNull(values, "values is null");
 		Validate.isTrue(!values.containsKey(null), "values contains a null key");

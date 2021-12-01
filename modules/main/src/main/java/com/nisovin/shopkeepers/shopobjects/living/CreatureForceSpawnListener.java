@@ -24,8 +24,8 @@ public class CreatureForceSpawnListener implements Listener {
 		} else {
 			// This shouldn't normally be reached..
 			Log.debug(() -> "Shopkeeper entity-spawning seems to be out of sync: spawn-force was activated for an entity of type "
-					+ nextEntityType.name() + " at location " + nextSpawnLocation.toString() + ", but a (different) entity of type "
-					+ event.getEntityType().name() + " was spawned at location " + event.getLocation().toString() + ".");
+					+ nextEntityType.name() + " at location " + nextSpawnLocation + ", but a (different) entity of type "
+					+ event.getEntityType().name() + " was spawned at location " + event.getLocation() + ".");
 		}
 		nextSpawnLocation = null;
 		nextEntityType = null;

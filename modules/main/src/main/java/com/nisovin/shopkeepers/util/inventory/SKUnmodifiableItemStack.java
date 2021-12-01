@@ -72,7 +72,7 @@ public class SKUnmodifiableItemStack extends ItemStack implements UnmodifiableIt
 	// Note: Any methods that the base class implements by delegating to other methods do not necessarily need to be
 	// overridden here. However, we delegate all read-only methods to the underlying item stack nevertheless, because
 	// the underlying item stack might provide an improved implementation specific to its concrete type of item stack
-	// (eg. CraftItemStack).
+	// (e.g. CraftItemStack).
 
 	@Override
 	public ItemStack copy() {

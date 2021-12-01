@@ -24,14 +24,14 @@ public interface ShopType<T extends Shopkeeper> extends SelectableType {
 	public String getDescription();
 
 	/**
-	 * Gets a user-friendly short (but possibly multi-line) description of how to setup this shop type after creation.
+	 * Gets a user-friendly short (but possibly multi-line) description of how to set up this shop type after creation.
 	 *
 	 * @return the setup description
 	 */
 	public String getSetupDescription();
 
 	/**
-	 * Gets a user-friendly short (possibly multi-line) description of how to setup the trades for this shop type.
+	 * Gets a user-friendly short (possibly multi-line) description of how to set up the trades for this shop type.
 	 * 
 	 * @return the trade setup description
 	 */

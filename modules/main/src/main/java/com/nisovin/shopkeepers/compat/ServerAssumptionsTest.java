@@ -44,8 +44,8 @@ public class ServerAssumptionsTest {
 	/**
 	 * Runs the server assumption tests.
 	 * <p>
-	 * The tests are only run once, during the initial plugin startup. Any subsequent invocations (eg. during subsequent
-	 * soft plugin reloads) return the result of the previous test execution.
+	 * The tests are only run once, during the initial plugin startup. Any subsequent invocations (e.g. during
+	 * subsequent soft plugin reloads) return the result of the previous test execution.
 	 * 
 	 * @return <code>true</code> if the tests passed, <code>false</code> if one of the tests failed
 	 */

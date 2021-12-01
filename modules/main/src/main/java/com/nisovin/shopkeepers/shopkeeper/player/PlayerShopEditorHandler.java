@@ -32,8 +32,8 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 	// Note: In the editor item1 is representing the low cost item and item2 the high cost item, but in the
 	// corresponding trading recipe they will be swapped if they are both present.
 
-	protected PlayerShopEditorHandler(AbstractPlayerShopkeeper shopkeeper, TradingRecipesAdapter tradingRecipesAdpter) {
-		super(SKDefaultUITypes.EDITOR(), shopkeeper, tradingRecipesAdpter);
+	protected PlayerShopEditorHandler(AbstractPlayerShopkeeper shopkeeper, TradingRecipesAdapter tradingRecipesAdapter) {
+		super(SKDefaultUITypes.EDITOR(), shopkeeper, tradingRecipesAdapter);
 	}
 
 	@Override
@@ -221,7 +221,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 			if (remainingCost <= Settings.currencyItem.getType().getMaxStackSize()) {
 				lowCostItem = Settings.createCurrencyItem(remainingCost);
 			} else {
-				// Cost is to large to represent: reset cost to zero:
+				// Cost is too large to represent: Reset cost to zero.
 				lowCostItem = Settings.createZeroCurrencyItem();
 				if (Settings.isHighCurrencyEnabled()) {
 					highCostItem = Settings.createZeroHighCurrencyItem();

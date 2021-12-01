@@ -1,6 +1,6 @@
 # Assumptions
 
-This document collects some of the assumptions and relevant implementation details about other software components with which this plugin interacts. This may include details about the underlying server and Bukkit/Spigot API implementation, but also about the Minecraft client, or the behavior of other plugins. If these assumptions are not actually fulfilled at runtime, the plugin can behave unexpectedly and is likely to cause problems.  
+This document collects some of the relevant assumptions and implementation details about other software components with which this plugin interacts. This may include details about the underlying server and Bukkit/Spigot API implementation, but also about the Minecraft client, or the behavior of other plugins. If these assumptions are not actually fulfilled at runtime, the plugin can behave unexpectedly and is likely to cause problems.  
 This document is in a continuous work-in-progress state: It will be updated and expanded as new assumptions are identified.
 
 ## Server and Bukkit API implementation

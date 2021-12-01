@@ -6,12 +6,7 @@ import com.nisovin.shopkeepers.text.Text;
 
 public interface ArgumentFilter<T> extends Predicate<T> {
 
-	public static final ArgumentFilter<Object> ACCEPT_ANY = new ArgumentFilter<Object>() {
-		@Override
-		public boolean test(Object object) {
-			return true;
-		}
-	};
+	public static final ArgumentFilter<Object> ACCEPT_ANY = (object) -> true;
 
 	@SuppressWarnings("unchecked")
 	public static <T> ArgumentFilter<T> acceptAny() {

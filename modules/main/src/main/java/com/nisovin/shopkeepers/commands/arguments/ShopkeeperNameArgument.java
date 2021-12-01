@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.commands.arguments;
 
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.nisovin.shopkeepers.api.ShopkeepersAPI;
@@ -15,7 +16,7 @@ import com.nisovin.shopkeepers.util.java.PredicateUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
 /**
- * By default this accepts any String regardless of whether it corresponds to a known shopkeeper, but provides
+ * By default, this accepts any String regardless of whether it corresponds to a known shopkeeper, but provides
  * suggestions for the names of known shopkeepers.
  */
 public class ShopkeeperNameArgument extends ObjectNameArgument {
@@ -77,7 +78,7 @@ public class ShopkeeperNameArgument extends ObjectNameArgument {
 						return normalizedWithCase;
 					}
 					return null; // No match
-				}).filter(name -> name != null)::iterator;
+				}).filter(Objects::nonNull)::iterator;
 	}
 
 	@Override

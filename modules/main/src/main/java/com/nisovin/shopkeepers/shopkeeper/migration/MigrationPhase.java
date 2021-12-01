@@ -37,8 +37,8 @@ public class MigrationPhase {
 	public static final MigrationPhase DEFAULT = new MigrationPhase("default");
 
 	/**
-	 * Migrations for the returned phase are executed after {@link #DEFAULT} for shopkeeper's of the specified type or
-	 * any sub type.
+	 * Migrations for the returned phase are executed after {@link #DEFAULT} for shopkeepers of the specified type or
+	 * any sub-type.
 	 * 
 	 * @param shopkeeperClass
 	 *            the shopkeeper class, not <code>null</code>
@@ -49,11 +49,11 @@ public class MigrationPhase {
 	}
 
 	/**
-	 * A {@link MigrationPhase} that is only executed for shopkeeper's of a specific type or any sub type.
+	 * A {@link MigrationPhase} that is only executed for shopkeepers of a specific type or any sub-type.
 	 */
 	public static final class ShopkeeperClassMigrationPhase extends MigrationPhase {
 
-		private static Map<Class<? extends Shopkeeper>, ShopkeeperClassMigrationPhase> CACHE = new HashMap<>();
+		private static final Map<Class<? extends Shopkeeper>, ShopkeeperClassMigrationPhase> CACHE = new HashMap<>();
 
 		private static ShopkeeperClassMigrationPhase of(Class<? extends Shopkeeper> shopkeeperClass) {
 			return CACHE.computeIfAbsent(shopkeeperClass, ShopkeeperClassMigrationPhase::new);
@@ -107,7 +107,7 @@ public class MigrationPhase {
 
 	/**
 	 * Migrations for the returned phase are executed after {@link #ofShopkeeperClass(Class)} for shop object's of the
-	 * specified type or any sub type.
+	 * specified type or any sub-type.
 	 * 
 	 * @param shopObjectClass
 	 *            the shop object class, not <code>null</code>
@@ -118,11 +118,11 @@ public class MigrationPhase {
 	}
 
 	/**
-	 * A {@link MigrationPhase} that is only executed for shop object's of a specific type or any sub type.
+	 * A {@link MigrationPhase} that is only executed for shop object's of a specific type or any sub-type.
 	 */
 	public static final class ShopObjectClassMigrationPhase extends MigrationPhase {
 
-		private static Map<Class<? extends ShopObject>, ShopObjectClassMigrationPhase> CACHE = new HashMap<>();
+		private static final Map<Class<? extends ShopObject>, ShopObjectClassMigrationPhase> CACHE = new HashMap<>();
 
 		private static ShopObjectClassMigrationPhase of(Class<? extends ShopObject> shopObjectClass) {
 			return CACHE.computeIfAbsent(shopObjectClass, ShopObjectClassMigrationPhase::new);
@@ -179,7 +179,7 @@ public class MigrationPhase {
 	 */
 	public static final MigrationPhase LATE = new MigrationPhase("late");
 
-	private String name;
+	private final String name;
 
 	private MigrationPhase(String name) {
 		Validate.notEmpty(name, "name is empty");

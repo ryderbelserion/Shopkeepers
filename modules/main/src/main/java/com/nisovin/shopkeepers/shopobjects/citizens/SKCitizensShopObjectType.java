@@ -43,7 +43,7 @@ public final class SKCitizensShopObjectType extends AbstractEntityShopObjectType
 		// We use the NPC's unique id as identifier:
 		// Note: On later versions of Citizens this matches the entity UUID of the NPC entity (actually the other way
 		// around: Citizens injects the NPC UUID into the entity). However, since we expect that each entity represents
-		// at most one shopkeeper, this is not an issue in regards to potential conflicts with the object ids of other
+		// at most one shopkeeper, this is not an issue in regard to potential conflicts with the object ids of other
 		// shopkeepers and object types.
 		UUID npcUniqueId = citizensShops.getNPCUniqueId(entity); // Null if the entity is not a NPC
 		if (npcUniqueId == null) return null; // Entity is not a NPC

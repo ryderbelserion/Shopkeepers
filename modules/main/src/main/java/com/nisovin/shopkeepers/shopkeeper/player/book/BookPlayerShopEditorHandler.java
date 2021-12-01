@@ -51,8 +51,7 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			});
 
 			// Add new empty recipe drafts for book items from the container without existing offer:
-			containerBooksByTitle.entrySet().forEach(bookEntry -> {
-				String bookTitle = bookEntry.getKey();
+			containerBooksByTitle.forEach((bookTitle, bookItem) -> {
 				assert bookTitle != null;
 				if (!bookTitles.add(bookTitle)) {
 					// We already added a recipe for a book with this title.
@@ -60,8 +59,8 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 				}
 
 				// Add new empty recipe:
-				ItemStack bookItem = ItemUtils.copySingleItem(bookEntry.getValue()); // Ensures a stack size of 1
-				TradingRecipeDraft recipe = createTradingRecipeDraft(bookItem, 0);
+				ItemStack bookItemCopy = ItemUtils.copySingleItem(bookItem); // Ensures a stack size of 1
+				TradingRecipeDraft recipe = createTradingRecipeDraft(bookItemCopy, 0);
 				recipes.add(recipe);
 			});
 

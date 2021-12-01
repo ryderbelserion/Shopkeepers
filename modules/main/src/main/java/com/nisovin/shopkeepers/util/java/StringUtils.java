@@ -350,7 +350,7 @@ public class StringUtils {
 	// The replaced keys use the format {key} (braces are not specified in the argument keys).
 	// Uses the String representation of the given arguments.
 	// If an argument is a Supplier, it gets invoked to obtain the actual argument.
-	public static String replaceArguments(String source, Map<String, Object> arguments) {
+	public static String replaceArguments(String source, Map<String, ?> arguments) {
 		return replaceArguments(source, MessageArguments.ofMap(arguments));
 	}
 
@@ -369,7 +369,7 @@ public class StringUtils {
 	}
 
 	// Creates and returns a new List:
-	public static List<String> replaceArguments(Collection<String> sources, Map<String, Object> arguments) {
+	public static List<String> replaceArguments(Collection<String> sources, Map<String, ?> arguments) {
 		Validate.notNull(sources, "sources is null");
 		List<String> replaced = new ArrayList<>(sources.size());
 		for (String source : sources) {
@@ -382,8 +382,8 @@ public class StringUtils {
 	// Argument's map: Faster than iterating and comparing.
 	// Arguments may occur more than once.
 	// Arguments inside arguments are not replaced.
-	// TODO Add support for argument options (eg.: formatting options, etc.).
-	// TODO Allow escaping, eg. via "\{key\}"?
+	// TODO Add support for argument options (e.g.: formatting options, etc.).
+	// TODO Allow escaping, e.g. via "\{key\}"?
 	// TODO Improve handling of inner braces: "{some{key}", "{some{inner}key}"
 	public static class ArgumentsReplacer {
 

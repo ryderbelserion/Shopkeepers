@@ -107,7 +107,7 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 *            the shop creation data, not <code>null</code>
 	 * @return the created shopkeeper, not <code>null</code>
 	 * @throws ShopkeeperCreateException
-	 *             if the shopkeeper cannot be created (eg. due to invalid or missing data)
+	 *             if the shopkeeper cannot be created (e.g. due to invalid or missing data)
 	 */
 	public final T createShopkeeper(int id, ShopCreationData shopCreationData) throws ShopkeeperCreateException {
 		T shopkeeper = this.createShopkeeper();
@@ -123,14 +123,14 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 	 * <p>
 	 * This operation does not modify the given {@link ShopkeeperData}. Any stored data elements (such as for example
 	 * item stacks, etc.) and collections of data elements are assumed to not be modified, neither by the loaded
-	 * shopkeeper, nor in contexts outside of the loaded shopkeeper. If the loaded shopkeeper can guarantee not to
-	 * modify these data elements, it is allowed to directly store them without copying them first.
+	 * shopkeeper, nor in contexts outside the loaded shopkeeper. If the loaded shopkeeper can guarantee not to modify
+	 * these data elements, it is allowed to directly store them without copying them first.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
 	 * @return the loaded shopkeeper, not <code>null</code>
 	 * @throws InvalidDataException
-	 *             if the shopkeeper cannot be loaded (eg. due to invalid or missing data)
+	 *             if the shopkeeper cannot be loaded (e.g. due to invalid or missing data)
 	 */
 	public final T loadShopkeeper(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		T shopkeeper = this.createShopkeeper();

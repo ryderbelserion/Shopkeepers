@@ -18,8 +18,8 @@ class ShopCreationItemSelectionTask implements Runnable {
 	/**
 	 * The time in ticks before we send the shop creation item selection message.
 	 * <p>
-	 * We only send the message if the player is still holding the item after this delay. This avoid message spam
-	 * when the player quickly scrolls through the items on the hotbar via the mouse wheel.
+	 * We only send the message if the player is still holding the item after this delay. This avoids message spam when
+	 * the player quickly scrolls through the items on the hotbar via the mouse wheel.
 	 */
 	private static final long DELAY_TICKS = 5L; // 0.25 seconds
 

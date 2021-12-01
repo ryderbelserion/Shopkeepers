@@ -109,10 +109,9 @@ public abstract class AbstractDataContainer implements DataContainer {
 	@Override
 	public void setAll(Map<?, ?> values) {
 		Validate.notNull(values, "values is null");
-		values.entrySet().forEach(entry -> {
-			String key = ConversionUtils.toString(entry.getKey());
-			Object value = entry.getValue();
-			this.set(key, value);
+		values.forEach((key, value) -> {
+			String stringKey = ConversionUtils.toString(key);
+			this.set(stringKey, value);
 		});
 	}
 

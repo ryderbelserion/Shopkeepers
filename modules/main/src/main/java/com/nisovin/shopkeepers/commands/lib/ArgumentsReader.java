@@ -194,13 +194,13 @@ public class ArgumentsReader {
 	}
 
 	/**
-	 * Creates an {@link ArgumentsReader} that copies the current state of this arguments reader.
+	 * Creates an {@link ArgumentsReader} that copies the current state of this ArgumentsReader.
 	 * <p>
-	 * This can be used to later reset the state of this arguments reader via {@link #setState(ArgumentsReader)}.
+	 * This can be used to later reset the state of this ArgumentsReader via {@link #setState(ArgumentsReader)}.
 	 * <p>
 	 * Note: The copy references the same underlying input arguments.
 	 * 
-	 * @return a copy of this arguments reader
+	 * @return a copy of this ArgumentsReader
 	 */
 	public ArgumentsReader createSnapshot() {
 		ArgumentsReader copy = new ArgumentsReader(this.args);
@@ -209,12 +209,12 @@ public class ArgumentsReader {
 	}
 
 	/**
-	 * Applies the state of the given other {@link ArgumentsReader} to this arguments reader.
+	 * Applies the state of the given other {@link ArgumentsReader} to this ArgumentsReader.
 	 * <p>
-	 * This is only applicable if both arguments readers reference the same input arguments.
+	 * This is only applicable if both ArgumentsReaders reference the same input arguments.
 	 * 
 	 * @param otherReader
-	 *            the other arguments reader
+	 *            the other ArgumentsReader
 	 */
 	public void setState(ArgumentsReader otherReader) {
 		Validate.notNull(otherReader, "otherReader is null");

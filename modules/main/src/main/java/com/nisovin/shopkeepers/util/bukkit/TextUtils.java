@@ -100,7 +100,7 @@ public class TextUtils {
 	public static String getPlayerString(String playerName, UUID playerUUID) {
 		// Either of them might be null.
 		if (playerName != null) {
-			return playerName + (playerUUID == null ? "" : " (" + playerUUID.toString() + ")");
+			return playerName + (playerUUID == null ? "" : " (" + playerUUID + ")");
 		} else if (playerUUID != null) {
 			return playerUUID.toString();
 		} else {
@@ -121,7 +121,7 @@ public class TextUtils {
 	}
 
 	public static final char COLOR_CHAR_ALTERNATIVE = '&';
-	private static final Pattern STRIP_COLOR_ALTERNATIVE_PATTERN = Pattern.compile("(?i)" + String.valueOf(COLOR_CHAR_ALTERNATIVE) + "[0-9A-FK-OR]");
+	private static final Pattern STRIP_COLOR_ALTERNATIVE_PATTERN = Pattern.compile("(?i)" + COLOR_CHAR_ALTERNATIVE + "[0-9A-FK-OR]");
 
 	// Only checks for the Minecraft color code character, not the alternative color code character.
 	public static boolean containsColorChar(String text) {
@@ -197,7 +197,7 @@ public class TextUtils {
 	 * @return the texts with Minecraft's color codes, or <code>null</code> if the given list is <code>null</code>
 	 */
 	public static List<String> colorize(List<String> texts) {
-		if (texts == null) return texts;
+		if (texts == null) return null;
 		List<String> colored = new ArrayList<>(texts.size());
 		for (String text : texts) {
 			colored.add(colorize(text));
@@ -233,7 +233,7 @@ public class TextUtils {
 		}
 	}
 
-	public static void sendMessage(CommandSender recipient, String message, Map<String, Object> arguments) {
+	public static void sendMessage(CommandSender recipient, String message, Map<String, ?> arguments) {
 		// Replace message arguments and then send:
 		sendMessage(recipient, StringUtils.replaceArguments(message, arguments));
 	}
@@ -342,7 +342,7 @@ public class TextUtils {
 		SpigotText.sendMessage(recipient, message);
 	}
 
-	public static void sendMessage(CommandSender recipient, Text message, Map<String, Object> arguments) {
+	public static void sendMessage(CommandSender recipient, Text message, Map<String, ?> arguments) {
 		Validate.notNull(recipient, "recipient is null");
 		Validate.notNull(message, "message is null");
 		// Assign arguments and then send:

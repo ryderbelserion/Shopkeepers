@@ -82,7 +82,7 @@ public class ShopkeeperUUIDArgument extends ObjectUUIDArgument {
 
 		return shopkeepersStream
 				.filter(filter)
-				.map(shopkeeper -> shopkeeper.getUniqueId())
+				.map(Shopkeeper::getUniqueId)
 				.filter(uuid -> {
 					// Assumption: UUID#toString is already lowercase (normalized)
 					return uuid.toString().startsWith(normalizedUUIDPrefix);

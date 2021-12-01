@@ -19,10 +19,10 @@ import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 public class TextTest extends AbstractBukkitTest {
 
-	// Tests Text parsing and backwards conversion with the actual default messages extracted from the default config
+	// Tests the Text parsing and backwards conversion with the actual messages of the default language file
 	@Test
 	public void testRealMessageConversions() throws IOException {
-		// read default config:
+		// Load default language file:
 		Configuration config;
 		ClassLoader classLoader = this.getClass().getClassLoader();
 		try (Reader reader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream("lang/language-en-default.yml")))) {
@@ -33,7 +33,7 @@ public class TextTest extends AbstractBukkitTest {
 		int tested = 0;
 		for (String key : configKeys) {
 			Object value = config.get(key);
-			if (value.getClass() != String.class) continue;
+			if (!(value instanceof String)) continue;
 
 			tested++;
 			String stringText = TextUtils.colorize((String) value);

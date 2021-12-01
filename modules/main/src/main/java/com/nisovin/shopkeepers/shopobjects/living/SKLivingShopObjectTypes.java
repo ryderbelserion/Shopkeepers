@@ -252,7 +252,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 		// registered:
 		// Note: These permissions are registered once, and then never unregistered again until the next server restart
 		// or full reload. This is not a problem.
-		orderedObjectTypesView.forEach(shopObjectType -> registerPermission(shopObjectType));
+		orderedObjectTypesView.forEach(SKLivingShopObjectTypes::registerPermission);
 	}
 
 	@Override

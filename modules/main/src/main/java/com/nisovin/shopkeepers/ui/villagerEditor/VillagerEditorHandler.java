@@ -198,7 +198,7 @@ public final class VillagerEditorHandler extends AbstractEditorHandler {
 	protected void setupButtons() {
 		super.setupButtons();
 		this.addButtonOrIgnore(this.createDeleteButton());
-		// Note: Players can also use nametags to rename the villager like normal. However, this option allows to setup
+		// Note: Players can also use nametags to rename the villager like normal. However, this option allows to set up
 		// colored names more conveniently.
 		this.addButtonOrIgnore(this.createNamingButton());
 		// Note: Wandering traders have an inventory as well, but it is usually always empty.

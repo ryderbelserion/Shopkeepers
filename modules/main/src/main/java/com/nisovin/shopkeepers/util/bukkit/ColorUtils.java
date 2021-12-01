@@ -19,7 +19,7 @@ public class ColorUtils {
 	 * @return the RGB value
 	 */
 	public static int HSBtoRGB(float hue, float saturation, float brightness) {
-		// We simple delegate to the in-built AWT implementation:
+		// We simply delegate to the in-built AWT implementation:
 		int rgb = java.awt.Color.HSBtoRGB(hue, saturation, brightness);
 		// AWT returns a RGB value with ones in the highest order bits, so we need to remove those:
 		return rgb & 0x00FFFFFF;

@@ -34,7 +34,7 @@ public final class InventoryUtils {
 	 * 
 	 * @return the empty array
 	 */
-	public static final ItemStack[] emptyItemStackArray() {
+	public static ItemStack[] emptyItemStackArray() {
 		return EMPTY_ITEMSTACK_ARRAY;
 	}
 
@@ -65,7 +65,7 @@ public final class InventoryUtils {
 	 *            the predicate, not <code>null</code>
 	 * @param amount
 	 *            the amount of items to check for
-	 * @return <code>true</code> if at least the specified amount of items were found
+	 * @return <code>true</code> if at least the specified amount of items was found
 	 */
 	public static boolean containsAtLeast(@ReadOnly ItemStack @ReadOnly [] contents, Predicate<@ReadOnly ItemStack> predicate, int amount) {
 		Validate.notNull(predicate, "predicate is null");
@@ -93,7 +93,7 @@ public final class InventoryUtils {
 	 *            the item data to check for, not <code>null</code>
 	 * @param amount
 	 *            the amount of items to check for
-	 * @return <code>true</code> if at least the specified amount of items were found
+	 * @return <code>true</code> if at least the specified amount of items was found
 	 */
 	public static boolean containsAtLeast(@ReadOnly ItemStack @ReadOnly [] contents, ItemData itemData, int amount) {
 		return containsAtLeast(contents, ItemUtils.matchingItems(itemData), amount);
@@ -109,7 +109,7 @@ public final class InventoryUtils {
 	 *            the item stack to check for, not <code>null</code>
 	 * @param amount
 	 *            the amount of items to check for
-	 * @return <code>true</code> if at least the specified amount of items were found
+	 * @return <code>true</code> if at least the specified amount of items was found
 	 */
 	public static boolean containsAtLeast(@ReadOnly ItemStack @ReadOnly [] contents, @ReadOnly ItemStack itemStack, int amount) {
 		return containsAtLeast(contents, ItemUtils.similarItems(itemStack), amount);
@@ -125,7 +125,7 @@ public final class InventoryUtils {
 	 *            the item stack to check for, not <code>null</code>
 	 * @param amount
 	 *            the amount of items to check for
-	 * @return <code>true</code> if at least the specified amount of items were found
+	 * @return <code>true</code> if at least the specified amount of items was found
 	 */
 	public static boolean containsAtLeast(@ReadOnly ItemStack @ReadOnly [] contents, UnmodifiableItemStack itemStack, int amount) {
 		return containsAtLeast(contents, ItemUtils.similarItems(itemStack), amount);
@@ -173,7 +173,7 @@ public final class InventoryUtils {
 	 *            the predicate, not <code>null</code>
 	 * @param amount
 	 *            the amount of items to check for
-	 * @return <code>true</code> if at least the specified amount of items were found
+	 * @return <code>true</code> if at least the specified amount of items was found
 	 */
 	public static boolean containsAtLeast(Iterable<@ReadOnly ItemStack> contents, Predicate<@ReadOnly ItemStack> predicate, int amount) {
 		Validate.notNull(predicate, "predicate is null");
@@ -201,7 +201,7 @@ public final class InventoryUtils {
 	 *            the item data to check for, not <code>null</code>
 	 * @param amount
 	 *            the amount of items to check for
-	 * @return <code>true</code> if at least the specified amount of items were found
+	 * @return <code>true</code> if at least the specified amount of items was found
 	 */
 	public static boolean containsAtLeast(Iterable<@ReadOnly ItemStack> contents, ItemData itemData, int amount) {
 		return containsAtLeast(contents, ItemUtils.matchingItems(itemData), amount);
@@ -217,7 +217,7 @@ public final class InventoryUtils {
 	 *            the item stack to check for, not <code>null</code>
 	 * @param amount
 	 *            the amount of items to check for
-	 * @return <code>true</code> if at least the specified amount of items were found
+	 * @return <code>true</code> if at least the specified amount of items was found
 	 */
 	public static boolean containsAtLeast(Iterable<@ReadOnly ItemStack> contents, @ReadOnly ItemStack itemStack, int amount) {
 		return containsAtLeast(contents, ItemUtils.similarItems(itemStack), amount);
@@ -539,7 +539,7 @@ public final class InventoryUtils {
 	}
 
 	public static void updateInventoryLater(Player player) {
-		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> player.updateInventory());
+		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), player::updateInventory);
 	}
 
 	// Only closes the player's open inventory view if it is still the specified view after the delay:
@@ -553,7 +553,7 @@ public final class InventoryUtils {
 	}
 
 	public static void closeInventoryDelayed(Player player) {
-		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> player.closeInventory());
+		Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), player::closeInventory);
 	}
 
 	// This can for example be used during the handling of inventory interaction events.

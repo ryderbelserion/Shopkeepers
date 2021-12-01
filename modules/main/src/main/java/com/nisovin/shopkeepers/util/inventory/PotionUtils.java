@@ -27,7 +27,7 @@ public class PotionUtils {
 
 	// TODO This may need to be updated on Minecraft updates.
 	// Formatted like the keys of namespaced keys:
-	private static Map<String, PotionType> POTION_TYPE_ALIASES = new HashMap<>();
+	private static final Map<String, PotionType> POTION_TYPE_ALIASES = new HashMap<>();
 	static {
 		POTION_TYPE_ALIASES.put("empty", PotionType.UNCRAFTABLE);
 		POTION_TYPE_ALIASES.put("leaping", PotionType.JUMP);
@@ -43,7 +43,7 @@ public class PotionUtils {
 	 * Expected format: {@code [minecraft:]<potion name>}
 	 * <p>
 	 * The given input String is formatted like a valid Minecraft {@link NamespacedKey} (see
-	 * {@link NamespacedKeyUtils#normalizeMinecraftNamespacedKey(String)}. The Minecraft namespace prefix is optional.
+	 * {@link NamespacedKeyUtils#normalizeMinecraftNamespacedKey(String)}). The Minecraft namespace prefix is optional.
 	 * 
 	 * @param input
 	 *            the input String
@@ -93,11 +93,11 @@ public class PotionUtils {
 	 *   potion. There are currently no potion variants that are both long and strong at the same time. Consequently, only one of
 	 *   these keywords is allowed to be used at the same time. However, we currently ignore any additional occurrences of the
 	 *   respectively other keywords. If the specified potion type does not support the selected variant, the keyword is
-	 *   currently ignored as well. But this might change and potentially become more strict in a future release.
+	 *   currently ignored as well. But this might change and potentially become stricter in a future release.
 	 * - Each keyword can occur at most once within the input, but there may be multiple valid locations at which it is allowed
 	 *   to occur (which is why the above formats mention some keywords multiple times). However, for simplicity, the parsing
 	 *   does not actually take the order or dependencies of words into account currently, but only checks for the presence of
-	 *   the various keywords. But this might change and potentially become more strict in a future release.
+	 *   the various keywords. But this might change and potentially become stricter in a future release.
 	 */
 	public static ItemStack parsePotionItem(String input) {
 		if (input == null || input.isEmpty()) return null;
@@ -115,7 +115,7 @@ public class PotionUtils {
 		CollectionUtils.replace(words, "of", null);
 
 		// Determine the item type based on keywords:
-		Material itemType = null;
+		Material itemType;
 		if (CollectionUtils.replace(words, "arrow", null)) {
 			// Keywords: [tipped] [potion] arrow [of]
 			itemType = Material.TIPPED_ARROW;

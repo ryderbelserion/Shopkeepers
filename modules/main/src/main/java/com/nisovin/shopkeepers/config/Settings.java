@@ -330,7 +330,7 @@ public class Settings extends Config {
 			setup();
 		}
 
-		// Gets called after setting values have changed (eg. after the config has been loaded):
+		// Gets called after setting values have changed (e.g. after the config has been loaded):
 		private static void setup() {
 			// TODO This formatter uses the server's default time zone. Allow configuring the time zone?
 			try {
@@ -568,7 +568,7 @@ public class Settings extends Config {
 		ConfigData configData = ConfigData.of(plugin.getConfig());
 
 		// Load settings from config:
-		boolean configChanged = false;
+		boolean configChanged;
 		try {
 			configChanged = loadConfig(configData);
 		} catch (ConfigLoadException e) {

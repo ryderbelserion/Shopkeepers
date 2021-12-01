@@ -31,7 +31,7 @@ import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class HorseShop extends BabyableShop<Horse> {
 
-	public static enum HorseArmor {
+	public enum HorseArmor {
 
 		LEATHER(Material.LEATHER_HORSE_ARMOR),
 		IRON(Material.IRON_HORSE_ARMOR),

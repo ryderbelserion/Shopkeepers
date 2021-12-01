@@ -116,7 +116,7 @@ public class ChatInput implements Listener {
 	 * is still of that type before you abort it with this method.
 	 * 
 	 * @param player
-	 *            the player
+	 *            the player, not <code>null</code>
 	 */
 	public void abortRequest(Player player) {
 		Validate.notNull(player, "player is null");

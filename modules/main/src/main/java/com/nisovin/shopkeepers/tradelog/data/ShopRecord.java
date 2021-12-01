@@ -9,8 +9,8 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * An immutable snapshot of the information about a shop.
  * <p>
- * This information is not necessarily up-to-date, but represents the shop's information at a certain point in time (eg.
- * the shop might have been modified or even deleted).
+ * This information is not necessarily up-to-date, but represents the shop's information at a certain point in time
+ * (e.g. the shop might have been modified or even deleted).
  */
 public class ShopRecord {
 
@@ -38,7 +38,7 @@ public class ShopRecord {
 	private final UUID uniqueId;
 	private final String typeId;
 	// The owner might no longer match the current owner of the shopkeeper.
-	private final PlayerRecord owner; // Can be null (eg. for admin shops)
+	private final PlayerRecord owner; // Can be null (e.g. for admin shops)
 	private final String name; // Can be empty
 	private final String worldName; // Can be null for virtual shops, not empty
 	// Coordinates are all 0 for virtual shops:

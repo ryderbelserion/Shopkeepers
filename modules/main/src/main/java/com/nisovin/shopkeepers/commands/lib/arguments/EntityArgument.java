@@ -16,8 +16,8 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 /**
  * Accepts an entity specified by some form of input.
  * <p>
- * Currently this only accepts UUIDs. In the future additional inputs to specify an entity could be added here (eg. by
- * name).
+ * Currently, this only accepts UUIDs. In the future, additional inputs to specify an entity could be added here (e.g.
+ * by name).
  */
 public class EntityArgument extends CommandArgument<Entity> {
 

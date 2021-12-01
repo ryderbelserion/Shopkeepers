@@ -41,7 +41,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * between objects, via so called 'anchors': If one object is referenced by multiple other objects, Yaml can restore
  * this object hierarchy, whereas Json by default can not. There are some extensions to Json that intend to make it
  * possible to persist such object references. However, neither Gson nor this TypeAdapter implement one of these
- * solutions yet. For maximum compatibility with Bukkit's serialization API, it is therefore recommended to stick to
+ * solutions yet. For maximum compatibility with Bukkit's serialization API, it is therefore recommended sticking to
  * Yaml when the Json format is not strictly required.
  */
 // Extends YamlLikeObjectTypeAdapter for better compatibility with Bukkit's serialization API.

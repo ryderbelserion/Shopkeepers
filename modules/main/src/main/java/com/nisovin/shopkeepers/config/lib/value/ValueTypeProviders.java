@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class ValueTypeProviders {
+public final class ValueTypeProviders {
 
 	public static ValueTypeProvider forTypePattern(TypePattern typePattern, Function<Type, ValueType<?>> valueTypeProvider) {
 		Validate.notNull(typePattern, "typePattern is null");

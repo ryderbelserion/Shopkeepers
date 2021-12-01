@@ -107,7 +107,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * data was originally meant for a different shop object type.
 	 * <p>
 	 * Any stored data elements (such as for example item stacks, etc.) and collections of data elements are assumed to
-	 * not be modified, neither by the shop object, nor in contexts outside of the shop object. If the shop object can
+	 * not be modified, neither by the shop object, nor in contexts outside the shop object. If the shop object can
 	 * guarantee not to modify these data elements, it is allowed to directly store them without copying them first.
 	 * 
 	 * @param shopObjectData
@@ -179,7 +179,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * <p>
 	 * This is called after {@link #remove()}.
 	 * <p>
-	 * This can for example be used to cleanup any persistent data corresponding to this shop object.
+	 * This can for example be used to clean up any persistent data corresponding to this shop object.
 	 */
 	public void delete() {
 	}
@@ -237,7 +237,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	/**
 	 * Spawns the shop object into the world at its spawn location.
 	 * <p>
-	 * This may have no effect if the shop object has already been spawned. To respawn this shop object if is is
+	 * This may have no effect if the shop object has already been spawned. To respawn this shop object if it is
 	 * currently already spawned, one can use {@link #respawn()}.
 	 * <p>
 	 * This needs to call {@link #onIdChanged()} if the shop object was successfully spawned.
@@ -371,7 +371,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	/**
 	 * Creates the editor buttons for editing this shop object.
 	 * <p>
-	 * This is usually only invoked once, when the {@link EditorHandler} is setup for the shopkeeper. So it is not
+	 * This is usually only invoked once, when the {@link EditorHandler} is set up for the shopkeeper. So it is not
 	 * possible to dynamically add or remove buttons with this method.
 	 * <p>
 	 * In order to allow for subtypes to more easily add or modify the returned editor buttons, this method is expected

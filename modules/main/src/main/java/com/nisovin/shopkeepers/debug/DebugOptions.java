@@ -26,7 +26,7 @@ public final class DebugOptions {
 	public static final String commands = add("commands");
 	// Logs information when updating stored shop owner names.
 	public static final String ownerNameUpdates = add("owner-name-updates");
-	// Logs whenever a shopkeeper performs item migrations (eg. for trading offers).
+	// Logs whenever a shopkeeper performs item migrations (e.g. for trading offers).
 	public static final String itemMigrations = add("item-migrations");
 	// Logs whenever we explicitly convert items to Spigot's data format. Note that this does not log when items get
 	// implicitly converted, which may happen under various circumstances.

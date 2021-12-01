@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * <p>
  * If this annotation is used on a container type, such as a collection or an array, its meaning applies to the
  * container itself, but not necessarily to its contained elements: The container itself may be modified, but no
- * statement is made on whether or not the states of the contained elements are modified.
+ * statement is made on whether the states of the contained elements are modified.
  * <p>
  * See also {@link ReadOnly}, which can be used to indicate that the referenced object is not modified.
  */

@@ -45,7 +45,7 @@ class CommandTransfer extends Command {
 	protected void execute(CommandInput input, CommandContextView context) throws CommandException {
 		CommandSender sender = input.getSender();
 
-		PlayerShopkeeper shopkeeper = (PlayerShopkeeper) context.get(ARGUMENT_SHOPKEEPER);
+		PlayerShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
 		assert shopkeeper != null;
 		Player newOwner = context.get(ARGUMENT_NEW_OWNER);
 		assert newOwner != null;

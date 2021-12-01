@@ -76,7 +76,7 @@ class WorldListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onPlayerTeleport(PlayerTeleportEvent event) {
-		// The target location can be null in some circumstances (eg. when a player enters an end gateway, but there is
+		// The target location can be null in some circumstances (e.g. when a player enters an end gateway, but there is
 		// no end world). We ignore the event in this case.
 		Location targetLocation = event.getTo();
 		if (targetLocation == null) return;

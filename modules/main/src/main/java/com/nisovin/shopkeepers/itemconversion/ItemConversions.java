@@ -42,6 +42,7 @@ public class ItemConversions {
 
 	/////
 
+	// Note: This is not a lambda, because we use the object's identity for performance optimization purposes.
 	private static final Predicate<ItemStack> NO_ITEMS_AFFECTED = new Predicate<ItemStack>() {
 		@Override
 		public boolean test(ItemStack item) {

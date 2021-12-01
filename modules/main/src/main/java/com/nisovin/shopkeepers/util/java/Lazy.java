@@ -33,13 +33,11 @@ public final class Lazy<T> {
 	 * @return the value, can be <code>null</code> if the calculated value is <code>null</code>
 	 */
 	public T get() {
-		if (calculated) {
-			return value;
-		} else {
+		if (!calculated) {
 			value = supplier.get(); // Can be null
 			calculated = true;
-			return value;
 		}
+		return value;
 	}
 
 	@Override

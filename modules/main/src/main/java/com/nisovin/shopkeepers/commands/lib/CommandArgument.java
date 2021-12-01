@@ -46,7 +46,7 @@ public abstract class CommandArgument<T> {
 	 * <code>:</code> is reserved for use by those internal arguments.
 	 * 
 	 * @param name
-	 *            the argument's name
+	 *            the argument's name, not <code>null</code> or empty
 	 */
 	public CommandArgument(String name) {
 		Validate.notEmpty(name, "name is null or empty");
@@ -66,7 +66,7 @@ public abstract class CommandArgument<T> {
 	/**
 	 * Gets the argument's display name.
 	 * <p>
-	 * This is used when representing this argument inside the argument format. By default this matches the argument's
+	 * This is used when representing this argument inside the argument format. By default, this matches the argument's
 	 * name.
 	 * 
 	 * @return the argument's display name
@@ -114,7 +114,7 @@ public abstract class CommandArgument<T> {
 	 * Gets the parent argument.
 	 * <p>
 	 * The parent being <code>null</code> indicates that either the parent hasn't been set yet, or this argument is a
-	 * top-level (root) argument. Otherwise this argument is used internally by another (the parent) argument.
+	 * top-level (root) argument. Otherwise, this argument is used internally by another argument (the parent).
 	 * 
 	 * @return the parent argument, can be <code>null</code>
 	 */
@@ -211,9 +211,9 @@ public abstract class CommandArgument<T> {
 
 	// COMMON ERRORS
 
-	private final Map<String, Object> defaultErrorMsgArgs = Collections.unmodifiableMap(this.setupDefaultErrorMsgArgs());
+	private final Map<String, ?> defaultErrorMsgArgs = Collections.unmodifiableMap(this.setupDefaultErrorMsgArgs());
 
-	private Map<String, Object> setupDefaultErrorMsgArgs() {
+	private Map<String, ?> setupDefaultErrorMsgArgs() {
 		// Dynamically resolve arguments:
 		Map<String, Object> args = new HashMap<>();
 		Supplier<?> argumentNameSupplier = () -> {
@@ -224,7 +224,7 @@ public abstract class CommandArgument<T> {
 			CommandArgument<?> rootArgument = this.getRootArgument();
 			String format = rootArgument.getFormat();
 			if (format.isEmpty()) {
-				// Use the name in case the format is empty (eg. for hidden arguments):
+				// Use the name in case the format is empty (e.g. for hidden arguments):
 				return argumentNameSupplier.get();
 			} else {
 				return format;
@@ -244,11 +244,11 @@ public abstract class CommandArgument<T> {
 	 * <li><code>argumentFormat</code>
 	 * </ul>
 	 * This uses the {@link #getRootArgument() root argument} for determining the argument name and format. If the
-	 * format is empty (eg. for hidden arguments), the name is used instead.
+	 * format is empty (e.g. for hidden arguments), the name is used instead.
 	 * 
 	 * @return the common default error message arguments
 	 */
-	public final Map<String, Object> getDefaultErrorMsgArgs() {
+	public final Map<String, ?> getDefaultErrorMsgArgs() {
 		return defaultErrorMsgArgs;
 	}
 
@@ -340,12 +340,12 @@ public abstract class CommandArgument<T> {
 	 * By default this delegates the parsing to {@link #parseValue(CommandInput, CommandContextView, ArgumentsReader)}.
 	 * 
 	 * @param input
-	 *            the command input
+	 *            the command input, not <code>null</code>
 	 * @param context
-	 *            the context which stores the parsed argument values
+	 *            the context which stores the parsed argument values, not <code>null</code>
 	 * @param argsReader
-	 *            the arguments reader
-	 * @return the parsed value, or <code>null</code> if nothing was parsed (eg. for optional command arguments)
+	 *            the ArgumentsReader, not <code>null</code>
+	 * @return the parsed value, or <code>null</code> if nothing was parsed (e.g. for optional command arguments)
 	 * @throws ArgumentParseException
 	 *             if unable to parse a value for a non-optional command argument
 	 */
@@ -365,12 +365,12 @@ public abstract class CommandArgument<T> {
 	 * {@link #parse(CommandInput, CommandContext, ArgumentsReader)} this method is not allowed to modify the context.
 	 * 
 	 * @param input
-	 *            the command input
+	 *            the command input, not <code>null</code>
 	 * @param context
-	 *            an unmodifiable view on the context storing the already parsed argument values
+	 *            an unmodifiable view on the context storing the already parsed argument values, not <code>null</code>
 	 * @param argsReader
-	 *            the arguments reader
-	 * @return the parsed value, or <code>null</code> if nothing was parsed (eg. for optional command arguments)
+	 *            the ArgumentsReader, not <code>null</code>
+	 * @return the parsed value, or <code>null</code> if nothing was parsed (e.g. for optional command arguments)
 	 * @throws ArgumentParseException
 	 *             if unable to parse a value for a non-optional command argument
 	 */
@@ -384,11 +384,11 @@ public abstract class CommandArgument<T> {
 	 * neither for the suggestions list nor its contents.
 	 * 
 	 * @param input
-	 *            the command input
+	 *            the command input, not <code>null</code>
 	 * @param context
-	 *            an unmodifiable view on the context storing the already parsed argument values
+	 *            an unmodifiable view on the context storing the already parsed argument values, not <code>null</code>
 	 * @param argsReader
-	 *            the arguments reader
+	 *            the ArgumentsReader, not <code>null</code>
 	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions' (not
 	 *         <code>null</code> and not containing <code>null</code>)
 	 */

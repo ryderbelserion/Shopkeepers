@@ -358,7 +358,7 @@ public interface DataValue {
 	 * <p>
 	 * Because {@link DataContainer}s and {@link DataValue}s themselves are not guaranteed to be serializable and
 	 * storing them instead of their {@link DataContainer#serialize() serialized form} or underlying {@link #get()
-	 * value} is a common overlooked error, this method catches this error early by not allowing to store a
+	 * value} is a commonly overlooked error, this method catches this error early by not allowing to store a
 	 * {@link DataContainer} or {@link DataValue}.
 	 * 
 	 * @param value

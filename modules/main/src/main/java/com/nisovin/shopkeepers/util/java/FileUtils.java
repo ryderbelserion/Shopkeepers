@@ -66,8 +66,8 @@ public class FileUtils {
 			}
 		} catch (SecurityException e) {
 			// Some SecurityManager implementations blindly deny the 'execute' permission without differentiating
-			// between files and directories. This should have no effect on whether or not we can write to the
-			// directory, so we can safely ignore it.
+			// between files and directories. This should have no effect on whether we can write to the directory, so we
+			// can safely ignore it.
 		}
 	}
 
@@ -77,7 +77,7 @@ public class FileUtils {
 	 * <p>
 	 * For some file / operating systems it may also be required to invoke fsync on directories to ensure that the names
 	 * of any contained newly created or renamed files have been properly persisted. However, not all operating systems
-	 * (eg. Windows) support to open or fsync directories. We therefore ignore any thrown {@link IOException} if the
+	 * (e.g. Windows) support to open or fsync directories. We therefore ignore any thrown {@link IOException} if the
 	 * given path points to a directory.
 	 * 
 	 * @param path
@@ -98,7 +98,7 @@ public class FileUtils {
 			file.force(true);
 		} catch (IOException e) {
 			if (isDirectory) {
-				// Ignored for directories, since this is not supported on all operating systems (eg. Windows):
+				// Ignored for directories, since this is not supported on all operating systems (e.g. Windows):
 				return;
 			}
 			throw new IOException("Could not fsync file '" + path + "': " + ThrowableUtils.getDescription(e), e);
@@ -197,9 +197,9 @@ public class FileUtils {
 	/**
 	 * Moves the specified source file to the given target path, replacing any already existing file at that path.
 	 * <p>
-	 * This attempts to atomically rename the file, but may fallback to a non-atomic move operation. In the latter case,
-	 * any occurring IO exception or severe system failure (crash, power loss, etc.) may leave the target file in an
-	 * undefined state. This logs a warning for each attempted fallback solution using the given {@link Logger}.
+	 * This attempts to atomically rename the file, but may fall back to a non-atomic move operation. In the latter
+	 * case, any occurring IO exception or severe system failure (crash, power loss, etc.) may leave the target file in
+	 * an undefined state. This logs a warning for each attempted fallback solution using the given {@link Logger}.
 	 * <p>
 	 * To account for transient issues that may occasionally prevent this operation from succeeding (such as in the
 	 * presence of other processes concurrently interacting with these files), it is recommended to wrap this operation

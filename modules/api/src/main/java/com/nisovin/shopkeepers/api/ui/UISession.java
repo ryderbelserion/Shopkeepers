@@ -38,7 +38,7 @@ public interface UISession {
 	 * <p>
 	 * A typical use for this is to deactivate the UI when the session is about to end / when the inventory view is
 	 * about to get closed. This is usually required because it is not safe to immediately close the inventory view as
-	 * reaction to inventory interactions by the player. Instead the closing of the inventory view is postponed to
+	 * reaction to inventory interactions by the player. Instead, the closing of the inventory view is postponed to
 	 * happen the next tick. The UI can be deactivated in this case to prevent the processing of any further inventory
 	 * interactions that might otherwise happen in the meantime.
 	 * 
@@ -98,7 +98,7 @@ public interface UISession {
 	 * Aborts this UI session.
 	 * <p>
 	 * Unlike {@link #close()} this has the semantic of the UI being forcefully closed without the player's intent. Some
-	 * types of UI might handle this differently, eg. by not saving any not yet applied changes.
+	 * types of UI might handle this differently, e.g. by not saving any not yet applied changes.
 	 * <p>
 	 * This may not be safe to call during UI / inventory events.
 	 */

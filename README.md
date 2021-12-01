@@ -49,9 +49,9 @@ The root project contains several module projects. The most important ones are:
 * `api`: This contains all API code.
 * And several modules for the NMS / CraftBukkit version specific code of the supported server versions.
 
-Shopkeepers requires serveral Spigot and CraftBukkit dependencies. The easiest way to automatically build and install these dependencies into your local Maven repository is to run the included `./scripts/installSpigotDependencies.sh` script.
+Shopkeepers requires several Spigot and CraftBukkit dependencies. The easiest way to automatically build and install these dependencies into your local Maven repository is to run the included `./scripts/installSpigotDependencies.sh` script.
 
-To build the project from within your IDE, refer to your IDE's respective documentation on how to build Gradle projects. For Eclipse, right click the root project, select **Run As > Run configurations...**, and then setup a 'Gradle Task' run configuration that executes the intended Gradle build tasks.  
+To build the project from within your IDE, refer to your IDE's respective documentation on how to build Gradle projects. For Eclipse, right-click the root project, select **Run As > Run configurations...**, and then set up a 'Gradle Task' run configuration that executes the intended Gradle build tasks.  
 Some shortcuts have been defined for commonly used combinations of build tasks. For example, 'cleanBuild' will trigger a clean build and runs all tests. 'cleanInstall' will additionally install the built jars into your local Maven repository.  
 
 Note that we require Java 16 to build.

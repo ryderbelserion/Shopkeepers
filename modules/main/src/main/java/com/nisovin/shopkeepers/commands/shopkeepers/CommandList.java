@@ -70,7 +70,7 @@ class CommandList extends Command {
 						new SenderPlayerNameFallback(new AnyStringFallback(
 								new TransformedArgument<>(
 										new PlayerByNameArgument(ARGUMENT_PLAYER_NAME),
-										(player) -> player.getName()
+										Player::getName
 								)
 						))
 				), false) // Don't join formats

@@ -33,7 +33,7 @@ public interface ShopkeepersPlugin extends Plugin {
 	 * 
 	 * @return the plugin instance, not <code>null</code>
 	 * @throws IllegalStateException
-	 *             if the API is not enabled currently, eg. because the plugin is not enabled currently
+	 *             if the API is not enabled currently, e.g. because the plugin is not enabled currently
 	 */
 	public static ShopkeepersPlugin getInstance() {
 		return ShopkeepersAPI.getPlugin();

@@ -28,10 +28,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class ItemUtils {
 
-	private ItemUtils() {
-	}
-
-	public static int MAX_STACK_SIZE = 64;
+	public static final int MAX_STACK_SIZE = 64;
 
 	// Material utilities:
 
@@ -302,12 +299,12 @@ public final class ItemUtils {
 	 * 
 	 * @param itemStack
 	 *            the item stack, can be empty
-	 * @param amountToDescrease
+	 * @param amountToDecrease
 	 *            the amount to decrease, can be negative to increase
 	 * @return the resulting item, or <code>null</code> if the item ends up being empty
 	 */
-	public static ItemStack descreaseItemAmount(@ReadWrite ItemStack itemStack, int amountToDescrease) {
-		return increaseItemAmount(itemStack, -amountToDescrease);
+	public static ItemStack decreaseItemAmount(@ReadWrite ItemStack itemStack, int amountToDecrease) {
+		return increaseItemAmount(itemStack, -amountToDecrease);
 	}
 
 	/**
@@ -639,7 +636,7 @@ public final class ItemUtils {
 		// Compare item types:
 		if (item.getType() != data.getType()) return false;
 
-		// Check if meta data is contained in item:
+		// Check if metadata is contained in item:
 		return matchesData(item.getItemMeta(), data.getItemMeta(), matchPartialLists);
 	}
 
@@ -658,10 +655,10 @@ public final class ItemUtils {
 		return matchesData(itemMetaData, dataMetaData, false); // Not matching partial lists
 	}
 
-	// Checks if the meta data contains the other given meta data.
+	// Checks if the metadata contains the other given metadata.
 	// Similar to Minecraft's NBT data matching (trading does not match partial lists, but data specified in commands
 	// does), but there are a few differences: Minecraft requires explicitly specified empty lists to perfectly match in
-	// all cases, and some data is treated as list in Minecraft but as map in Bukkit (eg. enchantments). But the
+	// all cases, and some data is treated as list in Minecraft but as map in Bukkit (e.g. enchantments). But the
 	// behavior is the same if not matching partial lists.
 	public static boolean matchesData(ItemMeta itemMetaData, ItemMeta dataMetaData, boolean matchPartialLists) {
 		if (itemMetaData == dataMetaData) return true;
@@ -832,5 +829,8 @@ public final class ItemUtils {
 	public static Predicate<@ReadOnly ItemStack> itemsOfType(Material itemType) {
 		Validate.notNull(itemType, "itemType is null");
 		return (itemStack) -> itemStack.getType() == itemType;
+	}
+
+	private ItemUtils() {
 	}
 }

@@ -53,7 +53,7 @@ import net.citizensnpcs.trait.LookClose;
  * <li>The 'shopkeeper' trait gets removed from the Citizens NPC. This deletes the corresponding shopkeeper but keeps
  * the Citizens NPC alive.
  * TODO Removing the shopkeeper only works if the Citizens plugin is currently running. Otherwise the shopkeeper will
- * remain existing and attached to the NPC until it is removed directly (eg. via the editor or via command).
+ * remain existing and attached to the NPC until it is removed directly (e.g. via the editor or via command).
  * <li>On plugin startup, if the Citizens plugin is running as well, we check for and remove invalid shopkeepers such as
  * shopkeepers for which there is no corresponding Citizens NPC (anymore) or shopkeepers which have the same Citizens
  * NPC assigned as another shopkeeper.
@@ -233,7 +233,7 @@ public class CitizensShops {
 		return npc.getId() + " (" + npc.getUniqueId() + ")";
 	}
 
-	// Returns null if this entity is no citizens NPC (or citizens or citizens shops are disabled).
+	// Returns null if the entity is no Citizens NPC, or if the Citizens plugin or Citizens shops are disabled.
 	public UUID getNPCUniqueId(Entity entity) {
 		if (this.isEnabled()) {
 			NPC npc = CitizensAPI.getNPCRegistry().getNPC(entity);
@@ -289,7 +289,7 @@ public class CitizensShops {
 	/**
 	 * Checks for and optionally warns about or deletes invalid Citizen shopkeepers.
 	 * <p>
-	 * This does nothing if the Citizens integration is disabled, or if the Citizens plugin is not running currently.
+	 * This does nothing if the Citizens integration is disabled or if the Citizens plugin is not running currently.
 	 * 
 	 * @param deleteInvalidShopkeepers
 	 *            <code>true</code> to also delete any found invalid Citizen shopkeepers

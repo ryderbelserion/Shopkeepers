@@ -305,12 +305,13 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	// The shopkeepers that are ticked (i.e. the (activated) shopkeepers in active chunks).
 	// The shopkeepers are stored by their object id, or, if they don't provide one, by a shopkeeper-specific fallback
-	// id (this ensures that shopkeepers that could not be spawned are still ticked, eg. for periodic respawn attempts).
+	// id (this ensures that shopkeepers that could not be spawned are still ticked, e.g. for periodic respawn
+	// attempts).
 	// Shopkeepers that are pending to be spawned (i.e. that are in the spawn queue) are not yet activated, and are
 	// therefore also not yet ticked.
 	private final Map<Object, AbstractShopkeeper> activeShopkeepersByObjectId = new LinkedHashMap<>();
 	private boolean tickingShopkeepers = false;
-	// True: Activate (or update previous activation, eg. after the object id changed)
+	// True: Activate (or update previous activation, e.g. after the object id changed)
 	// False: Deactivate
 	private final Map<AbstractShopkeeper, Boolean> pendingActivationChanges = new LinkedHashMap<>();
 
@@ -510,9 +511,9 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	 *             if the shopkeeper data could not be loaded
 	 */
 	// Internal method: This is only supposed to be called by the built-in storage currently. If the data comes from any
-	// other source, the storage would need to be made aware of the shopkeeper (eg. by marking the shopkeeper as dirty).
-	// Otherwise, certain operations (such as checking if a certain shopkeeper id is already in use) would no longer
-	// work as expected.
+	// other source, the storage would need to be made aware of the shopkeeper (e.g. by marking the shopkeeper as
+	// dirty). Otherwise, certain operations (such as checking if a certain shopkeeper id is already in use) would no
+	// longer work as expected.
 	public AbstractShopkeeper loadShopkeeper(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 
@@ -1217,7 +1218,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		return shopkeeper.getUniqueId();
 	}
 
-	// If the shop object provides no id (eg. if it could not be spawned), we store the shopkeeper under a fallback id
+	// If the shop object provides no id (e.g. if it could not be spawned), we store the shopkeeper under a fallback id
 	// nevertheless. This allows us to keep track of all shopkeepers that are located in active chunks and still tick
 	// them, so that they can check if they can be respawned.
 	// If the shopkeeper is already active under a different object id, that entry is removed first.
@@ -1226,7 +1227,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		if (tickingShopkeepers) {
 			// Defer activation until after ticking:
 			Log.debug(DebugOptions.shopkeeperActivation, () -> shopkeeper.getLogPrefix()
-					+ "Defering activation until after shopkeeper ticking.");
+					+ "Deferring activation until after shopkeeper ticking.");
 			pendingActivationChanges.put(shopkeeper, true); // Replaces any previous value for the shopkeeper
 			return;
 		}
@@ -1270,7 +1271,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		if (tickingShopkeepers) {
 			// Defer deactivation until after ticking:
 			Log.debug(DebugOptions.shopkeeperActivation, () -> shopkeeper.getLogPrefix()
-					+ "Defering deactivation until after shopkeeper ticking.");
+					+ "Deferring deactivation until after shopkeeper ticking.");
 			pendingActivationChanges.put(shopkeeper, false); // Replaces any previous value for the shopkeeper
 			return;
 		}

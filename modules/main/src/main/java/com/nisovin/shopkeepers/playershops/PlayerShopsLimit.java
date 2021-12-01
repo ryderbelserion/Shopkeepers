@@ -45,7 +45,7 @@ public class PlayerShopsLimit {
 		maxShopsPermissions.addAll(MaxShopsPermission.parseList(maxShopsPermissionOptions, invalidPermissionOptionCallback));
 
 		// Sort the permissions in descending order:
-		Collections.sort(maxShopsPermissions, Collections.reverseOrder());
+		maxShopsPermissions.sort(Collections.reverseOrder());
 	}
 
 	/**

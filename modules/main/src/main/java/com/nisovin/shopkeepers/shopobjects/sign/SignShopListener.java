@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.shopobjects.sign;
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -104,8 +105,8 @@ class SignShopListener implements Listener {
 		// Update inventory in case the interaction would trigger an item action normally:
 		player.updateInventory();
 
-		// Ignore if already cancelled. Resolves conflicts with other event handlers running at LOWEST priority (eg.
-		// Shopkeepers' shop creation item listener acts on LOWEST priority as well).
+		// Ignore if already cancelled. This resolves conflicts with other event handlers that also run at LOWEST
+		// priority, such as for example Shopkeepers' shop creation item listener.
 		if (!useInteractedBlock) {
 			Log.debug("  Ignoring already cancelled block interaction");
 			return;
@@ -218,18 +219,19 @@ class SignShopListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityExplosion(EntityExplodeEvent event) {
-		Iterator<Block> iterator = event.blockList().iterator();
-		while (iterator.hasNext()) {
-			Block block = iterator.next();
-			if (this.isProtectedBlock(block)) {
-				iterator.remove();
-			}
-		}
+		this.removeProtectedBlocks(event.blockList());
 	}
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockExplosion(BlockExplodeEvent event) {
-		Iterator<Block> iterator = event.blockList().iterator();
+		this.removeProtectedBlocks(event.blockList());
+	}
+
+	private void removeProtectedBlocks(List<Block> blockList) {
+		assert blockList != null;
+		// Note: We are not using Collection#removeIf here because on some Java versions the ArrayList implementation of
+		// this method evaluates the given Predicate multiple times, which we try to avoid here.
+		Iterator<Block> iterator = blockList.iterator();
 		while (iterator.hasNext()) {
 			Block block = iterator.next();
 			if (this.isProtectedBlock(block)) {

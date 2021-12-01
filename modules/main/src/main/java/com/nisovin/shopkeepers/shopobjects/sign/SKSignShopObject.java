@@ -279,7 +279,7 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		boolean wallSign = this.isWallSign();
 		Material signMaterial = getSignMaterial(signType, wallSign);
 		assert ItemUtils.isSign(signMaterial);
-		BlockData signData = null;
+		BlockData signData;
 		if (wallSign) {
 			// Wall sign:
 			WallSign wallSignData = (WallSign) Bukkit.createBlockData(signMaterial);
@@ -474,10 +474,10 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		Sign sign = this.getSign();
 		if (sign == null) return; // Not spawned or no longer a sign
 
-		// Note: The different sign types are different materials. We need to capture the sign state (eg. sign
+		// Note: The different sign types are different materials. We need to capture the sign state (e.g. sign
 		// contents), because they would otherwise be removed when changing the block's type.
 		BlockData blockData = this.createBlockData();
-		sign.setBlockData(blockData); // Keeps sign data (eg. text) the same
+		sign.setBlockData(blockData); // Keeps sign data (e.g. text) the same
 		sign.update(true, false); // Force: Material has changed, skip physics update.
 	}
 

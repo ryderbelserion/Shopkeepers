@@ -205,7 +205,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * @param shopCreationData
 	 *            the shop creation data, not <code>null</code>
 	 * @throws ShopkeeperCreateException
-	 *             if the initialization fails (eg. due to invalid or missing data)
+	 *             if the initialization fails (e.g. due to invalid or missing data)
 	 * @see AbstractShopType#createShopkeeper(int, ShopCreationData)
 	 * @see #loadFromCreationData(int, ShopCreationData)
 	 */
@@ -304,10 +304,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * This is called at the end of construction, after the shopkeeper data has been loaded, and can be used to perform
 	 * any remaining setup.
 	 * <p>
-	 * This might setup defaults for some things, if not yet specified by the sub-classes. So if you are overriding this
-	 * method, consider doing your own setup before calling the overridden method. And also take into account that
+	 * This might set up defaults for some things, if not yet specified by the sub-classes. So if you are overriding
+	 * this method, consider doing your own setup before calling the overridden method. And also take into account that
 	 * further sub-classes might perform their setup prior to calling your setup method as well. So don't replace any
-	 * components that have already been setup by further sub-classes.
+	 * components that have already been set up by further sub-classes.
 	 * <p>
 	 * The shopkeeper has not yet been registered at this point! If the registration fails, or if the shopkeeper is
 	 * created for some other purpose, the {@link #onRemoval(ShopkeeperRemoveEvent.Cause)} and {@link #onDeletion()}
@@ -425,8 +425,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * <p>
 	 * This operation does not modify the given {@link ShopkeeperData}. Any stored data elements (such as for example
 	 * item stacks, etc.) and collections of data elements are assumed to not be modified, neither by the shopkeeper,
-	 * nor in contexts outside of the shopkeeper. If the shopkeeper can guarantee not to modify these data elements, it
-	 * is allowed to directly store them without copying them first.
+	 * nor in contexts outside the shopkeeper. If the shopkeeper can guarantee not to modify these data elements, it is
+	 * allowed to directly store them without copying them first.
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
@@ -578,7 +578,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		assert !valid;
 		valid = true;
 
-		// If the shopkeeper has been marked as dirty earlier (eg. due to data migrations during loading, or when being
+		// If the shopkeeper has been marked as dirty earlier (e.g. due to data migrations during loading, or when being
 		// newly created), we inform the storage here:
 		if (this.isDirty()) {
 			this.markDirty();
@@ -712,7 +712,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			.build();
 	public static final Property<Float> YAW = new BasicProperty<Float>()
 			.dataKeyAccessor("yaw", NumberSerializers.FLOAT)
-			.useDefaultIfMissing() // For virtual shopkeepers, and if missing (eg. in pre 2.13.4 versions)
+			.useDefaultIfMissing() // For virtual shopkeepers, and if missing (e.g. in pre 2.13.4 versions)
 			.defaultValue(0.0F) // South
 			.build();
 
@@ -904,17 +904,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the Map of lazily and dynamically evaluated message arguments
 	 */
 	protected void populateMessageArguments(Map<String, Supplier<Object>> messageArguments) {
-		messageArguments.put("id", () -> String.valueOf(this.getId()));
-		messageArguments.put("uuid", () -> this.getUniqueId().toString());
-		messageArguments.put("name", () -> this.getName());
+		messageArguments.put("id", this::getId);
+		messageArguments.put("uuid", this::getUniqueId);
+		messageArguments.put("name", this::getName);
 		messageArguments.put("world", () -> StringUtils.getOrEmpty(this.getWorldName()));
-		messageArguments.put("x", () -> this.getX());
-		messageArguments.put("y", () -> this.getY());
-		messageArguments.put("z", () -> this.getZ());
+		messageArguments.put("x", this::getX);
+		messageArguments.put("y", this::getY);
+		messageArguments.put("z", this::getZ);
 		// TODO The decimal format is not localized. Move it into the language file?
 		messageArguments.put("yaw", () -> TextUtils.DECIMAL_FORMAT.format(this.getYaw()));
 		// TODO Rename to 'position'?
-		messageArguments.put("location", () -> this.getPositionString());
+		messageArguments.put("location", this::getPositionString);
 		messageArguments.put("type", () -> this.getType().getIdentifier());
 		messageArguments.put("object_type", () -> this.getShopObject().getType().getIdentifier());
 	}

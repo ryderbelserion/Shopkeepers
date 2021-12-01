@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * <p>
  * After construction, the property needs to be configured and then {@link #build() built} before it is ready to be
  * used. During the configuration phase, one has to at least specify a {@link #name(String) name} and a
- * {@link #dataAccessor(DataAccessor) DataAccessor}. The involved sub classes may require additional configuration steps
+ * {@link #dataAccessor(DataAccessor) DataAccessor}. The involved subclasses may require additional configuration steps
  * and impose additional constraints before the property can be built. Also, if the property's value is not configured
  * to be {@link #nullable() nullable} and no non-<code>null</code> {@link #defaultValue(Object) default value} is
  * specified, the resulting property will have no {@link #hasDefaultValue() valid default value}, which may make it
@@ -113,7 +113,7 @@ public class BasicProperty<T> implements Property<T> {
 	}
 
 	/**
-	 * This is called when the property is {@link #build() built} and can be overridden by sub classes to perform any
+	 * This is called when the property is {@link #build() built} and can be overridden by subclasses to perform any
 	 * remaining setup and validation.
 	 */
 	protected void postConstruct() {
@@ -291,7 +291,7 @@ public class BasicProperty<T> implements Property<T> {
 	 * Validates the given value.
 	 * <p>
 	 * This is called by {@link #validateValue(Object)} before the registered {@link #validator(PropertyValidator)
-	 * external validators} are invoked and can be overridden by sub classes to apply additional validations.
+	 * external validators} are invoked and can be overridden by subclasses to apply additional validations.
 	 * <p>
 	 * This is not invoked for <code>null</code> values.
 	 * 
@@ -301,7 +301,7 @@ public class BasicProperty<T> implements Property<T> {
 	 *             if the given value is invalid
 	 */
 	protected void internalValidateValue(T value) {
-		// Can be overridden in sub classes.
+		// Can be overridden in subclasses.
 	}
 
 	/**

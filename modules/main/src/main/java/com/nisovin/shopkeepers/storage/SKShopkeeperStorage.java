@@ -42,7 +42,7 @@ import com.nisovin.shopkeepers.util.java.VoidCallable;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 /**
- * Storage responsible for the shopkeepers data.
+ * Storage responsible for persisting and loading the data of shopkeepers.
  * <p>
  * Implementation notes:
  * <ul>
@@ -65,13 +65,15 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 	// Our stored 'data version' is a combination of two different data versions:
 	// - Our own 'shopkeepers data version', which we can use to determine our own required migrations or force a full
-	// save of all shopkeepers data after we have made changes to the storage format which affect all shopkeepers.
+	// save of the data of all shopkeepers after we have made changes to the storage format which affect all
+	// shopkeepers.
 	// - Minecraft's data version, which updates with every server update (even minor updates). Since these updates
 	// sometimes indicate item migrations done by Minecraft, they are also relevant for our stored item data.
 
 	// Our goal is to always keep the item data stored within the save.yml file up-to-date with the current server
-	// version to avoid ending up with very old items inside our save data that never got updated. For that reason we
-	// always trigger a full save of all shopkeepers data whenever one of the above mentioned data versions has changed.
+	// version to avoid ending up with very old items inside our save data that never got updated. For that reason, we
+	// always trigger a full save of the data of all shopkeepers whenever one of the above mentioned data versions has
+	// changed.
 	// The stored and compared data version is a simple concatenation of these two data versions.
 
 	private static final int SHOPKEEPERS_DATA_VERSION = 2;
@@ -392,7 +394,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	}
 
 	// Returns true on success, and false if there was some severe issue during loading.
-	// This is blocking and will wait for any currently on-going or pending saves to complete!
+	// This is blocking and will wait for any currently ongoing or pending saves to complete!
 	public boolean reload() {
 		if (currentlyLoading) {
 			throw new IllegalStateException("Already loading right now!");
@@ -440,8 +442,8 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			} else if (!Files.exists(saveFile)) {
 				// No save file exists yet (even after checking for it again, after the migration) -> No shopkeeper data
 				// available.
-				// We silently setup the data version and abort:
-				saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombinded());
+				// We silently set up the data version and abort:
+				saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombined());
 				return true;
 			}
 		}
@@ -472,7 +474,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		int shopkeepersCount = (keys.size() - 1);
 		if (shopkeepersCount == 0) {
 			// No shopkeeper data exists yet. Silently update the data version and abort:
-			saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombinded());
+			saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombined());
 			return true;
 		}
 
@@ -480,12 +482,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		// Check and update the data version:
 		String dataVersion = saveData.getStringOrDefault(DATA_VERSION_KEY, MISSING_DATA_VERSION);
-		boolean dataVersionChanged = (!currentDataVersion.getCombinded().equals(dataVersion));
+		boolean dataVersionChanged = (!currentDataVersion.getCombined().equals(dataVersion));
 		if (dataVersionChanged) {
-			Log.info("The data version has changed from '" + dataVersion + "' to '" + currentDataVersion.getCombinded()
+			Log.info("The data version has changed from '" + dataVersion + "' to '" + currentDataVersion.getCombined()
 					+ "': The saved data of all shopkeepers is updated.");
 			// Update the data version:
-			saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombinded());
+			saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombined());
 		}
 
 		for (String key : keys) {
@@ -511,7 +513,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			shopkeeperData.set(AbstractShopkeeper.ID, shopkeeperId);
 
 			// Perform data migrations:
-			boolean migrated = false;
+			boolean migrated;
 			try {
 				migrated = shopkeeperData.migrate(AbstractShopkeeper.getLogPrefix(shopkeeperId));
 			} catch (InvalidDataException e) {
@@ -669,7 +671,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				}
 			}
 			for (AbstractShopkeeper shopkeeper : saveTask.savingDirtyShopkeepers) {
-				// The dirty shopkeepers that are currently being saved are consistent (disjunct) with the
+				// The dirty shopkeepers that are currently being saved are consistent (disjoint) with the
 				// unsavedShopkeepers:
 				assert !unsavedShopkeepers.contains(shopkeeper.getId());
 				// But they might overlap with the shopkeepers that have been marked as dirty in the meantime:
@@ -678,7 +680,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				}
 			}
 		} else {
-			// Assert: dirtyShopkeepers and unsavedShopkeepers are disjunct.
+			// Assert: dirtyShopkeepers and unsavedShopkeepers are disjoint.
 			// Assert: saveTask.savingDirtyShopkeepers is empty.
 		}
 		return count;
@@ -782,7 +784,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				delayedSaveTask = null;
 			}
 
-			// Setup the file header:
+			// Set up the file header:
 			// This replaces any previously existing and loaded header and thereby ensures that it is always up-to-date
 			// after we have saved the file.
 			saveData.getConfig().options().header(HEADER);
@@ -962,7 +964,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			if (!Files.exists(saveFile)) {
 				// Renaming the temporary save file might have failed during an earlier saving attempt.
 				// It might contain the only backup of previously saved data -> Do not remove it!
-				// Instead we try to rename it to make it the new 'old save data' and then continue the saving
+				// Instead, we try to rename it to make it the new 'old save data' and then continue the saving
 				// procedure.
 				Log.warning("Found an already existing temporary save file (" + pluginDataRelative(tempSaveFile)
 						+ "), but no old save file!"
@@ -1036,7 +1038,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				});
 			}
 
-			// Regardless of whether or not the save has been successful:
+			// Regardless of whether the save has been successful:
 
 			// Transfer the shopkeepers that we failed to save to the dirty shopkeepers:
 			dirtyShopkeepers.addAll(failedToSave);

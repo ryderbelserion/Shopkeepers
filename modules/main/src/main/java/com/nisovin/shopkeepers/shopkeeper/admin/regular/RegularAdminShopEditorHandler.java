@@ -70,7 +70,7 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 			ItemStack item2 = ItemUtils.copyOrNull(invalidRecipe.getItem2());
 			PlayerInventory playerInventory = player.getInventory();
 
-			// Note: If the items don't fit the inventory, we ignore them rather then dropping them. This is usually
+			// Note: If the items don't fit the inventory, we ignore them rather than dropping them. This is usually
 			// safer than having admins accidentally drop items when they are setting up admin shops.
 			if (item1 != null) {
 				playerInventory.addItem(item1);

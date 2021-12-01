@@ -141,7 +141,7 @@ public final class Trade {
 	 * <p>
 	 * The type of the returned item equals that of the first required item of the used trading recipe, but its metadata
 	 * might be different. However, depending on the item matching rules of the used Minecraft version and the
-	 * Shopkeepers settings (eg. with strict item comparisons being disabled), the offered item might still be accepted
+	 * Shopkeepers settings (e.g. with strict item comparisons being disabled), the offered item might still be accepted
 	 * for the trade nevertheless.
 	 * <p>
 	 * The returned item stack is not a copy and might get modified once the trade is applied! The item stack size
@@ -163,7 +163,7 @@ public final class Trade {
 	 * <p>
 	 * The type of the returned item equals that of the second required item of the used trading recipe, but its
 	 * metadata might be different. However, depending on the item matching rules of the used Minecraft version and the
-	 * Shopkeepers settings (eg. with strict item comparisons being disabled), the offered item might still be accepted
+	 * Shopkeepers settings (e.g. with strict item comparisons being disabled), the offered item might still be accepted
 	 * for the trade nevertheless.
 	 * <p>
 	 * The returned item stack is not a copy and might get modified once the trade is applied! The item stack size

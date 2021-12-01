@@ -39,8 +39,8 @@ import net.citizensnpcs.api.trait.trait.MobType;
  */
 public class SKCitizensShopObject extends AbstractEntityShopObject implements CitizensShopObject {
 
-	// Null if there is no associated NPC, eg. because no NPC has been created yet for the shop object (eg. if Citizens
-	// was not enabled at the time the shop object has been created):
+	// Null if there is no associated NPC, e.g. because no NPC has been created yet for the shop object (e.g. if
+	// Citizens was not enabled at the time the shop object has been created):
 	public static final Property<UUID> NPC_UNIQUE_ID = new BasicProperty<UUID>()
 			.dataKeyAccessor("npcId", UUIDSerializers.LENIENT)
 			.nullable()
@@ -342,7 +342,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			// Note: Entity#isDead is sufficient to detect the entity removal. Checking the slightly more costly
 			// Entity#isValid is not required, since Citizens removes the entity on chunk unloads anyways.
 			Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Citizens NPC is missing. Attempting respawn.");
-			// Note: We respawn the entity at its last known location, rather then the (expected) shopkeeper location.
+			// Note: We respawn the entity at its last known location, rather than the (expected) shopkeeper location.
 			// This will log a debug message from Citizens if it cannot spawn the NPC currently:
 			npc.spawn(currentLocation);
 		} // Continue to update the shopkeeper location if the NPC moved since we last checked.

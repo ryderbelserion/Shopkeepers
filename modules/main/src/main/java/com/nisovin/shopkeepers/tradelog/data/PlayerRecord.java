@@ -10,7 +10,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * An immutable snapshot of the general information about a player.
  * <p>
  * This information is not necessarily up-to-date, but represents the player's information at a certain point in time
- * (eg. the name might not match the player's current name).
+ * (e.g. the name might not match the player's current name).
  */
 public class PlayerRecord {
 

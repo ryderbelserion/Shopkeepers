@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
  * <p>
  * Even though there this is not guaranteed or required, it is recommended that entity shop object types use these
  * shared default object ids, since it allows for a quick lookup of the shopkeeper for a given entity (without having to
- * query all registered entity shop object types individually). Shop object types can indicate whether they uses these
+ * query all registered entity shop object types individually). Shop object types can indicate whether they use these
  * default ids via {@link AbstractEntityShopObjectType#usesDefaultObjectIds()}.
  */
 public class DefaultEntityShopObjectIds {

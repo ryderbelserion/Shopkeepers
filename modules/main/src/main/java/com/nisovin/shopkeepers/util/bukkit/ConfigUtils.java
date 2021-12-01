@@ -15,17 +15,16 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public class ConfigUtils {
 
 	// Shared and reused YAML config:
-	private static final ThreadLocal<YamlConfiguration> YAML_CONFIG = ThreadLocal.withInitial(() -> new YamlConfiguration());
+	private static final ThreadLocal<YamlConfiguration> YAML_CONFIG = ThreadLocal.withInitial(YamlConfiguration::new);
 
 	// The given root config section itself is not converted.
 	public static void convertSubSectionsToMaps(ConfigurationSection rootSection) {
-		rootSection.getValues(false).entrySet().forEach(entry -> {
-			Object value = entry.getValue();
+		rootSection.getValues(false).forEach((key, value) -> {
 			if (value instanceof ConfigurationSection) {
 				// Recursively replace config sections with maps:
 				Map<String, Object> innerSectionMap = ((ConfigurationSection) value).getValues(false);
 				convertSectionsToMaps(innerSectionMap);
-				rootSection.set(entry.getKey(), innerSectionMap);
+				rootSection.set(key, innerSectionMap);
 			}
 		});
 	}
@@ -60,9 +59,7 @@ public class ConfigUtils {
 	public static void setAll(ConfigurationSection configSection, Map<?, ?> map) {
 		Validate.notNull(configSection, "configSection is null");
 		if (map != null) {
-			map.entrySet().forEach(entry -> {
-				Object key = entry.getKey();
-				Object value = entry.getValue();
+			map.forEach((key, value) -> {
 				String stringKey = StringUtils.toStringOrNull(key);
 				configSection.set(stringKey, value);
 			});

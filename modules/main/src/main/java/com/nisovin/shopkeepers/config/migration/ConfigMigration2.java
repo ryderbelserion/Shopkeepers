@@ -62,7 +62,9 @@ public class ConfigMigration2 implements ConfigMigration {
 					.append(configData.get(loreKey))
 					.append(")");
 		}
-		msgBuilder.append(" to new format at '" + newItemKey + "'.");
+		msgBuilder.append(" to new format at '")
+				.append(newItemKey)
+				.append("'.");
 		Log.info(msgBuilder.toString());
 
 		// Item type:

@@ -1,7 +1,7 @@
 package com.nisovin.shopkeepers.api.storage;
 
 /**
- * Responsible for persisting and loading the shopkeepers data.
+ * Responsible for persisting and loading the data of shopkeepers.
  */
 public interface ShopkeeperStorage {
 
@@ -32,14 +32,14 @@ public interface ShopkeeperStorage {
 	}
 
 	/**
-	 * Requests a save of all shopkeepers data.
+	 * Requests a save of the data of all shopkeepers.
 	 * <p>
 	 * The actual saving might happen instantly or delayed, depending on the '{@code save-instantly}' setting.
 	 */
 	public void save();
 
 	/**
-	 * Requests a delayed save of all shopkeepers data.
+	 * Requests a delayed save of the data of all shopkeepers.
 	 * <p>
 	 * This is useful for saves which are frequently triggered, but don't necessarily need to occur right away, even
 	 * with the '{@code save-instantly}' setting enabled.
@@ -51,7 +51,7 @@ public interface ShopkeeperStorage {
 	public void saveDelayed();
 
 	/**
-	 * Saves all shopkeepers data.
+	 * Saves the data of all shopkeepers.
 	 * <p>
 	 * The saving is usually done asynchronously (unless there are reasons that prevent this).
 	 * <p>
@@ -62,7 +62,7 @@ public interface ShopkeeperStorage {
 	public void saveNow();
 
 	/**
-	 * Saves all shopkeepers data immediately, in a blocking (synchronous) fashion.
+	 * Saves the data of all shopkeepers immediately, in a blocking (synchronous) fashion.
 	 * <p>
 	 * If another save is already in progress, this will wait for the current save to complete.
 	 */

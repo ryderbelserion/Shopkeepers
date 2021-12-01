@@ -41,7 +41,7 @@ class CommandTestDamage extends PlayerCommand {
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
 
 		// Set description:
-		this.setDescription(Text.of("Produces damage events for the targetted entity."));
+		this.setDescription(Text.of("Produces damage events for the targeted entity."));
 
 		// Hidden debugging command:
 		this.setHiddenInParentHelp(true);
@@ -64,7 +64,7 @@ class CommandTestDamage extends PlayerCommand {
 
 		LivingEntity target = (LivingEntity) EntityUtils.getTargetedEntity(player, (entity) -> entity instanceof LivingEntity);
 		if (target == null) {
-			player.sendMessage(ChatColor.RED + "No living entity targetted!");
+			player.sendMessage(ChatColor.RED + "No living entity targeted!");
 			return;
 		}
 

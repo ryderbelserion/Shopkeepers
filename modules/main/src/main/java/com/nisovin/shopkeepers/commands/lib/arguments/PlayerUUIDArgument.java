@@ -75,7 +75,7 @@ public class PlayerUUIDArgument extends ObjectUUIDArgument {
 		String normalizedUUIDPrefix = uuidPrefix.toLowerCase(Locale.ROOT);
 		return Bukkit.getOnlinePlayers().stream()
 				.filter(playerFilter)
-				.map(player -> player.getUniqueId())
+				.map(Player::getUniqueId)
 				.filter(uuid -> {
 					// Assumption: UUID#toString is already lowercase (normalized).
 					return uuid.toString().startsWith(normalizedUUIDPrefix);

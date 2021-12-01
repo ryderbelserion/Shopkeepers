@@ -18,8 +18,8 @@ import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
  * <p>
  * Before evaluating the fallback, the context gets reset to the original state from before the parsing of this command
  * argument. If the parsing of the following command arguments succeeds, the parsing of the fallback gets invoked with
- * no remaining input arguments. If the parsing of the following command arguments fails, the arguments reader gets
- * reset to the original state before evaluating the fallback.<br>
+ * no remaining input arguments. If the parsing of the following command arguments fails, the {@link ArgumentsReader}
+ * gets reset to the original state before evaluating the fallback.<br>
  * If the fallback succeeds and consumes arguments, the parsing restarts from there with the next command argument. If
  * the fallback succeeds but no arguments were consumed, any context changes from parsing the following command
  * arguments get applied and then the parsing either ends (either successfully, or with the parsing error from before
@@ -54,20 +54,20 @@ public abstract class FallbackArgument<T> extends CommandArgument<T> {
 	 * <p>
 	 * This gets invoked after regular parsing threw a {@link FallbackArgumentException} and parsing past this command
 	 * argument of the remaining input arguments either failed or succeeded. If parsing past this command argument
-	 * failed, the arguments reader got reset to the original state. Otherwise (if parsing succeeded) the arguments
-	 * reader will have no remaining unparsed arguments.
+	 * failed, the {@link ArgumentsReader} got reset to the original state. Otherwise, if parsing succeeded, the
+	 * {@link ArgumentsReader} will have no remaining unparsed arguments.
 	 * 
 	 * @param input
-	 *            the command input
+	 *            the command input, not <code>null</code>
 	 * @param context
-	 *            the context which stores the parsed argument values
+	 *            the context which stores the parsed argument values, not <code>null</code>
 	 * @param argsReader
-	 *            the arguments reader
+	 *            the ArgumentsReader, not <code>null</code>
 	 * @param fallbackException
-	 *            the fallback exception that indicated this fallback
+	 *            the fallback exception that indicated this fallback, not <code>null</code>
 	 * @param parsingFailed
-	 *            whether or not parsing past this command argument failed
-	 * @return the parsed value, or <code>null</code> if nothing was parsed (eg. for optional fallbacks)
+	 *            whether parsing past this command argument failed
+	 * @return the parsed value, or <code>null</code> if nothing was parsed (e.g. for optional fallbacks)
 	 * @throws ArgumentParseException
 	 *             if unable to parse a value for a non-optional fallback, but not allowed to throw another
 	 *             {@link FallbackArgumentException}

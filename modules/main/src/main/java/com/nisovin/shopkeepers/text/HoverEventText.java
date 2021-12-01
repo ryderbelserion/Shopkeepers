@@ -53,7 +53,7 @@ public class HoverEventText extends TextBuilder {
 	}
 
 	/**
-	 * Gets the hover event value (eg. the hover text).
+	 * Gets the hover event value (e.g. the hover text).
 	 * 
 	 * @return the hover event value, not <code>null</code>
 	 */

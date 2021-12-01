@@ -227,9 +227,9 @@ public abstract class SingletonTask {
 				asyncTask.cancel();
 			} else {
 				assert state == State.EXECUTING;
-				// Because we were able to acquire the lock and we are no longer in state PENDING, the task must already
-				// have finished its execution and async callback. However, its sync callback is still pending to be
-				// run. We will manually run it here.
+				// Because we were able to acquire the lock, and we are no longer in state PENDING, the task must
+				// already have finished its execution and async callback. However, its sync callback is still pending
+				// to be run. We will manually run it here.
 			}
 		}
 		boolean hasExecuted = (state == State.EXECUTING); // Else: state is PENDING and execution got cancelled.

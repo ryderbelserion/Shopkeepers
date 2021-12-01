@@ -116,7 +116,7 @@ public class DataKeyAccessor<T> implements DataAccessor<T> {
 		if (data == null || emptyDataPredicate.test(data)) {
 			throw this.missingDataError();
 		} else {
-			T value = null;
+			T value;
 			try {
 				// This is expected to throw an exception if it cannot reconstruct the original value:
 				value = serializer.deserialize(data);

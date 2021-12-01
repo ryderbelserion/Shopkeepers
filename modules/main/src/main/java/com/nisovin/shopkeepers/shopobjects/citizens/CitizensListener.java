@@ -114,7 +114,7 @@ class CitizensListener implements Listener {
 			// Check if we have all the information available to associate the trait with a specific player:
 			if (lastPlayerId != null && pendingTrait != null) {
 				CitizensShopkeeperTrait trait = pendingTrait;
-				Player player = Bukkit.getPlayer(lastPlayerId); // Can be null (eg. if player is no longer online)
+				Player player = Bukkit.getPlayer(lastPlayerId); // Can be null (e.g. if player is no longer online)
 				pendingTrait = null;
 				this.reset();
 				this.handleTrait(trait, player); // Handle with player (can be null though)

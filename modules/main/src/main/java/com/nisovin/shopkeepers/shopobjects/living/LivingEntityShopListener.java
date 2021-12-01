@@ -81,17 +81,17 @@ class LivingEntityShopListener implements Listener {
 
 	// We want to bypass other plugins by default, so that shops can also be opened in protected regions.
 	// We cancel the event to prevent any vanilla mechanics from taking place, and also to indicate to other plugins,
-	// and to later event handlers of our own plugin, that they can safely ignore the event (eg. to prevent protection
+	// and to later event handlers of our own plugin, that they can safely ignore the event (e.g. to prevent protection
 	// plugins from sending their 'interaction denied' message for shopkeeper entities). For that purpose, we handle and
 	// cancel the event as early as possible (LOWEST priority).
 	// Using a higher event priority with a setting to ignore whether the event got already cancelled by other plugins
 	// is not an option, because then these other plugins will already have handled the event and we have no chance to
-	// avoid their side-effects (eg. protection plugins will already have sent the player their 'interaction denied'
+	// avoid their side effects (e.g. protection plugins will already have sent the player their 'interaction denied'
 	// message, even though we open the shop UI afterwards anyways).
 	// In some usecases it may be desired by the server admin that we take into account whether some other plugin wants
 	// to cancel the interaction. For those situations the setting 'check-shop-interaction-result' can be used to call
 	// an additional interaction event that other plugins can react to and which determines whether we handle the
-	// interaction. Since this might cause side-effects in general due to other plugins handling the event, this is
+	// interaction. Since this might cause side effects in general due to other plugins handling the event, this is
 	// disabled by default. This also requires that we listen to and cancel the event as early as possible, so that the
 	// event is not handled twice by other plugins in this situation.
 	// There is still the potential for conflicts with other event handlers that run on LOWEST priority as well. If
@@ -138,7 +138,8 @@ class LivingEntityShopListener implements Listener {
 			return;
 		}
 
-		// Ignore if already cancelled. Resolves conflicts with other event handlers that also run at LOWEST priority.
+		// Ignore if already cancelled. This resolves conflicts with other event handlers that also run at LOWEST
+		// priority.
 		if (event.isCancelled()) {
 			Log.debug("  Ignoring already cancelled event.");
 			return;
@@ -381,7 +382,7 @@ class LivingEntityShopListener implements Listener {
 		}
 	}
 
-	// Prevent shopkeeper entities from getting set on fire (eg. monsters in daylight).
+	// Prevent shopkeeper entities from getting set on fire (e.g. monsters in daylight).
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onEntityCombustEvent(EntityCombustEvent event) {
 		// If the entity is standing in lava, fire, etc., we ignore the event.

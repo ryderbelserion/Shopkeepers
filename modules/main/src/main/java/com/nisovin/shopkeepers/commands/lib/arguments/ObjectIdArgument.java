@@ -16,7 +16,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * Base class for arguments that accept some form of object identifier (eg. UUID or name).
+ * Base class for arguments that accept some form of object identifier (e.g. UUID or name).
  * <p>
  * By default this argument accepts any identifier that can be parsed by the wrapped identifier argument.
  * <p>
@@ -34,7 +34,7 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 	protected final ArgumentFilter<I> filter; // Not null
 
 	// Some types of object id arguments may want to provide suggestions even for an empty partial input, while others
-	// might want to limit their suggestions to the case that there is at least a minimum sized input (eg. if there
+	// might want to limit their suggestions to the case that there is at least a minimum sized input (e.g. if there
 	// would otherwise be lots of candidate ids to suggest). This setting controls how many characters the input has to
 	// at least consist of in order for the argument to provide completion suggestions.
 	// However, some arguments may ignore this setting for some of their suggestions (Example: An entity uuid argument

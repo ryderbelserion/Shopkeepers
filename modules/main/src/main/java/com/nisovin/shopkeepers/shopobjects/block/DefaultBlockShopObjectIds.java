@@ -13,7 +13,7 @@ import com.nisovin.shopkeepers.util.bukkit.MutableBlockLocation;
  * <p>
  * Even though there this is not guaranteed or required, it is recommended that block shop object types use these shared
  * default object ids, since it allows for a quick lookup of the shopkeeper for a given block (without having to query
- * all registered block shop object types individually). Shop object types can indicate whether they uses these default
+ * all registered block shop object types individually). Shop object types can indicate whether they use these default
  * ids via {@link AbstractBlockShopObjectType#usesDefaultObjectIds()}.
  */
 public class DefaultBlockShopObjectIds {

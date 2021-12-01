@@ -46,7 +46,7 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 	}
 
 	/**
-	 * Whether or not the spawning and despawning of shop objects of this type is managed by the Shopkeepers plugin.
+	 * Whether the spawning and despawning of shop objects of this type is managed by the Shopkeepers plugin.
 	 * <p>
 	 * Some types of shop objects may take care of the spawning and despawning of their shop objects themselves. If this
 	 * returns <code>true</code>, the shop objects will be {@link AbstractShopObject#spawn() spawned} and
@@ -61,7 +61,7 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 	public abstract boolean mustBeSpawned();
 
 	/**
-	 * Whether or not shop objects of this type shall be despawned right before world saves and respawned afterwards.
+	 * Whether shop objects of this type shall be despawned right before world saves and respawned afterwards.
 	 * <p>
 	 * The return value of this method is only used if {@link #mustBeSpawned()} returns <code>true</code>.
 	 * <p>

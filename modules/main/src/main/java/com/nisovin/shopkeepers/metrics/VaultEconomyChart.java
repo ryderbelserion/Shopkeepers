@@ -17,7 +17,7 @@ public class VaultEconomyChart extends Metrics.SimplePie {
 
 	public VaultEconomyChart() {
 		super("vault_economy", () -> {
-			// Check if Vault's Economy class is present (independently from the Vault plugin itself):
+			// Check if Vault's Economy class is present (independently of the Vault plugin itself):
 			Class<?> economyClass = null;
 			try {
 				economyClass = Class.forName(ECONOMY_SERVICE_CLASS_NAME);

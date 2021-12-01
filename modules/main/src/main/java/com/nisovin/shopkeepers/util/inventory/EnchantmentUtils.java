@@ -163,8 +163,8 @@ public class EnchantmentUtils {
 		// Parse the enchantment:
 		enchantment = parseEnchantment(input);
 		if (enchantment == null) {
-			// If we found an portion of the input that might have been supposed to specify the level, but we were not
-			// able to parse the level, check if we can parse the enchantment by ignoring this portion of the input:
+			// If we found a portion of the input that might be supposed to specify the level, but we were not able to
+			// parse the level, check if we can parse the enchantment by ignoring this portion of the input:
 			if (level == null && lastSpace != -1) {
 				input = input.substring(0, lastSpace);
 				enchantment = parseEnchantment(input);
@@ -202,7 +202,7 @@ public class EnchantmentUtils {
 	 * {@link Enchantment#getMaxLevel() upper} bounds of the given {@link Enchantment}.
 	 * <p>
 	 * However, even though higher or lower enchantment levels cannot be created in vanilla Minecraft (except via
-	 * commands), they can be created by other means (eg. commands, plugins, etc.) and may work fine. Some servers may
+	 * commands), they can be created by other means (e.g. commands, plugins, etc.) and may work fine. Some servers may
 	 * therefore decide to create enchanted items with levels that are outside their normal bounds.
 	 * 
 	 * @param enchantment

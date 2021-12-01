@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.ui.editor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +88,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 	/**
 	 * Performs any setup that has to happen once for this UI.
 	 * <p>
-	 * This may for example setup the UI contents, such as registering buttons.
+	 * This may for example set up the UI contents, such as registering buttons.
 	 * <p>
 	 * Setup is performed lazily, before the first time the UI is opened.
 	 */
@@ -353,14 +354,10 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		if (!dirtyButtons) return;
 
 		// Reset buttons:
-		for (Button button : buttons) {
-			button.setSlot(Button.NO_SLOT);
-		}
+		buttons.forEach(button -> button.setSlot(Button.NO_SLOT));
 
 		// Clear array:
-		for (int i = 0; i < bakedButtons.length; ++i) {
-			bakedButtons[i] = null;
-		}
+		Arrays.fill(bakedButtons, null);
 
 		// Insert buttons:
 		int frontIndex = 0;
@@ -554,14 +551,17 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		Button[] buttons = this.getBakedButtons();
 		for (int buttonIndex = 0; buttonIndex < buttons.length; ++buttonIndex) {
 			int slot = BUTTONS_START + buttonIndex;
-			if (slot >= inventorySize) break; // This can be reached if called on a previously setup inventory
+			if (slot >= inventorySize) {
+				// This can be reached if called on a previously set up inventory.
+				break;
+			}
 
 			ItemStack icon = null;
 			Button button = buttons[buttonIndex];
 			if (button != null) {
 				icon = button.getIcon(editorSession);
 			}
-			// Null will clear the slot (required if this is called to refresh the buttons in an already setup
+			// Null will clear the slot (which is required if this is called to refresh the buttons in an already set up
 			// inventory):
 			inventory.setItem(slot, icon);
 		}

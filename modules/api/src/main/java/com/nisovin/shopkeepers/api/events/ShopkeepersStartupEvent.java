@@ -11,7 +11,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersAPI;
  * <p>
  * This can be used to make registrations that are used by the Shopkeepers plugin during startup (initially and on every
  * reload of the plugin). In case your plugin has Shopkeepers as a dependency, your plugin will likely get loaded after
- * the Shopkeepers plugin got loaded and enabled after the Shopkeepers plugin got enabled. In that case, since plugins
+ * the Shopkeepers plugin got loaded, and enabled after the Shopkeepers plugin got enabled. In that case, since plugins
  * can only register event listeners after they got enabled, you may also want to apply any registrations during your
  * plugin's {@link Plugin#onLoad() loading phase} (<b>after</b> checking that the ShopkeepersAPI has already been
  * {@link ShopkeepersAPI#isEnabled() enabled}).

@@ -64,7 +64,7 @@ public class WorldUtils {
 
 		RayTraceResult rayTraceResult = null;
 		if (collidableFluids.isEmpty()) {
-			// Considers block collision boxes, ignoring passable blocks and fluids (null if there is not hit):
+			// Considers block collision boxes, ignoring passable blocks and fluids (null if there is no hit):
 			rayTraceResult = world.rayTraceBlocks(TEMP_START_LOCATION, DOWN_DIRECTION, offsetMaxDistance, FluidCollisionMode.NEVER, true);
 		} else {
 			// Take the given types of fluids into account, but still ignore other types of passable blocks:
@@ -76,7 +76,7 @@ public class WorldUtils {
 					rayTraceResult = block.rayTrace(TEMP_START_LOCATION, DOWN_DIRECTION, offsetMaxDistance, FluidCollisionMode.ALWAYS);
 					if (rayTraceResult != null) {
 						break;
-					} // Else: The raytrace did not collide with the block (eg. open trap doors, etc.)
+					} // Else: The raytrace did not collide with the block (e.g. open trap doors, etc.)
 				} // Else: Continue.
 			}
 			// rayTraceResult can remain null if there are no block collisions in range.

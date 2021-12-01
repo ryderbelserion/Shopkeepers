@@ -121,8 +121,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 
 		// The entity may be able to stand on certain types of fluids:
 		Set<Material> collidableFluids = EntityUtils.getCollidableFluids(this.getEntityType());
-		// However, if the spawn location is inside of a fluid (i.e. under water or inside of lava), we ignore this
-		// aspect (i.e. the entity sinks to the ground even if can usually stand on top of the liquid).
+		// However, if the spawn location is inside a fluid (i.e. underwater or inside of lava), we ignore this aspect
+		// (i.e. the entity sinks to the ground even if it can usually stand on top of the liquid).
 		// We don't check the spawn block itself but the block above in order to also spawn entities that are in shallow
 		// liquids on top of the liquid.
 		if (!collidableFluids.isEmpty()) {
@@ -164,7 +164,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		// We give entities which would usually burn in sunlight an indestructible item as helmet. This results in less
 		// EntityCombustEvents that need to be processed.
 		if (entity instanceof Zombie || entity instanceof Skeleton) {
-			// Note: Phantoms also burn in sunlight, but setting an helmet has no effect for them.
+			// Note: Phantoms also burn in sunlight, but setting a helmet has no effect for them.
 			// Note: Buttons are small enough to not be visible inside the entity's head (even for their baby variants).
 			equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
 		}
@@ -242,8 +242,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			entity.setRemoveWhenFarAway(false);
 			entity.setCanPickupItems(false);
 
-			// This is also required so that certain Minecraft behaviors (eg. the panic behavior of nearby villagers)
-			// ignore the shopkeeper entities. Otherwise, the shopkeeper entities can be abused for mob farms (eg.
+			// This is also required so that certain Minecraft behaviors (e.g. the panic behavior of nearby villagers)
+			// ignore the shopkeeper entities. Otherwise, the shopkeeper entities can be abused for mob farms (e.g.
 			// villages spawn more iron golems when villagers are in panic due to nearby hostile mob shopkeepers).
 			entity.setInvulnerable(true);
 
@@ -276,7 +276,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 				NMSManager.getProvider().setCanJoinRaid((Raider) entity, false);
 			}
 
-			// Apply sub type:
+			// Apply sub-type:
 			this.onSpawn();
 
 			// Reset respawn attempts counter and tick rate:
@@ -455,7 +455,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	// True if the entity was respawned.
 	private boolean respawnInactiveEntity() {
 		assert !this.isActive();
-		Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Entity is missing, attemtping respawn.");
+		Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Entity is missing, attempting respawn.");
 		if (entity != null) {
 			if (ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
 				// The chunk was silently unloaded before:
@@ -510,6 +510,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			// the shopkeeper's location by letting it fall due to gravity and then placing a block below its actual
 			// spawn location for the shopkeeper to now be able to stand on.
 			Location spawnLocation = this.getSpawnLocation();
+			assert spawnLocation != null; // This is only called for shopkeepers in active chunks, i.e. loaded worlds
 			spawnLocation.setYaw(entityLoc.getYaw());
 			spawnLocation.setPitch(entityLoc.getPitch());
 			this.lastSpawnLocation = spawnLocation;

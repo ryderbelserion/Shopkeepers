@@ -62,8 +62,8 @@ public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 	@Override
 	protected Iterable<String> getCompletionSuggestions(CommandInput input, CommandContextView context,
 														int minimumCompletionInput, String idPrefix) {
-		// Note: Whether or not to include display name suggestions usually depends on whether or not the the used
-		// matching function considers display names
+		// Note: Whether to include display name suggestions usually depends on whether the used matching function
+		// considers display names.
 		return PlayerNameArgument.getDefaultCompletionSuggestions(input, context, minimumCompletionInput, idPrefix, filter, true);
 	}
 }

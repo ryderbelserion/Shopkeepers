@@ -522,7 +522,7 @@ public interface DataContainer {
 	 * <p>
 	 * Because {@link DataContainer}s and {@link DataValue}s themselves are not guaranteed to be serializable and
 	 * storing them instead of their {@link #serialize() serialized form} or underlying {@link DataValue#get()
-	 * value} is a common overlooked error, this method catches this error early by not allowing to store
+	 * value} is a commonly overlooked error, this method catches this error early by not allowing to store
 	 * {@link DataContainer}s or {@link DataValue}s.
 	 * 
 	 * @param key
@@ -638,8 +638,8 @@ public interface DataContainer {
 	/**
 	 * Gets a {@link Set} of the keys of this data container.
 	 * <p>
-	 * It is undefined whether or not the returned Set is a modifiable snapshot or an unmodifiable dynamic view on the
-	 * current keys.
+	 * It is undefined whether the returned Set is a modifiable snapshot or an unmodifiable dynamic view on the current
+	 * keys.
 	 * 
 	 * @return a Set of the keys of this data container
 	 */
@@ -648,8 +648,8 @@ public interface DataContainer {
 	/**
 	 * Gets a {@link Map} of the contents of this data container.
 	 * <p>
-	 * It is undefined whether or not the returned Map is a modifiable snapshot or an unmodifiable dynamic view on the
-	 * current contents.
+	 * It is undefined whether the returned Map is a modifiable snapshot or an unmodifiable dynamic view on the current
+	 * contents.
 	 * 
 	 * @return the contents of this data container
 	 */
@@ -684,7 +684,7 @@ public interface DataContainer {
 	 * container, but a dynamic view: Further modifications of this data container write through to the returned
 	 * serializable representation.
 	 * <p>
-	 * If this data container is a view around some dynamic data source, this may also return <code>null</code> (eg. if
+	 * If this data container is a view around some dynamic data source, this may also return <code>null</code> (e.g. if
 	 * the underlying data source is not present currently), or data that cannot be turned into a data container again.
 	 * 
 	 * @return the serializable representation, can be <code>null</code> in certain cases

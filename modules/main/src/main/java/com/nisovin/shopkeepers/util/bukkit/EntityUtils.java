@@ -38,7 +38,7 @@ public final class EntityUtils {
 	 */
 	public static Set<Material> getCollidableFluids(EntityType entityType) {
 		// Even though blazes sink to the ground in vanilla Minecraft, we allow them to stand on top of lava because
-		// that makes them more useful in nether themed shops. They are also able to fly and hover in mid air, so this
+		// that makes them more useful in nether themed shops. They are also able to fly and hover in mid-air, so this
 		// deviation from vanilla is not that severe.
 		switch (entityType.name()) {
 		case "STRIDER": // TODO Replace with enum constant once we only support 1.16+

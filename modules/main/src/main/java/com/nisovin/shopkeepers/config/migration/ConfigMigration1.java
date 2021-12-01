@@ -10,7 +10,8 @@ import com.nisovin.shopkeepers.util.logging.Log;
  * Migrates the config from version 0 (pre versioning) to version 1.
  * <p>
  * This previously converted legacy materials and item data values, as well as the shop creation item spawn egg to new
- * materials. This conversion is no longer supported. Instead we simply migrate all affected settings to their defaults.
+ * materials. This conversion is no longer supported. Instead, we simply migrate all affected settings to their
+ * defaults.
  */
 public class ConfigMigration1 implements ConfigMigration {
 
@@ -52,7 +53,7 @@ public class ConfigMigration1 implements ConfigMigration {
 	}
 
 	// This previously converted legacy material + data value to new material.
-	// This conversion is no longer supported. Instead we migrate any unknown materials to their defaults.
+	// This conversion is no longer supported. Instead, we migrate any unknown materials to their defaults.
 	// Returns true if any migrations took place.
 	private static boolean migrateLegacyItemData(DataContainer configData, String itemTypeKey, String itemDataKey, Material defaultType) {
 		boolean migrated = false;

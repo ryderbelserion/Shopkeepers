@@ -207,7 +207,8 @@ public class TradeNotifications implements Listener {
 		Shopkeeper shopkeeper = tradeContext.getShopkeeper();
 
 		Text message;
-		// We avoid checking for specific shop types (eg. buying shop) and instead check if the result item is currency:
+		// We avoid checking for specific shop types (e.g. buying shop) and instead check if the result item is
+		// currency:
 		if (tradeContext.isResultItemCurrency()) {
 			if (tradeContext.hasOfferedItem2()) {
 				message = Messages.buyNotificationTwoItems;
@@ -287,7 +288,8 @@ public class TradeNotifications implements Listener {
 		assert tradeContext != null;
 		Shopkeeper shopkeeper = tradeContext.getShopkeeper();
 
-		// We avoid checking for specific shop types (eg. buying shop) and instead check if the result item is currency:
+		// We avoid checking for specific shop types (e.g. buying shop) and instead check if the result item is
+		// currency:
 		boolean isBuy = tradeContext.isResultItemCurrency();
 		Text message;
 		if (isBuy) {

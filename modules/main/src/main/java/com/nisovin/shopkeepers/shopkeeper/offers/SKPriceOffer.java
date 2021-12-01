@@ -252,7 +252,7 @@ public class SKPriceOffer implements PriceOffer {
 			}
 
 			if (itemsMigrated) {
-				// Lazily setup the list of migrated offers, and add the trades that were already processed but did not
+				// Lazily set up the list of migrated offers, and add the trades that were already processed but did not
 				// require migrations:
 				if (migratedOffers == null) {
 					migratedOffers = new ArrayList<>(size);

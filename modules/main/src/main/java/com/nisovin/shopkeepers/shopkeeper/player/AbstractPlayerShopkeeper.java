@@ -169,8 +169,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	@Override
 	protected void populateMessageArguments(Map<String, Supplier<Object>> messageArguments) {
 		super.populateMessageArguments(messageArguments);
-		messageArguments.put("owner_name", () -> this.getOwnerName());
-		messageArguments.put("owner_uuid", () -> this.getOwnerUUID().toString());
+		messageArguments.put("owner_name", this::getOwnerName);
+		messageArguments.put("owner_uuid", this::getOwnerUUID);
 	}
 
 	@Override
@@ -193,7 +193,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				if (SKShopkeepersPlugin.getInstance().getShopkeeperNaming().requestNameChange(player, this, newName)) {
 					// Manually remove rename item from player's hand after this event is processed:
 					Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
-						ItemStack newItemInMainHand = ItemUtils.descreaseItemAmount(itemInMainHand, 1);
+						ItemStack newItemInMainHand = ItemUtils.decreaseItemAmount(itemInMainHand, 1);
 						playerInventory.setItemInMainHand(newItemInMainHand);
 					});
 				}
@@ -649,7 +649,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	@Override
 	public void tick() {
 		super.tick();
-		// Delete the shopkeeper if the container is no longer present (eg. if it got removed externally by another
+		// Delete the shopkeeper if the container is no longer present (e.g. if it got removed externally by another
 		// plugin, such as WorldEdit, etc.):
 		if (Settings.deleteShopkeeperOnBreakContainer) {
 			if (!checkContainerLimiter.request()) {

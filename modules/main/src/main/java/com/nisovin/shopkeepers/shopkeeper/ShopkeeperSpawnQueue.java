@@ -31,7 +31,7 @@ public class ShopkeeperSpawnQueue extends TaskQueue<AbstractShopkeeper> {
 		this.spawner = spawner;
 	}
 
-	private class SpawnerTask implements Runnable {
+	private static class SpawnerTask implements Runnable {
 
 		private final Runnable parentTask;
 

@@ -12,11 +12,11 @@
 
 ## Reproduction on a fresh and up-to-date Spigot server:
 
-I was **`<able / not able>`** to reproduce my issue on a freshly setup and up-to-date Spigot server (currently **`<Insert output of /version command on up-to-date Spigot server>`**) with the latest version of Shopkeepers (currently **`<Insert latest tested Shopkeepers version>`**), with no other plugins and with no kinds of other server or client mods.
+I was **`<able / not able>`** to reproduce my issue on a freshly set up and up-to-date Spigot server (currently **`<Insert output of /version command on up-to-date Spigot server>`**) with the latest version of Shopkeepers (currently **`<Insert latest tested Shopkeepers version>`**), with no other plugins and with no kinds of other server or client mods.
 
 ## The issue:
 
-Provide a detailed description of your problem and add as much information as possible which could help reproducing the issue.
+Provide a detailed description of your problem and add as much information as possible which could help to reproduce the issue.
 
 Include:
 * Description of the issue.
@@ -26,4 +26,4 @@ Include:
 * If items with special attributes are involved: Include instructions on how to create those items.
 * Server logs (from server startup until issue). Consider enabling debug mode in the config for additional console output.
 * If modified from default: Plugin configurations.
-* .. Anything else that might be useful to reproduce and identify the issue.
+* ... Anything else that might be useful to reproduce and identify the issue.

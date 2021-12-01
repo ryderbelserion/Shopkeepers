@@ -115,67 +115,63 @@ public class ConversionUtils {
 	// PARSE LISTS:
 
 	public static List<Integer> parseIntList(Collection<String> strings) {
+		Validate.notNull(strings, "strings is null");
 		List<Integer> result = new ArrayList<>(strings.size());
-		if (strings != null) {
-			for (String string : strings) {
-				Integer value = parseInt(string);
-				if (value != null) {
-					result.add(value);
-				}
+		strings.forEach(string -> {
+			Integer value = parseInt(string);
+			if (value != null) {
+				result.add(value);
 			}
-		}
+		});
 		return result;
 	}
 
 	public static List<Long> parseLongList(Collection<String> strings) {
+		Validate.notNull(strings, "strings is null");
 		List<Long> result = new ArrayList<>(strings.size());
-		if (strings != null) {
-			for (String string : strings) {
-				Long value = parseLong(string);
-				if (value != null) {
-					result.add(value);
-				}
+		strings.forEach(string -> {
+			Long value = parseLong(string);
+			if (value != null) {
+				result.add(value);
 			}
-		}
+		});
 		return result;
 	}
 
 	public static List<Double> parseDoubleList(Collection<String> strings) {
+		Validate.notNull(strings, "strings is null");
 		List<Double> result = new ArrayList<>(strings.size());
-		if (strings != null) {
-			for (String string : strings) {
-				Double value = parseDouble(string);
-				if (value != null) {
-					result.add(value);
-				}
+		strings.forEach(string -> {
+			Double value = parseDouble(string);
+			if (value != null) {
+				result.add(value);
 			}
-		}
+		});
 		return result;
 	}
 
 	public static List<Float> parseFloatList(Collection<String> strings) {
+		Validate.notNull(strings, "strings is null");
 		List<Float> result = new ArrayList<>(strings.size());
-		if (strings != null) {
-			for (String string : strings) {
-				Float value = parseFloat(string);
-				if (value != null) {
-					result.add(value);
-				}
+		strings.forEach(string -> {
+			Float value = parseFloat(string);
+			if (value != null) {
+				result.add(value);
 			}
-		}
+		});
 		return result;
 	}
 
 	public static <E extends Enum<E>> List<E> parseEnumList(Class<E> enumType, Collection<String> strings) {
+		Validate.notNull(enumType, "enumType is null");
+		Validate.notNull(strings, "strings is null");
 		List<E> result = new ArrayList<>(strings.size());
-		if (strings != null) {
-			for (String string : strings) {
-				E value = parseEnum(enumType, string);
-				if (value != null) {
-					result.add(value);
-				}
+		strings.forEach(string -> {
+			E value = parseEnum(enumType, string);
+			if (value != null) {
+				result.add(value);
 			}
-		}
+		});
 		return result;
 	}
 
@@ -262,84 +258,84 @@ public class ConversionUtils {
 	public static List<Integer> toIntegerList(List<?> list) {
 		if (list == null) return null;
 		List<Integer> result = new ArrayList<>(list.size());
-		for (Object value : list) {
+		list.forEach(value -> {
 			Integer integerValue = toInteger(value);
 			if (integerValue != null) {
 				result.add(integerValue);
 			}
-		}
+		});
 		return result;
 	}
 
 	public static List<Double> toDoubleList(List<?> list) {
 		if (list == null) return null;
 		List<Double> result = new ArrayList<>(list.size());
-		for (Object value : list) {
+		list.forEach(value -> {
 			Double doubleValue = toDouble(value);
 			if (doubleValue != null) {
 				result.add(doubleValue);
 			}
-		}
+		});
 		return result;
 	}
 
 	public static List<Float> toFloatList(List<?> list) {
 		if (list == null) return null;
 		List<Float> result = new ArrayList<>(list.size());
-		for (Object value : list) {
+		list.forEach(value -> {
 			Float floatValue = toFloat(value);
 			if (floatValue != null) {
 				result.add(floatValue);
 			}
-		}
+		});
 		return result;
 	}
 
 	public static List<Long> toLongList(List<?> list) {
 		if (list == null) return null;
 		List<Long> result = new ArrayList<>(list.size());
-		for (Object value : list) {
+		list.forEach(value -> {
 			Long longValue = toLong(value);
 			if (longValue != null) {
 				result.add(longValue);
 			}
-		}
+		});
 		return result;
 	}
 
 	public static List<Boolean> toBooleanList(List<?> list) {
 		if (list == null) return null;
 		List<Boolean> result = new ArrayList<>(list.size());
-		for (Object value : list) {
+		list.forEach(value -> {
 			Boolean booleanValue = toBoolean(value);
 			if (booleanValue != null) {
 				result.add(booleanValue);
 			}
-		}
+		});
 		return result;
 	}
 
 	public static List<String> toStringList(List<?> list) {
 		if (list == null) return null;
 		List<String> result = new ArrayList<>(list.size());
-		for (Object value : list) {
+		list.forEach(value -> {
 			String stringValue = toString(value);
 			if (stringValue != null) {
 				result.add(stringValue);
 			}
-		}
+		});
 		return result;
 	}
 
 	public static <E extends Enum<E>> List<E> toEnumList(Class<E> enumType, List<?> list) {
 		if (list == null) return null;
 		List<E> result = new ArrayList<>(list.size());
-		for (Object value : list) {
+		list.forEach(value -> {
 			E enumValue = toEnum(enumType, value);
 			if (enumValue != null) {
 				result.add(enumValue);
 			}
-		}
+		});
 		return result;
 	}
 }

@@ -6,7 +6,6 @@ import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventException;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -34,6 +33,7 @@ public class EventDebugListener<E extends Event> implements Listener {
 	private final Class<E> eventClass;
 	private final Map<EventPriority, EventExecutor> executors = new EnumMap<>(EventPriority.class);
 
+	@SuppressWarnings("unchecked")
 	public EventDebugListener(Class<E> eventClass, EventHandler<E> eventHandler) {
 		Validate.notNull(eventClass, "eventClass is null");
 		Validate.notNull(eventHandler, "eventHandler is null");
@@ -41,12 +41,8 @@ public class EventDebugListener<E extends Event> implements Listener {
 
 		// Create event executors for every event priority:
 		for (EventPriority priority : EventPriority.values()) {
-			executors.put(priority, new EventExecutor() {
-				@SuppressWarnings("unchecked")
-				@Override
-				public void execute(Listener listener, Event event) throws EventException {
-					eventHandler.handleEvent(priority, (E) event);
-				}
+			executors.put(priority, (listener, event) -> {
+				eventHandler.handleEvent(priority, (E) event);
 			});
 		}
 	}

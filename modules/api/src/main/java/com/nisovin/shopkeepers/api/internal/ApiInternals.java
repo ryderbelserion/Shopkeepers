@@ -20,7 +20,7 @@ public interface ApiInternals {
 	 * 
 	 * @return the internals, not <code>null</code>
 	 * @throws IllegalStateException
-	 *             if the API is not enabled currently, eg. because the plugin is not enabled currently
+	 *             if the API is not enabled currently, e.g. because the plugin is not enabled currently
 	 */
 	public static ApiInternals getInstance() {
 		return InternalShopkeepersAPI.getPlugin().getApiInternals();

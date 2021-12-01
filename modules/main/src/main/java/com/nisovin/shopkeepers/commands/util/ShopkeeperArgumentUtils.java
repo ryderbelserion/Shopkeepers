@@ -147,7 +147,7 @@ public class ShopkeeperArgumentUtils {
 
 		// Determine targeted shopkeeper, and return context dependent failure messages:
 		if (rayTraceResult != null) {
-			Shopkeeper shopkeeper = null;
+			Shopkeeper shopkeeper;
 			Block targetBlock = rayTraceResult.getHitBlock();
 			if (targetBlock != null) {
 				// Get shopkeeper by targeted block:
@@ -254,7 +254,7 @@ public class ShopkeeperArgumentUtils {
 
 	// Searches for shops owned by the player specified by either uuid or name.
 	// If at least one matching shop is found, it is used to complete the available information about the target player
-	// (eg. missing uuid or name). The found player name may also differ in case.
+	// (e.g. missing uuid or name). The found player name may also differ in case.
 	// If shops are searched via target player name, a map of matching shop owners is returned, which stores the player
 	// uuids and names of all shop owners found that match the given target player name. If this contains more than one
 	// entry then the target player name is ambiguous. The result contains the shops of all those matching players then.

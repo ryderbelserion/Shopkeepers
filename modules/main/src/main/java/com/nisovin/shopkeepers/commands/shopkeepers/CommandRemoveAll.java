@@ -100,9 +100,10 @@ class CommandRemoveAll extends Command {
 				targetPlayerName = senderPlayer.getName();
 			} else if (targetPlayerName != null) {
 				// Check if the target matches an online player:
+				// This check is case-insensitive.
 				// If the name matches an online player, remove that player's shops (regardless of if the name is
-				// ambiguous / if there are shops of other players with matching name):
-				Player onlinePlayer = Bukkit.getPlayerExact(targetPlayerName); // note: case insensitive
+				// ambiguous / if there are shops of other players with matching name).
+				Player onlinePlayer = Bukkit.getPlayerExact(targetPlayerName);
 				if (onlinePlayer != null) {
 					// Get missing / exact player information:
 					targetPlayerUUID = onlinePlayer.getUniqueId();

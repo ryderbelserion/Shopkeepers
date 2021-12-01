@@ -38,13 +38,13 @@ import com.nisovin.shopkeepers.util.yaml.YamlUtils;
  * Gson does not allow the default Object TypeAdapter to be overridden. This TypeAdapter therefore has to be explicitly
  * invoked whenever it is supposed to be used.
  * <p>
- * Another alternative could be to deserialize objects from Json via a Yaml parser: Since Json is supposed to be a
- * subset of Yaml, this should work in principal. However, there is no guarantee that the produced Json actually
- * conforms to standard Json: For instance, Json does not support special numbers like {@link Double#NaN} or infinities.
- * Their representation is therefore specific to the used Json generator and there is no guarantee that a certain Yaml
- * parser is then able to parse those numbers correctly.
+ * Another alternative could be to deserialize objects from Json via a Yaml parser: In principle, since Json is supposed
+ * to be a subset of Yaml, this should work. However, there is no guarantee that the produced Json actually conforms to
+ * standard Json: For instance, Json does not support special numbers like {@link Double#NaN} or infinities. Their
+ * representation is therefore specific to the used Json generator and there is no guarantee that a certain Yaml parser
+ * is then able to parse those numbers correctly.
  * <p>
- * There are also other limitations that make Json less suited for the serialization of {@link ConfigurationSerializable
+ * There are further limitations that make Json less suited for the serialization of {@link ConfigurationSerializable
  * ConfigurationSerializables}: See {@link BukkitAwareObjectTypeAdapter}.
  */
 public class YamlLikeObjectTypeAdapter extends TypeAdapter<Object> {
@@ -78,7 +78,7 @@ public class YamlLikeObjectTypeAdapter extends TypeAdapter<Object> {
 		JsonToken token = in.peek();
 		switch (token) {
 		case BEGIN_ARRAY:
-			List<Object> list = new ArrayList<Object>();
+			List<Object> list = new ArrayList<>();
 			in.beginArray();
 			while (in.hasNext()) {
 				// This recursively uses this custom Object TypeAdapter:
@@ -88,7 +88,7 @@ public class YamlLikeObjectTypeAdapter extends TypeAdapter<Object> {
 			return list;
 		case BEGIN_OBJECT:
 			// We use a LinkedHashMap instead of Gson's LinkedTreeMap:
-			Map<String, Object> map = new LinkedHashMap<String, Object>();
+			Map<String, Object> map = new LinkedHashMap<>();
 			in.beginObject();
 			while (in.hasNext()) {
 				// This recursively uses this custom Object TypeAdapter:

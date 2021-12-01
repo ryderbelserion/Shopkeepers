@@ -59,11 +59,7 @@ public class ShopkeeperCreation {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(container, "container is null");
 		String playerName = player.getName();
-		List<String> recentlyPlaced = recentlyPlacedContainers.get(playerName);
-		if (recentlyPlaced == null) {
-			recentlyPlaced = new LinkedList<>();
-			recentlyPlacedContainers.put(playerName, recentlyPlaced);
-		}
+		List<String> recentlyPlaced = recentlyPlacedContainers.computeIfAbsent(playerName, key -> new LinkedList<>());
 		recentlyPlaced.add(TextUtils.getLocationString(container));
 		if (recentlyPlaced.size() > 5) {
 			recentlyPlaced.remove(0);

@@ -124,7 +124,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	protected boolean openTradeWindow(String title, List<? extends TradingRecipe> recipes, Player player) {
-		// Setup merchant:
+		// Set up merchant:
 		Merchant merchant = this.setupMerchant(title, recipes);
 
 		// Increment 'talked-to-villager' statistic when opening trading menu:
@@ -137,7 +137,6 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	protected Merchant setupMerchant(String title, List<? extends TradingRecipe> recipes) {
-		// Setup merchant:
 		Merchant merchant = Bukkit.createMerchant(title);
 		this.setupMerchantRecipes(merchant, recipes);
 		return merchant;
@@ -199,7 +198,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		NMSManager.getProvider().updateTrades(player);
 	}
 
-	// Dynamically modifying trades (eg. their blocked state, or properties such as their items), or adding trades, is
+	// Dynamically modifying trades (e.g. their blocked state, or properties such as their items), or adding trades, is
 	// fine. But reducing the number of trades is not safe, because the index of the currently selected recipe can end
 	// up being out of bounds on the client. There is no way for us to remotely update it into valid bounds.
 	// TODO Check if this still applies in MC 1.14+
@@ -340,7 +339,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		clickEvent.setCancelled(true);
 		InventoryUtils.updateInventoryLater(player);
 
-		// Setup a new TradingContext:
+		// Set up a new TradingContext:
 		TradingContext tradingContext = new TradingContext(shopkeeper, clickEvent);
 		this.setupTradingContext(tradingContext);
 
@@ -413,7 +412,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			// If the current trading recipe is no longer fulfilled, and the currently selected recipe index is 0,
 			// it will switch to the next applicable trading recipe, and continue the trading if the new result item is
 			// equal to the previous result item.
-			// TODO Handling each trade individually, eg. 64 times one item for one other item, can result in the trade
+			// TODO Handling each trade individually, e.g. 64 times one item for one other item, can result in the trade
 			// to fail if the chest of a player shop is full, even though it would in principal be possible to trade one
 			// time 64 items for 64 items (because removing 64 items will clear a slot of the chest, whereas removing
 			// only one item at a time may not). However, determining up front how often the trade can be applied would
@@ -474,7 +473,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			}
 			this.updateTrades(player);
 		} else {
-			// The inventory action involves the result slot, but doesn't trigger a trade usually, or isn't supported
+			// The inventory action involves the result slot, but does not usually trigger a trade, or is not supported
 			// yet.
 		}
 	}
@@ -630,7 +629,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 			}
 		}
 
-		// Create and setup a new Trade:
+		// Create and set up a new Trade:
 		Trade trade = new Trade(tradingContext, tradingContext.getTradeCount(), tradingRecipe, offeredItem1, offeredItem2, swappedItemOrder);
 		this.setupTrade(trade);
 		tradingContext.setCurrentTrade(trade);
@@ -653,7 +652,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	/**
-	 * This is called for every newly created {@link TradingContext} and can be used by sub-classes to setup additional
+	 * This is called for every newly created {@link TradingContext} and can be used by sub-classes to set up additional
 	 * metdata that is relevant for processing any subsequent trades.
 	 * 
 	 * @param tradingContext
@@ -664,7 +663,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	}
 
 	/**
-	 * This is called for every newly created {@link Trade} and can be used by sub-classes to setup additional metadata
+	 * This is called for every newly created {@link Trade} and can be used by sub-classes to set up additional metadata
 	 * that is relevant for processing the trade.
 	 * 
 	 * @param trade
@@ -728,14 +727,14 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 		merchantInventory.setItem(RESULT_ITEM_SLOT_ID, null); // Clear result slot, just in case
 
 		TradingRecipe tradingRecipe = trade.getTradingRecipe();
-		ItemStack newOfferedItem1 = ItemUtils.descreaseItemAmount(trade.getOfferedItem1(), ItemUtils.getItemStackAmount(tradingRecipe.getItem1()));
-		ItemStack newOfferedItem2 = ItemUtils.descreaseItemAmount(trade.getOfferedItem2(), ItemUtils.getItemStackAmount(tradingRecipe.getItem2()));
+		ItemStack newOfferedItem1 = ItemUtils.decreaseItemAmount(trade.getOfferedItem1(), ItemUtils.getItemStackAmount(tradingRecipe.getItem1()));
+		ItemStack newOfferedItem2 = ItemUtils.decreaseItemAmount(trade.getOfferedItem2(), ItemUtils.getItemStackAmount(tradingRecipe.getItem2()));
 		// Inform the merchant inventory about the change (updates the active trading recipe and result item):
 		boolean itemOrderSwapped = trade.isItemOrderSwapped();
 		merchantInventory.setItem(itemOrderSwapped ? BUY_ITEM_2_SLOT_ID : BUY_ITEM_1_SLOT_ID, newOfferedItem1);
 		merchantInventory.setItem(itemOrderSwapped ? BUY_ITEM_1_SLOT_ID : BUY_ITEM_2_SLOT_ID, newOfferedItem2);
 
-		// TODO Increase uses of corresponding MerchanRecipe?
+		// TODO Increase uses of corresponding MerchantRecipe?
 		// TODO Add support for exp-rewards?
 		// TODO Support modifications to the MerchantRecipe's maxUses?
 
@@ -850,7 +849,7 @@ public class TradingHandler extends AbstractShopkeeperUIHandler {
 	protected int getAmountAfterTaxes(int amount) {
 		assert amount >= 0;
 		if (Settings.taxRate == 0) return amount;
-		int taxes = 0;
+		int taxes;
 		if (Settings.taxRoundUp) {
 			taxes = (int) Math.ceil(amount * (Settings.taxRate / 100.0D));
 		} else {

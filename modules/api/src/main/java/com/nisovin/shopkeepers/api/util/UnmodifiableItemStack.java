@@ -21,7 +21,7 @@ import com.nisovin.shopkeepers.api.internal.ApiInternals;
  * <p>
  * In order to avoid accidentally passing unmodifiable item stacks to code that is not aware that the item stack cannot
  * be modified, the API always exposes unmodifiable item stacks via this interface. Users of the API should not rely on
- * whether or not the implementation of this interface extends {@link ItemStack}. If an {@link ItemStack} view of this
+ * whether the implementation of this interface extends {@link ItemStack}. If an {@link ItemStack} view of this
  * unmodifiable item stack is required, use either {@link #copy()} to create a normal modifiable item stack copy with
  * the same item data, or the less safe {@link #asItemStack()} (see its documentation for notes about its limitations).
  * <p>

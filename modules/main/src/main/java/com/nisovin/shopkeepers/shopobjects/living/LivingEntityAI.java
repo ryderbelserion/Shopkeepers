@@ -431,7 +431,7 @@ public class LivingEntityAI implements Listener {
 		}
 	}
 
-	private static enum ActivationType {
+	private enum ActivationType {
 		GRAVITY,
 		AI;
 	}
@@ -504,7 +504,7 @@ public class LivingEntityAI implements Listener {
 		// currently, since all shopkeeper entities are stationary (unless some other plugin teleports them).
 		if (entity.isDead()) {
 			// Some plugin might have removed the entity. The shop object will remove the entity's entry once it
-			// recognizes that the entity has been removed. Until then we simply skip it here.
+			// recognizes that the entity has been removed. Until then, we simply skip it here.
 			return;
 		}
 
@@ -551,8 +551,8 @@ public class LivingEntityAI implements Listener {
 
 			// The entity may be able to stand on certain types of fluids:
 			Set<Material> collidableFluids = EntityUtils.getCollidableFluids(entity.getType());
-			// However, if the entity is inside of a fluid (i.e. if it is spawned under water or inside of lava), we
-			// ignore this aspect (i.e. it sinks to the ground even if can usually stand on top of the liquid).
+			// However, if the entity is inside a fluid (i.e. if it is spawned underwater or inside of lava), we ignore
+			// this aspect (i.e. it sinks to the ground even if it can usually stand on top of the liquid).
 			// We check the block above the entity's location, because fluids are usually not a full block high (even if
 			// the block at the entity's foot location is liquid, it may actually stand on top of the liquid).
 			if (!collidableFluids.isEmpty()) {
@@ -638,7 +638,7 @@ public class LivingEntityAI implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onPlayerTeleport(PlayerTeleportEvent event) {
-		// The target location can be null in some circumstances (eg. when a player enters an end gateway, but there is
+		// The target location can be null in some circumstances (e.g. when a player enters an end gateway, but there is
 		// no end world). We ignore the event in this case.
 		Location targetLocation = event.getTo();
 		if (targetLocation == null) return;

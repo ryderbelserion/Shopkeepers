@@ -43,7 +43,7 @@ class CommandSetForHire extends PlayerCommand {
 		assert (input.getSender() instanceof Player);
 		Player player = (Player) input.getSender();
 
-		PlayerShopkeeper shopkeeper = (PlayerShopkeeper) context.get(ARGUMENT_SHOPKEEPER);
+		PlayerShopkeeper shopkeeper = context.get(ARGUMENT_SHOPKEEPER);
 		assert shopkeeper != null;
 
 		ItemStack hireCost = player.getInventory().getItemInMainHand();

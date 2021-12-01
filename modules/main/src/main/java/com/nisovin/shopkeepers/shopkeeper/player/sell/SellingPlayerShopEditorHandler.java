@@ -91,7 +91,7 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			UnmodifiableItemStack resultItem = recipe.getResultItem();
 			// Replace placeholder item, if this is one:
 			// Note: We also replace placeholder items in selling shopkeepers, because this allows the setup of trades
-			// before the player has all of the required items.
+			// before the player has all the required items.
 			resultItem = PlaceholderItems.replace(resultItem);
 
 			return PriceOffer.create(resultItem, price);

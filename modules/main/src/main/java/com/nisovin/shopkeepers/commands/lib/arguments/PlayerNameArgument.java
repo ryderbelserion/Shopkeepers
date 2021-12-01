@@ -2,6 +2,7 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
@@ -95,7 +96,7 @@ public class PlayerNameArgument extends ObjectNameArgument {
 						}
 					}
 					return null; // no match
-				}).filter(name -> name != null)::iterator;
+				}).filter(Objects::nonNull)::iterator;
 	}
 
 	@Override

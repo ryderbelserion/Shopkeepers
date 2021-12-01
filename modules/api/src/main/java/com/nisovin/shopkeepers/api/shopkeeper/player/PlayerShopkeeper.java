@@ -48,11 +48,11 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	public String getOwnerName();
 
 	/**
-	 * Gets a string representation of the owning player.
+	 * Gets a String representation of the owning player.
 	 * <p>
 	 * This contains the owner's last known name as well as his uuid.
 	 * 
-	 * @return a string representing the the owner
+	 * @return a String representing the owner
 	 */
 	public String getOwnerString();
 

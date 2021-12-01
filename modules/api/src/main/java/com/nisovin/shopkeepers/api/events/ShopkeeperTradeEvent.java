@@ -21,7 +21,7 @@ import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
  * does not get cancelled you can assume that the trade is going to get applied.
  * <p>
  * DO NOT modify the corresponding {@link InventoryClickEvent}, any affected inventories (player, merchant, shop
- * container, ..), or any other state which might be affected by the trade during the handling of this event!
+ * container, etc.), or any other state which might be affected by the trade during the handling of this event!
  */
 public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable {
 

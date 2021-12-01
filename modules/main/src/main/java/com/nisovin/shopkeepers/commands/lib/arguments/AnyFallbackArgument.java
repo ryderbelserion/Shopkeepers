@@ -30,7 +30,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public class AnyFallbackArgument extends FallbackArgument<Object> {
 
-	protected final CommandArgument<?> argument; // May be a fallback argument itself
+	protected final CommandArgument<?> argument; // This may be a fallback argument itself
 	protected final CommandArgument<?> fallbackArgument;
 
 	public AnyFallbackArgument(CommandArgument<?> argument, CommandArgument<?> fallbackArgument) {
@@ -93,9 +93,9 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 		}
 	}
 
-	// parsingFailed: Whether parsing the following command arguments failed. The arguments reader got reset to the
-	// original state in that case. Otherwise (if parsing succeeded) the arguments reader will have no remaining
-	// unparsed arguments.
+	// parsingFailed: Whether parsing the following command arguments failed. The ArgumentsReader got reset to the
+	// original state in that case. Otherwise, if parsing succeeded, the ArgumentsReader will have no remaining unparsed
+	// arguments.
 	@Override
 	public Object parseFallback(CommandInput input, CommandContext context, ArgumentsReader argsReader,
 								FallbackArgumentException fallbackException, boolean parsingFailed) throws ArgumentParseException {
@@ -113,7 +113,7 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 			// the original argument (TODO only if the original error has been / is (after re-evaluating it) a 'missing
 			// argument' or 'requires player' error as well?):
 			if (parsingFailed) {
-				// The arguments reader got reset, so re-evaluating the original command arguments is not expected to be
+				// The ArgumentsReader got reset, so re-evaluating the original command arguments is not expected to be
 				// required / to yield a different outcome:
 				throw fallbackException.getRootException();
 			} else {
@@ -121,8 +121,8 @@ public class AnyFallbackArgument extends FallbackArgument<Object> {
 				// situation before than it is the case now. Re-evaluate the original argument will therefore likely
 				// yield a different error now (likely 'missing argument' or 'requires players').
 				// We can't however be sure that this is the case since we don't know the nature / internals of the
-				// original argument. It might for example be an argument that doesn't consume any arguments and
-				// therefore we can't simple throw a 'missing argument'/'requires player' exception in its name here.
+				// original argument. It might for example be an argument that doesn't consume any arguments. We
+				// therefore cannot simply throw a 'missing argument'/'requires player' exception in its name here.
 				try {
 					return argument.parse(input, context, argsReader);
 					// Unexpected, but in case the original argument succeeds now, use the parsed value.

@@ -345,7 +345,7 @@ public interface Shopkeeper {
 	/**
 	 * Gets the shopkeeper's current trading recipes for the given player.
 	 * <p>
-	 * Depending on the type of this shopkeeper, this might access the world (eg. check container contents) in order to
+	 * Depending on the type of this shopkeeper, this might access the world (e.g. check container contents) in order to
 	 * determine the available stock.
 	 * <p>
 	 * Managing (adding, removing, editing) the trading recipes usually differs depending on the type of shopkeeper and

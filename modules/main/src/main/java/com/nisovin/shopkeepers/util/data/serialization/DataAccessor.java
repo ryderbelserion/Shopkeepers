@@ -37,8 +37,8 @@ public interface DataAccessor<T> {
 	/**
 	 * Reconstructs the value from the data inside the given {@link DataContainer}.
 	 * <p>
-	 * It is undefined how this methods reacts to missing or invalid data: Some implementations may throw a
-	 * corresponding {@link InvalidDataException}, whereas others may return some fallback value in this case.
+	 * It is undefined how this method reacts to missing or invalid data: Some implementations may throw a corresponding
+	 * {@link InvalidDataException}, whereas others may return some fallback value in this case.
 	 * 
 	 * @param dataContainer
 	 *            the data container not <code>null</code>

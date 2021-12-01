@@ -56,7 +56,7 @@ public abstract class UIHandler {
 	}
 
 	/**
-	 * Checks whether or not the given player can open this interface.
+	 * Checks whether the given player can open this interface.
 	 * <p>
 	 * This may for example perform any necessary permission checks.
 	 * <p>
@@ -85,7 +85,7 @@ public abstract class UIHandler {
 	protected abstract boolean openWindow(UISession uiSession);
 
 	/**
-	 * Checks whether or not the given inventory view is managed by this UI handler.
+	 * Checks whether the given inventory view is managed by this UI handler.
 	 * <p>
 	 * The UI registry already keeps track of a player's currently open UI. This additional check verifies,
 	 * heuristically, in a best-effort manner, that the inventory view the player is interacting with actually
@@ -114,7 +114,7 @@ public abstract class UIHandler {
 	/**
 	 * This is called when an {@link UISession} handled by this {@link UIHandler} has ended.
 	 * <p>
-	 * If the {@link UISession} has ended not due to a received {@link InventoryCloseEvent} but for another reason (eg.
+	 * If the {@link UISession} has ended not due to a received {@link InventoryCloseEvent} but for another reason (e.g.
 	 * due to a call to {@link UISession#abort()}), the provided inventory close event argument is <code>null</code>.
 	 * <p>
 	 * This is also called when the UI session has ended because {@link #openWindow(UISession)} could not successfully
@@ -230,7 +230,7 @@ public abstract class UIHandler {
 	 * shift left-clicks that occur within {@link UIHandler#AUTOMATIC_SHIFT_LEFT_CLICK_NANOS} on a slot different to the
 	 * previously clicked slot are automatically triggered.
 	 * <p>
-	 * Limitations (TODO): We cannot use a much lower time span (eg. limiting it to 1 or 2 ticks), because the
+	 * Limitations (TODO): We cannot use a much lower time span (e.g. limiting it to 1 or 2 ticks), because the
 	 * automatically triggered clicks may arrive quite some time later (up to 150 ms later on a local server and
 	 * possibly more with network delay involved). Also, this does not work for automatic clicks triggered for the same
 	 * slot. Since the automatically triggered clicks may arrive quite some time later, we cannot differentiate them

@@ -83,7 +83,7 @@ public final class IntegerValidators {
 	 *            the maximum value
 	 * @return the property validator
 	 */
-	public static final PropertyValidator<Integer> bounded(int minValue, int maxValue) {
+	public static PropertyValidator<Integer> bounded(int minValue, int maxValue) {
 		return new BoundedIntegerValidator(minValue, maxValue);
 	}
 

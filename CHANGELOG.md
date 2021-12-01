@@ -5,7 +5,7 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
 * Added the option for admins to create and restore snapshots of shopkeepers.
-  * Each snapshot captures the shopkeeper's dynamic state (i.e. its trades, shop object configuration, etc.), a timestamp, and is associated with an uniqe name that is provided when the snapshot is created.
+  * Each snapshot captures the shopkeeper's dynamic state (i.e. its trades, shop object configuration, etc.), a timestamp, and is associated with a unique name that is provided when the snapshot is created.
   * The name can currently be at most 64 characters long and not contain any color codes.
   * The externally stored NPC state of Citizens NPC shopkeepers is not captured currently.
   * This feature is currently meant to only be used by admins and third-party plugins. Shop owners are not yet able to create and restore snapshots of their own shops.
@@ -57,7 +57,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: When changing the container location of a player shop via the API, the protection for the previous container was not properly disabled.
 * Fixed: Any code that retrieves the container block of a player shopkeeper accounts now for the fact that the block might be null. This was only really an issue when another plugin invokes internal operations that require the container block to be available in a situation in which it might not be available currently.
 * Fixed: The order of the enabled living shop object types was not updated on plugin reloads based on their order inside the config.
-* Debug: Removed the debug option 'capabilities' again. We already always log whether or not server version specific features are enabled. This also resolves an internal issue related to whether or not the config has already been loaded at the time this debug option is checked.
+* Debug: Removed the debug option 'capabilities' again. We already always log whether server version specific features are enabled. This also resolves an internal issue related to whether the config has already been loaded at the time this debug option is checked.
 * Fixed: In order to resolve compatibility issues with plugins that modify chat messages at lowest event priority, we now enforce that our chat input event handler always executes first. This should resolve compatibility issues with shopkeeper names not being considered valid, because some other plugin injected color codes into the player's chat message before we were able to process it.
 * Fixed: Since Bukkit 1.16.5, the data version was no longer guaranteed to be the first entry of the save file, and the log message for the number of loaded shopkeepers has been off by one if the save file did not contain any data version yet.
 * Fixed: We now check if the UI session is still valid before handling an inventory event at the HIGH event priority. Previously, the UI session was simply expected to still be valid. But this assumption can be violated by plugins that (incorrectly per API documentation) close the inventory during the handling of an inventory event.
@@ -100,7 +100,7 @@ Date format: (YYYY-MM-DD)
 * Internal API: ProtectedContainers requires a BlockLocation now when adding or removing a container protection.
 * Internal API: Various changes to the loading, saving, and migration of shop offers. They use the new internal data serialization and property APIs now to save and load their data.
 * Internal API: Removed various no longer needed utility methods related to the saving and loading of item stacks.
-* Internal API: CitizensShopkeeperTrair#getShopkeeper() returns an AbstractShopkeeper now.
+* Internal API: CitizensShopkeeperTrait#getShopkeeper() returns an AbstractShopkeeper now.
 * Internal API: Added SKSignShopObject#getSignType().
 * Internal API: It is now the responsibility of the shop object to inform about object id changes, even when the shop object is being spawned, despawned, or ticked.
 * Internal API: Added AbstractShopObject#respawn().
@@ -126,7 +126,7 @@ Date format: (YYYY-MM-DD)
 * Added validation for some constructor and method arguments in the API.
 * APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
 * Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
-* The save operations of the shopkeeper storage and the CSV trade logger will now restore any catched Thread interruption status for anyone interested in it. Other than that, these operations still ignore Thread interruptions, because we prefer to keep trying to still save the data to disk after all.
+* The save operations of the shopkeeper storage and the CSV trade logger will now restore any caught Thread interruption status for anyone interested in it. Other than that, these operations still ignore Thread interruptions, because we prefer to keep trying to still save the data to disk after all.
 * Admin shopkeepers normalize empty trade permissions in the save data to null now, similar to AdminShopkeeper#setTradePermission.
 * Removed an old update mechanism for sign shops: If the sign block is not available at the time it is meant to be updated, this would update the sign later, once it is available again. This mechanism should no longer be required: The sign is already updated whenever it is spawned, and we dynamically spawn and despawn the sign with chunk loads, and dynamically respawn it if it is detected to be missing.
 * ItemData caches the meta type of items now instead of always determining it freshly from a newly serialized ItemMeta instance.
@@ -177,7 +177,7 @@ Date format: (YYYY-MM-DD)
 * Updated for MC 1.17.1
 * Building: Bumped the CraftBukkit dependencies for the 1_16_R2 and 1_16_R3 versions of Shopkeepers from 1.16.2-R0.1 and 1.16.4-R0.1 to 1.16.3-R0.1 and 1.16.5-R0.1 respectively. This has no effect on the server versions the plugin works on, but simplifies testing.
 * Internal: We now use the server's mappings version to check if the plugin is compatible.
-  * Previously, we used CraftBukkit's 'Minecraft Version' to determine compatibility (eg. '1_16_R3' for 1.16.5). However, Spigot will occasionally update its mappings without bumping the CraftBukkit version or this 'Minecraft Version'. With the new remapping of NMS code since 1.17, these mappings changes will forcefully break our compiled NMS code and then require an update (or at least a rebuild) of the Shopkeepers plugin.
+  * Previously, we used CraftBukkit's 'Minecraft Version' to determine compatibility (e.g. '1_16_R3' for 1.16.5). However, Spigot will occasionally update its mappings without bumping the CraftBukkit version or this 'Minecraft Version'. With the new remapping of NMS code since 1.17, these mappings changes will forcefully break our compiled NMS code and then require an update (or at least a rebuild) of the Shopkeepers plugin.
   * Previously, these mappings changes would result in errors during plugin startup, instead of being detected as an incompatible server version. We now keep track of all supported mappings versions and use the server's mappings version to determine whether we can support it and which NMS module we need to load.
   * For some of the 1.16 versions of the plugin, multiple mappings versions are mapped to the same NMS module. However, this should not be a problem, because these modules do not make use of the new remapping build feature, and are therefore less likely to actually break on mappings changes (there are no known server incompatibility issues for these versions).
   * Another effect of the mappings versions being changed without there necessarily being a CraftBukkit version bump: Since our NMS modules build against specific CraftBukkit versions instead of mappings versions, we can only support the latest mappings version for every CraftBukkit version.
@@ -190,7 +190,7 @@ Date format: (YYYY-MM-DD)
 * Config: Added setting `save-citizen-npcs-instantly` (disabled by default), which triggers a save of all Citizens NPC data whenever the Shopkeepers plugin modifies a Citizens NPC. Saving the Citizens NPCs is quite a heavy operation. Since the Citizens API does not yet provide an API to trigger an asynchronous save, we trigger the asynchronous save by invoking the `/citizens save -a` command in the console. As a side effect, this will print command feedback in the console whenever the NPCs are saved this way.
 * Fixed: Since v2.13.0, when not using the `always-show-nameplates` setting (i.e. the default case), the nameplates of Citizens player NPC shopkeepers were limited to a length of 16 and would otherwise not be displayed. The issue is that the Citizens 'hover' nameplate option does not work well for player NPCs. If you are upgrading and have issues with nameplates of previously created NPCs not showing, either use the shopkeeper editor to rename the NPC, or use the `/npc name` command to toggle the nameplate visibility.
 * We no longer open the trading interface if the shopkeeper has no offers. If the player can edit the shopkeeper, we print instructions on how to open the editor. This may also resolve an incompatibility with Bedrock players when using GeyserMC.
-* Fixed: Writing files (such as when saving the shopkeepers data) failed on some servers due to the SecurityManager implementation blindly denying the execute permission without differentiating between files and directories. We check the execute (i.e. access) permission for directories in which we want to write files in order to provide more meaningful error messages in cases in which missing directory permissions prevent us from writing files. However, this intervention of the SecurityManager should have no effect on whether or not we can actually write to a directory, so we can safely ignore it.
+* Fixed: Writing files (such as when saving the data of shopkeepers) failed on some servers due to the SecurityManager implementation blindly denying the execute permission without differentiating between files and directories. We check the execute (i.e. access) permission for directories in which we want to write files in order to provide more meaningful error messages in cases in which missing directory permissions prevent us from writing files. However, this intervention of the SecurityManager should have no effect on whether we can actually write to a directory, so we can safely ignore it.
 * API: Added Shopkeeper#hasTradingRecipes(Player).
 * API: The type parameters of TypeRegistry#registerAll and #getRegisteredTypes were changed to be less specific.
 * Debug: When we print ItemStacks in YAML representation to the server console, we omit the trailing newline now. However, the `/shopkeeper yaml` command still sends additional empty lines in chat to make the output more readable.
@@ -249,9 +249,9 @@ Added messages:
 **New feature: Placeholder items for player shops.**  
 * When players set up the trades of their shopkeepers, they can now use renamed nametag items as substitutes for items that they don't have. The nametag's display name has to match the name of the substituted item type. Display names that don't match any english item type name won't work. Other properties of the substituted item cannot be specified.
 * The parsing is lenient to some extent: The Minecraft namespace prefix (`minecraft:`) is optional (some item type names are even too long to be used in anvils if the prefix is included). The upper and lower case of characters is not important. Leading and trailing whitespace is ignored. Spaces and dashes are converted to underscores. Any color codes are also ignored.
-* Placeholder items are immediately converted to their substituted item inside the shopkeeper editor. If what appears to be a placeholder item is not converted, its display name probably does not match a known item type. It is not possible to setup player shopkeeper trades that buy or sell the placeholder items themselves. But normal nametags, and nametags whose names do not match any valid item type, are treated like normal items and can be traded as usual.
+* Placeholder items are immediately converted to their substituted item inside the shopkeeper editor. If what appears to be a placeholder item is not converted, its display name probably does not match a known item type. It is not possible to set up player shopkeeper trades that buy or sell the placeholder items themselves. But normal nametags, and nametags whose names do not match any valid item type, are treated like normal items and can be traded as usual.
 * Placeholder items are supported by the selling, buying, and trading player shopkeeper. The admin shopkeeper treats them like normal items.
-* Placeholder items can not only be used for items that are bought, but also for items that are sold. This allows players to setup trades before they have the items required to fulfill these trades.
+* Placeholder items can not only be used for items that are bought, but also for items that are sold. This allows players to set up trades before they have the items required to fulfill these trades.
 * It is also possible to specify basic enchanted books via placeholder items:
   * The used naming format is `<enchantment> <level>`.
   * The parsing is similar to that of item type names: The normalized display name has to match the id of the intended enchantment.
@@ -267,8 +267,8 @@ Added messages:
     * Tipped arrow: `[long] [strong] [tipped] [potion] <arrow> [of] [long] [strong] <potion type> [2|ii] [tipped] [potion] <arrow> [2|ii]`
   * The parsing of the potion type is similar to that of enchantments: The normalized `potion type` has to match the id of the intended potion type. These potion types cover the potions that are found inside the creative inventory. Custom potion items with arbitrary effects and properties are not supported.
   * The keywords `splash`, `lingering`, and `arrow` are used to identify the different item types. If none of these keywords is found, a normal potion item is assumed.
-  * The keywords `long`, `strong`, `2`, and `ii` specify long or strong variants of the specified type of potion. There are currently no potion variants that are both long and strong at the same time. Consequently, only one of these keywords is allowed to be used at the same time. However, we currently ignore any additional occurrences of the respectively other keywords. If the specified potion type does not support the selected variant, the keyword is currently ignored as well. But this might change and potentially become more strict in a future release.
-  * Each keyword can occur at most once, but there may be multiple valid locations at which it can occur (which is why the above formats mention some keywords multiple times). However, for simplicity, the parsing does not actually take the order or dependencies of words into account currently, but only checks for the presence of the various keywords. But this might change and potentially become more strict in a future release. Any other words in the above formats that were not mentioned as keywords are optional.
+  * The keywords `long`, `strong`, `2`, and `ii` specify long or strong variants of the specified type of potion. There are currently no potion variants that are both long and strong at the same time. Consequently, only one of these keywords is allowed to be used at the same time. However, we currently ignore any additional occurrences of the respectively other keywords. If the specified potion type does not support the selected variant, the keyword is currently ignored as well. But this might change and potentially become stricter in a future release.
+  * Each keyword can occur at most once, but there may be multiple valid locations at which it can occur (which is why the above formats mention some keywords multiple times). However, for simplicity, the parsing does not actually take the order or dependencies of words into account currently, but only checks for the presence of the various keywords. But this might change and potentially become stricter in a future release. Any other words in the above formats that were not mentioned as keywords are optional.
 
 **New feature: Trade notifications.**  
 * Config: Added settings `notify-players-about-trades` (default: disabled) and `notify-shop-owners-about-trades` (default: enabled), which enable trade notifications for all players with certain permissions, or for shop owners about trades that take place in their own shops.
@@ -314,7 +314,7 @@ Added messages:
   * Shopkeeper mobs no longer tick Minecraft's float behavior. This has no effect since they use the NoAI flag.
   * The shopkeeper mob AI task is no longer dynamically started and stopped, but instead keeps running even if there are no entities to process currently. Frequently stopping and restarting the task is itself associated with a certain overhead.
   * Various other small optimizations to how the shopkeeper AI task:
-    * The shopkeeper mob AI task no longer checks if the entity is still valid, but only if it is still alive. This avoids having to check if the entity's chunk is still loaded, which is relatively costly compared to other operations. This check shouldn't be required since we expect the shopkeeper mobs to be stationary and we already stop their AI on chunk unloads.
+    * The shopkeeper mob AI task no longer checks if the entity is still valid, but only if it is still alive. This avoids having to check if the entity's chunk is still loaded, which is relatively costly compared to other operations. This check shouldn't be required since we expect the shopkeeper mobs to be stationary, and we already stop their AI on chunk unloads.
     * We also no longer remove dead entities from our mob AI processing right away, but simply ignore them. They are cleaned up once the shop objects recognize that the entities are no longer alive.
     * Shopkeeper mobs with AI are now stored by chunk. Instead of iterating over all mobs and checking if their AI or gravity is active, we now iterate over the chunks first and skip those with neither active AI nor gravity. Additionally, we skip the processing of mobs altogether if we know that there are currently no chunks with neither active AI nor gravity.
     * The shopkeeper mob AI no longer stores and queries chunk data by the chunks themselves, but via their coordinates. This avoids having to retrieve and check if the chunks around players are currently loaded during AI activation updates.
@@ -342,7 +342,7 @@ Added messages:
   * Added permission `shopkeeper.remove.others` (default: `op`): Allows the removal of shops of other players via command.
   * Added permission `shopkeeper.remove.admin` (default: `op`): Allows the removal of admin shops via command.
 * Improved the feedback messages when a player tries to create a shopkeeper via command.
-  * If the player targets a container, we assume that they are trying to create a player shop, regardless of whether or not the creation of player shops via command is enabled. However, unlike before this only affects the default shop type that is chosen if the player does not explicitly specify a shop type himself.
+  * If the player targets a container, we assume that they are trying to create a player shop, regardless of whether the creation of player shops via command is enabled. However, unlike before this only affects the default shop type that is chosen if the player does not explicitly specify a shop type himself.
   * It is now possible to create admin shops via command even when targeting a container. However, the admin shop type has to be explicitly specified as command argument.
   * When a player shop type is selected, we send appropriate feedback messages depending on whether player shop creation via command is enabled, whether a container is targeted, and whether it is a supported type of container.
   * When not specifying a shop object type, we pick the first shop object type that can be used by the player. This is consistent for the creation of player and admin shops now.
@@ -350,10 +350,10 @@ Added messages:
   * Fixed: When the parsing of a command argument failed, the error message was using the argument name instead of the argument format. However, this was mostly an issue for the few commands with required arguments whose format does not contain the argument name, for example because their format is constructed from their child arguments.
 
 **Changes related to Citizens shopkeepers:**  
-* Fixed: Previously, if the location of a Citizens shopkeeper changed due to the NPC moving around, it was not guaranteed whether or not that location change would be persisted. Now, we always trigger a save if at least one shopkeeper is marked as dirty during ticking.
+* Fixed: Previously, if the location of a Citizens shopkeeper changed due to the NPC moving around, it was not guaranteed whether that location change would be persisted. Now, we always trigger a save if at least one shopkeeper is marked as dirty during ticking.
 * Similar to non-Citizens shopkeepers, we also periodically respawn Citizens shopkeepers now if they have previously been spawned (i.e. if they have an associated entity) but their entity has been removed, for example by another plugin. If the NPC has intentionally been despawned, it is not automatically respawned.
 * Changes to Citizens shopkeeper NPC names:
-  * NPCs are initially created with an empty name now. Only if the NPC is of type player, we subsequently assign it a name, because this determines its initial skin. If the shopkeeper is a player shop, we use the shop owner's name as before. Otherwise, we try to use the name of the player who created the shopkeeper. If this is not available, we fallback to an empty name.
+  * NPCs are initially created with an empty name now. Only if the NPC is of type player, we subsequently assign it a name, because this determines its initial skin. If the shopkeeper is a player shop, we use the shop owner's name as before. Otherwise, we try to use the name of the player who created the shopkeeper. If this is not available, we fall back to an empty name.
   * We no longer add the nameplate prefix if the NPC is of type player, because this messes with the NPC's skin.
   * When we set the NPC's name, we now also set the nameplate visibility: If the name is empty, the nameplate is hidden. Otherwise, the `always-show-nameplates` setting determines whether the nameplate is always shown, or whether it is only shown when a player directly looks at the entity (this only works for non-player NPCs though).
 * Config: Added setting `default-citizen-npc-type` (default: `PLAYER`) which controls the entity type used by newly created Citizens shopkeeper NPCs.
@@ -369,7 +369,7 @@ Added messages:
 **Debugging improvements:**  
 * Added command "/shopkeeper testDamage [damage] [times-per-tick] [duration-ticks]", which can be used to debug the performance of handling lots of damage events.
 * Added debug command "/shopkeeper testSpawn [repetitions]", which measures the time it takes to respawn the active shopkeepers within the current chunk.
-* Minor improvements and additions to the "/shopkeeper checkitem" command: The command checks now whether the main and off hand items match the shop creation item, and whether they match each other according to Minecraft's own more strict item matching rules. The output is also more compact now.
+* Minor improvements and additions to the "/shopkeeper checkitem" command: The command checks now whether the main and off hand items match the shop creation item, and whether they match each other according to Minecraft's own stricter item matching rules. The output is also more compact now.
 * Various small fixes and additions related to the "/shopkeeper check" command.
   * For example, this also shows chunk activation timings now, statistics on the current and maximum number of pending shopkeeper spawns, and shopkeeper mob behavior tick rate.
   * We also no longer reset the shopkeeper mob AI and gravity statistics when there are no more active entities.
@@ -400,7 +400,7 @@ Added messages:
   * When a shopkeeper is marked as dirty during ticking, we trigger a delayed save instead of an immediate save now.
 * Fixed: Previously, after the Shopkeepers plugin has been dynamically reloaded, GriefPrevention prevented players from using the shop creation item or interact with shopkeepers in protected regions. This issue has been resolved by dynamically reordering the registered event handlers so that our event handlers are always executed first.
 * We only print the shop creation item usage message if the player is still holding the item after a short delay now. This avoids message spam when a player quickly scrolls through the items on the hotbar via the mouse wheel.
-* Fixed: We sometimes receive an additional left-click air interaction event when a player right-clicks air while looking at a block slightly outside of the interaction range. This led to the shop creation item switching between two selections back and forth for a single right-click. We ignore this additional left-click air interaction now by ignoring any subsequent interactions that occur within a brief time span of the last handled interaction. The ignored interactions are still cancelled to prevent any vanilla behaviors or side-effects of other event handlers, but they no longer change the player's selection.
+* Fixed: We sometimes receive an additional left-click air interaction event when a player right-clicks air while looking at a block slightly outside the interaction range. This led to the shop creation item switching between two selections back and forth for a single right-click. We ignore this additional left-click air interaction now by ignoring any subsequent interactions that occur within a brief time span of the last handled interaction. The ignored interactions are still cancelled to prevent any vanilla behaviors or side effects of other event handlers, but they no longer change the player's selection.
 * Fixed: Closing the shopkeeper editor did not immediately trigger a save, but relied on the periodic shopkeeper tick task to trigger a save. Also, we check now which trades have actually changed and only trigger a save if the shopkeeper was actually modified.
 * Added an editor option to rename regular villagers. Unlike the renaming via nametags, this allows the use of color codes.
 * Added an editor option to toggle the pumpkin head of snowman shopkeepers.
@@ -413,7 +413,7 @@ Added messages:
 * We also send the `shop-removed` message now when a shopkeeper is deleted via the editor menu. Similarly, deleting a regular villager via the villager editor will also print a message now.
 * When using the villager editor, we check more frequently now whether the villager still exist, and close the editor if it does not.
 * Fixed: Striders, magma cubes, and blazes are now able to stand on top of lava. This only applies if they are not completely submerged by lava (in which case they don't float to the top as they do in vanilla Minecraft, but sink to the ground as before).
-* When creating a shopkeeper via command, it is now possible to place it on top of liquids by targeting a water or lava block. If the player is under water (or inside of lava), the shopkeeper is placed at the targeted block as before. Since we spawn shopkeepers up to one block below their location, this still allows placing shopkeepers on the ground in shallow liquids, without them being continuously teleported back if they are not able to stand on top of the liquid.
+* When creating a shopkeeper via command, it is now possible to place it on top of liquids by targeting a water or lava block. If the player is underwater (or inside lava), the shopkeeper is placed at the targeted block as before. Since we spawn shopkeepers up to one block below their location, this still allows placing shopkeepers on the ground in shallow liquids, without them being continuously teleported back if they are not able to stand on top of the liquid.
 * Buying shopkeepers can also buy written books and enchanted items now. Being able to buy written books is probably not really useful though, because any book item being bought has to nearly perfectly match the requested book item.
 * Config: Added setting `disable-inventory-verification` (default: `false`). Even though modded servers (Cauldron, Mohist, etc.) are not officially supported, this setting may help to resolve a particular known incompatibility with these types of servers.
 * When the deletion of shopkeepers of inactive players is enabled, we not only check for inactive players during plugin startup, but also periodically now (roughly every 4 hours). This accounts for servers that keep running for long durations. We also log a message now whenever we check for shopkeepers of inactive players.
@@ -435,7 +435,7 @@ Added messages:
 * Fixed: The living shop object types were not registered in the order specified inside the config.
 * The `enabled-living-shops` setting is slightly more lenient now when parsing the specified mob types. Previously, the mob type names had to perfectly match the server's entity type names.
 * Fixed: If the material of the configured shop creation item was invalid, the used default shop creation item used a display name with untranslated color codes.
-* Fixed: Specifying meta data for items of type AIR (which do not support meta data) no longer results in an exception.
+* Fixed: Specifying metadata for items of type AIR (which do not support metadata) no longer results in an exception.
 * Updated the description of some settings, and improved the validation and error feedback.
   * Updated the description of the `file-encoding` setting: On all recent versions of Bukkit (since around 2016), we were actually using UTF-8 if this setting is left empty.
   * Added validation for the 'file-encoding' setting: If it is empty or invalid, we print a warning and use UTF-8.
@@ -483,7 +483,7 @@ Added messages:
 **Internal API:**  
 * Added methods to retrieve the values of the various mob shopkeeper properties.
 * For consistency reasons, a few methods related to the slime size, magma cube size, and parrot variant have been renamed.
-* The dirty flag of shopkeepers only indicates whether the the storage is aware of the shopkeeper's latest data changes. It is no longer an indicator for whether these changes have actually been persisted to disk yet.
+* The dirty flag of shopkeepers only indicates whether the storage is aware of the shopkeeper's latest data changes. It is no longer an indicator for whether these changes have actually been persisted to disk yet.
 * Several methods related to the shopkeeper's dirty flag are final now.
 * Renamed a few methods of the ShopkeeperStorage.
 * EditorHandler#addRecipe no longer receives the editing player as argument: None of the other related methods (#getTradingRecipes and #clearRecipes) receive the player either.
@@ -498,10 +498,10 @@ Added messages:
 * PlayerShopEditorHandler#createTradingRecipeDraft and #getPrice are no longer instance methods.
 * ItemData#withType may return the same ItemData instance now if the type has not changed.
 * Several internal references to the trade offer and trading recipe implementation classes have been replaced with references to the corresponding API interfaces. The internal return types of some shopkeeper methods for accessing the offers have changed. AbstractShopkeeper#getTradingRecipes no longer requires returning SKTradingRecipes.
-* When loading a shopkeeper from a config section, any stored data elements (except sub sections) are assumed to be immutable and the shopkeeper is allowed to directly store these elements without copying them first.
+* When loading a shopkeeper from a config section, any stored data elements (except sub-sections) are assumed to be immutable and the shopkeeper is allowed to directly store these elements without copying them first.
 * Various workarounds for avoiding copying internal item stacks when it is not required, such as methods that directly return internally stored item stacks, have been removed, since they are no longer required.
 * AbstractPlayerShopkeeper#createSellingRecipe and #createBuyingRecipe are final now.
-* Small refactors of TrandingRecipeDraft: Added TradingRecipeDraft#asItem2(). #toTradingRecipe has been moved into SKTradeOffer. Some methods are final now.
+* Small refactors of TradingRecipeDraft: Added TradingRecipeDraft#asItem2(). #toTradingRecipe has been moved into SKTradeOffer. Some methods are final now.
 
 **Internal:**  
 * Building:
@@ -513,12 +513,12 @@ Added messages:
 * Changes to object ids:
   * Performance: Object ids can be of any type now (not only String). This avoids having to construct new Strings whenever a shop object is queried. There are usually already objects present that can be used as identifiers, without having to construct them first. Living entity shops use the entity UUID as identifier now, Citizens shops use their unique NPC id, and sign shops use their block location.
   * Performance: By using a shared mutable block location object, the performance of checking if a block at a certain coordinate is a sign shop has been further improved (around 70% in my testing!). This is especially relevant when handling block physics events, since these can occur quite frequently.
-  * The object id can be a non-null value even if the entity is not active currently (eg. for Citizens shopkeepers, which use the unique NPC id for this). The description of the #getId() method and of some affected API methods in the ShopkeeperRegistry have been slightly adapted to account for that.
+  * The object id can be a non-null value even if the entity is not active currently (e.g. for Citizens shopkeepers, which use the unique NPC id for this). The description of the #getId() method and of some affected API methods in the ShopkeeperRegistry have been slightly adapted to account for that.
   * Virtual shop objects always return null as id now, since they are never present in the world.
   * The Citizens shopkeeper trait no longer keeps track of the shop object id. There is no need for that as the shopkeeper can be determined directly by the NPC.
 * The spawning and despawning of shopkeepers is handled more consistently now. For instance, if shopkeepers are marked as dirty during the spawning of their shop objects we would previously trigger a delayed save. We do the same when they are despawned now.
 * Performance: To slightly speed up iterations, we use LinkedHashMap instead of HashMap and Collection#forEach instead of iterators at a few places now.
-* Debug: A few debug messages are now printed before their denoted action takes place (eg. before the shop object is teleported or respawned).
+* Debug: A few debug messages are now printed before their denoted action takes place (e.g. before the shop object is teleported or respawned).
 * Fixed: Optional arguments delegate to the wrapped argument for more detailed error messages now.
 * Debug/Fixed: Average timings would previously sometimes be incorrect since they took into account unset values of the timing history.
 * Debug: The shopkeeper mob AI timers are stopped before the AI task is stopped now. This might, in rare cases, affect the correctness of some of the timing outputs of the 'check' command.
@@ -530,7 +530,7 @@ Added messages:
 * Major refactoring related to how the config and language files are loaded.
 * Refactoring related to how shopkeeper data is saved and loaded:
   * Shopkeepers are saved after they are unloaded now. This allows them to still modify their data during despawning or when handling the unload.
-  * When a new immediate save is triggered (for example during plugin shutdown), we no longer abort any currently scheduled but not yet started save task. Instead we finish it and then execute the save task again. This may trigger more saves than necessary in a few cases, but ensures that frequent requests to save the shopkeepers won't repeatedly abort any previous saving attempts.
+  * When a new immediate save is triggered (for example during plugin shutdown), we no longer abort any currently scheduled but not yet started save task. Instead, we finish it and then execute the save task again. This may trigger more saves than necessary in a few cases, but ensures that frequent requests to save the shopkeepers won't repeatedly abort any previous saving attempts.
   * Reloading the shopkeeper data will now wait for any current and pending saves to complete. However, this has not really been an issue before since we only reload the shopkeeper data during plugin startup currently.
   * The storage no longer checks for config defaults when checking if the save data contains data for a specific shopkeeper.
   * Shopkeepers are no longer marked as dirty when they are deleted. The storage keeps track of the deleted shopkeepers separately, so there is no need for that.
@@ -539,7 +539,7 @@ Added messages:
   * We no longer check the shopkeeper registry's loaded shopkeepers when we check if a given shopkeeper id is unused. Instead, the storage checks the available shopkeeper data (this also includes unloaded shopkeepers, and shopkeepers that could not be loaded for some reason), as well as the shopkeepers that are dirty (this also includes newly created shopkeepers that have not yet been persisted) or that are pending deletion from the storage. Ids of deleted shopkeepers can no longer be reused until their deletion has been persisted. If a deleted shopkeeper has never been saved before, its id becomes available for reuse right away. However, this is rarely relevant in practice, because we still prefer to use ascending unused ids when they are available.
 * Minor cleanup related to the AI and gravity processing of shopkeeper entities.
 * Removed a few redundant checks regarding whether an entity is still alive and its chunk is still loaded. These additional checks have been required in some previous versions of Spigot, but that should no longer apply to late Spigot 1.14.1 and above.
-* Added AbstractShopObject#onIdChanged that can be used to update the shopkeepers entry in the shopkeeper registry when a shop object's id dynamically changes.
+* Added AbstractShopObject#onIdChanged that can be used to update the shopkeeper's entry in the shopkeeper registry when a shop object's id dynamically changes.
 * A new RateLimiter class is used for all shopkeeper and shop object ticking activities that do not need to happen with every tick.
 * Added AbstractShopkeeper#onChunkActivation() and #onChunkDeactivation().
 * Instead of passing the chunk coordinates around whenever a shopkeeper is registered, unregistered, or moved, each shopkeeper remembers the chunk now by which we previously stored it.
@@ -554,11 +554,11 @@ Added messages:
 * Sign shops no longer check if their chunk is still loaded when accessing their block or checking if the block is still a sign. Since shopkeepers are despawned on chunk unloads, and sign shops cannot change their location, this is not required.
 * Moved the handling of shopkeeper metadata from ShopkeeperUtils into ShopkeeperMetadata.
 * When checking if a shopkeeper entity moved, we reuse a single Location object now.
-* Added test cases that compare the values of the default config and language file with their internal counter parts.
+* Added test cases that compare the values of the default config and language file with their internal counterparts.
 * We explicitly set the mob type of Citizen shopkeeper NPCs now when we create the NPC, similar to Citizens' own NPC creation command.
 * Slightly changed how we retrieve the entity type of Citizen shopkeeper NPCs.
 * Several minor optimizations and refactors related to the various types of shopkeepers. Items are copied and compared less often now.
-* Citizens shopkeepers setup their NPC after the shopkeeper has been successfully added to the shopkeeper registry now.
+* Citizens shopkeepers set up their NPC after the shopkeeper has been successfully added to the shopkeeper registry now.
 * We now keep track of the mapping between Citizens NPCs and their corresponding Citizen shopkeepers independently of the activation states of these shopkeepers.
 * Refactors related to the various player shops related functionality, such as the updating of shop owner names, the checking and deleting of shopkeepers of inactive players, and the max shops permissions.
 * The dynamically registered max shops permissions have a description now.
@@ -569,14 +569,14 @@ Added messages:
 * Added a CsvFormatter utility with various options.
 * The CSV trade logger uses new file and date-time APIs now.
 * Minor refactor to the utility functions that remove items from inventories, and to how the book shopkeeper removes writable books from the shop container.
-* Added an utility class TradeMerger for merging equivalent trades.
+* Added a utility class TradeMerger for merging equivalent trades.
 * Changes to how message arguments are represented.
 * Fixed: The default 'missing argument' error message was not being used. However, this issue probably remained unnoticed until now, because most of the commands either use more specific missing argument error messages, or provide fallbacks when no arguments are provided.
 * Minor improvements to normalizing and matching enum names (used by command arguments, config settings, shopkeeper data, etc.).
 * Added a SoundEffect class to represent sound effects inside the config.
 * Started to use annotations to mark which methods modify their input arguments. These annotations are not yet checked in any form, but are merely used for documentation purposes. More methods will be annotated as the time goes on.
-* Added a document that collects some of the assumptions that are made about the server implementation and which the plugin relies on in order to work correctly.
-* Testing: Added a minimal mock for the shopkeepers plugin. This is required, because some tests need to be able to create unmodifiable item stacks, which requires the corresponding factory method to be bound to the Shopkeepers API.
+* Added a document that collects some of the assumptions made about the server implementation that the plugin relies on in order to work correctly.
+* Testing: Added a minimal mock for the Shopkeepers plugin. This is required, because some tests need to be able to create unmodifiable item stacks, which requires the corresponding factory method to be bound to the Shopkeepers API.
 * Added utility methods to more compactly create ItemData instances based on another ItemData, but with different display name and lore.
 * Various other internal code refactoring.
 
@@ -687,7 +687,7 @@ You will have to manually update your custom language files to adapt to these ch
 
 * Updated for MC 1.16.4.
 * Bumped Towny dependency to 0.96.2.0 and using Jitpack repository for it now.
-* Fixed: Creating shopkeepers via Citizens trait failed previously if the block at the spawn location is not passable (eg. when the Citizens NPC stands on a non-full block such as carpet).
+* Fixed: Creating shopkeepers via Citizens trait failed previously if the block at the spawn location is not passable (e.g. when the Citizens NPC stands on a non-full block such as carpet).
 * Minor changes to handling failures when trying to create a shopkeeper via Citizens trait. We always inform the player (if there is one), log a warning and delete the trait again now.
 * Config: Added some more examples for the 'name-regex' setting to the default config.
 * Fixed: Some messages would print an empty line when set to an empty text, instead of being disabled.
@@ -703,7 +703,7 @@ Internal:
 * Updated building instructions in readme.
 * Internal API: UIHandler#canOpen is public and has an additional 'silent' flag now.
 * Internal API: UI requests can be silent now.
-* Editor UIs are setup lazily now, only when required for the first time.
+* Editor UIs are set up lazily now, only when required for the first time.
 
 ## v2.11.0 (2020-08-13)
 ### Supported MC versions: 1.16.3, 1.16.2, 1.16.1, 1.15.2, 1.14.4
@@ -720,13 +720,13 @@ Other changes:
   * This command can be used to convert the held (or all) items to conform to Spigot's internal data format. I.e. this runs the items through Spigot's item serialization and deserialization in the same way as it would happen when these items are used inside shopkeeper trades and the plugin gets reloaded.
   * Added corresponding permission node `shopkeeper.convertitems.own` (default: op). This allows converting own items.
   * Added corresponding permission node `shopkeeper.convertitems.others` (default: op). This allows converting items of other players.
-* Added config options for the automatic conversion of items inside the inventories of players and shop chests to Spigot's internal data format whenever a player is about to open a shopkeeper UI (eg. trading, editor, hiring, etc.).
+* Added config options for the automatic conversion of items inside the inventories of players and shop chests to Spigot's internal data format whenever a player is about to open a shopkeeper UI (e.g. trading, editor, hiring, etc.).
   * Added config option `convert-player-items` (default: false). This enables and disables the automatic item conversion.
   * Added config options `convert-all-player-items` (default: true) and 'convert-player-items-exceptions' (default: []). These two settings allow limiting which items are affected or ignored by the automatic conversion.
   * Note: Enabling this setting comes with a performance impact. You should generally try to avoid having to use this setting and instead search for alternative solutions. For more information, see the notes on this setting inside the default config.
 * Debug: Added debug option 'item-conversions' which logs whenever we explicitly convert items to Spigot's data format. Note that this does not log when items get implicitly converted, which may happen under various circumstances.
 * Config: Added option 'max-trades-pages' (default: 5, min: 1, max: 10) which allows changing the number of pages that can be filled with trading options. This limit applies to all shopkeepers (there are no different settings for different types of shops or different permission levels so far). Note: The scroll bar rendered by the Minecraft client will only work nicely for up to 64 trades.
-* Added: It is now possible to change the size of slimes and magma cubes. Their default size is 1 (tiny). Even though Minecraft theoretically allows sizes up to 256, we limit the max size to 10. This avoids running into issues such as related to rendering, performance and not being able to interact with the slime or magma cube. If you have market areas where players can create their own shops and they are able to create slime or magma cube shopkeepers, you might want to take this maximum slime/magma cube size into account when assigning shop areas to players.
+* Added: It is now possible to change the size of slimes and magma cubes. Their default size is 1 (tiny). Even though Minecraft theoretically allows sizes up to 256, we limit the max size to 10. This avoids running into issues such as related to rendering, performance and not being able to interact with the slime or magma cube. If you have market areas where players can create their own shops, and they are able to create slime or magma cube shopkeepers, you might want to take this maximum slime/magma cube size into account when assigning shop areas to players.
 * Fixed: Slimes and magma cubes no longer spawn with random size whenever they are respawned.
 * Fixed: Various optional (context dependent) command arguments were shown to be required inside the Shopkeepers command help.
 * Fixed: We no longer attempt to spawn Citizens NPCs when creating or loading Citizens shopkeepers if the spawn location's world is not loaded currently.
@@ -759,7 +759,7 @@ Other changes:
 Added editor for regular villagers and wandering traders:  
 * Any villagers and wandering traders which are not Citizens NPC or shopkeepers are considered 'regular'.
 * The editor supports editing the villager trades, similar to how editing works for admin shopkeepers. Note that trades created or edited via the editor will have infinite uses, no xp rewards, no price multipliers and the current uses counter gets reset to 0 (there are currently no options to edit or persist these attributes).
-* To not accidentally edit all original trades whenever the editor is opened and closed (and thereby change the above mentioned trade attributes), we compare the trades from the editor with the villager's current trades before applying the trades from the editor: If the items of a trade are still the same, we keep the original trade without changes. A message indicates how many trades have been modified.
+* To not accidentally edit all original trades whenever the editor is opened and closed (and thereby change the above-mentioned trade attributes), we compare the trades from the editor with the villager's current trades before applying the trades from the editor: If the items of a trade are still the same, we keep the original trade without changes. A message indicates how many trades have been modified.
 * Since villagers may change their trades whenever they change their profession, we set the villager's xp to at least 1 whenever the villager's trades or profession have been modified via the editor.
 * If the villager is killed or gets unloaded while editing, any changes in the editor will have no effect.
 * Other supported villager editor options are:
@@ -768,7 +768,7 @@ Added editor for regular villagers and wandering traders:
   * Changing the villager profession. Changing the profession via the editor will keep the current trades.
   * Changing the villager type (i.e. the biome specific outfit).
   * Changing the villager level (i.e. the badge color). This also affects which level is displayed and whether the villager's xp is shown within the villager's trading UI.
-  * Toggling the villager's AI on and off. This is useful to make the villager stationary while editing it. Otherwise it may wander away.
+  * Toggling the villager's AI on and off. This is useful to make the villager stationary while editing it. Otherwise, it may wander away.
 * Permissions: Added `shopkeeper.edit-villagers` and `shopkeeper.edit-wandering-traders` (default: `op`). These are required to edit regular villagers or wandering traders respectively.
 * Added command `/shopkeeper editVillager [villager]`. This opens an editor to edit the specified villager / wandering trader. The villager / wandering trader can either be specified by uuid or by looking at it.
 * Config: Added settings `edit-regular-villagers` and `edit-regular-wandering-traders` (default: `true`). With these settings enabled the villager editor can be opened by simply sneaking and right-clicking a regular villager (similar to how editing works for shopkeepers).
@@ -777,7 +777,7 @@ Internal changes:
 * Slightly changed how we cycle through the villager levels (badge colors).
 * Added support for Lists of ItemData inside the config.
 * We throw an exception now when we encounter an unexpected / not yet handled config setting type.
-* We load all plugin classes up front now. This should avoid issues when the plugin jar gets replaced during runtime (eg. for hot reloads).
+* We load all plugin classes up front now. This should avoid issues when the plugin jar gets replaced during runtime (e.g. for hot reloads).
 * Various internal renaming related to shop containers.
 * Replaced EditorHandler#closeEditorAndRunTask with UIHandler#closeDelayedAndRunTask.
 * Moved UIHandler#getShopkeeper into a separate ShopkeeperUIHandler class. The existing editor, trading and hiring UIs extend from that now.
@@ -785,7 +785,7 @@ Internal changes:
 * Removed UIHandler#closeDelayedAndRunTask and replaced it with using the new methods inside UISession.
 * Various minor refactoring inside SKUIRegistry.
 * Delayed closing of UIs uses the SchedulerUtils now, which guards against issues during plugin shutdown.
-* The created villager trading recipes use a 'max-uses' limit of the maximum integer value now (instead of 10000). If the trade is 'out of stock' both the 'max-uses' and the 'uses' are set to 0. This change should probably not affect anyone though.
+* The created villager trading recipes use a 'max-uses' limit of the maximum integer value now (instead of 10000). If the trade is 'out-of-stock' both the 'max-uses' and the 'uses' are set to 0. This change should probably not affect anyone though.
 * Added new command arguments to specify an entity by uuid.
 * Added new command arguments to select a targeted entity.
 * Moved and added some merchant and trading recipe related utilities into MerchantUtils.
@@ -796,7 +796,7 @@ Internal changes:
 * Removed the unused SKDefaultUITypes#register() method.
 * Various refactoring related to the editor UI. There is now a separate base class for the shared implementation of the shopkeeper editor and the new villager editor UI. Any shopkeeper references had to be removed from the base class. All existing shopkeeper editor buttons had to be slightly adapted to this change.
 * Minor refactoring related to the handling of wandering traders not supporting the baby state.
-* Minor: All type registries (shop types, shop object types, UI types, ..) remember the order of their registered types now. This should have no noticeable effect, other than maybe on the order of command argument completion suggestions.
+* Minor: All type registries (shop types, shop object types, UI types, etc.) remember the order of their registered types now. This should have no noticeable effect, other than maybe on the order of command argument completion suggestions.
 * Most block and entity shop object types share the same object ids now. The idea is that this might allow for optimization when doing shopkeeper lookups.
 * Minor refactoring related to the handling of chat inputs when naming shopkeepers.
 
@@ -887,23 +887,23 @@ Changed messages:
 * Internal data format changes: Sign shops of type 'GENERIC' and 'REDWOOD' are migrated to 'OAK' and 'SPRUCE' respectively.
 * Note on the removal of item type 'ZOMBIE_PIGMAN_SPAWN_EGG' and its replacement with item type 'ZOMBIFIED_PIGLIN_SPAWN_EGG':
   * If you are updating and your config contains an item of type 'ZOMBIE_PIGMAN_SPAWN_EGG' you will have to manually migrate this item to a 'ZOMBIFIED_PIGLIN_SPAWN_EGG'.
-  * Any items stored inside the shopkeepers (eg. for their trades or hire cost items) are automatically migrated.
+  * Any items stored inside the shopkeepers (e.g. for their trades or hire cost items) are automatically migrated.
 * Note on Minecraft's new RGB color codes and other new text related features: I have not yet looked into supporting those in the texts and messages of the Shopkeepers plugin.
 
 **Other migration notes:**
-* Removed: We no longer migrate items inside the config from legacy (pre MC 1.13) item types, data values and spawn eggs to corresponding item types in MC 1.13. Instead any unknown item types get migrated to their default now.
+* Removed: We no longer migrate items inside the config from legacy (pre MC 1.13) item types, data values and spawn eggs to corresponding item types in MC 1.13. Instead, any unknown item types get migrated to their default now.
 
 **Other changes:**
-* Changed/Improved: We use a combination of our own 'Shopkeepers data version' (which has been bumped to 2) and Minecraft's data version for the data version stored inside the save.yml now. Minecraft's data version is incremented on every Minecraft release (including minor updates) and may indicate that new item migrations have been added. So whenever you update your server, we automatically trigger a full migration of all your shopkeepers data to ensure that your save.yml is always up-to-date.
+* Changed/Improved: We use a combination of our own 'Shopkeepers data version' (which has been bumped to 2) and Minecraft's data version for the data version stored inside the save.yml now. Minecraft's data version is incremented on every Minecraft release (including minor updates) and may indicate that new item migrations have been added. So whenever you update your server, we automatically trigger a full migration of all your shopkeeper data to ensure that your save.yml is always up-to-date.
 * Fixed: Some mobs randomly spawn with passengers. We remove these passengers now.
 * Fixed: When a mob randomly spawns with a passenger, this would previously interfere with our 'bypass-spawn-blocking' feature and print a warning inside the log about an unexpected entity (the passenger) being spawned.
 * Fixed: The random equipment of certain mobs gets properly cleared now. For instance, this resolves the issue of foxes randomly carrying items inside their mouth.
-* Fixed: When a Citizens NPC, created without the 'shopkeeper' trait, is deleted, we immediately delete any corresponding shopkeeper now. Previously the corresponding shopkeeper would not get deleted right away, but only during the next plugin startup (when checking whether the corresponding NPC still exists). Any chest used by the shopkeeper would remain locked until then.
+* Fixed: When a Citizens NPC, created without the 'shopkeeper' trait, is deleted, we immediately delete any corresponding shopkeeper now. Previously, the corresponding shopkeeper would not get deleted right away, but only during the next plugin startup (when checking whether the corresponding NPC still exists). Any chest used by the shopkeeper would remain locked until then.
 * Improved: In order to determine the player who is setting up a shopkeeper via the 'shopkeeper' trait, we previously only took players into account which are adding the trait via the Citizens trait command (NPCTraitCommandAttachEvent). However, players are also able to add traits during NPC creation. We now also react to players creating NPCs (PlayerCreateNPCEvent) and then (heuristically) assume that any directly following trait additions for the same NPC within one tick are caused by this player. This player will then be able to receive feedback messages about the shopkeeper creation.
 * Improved: For any trait additions not directly associated with a player, we previously waited 5 ticks before the corresponding shopkeeper got created. One (minor) side effect of the above change is that we react to all trait additions within 1 tick now.
 * Added: Added a link inside the config which points to the translations repository.
 * Added: Added feedback messages when a player cannot trade with a shop due to trading with own shops being disabled or if the shop's chest is missing.
-* Changed: The check for whether the player is able to bypass the restriction of not being able to trade with own shops was previously checking if the player is an operator. Instead we now check if the player has the bypass permission.
+* Changed: The check for whether the player is able to bypass the restriction of not being able to trade with own shops was previously checking if the player is an operator. Instead, we now check if the player has the bypass permission.
 * Changed: When checking if the player is able to bypass the restriction of not being able to trade with shops while their owner is online, we only check for the bypass permission now after checking if the shop owner is actually online currently.
 * Added: The variant of rabbit shopkeepers can be changed now. Any existing rabbit shopkeepers will use the brown variant (the default). This also resolves an issue with the rabbit type randomly changing whenever the shopkeeper is respawned.
 * Added: Added a header comment to the top of the save.yml file mentioning the risk of manually editing this file while the server is still running or without making a backup first.
@@ -942,12 +942,12 @@ Changed messages (you will have to manually update those!):
 * The 'msg-removed-player-shops' message (previously 'msg-removed-all-player-shops') no longer mentions that 'all' shops got deleted (since this is not necessarily true).
 * Changed the 'msg-button-villager-level' and 'msg-button-villager-level-lore' messages to clarify that this option only changes the visual appearance of the villager's badge color. The included german translation has been updated accordingly as well.
 * Slightly changed the german translation of the 'msg-cant-trade-while-owner-online' message.
-* Removed the note about left and right clicking items to adjust amounts from the 'msg-trade-setup-desc-admin-regular' message, since this doesn't actually apply to admin shops.
+* Removed the note about left and right-clicking items to adjust amounts from the 'msg-trade-setup-desc-admin-regular' message, since this doesn't actually apply to admin shops.
 
 ## v2.9.3 (2020-04-12)
 ### Supported MC versions: 1.15.2, 1.14.4
 
-* Fixed: If a trade required two matching item stacks of the same type but different sizes, it was possible to trade for less items when offering the items in reverse order.
+* Fixed: If a trade required two matching item stacks of the same type but different sizes, it was possible to trade for fewer items when offering the items in reverse order.
 * Added: The `/shopkeeper remote` command can be used from console now and optionally accepts a player as argument. The shop will then be opened for the specified player.
   * Added permission: 'shopkeeper.remote.otherplayers' (default: op). This is required for opening shops for other players.
 * Partially fixed: When a player shift double left-clicks inside the editor view, Minecraft triggers shift left-clicks on all slots containing matching items. This causes the prices of other trades to unintentionally change. We heuristically assume that any shift left-clicks occurring within 250 ms on a slot different to the previously clicked were triggered automatically and ignore those clicks now.
@@ -972,7 +972,7 @@ Changed messages (you will have to manually update those!):
 * Fixed: Trading via shift-clicking while the player is charging a trident would allow the player to duplicate the trident.
   * The issue is caused by the inventory getting updated while the trident is being charged (or any other usable item being used).
   * We now prevent item actions to even start while interacting with a shopkeeper. Note: The client might currently still display the item action animation, even though it has been successfully stopped on the server (see SPIGOT-5609).
-  * Additionally, we only update those inventory slots that were actually changed by inventory manipulations. This also has the benefit of sending less inventory slot updates.
+  * Additionally, we only update those inventory slots that were actually changed by inventory manipulations. This also has the benefit of sending fewer inventory slot updates.
 
 Internal changes:  
 * Added AbstractShopkeeper#tick which gets invoked roughly once per second for all shopkeepers in currently active chunks.
@@ -987,7 +987,7 @@ Internal changes:
 **Other changes:**  
 * Added: Warning messages when a trading offer cannot be loaded for some reason.
 * Changed: Trading offer and hire cost items get automatically migrated to the current data version now.
-  * This will typically occur with every (even minor) minecraft updates.
+  * This will typically occur with every (even minor) Minecraft updates.
   * A warning is logged if an offer can not be migrated.
   * Minecraft may log 'Unable to resolve BlockEntity for ItemStack ...' messages during ItemStack migrations. You can safely ignore these debug messages.
   * Config/Debug: Added debug option 'item-migrations' to log whenever a shopkeeper performs item migrations.
@@ -1008,20 +1008,20 @@ Internal changes:
 * Fixed: We would previously drop the shop-creation item returned on shop deletion at the shop's location, even if the shop got deleted via remote editing from far away (and is potentially not even loaded). If the player is further than 10 blocks away (or if the shop object is not loaded), it will drop the item at the player's location now.
 * Fixed: The shop creation item can no longer be used from dispensers if regular use is disabled.
 * Config/Fixed: Derived settings were not updated when loading messages from a separate language file.
-* Config/Fixed: Some settings would not loaded correctly depending on the used locale. Also made all text comparisons locale independent.
+* Config/Fixed: Some settings would not load correctly depending on the used locale. Also made all text comparisons locale independent.
 * Config/Fixed: In case the name-regex setting cannot be parsed, we now print a warning and revert to the default (instead of throwing an error).
 * API/Fixed: NPE when accessing a non-existing second offered item from the ShopkeeperTradeEvent.
 * API/Fixed: The offered items inside the ShopkeeperTradeEvent are copies now and their stack sizes match those of the trading recipe.
 * Messages/Fixed: The internal default for message 'msg-list-shops-entry' (that gets used if the message is missing in the config) was not matching the message in the default config.
 * Internal/Fixed: Improved thread-safety for asynchronous logging operations and settings access.
-* Changed: Villager shopkeepers get their experience set to 1 now. I wasn't able to reproduce this myself yet, but according to some reports villager shopkeepers would sometimes lose their profession. Setting their experience to something above 0 is an attempt to resolve this.
+* Changed: Villager shopkeepers get their experience set to 1 now. I wasn't able to reproduce this myself yet, but according to some reports, villager shopkeepers would sometimes lose their profession. Setting their experience to something above 0 is an attempt to resolve this.
 * Changed: Instead of using a fallback name ("unknown"), player shops are required to always provide a valid owner name now.
 * Changed: Explicitly checking for missing world names when loading shopkeepers.
 * Changed: Added validation that the unique id of loaded or freshly created shopkeepers is not yet used.
 * Changed: Added more information to the message that gets logged when a shopkeeper gets removed for owner inactivity.
 * Changed: The errors about a potentially incompatible server version and trying to run in compatibility mode are warnings now.
 * Messages/Changed: The msg-shop-creation-items-given message was using the player's display name. This was changed to use the player's regular name to be consistent with the rest of the plugin.
-* Config/Changed: The plugin will now shutdown in case a severe issue prevents loading the config. This includes the case that the config version is invalid. Previously it would treat invalid and missing config versions the same and apply config migrations nevertheless.
+* Config/Changed: The plugin will now shutdown in case a severe issue prevents loading the config. This includes the case that the config version is invalid. Previously, it would treat invalid and missing config versions the same and apply config migrations nevertheless.
 * Config/Changed: The always-show-nameplates setting seems to be working again (since MC 1.9 already). The corresponding comment in the default config was updated.
 * Config/Changed: Changed/Added a few information/warning messages related to config and language file loading.
 * Config/Changed: Only printing the 'Config already loaded' message during startup if the debug mode is enabled.
@@ -1029,7 +1029,7 @@ Internal changes:
 * Various changes to the shopkeeper registry and shopkeeper activation:
   * We keep track now which chunks have been activated. This avoids a few checks whether chunks are loaded.
   * The delayed chunk activation tasks get cancelled now if the chunk gets unloaded again before it got activated. This resolves a few inconsistencies such as duplicate or out-of-order chunk activation and deactivation handling when chunks get loaded and unloaded very frequently.
-  * Similarly the respawn task on world saves gets cancelled now if the world gets unloaded.
+  * Similarly, the respawn task on world saves gets cancelled now if the world gets unloaded.
   * Shopkeeper spawning is skipped if there is a respawn pending due to a world save.
   * Shopkeepers are now stored by world internally. This might speed up a few tasks which only affect the shopkeepers of a specific world.
   * Debug: Added debug option 'shopkeeper-activation'. Various debug output related to chunk/world loading/unloading/saving and spawning/despawning of shopkeepers was moved into this debug category.
@@ -1038,7 +1038,7 @@ Internal changes:
 
 **API changes:**  
 * Added: PlayerShopkeeper#getChestX/getChestY/getChestZ
-* Added: ShopkeepersStartupEvent which can be used by plugins to make registrations during Shopkeepers' startup process (eg. to register custom shop types, object types, etc.). This event is marked as deprecated because custom shop types, object types, etc. are not yet officially supported as part of the API. Also, the event is called so early that the plugin (and thereby the API) are not yet fully setup and ready to be used, so this event is only of use for plugins which know what they are doing.
+* Added: ShopkeepersStartupEvent which can be used by plugins to make registrations during Shopkeepers' startup process (e.g. to register custom shop types, object types, etc.). This event is marked as deprecated because custom shop types, object types, etc. are not yet officially supported as part of the API. Also, the event is called so early that the plugin (and thereby the API) are not yet fully set up and ready to be used, so this event is only of use for plugins which know what they are doing.
 * Added: Shopkeeper#getIdString.
 * Removed: Various API methods from Shopkeeper which simply delegated to the corresponding shop object.
 * Changed: Moved ShopObjectType#needsSpawning into ShopObject.
@@ -1064,21 +1064,21 @@ Internal changes:
 
 **Various (mostly internal) changes to commands and argument parsing:**  
 * Fallback mechanism:
-  * Previously arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fallback to the executing player and display his second page of shopkeepers. Instead the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information.
+  * Previously, arguments were parsed one after the other. In the presence of optional arguments this can lead to ambiguities. For example, the command "/shopkeeper list [player] 2" with no player specified is supposed to fall back to the executing player and display his second page of shopkeepers. Instead, the argument '2' was previously interpreted as the player name and the command therefore failed presenting the intended information.
   * A new mechanism was added for these kinds of fallbacks: It first continues parsing to check if the current argument can be interpreted by the following command arguments, before jumping back and then either providing a fallback value or presenting a likely more relevant error message.
   * Most optional arguments, default values and fallbacks were updated to use this new fallback mechanism, which should provide more relevant error messages in a few edge cases.
 * Fixed: Commands would sometimes not correctly recognize the targeted shopkeeper entity. This is caused by SPIGOT-5228 keeping dead invisible entities around, which get ignored by the commands now.
 * Added: The "give", "transfer", "list" and "remove" commands show the player's uuid as hover text now and allow it to be copied into the chat input via shift clicking.
 * The "list", "remove", "transfer" and "setTradePerm" commands can be used from console now. Command confirmations work for the console as well now (any command sender that is not a player is considered to be the 'console' for this purpose).
-* The "setForHire" and "transfer" commands allow specifying the shopkeeper via argument now. Also: When targeting a chest that happens to be used by multiple shopkeepers (eg. due to manually modified save data..), it picks the first one now (instead of applying the command to all shops). In the future this will likely print an error message instead.
+* The "setForHire" and "transfer" commands allow specifying the shopkeeper via argument now. Also: When targeting a chest that happens to be used by multiple shopkeepers (e.g. due to manually modified save data), it picks the first one now (instead of applying the command to all shops). In the future this will likely print an error message instead.
 * The "debugCreateShops" command limits the shop count per command invocation to 1000 and prints the number of actually created shops now.
 * Added debug option 'commands' and added various debug output when parsing and executing commands.
 * All argument suggestions are limited to 20 entries by default now.
 * Player arguments suggest matching uuids now. To avoid spamming the suggestions with uuids for the first few characters of input, suggestions are only provided after at least 3 characters of matching input.
-* Some commands (eg. "list") provide suggestions for names of online players now.
+* Some commands (e.g. "list") provide suggestions for names of online players now.
 * The "list" and "remove" commands accept player uuids now and ignore the case when comparing player names.
 * The "list" and "remove" commands handle ambiguous player names now: If there are shops of different players matching the given player name, an error message is shown and the player needs to be specified by uuid instead. The player names and uuids can be copied to the chat input via shift clicking. If a player with matching name is online, that player is used for the command (regardless of if the given player name is ambiguous).
-* The shops affected by the "remove" command are now determined before asking for the users confirmation. This allows detecting ambiguous player names and missing player information before prompting the command executor for confirmation. A minor side effect of this is that any shops created after the command invocation are no longer affected by the remove command once it gets confirmed.
+* The shops affected by the "remove" command are now determined before asking for the user's confirmation. This allows detecting ambiguous player names and missing player information before prompting the command executor for confirmation. A minor side effect of this is that any shops created after the command invocation are no longer affected by the remove command once it gets confirmed.
 * Internal: Refactored name, uuid and id based parsing (and matching) of players and shopkeepers to allow for more code reuse. Added ObjectByIdArgument which contains most of the shared logic now.
 * Internal: Added ShopkeeperIdArgument.
 * Internal: Added TransformedArgument which allows transforming of parsed arguments.
@@ -1096,9 +1096,9 @@ Internal changes:
 * Internal: Moved ArgumentFilter into base commands lib package.
 * Internal: Command arguments keep track of their parent argument now (if used internally by another argument) and use that for their error messages.
 * Internal: Added a display name property to all command arguments that can be used to change the name that is used to represent the argument in the command format. This is especially useful for conflicting literal arguments. Literal arguments will omit their actual argument name from the argument completions if a different display name has been set.
-* Internal: Minor changes to handling errors during command handling. Besides the stack trace, the plugin also logs the command context (parsed arguments) now.
+* Internal: Minor changes to handling errors during command handling. In addition to the stack trace, the plugin also logs the command context (parsed arguments) now.
 * Internal: CommandArgument#parse now also returns the parsed value. This is useful when there is a chain of wrapped arguments and the parent needs to handle the value parsed by the child argument in some way.
-* Internal/Fixed: Chains of FirstOfArguments should now be able to properly store all the values parsed by child arguments along the chain. Previously this only worked for a chain depth of 1.
+* Internal/Fixed: Chains of FirstOfArguments should now be able to properly store all the values parsed by child arguments along the chain. Previously, this only worked for a chain depth of 1.
 * Internal: Added validation that no arguments with the same name get added to the same command.
 * Internal: Moved default shopkeeper argument filters into ShopkeeperFilter class/namespace.
 * Internal: Added map view, toString and copy to CommandContext and made constructor CommandContext(otherContext) protected.
@@ -1108,21 +1108,21 @@ Internal changes:
 * Internal: Replaced CommandArgs with ArgumentsReader: The arguments are now stored inside the CommandInput and the ArgumentsReader only references them from there.
 * Internal: CommandContext is now an interface (with SimpleCommandContext as implementation). A new class CommandContextView was added that gets used anywhere where accessing the context is allowed, while modifying is not.
 * Internal: Command and tab completion handling was moved from BaseCommand into Command.
-* Internal: Resetting of the arguments reader if parsing of a command argument failed was moved from CommandArgument#parse into Command.
+* Internal: Resetting of the ArgumentsReader if parsing of a command argument failed was moved from CommandArgument#parse into Command.
 * Internal: Added TypedFirstOfArgument, a variant of FirstOfArgument that preserves the result type of its child arguments.
 * Internal: Added NamedArgument, which can be useful if there would otherwise be conflicts / ambiguities between arguments.
 * Internal: ArgumentParseException provides the command argument that created it now. This is especially useful for debugging purposes.
-* Internal: The commands library was updated to use a new text representation everywhere now, and thereby support text features such as hover events, click events, etc.
+* Internal: The command library was updated to use a new text representation everywhere now, and thereby support text features such as hover events, click events, etc.
 
 Other internal changes:  
 * Internal: The save task was using a copy of the save data to protect against concurrent modifications while an async save is in progress. However, since the actual save data did not get modified during ongoing saves anyways, this copy is redundant and was therefore removed.
 * Internal: Made various changes in order to support Minecraft's text features such as hover events, click events, insertions, etc. Most texts are now stored in a new format internally.
 * Internal: Various changes to TextUtils and argument replacement.
-  * Arguments can be arbitrary objects now and Suppliers can be used to dynamically lookup argument values.
-  * Argument replacement uses a Map-based argument lookup now. Placeholder keys are specified without the surrounding braces now. Argument replacement for both plain Strings as well as the new text format should be faster now.
+  * Arguments can be arbitrary objects now and Suppliers can be used to dynamically look up argument values.
+  * Argument replacement uses a Map-based argument lookup now. Placeholder keys are specified without the surrounding braces now. Argument replacements for both plain Strings and the new text format should be faster now.
 * Internal: Moved newline pattern and splitting into StringUtils.
 * Internal: The regex pattern used to validate shopkeeper names gets precompiled now.
-* Internal: bstats gets shaded into the package '[..].libs.bstats' now.
+* Internal: bstats gets shaded into the package '[...].libs.bstats' now.
 * Internal: Added Settings#isDebugging and Settings#isDebugging(option) to conveniently (and thread-safe) check for debugging options.
 * Internal: Default shop, object and UI types are getting registered early during onLoad now.
 * Internal: Separated config and language file loading.
@@ -1177,14 +1177,14 @@ Internal:
 ### Supported MC versions: 1.14.4
 
 * Bumped Bukkit dependency from 1.14.3 to 1.14.4.
-* Added: Changed how items are getting defined in the config. Internally this new format uses Bukkit's item serialization for parsing the item data, which allows it to support the specification of arbitrary item data and hopefully not require any major maintenance for future minecraft versions. At the same time it tries to stay (slightly) more user-friendly than Bukkit's item serialization by omitting any data that can be restored by the plugin, by avoiding one level of nesting between the item type and item data, by translating ampersand ('&') color codes in display name and lore, and by offering a compact representation for specifying an item only by its type.
-  * This change also allows a more detailed specification of some of the editor button items. However, many editor buttons still miss corresponding config settings. Also keep in mind that the display name and lore for these button items get specified via corresponding message settings, so any specified item display name and lore will get replaced by that.
+* Added: Changed how items are getting defined in the config. Internally this new format uses Bukkit's item serialization for parsing the item data, which allows it to support the specification of arbitrary item data and hopefully not require any major maintenance for future Minecraft versions. At the same time it tries to stay (slightly) more user-friendly than Bukkit's item serialization by omitting any data that can be restored by the plugin, by avoiding one level of nesting between the item type and item data, by translating ampersand ('&') color codes in display name and lore, and by offering a compact representation for specifying an item only by its type.
+  * This change also allows a more detailed specification of some of the editor button items. However, many editor buttons still miss corresponding config settings. Also, keep in mind that the display name and lore for these button items get specified via corresponding message settings, so any specified item display name and lore will get replaced by that.
   * When checking if an in-game item matches the item data specified in the config, only the specified data gets compared. So this does not check for item data equality, but instead the checked item is able to contain additional data but still get matched (like before, but previously this was limited to checking display name and lore).
   * The previous item data gets automatically migrated to the new format (config version 2).
 * Renamed the setting 'high-zero-currency-item' to 'zero-high-currency-item'. This gets automatically updated during the migration.
 * Changed: All priorities and ignoring of cancelled events were reconsidered.
   * Event handlers potentially modifying or canceling the event and which don't depend on other plugins' event handling are called early (LOW or LOWEST), so that other plugins can react to / ignore those modified or canceled events.
-    * All event handlers which simply cancel some event use the LOW priority now and more consistently ignore the event if already cancelled. Previously they mostly used NORMAL priority.
+    * All event handlers which simply cancel some event use the LOW priority now and more consistently ignore the event if already cancelled. Previously, they mostly used NORMAL priority.
     * Zombie villager curing is prevented (this includes sending the player a message) on LOW priority now. If some plugin wants to bypass Shopkeepers (for example to allow the curing of specific zombie villagers) it can still cancel the event on lowest priority, so that Shopkeepers ignores it, and then uncancel it afterwards.
     * Interaction with the shop creation item (chest selection, shop creation) is handled at LOWEST priority now, so that hopefully even protection plugins can ignore the cancelled event and don't handle it twice when we check chest access by calling another fake interact event. In order to resolve potential conflicts with other event handlers acting on LOWEST priority (such as Shopkeepers' sign interaction listener), we ignore the event if interaction with the item got already cancelled.
     * Interaction with shopkeepers (entities and signs) are handled at LOWEST priority now, so that other plugins more reliably ignore the cancelled event. This makes bypassing of other plugin's interaction blocking the new default behavior. Taking the interaction result of other plugins into account can be enabled by the new setting 'check-shop-interaction-result', which involves calling a fake interact event (similarly to how chest access is checked). Since this is usually not wanted and might in general cause side effects (depending on the other plugins active on the server) this is disabled by default. In order to resolve conflicts with other event handlers acting on LOWEST priority (such as Shopkeepers' shop creation item interaction handling), the interaction is ignored if the event got already cancelled.
@@ -1201,8 +1201,8 @@ Internal:
 * Changed: Added a new 'loadbefore' entry for GriefPrevention as workaround to fix some compatibility issue caused by our changed event priorities and GriefPrevention reacting to entity interactions at LOWEST priority.
 * Fixed: Also cancelling the PlayerInteractAtEntityEvent for shopkeeper entity interactions.
 * Changed: When forcing an entity to spawn, the pitch and yaw of the expected and actual spawn location are ignored now. This avoids a warning message for some entity types (such as shulkers), which always spawn with fixed pitch and yaw.
-* Changed: Some entity attributes are setup prior to entity spawning now (such as metadata, non-persist flag and name (if it has/uses one)). This should help other plugins to identify Shopkeeper entities during spawning.
-* Changed: Added setting 'increment-villager-statistics' (default: false) which controls whether opening the trading menu and trading with shopkeepers increment minecraft's 'talked-to-villager' and 'traded-with-villager' statistics. Previously the talked-to-villager statistics would always get incremented and the traded-with-villager statistic was not used.
+* Changed: Some entity attributes are set up prior to entity spawning now (such as metadata, non-persist flag and name (if it has/uses one)). This should help other plugins to identify Shopkeeper entities during spawning.
+* Changed: Added setting 'increment-villager-statistics' (default: false) which controls whether opening the trading menu and trading with shopkeepers increment Minecraft's 'talked-to-villager' and 'traded-with-villager' statistics. Previously, the talked-to-villager statistics would always get incremented and the traded-with-villager statistic was not used.
 * Added: The previous, current and next page items inside the editor view will now use their stack size to visualize the previous, current and next page number. This even works for items which are usually not stackable.
 * Added: Added the config setting 'register-world-guard-allow-shop-flag' (default: true) which can be used to disable the registration of the 'allow-shop' WorldGuard flag. Note that changing this setting has no effect until the next server restart or full server reload.
 
@@ -1232,7 +1232,7 @@ Internal:
 Debugging:  
 * Debugging: Added new debug command "/shopkeepers yaml", which prints Bukkit's yaml serialization and the item data representation used in the config for the currently held item.
 * Debugging: Added entity, invalid entity and dead entity count to shopkeeper's "check" command. Also restructured the output slightly to make it more compact and clearer.
-* Debugging: Minor changes to the "checkitem" command. It nows compares the items in main and off hand and also checks if the item in the main hand matches the item in the off-hand.
+* Debugging: Minor changes to the "checkitem" command. It now compares the items in main and off hand and also checks if the item in the main hand matches the item in the off-hand.
 * Debugging: Small changes and additions to some debug messages, especially related to shopkeeper interactions and shopkeeper spawning.
 * Debugging: Added setting 'debug-options', which can be used to enable additional debugging tools.
   * Option 'log-all-events': Logs all events. Subsequent calls of the same event get combined into a single logging entry to slightly reduce spam.
@@ -1242,8 +1242,8 @@ Debugging:
 ### Supported MC versions: 1.14.3
 
 * Bumped Bukkit dependency to 1.14.3.
-* Changed: With MC 1.14.3 custom merchants will no longer display the 'Villagers restock up to two times per day' message when hovering over the out of stock icon.
-* Changed: Spigot is hiding the unused xp bar from custom merchant inventories now. The dynamic updating of trades (out of stock icon) was adapted accordingly.
+* Changed: With MC 1.14.3 custom merchants will no longer display the 'Villagers restock up to two times per day' message when hovering over the out-of-stock icon.
+* Changed: Spigot is hiding the unused xp bar from custom merchant inventories now. The dynamic updating of trades (out-of-stock icon) was adapted accordingly.
 * Improved performance of world save handling.
 * Slightly improved metrics performance.
 * Added debug messages for mob spawn blocking and zombie villager curing.
@@ -1285,11 +1285,11 @@ Checkout the changelog of v2.7.0 regarding the update to 1.14.
 Other changes:  
 * Changed: When spawning of villagers or wandering traders is disabled, villagers and wandering traders spawned by other plugins, spawn eggs, mob spawners or due to curing zombie villagers are still allowed to spawn now.
 * Added a separate setting 'disable-zombie-villager-curing' (default: false) that can be used to prevent curing of zombie villagers.
-* Made shop and object type matching more strict. This uses a fixed list of internal aliases now.
-* Removed the generic 'sub type' editor option in favor of letting each shop object supply a list of editor options. This allows living shopkeepers to provide multiple editor options now.
+* Made shop and object type matching stricter. This uses a fixed list of internal aliases now.
+* Removed the generic 'sub-type' editor option in favor of letting each shop object supply a list of editor options. This allows living shopkeepers to provide multiple editor options now.
   * API: Removed getSubTypeItem, cycleSubType and equipItem from ShopObject. Editor options are internal API for now, and mob equipment hasn't properly worked already before due to not getting persisted.
 * Added new mob attribute editor options:
-  * All ageable mobs (except the wandering trader and parrots) and all zombies (zombie, husk, drowned, pig zombie, zombie villager): Baby variant. Previously this options was only available for zombie and pig zombie shopkeepers. The editor item for this option is a regular chicken egg now.
+  * All ageable mobs (except the wandering trader and parrots) and all zombies (zombie, husk, drowned, pig zombie, zombie villager): Baby variant. Previously, this options was only available for zombie and pig zombie shopkeepers. The editor item for this option is a regular chicken egg now.
   * Zombie villager: Villager profession.
   * Sheep: Sheared state.
   * Cat: Collar color.
@@ -1303,9 +1303,9 @@ Other changes:
   * Panda: Genes (appearance).
   * MushroomCow: Variant.
   * Pig: Saddled.
-* Added the ability to cycle the editor options back and forth via left and right clicking.
+* Added the ability to cycle the editor options back and forth via left and right-clicking.
 * Updated for the latest WorldGuard changes. You will have to update WorldGuard for the WorldGuard integration to work.
-  * The 'allow-shop' flag got removed from WorldGuard itself and it is left for other plugins to register themselves. Shopkeepers will now attempt to register this flag, if no other plugin has registered it yet (one such other plugin is for example ChestShop). Since WorldGuard only allows registering flags before it got enabled, but we are loading the config at a later point, we will always attempt to register the flag, even if the WorldGuard integration is disabled in the config.
+  * The 'allow-shop' flag has been removed from WorldGuard and is now left to other plugins to register themselves. Shopkeepers will now attempt to register this flag if no other plugin has registered it yet (one such other plugin is for example ChestShop). Since WorldGuard only allows registering flags before it got enabled, but we are loading the config at a later point, we will always attempt to register the flag, even if the WorldGuard integration is disabled in the config.
   * Removed: We no longer check for the alternative 'enable-shop' flag, if the 'allow-shop' flag is not present.
 * Fixed a class loading issue in case the WorldGuard integration is enabled but WorldGuard is not present.
 * Fix: Sign shops no longer temporarily load the chunk when checking if they are active.
@@ -1392,35 +1392,35 @@ Since the changes of this update are manifold and prone to potentially exploitab
 * Unified the trade representation in the editor among all shopkeeper types to be more consistent:
   * The top item is now always representing the result item and the next two items represent from bottom to top the buy items 1 and 2.
   * The only exception to this are the selling and book shopkeeper: Here the high cost item will appear as buy item 2 inside the editor, but as first item inside the trading recipe (like before).
-  * The admin and trading shop editors were updated to reflect those changes. This change might initially confuse anyone who is used to the previous admin trades setup (with the result item being at the bottom), but should ultimately be easier to remember due to being consistent among all shopkeeper types.
-* It is now possible to switch between up to 5 pages inside the editor, allowing for a total of 45 trades to be setup per shopkeeper.
+  * The admin and trading shop editors were updated to reflect those changes. This change might initially confuse anyone who is used to the previous admin trade setup (with the result item being at the bottom), but should ultimately be easier to remember due to being consistent among all shopkeeper types.
+* It is now possible to switch between up to 5 pages inside the editor, allowing for a total of 45 trades to be set up per shopkeeper.
   * Added settings for the button items used to switch between pages.
 * The editor buttons were moved to the bottom row. In the future the additional space may be used for more editor options.
   * The chest button option for player shops will no longer replace the naming button, but they will be both available side by side now.
 * Improved the setup of the trading player shopkeepers:
   * Inside the editor, the player picks up items in their inventory and can then freely place copies of those items in the trades section of the editor to specify the traded items. The picked up items will appear on the player's cursor, making the setup more apparent.
   * To make the inventory interaction more fluent, item dragging that only involves a single slot gets interpreted as click.
-  * It is now also possible to setup multiple trades for the same result item.
-* Visualizing trades that are out of stock:
+  * It is now also possible to set up multiple trades for the same result item.
+* Visualizing trades that are out-of-stock:
   * When a trade runs out of stock it gets deactivated, but is still visualized by limiting the trade's remaining uses.
   * The trades get updated for the trading player dynamically after every trade attempt. This will not work in compatibility mode in which case it will behave as before, with trading simply getting cancelled without visual feedback for the user.
-  * The player shopkeepers will also keep displaying their setup trades in the editor, even if the corresponding items are no longer present in the chest.
+  * The player shopkeepers will also keep displaying their set up trades in the editor, even if the corresponding items are no longer present in the chest.
   * Trades of the book shopkeeper for books that are no longer present in the chest will be displayed in the form of dummy books with unknown author and 'tattered' generation.
-* An item inside the editor briefly explains the trades setup for the specific type of shopkeeper.
+* An item inside the editor briefly explains the trade setup for the specific type of shopkeeper.
   * Added setting 'trade-setup-item'.
-  * Changed the shop type display names to upper case and with 'shop' prefix, since this is now also used for the trades setup item.
+  * Changed the shop type display names to upper case and with 'shop' prefix, since this is now also used for the trade setup item.
   * Slightly changed the admin and book shopkeeper description messages.
 
 Other changes:  
 * Changed: Clicking the naming or chest editor buttons will no longer trigger two consecutive saves.
-* Changed: The book shopkeeper's behavior more closely matches minecraft's behavior now: Only original and copies of original books can be copied. When copied, the book's generation is increased.
+* Changed: The book shopkeeper's behavior more closely matches Minecraft's behavior now: Only original and copies of original books can be copied. When copied, the book's generation is increased.
 * Changed: The book shopkeeper editor will filter different books with the same title and only consider the first one it finds in the chest.
-* Changed: The transfer command will now transfer all shops that use a chest that are owned by the player. Previously it would report 'no permission' if there was a single non-owned shop that was using the same chest. If the player has the bypass permission, all shops will get transferred (like before), regardless of the owner.
+* Changed: The transfer command will now transfer all shops that use a chest that are owned by the player. Previously, it would report 'no permission' if there was a single non-owned shop that was using the same chest. If the player has the bypass permission, all shops will get transferred (like before), regardless of the owner.
 * Added: The transfer, remote, setForHire and setTradePerm commands allow targeting the shopkeeper directly now, instead of having to target the corresponding chest.
 * Changed: The shopkeeper remote command can now also be used to open player shopkeepers. Also added the alias 'open' for this command.
-* Added: 'edit' command to remotely edit shops. Permission 'shopkeeper.remoteedit' (default: op). This works with both admin and player shops. Shops can be specified via argument (id, name, ..) or by targeting a shop or shop chest.
+* Added: 'edit' command to remotely edit shops. Permission 'shopkeeper.remoteedit' (default: op). This works with both admin and player shops. Shops can be specified via argument (id, name, etc.) or by targeting a shop or shop chest.
 * Added: 'give' command that can be used to give players shop creation items. Permission 'shopkeeper.give' (default: op).
-* Added: Allow backwards cycling through shop and shop object types with the shop creation item in hand by left clicking.
+* Added: Allow backwards cycling through shop and shop object types with the shop creation item in hand by left-clicking.
 * Changed: Improved handling of shopkeeper names with colors and whitespace in commands.
 * Changed: Using the shop type and object type display names for the command argument suggestions.
 * Fixed: The list command's max page is now at least 1 (even if there are no shops to list).
@@ -1430,11 +1430,11 @@ Other changes:
 Internal changes:  
 * Various refactoring related to the editor code common to all shopkeeper types.
 * Small changes related to handling start and end of UI sessions of players.
-* As precaution the trading player shop now verifies that there actually still is a corresponding offer setup for the currently traded recipe.
+* As precaution, the trading player shop verifies now that there actually still is a corresponding offer set up for the currently traded recipe.
 * API: Removed UIRegistry#onInventoryClose(Player)
 * API: Calling ShopkeeperEditedEvent on regular editor inventory closes as well now.
 
-This update includes many message changes. It is therefore suggested to let shopkeeper freshly generate all default messages.  
+This update includes many message changes. It is therefore suggested letting Shopkeepers freshly generate all default messages.  
 
 Changed messages:
 * msg-creation-item-selected
@@ -1512,18 +1512,18 @@ Removed messages:
 * Fixed: Also preventing items being moved into a protected chest. Players might have previously abused this to fill a chest with useless items to prevent the shop from being able to trade due to being out of storage space.
 * Fixed: Item movement protection for double chests might not have worked correctly.
 * Added: The setting 'prevent-item-movement' (default: true) can now be used to allow item movement from/to the shop chest. This gives the shop owner more possibilities to manage the chest contents, but also opens possibilities for other players to maliciously inject or extract items if this is not properly prevented by other means. If chest protection is disabled, this setting will have no effect (item movement will always be allowed then).
-* Reworked chest protection to by slightly less strict:
+* Reworked chest protection to be slightly less strict:
   * Players with bypass permission can now bypass block placement restrictions when placing blocks next to protected shop chests.
   * Chests next to a shop's chest are now only protected / prevented from being placed if they are actually connected to the shop's chest.
-  * Placement of adjacent hoppers is now only prevented if they would able to extract or inject items into the chest.
+  * Placement of adjacent hoppers is now only prevented if they would be able to extract or inject items into the chest.
   * Added: Also restricting placement of droppers in a similar way now.
-* Changed: If chest protection is disabled in the config, chest access will not prevented either now. (It doesn't seem to make much sense to prevent chest access but allow the chest to be broken/destroyed)
+* Changed: If the chest protection is disabled in the config, chest access will not be prevented either now. (It doesn't seem to make much sense to prevent chest access but allow the chest to be broken/destroyed)
 * Changed: If 'delete-shopkeeper-on-break-chest' is enabled, the shopkeeper will now no longer be removed if the half of a double chest gets broken that is not directly used by the shopkeeper.
 * Changed: If 'delete-shopkeeper-on-break-chest' is enabled, the shopkeepers will now also be removed if the chest gets destroyed by an explosion. And if 'deleting-player-shop-returns-creation-item' is enabled, shop creations items will be dropped for those shopkeepers as well.
 
 **Improved shopkeeper placement:**
 * Fixed: Treating other air variants as empty as well when trying to place a shopkeeper.
-* Slightly changed how the spawn block is determined to match more closely to vanilla minecraft's behavior: If the clicked / targeted block is passable (i.e. tall grass, etc.) this block gets used as spawn location. Only otherwise the spawn location is shifted according to the clicked / targeted block face.
+* Slightly changed how the spawn block is determined to more closely match the behavior of vanilla Minecraft: If the clicked / targeted block is passable (i.e. tall grass, etc.) this block gets used as spawn location. Only otherwise the spawn location is shifted according to the clicked / targeted block face.
   * This now also allows placement of shopkeepers underwater (Update aquatic)! Signs can still only be placed at air blocks.
 * Shopkeeper entities get now spawned at the exact location they would fall to due to gravity (within a range of 1 block below their spawn block, and even if gravity is disabled).
   * This also resolves the issue for shopkeepers periodically 'jumping' if their spawn location is 1 block above a passable or non-full block (such as grass, snow, carpet, etc.).
@@ -1536,17 +1536,17 @@ Removed messages:
 * Fixed: Nearby shopkeeper monsters will no longer prevent sleeping.
 * Small performance improvements to related to sign shopkeepers.
 * Fixed: No longer randomly spawning baby variants of shopkeeper mobs.
-* Increased the built-in max shopkeeper name length from 32 to to 128. The actual name length limit is still further limited by the config settings by default and some shopkeeper object types will not be able to actually display names of those length.
+* Increased the built-in maximum shopkeeper name length from 32 to 128. The actual name length limit is still limited by the default config settings, and some types of shopkeeper objects will not be able to actually display names of larger lengths.
 
-**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.x.
+**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if you are just updating to MC 1.13.x.
 
 ## v2.4.1 Beta (2018-09-11)
 ### Supported MC versions: 1.13.1
 * Added: A (very simple) minimum version check.
 * Fixed #522: CME during reload when closing shopkeeper UIs.
-* Fixed #521: Error when adding a shopkeeper to an existing citizens npc via trait.
+* Fixed #521: Error when adding a shopkeeper to an existing Citizens NPC via trait.
 
-**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.x.
+**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if you are just updating to MC 1.13.x.
 
 ## v2.2.2 Release (2018-09-11)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
@@ -1584,29 +1584,29 @@ Added and changed (mostly colors) a few messages:
 **Various changes to sign shopkeepers:**  
 * Changed: Shopkeeper signs get despawned now with chunk unloads and during world saves.
   * To prevent potential abuse of this temporarily despawning during world saves, players are prevented from placing blocks at the location where the sign is supposed to be. And shopkeeper signs will now replace any block that is at the location the sign tries to spawn at.
-  * Changed: Signs that could not be respawned will no longer cause the shopkeeper to be deleted. Instead a 3 minute spawning delay was added to prevent potential abuse (in case the spawned signs drop for some reason/bug).
-  * Added a warning if the facing direction of a sign shopkeeper could not be determined or is missing. Since the signs are getting removed now, it will no longer attempt to determine the sign facing from the world now. Instead it will fallback to using some arbitrary default facing direction then.
+  * Changed: Signs that could not be respawned will no longer cause the shopkeeper to be deleted. Instead, a 3-minute spawning delay was added to prevent potential abuse (in case the spawned signs drop for some reason/bug).
+  * Added a warning if the facing direction of a sign shopkeeper could not be determined or is missing. Since the signs are getting removed now, it will no longer attempt to determine the sign facing from the world now. Instead, it will fall back to using some arbitrary default facing direction then.
 * Changed: Blocks to which shopkeeper signs are attached to are now protected as well.
 * API/Internal: Spawn locations passed to the ShopCreationData are now in the center of the spawn block and contain yaw and pitch to face the creating player. Shop objects can now use this new information if they wish.
 * Added: Sign shopkeepers now support sign posts (if the creating player targets the top of a block). The sign is rotated to face towards the creating player.
 * Added: The setting 'enable-sign-post-shops' (default true) can be used to disable creation of sign post shops.
 
 **Experimental change related to handling shopkeeper entities:**  
-* Using Bukkit's new (experimental) non-persistent entities feature: This should make sure that shopkeeper entities don't get saved to the chunk data during world saves and by that also prevent any kind of duplicate entities issues (assuming it works correctly..).
-* As consequence all existing fallback code was removed:
+* Using Bukkit's new (experimental) non-persistent entities feature: This should make sure that shopkeeper entities don't get saved to the chunk data during world saves and by that also prevent any kind of duplicate entities issues (assuming it works correctly).
+* As consequence, all existing fallback code was removed:
   * No longer keeping track of the uuid of the last spawned entity (this should also reduce the need of periodic saves of shopkeeper data) and no longer searching for old entities before spawning an entity.
   * No longer handling silent / unnoticed chunk unloads and no longer handling entities that got pushed out of their chunk (it's assumed that the non-persistent entities get automatically removed).
   * No longer temporarily despawning all shopkeeper entities during world saves (less performance impact and less visual disturbance for players).
 However, in case something doesn't work as expected, this change has the potential to cause entity related issues (thus 'experimental').
 
 **Other changes:**  
-* Changed: Citizens shopkeepers are now identified by the citizens NPC's unique ids. Conversion should happen automatically once Citizens is detected to be running.
-* Fixed: No longer deleting the citizens NPC when a shopkeeper is deleted due to another shopkeeper using the same NPC.
-* Changed (internal): Removal of invalid citizens shopkeepers was moved and gets run now everytime Citizens gets enabled.
+* Changed: Citizens shopkeepers are now identified by the Citizens NPC's unique ids. Conversion should happen automatically once Citizens is detected to be running.
+* Fixed: No longer deleting the Citizens NPC when a shopkeeper is deleted due to another shopkeeper using the same NPC.
+* Changed (internal): Removal of invalid Citizens shopkeepers was moved and gets run now everytime Citizens gets enabled.
 * Fixed: There might have been some trading issue related to undamaged damageable items not being considered matching since 1.13.
 * Debugging/Changed: Durability is no longer displayed as part of the recipe items debugging information.
 
-**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.x.
+**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if you are just updating to MC 1.13.x.
 
 ## v2.3.4 Alpha (2018-08-18)
 ### Supported MC versions: 1.13
@@ -1614,27 +1614,27 @@ However, in case something doesn't work as expected, this change has the potenti
 * Fixed: Sign facing wasn't applied correctly since the update to 1.13.
 * Fixed: The sign physics protection broke somewhere in MC 1.13.
 
-**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.
+**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if you are just updating to MC 1.13.
 
 ## v2.3.3 Alpha (2018-08-01)
 ### Supported MC versions: 1.13
 * Fixed: Defaults values for missing config values not getting properly added.
 * Fixed: Not decolorizing default values which are not meant to be colorized.
 
-**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.
+**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if you are just updating to MC 1.13.
 
 ## v2.3.2 Alpha (2018-08-01) [broken]
 See 2.3.3 instead.
 
 ## v2.3.1 Alpha (2018-08-01)
 ### Supported MC versions: 1.13
-* This version relies on the very latest version of Craftbukkit / Spigot. Make sure to **update your server** to the latest Spigot build before running this version!
+* This version relies on the very latest version of CraftBukkit / Spigot. Make sure to **update your server** to the latest Spigot build before running this version!
 * Updated link to project website.
 * Fixed: Chicken shopkeepers should no longer lay eggs.
 * Fixed: Shopkeeper entities should no longer gain potion effects (for any reason).
 * Fixed: Player shop type migration broke in v2.3.0.
 
-**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if your are just updating to MC 1.13.
+**Make sure you have read the changelog and notices of v2.3.0 before installing this version!** Especially if you are just updating to MC 1.13.
 
 ## v2.3.0 Alpha (2018-07-18)
 ### Supported MC versions: 1.13
@@ -1642,36 +1642,36 @@ See 2.3.3 instead.
 **Some important notices to begin with:**
 * Support for versions below 1.13 has been dropped. It is only compatible with the latest builds of Spigot 1.13-pre7.
 * This update is **experimental**! Don't use it for live servers yet, until any upcoming issue have been fixed.
-* Before installing: **Backup your existing shopkeepers data!** This update will make irreversible changes and might not even be able to import all of the previous data.
-* **Updating is only supported from version v2.2.1 and MC 1.12.2!** Updating from older minecraft or shopkeepers versions hasn't been tested and might not properly work, because some old migration code has been removed with this update as well. So if you are updating from an older version of shopkeepers OR minecraft, first update to MC 1.12.2 and Shopkeepers v2.2.1.
+* Before installing: **Back up your existing shopkeeper data!** This update will make irreversible changes and might not even be able to import all the previous data.
+* **Updating is only supported from version v2.2.1 and MC 1.12.2!** Updating from older Minecraft or Shopkeepers versions hasn't been tested and might not properly work, because some old migration code has been removed with this update as well. So if you are updating from an older version of Shopkeepers OR Minecraft, first update to MC 1.12.2 and Shopkeepers v2.2.1.
 
 **Migration procedure:**  
-Item data values have been removed and various material (item/block) names have changed to be more in-line with vanilla minecraft names. So this update require a migration of existing configs and shopkeepers data.
-* If you use any item ids inside your config (if your config is very old): Those are no longer supported at all and you will have to manually replace them with the corresponding material names prior to running this update.
-* Config migration: When being run for the first time (if there is no 'config-version' present in the existing config), this update attempts to convert previous materials and data values, and the shop-creation-item from the config. However, there is no guarantee for this to work for all materials. It will log every migration it performs and might fallback to using default materials. So check the log and the resulting config and make sure everything went fine.
+Item data values have been removed and various material (item/block) names have changed to be more in-line with vanilla Minecraft names. So this update requires a migration of existing configs and shopkeeper data.
+* If you use any item ids inside your config (if your config is very old): Those are no longer supported at all, and you will have to manually replace them with the corresponding material names prior to running this update.
+* Config migration: When being run for the first time (if there is no 'config-version' present in the existing config), this update attempts to convert previous materials and data values, and the shop-creation-item from the config. However, there is no guarantee for this to work for all materials. It will log every migration it performs and might fall back to using default materials. So check the log and the resulting config and make sure everything went fine.
 * Shopkeeper data migration: Shopkeeper trades will get converted by Bukkit/Spigot itself. So it's up to them to make sure that this works correctly.
-* The plugin will trigger a save of all shopkeepers data, so that any legacy materials that got converted by Bukkit during loading of the shopkeepers will also end up being saved with their updated materials to the save data. Any shopkeepers that cannot be loaded for some reason will skip this procedure however. So make sure that all your existing shopkeepers load fine prior to installing the update, or you might have to update the data of those shopkeepers manually in the future.
-* If some materials cannot be converted, the result might be some kind of fallback: Empty spawn eggs for example will be converted to pig spawn eggs by Bukkit. There is no existing documentation available so far regarding which fallbacks there exist.
+* The plugin will trigger a save of all shopkeeper data, so that any legacy materials that got converted by Bukkit during loading of the shopkeepers will also end up being saved with their updated materials to the save data. However, any shopkeepers that cannot be loaded for some reason will skip this procedure. So make sure that all your existing shopkeepers load fine prior to installing the update, or you might have to update the data of those shopkeepers manually in the future.
+* If some materials cannot be converted, the result might be some kind of fallback: Empty spawn eggs for example will be converted to pig spawn eggs by Bukkit. There is no existing documentation available so far regarding which fallbacks exist.
 
 **Updating is only supported from version v2.2.1 and MC 1.12.2:**
 * Removed support for loading very old (MC 1.8) serialized item attributes.
-* Removed MC 1.10 villager profession id migrations. 
+* Removed MC 1.10 villager profession id migrations.
 * Removed MC 1.11 entity type migrations.
 * Removed support for importing very old shopkeeper trades (changed somewhere in 2015).
 
 **Other changes related to the update:**
-* Removed skip-custom-head-saving setting: Previously this was meant to workaround some issue with saving custom head items (head items with custom texture and no player name) causing corrupted save data. The data corruption / crashing should be fixed by Bukkit by now (by completely dropping 'support' for those custom head items though).
+* Removed the `skip-custom-head-saving` setting: Previously, this was meant to work around some issue with saving custom head items (head items with custom texture and no player name) causing corrupted save data. The data corruption / crashing should be fixed by Bukkit by now (by completely dropping 'support' for those custom head items though).
 * Added: All 1.13 mobs have been added to the default config. There is no support for them beyond that yet (no support to switch to baby variants, etc.).
 * Improvement: The chest and sign protection takes block explosions into account.
 * Internal: Reduced the amount of version specific code, since for many things there are Bukkit alternatives available by now.
-* Internal: The save data now contains a 'data-version'. This can be used to determine required migrations (not used for that currently), or force a save of all loaded shopkeepers data.
+* Internal: The save data now contains a 'data-version'. This can be used to determine required migrations (not used for that currently), or force a save of all loaded shopkeeper data.
 
 **Other changes:**
 * Internal: Sheep colors were previous saved by using the old wool data values. They are now converted and saved by their color names.
 * Improvement: Logging a message when importing old book offers (changed during late 1.12.2) and old sheep colors (changed with this update).
 * Improvement: Added a warning message when not able to load a cat type or sheep color and falling back to the default in that case.
 * Improvement: When testing if a player can access a chest, it now clears the off hand as well during the check (making the check more accurate).
-* Improvement: When the plugin is reloaded and the config is missing values, it should now use the actual default values instead of the pre-reload values. (Fallback is still to use the previous values)
+* Improvement: When the plugin is reloaded and the config is missing values, it should now use the actual default values instead of the pre-reload values. (There is still a fallback of using the previous values)
 * Internal: There have been some formatting changes to the permissions section of the plugin.yml. This gets copied into the wiki now.
 * Internal: Using player ids instead of player names for temporary data at a few places now.
 * Internal: Minor changes to the internal maven project layout.
@@ -1683,7 +1683,7 @@ Item data values have been removed and various material (item/block) names have 
 * Changed: Using the normalized entity type name in the 'selected shop object type' messages.
 * Debugging: Added some storage debugging output to the 'check' command.
 
-If you are updating, please read through the changelogs of the previous few versions! They also contain updating hints (ex. regarding changed messages).
+If you are updating, please read through the changelogs of the previous few versions! They also contain updating hints (e.g. regarding changed messages).
 
 ## v2.2.0 Release (2018-06-29)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
@@ -1695,7 +1695,7 @@ If you are updating, please read through the changelogs of the previous few vers
   * Renamed ShopObject#getObjectType() to ShopObject#getType().
   * A few internal shop object ids have changes to be slightly more consistent.
 
-Since there have been no reported issues with the previous beta versions, I mark this version as 'release' to get a few more people to use this new version. If you are updating, please read through the changelogs of the previous beta versions! They also contain updating hints (ex. regarding changed messages). The easiest way to update your config and messages is to remove it and let the plugin regenerate it, and then re-apply you custom changes.
+Since there have been no reported issues with the previous beta versions, I mark this version as 'release' to get a few more people to use this new version. If you are updating, please read through the changelogs of the previous beta versions! They also contain updating hints (e.g. regarding changed messages). The easiest way to update your config and messages is to remove it and let the plugin regenerate it, and then re-apply you custom changes.
 
 ## v2.1.0 Beta (2018-06-18)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
@@ -1704,13 +1704,13 @@ Since there have been no reported issues with the previous beta versions, I mark
   * API: Renamed getShopkeeper-methods to ShopkeeperRegistry#getShopkeeperById and ShopkeeperRegistry#getShopkeeperByUniqueId
 * All shopkeeper data gets kept in memory now and during saves, only the data of dirty shopkeepers gets updated.
   * This should come with a large performance improvement if there are many shopkeepers loaded, but only few of them change between saves.
-  * Internal/API: Shopkeepers should automatically get marked as dirty, when some of their data gets changed.
+  * Internal/API: Shopkeepers are automatically marked as dirty when some of their data has changed.
   * When legacy shopkeeper or shop object data gets found and imported, the shopkeeper gets marked as dirty.
-  * Dirty shopkeeper data gets saved back to file right after plugin start (ex. any imported legacy data).
-  * Internal: Various changes to the way the sync saves get handled (ex. during plugin disable).
-  * Change: No longer shutting the plugin down if a shopkeeper cannot be loaded. The invalid shopkeeper data should get saved back to file again now, without any information getting lost.
-  * Change: No longer using default object type if a shopkeeper with invalid object type is loaded. Instead the shopkeeper gets skipped during loading.
-  * Change: No longer defaulting player shops of unknown type to 'normal'. Instead the shopkeeper gets skipped during loading.
+  * Dirty shopkeeper data gets saved back to file right after plugin start (e.g. any imported legacy data).
+  * Internal: Various changes to the way the sync saves get handled (e.g. during plugin disable).
+  * Change: We no longer shut down the plugin when a shopkeeper cannot be loaded. The invalid shopkeeper data should get saved back to file again now, without any information being lost.
+  * Change: We no longer use the default object type if a shopkeeper with invalid object type is loaded. Instead, the shopkeeper is skipped during loading.
+  * Change: We no longer default player shops of unknown type to 'normal'. Instead, the shopkeeper is skipped during loading.
 * Internal/API: Improvements to the life cycle handling of shopkeepers:
   * Internal/API: The naming and calling of methods and events should be clearer and more consistent now.
   * API: Shopkeepers get properly unloaded now (with removal events) during shutdown and reloads.
@@ -1749,9 +1749,9 @@ Since there have been no reported issues with the previous beta versions, I mark
 * API: Renamed 'saveReal()' to 'saveNow()'.
 * API: Added Shopkeeper#save() and Shopkeeper#saveDelayed() as shortcuts for marking a specific shopkeeper dirty and requesting a save of the ShopkeeperStorage.
 * API: Added saveImmediate() to request a sync (blocking) save.
-* Debugging: Added various debugging output related to citizens shopkeepers.
+* Debugging: Added various debugging output related to Citizens shopkeepers.
 * Debugging: Saving debug messages show the number of dirty and number of deleted shopkeepers that were saved now.
-* Internal: Saving aborts any delayed saving task now (less unneeded saves).
+* Internal: Saving aborts any delayed saving task now (fewer unneeded saves).
 * Various internal project restructuring:
   * This should also make it easier for other plugins to depend on Shopkeepers or ShopkeepersAPI.
   * Various classes were moved around again: If your plugin depends on Shopkeepers' API, you may have to update.
@@ -1762,25 +1762,25 @@ Due to the various message related changes, you will have to update your message
 ## v2.0 Beta (2018-06-05)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
 **Major change to Shopkeepers' mob behavior:**
-* Shopkeeper mobs by default use minecraft's NoAI flag now:
+* Shopkeeper mobs by default use Minecraft's NoAI flag now:
   * This disables various internal AI behavior that would otherwise still be active in the background (villagers for example would periodically search for nearby villages and even cause chunk loads by that).
   * This makes shop entities unpushable (at least on certain MC versions, see below).
 * However:
-  * In order to keep the look-at-nearby-players behavior, the plugin now manually triggers the minecraft logic responsible for that.
-  * In order for the entities to still be affected by gravity, the plugin now manually periodically checks for block collisions below mobs and then teleports them downwards. This doesn't look as smooth as minecraft's gravity motion, but it should suffice (especially since the shopkeeper mobs are usually not falling far from their initial spawn position anyways).
+  * In order to keep the look-at-nearby-players behavior, the plugin now manually triggers the Minecraft logic responsible for that.
+  * In order for the entities to still be affected by gravity, the plugin now manually periodically checks for block collisions below mobs and then teleports them downwards. This doesn't look as smooth as Minecraft's gravity motion, but it should suffice (especially since the shopkeeper mobs are usually not falling far from their initial spawn position anyways).
   
 **Impact on performance:**
 * Shopkeepers only runs the AI and the gravity for mobs that are in range of players (AI: 1 chunk around players, gravity: 4 chunks around players by default).
 * You can experiment with the gravity chunk range by tuning the config setting 'gravity-chunk-range'. Setting it lower than your server's entity tracking range might however result in players being able to see mobs floating above the ground until they get closer.
 * Internal: The active AI and gravity chunks are currently determined only once every 20 ticks, and falling conditions of mobs are checked only once every 10 ticks (with a random initial offset to distribute the falling checks over all ticks).
 * Internal: The shopkeeper mobs get their internal 'onGround' flag set, so that the mobs are properly recognized by Spigot's entity activation range and not getting ticked when far away (see SPIGOT-3947).
-  * However, during our simulated 'falling' the flag gets disabled and enabled again at the end of the fall in order to workaround some visual glitch that might otherwise affect players near the entity tracking range (see MC-130725 and SPIGOT-3948).
+  * However, during our simulated 'falling' the flag gets disabled and enabled again at the end of the fall in order to work around some visual glitch that might otherwise affect players near the entity tracking range (see MC-130725 and SPIGOT-3948).
 * Please note: Since at least some AI stuff is now run or triggered by the Shopkeepers plugin, your timings reports will show that Shopkeepers is using quite a bit more of your server's ticking time now. Don't be irritated by that though: I tried to optimize this quite a bit, so hopefully if you compare the performance of your server overall before and after the update, it should in summary even be a small improvement, since lots of unneeded AI and movement logic is no longer getting run.
 
 **Other related changes:**
 * Shopkeeper mobs get the 'collidable' flag set on MC 1.9 and above now. Unfortunately this alone will not prevent them from getting pushed around, however it might be beneficial regardless, due them being fully ignored by minecarts, boats and projectiles now.
-* You can disable the new mob behavior with the setting 'use-legacy-mob-behavior' (default: false). AI and gravity will then be handled by minecraft directly again. By the way, please use this setting and compare the overall performance of your server with and without the new mob behavior and let me know of your findings!
-  * Side note: Spigot added a new setting 'tick-inactive-villagers' (default: true). If you have areas with lots of villagers, and you are using the old (legacy) mob behavior, consider disabling this setting. Otherwise those villagers might cause lots of unneeded additional chunk loads due to their search for nearby villages.
+* You can disable the new mob behavior with the setting 'use-legacy-mob-behavior' (default: false). AI and gravity will then be handled by Minecraft directly again. By the way, please use this setting and compare the overall performance of your server with and without the new mob behavior and let me know of your findings!
+  * Side note: Spigot added a new setting 'tick-inactive-villagers' (default: true). If you have areas with lots of villagers, and you are using the old (legacy) mob behavior, consider disabling this setting. Otherwise, those villagers might cause lots of unneeded additional chunk loads due to their search for nearby villages.
 * You are now able to fully disable gravity of shopkeeper mobs via the setting 'disable-gravity' (default: false).
   * This only works on MC 1.10 and later.
   * If you are using the legacy-mob-behavior: Some mob types will always get their AI disabled, and will therefore not be affected by gravity regardless of that setting.
@@ -1788,17 +1788,17 @@ Due to the various message related changes, you will have to update your message
   * With gravity disabled, mobs will be spawned exactly at the position they are meant to be. Note however, that if your shopkeeper's spawn location is already above the ground (for example if they were placed on top of grass or other collision-less blocks), those shopkeepers will end up floating above the ground.
 
 **Note on MC version differences:**
-* On MC 1.9 and MC 1.10 the NoAI tag does not disable minecraft's gravity and collision handling. Mobs will therefore by default be pushable on those versions, even with the new mob behavior.
-* However, if gravity gets disabled on MC 1.10 and above, we are also able to disable collisions/pushing of mobs (by using minecraft's internal noclip flag of entities).
+* On MC 1.9 and MC 1.10 the NoAI tag does not disable Minecraft's gravity and collision handling. Mobs will therefore by default be pushable on those versions, even with the new mob behavior.
+* However, if gravity gets disabled on MC 1.10 and above, we are also able to disable collisions/pushing of mobs (by using Minecraft's internal noclip flag of entities).
 
-**Various improvements when running on a not yet supported version of minecraft:**
-* Fixed: Freezing of mobs via a slowness potion effect didn't properly work. Instead mobs get their movement speed set to zero now via a custom attribute modifier.
+**Various improvements when running on a not yet supported version of Minecraft:**
+* Fixed: Freezing of mobs via a slowness potion effect didn't properly work. Instead, we now set the movement speed of mobs to zero via a custom attribute modifier.
 * Fixed: The fallback handler supports silencing of entities now.
 * Fixed: The fallback handler wasn't able to handle trading recipes with empty second item.
 * Fixed: The fallback handler was updated to now support setting the NoAI flag of mobs.
-* Note on the new mob behavior: The new AI and gravity handling is not supported when running on unsupported minecraft versions: All entity AI will be prevented (due to the NoAI flag), but no AI replacement will be active, causing the mobs to not be affected by gravity and not look at nearby players.
-  * As workaround you may enable the legacy mob behavior in this case then: Minecraft will handle AI and gravity again then. However, this might be unperformant due to lots of unneeded internal AI logic being active then.
-  * When using the legacy mob behavior and also disabling gravity, the mobs will additionally not be affected by gravity and they can no longer be pushed around by players.
+* Note on the new mob behavior: The new AI and gravity handling is not supported when running on unsupported Minecraft versions: All entity AI will be prevented (due to the NoAI flag), but no AI replacement will be active, causing the mobs to not be affected by gravity and not look at nearby players.
+  * As a workaround, you may enable the legacy mob behavior in this case then: Minecraft will handle AI and gravity again then. However, this might be unperformant due to lots of unneeded internal AI logic being active then.
+  * When using the legacy mob behavior and also disabling gravity, the mobs will additionally not be affected by gravity, and they can no longer be pushed around by players.
 
 **Other changes:**
 * Changed: The default help page header message now includes the plugin's version. If you are updating, you will have to manually update the message or let it regenerate.
@@ -1807,12 +1807,12 @@ Due to the various message related changes, you will have to update your message
 * Added blaze and silverfish to the by default enabled mob types. They seem to work fine with NoAI.
 * Minor reordering of the default shop types: 'Buying' is placed between 'normal' and 'trading' now.
 * Added bStats metrics: This reports anonymous usage statistics to bstats.org.
-  * Besides the general server and plugin information, this also collects Shopkeepers-specific information about: Usage of supported third-party plugins, used Vault economy, usage of various features, total shopkeeper count and the number of worlds containing shopkeepers.
+  * In addition to the general server and plugin information, this also collects Shopkeepers-specific information about: Usage of supported third-party plugins, used Vault economy, usage of various features, total shopkeeper count and the number of worlds containing shopkeepers.
   * All collected information can be publicly viewed here: https://bstats.org/plugin/bukkit/Shopkeepers/
   * You can disable this globally for all plugins on your server by editing 'plugins/bStats/config.yml'. Or you can alternatively also disable this for Shopkeepers only via the setting 'enable-metrics'.
-  * Consider keeping this enabled: Having this information available allows me to determine when it is safe to drop support for older minecraft versions, and on which features I should focus development and optimization efforts.
+  * Consider keeping this enabled: Having this information available allows me to determine when it is safe to drop support for older Minecraft versions, and on which features I should focus development and optimization efforts.
 * Documentation: The full changelog of the plugin can now also be found in the repository: https://github.com/Shopkeepers/Shopkeepers/blob/master/CHANGELOG.md
-* Debugging: Improved the output of debugging command '/shopkeepers check': It prints information about loaded chunks, and it lists various AI and gravity related timing statistics now. With the arguments 'chunks' and 'active' you can let it print additional information. Some information, that may not fit into the player's chat, may only get printed if the command is run from the console. 
+* Debugging: Improved the output of debugging command '/shopkeepers check': It prints information about loaded chunks, and it lists various AI and gravity related timing statistics now. With the arguments 'chunks' and 'active' you can let it print additional information. Some information, that may not fit into the player's chat, may only get printed if the command is run from the console.
 * Debugging: Added world name to chunk load and unload debug messages.
 * Fixed/Internal: The license file gets properly included inside the plugin jar now.
 * Internal: Added a few plugins as soft dependencies (Vault, WorldGuard, Towny, Gringotts). They will now get reliably loaded before Shopkeepers.
@@ -1821,12 +1821,12 @@ Due to the various message related changes, you will have to update your message
 * All functions related to the public API of the plugin have been moved into a separate package, and are mostly behind interfaces now. This will break every plugin currently depending on Shopkeepers, sorry! However, this should make it far easier to differentiate between the public API and the internal API and implementation. This is only the first step towards providing a more stable and therefore more useful public API in the future. The functionality of the API hasn't changed much yet, and things will still keep changing quite a lot, until I have refined all the currently existing functions.
 * Various classes were split into abstract base classes (internal API) and interfaces (public API).
 * Everything related to shop type and shop object type was moved into the corresponding packages.
-* Renamed 'UIManager' to 'UIRegistry' and added an (read-only) interface for it to the API. UIHandler is no longer exposed in the API for now.
+* Renamed 'UIManager' to 'UIRegistry' and added a (read-only) interface for it to the API. UIHandler is no longer exposed in the API for now.
 * Added interfaces for accessing the default shop types, shop object types and UI types.
 * Various functionality was moved outside the plugin's main class into separate classes: ShopkeeperStorage, ShopkeeperRegistry.
 * ShopCreationData construction is now hidden behind a factory method.
 * Renamed a few primary classes: ShopkeepersPlugin is an interface now, ShopkeepersAPI provides static access to the methods of ShopkeepersPlugin, the actual main plugin class is called SKShopkeepersPlugin now.
-* Some restructuring and cleanup related to the internal project structure an how the plugin gets built. The API part gets built separately and can be depended on separately now from other projects.
+* Some restructuring and cleanup related to the internal project structure and how the plugin gets built. The API part gets built separately and can be depended on separately now from other projects.
 
 **Other API related changes:**
 * CreatePlayerShopkeeperEvent has changed a bit. It also no longer supports changing the shop type.
@@ -1847,39 +1847,39 @@ Due to the various message related changes, you will have to update your message
 
 Shopkeepers is now implementing the inventory actions that might trigger trades itself.
 
-Previously, trading with player shopkeepers only allowed simple left clicks of the result slot. We predicted the trading outcome (rather simple when only allowing left clicking..) and then let minecraft handle the click like normal. Any other inventory actions (ex. shift-clicks) were prevented, because so far we weren't able to predict the outcome of those.  
-I finally took the time to dive into minecraft's and craftbukkit's internals to figure out, how it processes the various clicking types and resulting inventory actions, how those can trigger trades, and how minecraft processes those trades.
+Previously, trading with player shopkeepers only allowed simple left-clicks of the result slot. We predicted the trading outcome (rather simple when only allowing left-clicking) and then let Minecraft handle the click like normal. Any other inventory actions (e.g. shift-clicks) were prevented, because so far, we weren't able to predict the outcome of those.  
+I finally took the time to dive into Minecraft's and CraftBukkit's internals to figure out how it processes the various clicking types and resulting inventory actions, how those can trigger trades, and how Minecraft processes those trades.
 
 Supporting more advanced inventory actions for trading requires at minimum being able to reliably predict the outcome of those inventory actions, and by that already requires re-implementing of large parts of the vanilla logic (which is one of the reasons why this wasn't done so far). The step to also apply those predicted inventory changes ourselves then isn't that much of an additional effort on top, but has a few advantages:  
-For one, we can be quite sure that the predicted outcome of a trade actually matches what gets applied in the end. This should reduce the risk of inconsistencies between minecraft's behaviour and our predictions resulting in bugs (also with future minecraft updates in mind).  
-Secondly, when relying on minecraft's implementation we are only able to allow or cancel the inventory action as a whole. The shift-clicking inventory action however is able to trigger multiple successive trades (possibly even using different trading recipes). By implementing this ourselves, we are able to apply as many trades as are possible with regards to available stock and chest capacity.
+For one, we can be quite sure that the predicted outcome of a trade actually matches what gets applied in the end. This should reduce the risk of inconsistencies between Minecraft's behaviour and our predictions resulting in bugs (also with future Minecraft updates in mind).  
+Secondly, when relying on Minecraft's implementation we are only able to allow or cancel the inventory action as a whole. The shift-clicking inventory action however is able to trigger multiple successive trades (possibly even using different trading recipes). By implementing this ourselves, we are able to apply as many trades as possible in terms of available stock and chest capacity.
 
 Implementing the trading ourselves has a few advantages, but also comes with caveats:
 
 **Caveats:** 
 * Increased risk for bugs which we need to fix ourselves. Increased maintenance and testing effort.
 * Increased possibility for inconsistencies between vanilla inventory/trading behaviour and our own implementation.
-* Minecraft performs some map initialization when certain map items are created by crafting or via trades: This seems to be responsible for updating the scaling (after crafting a larger map) and enabling tracking (this doesn't seem to be used anywhere inside minecraft though). Since this is only the case if the map item has some special internal nbt data (which shouldn't be obtainable in vanilla minecraft), we currently simply ignore this inside Shopkeepers.
+* Minecraft performs some map initialization when certain map items are created by crafting or via trades: This seems to be responsible for updating the scaling (after crafting a larger map) and enabling tracking (this doesn't seem to be used anywhere inside Minecraft though). Since this is only the case if the map item has some special internal nbt data (which shouldn't be obtainable in vanilla Minecraft), we currently simply ignore this inside Shopkeepers.
 
 **Neutral:**  
 * The usage count of the used trading recipes doesn't get increased anymore. But since these are only temporarily existing and aren't used for anything so far anyways, this shouldn't be an issue.
 * The player's item crafting statistic doesn't get increased anymore for items received via shopkeeper trades.
 * The player's traded-with-villager statistic doesn't get increased anymore for shopkeeper trades.
 
-I could manually replicate some of these, but since these are custom trades anyways I don't see the need for it right now. But if there is a justified interest in this, let me know and I might add a config option for it.
+I could manually replicate some of these, but since these are custom trades anyways I don't see the need for it right now. But if there is a justified interest in this, let me know, and I might add a config option for it.
 
 **Advantages:**  
 * Support for more advanced inventory actions when trading with shopkeepers:
   * Currently supported are: Shift-clicking, and moving traded items to a hotbar slot. (Fixes #437)
   * Not (yet) supported are:
-    * Dropping the traded item: Exactly reproducing the vanilla behaviour for dropping the traded item is actually rather tricky / impossible with pure bukkit API so far. 
+    * Dropping the traded item: Exactly reproducing the vanilla behaviour for dropping the traded item is actually rather tricky / impossible with pure Bukkit API so far.
     * Trading by double-clicking an item in the player inventory: The behaviour of this inventory action is rather arbitrary in vanilla already (trades zero, one, or two times depending on the other items in the inventory), and it is currently affected by a bug (https://bugs.mojang.com/browse/MC-129515)
-* Simpler API: A single ShopkeeperTradeEvent is called for each trade (might be multiple per click depending on the used inventory action, ex. shift-clicking). The ShopkeeperTradeCompletedEvent was removed. (API breakage, sorry.)
+* Simpler API: A single ShopkeeperTradeEvent is called for each trade (might be multiple per click depending on the used inventory action, e.g. shift-clicking). The ShopkeeperTradeCompletedEvent was removed. (API breakage, sorry.)
 * Fixed: The logging of purchases should now actually be accurate for shift-clicks. It logs each trade individually. (Fixes #360)
 * Eventually this might allow for more options for customization of the trading behaviour in the future.
 
 **Potential issue (that has existed before already):**  
-* If minecraft adds new inventory actions, those are initially not supported by shopkeepers: If those inventory actions involve clicking on the result slot, they will simply be prevented. If they however allow players to trigger trades by clicking on items inside the player's inventory (similar to the existing collect-to-cursor action by double-clicking), they might introduce bugs which players might be able to exploit.
+* If Minecraft adds new inventory actions, those are initially not supported by shopkeepers: If those inventory actions involve clicking on the result slot, they will simply be prevented. If they however allow players to trigger trades by clicking on items inside the player's inventory (similar to the existing collect-to-cursor action by double-clicking), they might introduce bugs which players might be able to exploit.
 
 **Other changes in this update:**  
 * Fix: Player inventory changed even though hiring was not successful. (Fixes #493)
@@ -1901,7 +1901,7 @@ I could manually replicate some of these, but since these are custom trades anyw
 * API/Internal: Changed how the AdminShopkeeper is handling its offers/recipes. The saving and loading of offers was slightly refactored, but shouldn't impact the current saving format.
 * Internal/Fix: Minor refactoring during updating to the new trade handling. This might even fix a few small potential bugs/inconsistencies related to handling of high-currency items.
 * Internal/Fix: All general inventory operations now work on content arrays (inventory snapshots) instead of the inventories directly. This might even fix a few severe issues, which went unnoticed so far.
-* Internal: Removed 'forHire' boolean value from shopkeepers. Instead a shopkeeper's hiring state is now solely determined by whether or not a non-empty hire cost item has been specified.
+* Internal: Removed 'forHire' boolean value from shopkeepers. Instead, a shopkeeper's hiring state is now solely determined by whether a non-empty hire cost item has been specified.
 * Internal: Added Settings#isHighCurrencyEnabled() and using that now everywhere.
 * Internal: Settings#isHighCurrencyItem() now returns false if high currency isn't enabled.
 * Internal: Added a debug message for every trade processed by Shopkeepers.
@@ -1920,25 +1920,25 @@ Thanks.
 ## v1.85 Release (2018-01-10)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
 * Added: Debug command (debugCreateShops <count>) to spawn massive amounts of empty admin shopkeepers for testing purposes.
-* Internal: Replaced Scanner with InputStreamReader and letting bukkit load the save file contents using that reader.
-* Internal: Fully wrapped loading procedure into try-catch-block to catch any types of unexpected issues there, and then disable the plugin. (hopefully helps figuring out the issue behind #485)
+* Internal: Replaced Scanner with InputStreamReader and letting Bukkit load the save file contents using that reader.
+* Internal: Fully wrapped loading procedure into try-catch-block to catch any types of unexpected issues there, and then disable the plugin. (This hopefully helps to figure out the issue behind #485)
 * Minor improvement: Logging to console how many shops are about to get loaded.
 
 ## v1.84 Release (2018-01-09)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
-* Improvements to saving and loading: Saving first writes to a temporary save file before replacing the old save file. This update improves on that by considering this temporary save file during saving and loading, if no actual save file is found. Previously any existing temporary save file would simple have been ignored and removed during saving and loading, possibly deleting the last valid backup of shop data, if a previous saving attempt already deleted the save.yml file but wasn't then able to rename the temporary save file for some reason.
+* Improvements to saving and loading: Saving first writes to a temporary save file before replacing the old save file. This update improves on that by considering this temporary save file during saving and loading, if no actual save file is found. Previously, any existing temporary save file would simply have been ignored and removed during saving and loading, possibly deleting the last valid backup of shop data, if a previous saving attempt already deleted the save.yml file but wasn't then able to rename the temporary save file for some reason.
 * Added: An error message being printed to online admins (throttled to at most 1 message every 4 minutes) when saving failed. So that these severe issues do hopefully get noticed and looked into quicker when they occur.
 * Minor change: Warning instead of debug message in case a shopkeeper cannot be spawned after creation or loading.
 * Improved: Catching any type of issue during shopkeeper loading, and logging them with severe instead of warning priority.
 * Minor changes to multi-line warning log messages.
 * Various improvements related to async tasks, saving, reloads, disabling:
-* Improved: Catching a rare race-condition when trying to register a task with the bukkit scheduler from within an async task while the plugin is currently getting disabled.
+* Improved: Catching a rare race-condition when trying to register a task with the Bukkit scheduler from within an async task while the plugin is currently getting disabled.
 * Improved: Waiting (up to 10 seconds) for all currently running async tasks to finish, before continuing to disable.
-* Improved: Using synchronization to make sure that only one thread at once attempts to write the save files. Previously this might have caused issues, if an async and a sync save were going on at the same time (due to the plugin being disabled).
+* Improved: Using synchronization to make sure that only one thread at once attempts to write the save files. Previously, this might have caused issues if an async and a sync save were going on at the same time (due to the plugin being disabled).
 * API / Internal: Added a method for requesting a delayed save. Refactored (replaced) the chunkLoadSave task to use this instead now.
 * Improved: If saving fails, it will now attempt another save after a short delay.
 * Improved: The saving debug output is now slightly more detailed.
-* Fixed: Invalid saving debug timings were logged in case a sync save gets triggered (ex. during plugin disable) while an async save is already going on.
+* Fixed: Invalid saving debug timings were logged in case a sync save gets triggered (e.g. during plugin disable) while an async save is already going on.
 * Improved: A bunch of variables now get properly reset on reloads. Not sure though if this might have been an issue previously.
 * Improved / Fixed hiring behavior:
 * Changed: The hiring window can now always be open, regardless of if the player has the permission to hire this type of shopkeeper.
@@ -1952,7 +1952,7 @@ Thanks.
 * Internal: Renamed ChunkData -> ChunkCoords and removed an unneeded API function (for which an alternative is available).
 * Internal: Some refactoring related to utility functions.
 * Fixed: During chunk unloads the plugin now checks and removes entities belonging to living entity shopkeepers located in other chunks. This fixes an entity duplication issue (#488).
-* Improved: The findOldEntity routine was slightly improved to also find entities in neighboring (and loaded) chunks. (This is only useful for situations in which chunk-unload events are not properly called, or world-save events were not properly called and the server crashes. However, it only improves the handling of those cases, it doesn't fully solve them..)
+* Improved: The findOldEntity routine was slightly improved to also find entities in neighboring (and loaded) chunks. (This is only useful for situations in which chunk-unload events are not properly called, or world-save events were not properly called and the server crashes. However, it only improves the handling of those cases, it doesn't fully solve them.)
 
 ## v1.83 Release (2017-10-10)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
@@ -1963,10 +1963,10 @@ Thanks.
 * Changed: Book shopkeepers now store their trades in a section called 'offers' (previous 'costs'), to be consistent with all the other shop types.
 * Minor internal refactoring related to shop offers handling for all shop types.
 * Fixed: Default config missing by-default enabled mob types for MC 1.12 (illusioner and parrot).
-* Fixed: Ejecting shopkeeper mobs right after spawning. Some entities have a random chance to mount nearby entities when spawned, ex. baby zombies on chickens.
+* Fixed: Ejecting shopkeeper mobs right after spawning. Some entities have a random chance to mount nearby entities when spawned, e.g. baby zombies on chickens.
 * Minor internal refactor related to applying mob sub-types for various living entity shops.
-* Added: Support for baby pigman shops. Previously pigman shops would randomly spawn as baby variant, now this can be explicitly specified in the editor menu of the shop.
-* Fixed / Re-Added: Ability to specify the required spawn egg type for the shop creation item in the config (default: villager). Can be set empty to accept any spawn egg type. Can be set to something invalid (ex. white space ' ') to only accept the spawn egg without any entity type assigned. This only works for the latest versions of bukkit 1.11 upwards! On MC 1.9 and 1.10 any spawn egg type will be accepted. On MC 1.8 the spawn egg type is specified via the data value.
+* Added: Support for baby pigman shops. Previously, pigman shops would randomly spawn as baby variant. Now, this can be explicitly specified in the editor menu of the shop.
+* Fixed / Re-Added: Ability to specify the required spawn egg type for the shop creation item in the config (default: villager). Can be set empty to accept any spawn egg type. Can be set to something invalid (e.g. white space ' ') to only accept the spawn egg without any entity type assigned. This only works for the latest versions of Bukkit 1.11 upwards! On MC 1.9 and 1.10 any spawn egg type will be accepted. On MC 1.8 the spawn egg type is specified via the data value.
 
 ## v1.82 Release (2017-05-17)
 ### Supported MC versions: 1.12, 1.11, 1.10, 1.9, 1.8
@@ -1992,7 +1992,7 @@ Thanks.
 
 **Internal refactoring and cleanup:**  
 * Removed separate handling of villager AI. Their AI is now replaced in the same way as for any other living entity shop.
-* Major change: Using new bukkit api for opening virtual merchant inventories and getting the used trading recipe. This is only available in the very latest version of bukkit for MC 1.11, so **if you are already using Spigot 1.11, you need to update to the most recent version**.
+* Major change: Using new Bukkit API for opening virtual merchant inventories and getting the used trading recipe. This is only available in the very latest version of Bukkit for MC 1.11, so **if you are already using Spigot 1.11, you need to update to the most recent version**.
 * Changes/Fixes: All empty itemstacks related to trading recipes should now be replaced with null everywhere (similar to the pre-1.11 behavior). This also means that trading recipes with empty second item should no longer save this as an item of type AIR, but instead omit this entry all together.
 * Changes: More consistent handling of empty itemstacks everywhere in the code.
 * Minor code cleanup at various places.
@@ -2001,9 +2001,9 @@ Thanks.
 ### Supported MC versions: 1.11, 1.10, 1.9, 1.8
 **Update for MC 1.11:** 
 * Minecraft represents the different variants of skeletons (stray, wither_skeleton) and zombies (zombie_villager) now in the form of different entity types. Shopkeepers using these variants get automatically converted to use the new mob types instead.  
-  This however means that you cannot switch back to previous minecraft versions without loosing those converted shopkeepers.  
+  This however means that you cannot switch back to previous Minecraft versions without loosing those converted shopkeepers.  
   And you will have to give all your players, which were previously able to create zombie or skeleton shopkeepers the required permission nodes for stray, wither_skeleton and zombie_villager, otherwise they won't be able to access/edit their shops after this conversion.  
-  Also, if you are running on a minecraft version below MC 1.11, you can no longer cycle through the different zombie variants and skeleton variants and existing shopkeepers using those will fallback to normal zombies and skeletons.
+  Also, if you are running on a Minecraft version below MC 1.11, you can no longer cycle through the different zombie variants and skeleton variants and existing shopkeepers using those will fall back to normal zombies and skeletons.
 * Added the new mobs from MC 1.11 (evoker, vex, vindicator). Llamas, sadly, act weirdly currently when clicked (same goes for all horse variants) and are therefore not included in the default list of enabled mob types. In case you are updating, you will have to let the plugin recreate this config entry (by removing the entry or the whole config) or manually add those new mobs in order to enable them.
 * Added: Support for the green 'Nitwit' villager variant added in MC 1.11.
 * Some minor changes related to handling empty inventory slots and itemstacks, especially when creating the trading recipes, were required.
@@ -2012,20 +2012,20 @@ Thanks.
 * Added a bunch of old mobs, which seem to mostly work fine, to the by default enabled living shop types. Also reordered this list a bit (roughly: friendly mobs first, hostile and new mobs at the end).
 * Added: Instead of cycling between normal and villager variant, zombie shopkeepers can now change to baby variant by clicking the spawn egg in the editor window.
 * Change: No longer disabling other, normal villagers by default.
-* Fix: Ignoring double left clicks in editor window when adjusting item amounts. Previously this would cause 2 fast left clicks to be counted as 3 left clicks.
+* Fix: Ignoring double left-clicks in editor window when adjusting item amounts. Previously, this would cause two fast left-clicks to be counted as three left-clicks.
 * Fix: Also ignoring double clicks when cycle shopkeeper object variants in editor window.
-* Fixed: The 'compatibility mode' fallback, which is run if no supported minecraft version is found, wasn't able to open the trading window for players.
+* Fixed: The 'compatibility mode' fallback, which is run if no supported Minecraft version is found, wasn't able to open the trading window for players.
 
 **Known Caveats:**  
-* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this..
-* Server crashes and improper shutdowns might cause living non-citizens shopkeeper entities to duplicate sometimes.
+* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this.
+* Server crashes and improper shutdowns might cause living non-Citizens shopkeeper entities to duplicate sometimes.
 * The 'always-show-nameplates' setting is no longer working on MC 1.8.
-* Compatibility with older bukkit versions is untested. If you encounter any problems let me know and I will look into it.
+* Compatibility with older Bukkit versions is untested. If you encounter any problems, let me know, and I will look into it.
 * A bunch of entity types are only meant for experimental usage. They might cause all kinds of issues if used. See changelog of v1.50.
-* In the latest MC 1.8.x versions default minecraft trading logic has slightly changed (and by that those of shopkeepers as well): if a trade requires an item with special data (like a custom name, etc.) minecraft is now only allowing this trade, if the offered item is perfectly matching, including all special item data and attributes.
-* MC 1.9 has changed how the different spawn eggs are differentiated internally. All spawn eggs now have the data value 0 and there is no API in bukkit yet which would allow me to check which type of spawn egg a player is holding. In order to get the shop creation via item working for now, you will have to either change the data value of the shop creation item to 0 (which will however let ALL types of spawn eggs act like the creation item), or you change the creation item type all together.
-* Shopkeepers using skeleton or zombie variants after updating to MC 1.11 or above can not be loaded again (will be lost) when switching back to a previous minecraft version.
-* If you are running on a minecraft version below MC 1.11, you can no longer cycle through the different zombie variants and skeleton variants. Existing shopkeepers using those will fallback to normal zombies and skeletons.
+* In the latest MC 1.8.x versions default Minecraft trading logic has slightly changed (and by that those of shopkeepers as well): If a trade requires an item with special data (like a custom name, etc.) Minecraft is now only allowing this trade if the offered item is perfectly matching, including all special item data and attributes.
+* MC 1.9 has changed how the different spawn eggs are differentiated internally. All spawn eggs now have the data value 0 and there is no API in Bukkit yet which would allow me to check which type of spawn egg a player is holding. In order to get the shop creation via item working for now, you will have to either change the data value of the shop creation item to 0 (which will however let ALL types of spawn eggs act like the creation item), or you change the creation item type all together.
+* Shopkeepers using skeleton or zombie variants after updating to MC 1.11 or above can not be loaded again (will be lost) when switching back to a previous Minecraft version.
+* If you are running on a Minecraft version below MC 1.11, you can no longer cycle through the different zombie variants and skeleton variants. Existing shopkeepers using those will fall back to normal zombies and skeletons.
 
 ## v1.78 Release (2016-10-24)
 ### Supported MC versions: 1.10, 1.9, 1.8
@@ -2039,18 +2039,18 @@ Thanks.
 * Changed the default naming item to name tag. (Contributed by Intangir)
 * Changed the default zero currency items from slime balls to barrier items.
 * Reordered the settings in the default config slightly.
-* Changed: No longer removing monsters which are accidentally attacking a shopkeeper entity (ex. wither explosions).
+* Changed: No longer removing monsters which are accidentally attacking a shopkeeper entity (e.g. wither explosions).
 * Changed: When setting item amount with hotbar button, use the actual number key value instead of key value - 1.
 * Some small internal refactoring at various places. Among others, related to handling of updating item amount when clicking items in the editor view.
 
 ## v1.77 Release (2016-07-14)
 ### Supported MC versions: 1.10, 1.9, 1.8
 * Fix: If 'protect-chests' is disabled, it should no longer prevent breaking of shop chests. Opening of shop chests will still be prevented though.
-* Added 'use-strict-item-comparison' setting back in (default: false). It seems that even with the trading changes in MC 1.8 there are still some cases in which minecraft ignores certain item attributes.
-* Reimplemented chest protection: Now it considers all shopkeepers, even currently inactive ones. This might be of use in the edge case of player shopkeepers being in a different and somehow unloaded chunk than the corresponding chest. This should also fix the major issue that chest are temporarily unprotected after world saves due to the temporarily deactivation of shops. And this might bring slight performance improvements if you have lots of shopkeepers in loaded chunks.
+* Added 'use-strict-item-comparison' setting back in (default: false). It seems that even with the trading changes in MC 1.8 there are still some cases in which Minecraft ignores certain item attributes.
+* Reimplemented chest protection: It considers all shopkeepers now, even currently inactive ones. This might be of use in the edge case of player shopkeepers being in a different and somehow unloaded chunk than the corresponding chest. This should also fix the major issue that chest are temporary unprotected after world saves due to the temporarily deactivation of shops. And this might bring slight performance improvements if you have lots of shopkeepers in loaded chunks.
 * Changed: Only allowing chest placement near to protected chests, if the chest can also be broken again.
 * Changed: Chest protection in different situations should now be more consistent. Adjacent protected chests are now considered in all situations in which we check for chest protection.
-* Decreased refresh delay on world saves from 2 ticks to 1. 
+* Decreased refresh delay on world saves from 2 ticks to 1.
 
 If you notice any issues, especially with the changes regarding chest protection, let me know.
 
@@ -2062,17 +2062,17 @@ If you notice any issues, especially with the changes regarding chest protection
 ### Supported MC versions: 1.10, 1.9, 1.8
 **Backup your save file. If you run this version you cannot switch back to previous versions due to changes in the way things get stored in the save file.**  
 * Updated for MC 1.10.
-* Due to some villager profession changes in bukkit, data about villager professions gets converted to a new storage format (stored by name instead of id) (not backwards compatible!).
-* Using bukkit's new API for setting entities silent on MC 1.10.
+* Due to some villager profession changes in Bukkit, data about villager professions gets converted to a new storage format (stored by name instead of id) (not backwards compatible!).
+* Using Bukkit's new API for setting entities silent on MC 1.10.
 * Added POLAR_BEAR to default config.
-* Added support for the new Stray skeleton type (represented by MHF_Ghast player head currently.. which doesn't work perfectly, but better than nothing for now).
-* Minor changes to the compatibility mode, which didn't work for the past few minecraft updates. 
+* Added support for the new Stray skeleton type. It is represented by MHF_Ghast player head currently, which doesn't work perfectly, but is better than nothing for now.
+* Minor changes to the compatibility mode, which didn't work for the past few Minecraft updates.
 * Removed support for MC 1.7.10.
-* Removed 'use-strict-item-comparison' setting (minecraft is performing a strict item comparison already itself since MC 1.8).
+* Removed 'use-strict-item-comparison' setting (Minecraft is performing a strict item comparison already itself since MC 1.8).
 * Removed uuid conversion related code: PlayerShops are expected to have a valid owner uuid by now.
-* Slightly refactored handling of issues during shop creation and loading, so that shopkeepers with invalid data (ex. missing owner uuids) can now communicate to the loading procedure that the loading failed (which then prints a warning and continues). Shops which failed to load might get overwritten the next time shopkeepers saves it's data. 
+* Slightly refactored the handling of issues during shop creation and loading, so that shopkeepers with invalid data (e.g. missing owner uuids) can now communicate to the loading procedure that the loading failed (which then prints a warning and continues). Shops which failed to load might get overwritten the next time shopkeepers saves its data.
 * Fixed: Also replacing settradeperm to all lower-case in the wildcard permission.
-* Fixed: The location strings for shopkeepers in debug messages should now be correct. 
+* Fixed: The location strings for shopkeepers in debug messages should now be correct.
 
 If you run into any issues let me know.
 
@@ -2089,12 +2089,12 @@ If you run into any issues let me know.
 **This update contains a change, which might require you to update your permissions.**  
 * Changed the setTradePerm permissions to 'shopkeeper.settradeperm' (all lower-case), to match the other permissions and potentially cause less trouble with certain permissions plugins.
 * Fixed a typo in the default config: 'msg-trade-perm-removed' instead of 'term'.
-* Fixed an issue related to the shopkeeper citizens trait when either shopkeepers or citizens are not running: Unregistering shopkeeper citizens trait whenever shopkeepers or citizens get disabled. And added an additional check to ignore shopkeeper citizens trait attachments if shopkeepers isn't currently running (just in case).
-* Removed the restrictions of not being able to open shops while holding a villager egg in the hand by slightly changing the way the villager trading menu gets opened for past minecraft versions.
+* Fixed an issue related to the shopkeeper Citizens trait when either Shopkeepers or Citizens are not running: We now unregister the shopkeeper Citizens trait whenever Shopkeepers or Citizens get disabled. Also added an additional check to ignore shopkeeper Citizens trait attachments if Shopkeepers isn't currently running (just in case).
+* Removed the restrictions of not being able to open shops while holding a villager egg in the hand by slightly changing the way the villager trading menu gets opened for past Minecraft versions.
 * Removed the no longer used 'msg-cant-open-shop-with-spawn-egg' message.
 * Fix: The remote command should now work again.
 * Added: Preventing shopkeepers from entering vehicles.
-* Improved filtering out of faulty trading offers in the saved data.
+* Improved filtering of faulty trading offers in the saved data.
 * Fixed: The shop creation item, the hire item and the currency item get now automatically set to their defaults if they are invalidly set to AIR in the config. The (high) zero currency items should now even work in the player shop editors if being of type AIR.
 
 ## v1.71 Release (2016-04-07)
@@ -2104,16 +2104,16 @@ If you run into any issues let me know.
 * Replaced 'disable-living-shops' with 'enabled-living-shops'. You might have to update your config due to this, however it has the advantage that whenever new mob types, which are disabled by default, are added to shopkeepers in the future, they don't automatically get enabled on servers which already run shopkeepers (which already have an old config which doesn't list those new mob types as disabled yet).
 * Did some internal refactoring, mostly related to living shop types: Shopkeepers is now automatically 'supporting' all living entity types available for your server version for being used as shop entities. However, not all entity types will properly work: If you want to try out on your own risk if a living entity type works as shop entity, you will have to manually enable it in the config.
 * Added RABBIT to the by default enabled living shop entity types.
-* Slightly changed the default shopkeeper list entry message, to display the shopkeeper's session id instead of the list index. Also the colors where slightly changed to make it better readable.
+* Slightly changed the default shopkeeper list entry message, to display the shopkeeper's session id instead of the list index. Also, the colors where slightly changed to make it better readable.
 * Added some german translations for some command argument names to the included default german translation.
 * Added setTradePerm command: This allows setting of a custom permission for individual admin shopkeepers, which is then required for being allowed to trade with the affected shopkeeper. Also added a few new messages related to this.
-* Also added a new message which gets sent to players which don't have the regular trade-permission. By default the message text is the same as the message being sent if the player is missing the newly added custom trading permission, though those can be changed in the config independently.
+* Also added a new message which is sent to players that don't have the normal trade-permission. By default, the message text is the same as the message being sent if the player is missing the newly added custom trading permission, though those can be changed in the config independently.
 * The 'remote' command now also accepts a shop's unique id or session id (instead of the shop name).
 * The default 'unknown-shopkeeper'-message was changed to include the 'unknown id' fact.
-* No longer manually saving item attributes for servers running on MC 1.9 upwards. Since somewhere in late 1.8 bukkit started saving attribute data as part of their 'internal' data. Attribute loading is left in for now, in case someone updates from a bukkit version which didn't save attributes yet. This should also fix the issue of the new Slot attribute added in MC 1.9 being now properly saved.
-* Slightly changed the saving procedure which will hopefully make it less likely that all your save data gets lost if something goes wrong during saving: The data gets now first saved to a different, temporary file (in the shopkeepers plugin folder). Only if saving was successful, the old save file gets removed and replaced by the new one. Also added a bit more debugging information to the related messages.
+* No longer manually saving item attributes for servers running on MC 1.9 upwards. Since somewhere in late 1.8 Bukkit started saving attribute data as part of their 'internal' data. Attribute loading is left in for now, in case someone updates from a Bukkit version which didn't save attributes yet. This should also fix the issue of the new Slot attribute added in MC 1.9 being now properly saved.
+* Slightly changed the saving procedure which will hopefully make it less likely that all your save data gets lost if something goes wrong during saving: The data gets now first saved to a different, temporary file (in the Shopkeepers plugin folder). Only if saving was successful, the old save file gets removed and replaced by the new one. Also added a bit more debugging information to the related messages.
 * Added a possible workaround for the 'duplicating villagers' issue some people still seem to have sometimes:
-* My current guess on the problem is, that: The shopkeeper entities get saved to disk when the world gets saved. Shopkeepers removes a shop entity, respawns the entity (this replaces the old 'last-entity-uuid'). This does not necessarily have to happen at the same time or for all entities, but it does occur when shopkeepers is for ex. getting reloaded. Now if the server closes (ex. due to a crash) without another world save taking place, the old shop entity is still saved in the chunk data of the world, but we cannot identify it as shop entity on the next server start, because we remembered the entity-uuid of the last entity we spawned, which is not the same as the last entity which was saved to disk.
+* My current guess on the problem is, that: The shopkeeper entities get saved to disk when the world is saved. Shopkeepers removes a shop entity, respawns the entity (this replaces the old 'last-entity-uuid'). This does not necessarily have to happen at the same time or for all entities, but it does for example occur when the Shopkeepers plugin is getting reloaded. Now, if the server closes (e.g. due to a crash) without another world save taking place, the old shop entity is still saved in the chunk data of the world, but we cannot identify it as shop entity on the next server start, because we remembered the entity-uuid of the last entity we spawned, which is not the same as the last entity which was saved to disk.
 * This workaround: Whenever the world gets saved (at least whenever WorldSaveEvent gets triggered) all shopkeepers get temporarily unloaded (and by that removed from the world) and loaded (respawned) again shortly after the world-save. With this the shop entities will hopefully no longer get stored to the chunk data. You will notice a short flicker of shop entities, but trading etc. should keep working, even during world-saves. If you have debug-mode enabled in the config, you will get a rather large block of debugging output everytime all your worlds get saved.
 
 ## v1.70 Release (2016-03-08)
@@ -2123,28 +2123,28 @@ If you run into any issues let me know.
 ## v1.69 Release (2016-03-01)
 ### Supported MC versions: 1.9, 1.8, 1.7.10
 * Updated for MC 1.9.
-* Removed support for nearly all versions of MC 1.7. Only v1.7.10 is still supported. 
-* Added setting 'skip-custom-head-saving' (default: true), which allows turning of the skipping of custom player head items (player heads with custom texture property and no valid owner) during saving of shopkeeper trades. Note: Best you keep this enabled for now, because disabling this on a server which does not properly support saving of custom player head items, can cause all your saved shopkeepers to get wiped. On newer versions of spigot the wiping of saved shopkeepers might be fixed, however custom player head items are still not properly supported by spigot, so they will basically get saved like if they were normal player head items.
+* Removed support for nearly all versions of MC 1.7. Only v1.7.10 is still supported.
+* Added setting 'skip-custom-head-saving' (default: true), which allows turning of the skipping of custom player head items (player heads with custom texture property and no valid owner) during saving of shopkeeper trades. Note: Best you keep this enabled for now, because disabling this on a server which does not properly support saving of custom player head items, can cause all your saved shopkeepers to get wiped. On newer versions of Spigot, the wiping of saved shopkeepers might be fixed, however custom player head items are still not properly supported by Spigot, so they will basically get saved like if they were normal player head items.
 * Fixed: No longer considering normal player heads without any owner as 'custom' player heads
-* Added: Shopkeepers now get assigned a 'session id', which is much shorter than the unique id, but is only valid until the next server restart or the next time the shopkeepers get reloaded from the save file. Those ids are currently unused, but might get used in the future to let players (admins) specifiy a shopkeeper in commands via these shorter ids. 
+* Added: Shopkeepers now get assigned a 'session id', which is much shorter than the unique id, but is only valid until the next server restart or the next time the shopkeepers get reloaded from the save file. Those ids are currently unused, but might get used in the future to let players (admins) specifiy a shopkeeper in commands via these shorter ids.
 
 **Notice about an issue with MC 1.9:**  
-MC 1.9 has changed how the different spawn eggs are differentiated internally. All spawn eggs now have the data value 0 and there is no API in bukkit yet which would allow me to check which type of spawn egg a player is holding.  
+MC 1.9 has changed how the different spawn eggs are differentiated internally. All spawn eggs now have the data value 0 and there is no API in Bukkit yet which would allow me to check which type of spawn egg a player is holding.  
 In order to get the shop creation via item working for now, you will have to either change the data value of the shop creation item to 0 (which will however let ALL types of spawn eggs act like the creation item), or you change the creation item type all together.
 
 **Known caveats:**  
-* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this..
-* Server crashes and improper shutdowns might cause living non-citizens shopkeeper entities to duplicate sometimes.
+* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this.
+* Server crashes and improper shutdowns might cause living non-Citizens shopkeeper entities to duplicate sometimes.
 * The 'always-show-nameplates' setting is no longer working on MC 1.8.
-* Compatibility with older bukkit versions is untested. If you encounter any problems let me know and I will look into it.
+* Compatibility with older Bukkit versions is untested. If you encounter any problems, let me know, and I will look into it.
 * A bunch of entity types are only meant for experimental usage. They might cause all kinds of issues if used. See changelog of v1.50.
-* In the latest MC 1.8.x versions default minecraft trading logic has slightly changed (and by that those of shopkeepers as well): if a trade requires an item with special data (like a custom name, etc.) minecraft is now only allowing this trade, if the offered item is perfectly matching, including all special item data and attributes.
-* MC 1.9 has changed how the different spawn eggs are differentiated internally. All spawn eggs now have the data value 0 and there is no API in bukkit yet which would allow me to check which type of spawn egg a player is holding. In order to get the shop creation via item working for now, you will have to either change the data value of the shop creation item to 0 (which will however let ALL types of spawn eggs act like the creation item), or you change the creation item type all together.
+* In the latest MC 1.8.x versions default Minecraft trading logic has slightly changed (and by that those of shopkeepers as well): if a trade requires an item with special data (like a custom name, etc.) Minecraft is now only allowing this trade, if the offered item is perfectly matching, including all special item data and attributes.
+* MC 1.9 has changed how the different spawn eggs are differentiated internally. All spawn eggs now have the data value 0 and there is no API in Bukkit yet which would allow me to check which type of spawn egg a player is holding. In order to get the shop creation via item working for now, you will have to either change the data value of the shop creation item to 0 (which will however let ALL types of spawn eggs act like the creation item), or you change the creation item type all together.
 
 ## v1.68 Release (2015-12-21)
 ### Supported MC versions: 1.8, 1.7
-* Small change to the logging format: Now including the shopkeeper id and the amounts of currency 1 and currency 2.
-* Small improvement: Now spawning citizens npc's in the center of the block, similar to the other living entity shops.
+* Small change to the logging format: It now includes the shopkeeper id and the amounts of currency 1 and currency 2.
+* Small improvement: We now spawn Citizens NPCs in the center of the block, similar to the other living entity shops.
 
 ## v1.67 Release (2015-11-28)
 ### Supported MC versions: 1.8, 1.7
@@ -2152,7 +2152,7 @@ In order to get the shop creation via item working for now, you will have to eit
 
 ## v1.66 Release (2015-11-25)
 ### Supported MC versions: 1.8, 1.7
-* Fix: Added a temporary check to skip saving of trades which involve a custom head item, which would otherwise currently cause a wipe of the complete save file due to a bug in bukkit's/spigot's item serialization.
+* Fix: Added a temporary check to skip saving of trades which involve a custom head item, which would otherwise currently cause a wipe of the complete save file due to a bug in Bukkit's/Spigot's item serialization.
 
 ## v1.65 Release (2015-10-25)
 ### Supported MC versions: 1.8, 1.7
@@ -2169,25 +2169,25 @@ In order to get the shop creation via item working for now, you will have to eit
 
 ## v1.63 Release (2015-07-18)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Now really fixed: Citizens npc's with the shopkeeper trait should now keep working after a reload via '/citizens reload'.
-* Improvement: Now reacting to Citizens getting enabled or disabled dynamically (in case this is possible, via plugin managers or similar).
-* Tiny internal changes. 
+* Now really fixed: Citizens NPCs with the shopkeeper trait should now keep working after a reload via '/citizens reload'.
+* Improvement: We now react to Citizens getting enabled or disabled dynamically (in case this is possible, via plugin managers or similar).
+* Tiny internal changes.
 
 ## v1.62 Release (2015-07-17)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
 * Improvement: If an error is catched during loading of shopkeeper data, the plugin gets disabled without triggering a save. This hopefully prevents that the complete shopkeeper data gets lost if for example some item cannot be properly loaded.
-* Change: Also disable without save if one shopkeeper cannot be loaded (for ex. because of invalid save data). Previously that shopkeeper would have been skipped, resulting in that shopkeeper being completely removed. Now you have to manually fix your save data in this case, but with the advantage of being able to fix the affected shopkeeper without losing for example all the setup trades.
-* ~~Fixed: Citizens npc's with the shopkeeper trait should now keep working after a reload via '/citizens reload'.~~ (Not actually fixed, check out the next version..)
-* Added: Automatically removing invalid citizens shopkeepers, which either have no backing citizens npc, or are using the same npc as some other shopkeeper for some reason.
-* A few minor other internal improvements related to citizens related code (like checking if Citizens is currently still enabled before accessing or creating npcs).
+* Change: We also disable the plugin without a save now if a shopkeeper cannot be loaded (for example because of invalid save data). Previously, that shopkeeper would have been skipped, resulting in that shopkeeper being completely removed. Now, you have to manually fix your save data in this case, but with the advantage of being able to fix the affected shopkeeper without losing for example all the set up trades.
+* ~~Fixed: Citizens NPCs with the shopkeeper trait should now keep working after a reload via '/citizens reload'.~~ (Not actually fixed, check out the next version.)
+* Added: Automatic removal of invalid Citizens shopkeepers, which either have no backing Citizens NPC, or are using the same NPC as some other shopkeeper for some reason.
+* A few minor other internal improvements related to Citizens related code (like checking if Citizens is currently still enabled before accessing or creating NPCs).
 * Tiny improvement: Not triggering a save during removal of inactive player shopkeepers, if no shopkeepers got actually removed.
-* Improvement: Hopefully better handling shopkeepers with somehow invalid or duplicate object id during activation and deactivation (preventing that the wrong shopkeeper gets disabled for example), and printing some warnings if a shopkeeper is detected during activation with an somehow invalid object id. This mostly has debugging purposes currently.
+* Improvement: Hopefully better handling shopkeepers with somehow invalid or duplicate object id during activation and deactivation (preventing that the wrong shopkeeper gets disabled for example), and printing some warnings if a shopkeeper is detected during activation with a somehow invalid object id. This mostly has debugging purposes currently.
 * A few tiny other internal changes, which hopefully didn't break anything.
 
 ## v1.61 Release (2015-06-24)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Slight changes to handling saving: If there is a problem during the saving it waits a bit and then retries several times. This might help if for some reason the save file can only temporary not be written to (for example because of some other application, like Dropbox, currently locking the file). It also checks for some other possible causes of issues, like if the parent directory is missing (if it is, it attempts to create it). It also checks if it currently can write to the save file, before removing the old save file. These changes hopefully prevent that certain issues cause the save data to go completely lost. Also it prints some more information to the log if it detects some issue.
-* Fixed: A bug in minecraft's trading allowed players to exploit certain trade setups (only very few trade setups are affected though). Shopkeepers is now detecting and preventing those affected trades.
+* Slight changes to handling saving: If there is a problem during the saving, we wait a bit and then retry it several times. This might help if for some reason the save file can only temporary not be written to (for example because of some other application, like Dropbox, currently locking the file). We also checks for other possible causes of issues now, like whether the parent directory is missing (if it is, we try to create it), and whether we can currently write to the save file. These checks are done before we remove the old save file. These changes hopefully prevent that certain issues cause the save data to go completely lost. We also print more information to the log when we detect some issue.
+* Fixed: A bug in Minecraft's trading allowed players to exploit certain trade setups (only very few trade setups are affected though). Shopkeepers is now detecting and preventing those affected trades.
 * Added (API): The ShopkeeperTradeEvent now holds information about the used trading recipe, and the ShopkeeperTradeCompletedEvent holds a reference to the original ShopkeeperTradeEvent.
 * Added (API): A bunch of javadoc was added or updated for the available events.
 
@@ -2195,45 +2195,45 @@ In order to get the shop creation via item working for now, you will have to eit
 ### Supported MC versions: 1.8, 1.7, 1.6.2
 * Fixed: Allways allow editing of own shopkeepers, even if a player no longer has the permission to create shopkeepers of that type.
 * Fixed: Skipping empty recipes for admin shopkeepers during loading.
-* Changed: If a player cannot create any shopkeeper at all because of missing permissions, the no-permission message is printed instead of the creation-failed message. Also chest selection and shop and object type cycling is skipped. And no message is printed when the player selects the shop creation item in the hotbar.
+* Changed: If a player cannot create any shopkeeper at all because of missing permissions, the no-permission message is printed instead of the creation-failed message. We also skip the chest selection, and the cycling of the shop object type, and print no message when the player selects the shop creation item in the hotbar.
 * Change/Possible fix: Triggering a save if the teleporter task had to respawn a shopkeeper object (like an entity). This should make sure that the latest entity uuid gets saved.
 * Change: No need to update a sign shop another time if it had to be respawned.
-* Internal change: Moved a few more permissions node into ShopkeepersAPI.
+* Internal change: Moved a few more permission nodes into ShopkeepersAPI.
 * Added: API method for checking if a player can create any shopkeeper at all.
 
 ## v1.59 Release (2015-06-08)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Fixed: Updated to latest version of citizens.
+* Fixed: Updated to the latest version of Citizens.
 
 ## v1.58 Release (2015-06-06)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
 * Some internal cleanup, moving around of things and other minor changes. Hopefully all is still working properly.
 * Possible fixed: Some minor cleanup did not take place if a shopkeeper entity was respawned, or when activating a shopkeeper on chunk load.
-* Changed/Fixed: The permissions node for the help command was added to the plugin.yml and now defaults to 'true' instead of 'false'.
-* Changed: shopkeeper.remote permissions node default value was changed from 'false' to 'op'.
-* Added: shopkeeper.* permissions node, which includes all other permissions nodes.
-* Added: Debug information whenever a permissions node is checked for a player. Might be a bit spammy though.
+* Changed/Fixed: The permission node for the help command was added to the plugin.yml and now defaults to 'true' instead of 'false'.
+* Changed: The default of the `shopkeeper.remote` permission node was changed from `false´ to `op`.
+* Added: `shopkeeper.*` permission node, which includes all other permission nodes.
+* Added: Debug information whenever a permission node is checked for a player. Might be a bit spammy though.
 * Changed: Handling of world unloads was slightly changed to reduce the amount of duplicate code. It now triggers the chunk unload code for all currently loaded chunks. Hopyfully without causing issues.
-* Changed: Now checking the hire item name and lore earlier already. If they don't match the player is informed that the villager can be hired (just like when clicking a villager with any other item), instead of telling him that hiring failed (like when the player does not have the needed amount of hiring items).
+* Changed: We now check the hire item name and lore earlier already. If they don't match, the player is informed that the villager can be hired (just like when clicking a villager with any other item), instead of telling them that hiring failed (like when the player does not have the needed amount of hiring items).
 * Fixed: The code which checks for chest access when creating a player shopkeeper via command does no longer trigger chest selection if the player is holding a shop creation item in hand.
-* Fixed: Previously sign shops weren't properly created if created via command. The initial sign wasn't placed and the shopkeeper was stored at the wrong location.
+* Fixed: Previously, sign shops weren't properly created if created via command. The initial sign wasn't placed and the shopkeeper was stored at the wrong location.
 * Changed: Shop creation via command will fail now if a block face is targeted at which either a non-air block is, or if no wall sign can be placed there.
 * Added/Fixed: Canceling block physics for shop signs, so they should no longer break in various situations. Signs might end up floating in mid-air though.
 * Added/Fixed: Preventing entity explosions from destroying shop signs.
 * Added/Fixed: Preventing entity explosions from destroying shop chests.
-* Added/Fixed: In case we detect that a shop sign went missing, we attempt to respawn it. If the sign respawning fails for some reason, we completely remove the shopkeeper and print a warning to console. Previously the sign shopkeepers would no longer be usable nor accessible from inside of minecraft, but still be secretly existing in the save data.
+* Added/Fixed: In case we detect that a shop sign went missing, we attempt to respawn it. If the sign respawning fails for some reason, we completely remove the shopkeeper and print a warning to console. Previously, the sign shopkeepers would no longer be usable nor accessible from inside Minecraft, but still exist in the save data.
 * Added: Sign shops should now store their initial sign facing, which is used for sign-respawning. For already existing sign shops it is attempted to get the facing from the current sign in the world.
 * Fixed: Shop signs are now updated at least once when their chunk gets loaded, so that config changes which affect the sign content are applied to the already existing signs.
-* Fixed: Also requesting a sign update whenever the owner or owner name changes, so that the owner name on the sign gets updated.
+* Fixed: We also request a sign update whenever the owner or owner name changes, so that the owner name on the sign gets updated.
 * Added: Whenever a player switches to the shop creation item in the hotbar, a message explaining the usage of it is now printed.
 
 ## v1.57 Alpha (2015-05-25)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Internal change: Removed own trading-recipe-finding code, and instead getting the reciped used in the current trade from minecraft directly. With this it should be guaranteed that we really get the same recipe as minecraft is actually using. Also we have less work for keeping it updated.
+* Internal change: Removed our own trading-recipe-finding code and instead we now get the recipe used in the current trade from Minecraft directly. With this change, it should be guaranteed that we really get the same recipe that Minecraft is using. We also have less work for keeping this code updated.
 * Internal change: The code which adds and removes an item stack to/from a chest was changed. Adding an item stack should now try to first fill up existing item stacks before starting to create new ones.
-* Fixed: The trading and buying player-shopkeepers are now adding those items to the chest, which were actually used by the trading player. Depending on item comparison of minecraft and shopkeeper settings those don't have to perfectly match the required items from the used recipe, but are still accepted.
+* Fixed: The trading and buying player shopkeepers are now adding those items to the chest, which were actually used by the trading player. Depending on item comparison of Minecraft and shopkeeper settings, those don't have to perfectly match the required items from the used recipe, but are still accepted.
 * Fixed: The owner name for player shopkeepers was initially (on creation) getting stored in lower case for some reason in the past. This probably caused issues at some places when we were comparing the owner name to the name of a certain player, for example when using the remove command.
-* Tiny change/fix (not sure if this was actually an issue): Skipping npc players now when doing some initialization with the online player when the plugin gets enabled.
+* Tiny change/fix (not sure if this was actually an issue): Skipping NPC players now when doing some initialization with the online player when the plugin gets enabled.
 
 See also the changelog of the previous version!
 
@@ -2245,87 +2245,88 @@ Please create a backup of your shopkeeper save.yml file before using this versio
 You might especially want to check if all shopkeeper trades get properly loaded and saved, and if the setup of shopkeepers, trading and item removal and disposal in/from player-shop-chests is working properly.  
 If you discover any issues please let me know by creating tickets for those.
 
-* Removed custom item comparison, which was used in the past to only allow trades if the required and the offered items perfectly match, excluding internal attribute uuids. This is now useless, because of changes in minecraft's 1.8.x trading logic.
+* Removed custom item comparison, which was used in the past to only allow trades if the required and the offered items perfectly match, excluding internal attribute uuids. This is now useless, because of changes in Minecraft's 1.8.x trading logic.
 * Unfortunately detailed debug messages, telling exactly why certain items are not similar, are no longer possible with this change.
-* Updated to minecraft's new 1.8.x trading logic:  
-  Previously minecraft did unlock a trade if the type of the offered items matches the required item. Now in MC 1.8.x if a trade requires an item with custom data, such as custom name, lore or attributes, minecraft only unlocks the trade if the offered item perfectly matches the required one (all the item's internal data and attributes have to be the same).  
+* Updated to Minecraft's new 1.8.x trading logic:  
+  Previously, Minecraft did unlock a trade if the type of the offered items matches the required item. Now, in MC 1.8.x, if a trade requires an item with custom data, such as custom name, lore or attributes, Minecraft only unlocks the trade if the offered item perfectly matches the required one (all the item's internal data and attributes have to be the same).  
     If the required item has no special data, then any item of the same type, even items with special data, can be used for this trade.  
-    Also, minecraft sometimes unlocks a non-selected trade, if the required items of a different trade is matching the ones which are currently inserted.
+    Also, Minecraft sometimes unlocks a non-selected trade, if the required items of a different trade is matching the ones which are currently inserted.
 
 Shopkeepers is now trying to allow most of those trades as well. So if a trade requires an item without special data, every item of that type is accepted. If an item with special data is required, only perfectly matching items are accepted.
 
-* Added setting use-strict-item-comparison setting, which defaults to true. When this setting is active trading behavior is nearly the same as before: An additional and more strict item comparison is performed before a trade is allowed, which makes sure that the items offered perfectly match those of the used recipe. So even if the required item has no special data, only items of the same type which as well don't have special data are accepted. Otherwise the trade gets blocked.  
-  This setting's default is currently set to true, to prevent potential issues with already setup shops, which expect the old/current trading behavior. Also servers running on MC versions below 1.8.x might depend on this setting to be active.  
-  For servers using the latest server versions I recommend disabling this setting, so that the trading logic better matches the one of minecraft. 
+* Added setting `use-strict-item-comparison` (default: `true`). When this setting is active, the trading behavior is nearly the same as before: An additional and stricter item comparison is performed before a trade is allowed, which ensures that the offered items perfectly match those of the used trading recipe. So even if the required item has no special data, only items of the same type that also don't have any special data are accepted. Otherwise, the trade is blocked.  
+  This setting's default is currently set to true, to prevent potential issues with already set up shops, which expect the old/current trading behavior. Also, servers running on MC versions below 1.8.x might depend on this setting to be active.  
+  For servers that use the latest server versions, I recommend disabling this setting, so that the trading logic better matches the one of Minecraft.
 * Changed: Resetting the player's selected chest after successfully creating a player shopkeeper. This seems to be more intuitive.
-* Fixed: the default shop-created message for the buying shopkeeper did say that one of each item which is being 'sold' has to be entered into the chest. Instead it was meant to say 'one of each items being bought'.
+* Fixed: The default shop-created message for the buying shopkeeper did say that one of each item which is being 'sold' has to be entered into the chest. Instead, it was meant to say 'one of each item being bought'.
 
 **Known caveats:**  
-* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this..
-* Server crashes and improper shutdowns might cause living non-citizens shopkeeper entities to duplicate sometimes.
+* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this.
+* Server crashes and improper shutdowns might cause living non-Citizens shopkeeper entities to duplicate sometimes.
 * The 'always-show-nameplates' setting is no longer working on MC 1.8.
-* Compatibility with older bukkit versions is untested. If you encounter any problems let me know and I will look into it.
+* Compatibility with older Bukkit versions is untested. If you encounter any problems, let me know, and I will look into it.
 * A bunch of entity types are only meant for experimental usage. They might cause all kinds of issues if used. See changelog of v1.50.
-* In the latest MC 1.8.x versions default minecraft trading logic has slightly changed (and by that those of shopkeepers as well): if a trade requires an item with special data (like a custom name, etc.) minecraft is now only allowing this trade, if the offered item is perfectly matching, including all special item data and attributes.
+* In the latest MC 1.8.x versions default Minecraft trading logic has slightly changed (and by that those of shopkeepers as well): If a trade requires an item with special data (like a custom name, etc.), Minecraft is now only allowing this trade if the offered item is perfectly matching, including all special item data and attributes.
 
 ## v1.55 Release (2015-05-18)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Fixed: Actually include the update for 1.8.4. 
+* Fixed: Actually include the update for 1.8.4.
 
 ## v1.54 Release (2015-05-18)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Fixed: Color codes should now actually get converted.. 
+* Fixed: Color codes should now actually get converted.
 
 ## v1.53 Release (2015-05-17)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
 * Fixed: Code which requires searching for nearby entities wasn't properly searching in negative z direction previously.
-* Updated to latest spigot build: now comparing the stored block state of items (untested)
+* Updated to the latest Spigot build: now comparing the stored block state of items (untested)
 * Fixed: Missed applying the creation item lore from the config to the creation item.
 * Fixed: Missed applying color code conversion to the shop creation item name and lore.
 * Internal change: Color code conversion of text is now done once when the config is loaded, instead of everytime the colored text is needed. If you encounter any issues with color codes not being properly converted at certain places, let me know.
-* Updated to support spigot's 1.8.4 build. 
+* Updated to support Spigot's 1.8.4 build.
 
 ## v1.52 Release (2015-03-15)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
 * Tiny cosmetic fix: Print 'yes' instead of 'null' for the checkItems debug command, if the compared items are similar.
 * Fixed: Banner meta comparison now compares base colors as well.
-* Fixed: Banner meta comparison should now actually work. Before it reported that the patterns of two banners are similar, when they weren't, and that they are different, when they were actually similar. 
+* Fixed: Banner meta comparison should now actually work. Before it reported that the patterns of two banners are similar, when they weren't, and that they are different, when they were actually similar.
 
 ## v1.51 Release (2015-03-13)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
 * Improved/Fixed: sometimes villagers were still able to turn into witches by nearby lightning strikes. The radius in which lightning strikes around villager shopkeepers get prevented was increased from 4 to 7 blocks.
-* Fixed (workaround): occasionally an error did pop up for some users during thunder storms due to entities reporting to be in a different world than we are expecting them to be.
+* Fixed (workaround): Occasionally, an error did pop up for some users during thunderstorms due to entities reporting to be in a different world than we are expecting them to be.
 * Fixed: Player shops should now identify shop owners solely by name again if running on versions which don't properly support player uuids yet (below 1.7.10, I think). Untested though.
-* Changed: We no longer remove all already stored owner uuids when switching from a bukkit version which supported player uuids to an older versions which doesn't. The owner uuids are not used on that older bukkit version, but we still keep them for the case that we switch back to a newer version of bukkit. 
+* Changed: We no longer remove all already stored owner uuids when switching from a Bukkit version which supported player uuids to an older versions which doesn't. The owner uuids are not used on that older Bukkit version, but we still keep them for the case that we switch back to a newer version of Bukkit.
 
 **Known caveats:**  
-* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this..
-* Server crashes and improper shutdowns might cause living non-citizens shopkeeper entities to duplicate sometimes.
+* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this.
+* Server crashes and improper shutdowns might cause living non-Citizens shopkeeper entities to duplicate sometimes.
 * The 'always-show-nameplates' setting is no longer working on MC 1.8.
-* Compatibility with older bukkit versions is untested. If you encounter any problems let me know and I will look into it.
+* Compatibility with older Bukkit versions is untested. If you encounter any problems, let me know, and I will look into it.
 * A bunch of entity types are only meant for experimental usage. They might cause all kinds of issues if used. See changelog of v1.50.
 
 ## v1.50 Release (2015-03-07)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Added support for craftbukkit/spigot 1.8.3.
+* Added support for CraftBukkit/Spigot 1.8.3.
 * Experimental: Unlocked a bunch of remaining living entity types for use as shopkeeper objects: bat, blaze, cave_spider, spider, ender_dragon, wither, enderman, ghast, giant, horse, magma_cube, slime, pig_zombie, silverfish, squid (no MC 1.8 entities yet) Those are highly experimental! They are disabled by default in the configuration: you might need to remove the 'disabled-living-shops' section in your config in order to let it regenerate with the new default values.  
-Some of those entities (currently: bat, ender_dragon, wither, enderman, silverfish) get the new NoAI entity tag set in order to prevent the biggest issues with them: As this new tag is only available on MC 1.8 you should only enabled those if you are running on MC 1.8.x. 
+Some of those entities (currently: bat, ender_dragon, wither, enderman, silverfish) get the new NoAI entity tag set in order to prevent the biggest issues with them: As this new tag is only available on MC 1.8, you should only enable those mobs if you are running MC 1.8.x.
 
-Currently known issues with those new entity types (there might be more issues.. usage on own risk):  
-* chicken: Still lays eggs.
-* bat: Without the NoAI tag it flies around. If NoAI tag is available (MC 1.8) the bat is sleeping, but starts the flying animation if being hit by something.
-* blaze: Without the NoAI tag it randomly starts flying upwards.
-* enderdragon: Without NoAI tag, it flies around, towards players, and pushes entities around. Shows boss bar.
-* wither: Without NoAI tag, it makes noise. Shows boss bar.
-* enderman: Teleports away / goes invisible when being hit by a projectile. Starts starring animation.
-* silverfish: Without NoAI tag it is rotating wierdly depending on where the player is standing (possibly because it tries to rotate towards the player). Is constantly showing the movement animation.
+Known issues with those new entity types:  
+* Chicken: Still lays eggs.
+* Bat: Without the NoAI tag it flies around. If NoAI tag is available (MC 1.8) the bat is sleeping, but starts the flying animation if being hit by something.
+* Blaze: Without the NoAI tag it randomly starts flying upwards.
+* Enderdragon: Without NoAI tag, it flies around, towards players, and pushes entities around. Shows boss bar.
+* Wither: Without NoAI tag, it makes noise. Shows boss bar.
+* Enderman: Teleports away / goes invisible when being hit by a projectile. Starts starring animation.
+* Silverfish: Without NoAI tag it is rotating wierdly depending on where the player is standing (possibly because it tries to rotate towards the player). Is constantly showing the movement animation.
+There might be more issues. Use on your own risk.
 
 **Known caveats:**  
-* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this..
-* Server crashes and improper shutdowns might cause living non-citizens shopkeeper entities to duplicate sometimes.
+* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this.
+* Server crashes and improper shutdowns might cause living non-Citizens shopkeeper entities to duplicate sometimes.
 * The 'always-show-nameplates' setting is no longer working on MC 1.8.
-* Compatibility with older bukkit versions is untested. If you encounter any problems let me know and I will look into it.
-* When switching from a bukkit version which support mojang uuids to a bukkit version which does not support mojang uuids yet all stored owner uuids of player shops are lost.
+* Compatibility with older Bukkit versions is untested. If you encounter any problems, let me know, and I will look into it.
+* When switching from a Bukkit version which support mojang uuids to a Bukkit version which does not support mojang uuids yet all stored owner uuids of player shops are lost.
 * A bunch of entity types are only meant for experimental usage. They might cause all kinds of issues if used. See changelog of v1.50.
 
 ## v1.49 Release (2015-03-05)
@@ -2335,35 +2336,35 @@ Currently known issues with those new entity types (there might be more issues..
 
 ## v1.48 Release (2015-03-04)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Changed: Being less strict with the argument count of commands now: If the first argument matches an exisitng command, we handle this command, even if the argument count doesn't match the required amount of arguments. Previously it attempted to spawn a shopkeeper via command in some situations, if it didn't find a command that exactly matched.
+* Changed: We are now less strict with the argument count of commands: If the first argument matches an existing command, we handle this command, even if the argument count doesn't match the required amount of arguments. Previously, it attempted to spawn a shopkeeper via command in some situations if it didn't find a command that exactly matched.
 * Changed: Ignoring the player's naming chat event, if the affected shopkeeper is no longer existing.
 * Changed (API): Deprecated getting all shopkeepers by chunks.
 * Changed (API): All API methods now return unmodifiable collections.
-* Changed (API): The permission nodes were moved into ShopkeepersAPI. 
-* Added command: /shopkeeper list [player|admin] [page] - Lists the players own shops (if no player/'admin' is specified), the shops of a specified player or all admin shops. The shops are divided into pages.
-* Added permissions node: shopkeeper.list.own (default: true) - Allows listing the own shops via command.
-* Added permissions node: shopkeeper.list.others (default: op) - Allows listing the shops of other players via command.
-* Added permissions node: shopkeeper.list.admin (default: op) - Allows listing all admin shops via command. 
-* Added command: /shopkeeper remove [player|all|admin] - Removes the players own shops (if no player/'admin' is specified), the shops of a specified player, all player shops, or all admin shops. The command needs to be confirmed by the player via '/shopkeeper confirm'
-* Added permissions node: shopkeeper.remove.own (default: op) - Allows removing the own shops via command.
-* Added permissions node: shopkeeper.remove.others (default: op) - Allows removing the shops of other players via command.
-* Added permissions node: shopkeeper.remove.all (default: op) - Allows removing the shops of all players at once via command.
-* Added permissions node: shopkeeper.remove.admin (default: op) - Allows removing all admin shops via command. 
+* Changed (API): The permission nodes were moved into ShopkeepersAPI.
+* Added command: "/shopkeeper list [player|admin] [page]" - Lists the players own shops (if no player/'admin' is specified), the shops of a specified player or all admin shops. The shops are divided into pages.
+* Added permission node: `shopkeeper.list.own` (default: `true`) - Allows listing the own shops via command.
+* Added permission node: `shopkeeper.list.others` (default: `op`) - Allows listing the shops of other players via command.
+* Added permission node: `shopkeeper.list.admin` (default: `op`) - Allows listing all admin shops via command.
+* Added command: "/shopkeeper remove [player|all|admin]" - Removes the players own shops (if no player/'admin' is specified), the shops of a specified player, all player shops, or all admin shops. The command needs to be confirmed by the player via '/shopkeeper confirm'
+* Added permission node: `shopkeeper.remove.own` (default: `op`) - Allows removing the own shops via command.
+* Added permission node: `shopkeeper.remove.others` (default: `op`) - Allows removing the shops of other players via command.
+* Added permission node: `shopkeeper.remove.all` (default: `op`) - Allows removing the shops of all players at once via command.
+* Added permission node: `shopkeeper.remove.admin` (default: `op`) - Allows removing all admin shops via command.
 
-Create a backup of your save.yml file and make sure that the permissions are setup correctly and actually work correctly before using.
+Create a backup of your save.yml file and make sure that the permissions are set up correctly and actually work correctly before using.
 
 ## v1.47 Release (2015-03-01)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Update to latest spigot version: Item flags should now get compared as well.
+* Update to the latest Spigot version: Item flags should now get compared as well.
 * Fixed (workaround): In order to prevent villager shopkeeper to turn into witches, we prevent all lightning strikes in a 5 block radius around villager shopkeepers.
-* Added (API): method for getting a shopkeeper by it's uuid.
-* Fixed (API) : whenever shopkeeper.setLocation(..) is called, the shopkeepers location is now updated in the chunk map as well
+* Added (API): Method for getting a shopkeeper by its uuid.
+* Fixed (API): Whenever Shopkeeper#setLocation is called, the shopkeeper's location is now updated in the chunk map as well.
 
 ## v1.46 Release (2015-02-13)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
 * Added: The skeleton shopkeepers can now be switched between normal and wither skeleton variant.
 * Added: The ocelot shopkeepers can now be switched between different cat type variants.
-* Added: The zombie shopkeepers can now be switched between normal and villager-zombie variant. 
+* Added: The zombie shopkeepers can now be switched between normal and villager-zombie variant.
 
 I am open for recommendations regarding how the different mob variants are represented by items in the editor menu, especially regarding representing the different cat types.
 
@@ -2378,39 +2379,39 @@ I am open for recommendations regarding how the different mob variants are repre
 
 ## v1.44 Release (2015-02-03)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Fixed: Left and right clicking the delete button at the same time no longer gives two shop creation items (eggs) back. 
+* Fixed: Left and right-clicking the delete button at the same time no longer gives two shop creation items (eggs) back.
 
 ## v1.43 Release (2015-01-10)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
 * Fixed: If the cost for an item of a normal player shopkeeper are between high-currency-min and high-currency-value the first slot of the recipe remained empty (and by that the trade became unavailable). We now move the low cost into the first slot in this case.
-* Slightly improved handling of invalid costs (this can happen if somebody manually modifies the save file) for trading player shopkeepers: if the first item for some reason is empty we now insert the second item into the first slot in this case, for the same reasons: making the trade still usable. 
+* Slightly improved handling of invalid costs (this can happen if somebody manually modifies the save file) for trading player shopkeepers: If the first item is empty for some reason, we now insert the second item into the first slot to make the trade still usable.
 
 ## v1.42 Release (2015-01-07)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Added: each shopkeeper now additionally stores an unique id which shouldn't change over the shopkeepers lifetime.
-* Attempt to fix potential issue with protection plugins, which cancle the PlayerInteractEvent because they want to deny usage of the shop creation item, not because denying access to the clicked chest: We now call another PlayerInteractEvent with the player not holding any items in hand, if that events gets cancelled as well we can be sure that the player has no access to the clicked chest. 
+* Added: each shopkeeper now additionally stores a unique id which should not change over the shopkeeper's lifetime.
+* Attempt to fix potential issue with protection plugins, which cancle the PlayerInteractEvent because they want to deny usage of the shop creation item, not because denying access to the clicked chest: We now call another PlayerInteractEvent with the player not holding any items in hand, if that events gets cancelled as well we can be sure that the player has no access to the clicked chest.
 
 ## v1.41 Release (2015-01-05)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* No longer storing owner uuids of player shops if running on a bukkit version which does not support mojang uuids yet. This helps if you have already stored those 'invalid'/non-mojang player uuids by running v1.40, however it has the disadvantage that you loose all stored owner uuids if you switch back to an older bukkit version after you have already run a newer bukkit version which supports mojang uuids!
-* Ignoring the owner uuid now when finding inactive shops if not running on a bukkit versions which supports mojang uuids yet. 
+* No longer storing owner uuids of player shops if running on a Bukkit version which does not support mojang uuids yet. This helps if you have already stored those 'invalid'/non-mojang player uuids by running v1.40, however it has the disadvantage that you lose all stored owner uuids if you switch back to an older Bukkit version after you have already run a newer Bukkit version which supports mojang uuids!
+* Ignoring the owner uuid now when finding inactive shops if not running on a Bukkit versions which supports mojang uuids yet.
 
 **Known caveats:**  
-* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this..
-* Server crashes and improper shutdowns might cause living non-citizens shopkeeper entities to duplicate sometimes.
+* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this.
+* Server crashes and improper shutdowns might cause living non-Citizens shopkeeper entities to duplicate sometimes.
 * The 'always-show-nameplates' setting is no longer working on MC 1.8.
-* Compatibility with older bukkit versions is untested.
-* When switching from a bukkit version which support mojang uuids to a bukkit version which does not support mojang uuids yet all stored owner uuids of player shops are lost. 
+* Compatibility with older Bukkit versions is untested.
+* When switching from a Bukkit version which support mojang uuids to a Bukkit version which does not support mojang uuids yet all stored owner uuids of player shops are lost.
 
 ## v1.40 Release (2015-01-05)
 ### Supported MC versions: 1.8, 1.7, 1.6.2
-* Tiny change to the (hidden) debugging command checkitem: The currently selected item now gets compared to the item in the next hotbar slot, instead of the item on the cursor (which made no sense because the player never has an item on the cursor when executing a command..)
-* Attempt of making shopkeepers backwards compatible again down to bukkit 1.6.2 R1.0. Completely untested though. 
+* Tiny change to the (hidden) debugging command checkitem: The currently selected item now gets compared to the item in the next hotbar slot, instead of the item on the cursor (which made no sense, because the player never has an item on the cursor when executing a command).
+* Attempt of making shopkeepers backwards compatible again down to Bukkit 1.6.2 R1.0. Completely untested though.
 
 ## v1.39 Release (2014-12-30)
 ### Supported MC versions: 1.8.1, 1.8
-* Fixed duplication bug when players shift-click very fast (at least 2 times in the same tick) an item in an shopkeeper inventory which gets closed one tick later (ex. hire inventory).
-* Added ShopkeeperTradeEvent (meant for canceling trades because of additional conditions) and ShopkeeperTradeCompletedEvent (meant for monitoring the actual outcome of a trade). 
+* Fixed a duplication bug when players shift-click very fast (at least 2 times in the same tick) an item in a shopkeeper inventory which gets closed one tick later (e.g. hire inventory).
+* Added ShopkeeperTradeEvent (meant for canceling trades because of additional conditions) and ShopkeeperTradeCompletedEvent (meant for monitoring the actual outcome of a trade).
 
 ## v1.38 Release (2014-12-29)
 ### Supported MC versions: 1.8.1, 1.7.4, 1.7.2
@@ -2422,26 +2423,26 @@ I am open for recommendations regarding how the different mob variants are repre
 
 ## v1.36 Release (2014-12-17)
 ### Supported MC versions: 1.8.1, 1.8, 1.7.9
-* Changed: the shopkeeper data now gets saved to file in a separate thread, hopefully reducing load on the main thread if your save file is very (very very) large. 
+* Changed: the shopkeeper data now gets saved to file in a separate thread, hopefully reducing load on the main thread if your save file is very large.
 
 ## v1.35 Release (2014-12-17)
 ### Supported MC versions: 1.8.1, 1.8, 1.7.9
-* Readded: removing inactive player shops every time the plugin gets enabled. Untested though. 
+* Readded: removing inactive player shops every time the plugin gets enabled. Untested though.
 
 **Known caveats:**  
-* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this..
-* Server crashes and improper shutdowns might cause living non-citizens shopkeeper entities to duplicate sometimes.
-* The 'always-show-nameplates' setting is no longer working on MC 1.8. 
+* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this.
+* Server crashes and improper shutdowns might cause living non-Citizens shopkeeper entities to duplicate sometimes.
+* The 'always-show-nameplates' setting is no longer working on MC 1.8.
 
 ## v1.34 Release (2014-12-16)
 ### Supported MC versions: 1.8.1, 1.8, 1.7.9
 * Fixed: hiring of shopkeepers should now work again.
 
 **Known caveats:**  
-* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this..
+* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this.
 * The 'remove shopkeeper after certain time of inactivity of player' feature has been removed for now.
 * Experimental 1.8 support.
-* Server crashes and improper shutdowns might cause living shopkeeper entities to duplicate sometimes. 
+* Server crashes and improper shutdowns might cause living shopkeeper entities to duplicate sometimes.
 
 ## v1.33 Release (2014-12-15)
 ### Supported MC versions: 1.8.1, 1.8, 1.7.9
@@ -2450,7 +2451,7 @@ I am open for recommendations regarding how the different mob variants are repre
 ## v1.32 Release (2014-12-15)
 ### Supported MC versions: 1.8.1, 1.8, 1.7.9
 * Added: (hidden) debug command 'shopkeepers checkitem' (only usable with debug permission) which compares the item in hand and item on cursor with each other and with the currency items.
-* Fixed: item comparison (especially comparison of display name and lore) for the currency items didn't properly work for certain items under certain circumstances. 
+* Fixed: item comparison (especially comparison of display name and lore) for the currency items didn't properly work for certain items under certain circumstances.
 
 ## v1.31 Release (2014-12-07)
 ### Supported MC versions: 1.8, 1.7.9
@@ -2459,119 +2460,119 @@ I am open for recommendations regarding how the different mob variants are repre
 * Changed: All item data values in the config can now be set to -1 in order to indicate that the data value shall be ignored.
 * Changed: the item ids in the default config were replaced with material names.
 * Added optional item lore setting for the shop creation item (if none is set (default) the lore is ignored).
-* Added optional name and lore settings for the hire item. Those will be ignore if they are kept empty.
+* Added optional name and lore settings for the hire item. Those will be ignored if they are kept empty.
 * The settings 'zero-item' and 'high-zero-item' were renamed to 'zero-currency-item' and 'high-zero-currency-item'. You will have to update your config if you made changes to those settings in the past!
 * Added optional item name and lore settings for currency and high currency item (if not set (by default) those will be ignored).
 * Added optional item data, name and lore for zero currency and high zero currency items as well (if not set (by default) those will be ignored).
 * Removed 5th villager profession (green) from editor menu in case the plugin is running on MC 1.8. Mc 1.8 doesn't seem to have the green version anymore.
 * Fixed: the shopkeeper command should now work again with the optional shop object type parameter. [Ticket-269]
 * Added /shopkeepers help command and help pages which displays the available commands. Commands for which a player doesn't have the needed permission get filtered out.
-* Added a few more messages to the command output for the cases that a command fails (for example due to missing permissions or invalid command parameters). Also we now stop the command execution instead of continuing with default command parameters.
-* Added 'shopkeepers.debug' permissions node (default: op). Previously we manually checked if the command executor is op before giving access to the debug command. 
+* Added a few more messages to the command output for the cases that a command fails (for example due to missing permissions or invalid command parameters). And we also stop the command execution now instead of continuing with default command parameters.
+* Added `shopkeepers.debug` permission node (default: `op`). Previously, we manually checked if the command executor is op before giving access to the debug command.
 
 ## v1.30 Release (2014-12-02)
 ### Supported MC versions: 1.8, 1.7.9
-* Added the setting 'silence-living-shop-entities' which let's you define whether or not living shopkeeper entities create sounds or not (default: true/silenced). This feature only work on MC 1.8. 
+* Added the setting 'silence-living-shop-entities' which lets you define whether living shopkeeper entities create sounds or not (default: true/silenced). This feature only work on MC 1.8.
 
-Also please see the changelog of the previous versions!
+Please also see the changelog of the previous versions!
 
 ## v1.29 Beta (2014-11-29)
 ### Supported MC versions: 1.8, 1.7.9
-* Updated for craftbukkit/spigot 1.8
+* Updated for CraftBukkit/Spigot 1.8
 
-Also please see the changelog of the previous versions!
+Please also see the changelog of the previous versions!
 
 ## v1.28 Alpha (2014-11-21)
 ### Supported MC versions: 1.7.9
 * Reordered the shop types so the normal player shop is by default selected instead of the book shop.
 * The selection of shop type and shop object (mobs, sign) are no longer reset after shop creation, but are kept stored until the player quits or the plugin is reloaded.
 * Added a debug message to inventory clicks.
-* Fixed: The previous version did not proplery block shift-click buying on player shops anymore. This should now be fixed again. 
+* Fixed: The previous version did not proplery block shift-click buying on player shops anymore. This should now be fixed again.
 
-Also please see the changelog of the previous versions!
+Please also see the changelog of the previous versions!
 
 ## v1.27 Alpha (2014-11-21)
 ### Supported MC versions: 1.7.9
 * Fixed: The first (top-left) slot in a player's inventory was not properly working in editor mode of player shopkeepers.
 * Fixed: The custom item comparison in the last version did skip item meta comparison.
 * Improved the debug output when trading fails: it now displays the reason why the invovled items are not considered similar.
-* Fixed: When the trading slot was clicked and the cursor would not be able to hold the result of the trade (because the cursor already hold an item of different type or the result would exceed the max stack size) minecraft cancles the trade. Shopkeepers however wasn't aware of this and removed and added the invovled items to and from a player's shop chest regardlessly. We now skip our trade-handling as well in this situation: you cannot trade if the cursor cannot hold the resulting items. 
+* Fixed: When the trading slot was clicked and the cursor would not be able to hold the result of the trade (because the cursor already hold an item of different type or the result would exceed the max stack size) Minecraft cancles the trade. Shopkeepers however wasn't aware of this and removed and added the invovled items to and from a player's shop chest regardlessly. We now skip our trade-handling as well in this situation: You cannot trade if the cursor cannot hold the resulting items.
 
-Also please see the changelog of the previous versions!
+Please also see the changelog of the previous versions!
 
 ## v1.26 Alpha (2014-11-20)
 ### Supported MC versions: 1.7.9
-* Changed how item comparison is done: We no longer use bukkit's built-in comparison method. This has the disadvantage that we have to write and update the comparison of all item related data ourselves and probably don't work with modded items that well anymore (I might add a setting in the future which toggles between the new and the old comparison if there is the need for it). However doing the comparison ourselves gives us more control over what aspects of items actually define them as being 'similar': this change allows us to compare item attributes and skull data ourselves, hopefully resolving the issues we had with this in the past.
+* Changed how item comparison is done: We no longer use Bukkit's built-in comparison method. This has the disadvantage that we have to write and update the comparison of all item related data ourselves and probably don't work with modded items that well anymore (I might add a setting in the future which toggles between the new and the old comparison if there is the need for it). However doing the comparison ourselves gives us more control over what aspects of items actually define them as being 'similar': this change allows us to compare item attributes and skull data ourselves, hopefully resolving the issues we had with this in the past.
 
-Also please see the changelog of the previous versions!
+Please also see the changelog of the previous versions!
 
 This is an alpha version. Things might not properly work yet.  
 **Known caveats:**  
-* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this..
-* The 'remove shopkeeper after certain time of inactivity of player' feature has been removed for now. 
+* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this.
+* The 'remove shopkeeper after certain time of inactivity of player' feature has been removed for now.
 
-I suggest you to backup your old save file, just in case
+I suggest you to backup your old save file, just in case.
 
 ## v1.25 Alpha (2014-08-14)
 ### Supported MC versions: 1.7.9
-* Fixed: citizens falsely being detected as disabled 
+* Fixed: Citizens falsely being detected as disabled.
 
-Also please see the changelog of the previous versions!
+Please also see the changelog of the previous versions!
 
 ## v1.24 Alpha (2014-08-04)
 ### Supported MC versions: 1.7.9
-* Fixed: some chest checks not working for the transfer and setForHire commands
-* Fixed: it should no longer be possible to create a player shopkeeper with a chest which is already in use by some other shopkeeper
-* Added setting 'prevent trading while owner is online' (default false): with this setting enabled player shopkeepers don't trade (nor open the trading window) while the owning player is online. This might be useful for role playing servers, which wish to force players to trade with each other directly while being online. 
+* Fixed: Some chest checks not working for the transfer and setForHire commands.
+* Fixed: It should no longer be possible to create a player shopkeeper with a chest which is already in use by some other shopkeeper.
+* Added setting 'prevent trading while owner is online' (default false): With this setting enabled, player shopkeepers don't trade (nor open the trading window) while the owning player is online. This might be useful for role-playing servers, which wish to force players to trade with each other directly while being online.
 
-Also please see the changelog of the previous versions!
+Please also see the changelog of the previous versions!
 
 ## v1.23 Alpha (2014-07-27)
 ### Supported MC versions: 1.7.9
-* Fixed: missing save when editor window is closed 
+* Fixed: Missing save when editor window is closed.
 
-Also please see the changelog of the previous versions!
+Please also see the changelog of the previous versions!
 
 ## v1.22 Alpha (2014-07-26)
 ### Supported MC versions: 1.7.9
-* Fixed: trading with player shopkeepers not working
-* Fixed: shopkeeper names not being colored in the trade menu or on signs 
+* Fixed: Trading with player shopkeepers not working.
+* Fixed: Shopkeeper names not being colored in the trade menu or on signs.
 
 Also please see the changelog of the previous versions!
 
 ## v1.21 Alpha (2014-07-12)
 ### Supported MC versions: 1.7.9
-* Fixed: normal players not being able to trade with admin shops.
-* Added: permission 'shopkeeper.trade' (default true), which determines whether or not a player can trade with shopkeepers.
-* Added: sheep shopkeepers can now change their colors via the editor menu. 
+* Fixed: Normal players not being able to trade with admin shops.
+* Added: Permission `shopkeeper.trade` (default `true`), which determines whether a player can trade with shopkeepers.
+* Added: Sheep shopkeepers can now change their colors via the editor menu.
 
-Also please see the changelog of the previous version!
+Please also see the changelog of the previous version!
 
 ## v1.20 Alpha (2014-07-10)
 ### Supported MC versions: 1.7.9
 This is an alpha version:  
 While this version seems to work quite well already, there might be some new bugs being introduced due to some internal changes.
-Also there are some issues which still needs to be resolved (hopefully no breaking issues though..) and some new features to test out.
+Also, there are some issues that still need to be resolved (hopefully no breaking issues though) and some new features to test out.
 
 * Updated to CB 1.7.10. Not much tested yet.
-* Internal rewrites. (Though I am not completly statisfied with the current result yet..)
+* Internal rewrites. (Though I am not completly statisfied with the current result yet)
 * Added: Shopkeeper entities are now tagged with metadata 'shopkeeper' which can be used to identify shopkeeper entities in other plugins.
 * Added new setting 'bypassShopInteractionBlocking': can be turned on if you experience issues with other plugins bocking users from opening the shopkeeper interfaces (for example due to protected regions).
 * Renamed setting from 'deletingPlayerShopReturnsEgg' to 'deletingPlayerShopReturnsCreationItem'
-* Added support for some more living entities shopkeeper types: chicken, cow, iron_golem, mushroom_cow, ocelot, pig, sheep, skeleton, snowman, wolf, zombie. Other entity types weren't included yet due to issues regarding replacement of their default behavior. The newly added entitiy types seem to work fine. However, note that chicken shopkeepers still lay eggs.
-* Changed the permission nodes for the living entity shopkeepers to: shopkeeper.entity.<lowercase_mobname> and shopkeeper.entity.*for all.
+* Added support for more living entity shopkeeper types: chicken, cow, iron_golem, mushroom_cow, ocelot, pig, sheep, skeleton, snowman, wolf, zombie. Other entity types weren't included yet due to issues regarding replacement of their default behavior. The newly added entitiy types seem to work fine. However, note that chicken shopkeepers still lay eggs.
+* Changed the permission nodes for the living entity shopkeepers to: `shopkeeper.entity.<lowercase_mobname>` and `shopkeeper.entity.*` for all.
 * Old permission nodes for creepers, villagers and witches should still work, but might be removed in a future update.
 * Trapped Chests can now be used as shop chests as well.
-* Added: experimental support for Citizens based shopkeeper entities (Thanks to elMakers for that): You can either create a player npc shopkeeper via the creation item, which will default to the owner's name/skin, or an admin npc shopkeeper via the command '/shopkeeper npc'. Also there was a special ShopkeeperTrait added which can be assigned to a NPC to assign shopkeeper behavior to it. Though it is recommended currently to created the citizens npc's through the shopkeeper command instead. Permission node for creation is: shopkeeper.citizen
-* Note that there are very likely still some issues left, mainly regarding cleanup of Citizens npc's or shopkeeper data, especially in situations where either Citizens or Shopkeepers is not running.
-* Added a setting to disallow renaming of citizens player shopkeepers.
-* The 'remove shopkeeper after certain time of inactivity of player' feature has been removed for now due to differences between the different currently supported bukkit versions. This will probably be added at a later point again. 
+* Added: Experimental support for Citizens based shopkeeper entities (Thanks to elMakers for that): You can either create a player NPC shopkeeper via the creation item, which will default to the owner's name/skin, or an admin NPC shopkeeper via the command '/shopkeeper npc'. Also, there was a special ShopkeeperTrait added which can be assigned to a NPC to assign shopkeeper behavior to it. However, it is currently recommended to create the Citizens NPCs through the shopkeeper command instead. The permission node for creation is `shopkeeper.citizen`.
+* Note that there are very likely still some issues left, mainly regarding cleanup of Citizens NPCs or shopkeeper data, especially in situations where either Citizens or Shopkeepers is not running.
+* Added a setting to disallow renaming of Citizens player shopkeepers.
+* The 'remove shopkeeper after certain time of inactivity of player' feature has been removed for now due to differences between the different currently supported Bukkit versions. This will probably be added at a later point again.
 
 This is an alpha version. Things might not properly work yet.  
 **Known caveats:**  
-* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this..
+* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this.
 * Items with attributes might not properly work.
-* The 'remove shopkeeper after certain time of inactivity of player' feature has been removed for now. 
+* The 'remove shopkeeper after certain time of inactivity of player' feature has been removed for now.
 
 I suggest you to backup your old save file, just in case
 
@@ -2579,18 +2580,18 @@ I suggest you to backup your old save file, just in case
 ### Supported MC versions: 1.7.9, 1.7.4, 1.7.2
 * Updated to CB 1.7.8
 * Fixed a serious item duping bug [Ticket 228]: double clicking in the bottom inventory while having the trading gui opened gets blocked now
-* Now updating the players inventory shortly after a trade failed to reduce the chance for fake items popping up in the players inventory temporary.
-* Now printing slightly more detailed debug message for failing trades, if debug mode is turned on.
-* Removed unused stuff from the compatibility mode, which probably was the cause that this time the compatibility mode didn't work when you tried to use the old Shopkeepers version on 1.7.8 servers..
-* Updated to use player uuids. Some notices on that: 
-  * Make sure you run on some of the newest MC/Bukkit versions, because old versions might not support player account uuids correctly. I suggest you use at least some 1.7.+ version.
-  * Make sure that your server runs in the correct online mode: uuids of player between online and offline mode don't match. So if you switch your server's online mode the stored player uuids won't be 'working' anymore..
-  * The uuids for owners of player shops get stored as soon as the player logs in. The playername gets used for display purposes and as identifier for the shop owner of those player shops for which we don't have an uuid yet.
+* We now update the player's inventory shortly after a trade failed to reduce the chance for fake items temporarily popping up in the player's inventory.
+* If debug mode is enabled, we now print a slightly more detailed debug message for failing trades.
+* Removed unused stuff from the compatibility mode, which probably was the cause that this time the compatibility mode didn't work when you tried to use the old Shopkeepers version on 1.7.8 servers.
+* Updated to use player UUIDs. Some notes on that:
+  * Make sure that you run one of the newest MC/Bukkit versions, because old versions might not support player account UUIDs correctly. I suggest that you use at least one of the 1.7.+ versions.
+  * Make sure that your server runs in the correct online mode: UUIDs of players in online and offline mode don't match. So if you switch your server's online mode, the stored player UUIDs won't be 'working' anymore.
+  * The uuids for owners of player shops get stored as soon as the player logs in. The playername gets used for display purposes and as identifier for the shop owner of those player shops for which we don't have a uuid yet.
 
 **Known caveats:**  
-* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this..
-* If you use the 'remove shopkeeper after certain time of inactivity of player' feature, then you might experience some server freezing when the plugin loads: to find out when the owner of a shop was online for the last time we use a method which might have to lookup a player's uuid or name via mojangs services. However, this is currently considered a minor 'issue' as those lookups can only happen once per plugin load (and reload), and the server probably also caches the results from those lookups, so the next plugin loads probably won't have to lookup those data again.
-* If you have shops with items in it with attributes, those might disappear or crash players. I am not completly sure if this is an issue with shopkeepers or a general thing that the client can't cope with certain modified items and crashes then. I also experienced this only for the first time I tested the new 1.7.8 bukkit version, afterwards those items went lost somehow and stopped crashing the client. However I wasn't able yet to test the new shopkeepers version with items with custom attributes / edited nbt data, as I wasn't able yet to find some updated/working plugin which creates items with attributes.. 
+* If the trade for a written book fails players can sometimes still open and read the book if they close the shop and click the temporary fake book in their inventory fast enough. There is not much I can do about this.
+* If you use the 'remove shopkeeper after certain time of inactivity of player' feature, then you might experience some server freezing when the plugin loads: to find out when the owner of a shop was online for the last time we use a method which might have to look up a player's uuid or name via mojangs services. However, this is currently considered a minor 'issue' as those lookups can only happen once per plugin load (and reload), and the server probably also caches the results from those lookups, so the next plugin loads probably won't have to look up this data again.
+* If you have shops with items in it with attributes, those might disappear or crash players. I am not completly sure if this is an issue with Shopkeepers or a general thing that the client cannot cope with certain modified items and crashes then. I also experienced this only for the first time I tested the new 1.7.8 Bukkit version, afterwards those items went lost somehow and stopped crashing the client. However, I wasn't able yet to test the new Shopkeepers version with items with custom attributes / edited nbt data, as I wasn't able yet to find some updated/working plugin which creates items with attributes.
 
 I suggest you to backup your old save file, just in case
 
@@ -2604,29 +2605,29 @@ I suggest you to backup your old save file, just in case
 ### Supported MC versions: 1.7.4, 1.7.2, 1.6.4
 * Tiny encoding changes of the included german translation file (let me know if this works for you if you use it)
 * Fixed: the trade not being blocked if there is a similar trade existing (only the current trade gets checked now)
-* Probably fixed: Shopkeeper entities (villagers) duplicating sometimes. This was caused by plugins which manually unload chunks without calling an event (without letting us know). We now work-around this by loading the chunk whenever we want to remove the entity again. Edit: Please let me know if this is still an issue.
-* Probably fixed: Chunks kept loaded due to the same reason above: plugins not letting us know that they have unloaded the chunk. We now load the chunk only once and request an ordinary ChunkUnload which will then remove and deactivate the Shopkeeper when the chunk gets unloaded by that request. (Edit: seems to still be not fixed -> craftbukkit seems to not call an ChunkUnloadEvent if saving is disabled :( )
+* Probably fixed: Shopkeeper entities (villagers) duplicating sometimes. This was caused by plugins which manually unload chunks without calling an event (without letting us know). We now work around this by loading the chunk whenever we want to remove the entity again. Edit: Please let me know if this is still an issue.
+* Probably fixed: Chunks kept loaded due to the same reason above: plugins not letting us know that they have unloaded the chunk. We now load the chunk only once and request an ordinary ChunkUnload which will then remove and deactivate the Shopkeeper when the chunk gets unloaded by that request. (Edit: seems to still be not fixed -> CraftBukkit seems to not call an ChunkUnloadEvent if saving is disabled :( )
 
 ## v1.16 Release (2014-02-08)
 ### Supported MC versions: 1.7.4, 1.7.2, 1.6.4
-* Fixed: preventing of the regular usage of the shop creation item did not work properly
-* Fixed: players could loose their spawn eggs when clicking a living shopkeeper (clicking with spawn eggs in hand is now blocked)
-* Fixed: some NPE when sign shops had no name
-* Fixed: name plate prefix / coloring going lost under certain conditions. Also the entity name / name plate are now removed, if name plates are disabled in the config (before they were simply left they way they are)
-* Changed: empty messages are now skipped (quick solution to disable certainmessages)
-* Added: item data settings for the delete, hire and name item.
-* Added: buttons can now have configurable item lore
+* Fixed: Preventing of the regular usage of the shop creation item did not work properly
+* Fixed: Players could lose their spawn eggs when clicking a living shopkeeper (clicking with spawn eggs in hand is now blocked)
+* Fixed: Some NPE when sign shops had no name
+* Fixed: Name plate prefix / coloring going lost under certain conditions. Also, the entity name / name plate are now removed if name plates are disabled in the config. Previously, they were simply left the way they are.
+* Changed: Empty messages are now skipped (quick solution to disable certainmessages)
+* Added: Item data settings for the delete, hire, and name item.
+* Added: Buttons can now have configurable item lore
 * There are probably a few new messages in the config
 
 See also the changes of the previous 1.16 beta versions!
 
 ## v1.16-beta3 Beta (2014-01-09)
 ### Supported MC versions: 1.7.4, 1.7.2, 1.6.4
-* Added new command to remotly open admin shops via "/shopkeeper remote <shopname>" which needs the new "shopkeeper.remote" permissions node
+* Added new command to remotly open admin shops via "/shopkeeper remote <shopname>" which needs the new `shopkeeper.remote` permission node.
 * Fixed: shop entity-types are now correctly being checked, if they are enabled in the config, before they are created
 * Fixed: an empty save.yml file should no longer cause an error
 * Citizens2 NPC's are now ignored when being clicked
-* Added a few new settings to allow naturally spawned villagers to be "hired" (a certain amount of shop-hire items can be traded for the shop creation item). By default turned off.
+* Added a few new settings to allow naturally spawned villagers to be "hired" (a certain amount of shop-hire items can be traded for the shop creation item). This is turned off by default.
 * Added new messages to be configureable now. Make sure to update your translations.
 * Tiny change: the items in the trading slots now have to also match the required number of their corresponding slots. [Ticket 210]
 
@@ -2641,19 +2642,19 @@ See also the changes of the previous 1.16 beta versions!
 * Added creeper admin shop option
 * Added support for item attributes
 
-In 1.7.2, an invalid trade will create a "ghost item". This seems to be a CraftBukkit bug. 
+In 1.7.2, an invalid trade will create a "ghost item". This seems to be a CraftBukkit bug.
 
 ## v1.15.1 Release (2013-07-19)
 ### Supported MC versions: 1.6.2
-* Added prevent-trading-with-own-shop option
-* Added tax-rate and tax-round-up options
-* Added prevent-shop-creation-item-regular-usage option
-* Added transfer command (/shopkeeper transfer playername, while looking at a shopkeeper chest) and shopkeeper.transfer permission node
-* Added setforhire command (/shopkeeper setforhire, while looking at a shopkeeper chest and holding the cost in hand) and shopkeeper.setforhire and shopkeeper.hire permission nodes
-* Added max-shops-perm-options option and associated shopkeeper.maxshops.X permission node
-* Added name-regex and msg-name-invalid options
-* Added creeper shops (options: enable-creeper-shops and msg-selected-creeper-shop; permission: shopkeeper.creeper)
-* Added support for 1.6.2
+* Added `prevent-trading-with-own-shop` option.
+* Added `tax-rate` and `tax-round-up` options.
+* Added `prevent-shop-creation-item-regular-usage` option.
+* Added transfer command ("/shopkeeper transfer <playername>" while looking at a shopkeeper chest) and `shopkeeper.transfer` permission node.
+* Added setforhire command ("/shopkeeper setforhire" while looking at a shopkeeper chest and holding the cost in hand) and `shopkeeper.setforhire` and `shopkeeper.hire` permission nodes.
+* Added `max-shops-perm-options` option and associated `shopkeeper.maxshops.<X>` permission node.
+* Added `name-regex` and msg-name-invalid options.
+* Added creeper shops (options: `enable-creeper-shops` and msg-selected-creeper-shop; permission: `shopkeeper.creeper`).
+* Added support for 1.6.2.
 
 ## v1.14.2 Beta (2013-07-05)
 ### Supported MC versions: 1.6.1
@@ -2703,10 +2704,10 @@ Doesn't work. Whoops!
 ### Supported MC versions: 1.5.1, 1.4.7
 * Updated for Minecraft 1.5 (should still work with 1.4.7 as well).
 * Several config options have been added, changed, or deleted. See Configuration Options for more information.
-* Added support for all items with meta information (fireworks, enchanted books, custom potions, etc). Renamed items and items with lore are also supported.
+* Added support for all items with meta information (fireworks, enchanted books, custom potions, etc.). Renamed items and items with lore are also supported.
 * Added tooltips for the editor window action buttons.
 * Removed the "Save" action button (just close the editor window to save).
-* Added the "Set Shop Name" action button, which allows you to set a shop's name. This sets the nameplate for the villager as well as the trade window text.
+* Added the "Set Shop Name" action button, which allows you to set a shop's name. This sets both the nameplate of the villager and the trade window text.
 * Added the witch as a shopkeeper type.
 * Shopkeeper creating has been unified. Right-click in air while holding the creation item (villager egg by default) to select the type of shop (normal, buy, trade). Hold sneak while you right-click in air to choose the shopkeeper type (villager, sign, witch). Then right-click on a chest then on a block as usual to place the shop.
 
@@ -2730,7 +2731,7 @@ I highly recommend you back up your save.yml file in the Shopkeepers folder. I'v
 ## v1.8 Release (2012-10-25)
 ### Supported MC versions: 1.3.2
 * Multiple players can trade with a shopkeeper at the same time
-* Sign shopkeepers added: right click a chest with an emerald in your hand, then right click a block to place the sign shop
+* Sign shopkeepers added: Right-click a chest with an emerald in your hand, then right-click a block to place the sign shop.
 * New Configuration Options added for sign shops
 * Players can no longer buy items from their own shops
 * Added enable-purchase-logging config option

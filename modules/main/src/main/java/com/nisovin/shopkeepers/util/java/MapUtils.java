@@ -98,9 +98,7 @@ public class MapUtils {
 	public static Map<String, Object> toStringMap(Map<?, ?> map) {
 		if (map == null) return null;
 		Map<String, Object> stringMap = new LinkedHashMap<>(getIdealHashMapCapacity(map.size()));
-		map.entrySet().forEach(entry -> {
-			Object key = entry.getKey();
-			Object value = entry.getValue();
+		map.forEach((key, value) -> {
 			String stringKey = StringUtils.toStringOrNull(key);
 			stringMap.put(stringKey, value);
 		});

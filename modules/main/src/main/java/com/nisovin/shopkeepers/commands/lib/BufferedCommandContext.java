@@ -76,7 +76,7 @@ public final class BufferedCommandContext extends SimpleCommandContext {
 		if (super.values == null || super.values.isEmpty()) {
 			return context.getMapView();
 		} else {
-			// combine maps:
+			// Combine maps:
 			Map<String, Object> combinedMap = new LinkedHashMap<>(context.getMapView());
 			combinedMap.putAll(super.values); // Replaces existing entries for duplicate keys
 			return Collections.unmodifiableMap(combinedMap);

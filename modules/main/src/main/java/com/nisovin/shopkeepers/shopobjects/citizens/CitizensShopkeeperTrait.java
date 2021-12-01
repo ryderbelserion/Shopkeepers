@@ -131,7 +131,7 @@ public class CitizensShopkeeperTrait extends Trait {
 	private void createShopkeeperIfMissing(Player creator) {
 		NPC npc = this.getNPC();
 		if (npc == null || !npc.hasTrait(CitizensShopkeeperTrait.class)) {
-			// The trait is no longer attached to the NPC. Has is already been removed again? We skip creating a
+			// The trait is no longer attached to the NPC. Has it already been removed again? We skip creating a
 			// shopkeeper for this no longer attached trait:
 			return;
 		}
@@ -151,12 +151,12 @@ public class CitizensShopkeeperTrait extends Trait {
 		Log.debug(() -> "Creating shopkeeper for Citizens NPC " + CitizensShops.getNPCIdString(npc)
 				+ (creator != null ? " and player '" + creator.getName() + "'" : ""));
 
-		Location location = null;
+		Location location;
 		Entity entity = npc.getEntity();
 		if (entity != null) {
 			location = entity.getLocation();
 		} else {
-			location = npc.getStoredLocation();
+			location = npc.getStoredLocation(); // Can be null
 		}
 
 		String shopkeeperCreationError = null; // Null indicates success

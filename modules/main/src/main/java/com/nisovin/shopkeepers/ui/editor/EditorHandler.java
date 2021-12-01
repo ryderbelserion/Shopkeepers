@@ -186,7 +186,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 			// Call event:
 			Bukkit.getPluginManager().callEvent(new ShopkeeperEditedEvent(shopkeeper, player));
 
-			// TODO Close all other UI sessions for the shopkeeper (eg. trading players)? Also send a message to them.
+			// TODO Close all other UI sessions for the shopkeeper (e.g. trading players)? Also send a message to them.
 		}
 
 		// Even if no trades have changed, the shopkeeper might have been marked as dirty due to other editor options.

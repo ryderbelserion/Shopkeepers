@@ -31,7 +31,7 @@ public class InteractionUtils {
 	 * @return <code>true</code> if no plugin denied block interaction
 	 */
 	public static boolean checkBlockInteract(Player player, Block block) {
-		// Simulating right click on the block to check if access is denied:
+		// Simulating a right-click on the block to check if access is denied:
 		// Making sure that block access is really denied, and that the event is not cancelled because of denying
 		// usage with the items in hands:
 		PlayerInventory playerInventory = player.getInventory();
@@ -67,7 +67,7 @@ public class InteractionUtils {
 	 * @return <code>true</code> if no plugin denied interaction
 	 */
 	public static boolean checkEntityInteract(Player player, Entity entity) {
-		// Simulating right click on the entity to check if access is denied:
+		// Simulating a right-click on the entity to check if access is denied:
 		// Making sure that entity access is really denied, and that the event is not cancelled because of denying usage
 		// with the items in hands:
 		PlayerInventory playerInventory = player.getInventory();

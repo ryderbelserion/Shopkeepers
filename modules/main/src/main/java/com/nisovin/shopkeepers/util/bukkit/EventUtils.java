@@ -82,7 +82,7 @@ public class EventUtils {
 		Class<? extends Event> eventRegistrationClass = getEventRegistrationClass(eventClass);
 		assert eventRegistrationClass != null;
 
-		HandlerList handlerList = null;
+		HandlerList handlerList;
 		try {
 			Method method = eventRegistrationClass.getDeclaredMethod("getHandlerList");
 			method.setAccessible(true);
@@ -188,7 +188,7 @@ public class EventUtils {
 											Predicate<RegisteredListener> affectedEventHandlers) {
 		Validate.notNull(eventClass, "eventClass is null");
 
-		// Retrieve the hander list:
+		// Retrieve the handler list:
 		HandlerList handlerList = getHandlerList(eventClass);
 		assert handlerList != null;
 

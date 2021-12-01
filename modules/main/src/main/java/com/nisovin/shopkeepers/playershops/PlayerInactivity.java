@@ -149,9 +149,7 @@ public class PlayerInactivity {
 
 				// Process the inactive players and their shopkeepers:
 				if (!shopsByInactivePlayers.isEmpty()) {
-					shopsByInactivePlayers.entrySet().forEach(entry -> {
-						User user = entry.getKey();
-						List<PlayerShopkeeper> shopkeepers = entry.getValue();
+					shopsByInactivePlayers.forEach((user, shopkeepers) -> {
 						int originalShopkeepersCount = shopkeepers.size();
 						assert !shopkeepers.isEmpty();
 

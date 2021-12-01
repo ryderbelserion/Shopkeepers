@@ -11,7 +11,7 @@ public class Retry {
 		/**
 		 * Gets invoked after every failed execution attempt of {@link Retry#retry(Callable, int, Retry.Callback)}.
 		 * <p>
-		 * This can be used to process the failed attempt (eg. log it) and to prepare a subsequent reattempt.
+		 * This can be used to process the failed attempt (e.g. log it) and to prepare a subsequent reattempt.
 		 * 
 		 * @param attemptNumber
 		 *            the number of the last failed attempt, starting at <code>1</code> for the first failed attempt

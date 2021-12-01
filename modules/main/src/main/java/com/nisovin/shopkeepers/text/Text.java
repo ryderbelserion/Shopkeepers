@@ -59,8 +59,8 @@ public interface Text {
 	 * Shortcut for converting the given object into a {@link Text}.
 	 * <p>
 	 * If the given object is a {@link Supplier}, it gets invoked to obtain the actual object. If the object is already
-	 * a Text, it is returned. Otherwise a new {@link Text} is created from the Object's String representation. If the
-	 * object is <code>null</code>, the String "null" is used.
+	 * a {@link Text}, it is returned. Otherwise, a new {@link Text} is created from the Object's String representation.
+	 * If the object is <code>null</code>, the String {@code "null"} is used.
 	 * 
 	 * @param object
 	 *            the object to convert to a Text
@@ -289,7 +289,7 @@ public interface Text {
 	 */
 	public <T extends Text> T getRoot();
 
-	// Maybe also useful (eg. when building Texts):
+	// Maybe also useful (e.g. when building Texts):
 	// TODO Add getLeaf which returns the last Text in the chain of next Texts?
 	// TODO Add getLast which returns the last Text in the sequential order of Texts (goes to the leaf, but then also
 	// considers the child Texts of that leaf)

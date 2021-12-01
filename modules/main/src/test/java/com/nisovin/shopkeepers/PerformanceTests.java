@@ -55,18 +55,12 @@ public class PerformanceTests extends AbstractBukkitTest {
 		ItemStack itemStack = TestItemStacks.createItemStackComplete();
 		ItemData itemData = new ItemData(itemStack);
 
-		testPerformance("  ", "ItemData#createItemStack", warmupCount, testCount, () -> {
-			itemData.createItemStack();
-		});
+		testPerformance("  ", "ItemData#createItemStack", warmupCount, testCount, itemData::createItemStack);
 
-		testPerformance("  ", "ItemStack#clone()", warmupCount, testCount, () -> {
-			itemStack.clone();
-		});
+		testPerformance("  ", "ItemStack#clone()", warmupCount, testCount, itemStack::clone);
 
 		CraftItemStack craftItemStack = CraftItemStack.asCraftCopy(itemStack);
-		testPerformance("  ", "CraftItemStack#clone()", warmupCount, testCount, () -> {
-			craftItemStack.clone();
-		});
+		testPerformance("  ", "CraftItemStack#clone()", warmupCount, testCount, craftItemStack::clone);
 	}
 
 	@Test

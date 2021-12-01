@@ -54,7 +54,7 @@ public class DefaultValueTypes {
 			@SuppressWarnings("unchecked")
 			@Override
 			public ValueType<?> apply(Type type) {
-				assert type instanceof Enum<?>;
+				assert type instanceof Class<?> && Enum.class.isAssignableFrom((Class<?>) type);
 				Class<? extends Enum<?>> enumClass = (Class<? extends Enum<?>>) type;
 				return this.newEnumValueType(enumClass);
 			}

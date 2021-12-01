@@ -43,7 +43,7 @@ import net.minecraft.world.item.trading.MerchantOffers;
 
 public final class NMSHandler implements NMSCallProvider {
 
-	private Field craftItemStackHandleField;
+	private final Field craftItemStackHandleField;
 
 	public NMSHandler() throws Exception {
 		craftItemStackHandleField = CraftItemStack.class.getDeclaredField("handle");
@@ -253,7 +253,7 @@ public final class NMSHandler implements NMSCallProvider {
 
 	@Override
 	public void setGlowSquidDark(LivingEntity glowSquid, boolean dark) {
-		// Integer.MAX_VALUE should be sufficiently long to not require periodic refreshs.
+		// Integer.MAX_VALUE should be sufficiently long to not require periodic refreshes.
 		((GlowSquid) glowSquid).setDarkTicksRemaining(dark ? Integer.MAX_VALUE : 0);
 	}
 

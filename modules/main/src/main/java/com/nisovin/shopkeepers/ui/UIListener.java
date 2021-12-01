@@ -228,7 +228,7 @@ class UIListener implements Listener {
 
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onInventoryClose(InventoryCloseEvent event) {
-		// Inform the UI registry so that it can cleanup any corresponding UI session:
+		// Inform the UI registry so that it can clean up any corresponding UI session:
 		uiRegistry.onInventoryClose(event);
 	}
 
@@ -240,8 +240,8 @@ class UIListener implements Listener {
 		if (event instanceof TestPlayerInteractEvent) return;
 
 		// When a player interacts with a shopkeeper entity while holding an item in hand, we may first receive the
-		// entity interaction event, which starts an UI session, and then the interaction event for the item.
-		// In order to not trigger any item actions for the held item, we cancel any interaction events while an UI
+		// entity interaction event, which starts a UI session, and then the interaction event for the item.
+		// In order to not trigger any item actions for the held item, we cancel any interaction events while a UI
 		// session is active.
 		Player player = event.getPlayer();
 		SKUISession session = this.getUISession(player);

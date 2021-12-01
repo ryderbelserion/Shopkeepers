@@ -11,13 +11,13 @@ public class DataVersion {
 
 	private final int shopkeepersDataVersion;
 	private final int minecraftDataVersion;
-	private final String combindedDataVersion;
+	private final String combinedDataVersion;
 
 	public DataVersion(int shopkeepersDataVersion, int minecraftDataVersion) {
 		this.shopkeepersDataVersion = shopkeepersDataVersion;
 		this.minecraftDataVersion = minecraftDataVersion;
 		// We concatenate the two data versions to create a String representing the combined data version:
-		this.combindedDataVersion = (shopkeepersDataVersion + "|" + minecraftDataVersion);
+		this.combinedDataVersion = (shopkeepersDataVersion + "|" + minecraftDataVersion);
 	}
 
 	/**
@@ -43,8 +43,8 @@ public class DataVersion {
 	 * 
 	 * @return the combined data version
 	 */
-	public String getCombinded() {
-		return combindedDataVersion;
+	public String getCombined() {
+		return combinedDataVersion;
 	}
 
 	@Override
@@ -68,6 +68,6 @@ public class DataVersion {
 
 	@Override
 	public String toString() {
-		return combindedDataVersion;
+		return combinedDataVersion;
 	}
 }

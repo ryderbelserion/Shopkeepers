@@ -118,6 +118,8 @@ class ContainerProtectionListener implements Listener {
 
 	// Block list has to be modifiable.
 	private void removeProtectedChests(List<Block> blockList) {
+		// Note: We are not using Collection#removeIf here because on some Java versions the ArrayList implementation of
+		// this method evaluates the given Predicate multiple times, which we try to avoid here.
 		Iterator<Block> iterator = blockList.iterator();
 		while (iterator.hasNext()) {
 			Block block = iterator.next();

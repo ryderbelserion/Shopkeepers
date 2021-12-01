@@ -1,6 +1,9 @@
 package com.nisovin.shopkeepers.api;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -20,7 +23,7 @@ public class APIMirrorTest {
 	 */
 	@Test
 	public void testMatchingMethods() {
-		List<Method> pluginMethods = Arrays.asList(ShopkeepersPlugin.class.getDeclaredMethods()).stream().filter((method) -> {
+		List<Method> pluginMethods = Arrays.stream(ShopkeepersPlugin.class.getDeclaredMethods()).filter(method -> {
 			return Modifier.isAbstract(method.getModifiers());
 		}).collect(Collectors.toList());
 		for (Method pluginMethod : pluginMethods) {

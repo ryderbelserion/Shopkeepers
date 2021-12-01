@@ -99,7 +99,7 @@ public class ShopkeepersCommand extends BaseCommand {
 		childCommands.register(new CommandTestSpawn(plugin));
 	}
 
-	// Also responsible for hiding the command from the help page, if shop creation via command is disabled:
+	// This also hides the command from the help page if the player shop creation via command is disabled.
 	@Override
 	public boolean testPermission(CommandSender sender) {
 		if (!super.testPermission(sender)) return false;
@@ -117,9 +117,9 @@ public class ShopkeepersCommand extends BaseCommand {
 		// Creating new shopkeeper:
 
 		// Get targeted block information:
-		// If the player is under water or lava, we ignore fluid collisions (allows placing shopkeepers under water or
-		// inside of lava). Otherwise, we take fluids into account (allows placing shopkeepers on top of water or lava,
-		// such as for example for striders).
+		// If the player is underwater or inside lava, we ignore fluid collisions to allow the placement of shopkeepers
+		// underwater or inside lava. Otherwise, we take fluids into account, which allows the placement of shopkeepers
+		// on top of water or lava, such as for example for striders.
 		Block playerBlock = player.getEyeLocation().getBlock();
 		boolean ignoreFluids = playerBlock.isLiquid();
 		FluidCollisionMode fluidCollisionMode = ignoreFluids ? FluidCollisionMode.NEVER : FluidCollisionMode.ALWAYS;

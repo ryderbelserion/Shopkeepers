@@ -27,7 +27,7 @@ import com.nisovin.shopkeepers.util.data.serialization.java.DataContainerSeriali
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
- * An immutable object that stores item type and meta data information.
+ * An immutable object that stores item type and metadata information.
  */
 public final class ItemData {
 
@@ -70,7 +70,7 @@ public final class ItemData {
 				throw new IllegalStateException("Could not determine the meta type of "
 						+ itemMeta.getClass().getName() + "!");
 			}
-		} // Else: Item does not support meta data. metaType remains null.
+		} // Else: Item does not support metadata. metaType remains null.
 
 		// Cache the meta type (can be null if the item does not support ItemMeta):
 		META_TYPE_BY_ITEM_TYPE.put(itemType, metaType);
@@ -104,7 +104,7 @@ public final class ItemData {
 
 				// Omit 'blockMaterial' for empty TILE_ENTITY item meta:
 				if (TILE_ENTITY_BLOCK_MATERIAL_KEY.equals(metaKey)) {
-					// Check if specific meta type only contains unspecific meta data:
+					// Check if specific meta type only contains unspecific metadata:
 					ItemMeta specificItemMeta = value.dataItem.getItemMeta();
 					// TODO Relies on some material with unspecific item meta.
 					ItemMeta unspecificItemMeta = Bukkit.getItemFactory().asMetaFor(specificItemMeta, Material.STONE);
@@ -137,7 +137,7 @@ public final class ItemData {
 			Material itemType;
 			DataContainer itemDataData = null;
 			if (data instanceof String) {
-				// Reconstruct from compact representation (no additional item meta data):
+				// Reconstruct from compact representation (no additional item metadata):
 				itemType = MinecraftEnumSerializers.Materials.LENIENT.deserialize((String) data);
 				try {
 					ITEM_TYPE.validateValue(itemType);
@@ -152,22 +152,22 @@ public final class ItemData {
 					throw new InvalidDataException(e.getMessage(), e);
 				}
 
-				// Skip the meta data loading if no further data (besides the item type) is given:
+				// Skip loading the metadata if no further data (besides the item type) is given:
 				if (itemDataData.size() <= 1) {
 					itemDataData = null;
 				}
 			}
 			assert itemType != null;
 
-			// Create item stack (still misses meta data):
+			// Create item stack (still misses metadata):
 			ItemStack dataItem = new ItemStack(itemType);
 
-			// Load additional meta data:
+			// Load additional metadata:
 			if (itemDataData != null) {
-				// Prepare the data for the meta data deserialization:
+				// Prepare the data for the metadata deserialization:
 				// We (shallow) copy the data to a new Map, because we will have to insert additional data for the
 				// ItemMeta to be deserializable, and don't want to modify the given original data.
-				// Note: Additional information (eg. the item type) does not need to be removed, but is simply ignored.
+				// Note: Additional information (e.g. the item type) does not need to be removed, but is simply ignored.
 				Map<String, Object> itemMetaData = itemDataData.getValuesCopy();
 
 				// Recursively replace all config sections with Maps, because the ItemMeta deserialization expects Maps:
@@ -176,7 +176,7 @@ public final class ItemData {
 				// Determine the meta type:
 				String metaType = getMetaType(itemType);
 				if (metaType == null) {
-					throw new InvalidDataException("Items of type " + itemType.name() + " do not support meta data!");
+					throw new InvalidDataException("Items of type " + itemType.name() + " do not support metadata!");
 				}
 
 				// Insert meta type:
@@ -208,8 +208,8 @@ public final class ItemData {
 
 	/////
 
-	private final UnmodifiableItemStack dataItem; // Has amount of 1
-	// Cache serialized item meta data, to avoid serializing it again for every comparison:
+	private final UnmodifiableItemStack dataItem; // Has an amount of 1
+	// Cache serialized item metadata, to avoid serializing it again for every comparison:
 	private @ReadOnly Map<String, @ReadOnly Object> serializedMetaData = null; // Gets lazily initialized when needed
 
 	public ItemData(Material type) {
@@ -253,7 +253,7 @@ public final class ItemData {
 
 	// Creates a copy of this ItemData, but changes the item type. If the new type matches the previous type, the
 	// current ItemData is returned.
-	// Any incompatible meta data is removed.
+	// Any incompatible metadata is removed.
 	public ItemData withType(Material type) {
 		Validate.notNull(type, "type is null");
 		Validate.isTrue(type.isItem(), () -> "type is not an item: " + type);

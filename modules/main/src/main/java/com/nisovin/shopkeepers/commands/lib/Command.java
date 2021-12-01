@@ -22,6 +22,7 @@ import com.nisovin.shopkeepers.util.java.MapUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
+import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 public abstract class Command {
 
@@ -63,16 +64,16 @@ public abstract class Command {
 	private boolean includeChildsInParentHelp = false;
 
 	// Common message arguments:
-	private final Map<String, Object> commonMessageArgs;
+	private final MessageArguments commonMessageArgs;
 	{
 		// Dynamically evaluated:
-		Map<String, Object> commonMessageArgs = new HashMap<>();
-		commonMessageArgs.put("name", (Supplier<?>) () -> this.getName());
-		commonMessageArgs.put("description", (Supplier<?>) () -> this.getDescription());
-		commonMessageArgs.put("command", (Supplier<?>) () -> this.getCommandFormat());
-		commonMessageArgs.put("usage", (Supplier<?>) () -> this.getUsageFormat());
-		commonMessageArgs.put("arguments", (Supplier<?>) () -> this.getArgumentsFormat());
-		this.commonMessageArgs = Collections.unmodifiableMap(commonMessageArgs);
+		Map<String, Supplier<?>> commonMessageArgs = new HashMap<>();
+		commonMessageArgs.put("name", this::getName);
+		commonMessageArgs.put("description", this::getDescription);
+		commonMessageArgs.put("command", this::getCommandFormat);
+		commonMessageArgs.put("usage", this::getUsageFormat);
+		commonMessageArgs.put("arguments", this::getArgumentsFormat);
+		this.commonMessageArgs = MessageArguments.ofMap(commonMessageArgs);
 	}
 
 	// Formatting (null results in the parent's formatting to be used):
@@ -108,7 +109,7 @@ public abstract class Command {
 	 * Gets the name of this command.
 	 * <p>
 	 * For {@link BaseCommand base commands} this name is supposed to be unique among the commands of the same plugin.
-	 * There might conflicts with the commands of other plugins though.
+	 * However, there can be conflicts with the commands of other plugins.
 	 * <p>
 	 * For child commands this name is supposed to be unique among the child commands of the same parent command.
 	 * 
@@ -252,7 +253,7 @@ public abstract class Command {
 	 */
 	public boolean isAccepted(CommandSender sender) {
 		Validate.notNull(sender, "sender is null");
-		// By default all command senders are accepted:
+		// By default, all command senders are accepted:
 		return true;
 	}
 
@@ -393,7 +394,7 @@ public abstract class Command {
 	 * 
 	 * @return the common message arguments
 	 */
-	public final Map<String, Object> getCommonMessageArgs() {
+	public final MessageArguments getCommonMessageArgs() {
 		return commonMessageArgs;
 	}
 
@@ -424,12 +425,12 @@ public abstract class Command {
 	}
 
 	/**
-	 * Checks if the arguments reader's next argument matches a child command.
+	 * Checks if the ArgumentsReader's next argument matches a child command.
 	 * <p>
-	 * If a matching child command is found, the arguments reader's cursor gets moved forward.
+	 * If a matching child command is found, the ArgumentsReader's cursor is moved forward.
 	 * 
 	 * @param argsReader
-	 *            the arguments reader
+	 *            the ArgumentsReader, not <code>null</code>
 	 * @return the child command, or <code>null</code> if none was found
 	 */
 	protected Command getChildCommand(ArgumentsReader argsReader) {
@@ -453,7 +454,7 @@ public abstract class Command {
 	 * processing.
 	 * 
 	 * @param input
-	 *            the command input
+	 *            the command input, not <code>null</code>
 	 */
 	public void handleCommand(CommandInput input) {
 		Validate.notNull(input, "input is null");
@@ -464,7 +465,7 @@ public abstract class Command {
 		ArgumentsReader argsReader = new ArgumentsReader(input);
 		try {
 			this.processCommand(input, context, argsReader);
-			Log.debug(DebugOptions.commands, () -> "Command succeeded. Context: " + context.toString());
+			Log.debug(DebugOptions.commands, () -> "Command succeeded. Context: " + context);
 		} catch (CommandException e) {
 			TextUtils.sendMessage(sender, e.getMessageText());
 
@@ -479,13 +480,13 @@ public abstract class Command {
 				return sb.toString();
 			});
 			Log.debug(DebugOptions.commands, "Command exception: ", e);
-			Log.debug(DebugOptions.commands, () -> "Context: " + context.toString());
-			Log.debug(DebugOptions.commands, () -> "Arguments reader: " + argsReader.toString());
+			Log.debug(DebugOptions.commands, () -> "Context: " + context);
+			Log.debug(DebugOptions.commands, () -> "ArgumentsReader: " + argsReader);
 		} catch (Exception e) {
 			// An unexpected exception was caught:
 			TextUtils.sendMessage(sender, Text.color(ChatColor.RED).text("An error occurred during command handling! Check the console log."));
 			Log.severe("An error occurred during command handling!", e);
-			Log.severe("Context: " + context.toString());
+			Log.severe("Context: " + context);
 		}
 	}
 
@@ -509,7 +510,7 @@ public abstract class Command {
 	 * Processes the given inputs and then executes this command.
 	 * 
 	 * @param input
-	 *            the command input
+	 *            the command input, not <code>null</code>
 	 * @throws CommandException
 	 *             if command execution failed
 	 */
@@ -535,14 +536,14 @@ public abstract class Command {
 	 * </ul>
 	 * 
 	 * @param input
-	 *            the command input
+	 *            the command input, not <code>null</code>
 	 * @throws CommandException
 	 *             if command execution failed
 	 */
 	protected void processCommand(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws CommandException {
 		assert input != null && context != null && argsReader != null;
 		assert (input.getCommand() == this.getRootCommand()); // Input is meant for this command
-		assert (argsReader.getArgs() != input.getArguments()); // Arguments reader is consistent with input
+		assert (argsReader.getArgs() != input.getArguments()); // ArgumentsReader is consistent with the input
 
 		// Search for matching child-command:
 		Command childCommand = this.getChildCommand(argsReader);
@@ -682,7 +683,7 @@ public abstract class Command {
 		/**
 		 * Gets the {@link ArgumentsReader} at the state from before the fallback.
 		 * 
-		 * @return the arguments reader at the state from before the fallback
+		 * @return the ArgumentsReader at the state from before the fallback
 		 */
 		public ArgumentsReader getOriginalArgsReader() {
 			return originalArgsReader;
@@ -693,11 +694,11 @@ public abstract class Command {
 	 * Parses all command arguments for this command.
 	 * 
 	 * @param input
-	 *            the input
+	 *            the input, not <code>null</code>
 	 * @param context
-	 *            the command context to store the parsed values in
+	 *            the command context to store the parsed values in, not <code>null</code>
 	 * @param argsReader
-	 *            the arguments reader
+	 *            the ArgumentsReader, not <code>null</code>
 	 * @throws ArgumentParseException
 	 *             if a required argument cannot be parsed or there are unparsed remaining arguments
 	 */
@@ -881,8 +882,8 @@ public abstract class Command {
 			// remaining, we assume that they do not depend on the new context provided by the current fallback and that
 			// restarting the parsing would result in the same outcome as before. We can therefore apply the previously
 			// captured state and skip parsing these arguments again.
-			// TODO One can easily construct examples in which this heuristic fails (eg. if the context is optional, but
-			// would result in a different outcome when present). Remove this heuristic?
+			// TODO One can easily construct examples in which this heuristic fails (e.g. if the context is optional,
+			// but would result in a different outcome when present). Remove this heuristic?
 			if (!parsingFailed) {
 				// Apply buffered context changes that happened after the fallback argument:
 				fallback.getBufferedContext().applyBuffer();
@@ -959,9 +960,9 @@ public abstract class Command {
 	 * command behavior.
 	 * 
 	 * @param input
-	 *            the command input
+	 *            the command input, not <code>null</code>
 	 * @param context
-	 *            the context containing the parsed argument values
+	 *            the context containing the parsed argument values, not <code>null</code>
 	 * @throws CommandException
 	 *             if command execution failed
 	 */
@@ -974,7 +975,7 @@ public abstract class Command {
 	 * Gets tab completion suggestions for the last (possibly partial or empty) argument of the given input.
 	 * 
 	 * @param input
-	 *            the command input
+	 *            the command input, not <code>null</code>
 	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions' (not
 	 *         <code>null</code> and not containing <code>null</code>)
 	 */
@@ -991,18 +992,18 @@ public abstract class Command {
 	 * Gets tab completion suggestions for the last (possibly partial or empty) argument of the given input.
 	 * 
 	 * @param input
-	 *            the command input
+	 *            the command input, not <code>null</code>
 	 * @param context
-	 *            the context
+	 *            the context, not <code>null</code>
 	 * @param argsReader
-	 *            the arguments reader
+	 *            the ArgumentsReader, not <code>null</code>
 	 * @return the suggestions for the final argument, or an empty list to indicate 'no suggestions' (not
 	 *         <code>null</code> and not containing <code>null</code>)
 	 */
 	protected List<String> handleTabCompletion(CommandInput input, CommandContext context, ArgumentsReader argsReader) {
 		assert input != null && context != null && argsReader != null;
 		assert (input.getCommand() == this.getRootCommand()); // Input is meant for this command
-		assert (argsReader.getArgs() != input.getArguments()); // Arguments reader is consistent with input
+		assert (argsReader.getArgs() != input.getArguments()); // ArgumentsReader is consistent with the input
 
 		// Search for matching child-command:
 		Command childCommand = this.getChildCommand(argsReader);
@@ -1090,7 +1091,7 @@ public abstract class Command {
 			} catch (FallbackArgumentException e) {
 				// Parsing failed, but registered a fallback:
 				// Check for completions, but continue parsing.
-				// TODO Also include suggestions for the following arguments with the fallback evaluated? (Eg. if the
+				// TODO Also include suggestions for the following arguments with the fallback evaluated? (E.g. if the
 				// following arguments depend on context provided by the fallback argument).
 				argsReader.setState(argsReaderState);
 				suggestions.addAll(argument.complete(input, contextView, argsReader));
@@ -1401,7 +1402,7 @@ public abstract class Command {
 	 * Sends usage information about this command and its child-commands to the given {@link CommandSender}.
 	 * 
 	 * @param recipient
-	 *            the recipient
+	 *            the recipient, not <code>null</code>
 	 * @throws NoPermissionException
 	 *             if the sender is not allowed to view the help of this command
 	 */
@@ -1413,7 +1414,7 @@ public abstract class Command {
 			throw this.noPermissionException();
 		}
 
-		Map<String, Object> commonMsgArgs = this.getCommonMessageArgs();
+		MessageArguments commonMsgArgs = this.getCommonMessageArgs();
 
 		// Title:
 		Text titleFormat = this.getHelpTitleFormat();
@@ -1470,7 +1471,7 @@ public abstract class Command {
 		for (Command childCommand : command.getChildCommands().getCommands()) {
 			// Skip info about the command if it is hidden or the recipient does not have the required permission:
 			if (!childCommand.isHiddenInParentHelp() && childCommand.testPermission(recipient)) {
-				Map<String, Object> childCommonMsgArgs = childCommand.getCommonMessageArgs();
+				MessageArguments childCommonMsgArgs = childCommand.getCommonMessageArgs();
 
 				// Command usage:
 				childUsageFormat.setPlaceholderArguments(childCommonMsgArgs);

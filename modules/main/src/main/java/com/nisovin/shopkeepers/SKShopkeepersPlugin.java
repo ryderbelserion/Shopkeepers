@@ -136,8 +136,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 	private boolean isOutdatedServerVersion() {
 		// Validate that this server is running a minimum required version:
 		// TODO Add proper version parsing.
-		/*String cbVersion = Utils.getServerCBVersion(); // eg. 1_13_R2
-		String bukkitVersion = Bukkit.getBukkitVersion(); // eg. 1.13.1-R0.1-SNAPSHOT*/
+		/*String cbVersion = Utils.getServerCBVersion(); // E.g. 1_13_R2
+		String bukkitVersion = Bukkit.getBukkitVersion(); // E.g. 1.13.1-R0.1-SNAPSHOT*/
 		try {
 			// This has been added with the recent changes to PlayerBedEnterEvent: TODO outdated
 			Class.forName("org.bukkit.event.player.PlayerBedEnterEvent$BedEnterResult");
@@ -147,7 +147,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		}
 	}
 
-	// Returns false if no compatible NMS version, nor the fallback handler could be setup.
+	// Returns false if no compatible NMS version, nor the fallback handler could be set up.
 	private boolean setupNMS() {
 		NMSManager.load(this);
 		return (NMSManager.getProvider() != null);
@@ -167,13 +167,13 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 	@Override
 	public void onLoad() {
-		Log.setLogger(this.getLogger()); // Setup logger early
+		Log.setLogger(this.getLogger()); // Set up logger early
 		// Setting plugin reference early, so it is also available for any code running here:
 		plugin = this;
 		InternalShopkeepersAPI.enable(this);
 
 		// Loading all plugin classes up front ensures that we don't run into missing classes (usually during shutdown)
-		// when the plugin jar gets replaced during runtime (eg. for hot reloads):
+		// when the plugin jar gets replaced during runtime (e.g. for hot reloads):
 		this.loadAllPluginClasses();
 
 		// Validate that this server is running a minimum required version:
@@ -209,11 +209,11 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 	@Override
 	public void onEnable() {
-		assert Log.getLogger() != null; // Log should already have been setup
+		assert Log.getLogger() != null; // Log should already have been set up
 		// Plugin instance and API might already have been set during onLoad:
-		boolean alreadySetup = true;
+		boolean alreadySetUp = true;
 		if (plugin == null) {
-			alreadySetup = false;
+			alreadySetUp = false;
 			plugin = this;
 			InternalShopkeepersAPI.enable(this);
 		}
@@ -233,7 +233,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		}
 
 		// Load config (if not already loaded during onLoad):
-		if (!alreadySetup) {
+		if (!alreadySetUp) {
 			this.configLoadError = Settings.loadConfig(this);
 		} else {
 			Log.debug("Config already loaded.");
@@ -245,7 +245,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		}
 
 		// Load language file (if not already loaded during onLoad):
-		if (!alreadySetup) {
+		if (!alreadySetUp) {
 			Messages.loadLanguageFile();
 		} else {
 			Log.debug("Language file already loaded.");
@@ -269,8 +269,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 			return;
 		}
 
-		// Register defaults (if not already setup during onLoad):
-		if (!alreadySetup) {
+		// Register defaults (if not already set up during onLoad):
+		if (!alreadySetUp) {
 			this.registerDefaults();
 		} else {
 			Log.debug("Defaults already registered.");
@@ -365,7 +365,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// Trade notifications:
 		tradeNotifications.onEnable();
 
-		// Save all updated shopkeeper data (eg. after data migrations):
+		// Save all updated shopkeeper data (e.g. after data migrations):
 		shopkeeperStorage.saveIfDirty();
 
 		// Plugin metrics:
@@ -522,7 +522,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		return protectedContainers;
 	}
 
-	// SHOPKEEPR REMOVAL ON CONTAINER BREAKING
+	// SHOPKEEPER REMOVAL ON CONTAINER BREAKING
 
 	public RemoveShopOnContainerBreak getRemoveShopOnContainerBreak() {
 		return removeShopOnContainerBreak;

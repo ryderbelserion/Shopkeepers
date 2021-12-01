@@ -29,7 +29,7 @@ public class TradeMerger {
 	 */
 	public enum MergeMode {
 		/**
-		 * Merges equivalent trades that were triggered by the same {@link InventoryClickEvent} (eg. when multiple
+		 * Merges equivalent trades that were triggered by the same {@link InventoryClickEvent} (e.g. when multiple
 		 * trades are automatically triggered by a single shift click).
 		 */
 		SAME_CLICK_EVENT,
@@ -135,7 +135,8 @@ public class TradeMerger {
 		Validate.notNull(tradeEvent, "tradeEvent is null");
 		// In order to check if the trade can be merged with the previous trades, we most likely need to retrieve item
 		// copies from the event. By creating the new MergedTrades right away, instead of only afterwards when it is
-		// actually required, we can cache these once retrieved item copies. This is therefore cheaper most of the time.
+		// actually required, we can cache these item copies and only need to retrieve them once. This is therefore
+		// cheaper most of the time.
 		MergedTrades newMergedTrades = new MergedTrades(tradeEvent);
 		long nowNanos = System.nanoTime();
 		if (previousTrades == null) {
@@ -232,7 +233,7 @@ public class TradeMerger {
 		// End the previous task, if there is one:
 		this.endNextMergeTimeoutTask();
 
-		// In order to avoid restarting this task very frequently (eg. after every merged trade), we instead only start
+		// In order to avoid restarting this task very frequently (e.g. after every merged trade), we instead only start
 		// this task once and then check afterwards whether there have been any trades in the meantime. If there has
 		// been another trade, a new next merge timeout task is started with a delay according to the remaining timeout
 		// duration for the last merged trade.

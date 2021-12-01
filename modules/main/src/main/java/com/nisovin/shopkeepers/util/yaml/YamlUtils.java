@@ -65,7 +65,7 @@ public class YamlUtils {
 	public static <T> T fromYaml(String yamlString) {
 		Validate.notNull(yamlString, "yamlString is null");
 		Yaml yaml = YAML.get();
-		Object object = yaml.load(yamlString); // Can be null (eg. for an empty String)
+		Object object = yaml.load(yamlString); // Can be null (e.g. for an empty String)
 		return (T) object;
 	}
 

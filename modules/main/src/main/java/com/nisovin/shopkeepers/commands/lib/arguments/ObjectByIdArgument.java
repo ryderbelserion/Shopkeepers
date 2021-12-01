@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.text.Text;
 
 /**
- * Base class for arguments that accept some form of identifier (eg. UUID or name) for specifying a corresponding
+ * Base class for arguments that accept some form of identifier (e.g. UUID or name) for specifying a corresponding
  * object.
  *
  * @param <I>
@@ -47,7 +47,7 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 		}
 	}
 
-	// Implementation note: Usually we don't use an id filter here. Instead we filter directly which objects are
+	// Implementation note: Usually, we don't use an id filter here. Instead, we filter directly which objects are
 	// involved in generating the suggestions. To achieve that, the created id-argument has to delegate its
 	// ObjectIdArgument#getCompletionSuggestions(String) implementation to
 	// ObjectByIdArgument#getCompletionSuggestions(String), which should take this argument's object filter into
@@ -107,8 +107,8 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 	 *            the command input, not <code>null</code>
 	 * @param context
 	 *            the command context, not <code>null</code>
-	 * @param the
-	 *            minimum input length before completion suggestions are provided
+	 * @param minimumCompletionInput
+	 *            the minimum input length before completion suggestions are provided
 	 * @param idPrefix
 	 *            the id prefix, may be empty, not <code>null</code>
 	 * @return the suggestions

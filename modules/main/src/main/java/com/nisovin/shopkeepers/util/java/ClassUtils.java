@@ -54,9 +54,9 @@ public class ClassUtils {
 	/**
 	 * Casts the given {@link Class} to a class with a more specific type parameter.
 	 * <p>
-	 * This is especially useful when working with class literals of generic types: These class literals are raw,
-	 * unparameterized types, but a method may require a class literal as argument with a type parameter that matches
-	 * some specific parameterization.
+	 * The cast is unchecked. This method is especially useful when working with class literals of generic types: These
+	 * class literals are raw, unparameterized types, but a method may require a class literal as argument with a type
+	 * parameter that matches some specific parameterization.
 	 * 
 	 * @param <T>
 	 *            the input type parameter type
@@ -64,7 +64,7 @@ public class ClassUtils {
 	 *            the output type parameter type
 	 * @param clazz
 	 *            the input class
-	 * @return the casted class
+	 * @return the class after casting
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T, U extends T> Class<U> parameterized(Class<T> clazz) {

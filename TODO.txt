@@ -7,7 +7,7 @@ Mid priority:
 
 
 Low priority:
-* Make all config keys consistent: Avoid spaces (eg. 'owner uuid') and use hyphens rather than camelcase?
+* Make all config keys consistent: Avoid spaces (e.g. 'owner uuid') and use hyphens rather than camelcase?
 
 * German translation:
   * Rename all occurrences of 'Shop/Shops' with 'Laden/Läden/Händler'?
@@ -16,13 +16,13 @@ Low priority:
   * Reverse the setup of arguments in parsing chains:
     * Currently the parent argument delegates to child arguments, making the setup unnatural since fallbacks need to be specified first
     * Instead, allow specifying the chain of arguments more naturally: argument.fallback(fallback).fallback(fallback) etc.
-  * Support advanced text features (eg. in helps page)
+  * Support advanced text features (e.g. in helps page)
   * Allow arguments to change the following arguments, similar to how subcommands have different chains of arguments
-    * Eg. /shopkeeper info ['own'|'admin'|<player>] <shopkeeper>: Different suggestions/allowed arguments for the second argument depending on the first argument
+    * E.g. /shopkeeper info ['own'|'admin'|<player>] <shopkeeper>: Different suggestions/allowed arguments for the second argument depending on the first argument
     * But: Avoid duplicate definition of common argument chains, if different chains are not required/used
-      * Eg. by defining an argument chain once and then reusing it for different sub-commands/arguments
+      * E.g. by defining an argument chain once and then reusing it for different sub-commands/arguments
     * Maybe even dynamically, by allowing arguments that get parameterized by the arguments parsed before
-      * Eg. /region <region> removeMember <member>: Only suggest members that are part of the region
+      * E.g. /region <region> removeMember <member>: Only suggest members that are part of the region
   * Bind executing code directly to an argument chain, to avoid having to manually check the CommandContext for which arguments got actually parsed
   * Allow for easier debugging of command execution and argument parsing (without introducing plugin-specific logging dependencies into the library classes).
     * Maybe define separate logging interface for the command lib, current the Log class is used directly
@@ -31,22 +31,22 @@ Low priority:
     * Example: /list [player (default:sender)] [page (default:1)])
       * "/list 123" ("123" is a valid player name!)
       * Also: "/list 123 2" would currently try to parse "123" as page number and then print an error due to the unexpected "2" due to the fallback mechanic used for the player argument
-    * Warning if command/arguments allow for ambiguity? Eg. by letting arguments provide a list of examples and evaluating all possible combinations
+    * Warning if command/arguments allow for ambiguity? E.g. by letting arguments provide a list of examples and evaluating all possible combinations
     * Parse all possible argument assignments and print a warning if the input is ambigous?
-    * Allow resolving ambiguities by explicitly binding arguments, eg. "/list player=blablubbabc page=3"
+    * Allow resolving ambiguities by explicitly binding arguments, e.g. "/list player=blablubbabc page=3"
       * or '::' or ':=' or '!='? '=' might likely be used/useful in various arguments as well, and ':' alone is ambiguous because the use in namespaces
       * or "/list -player blablubbabc -page 2" ? or "/list !player=blablubbabc !page=2"?
         * or "/list --player blablubbabc --page 2"
-      * but: requires users to know the exact argument name: issue when arguments can have alises? (eg. for literals, especially if the command format uses an alias instead of the actual argument name)
+      * but: requires users to know the exact argument name: issue when arguments can have aliases? (e.g. for literals, especially if the command format uses an alias instead of the actual argument name)
       * also: what about sub-arguments? Is it required to be able to explicitly specify which sub-argument an arg is meant to bind to? sub-arguments are usually an implementation detail
       * or: "/list '' '2'" (quotes contain the arg(s) that get bound to specific arguments; including marking empty arguments explicitly)
-      * or: use some separator that marks which arg(s) get bound to which arguments, eg.: "/list | | 2"
+      * or: use some separator that marks which arg(s) get bound to which arguments, e.g.: "/list | | 2"
       * or: use special character/marker to explicitly mark missing arguments: "/list ! 2", or "/list _ 2"
-        * However: Does not allow resolving all kinds of ambiguities! eg. if arguments parse multiple args: "/cmd [multiple args (here] and there)" ('here' may be the last arg of the first argument, or the first arg of the second argument)
+        * However: Does not allow resolving all kinds of ambiguities! e.g. if arguments parse multiple args: "/cmd [multiple args (here] and there)" ('here' may be the last arg of the first argument, or the first arg of the second argument)
         * -> Special character marks 'end of current argument': Allows marking missing arguments, as well as using it as argument delimiter
       * Also allow for multi-part arguments: "/text text='some text'"
       * And empty/missing argument: "/list player='' 1" (player argument is optional)
-      * Problem: FirstOf arguments with literals can internally have ambiguities as well, eg. "/list <'all'|player>" (with an existing player named 'all')
+      * Problem: FirstOf arguments with literals can internally have ambiguities as well, e.g. "/list <'all'|player>" (with an existing player named 'all')
         * This is only a problem if the sub arguments are joined to a single name in the argument format (which unusual if literal arguments are involved)
     * Allow quoted string parsing "'some text'" (accepting "" and '' and ``)
       * Also: "{some: map, like: data}"
@@ -67,7 +67,7 @@ Low priority:
 
 * Remove AbstractType#matches with aliases
 * remove AbstractType#isEnabled() and instead dynamically register and unregister enabled/disabled types?
-  * might change the order of the types dynamically though.. determine the order differently, via config?
+  * might change the order of the types dynamically though... determine the order differently, via config?
 * set entity attributes (subtypes/look) before spawning the entity (avoids short flicker)
 * rename registry#getShopkeeperByBlock() to getShopkeeperBySignBlock or similar?
 * properly separate loading/unloading from activation/deactivation in debug messages/method names/etc
@@ -77,8 +77,6 @@ Low priority:
   * Mobs riding other mobs?
   * Enderman: carrying block
   * Phantom: size
-  * Puffer fish: puff up state.
-  * Tropical fish: color, pattern, pattern color
   * Vex: charged state?
 * Add individual config options for the different editor options?
 * Allow changing the editor option button items
@@ -93,6 +91,6 @@ Ideas:
   -> which could contain additional meta-data, per-trade/shopkeeper settings, which could be used (ex. by other plugins) to trigger certain actions when a specific trade is used <br>
 * Maybe move shop options (like currently name, profession, etc.) into a separate inventory view to have additional space there<br>
 * Add message to default zero-currency items explaining how to increase/decrease costs.
-* Add zero-cost items in trading shopkeeper, with lore which explains how to setup the trade.
+* Add zero-cost items in trading shopkeeper, with lore which explains how to set up the trade.
 * Store shopkeeper data (save.yml) in smaller chunks? Maybe 1 file per world?
   * Makes only sense for very large numbers of shops, with many trades -> TODO benchmark

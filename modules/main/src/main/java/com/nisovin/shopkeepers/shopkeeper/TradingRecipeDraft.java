@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 public class TradingRecipeDraft {
 
 	public static final TradingRecipeDraft EMPTY = new TradingRecipeDraft(
-			(UnmodifiableItemStack) null, (UnmodifiableItemStack) null, (UnmodifiableItemStack) null
+			(UnmodifiableItemStack) null, null, null
 	);
 
 	protected final UnmodifiableItemStack resultItem;

@@ -219,7 +219,7 @@ public final class MathUtils {
 	 */
 	public static int rangeModulo(int value, int min, int max) {
 		Validate.isTrue(min <= max, "min > max");
-		// Note: value can be outside of this range.
+		// Note: The value can be outside this range.
 		int offset = min;
 		int range = max - min + 1;
 		int modulo = (value - offset) % range;

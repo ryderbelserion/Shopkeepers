@@ -50,7 +50,7 @@ public class BlockLocation {
 	 */
 	public static BlockLocation of(Location location) {
 		Validate.notNull(location, "location is null");
-		// Note: We no not check Location#isWorldLoaded here, because if the location references a world that has been
+		// Note: We do not check Location#isWorldLoaded here, because if the location references a world that has been
 		// unloaded by now, this is likely an unexpected error that we want to inform about via an exception.
 		World world = location.getWorld(); // Throws an exception if the world has been unloaded
 		String worldName = (world != null) ? world.getName() : null;

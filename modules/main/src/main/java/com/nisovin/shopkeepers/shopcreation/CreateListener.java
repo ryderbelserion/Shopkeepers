@@ -118,7 +118,7 @@ class CreateListener implements Listener {
 	}
 
 	// See LivingEntityShopListener for a reasoning on why we handle this the event the way we do:
-	// We handle and cancel this event on LOWEST priority so that other plugins (eg. protection plugins) can ignore it.
+	// We handle and cancel this event on LOWEST priority so that other plugins (e.g. protection plugins) can ignore it.
 	// This event handler might check container access by calling another dummy interaction event. Handling and
 	// canceling this event as early as possible is also required so that other event handlers (for example of
 	// protection plugins) can ignore the first event and don't handle the interaction twice.
@@ -168,8 +168,8 @@ class CreateListener implements Listener {
 			return;
 		}
 
-		// Ignore if already cancelled. Resolves conflicts with other event handlers running at LOWEST priority (eg.
-		// Shopkeepers' sign shop listener acts on LOWEST priority as well).
+		// Ignore if already cancelled. This resolves conflicts with other event handlers that also run at LOWEST
+		// priority, such as for example Shopkeeper's sign shop listener.
 		if (useItemInHand == Result.DENY) {
 			Log.debug("  Ignoring already cancelled item interaction");
 			return;
@@ -282,7 +282,7 @@ class CreateListener implements Listener {
 
 					// Manually remove creation item from player's hand after this event is processed:
 					Bukkit.getScheduler().runTask(plugin, () -> {
-						ItemStack newItemInMainHand = ItemUtils.descreaseItemAmount(itemInHand, 1);
+						ItemStack newItemInMainHand = ItemUtils.decreaseItemAmount(itemInHand, 1);
 						player.getInventory().setItemInMainHand(newItemInMainHand);
 					});
 				}

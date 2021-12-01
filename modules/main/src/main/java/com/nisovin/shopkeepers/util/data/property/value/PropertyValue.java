@@ -37,7 +37,7 @@ public class PropertyValue<T> {
 	/**
 	 * The default {@link UpdateFlag}s.
 	 */
-	public static enum DefaultUpdateFlag implements UpdateFlag {
+	public enum DefaultUpdateFlag implements UpdateFlag {
 		/**
 		 * Whether to mark the {@link PropertyValue#getHolder() holder} as
 		 * {@link AbstractPropertyValuesHolder#markDirty() dirty} when the value has changed.
@@ -81,14 +81,14 @@ public class PropertyValue<T> {
 	}
 
 	/**
-	 * Verifies that this {@link PropertyValue} has already been {@link #build() built}.
+	 * Verifies that this {@link PropertyValue} has already been {@link #build(PropertyValuesHolder) built}.
 	 */
 	protected final void validateBuilt() {
 		Validate.State.isTrue(this.isBuilt(), "PropertyValue has not yet been built!");
 	}
 
 	/**
-	 * Verifies that this {@link PropertyValue} has not yet been {@link #build() built}.
+	 * Verifies that this {@link PropertyValue} has not yet been {@link #build(PropertyValuesHolder) built}.
 	 */
 	protected final void validateNotBuilt() {
 		Validate.State.isTrue(!this.isBuilt(), "PropertyValue has already been built!");
@@ -129,8 +129,8 @@ public class PropertyValue<T> {
 	}
 
 	/**
-	 * This is called when the {@link PropertyValue} is {@link #build() built} and can be overridden by sub classes to
-	 * perform any remaining setup and validation.
+	 * This is called when the {@link PropertyValue} is {@link #build(PropertyValuesHolder) built} and can be overridden
+	 * by subclasses to perform any remaining setup and validation.
 	 */
 	protected void postConstruct() {
 	}
@@ -291,7 +291,7 @@ public class PropertyValue<T> {
 	public final void load(DataContainer dataContainer) throws InvalidDataException {
 		// TODO Allow callers to pass UpdateFlags to this method?
 		Set<UpdateFlag> updateFlags = Collections.emptySet(); // Does not mark the holder as dirty
-		T value = null;
+		T value;
 		try {
 			value = property.load(dataContainer); // Can load null
 		} catch (MissingDataException e) {

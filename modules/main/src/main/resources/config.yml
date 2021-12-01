@@ -25,8 +25,8 @@ debug: false
 # - 'commands': Enables additional commands related debugging output.
 # - 'owner-name-updates': Logs information when updating stored shop owner
 #    names.
-# - 'item-migrations': Logs whenever a shopkeeper performs item migrations (eg.
-#    for trading offers).
+# - 'item-migrations': Logs whenever a shopkeeper performs item migrations
+#    (e.g. for trade offers).
 # - 'item-conversions': Logs whenever we explicitly convert items to Spigot's
 #    data format. Note that this does not log when items get implicitly
 #    converted, which may happen under various circumstances.
@@ -63,11 +63,11 @@ file-encoding: "UTF-8"
 save-instantly: true
 
 # Enables the automatic conversion of items inside the inventories of players
-# and shop containers whenever a player opens a shopkeeper UI (eg. trading,
+# and shop containers whenever a player opens a shopkeeper UI (e.g. trading,
 # editor, hiring, etc.) The items are converted to conform to Spigot's internal
 # data format.
 # This setting helps with issues related to items which have been created on
-# previous Spigot versions or via some Minecraft mechanism (eg. give command,
+# previous Spigot versions or via some Minecraft mechanism (e.g. give command,
 # loot tables, etc.) no longer getting accepted when trading with shopkeepers.
 # In order for the items to get reliably accepted during trades, their data has
 # to match the internal format which Spigot uses when a plugin would create the
@@ -79,9 +79,9 @@ save-instantly: true
 # shopkeeper trades. This setting will not reliably help you prevent item
 # stacking related issues!
 # Enabling this setting comes with a performance impact! Try to avoid using
-# this option and search for alternative solutions instead (eg. stick to
+# this option and search for alternative solutions instead (e.g. stick to
 # Spigot's data format when creating items via Minecraft mechanisms). Try to
-# only keep this setting enabled for as long as required (eg. until you assume
+# only keep this setting enabled for as long as required (e.g. until you assume
 # that most of your players' legacy items got converted by now).
 convert-player-items: false
 # If 'convert-player-items' is enabled, this setting toggles whether the
@@ -111,7 +111,7 @@ enable-world-guard-restrictions: false
 # If enabled (additionally to the enable-world-guard-restrictions setting),
 # players will only be able to place shopkeepers in regions where the
 # 'allow-shop' flag is set, but nowhere else. However, players will still
-# require container access to setup shops. And in case they can't place
+# require container access to set up shops. And in case they can't place
 # containers in the affected region, shop containers need to be pre-setup by
 # someone else and the require-container-recently-placed setting needs to be
 # disabled.
@@ -130,7 +130,7 @@ enable-towny-restrictions: false
 # inventory, the Shopkeepers plugin verifies that the open inventory still
 # matches the expected type of inventory before it handles inventory
 # interactions. This setting disables this verification.
-# It is usually recommended to keep this verification enabled. However, when
+# It is usually recommended keeping this verification enabled. However, when
 # the Shopkeepers plugin is used on certain types of modded servers (such as
 # variants of Cauldron and its successors), a known issue is that these types
 # of servers sometimes report that the currently open inventory is of a type
@@ -179,7 +179,7 @@ max-shops-per-player: -1
 max-shops-perm-options: 5,15,25
 
 # Whether to protect player shop containers from being accessed or broken. It
-# is usually recommended to keep this enabled.
+# is usually recommended keeping this enabled.
 protect-containers: true
 # Whether to prevent item movements from and to protected shop containers (via
 # hoppers, droppers, etc.). If you disable this, you and your players will have
@@ -280,7 +280,7 @@ disable-gravity: false
 # The range in chunks around players in which shopkeeper mobs will be affected
 # by gravity. Setting this too high may have a negative impact on performance.
 # And setting it below the server's entity tracking range will result in
-# players being able to see mobs floating in mid air until they get close
+# players being able to see mobs floating in mid-air until they get close
 # enough. A value of 0 will limit the gravity to mobs within chunks that
 # contain a player. This has no effect if gravity is disabled.
 gravity-chunk-range: 4
@@ -366,8 +366,8 @@ name-regex: "[A-Za-z0-9 ]{3,25}"
 # Whether player shops get named via item. This will hide the naming option
 # from the editor menu.
 naming-of-player-shops-via-item: false
-# Whether renaming of player npc (citizen) shopkeepers is allowed. By default
-# those shopkeepers will be named after the player who owns the shop.
+# Whether shop owners are allowed to rename their Citizens NPC shopkeepers. By
+# default, those shopkeepers will be named after the player who owns the shop.
 allow-renaming-of-player-npc-shops: false
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
@@ -454,11 +454,10 @@ prevent-trading-with-own-shop: true
 # This might be useful for role-playing servers, which wish to force players to
 # trade with each other directly while being online.
 prevent-trading-while-owner-is-online: false
-# Minecraft allows trading of not fully matching items in some situations
-# (ex. items with additional data are accepted in trades). With this enabled
-# Shopkeepers will always check that the traded items are fully matching and it
-# will prevent the trade once the player tries to pickup the item from the
-# trading result slot.
+# In some situations, Minecraft allows the trading of items even if they do not
+# fully match (e.g. villagers accept items with additional metadata). With this
+# setting enabled, the Shopkeepers plugin will always check that the traded
+# items fully match before allowing the trade to take place.
 use-strict-item-comparison: false
 
 # Whether to increment Minecraft's talked-to-villager and traded-with-villager
@@ -541,7 +540,7 @@ shop-owner-trade-notification-sound:
 # maximum duration in ticks during which successive equal trades are merged.
 # Setting this to a value of 0 disables the merging of trades. Setting this to
 # a value of 1 will only merge trades that are triggered by the same inventory
-# action (eg. by the same shift click).
+# action (e.g. by the same shift click).
 # It is recommended to not set this value to something longer than a few
 # seconds: The longer the chosen duration, the greater the difference between
 # the logged timestamps and shopkeeper states may be to the actual timestamps

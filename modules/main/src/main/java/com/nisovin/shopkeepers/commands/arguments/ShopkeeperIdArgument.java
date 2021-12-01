@@ -91,10 +91,10 @@ public class ShopkeeperIdArgument extends ObjectIdArgument<Integer> {
 		}
 
 		// Note: No normalization required.
-		// TODO Prefer short ids (eg. input "2", suggest "20", "21", "22",.. instead of "200", "201", "202",..)
+		// TODO Prefer short ids (e.g. input "2", suggest "20", "21", "22",.. instead of "200", "201", "202",..)
 		return shopkeepersStream
 				.filter(filter)
-				.map(shopkeeper -> shopkeeper.getId())
+				.map(Shopkeeper::getId)
 				.filter(id -> id.toString().startsWith(idPrefix))::iterator;
 	}
 

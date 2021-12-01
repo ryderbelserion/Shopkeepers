@@ -35,7 +35,7 @@ public abstract class AbstractText implements Text {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T extends Text> T getParent() {
-		// Note: Allows the caller to conveniently cast the result to the expected Text type (eg. to TextBuilder in a
+		// Note: Allows the caller to conveniently cast the result to the expected Text type (e.g. to TextBuilder in a
 		// fluently built Text).
 		return (T) parent;
 	}
@@ -59,7 +59,7 @@ public abstract class AbstractText implements Text {
 		while (text.getParent() != null) {
 			text = text.getParent();
 		}
-		// Note: Allows the caller to conveniently cast the result to the expected Text type (eg. to TextBuilder in a
+		// Note: Allows the caller to conveniently cast the result to the expected Text type (e.g. to TextBuilder in a
 		// fluently built Text).
 		return (T) text;
 	}
