@@ -159,7 +159,9 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		// Doing this during entity preparation resolves some issue with the equipment not getting cleared (or at least
 		// not getting cleared visually).
 		EntityEquipment equipment = entity.getEquipment();
-		equipment.clear();
+		if (equipment != null) {
+			equipment.clear();
+		}
 
 		// We give entities which would usually burn in sunlight an indestructible item as helmet. This results in less
 		// EntityCombustEvents that need to be processed.
