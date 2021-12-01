@@ -38,6 +38,7 @@ public abstract class AbstractPropertyValuesHolder implements PropertyValuesHold
 						+ propertyName);
 			}
 		}
+		propertyValues.add(propertyValue);
 	}
 
 	@Override
