@@ -1,8 +1,8 @@
 package com.nisovin.shopkeepers.shopcreation;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
@@ -16,18 +16,25 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
+import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
+import com.nisovin.shopkeepers.util.bukkit.MutableBlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.interaction.InteractionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public class ShopkeeperCreation {
 
+	private static final int MAX_TRACKED_CONTAINERS = 5;
+
+	// This BlockLocation object is reused for lookups. It does not need to be reset after every use.
+	private static final MutableBlockLocation sharedBlockLocation = new MutableBlockLocation();
+
 	private final SKShopkeepersPlugin plugin;
 	private final CreateListener createListener;
 
 	// By player name:
-	private final Map<String, List<String>> recentlyPlacedContainers = new HashMap<>();
+	private final Map<String, Deque<BlockLocation>> recentlyPlacedContainers = new HashMap<>();
 	private final Map<String, Block> selectedContainer = new HashMap<>();
 
 	public ShopkeeperCreation(SKShopkeepersPlugin plugin) {
@@ -55,23 +62,30 @@ public class ShopkeeperCreation {
 
 	// RECENTLY PLACED CONTAINERS
 
+	private BlockLocation getSharedKey(Block block) {
+		sharedBlockLocation.set(block);
+		return sharedBlockLocation;
+	}
+
 	public void addRecentlyPlacedContainer(Player player, Block container) {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(container, "container is null");
 		String playerName = player.getName();
-		List<String> recentlyPlaced = recentlyPlacedContainers.computeIfAbsent(playerName, key -> new LinkedList<>());
-		recentlyPlaced.add(TextUtils.getLocationString(container));
-		if (recentlyPlaced.size() > 5) {
-			recentlyPlaced.remove(0);
+		Deque<BlockLocation> recentlyPlaced = recentlyPlacedContainers.computeIfAbsent(playerName, key -> new ArrayDeque<>(MAX_TRACKED_CONTAINERS + 1));
+		if (recentlyPlaced.size() == MAX_TRACKED_CONTAINERS) {
+			recentlyPlaced.removeFirst();
 		}
+		recentlyPlaced.addLast(BlockLocation.of(container));
 	}
 
 	public boolean isRecentlyPlacedContainer(Player player, Block container) {
 		Validate.notNull(player, "player is null");
 		Validate.notNull(container, "container is null");
 		String playerName = player.getName();
-		List<String> recentlyPlaced = recentlyPlacedContainers.get(playerName);
-		return recentlyPlaced != null && recentlyPlaced.contains(TextUtils.getLocationString(container));
+		Deque<BlockLocation> recentlyPlaced = recentlyPlacedContainers.get(playerName);
+		if (recentlyPlaced == null) return false;
+		BlockLocation containerLocation = this.getSharedKey(container);
+		return recentlyPlaced.contains(containerLocation);
 	}
 
 	// SELECTED CONTAINER
