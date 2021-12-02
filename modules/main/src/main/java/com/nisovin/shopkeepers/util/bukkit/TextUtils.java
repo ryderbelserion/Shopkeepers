@@ -30,6 +30,7 @@ import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**
  * Text and messaging utilities.
@@ -340,6 +341,14 @@ public class TextUtils {
 
 	public static void sendMessage(CommandSender recipient, Text message) {
 		SpigotText.sendMessage(recipient, message);
+	}
+
+	public static void sendMessage(CommandSender recipient, Text message, MessageArguments arguments) {
+		Validate.notNull(recipient, "recipient is null");
+		Validate.notNull(message, "message is null");
+		// Assign arguments and then send:
+		message.setPlaceholderArguments(arguments);
+		sendMessage(recipient, message);
 	}
 
 	public static void sendMessage(CommandSender recipient, Text message, Map<String, ?> arguments) {
