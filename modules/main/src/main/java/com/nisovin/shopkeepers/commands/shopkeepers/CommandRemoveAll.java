@@ -39,8 +39,10 @@ class CommandRemoveAll extends Command {
 	private static final String ARGUMENT_PLAYER = "player";
 	private static final String ARGUMENT_PLAYER_NAME = "player:name";
 	private static final String ARGUMENT_PLAYER_UUID = "player:uuid";
-	private static final String ARGUMENT_ALL_PLAYER_SHOPS = "player";
-	private static final String ARGUMENT_ALL_ADMIN_SHOPS = "admin";
+	private static final String ARGUMENT_ALL_PLAYER_SHOPS = "all-player";
+	private static final String ARGUMENT_ALL_PLAYER_SHOPS_DISPLAY_NAME = "player";
+	private static final String ARGUMENT_ALL_ADMIN_SHOPS = "all-admin";
+	private static final String ARGUMENT_ALL_ADMIN_SHOPS_DISPLAY_NAME = "admin";
 
 	private final ShopkeepersPlugin plugin;
 	private final ShopkeeperRegistry shopkeeperRegistry;
@@ -59,8 +61,10 @@ class CommandRemoveAll extends Command {
 
 		// Arguments:
 		this.addArgument(new FirstOfArgument("target", Arrays.asList(
-				new LiteralArgument(ARGUMENT_ALL_ADMIN_SHOPS),
-				new LiteralArgument(ARGUMENT_ALL_PLAYER_SHOPS),
+				new LiteralArgument(ARGUMENT_ALL_ADMIN_SHOPS, Arrays.asList(ARGUMENT_ALL_ADMIN_SHOPS_DISPLAY_NAME))
+						.setDisplayName(ARGUMENT_ALL_ADMIN_SHOPS_DISPLAY_NAME),
+				new LiteralArgument(ARGUMENT_ALL_PLAYER_SHOPS, Arrays.asList(ARGUMENT_ALL_PLAYER_SHOPS_DISPLAY_NAME))
+						.setDisplayName(ARGUMENT_ALL_PLAYER_SHOPS_DISPLAY_NAME),
 				new FirstOfArgument(ARGUMENT_PLAYER, Arrays.asList(
 						// TODO Provide completions for known shop owners?
 						new PlayerUUIDArgument(ARGUMENT_PLAYER_UUID), // Accepts any uuid
@@ -86,9 +90,9 @@ class CommandRemoveAll extends Command {
 		Player senderPlayer = (sender instanceof Player) ? (Player) sender : null;
 		boolean allPlayers = context.has(ARGUMENT_ALL_PLAYER_SHOPS);
 		boolean allAdmin = context.has(ARGUMENT_ALL_ADMIN_SHOPS);
-		UUID targetPlayerUUID = context.get(ARGUMENT_PLAYER_UUID); // can be null
-		String targetPlayerName = context.get(ARGUMENT_PLAYER_NAME); // can be null
-		assert allPlayers ^ allAdmin ^ (targetPlayerUUID != null ^ targetPlayerName != null); // xor
+		UUID targetPlayerUUID = context.get(ARGUMENT_PLAYER_UUID); // Can be null
+		String targetPlayerName = context.get(ARGUMENT_PLAYER_NAME); // Can be null
+		assert allPlayers ^ allAdmin ^ (targetPlayerUUID != null ^ targetPlayerName != null);
 
 		boolean targetOwnShops = false;
 		if (targetPlayerUUID != null || targetPlayerName != null) {
