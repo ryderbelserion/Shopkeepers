@@ -4,6 +4,9 @@ Date format: (YYYY-MM-DD)
 ## v2.14.0 (TBA)
 ### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
+* Updated for MC 1.18.
+  * This update contains no new features (such as mobs) that would be relevant for Shopkeepers.
+  * Updated the 'compatibility mode' implementation, which broke with the 1.18 update. However, due to some server internal mapping changes, it is likely that this compatibility mode will break again in future updates.
 * Added the option for admins to create and restore snapshots of shopkeepers.
   * Each snapshot captures the shopkeeper's dynamic state (i.e. its trades, shop object configuration, etc.), a timestamp, and is associated with a unique name that is provided when the snapshot is created.
   * The name can currently be at most 64 characters long and not contain any color codes.
@@ -81,6 +84,7 @@ Date format: (YYYY-MM-DD)
 * Clarified that the block returned by PlayerShopkeeper#getContainer() can be null if the container's world is not loaded currently.
 
 **Various internal build changes:**  
+* We use JDK 17 now to build Shopkeepers. However, for compatibility with older and still supported MC versions, we still only use Java 8 compliant features.
 * Switched from Maven to Gradle.
 * The Maven publication of the Shopkeepers API also includes the API Javadocs now.
 * We also publish a 'ShopkeepersMain' artifact now that contains the internal plugin code, but omits all NMS modules. Any plugins that rely on these internals, but don't require the NMS modules, can now depend on this artifact as an alternative to depending on the complete plugin jar.

@@ -12,6 +12,9 @@ case "$1" in
   16)
     JDK_VERSION="adopt@1.16.0-1"
     ;;
+  17)
+    JDK_VERSION="zulu@1.17.0-0"
+    ;;
   *)
     JDK_VERSION=$1
     ;;

@@ -13,15 +13,19 @@ import com.nisovin.shopkeepers.compat.CompatVersion;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 public interface NMSCallProvider {
 
 	// The compat version string.
 	public String getVersionId();
 
-	// This is expected to not return null.
+	// This does not return null.
 	public default CompatVersion getCompatVersion() {
-		return NMSManager.getCompatVersion(this.getVersionId());
+		CompatVersion compatVersion = NMSManager.getCompatVersion(this.getVersionId());
+		// Not finding the compat version indicates a bug.
+		Validate.State.notNull(compatVersion, "Could not find CompatVersion for '" + this.getVersionId() + "'!");
+		return compatVersion;
 	}
 
 	public void overwriteLivingEntityAI(LivingEntity entity);

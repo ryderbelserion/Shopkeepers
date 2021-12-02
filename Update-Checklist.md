@@ -28,8 +28,14 @@ To support the latest mappings version:
 		* Update all NMS version specific imports and references.
 		* Check all NMS version specific code:
 			* Methods or fields might no longer exist or might have been renamed.
+	* Also update the package names of all NMS module test classes.
 
 * Add a new build entry in 'scripts/installSpigotDependencies.sh'.
+
+* If Spigot requires a new JDK version to build:
+	* Define a version alias for the JDK version in 'scripts/installJDK.sh'.
+	* Add a JDK installation entry in 'scripts/installSpigotDependencies.sh'.
+	* Update the JDK installation entry in 'build.sh'.
 
 * New mobs:
 	* Test if they can be used for shopkeepers.

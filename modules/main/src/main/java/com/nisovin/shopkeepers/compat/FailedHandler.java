@@ -42,10 +42,10 @@ public final class FailedHandler implements NMSCallProvider {
 
 		// Minecraft
 		nmsItemStackClass = Class.forName("net.minecraft.world.item.ItemStack");
-		nmsGetTagMethod = nmsItemStackClass.getDeclaredMethod("getTag");
+		nmsGetTagMethod = nmsItemStackClass.getDeclaredMethod("s"); // getTag
 
 		nmsEntityClass = Class.forName("net.minecraft.world.entity.Entity");
-		nmsEntitySetOnGroundMethod = nmsEntityClass.getDeclaredMethod("setOnGround", boolean.class);
+		nmsEntitySetOnGroundMethod = nmsEntityClass.getDeclaredMethod("c", boolean.class); // setOnGround
 
 		nmsGameProfileSerializerClass = Class.forName("net.minecraft.nbt.GameProfileSerializer");
 		nmsNBTBaseClass = Class.forName("net.minecraft.nbt.NBTBase");

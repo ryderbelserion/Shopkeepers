@@ -32,4 +32,9 @@ source installJDK.sh 16
 buildSpigotIfMissing 1.17 remapped
 buildSpigotIfMissing 1.17.1 remapped
 
+# The following versions require JDK 17 to build:
+source installJDK.sh 17
+
+buildSpigotIfMissing 1.18 remapped
+
 popd
