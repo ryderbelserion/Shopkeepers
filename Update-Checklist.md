@@ -36,6 +36,7 @@ To support the latest mappings version:
 	* Define a version alias for the JDK version in 'scripts/installJDK.sh'.
 	* Add a JDK installation entry in 'scripts/installSpigotDependencies.sh'.
 	* Update the JDK installation entry in 'build.sh'.
+	* Update the JDK version inside the GitHub workflow '.github/workflows/build.yml'.
 
 * New mobs:
 	* Test if they can be used for shopkeepers.
