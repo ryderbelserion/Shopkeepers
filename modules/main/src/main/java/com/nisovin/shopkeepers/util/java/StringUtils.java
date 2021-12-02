@@ -321,6 +321,7 @@ public class StringUtils {
 
 	private static final ArgumentsReplacer ARGUMENTS_REPLACER = new ArgumentsReplacer(); // Singleton for reuse
 	private static final Map<String, Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
+	private static final MessageArguments TEMP_ARGUMENTS = MessageArguments.ofMap(TEMP_ARGUMENTS_MAP);
 
 	// Arguments format: [key1, value1, key2, value2, ...]
 	// The keys are expected to be of type String.
@@ -341,7 +342,7 @@ public class StringUtils {
 		assert TEMP_ARGUMENTS_MAP.isEmpty();
 		try {
 			addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
-			return replaceArguments(source, TEMP_ARGUMENTS_MAP);
+			return replaceArguments(source, TEMP_ARGUMENTS);
 		} finally {
 			TEMP_ARGUMENTS_MAP.clear(); // Reset
 		}

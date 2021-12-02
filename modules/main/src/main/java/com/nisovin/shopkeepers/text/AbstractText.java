@@ -16,6 +16,7 @@ public abstract class AbstractText implements Text {
 
 	// Reused among all Text instances:
 	private static final Map<String, Object> TEMP_ARGUMENTS_MAP = new HashMap<>();
+	private static final MessageArguments TEMP_ARGUMENTS = MessageArguments.ofMap(TEMP_ARGUMENTS_MAP);
 
 	// TODO Remove parent reference?
 	// Would allow less mutable state, which simplifies reuse of Text instances.
@@ -148,7 +149,7 @@ public abstract class AbstractText implements Text {
 		assert TEMP_ARGUMENTS_MAP.isEmpty();
 		try {
 			StringUtils.addArgumentsToMap(TEMP_ARGUMENTS_MAP, argumentPairs);
-			return this.setPlaceholderArguments(TEMP_ARGUMENTS_MAP);
+			return this.setPlaceholderArguments(TEMP_ARGUMENTS);
 		} finally {
 			TEMP_ARGUMENTS_MAP.clear(); // Reset
 		}
