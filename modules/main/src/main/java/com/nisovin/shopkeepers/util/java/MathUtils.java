@@ -52,16 +52,38 @@ public final class MathUtils {
 	}
 
 	/**
-	 * Gets a random integer between the given min value (inclusive) and max value (exclusive).
+	 * Gets a random integer value between the given minimum value (inclusive) and maximum value (exclusive).
 	 * 
 	 * @param min
 	 *            the minimum value (inclusive)
 	 * @param max
 	 *            the maximum value (exclusive)
-	 * @return the random value in between
+	 * @return a random value within the specified range
+	 * @throws IllegalArgumentException
+	 *             if {@code max} is greater than or equal to {@code min}
 	 */
-	public static int randomInRange(int min, int max) {
+	public static int randomIntInRange(int min, int max) {
 		return ThreadLocalRandom.current().nextInt(min, max);
+	}
+
+	/**
+	 * Gets a random float value between the given minimum value (inclusive) and maximum value (exclusive).
+	 * 
+	 * @param min
+	 *            the minimum value (inclusive)
+	 * @param max
+	 *            the maximum value (exclusive)
+	 * @return a random value within the specified range
+	 * @throws IllegalArgumentException
+	 *             if {@code max} is greater than or equal to {@code min}
+	 */
+	public static float randomFloatInRange(float min, float max) {
+		Validate.isTrue(min < max, "max must be greater than min");
+		float value = min + ThreadLocalRandom.current().nextFloat() * (max - min);
+		if (value >= max) {// Correct for rounding
+			value = Float.intBitsToFloat(Float.floatToIntBits(max) - 1);
+		}
+		return value;
 	}
 
 	/**

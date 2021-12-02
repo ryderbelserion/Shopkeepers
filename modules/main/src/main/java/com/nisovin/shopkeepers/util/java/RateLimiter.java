@@ -20,7 +20,7 @@ public class RateLimiter {
 	 * @return the rate limiter
 	 */
 	public static RateLimiter withRandomInitialThreshold(int threshold) {
-		return new RateLimiter(threshold, MathUtils.randomInRange(0, threshold) + 1);
+		return new RateLimiter(threshold, MathUtils.randomIntInRange(0, threshold) + 1);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public class RateLimiter {
 	 * @return the rate limiter
 	 */
 	public static RateLimiter withRandomInitialOffset(int threshold) {
-		return new RateLimiter(threshold, threshold + MathUtils.randomInRange(0, threshold));
+		return new RateLimiter(threshold, threshold + MathUtils.randomIntInRange(0, threshold));
 	}
 
 	private int threshold;

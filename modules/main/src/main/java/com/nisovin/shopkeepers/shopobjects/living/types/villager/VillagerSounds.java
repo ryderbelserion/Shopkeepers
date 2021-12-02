@@ -31,6 +31,7 @@ import com.nisovin.shopkeepers.ui.trading.TradingListener;
 import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.Ticks;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.MathUtils;
 import com.nisovin.shopkeepers.util.java.TimeUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -127,9 +128,7 @@ public class VillagerSounds extends TradingListener {
 
 	private float getPitch(AbstractVillager villager) {
 		// Random value in range (0.8, 1.2) for adults, and (1.3, 1.7) for babies:
-		float basePitch = villager.isAdult() ? 1.0F : 1.5F;
-		float deviation = 0.2F * (ThreadLocalRandom.current().nextFloat() - ThreadLocalRandom.current().nextFloat());
-		return basePitch + deviation;
+		return (villager.isAdult() ? 1.0F : 1.5F) + MathUtils.randomFloatInRange(-0.2F, 0.2F);
 	}
 
 	private void tryPlayVillagerTradingSound(Player tradingPlayer, String context, Sound sound, boolean playGlobal) {
