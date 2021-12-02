@@ -12,6 +12,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.text.MessageArguments;
 
 /**
  * A command component responsible for parsing and providing completion suggestions for a portion of the command's input
@@ -211,9 +212,9 @@ public abstract class CommandArgument<T> {
 
 	// COMMON ERRORS
 
-	private final Map<String, ?> defaultErrorMsgArgs = Collections.unmodifiableMap(this.setupDefaultErrorMsgArgs());
+	private final MessageArguments defaultErrorMsgArgs = this.setupDefaultErrorMsgArgs();
 
-	private Map<String, ?> setupDefaultErrorMsgArgs() {
+	private MessageArguments setupDefaultErrorMsgArgs() {
 		// Dynamically resolve arguments:
 		Map<String, Object> args = new HashMap<>();
 		Supplier<?> argumentNameSupplier = () -> {
@@ -232,7 +233,7 @@ public abstract class CommandArgument<T> {
 		};
 		args.put("argumentName", argumentNameSupplier);
 		args.put("argumentFormat", argumentFormatSupplier);
-		return args;
+		return MessageArguments.ofMap(args);
 	}
 
 	/**
@@ -248,7 +249,7 @@ public abstract class CommandArgument<T> {
 	 * 
 	 * @return the common default error message arguments
 	 */
-	public final Map<String, ?> getDefaultErrorMsgArgs() {
+	public final MessageArguments getDefaultErrorMsgArgs() {
 		return defaultErrorMsgArgs;
 	}
 
