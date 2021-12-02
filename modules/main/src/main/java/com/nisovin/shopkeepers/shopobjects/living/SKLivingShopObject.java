@@ -156,19 +156,22 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		this.applyName(entity, shopkeeper.getName());
 
 		// Clear equipment:
-		// Doing this during entity preparation resolves some issue with the equipment not getting cleared (or at least
-		// not getting cleared visually).
+		// Doing this during entity preparation resolves some issue with the equipment not getting cleared (at least not
+		// visually).
 		EntityEquipment equipment = entity.getEquipment();
+		// Currently, there is no type of living entity without equipment. But since the API specifies this as nullable,
+		// we check for this here just in case this changes in the future.
 		if (equipment != null) {
 			equipment.clear();
-		}
 
-		// We give entities which would usually burn in sunlight an indestructible item as helmet. This results in less
-		// EntityCombustEvents that need to be processed.
-		if (entity instanceof Zombie || entity instanceof Skeleton) {
-			// Note: Phantoms also burn in sunlight, but setting a helmet has no effect for them.
-			// Note: Buttons are small enough to not be visible inside the entity's head (even for their baby variants).
-			equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
+			// We give entities which would usually burn in sunlight an indestructible item as helmet. This results in
+			// less EntityCombustEvents that need to be processed.
+			if (entity instanceof Zombie || entity instanceof Skeleton) {
+				// Note: Phantoms also burn in sunlight, but setting a helmet has no effect for them.
+				// Note: Buttons are small enough to not be visible inside the entity's head (even for their baby
+				// variants).
+				equipment.setHelmet(new ItemStack(Material.STONE_BUTTON));
+			}
 		}
 
 		// Any version-specific preparation:

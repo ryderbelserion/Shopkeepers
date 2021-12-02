@@ -119,7 +119,6 @@ Date format: (YYYY-MM-DD)
 * Internal API: Various uses of ShopkeeperCreateException have been replaced with the better fitting InvalidDataException.
 * Internal API: Minor changes to the shop and shop object type constructors.
 * Internal API: Various changes to how shopkeepers are constructed, initialized, and loaded. The shopkeeper id is passed around as part of the shopkeeper data now.
-* Fixed: It was possible to run into a NPE when we try to clear the equipment of a shopkeeper entity that does not support equipment. However, since this only applies to ender dragons, which are disabled by default, and don't properly work as shopkeepers anyways, this fix has no noticeable impact.
 * Fixed: The arguments of translatable text components were not getting correctly converted to arguments of the corresponding Spigot-based text components. However, since we don't use any translatable texts with arguments yet, this fix has no noticeable impact.
 * Various changes to the internal representation and handling of shopkeeper data, shop object data, and data migrations.
 * Major refactors to the internal properties API.
