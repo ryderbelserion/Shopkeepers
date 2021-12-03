@@ -143,7 +143,7 @@ enable-towny-restrictions: false
 disable-inventory-verification: false
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
-# Shop Creation (and removal)
+# Shop Creation and Removal
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
 # The item used to create player shops.
@@ -309,10 +309,10 @@ show-nameplates: true
 # when looking directly at the shopkeeper.
 always-show-nameplates: false
 
-# Whether to allow the creation of Citizen (NPC) shopkeepers. Requires the
+# Whether to allow the creation of Citizens NPC shopkeepers. Requires the
 # plugin Citizens.
 enable-citizen-shops: true
-# The entity type used by newly created Citizen NPC shopkeepers:
+# The entity type of newly created Citizens NPC shopkeepers.
 default-citizen-npc-type: 'PLAYER'
 # Whether to immediately save all Citizens NPCs whenever the Shopkeepers plugin
 # modifies a Citizens NPC. If disabled, the Citizens plugin handles the saving
@@ -401,7 +401,7 @@ trade-notifications-item: BELL
 delete-item: BONE
 
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
-# Non-shopkeeper villagers
+# Non-Shopkeeper Villagers
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
 # Whether to prevent trading with non-shopkeeper villagers.

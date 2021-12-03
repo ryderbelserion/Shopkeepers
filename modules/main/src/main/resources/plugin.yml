@@ -154,7 +154,7 @@ permissions:
         description: Create sign shopkeepers
         default: true
     shopkeeper.citizen:
-        description: Create citizens (npc) shopkeepers
+        description: Create Citizens NPC shopkeepers
         default: op
     shopkeeper.entity.*:
         description: Create shopkeepers of any mob type

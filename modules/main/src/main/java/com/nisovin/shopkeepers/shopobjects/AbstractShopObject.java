@@ -361,7 +361,7 @@ public abstract class AbstractShopObject implements ShopObject {
 	// PLAYER SHOP OWNER
 
 	/**
-	 * This is called by {@link PlayerShopkeeper player shopkeepers} when their owner changes.
+	 * This is called by {@link PlayerShopkeeper}s when their owner has changed.
 	 */
 	public void onShopOwnerChanged() {
 	}

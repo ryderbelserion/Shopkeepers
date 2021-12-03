@@ -99,7 +99,7 @@ public class CitizensShops {
 	}
 
 	/**
-	 * Returns whether citizens shopkeepers are currently enabled.
+	 * Returns whether Citizens shopkeepers are currently enabled.
 	 * 
 	 * @return <code>true</code> if currently enabled
 	 */
