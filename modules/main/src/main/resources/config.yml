@@ -351,8 +351,7 @@ enable-sign-post-shops: true
 # * "[A-Za-z0-9 ]{3,25}": The default. Allows the letters A to Z, in both upper
 # and lower case, and the digits 0 to 9. The name has to consist of at least 3
 # characters and can be maximal 25 characters long.
-# * "[A-Za-z0-9& ]{3,25}": Same as the default, but also allows the ampersand
-# character which enables color codes.
+# * "[A-Za-z0-9&§ ]{3,25}": Same as the default, but allows using color codes.
 # * "[\p{L}0-9 ]{3,25}": Same as the default, but allows any letter to be used,
 # regardless of the language. If you encounter errors when the config is
 # loaded, make sure that your config file is encoded as UTF-8.
