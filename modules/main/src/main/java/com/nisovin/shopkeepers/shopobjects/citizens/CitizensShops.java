@@ -129,8 +129,15 @@ public class CitizensShops {
 
 		// Delayed to run after shopkeepers and NPCs were loaded:
 		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+			if (!this.isEnabled()) return; // No longer enabled
+
 			// Check for invalid Citizens shopkeepers:
 			this.validateCitizenShopkeepers(Settings.deleteInvalidCitizenShopkeepers, false);
+
+			// Inform the Citizens NPC shop objects:
+			shopkeepersByNpcId.values().stream().flatMap(List::stream).forEach(shopkeeper -> {
+				((SKCitizensShopObject) shopkeeper.getShopObject()).onCitizensShopsEnabled();
+			});
 		}, 3L);
 
 		// Enabled:
@@ -143,13 +150,18 @@ public class CitizensShops {
 			return;
 		}
 
+		// Inform the Citizens NPC shop objects:
+		shopkeepersByNpcId.values().stream().flatMap(List::stream).forEach(shopkeeper -> {
+			((SKCitizensShopObject) shopkeeper.getShopObject()).onCitizensShopsDisabled();
+		});
+
 		Plugin citizensPlugin = CitizensHandler.getPlugin();
 		if (citizensPlugin != null) {
-			// Unregister shopkeeper trait:
+			// Unregister the shopkeeper trait:
 			this.unregisterShopkeeperTrait();
 		}
 
-		// Unregister citizens listener:
+		// Unregister the Citizens listener:
 		citizensListener.onDisable();
 		HandlerList.unregisterAll(citizensListener);
 

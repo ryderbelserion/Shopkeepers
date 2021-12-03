@@ -9,7 +9,7 @@ craftbukkit = "1.14.4-R0.1-SNAPSHOT"
 
 worldguard = "7.0.0"
 towny = "0.96.2.0"
-citizens = "2.0.28-SNAPSHOT"
+citizens = "2.0.29-SNAPSHOT"
 vault = "1.7"
 bstats = "1.5"
 

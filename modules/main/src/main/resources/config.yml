@@ -314,6 +314,13 @@ always-show-nameplates: false
 enable-citizen-shops: true
 # The entity type of newly created Citizens NPC shopkeepers.
 default-citizen-npc-type: 'PLAYER'
+# Whether to set the Citizens NPC owner of player-owned NPC shopkeepers. If
+# disabled, the Shopkeepers plugin will automatically remove the Citizens NPC
+# owners of player shopkeepers again.
+# By enabling this setting, and configuring the Citizens command permissions
+# for your players accordingly, you can allow shop owners to use the commands
+# of the Citizens plugin to edit the Citizens NPCs of their NPC shopkeepers.
+set-citizen-npc-owner-of-player-shops: false
 # Whether to immediately save all Citizens NPCs whenever the Shopkeepers plugin
 # modifies a Citizens NPC. If disabled, the Citizens plugin handles the saving
 # of the Citizens NPCs as usual: They are saved when the Citizens plugin shuts

@@ -17,7 +17,6 @@ Date format: (YYYY-MM-DD)
   * When formatting the timestamp of a snapshot for display, we currently use the server's default time zone. There is no option in Shopkeepers yet to use a different timezone. If you want to use a different timezone for formatting the timestamps, you can change your server's default timezone via the JVM command line argument `-Duser.timezone=America/New_York` when you start your server.
   * Command: Added commands `/shopkeeper snapshot [list|create|remove|restore]` to manage shopkeeper snapshots.
   * Permission: Added permission `shopkeeper.snapshot` (default: op) which provides access to the new snapshot commands.
-* API: API additions to manage the snapshots of a shopkeeper.
 * Added editor options to change the puff state of puffer fish, as well as the pattern and colors of tropical fish.
 * Added sound effects when a trade succeeds or fails.
   * Config: These sound effects can be changed or disabled (by setting their volume to zero) via the new config settings `trade-succeeded-sound` and `trade-failed-sound`.
@@ -34,6 +33,9 @@ Date format: (YYYY-MM-DD)
   * Existing shopkeepers will have a yaw of 0, i.e. they keep facing south by default. In the future it will be possible to reposition shopkeepers and thereby also adjust the yaw of already existing shopkeepers.
   * Data: Sign shopkeepers no longer store their sign facing. Instead, this facing is now derived from the shopkeeper's yaw. Existing sign shops, for which the shopkeeper has previously not yet stored the yaw, will automatically migrate their currently stored sign facing to the shopkeeper's yaw.
   * Shopkeeper mobs will rotate back to their initial direction now when there is no player to look at. However, this requires a player to still be somewhat nearby, since only shopkeeper mobs with nearby players are ticked.
+* Config: Added setting `set-citizen-npc-owner-of-player-shops` (default: `false`).
+  * When enabled, we set the Citizens NPC owner of player-owned NPC shopkeepers. When disabled, we automatically remove any previously set Citizens NPC owners from those player-owned NPC shopkeepers again.
+  * By enabling this setting, and configuring the Citizens command permissions for your players accordingly, you can allow shop owners to use the commands of the Citizens plugin to edit the Citizens NPCs of their NPC shopkeepers.
 * Fixed: Shopkeepers could lose some of their trades during item migrations. When an item was migrated, but the subsequent trades did not require any item migrations, these subsequent trades were lost. However, it was relatively unlikely to encounter this issue in practice. An exception to this is in combination with the following Paper-specific issue that only affects trades with certain enchanted book items.
 * Fixed: On Paper servers, the comparisons of enchanted book items with multiple stored enchantments were not working as expected. The issue was caused by the server reordering the stored enchantments in some cases, as well as Paper automatically converting any deserialized Bukkit item stacks to CraftItemStacks, which behave differently when being compared to other CraftItemStacks. One known effect of this was that the above issue of trades potentially being lost due to item migrations would be encountered more likely on Paper servers, because the reordering of these stored enchantments would be detected as an 'item migration' by the Shopkeepers plugin. It also caused an unnecessary save of all shopkeeper data after every plugin reload.
 * Fixed: The "/shopkeeper removeAll" command always tried to remove all player shops, instead of only the shops of the executing player.
@@ -49,6 +51,7 @@ Date format: (YYYY-MM-DD)
   * In a few remaining cases, stack traces are no longer printed directly to the server log, but through the plugin logger.
 * During the initial plugin startup, we now test if the server meets certain basic assumptions about its API implementation. In order to prevent damage due to unexpected server and plugin behavior, the plugin shuts itself down if any of these assumptions turn out to be incorrect. These tests are meant to be lightweight, but may be expanded in the future.
 * Debug: Added a debug log message whenever a player tries to set an invalid shop name.
+* Debug: Added a debug log message when the creation of a Citizens NPC fails.
 * Data: Removed various 3 year old data migrations:
   * We no longer check for and remove entity uuids from the data of living entity shopkeepers.
   * The object data of shopkeepers is expected to be located in its own dedicated 'object' section.
@@ -67,6 +70,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: We now check if the UI session is still valid before handling an inventory event at the HIGH event priority. Previously, the UI session was simply expected to still be valid. But this assumption can be violated by plugins that (incorrectly per API documentation) close the inventory during the handling of an inventory event.
 
 **API changes:**  
+* Additions to manage the snapshots of shopkeepers.
 * Added PlayerInactiveEvent that can be used to react to inactive players being detected, or alter which of their shopkeepers are deleted.
 * Added User interface to represent players that the plugin knows about. However, this is not yet used throughout the API.
 * Added Shopkeeper#getYaw().
@@ -93,7 +97,8 @@ Date format: (YYYY-MM-DD)
 * All external Maven repositories are accessed via https now.
 * Bumped the Vault dependency to version 1.7 and updated its repository.
 * Reduced the Citizens dependency to the 'citizens-main' portion of Citizens.
-* Bumped the WorldGuard dependency to 7.0.0, updated the repository, and removed the no longer needed Paper repository.
+* Bumped the Citizens dependency to version 2.0.29.
+* Bumped the WorldGuard dependency to version 7.0.0, updated the repository, and removed the no longer needed Paper repository.
 * Moved all auxiliary build scripts into a separate 'scripts' folder and made them less reliant on the directory they are called from.
 * The primary 'build' script automatically invokes the 'installSpigotDependencies' script now.
 
