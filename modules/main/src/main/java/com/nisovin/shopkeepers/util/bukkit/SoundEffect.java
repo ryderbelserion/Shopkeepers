@@ -316,7 +316,7 @@ public final class SoundEffect {
 	 * Plays this {@link SoundEffect} at the specified {@link Location}.
 	 * 
 	 * @param location
-	 *            the location
+	 *            the location, not <code>null</code>
 	 * @see World#playSound(Location, String, SoundCategory, float, float)
 	 */
 	public void play(Location location) {
@@ -334,24 +334,27 @@ public final class SoundEffect {
 	}
 
 	/**
-	 * Plays this {@link SoundEffect} for the specified player, at its {@link Player#getEyeLocation()}.
+	 * Plays this {@link SoundEffect} for the specified player at their {@link Player#getLocation()}.
 	 * 
 	 * @param player
-	 *            the player
+	 *            the player, not <code>null</code>
 	 * @see #play(Player, Location)
 	 */
 	public void play(Player player) {
 		Validate.notNull(player, "player is null");
-		this.play(player, player.getEyeLocation());
+		// Note: We intentionally play the sound at the feet location, not the head/eye location. Playing the sound at
+		// the eye location can result in the sound being played/heard slightly to the left or the right, depending on
+		// the player's location.
+		this.play(player, player.getLocation());
 	}
 
 	/**
-	 * Plays this {@link SoundEffect} for the specified player, at the specified {@link Location}.
+	 * Plays this {@link SoundEffect} for the specified player at the specified {@link Location}.
 	 * 
 	 * @param player
-	 *            the player
+	 *            the player, not <code>null</code>
 	 * @param location
-	 *            the location
+	 *            the location, not <code>null</code>
 	 * @see Player#playSound(Location, String, SoundCategory, float, float)
 	 */
 	public void play(Player player, Location location) {

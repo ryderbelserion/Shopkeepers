@@ -68,6 +68,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: In order to resolve compatibility issues with plugins that modify chat messages at lowest event priority, we now enforce that our chat input event handler always executes first. This should resolve compatibility issues with shopkeeper names not being considered valid, because some other plugin injected color codes into the player's chat message before we were able to process it.
 * Fixed: Since Bukkit 1.16.5, the data version was no longer guaranteed to be the first entry of the save file, and the log message for the number of loaded shopkeepers has been off by one if the save file did not contain any data version yet.
 * Fixed: We now check if the UI session is still valid before handling an inventory event at the HIGH event priority. Previously, the UI session was simply expected to still be valid. But this assumption can be violated by plugins that (incorrectly per API documentation) close the inventory during the handling of an inventory event.
+* Fixed: Sound effects played to players would sometimes appear to be played slightly to the left or the right of the player's head.
 
 **API changes:**  
 * Additions to manage the snapshots of shopkeepers.
