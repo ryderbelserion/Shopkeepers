@@ -64,6 +64,10 @@ public class LocationUtils {
 		World world2 = location2.getWorld();
 		Validate.notNull(world1, "World of location1 is null");
 		Validate.notNull(world2, "World of location2 is null");
+		// Comparing the worlds by identity rather than equals / UUID is sufficient. Location itself compares worlds by
+		// identity in Location#distanceSquared. Also, even if the worlds have the same UUID but are different
+		// instances, it is unclear whether they can be treated as equal, since some operations on a previously unloaded
+		// world might have no effect.
 		if (world1 != world2) return Double.MAX_VALUE; // Different worlds
 		// Note: Not using Location#distanceSquared to avoid redundant precondition checks.
 		double dx = location1.getX() - location2.getX();
