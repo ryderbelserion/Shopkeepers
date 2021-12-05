@@ -194,14 +194,14 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 			ChunkCoords chunkCoords = shopkeeper.getChunkCoords();
 			assert chunkCoords != null;
 			assert chunkCoords.getWorldName().equals(worldName);
-			ChunkShopkeepers chunkEntry = shopkeepersByChunk.get(chunkCoords);
-			if (chunkEntry == null) {
-				// If the chunk is currently loaded, the chunk entry gets initialized as active:
-				boolean chunkLoaded = chunkCoords.isChunkLoaded();
-				chunkEntry = new ChunkShopkeepers(this, chunkCoords, chunkLoaded);
-				shopkeepersByChunk.put(chunkCoords, chunkEntry);
-				shopkeeperViewsByChunk.put(chunkCoords, Collections.unmodifiableList(chunkEntry.shopkeepers));
-			}
+			ChunkShopkeepers chunkEntry = shopkeepersByChunk.computeIfAbsent(chunkCoords, chkCoords -> {
+				// If the chunk is currently loaded, the chunk entry is initialized as active:
+				boolean chunkLoaded = chkCoords.isChunkLoaded();
+				ChunkShopkeepers newChunkEntry = new ChunkShopkeepers(this, chkCoords, chunkLoaded);
+				shopkeeperViewsByChunk.put(chkCoords, Collections.unmodifiableList(newChunkEntry.shopkeepers));
+				return newChunkEntry;
+			});
+			assert chunkEntry != null;
 			assert !chunkEntry.shopkeepers.contains(shopkeeper);
 			chunkEntry.shopkeepers.add(shopkeeper);
 			shopkeeper.setLastChunkCoords(chunkCoords);
@@ -623,15 +623,12 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	// Only called for non-virtual shopkeepers.
 	private ChunkShopkeepers addShopkeeperToChunk(AbstractShopkeeper shopkeeper) {
-		assert shopkeeper != null;
+		assert shopkeeper != null && !shopkeeper.isVirtual();
 		assert shopkeeper.getLastChunkCoords() == null;
 		String worldName = shopkeeper.getWorldName();
 		assert worldName != null;
-		WorldShopkeepers worldEntry = shopkeepersByWorld.get(worldName);
-		if (worldEntry == null) {
-			worldEntry = new WorldShopkeepers(worldName);
-			shopkeepersByWorld.put(worldName, worldEntry);
-		}
+		WorldShopkeepers worldEntry = shopkeepersByWorld.computeIfAbsent(worldName, WorldShopkeepers::new);
+		assert worldEntry != null;
 		return worldEntry.addShopkeeper(shopkeeper);
 	}
 
@@ -680,17 +677,18 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 	}
 
 	// Only called for non-virtual shopkeepers.
-	private void removeShopkeeperFromChunk(AbstractShopkeeper shopkeeper) {
-		assert shopkeeper != null;
+	private ChunkShopkeepers removeShopkeeperFromChunk(AbstractShopkeeper shopkeeper) {
+		assert shopkeeper != null && !shopkeeper.isVirtual();
 		String worldName = shopkeeper.getWorldName();
 		assert worldName != null;
 		WorldShopkeepers worldEntry = shopkeepersByWorld.get(worldName);
-		if (worldEntry == null) return; // Could not find shopkeeper
-		worldEntry.removeShopkeeper(shopkeeper); // Remove from chunk
+		if (worldEntry == null) return null; // Could not find the shopkeeper
+		ChunkShopkeepers chunkEntry = worldEntry.removeShopkeeper(shopkeeper); // Remove from chunk
 		if (worldEntry.shopkeeperCount <= 0) {
 			worldEntry.cleanUp();
 			shopkeepersByWorld.remove(worldName);
 		}
+		return chunkEntry;
 	}
 
 	private void unloadShopkeeper(AbstractShopkeeper shopkeeper) {
