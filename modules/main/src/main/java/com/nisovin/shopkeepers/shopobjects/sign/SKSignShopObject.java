@@ -323,12 +323,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	}
 
 	@Override
-	public Location getLocation() {
-		if (block == null) return null;
-		return block.getLocation();
-	}
-
-	@Override
 	public Location getTickVisualizationParticleLocation() {
 		Location location = this.getLocation();
 		if (location == null) return null;

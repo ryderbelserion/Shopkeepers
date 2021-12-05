@@ -37,6 +37,12 @@ public abstract class AbstractEntityShopObject extends AbstractShopObject implem
 	}
 
 	@Override
+	public Location getLocation() {
+		Entity entity = this.getEntity();
+		return (entity != null) ? entity.getLocation() : null;
+	}
+
+	@Override
 	public Object getId() {
 		Entity entity = this.getEntity();
 		if (entity == null) return null; // Not active

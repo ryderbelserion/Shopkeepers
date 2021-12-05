@@ -1,5 +1,6 @@
 package com.nisovin.shopkeepers.shopobjects.block;
 
+import org.bukkit.Location;
 import org.bukkit.block.Block;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
@@ -25,6 +26,12 @@ public abstract class AbstractBlockShopObject extends AbstractShopObject impleme
 	public boolean isActive() {
 		// Same as isSpawned by default:
 		return this.isSpawned();
+	}
+
+	@Override
+	public Location getLocation() {
+		Block block = this.getBlock();
+		return (block != null) ? block.getLocation() : null;
 	}
 
 	@Override

@@ -413,12 +413,6 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		this.onIdChanged();
 	}
 
-	@Override
-	public Location getLocation() {
-		if (entity == null) return null;
-		return entity.getLocation();
-	}
-
 	// TICKING
 
 	@Override
