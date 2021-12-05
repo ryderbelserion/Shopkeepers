@@ -621,7 +621,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		}
 	}
 
-	// Only called for non-virtual shopkeepers
+	// Only called for non-virtual shopkeepers.
 	private ChunkShopkeepers addShopkeeperToChunk(AbstractShopkeeper shopkeeper) {
 		assert shopkeeper != null;
 		assert shopkeeper.getLastChunkCoords() == null;
@@ -731,6 +731,17 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	// CHUNK ACTIVATION
 
+	private ChunkShopkeepers getChunkEntry(Chunk chunk) {
+		assert chunk != null;
+		sharedChunkCoords.set(chunk);
+		return this.getChunkEntry(sharedChunkCoords);
+	}
+
+	private ChunkShopkeepers getChunkEntry(String worldName, int chunkX, int chunkZ) {
+		sharedChunkCoords.set(worldName, chunkX, chunkZ);
+		return this.getChunkEntry(sharedChunkCoords);
+	}
+
 	private ChunkShopkeepers getChunkEntry(ChunkCoords chunkCoords) {
 		if (chunkCoords == null) return null;
 		String worldName = chunkCoords.getWorldName();
@@ -742,20 +753,19 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	void onChunkLoad(Chunk chunk) {
 		assert chunk != null;
-		ChunkCoords chunkCoords = new ChunkCoords(chunk);
-		ChunkShopkeepers chunkEntry = this.getChunkEntry(chunkCoords);
+		ChunkShopkeepers chunkEntry = this.getChunkEntry(chunk);
 		if (chunkEntry == null) return; // There are no shopkeepers in this chunk
 
 		// Chunk is not expected to already be active or pending activation (if chunk loading and unloading events are
 		// consistently ordered and correctly handled by us):
 		if (chunkEntry.active) {
 			Log.debug(DebugOptions.shopkeeperActivation,
-					() -> "Detected chunk load for already active chunk: " + TextUtils.getChunkString(chunkCoords)
+					() -> "Detected chunk load for already active chunk: " + TextUtils.getChunkString(chunk)
 			);
 			return;
 		} else if (chunkEntry.isActivationPending()) {
 			Log.debug(DebugOptions.shopkeeperActivation,
-					() -> "Detected chunk load for already pending chunk activation: " + TextUtils.getChunkString(chunkCoords)
+					() -> "Detected chunk load for already pending chunk activation: " + TextUtils.getChunkString(chunk)
 			);
 			return;
 		}
@@ -827,8 +837,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 		int maxChunkZ = centerChunkZ + chunkRadius;
 		for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
 			for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
-				sharedChunkCoords.set(worldName, chunkX, chunkZ);
-				ChunkShopkeepers chunkEntry = this.getChunkEntry(sharedChunkCoords);
+				ChunkShopkeepers chunkEntry = this.getChunkEntry(worldName, chunkX, chunkZ);
 				if (chunkEntry == null) continue;
 
 				// Activate the chunk if it is currently pending activation:
@@ -961,8 +970,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	void onChunkUnload(Chunk chunk) {
 		assert chunk != null;
-		ChunkCoords chunkCoords = new ChunkCoords(chunk);
-		ChunkShopkeepers chunkEntry = this.getChunkEntry(chunkCoords);
+		ChunkShopkeepers chunkEntry = this.getChunkEntry(chunk);
 		if (chunkEntry == null) return; // There are no shopkeepers in this chunk
 
 		this.deactivateChunk(chunkEntry);

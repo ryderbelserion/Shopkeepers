@@ -91,7 +91,7 @@ public class MutableChunkCoords extends ChunkCoords {
 	 *            the chunk, not <code>null</code>
 	 */
 	public void set(Chunk chunk) {
-		Validate.notNull(chunk, "block is null");
+		Validate.notNull(chunk, "chunk is null");
 		this.set(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
 	}
 
