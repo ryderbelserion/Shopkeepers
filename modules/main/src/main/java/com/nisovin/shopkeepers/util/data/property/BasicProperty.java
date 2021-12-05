@@ -233,6 +233,13 @@ public class BasicProperty<T> implements Property<T> {
 	 * <p>
 	 * When using this option, it is required to specify a {@link #defaultValue(Object) default value}.
 	 * <p>
+	 * Be aware that by using this option, components that call {@link #load(DataContainer)} are no longer able to
+	 * detect and react to cases of missing property data. Consequently, only use this option for properties for which
+	 * missing data is either an expected state (e.g. when using {@link #omitIfDefault()}), or for which the explicit
+	 * handling of the missing data case is not necessary, for example because their default values represent the
+	 * missing data case equally well (this may for example apply when using an empty String or an empty List as default
+	 * value).
+	 * <p>
 	 * This method can only be called while the property has not yet been {@link #build() built}.
 	 * 
 	 * @param <P>
@@ -341,6 +348,13 @@ public class BasicProperty<T> implements Property<T> {
 	/**
 	 * Sets the {@link DataAccessor} that is used to save and load values for this property.
 	 * <p>
+	 * The given {@link DataAccessor} is used like a black box. Since users of this property may want to control certain
+	 * aspects related to the saving and loading of property values, it is usually recommended that the used
+	 * {@link DataAccessor} does not handle the validation of values or deal with default or fallback values, but
+	 * instead leaves these aspects to this property. If the given {@link DataAccessor} is able to return a loaded value
+	 * of <code>null</code> instead of throwing a {@link MissingDataException}, this <code>null</code> value is
+	 * processed like any other loaded value rather than being treated like missing data.
+	 * <p>
 	 * The data accessor has to be set exactly once before the property is {@link #build() built}.
 	 * <p>
 	 * As a typically useful convenience side effect, if the given data accessor is a {@link DataKeyAccessor} and no
@@ -440,10 +454,9 @@ public class BasicProperty<T> implements Property<T> {
 	}
 
 	private T loadUnvalidated(DataContainer dataContainer) throws MissingDataException, InvalidDataException {
-		Validate.notNull(dataContainer, "dataContainer is null");
 		try {
 			try {
-				return this.loadValue(dataContainer);
+				return this.loadValue(dataContainer); // Can be null
 			} catch (MissingDataException e) {
 				if (useDefaultIfMissing) {
 					// This implies that there is a valid default value.
@@ -469,20 +482,21 @@ public class BasicProperty<T> implements Property<T> {
 	}
 
 	/**
-	 * Loads the value for this property from the given {@link DataContainer}.
+	 * Loads the value for this property from the given {@link DataContainer} using this property's
+	 * {@link #getDataAccessor() DataAccessor}.
 	 * <p>
-	 * This is called by {@link #load(DataContainer)} after the given data container has been validated. This method
-	 * does not {@link #validateValue(Object) validate} the loaded value.
+	 * This method does not {@link #validateValue(Object) validate} the loaded value, nor does it handle default values.
 	 * 
 	 * @param dataContainer
 	 *            the data container, not <code>null</code>
-	 * @return the loaded value, not <code>null</code>
+	 * @return the loaded value, can be <code>null</code>
 	 * @throws MissingDataException
 	 *             if the data for the value is missing
 	 * @throws InvalidDataException
 	 *             if the value cannot be loaded
 	 */
 	private T loadValue(DataContainer dataContainer) throws InvalidDataException {
+		Validate.notNull(dataContainer, "dataContainer is null");
 		return dataAccessor.load(dataContainer);
 	}
 
