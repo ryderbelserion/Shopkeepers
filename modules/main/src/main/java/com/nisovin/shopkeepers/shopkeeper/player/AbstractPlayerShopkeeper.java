@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.shopkeeper.player;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -171,6 +172,21 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		super.populateMessageArguments(messageArguments);
 		messageArguments.put("owner_name", this::getOwnerName);
 		messageArguments.put("owner_uuid", this::getOwnerUUID);
+	}
+
+	@Override
+	protected void onShopkeeperMoved() {
+		super.onShopkeeperMoved();
+
+		// Update the container location and the registered container protection if the shopkeeper has been moved to a
+		// different world:
+		// The container is (currently) assumed to always be located in the same world as the shopkeeper. If the
+		// shopkeeper is moved to a different world, the container is expected to also have been moved. Otherwise, if
+		// the container cannot be found in the new world, trading will not work.
+		if (!Objects.equals(this.getWorldName(), container.getWorldName())) {
+			// This updates the container's world based on the shopkeeper's current world:
+			this._setContainer(container);
+		}
 	}
 
 	@Override
@@ -491,10 +507,16 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		}
 
 		// Update container:
-		// Ensure that the container's world name matches the shopkeeper world name:
-		MutableBlockLocation newContainer = container.mutableCopy();
-		newContainer.setWorldName(this.getWorldName());
-		this.container = newContainer.immutable();
+		// Ensure that the container's world matches the shopkeeper world:
+		String shopkeeperWorldName = this.getWorldName(); // Can be null for virtual shopkeepers
+		if (!Objects.equals(container.getWorldName(), shopkeeperWorldName)) {
+			MutableBlockLocation newContainer = container.mutableCopy();
+			newContainer.setWorldName(shopkeeperWorldName);
+			container = newContainer;
+		}
+
+		// Ensure that we store an immutable BlockLocation:
+		this.container = container.immutable();
 
 		if (this.isValid()) {
 			// Enable the protection for the new container:

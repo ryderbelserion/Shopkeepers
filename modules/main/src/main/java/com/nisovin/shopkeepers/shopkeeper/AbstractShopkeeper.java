@@ -852,13 +852,23 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		Validate.isTrue(location.hasWorldName(), "location has not world name");
 
 		// TODO Changing the world is not safe (at least not for all types of shops)! Consider for example player shops
-		// which currently use the world name to locate their container.
+		// which currently use the shopkeeper's world name to locate their container.
 		this.location = location.immutable(); // Immutable copy if necessary
+
 		this.updateChunkCoords();
 		this.markDirty();
 
 		// Update shopkeeper in chunk map:
 		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperMoved(this);
+
+		// Inform subclasses:
+		this.onShopkeeperMoved();
+	}
+
+	/**
+	 * This is called when the location of the shopkeeper has changed.
+	 */
+	protected void onShopkeeperMoved() {
 	}
 
 	/**
