@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 
+import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
@@ -22,7 +23,7 @@ public class BlockLocation {
 	/**
 	 * An immutable block location with unset world name and all coordinates being zero.
 	 */
-	public static final BlockLocation ZERO = new BlockLocation();
+	public static final BlockLocation EMPTY = new BlockLocation();
 
 	/**
 	 * Creates a new {@link BlockLocation} for the given {@link Block}
@@ -241,6 +242,15 @@ public class BlockLocation {
 	}
 
 	/**
+	 * Checks if this location is empty, i.e. if it has no world name and all its coordinates are zero.
+	 * 
+	 * @return <code>true</code> if this location is empty
+	 */
+	public final boolean isEmpty() {
+		return !this.hasWorldName() && x == 0 && y == 0 && z == 0;
+	}
+
+	/**
 	 * Gets the {@link World} this block location is located in.
 	 * 
 	 * @return the world, or <code>null</code> if the world name of this block location is unset or if the world is not
@@ -261,6 +271,15 @@ public class BlockLocation {
 		World world = this.getWorld();
 		if (world == null) return null;
 		return world.getBlockAt(x, y, z); // Not null (even for coordinates outside the world's bounds)
+	}
+
+	/**
+	 * Gets the {@link ChunkCoords} of this location.
+	 * 
+	 * @return the {@link ChunkCoords}, or <code>null</code> if this location has no {@link #hasWorldName() world name}
+	 */
+	public final ChunkCoords getChunkCoords() {
+		return this.hasWorldName() ? ChunkCoords.fromBlock(worldName, x, z) : null;
 	}
 
 	/**

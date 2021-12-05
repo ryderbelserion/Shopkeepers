@@ -8,7 +8,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 /**
- * Stores positional information about a chunk, like its world and coordinates.
+ * Stores positional information about a chunk, i.e. its world name and coordinates.
  */
 public class ChunkCoords {
 
@@ -68,7 +68,7 @@ public class ChunkCoords {
 	 * Gets a {@link ChunkCoords} for the specified block location.
 	 * 
 	 * @param worldName
-	 *            the world name
+	 *            the world name, not <code>null</code> or empty
 	 * @param blockX
 	 *            the block's x coordinate
 	 * @param blockZ

@@ -58,11 +58,23 @@ public class TextUtils {
 	private static final String UNKNOWN_PLAYER = "[unknown]";
 
 	public static String getLocationString(Location location) {
+		assert location != null && location.getWorld() != null; // Also: World is still loaded.
 		return getLocationString(location.getWorld().getName(), location.getX(), location.getY(), location.getZ());
 	}
 
 	public static String getLocationString(Block block) {
+		assert block != null;
 		return getLocationString(block.getWorld().getName(), block.getX(), block.getY(), block.getZ());
+	}
+
+	public static String getLocationString(BlockLocation blockLocation) {
+		assert blockLocation != null;
+		return getLocationString(blockLocation.getWorldName(), blockLocation.getX(), blockLocation.getY(), blockLocation.getZ());
+	}
+
+	public static String getLocationString(BlockLocation blockLocation, double yaw) {
+		assert blockLocation != null;
+		return getLocationString(blockLocation.getWorldName(), blockLocation.getX(), blockLocation.getY(), blockLocation.getZ(), yaw);
 	}
 
 	// More performant variant if coordinates are integers:
@@ -79,10 +91,12 @@ public class TextUtils {
 	}
 
 	public static String getChunkString(ChunkCoords chunk) {
+		assert chunk != null;
 		return getChunkString(chunk.getWorldName(), chunk.getChunkX(), chunk.getChunkZ());
 	}
 
 	public static String getChunkString(Chunk chunk) {
+		assert chunk != null;
 		return getChunkString(chunk.getWorld().getName(), chunk.getX(), chunk.getZ());
 	}
 
@@ -91,10 +105,12 @@ public class TextUtils {
 	}
 
 	public static String getPlayerString(Player player) {
+		assert player != null;
 		return getPlayerString(player.getName(), player.getUniqueId());
 	}
 
 	public static String getPlayerString(User user) {
+		assert user != null;
 		return getPlayerString(user.getLastKnownName(), user.getUniqueId());
 	}
 

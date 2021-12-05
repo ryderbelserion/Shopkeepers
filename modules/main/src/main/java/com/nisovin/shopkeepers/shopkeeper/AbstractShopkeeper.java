@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Supplier;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
@@ -48,6 +47,7 @@ import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.trading.TradingHandler;
+import com.nisovin.shopkeepers.util.bukkit.BlockLocation;
 import com.nisovin.shopkeepers.util.bukkit.ColorUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
@@ -57,6 +57,7 @@ import com.nisovin.shopkeepers.util.data.property.EmptyDataPredicates;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.validation.java.IntegerValidators;
 import com.nisovin.shopkeepers.util.data.property.validation.java.StringValidators;
+import com.nisovin.shopkeepers.util.data.serialization.DataAccessor;
 import com.nisovin.shopkeepers.util.data.serialization.DataSerializer;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.data.serialization.bukkit.ColoredStringSerializers;
@@ -152,10 +153,8 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private UUID uniqueId; // Not null and constant after initialization
 	private AbstractShopObject shopObject; // Not null after initialization
 	// TODO Move location information into ShopObject?
-	private String worldName; // Not empty, null for virtual shops
-	private int x;
-	private int y;
-	private int z;
+	// Immutable instances, null for virtual shops, always has a world name:
+	private BlockLocation location;
 	private float yaw;
 
 	private ChunkCoords chunkCoords; // Null for virtual shops
@@ -278,18 +277,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 		if (shopObjectType instanceof VirtualShopObjectType) {
 			// Virtual shops ignore any potentially available spawn location:
-			this.worldName = null;
-			this.x = 0;
-			this.y = 0;
-			this.z = 0;
+			this.location = null;
 			this.yaw = 0.0F;
 		} else {
 			Location spawnLocation = shopCreationData.getSpawnLocation();
 			assert spawnLocation != null && spawnLocation.getWorld() != null;
-			this.worldName = spawnLocation.getWorld().getName();
-			this.x = spawnLocation.getBlockX();
-			this.y = spawnLocation.getBlockY();
-			this.z = spawnLocation.getBlockZ();
+			this.location = BlockLocation.of(spawnLocation);
+			assert this.location.hasWorldName();
 			this.yaw = spawnLocation.getYaw();
 		}
 		this.updateChunkCoords();
@@ -363,22 +357,22 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		AbstractShopObjectType<?> objectType = shopObjectData.get(AbstractShopObject.SHOP_OBJECT_TYPE);
 		assert objectType != null;
 
-		// Note: An empty world name is normalized to null.
-		this.worldName = shopkeeperData.get(WORLD_NAME);
-		this.x = shopkeeperData.get(LOCATION_X);
-		this.y = shopkeeperData.get(LOCATION_Y);
-		this.z = shopkeeperData.get(LOCATION_Z);
+		// Not null, even if the world name is null:
+		// Gets set to null afterwards if this shopkeeper is virtual.
+		this.location = shopkeeperData.get(LOCATION);
+		assert this.location != null;
 		this.yaw = shopkeeperData.get(YAW);
 
 		if (objectType instanceof VirtualShopObjectType) {
-			if (worldName != null || x != 0 || y != 0 || z != 0 || yaw != 0.0F) {
+			if (!location.isEmpty() || yaw != 0.0F) {
 				// TODO Allow virtual shopkeeper to store a location? This could later enable us to allow users to
 				// dynamically change the shop object type, including from virtual to non-virtual.
 				throw new InvalidDataException("Shopkeeper is virtual, but stores a non-empty location: "
-						+ TextUtils.getLocationString(StringUtils.getOrEmpty(worldName), x, y, z, yaw));
+						+ TextUtils.getLocationString(location, yaw));
 			}
+			this.location = null;
 		} else {
-			if (worldName == null) {
+			if (!location.hasWorldName()) {
 				throw new InvalidDataException("Missing world name!");
 			}
 		}
@@ -474,10 +468,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		shopkeeperData.set(UNIQUE_ID, uniqueId);
 
 		if (!this.isVirtual()) {
-			shopkeeperData.set(WORLD_NAME, worldName);
-			shopkeeperData.set(LOCATION_X, x);
-			shopkeeperData.set(LOCATION_Y, y);
-			shopkeeperData.set(LOCATION_Z, z);
+			shopkeeperData.set(LOCATION, location);
 			shopkeeperData.set(YAW, yaw);
 		}
 
@@ -715,6 +706,30 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 			.useDefaultIfMissing() // For virtual shopkeepers, and if missing (e.g. in pre 2.13.4 versions)
 			.defaultValue(0.0F) // South
 			.build();
+	// This always loads a non-null location, even for virtual shopkeepers.
+	// This ensures that we can inspect and validate the loaded coordinates even if the world name is null.
+	public static final Property<BlockLocation> LOCATION = new BasicProperty<BlockLocation>()
+			.name("location")
+			.dataAccessor(new DataAccessor<BlockLocation>() {
+				@Override
+				public void save(DataContainer dataContainer, BlockLocation value) {
+					assert value != null;
+					dataContainer.set(WORLD_NAME, value.getWorldName());
+					dataContainer.set(LOCATION_X, value.getX());
+					dataContainer.set(LOCATION_Y, value.getY());
+					dataContainer.set(LOCATION_Z, value.getZ());
+				}
+
+				@Override
+				public BlockLocation load(DataContainer dataContainer) throws InvalidDataException {
+					String worldName = dataContainer.get(WORLD_NAME); // Can be null
+					int x = dataContainer.get(LOCATION_X);
+					int y = dataContainer.get(LOCATION_Y);
+					int z = dataContainer.get(LOCATION_Z);
+					return new BlockLocation(worldName, x, y, z);
+				}
+			})
+			.build();
 
 	@Override
 	public int getId() {
@@ -752,28 +767,28 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public final boolean isVirtual() {
-		assert (worldName != null) ^ (shopObject instanceof VirtualShopObject); // xor
-		return (worldName == null);
+		assert (location != null && location.hasWorldName()) ^ (location == null && shopObject instanceof VirtualShopObject);
+		return (location == null);
 	}
 
 	@Override
 	public String getWorldName() {
-		return worldName;
+		return (location != null) ? location.getWorldName() : null;
 	}
 
 	@Override
 	public int getX() {
-		return x;
+		return (location != null) ? location.getX() : 0;
 	}
 
 	@Override
 	public int getY() {
-		return y;
+		return (location != null) ? location.getY() : 0;
 	}
 
 	@Override
 	public int getZ() {
-		return z;
+		return (location != null) ? location.getZ() : 0;
 	}
 
 	@Override
@@ -783,16 +798,43 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	@Override
 	public String getPositionString() {
-		if (worldName == null) return VIRTUAL_SHOPKEEPER_MARKER;
-		return TextUtils.getLocationString(worldName, x, y, z);
+		if (this.isVirtual()) return VIRTUAL_SHOPKEEPER_MARKER;
+		return TextUtils.getLocationString(location);
 	}
 
 	@Override
 	public Location getLocation() {
-		if (worldName == null) return null;
-		World world = Bukkit.getWorld(worldName);
+		if (this.isVirtual()) return null;
+		assert location != null && location.hasWorldName();
+		World world = location.getWorld();
 		if (world == null) return null;
-		return new Location(world, x, y, z, yaw, 0.0F);
+		return new Location(world, location.getX(), location.getY(), location.getZ(), yaw, 0.0F);
+	}
+
+	/**
+	 * Gets the shopkeeper's location.
+	 * <p>
+	 * Unlike {@link #getLocation()}, this returns a location even if the shopkeeper's world is not loaded currently.
+	 * 
+	 * @return the shopkeeper's block location, or <code>null</code> if the shopkeeper is virtual
+	 */
+	public BlockLocation getBlockLocation() {
+		return location;
+	}
+
+	/**
+	 * Sets the stored location and yaw of this shopkeeper.
+	 * 
+	 * @param location
+	 *            the new stored location of this shopkeeper
+	 * @see #setLocation(BlockLocation)
+	 * @see #setYaw(float)
+	 */
+	public final void setLocation(Location location) {
+		// This validates the given location, and throws an exception if the location's world is no longer loaded:
+		this.setLocation(BlockLocation.of(location));
+		assert location != null;
+		this.setYaw(location.getYaw());
 	}
 
 	/**
@@ -804,19 +846,14 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * @param location
 	 *            the new stored location of this shopkeeper
 	 */
-	public void setLocation(Location location) {
+	public final void setLocation(BlockLocation location) {
 		Validate.State.isTrue(!this.isVirtual(), "Cannot set location of virtual shopkeeper!");
 		Validate.notNull(location, "location is null");
-		World world = location.getWorld();
-		Validate.notNull(world, "World of location is null");
+		Validate.isTrue(location.hasWorldName(), "location has not world name");
 
 		// TODO Changing the world is not safe (at least not for all types of shops)! Consider for example player shops
 		// which currently use the world name to locate their container.
-		worldName = world.getName();
-		x = location.getBlockX();
-		y = location.getBlockY();
-		z = location.getBlockZ();
-		yaw = location.getYaw();
+		this.location = location.immutable(); // Immutable copy if necessary
 		this.updateChunkCoords();
 		this.markDirty();
 
@@ -844,7 +881,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	private void updateChunkCoords() {
-		this.chunkCoords = this.isVirtual() ? null : ChunkCoords.fromBlock(worldName, x, z);
+		this.chunkCoords = this.isVirtual() ? null : location.getChunkCoords();
 	}
 
 	/**
