@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.playershops;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -106,8 +105,8 @@ public class PlayerInactivity {
 		shopkeeperRegistry.getAllPlayerShopkeepers().forEach(playerShop -> {
 			// In this first step, we are only interested in the existing shop owners, and therefore don't store the
 			// shopkeepers. We later gather the shopkeepers of only the inactive shop owners.
-			// We insert the empty list here instead of null, because the subsequent code needs to be able to
-			// differentiate between there being a mapping for a specific user versus the user being mapped to null.
+			// We insert the empty list here instead of null, because the subsequent code would otherwise not be able to
+			// differentiate between there being no mapping for a specific user versus the user being mapped to null.
 			shopsByInactivePlayers.put(playerShop.getOwnerUser(), Collections.emptyList());
 		});
 		if (shopsByInactivePlayers.isEmpty()) {
@@ -116,15 +115,7 @@ public class PlayerInactivity {
 
 		// Retrieve the OfflinePlayers and their 'last played' times asynchronously:
 		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-			// Note: We don't use #removeIf(Predicate) here, because the implementation may evaluate the Predicate
-			// multiple times (which may be costly).
-			Iterator<User> shopOwnersIterator = shopsByInactivePlayers.keySet().iterator();
-			while (shopOwnersIterator.hasNext()) {
-				User shopOwner = shopOwnersIterator.next();
-				if (!isInactive(shopOwner)) {
-					shopOwnersIterator.remove();
-				}
-			}
+			shopsByInactivePlayers.keySet().removeIf(shopOwner -> !this.isInactive(shopOwner));
 			if (shopsByInactivePlayers.isEmpty()) {
 				return; // No inactive players found
 			}

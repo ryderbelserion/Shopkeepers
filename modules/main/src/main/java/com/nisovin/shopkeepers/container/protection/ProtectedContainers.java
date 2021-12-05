@@ -215,8 +215,22 @@ public class ProtectedContainers {
 	/**
 	 * Checks if the given block is a protected shop container.
 	 * <p>
-	 * This checks if the specified block is actually a supported shop container and takes the bypass permission into
-	 * account.
+	 * This checks if the specified block actually is a supported type of shop container. This does not take any players
+	 * into account, such as shop owners or players with the bypass permission.
+	 * 
+	 * @param block
+	 *            the block
+	 * @return <code>true</code> if the block is a protected container
+	 */
+	public boolean isProtectedContainer(Block block) {
+		return this.isProtectedContainer(block, null);
+	}
+
+	/**
+	 * Checks if the given block is a protected shop container.
+	 * <p>
+	 * This checks if the specified block actually is a supported type of shop container currently, and optionally takes
+	 * shop owners and the bypass permission into account.
 	 * 
 	 * @param block
 	 *            the block
