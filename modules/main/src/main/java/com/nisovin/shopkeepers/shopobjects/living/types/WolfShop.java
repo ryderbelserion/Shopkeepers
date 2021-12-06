@@ -59,8 +59,8 @@ public class WolfShop extends SittableShop<Wolf> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		angryProperty.save(shopObjectData);
 		collarColorProperty.save(shopObjectData);
 	}

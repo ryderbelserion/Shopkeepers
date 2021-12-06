@@ -96,8 +96,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 	}
 
 	// ACTIVATION

@@ -86,8 +86,8 @@ public abstract class AbstractAdminShopkeeper extends AbstractShopkeeper impleme
 	}
 
 	@Override
-	public void saveDynamicState(ShopkeeperData shopkeeperData) {
-		super.saveDynamicState(shopkeeperData);
+	public void saveDynamicState(ShopkeeperData shopkeeperData, boolean saveAll) {
+		super.saveDynamicState(shopkeeperData, saveAll);
 		this.saveTradePermission(shopkeeperData);
 	}
 

@@ -28,13 +28,13 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 	}
 
 	@Override
-	public void load(ShopObjectData configSection) throws InvalidDataException {
-		super.load(configSection);
+	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
+		super.load(shopObjectData);
 	}
 
 	@Override
-	public void save(ShopObjectData configSection) {
-		super.save(configSection);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 	}
 
 	// ACTIVATION

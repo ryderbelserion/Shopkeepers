@@ -10,6 +10,7 @@ import org.bukkit.World;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.events.ShopkeeperAddedEvent;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
+import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
@@ -131,11 +132,19 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * It is assumed that the data stored in the given {@link ShopObjectData} does not change afterwards and can be
 	 * serialized asynchronously. The shop object must therefore ensure that this data is not modified, for example by
 	 * only inserting immutable data, or always making copies of the inserted data.
+	 * <p>
+	 * Some types of shop objects may rely on externally stored data and only save a reference to that external data as
+	 * part of their shop object data. However, in some situations, such as when creating a
+	 * {@link Shopkeeper#createSnapshot(String) shopkeeper snapshot}, it may be necessary to also save that external
+	 * data as part of the shop object data in order to later be able to restore it. The {@code saveAll} parameter
+	 * indicates whether the shop object should try to also save any external data.
 	 * 
 	 * @param shopObjectData
 	 *            the shop object data, not <code>null</code>
+	 * @param saveAll
+	 *            <code>true</code> to also save any data that would usually be stored externally
 	 */
-	public void save(ShopObjectData shopObjectData) {
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
 		Validate.notNull(shopObjectData, "shopObjectData is null");
 		shopObjectData.set("type", this.getType().getIdentifier());
 	}

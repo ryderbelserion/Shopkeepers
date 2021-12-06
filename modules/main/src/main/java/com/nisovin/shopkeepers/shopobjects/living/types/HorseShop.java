@@ -90,8 +90,8 @@ public class HorseShop extends BabyableShop<Horse> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		colorProperty.save(shopObjectData);
 		styleProperty.save(shopObjectData);
 		armorProperty.save(shopObjectData);

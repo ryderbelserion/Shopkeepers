@@ -426,7 +426,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 *            the shopkeeper data, not <code>null</code>
 	 * @throws InvalidDataException
 	 *             if the data cannot be loaded
-	 * @see #saveDynamicState(ShopkeeperData)
+	 * @see #saveDynamicState(ShopkeeperData, boolean)
 	 */
 	public void loadDynamicState(ShopkeeperData shopkeeperData) throws InvalidDataException {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
@@ -453,7 +453,13 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	/**
 	 * Saves the shopkeeper's state to the given {@link ShopkeeperData}.
 	 * <p>
-	 * This also includes the shopkeeper's {@link #saveDynamicState(ShopkeeperData) dynamic state}.
+	 * This also includes the shopkeeper's {@link #saveDynamicState(ShopkeeperData, boolean) dynamic state}.
+	 * <p>
+	 * Some types of shopkeepers or shop objects may rely on externally stored data and only save a reference to that
+	 * external data as part of their shopkeeper data. However, in some situations, such as when creating a
+	 * {@link #createSnapshot(String) shopkeeper snapshot}, it may be necessary to also save that external data as part
+	 * of the shopkeeper data in order to later be able to restore it. The {@code saveAll} parameter indicates whether
+	 * the shopkeeper should try to also save any external data.
 	 * <p>
 	 * It is assumed that the data stored in the given {@link ShopkeeperData} does not change afterwards and can be
 	 * serialized asynchronously. The shopkeeper must therefore ensure that this data is not modified, for example by
@@ -461,8 +467,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
+	 * @param saveAll
+	 *            <code>true</code> to also save any data that would usually be stored externally
 	 */
-	public void save(ShopkeeperData shopkeeperData) {
+	public void save(ShopkeeperData shopkeeperData, boolean saveAll) {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 		shopkeeperData.set(ID, id);
 		shopkeeperData.set(UNIQUE_ID, uniqueId);
@@ -473,7 +481,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		}
 
 		// Dynamic shopkeeper and shop object data:
-		this.saveDynamicState(shopkeeperData);
+		this.saveDynamicState(shopkeeperData, saveAll);
 
 		// Snapshots:
 		this.saveSnapshots(shopkeeperData);
@@ -486,6 +494,12 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * shopkeeper itself might dynamically change at runtime. State that is currently part of the non-dynamic portion,
 	 * such as the shopkeeper's type, location, or object type, might be moved to the dynamic portion in the future.
 	 * <p>
+	 * Some types of shopkeepers or shop objects may rely on externally stored data and only save a reference to that
+	 * external data as part of their shopkeeper data. However, in some situations, such as when creating a
+	 * {@link #createSnapshot(String) shopkeeper snapshot}, it may be necessary to also save that external data as part
+	 * of the shopkeeper data in order to later be able to restore it. The {@code saveAll} parameter indicates whether
+	 * the shopkeeper should try to also save any external data.
+	 * <p>
 	 * The saved dynamic state can be loaded again via {@link #loadDynamicState(ShopkeeperData)}.
 	 * <p>
 	 * It is assumed that the data stored in the given {@link ShopkeeperData} does not change afterwards and can be
@@ -494,15 +508,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * 
 	 * @param shopkeeperData
 	 *            the shopkeeper data, not <code>null</code>
+	 * @param saveAll
+	 *            <code>true</code> to also save any data that would usually be stored externally
 	 */
-	public void saveDynamicState(ShopkeeperData shopkeeperData) {
+	public void saveDynamicState(ShopkeeperData shopkeeperData, boolean saveAll) {
 		Validate.notNull(shopkeeperData, "shopkeeperData is null");
 		shopkeeperData.set(SHOP_TYPE, this.getType());
 		shopkeeperData.set(NAME, name);
 
 		// Shop object:
 		ShopObjectData shopObjectData = ShopObjectData.of(DataContainer.create());
-		shopObject.save(shopObjectData);
+		shopObject.save(shopObjectData, saveAll);
 		shopkeeperData.set(SHOP_OBJECT_DATA, shopObjectData);
 	}
 
@@ -1136,7 +1152,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		// The name is validated during the creation of the snapshot.
 		Instant timestamp = Instant.now();
 		ShopkeeperData dynamicShopkeeperData = ShopkeeperData.of(DataContainer.create());
-		this.saveDynamicState(dynamicShopkeeperData);
+		this.saveDynamicState(dynamicShopkeeperData, true); // Save all data
 		return new SKShopkeeperSnapshot(name, timestamp, dynamicShopkeeperData);
 	}
 

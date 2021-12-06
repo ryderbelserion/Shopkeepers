@@ -813,7 +813,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			// This replaces the previous shopkeeper data:
 			ShopkeeperData newData = ShopkeeperData.of(saveData.createContainer(key));
 			try {
-				shopkeeper.save(newData);
+				shopkeeper.save(newData, false); // May reference externally stored data
 			} catch (Exception e) {
 				// Error while saving shopkeeper data:
 				// Restore previous shopkeeper data and then skip this shopkeeper.

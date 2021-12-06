@@ -47,8 +47,8 @@ public class CreeperShop extends SKLivingShopObject<Creeper> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		poweredProperty.save(shopObjectData);
 	}
 

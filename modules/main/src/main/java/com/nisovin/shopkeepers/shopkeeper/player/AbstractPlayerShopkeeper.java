@@ -120,8 +120,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	}
 
 	@Override
-	public void saveDynamicState(ShopkeeperData shopkeeperData) {
-		super.saveDynamicState(shopkeeperData);
+	public void saveDynamicState(ShopkeeperData shopkeeperData, boolean saveAll) {
+		super.saveDynamicState(shopkeeperData, saveAll);
 		this.saveOwner(shopkeeperData);
 		this.saveContainer(shopkeeperData);
 		this.saveNotifyOnTrades(shopkeeperData);

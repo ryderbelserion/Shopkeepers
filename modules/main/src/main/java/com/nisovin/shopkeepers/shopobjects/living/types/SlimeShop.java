@@ -56,8 +56,8 @@ public class SlimeShop extends SKLivingShopObject<Slime> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		sizeProperty.save(shopObjectData);
 	}
 

@@ -71,8 +71,8 @@ public class FoxShop extends SittableShop<Fox> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		foxTypeProperty.save(shopObjectData);
 		sleepingProperty.save(shopObjectData);
 		crouchingProperty.save(shopObjectData);

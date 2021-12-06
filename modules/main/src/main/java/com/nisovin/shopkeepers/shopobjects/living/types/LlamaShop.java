@@ -59,8 +59,8 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		colorProperty.save(shopObjectData);
 		carpetColorProperty.save(shopObjectData);
 	}

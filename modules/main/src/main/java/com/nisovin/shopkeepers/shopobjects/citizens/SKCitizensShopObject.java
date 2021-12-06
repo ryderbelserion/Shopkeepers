@@ -92,8 +92,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		npcUniqueIdProperty.save(shopObjectData);
 	}
 

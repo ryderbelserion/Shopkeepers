@@ -48,8 +48,8 @@ public class PandaShop extends BabyableShop<Panda> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		geneProperty.save(shopObjectData);
 	}
 

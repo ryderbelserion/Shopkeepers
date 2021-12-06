@@ -33,8 +33,8 @@ public class WanderingTraderShop extends BabyableShop<WanderingTrader> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 	}
 
 	@Override

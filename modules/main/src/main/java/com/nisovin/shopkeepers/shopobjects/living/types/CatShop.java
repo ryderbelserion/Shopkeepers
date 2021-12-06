@@ -59,8 +59,8 @@ public class CatShop extends SittableShop<Cat> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		catTypeProperty.save(shopObjectData);
 		collarColorProperty.save(shopObjectData);
 	}

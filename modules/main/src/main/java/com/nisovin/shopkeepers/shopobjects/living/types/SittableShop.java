@@ -48,8 +48,8 @@ public class SittableShop<E extends Ageable & Sittable> extends BabyableShop<E> 
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		sittingProperty.save(shopObjectData);
 	}
 

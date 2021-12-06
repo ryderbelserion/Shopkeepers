@@ -46,8 +46,8 @@ public class PigShop extends BabyableShop<Pig> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		saddleProperty.save(shopObjectData);
 	}
 

@@ -66,8 +66,8 @@ public class TropicalFishShop extends SKLivingShopObject<TropicalFish> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		patternProperty.save(shopObjectData);
 		bodyColorProperty.save(shopObjectData);
 		patternColorProperty.save(shopObjectData);

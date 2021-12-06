@@ -47,8 +47,8 @@ public class SnowmanShop extends SKLivingShopObject<Snowman> {
 	}
 
 	@Override
-	public void save(ShopObjectData shopObjectData) {
-		super.save(shopObjectData);
+	public void save(ShopObjectData shopObjectData, boolean saveAll) {
+		super.save(shopObjectData, saveAll);
 		pumpkinHeadProperty.save(shopObjectData);
 	}
 
