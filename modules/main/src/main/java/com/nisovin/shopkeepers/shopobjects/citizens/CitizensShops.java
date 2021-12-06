@@ -280,6 +280,9 @@ public class CitizensShops {
 	}
 
 	void onNPCEdited(NPC npc) {
+		// TODO We may sometimes unnecessarily call this multiple times within the same tick. Merge all save requests
+		// within a short time period (i.e. a few ticks)? But we would also need to ensure that the save is triggered on
+		// plugin shutdown, including when Citizens shuts down.
 		if (Settings.saveCitizenNpcsInstantly) {
 			this.saveNPCs();
 		} // Else: Saving is controlled only by Citizens itself: Periodically, manually, and on shutdown.

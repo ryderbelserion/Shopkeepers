@@ -155,15 +155,14 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		return npc.getOrAddTrait(MobType.class).getType();
 	}
 
-	// Returns null if the NPC is not available and could not be created.
-	private NPC getOrCreateNpcIfMissing() {
-		NPC npc = this.getNPC();
-		if (npc != null) return npc;
+	// Returns null if the NPC could not be created, including if the NPC has already been created before.
+	private NPC createNpcIfNotYetCreated() {
 		if (this.getNPCUniqueId() != null) {
 			// The NPC has already been created in the past. Even if it no longer exists, we won't force a recreation of
-			// it, since periodically recreating new NPCs could go really wrong.
+			// it here, because periodically recreating new NPCs could go really wrong.
 			return null;
 		}
+		assert this.getNPC() == null;
 		if (!citizensShops.isEnabled()) return null;
 
 		Log.debug(() -> shopkeeper.getLogPrefix() + "Creating Citizens NPC.");
@@ -173,7 +172,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		// spawning will happen later once the world is loaded.
 		Location spawnLocation = this.getSpawnLocation(); // Can be null
 		// The NPC name is initially empty (works fine, even for player NPCs):
-		npc = citizensShops.createNPC(spawnLocation, entityType, "");
+		NPC npc = citizensShops.createNPC(spawnLocation, entityType, "");
 		if (npc == null) {
 			// NPC creation failed for some reason.
 			Log.debug(() -> shopkeeper.getLogPrefix() + "Failed to create Citizens NPC!");
@@ -198,45 +197,54 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 		// Apply the name:
 		// This also applies the nameplate prefix and adjusts the nameplate visibility if required.
-		// This also triggers a save of the NPC data if required.
-		this.setName(name);
+		this.setNpcName(npc, name);
 
 		return npc;
 	}
 
 	private void setupNpc() {
-		NPC npc = this.getOrCreateNpcIfMissing();
-		if (npc == null) return; // NPC is not available
+		boolean npcHasChanged = false;
+		NPC npc = this.getNPC();
+		if (npc == null) {
+			npc = this.createNpcIfNotYetCreated();
+			if (npc == null) {
+				return; // NPC could not be created or is not available
+			} else {
+				// NPC has been newly created:
+				npcHasChanged = true;
+			}
+		}
+		assert npc != null;
 
-		this.applyNpcData();
-		this.updateNpcOwner();
+		npcHasChanged |= this.applyNpcData(npc);
+		npcHasChanged |= this.updateNpcOwner(npc);
+
+		if (npcHasChanged) {
+			citizensShops.onNPCEdited(npc);
+		}
 	}
 
-	private void updateNpcOwner() {
-		if (!(shopkeeper instanceof PlayerShopkeeper)) return;
+	// Returns true if the NPC has changed.
+	private boolean updateNpcOwner(NPC npc) {
+		assert npc != null;
+		if (!(shopkeeper instanceof PlayerShopkeeper)) return false;
 		PlayerShopkeeper playerShop = (PlayerShopkeeper) shopkeeper;
 
-		NPC npc = this.getNPC();
-		if (npc == null) return;
-
-		boolean npcChanged = false;
+		boolean npcHasChanged = false;
 		if (Settings.setCitizenNpcOwnerOfPlayerShops) {
 			UUID ownerId = playerShop.getOwnerUUID();
 			Owner ownerTrait = npc.getOrAddTrait(Owner.class);
 			if (!ownerId.equals(ownerTrait.getOwnerId())) {
 				ownerTrait.setOwner(ownerId);
-				npcChanged = true;
+				npcHasChanged = true;
 				Log.debug(() -> shopkeeper.getLogPrefix() + "Citizens NPC owner set.");
 			}
 		} else if (npc.hasTrait(Owner.class)) {
 			npc.removeTrait(Owner.class);
-			npcChanged = true;
+			npcHasChanged = true;
 			Log.debug(() -> shopkeeper.getLogPrefix() + "Citizens NPC owner removed.");
 		}
-
-		if (npcChanged) {
-			citizensShops.onNPCEdited(npc);
-		}
+		return npcHasChanged;
 	}
 
 	// NPC DATA
@@ -285,6 +293,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			// Previously saved but no longer needed NPC data is deleted during data migrations:
 			assert Settings.snapshotsSaveCitizenNpcData;
 			// Update the NPC, if it is currently available:
+			// If the NPC is not available currently, we remember the NPC data and try to apply it once the NPC becomes
+			// available again.
 			if (shopkeeper.isValid()) {
 				this.setupNpc();
 			}
@@ -317,24 +327,18 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 
 	// It may be necessary to also apply other changes to the NPC after the NPC state has been restored. Usually, this
 	// should therefore not be called directly, but as part of #setupNpc().
-	private void applyNpcData() {
-		if (this.npcData == null) return; // Nothing to apply
-
-		NPC npc = this.getNPC();
-		if (npc == null) {
-			// The NPC is not available currently. We remember the NPC data and try to apply it once the NPC becomes
-			// available again.
-			return;
-		}
+	// Returns true if the NPC has changed.
+	private boolean applyNpcData(NPC npc) {
+		assert npc != null;
+		if (this.npcData == null) return false; // Nothing to apply
 
 		Log.debug(() -> shopkeeper.getLogPrefix() + "Applying stored Citizens NPC state to NPC " + npc.getId());
 		CitizensUtils.loadNpc(npc, npcData);
 
-		citizensShops.onNPCEdited(npc);
-
 		// Once applied, we can delete our copy of the NPC data:
 		this.npcData = null;
 		shopkeeper.markDirty();
+		return true;
 	}
 
 	// LIFE CYCLE
@@ -545,6 +549,14 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		NPC npc = this.getNPC();
 		if (npc == null) return;
 
+		if (this.setNpcName(npc, name)) {
+			citizensShops.onNPCEdited(npc);
+		}
+	}
+
+	// Returns true if the NPC has changed.
+	private boolean setNpcName(NPC npc, String name) {
+		assert npc != null;
 		if (Settings.showNameplates && name != null && !name.isEmpty()) {
 			boolean isPlayerNPC = (this.getEntityType() == EntityType.PLAYER);
 			if (!isPlayerNPC) {
@@ -568,8 +580,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			// Update the nameplate visibility:
 			npc.data().setPersistent(NPC.NAMEPLATE_VISIBLE_METADATA, "false");
 		}
-
-		citizensShops.onNPCEdited(npc);
+		return true;
 	}
 
 	@Override
@@ -586,12 +597,19 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		super.onShopOwnerChanged();
 		assert shopkeeper instanceof PlayerShopkeeper;
 
-		this.updateNpcOwner();
+		NPC npc = this.getNPC();
+		if (npc == null) return;
+
+		boolean npcHasChanged = this.updateNpcOwner(npc);
 
 		if (!Settings.allowRenamingOfPlayerNpcShops) {
 			// Update the NPC's name:
 			String ownerName = ((PlayerShopkeeper) shopkeeper).getOwnerName();
-			this.setName(ownerName);
+			npcHasChanged |= this.setNpcName(npc, ownerName);
+		}
+
+		if (npcHasChanged) {
+			citizensShops.onNPCEdited(npc);
 		}
 	}
 
