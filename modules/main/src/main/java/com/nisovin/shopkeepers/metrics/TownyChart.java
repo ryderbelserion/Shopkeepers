@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.metrics;
 
 import org.bstats.bukkit.Metrics;
 
-import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
+import com.nisovin.shopkeepers.dependencies.towny.TownyDependency;
 
 /**
  * Checks whether this server is using Towny.
@@ -10,6 +10,6 @@ import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
 public class TownyChart extends Metrics.SimplePie {
 
 	public TownyChart() {
-		super("uses_towny", () -> (TownyHandler.isPluginEnabled()) ? "Yes" : "No");
+		super("uses_towny", () -> (TownyDependency.isPluginEnabled()) ? "Yes" : "No");
 	}
 }

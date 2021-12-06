@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.pluginhandlers;
+package com.nisovin.shopkeepers.dependencies.worldguard;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -18,7 +18,7 @@ import com.sk89q.worldguard.protection.flags.StateFlag;
 import com.sk89q.worldguard.protection.flags.registry.FlagConflictException;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
 
-public class WorldGuardHandler {
+public final class WorldGuardDependency {
 
 	public static final String PLUGIN_NAME = "WorldGuard";
 	// This flag got originally registered by WorldGuard itself, but this is no longer the case. Other plugins are
@@ -101,6 +101,6 @@ public class WorldGuardHandler {
 		}
 	}
 
-	private WorldGuardHandler() {
+	private WorldGuardDependency() {
 	}
 }

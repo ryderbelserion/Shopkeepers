@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.pluginhandlers.citizens;
+package com.nisovin.shopkeepers.dependencies.citizens;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
@@ -17,6 +17,11 @@ import net.citizensnpcs.api.util.MemoryDataKey;
  * Utilities related to the Citizens plugin and Citizens NPCs.
  */
 public final class CitizensUtils {
+
+	public static boolean isNPC(Entity entity) {
+		if (entity == null) return false;
+		return entity.hasMetadata("NPC");
+	}
 
 	public static DataKey toDataKey(DataContainer dataContainer) {
 		Validate.notNull(dataContainer, "dataContainer is null");

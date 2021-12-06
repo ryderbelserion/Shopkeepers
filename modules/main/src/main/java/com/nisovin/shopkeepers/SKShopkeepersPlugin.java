@@ -28,13 +28,13 @@ import com.nisovin.shopkeepers.container.protection.RemoveShopOnContainerBreak;
 import com.nisovin.shopkeepers.debug.Debug;
 import com.nisovin.shopkeepers.debug.events.EventDebugger;
 import com.nisovin.shopkeepers.debug.trades.TradingCountListener;
+import com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency;
 import com.nisovin.shopkeepers.internals.SKApiInternals;
 import com.nisovin.shopkeepers.itemconversion.ItemConversions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.metrics.PluginMetrics;
 import com.nisovin.shopkeepers.naming.ShopkeeperNaming;
 import com.nisovin.shopkeepers.playershops.PlayerShops;
-import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.shopcreation.ShopkeeperCreation;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -121,7 +121,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 			// Skip version dependent classes:
 			if (className.startsWith("com.nisovin.shopkeepers.compat.")) return false;
 			// Skip classes that interact with optional dependencies:
-			if (className.equals("com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler$Internal")) return false;
+			if (className.equals("com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency$Internal")) return false;
 			if (className.equals("com.nisovin.shopkeepers.shopobjects.citizens.CitizensShopkeeperTrait")) return false;
 			if (className.equals("com.nisovin.shopkeepers.spigot.text.SpigotText$Internal")) return false;
 			return true;
@@ -200,7 +200,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// WorldGuard only allows registering flags before it gets enabled.
 		// Note: Changing the config setting has no effect until the next server restart or server reload.
 		if (Settings.registerWorldGuardAllowShopFlag) {
-			WorldGuardHandler.registerAllowShopFlag();
+			WorldGuardDependency.registerAllowShopFlag();
 		}
 
 		// Register defaults:

@@ -18,7 +18,7 @@ import org.bukkit.plugin.Plugin;
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
-import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.dependencies.citizens.CitizensDependency;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -114,7 +114,7 @@ public class CitizensShops {
 		}
 
 		if (!Settings.enableCitizenShops) return; // Feature disabled
-		if (!CitizensHandler.isPluginEnabled()) {
+		if (!CitizensDependency.isPluginEnabled()) {
 			Log.debug("Citizen shops enabled, but Citizens plugin not found or disabled.");
 			return;
 		}
@@ -155,7 +155,7 @@ public class CitizensShops {
 			((SKCitizensShopObject) shopkeeper.getShopObject()).onCitizensShopsDisabled();
 		});
 
-		Plugin citizensPlugin = CitizensHandler.getPlugin();
+		Plugin citizensPlugin = CitizensDependency.getPlugin();
 		if (citizensPlugin != null) {
 			// Unregister the shopkeeper trait:
 			this.unregisterShopkeeperTrait();

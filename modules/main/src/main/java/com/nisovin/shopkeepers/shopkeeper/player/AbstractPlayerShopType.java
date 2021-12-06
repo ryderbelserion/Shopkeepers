@@ -14,10 +14,10 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.container.ShopContainers;
+import com.nisovin.shopkeepers.dependencies.towny.TownyDependency;
+import com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
-import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
-import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
@@ -74,7 +74,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 
 		// Check WorldGuard:
 		if (Settings.enableWorldGuardRestrictions) {
-			if (!WorldGuardHandler.isShopAllowed(creator, spawnLocation)) {
+			if (!WorldGuardDependency.isShopAllowed(creator, spawnLocation)) {
 				TextUtils.sendMessage(creator, Messages.shopCreateFail);
 				return false;
 			}
@@ -82,7 +82,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 
 		// Check Towny:
 		if (Settings.enableTownyRestrictions) {
-			if (!TownyHandler.isCommercialArea(spawnLocation)) {
+			if (!TownyDependency.isCommercialArea(spawnLocation)) {
 				TextUtils.sendMessage(creator, Messages.shopCreateFail);
 				return false;
 			}

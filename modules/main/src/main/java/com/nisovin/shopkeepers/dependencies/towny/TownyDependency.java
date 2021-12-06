@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.pluginhandlers;
+package com.nisovin.shopkeepers.dependencies.towny;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -8,7 +8,7 @@ import com.palmergames.bukkit.towny.TownyAPI;
 import com.palmergames.bukkit.towny.object.TownBlock;
 import com.palmergames.bukkit.towny.object.TownBlockType;
 
-public class TownyHandler {
+public final class TownyDependency {
 
 	public static final String PLUGIN_NAME = "Towny";
 
@@ -26,6 +26,6 @@ public class TownyHandler {
 		return (townBlock != null && townBlock.getType() == TownBlockType.COMMERCIAL);
 	}
 
-	private TownyHandler() {
+	private TownyDependency() {
 	}
 }

@@ -1,10 +1,9 @@
-package com.nisovin.shopkeepers.pluginhandlers;
+package com.nisovin.shopkeepers.dependencies.citizens;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.plugin.Plugin;
 
-public class CitizensHandler {
+public final class CitizensDependency {
 
 	public static final String PLUGIN_NAME = "Citizens";
 
@@ -16,10 +15,6 @@ public class CitizensHandler {
 		return Bukkit.getPluginManager().isPluginEnabled(PLUGIN_NAME);
 	}
 
-	public static boolean isNPC(Entity entity) {
-		return entity.hasMetadata("NPC");
-	}
-
-	private CitizensHandler() {
+	private CitizensDependency() {
 	}
 }

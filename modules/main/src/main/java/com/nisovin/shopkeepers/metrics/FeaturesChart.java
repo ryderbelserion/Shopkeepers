@@ -6,9 +6,9 @@ import java.util.Map;
 import org.bstats.bukkit.Metrics;
 
 import com.nisovin.shopkeepers.config.Settings;
-import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
-import com.nisovin.shopkeepers.pluginhandlers.TownyHandler;
-import com.nisovin.shopkeepers.pluginhandlers.WorldGuardHandler;
+import com.nisovin.shopkeepers.dependencies.citizens.CitizensDependency;
+import com.nisovin.shopkeepers.dependencies.towny.TownyDependency;
+import com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency;
 import com.nisovin.shopkeepers.util.java.MapUtils;
 
 /**
@@ -24,10 +24,10 @@ public class FeaturesChart extends Metrics.DrilldownPie {
 			// Plugin compatibility features:
 			addFeatureEntry(allFeatures, "check-shop-interaction-result", Settings.checkShopInteractionResult);
 			addFeatureEntry(allFeatures, "bypass-spawn-blocking", Settings.bypassSpawnBlocking);
-			addFeatureEntry(allFeatures, "enable-world-guard-restrictions", Settings.enableWorldGuardRestrictions && WorldGuardHandler.isPluginEnabled());
-			addFeatureEntry(allFeatures, "require-world-guard-allow-shop-flag", Settings.requireWorldGuardAllowShopFlag && WorldGuardHandler.isPluginEnabled());
-			addFeatureEntry(allFeatures, "enable-towny-restrictions", Settings.enableTownyRestrictions && TownyHandler.isPluginEnabled());
-			addFeatureEntry(allFeatures, "enable-citizen-shops", Settings.enableCitizenShops && CitizensHandler.isPluginEnabled());
+			addFeatureEntry(allFeatures, "enable-world-guard-restrictions", Settings.enableWorldGuardRestrictions && WorldGuardDependency.isPluginEnabled());
+			addFeatureEntry(allFeatures, "require-world-guard-allow-shop-flag", Settings.requireWorldGuardAllowShopFlag && WorldGuardDependency.isPluginEnabled());
+			addFeatureEntry(allFeatures, "enable-towny-restrictions", Settings.enableTownyRestrictions && TownyDependency.isPluginEnabled());
+			addFeatureEntry(allFeatures, "enable-citizen-shops", Settings.enableCitizenShops && CitizensDependency.isPluginEnabled());
 
 			// Mob behavior features:
 			addFeatureEntry(allFeatures, "disable-gravity", Settings.disableGravity);

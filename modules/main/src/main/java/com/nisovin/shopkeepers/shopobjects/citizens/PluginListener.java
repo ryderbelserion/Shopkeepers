@@ -6,7 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 
-import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.dependencies.citizens.CitizensDependency;
 
 class PluginListener implements Listener {
 
@@ -19,7 +19,7 @@ class PluginListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onPluginEnable(PluginEnableEvent event) {
 		String pluginName = event.getPlugin().getName();
-		if (pluginName.equals(CitizensHandler.PLUGIN_NAME)) {
+		if (pluginName.equals(CitizensDependency.PLUGIN_NAME)) {
 			citizensShops.enable();
 		}
 	}
@@ -27,7 +27,7 @@ class PluginListener implements Listener {
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onPluginDisable(PluginDisableEvent event) {
 		String pluginName = event.getPlugin().getName();
-		if (pluginName.equals(CitizensHandler.PLUGIN_NAME)) {
+		if (pluginName.equals(CitizensDependency.PLUGIN_NAME)) {
 			citizensShops.disable();
 		}
 	}

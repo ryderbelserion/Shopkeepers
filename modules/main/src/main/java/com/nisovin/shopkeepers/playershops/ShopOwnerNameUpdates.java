@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.SKShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.debug.DebugOptions;
-import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.dependencies.citizens.CitizensUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -33,7 +33,7 @@ public class ShopOwnerNameUpdates implements Listener {
 
 		// Update the owner information of all shops owned by players that are already online:
 		for (Player player : Bukkit.getOnlinePlayers()) {
-			if (CitizensHandler.isNPC(player)) continue;
+			if (CitizensUtils.isNPC(player)) continue;
 			this.updateShopkeepersForPlayer(player.getUniqueId(), player.getName());
 		}
 	}

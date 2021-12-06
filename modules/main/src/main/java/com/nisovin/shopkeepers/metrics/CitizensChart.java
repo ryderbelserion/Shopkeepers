@@ -2,7 +2,7 @@ package com.nisovin.shopkeepers.metrics;
 
 import org.bstats.bukkit.Metrics;
 
-import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
+import com.nisovin.shopkeepers.dependencies.citizens.CitizensDependency;
 
 /**
  * Checks whether this server is using Citizens.
@@ -10,6 +10,6 @@ import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 public class CitizensChart extends Metrics.SimplePie {
 
 	public CitizensChart() {
-		super("uses_citizens", () -> (CitizensHandler.isPluginEnabled()) ? "Yes" : "No");
+		super("uses_citizens", () -> (CitizensDependency.isPluginEnabled()) ? "Yes" : "No");
 	}
 }

@@ -14,8 +14,8 @@ import com.nisovin.shopkeepers.commands.lib.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.arguments.EntityArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityArgument.TargetEntityFilter;
 import com.nisovin.shopkeepers.commands.lib.arguments.TargetEntityFallback;
+import com.nisovin.shopkeepers.dependencies.citizens.CitizensUtils;
 import com.nisovin.shopkeepers.lang.Messages;
-import com.nisovin.shopkeepers.pluginhandlers.CitizensHandler;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
@@ -32,7 +32,7 @@ class CommandEditVillager extends PlayerCommand {
 			if (!(entity instanceof AbstractVillager)) {
 				return false; // No villager or wandering trader.
 			}
-			if (ShopkeeperMetadata.isTagged(entity) || CitizensHandler.isNPC(entity)) {
+			if (ShopkeeperMetadata.isTagged(entity) || CitizensUtils.isNPC(entity)) {
 				return false; // Shopkeeper or Citizens NPC.
 			}
 			return true;
