@@ -195,6 +195,7 @@ public class Settings extends Config {
 	public static EntityType defaultCitizenNpcType = EntityType.PLAYER;
 	public static boolean setCitizenNpcOwnerOfPlayerShops = false;
 	public static boolean saveCitizenNpcsInstantly = false;
+	public static boolean snapshotsSaveCitizenNpcData = true;
 	public static boolean deleteInvalidCitizenShopkeepers = false;
 
 	public static boolean enableSignShops = true;

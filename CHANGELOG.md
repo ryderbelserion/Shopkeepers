@@ -10,13 +10,17 @@ Date format: (YYYY-MM-DD)
 * Added the option for admins to create and restore snapshots of shopkeepers.
   * Each snapshot captures the shopkeeper's dynamic state (i.e. its trades, shop object configuration, etc.), a timestamp, and is associated with a unique name that is provided when the snapshot is created.
   * The name can currently be at most 64 characters long and not contain any color codes.
-  * The externally stored NPC state of Citizens NPC shopkeepers is not captured currently.
   * This feature is currently meant to only be used by admins and third-party plugins. Shop owners are not yet able to create and restore snapshots of their own shops.
   * The shopkeeper data of snapshots is automatically migrated during plugin startup, just like the shopkeeper's normal data.
   * Shopkeeper snapshots are currently expected to be used sparsely. In order to guard against the unnoticed creation of excessive amounts of snapshots, we log a warning whenever a shopkeeper has more than 10 snapshots.
   * When formatting the timestamp of a snapshot for display, we currently use the server's default time zone. There is no option in Shopkeepers yet to use a different timezone. If you want to use a different timezone for formatting the timestamps, you can change your server's default timezone via the JVM command line argument `-Duser.timezone=America/New_York` when you start your server.
   * Command: Added commands `/shopkeeper snapshot [list|create|remove|restore]` to manage shopkeeper snapshots.
   * Permission: Added permission `shopkeeper.snapshot` (default: op) which provides access to the new snapshot commands.
+  * Experimental: It is also possible to capture and restore the NPC state of Citizens NPC shopkeepers.
+    * Config: Added setting `snapshots-save-citizen-npc-data` (default: `true`) that controls whether shopkeeper snapshots capture and restore Citizens NPC data.
+    * When this setting is disabled, the Shopkeepers plugin automatically deletes all previously saved NPC data again.
+    * Capturing the data of a Citizens NPC will not work if the NPC is not available at the time the snapshot is created (e.g. if the Citizens plugin is not running currently).
+    * If the Citizens NPC is not available when a snapshot is restored, the shopkeeper remembers the NPC data until the NPC becomes available again and it is then able to apply the stored NPC state. If another snapshot is restored in the meantime, which does not store any NPC data, we keep the previously restored but not yet applied NPC state.
 * Added editor options to change the puff state of puffer fish, as well as the pattern and colors of tropical fish.
 * Added sound effects when a trade succeeds or fails.
   * Config: These sound effects can be changed or disabled (by setting their volume to zero) via the new config settings `trade-succeeded-sound` and `trade-failed-sound`.

@@ -15,15 +15,22 @@ import com.nisovin.shopkeepers.api.shopobjects.citizens.CitizensShopObject;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.pluginhandlers.citizens.CitizensUtils;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
+import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
+import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
+import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.java.DataContainerSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.UUIDSerializers;
 import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.RateLimiter;
@@ -47,6 +54,11 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 			.nullable()
 			.defaultValue(null)
 			.build();
+	public static final Property<DataContainer> NPC_DATA = new BasicProperty<DataContainer>()
+			.dataKeyAccessor("npc-data", DataContainerSerializers.DEFAULT)
+			.nullable() // Saving of NPC data is optional
+			.defaultValue(null)
+			.build();
 
 	public static final String CREATION_DATA_NPC_UUID_KEY = "CitizensNpcUUID";
 	private static final int CHECK_PERIOD_SECONDS = 10;
@@ -57,6 +69,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	private final PropertyValue<UUID> npcUniqueIdProperty = new PropertyValue<>(NPC_UNIQUE_ID)
 			.onValueChanged((property, oldValue, newValue, updateFlags) -> this.onNPCUniqueIdChanged(oldValue, newValue))
 			.build(properties);
+	private DataContainer npcData = null;
 
 	// Only used initially, when the shopkeeper is created by a player. If this name is not available when we create the
 	// NPC, we fall back to a different name.
@@ -89,12 +102,14 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	public void load(ShopObjectData shopObjectData) throws InvalidDataException {
 		super.load(shopObjectData);
 		npcUniqueIdProperty.load(shopObjectData);
+		this.loadNpcData(shopObjectData);
 	}
 
 	@Override
 	public void save(ShopObjectData shopObjectData, boolean saveAll) {
 		super.save(shopObjectData, saveAll);
 		npcUniqueIdProperty.save(shopObjectData);
+		this.saveNpcData(shopObjectData, saveAll);
 	}
 
 	// NPC ID
@@ -193,6 +208,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		NPC npc = this.getOrCreateNpcIfMissing();
 		if (npc == null) return; // NPC is not available
 
+		this.applyNpcData();
 		this.updateNpcOwner();
 	}
 
@@ -223,6 +239,104 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		}
 	}
 
+	// NPC DATA
+
+	static {
+		// Register shopkeeper data migrations:
+		ShopkeeperDataMigrator.registerMigration(new Migration("citizens-npc-data-cleanup",
+				MigrationPhase.ofShopObjectClass(SKCitizensShopObject.class)) {
+			@Override
+			public boolean migrate(ShopkeeperData shopkeeperData, String logPrefix) throws InvalidDataException {
+				// When this setting has been disabled, we automatically delete any previously saved but no longer
+				// required NPC data:
+				if (Settings.snapshotsSaveCitizenNpcData) return false;
+
+				ShopObjectData shopObjectData = shopkeeperData.get(AbstractShopkeeper.SHOP_OBJECT_DATA);
+				DataContainer npcData = shopObjectData.get(NPC_DATA);
+				if (npcData != null) {
+					Log.warning(logPrefix + "Deleted previously saved Citizens NPC data!");
+					shopObjectData.set(NPC_DATA, null);
+					return true;
+				}
+				return false;
+			}
+		});
+	}
+
+	private void loadNpcData(ShopObjectData shopObjectData) throws InvalidDataException {
+		// Note: If we store previously restored but not yet applied NPC data, and we then restore another snapshot that
+		// does not store any NPC data, we would normally clear the currently stored but not yet applied NPC data! In
+		// order to prevent this loss of data, we keep the previous NPC data in this case.
+		// TODO However, there might be situations in which we want the shop object to strictly adapt the loaded state.
+		// Ideally, this would require some kind of flag to differentiate here between a snapshot being applied vs the
+		// shop object being loaded normally. However, this isn't much of an issue currently: When we normally reload
+		// the shopkeepers from disk (eg. during a reload of the plugin), we fully recreate the shop objects. So any
+		// state in memory is lost anyways (if it hasn't been saved to disk before).
+		DataContainer previousNpcData = this.npcData;
+		this.npcData = shopObjectData.get(NPC_DATA);
+		if (npcData == null && previousNpcData != null) {
+			Log.warning(shopkeeper.getLogPrefix()
+					+ "Prevented previously restored but not yet applied Citizens NPC data from being cleared!");
+			this.npcData = previousNpcData;
+			shopkeeper.markDirty(); // Our shop object state differs from the loaded data
+		}
+		if (npcData != null) {
+			// TODO Do we need to somehow apply NPC data migrations?
+			// Previously saved but no longer needed NPC data is deleted during data migrations:
+			assert Settings.snapshotsSaveCitizenNpcData;
+			// Update the NPC, if it is currently available:
+			if (shopkeeper.isValid()) {
+				this.setupNpc();
+			}
+			// Else: The shopkeeper is currently being set up. The NPC setup is triggered once the shopkeeper is added
+			// to the shopkeeper registry.
+		}
+	}
+
+	private void saveNpcData(ShopObjectData shopObjectData, boolean saveAll) {
+		// If the saving of NPC data is disabled, we also skip the saving of any previously restored but not yet applied
+		// NPC data.
+		if (!Settings.snapshotsSaveCitizenNpcData) return;
+
+		// There is no need to try to get the current NPC data if we still store previously restored NPC data that we
+		// were not yet able to apply (because the NPC hasn't been loaded in the meantime).
+		DataContainer npcData = this.npcData;
+		if (saveAll && npcData == null) {
+			NPC npc = this.getNPC();
+			UUID npcUniqueId = this.getNPCUniqueId();
+			if (npc == null && npcUniqueId != null) {
+				Log.warning(shopkeeper.getLogPrefix()
+						+ "Citizens NPC not found! Is Citizens running? Could not save data of Citizens NPC with uuid "
+						+ npcUniqueId);
+				return;
+			}
+			npcData = CitizensUtils.saveNpc(npc);
+		}
+		shopObjectData.set(NPC_DATA, npcData);
+	}
+
+	// It may be necessary to also apply other changes to the NPC after the NPC state has been restored. Usually, this
+	// should therefore not be called directly, but as part of #setupNpc().
+	private void applyNpcData() {
+		if (this.npcData == null) return; // Nothing to apply
+
+		NPC npc = this.getNPC();
+		if (npc == null) {
+			// The NPC is not available currently. We remember the NPC data and try to apply it once the NPC becomes
+			// available again.
+			return;
+		}
+
+		Log.debug(() -> shopkeeper.getLogPrefix() + "Applying stored Citizens NPC state to NPC " + npc.getId());
+		CitizensUtils.loadNpc(npc, npcData);
+
+		citizensShops.onNPCEdited(npc);
+
+		// Once applied, we can delete our copy of the NPC data:
+		this.npcData = null;
+		shopkeeper.markDirty();
+	}
+
 	// LIFE CYCLE
 
 	protected void setKeepNPCOnDeletion() {
@@ -233,8 +347,8 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 	public void onShopkeeperAdded(ShopkeeperAddedEvent.Cause cause) {
 		super.onShopkeeperAdded(cause);
 
-		// Setup the NPC:
-		// If required (and possible), this will first create the NPC.
+		// Set up the NPC:
+		// If not yet done, this will first try to create the NPC.
 		this.setupNpc();
 
 		// Register:

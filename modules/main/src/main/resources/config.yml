@@ -327,6 +327,10 @@ set-citizen-npc-owner-of-player-shops: false
 # down, periodically as configured in the Citizens config, and when manually
 # triggered via command by a player.
 save-citizen-npcs-instantly: false
+# Whether shopkeeper snapshots shall save and restore Citizens NPC data.
+# Warning: When you disable this setting, the Shopkeepers plugin automatically
+# deletes all NPC data that was previously saved by shopkeeper snapshots.
+snapshots-save-citizen-npc-data: true
 # Whether to automatically delete all invalid Citizen shopkeepers during plugin
 # startup. This includes for example Citizen shopkeepers that are attached to
 # the same Citizen NPC as another shopkeeper, or any shopkeepers for which the
