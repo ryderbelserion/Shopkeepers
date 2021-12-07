@@ -13,10 +13,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class CollectionUtils {
-
-	private CollectionUtils() {
-	}
+public final class CollectionUtils {
 
 	/**
 	 * Replaces the first occurrence of the given element inside the given list.
@@ -251,5 +248,8 @@ public class CollectionUtils {
 	// Note: The returned Iterable can only be iterated once!
 	public static <T> Iterable<T> toIterable(Stream<T> stream) {
 		return stream::iterator;
+	}
+
+	private CollectionUtils() {
 	}
 }

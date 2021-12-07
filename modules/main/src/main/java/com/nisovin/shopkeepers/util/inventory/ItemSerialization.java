@@ -9,12 +9,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
-public class ItemSerialization {
+public final class ItemSerialization {
 
 	private static final String ITEM_META_SERIALIZATION_KEY = "ItemMeta";
-
-	private ItemSerialization() {
-	}
 
 	public static Map<String, Object> serializeItemMeta(@ReadOnly ItemMeta itemMeta) {
 		// Check if ItemMeta is empty (equivalent to ItemStack#hasItemMeta):
@@ -35,5 +32,8 @@ public class ItemSerialization {
 		// Can be null:
 		ItemMeta itemMeta = (ItemMeta) ConfigurationSerialization.deserializeObject(itemMetaData, serializableItemMetaClass);
 		return itemMeta;
+	}
+
+	private ItemSerialization() {
 	}
 }

@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.util.json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class JsonUtils {
+public final class JsonUtils {
 
 	private static final ThreadLocal<Gson> GSON = ThreadLocal.withInitial(() -> {
 		return newGsonBuilder().create();

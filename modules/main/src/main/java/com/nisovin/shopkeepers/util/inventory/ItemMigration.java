@@ -7,12 +7,9 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 
-public class ItemMigration {
+public final class ItemMigration {
 
 	private static Inventory DUMMY_INVENTORY = null;
-
-	private ItemMigration() {
-	}
 
 	// Use oldItemStack.isSimilar(migratedItemStack) to test if the item was migrated.
 	public static ItemStack migrateItemStack(@ReadOnly ItemStack itemStack) {
@@ -31,5 +28,8 @@ public class ItemMigration {
 
 	public static UnmodifiableItemStack migrateItemStack(UnmodifiableItemStack itemStack) {
 		return UnmodifiableItemStack.of(migrateItemStack(ItemUtils.asItemStackOrNull(itemStack)));
+	}
+
+	private ItemMigration() {
 	}
 }

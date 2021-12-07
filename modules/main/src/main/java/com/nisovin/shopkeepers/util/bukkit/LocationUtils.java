@@ -8,10 +8,7 @@ import org.bukkit.block.Block;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class LocationUtils {
-
-	private LocationUtils() {
-	}
+public final class LocationUtils {
 
 	/**
 	 * Checks if the given locations represent the same position.
@@ -86,5 +83,8 @@ public class LocationUtils {
 	public static Location getBlockCenterLocation(Block block) {
 		Validate.notNull(block, "block is null");
 		return block.getLocation().add(0.5D, 0.5D, 0.5D);
+	}
+
+	private LocationUtils() {
 	}
 }

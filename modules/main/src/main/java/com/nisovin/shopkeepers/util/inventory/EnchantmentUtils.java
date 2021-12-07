@@ -14,7 +14,7 @@ import com.nisovin.shopkeepers.util.bukkit.NamespacedKeyUtils;
 import com.nisovin.shopkeepers.util.java.ConversionUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class EnchantmentUtils {
+public final class EnchantmentUtils {
 
 	// Minecraft uses shorts to store enchantment levels:
 	private static final int MIN_LEVEL = Short.MIN_VALUE;

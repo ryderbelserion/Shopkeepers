@@ -23,7 +23,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Utility functions related to potion items, and other items with potion effects.
  */
-public class PotionUtils {
+public final class PotionUtils {
 
 	// TODO This may need to be updated on Minecraft updates.
 	// Formatted like the keys of namespaced keys:

@@ -11,7 +11,7 @@ import org.yaml.snakeyaml.representer.Representer;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class YamlUtils {
+public final class YamlUtils {
 
 	// Mimics Bukkit's Yaml configuration:
 	private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> {

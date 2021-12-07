@@ -3,10 +3,7 @@ package com.nisovin.shopkeepers.util.java;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class Validate {
-
-	private Validate() {
-	}
+public final class Validate {
 
 	// ARGUMENTS
 
@@ -181,10 +178,7 @@ public class Validate {
 
 	// STATE
 
-	public static class State {
-
-		private State() {
-		}
+	public static final class State {
 
 		public static void error(String errorMessage) {
 			throw new IllegalStateException(errorMessage);
@@ -354,5 +348,11 @@ public class Validate {
 			}
 			return iterable;
 		}
+
+		private State() {
+		}
+	}
+
+	private Validate() {
 	}
 }

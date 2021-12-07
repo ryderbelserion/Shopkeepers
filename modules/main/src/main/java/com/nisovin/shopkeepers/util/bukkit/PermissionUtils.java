@@ -12,10 +12,7 @@ import org.bukkit.plugin.PluginManager;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public class PermissionUtils {
-
-	private PermissionUtils() {
-	}
+public final class PermissionUtils {
 
 	/**
 	 * Performs a permissions check and logs debug information about it.
@@ -76,5 +73,8 @@ public class PermissionUtils {
 	 */
 	public static boolean registerPermission(String permissionNode) {
 		return registerPermission(permissionNode, node -> new Permission(node, PermissionDefault.FALSE));
+	}
+
+	private PermissionUtils() {
 	}
 }

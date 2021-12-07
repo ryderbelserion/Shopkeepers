@@ -37,10 +37,7 @@ import com.nisovin.shopkeepers.util.text.MessageArguments;
  * <p>
  * In contrast to {@link StringUtils}, this contains utilities that are more Minecraft and messaging specific.
  */
-public class TextUtils {
-
-	private TextUtils() {
-	}
+public final class TextUtils {
 
 	/*
 	 * PLAIN TEXT
@@ -381,5 +378,8 @@ public class TextUtils {
 		// Assign arguments and then send:
 		message.setPlaceholderArguments(argumentPairs);
 		sendMessage(recipient, message);
+	}
+
+	private TextUtils() {
 	}
 }

@@ -2,10 +2,7 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.concurrent.Callable;
 
-public class ThrowableUtils {
-
-	private ThrowableUtils() {
-	}
+public final class ThrowableUtils {
 
 	/**
 	 * Gets the root cause of the given {@link Throwable}, or the given {@link Throwable} itself if it has no cause.
@@ -110,5 +107,8 @@ public class ThrowableUtils {
 		} catch (Throwable e) {
 			throw ThrowableUtils.rethrow(e);
 		}
+	}
+
+	private ThrowableUtils() {
 	}
 }

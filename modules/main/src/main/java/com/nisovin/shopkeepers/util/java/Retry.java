@@ -2,10 +2,7 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.concurrent.Callable;
 
-public class Retry {
-
-	private Retry() {
-	}
+public final class Retry {
 
 	public interface Callback {
 		/**
@@ -104,5 +101,8 @@ public class Retry {
 		}
 		assert lastException != null;
 		throw lastException;
+	}
+
+	private Retry() {
 	}
 }

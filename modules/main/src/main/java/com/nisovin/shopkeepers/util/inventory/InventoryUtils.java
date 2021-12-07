@@ -26,9 +26,6 @@ public final class InventoryUtils {
 
 	private static final ItemStack[] EMPTY_ITEMSTACK_ARRAY = new ItemStack[0];
 
-	private InventoryUtils() {
-	}
-
 	/**
 	 * Returns an empty array of {@link ItemStack ItemStacks}.
 	 * 
@@ -584,5 +581,8 @@ public final class InventoryUtils {
 		default:
 			return null;
 		}
+	}
+
+	private InventoryUtils() {
 	}
 }

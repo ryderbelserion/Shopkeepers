@@ -14,10 +14,7 @@ import org.bukkit.util.Vector;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class WorldUtils {
-
-	private WorldUtils() {
-	}
+public final class WorldUtils {
 
 	// Temporary objects getting re-used during ray tracing:
 	private static final Location TEMP_START_LOCATION = new Location(null, 0, 0, 0);
@@ -94,5 +91,8 @@ public class WorldUtils {
 			if (distanceToGround < 0.0D) distanceToGround = 0.0D;
 		}
 		return distanceToGround;
+	}
+
+	private WorldUtils() {
 	}
 }

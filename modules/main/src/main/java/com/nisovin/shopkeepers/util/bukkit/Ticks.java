@@ -7,7 +7,7 @@ import org.bukkit.util.NumberConversions;
 /**
  * Utilities related to Minecraft ticks.
  */
-public class Ticks {
+public final class Ticks {
 
 	/**
 	 * The expected number of ticks per second.

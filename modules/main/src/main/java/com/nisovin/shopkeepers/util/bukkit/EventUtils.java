@@ -17,10 +17,7 @@ import org.bukkit.plugin.SimplePluginManager;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
-public class EventUtils {
-
-	private EventUtils() {
-	}
+public final class EventUtils {
 
 	/**
 	 * Sets the {@link Cancellable#setCancelled(boolean) cancellation state} of the given {@link Event} if it is
@@ -288,5 +285,8 @@ public class EventUtils {
 			Log.info(" - " + rl.getPlugin().getName() + " (" + rl.getListener().getClass().getName() + ")"
 					+ ", priority: " + rl.getPriority() + ", ignoring cancelled: " + rl.isIgnoringCancelled());
 		}
+	}
+
+	private EventUtils() {
 	}
 }

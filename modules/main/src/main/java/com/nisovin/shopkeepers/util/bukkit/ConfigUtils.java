@@ -12,7 +12,7 @@ import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class ConfigUtils {
+public final class ConfigUtils {
 
 	// Shared and reused YAML config:
 	private static final ThreadLocal<YamlConfiguration> YAML_CONFIG = ThreadLocal.withInitial(YamlConfiguration::new);

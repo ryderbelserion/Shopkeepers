@@ -7,7 +7,7 @@ import org.bukkit.NamespacedKey;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class MinecraftEnumUtils {
+public final class MinecraftEnumUtils {
 
 	// Upper case because we normalize Strings to match the names of enum constants, which are upper case, before we
 	// check for this prefix:

@@ -10,10 +10,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-public class InteractionUtils {
-
-	private InteractionUtils() {
-	}
+public final class InteractionUtils {
 
 	/**
 	 * Checks if the player can interact with the given block.
@@ -39,11 +36,11 @@ public class InteractionUtils {
 		ItemStack itemInOffHand = playerInventory.getItemInOffHand();
 		playerInventory.setItemInMainHand(null);
 		playerInventory.setItemInOffHand(null);
-	
+
 		TestPlayerInteractEvent dummyInteractEvent = new TestPlayerInteractEvent(player, Action.RIGHT_CLICK_BLOCK, null, block, BlockFace.UP);
 		Bukkit.getPluginManager().callEvent(dummyInteractEvent);
 		boolean canAccessBlock = (dummyInteractEvent.useInteractedBlock() != Result.DENY);
-	
+
 		// Resetting items in main and off hand:
 		playerInventory.setItemInMainHand(itemInMainHand);
 		playerInventory.setItemInOffHand(itemInOffHand);
@@ -75,14 +72,17 @@ public class InteractionUtils {
 		ItemStack itemInOffHand = playerInventory.getItemInOffHand();
 		playerInventory.setItemInMainHand(null);
 		playerInventory.setItemInOffHand(null);
-	
+
 		TestPlayerInteractEntityEvent dummyInteractEvent = new TestPlayerInteractEntityEvent(player, entity);
 		Bukkit.getPluginManager().callEvent(dummyInteractEvent);
 		boolean canAccessEntity = !dummyInteractEvent.isCancelled();
-	
+
 		// Resetting items in main and off hand:
 		playerInventory.setItemInMainHand(itemInMainHand);
 		playerInventory.setItemInOffHand(itemInOffHand);
 		return canAccessEntity;
+	}
+
+	private InteractionUtils() {
 	}
 }

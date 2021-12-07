@@ -12,10 +12,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Utilities related to {@link BlockFace}.
  */
-public class BlockFaceUtils {
-
-	private BlockFaceUtils() {
-	}
+public final class BlockFaceUtils {
 
 	/**
 	 * Sets of directional {@link BlockFace BlockFaces}.
@@ -239,5 +236,8 @@ public class BlockFaceUtils {
 				}
 			}
 		}
+	}
+
+	private BlockFaceUtils() {
 	}
 }

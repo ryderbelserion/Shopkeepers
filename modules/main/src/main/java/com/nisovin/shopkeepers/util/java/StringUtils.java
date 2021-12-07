@@ -14,10 +14,7 @@ import com.nisovin.shopkeepers.util.text.MessageArguments;
 /**
  * Utility functions related to Strings.
  */
-public class StringUtils {
-
-	private StringUtils() {
-	}
+public final class StringUtils {
 
 	private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
@@ -577,5 +574,8 @@ public class StringUtils {
 			assert resultBuilder != null;
 			result = resultBuilder.toString();
 		}
+	}
+
+	private StringUtils() {
 	}
 }

@@ -17,10 +17,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Utilities related to merchants and trading.
  */
-public class MerchantUtils {
-
-	private MerchantUtils() {
-	}
+public final class MerchantUtils {
 
 	public static TradingRecipe getActiveTradingRecipe(MerchantInventory merchantInventory) {
 		MerchantRecipe merchantRecipe = merchantInventory.getSelectedRecipe();
@@ -183,4 +180,7 @@ public class MerchantUtils {
 			return true;
 		}
 	};
+
+	private MerchantUtils() {
+	}
 }

@@ -12,10 +12,7 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class ClassUtils {
-
-	private ClassUtils() {
-	}
+public final class ClassUtils {
 
 	private static final String CLASS_FILE_EXTENSION = ".class";
 
@@ -142,5 +139,8 @@ public class ClassUtils {
 			return false;
 		}
 		return true;
+	}
+
+	private ClassUtils() {
 	}
 }

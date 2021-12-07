@@ -1,6 +1,6 @@
 package com.nisovin.shopkeepers.util.bukkit;
 
-public class ColorUtils {
+public final class ColorUtils {
 
 	/**
 	 * Converts the given HSB color to RGB.

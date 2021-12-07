@@ -9,7 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-public class ConversionUtils {
+public final class ConversionUtils {
 
 	public static final Map<String, Boolean> BOOLEAN_VALUES;
 
@@ -337,5 +337,8 @@ public class ConversionUtils {
 			}
 		});
 		return result;
+	}
+
+	private ConversionUtils() {
 	}
 }

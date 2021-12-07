@@ -16,9 +16,6 @@ import com.nisovin.shopkeepers.util.java.Validate;
  */
 public final class SchedulerUtils {
 
-	private SchedulerUtils() {
-	}
-
 	public static int getActiveAsyncTasks(Plugin plugin) {
 		int workers = 0;
 		for (BukkitWorker worker : Bukkit.getScheduler().getActiveWorkers()) {
@@ -157,5 +154,8 @@ public final class SchedulerUtils {
 			logger.severe("There are still " + activeAsyncTasks + " remaining async tasks active! Disabling anyways now ..");
 		}
 		return activeAsyncTasks;
+	}
+
+	private SchedulerUtils() {
 	}
 }

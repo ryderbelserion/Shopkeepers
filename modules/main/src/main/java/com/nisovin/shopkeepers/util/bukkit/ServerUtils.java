@@ -8,9 +8,6 @@ import org.bukkit.UnsafeValues;
 
 public final class ServerUtils {
 
-	private ServerUtils() {
-	}
-
 	private static final String MAPPINGS_VERSION;
 
 	static {
@@ -36,5 +33,8 @@ public final class ServerUtils {
 		String packageName = Bukkit.getServer().getClass().getPackage().getName();
 		String cbVersion = packageName.substring(packageName.lastIndexOf('.') + 1);
 		return cbVersion;
+	}
+
+	private ServerUtils() {
 	}
 }

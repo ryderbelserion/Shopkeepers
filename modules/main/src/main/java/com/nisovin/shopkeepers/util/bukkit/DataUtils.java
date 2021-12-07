@@ -11,10 +11,7 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
  * Utility functions related to loading and saving Bukkit, Minecraft, and plugin related objects from and to
  * {@link DataContainer}s.
  */
-public class DataUtils {
-
-	private DataUtils() {
-	}
+public final class DataUtils {
 
 	public static Material loadMaterial(DataContainer dataContainer, String key) {
 		String materialName = dataContainer.getString(key);
@@ -51,5 +48,8 @@ public class DataUtils {
 			loadedItemStack = ItemUtils.ensureBukkitItemStack(loadedItemStack);
 		}
 		return loadedItemStack;
+	}
+
+	private DataUtils() {
 	}
 }

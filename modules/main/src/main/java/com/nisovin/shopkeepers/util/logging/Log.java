@@ -8,9 +8,6 @@ import com.nisovin.shopkeepers.debug.Debug;
 
 public final class Log {
 
-	private Log() {
-	}
-
 	// Gets set early on plugin startup and then (ideally) never unset.
 	// -> Volatile is therefore not expected to be required.
 	private static Logger logger = null;
@@ -109,5 +106,8 @@ public final class Log {
 
 	public static void severe(Throwable throwable, Supplier<String> msgSupplier) {
 		getLogger().log(Level.SEVERE, throwable, msgSupplier);
+	}
+
+	private Log() {
 	}
 }

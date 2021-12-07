@@ -2,10 +2,7 @@ package com.nisovin.shopkeepers.util.java;
 
 import java.util.function.Predicate;
 
-public class PredicateUtils {
-
-	private PredicateUtils() {
-	}
+public final class PredicateUtils {
 
 	private static final Predicate<Object> ALWAYS_TRUE = (object) -> true;
 	private static final Predicate<Object> ALWAYS_FALSE = (object) -> false;
@@ -62,5 +59,8 @@ public class PredicateUtils {
 	public static <T> Predicate<T> orAlwaysFalse(Predicate<T> predicate) {
 		if (predicate != null) return predicate;
 		return alwaysFalse();
+	}
+
+	private PredicateUtils() {
 	}
 }

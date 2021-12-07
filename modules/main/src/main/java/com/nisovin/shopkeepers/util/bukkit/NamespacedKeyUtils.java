@@ -6,7 +6,7 @@ import org.bukkit.NamespacedKey;
 
 import com.nisovin.shopkeepers.util.java.StringUtils;
 
-public class NamespacedKeyUtils {
+public final class NamespacedKeyUtils {
 
 	public static final char NAMESPACED_KEY_SEPARATOR_CHAR = ':';
 	public static final String NAMESPACED_KEY_SEPARATOR = String.valueOf(NAMESPACED_KEY_SEPARATOR_CHAR);

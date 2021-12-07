@@ -13,7 +13,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Utilities related to book items.
  */
-public class BookItems {
+public final class BookItems {
 
 	/**
 	 * Checks if the given {@link ItemStack} is {@link ItemUtils#isEmpty(ItemStack) non-empty} and a

@@ -3,10 +3,7 @@ package com.nisovin.shopkeepers.util.java;
 import java.util.Locale;
 import java.util.function.Predicate;
 
-public class EnumUtils {
-
-	private EnumUtils() {
-	}
+public final class EnumUtils {
 
 	public static <T extends Enum<T>> T cycleEnumConstant(Class<T> enumClass, T current, boolean backwards) {
 		return cycleEnumConstant(enumClass, current, backwards, null);
@@ -105,5 +102,8 @@ public class EnumUtils {
 		enumName = StringUtils.replaceWhitespace(enumName, "_");
 		enumName = enumName.toUpperCase(Locale.ROOT);
 		return enumName;
+	}
+
+	private EnumUtils() {
 	}
 }

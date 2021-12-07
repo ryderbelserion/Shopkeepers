@@ -5,10 +5,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class MapUtils {
-
-	private MapUtils() {
-	}
+public final class MapUtils {
 
 	// Maximum capacity of a HashMap (largest power of two fitting into an int):
 	private static final int MAX_CAPACITY = (1 << 30);
@@ -119,5 +116,8 @@ public class MapUtils {
 	 */
 	public static <K, V> Map<K, V> getOrEmpty(Map<K, V> map) {
 		return (map != null) ? map : Collections.emptyMap();
+	}
+
+	private MapUtils() {
 	}
 }

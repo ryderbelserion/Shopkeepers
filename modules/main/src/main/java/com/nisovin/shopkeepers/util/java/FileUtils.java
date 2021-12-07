@@ -20,10 +20,7 @@ import java.util.logging.Logger;
  * Several methods in this class wrap underlying IO exceptions into IO exceptions that replicate the original exception
  * messages but prepend it with a more general and therefore user-friendly description of the failed operation.
  */
-public class FileUtils {
-
-	private FileUtils() {
-	}
+public final class FileUtils {
 
 	/**
 	 * Checks if the specified file is {@link Files#isWritable(Path) writable} and throws an {@link IOException} if this
@@ -292,5 +289,8 @@ public class FileUtils {
 		CharsetEncoder encoder = cs.newEncoder();
 		Writer writer = new OutputStreamWriter(Files.newOutputStream(path, options), encoder);
 		return writer;
+	}
+
+	private FileUtils() {
 	}
 }
