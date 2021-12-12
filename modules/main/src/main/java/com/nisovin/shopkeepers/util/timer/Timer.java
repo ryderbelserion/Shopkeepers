@@ -3,8 +3,15 @@ package com.nisovin.shopkeepers.util.timer;
 import java.util.concurrent.TimeUnit;
 
 import com.nisovin.shopkeepers.util.java.TimeUtils;
+import com.nisovin.shopkeepers.util.logging.Log;
 
 public class Timer implements Timings {
+
+	// Note: When a timer operation is called during an unexpected state, we only log a (verbose) error instead of
+	// throwing an actual exception, because any issues with the timer potentially yielding wrong values are usually
+	// less important compared to issues that could be caused by an exception unexpectedly aborting some external
+	// operation. In order to avoid spamming the log with errors when an unexpected timer state is retained and also
+	// affects all future timer operations, we only log the error once and then disable all future timer state checks.
 
 	private long counter = 0L;
 	private long totalTimeNanos = 0L;
@@ -16,16 +23,26 @@ public class Timer implements Timings {
 	private long startTimeNanos;
 	private long elapsedTimeNanos;
 
+	private boolean stateErrorEncountered = false;
+
 	public Timer() {
 	}
 
+	private void validateState(boolean expectedStated) {
+		// We only log the first encountered state error and then skip all future timer state checks:
+		if (stateErrorEncountered) return;
+		if (!expectedStated) {
+			stateErrorEncountered = true;
+			Log.severe("Unexpected timer state! Timings might be wrong. started="
+					+ started + ", paused=" + paused, new IllegalStateException());
+		}
+	}
+
 	public void start() {
-		assert !started && !paused;
-		// Reset:
+		this.validateState(!started && !paused);
+		// Start a new timing:
 		started = true;
-		paused = false;
 		elapsedTimeNanos = 0L;
-		// Start timing:
 		startTimeNanos = System.nanoTime();
 	}
 
@@ -35,32 +52,36 @@ public class Timer implements Timings {
 	}
 
 	public void pause() {
-		assert started && !paused;
+		this.validateState(started && !paused);
+		// Pause and update the current timing:
 		paused = true;
-		// Update timing:
 		elapsedTimeNanos += (System.nanoTime() - startTimeNanos);
 	}
 
 	public void resume() {
-		assert started && paused;
-		paused = false;
+		this.validateState(started && paused);
 		// Continue timing:
+		paused = false;
 		startTimeNanos = System.nanoTime();
 	}
 
 	public void stop() {
-		assert started;
+		this.validateState(started);
 		if (!paused) {
-			// Update timing by pausing:
+			// Update the current timing by pausing:
 			this.pause();
 		}
 		assert paused;
 
-		// Update timings:
+		// Stop the timer:
+		started = false;
+		paused = false;
+
+		// Update the timings:
 		counter++;
 		totalTimeNanos += elapsedTimeNanos;
 
-		// Update max timing:
+		// Update the max timing:
 		if (elapsedTimeNanos > maxTimeNanos) {
 			maxTimeNanos = elapsedTimeNanos;
 		}
