@@ -36,5 +36,6 @@ buildSpigotIfMissing 1.17.1 remapped
 source installJDK.sh 17
 
 buildSpigotIfMissing 1.18 remapped
+buildSpigotIfMissing 1.18.1 remapped
 
 popd

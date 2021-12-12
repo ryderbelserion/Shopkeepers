@@ -2,9 +2,9 @@
 Date format: (YYYY-MM-DD)  
 
 ## v2.14.0 (TBA)
-### Supported MC versions: 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
+### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
-* Updated for MC 1.18.
+* Updated for MC 1.18 and MC 1.18.1.
   * This update contains no new features (such as mobs) that would be relevant for Shopkeepers.
   * Updated the 'compatibility mode' implementation, which broke with the 1.18 update. However, due to some server internal mapping changes, it is likely that this compatibility mode will break again in future updates.
 * Added the option for admins to create and restore snapshots of shopkeepers.
