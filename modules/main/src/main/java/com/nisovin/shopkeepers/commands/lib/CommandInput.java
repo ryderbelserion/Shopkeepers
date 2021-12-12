@@ -16,7 +16,7 @@ public final class CommandInput {
 	private final CommandSender sender;
 	private final Command command;
 	private final String commandAlias;
-	private final List<String> arguments; // unmodifiable
+	private final List<String> arguments; // Unmodifiable
 
 	// The arguments are expected to not change during the command processing.
 	public CommandInput(CommandSender sender, Command command, String commandAlias, String[] arguments) {

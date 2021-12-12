@@ -16,8 +16,8 @@ public class ArgumentsReader {
 
 	public ArgumentsReader(CommandInput commandInput) {
 		Validate.notNull(commandInput, "commandInput is null");
-		// CommandInput guarantees: not null, does not contain null, unmodifiable, arguments don't change during command
-		// processing, always returns the same list instance (important for identity-based checks)
+		// CommandInput guarantees: Not null, does not contain null, unmodifiable, arguments don't change during command
+		// processing, always returns the same list instance (important for identity-based checks).
 		this.args = commandInput.getArguments();
 	}
 

@@ -543,7 +543,7 @@ public abstract class Command {
 	protected void processCommand(CommandInput input, CommandContext context, ArgumentsReader argsReader) throws CommandException {
 		assert input != null && context != null && argsReader != null;
 		assert (input.getCommand() == this.getRootCommand()); // Input is meant for this command
-		assert (argsReader.getArgs() != input.getArguments()); // ArgumentsReader is consistent with the input
+		assert (argsReader.getArgs() == input.getArguments()); // ArgumentsReader is consistent with the input
 
 		// Search for matching child-command:
 		Command childCommand = this.getChildCommand(argsReader);
@@ -1003,7 +1003,7 @@ public abstract class Command {
 	protected List<String> handleTabCompletion(CommandInput input, CommandContext context, ArgumentsReader argsReader) {
 		assert input != null && context != null && argsReader != null;
 		assert (input.getCommand() == this.getRootCommand()); // Input is meant for this command
-		assert (argsReader.getArgs() != input.getArguments()); // ArgumentsReader is consistent with the input
+		assert (argsReader.getArgs() == input.getArguments()); // ArgumentsReader is consistent with the input
 
 		// Search for matching child-command:
 		Command childCommand = this.getChildCommand(argsReader);
