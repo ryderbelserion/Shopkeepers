@@ -13,7 +13,7 @@ public class CyclicCounter {
 	private int value;
 
 	/**
-	 * Creates a new {@link CyclicCounter} with a lower bound of {@code 0}.
+	 * Creates a new {@link CyclicCounter} with a lower bound and initial value of {@code 0}.
 	 * 
 	 * @param upperBound
 	 *            the upper bound (exclusive), has to be positive
@@ -85,9 +85,10 @@ public class CyclicCounter {
 	/**
 	 * Gets the current value and then increments it by one.
 	 * <p>
-	 * If the new value reaches the upper bound of this counter, it is reset to the {@code lower bound}.
+	 * If the new value reaches the {@link #getUpperBound() upper bound} of this counter, the value is reset to the
+	 * {@link #getLowerBound() lower bound}.
 	 * 
-	 * @return the current value (prior to the increment)
+	 * @return the current value prior to the increment
 	 */
 	public int getAndIncrement() {
 		int currentValue = value;
@@ -99,6 +100,19 @@ public class CyclicCounter {
 			value = nextValue;
 		}
 		return currentValue;
+	}
+
+	/**
+	 * Increments the current value by one and then returns the new value.
+	 * <p>
+	 * If the new value reaches the {@link #getUpperBound() upper bound} of this counter, the value is reset to the
+	 * {@link #getLowerBound() lower bound}.
+	 * 
+	 * @return the new value after the increment
+	 */
+	public int incrementAndGet() {
+		this.getAndIncrement();
+		return this.getValue();
 	}
 
 	@Override
