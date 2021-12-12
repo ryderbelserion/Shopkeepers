@@ -23,92 +23,102 @@ public final class CitizensUtils {
 		return entity.hasMetadata("NPC");
 	}
 
-	public static DataKey toDataKey(DataContainer dataContainer) {
-		Validate.notNull(dataContainer, "dataContainer is null");
-		DataKey dataKey = new MemoryDataKey();
-		insertIntoDataKey(dataKey, "", dataContainer);
-		return dataKey;
-	}
+	/**
+	 * This class can only be accessed when the Citizens plugin is loaded.
+	 */
+	public static final class Internal {
 
-	private static void insertIntoDataKey(DataKey dataKey, String parentPath, DataContainer dataContainer) {
-		assert dataKey != null && dataContainer != null;
-		dataContainer.getValues().forEach((key, value) -> {
-			String path = parentPath.isEmpty() ? key : (parentPath + "." + key);
-			DataContainer valueContainer = DataContainer.of(value);
-			if (valueContainer != null) {
-				insertIntoDataKey(dataKey, path, valueContainer);
+		public static DataKey toDataKey(DataContainer dataContainer) {
+			Validate.notNull(dataContainer, "dataContainer is null");
+			DataKey dataKey = new MemoryDataKey();
+			insertIntoDataKey(dataKey, "", dataContainer);
+			return dataKey;
+		}
+
+		private static void insertIntoDataKey(DataKey dataKey, String parentPath, DataContainer dataContainer) {
+			assert dataKey != null && dataContainer != null;
+			dataContainer.getValues().forEach((key, value) -> {
+				String path = parentPath.isEmpty() ? key : (parentPath + "." + key);
+				DataContainer valueContainer = DataContainer.of(value);
+				if (valueContainer != null) {
+					insertIntoDataKey(dataKey, path, valueContainer);
+				} else {
+					dataKey.setRaw(path, value);
+				}
+			});
+		}
+
+		public static DataContainer toDataContainer(MemoryDataKey dataKey) {
+			Validate.notNull(dataKey, "dataKey is null");
+			// MemoryDataKey#getRaw("") returns the root MemoryConfiguration:
+			return DataContainer.of(dataKey.getRaw(""));
+		}
+
+		public static DataContainer saveNpc(NPC npc) {
+			Validate.notNull(npc, "npc is null");
+			MemoryDataKey dataKey = new MemoryDataKey();
+			npc.save(dataKey);
+			return toDataContainer(dataKey);
+		}
+
+		public static void loadNpc(NPC npc, DataContainer npcData) {
+			Validate.notNull(npc, "npc is null");
+			Validate.notNull(npcData, "npcData is null");
+
+			// For some traits and NPC properties it may be necessary to respawn the NPC in order for the changes to
+			// have an effect. For example, loading a new stored location has no effect on the location of any currently
+			// spawned NPC entity. And some properties, such as the NPC type or name, are not applied until the NPC
+			// entity is recreated.
+			// Note: We don't use NPC#isSpawned here because it takes into account whether the entity has died.
+			Entity entity = npc.getEntity();
+			boolean spawned = (npc.getEntity() != null);
+			Location previousLocation = spawned ? entity.getLocation() : null;
+			boolean despawnFailed = false;
+			if (spawned) {
+				despawnFailed = !npc.despawn();
+				if (despawnFailed) {
+					Log.warning("Failed to despawn Citizens NPC " + npc.getId()
+							+ "! Some changes to the NPC's data might have no effect!");
+				}
+			}
+
+			// Note: Some properties, such as the id or unique id, cannot be loaded.
+			// Note: Loading the MobType trait does not automatically change the NPC's type. We therefore need to
+			// manually apply the loaded NPC type.
+			// Note: NPC#load might automatically respawn the NPC again.
+			// Note: Citizens ignores the loaded MobType when it respawns the NPC, and instead even overwrites the
+			// stored MobType with the NPC's previous and still cached entity type. We therefore need to manually load
+			// and apply the mob type before we load the rest of the NPC data.
+			DataKey npcDataKey = toDataKey(npcData);
+			String mobTypeName = npcDataKey.getString("traits.type", EntityType.PLAYER.name());
+			// TODO This does not take any (version-specific) mob type migrations into account (e.g. for pig zombies).
+			// However, these migrations are currently also broken in Citizens itself (SimpleNPCDataStore does not
+			// account for mob type migrations either).
+			EntityType mobType = EntityUtils.parseEntityType(mobTypeName);
+			if (mobType == null) {
+				Log.warning("Failed to parse Citizens NPC mob type: " + mobTypeName);
 			} else {
-				dataKey.setRaw(path, value);
+				npc.setBukkitEntityType(mobType);
 			}
-		});
-	}
 
-	public static DataContainer toDataContainer(MemoryDataKey dataKey) {
-		Validate.notNull(dataKey, "dataKey is null");
-		// MemoryDataKey#getRaw("") returns the root MemoryConfiguration:
-		return DataContainer.of(dataKey.getRaw(""));
-	}
+			// This might automatically respawn the NPC again:
+			npc.load(npcDataKey);
 
-	public static DataContainer saveNpc(NPC npc) {
-		Validate.notNull(npc, "npc is null");
-		MemoryDataKey dataKey = new MemoryDataKey();
-		npc.save(dataKey);
-		return toDataContainer(dataKey);
-	}
-
-	public static void loadNpc(NPC npc, DataContainer npcData) {
-		Validate.notNull(npc, "npc is null");
-		Validate.notNull(npcData, "npcData is null");
-
-		// For some traits and NPC properties it may be necessary to respawn the NPC in order for the changes to have an
-		// effect. For example, loading a new stored location has no effect on the location of any currently spawned NPC
-		// entity. And some properties, such as the NPC type or name, are not applied until the NPC entity is recreated.
-		// Note: We don't use NPC#isSpawned here because it takes into account whether the entity has died.
-		Entity entity = npc.getEntity();
-		boolean spawned = (npc.getEntity() != null);
-		Location previousLocation = spawned ? entity.getLocation() : null;
-		boolean despawnFailed = false;
-		if (spawned) {
-			despawnFailed = !npc.despawn();
-			if (despawnFailed) {
-				Log.warning("Failed to despawn Citizens NPC " + npc.getId()
-						+ "! Some changes to the NPC's data might have no effect!");
+			// If the NPC was previously spawned, despawning did not fail, and the NPC was not already respawned by
+			// NPC#load, we respawn it ourselves:
+			if (spawned && !despawnFailed && npc.getEntity() == null) {
+				Location spawnLocation = npc.getStoredLocation();
+				if (spawnLocation == null) {
+					assert previousLocation != null; // The NPC was spawned earlier
+					spawnLocation = previousLocation;
+				}
+				if (!npc.spawn(spawnLocation)) {
+					Log.warning("Failed to respawn Citizens NPC " + npc.getId() + "!");
+				}
 			}
 		}
 
-		// Note: Some properties, such as the id or unique id, cannot be loaded.
-		// Note: Loading the MobType trait does not automatically change the NPC's type. We therefore need to manually
-		// apply the loaded NPC type.
-		// Note: NPC#load might automatically respawn the NPC again.
-		// Note: Citizens ignores the loaded MobType when it respawns the NPC, and instead even overwrites the stored
-		// MobType with the NPC's previous and still cached entity type. We therefore need to manually load and apply
-		// the mob type before we load the rest of the NPC data.
-		DataKey npcDataKey = toDataKey(npcData);
-		String mobTypeName = npcDataKey.getString("traits.type", EntityType.PLAYER.name());
-		// TODO This does not take any (version-specific) mob type migrations into account (e.g. for pig zombies).
-		// However, these migrations are currently also broken in Citizens itself (SimpleNPCDataStore does not account
-		// for mob type migrations either).
-		EntityType mobType = EntityUtils.parseEntityType(mobTypeName);
-		if (mobType == null) {
-			Log.warning("Failed to parse Citizens NPC mob type: " + mobTypeName);
-		} else {
-			npc.setBukkitEntityType(mobType);
-		}
-
-		// This might automatically respawn the NPC again:
-		npc.load(npcDataKey);
-
-		// If the NPC was previously spawned, despawning did not fail, and the NPC was not already respawned by
-		// NPC#load, we respawn it ourselves:
-		if (spawned && !despawnFailed && npc.getEntity() == null) {
-			Location spawnLocation = npc.getStoredLocation();
-			if (spawnLocation == null) {
-				assert previousLocation != null; // The NPC was spawned earlier
-				spawnLocation = previousLocation;
-			}
-			if (!npc.spawn(spawnLocation)) {
-				Log.warning("Failed to respawn Citizens NPC " + npc.getId() + "!");
-			}
+		private Internal() {
 		}
 	}
 

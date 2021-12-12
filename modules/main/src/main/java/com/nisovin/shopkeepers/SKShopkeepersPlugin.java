@@ -122,6 +122,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 			if (className.startsWith("com.nisovin.shopkeepers.compat.")) return false;
 			// Skip classes that interact with optional dependencies:
 			if (className.equals("com.nisovin.shopkeepers.dependencies.worldguard.WorldGuardDependency$Internal")) return false;
+			if (className.equals("com.nisovin.shopkeepers.dependencies.citizens.CitizensUtils$Internal")) return false;
 			if (className.equals("com.nisovin.shopkeepers.shopobjects.citizens.CitizensShopkeeperTrait")) return false;
 			if (className.equals("com.nisovin.shopkeepers.spigot.text.SpigotText$Internal")) return false;
 			return true;

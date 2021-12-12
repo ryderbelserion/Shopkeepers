@@ -320,7 +320,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 						+ npcUniqueId);
 				return;
 			}
-			npcData = CitizensUtils.saveNpc(npc);
+			npcData = CitizensUtils.Internal.saveNpc(npc);
 		}
 		shopObjectData.set(NPC_DATA, npcData);
 	}
@@ -333,7 +333,7 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		if (this.npcData == null) return false; // Nothing to apply
 
 		Log.debug(() -> shopkeeper.getLogPrefix() + "Applying stored Citizens NPC state to NPC " + npc.getId());
-		CitizensUtils.loadNpc(npc, npcData);
+		CitizensUtils.Internal.loadNpc(npc, npcData);
 
 		// Once applied, we can delete our copy of the NPC data:
 		this.npcData = null;
