@@ -448,14 +448,12 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			}
 		}
 
-		try {
-			// Load the save data with the specified encoding:
-			try (Reader reader = Files.newBufferedReader(saveFile, DerivedSettings.fileCharset)) {
-				// Since Bukkit 1.16.5, this automatically clears the save data before loading the new entries.
-				saveData.load(reader);
-			}
+		// Load the save data with the specified encoding:
+		try (Reader reader = Files.newBufferedReader(saveFile, DerivedSettings.fileCharset)) {
+			// Since Bukkit 1.16.5, this automatically clears the save data before loading the new entries.
+			saveData.load(reader);
 		} catch (Exception e) {
-			Log.severe("Failed to load save file!", e);
+			Log.severe("Failed to load the save file!", e);
 			return false; // Disable without save
 		}
 

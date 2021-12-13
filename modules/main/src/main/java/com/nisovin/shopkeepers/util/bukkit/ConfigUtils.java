@@ -2,20 +2,31 @@ package com.nisovin.shopkeepers.util.bukkit;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
+import com.nisovin.shopkeepers.util.logging.LogDetectionHandler;
 
 public final class ConfigUtils {
 
 	// Shared and reused YAML config:
 	private static final ThreadLocal<YamlConfiguration> YAML_CONFIG = ThreadLocal.withInitial(YamlConfiguration::new);
+
+	private static final LogDetectionHandler ERROR_DETECTION_HANDLER = new LogDetectionHandler();
+	static {
+		ERROR_DETECTION_HANDLER.setLevel(Level.SEVERE);
+	}
 
 	// The given root config section itself is not converted.
 	public static void convertSubSectionsToMaps(ConfigurationSection rootSection) {
@@ -158,6 +169,48 @@ public final class ConfigUtils {
 			return null;
 		} finally {
 			clearConfigSection(yamlConfig);
+		}
+	}
+
+	// TODO Hack to detect issues during the deserialization of ConfigurationSerializables. Bukkit does not throw
+	// exceptions in those cases, but instead only logs an error and then deserializes the value as null.
+	// When an error is detected, we wrap it into an InvalidConfigurationException.
+	public static void loadConfigSafely(FileConfiguration config, String contents) throws InvalidConfigurationException {
+		Validate.notNull(config, "config is null");
+		// Get the logger that is used during the deserialization of ConfigurationSerializables:
+		Logger configSerializationLogger = Logger.getLogger(ConfigurationSerialization.class.getName());
+
+		// Capture the current logger state:
+		Handler[] handlers = configSerializationLogger.getHandlers();
+		boolean useParent = configSerializationLogger.getUseParentHandlers();
+		try {
+			// Disable logging:
+			for (Handler handler : handlers) {
+				configSerializationLogger.removeHandler(handler);
+			}
+			configSerializationLogger.setUseParentHandlers(false);
+
+			// Register our own error detection handler:
+			configSerializationLogger.addHandler(ERROR_DETECTION_HANDLER);
+
+			// Load the config:
+			config.loadFromString(contents);
+
+			// Check if we detected an error:
+			LogRecord error = ERROR_DETECTION_HANDLER.getLastLogRecord();
+			if (error != null) {
+				throw new InvalidConfigurationException(error.getMessage(), error.getThrown());
+			}
+		} finally {
+			// Reset the error detection handler:
+			ERROR_DETECTION_HANDLER.reset();
+
+			// Restore the previous logger state:
+			configSerializationLogger.removeHandler(ERROR_DETECTION_HANDLER);
+			for (Handler handler : handlers) {
+				configSerializationLogger.addHandler(handler);
+			}
+			configSerializationLogger.setUseParentHandlers(useParent);
 		}
 	}
 
