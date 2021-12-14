@@ -30,6 +30,7 @@ import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.util.bukkit.SchedulerUtils;
 import com.nisovin.shopkeepers.util.bukkit.SingletonTask;
+import com.nisovin.shopkeepers.util.data.container.DataContainer;
 import com.nisovin.shopkeepers.util.data.persistence.DataStore;
 import com.nisovin.shopkeepers.util.data.persistence.bukkit.BukkitConfigDataStore;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
@@ -76,7 +77,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	// changed.
 	// The stored and compared data version is a simple concatenation of these two data versions.
 
-	private static final int SHOPKEEPERS_DATA_VERSION = 2;
+	private static final int SHOPKEEPERS_DATA_VERSION = 3;
 	private static final String MISSING_DATA_VERSION = "<missing>";
 	private static final String DATA_VERSION_KEY = "data-version";
 
@@ -491,55 +492,75 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		for (String key : keys) {
 			if (key.equals(DATA_VERSION_KEY)) continue; // Skip the data version entry
 
-			Integer idInt = ConversionUtils.parseInt(key);
-			if (idInt == null || idInt <= 0) {
-				this.failedToLoadShopkeeper(key, "Invalid id: " + key);
-				continue;
-			}
-			int shopkeeperId = idInt.intValue();
-			if (shopkeeperId > maxUsedShopkeeperId) {
-				maxUsedShopkeeperId = shopkeeperId;
-			}
-
-			ShopkeeperData shopkeeperData = ShopkeeperData.of(saveData.getContainer(key));
-			if (shopkeeperData == null) {
-				this.failedToLoadShopkeeper(key, "Invalid shopkeeper data!");
-				continue; // Skip this shopkeeper
-			}
-
-			// Insert the separately stored shopkeeper id back into the shopkeeper data:
-			shopkeeperData.set(AbstractShopkeeper.ID, shopkeeperId);
-
-			// Perform data migrations:
-			boolean migrated;
-			try {
-				migrated = shopkeeperData.migrate(AbstractShopkeeper.getLogPrefix(shopkeeperId));
-			} catch (InvalidDataException e) {
-				this.failedToLoadShopkeeper(key, "Shopkeeper data migration failed!", e);
-				continue; // Skip this shopkeeper
-			}
-
-			// Load the shopkeeper:
-			AbstractShopkeeper shopkeeper;
-			try {
-				shopkeeper = shopkeeperRegistry.loadShopkeeper(shopkeeperData);
-				assert shopkeeper != null && shopkeeper.isValid();
-			} catch (InvalidDataException e) {
-				this.failedToLoadShopkeeper(key, e.getMessage());
-				continue; // Skip this shopkeeper
-			} catch (Exception e) {
-				this.failedToLoadShopkeeper(key, "Unexpected error!", e);
-				continue; // Skip this shopkeeper
-			}
-
-			// If the shopkeeper was migrated or the data version has changed, mark it as dirty:
-			// During plugin enable, after the shopkeepers have been loaded, a save is triggered if the storage was
-			// marked as dirty.
-			if (migrated || dataVersionChanged) {
-				shopkeeper.markDirty();
-			}
+			// If the shopkeeper cannot be loaded, it is skipped and the loading continues with the remaining
+			// shopkeepers:
+			this.loadShopkeeper(key, dataVersionChanged);
 		}
 		return true;
+	}
+
+	private ShopkeeperData getShopkeeperData(int shopkeeperId) {
+		DataContainer shopkeeperDataContainer = saveData.getContainer(String.valueOf(shopkeeperId));
+		if (shopkeeperDataContainer == null) {
+			return null;
+		}
+
+		// We create a shallow copy of the shopkeeper data and then re-insert the separately stored shopkeeper id:
+		// The copy is required because we don't want to insert the id into the data container that is stored by
+		// saveData, because that data container can end up being saved back to disk again (e.g. when the shopkeeper
+		// fails to load, or when it fails to save its state during shopkeeper saving).
+		ShopkeeperData shopkeeperData = ShopkeeperData.of(DataContainer.of(shopkeeperDataContainer.getValuesCopy()));
+		shopkeeperData.set(AbstractShopkeeper.ID, shopkeeperId);
+		return shopkeeperData;
+	}
+
+	private void loadShopkeeper(String key, boolean dataVersionChanged) {
+		Integer idInt = ConversionUtils.parseInt(key);
+		if (idInt == null || idInt <= 0) {
+			this.failedToLoadShopkeeper(key, "Invalid id: " + key);
+			return;
+		}
+
+		int shopkeeperId = idInt.intValue();
+		if (shopkeeperId > maxUsedShopkeeperId) {
+			maxUsedShopkeeperId = shopkeeperId;
+		}
+
+		ShopkeeperData shopkeeperData = this.getShopkeeperData(shopkeeperId);
+		if (shopkeeperData == null) {
+			this.failedToLoadShopkeeper(key, "Invalid shopkeeper data!");
+			return;
+		}
+
+		// Perform data migrations:
+		boolean migrated;
+		try {
+			migrated = shopkeeperData.migrate(AbstractShopkeeper.getLogPrefix(shopkeeperId));
+		} catch (InvalidDataException e) {
+			this.failedToLoadShopkeeper(key, "Shopkeeper data migration failed!", e);
+			return;
+		}
+
+		// Load the shopkeeper:
+		SKShopkeeperRegistry shopkeeperRegistry = this.getShopkeeperRegistry();
+		AbstractShopkeeper shopkeeper;
+		try {
+			shopkeeper = shopkeeperRegistry.loadShopkeeper(shopkeeperData);
+			assert shopkeeper != null && shopkeeper.isValid();
+		} catch (InvalidDataException e) {
+			this.failedToLoadShopkeeper(key, e.getMessage());
+			return;
+		} catch (Exception e) {
+			this.failedToLoadShopkeeper(key, "Unexpected error!", e);
+			return;
+		}
+
+		// If the shopkeeper was migrated or the data version has changed, mark it as dirty:
+		// During plugin enable, after the shopkeepers have been loaded, a save is triggered if the storage was marked
+		// as dirty.
+		if (migrated || dataVersionChanged) {
+			shopkeeper.markDirty();
+		}
 	}
 
 	private void failedToLoadShopkeeper(String idKey, String reason) {

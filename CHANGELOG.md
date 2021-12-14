@@ -75,6 +75,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: We now check if the UI session is still valid before handling an inventory event at the HIGH event priority. Previously, the UI session was simply expected to still be valid. But this assumption can be violated by plugins that (incorrectly per API documentation) close the inventory during the handling of an inventory event.
 * Fixed: Sound effects played to players would sometimes appear to be played slightly to the left or the right of the player's head.
 * Fixed: When a NPC player shopkeeper moved to a different world, its container location (which is currently expected to always be located in the same world as the shopkeeper) and the protection of the container were not getting updated.
+* Data: Under certain circumstances, one of the publicly posted snapshots of this update accidentally saved shopkeeper ids as normal attributes into the save file. The save file data version was bumped from 2 to 3, so that any previously saved shopkeeper ids are automatically removed again.
 
 **API changes:**  
 * Additions to manage the snapshots of shopkeepers.
