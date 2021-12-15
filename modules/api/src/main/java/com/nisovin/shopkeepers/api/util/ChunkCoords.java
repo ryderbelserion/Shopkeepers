@@ -1,11 +1,12 @@
 package com.nisovin.shopkeepers.api.util;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+
+import com.google.common.base.Preconditions;
 
 /**
  * Stores positional information about a chunk, i.e. its world name and coordinates.
@@ -94,7 +95,8 @@ public class ChunkCoords {
 	 *            the chunk's z coordinate
 	 */
 	public ChunkCoords(String worldName, int chunkX, int chunkZ) {
-		Validate.notEmpty(worldName, "worldName is empty");
+		Preconditions.checkNotNull(worldName, "worldName is null");
+		Preconditions.checkArgument(!worldName.isEmpty(), "worldName is empty");
 		this.worldName = worldName;
 		this.chunkX = chunkX;
 		this.chunkZ = chunkZ;
@@ -159,7 +161,8 @@ public class ChunkCoords {
 	 *            the world name, not <code>null</code> or empty
 	 */
 	protected void setWorldName(String worldName) {
-		Validate.notEmpty(worldName, "worldName is empty");
+		Preconditions.checkNotNull(worldName, "worldName is null");
+		Preconditions.checkArgument(!worldName.isEmpty(), "worldName is empty");
 		this.worldName = worldName;
 	}
 

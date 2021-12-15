@@ -1,11 +1,11 @@
 package com.nisovin.shopkeepers.api.events;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.inventory.InventoryClickEvent;
 
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -57,10 +57,10 @@ public class ShopkeeperTradeEvent extends ShopkeeperEvent implements Cancellable
 	public ShopkeeperTradeEvent(Shopkeeper shopkeeper, Player player, InventoryClickEvent clickEvent, TradingRecipe tradingRecipe,
 								UnmodifiableItemStack offeredItem1, UnmodifiableItemStack offeredItem2, boolean swappedItemOrder) {
 		super(shopkeeper);
-		Validate.notNull(player, "player");
-		Validate.notNull(clickEvent, "clickEvent");
-		Validate.notNull(tradingRecipe, "tradingRecipe");
-		Validate.notNull(offeredItem1, "offeredItem1");
+		Preconditions.checkNotNull(player, "player is null");
+		Preconditions.checkNotNull(clickEvent, "clickEvent is null");
+		Preconditions.checkNotNull(tradingRecipe, "tradingRecipe is null");
+		Preconditions.checkNotNull(offeredItem1, "offeredItem1 is null");
 		this.player = player;
 		this.clickEvent = clickEvent;
 		this.tradingRecipe = tradingRecipe;

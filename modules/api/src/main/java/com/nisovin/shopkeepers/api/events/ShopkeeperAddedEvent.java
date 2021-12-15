@@ -1,8 +1,8 @@
 package com.nisovin.shopkeepers.api.events;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.event.HandlerList;
 
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 
@@ -41,7 +41,7 @@ public class ShopkeeperAddedEvent extends ShopkeeperEvent {
 	 */
 	public ShopkeeperAddedEvent(Shopkeeper shopkeeper, Cause cause) {
 		super(shopkeeper);
-		Validate.notNull(cause, "cause");
+		Preconditions.checkNotNull(cause, "cause is null");
 		this.cause = cause;
 	}
 

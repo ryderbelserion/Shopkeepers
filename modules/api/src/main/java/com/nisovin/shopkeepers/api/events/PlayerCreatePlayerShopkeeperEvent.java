@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.api.events;
 
-import org.apache.commons.lang.Validate;
-
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 
@@ -27,7 +26,7 @@ public class PlayerCreatePlayerShopkeeperEvent extends PlayerCreateShopkeeperEve
 	 */
 	public PlayerCreatePlayerShopkeeperEvent(ShopCreationData creationData, int maxShopsLimit) {
 		super(creationData);
-		Validate.isTrue(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
+		Preconditions.checkArgument(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
 		this.maxShopsLimit = maxShopsLimit;
 	}
 
@@ -54,7 +53,7 @@ public class PlayerCreatePlayerShopkeeperEvent extends PlayerCreateShopkeeperEve
 	 *            the owner's max shops limit to use for this shopkeeper creation, not negative
 	 */
 	public void setMaxShopsLimit(int maxShopsLimit) {
-		Validate.isTrue(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
+		Preconditions.checkArgument(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
 		this.maxShopsLimit = maxShopsLimit;
 	}
 }

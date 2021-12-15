@@ -15,6 +15,13 @@ repositories {
 	maven { url 'https://jitpack.io' }
 }
 
+configurations {
+	implementation {
+		// Removed from Bukkit in newer versions:
+		exclude group: 'commons-lang', module: 'commons-lang'
+	}
+}
+
 dependencies {
 	api project(':shopkeepers-api')
 	// compileOnly: Omits these dependencies from the transitively inherited apiElements and runtimeElements.

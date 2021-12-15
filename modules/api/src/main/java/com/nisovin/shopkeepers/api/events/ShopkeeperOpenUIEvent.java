@@ -1,8 +1,8 @@
 package com.nisovin.shopkeepers.api.events;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.api.ui.UIType;
 
@@ -27,7 +27,7 @@ public class ShopkeeperOpenUIEvent extends PlayerOpenUIEvent {
 	 */
 	public ShopkeeperOpenUIEvent(Shopkeeper shopkeeper, UIType uiType, Player player, boolean silentRequest) {
 		super(uiType, player, silentRequest);
-		Validate.notNull(shopkeeper, "shopkeeper");
+		Preconditions.checkNotNull(shopkeeper, "shopkeeper is null");
 		this.shopkeeper = shopkeeper;
 	}
 

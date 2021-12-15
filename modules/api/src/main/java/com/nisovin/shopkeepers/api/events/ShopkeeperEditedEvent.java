@@ -1,9 +1,9 @@
 package com.nisovin.shopkeepers.api.events;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
 /**
@@ -23,7 +23,7 @@ public class ShopkeeperEditedEvent extends ShopkeeperEvent {
 	 */
 	public ShopkeeperEditedEvent(Shopkeeper shopkeeper, Player player) {
 		super(shopkeeper);
-		Validate.notNull(player, "player");
+		Preconditions.checkNotNull(player, "player is null");
 		this.player = player;
 	}
 

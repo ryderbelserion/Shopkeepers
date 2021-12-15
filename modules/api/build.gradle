@@ -3,6 +3,13 @@ plugins {
 	id 'maven-publish'
 }
 
+configurations {
+	implementation {
+		// Removed from Bukkit in newer versions:
+		exclude group: 'commons-lang', module: 'commons-lang'
+	}
+}
+
 dependencies {
 	// compileOnly: Omits the dependency from the transitively inherited apiElements and runtimeElements.
 	// However, we need to manually add this dependency to our test dependencies if needed.

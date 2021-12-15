@@ -3,11 +3,11 @@ package com.nisovin.shopkeepers.api.shopkeeper;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObjectType;
 
@@ -43,17 +43,17 @@ public abstract class ShopCreationData {
 	 */
 	protected ShopCreationData(	Player creator, ShopType<?> shopType, ShopObjectType<?> shopObjectType,
 								Location spawnLocation, BlockFace targetedBlockFace) {
-		Validate.notNull(shopType, "Shop type is null!");
-		Validate.notNull(shopObjectType, "Shop object type is null!");
+		Preconditions.checkNotNull(shopType, "shopType is null");
+		Preconditions.checkNotNull(shopObjectType, "shopObjectType is null");
 		this.creator = creator;
 		this.shopType = shopType;
 		this.shopObjectType = shopObjectType;
 		if (spawnLocation != null) {
-			Validate.notNull(spawnLocation.getWorld(), "Spawn location is missing world!");
+			Preconditions.checkNotNull(spawnLocation.getWorld(), "spawnLocation has no world");
 			spawnLocation.checkFinite();
 			this.spawnLocation = spawnLocation.clone();
 		} else {
-			Validate.isTrue(shopObjectType instanceof VirtualShopObjectType, "Spawn location is null, but the shop object type is not virtual!");
+			Preconditions.checkArgument(shopObjectType instanceof VirtualShopObjectType, "spawnLocation is null, but the shop object type is not virtual");
 			this.spawnLocation = null;
 		}
 		this.targetedBlockFace = targetedBlockFace;
@@ -106,16 +106,16 @@ public abstract class ShopCreationData {
 	 */
 	public void setSpawnLocation(Location newSpawnLocation) {
 		if (!(shopObjectType instanceof VirtualShopObjectType)) {
-			Validate.notNull(newSpawnLocation, "New spawn location is null, but the shop object type is not virtual!");
+			Preconditions.checkNotNull(newSpawnLocation, "newSpawnLocation is null, but the shop object type is not virtual");
 		}
 		if (newSpawnLocation == null) {
 			this.spawnLocation = null;
 		} else {
-			Validate.notNull(newSpawnLocation.getWorld(), "New spawn location is missing world!");
+			Preconditions.checkNotNull(newSpawnLocation.getWorld(), "newSpawnLocation has no world");
 			newSpawnLocation.checkFinite();
 			if (this.spawnLocation != null) {
-				Validate.isTrue(this.spawnLocation.getWorld() == newSpawnLocation.getWorld(),
-						"Cannot set the spawn location to another world!");
+				Preconditions.checkArgument(this.spawnLocation.getWorld() == newSpawnLocation.getWorld(),
+						"Cannot set the spawn location to a different world!");
 			}
 			this.spawnLocation = newSpawnLocation.clone();
 		}

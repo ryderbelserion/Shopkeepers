@@ -1,11 +1,11 @@
 package com.nisovin.shopkeepers.api.shopkeeper.player;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
@@ -17,7 +17,7 @@ import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObjectType;
 public class PlayerShopCreationData extends ShopCreationData {
 
 	private static PlayerShopType<?> toPlayerShopType(ShopType<?> shopType) {
-		Validate.isTrue(shopType instanceof PlayerShopType, "shopType has to be a PlayerShopType");
+		Preconditions.checkArgument(shopType instanceof PlayerShopType, "shopType has to be a PlayerShopType");
 		return (PlayerShopType<?>) shopType;
 	}
 
@@ -112,12 +112,12 @@ public class PlayerShopCreationData extends ShopCreationData {
 		// The shop container needs to be located in a world, which is only available for non-virtual shops:
 		// TODO Decouple shopkeeper/shop object location from shop container location? (allows containers in different
 		// world, and virtual player shopkeepers connected to a container located in a world)
-		Validate.isTrue(!(shopObjectType instanceof VirtualShopObjectType), "Cannot create virtual player shops!");
-		Validate.notNull(shopContainer, "shopContainer is null");
-		Validate.isTrue(spawnLocation.getWorld().equals(shopContainer.getWorld()),
+		Preconditions.checkArgument(!(shopObjectType instanceof VirtualShopObjectType), "Cannot create virtual player shops!");
+		Preconditions.checkNotNull(shopContainer, "shopContainer is null");
+		Preconditions.checkArgument(spawnLocation.getWorld().equals(shopContainer.getWorld()),
 				"The shop container is located in a different world than the spawn location!");
-		// the creator cannot be null for player shopkeepers:
-		Validate.notNull(creator, "Creator cannot be null!");
+		// The creator cannot be null for player shopkeepers:
+		Preconditions.checkNotNull(creator, "creator is null");
 		this.shopContainer = shopContainer;
 	}
 

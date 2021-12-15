@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.api.events;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
@@ -27,7 +27,7 @@ public class PlayerCreateShopkeeperEvent extends Event implements Cancellable {
 	 *            the shop creation data, not <code>null</code>
 	 */
 	public PlayerCreateShopkeeperEvent(ShopCreationData creationData) {
-		Validate.notNull(creationData, "creationData");
+		Preconditions.checkNotNull(creationData, "creationData is null");
 		this.creationData = creationData;
 	}
 

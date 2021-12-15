@@ -2,11 +2,11 @@ package com.nisovin.shopkeepers.api.events;
 
 import java.util.Collection;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.user.User;
 
@@ -29,8 +29,8 @@ public class PlayerInactiveEvent extends Event implements Cancellable {
 	 *            the user's owned shopkeepers that are about to be deleted, not <code>null</code> but can be empty
 	 */
 	public PlayerInactiveEvent(User user, Collection<? extends PlayerShopkeeper> shopkeepers) {
-		Validate.notNull(user, "user");
-		Validate.notNull(shopkeepers, "shopkeepers");
+		Preconditions.checkNotNull(user, "user is null");
+		Preconditions.checkNotNull(shopkeepers, "shopkeepers is null");
 		this.user = user;
 		this.shopkeepers = shopkeepers;
 	}

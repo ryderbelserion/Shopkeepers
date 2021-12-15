@@ -1,11 +1,11 @@
 package com.nisovin.shopkeepers.api.events;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 
 /**
@@ -41,9 +41,9 @@ public class PlayerShopkeeperHireEvent extends ShopkeeperEvent implements Cancel
 	 */
 	public PlayerShopkeeperHireEvent(PlayerShopkeeper shopkeeper, Player player, ItemStack[] newPlayerInventoryContents, int maxShopsLimit) {
 		super(shopkeeper);
-		Validate.notNull(player, "player");
-		Validate.notNull(newPlayerInventoryContents, "newPlayerInventoryContents");
-		Validate.isTrue(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
+		Preconditions.checkNotNull(player, "player is null");
+		Preconditions.checkNotNull(newPlayerInventoryContents, "newPlayerInventoryContents is null");
+		Preconditions.checkArgument(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
 		this.player = player;
 		this.newPlayerInventoryContents = newPlayerInventoryContents;
 		this.maxShopsLimit = maxShopsLimit;
@@ -99,7 +99,7 @@ public class PlayerShopkeeperHireEvent extends ShopkeeperEvent implements Cancel
 	 *            the hiring player's max shops limit to use for this hire, not negative
 	 */
 	public void setMaxShopsLimit(int maxShopsLimit) {
-		Validate.isTrue(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
+		Preconditions.checkArgument(maxShopsLimit >= 0, "maxShopsLimit cannot be negative");
 		this.maxShopsLimit = maxShopsLimit;
 	}
 

@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.naming;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -11,6 +10,7 @@ import com.nisovin.shopkeepers.chatinput.ChatInput.Request;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
 
 public class ShopkeeperNaming {

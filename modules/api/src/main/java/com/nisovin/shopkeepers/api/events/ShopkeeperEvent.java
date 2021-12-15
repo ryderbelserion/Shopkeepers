@@ -1,8 +1,8 @@
 package com.nisovin.shopkeepers.api.events;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.event.Event;
 
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 
 /**
@@ -21,7 +21,7 @@ public abstract class ShopkeeperEvent extends Event {
 	 *            the shopkeeper, not <code>null</code>
 	 */
 	protected ShopkeeperEvent(Shopkeeper shopkeeper) {
-		Validate.notNull(shopkeeper, "shopkeeper");
+		Preconditions.checkNotNull(shopkeeper, "shopkeeper is null");
 		this.shopkeeper = shopkeeper;
 	}
 

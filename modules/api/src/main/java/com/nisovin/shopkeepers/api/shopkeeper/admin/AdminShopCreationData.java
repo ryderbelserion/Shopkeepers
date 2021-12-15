@@ -1,10 +1,10 @@
 package com.nisovin.shopkeepers.api.shopkeeper.admin;
 
-import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 public class AdminShopCreationData extends ShopCreationData {
 
 	private static AdminShopType<?> toAdminShopType(ShopType<?> shopType) {
-		Validate.isTrue(shopType instanceof AdminShopType, "shopType has to be an AdminShopType");
+		Preconditions.checkArgument(shopType instanceof AdminShopType, "shopType has to be an AdminShopType");
 		return (AdminShopType<?>) shopType;
 	}
 

@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.api.internal;
 
-import org.apache.commons.lang.Validate;
-
+import com.google.common.base.Preconditions;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 
 /**
@@ -21,7 +20,7 @@ public class InternalShopkeepersAPI {
 	 *            the plugin instance, not <code>null</code>
 	 */
 	public static void enable(InternalShopkeepersPlugin plugin) {
-		Validate.notNull(plugin, "plugin is null");
+		Preconditions.checkNotNull(plugin, "plugin is null");
 		if (InternalShopkeepersAPI.plugin != null) {
 			throw new IllegalStateException("API is already enabled!");
 		}
