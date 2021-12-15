@@ -54,6 +54,8 @@ public class WanderingTraderShop extends BabyableShop<WanderingTrader> {
 	protected void onSpawn() {
 		super.onSpawn();
 		WanderingTrader entity = this.getEntity();
+
+		// Disable the vanilla ambient sounds if we simulate the ambient and/or trading sounds ourselves:
 		if (Settings.simulateWanderingTraderTradingSounds || Settings.simulateWanderingTraderAmbientSounds) {
 			entity.setSilent(true);
 		}

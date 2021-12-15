@@ -154,9 +154,12 @@ public class VillagerShop extends BabyableShop<Villager> {
 		// Related (but shouldn't apply here since we use NoAI mobs): https://hub.spigotmc.org/jira/browse/SPIGOT-4776
 		Villager entity = this.getEntity();
 		entity.setVillagerExperience(1);
+
+		// Disable the vanilla ambient sounds if we simulate the ambient and/or trading sounds ourselves:
 		if (Settings.simulateVillagerTradingSounds || Settings.simulateVillagerAmbientSounds) {
 			entity.setSilent(true);
 		}
+
 		this.applyProfession();
 		this.applyVillagerType();
 		this.applyVillagerLevel();
