@@ -348,7 +348,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		if (!loadingSuccessful) {
 			// Detected an issue during loading.
 			// Disabling the plugin without saving, to prevent loss of shopkeeper data:
-			Log.severe("Detected an issue during the loading of the shopkeepers data! Disabling the plugin!");
+			Log.severe("Detected an issue during the loading of the saved shopkeepers data! Disabling the plugin!");
 			shopkeeperStorage.disableSaving();
 			Bukkit.getPluginManager().disablePlugin(this);
 			return;

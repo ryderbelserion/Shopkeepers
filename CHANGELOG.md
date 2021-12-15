@@ -76,6 +76,11 @@ Date format: (YYYY-MM-DD)
 * Fixed: Sound effects played to players would sometimes appear to be played slightly to the left or the right of the player's head.
 * Fixed: When a NPC player shopkeeper moved to a different world, its container location (which is currently expected to always be located in the same world as the shopkeeper) and the protection of the container were not getting updated.
 * Data: Under certain circumstances, one of the publicly posted snapshots of this update accidentally saved shopkeeper ids as normal attributes into the save file. The save file data version was bumped from 2 to 3, so that any previously saved shopkeeper ids are automatically removed again.
+* Data: Improved the detection of server and plugin downgrades.
+  * We now use the data version that is stored inside the Shopkeepers save file to detect Minecraft server and Shopkeepers plugin downgrades. When a downgrade is detected, we log an error and disable the plugin to prevent any potential loss of data.
+  * There is one minor issue with this: After server downgrades, Spigot fails to load item stacks that are stored inside the save file. This causes the loading of the save file to fail before we are able to extract the data version. Our own Minecraft server downgrade check will therefore usually not actually be reached. However, the plugin will disable itself in this situation anyway. But the error message will then be different and more verbose. It should, however, also mention that the server downgrade is the issue.
+  * In order to be able to more reliably detect downgrades of the Shopkeepers plugin that might affect the saved shopkeeper data, we added a new 'shopkeeper data version' component to the data version that is stored inside the save file. The previous 'shopkeeper storage version' was, and still is, used for changes that require a save of all shopkeepers, such as for example when the storage format has changed. The new shopkeeper data version, however, is meant to be incremented more frequently, namely after every change to the data format of shopkeepers and shop objects. Usually, these changes only affect a subset of the shopkeepers and shop objects, so no full save of all shopkeepers is required when this data version component has changed.
+  * These shopkeeper and shop object data format changes also include the addition of new shopkeeper or shop object attributes: Since older plugin versions are not aware of these new attributes, the data for these attributes can get lost when an older plugin version would be allowed to load and later save shopkeepers that previously contained data for these attributes.
 
 **API changes:**  
 * Additions to manage the snapshots of shopkeepers.
@@ -132,6 +137,8 @@ Date format: (YYYY-MM-DD)
 * Internal API: Various uses of ShopkeeperCreateException have been replaced with the better fitting InvalidDataException.
 * Internal API: Minor changes to the shop and shop object type constructors.
 * Internal API: Various changes to how shopkeepers are constructed, initialized, and loaded. The shopkeeper id is passed around as part of the shopkeeper data now.
+* Various refactors and internal documentation improvements to the DataVersion class, and to how the 'missing data version' state is represented.
+* When we are not able to retrieve the server's Minecraft data version, we now abort the initialization of the plugin with an error. Previously, we would have continued with a dummy data version value in this case, which would have bypassed our new version checks.
 * Fixed: The arguments of translatable text components were not getting correctly converted to arguments of the corresponding Spigot-based text components. However, since we don't use any translatable texts with arguments yet, this fix has no noticeable impact.
 * Various changes to the internal representation and handling of shopkeeper data, shop object data, and data migrations.
 * Major refactors to the internal properties API.

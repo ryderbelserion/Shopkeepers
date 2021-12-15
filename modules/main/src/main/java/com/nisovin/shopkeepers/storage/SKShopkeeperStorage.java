@@ -64,21 +64,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private static final String SAVE_FILE_NAME = "save.yml";
 	private static final String TEMP_SAVE_FILE_NAME = SAVE_FILE_NAME + ".tmp";
 
-	// Our stored 'data version' is a combination of two different data versions:
-	// - Our own 'shopkeepers data version', which we can use to determine our own required migrations or force a full
-	// save of the data of all shopkeepers after we have made changes to the storage format which affect all
-	// shopkeepers.
-	// - Minecraft's data version, which updates with every server update (even minor updates). Since these updates
-	// sometimes indicate item migrations done by Minecraft, they are also relevant for our stored item data.
-
-	// Our goal is to always keep the item data stored within the save.yml file up-to-date with the current server
-	// version to avoid ending up with very old items inside our save data that never got updated. For that reason, we
-	// always trigger a full save of the data of all shopkeepers whenever one of the above mentioned data versions has
-	// changed.
-	// The stored and compared data version is a simple concatenation of these two data versions.
-
-	private static final int SHOPKEEPERS_DATA_VERSION = 3;
-	private static final String MISSING_DATA_VERSION = "<missing>";
 	private static final String DATA_VERSION_KEY = "data-version";
 
 	private static final String HEADER = "This file is not intended to be manually modified! If you want to manually edit this"
@@ -92,8 +77,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private static final long SAVE_ERROR_MSG_THROTTLE_MILLIS = TimeUnit.MINUTES.toMillis(4);
 
 	private final SKShopkeepersPlugin plugin;
-	private final int minecraftDataVersion;
-	private final DataVersion currentDataVersion;
 
 	private final Path saveFile;
 	private final Path tempSaveFile;
@@ -139,21 +122,11 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	private BukkitTask delayedSaveTask = null;
 
 	public SKShopkeeperStorage(SKShopkeepersPlugin plugin) {
+		DataVersion.init();
 		this.plugin = plugin;
-		this.minecraftDataVersion = this.getMinecraftDataVersion();
-		this.currentDataVersion = new DataVersion(SHOPKEEPERS_DATA_VERSION, minecraftDataVersion);
 		this.saveFile = this._getSaveFile();
 		this.tempSaveFile = this._getTempSaveFile();
 		this.saveTask = new SaveTask(plugin);
-	}
-
-	private int getMinecraftDataVersion() {
-		try {
-			return Bukkit.getUnsafe().getDataVersion();
-		} catch (Exception e) {
-			Log.warning("Could not determine Minecraft's current data version!", e);
-			return 0;
-		}
 	}
 
 	private Path getPluginDataFolder() {
@@ -435,7 +408,6 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				Log.warning("Found no save file, but an existing temporary save file (" + this.pluginDataRelative(tempSaveFile) + ")!"
 						+ " This might indicate an issue during a previous saving attempt!"
 						+ " We try to load the Shopkeepers data from this temporary save file instead!");
-
 				saveFile = tempSaveFile;
 			} else if (!this.migrateOldSaveFile()) {
 				// Migration of old save file failed:
@@ -444,7 +416,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 				// No save file exists yet (even after checking for it again, after the migration) -> No shopkeeper data
 				// available.
 				// We silently set up the data version and abort:
-				saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombined());
+				saveData.set(DATA_VERSION_KEY, DataVersion.current().toString());
 				return true;
 			}
 		}
@@ -459,13 +431,53 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		}
 
 		// Insert the data version as the first (top) entry:
-		// Explicitly setting the 'missing data version' value here ensures that the data version will be the first
+		// Explicitly setting the 'missing' data version value here ensures that the data version will be the first
 		// entry in the save file, even if it is missing in the save file currently. If a data version is present in the
-		// loaded data, the 'missing data version' value is replaced with the actual data version afterwards.
+		// loaded data, the 'missing' data version value is replaced with the actual data version afterwards.
 		Map<String, Object> saveDataEntries = saveData.getValuesCopy();
 		saveData.clear();
-		saveData.set(DATA_VERSION_KEY, MISSING_DATA_VERSION);
+		saveData.set(DATA_VERSION_KEY, DataVersion.MISSING.toString());
 		saveData.setAll(saveDataEntries);
+
+		// Parse data version:
+		String dataVersionString = saveData.getString(DATA_VERSION_KEY);
+		assert dataVersionString != null;
+		DataVersion dataVersion;
+		try {
+			dataVersion = DataVersion.parse(dataVersionString);
+		} catch (IllegalArgumentException e) {
+			Log.severe("Failed to parse the data version of the save file!", e);
+			return false; // Disable without save
+		}
+
+		// Check if we can detect a server downgrade:
+		// TODO This check is often never reached, because Bukkit already fails to load the save file during server
+		// downgrades if it contains saved item stacks. This check only catches cases in which the save file contains no
+		// saved item stacks, or the item stacks are for some reason stored in an older data version.
+		if (DataVersion.current().isMinecraftDowngrade(dataVersion)) {
+			Log.severe("Detected Minecraft server downgrade from data version '"
+					+ dataVersion + "' to '" + DataVersion.current()
+					+ "'! Server downgrades are not supported. Disabling the plugin in order to prevent data loss!");
+			return false; // Disable without save
+		}
+
+		// Check if we can detect a Shopkeepers plugin downgrade:
+		// Even if the Minecraft server did not downgrade, plugin downgrades can also be problematic, because shopkeeper
+		// data other than item stacks can also be affected by backwards incompatible changes that have previously been
+		// applied by a newer Shopkeepers version. Note that even the addition of new shopkeeper attributes is a
+		// 'backwards incompatible' change: Even if the current plugin version simply ignores any additional data and
+		// would run fine, our current storage implementation does not keep track of unknown data. So with the next save
+		// this additional data would be lost.
+		// TODO This check can only detect changes for which we incremented the shopkeeper data version. Any external
+		// shopkeeper or shop object object implementations are not yet covered by this check. A possible solution could
+		// be to allow external add-ons to specify their data versions and then save those into the save file as well.
+		if (DataVersion.current().isShopkeeperStorageDowngrade(dataVersion)
+				|| DataVersion.current().isShopkeeperDataDowngrade(dataVersion)) {
+			Log.severe("Detected Shopkeepers plugin downgrade from data version '"
+					+ dataVersion + "' to '" + DataVersion.current()
+					+ "'! Plugin downgrades are not supported. Disabling the plugin in order to prevent data loss!");
+			return false; // Disable without save
+		}
 
 		Set<String> keys = saveData.getKeys();
 		// Contains at least the data-version entry:
@@ -473,20 +485,26 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		int shopkeepersCount = (keys.size() - 1);
 		if (shopkeepersCount == 0) {
 			// No shopkeeper data exists yet. Silently update the data version and abort:
-			saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombined());
+			saveData.set(DATA_VERSION_KEY, DataVersion.current().toString());
 			return true;
 		}
 
 		Log.info("Loading the data of " + shopkeepersCount + " shopkeepers ...");
 
-		// Check and update the data version:
-		String dataVersion = saveData.getStringOrDefault(DATA_VERSION_KEY, MISSING_DATA_VERSION);
-		boolean dataVersionChanged = (!currentDataVersion.getCombined().equals(dataVersion));
+		// Check if the data version has changed, and whether we need to trigger a full save of all shopkeeper data:
+		boolean dataVersionChanged = !DataVersion.current().equals(dataVersion);
+		boolean forceSaveAllShopkeepers = DataVersion.current().isMinecraftUpgrade(dataVersion)
+				|| DataVersion.current().isShopkeeperStorageUpgrade(dataVersion);
 		if (dataVersionChanged) {
-			Log.info("The data version has changed from '" + dataVersion + "' to '" + currentDataVersion.getCombined()
-					+ "': The saved data of all shopkeepers is updated.");
+			Log.info("The save file's data version has changed from '" + dataVersion
+					+ "' to '" + DataVersion.current() + "'."
+					+ (forceSaveAllShopkeepers ? " The saved data of all shopkeepers is updated." : ""));
 			// Update the data version:
-			saveData.set(DATA_VERSION_KEY, currentDataVersion.getCombined());
+			saveData.set(DATA_VERSION_KEY, DataVersion.current().toString());
+
+			// Mark the storage as dirty so that the new data version is saved to disk even if none of the loaded
+			// shopkeepers is marked as dirty:
+			this.requestSave();
 		}
 
 		for (String key : keys) {
@@ -494,7 +512,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 			// If the shopkeeper cannot be loaded, it is skipped and the loading continues with the remaining
 			// shopkeepers:
-			this.loadShopkeeper(key, dataVersionChanged);
+			this.loadShopkeeper(key, forceSaveAllShopkeepers);
 		}
 		return true;
 	}
@@ -514,7 +532,7 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 		return shopkeeperData;
 	}
 
-	private void loadShopkeeper(String key, boolean dataVersionChanged) {
+	private void loadShopkeeper(String key, boolean forceSave) {
 		Integer idInt = ConversionUtils.parseInt(key);
 		if (idInt == null || idInt <= 0) {
 			this.failedToLoadShopkeeper(key, "Invalid id: " + key);
@@ -555,10 +573,10 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 			return;
 		}
 
-		// If the shopkeeper was migrated or the data version has changed, mark it as dirty:
-		// During plugin enable, after the shopkeepers have been loaded, a save is triggered if the storage was marked
-		// as dirty.
-		if (migrated || dataVersionChanged) {
+		// If the shopkeeper was migrated or a forced save is requested, mark the shopkeeper as dirty:
+		// During plugin enable, after the shopkeepers have been loaded, a save is triggered if the storage has been
+		// marked as dirty.
+		if (migrated || forceSave) {
 			shopkeeper.markDirty();
 		}
 	}
