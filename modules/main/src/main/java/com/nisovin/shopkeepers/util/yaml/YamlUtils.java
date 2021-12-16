@@ -1,7 +1,6 @@
 package com.nisovin.shopkeepers.util.yaml;
 
 import org.bukkit.configuration.file.YamlConstructor;
-import org.bukkit.configuration.file.YamlRepresenter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
 import org.yaml.snakeyaml.Yaml;
@@ -13,12 +12,12 @@ import com.nisovin.shopkeepers.util.java.Validate;
 
 public final class YamlUtils {
 
-	// Mimics Bukkit's Yaml configuration:
+	// Roughly mimics Bukkit's Yaml configuration:
 	private static final ThreadLocal<Yaml> YAML = ThreadLocal.withInitial(() -> {
 		DumperOptions yamlOptions = new DumperOptions();
 		yamlOptions.setIndent(2);
 		yamlOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-		Representer yamlRepresenter = new YamlRepresenter();
+		Representer yamlRepresenter = new OldBukkitYamlRepresenter();
 		yamlRepresenter.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		BaseConstructor yamlConstructor = new YamlConstructor();
 		Yaml yaml = new Yaml(yamlConstructor, yamlRepresenter, yamlOptions);

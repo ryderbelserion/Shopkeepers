@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.util.yaml;
 
-import org.bukkit.configuration.file.YamlRepresenter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.DumperOptions.ScalarStyle;
 import org.yaml.snakeyaml.nodes.Node;
@@ -23,7 +22,7 @@ import com.nisovin.shopkeepers.util.java.StringUtils;
  * {@link Representer} therefore enforces the use of the scalar style {@link ScalarStyle#DOUBLE_QUOTED} for any scalars
  * that contain newline characters.
  */
-public class CompactYamlRepresenter extends YamlRepresenter { // Extends Bukkit's YamlRepresenter
+public class CompactYamlRepresenter extends OldBukkitYamlRepresenter { // Extends Bukkit's YamlRepresenter
 
 	public CompactYamlRepresenter() {
 	}

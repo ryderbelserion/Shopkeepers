@@ -160,6 +160,7 @@ Date format: (YYYY-MM-DD)
 * The shop object types for the various mob shop objects use composition now instead of deriving their own shop object type from a base class.
 * Fixed: Timer was not correctly updating its state when being stopped, breaking an assertion when the timer was started again. The Timer class more strictly checks its expected states now and logs an error with stack trace whenever one of its operations is called in an unexpected state for the first time.
 * Spigot plans to remove the Apache Commons Lang library from Bukkit. We therefore replaced all uses of the Apache Commons Lang Validate class with Guava's Preconditions class (this applies primarily to the API module).
+* Changes to account for potential future changes to how Bukkit implements the representation of configuration sections for Yaml configurations: There are plans in Spigot to change how Yaml configurations save their sections. These changes move the representation of configuration sections from Bukkit's YamlRepresenter into YamlConfiguration. However, since we reuse Bukkit's YamlRepresenter for our own Yaml serialization purposes, we need it to still be able to represent configuration sections in the future. We now account for this potential future change and ensure that our Bukkit-based Yaml representer will still be able to represent configuration sections.
 * Various other minor internal refactors and Javadoc improvements.
 
 **Message changes:**  
