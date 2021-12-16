@@ -7,6 +7,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Raider;
+import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
@@ -35,6 +36,7 @@ public final class FailedHandler implements NMSCallProvider {
 
 	// Bukkit
 	private final Method raiderSetCanJoinRaidMethod;
+	private final Method wanderingTraderSetDespawnDelayMethod;
 
 	public FailedHandler() throws Exception {
 		String cbVersion = ServerUtils.getCraftBukkitVersion();
@@ -61,6 +63,8 @@ public final class FailedHandler implements NMSCallProvider {
 		// Bukkit
 		// Only available on Bukkit 1.15.1 and upwards:
 		raiderSetCanJoinRaidMethod = Raider.class.getDeclaredMethod("setCanJoinRaid", boolean.class);
+		// Only available in later versions of Bukkit 1.16.5 and upwards:
+		wanderingTraderSetDespawnDelayMethod = WanderingTrader.class.getDeclaredMethod("setDespawnDelay", int.class);
 	}
 
 	@Override
@@ -104,6 +108,15 @@ public final class FailedHandler implements NMSCallProvider {
 			raiderSetCanJoinRaidMethod.invoke(raider, canJoinRaid);
 		} catch (Exception e) {
 			// Not supported. Raider mobs might interfere with nearby raids :(
+		}
+	}
+
+	@Override
+	public void setDespawnDelay(WanderingTrader wanderingTrader, int despawnDelay) {
+		try {
+			wanderingTraderSetDespawnDelayMethod.invoke(wanderingTrader, despawnDelay);
+		} catch (Exception e) {
+			// Not supported. The wandering trader might periodically despawn, but is then respawned shortly afterwards.
 		}
 	}
 

@@ -6,6 +6,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Raider;
+import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
@@ -56,6 +57,10 @@ public interface NMSCallProvider {
 	public default void setExclusiveAdult(LivingEntity entity) {
 		// No exclusive mobs by default.
 	}
+
+	// TODO Remove this once we only support later versions of Bukkit 1.16.5 and upwards (those have an API method to
+	// set the DespawnDelay).
+	public void setDespawnDelay(WanderingTrader wanderingTrader, int despawnDelay);
 
 	// Performs any version-specific setup that needs to happen before the entity is spawned. The available operations
 	// may be limited during this phase of the entity spawning.

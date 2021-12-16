@@ -6,6 +6,7 @@ import org.bukkit.entity.WanderingTrader;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
+import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -59,6 +60,9 @@ public class WanderingTraderShop extends BabyableShop<WanderingTrader> {
 		if (Settings.simulateWanderingTraderTradingSounds || Settings.simulateWanderingTraderAmbientSounds) {
 			entity.setSilent(true);
 		}
+
+		// Disable the delayed despawning of the wandering trader:
+		NMSManager.getProvider().setDespawnDelay(entity, 0);
 	}
 
 	@Override

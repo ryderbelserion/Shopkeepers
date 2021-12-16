@@ -10,6 +10,7 @@ import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftWanderingTrader;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftMerchant;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftMagicNumbers;
@@ -18,6 +19,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Raider;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
@@ -149,6 +151,11 @@ public final class NMSHandler implements NMSCallProvider {
 	public void setCanJoinRaid(Raider raider, boolean canJoinRaid) {
 		// Only works in the latest versions of Bukkit 1.15.1 and upwards:
 		raider.setCanJoinRaid(canJoinRaid);
+	}
+
+	@Override
+	public void setDespawnDelay(WanderingTrader wanderingTrader, int despawnDelay) {
+		((CraftWanderingTrader) wanderingTrader).getHandle().u(despawnDelay);
 	}
 
 	// For CraftItemStacks, this first tries to retrieve the underlying NMS item stack without making a copy of it.

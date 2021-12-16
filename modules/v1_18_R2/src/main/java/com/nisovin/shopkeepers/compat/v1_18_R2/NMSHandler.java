@@ -24,6 +24,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Raider;
 import org.bukkit.entity.Villager;
+import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.Merchant;
@@ -151,6 +152,11 @@ public final class NMSHandler implements NMSCallProvider {
 	@Override
 	public void setExclusiveAdult(LivingEntity entity) {
 		// There are no mobs in this MC version to which this applies.
+	}
+
+	@Override
+	public void setDespawnDelay(WanderingTrader wanderingTrader, int despawnDelay) {
+		wanderingTrader.setDespawnDelay(despawnDelay);
 	}
 
 	// For CraftItemStacks, this first tries to retrieve the underlying NMS item stack without making a copy of it.

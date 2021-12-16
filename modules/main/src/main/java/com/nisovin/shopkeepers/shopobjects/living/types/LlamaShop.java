@@ -70,6 +70,11 @@ public class LlamaShop<E extends Llama> extends ChestedHorseShop<E> {
 		super.onSpawn();
 		this.applyColor();
 		this.applyCarpetColor();
+
+		E entity = this.getEntity();
+		// If this is a trader llama, marking it as 'tamed' disables its delayed despawning. The 'tamed' state should
+		// have no visual effect on the llama entity.
+		entity.setTamed(true);
 	}
 
 	@Override
