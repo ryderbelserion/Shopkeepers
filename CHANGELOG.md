@@ -5,8 +5,7 @@ Date format: (YYYY-MM-DD)
 ### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
 * Updated for MC 1.18 and MC 1.18.1.
-  * This update contains no new features (such as mobs) that would be relevant for Shopkeepers.
-  * Updated the 'compatibility mode' implementation, which broke with the 1.18 update. However, due to some server internal mapping changes, it is likely that this compatibility mode will break again in future updates.
+* Updated the 'compatibility mode' implementation, which broke with the Miecraft 1.18 update. However, due to some server internal mapping changes, it is likely that this compatibility mode will break again in future updates.
 * Added the option for admins to create and restore snapshots of shopkeepers.
   * Each snapshot captures the shopkeeper's dynamic state (i.e. its trades, shop object configuration, etc.), a timestamp, and is associated with a unique name that is provided when the snapshot is created.
   * The name can currently be at most 64 characters long and not contain any color codes.
@@ -15,39 +14,39 @@ Date format: (YYYY-MM-DD)
   * Shopkeeper snapshots are currently expected to be used sparsely. In order to guard against the unnoticed creation of excessive amounts of snapshots, we log a warning whenever a shopkeeper has more than 10 snapshots.
   * When formatting the timestamp of a snapshot for display, we currently use the server's default time zone. There is no option in Shopkeepers yet to use a different timezone. If you want to use a different timezone for formatting the timestamps, you can change your server's default timezone via the JVM command line argument `-Duser.timezone=America/New_York` when you start your server.
   * Command: Added commands `/shopkeeper snapshot [list|create|remove|restore]` to manage shopkeeper snapshots.
-  * Permission: Added permission `shopkeeper.snapshot` (default: op) which provides access to the new snapshot commands.
+  * Permission: Added permission `shopkeeper.snapshot` (default: `op`) that provides access to the new snapshot commands.
   * Experimental: It is also possible to capture and restore the NPC state of Citizens NPC shopkeepers.
     * Config: Added setting `snapshots-save-citizen-npc-data` (default: `true`) that controls whether shopkeeper snapshots capture and restore Citizens NPC data.
     * When this setting is disabled, the Shopkeepers plugin automatically deletes all previously saved NPC data again.
     * Capturing the data of a Citizens NPC will not work if the NPC is not available at the time the snapshot is created (e.g. if the Citizens plugin is not running currently).
-    * If the Citizens NPC is not available when a snapshot is restored, the shopkeeper remembers the NPC data until the NPC becomes available again and it is then able to apply the stored NPC state. If another snapshot is restored in the meantime, which does not store any NPC data, we keep the previously restored but not yet applied NPC state.
+    * If the Citizens NPC is not available when a snapshot is restored, the shopkeeper remembers the NPC data until the NPC becomes available again and the stored NPC state can be applied. If another snapshot is restored in the meantime that does not store any NPC data, we retain the previously restored but not yet applied NPC state.
 * Added editor options to change the puff state of puffer fish, as well as the pattern and colors of tropical fish.
 * Added sound effects when a trade succeeds or fails.
   * Config: These sound effects can be changed or disabled (by setting their volume to zero) via the new config settings `trade-succeeded-sound` and `trade-failed-sound`.
 * Added settings to simulate the trading sounds of vanilla villagers and wandering traders.
-  * Config: Added setting `simulate-villager-trading-sounds` (default: `true`)
-  * Config: Added setting `simulate-villager-ambient-sounds` (default: `false`)
-  * Config: Added setting `simulate-wandering-trader-trading-sounds` (default: `true`)
-  * Config: Added setting `simulate-wandering-trader-ambient-sounds` (default: `false`)
-  * Config: Added setting `simulate-villager-trading-sounds-only-for-the-trading-player` (default: `true`)
+  * Config: Added setting `simulate-villager-trading-sounds` (default: `true`).
+  * Config: Added setting `simulate-villager-ambient-sounds` (default: `false`).
+  * Config: Added setting `simulate-wandering-trader-trading-sounds` (default: `true`).
+  * Config: Added setting `simulate-wandering-trader-ambient-sounds` (default: `false`).
+  * Config: Added setting `simulate-villager-trading-sounds-only-for-the-trading-player` (default: `true`).
   * By default, we now simulate the trading sounds of villagers and wandering traders for the trading player. These sounds are only played if the trading player is in the vicinity of the shopkeeper. Trading remotely will not play these sounds.
   * Debug: Debug output for these simulated villager sounds can be enabled via the existing debug option `regular-tick-activities`.
 * Shopkeepers store the yaw angle now with which they are initially spawned.
   * When placing a shopkeeper on top of a block, the yaw angle is chosen so that the shopkeeper faces towards the player who is creating the shopkeeper. When placing a shopkeeper against the side of a block, the shopkeeper is rotated according to the direction of the targeted block side.
-  * Existing shopkeepers will have a yaw of 0, i.e. they keep facing south by default. In the future it will be possible to reposition shopkeepers and thereby also adjust the yaw of already existing shopkeepers.
-  * Data: Sign shopkeepers no longer store their sign facing. Instead, this facing is now derived from the shopkeeper's yaw. Existing sign shops, for which the shopkeeper has previously not yet stored the yaw, will automatically migrate their currently stored sign facing to the shopkeeper's yaw.
-  * Shopkeeper mobs will rotate back to their initial direction now when there is no player to look at. However, this requires a player to still be somewhat nearby, since only shopkeeper mobs with nearby players are ticked.
+  * Existing shopkeepers will have a yaw of 0, i.e. they face south just like before. In the future, it will be possible to reposition shopkeepers and thereby also adjust the yaw of already existing shopkeepers. But this is not yet available.
+  * Data: Sign shopkeepers no longer store their sign facing. Instead, this facing is now derived from the shopkeeper's yaw. Existing sign shops will automatically migrate their currently stored sign facing to the shopkeeper's yaw.
+  * Shopkeeper mobs will rotate back to their initial direction now when there is no player to look at. However, this requires a player to still be somewhat nearby, since we only tick shopkeeper mobs when players are nearby.
 * Config: Added setting `set-citizen-npc-owner-of-player-shops` (default: `false`).
   * When enabled, we set the Citizens NPC owner of player-owned NPC shopkeepers. When disabled, we automatically remove any previously set Citizens NPC owners from those player-owned NPC shopkeepers again.
   * By enabling this setting, and configuring the Citizens command permissions for your players accordingly, you can allow shop owners to use the commands of the Citizens plugin to edit the Citizens NPCs of their NPC shopkeepers.
-* Fixed: Wandering traders and trader llama shopkeepers despawned roughly every 40 minutes due to Minecraft's despawning timer still being active for these mobs, even when their AI is disabled. However, this issue has been rather minor, because the affected shopkeepers automatically respawned a few seconds afterwards. This issue has now been fixed by setting the `DespawnDelay` of wandering traders to 0, and by marking trader llamas as 'tamed', which disables Minecraft's despawning timer for these mobs.
-* Fixed: We were not able to detect item stack deserialization issues, because Bukkit only logs an error in this case instead of throwing an exception. This also resulted in the loss of shopkeeper data when someone tried to revert from one server version to an older one, because the loading of item stacks that were saved on a newer server version is not supported. We are now able to detect these deserialization issues and then shut down the plugin before any data is lost.
+* Fixed: Wandering traders and trader llama shopkeepers despawned roughly every 40 minutes due to Minecraft's despawning timer still being active for these mobs, even when their AI is disabled. However, this issue has been rather minor, because the affected shopkeepers automatically respawned a few seconds afterwards. This issue has now been fixed by setting the `DespawnDelay` of wandering traders to `0` and marking trader llamas as 'tamed', which disables Minecraft's despawning timer for these mobs.
+* Fixed: We were not able to detect item stack deserialization issues, because Bukkit only logs an error in this case instead of throwing an exception. This also resulted in the loss of shopkeeper data when someone tried to revert from one server version to an older one, because the loading of item stacks that were saved on a newer server version is not supported by Bukkit. We are now able to detect these deserialization issues and then shut down the plugin before any data is lost.
 * Fixed: Shopkeepers could lose some of their trades during item migrations. When an item was migrated, but the subsequent trades did not require any item migrations, these subsequent trades were lost. However, it was relatively unlikely to encounter this issue in practice. An exception to this is in combination with the following Paper-specific issue that only affects trades with certain enchanted book items.
 * Fixed: On Paper servers, the comparisons of enchanted book items with multiple stored enchantments were not working as expected. The issue was caused by the server reordering the stored enchantments in some cases, as well as Paper automatically converting any deserialized Bukkit item stacks to CraftItemStacks, which behave differently when being compared to other CraftItemStacks. One known effect of this was that the above issue of trades potentially being lost due to item migrations would be encountered more likely on Paper servers, because the reordering of these stored enchantments would be detected as an 'item migration' by the Shopkeepers plugin. It also caused an unnecessary save of all shopkeeper data after every plugin reload.
 * Fixed: The "/shopkeeper removeAll" command always tried to remove all player shops, instead of only the shops of the executing player.
 * Data: Various kinds of invalid shopkeeper data and failed data migrations that have previously been ignored or only triggered a warning are now checked for and will prevent the shopkeeper from loading. Most notably, this includes the data of shopkeeper offers, and the hire cost item of player shops. Previously, this invalid data would be cleared. Now, it is retained for a server admin to investigate the issue.
 * Data: It is invalid now to mix legacy and non-legacy book offer data (changed during late MC 1.14.4).
-* When shopkeepers of inactive players are removed, we now trigger an immediate save, even if the 'save-instantly' setting is disabled.
+* When shopkeepers of inactive players are removed, we now trigger an immediate save, even if the `save-instantly` setting is disabled.
 * Versioning: Snapshot builds will now include the Git hash in their plugin version.
 * Debug: The 'shopkeeper-activation' debug option will now log additional details about every single shopkeeper activation and deactivation, instead of only logging a summary about how many shopkeepers were activated per chunk.
 * Various minor changes to error and debug log messages:
@@ -64,8 +63,8 @@ Date format: (YYYY-MM-DD)
   * The stored object type identifiers of shopkeepers are expected to perfectly match the registered shop object types. They are no longer normalized and fuzzy matched.
 * Data: We no longer generate a new unique id if the shopkeeper data is missing the shopkeeper's unique id. Instead, the loading of the shopkeeper fails now in this case.
 * Data: All item stacks are now (shallow) copied before they are saved to the shopkeeper data. This prevents SnakeYaml from representing the item stacks using anchors and aliases (a Yaml feature) inside the shopkeepers save file if the same item stack instances would otherwise be saved multiple times in different contexts.
-* For consistency among commands, and to avoid certain ambiguous command parsing cases, the "edit", "remote", and "remove" commands no longer merge trailing arguments to derive the target shopkeeper name. It is still possible to target shopkeepers with names that consist of multiple words by using a dash as word separator instead of a space.
-* Shopkeeper and entity command arguments now propose the ids of targeted shopkeepers and entities.
+* Command: For consistency among commands, and to avoid certain ambiguous command parsing cases, the "edit", "remote", and "remove" commands no longer merge trailing arguments to derive the target shopkeeper name. It is still possible to target shopkeepers with names that consist of multiple words by using a dash as word separator instead of a space.
+* Command: Shopkeeper and entity command arguments now propose the ids of targeted shopkeepers and entities.
 * Fixed: The "testSpawn" debug command would respawn the shopkeepers in the executing player's chunk, but would not immediately update their object id registrations. The shop objects will now automatically and immediately inform the shopkeeper registry about those object id changes.
 * Fixed: When changing the container location of a player shop via the API, the protection for the previous container was not properly disabled.
 * Fixed: Any code that retrieves the container block of a player shopkeeper accounts now for the fact that the block might be null. This was only really an issue when another plugin invokes internal operations that require the container block to be available in a situation in which it might not be available currently.
@@ -92,7 +91,7 @@ Date format: (YYYY-MM-DD)
 * Shopkeeper#getLocation() will include the shopkeeper's yaw now.
 * ShopCreationData#getTargetedBlockFace() no longer determines the facing of sign shops. Instead, sign shops use the yaw of the spawn location now to derive their facing.
 * Added UnmodifiableItemStack#shallowCopy().
-* Various Javadoc additions, improvements, and fixes.
+* Various Javadoc additions, improvements, and fixes, and added additional validations for some constructor and method arguments.
 * Deprecated DefaultShopTypes#getAdminShopType() and #ADMIN(), and added #getRegularAdminShopType() and #ADMIN_REGULAR() as alternatives.
 * Deprecated the previous constructors and factory methods of AdminShopCreationData and PlayerShopCreationData, and added corresponding alternatives that directly require an AdminShopType or PlayerShopType respectively.
 * Deprecated the superfluous LivingShopObjectTypes#getAliases(EntityType).
@@ -105,6 +104,7 @@ Date format: (YYYY-MM-DD)
 **Various internal build changes:**  
 * We use JDK 17 now to build Shopkeepers. However, for compatibility with older and still supported MC versions, we still only use Java 8 compliant features.
 * Switched from Maven to Gradle.
+* Refactored the project structure to more closely align with Maven's recommended layout and resolve some IDE issues.
 * The Maven publication of the Shopkeepers API also includes the API Javadocs now.
 * We also publish a 'ShopkeepersMain' artifact now that contains the internal plugin code, but omits all NMS modules. Any plugins that rely on these internals, but don't require the NMS modules, can now depend on this artifact as an alternative to depending on the complete plugin jar.
 * Removed the unused jenkins and release build profiles from Maven.
@@ -116,43 +116,41 @@ Date format: (YYYY-MM-DD)
 * Moved all auxiliary build scripts into a separate 'scripts' folder and made them less reliant on the directory they are called from.
 * The primary 'build' script automatically invokes the 'installSpigotDependencies' script now.
 
-**Other internal changes:**  
-* Internal API: Various internal UI, editor UI, and trading UI related refactors.
+**Internal API changes:**  
+* Various internal UI, editor UI, and trading UI related refactors.
   * Changed how the trading UI handler represents the trade that is currently being processed.
   * It is now possible to register TradingListeners with the TradingHandler that are informed on various events during the trade handling.
   * Moved various editor internal classes into their own files.
-* Internal API: ProtectedContainers requires a BlockLocation now when adding or removing a container protection.
-* Internal API: Various changes to the loading, saving, and migration of shop offers. They use the new internal data serialization and property APIs now to save and load their data.
-* Internal API: Removed various no longer needed utility methods related to the saving and loading of item stacks.
-* Internal API: CitizensShopkeeperTrait#getShopkeeper() returns an AbstractShopkeeper now.
-* Internal API: Added SKSignShopObject#getSignType().
-* Internal API: It is now the responsibility of the shop object to inform about object id changes, even when the shop object is being spawned, despawned, or ticked.
-* Internal API: Added AbstractShopObject#respawn().
-* Internal API: Various internal fields of AbstractPlayerShopkeeper and AbstractAdminShopkeeper are no longer directly accessible by subclasses, but need to be accessed via their respective getters and setters now.
-* Internal API: Added the possibility to save and load a shopkeeper's dynamic state.
-* Internal API: Instead of using Bukkit's ConfigurationSection interface, we now use our own DataContainer interface to represent data in memory.
+* ProtectedContainers requires a BlockLocation now when adding or removing a container protection.
+* Various changes to the loading, saving, and migration of shop offers. They use the new internal data serialization and property APIs now to save and load their data.
+* Removed various no longer needed utility methods related to the saving and loading of item stacks.
+* CitizensShopkeeperTrait#getShopkeeper() returns an AbstractShopkeeper now.
+* Added SKSignShopObject#getSignType().
+* It is now the responsibility of the shop object to inform about object id changes, even when the shop object is being spawned, despawned, or ticked.
+* Added AbstractShopObject#respawn().
+* Various internal fields of AbstractPlayerShopkeeper and AbstractAdminShopkeeper are no longer directly accessible by subclasses, but need to be accessed via their respective getters and setters now.
+* Added the possibility to save and load a shopkeeper's dynamic state.
+* Various changes to the internal representation and handling of shopkeeper data, shop object data, and data migrations.
+* Instead of using Bukkit's ConfigurationSection interface, we now use our own DataContainer interface to represent data in memory.
   * Most uses of ConfigurationSection have been replaced with DataContainer, such as for representing config, language file, shopkeeper, and shop object data.
   * A ConfigData interface extends DataContainer to provide access to default config values.
-  * ShopkeeperData and ShopObjectData wrappers extend DataContainer with common convenience methods that were previously located inside AbstractShopkeeper to interact with the shopkeeper and shop object data.
-* Internal API: Various refactors related to shop object properties.
-* Internal API: Various uses of ShopkeeperCreateException have been replaced with the better fitting InvalidDataException.
-* Internal API: Minor changes to the shop and shop object type constructors.
-* Internal API: Various changes to how shopkeepers are constructed, initialized, and loaded. The shopkeeper id is passed around as part of the shopkeeper data now.
+  * ShopkeeperData and ShopObjectData are DataContainer wrappers for the data of shopkeepers and shop objects. In the future, they may contain additional methods specific to the handling of shopkeeper and shop object data.
+* Various refactors related to shop object properties and the internal properties API. Shop objects also take into account now that their property values might get dynamically reloaded at runtime.
+* Various uses of ShopkeeperCreateException have been replaced with the better fitting InvalidDataException.
+* Minor changes to the shop and shop object type constructors.
+* Various changes to how shopkeepers are constructed, initialized, and loaded. The shopkeeper id is passed around as part of the shopkeeper data now.
+
+**Other internal changes:**  
 * Various refactors and internal documentation improvements to the DataVersion class, and to how the 'missing data version' state is represented.
 * When we are not able to retrieve the server's Minecraft data version, we now abort the initialization of the plugin with an error. Previously, we would have continued with a dummy data version value in this case, which would have bypassed our new version checks.
 * Fixed: The arguments of translatable text components were not getting correctly converted to arguments of the corresponding Spigot-based text components. However, since we don't use any translatable texts with arguments yet, this fix has no noticeable impact.
-* Various changes to the internal representation and handling of shopkeeper data, shop object data, and data migrations.
-* Major refactors to the internal properties API.
 * Data: The world, coordinates, and yaw are now omitted from the save data of virtual shopkeepers. However, this has no effect yet, since virtual shopkeepers are not yet properly supported.
-* Minor changes to how shop object property changes are applied to the spawned shop object. Shop objects also properly take into account now that their properties might get dynamically loaded at runtime.
 * Shopkeepers are now deactivated before they are despawned. This avoids having to process the object id change of the shop object being despawned when the shopkeeper is going to be deactivated anyways.
 * Fixed: The ShopkeeperByName command argument did not take the 'joinRemainingArgs' argument into account.
 * Fixed: The parsing of command arguments failed in cases in which command arguments depend on the context provided by fallbacks of earlier arguments.
 * Refactors related to the removal of shopkeepers of inactive players.
 * We now enforce for all of our event handlers at lowest priority that they are executed first.
-* Added validation for some constructor and method arguments in the API.
 * APIMirrorTest no longer uses Hamcrest matchers. This also resolves some JUnit deprecations.
-* Refactored the project's structure to more closely align with Maven's recommended layout and resolve some IDE issues.
 * The save operations of the shopkeeper storage and the CSV trade logger will now restore any caught Thread interruption status for anyone interested in it. Other than that, these operations still ignore Thread interruptions, because we prefer to keep trying to still save the data to disk after all.
 * Admin shopkeepers normalize empty trade permissions in the save data to null now, similar to AdminShopkeeper#setTradePermission.
 * Removed an old update mechanism for sign shops: If the sign block is not available at the time it is meant to be updated, this would update the sign later, once it is available again. This mechanism should no longer be required: The sign is already updated whenever it is spawned, and we dynamically spawn and despawn the sign with chunk loads, and dynamically respawn it if it is detected to be missing.
