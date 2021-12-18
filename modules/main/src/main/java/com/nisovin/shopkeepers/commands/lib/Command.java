@@ -1033,7 +1033,7 @@ public abstract class Command {
 			// Asserts that the aliases-map provides all aliases for the same command in succession.
 			Command lastMatchingCommand = null;
 			for (Entry<String, Command> aliasEntry : this.getChildCommands().getAliasesMap().entrySet()) {
-				String alias = aliasEntry.getKey(); // normalized
+				String alias = aliasEntry.getKey(); // Normalized
 				Command aliasCommand = aliasEntry.getValue();
 				if (lastMatchingCommand != null && lastMatchingCommand == aliasCommand) {
 					// We have already included a suggestion for this child command, skip:
@@ -1065,7 +1065,7 @@ public abstract class Command {
 		for (CommandArgument<?> argument : arguments) {
 			int remainingArgs = argsReader.getRemainingSize();
 			if (remainingArgs == 0) {
-				// No argument left which could be completed:
+				// No argument left that could be completed:
 				break;
 			}
 			ArgumentsReader argsReaderState = argsReader.createSnapshot();
@@ -1080,7 +1080,7 @@ public abstract class Command {
 					break;
 				} else if (argsReader.getRemainingSize() == remainingArgs) {
 					// No error during parsing, but none of the remaining args used up:
-					// -> This was an optional argument which got skipped.
+					// -> This is an optional argument that was skipped.
 					// Include suggestions (if it has any), but continue:
 					suggestions.addAll(argument.complete(input, contextView, argsReader));
 
