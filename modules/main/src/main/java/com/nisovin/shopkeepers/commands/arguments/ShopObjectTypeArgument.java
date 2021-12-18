@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import org.bukkit.entity.Player;
+
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
@@ -50,10 +52,14 @@ public class ShopObjectTypeArgument extends CommandArgument<ShopObjectType<?>> {
 			return Collections.emptyList();
 		}
 
+		Player senderPlayer = (input.getSender() instanceof Player) ? (Player) input.getSender() : null;
 		List<String> suggestions = new ArrayList<>();
 		String partialArg = StringUtils.normalize(argsReader.next());
 		for (ShopObjectType<?> shopObjectType : ShopkeepersPlugin.getInstance().getShopObjectTypeRegistry().getRegisteredTypes()) {
 			if (suggestions.size() >= MAX_SUGGESTIONS) break;
+			if (!shopObjectType.isEnabled()) continue;
+			if (senderPlayer != null && !shopObjectType.hasPermission(senderPlayer)) continue;
+
 			String displayName = shopObjectType.getDisplayName();
 			displayName = StringUtils.normalizeKeepCase(displayName);
 			String displayNameNorm = displayName.toLowerCase(Locale.ROOT);

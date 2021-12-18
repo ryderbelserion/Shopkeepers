@@ -9,6 +9,7 @@ Date format: (YYYY-MM-DD)
 * Added an editor option to toggle the saddle of horse shopkeepers on and off.
 * Data: The shopkeeper data version has changed from `1` to `2`.
 * Reduced the range at which shopkeeper mobs look at players from 12 to 6 blocks.
+* Command: The "/shopkeeper [shop-type] [object-type]" command no longer suggests completions for disabled shop and object types, or shop and object types for which the executing player does not have the usage permission.
 
 **Message changes:**  
 * Added `button-horse-saddle`.
