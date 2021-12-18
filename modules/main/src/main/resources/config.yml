@@ -395,6 +395,11 @@ next-page-item: WRITABLE_BOOK
 current-page-item: WRITABLE_BOOK
 trade-setup-item: PAPER
 
+# The item that players can rename and then use as a substitute for items they
+# don't have yet when they set up their trade offers.
+# Set this to AIR to disable the use of placeholder items.
+placeholder-item: NAME_TAG
+
 # The item used for the set-name button, and the naming item (if enabled).
 name-item: NAME_TAG
 
