@@ -218,7 +218,7 @@ public class Settings extends Config {
 	public static ItemData currentPageItem = new ItemData(Material.WRITABLE_BOOK);
 	public static ItemData tradeSetupItem = new ItemData(Material.PAPER);
 
-	public static ItemData placeholderItem = new ItemData(Material.NAME_TAG);
+	public static ItemData placeholderItem = new ItemData(Material.PAPER);
 
 	public static ItemData nameItem = new ItemData(Material.NAME_TAG);
 
