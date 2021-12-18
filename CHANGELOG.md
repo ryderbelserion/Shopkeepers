@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.14.1 (TBA)
 ### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
+* Reduced the range at which shopkeeper mobs look at players from 12 to 6 blocks.
 
 ## v2.14.0 (2021-12-17)
 ### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4

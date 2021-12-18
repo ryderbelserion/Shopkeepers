@@ -31,6 +31,7 @@ import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -80,7 +81,7 @@ public final class NMSHandler implements NMSCallProvider {
 			goalSelector.removeAllGoals();
 
 			// Add new goals:
-			goalSelector.addGoal(0, new LookAtPlayerGoal(mcMob, net.minecraft.world.entity.player.Player.class, 12.0F, 1.0F));
+			goalSelector.addGoal(0, new LookAtPlayerGoal(mcMob, net.minecraft.world.entity.player.Player.class, LivingEntityAI.LOOK_RANGE, 1.0F));
 
 			// Overwrite the target selector:
 			GoalSelector targetSelector = mcMob.targetSelector;

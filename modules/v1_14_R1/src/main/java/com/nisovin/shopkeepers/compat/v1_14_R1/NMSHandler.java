@@ -27,6 +27,7 @@ import org.bukkit.inventory.Merchant;
 import org.bukkit.inventory.MerchantInventory;
 
 import com.nisovin.shopkeepers.compat.api.NMSCallProvider;
+import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.logging.Log;
 
@@ -83,7 +84,7 @@ public final class NMSHandler implements NMSCallProvider {
 			goals_d.clear();
 
 			// Add new goals:
-			goals.a(0, new PathfinderGoalLookAtPlayer(mcInsentientEntity, EntityHuman.class, 12.0F, 1.0F));
+			goals.a(0, new PathfinderGoalLookAtPlayer(mcInsentientEntity, EntityHuman.class, LivingEntityAI.LOOK_RANGE, 1.0F));
 
 			// Overwrite the target selector:
 			Field targetsField = EntityInsentient.class.getDeclaredField("targetSelector");

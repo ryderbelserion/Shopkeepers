@@ -45,6 +45,11 @@ import com.nisovin.shopkeepers.util.timer.Timings;
 public class LivingEntityAI implements Listener {
 
 	/**
+	 * The range at which shopkeeper mobs look at players.
+	 */
+	public static final float LOOK_RANGE = 6.0F;
+
+	/**
 	 * Determines how often AI activations are rechecked (every X ticks).
 	 * <p>
 	 * We also separately react to player joins and teleports in order to quickly activate the AI of nearby shopkeepers
@@ -59,8 +64,8 @@ public class LivingEntityAI implements Listener {
 	/**
 	 * The range in chunks around players in which AI is active.
 	 * <p>
-	 * The look-at-players AI goal only targets players in 12 block radius, so we can limit the AI ticking to the direct
-	 * chunks around the player.
+	 * The look-at-players AI goal only targets players in a {@link #LOOK_RANGE} radius, so we can limit the AI ticking
+	 * to the direct chunks around the player.
 	 */
 	private static final int AI_ACTIVATION_CHUNK_RANGE = 1;
 	// Regarding gravity activation range:
