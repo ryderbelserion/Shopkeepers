@@ -20,7 +20,6 @@ public class PlaceholderItemTests extends AbstractBukkitTest {
 		testParsing(null, null);
 		testParsing(new ItemStack(Material.AIR), null);
 		testParsing(new ItemStack(Material.STONE), null);
-		testParsing(new ItemStack(Material.NAME_TAG), null);
 		testParsing(placeholderItem(null), null);
 		testParsing(placeholderItem(""), null);
 		testParsing(placeholderItem("bla"), null);

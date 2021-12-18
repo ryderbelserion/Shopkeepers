@@ -23,7 +23,7 @@ import com.nisovin.shopkeepers.util.inventory.PotionUtils;
  * The display name of the placeholder item specifies the substituted item type. Other properties of the substituted
  * item cannot be specified.
  */
-public class PlaceholderItems {
+public final class PlaceholderItems {
 
 	/**
 	 * Creates a placeholder item.
@@ -33,19 +33,23 @@ public class PlaceholderItems {
 	 * @return the placeholder item
 	 */
 	public static ItemStack createPlaceholderItem(String displayName) {
-		ItemStack item = new ItemStack(Material.NAME_TAG, 1);
+		ItemStack item = DerivedSettings.placeholderItemData.createItemStack();
 		ItemUtils.setDisplayName(item, displayName);
 		return item;
 	}
 
 	/**
-	 * Checks if the given {@link ItemStack} is of the type used by placeholder items (i.e. {@link Material#NAME_TAG}).
+	 * Checks if the given {@link ItemStack} is a placeholder item (i.e. matches
+	 * {@link DerivedSettings#placeholderItemData}).
+	 * <p>
+	 * This does not check if the given placeholder item specifies a {@link #isValidPlaceholderItem(ItemStack) valid
+	 * substituted item}.
 	 * 
 	 * @param itemStack
 	 *            the item stack
-	 * @return <code>true</code> if the item stack is of the type used by placeholder items
+	 * @return <code>true</code> if the item stack is a placeholder item
 	 */
-	public static boolean isPlaceholderItemType(@ReadOnly ItemStack itemStack) {
+	public static boolean isPlaceholderItem(@ReadOnly ItemStack itemStack) {
 		return DerivedSettings.placeholderItemData.matches(itemStack);
 	}
 
@@ -58,7 +62,7 @@ public class PlaceholderItems {
 	 * @return the substituted item stack, or <code>null</code> if the given item stack is not a valid placeholder
 	 */
 	public static ItemStack getSubstitutedItem(@ReadOnly ItemStack placeholderItem) {
-		if (!isPlaceholderItemType(placeholderItem)) return null;
+		if (!isPlaceholderItem(placeholderItem)) return null;
 
 		// Get the display name:
 		ItemMeta meta = placeholderItem.getItemMeta();
@@ -108,12 +112,12 @@ public class PlaceholderItems {
 	 *            the item stack
 	 * @return <code>true</code> if the item stack is a valid placeholder
 	 */
-	public static boolean isPlaceholderItem(@ReadOnly ItemStack itemStack) {
-		return getSubstitutedItem(itemStack) != null;
+	public static boolean isValidPlaceholderItem(@ReadOnly ItemStack itemStack) {
+		return (getSubstitutedItem(itemStack) != null);
 	}
 
 	/**
-	 * If the given item stack is a {@link #isPlaceholderItem(ItemStack) valid placeholder}, this returns the
+	 * If the given item stack is a {@link #isValidPlaceholderItem(ItemStack) valid placeholder}, this returns the
 	 * {@link #getSubstitutedItem(ItemStack) substituted item stack}. Otherwise, this returns the given
 	 * {@link ItemStack} itself.
 	 * 
@@ -128,7 +132,7 @@ public class PlaceholderItems {
 	}
 
 	/**
-	 * If the given item stack is a {@link #isPlaceholderItem(ItemStack) valid placeholder}, this returns the
+	 * If the given item stack is a {@link #isValidPlaceholderItem(ItemStack) valid placeholder}, this returns the
 	 * {@link #getSubstitutedItem(ItemStack) substituted item stack}. Otherwise, this returns the given
 	 * {@link UnmodifiableItemStack} itself.
 	 * 
