@@ -97,6 +97,8 @@ public class Messages extends Config {
 	public static List<String> buttonHorseColorLore = c(Arrays.asList("Changes the color", "of the horse"));
 	public static String buttonHorseStyle = c("&aChoose horse style");
 	public static List<String> buttonHorseStyleLore = c(Arrays.asList("Changes the coat pattern", "of the horse"));
+	public static String buttonHorseSaddle = c("&aToggle horse saddle");
+	public static List<String> buttonHorseSaddleLore = c(Arrays.asList("Toggles the saddle", "of the horse"));
 	public static String buttonHorseArmor = c("&aChoose horse armor");
 	public static List<String> buttonHorseArmorLore = c(Arrays.asList("Changes the armor", "of the horse"));
 	public static String buttonLlamaVariant = c("&aChoose llama variant");

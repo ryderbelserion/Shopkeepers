@@ -6,7 +6,13 @@ Date format: (YYYY-MM-DD)
 
 * Config: Added config option `placeholder-item` that allows changing the placeholder item (Thanks to oltdaniel, PR #762). It is also possible to disable placeholder items now by setting the item to AIR.
 * Config: Changed the default placeholder item type from `NAME_TAG`, which is difficult to obtain in vanilla Minecraft, to `PAPER`.
+* Added an editor option to toggle the saddle of horse shopkeepers on and off.
+* Data: The shopkeeper data version has changed from `1` to `2`.
 * Reduced the range at which shopkeeper mobs look at players from 12 to 6 blocks.
+
+**Message changes:**  
+* Added `button-horse-saddle`.
+* Added `button-horse-saddle-lore`.
 
 ## v2.14.0 (2021-12-17)
 ### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4

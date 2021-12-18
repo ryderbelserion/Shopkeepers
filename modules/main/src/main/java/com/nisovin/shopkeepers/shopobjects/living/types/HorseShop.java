@@ -25,6 +25,7 @@ import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.value.PropertyValue;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
+import com.nisovin.shopkeepers.util.data.serialization.java.BooleanSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.EnumSerializers;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.EnumUtils;
@@ -60,6 +61,11 @@ public class HorseShop extends BabyableShop<Horse> {
 			.defaultValue(Horse.Style.NONE)
 			.build();
 
+	public static final Property<Boolean> SADDLE = new BasicProperty<Boolean>()
+			.dataKeyAccessor("saddle", BooleanSerializers.LENIENT)
+			.defaultValue(false)
+			.build();
+
 	public static final Property<HorseArmor> ARMOR = new BasicProperty<HorseArmor>()
 			.dataKeyAccessor("armor", EnumSerializers.lenient(HorseArmor.class))
 			.nullable() // Null indicates 'no armor'
@@ -71,6 +77,9 @@ public class HorseShop extends BabyableShop<Horse> {
 			.build(properties);
 	private final PropertyValue<Horse.Style> styleProperty = new PropertyValue<>(STYLE)
 			.onValueChanged(this::applyStyle)
+			.build(properties);
+	private final PropertyValue<Boolean> saddleProperty = new PropertyValue<>(SADDLE)
+			.onValueChanged(this::applySaddle)
 			.build(properties);
 	private final PropertyValue<HorseArmor> armorProperty = new PropertyValue<>(ARMOR)
 			.onValueChanged(this::applyArmor)
@@ -86,6 +95,7 @@ public class HorseShop extends BabyableShop<Horse> {
 		super.load(shopObjectData);
 		colorProperty.load(shopObjectData);
 		styleProperty.load(shopObjectData);
+		saddleProperty.load(shopObjectData);
 		armorProperty.load(shopObjectData);
 	}
 
@@ -94,6 +104,7 @@ public class HorseShop extends BabyableShop<Horse> {
 		super.save(shopObjectData, saveAll);
 		colorProperty.save(shopObjectData);
 		styleProperty.save(shopObjectData);
+		saddleProperty.save(shopObjectData);
 		armorProperty.save(shopObjectData);
 	}
 
@@ -102,6 +113,7 @@ public class HorseShop extends BabyableShop<Horse> {
 		super.onSpawn();
 		this.applyColor();
 		this.applyStyle();
+		this.applySaddle();
 		this.applyArmor();
 	}
 
@@ -110,6 +122,7 @@ public class HorseShop extends BabyableShop<Horse> {
 		List<Button> editorButtons = super.createEditorButtons();
 		editorButtons.add(this.getColorEditorButton());
 		editorButtons.add(this.getStyleEditorButton());
+		editorButtons.add(this.getSaddleEditorButton());
 		editorButtons.add(this.getArmorEditorButton());
 		return editorButtons;
 	}
@@ -222,6 +235,47 @@ public class HorseShop extends BabyableShop<Horse> {
 			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
 				boolean backwards = clickEvent.isRightClick();
 				cycleStyle(backwards);
+				return true;
+			}
+		};
+	}
+
+	// SADDLE
+
+	public boolean hasSaddle() {
+		return saddleProperty.getValue();
+	}
+
+	public void setSaddle(boolean saddle) {
+		saddleProperty.setValue(saddle);
+	}
+
+	public void cycleSaddle() {
+		this.setSaddle(!this.hasSaddle());
+	}
+
+	private void applySaddle() {
+		Horse entity = this.getEntity();
+		if (entity == null) return; // Not spawned
+		entity.getInventory().setSaddle(this.hasSaddle() ? new ItemStack(Material.SADDLE) : null);
+	}
+
+	private ItemStack getSaddleEditorItem() {
+		ItemStack iconItem = new ItemStack(Material.SADDLE);
+		ItemUtils.setDisplayNameAndLore(iconItem, Messages.buttonHorseSaddle, Messages.buttonHorseSaddleLore);
+		return iconItem;
+	}
+
+	private Button getSaddleEditorButton() {
+		return new ShopkeeperActionButton() {
+			@Override
+			public ItemStack getIcon(EditorSession editorSession) {
+				return getSaddleEditorItem();
+			}
+
+			@Override
+			protected boolean runAction(EditorSession editorSession, InventoryClickEvent clickEvent) {
+				cycleSaddle();
 				return true;
 			}
 		};

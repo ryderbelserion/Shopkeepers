@@ -107,6 +107,10 @@ button-horse-style: "&aChoose horse style"
 button-horse-style-lore:
 - "Changes the coat pattern"
 - "of the horse"
+button-horse-saddle: "&aToggle horse saddle"
+button-horse-saddle-lore:
+- "Toggles the saddle"
+- "of the horse"
 button-horse-armor: "&aChoose horse armor"
 button-horse-armor-lore:
 - "Changes the armor"

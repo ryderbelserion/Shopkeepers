@@ -54,7 +54,7 @@ public final class DataVersion {
 	 * Changes to this version indicate that the data format of individual types of shopkeepers or shop objects might
 	 * have changed. But they do not trigger a full save of all shopkeepers.
 	 */
-	private static final int SHOPKEEPER_DATA_VERSION = 1;
+	private static final int SHOPKEEPER_DATA_VERSION = 2;
 
 	private static DataVersion current = null;
 

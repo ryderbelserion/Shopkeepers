@@ -102,6 +102,10 @@ button-horse-style: "&aFellmuster ändern"
 button-horse-style-lore:
 - "Ändert das Fellmuster"
 - "des Pferdes"
+button-horse-saddle: "&aSattel umschalten"
+button-horse-saddle-lore:
+- "Schaltet den Sattel"
+- "an oder aus"
 button-horse-armor: "&aPferderüstung ändern"
 button-horse-armor-lore:
 - "Ändert die Pferderüstung"
