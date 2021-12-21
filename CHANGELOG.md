@@ -18,6 +18,7 @@ Date format: (YYYY-MM-DD)
 * We log a warning now whenever a shopkeeper mob has been removed due to the world's difficulty being set to peaceful. This warning is only logged once per affected shopkeeper and then skipped until the difficulty has changed.
 * It is no longer possible to create mob shopkeepers when they would not be able to spawn due to the difficulty being set to peaceful.
 * Improved the feedback messages that are sent when a shopkeeper cannot be created at a specific location: The previously used generic `shop-create-fail` message was replaced with dedicated messages for the different reasons for why the shopkeeper cannot be created.
+* Config: Added setting `invert-shop-type-and-object-type-selection` (default: `false`), which allows to invert how the shop type and the shop object type are selected with the shop creation item. This might for example be useful for servers that disable all shop types but one.
 
 ** Internal changes:**  
 * Refactors related to the deletion of shopkeepers that are owned by inactive players.

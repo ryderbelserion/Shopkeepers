@@ -146,17 +146,21 @@ disable-inventory-verification: false
 # Shop Creation and Removal
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
-# The item used to create player shops.
+# The item that is used to create player shops.
 # Use the '/shopkeeper give' command to give yourself this item in-game.
 shop-creation-item:
   type: VILLAGER_SPAWN_EGG
   display-name: "&aShopkeeper"
 
-# Whether to prevent normal usage of the shop-creation item. Players with the
+# Whether to prevent normal usage of the shop creation item. Players with the
 # bypass permission (usually admins) can bypass this.
 prevent-shop-creation-item-regular-usage: true
+# By default, the shop type is selected by right-clicking while holding the
+# shop creation item in hand, and the shop object type is selected by sneaking
+# and right-clicking. If this setting is enabled, these controls are inverted.
+invert-shop-type-and-object-type-selection: false
 # Whether deleting (or destroying) a player shopkeeper returns (drops) the
-# shop-creation item.
+# shop creation item.
 deleting-player-shop-returns-creation-item: false
 
 # Whether to allow creating player shops with the /shopkeeper command.

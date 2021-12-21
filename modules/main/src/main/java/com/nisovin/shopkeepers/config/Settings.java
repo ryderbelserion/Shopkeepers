@@ -84,7 +84,9 @@ public class Settings extends Config {
 	 * Shop Creation (and removal)
 	 */
 	public static ItemData shopCreationItem = new ItemData(Material.VILLAGER_SPAWN_EGG, c("&aShopkeeper"), null);
+
 	public static boolean preventShopCreationItemRegularUsage = true;
+	public static boolean invertShopTypeAndObjectTypeSelection = false;
 	public static boolean deletingPlayerShopReturnsCreationItem = false;
 
 	public static boolean createPlayerShopWithCommand = false;
