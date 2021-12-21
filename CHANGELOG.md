@@ -10,6 +10,14 @@ Date format: (YYYY-MM-DD)
 * Data: The shopkeeper data version has changed from `1` to `2`.
 * Reduced the range at which shopkeeper mobs look at players from 12 to 6 blocks.
 * Command: The "/shopkeeper [shop-type] [object-type]" command no longer suggests completions for disabled shop and object types, or shop and object types for which the executing player does not have the usage permission.
+* Improvements related to the deletion of shopkeepers that are owned by inactive players:
+  * We now log how many days ago the players were last seen when we delete their shops.
+  * Fixed: If the plugin is reloaded, and the still pending asynchronous task that checks for inactive players is somehow taking longer than 10 seconds to complete, and the `player-shopkeeper-inactive-days` setting is changed to `0` (i.e. disabled) during the reload, there was a chance for shop owners to be incorrectly considered 'inactive' and their shopkeepers deleted.
+  * Related to that, this asynchronous task also aborts itself now when it detects that it has been cancelled, which happens when the plugin is disabled.
+  * Fixed: When we delete the shops of an inactive player, we now ignore any shops that have already been removed for other reasons in the meantime.
+
+** Internal changes:**  
+* Refactors related to the deletion of shopkeepers that are owned by inactive players.
 
 **Message changes:**  
 * Added `button-horse-saddle`.

@@ -1,6 +1,7 @@
 package com.nisovin.shopkeepers.playershops;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.playershops.inactivity.PlayerInactivity;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**

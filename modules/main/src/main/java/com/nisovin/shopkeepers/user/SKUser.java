@@ -29,6 +29,7 @@ public final class SKUser implements User {
 	public static User of(UUID uniqueId, String lastKnownName) {
 		return cache.compute(uniqueId, (uuid, oldUser) -> {
 			if (oldUser != null && oldUser.getLastKnownName().equals(lastKnownName)) {
+				assert oldUser.getUniqueId().equals(uniqueId);
 				return oldUser;
 			} else {
 				return new SKUser(uniqueId, lastKnownName);
