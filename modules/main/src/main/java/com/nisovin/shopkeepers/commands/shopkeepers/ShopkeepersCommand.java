@@ -129,7 +129,7 @@ public class ShopkeepersCommand extends BaseCommand {
 
 		// Check for valid targeted block:
 		if (targetBlockInfo == null) {
-			TextUtils.sendMessage(player, Messages.shopCreateFail);
+			TextUtils.sendMessage(player, Messages.mustTargetBlock);
 			return;
 		}
 		Block targetBlock = targetBlockInfo.getHitBlock();

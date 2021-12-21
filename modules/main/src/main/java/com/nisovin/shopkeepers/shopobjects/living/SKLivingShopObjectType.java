@@ -2,6 +2,9 @@ package com.nisovin.shopkeepers.shopobjects.living;
 
 import java.util.List;
 
+import org.bukkit.Difficulty;
+import org.bukkit.Location;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 
@@ -11,7 +14,9 @@ import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObjectType;
+import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 
@@ -72,6 +77,23 @@ public final class SKLivingShopObjectType<T extends SKLivingShopObject<?>> exten
 	public boolean mustDespawnDuringWorldSave() {
 		// Spawned entities are non-persistent and therefore already skipped during world saves:
 		return false;
+	}
+
+	@Override
+	public boolean validateSpawnLocation(Player creator, Location spawnLocation, BlockFace targetedBlockFace) {
+		if (!super.validateSpawnLocation(creator, spawnLocation, targetedBlockFace)) {
+			return false;
+		}
+
+		// Check if the world's difficulty would prevent the mob from spawning:
+		if (EntityUtils.isRemovedOnPeacefulDifficulty(entityType)
+				&& spawnLocation.getWorld().getDifficulty() == Difficulty.PEACEFUL) {
+			if (creator != null) {
+				TextUtils.sendMessage(creator, Messages.mobCannotSpawnOnPeacefulDifficulty);
+			}
+			return false;
+		}
+		return true;
 	}
 
 	@Override

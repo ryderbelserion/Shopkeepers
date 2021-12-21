@@ -75,7 +75,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		// Check WorldGuard:
 		if (Settings.enableWorldGuardRestrictions) {
 			if (!WorldGuardDependency.isShopAllowed(creator, spawnLocation)) {
-				TextUtils.sendMessage(creator, Messages.shopCreateFail);
+				TextUtils.sendMessage(creator, Messages.restrictedArea);
 				return false;
 			}
 		}
@@ -83,7 +83,7 @@ public abstract class AbstractPlayerShopType<T extends AbstractPlayerShopkeeper>
 		// Check Towny:
 		if (Settings.enableTownyRestrictions) {
 			if (!TownyDependency.isCommercialArea(spawnLocation)) {
-				TextUtils.sendMessage(creator, Messages.shopCreateFail);
+				TextUtils.sendMessage(creator, Messages.restrictedArea);
 				return false;
 			}
 		}

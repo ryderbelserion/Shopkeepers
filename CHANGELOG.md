@@ -16,13 +16,25 @@ Date format: (YYYY-MM-DD)
   * Related to that, this asynchronous task also aborts itself now when it detects that it has been cancelled, which happens when the plugin is disabled.
   * Fixed: When we delete the shops of an inactive player, we now ignore any shops that have already been removed for other reasons in the meantime.
 * We log a warning now whenever a shopkeeper mob has been removed due to the world's difficulty being set to peaceful. This warning is only logged once per affected shopkeeper and then skipped until the difficulty has changed.
+* It is no longer possible to create mob shopkeepers when they would not be able to spawn due to the difficulty being set to peaceful.
+* Improved the feedback messages that are sent when a shopkeeper cannot be created at a specific location: The previously used generic `shop-create-fail` message was replaced with dedicated messages for the different reasons for why the shopkeeper cannot be created.
 
 ** Internal changes:**  
 * Refactors related to the deletion of shopkeepers that are owned by inactive players.
+* Replaced ShopObjectType#isValidSpawnLocation with AbstractShopObjectType#validateSpawnLocation, which additionally sends feedback to the player who is trying to create the shopkeeper.
 
 **Message changes:**  
+* Slightly changed the default `must-target-container` message.
+* Removed `shop-create-fail`.
 * Added `button-horse-saddle`.
 * Added `button-horse-saddle-lore`.
+* Added `must-target-block`.
+* Added `missing-spawn-location`.
+* Added `spawn-block-not-empty`.
+* Added `invalid-spawn-block-face`.
+* Added `mob-cannot-spawn-on-peaceful-difficulty`.
+* Added `restricted-area`.
+* Added `location-already-in-use`.
 
 ## v2.14.0 (2021-12-17)
 ### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4

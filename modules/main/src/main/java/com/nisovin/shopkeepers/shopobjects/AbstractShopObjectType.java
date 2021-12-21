@@ -74,15 +74,48 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 	}
 
 	@Override
-	public boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
-		// TODO Check actual object size?
-		if (spawnLocation == null || spawnLocation.getWorld() == null) return false;
+	public final boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
+		return this.validateSpawnLocation(null, spawnLocation, targetedBlockFace);
+	}
+
+	/**
+	 * Checks if this type of shop object can be spawned at the specified location.
+	 * <p>
+	 * Unlike {@link #isValidSpawnLocation(Location, BlockFace)}, this may send feedback to the given shop creator (if a
+	 * shop creator is available).
+	 * 
+	 * @param creator
+	 *            the shop creator, can be <code>null</code>
+	 * @param spawnLocation
+	 *            the spawn location, can be <code>null</code>
+	 * @param targetedBlockFace
+	 *            the block face against which to spawn the object, or <code>null</code> if unknown
+	 * @return <code>true</code> if the shop object can be spawned at the specified location
+	 */
+	public boolean validateSpawnLocation(Player creator, Location spawnLocation, BlockFace targetedBlockFace) {
+		// TODO Check the actual object size?
+		if (spawnLocation == null || spawnLocation.getWorld() == null) {
+			if (creator != null) {
+				TextUtils.sendMessage(creator, Messages.missingSpawnLocation);
+			}
+			return false;
+		}
+
 		Block spawnBlock = spawnLocation.getBlock();
-		if (!spawnBlock.isPassable()) return false;
+		if (!spawnBlock.isPassable()) {
+			if (creator != null) {
+				TextUtils.sendMessage(creator, Messages.spawnBlockNotEmpty);
+			}
+			return false;
+		}
+
 		if (targetedBlockFace != null) {
 			// TODO DOWN might be a valid block face for some shop types (in the future). However, it certainly is not
 			// for sign and entity shops (the current by default available types).
 			if (targetedBlockFace == BlockFace.DOWN || !BlockFaceUtils.isBlockSide(targetedBlockFace)) {
+				if (creator != null) {
+					TextUtils.sendMessage(creator, Messages.invalidSpawnBlockFace);
+				}
 				return false;
 			}
 		}

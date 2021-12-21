@@ -238,10 +238,18 @@ button-hire-lore:
 trading-title-prefix: "&2"
 trading-title-default: "Shopkeeper"
 
+must-target-block: "&7You must look at a block to place the shopkeeper."
+missing-spawn-location: "&7You must specify a spawn location for this type of shop."
+spawn-block-not-empty: "&7The spawn location must be empty."
+invalid-spawn-block-face: "&7The shopkeeper cannot be placed on this side of the block."
+mob-cannot-spawn-on-peaceful-difficulty: "&7The selected mob type cannot spawn on peaceful difficulty."
+restricted-area: "&7You cannot create a shopkeeper in this area."
+location-already-in-use: "&7This location is already used by another shopkeeper."
+
 container-selected: "&aContainer selected! Right-click a block to place your shopkeeper."
 unsupported-container: "&7This type of container cannot be used for shops."
 must-select-container: "&7You must right-click a container before placing your shopkeeper."
-must-target-container: "&7You must target a container to place this type of shop."
+must-target-container: "&7You must look at a container to place this type of shop."
 invalid-container: "&7The selected block is not a valid container!"
 container-too-far-away: "&7The shopkeeper's container is too far away!"
 container-not-placed: "&7You must select a container you have recently placed!"
@@ -249,7 +257,6 @@ container-already-in-use: "&7Another shopkeeper is already using the selected co
 no-container-access: "&7You cannot access the selected container!"
 too-many-shops: "&7You have already reached the limit of how many shops you can own!"
 no-player-shops-via-command: "&7Player shops can only be created via the shop creation item!"
-shop-create-fail: "&7You cannot create a shopkeeper there."
 
 type-new-name: "&aPlease enter the shop's new name in chat.\n  &aEnter a dash (-) to remove the current name."
 name-set: "&aThe shop's name has been set to '&e{name}&a'!"

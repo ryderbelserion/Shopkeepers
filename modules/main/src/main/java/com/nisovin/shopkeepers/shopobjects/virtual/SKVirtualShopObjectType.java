@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.virtual.VirtualShopObjectType;
@@ -36,7 +37,7 @@ public final class SKVirtualShopObjectType extends AbstractShopObjectType<SKVirt
 	}
 
 	@Override
-	public boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
+	public boolean validateSpawnLocation(Player creator, Location spawnLocation, BlockFace targetedBlockFace) {
 		return true; // Does not use any spawn location
 	}
 

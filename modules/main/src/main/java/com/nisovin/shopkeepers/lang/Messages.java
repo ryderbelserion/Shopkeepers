@@ -173,10 +173,18 @@ public class Messages extends Config {
 	public static String tradingTitlePrefix = c("&2");
 	public static String tradingTitleDefault = c("Shopkeeper");
 
+	public static Text mustTargetBlock = Text.parse("&7You must look at a block to place the shopkeeper.");
+	public static Text missingSpawnLocation = Text.parse("&7You must specify a spawn location for this type of shop.");
+	public static Text spawnBlockNotEmpty = Text.parse("&7The spawn location must be empty.");
+	public static Text invalidSpawnBlockFace = Text.parse("&7The shopkeeper cannot be placed on this side of the block.");
+	public static Text mobCannotSpawnOnPeacefulDifficulty = Text.parse("&7The selected mob type cannot spawn on peaceful difficulty.");
+	public static Text restrictedArea = Text.parse("&7You cannot create a shopkeeper in this area.");
+	public static Text locationAlreadyInUse = Text.parse("&7This location is already used by another shopkeeper.");
+
 	public static Text containerSelected = Text.parse("&aContainer selected! Right-click a block to place your shopkeeper.");
 	public static Text unsupportedContainer = Text.parse("&7This type of container cannot be used for shops.");
 	public static Text mustSelectContainer = Text.parse("&7You must right-click a container before placing your shopkeeper.");
-	public static Text mustTargetContainer = Text.parse("&7You must target a container to place this type of shop.");
+	public static Text mustTargetContainer = Text.parse("&7You must look at a container to place this type of shop.");
 	public static Text invalidContainer = Text.parse("&7The selected block is not a valid container!");
 	public static Text containerTooFarAway = Text.parse("&7The shopkeeper's container is too far away!");
 	public static Text containerNotPlaced = Text.parse("&7You must select a container you have recently placed!");
@@ -184,7 +192,6 @@ public class Messages extends Config {
 	public static Text noContainerAccess = Text.parse("&7You cannot access the selected container!");
 	public static Text tooManyShops = Text.parse("&7You have already reached the limit of how many shops you can own!");
 	public static Text noPlayerShopsViaCommand = Text.parse("&7Player shops can only be created via the shop creation item!");
-	public static Text shopCreateFail = Text.parse("&7You cannot create a shopkeeper there.");
 
 	public static Text typeNewName = Text.parse("&aPlease enter the shop's new name in chat.\n"
 			+ "  &aEnter a dash (-) to remove the current name.");

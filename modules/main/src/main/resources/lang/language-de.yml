@@ -239,6 +239,14 @@ button-hire-lore:
 trading-title-prefix: "&2"
 trading-title-default: "Händler"
 
+must-target-block: "&7Du musst einen Block anvisieren, um den Shop zu platzieren."
+missing-spawn-location: "&7Für diese Art von Shop musst du einen Spawn-Ort angeben."
+spawn-block-not-empty: "&7Der Spawn-Ort muss leer sein."
+invalid-spawn-block-face: "&7Der Shop kann nicht auf dieser Seite des Blocks platziert werden."
+mob-cannot-spawn-on-peaceful-difficulty: "&7Der gewählte Mob-Typ kann bei friedlichem Schwierigkeitsgrad nicht spawnen."
+restricted-area: "&7Du kannst in dieser Gegend keinen Shop erstellen."
+location-already-in-use: "&7An diesem Ort befindet sich bereits ein anderer Shop."
+
 container-selected:  "&aBehälter ausgewählt! Klicke mit rechts auf einen Block, um den Shop zu platzieren."
 unsupported-container: "&7Diese Art von Behälter kann nicht für Shops benutzt werden."
 must-select-container: "&7Du musst zuerst einen Behälter mit rechts anklicken, bevor du den Shop platzieren kannst."
@@ -250,7 +258,6 @@ container-already-in-use: "&7Ein anderer Shop benutzt bereits den ausgewählten 
 no-container-access: "&7Du hast keinen Zugriff auf den ausgewählten Behälter!"
 too-many-shops: "&7Du hast bereits das Limit an Shops erreicht, die du besitzen kannst!"
 no-player-shops-via-command: "&7Spieler-Shops können nur mit dem Shop-Erstellungs Item erzeugt werden!"
-shop-create-fail: "&7Du kannst dort keinen Shop erstellen."
 
 type-new-name: "&aBitte gib den neuen Namen des Shops im Chat ein.\n  &aEin Minus (-) entfernt den aktuellen Namen."
 name-set: "&aDer Name des Shops wurde auf '&e{name}&a' gesetzt!"

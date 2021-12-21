@@ -4,6 +4,7 @@ import java.util.Collections;
 
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Player;
 
 import com.nisovin.shopkeepers.api.shopkeeper.ShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObjectType;
@@ -11,6 +12,7 @@ import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopobjects.block.AbstractBlockShopObjectType;
+import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 
 public final class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSignShopObject> implements SignShopObjectType<SKSignShopObject> {
 
@@ -37,11 +39,28 @@ public final class SKSignShopObjectType extends AbstractBlockShopObjectType<SKSi
 	}
 
 	@Override
-	public boolean isValidSpawnLocation(Location spawnLocation, BlockFace targetedBlockFace) {
-		// Block has to be empty, and limit to wall sign faces if sign posts are disabled:
-		return spawnLocation.getBlock().isEmpty()
-				&& (Settings.enableSignPostShops || targetedBlockFace != BlockFace.UP)
-				&& super.isValidSpawnLocation(spawnLocation, targetedBlockFace);
+	public boolean validateSpawnLocation(Player creator, Location spawnLocation, BlockFace targetedBlockFace) {
+		if (!super.validateSpawnLocation(creator, spawnLocation, targetedBlockFace)) {
+			return false;
+		}
+
+		// Block has to be empty:
+		if (!spawnLocation.getBlock().isEmpty()) {
+			if (creator != null) {
+				TextUtils.sendMessage(creator, Messages.spawnBlockNotEmpty);
+			}
+			return false;
+		}
+
+		// If sign posts are disabled, only wall sign block faces are allowed:
+		// The super implementation already limits the block face to block sides, and already excludes BlockFace#DOWN.
+		if (targetedBlockFace == BlockFace.UP && !Settings.enableSignPostShops) {
+			if (creator != null) {
+				TextUtils.sendMessage(creator, Messages.invalidSpawnBlockFace);
+			}
+			return false;
+		}
+		return true;
 	}
 
 	@Override

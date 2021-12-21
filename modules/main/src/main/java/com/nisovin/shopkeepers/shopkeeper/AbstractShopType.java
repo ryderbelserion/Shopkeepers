@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperCreateException;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.lang.Messages;
+import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -154,6 +155,12 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		ShopType<?> shopType = shopCreationData.getShopType();
 		Validate.isTrue(this == shopType, () -> "ShopType of shopCreationData is not of type "
 				+ this.getClass().getName() + ", but: " + shopType.getClass().getName());
+
+		ShopObjectType<?> shopObjectType = shopCreationData.getShopObjectType();
+		Validate.isTrue(shopObjectType instanceof AbstractShopObjectType,
+				() -> "ShopObjectType of shopCreationData is not of type "
+						+ AbstractShopObjectType.class.getSimpleName()
+						+ ", but: " + shopType.getClass().getName());
 	}
 
 	// Handles the shopkeeper creation by players.
@@ -166,8 +173,8 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		Player creator = shopCreationData.getCreator();
 		Validate.notNull(creator, "Creator of shopCreationData is null");
 
-		ShopType<?> shopType = shopCreationData.getShopType();
-		ShopObjectType<?> shopObjectType = shopCreationData.getShopObjectType();
+		AbstractShopType<?> shopType = this;
+		AbstractShopObjectType<?> shopObjectType = (AbstractShopObjectType<?>) shopCreationData.getShopObjectType();
 
 		// Can the selected shop type be used?
 		if (!shopType.hasPermission(creator)) {
@@ -192,16 +199,15 @@ public abstract class AbstractShopType<T extends AbstractShopkeeper> extends Abs
 		Location spawnLocation = shopCreationData.getSpawnLocation(); // Can be null for virtual shops
 		BlockFace targetedBlockFace = shopCreationData.getTargetedBlockFace(); // Can be null
 
-		// Check if the shop can be placed there (enough space, etc.):
-		if (!shopObjectType.isValidSpawnLocation(spawnLocation, targetedBlockFace)) {
-			// Invalid spawn location or targeted block face:
-			TextUtils.sendMessage(creator, Messages.shopCreateFail);
+		// Validate the spawn location:
+		// This is also expected to send feedback to the shop creator if necessary.
+		if (!shopObjectType.validateSpawnLocation(creator, spawnLocation, targetedBlockFace)) {
 			return null;
 		}
 
+		// Check if the location is already used by another shopkeeper:
 		if (spawnLocation != null && !shopkeeperRegistry.getShopkeepersAtLocation(spawnLocation).isEmpty()) {
-			// There is already a shopkeeper at that location:
-			TextUtils.sendMessage(creator, Messages.shopCreateFail);
+			TextUtils.sendMessage(creator, Messages.locationAlreadyInUse);
 			return null;
 		}
 
