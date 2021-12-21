@@ -15,6 +15,7 @@ Date format: (YYYY-MM-DD)
   * Fixed: If the plugin is reloaded, and the still pending asynchronous task that checks for inactive players is somehow taking longer than 10 seconds to complete, and the `player-shopkeeper-inactive-days` setting is changed to `0` (i.e. disabled) during the reload, there was a chance for shop owners to be incorrectly considered 'inactive' and their shopkeepers deleted.
   * Related to that, this asynchronous task also aborts itself now when it detects that it has been cancelled, which happens when the plugin is disabled.
   * Fixed: When we delete the shops of an inactive player, we now ignore any shops that have already been removed for other reasons in the meantime.
+* We log a warning now whenever a shopkeeper mob has been removed due to the world's difficulty being set to peaceful. This warning is only logged once per affected shopkeeper and then skipped until the difficulty has changed.
 
 ** Internal changes:**  
 * Refactors related to the deletion of shopkeepers that are owned by inactive players.

@@ -9,12 +9,14 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 import org.bukkit.Chunk;
+import org.bukkit.Difficulty;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
 import org.bukkit.util.Vector;
@@ -47,6 +49,33 @@ public final class EntityUtils {
 			return LAVA;
 		default:
 			return Collections.emptySet();
+		}
+	}
+
+	/**
+	 * Checks if entities of the given type may in some circumstances despawn when the world's difficulty is set to
+	 * {@link Difficulty#PEACEFUL}.
+	 * <p>
+	 * This does not take any entity instance specific conditions into account. For example, when the difficulty is set
+	 * to peaceful, slimes only despawn if their size is greater than <code>0</code> (<code>1</code> in Bukkit). This
+	 * method does not take these aspects into account and instead returns <code>true</code> for slimes.
+	 * 
+	 * @param entityType
+	 *            the entity type, not <code>null</code>
+	 * @return <code>true</code> if entities of the given type are in some circumstances despawned due to the world's
+	 *         difficulty being set to peaceful
+	 */
+	public static boolean isRemovedOnPeacefulDifficulty(EntityType entityType) {
+		assert entityType != null;
+		switch (entityType.name()) { // TODO Replace with enum constants once we only support MC 1.16+
+		case "PIGLIN":
+			return false;
+		case "SLIME":
+		case "GHAST":
+		case "PHANTOM":
+			return true;
+		default:
+			return Monster.class.isAssignableFrom(entityType.getEntityClass());
 		}
 	}
 

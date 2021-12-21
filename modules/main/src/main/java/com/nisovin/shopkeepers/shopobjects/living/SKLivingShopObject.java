@@ -3,7 +3,9 @@ package com.nisovin.shopkeepers.shopobjects.living;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
+import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -72,6 +74,7 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	// Initial threshold between [1, CHECK_PERIOD_SECONDS] for load balancing:
 	private final int checkingOffset = nextCheckingOffset.getAndIncrement();
 	private final RateLimiter checkLimiter = new RateLimiter(CHECK_PERIOD_SECONDS, checkingOffset);
+	private boolean skipRespawnAttemptsIfPeaceful = false;
 
 	protected SKLivingShopObject(	LivingShops livingShops, SKLivingShopObjectType<?> livingObjectType,
 									AbstractShopkeeper shopkeeper, ShopCreationData creationData) {
@@ -284,9 +287,10 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			// Apply sub-type:
 			this.onSpawn();
 
-			// Reset respawn attempts counter and tick rate:
+			// Reset all state related to respawn throttling:
 			respawnAttempts = 0;
 			this.resetTickRate();
+			skipRespawnAttemptsIfPeaceful = false;
 
 			// Inform about the object id change:
 			this.onIdChanged();
@@ -454,18 +458,54 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	// True if the entity was respawned.
 	private boolean respawnInactiveEntity() {
 		assert !this.isActive();
-		Log.debug(() -> shopkeeper.getLocatedLogPrefix() + "Entity is missing, attempting respawn.");
-		if (entity != null) {
-			if (ChunkCoords.isSameChunk(shopkeeper.getLocation(), entity.getLocation())) {
-				// The chunk was silently unloaded before:
-				Log.debug(
-						() -> "  Chunk got silently unloaded or mob got removed! (dead: " + entity.isDead() + ", valid: "
-								+ entity.isValid() + ", chunk loaded: " + ChunkCoords.isChunkLoaded(entity.getLocation()) + ")"
-				);
+		if (skipRespawnAttemptsIfPeaceful) {
+			Location shopkeeperLocation = shopkeeper.getLocation(); // Null if the world is not loaded
+			if (shopkeeperLocation != null && shopkeeperLocation.getWorld().getDifficulty() == Difficulty.PEACEFUL) {
+				Log.debug(DebugOptions.regularTickActivities, () -> shopkeeper.getLocatedLogPrefix()
+						+ this.getEntityType() + " is missing. Skipping respawn attempt due to peaceful difficulty.");
+				return false;
+			} else {
+				skipRespawnAttemptsIfPeaceful = false;
 			}
+		}
+		assert !skipRespawnAttemptsIfPeaceful;
+
+		Supplier<String> additionalDebugInfo = null;
+		if (entity != null) {
+			Location entityLocation = entity.getLocation();
+			if (ChunkCoords.isSameChunk(shopkeeper.getLocation(), entityLocation)) {
+				// Check if the entity was removed due to the world's difficulty:
+				if (entity.isDead()
+						&& entityLocation.getWorld().getDifficulty() == Difficulty.PEACEFUL
+						&& EntityUtils.isRemovedOnPeacefulDifficulty(this.getEntityType())) {
+					skipRespawnAttemptsIfPeaceful = true;
+					// This is a warning in order to inform server admins about the issue right away.
+					// This is only logged once per affected shopkeeper and then skipped until the difficulty is
+					// changed.
+					Log.warning(shopkeeper.getLocatedLogPrefix() + this.getEntityType()
+							+ " was removed due to the world's difficulty being set to peaceful."
+							+ " Respawn attempts are skipped until the difficulty is changed.");
+					// No return here because we still need to clean up the old entity.
+				} else {
+					// The entity has been removed (e.g. by another plugin), or the chunk silently unloaded (without a
+					// corresponding ChunkUnloadEvent):
+					additionalDebugInfo = () -> "  Mob was removed (maybe by another plugin), or the chunk silently unloaded! (dead: "
+							+ entity.isDead() + ", valid: " + entity.isValid() + ", chunk loaded: "
+							+ ChunkCoords.isChunkLoaded(entityLocation) + ")";
+				}
+			} // Else: The entity might have moved into a chunk that was then unloaded.
 
 			// Despawn (i.e. cleanup) the previously spawned but no longer active entity:
 			this.despawn();
+
+			if (skipRespawnAttemptsIfPeaceful) {
+				return false;
+			}
+		}
+
+		Log.debug(() -> shopkeeper.getLocatedLogPrefix() + this.getEntityType() + " is missing. Attempting respawn.");
+		if (additionalDebugInfo != null) {
+			Log.debug(additionalDebugInfo);
 		}
 
 		boolean spawned = this.spawn(); // This will load the chunk if necessary
