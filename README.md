@@ -8,12 +8,12 @@ Shopkeepers [![Build Status](https://github.com/Shopkeepers/Shopkeepers/actions/
 Shopkeepers is a Bukkit/[Spigot](https://www.spigotmc.org/wiki/spigot/) plugin that allows you to set up custom villager shopkeepers that sell exactly what you want them to sell and for what price. 
 You can set up admin shops, which have infinite supply, and you can also set up player shops, which pull supply from a container.
 
-**BukkitDev Page**: https://dev.bukkit.org/projects/shopkeepers  
-**Spigot Page**: https://www.spigotmc.org/resources/shopkeepers.80756/  
+**BukkitDev**: https://dev.bukkit.org/projects/shopkeepers  
+**Spigot**: https://www.spigotmc.org/resources/shopkeepers.80756/  
 **Wiki**: https://github.com/Shopkeepers/Shopkeepers-Wiki/wiki  
 **Language Files**: https://github.com/Shopkeepers/Language-Files/  
-**Issue Tracker**: https://github.com/Shopkeepers/Shopkeepers/issues  
-**Discord Server**: https://discord.gg/d9NKd5z  
+**Issues**: https://github.com/Shopkeepers/Shopkeepers/issues  
+**Discord**: https://discord.gg/d9NKd5z  
 **Source code**: https://github.com/Shopkeepers/Shopkeepers/  
 
 Maven repository for releases: https://nexus.lichtspiele.org/repository/releases/  
