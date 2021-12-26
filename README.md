@@ -11,7 +11,7 @@ You can set up admin shops, which have infinite supply, and you can also set up 
 **BukkitDev Page**: https://dev.bukkit.org/projects/shopkeepers  
 **Spigot Page**: https://www.spigotmc.org/resources/shopkeepers.80756/  
 **Wiki**: https://github.com/Shopkeepers/Shopkeepers-Wiki/wiki  
-**Translations** : https://github.com/Shopkeepers/Translations/  
+**Language Files**: https://github.com/Shopkeepers/Language-Files/  
 **Issue Tracker**: https://github.com/Shopkeepers/Shopkeepers/issues  
 **Discord Server**: https://discord.gg/d9NKd5z  
 **Source code**: https://github.com/Shopkeepers/Shopkeepers/  

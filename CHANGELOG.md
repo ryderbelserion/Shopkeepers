@@ -4,6 +4,7 @@ Date format: (YYYY-MM-DD)
 ## v2.14.1 (TBA)
 ### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
+* Config: The translations repository has been renamed and is now located at `https://github.com/Shopkeepers/Language-Files`.
 * Config: Added config option `placeholder-item` that allows changing the placeholder item (Thanks to oltdaniel, PR #762). It is also possible to disable placeholder items now by setting the item to AIR.
 * Config: Changed the default placeholder item type from `NAME_TAG`, which is difficult to obtain in vanilla Minecraft, to `PAPER`.
 * Added an editor option to toggle the saddle of horse shopkeepers on and off.
