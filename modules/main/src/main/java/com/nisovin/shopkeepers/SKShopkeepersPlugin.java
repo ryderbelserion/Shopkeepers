@@ -265,9 +265,15 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 		// Test server assumptions:
 		if (!ServerAssumptionsTest.run()) {
-			Log.severe("Server incompatibility detected! Disabling the plugin!");
-			this.setEnabled(false); // Also calls onDisable
-			return;
+			if (Settings.ignoreFailedServerAssumptionTests) {
+				Log.severe("Server incompatibility detected! But we continue to enable the plugin anyway,"
+						+ " because setting 'ignore-failed-server-assumption-tests' is enabled."
+						+ " Do not expect support for problems you encounter while running in this mode!");
+			} else {
+				Log.severe("Server incompatibility detected! Disabling the plugin!");
+				this.setEnabled(false); // Also calls onDisable
+				return;
+			}
 		}
 
 		// Register defaults (if not already set up during onLoad):

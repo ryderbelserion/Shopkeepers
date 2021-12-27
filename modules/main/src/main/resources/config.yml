@@ -98,6 +98,21 @@ convert-player-items-exceptions: []
 # Plugin Compatibility
 # *~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~*
 
+# During start-up, the plugin performs some basic checks to verify that certain
+# aspects of the server implementation work as expected. For example, one of
+# the tested aspects is that the comparison of item stacks works correctly,
+# which is quite essential for an item-based trading plugin such as
+# Shopkeepers. If any of these tests fail, the plugin disables itself to avoid
+# problems that can otherwise arise later.
+# However, even if one of this tests fails, the plugin might still be usable to
+# some degree. For example, an issue with the item stack comparisons might only
+# affect specific kinds of item stacks.
+# If you want to take the risk and try running the plugin anyway, even though a
+# potential problem has been detected, you can enable this setting. However, do
+# not expect any support when you subsequently encounter problems while this
+# setting is enabled, or has been enabled in the past.
+ignore-failed-server-assumption-tests: false
+
 # If enabled, Shopkeepers tries to bypass other plugins which deny mob spawning
 # (ex. land protection plugins).
 bypass-spawn-blocking: true
