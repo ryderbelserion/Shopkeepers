@@ -68,16 +68,16 @@ public class SKVirtualShopObject extends AbstractShopObject implements VirtualSh
 		return null;
 	}
 
-	@Override
-	public Location getTickVisualizationParticleLocation() {
-		return null;
-	}
-
 	// TICKING
 
 	@Override
-	public void tick() {
-		super.tick();
+	public void onTick() {
+		super.onTick();
+	}
+
+	@Override
+	public Location getTickVisualizationParticleLocation() {
+		return null;
 	}
 
 	// NAMING

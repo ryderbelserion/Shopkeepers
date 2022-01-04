@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -13,10 +15,16 @@ import org.bukkit.scheduler.BukkitTask;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
+import com.nisovin.shopkeepers.debug.DebugOptions;
+import com.nisovin.shopkeepers.util.logging.Log;
 
+import net.citizensnpcs.api.event.CitizensReloadEvent;
 import net.citizensnpcs.api.event.NPCAddTraitEvent;
+import net.citizensnpcs.api.event.NPCDespawnEvent;
 import net.citizensnpcs.api.event.NPCRemoveEvent;
 import net.citizensnpcs.api.event.NPCRemoveTraitEvent;
+import net.citizensnpcs.api.event.NPCSpawnEvent;
+import net.citizensnpcs.api.event.NPCTeleportEvent;
 import net.citizensnpcs.api.event.NPCTraitCommandAttachEvent;
 import net.citizensnpcs.api.event.PlayerCreateNPCEvent;
 import net.citizensnpcs.api.npc.NPC;
@@ -242,6 +250,7 @@ class CitizensListener implements Listener {
 	}
 
 	// Called right before the NPC gets deleted.
+	// Called before the NPC is despawned
 	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
 	void onNPCRemoved(NPCRemoveEvent event) {
 		pendingTraitAddition.reset(); // Handles any currently pending trait
@@ -260,5 +269,61 @@ class CitizensListener implements Listener {
 				});
 			}
 		}
+	}
+
+	// NPC (RE-)LOADING
+
+	// Called when Citizens has reloaded its NPCs from storage.
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	void onCitizensReloaded(CitizensReloadEvent event) {
+		citizensShops.onCitizensReloaded();
+	}
+
+	// NPC SPAWNING & DESPAWNING
+
+	// Called when the NPC entity was successfully spawned.
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	void onNPCSpawned(NPCSpawnEvent event) {
+		NPC npc = event.getNPC();
+		Shopkeeper shopkeeper = citizensShops.getShopkeeper(npc);
+		if (shopkeeper == null) return;
+
+		Log.debug(DebugOptions.regularTickActivities,
+				shopkeeper.getLogPrefix() + "Citizens NPC has been spawned.");
+
+		SKCitizensShopObject shopObject = (SKCitizensShopObject) shopkeeper.getShopObject();
+		Entity entity = npc.getEntity();
+		assert entity != null;
+		shopObject.setEntity(entity);
+	}
+
+	// Called when the NPC entity is about to be removed. The entity might already be dead.
+	@EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+	void onNPCDepawn(NPCDespawnEvent event) {
+		NPC npc = event.getNPC();
+		Shopkeeper shopkeeper = citizensShops.getShopkeeper(npc);
+		if (shopkeeper == null) return;
+
+		Log.debug(DebugOptions.regularTickActivities,
+				shopkeeper.getLogPrefix() + "Citizens NPC is despawned.");
+
+		SKCitizensShopObject shopObject = (SKCitizensShopObject) shopkeeper.getShopObject();
+		shopObject.setEntity(null);
+	}
+
+	// NPC TELEPORTING
+
+	@EventHandler
+	void onNPCTeleport(NPCTeleportEvent event) {
+		NPC npc = event.getNPC();
+		this.updateShopkeeperLocations(npc, event.getTo());
+	}
+
+	private void updateShopkeeperLocations(NPC npc, Location toLocation) {
+		citizensShops.getShopkeepers(npc).forEach(shopkeeper -> {
+			assert shopkeeper.getShopObject() instanceof SKCitizensShopObject;
+			SKCitizensShopObject shopObject = (SKCitizensShopObject) shopkeeper.getShopObject();
+			shopObject.onNpcTeleport(toLocation);
+		});
 	}
 }

@@ -20,7 +20,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.dependencies.citizens.CitizensDependency;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.java.TimeUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
@@ -195,6 +195,18 @@ public class CitizensShops {
 		}
 	}
 
+	// Called when the Citizens plugin has reloaded its NPCs.
+	void onCitizensReloaded() {
+		if (shopkeepersByNpcId.isEmpty()) return;
+
+		Log.debug("Citizens plugin has been reloaded.");
+
+		// Inform all Citizens NPC shop objects:
+		shopkeepersByNpcId.values().stream().flatMap(List::stream).forEach(shopkeeper -> {
+			((SKCitizensShopObject) shopkeeper.getShopObject()).onCitizensReloaded();
+		});
+	}
+
 	void registerCitizensShopkeeper(SKCitizensShopObject citizensShop, UUID npcId) {
 		assert citizensShop != null;
 		if (npcId == null) return;
@@ -218,6 +230,10 @@ public class CitizensShops {
 				return shopkeepers;
 			}
 		});
+	}
+
+	public boolean isShopkeeper(NPC npc) {
+		return !this.getShopkeepers(npc).isEmpty();
 	}
 
 	// If there are multiple shopkeepers associated with the given NPC, this only returns one of them.

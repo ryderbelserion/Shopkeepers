@@ -148,10 +148,11 @@ public interface ShopkeeperRegistry {
 	/**
 	 * Gets the currently active chunks in the specified world.
 	 * <p>
-	 * Chunks get activated and deactivated when they get loaded and unloaded. During activation, the shopkeepers
-	 * located inside the chunk get spawned. However, to not spawn shopkeepers for chunks that stay loaded only briefly,
-	 * the activation of chunks may be deferred. Consequently, this may not return chunks even if they are currently
-	 * already loaded.
+	 * Chunks are activated and deactivated when they are loaded and unloaded. During activation, the shopkeepers inside
+	 * the chunk are spawned.
+	 * <p>
+	 * However, in order to not spawn shopkeepers for chunks that only stay briefly loaded, the activation of chunks may
+	 * be deferred. Consequently, this might not return chunks even if they are currently already loaded.
 	 * 
 	 * @param worldName
 	 *            the world name
@@ -172,13 +173,17 @@ public interface ShopkeeperRegistry {
 	/**
 	 * Gets all shopkeepers in currently {@link #getActiveChunks(String) active chunks}.
 	 * <p>
-	 * Since the chunk activation may be deferred from chunk loading, this may not return shopkeepers even if their
+	 * Since the chunk activation may be deferred from chunk loading, this might not return shopkeepers even if their
 	 * chunk is currently already loaded.
 	 * <p>
 	 * Similarly, the spawning of {@link ShopObject shop objects} may be deferred from chunk activation, or even fail.
 	 * This is not reflected by this method, which only considers the activation state of chunks as a whole. Use
 	 * {@link ShopObject#isSpawned()} or {@link ShopObject#isActive()} to check if a shop object is actually spawned and
 	 * active.
+	 * <p>
+	 * The opposite situation can also apply: Some types of shop objects may handle their spawning and despawning
+	 * independently of chunk activations. It is therefore possible for a shop object to already be spawned and active
+	 * before its corresponding chunk has been activated.
 	 * 
 	 * @return an unmodifiable view on the active shopkeepers
 	 */
@@ -187,13 +192,17 @@ public interface ShopkeeperRegistry {
 	/**
 	 * Gets all shopkeepers in currently {@link #getActiveChunks(String) active chunks} in the specified world.
 	 * <p>
-	 * Since the chunk activation may be deferred from chunk loading, this may not return shopkeepers even if their
+	 * Since the chunk activation may be deferred from chunk loading, this might not return shopkeepers even if their
 	 * chunk is currently already loaded.
 	 * <p>
 	 * Similarly, the spawning of {@link ShopObject shop objects} may be deferred from chunk activation, or even fail.
 	 * This is not reflected by this method, which only considers the activation state of chunks as a whole. Use
 	 * {@link ShopObject#isSpawned()} or {@link ShopObject#isActive()} to check if a shop object is actually spawned and
 	 * active.
+	 * <p>
+	 * The opposite situation can also apply: Some types of shop objects may handle their spawning and despawning
+	 * independently of chunk activations. It is therefore possible for a shop object to already be spawned and active
+	 * before its corresponding chunk has been activated.
 	 * 
 	 * @param worldName
 	 *            the world name

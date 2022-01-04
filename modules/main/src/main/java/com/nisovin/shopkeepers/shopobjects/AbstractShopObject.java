@@ -19,6 +19,8 @@ import com.nisovin.shopkeepers.api.storage.ShopkeeperStorage;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperPropertyValuesHolder;
+import com.nisovin.shopkeepers.shopkeeper.registry.ShopObjectRegistry;
+import com.nisovin.shopkeepers.shopkeeper.spawning.ShopkeeperSpawnState;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
@@ -33,10 +35,22 @@ import com.nisovin.shopkeepers.util.java.Validate;
 /**
  * Abstract base class for all shop object implementations.
  * <p>
- * Implementation hints:<br>
- * <ul>
- * <li>Make sure to call {@link AbstractShopkeeper#markDirty()} on every change of data that might need to be persisted.
- * </ul>
+ * Make sure to call {@link AbstractShopkeeper#markDirty()} on every change of data that might need to be persisted.
+ * <p>
+ * The shop object needs to {@link #onIdChanged() register} itself whenever it is spawned, despawned, or its object id
+ * might have changed. If this type of shop object manages its {@link AbstractShopObjectType#mustBeSpawned() spawning}
+ * itself, it might need to register itself earlier than shop objects whose spawning is managed by the Shopkeepers
+ * plugin: For instance, if the shop object is already spawned during or shortly after chunk loads, it needs to be
+ * registered in this exact moment, rather than when the shopkeeper's chunk is activated. And if the shop object is able
+ * to spawn before the shopkeeper has been created or loaded, it may need to register itself during
+ * {@link #onShopkeeperAdded(ShopkeeperAddedEvent.Cause)}.
+ * <p>
+ * If this type of shop object is able to move, teleport, or be spawned into a different chunk, the
+ * {@link ShopkeeperRegistry} needs to be made aware of these location changes by
+ * {@link AbstractShopkeeper#setLocation(Location) updating the location} of the corresponding shopkeeper. If the
+ * shopkeeper is not ticking currently (i.e. if its previous chunk is not active currently), these location updates need
+ * to happen quickly, so that the chunk of the shopkeeper's new location, if currently loaded, can be activated and
+ * start the shopkeeper's ticking as quickly as possible.
  */
 public abstract class AbstractShopObject implements ShopObject {
 
@@ -166,10 +180,12 @@ public abstract class AbstractShopObject implements ShopObject {
 	/**
 	 * This is called when the shopkeeper is added to the {@link ShopkeeperRegistry}.
 	 * <p>
-	 * The shopkeeper has not yet been spawned or activated at this point.
+	 * Usually, the shopkeeper has not yet been spawned or activated at this point. However, if this this type of shop
+	 * object handles it spawning {@link AbstractShopObjectType#mustBeSpawned() itself}, and the shop object is
+	 * currently already {@link #isSpawned() spawned}, this may {@link #onIdChanged() register} the spawned shop object.
 	 * 
 	 * @param cause
-	 *            the cause of the addition
+	 *            the cause of the addition, not <code>null</code>
 	 */
 	public void onShopkeeperAdded(ShopkeeperAddedEvent.Cause cause) {
 	}
@@ -178,7 +194,11 @@ public abstract class AbstractShopObject implements ShopObject {
 	 * This is called when the {@link ShopObject} is removed, usually when the corresponding shopkeeper is removed from
 	 * the {@link ShopkeeperRegistry}.
 	 * <p>
-	 * This can for example be used to disable any active components (ex. listeners) for this shop object.
+	 * This can for example be used to disable any active components (e.g. listeners) for this shop object.
+	 * <p>
+	 * If this type of shop object handles its spawning {@link AbstractShopObjectType#mustBeSpawned() itself}, and the
+	 * shop object is currently {@link #isSpawned() spawned}, the shop object needs to mark itself as despawned and
+	 * {@link #onIdChanged() unregister} itself when this is called.
 	 */
 	public void remove() {
 	}
@@ -193,16 +213,30 @@ public abstract class AbstractShopObject implements ShopObject {
 	public void delete() {
 	}
 
-	// ACTIVATION
+	// SPAWNING
 
-	public void onChunkActivation() {
+	/**
+	 * Gets the object id by which the shopkeeper is currently registered inside the {@link ShopObjectRegistry}.
+	 * <p>
+	 * This method is meant to only be used internally by the Shopkeepers plugin itself!
+	 * 
+	 * @return the object id, or <code>null</code>
+	 */
+	public final Object getLastId() {
+		return lastId;
 	}
 
-	public void onChunkDeactivation() {
+	/**
+	 * Sets the object id by which the shopkeeper is currently registered inside the {@link ShopObjectRegistry}.
+	 * <p>
+	 * This method is meant to only be used internally by the Shopkeepers plugin itself!
+	 * 
+	 * @param lastId
+	 *            the object id, can be <code>null</code>
+	 */
+	public final void setLastId(Object lastId) {
+		this.lastId = lastId; // can be null
 	}
-
-	@Override
-	public abstract boolean isActive();
 
 	/**
 	 * Gets an object that uniquely identifies this {@link ShopObject} while it is {@link #isSpawned() spawned}.
@@ -216,32 +250,33 @@ public abstract class AbstractShopObject implements ShopObject {
 	public abstract Object getId();
 
 	/**
-	 * This has to be invoked whenever the id of this shop object might have changed.
+	 * This has to be invoked whenever the {@link #getId() id} of this shop object might have changed, such as when this
+	 * shop object has been {@link #spawn() spawned}, {@link #despawn() despawned}, or has changed its id for some other
+	 * reason.
 	 * <p>
-	 * This updates the id by which the shopkeeper is currently stored inside the shopkeeper registry.
+	 * This updates the shop object id by which the shopkeeper is currently registered inside the
+	 * {@link ShopkeeperRegistry}: If the shop object has been freshly spawned, this will register the current shop
+	 * object id. If the shop object has been despawned, this will unregister any previously registered object id. If
+	 * the shop object id has changed, this will both unregister any previous object id and then register the current
+	 * object id.
 	 */
 	protected final void onIdChanged() {
-		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperObjectIdChanged(shopkeeper);
+		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getShopObjectRegistry().updateShopObjectRegistration(shopkeeper);
 	}
 
 	/**
-	 * Gets the object id the shopkeeper is currently stored by inside the shopkeeper registry.
+	 * Checks if the spawning of this shop object is scheduled, for example by some external component.
+	 * <p>
+	 * The shop object should usually avoid spawning itself while its spawning is still scheduled.
 	 * 
-	 * @return the object id, or <code>null</code>
+	 * @return <code>true</code> if a spawn of this shop object is scheduled
 	 */
-	public final Object getLastId() {
-		return lastId;
+	protected final boolean isSpawningScheduled() {
+		return shopkeeper.getComponents().getOrAdd(ShopkeeperSpawnState.class).isSpawningScheduled();
 	}
 
-	/**
-	 * Sets the object id the shopkeeper is currently stored by inside the shopkeeper registry.
-	 * 
-	 * @param lastId
-	 *            the object id, can be <code>null</code>
-	 */
-	public final void setLastId(Object lastId) {
-		this.lastId = lastId; // can be null
-	}
+	@Override
+	public abstract boolean isActive();
 
 	/**
 	 * Spawns the shop object into the world at its spawn location.
@@ -282,6 +317,71 @@ public abstract class AbstractShopObject implements ShopObject {
 	@Override
 	public abstract Location getLocation();
 
+	// TICKING
+
+	/**
+	 * This is called when the shopkeeper starts ticking.
+	 */
+	public void onStartTicking() {
+	}
+
+	/**
+	 * This is called when the shopkeeper stops ticking.
+	 */
+	public void onStopTicking() {
+	}
+
+	/**
+	 * This is called at the beginning of a shopkeeper tick.
+	 */
+	public void onTickStart() {
+		// Reset activity indicator:
+		tickActivity = false;
+	}
+
+	/**
+	 * This is called periodically (roughly once per second) for shopkeepers in active chunks.
+	 * <p>
+	 * This can for example be used to check if everything is still okay with the shop object, such as if it still
+	 * exists and if it is still in its expected location and state. If any of these checks fail, the shop object may be
+	 * respawned, teleported back into place, or otherwise brought back into its expected state.
+	 * <p>
+	 * However, note that shop objects may already be ticked while they are still {@link #isSpawningScheduled()
+	 * scheduled} to be spawned. It is usually recommended to skip any shop object checks and spawning attempts until
+	 * after the scheduled spawning attempt took place.
+	 * <p>
+	 * This is also called for shop objects that manage their spawning and despawning
+	 * {@link AbstractShopObjectType#mustBeSpawned() manually}.
+	 * <p>
+	 * If the checks to perform are potentially costly performance-wise, or not required to happen every second, the
+	 * shop object may decide to run them only every X invocations. For debugging purposes, the shop object can indicate
+	 * tick activity by calling {@link #indicateTickActivity()} whenever it is doing actual work.
+	 * <p>
+	 * The ticking of shop objects in active chunks may be spread across multiple ticks and might therefore not happen
+	 * for all shopkeepers within the same tick.
+	 * <p>
+	 * If the shopkeeper of this ticked shop object is marked as {@link AbstractShopkeeper#isDirty() dirty}, a
+	 * {@link ShopkeeperStorage#saveDelayed() delayed save} will subsequently be triggered.
+	 * <p>
+	 * When overriding this method, consider calling the parent class version of this method.
+	 */
+	public void onTick() {
+	}
+
+	/**
+	 * This is called at the end of a shopkeeper tick.
+	 */
+	public void onTickEnd() {
+	}
+
+	/**
+	 * Subclasses can call this method to indicate activity during their last tick. When enabled, this can for example
+	 * be used to visualize ticking activity, for example for debugging purposes.
+	 */
+	protected void indicateTickActivity() {
+		tickActivity = true;
+	}
+
 	/**
 	 * Gets the location at which particles for the shopkeeper's tick visualization shall be spawned.
 	 * 
@@ -289,45 +389,6 @@ public abstract class AbstractShopObject implements ShopObject {
 	 *         currently, or if it does not support the tick visualization
 	 */
 	public abstract Location getTickVisualizationParticleLocation();
-
-	// TICKING
-
-	/**
-	 * This is called periodically (roughly once per second) for shopkeepers in active chunks.
-	 * <p>
-	 * This can for example be used to check if everything is still alright with the shop object, such as if it still
-	 * exists and if it is still in its expected location and state. If any of these checks fail, the shop object may be
-	 * respawned, teleported back into place, and brought back into its expected state.
-	 * <p>
-	 * This is also called for shop objects that manage their spawning and despawning
-	 * {@link AbstractShopObjectType#mustBeSpawned() manually}.
-	 * <p>
-	 * Any changes to the shopkeeper's activation state or {@link AbstractShopObject#getId() shop object id} might only
-	 * be processed after the ticking of all currently ticked shop objects completes.
-	 * <p>
-	 * If the checks to perform are potentially heavy or not required to happen every second, the shop object may decide
-	 * to only run it every X invocations.
-	 * <p>
-	 * The ticking of shop objects in active chunks may be spread across multiple ticks and may therefore not happen for
-	 * all shopkeepers within the same tick.
-	 * <p>
-	 * If any of the shopkeepers whose shop objects are ticked are marked as {@link AbstractShopkeeper#isDirty() dirty},
-	 * a {@link ShopkeeperStorage#saveDelayed() delayed save} will subsequently be triggered.
-	 * <p>
-	 * If you are overriding this method, consider calling the parent class version of this method.
-	 */
-	public void tick() {
-		// Reset activity indicator:
-		tickActivity = false;
-	}
-
-	/**
-	 * Optional: Subclasses can call this method to indicate activity during their last tick. If the tick visualization
-	 * is enabled, this will result in a default visualization of that ticking activity.
-	 */
-	protected void indicateTickActivity() {
-		tickActivity = true;
-	}
 
 	/**
 	 * Visualizes the shop object's activity during the last tick.

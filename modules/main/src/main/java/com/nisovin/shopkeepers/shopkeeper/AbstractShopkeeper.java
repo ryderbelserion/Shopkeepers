@@ -38,9 +38,12 @@ import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.ui.UIType;
 import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.debug.Debug;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.shopkeeper.migration.Migration;
 import com.nisovin.shopkeepers.shopkeeper.migration.MigrationPhase;
 import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
+import com.nisovin.shopkeepers.shopkeeper.ticking.ShopkeeperTicker;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
@@ -65,7 +68,6 @@ import com.nisovin.shopkeepers.util.data.serialization.java.DataContainerSeriali
 import com.nisovin.shopkeepers.util.data.serialization.java.NumberSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.StringSerializers;
 import com.nisovin.shopkeepers.util.data.serialization.java.UUIDSerializers;
-import com.nisovin.shopkeepers.util.java.CyclicCounter;
 import com.nisovin.shopkeepers.util.java.StringUtils;
 import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.logging.Log;
@@ -84,24 +86,6 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	private static final String VIRTUAL_SHOPKEEPER_MARKER = "[virtual]";
 
-	/**
-	 * The ticking period of active shopkeepers and shop objects in ticks.
-	 */
-	public static final int TICKING_PERIOD_TICKS = 20; // 1 second
-	/**
-	 * For load balancing purposes, shopkeepers are ticked in groups.
-	 * <p>
-	 * This number is chosen as a balance between {@code 1} group (all shopkeepers are ticked within the same tick; no
-	 * load balancing), and the maximum of {@code 20} groups (groups are as small as possible for the tick rate of once
-	 * every second, i.e. once every {@code 20} ticks; best load balancing; but this is associated with a large overhead
-	 * due to having to iterate the active shopkeepers each Minecraft tick).
-	 * <p>
-	 * With {@code 4} ticking groups, the active shopkeepers are iterated once every {@code 5} ticks, and one fourth of
-	 * them are actually processed.
-	 */
-	public static final int TICKING_GROUPS = 4;
-	private static final CyclicCounter nextTickingGroup = new CyclicCounter(TICKING_GROUPS);
-
 	// The maximum supported name length:
 	// The actual maximum name length that can be used might be lower depending on config settings
 	// and on shop object specific limits.
@@ -116,24 +100,16 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	// Particles of different colors indicate the different ticking groups.
 	// Note: The client seems to randomly change the color slightly each time a dust particle is spawned.
 	// Note: The particle size also determines the effect duration.
-	private static final DustOptions[] TICK_VISUALIZATION_DUSTS = new DustOptions[AbstractShopkeeper.TICKING_GROUPS];
+	private static final DustOptions[] TICK_VISUALIZATION_DUSTS = new DustOptions[ShopkeeperTicker.TICKING_GROUPS];
 	static {
 		// Even distribution of colors in the HSB color space: Ensures a distinct color for each ticking group.
-		float hueStep = (1.0F / AbstractShopkeeper.TICKING_GROUPS);
-		for (int i = 0; i < AbstractShopkeeper.TICKING_GROUPS; ++i) {
+		float hueStep = (1.0F / ShopkeeperTicker.TICKING_GROUPS);
+		for (int i = 0; i < ShopkeeperTicker.TICKING_GROUPS; ++i) {
 			float hue = i * hueStep; // Starts with red
 			int rgb = ColorUtils.HSBtoRGB(hue, 1.0F, 1.0F);
 			Color color = Color.fromRGB(rgb);
 			TICK_VISUALIZATION_DUSTS[i] = new DustOptions(color, 1.0F);
 		}
-	}
-
-	// This is called on plugin enable and can be used to setup or reset any initial static state.
-	static void setupOnEnable() {
-		// Resetting the ticking group counter ensures that shopkeepers retain their ticking group across reloads (if
-		// there are no changes in the order of the loaded shopkeepers). This ensures that the particle colors of our
-		// tick visualization remain the same across reloads (avoids possible confusion for users).
-		nextTickingGroup.reset();
 	}
 
 	/**
@@ -158,12 +134,14 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private float yaw;
 
 	private ChunkCoords chunkCoords; // Null for virtual shops
-	// The ChunkCoords under which the shopkeeper is currently stored:
+	// The ChunkCoords by which the shopkeeper is currently stored:
 	private ChunkCoords lastChunkCoords = null;
 	private String name = ""; // Not null, can be empty
 
 	private final List<SKShopkeeperSnapshot> snapshots = new ArrayList<>();
 	private final List<? extends SKShopkeeperSnapshot> snapshotsView = Collections.unmodifiableList(snapshots);
+
+	private final ShopkeeperComponentHolder components = new ShopkeeperComponentHolder(this);
 
 	// Map of dynamically evaluated message arguments:
 	private final Map<String, Supplier<Object>> messageArgumentsMap = new HashMap<>();
@@ -175,12 +153,14 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	private boolean dirty = false;
 	// Is currently registered:
 	private boolean valid = false;
+	private boolean active = false;
+	private boolean ticking = false;
 
 	// UI type identifier -> UI handler
 	private final Map<String, UIHandler> uiHandlers = new HashMap<>();
 
 	// Internally used for load balancing purposes:
-	private final int tickingGroup = nextTickingGroup.getAndIncrement();
+	private final int tickingGroup = ShopkeeperTicker.nextTickingGroup();
 
 	// CONSTRUCTION AND SETUP
 
@@ -574,6 +554,17 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		dirty = false;
 	}
 
+	// COMPONENTS
+
+	/**
+	 * Gets the {@link ShopkeeperComponentHolder} the holds the components of this shopkeeper.
+	 * 
+	 * @return the component holder, not <code>null</code>
+	 */
+	public final ShopkeeperComponentHolder getComponents() {
+		return components;
+	}
+
 	// LIFE CYCLE
 
 	@Override
@@ -601,7 +592,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	 * The shopkeeper has not yet been spawned or activated at this point.
 	 * 
 	 * @param cause
-	 *            the cause of the addition
+	 *            the cause of the addition, not <code>null</code>
 	 */
 	protected void onAdded(ShopkeeperAddedEvent.Cause cause) {
 		shopObject.onShopkeeperAdded(cause);
@@ -617,12 +608,15 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * This is called once the shopkeeper is about to be removed from the {@link ShopkeeperRegistry}.
+	 * This is called when the shopkeeper is about to be removed from the {@link ShopkeeperRegistry}.
 	 * <p>
-	 * The shopkeeper has already been deactivated at this point.
+	 * The shopkeeper has already been deactivated at this point, i.e. its ticking has been stopped and, if the shop
+	 * object's spawning is {@link AbstractShopObjectType#mustBeSpawned() managed} by the Shopkeepers plugin, it has
+	 * already been despawned. If the shop object handles its spawning itself, it may still be spawned and is then
+	 * responsible to {@link AbstractShopObject#remove() unregister} itself during this call.
 	 * 
 	 * @param cause
-	 *            the cause for the removal
+	 *            the cause of the removal, not <code>null</code>
 	 */
 	protected void onRemoval(ShopkeeperRemoveEvent.Cause cause) {
 		shopObject.remove();
@@ -640,12 +634,35 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * This is called if the shopkeeper is about to be removed due to permanent deletion.
+	 * This is called when the shopkeeper is about to be permanently deleted.
 	 * <p>
 	 * This is called after {@link #onRemoval(ShopkeeperRemoveEvent.Cause)}.
 	 */
 	protected void onDeletion() {
 		shopObject.delete();
+	}
+
+	/**
+	 * Sets the shopkeeper's activation state.
+	 * <p>
+	 * This method is meant to only be used internally by the Shopkeepers plugin itself!
+	 * 
+	 * @param active
+	 *            the new activation state
+	 */
+	public final void setActive(boolean active) {
+		this.active = active;
+	}
+
+	/**
+	 * Gets the shopkeeper's current activation state.
+	 * <p>
+	 * This method is meant to only be used internally by the Shopkeepers plugin itself!
+	 * 
+	 * @return <code>true</code> if the shopkeeper is currently active
+	 */
+	public final boolean isActive() {
+		return active;
 	}
 
 	// SHOP TYPE
@@ -874,8 +891,10 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		this.updateChunkCoords();
 		this.markDirty();
 
-		// Update shopkeeper in chunk map:
-		SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperMoved(this);
+		// Inform shopkeeper registry:
+		if (this.isValid()) {
+			SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().onShopkeeperMoved(this);
+		}
 
 		// Inform subclasses:
 		this.onShopkeeperMoved();
@@ -911,23 +930,23 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 	}
 
 	/**
-	 * Gets the {@link ChunkCoords} under which the shopkeeper is currently stored.
+	 * Gets the {@link ChunkCoords} by which the shopkeeper is currently stored.
 	 * <p>
-	 * Internal use only!
+	 * This method is meant to only be used internally by the Shopkeepers plugin itself!
 	 * 
-	 * @return the chunk coordinates
+	 * @return the chunk coordinates, can be <code>null</code>
 	 */
 	public final ChunkCoords getLastChunkCoords() {
 		return lastChunkCoords;
 	}
 
 	/**
-	 * Update the {@link ChunkCoords} for which the shopkeeper is currently stored.
+	 * Sets the {@link ChunkCoords} by which the shopkeeper is currently stored.
 	 * <p>
-	 * Internal use only!
+	 * This method is meant to only be used internally by the Shopkeepers plugin itself!
 	 * 
 	 * @param chunkCoords
-	 *            the chunk coordinates
+	 *            the chunk coordinates, can be <code>null</code>
 	 */
 	public final void setLastChunkCoords(ChunkCoords chunkCoords) {
 		this.lastChunkCoords = chunkCoords;
@@ -1299,58 +1318,166 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		}
 	}
 
-	// ACTIVATION AND TICKING
+	// TICKING
 
-	public void onChunkActivation() {
-	}
-
-	public void onChunkDeactivation() {
-	}
-
-	// For internal purposes only.
-	final int getTickingGroup() {
+	/**
+	 * Gets the shopkeeper's ticking group.
+	 * <p>
+	 * This method is meant to only be used internally by the Shopkeepers plugin itself!
+	 * 
+	 * @return the shopkeeper's ticking group
+	 */
+	public final int getTickingGroup() {
 		return tickingGroup;
+	}
+
+	/**
+	 * This is called when the shopkeeper starts ticking.
+	 * <p>
+	 * This method is meant to only be used internally by the Shopkeepers plugin itself!
+	 */
+	public final void informStartTicking() {
+		ticking = true;
+		this.onStartTicking();
+	}
+
+	/**
+	 * This is called when the shopkeeper starts ticking.
+	 */
+	protected void onStartTicking() {
+		shopObject.onStartTicking();
+	}
+
+	/**
+	 * This is called when the shopkeeper stops ticking.
+	 * <p>
+	 * This method is meant to only be used internally by the Shopkeepers plugin itself!
+	 */
+	public final void informStopTicking() {
+		// If the shopkeeper is currently processing a tick, this flag can also be used to abort the processing:
+		ticking = false;
+		this.onStopTicking();
+	}
+
+	/**
+	 * This is called when the shopkeeper stops ticking.
+	 */
+	protected void onStopTicking() {
+		shopObject.onStopTicking();
+	}
+
+	/**
+	 * Checks if the shopkeeper is currently ticking, i.e. its ticking has been {@link #onStartTicking() started} and
+	 * not yet {@link #onStopTicking() stopped} again.
+	 * <p>
+	 * The return value does NOT indicate whether the shopkeeper is currently processing a tick.
+	 * 
+	 * @return <code>true</code> if the shopkeeper is currently ticking
+	 */
+	public final boolean isTicking() {
+		return ticking;
+	}
+
+	/**
+	 * Ticks this shopkeeper.
+	 * <p>
+	 * This method is meant to only be used internally by the Shopkeepers plugin itself!
+	 */
+	public final void tick() {
+		assert this.isTicking();
+
+		// An exception during onTickStart will abort the tick.
+		this.onTickStart();
+		// Abort if the ticking has already been stopped again:
+		if (!this.isTicking()) return;
+
+		try {
+			this.onTick();
+		} finally {
+			// onTickEnd is always called, even if onTick was aborted by an exception.
+			this.onTickEnd();
+		}
+	}
+
+	/**
+	 * This is called at the beginning of a shopkeeper tick.
+	 */
+	protected void onTickStart() {
+		shopObject.onTickStart();
 	}
 
 	// TODO Maybe also tick shopkeepers if the container chunk is loaded? This might make sense once a shopkeeper can be
 	// linked to multiple containers, and for virtual player shopkeepers.
+	// TODO Maybe also (optionally) tick virtual shopkeepers.
+	// TODO Indicate tick activity, similar to shop objects.
 	/**
 	 * This is called periodically (roughly once per second) for shopkeepers in active chunks.
 	 * <p>
-	 * Consequently, this is not called for {@link Shopkeeper#isVirtual() virtual} shopkeepers.
+	 * This is not called for {@link Shopkeeper#isVirtual() virtual} shopkeepers currently.
 	 * <p>
 	 * This can for example be used for checks that need to happen periodically, such as checking if the container of a
 	 * player shop still exists.
 	 * <p>
-	 * If the check to perform is potentially heavy or not required to happen every second, the shopkeeper may decide to
-	 * only run it every X invocations.
+	 * If the checks to perform are potentially costly performance-wise, or not required to happen every second, the
+	 * shopkeeper may decide to run them only every X invocations.
 	 * <p>
-	 * The ticking of shopkeepers in active chunks may be spread across multiple ticks and may therefore not happen for
-	 * all shopkeepers within the same tick.
+	 * The ticking of shopkeepers in active chunks may be spread across multiple ticks and might therefore not happen
+	 * for all shopkeepers within the same tick.
 	 * <p>
-	 * If any of the ticked shopkeepers are marked as {@link AbstractShopkeeper#isDirty() dirty}, a
-	 * {@link ShopkeeperStorage#saveDelayed() delayed save} will subsequently be triggered.
+	 * If the shopkeeper is marked as {@link #isDirty() dirty}, a {@link ShopkeeperStorage#saveDelayed() delayed save}
+	 * will subsequently be triggered.
 	 * <p>
-	 * Any changes to the shopkeeper's activation state or {@link AbstractShopObject#getId() shop object id} may only be
-	 * processed after the ticking of all currently ticked shopkeepers completes.
-	 * <p>
-	 * If you are overriding this method, consider calling the parent class version of this method.
+	 * When overriding this method, consider calling the parent class version of this method.
 	 */
-	public void tick() {
-		// Nothing to do by default.
+	protected void onTick() {
+		// Abort if the ticking has already been stopped again (e.g. if the shopkeeper has been deleted or its ticking
+		// stopped due to or during the onTick implementations of the sub-classes):
+		if (!this.isTicking()) return;
+
+		// Tick the shop object:
+		shopObject.onTick();
 	}
 
 	/**
-	 * Visualizes the shopkeeper's activity during the last tick.
+	 * This is called at the end of a shopkeeper tick.
 	 */
-	public void visualizeLastTick() {
+	protected void onTickEnd() {
+		shopObject.onTickEnd();
+
+		// Visualize tick activity:
+		if (Debug.isDebugging(DebugOptions.visualizeShopkeeperTicks)) {
+			this.visualizeLastTick();
+		}
+	}
+
+	/**
+	 * Visualizes the activity of this shopkeeper and all of its components during the last tick.
+	 */
+	protected void visualizeLastTick() {
+		// Visualize the shopkeeper's own tick activity:
+		this.visualizeLastShopkeeperTick();
+
+		// Visualize the shop object's tick activity:
+		shopObject.visualizeLastTick();
+	}
+
+	/**
+	 * Visualizes the shopkeeper's own activity during the last tick.
+	 * <p>
+	 * To also visualize the activity of other components of this shopkeeper, see {@link #visualizeLastTick()}.
+	 */
+	protected void visualizeLastShopkeeperTick() {
 		Location particleLocation = shopObject.getTickVisualizationParticleLocation();
 		if (particleLocation == null) return;
+		assert particleLocation.isWorldLoaded() && particleLocation.getWorld() != null;
 
-		assert particleLocation.isWorldLoaded();
-		World world = particleLocation.getWorld();
-		assert world != null;
-		world.spawnParticle(Particle.REDSTONE, particleLocation, 1, TICK_VISUALIZATION_DUSTS[tickingGroup]);
+		this.spawnTickVisualizationParticle(particleLocation);
+	}
+
+	private void spawnTickVisualizationParticle(Location location) {
+		assert location != null && location.isWorldLoaded() && location.getWorld() != null;
+		World world = location.getWorld();
+		world.spawnParticle(Particle.REDSTONE, location, 1, TICK_VISUALIZATION_DUSTS[tickingGroup]);
 	}
 
 	// TOSTRING

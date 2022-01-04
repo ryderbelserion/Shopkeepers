@@ -9,7 +9,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopkeeperRegistry;
 /**
  * This event is called whenever a {@link Shopkeeper} was added to the {@link ShopkeeperRegistry}.
  * <p>
- * The shopkeeper has not yet been activated at this point.
+ * Depending on the type of shop object, the shopkeeper may or may not already be spawned.
  * <p>
  * The {@link Cause} can be used to differentiate between the different reasons for which a shopkeeper can be added.
  */

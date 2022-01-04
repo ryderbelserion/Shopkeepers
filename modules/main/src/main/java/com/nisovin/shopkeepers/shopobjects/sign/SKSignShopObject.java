@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.shopobjects.sign.SignShopObject;
 import com.nisovin.shopkeepers.compat.MC_1_17;
 import com.nisovin.shopkeepers.compat.NMSManager;
+import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.ShopkeeperData;
@@ -322,19 +323,6 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 		ShopkeeperMetadata.remove(block);
 	}
 
-	@Override
-	public Location getTickVisualizationParticleLocation() {
-		Location location = this.getLocation();
-		if (location == null) return null;
-		if (this.isWallSign()) {
-			// Return location at the block center:
-			return location.add(0.5D, 0.5D, 0.5D);
-		} else {
-			// Return location above the sign post:
-			return location.add(0.5D, 1.3D, 0.5D);
-		}
-	}
-
 	private void updateSign() {
 		Sign sign = this.getSign();
 		if (sign == null) return; // Not spawned or no longer a sign
@@ -378,9 +366,15 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 	// TICKING
 
 	@Override
-	public void tick() {
-		super.tick();
+	public void onTick() {
+		super.onTick();
 		if (!checkLimiter.request()) {
+			return;
+		}
+
+		if (this.isSpawningScheduled()) {
+			Log.debug(DebugOptions.regularTickActivities,
+					() -> shopkeeper.getLogPrefix() + "Spawning is scheduled. Skipping sign check.");
 			return;
 		}
 
@@ -400,6 +394,19 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 				Log.warning(shopkeeper.getLocatedLogPrefix() + "Sign could not be spawned!");
 			}
 			return;
+		}
+	}
+
+	@Override
+	public Location getTickVisualizationParticleLocation() {
+		Location location = this.getLocation();
+		if (location == null) return null;
+		if (this.isWallSign()) {
+			// Return location at the block center:
+			return location.add(0.5D, 0.5D, 0.5D);
+		} else {
+			// Return location above the sign post:
+			return location.add(0.5D, 1.3D, 0.5D);
 		}
 	}
 

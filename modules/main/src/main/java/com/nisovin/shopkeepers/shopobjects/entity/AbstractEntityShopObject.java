@@ -45,8 +45,8 @@ public abstract class AbstractEntityShopObject extends AbstractShopObject implem
 	@Override
 	public Object getId() {
 		Entity entity = this.getEntity();
-		if (entity == null) return null; // Not active
-		return this.getType().getObjectId(entity);
+		if (entity == null) return null; // Not spawned
+		return EntityShopObjectIds.getObjectId(entity);
 	}
 
 	@Override

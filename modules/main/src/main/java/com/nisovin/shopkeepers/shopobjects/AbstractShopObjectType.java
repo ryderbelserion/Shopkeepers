@@ -15,7 +15,7 @@ import com.nisovin.shopkeepers.api.shopobjects.ShopObject;
 import com.nisovin.shopkeepers.api.shopobjects.ShopObjectType;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
-import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.shopkeeper.registry.ShopObjectRegistry;
 import com.nisovin.shopkeepers.types.AbstractSelectableType;
 import com.nisovin.shopkeepers.util.bukkit.BlockFaceUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -48,10 +48,10 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 	/**
 	 * Whether the spawning and despawning of shop objects of this type is managed by the Shopkeepers plugin.
 	 * <p>
-	 * Some types of shop objects may take care of the spawning and despawning of their shop objects themselves. If this
+	 * Some types of shop objects may handle the spawning and despawning of their shop objects themselves. If this
 	 * returns <code>true</code>, the shop objects will be {@link AbstractShopObject#spawn() spawned} and
-	 * {@link AbstractShopObject#despawn() despawned} with chunk loads and unloads (more accurately: with
-	 * {@link ShopkeeperRegistry#getActiveChunks(String) chunk activations}).
+	 * {@link AbstractShopObject#despawn() despawned} by the Shopkeepers plugin in reaction to
+	 * {@link ShopkeeperRegistry#getActiveChunks(String) chunk activations} and deactivations.
 	 * <p>
 	 * The return value of this method is expected to be fixed.
 	 * 
@@ -134,17 +134,19 @@ public abstract class AbstractShopObjectType<T extends AbstractShopObject> exten
 	public abstract T createObject(AbstractShopkeeper shopkeeper, ShopCreationData creationData);
 
 	/**
-	 * Gets the active (i.e. ticking) {@link Shopkeeper} for the given object id that uses a {@link ShopObject} of this
-	 * type.
+	 * Gets the {@link Shopkeeper} for the given object id that uses a {@link ShopObject} of this type.
+	 * <p>
+	 * This behaves like {@link ShopObjectRegistry#getShopkeeperByObjectId(Object)}, but additionally verifies that the
+	 * found shopkeeper uses a shop object of this type.
 	 * 
 	 * @param objectId
 	 *            the object id
-	 * @return the shopkeeper, or <code>null</code> if no such shopkeeper is found, or if the shopkeeper is not using
-	 *         this type of shop object
+	 * @return the shopkeeper, or <code>null</code> if no corresponding shopkeeper is found, or if the found shopkeeper
+	 *         is not using this type of shop object
 	 */
-	protected AbstractShopkeeper getShopkeeperByObjectId(Object objectId) {
-		SKShopkeeperRegistry shopkeeperRegistry = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry();
-		AbstractShopkeeper shopkeeper = shopkeeperRegistry.getActiveShopkeeper(objectId);
+	protected final AbstractShopkeeper getShopkeeperByObjectId(Object objectId) {
+		ShopObjectRegistry shopObjectRegistry = SKShopkeepersPlugin.getInstance().getShopkeeperRegistry().getShopObjectRegistry();
+		AbstractShopkeeper shopkeeper = shopObjectRegistry.getShopkeeperByObjectId(objectId);
 		if (shopkeeper != null && shopkeeper.getShopObject().getType() == this) {
 			return shopkeeper;
 		} else {

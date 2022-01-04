@@ -1,22 +1,27 @@
-package com.nisovin.shopkeepers.shopkeeper;
+package com.nisovin.shopkeepers.shopkeeper.spawning;
 
 import java.util.function.Consumer;
 
 import org.bukkit.plugin.Plugin;
 
+import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
+import com.nisovin.shopkeepers.shopkeeper.spawning.ShopkeeperSpawnState.State;
+import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
+import com.nisovin.shopkeepers.util.java.Validate;
 import com.nisovin.shopkeepers.util.taskqueue.TaskQueue;
 
 /**
  * A queue for load balancing the spawning of shopkeepers.
  * <p>
- * Creating and spawning lots of mobs, or placing lots of sign blocks with contents, is comparatively heavy
- * performance-wise. In order to avoid short performance drops (for instance when chunks with lots of shopkeepers are
- * loaded) we use this queue to always only spawn at most a few shopkeepers within the same tick.
+ * Spawning shopkeepers can be relatively costly performance-wise. In order to avoid performance drops when chunks with
+ * lots of shopkeepers are activated, we use this queue to distribute the spawning of shopkeepers over several ticks.
+ * <p>
+ * Shopkeepers may already be ticked while they are still pending to be spawned. Shop objects can use
+ * {@link AbstractShopObject#isSpawningScheduled()} to check if they are currently still pending to be spawned.
  */
-// Used by the ShopkeeperRegistry.
 public class ShopkeeperSpawnQueue extends TaskQueue<AbstractShopkeeper> {
 
-	// With this configuration we can spawn around ~40 shopkeepers per second.
+	// With this configuration we can spawn around 40 shopkeepers per second.
 	// A more frequently running task has a higher general overhead.
 	private static final int SPAWN_TASK_PERIOD_TICKS = 3;
 	// On my test setup, and without any GC taking place, the spawning of a shopkeeper seems to take between
@@ -27,7 +32,7 @@ public class ShopkeeperSpawnQueue extends TaskQueue<AbstractShopkeeper> {
 
 	ShopkeeperSpawnQueue(Plugin plugin, Consumer<AbstractShopkeeper> spawner) {
 		super(plugin, SPAWN_TASK_PERIOD_TICKS, SPAWNS_PER_EXECUTION);
-		assert spawner != null;
+		Validate.notNull(spawner, "spawner is null");
 		this.spawner = spawner;
 	}
 
@@ -46,6 +51,34 @@ public class ShopkeeperSpawnQueue extends TaskQueue<AbstractShopkeeper> {
 		}
 	}
 
+	private void setQueued(AbstractShopkeeper shopkeeper) {
+		assert shopkeeper != null;
+		ShopkeeperSpawnState spawnState = shopkeeper.getComponents().getOrAdd(ShopkeeperSpawnState.class);
+		assert !spawnState.isSpawningScheduled();
+		spawnState.setState(State.QUEUED);
+	}
+
+	private void resetQueued(AbstractShopkeeper shopkeeper) {
+		assert shopkeeper != null;
+		ShopkeeperSpawnState spawnState = shopkeeper.getComponents().getOrAdd(ShopkeeperSpawnState.class);
+		assert spawnState.getState() == State.QUEUED;
+		spawnState.setState(State.DESPAWNED);
+	}
+
+	@Override
+	protected void onAdded(AbstractShopkeeper shopkeeper) {
+		super.onAdded(shopkeeper);
+		// Mark the shopkeeper as 'queued':
+		this.setQueued(shopkeeper);
+	}
+
+	@Override
+	protected void onRemoval(AbstractShopkeeper shopkeeper) {
+		super.onRemoval(shopkeeper);
+		// Reset the shopkeeper's 'queued' state:
+		this.resetQueued(shopkeeper);
+	}
+
 	@Override
 	protected Runnable createTask() {
 		return new SpawnerTask(super.createTask());
@@ -53,6 +86,9 @@ public class ShopkeeperSpawnQueue extends TaskQueue<AbstractShopkeeper> {
 
 	@Override
 	protected void process(AbstractShopkeeper shopkeeper) {
+		// Reset the shopkeeper's 'queued' state:
+		this.resetQueued(shopkeeper);
+
 		// Spawn the shopkeeper:
 		spawner.accept(shopkeeper);
 	}

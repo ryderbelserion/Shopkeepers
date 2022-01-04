@@ -260,7 +260,7 @@ public class VillagerSounds extends TradingListener {
 	}
 
 	/**
-	 * This is expected to be called once per {@link AbstractShopObject#tick() shopkeeper tick}, i.e. once per second
+	 * This is expected to be called once per {@link AbstractShopObject#onTick() shopkeeper tick}, i.e. once per second
 	 * while the shop object is active.
 	 */
 	public void tick() {

@@ -177,7 +177,7 @@ public interface PlayerShopkeeper extends Shopkeeper {
 	/**
 	 * Attempts to open the hiring interface of this shopkeeper for the specified player.
 	 * <p>
-	 * Fails if this shopkeeper type doesn't support hiring (ex. admin shops).
+	 * Fails if this shopkeeper type does not support hiring (e.g. admin shops).
 	 * 
 	 * @param player
 	 *            the player

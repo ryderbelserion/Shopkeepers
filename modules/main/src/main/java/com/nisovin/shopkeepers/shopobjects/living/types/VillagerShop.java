@@ -166,8 +166,8 @@ public class VillagerShop extends BabyableShop<Villager> {
 	}
 
 	@Override
-	public void tick() {
-		super.tick();
+	public void onTick() {
+		super.onTick();
 
 		// Ambient sounds:
 		if (Settings.simulateVillagerAmbientSounds) {

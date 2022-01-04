@@ -92,11 +92,13 @@ public abstract class TaskQueue<T> implements TaskQueueStatistics {
 	/**
 	 * This has to be called on plugin shutdown.
 	 * <p>
-	 * This stops the task and clears the queue of pending work units (without processing them).
+	 * This stops the task and clears the queue of pending work units without processing them.
 	 */
 	public void shutdown() {
-		this.stopTask();
+		// Invoke removal callbacks for all pending work units:
+		pending.forEach(this::onRemoval);
 		pending.clear();
+		this.stopTask();
 		maxPending = 0;
 	}
 
@@ -117,6 +119,18 @@ public abstract class TaskQueue<T> implements TaskQueueStatistics {
 		if (size > maxPending) {
 			maxPending = size;
 		}
+
+		// Callback for subclasses:
+		this.onAdded(workUnit);
+	}
+
+	/**
+	 * This callback is invoked whenever a new work unity has been added to the queue.
+	 * 
+	 * @param workUnit
+	 *            the work unit, not <code>null</code>
+	 */
+	protected void onAdded(T workUnit) {
 	}
 
 	/**
@@ -127,7 +141,19 @@ public abstract class TaskQueue<T> implements TaskQueueStatistics {
 	 */
 	public void remove(T workUnit) {
 		assert workUnit != null; // Also checked by queue already
-		pending.remove(workUnit);
+		if (pending.remove(workUnit)) {
+			// Callback for subclasses:
+			this.onRemoval(workUnit);
+		}
+	}
+
+	/**
+	 * This callback is invoked whenever a work unity is or has been removed from the queue without being processed.
+	 * 
+	 * @param workUnit
+	 *            the work unit, not <code>null</code>
+	 */
+	protected void onRemoval(T workUnit) {
 	}
 
 	// STATISTICS

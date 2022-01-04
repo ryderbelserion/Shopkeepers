@@ -16,12 +16,12 @@ public interface BlockShopObjectType<T extends BlockShopObject> extends ShopObje
 
 	/**
 	 * Gets the {@link Shopkeeper} that uses a {@link ShopObject} of this type and is currently represented by the given
-	 * block.
+	 * {@link Block}.
 	 * 
 	 * @param block
 	 *            the block, not <code>null</code>
 	 * @return the shopkeeper, or <code>null</code> if the given block is not a shopkeeper currently, or if the
-	 *         shopkeeper is not using this type of shop object
+	 *         corresponding shopkeeper is not using this type of shop object
 	 */
 	public Shopkeeper getShopkeeper(Block block);
 

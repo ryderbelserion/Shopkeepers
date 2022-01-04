@@ -28,7 +28,9 @@ import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.config.Settings;
-import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.shopkeeper.activation.ShopkeeperChunkActivator;
+import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.shopkeeper.spawning.ShopkeeperSpawner;
 import com.nisovin.shopkeepers.shopobjects.living.LivingEntityAI;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
@@ -42,11 +44,15 @@ class CommandCheck extends Command {
 
 	private final SKShopkeepersPlugin plugin;
 	private final SKShopkeeperRegistry shopkeeperRegistry;
+	private final ShopkeeperSpawner shopkeeperSpawner;
+	private final ShopkeeperChunkActivator chunkActivator;
 
 	CommandCheck(SKShopkeepersPlugin plugin) {
 		super("check");
 		this.plugin = plugin;
 		this.shopkeeperRegistry = plugin.getShopkeeperRegistry();
+		this.shopkeeperSpawner = shopkeeperRegistry.getShopkeeperSpawner();
+		this.chunkActivator = shopkeeperRegistry.getChunkActivator();
 
 		// Set permission:
 		this.setPermission(ShopkeepersPlugin.DEBUG_PERMISSION);
@@ -94,11 +100,11 @@ class CommandCheck extends Command {
 		sender.sendMessage("    With active AI: " + livingEntityAI.getActiveAIEntityCount());
 		sender.sendMessage("    With active gravity: " + livingEntityAI.getActiveGravityEntityCount());
 
-		TaskQueueStatistics spawnQueueStatistics = shopkeeperRegistry.getSpawnQueueStatistics();
+		TaskQueueStatistics spawnQueueStatistics = shopkeeperSpawner.getSpawnQueueStatistics();
 		sender.sendMessage("  Pending shopkeeper spawns | max: " + spawnQueueStatistics.getPendingCount()
 				+ " | " + spawnQueueStatistics.getMaxPendingCount());
 
-		Timings chunkActivationTimings = shopkeeperRegistry.getChunkActivationTimings();
+		Timings chunkActivationTimings = chunkActivator.getChunkActivationTimings();
 		double avgChunkActivationTimings = chunkActivationTimings.getAverageTimeMillis();
 		double maxChunkActivationTimings = chunkActivationTimings.getMaxTimeMillis();
 		sender.sendMessage("  Chunk activation timings (avg | max | cnt): "

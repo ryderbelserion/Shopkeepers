@@ -420,9 +420,15 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 	// TICKING
 
 	@Override
-	public void tick() {
-		super.tick();
+	public void onTick() {
+		super.onTick();
 		if (checkLimiter.request()) {
+			if (this.isSpawningScheduled()) {
+				Log.debug(DebugOptions.regularTickActivities,
+						() -> shopkeeper.getLogPrefix() + "Spawning is scheduled. Skipping entity check.");
+				return;
+			}
+
 			this.check();
 
 			// Indicate ticking activity for visualization:

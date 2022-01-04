@@ -1,7 +1,7 @@
 # Changelog
 Date format: (YYYY-MM-DD)  
 
-## v2.14.1 (TBA)
+## v2.15.0 (TBA)
 ### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
 
 * Config: The translations repository has been renamed and is now located at `https://github.com/Shopkeepers/Language-Files`.
@@ -21,10 +21,43 @@ Date format: (YYYY-MM-DD)
 * Improved the feedback messages that are sent when a shopkeeper cannot be created at a specific location: The previously used generic `shop-create-fail` message was replaced with dedicated messages for the different reasons for why the shopkeeper cannot be created.
 * Config: Added setting `invert-shop-type-and-object-type-selection` (default: `false`), which allows to invert how the shop type and the shop object type are selected with the shop creation item. This might for example be useful for servers that disable all shop types but one.
 * Config: Added setting `ignore-failed-server-assumption-tests` (default: `false`), which allows to enable the plugin anyway, even when a server incompatibility has been detected during the initial server assumption tests.
+* Fixed: Citizens shopkeepers are able to move, teleport, and change their location while the Shopkeepers plugin is not running, or while the shopkeeper's chunk is not active currently. Previously, we only updated the shopkeeper's location during shopkeeper ticking, i.e. when the shopkeeper's chunk has been activated. However, if the NPC was moved to a different chunk (or even world), and the shopkeeper's previous chunk has never been activated since then, the spawned NPC might no longer have been recognized as a shopkeeper. One noticeable effect of this was that the NPC could no longer be interacted with. This has been fixed by also updating the shopkeeper's location in various other circumstances now.
+* Fixed: A related but more minor issue has been that Citizens NPCs can already be spawned while their chunk is still pending to be activated by the Shopkeepers plugin. During this short time period (roughly one second after chunk loads), the Citizens NPCs were not yet recognized as shopkeepers. This has been fixed by separating the registration of ticking (i.e. active) shopkeepers from the registration of spawned shop objects: Citizens shopkeepers now register their NPC entity already before the chunk is activated.
+* Fixed: Updating a shopkeeper's location also updates the shopkeeper's activation state now. Previously, it was possible for a shopkeeper's new chunk to not get activated until the chunk is reloaded.
 
-** Internal changes:**  
+**Debugging changes:**
+* We still clear all shopkeeper registry collections during plugin shutdown, just in case something went wrong earlier and prevented elements from being properly removed. But we also log a warning in this case now.
+* Added additional debug output when chunks are activated and deactivated. Also, the debug output when shopkeepers are spawned due to chunk activations has slightly changed.
+
+**API changes:**
+* The ShopkeeperRemoveEvent is now called earlier during the shopkeeper removal, before the shopkeeper is deactivated (i.e. despawned, UIs closed, ticking stopped, etc.).
+* Minor javadoc adjustments, for example to clarify behavior related to shop object spawning.
+
+**Internal changes:**  
 * Refactors related to the deletion of shopkeepers that are owned by inactive players.
 * Replaced ShopObjectType#isValidSpawnLocation with AbstractShopObjectType#validateSpawnLocation, which additionally sends feedback to the player who is trying to create the shopkeeper.
+* Various internal changes to Citizens shop objects, mostly related to how they register their spawned NPC entities, and how they update the location of their associated shopkeepers.
+* Various refactors related to the shopkeeper registry, shopkeeper activation, ticking, and spawning.
+  * Fixed: We better account for dynamic shopkeeper registry, location, activation, and spawn state changes during various internal shopkeeper and shop object callbacks, such as when a shopkeeper starts/stops ticking, or a shop object is spawned/despawned. This has become necessary because Citizens shop objects might update their shopkeeper's location during ticking stop now.
+  * Updating the location of a shopkeeper from one chunk to another will no longer remove and subsequently recreate the world data if this shopkeeper is the only shopkeeper within the world.
+  * Fixed: When removing or moving a shopkeeper in the chunk map, we no longer use the shopkeeper's current world, but the world it was last stored by.
+  * Internal API: Changes to block and entity object ids, and to how active shopkeeper blocks and entities are registered and tracked.
+  * Internal API: Extended the implementation notes in AbstractShopObject with regard to the registration of spawned shop objects, and shop objects that can change their location.
+  * Various constants related to shopkeeper ticking have been moved from AbstractShopkeeper into ShopkeeperTicker.
+  * Each ticking group stores its respective shopkeepers separately now. We therefore no longer need to iterate and filter all active shopkeepers, but can directly iterate the shopkeepers of the currently active ticking group.
+  * Internal API: Chunk activations immediately start the ticking of activated shopkeepers now, even if these shopkeepers are not immediately spawned. Shop objects can use `#isSpawningScheduled` to check whether their spawning is scheduled, and then skip any shop object checks and spawning attempts in the meantime. This 'spawning-scheduled' state is also active while shopkeepers are pending to be respawned during world saves.
+  * Internal API: `#onChunkActivation/Deactivation` methods in AbstractShopkeeper and AbstractShopObject have been renamed to `#onStart/StopTicking`.
+  * Internal API: AbstractShopkeeper is responsible now for invoking the tick callbacks of its shop object. AbstractShopkeeper keeps track now whether it is currently ticking. This flag is used to skip ticking the shop object if the shopkeeper aborts its own ticking while it is being ticked.
+  * Internal API: AbstractShopkeeper and AbstractShopObject have additional callbacks now that are run at the beginning and at the end of a shopkeeper tick.
+  * Internal API: Minor changes to the tick visualization of shopkeepers. The shopkeeper is itself responsible for invoking the tick visualization at the end of a tick now.
+  * We no longer clear the spawn queue right away now during plugin disable (i.e. when unloading all shopkeepers): This optimization is not expected to provide much benefit anyway, as the spawn queue is intentionally not used in situations in which it could fill up a lot.
+  * We also track now if a world is currently being saved even if the world does not contain any shopkeepers yet, because shopkeepers might be added to the world while it is being saved. The world data of the ShopkeeperSpawner is cleared again once the world is no longer loaded and contains no shopkeepers anymore.
+  * The world save respawn task is now started and assigned before the world's shopkeepers are despawned. This ensures that the world is already marked as 'currently-saving' when the shopkeepers are despawned.
+  * Internal API: Some callback functions have been renamed and had changes to their visibility. Some externally called callback functions are final now and delegate to other internal callback functions.
+  * Internal API: Some calls to shopkeeper callback functions are better guarded against unexpected exceptions now. But this does not yet apply to all callback functions.
+  * Internal API: Various other internal changes that might also affect the internal API of shopkeepers and shop objects.
+* Internal API: Added the ability to attach external 'components' to shopkeepers, which can provide additional state and/or functionality related to a particular shopkeeper.
+* Various other internal refactors and documentation changes.
 
 **Message changes:**  
 * Slightly changed the default `must-target-container` message.

@@ -21,7 +21,7 @@ public interface EntityShopObjectType<T extends EntityShopObject> extends ShopOb
 	 * @param entity
 	 *            the entity, not <code>null</code>
 	 * @return the shopkeeper, or <code>null</code> if the given entity is not a shopkeeper currently, or if the
-	 *         shopkeeper is not using this type of shop object
+	 *         corresponding shopkeeper is not using this type of shop object
 	 */
 	public Shopkeeper getShopkeeper(Entity entity);
 

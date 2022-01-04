@@ -669,22 +669,25 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	// TICKING
 
 	@Override
-	public void tick() {
-		super.tick();
-		// Delete the shopkeeper if the container is no longer present (e.g. if it got removed externally by another
-		// plugin, such as WorldEdit, etc.):
-		if (Settings.deleteShopkeeperOnBreakContainer) {
-			if (!checkContainerLimiter.request()) {
-				return;
-			}
+	protected void onTick() {
+		this.onTickCheckDeleteIfContainerBroken();
+		super.onTick();
+	}
 
-			// This checks if the block is still a valid container:
-			Block containerBlock = this.getContainer();
-			if (containerBlock != null && !ShopContainers.isSupportedContainer(containerBlock.getType())) {
-				// Note: If this shopkeeper got deleted due to the chest being broken, we will trigger a delayed save
-				// after the ticking of the shopkeepers.
-				SKShopkeepersPlugin.getInstance().getRemoveShopOnContainerBreak().handleBlockBreakage(containerBlock);
-			}
+	// Deletes the shopkeeper if the container is no longer present (e.g. if it got removed externally by another
+	// plugin, such as WorldEdit, etc.):
+	private void onTickCheckDeleteIfContainerBroken() {
+		if (!Settings.deleteShopkeeperOnBreakContainer) return;
+		if (!checkContainerLimiter.request()) {
+			return;
+		}
+
+		// This checks if the block is still a valid container:
+		Block containerBlock = this.getContainer();
+		if (containerBlock != null && !ShopContainers.isSupportedContainer(containerBlock.getType())) {
+			// Note: If this shopkeeper is deleted due to the chest having been broken, we will trigger a delayed
+			// save after the ticking of the shopkeepers.
+			SKShopkeepersPlugin.getInstance().getRemoveShopOnContainerBreak().handleBlockBreakage(containerBlock);
 		}
 	}
 }

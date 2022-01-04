@@ -37,7 +37,7 @@ public abstract class AbstractBlockShopObject extends AbstractShopObject impleme
 	@Override
 	public Object getId() {
 		Block block = this.getBlock();
-		if (block == null) return null; // Not active
-		return this.getType().getObjectId(block);
+		if (block == null) return null; // Not spawned
+		return BlockShopObjectIds.getObjectId(block);
 	}
 }

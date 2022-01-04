@@ -40,8 +40,8 @@ import com.nisovin.shopkeepers.shopkeeper.AbstractShopType;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.SKDefaultShopTypes;
 import com.nisovin.shopkeepers.shopkeeper.SKShopTypesRegistry;
-import com.nisovin.shopkeepers.shopkeeper.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopkeeper.migration.ShopkeeperDataMigrator;
+import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
 import com.nisovin.shopkeepers.shopobjects.SKDefaultShopObjectTypes;
 import com.nisovin.shopkeepers.shopobjects.SKShopObjectTypesRegistry;
 import com.nisovin.shopkeepers.shopobjects.citizens.CitizensShops;
@@ -361,7 +361,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		}
 
 		// Activate (spawn) shopkeepers in loaded chunks of all loaded worlds:
-		shopkeeperRegistry.activateShopkeepersInAllWorlds();
+		shopkeeperRegistry.getChunkActivator().activateShopkeepersInAllWorlds();
 
 		// Player shops:
 		playerShops.onEnable();
@@ -390,8 +390,8 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		// Inform UI registry about disable:
 		uiRegistry.onDisable();
 
-		// Despawn all shopkeepers (prior to saving shopkeepers data and before unloading all shopkeepers):
-		shopkeeperRegistry.deactivateShopkeepersInAllWorlds();
+		// Deactivate (despawn) all shopkeepers (prior to saving shopkeepers data and before unloading all shopkeepers):
+		shopkeeperRegistry.getChunkActivator().deactivateShopkeepersInAllWorlds();
 
 		// Disable living entity shops:
 		livingShops.onDisable();
@@ -406,7 +406,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		protectedContainers.disable();
 		removeShopOnContainerBreak.onDisable();
 
-		// Disable shopkeeper registry: Unloads all shopkeepers
+		// Disable shopkeeper registry: Unloads all shopkeepers.
 		shopkeeperRegistry.onDisable();
 
 		// Shutdown shopkeeper storage (saves shopkeepers):

@@ -32,6 +32,8 @@ import com.nisovin.shopkeepers.util.java.EnumUtils;
 
 public class HorseShop extends BabyableShop<Horse> {
 
+	// TODO Saddle property?
+
 	public enum HorseArmor {
 
 		LEATHER(Material.LEATHER_HORSE_ARMOR),
