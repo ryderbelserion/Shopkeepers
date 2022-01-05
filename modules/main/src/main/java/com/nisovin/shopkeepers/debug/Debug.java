@@ -1,22 +1,20 @@
 package com.nisovin.shopkeepers.debug;
 
-import org.bukkit.Bukkit;
-
 import com.nisovin.shopkeepers.config.Settings;
 
-public class Debug {
+/**
+ * Access to the debugging state.
+ */
+public final class Debug {
 
 	public static boolean isDebugging() {
 		return isDebugging(null);
 	}
 
 	public static boolean isDebugging(String option) {
-		if (Bukkit.isPrimaryThread()) {
-			return Settings.debug && (option == null || Settings.debugOptions.contains(option));
-		} else {
-			Settings.AsyncSettings async = Settings.async();
-			return async.debug && (option == null || async.debugOptions.contains(option));
-		}
+		// Thread-safe:
+		Settings.AsyncSettings settings = Settings.async();
+		return settings.debug && (option == null || settings.debugOptions.contains(option));
 	}
 
 	private Debug() {
