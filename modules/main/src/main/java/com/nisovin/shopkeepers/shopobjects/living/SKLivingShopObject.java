@@ -3,7 +3,6 @@ package com.nisovin.shopkeepers.shopobjects.living;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
 
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
@@ -476,7 +475,6 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		}
 		assert !skipRespawnAttemptsIfPeaceful;
 
-		Supplier<String> additionalDebugInfo = null;
 		if (entity != null) {
 			Location entityLocation = entity.getLocation();
 			if (ChunkCoords.isSameChunk(shopkeeper.getLocation(), entityLocation)) {
@@ -495,9 +493,10 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 				} else {
 					// The entity has been removed (e.g. by another plugin), or the chunk silently unloaded (without a
 					// corresponding ChunkUnloadEvent):
-					additionalDebugInfo = () -> "  Mob was removed (maybe by another plugin), or the chunk silently unloaded! (dead: "
+					Log.debug(() -> shopkeeper.getLocatedLogPrefix() + this.getEntityType() +
+							" was removed. Maybe by another plugin, or the chunk was silently unloaded. (dead: "
 							+ entity.isDead() + ", valid: " + entity.isValid() + ", chunk loaded: "
-							+ ChunkCoords.isChunkLoaded(entityLocation) + ")";
+							+ ChunkCoords.isChunkLoaded(entityLocation) + ")");
 				}
 			} // Else: The entity might have moved into a chunk that was then unloaded.
 
@@ -510,9 +509,6 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 		}
 
 		Log.debug(() -> shopkeeper.getLocatedLogPrefix() + this.getEntityType() + " is missing. Attempting respawn.");
-		if (additionalDebugInfo != null) {
-			Log.debug(additionalDebugInfo);
-		}
 
 		boolean spawned = this.spawn(); // This will load the chunk if necessary
 		if (!spawned) {
