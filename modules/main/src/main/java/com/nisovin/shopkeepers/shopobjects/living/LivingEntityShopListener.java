@@ -51,6 +51,7 @@ import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.shopkeeper.registry.SKShopkeeperRegistry;
+import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.EventUtils;
 import com.nisovin.shopkeepers.util.interaction.InteractionUtils;
 import com.nisovin.shopkeepers.util.interaction.TestPlayerInteractEntityEvent;
@@ -123,16 +124,21 @@ class LivingEntityShopListener implements Listener {
 	void onEntityInteract(PlayerInteractEntityEvent event) {
 		// Ignore our own fake interact event:
 		if (event instanceof TestPlayerInteractEntityEvent) return;
-		if (!(event.getRightClicked() instanceof LivingEntity)) return;
 
-		LivingEntity shopEntity = (LivingEntity) event.getRightClicked();
+		// If the clicked entity is a complex entity part, we continue with its parent:
+		Entity clickedEntity = EntityUtils.resolveComplexEntity(event.getRightClicked());
+
 		Player player = event.getPlayer();
 		boolean isInteractAtEvent = (event instanceof PlayerInteractAtEntityEvent);
 		Log.debug(() -> "Player " + player.getName() + " is interacting (" + (event.getHand()) + ") "
-				+ (isInteractAtEvent ? "at" : "with") + " entity at " + shopEntity.getLocation());
+				+ (isInteractAtEvent ? "at " : "with ") + clickedEntity.getType()
+				+ " at " + clickedEntity.getLocation());
+
+		// We only deal with living entities here:
+		if (!(clickedEntity instanceof LivingEntity)) return;
 
 		// Also checks for Citizens NPC shopkeepers:
-		AbstractShopkeeper shopkeeper = shopkeeperRegistry.getShopkeeperByEntity(shopEntity);
+		AbstractShopkeeper shopkeeper = shopkeeperRegistry.getShopkeeperByEntity(clickedEntity);
 		if (shopkeeper == null) {
 			Log.debug("  Non-shopkeeper");
 			return;
@@ -180,7 +186,7 @@ class LivingEntityShopListener implements Listener {
 
 		// Check the entity interaction result by calling another interact event:
 		if (Settings.checkShopInteractionResult) {
-			if (!InteractionUtils.checkEntityInteract(player, shopEntity)) {
+			if (!InteractionUtils.checkEntityInteract(player, clickedEntity)) {
 				Log.debug("  Cancelled by another plugin");
 				return;
 			}

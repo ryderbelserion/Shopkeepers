@@ -14,6 +14,7 @@ import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.entity.ComplexEntityPart;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Monster;
@@ -76,6 +77,22 @@ public final class EntityUtils {
 			return true;
 		default:
 			return Monster.class.isAssignableFrom(entityType.getEntityClass());
+		}
+	}
+
+	/**
+	 * Checks if the given entity is a {@link ComplexEntityPart} and then returns its
+	 * {@link ComplexEntityPart#getParent() parent}. Otherwise, returns the given entity itself.
+	 * 
+	 * @param entity
+	 *            the entity, can be <code>null</code>
+	 * @return the resolved entity, or <code>null</code> if the given entity is <code>null</code>
+	 */
+	public static Entity resolveComplexEntity(Entity entity) {
+		if (entity instanceof ComplexEntityPart) {
+			return ((ComplexEntityPart) entity).getParent();
+		} else {
+			return entity;
 		}
 	}
 

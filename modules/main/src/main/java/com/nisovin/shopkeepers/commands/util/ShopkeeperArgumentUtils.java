@@ -187,7 +187,7 @@ public class ShopkeeperArgumentUtils {
 			// Check if found shopkeeper is accepted:
 			if (shopkeeper != null) {
 				if (shopkeeperFilter.test(shopkeeper)) {
-					return new TargetShopkeepersResult(Arrays.asList(shopkeeper)); // accepted
+					return new TargetShopkeepersResult(Arrays.asList(shopkeeper)); // Accepted
 				} else {
 					return new TargetShopkeepersResult(shopkeeperFilter.getInvalidTargetErrorMsg(shopkeeper));
 				}

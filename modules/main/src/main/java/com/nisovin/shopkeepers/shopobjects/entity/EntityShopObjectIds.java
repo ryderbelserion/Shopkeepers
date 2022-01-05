@@ -1,10 +1,12 @@
 package com.nisovin.shopkeepers.shopobjects.entity;
 
+import org.bukkit.entity.ComplexEntityPart;
 import org.bukkit.entity.Entity;
 
 import com.nisovin.shopkeepers.api.shopobjects.entity.EntityShopObject;
 import com.nisovin.shopkeepers.api.shopobjects.entity.EntityShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.AbstractShopObject;
+import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 
 /**
  * Produces the {@link AbstractShopObject#getId() shop object ids} used by {@link EntityShopObject}s.
@@ -17,12 +19,18 @@ public final class EntityShopObjectIds {
 
 	/**
 	 * Gets the object id for the given {@link Entity}.
+	 * <p>
+	 * If the given entity is a {@link ComplexEntityPart}, this returns the object for its
+	 * {@link ComplexEntityPart#getParent() parent}.
 	 * 
 	 * @param entity
 	 *            the entity, not <code>null</code>
 	 * @return the object id, not <code>null</code>
 	 */
 	public static Object getObjectId(Entity entity) {
+		// If the entity is a complex entity part, we return the id of the parent entity:
+		entity = EntityUtils.resolveComplexEntity(entity);
+
 		// We use the entity's unique id (requires no computations).
 		// This is expected to be universally unique, even across UUIDs that identify other types of shop objects
 		// (possibly not even entities). We also expect that a specific entity represents at most one shopkeeper,

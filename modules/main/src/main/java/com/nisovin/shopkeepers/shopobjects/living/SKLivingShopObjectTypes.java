@@ -67,7 +67,7 @@ public final class SKLivingShopObjectTypes implements LivingShopObjectTypes {
 	 * <li> CHICKEN: might still lays eggs (TODO re-check: this might no longer be the case), seems okay
 	 * <li> COW: okay
 	 * <li> CREEPER: okay
-	 * <li> ENDER_DRAGON: experimental: requires NoAI, shows boss bar, not clickable..
+	 * <li> ENDER_DRAGON: experimental: requires NoAI, plays no animation without AI (client-sided), shows boss bar on older versions, not clickable! (body parts are server-sided, so the client reports no interactions with them).
 	 * <li> ENDERMAN: experimental: requires NoAI, still teleports away if hit by projectile, starts starring
 	 * <li> GHAST: seems okay
 	 * <li> GIANT: seems okay
