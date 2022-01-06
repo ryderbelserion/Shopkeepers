@@ -30,6 +30,7 @@ Date format: (YYYY-MM-DD)
 * Added additional debug output when chunks are activated and deactivated. Also, the debug output when shopkeepers are spawned due to chunk activations has slightly changed.
 * The debug output for entity interactions is no longer limited to living entities, and also mentions the entity type now.
 * Converted various Bukkit scheduler tasks from lambda expressions and anonymous classes to dedicated classes, so that they can be better identified in timing reports.
+* Added additional log output when we fail to re-register a listener when we reorder the event handlers of some event. In order to resolve certain plugin incompatibility issues, we reorder the event handlers for some types of events. However, as it turns out, some plugins modify the internals of the Bukkit event system. If these plugins have flaws, they can break our event handler reordering. This additional log output should make it easier to identify the culprit plugin in those cases.
 
 **API changes:**
 * The ShopkeeperRemoveEvent is now called earlier during the shopkeeper removal, before the shopkeeper is deactivated (i.e. despawned, UIs closed, ticking stopped, etc.).

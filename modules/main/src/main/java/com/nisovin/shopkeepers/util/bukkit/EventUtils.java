@@ -1,6 +1,11 @@
 package com.nisovin.shopkeepers.util.bukkit;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -273,8 +278,52 @@ public final class EventUtils {
 
 				// Unregister and register: This moves the event handler to the back of the handler list.
 				handlerList.unregister(registeredListener);
-				handlerList.register(registeredListener);
+				try {
+					handlerList.register(registeredListener);
+				} catch (Exception e) {
+					Log.severe("Failed to re-register a listener of plugin '"
+							+ registeredListener.getPlugin().getName() + "' for event "
+							+ ((eventClass != null) ? "'" + eventClass.getName() + "'" : "<unspecified>")
+							+ " at priority " + eventPriority.name() + "!", e);
+					Log.severe("This issue might be caused by one of your other plugins on your server."
+							+ " Check below for anything that indicates the involvement of one of your plugins.");
+					inspectHandlerListInternals(handlerList, eventClass, eventPriority, registeredListener);
+				}
 			}
+		}
+	}
+
+	// eventClass can be null.
+	private static void inspectHandlerListInternals(HandlerList handlerList, Class<? extends Event> eventClass,
+													EventPriority eventPriority, RegisteredListener targetListener) {
+		assert handlerList != null && eventClass != null && eventPriority != null && targetListener != null;
+		assert getHandlerList(eventClass) == handlerList;
+		Log.info("Inspecting the HandlerList internals of event "
+				+ ((eventClass != null) ? "'" + eventClass.getName() + "'" : "<unspecified>")
+				+ " and priority " + eventPriority + ":");
+		try {
+			Log.info("  Target RegisteredListener implementation: " + targetListener.getClass().getName());
+			Log.info("  HandlerList implementation: " + handlerList.getClass().getName());
+
+			Field handlerslotsField = HandlerList.class.getDeclaredField("handlerslots");
+			handlerslotsField.setAccessible(true);
+			Object handlerslots = handlerslotsField.get(handlerList);
+			Log.info("  handlerslots implementation: " + handlerslots.getClass().getName());
+
+			@SuppressWarnings("unchecked")
+			Map<EventPriority, ?> handlerslotsMap = (Map<EventPriority, ?>) handlerslots;
+			Object handlerslotsList = handlerslotsMap.get(eventPriority);
+			Log.info("  handlerslots list implementation: " + handlerslotsList.getClass().getName());
+
+			@SuppressWarnings("unchecked")
+			List<RegisteredListener> registeredListeners = (List<RegisteredListener>) handlerslotsList;
+			Set<String> registeredListenerClasses = new LinkedHashSet<>();
+			for (RegisteredListener registeredListener : registeredListeners) {
+				registeredListenerClasses.add(registeredListener.getClass().getName());
+			}
+			Log.info("  RegisteredListener implementations: " + registeredListenerClasses);
+		} catch (Exception e) {
+			Log.severe("Error during HandlerList inspection!", e);
 		}
 	}
 
