@@ -192,12 +192,25 @@ public class VillagerSounds extends TradingListener {
 			// We are already about to process another inventory interaction.
 			return;
 		}
-		tradeInteractionTask = Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), () -> {
+		tradeInteractionTask = Bukkit.getScheduler().runTask(SKShopkeepersPlugin.getInstance(), new ProcessTradeInteractionTask(uiSession));
+	}
+
+	private class ProcessTradeInteractionTask implements Runnable {
+
+		private final UISession uiSession;
+
+		private ProcessTradeInteractionTask(UISession uiSession) {
+			assert uiSession != null;
+			this.uiSession = uiSession;
+		}
+
+		@Override
+		public void run() {
 			tradeInteractionTask = null; // Reset the task
 			if (!uiSession.isValid()) return; // The UI session is no longer valid
 
-			this.onPostTradeInteraction(uiSession);
-		});
+			onPostTradeInteraction(uiSession);
+		}
 	}
 
 	private void onPostTradeInteraction(UISession uiSession) {

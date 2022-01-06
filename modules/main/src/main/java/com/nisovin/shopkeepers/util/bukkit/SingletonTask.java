@@ -12,7 +12,7 @@ import com.nisovin.shopkeepers.util.java.Validate;
  * Represents a task that is triggered from the server's main thread and of which only one execution can take place
  * simultaneously.
  * <p>
- * Usually the task is run asynchronously, but it may also run on the server's main thread (for example when forcing an
+ * The task is usually run asynchronously, but it may also run on the server's main thread (for example when forcing an
  * immediate execution, such as during shutdown).
  * <p>
  * While the task is already running asynchronously, any subsequent requests to execute the task are deferred until
@@ -311,48 +311,7 @@ public abstract class SingletonTask {
 		// subsequent execution and is responsible to reset any state associated with this execution.
 		// Note: This needs to be a new runnable (cannot be a lambda), in order to be able to reliable use the object's
 		// identity to identify whether the callback has already been run.
-		internalSyncCallback = new Runnable() {
-			@Override
-			public void run() {
-				// We omit running this callback if it has already been run (for example when awaiting the execution to
-				// finish).
-				// We check the identity of the callback here (instead of checking for null), because if the callback
-				// has already been run manually, another execution (and its sync callback) might already have been
-				// prepared while the task for this callback (started by the async callback) was still pending
-				// execution.
-				if (internalSyncCallback != this) {
-					return;
-				}
-
-				// Reset state related to the previous execution.
-				// It is important that these get reset in the sync execution context so that we can reason about them
-				// within the main thread without requiring synchronization.
-				internalSyncCallback = null;
-				// Note: The (async) callback has already been run at this point.
-				internalCallback = null;
-				asyncTask = null;
-
-				assert state == State.EXECUTING;
-				state = State.SYNC_CALLBACK;
-
-				// Synchronous user callback:
-				syncCallback();
-
-				// This execution has been completed:
-				state = State.NOT_RUNNING;
-
-				// Trigger another execution if there is a pending execution request:
-				if (runAgain) {
-					runAgain = false;
-					if (runAgainSync) {
-						SingletonTask.this.runImmediately();
-					} else {
-						SingletonTask.this.run();
-					}
-				}
-				assert !runAgain;
-			}
-		};
+		internalSyncCallback = this.createInternalSyncCallbackTask();
 
 		preparationEndTimeNanos = System.nanoTime();
 		preparationDurationMillis = TimeUnit.NANOSECONDS.toMillis(preparationEndTimeNanos - startTimeNanos);
@@ -366,24 +325,97 @@ public abstract class SingletonTask {
 			// TODO Measure the time it takes to schedule the async task as part of the preparation? Tricky, since in
 			// general there is no guarantee about the order in which the task and any following instructions are
 			// executed.
-			this.asyncTask = new Runnable() {
-				private BukkitTask task; // Captured Bukkit task
-
-				private BukkitTask runTaskAsynchronously() {
-					this.task = Bukkit.getScheduler().runTaskAsynchronously(plugin, this);
-					return task;
-				}
-
-				@Override
-				public void run() {
-					executeTask(task);
-				}
-			}.runTaskAsynchronously();
+			this.asyncTask = this.createInternalAsyncTask().runTaskAsynchronously();
 		} else {
 			// Synchronous execution:
 			this.executeTask(null);
 		}
 	}
+
+	/**
+	 * The type of the task determines how it is shown and merged with other tasks in timings reports. This task class
+	 * is only exposed so that subclasses can construct task instances of a custom distinct type that derives from this
+	 * type. The behavior of this task cannot be changed by subclasses.
+	 */
+	public abstract class InternalAsyncTask implements Runnable {
+
+		private BukkitTask task; // Captured Bukkit task
+
+		protected InternalAsyncTask() {
+		}
+
+		private BukkitTask runTaskAsynchronously() {
+			this.task = Bukkit.getScheduler().runTaskAsynchronously(plugin, this);
+			return task;
+		}
+
+		@Override
+		public final void run() {
+			executeTask(task);
+		}
+	}
+
+	/**
+	 * Creates an {@link InternalAsyncTask}.
+	 * 
+	 * @return the task instance, not <code>null</code>
+	 */
+	protected abstract InternalAsyncTask createInternalAsyncTask();
+
+	/**
+	 * The type of the task determines how it is shown and merged with other tasks in timings reports. This task class
+	 * is only exposed so that subclasses can construct task instances of a custom distinct type that derives from this
+	 * type. The behavior of this task cannot be changed by subclasses.
+	 */
+	public class InternalSyncCallbackTask implements Runnable {
+		@Override
+		public final void run() {
+			// We omit running this callback if it has already been run (for example when awaiting the execution to
+			// finish).
+			// We check the identity of the callback here (instead of checking for null), because if the callback
+			// has already been run manually, another execution (and its sync callback) might already have been
+			// prepared while the task for this callback (started by the async callback) was still pending
+			// execution.
+			if (internalSyncCallback != this) {
+				return;
+			}
+
+			// Reset state related to the previous execution.
+			// It is important that these get reset in the sync execution context so that we can reason about them
+			// within the main thread without requiring synchronization.
+			internalSyncCallback = null;
+			// Note: The (async) callback has already been run at this point.
+			internalCallback = null;
+			asyncTask = null;
+
+			assert state == State.EXECUTING;
+			state = State.SYNC_CALLBACK;
+
+			// Synchronous user callback:
+			syncCallback();
+
+			// This execution has been completed:
+			state = State.NOT_RUNNING;
+
+			// Trigger another execution if there is a pending execution request:
+			if (runAgain) {
+				runAgain = false;
+				if (runAgainSync) {
+					SingletonTask.this.runImmediately();
+				} else {
+					SingletonTask.this.run();
+				}
+			}
+			assert !runAgain;
+		}
+	}
+
+	/**
+	 * Creates an {@link InternalSyncCallbackTask}.
+	 * 
+	 * @return the task instance, not <code>null</code>
+	 */
+	protected abstract InternalSyncCallbackTask createInternalSyncCallbackTask();
 
 	// Potentially run asynchronously.
 	// asyncTask: The async task executing this method. Null for sync executions.

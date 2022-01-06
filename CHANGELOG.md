@@ -29,6 +29,7 @@ Date format: (YYYY-MM-DD)
 * We still clear all shopkeeper registry collections during plugin shutdown, just in case something went wrong earlier and prevented elements from being properly removed. But we also log a warning in this case now.
 * Added additional debug output when chunks are activated and deactivated. Also, the debug output when shopkeepers are spawned due to chunk activations has slightly changed.
 * The debug output for entity interactions is no longer limited to living entities, and also mentions the entity type now.
+* Converted various Bukkit scheduler tasks from lambda expressions and anonymous classes to dedicated classes, so that they can be better identified in timing reports.
 
 **API changes:**
 * The ShopkeeperRemoveEvent is now called earlier during the shopkeeper removal, before the shopkeeper is deactivated (i.e. despawned, UIs closed, ticking stopped, etc.).

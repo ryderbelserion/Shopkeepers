@@ -750,11 +750,22 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 	public void saveDelayed() {
 		this.requestSave();
 		if (Settings.saveInstantly && delayedSaveTask == null) {
-			delayedSaveTask = SchedulerUtils.runTaskLaterOrOmit(plugin, () -> {
-				delayedSaveTask = null;
-				this.saveIfDirty();
-			}, DELAYED_SAVE_TICKS);
+			new DelayedSaveTask().start();
 		} // Else: The periodic save task will trigger a save at some point.
+	}
+
+	private class DelayedSaveTask implements Runnable {
+
+		void start() {
+			assert delayedSaveTask == null;
+			delayedSaveTask = SchedulerUtils.runTaskLaterOrOmit(plugin, this, DELAYED_SAVE_TICKS);
+		}
+
+		@Override
+		public void run() {
+			delayedSaveTask = null;
+			saveIfDirty();
+		}
 	}
 
 	@Override
@@ -811,6 +822,22 @@ public class SKShopkeeperStorage implements ShopkeeperStorage {
 
 		void onDisable() {
 			lastSaveErrorMsgMillis = 0L;
+		}
+
+		private class InternalAsyncTask extends SingletonTask.InternalAsyncTask {
+		}
+
+		private class InternalSyncCallbackTask extends SingletonTask.InternalSyncCallbackTask {
+		}
+
+		@Override
+		protected InternalAsyncTask createInternalAsyncTask() {
+			return new InternalAsyncTask();
+		}
+
+		@Override
+		protected InternalSyncCallbackTask createInternalSyncCallbackTask() {
+			return new InternalSyncCallbackTask();
 		}
 
 		@Override

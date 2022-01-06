@@ -216,11 +216,16 @@ public class TradeMerger {
 		this.endMergeDurationTask();
 
 		// Start a new delayed task that ends the trade merging after a certain maximum duration:
-		mergeDurationTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+		mergeDurationTask = Bukkit.getScheduler().runTaskLater(plugin, new MaxMergeDurationTimeoutTask(), mergeDurationTicks);
+	}
+
+	private class MaxMergeDurationTimeoutTask implements Runnable {
+		@Override
+		public void run() {
 			assert previousTrades != null; // Otherwise this task would have already been cancelled
 			mergeDurationTask = null;
-			this.processPreviousTrades();
-		}, mergeDurationTicks);
+			processPreviousTrades();
+		}
 	}
 
 	private void startNextMergeTimeoutTask() {
@@ -261,18 +266,23 @@ public class TradeMerger {
 		long taskDelayTicks = Ticks.fromNanos(remainingTimeoutNanos);
 		assert taskDelayTicks >= 1; // Due to the threshold checked above
 		nextMergeTimeoutStartNanos = lastMergedTradeNanos; // Keep track of the timestamp of the last merged trade
-		nextMergeTimeoutTask = Bukkit.getScheduler().runTaskLater(plugin, () -> {
+		nextMergeTimeoutTask = Bukkit.getScheduler().runTaskLater(plugin, new NextMergeTimeoutTask(), taskDelayTicks);
+	}
+
+	private class NextMergeTimeoutTask implements Runnable {
+		@Override
+		public void run() {
 			assert previousTrades != null; // Otherwise this task would have already been cancelled
 			nextMergeTimeoutTask = null;
 
 			// If there has been another trade in the meantime, restart this timeout task:
 			if (lastMergedTradeNanos != nextMergeTimeoutStartNanos) {
-				this.startNextMergeTimeoutTask();
+				startNextMergeTimeoutTask();
 			} else {
 				// Otherwise, abort the trade merging:
-				this.processPreviousTrades();
+				processPreviousTrades();
 			}
-		}, taskDelayTicks);
+		}
 	}
 
 	/**

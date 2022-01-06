@@ -128,20 +128,25 @@ public class CitizensShops {
 		citizensListener.onEnable();
 
 		// Delayed to run after shopkeepers and NPCs were loaded:
-		Bukkit.getScheduler().runTaskLater(plugin, () -> {
-			if (!this.isEnabled()) return; // No longer enabled
+		Bukkit.getScheduler().runTaskLater(plugin, new DelayedSetupTask(), 3L);
+
+		// Enabled:
+		citizensShopsEnabled = true;
+	}
+
+	private class DelayedSetupTask implements Runnable {
+		@Override
+		public void run() {
+			if (!isEnabled()) return; // No longer enabled
 
 			// Check for invalid Citizens shopkeepers:
-			this.validateCitizenShopkeepers(Settings.deleteInvalidCitizenShopkeepers, false);
+			validateCitizenShopkeepers(Settings.deleteInvalidCitizenShopkeepers, false);
 
 			// Inform the Citizens NPC shop objects:
 			shopkeepersByNpcId.values().stream().flatMap(List::stream).forEach(shopkeeper -> {
 				((SKCitizensShopObject) shopkeeper.getShopObject()).onCitizensShopsEnabled();
 			});
-		}, 3L);
-
-		// Enabled:
-		citizensShopsEnabled = true;
+		}
 	}
 
 	void disable() {

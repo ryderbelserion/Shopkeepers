@@ -123,10 +123,15 @@ public class CsvTradeLogger implements TradeLogger {
 			return;
 		}
 
-		delayedSaveTask = SchedulerUtils.runTaskLaterOrOmit(plugin, () -> {
+		delayedSaveTask = SchedulerUtils.runTaskLaterOrOmit(plugin, new DelayedSaveTask(), DELAYED_SAVE_TICKS);
+	}
+
+	private class DelayedSaveTask implements Runnable {
+		@Override
+		public void run() {
 			delayedSaveTask = null;
-			this.savePending();
-		}, DELAYED_SAVE_TICKS);
+			savePending();
+		}
 	}
 
 	private void cancelDelayedSave() {
@@ -153,6 +158,22 @@ public class CsvTradeLogger implements TradeLogger {
 
 		SaveTask(Plugin plugin) {
 			super(plugin);
+		}
+
+		private class InternalAsyncTask extends SingletonTask.InternalAsyncTask {
+		}
+
+		private class InternalSyncCallbackTask extends SingletonTask.InternalSyncCallbackTask {
+		}
+
+		@Override
+		protected InternalAsyncTask createInternalAsyncTask() {
+			return new InternalAsyncTask();
+		}
+
+		@Override
+		protected InternalSyncCallbackTask createInternalSyncCallbackTask() {
+			return new InternalSyncCallbackTask();
 		}
 
 		@Override
