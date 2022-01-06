@@ -297,7 +297,7 @@ public final class EventUtils {
 	private static void inspectHandlerListInternals(HandlerList handlerList, Class<? extends Event> eventClass,
 													EventPriority eventPriority, RegisteredListener targetListener) {
 		assert handlerList != null && eventClass != null && eventPriority != null && targetListener != null;
-		assert getHandlerList(eventClass) == handlerList;
+		assert eventClass == null || getHandlerList(eventClass) == handlerList;
 		Log.info("Inspecting the HandlerList internals of event "
 				+ ((eventClass != null) ? "'" + eventClass.getName() + "'" : "<unspecified>")
 				+ " and priority " + eventPriority + ":");
