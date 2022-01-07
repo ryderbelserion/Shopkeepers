@@ -190,7 +190,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		}
 
 		// Load config:
-		this.configLoadError = Settings.loadConfig(this);
+		this.configLoadError = Settings.loadConfig();
 		if (this.configLoadError != null) {
 			return;
 		}
@@ -235,7 +235,7 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 
 		// Load config (if not already loaded during onLoad):
 		if (!alreadySetUp) {
-			this.configLoadError = Settings.loadConfig(this);
+			this.configLoadError = Settings.loadConfig();
 		} else {
 			Log.debug("Config already loaded.");
 		}

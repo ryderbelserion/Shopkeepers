@@ -23,6 +23,8 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import com.nisovin.shopkeepers.SKShopkeepersPlugin;
+import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.lib.Config;
 import com.nisovin.shopkeepers.config.lib.ConfigData;
@@ -567,11 +569,12 @@ public class Settings extends Config {
 		return zeroHighCurrencyItem.matches(item);
 	}
 
-	///// LOADING
+	///// PERSISTENCE
 
 	// Returns null on success, otherwise a severe issue prevented loading the config.
-	public static ConfigLoadException loadConfig(Plugin plugin) {
+	public static ConfigLoadException loadConfig() {
 		Log.info("Loading config.");
+		Plugin plugin = SKShopkeepersPlugin.getInstance();
 
 		// Save default config in case the config file does not exist:
 		plugin.saveDefaultConfig();
@@ -592,6 +595,7 @@ public class Settings extends Config {
 
 		if (configChanged) {
 			// If the config was modified (migrations, adding missing settings, ..), save it:
+			Log.info("Saving config.");
 			plugin.saveConfig();
 		}
 		return null; // Config loaded successfully
@@ -618,6 +622,18 @@ public class Settings extends Config {
 
 		onSettingsChanged();
 		return configChanged;
+	}
+
+	/**
+	 * Applies the values of this config to the config of the {@link ShopkeepersPlugin} and {@link Plugin#saveConfig()
+	 * saves it}.
+	 */
+	public static void saveConfig() {
+		Log.info("Saving config.");
+		Plugin plugin = SKShopkeepersPlugin.getInstance();
+		ConfigData configData = ConfigData.of(plugin.getConfig());
+		Settings.getInstance().save(configData);
+		plugin.saveConfig();
 	}
 
 	/////
