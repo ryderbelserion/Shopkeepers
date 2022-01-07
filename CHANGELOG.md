@@ -24,6 +24,8 @@ Date format: (YYYY-MM-DD)
 * Fixed: Citizens shopkeepers are able to move, teleport, and change their location while the Shopkeepers plugin is not running, or while the shopkeeper's chunk is not active currently. Previously, we only updated the shopkeeper's location during shopkeeper ticking, i.e. when the shopkeeper's chunk has been activated. However, if the NPC was moved to a different chunk (or even world), and the shopkeeper's previous chunk has never been activated since then, the spawned NPC might no longer have been recognized as a shopkeeper. One noticeable effect of this was that the NPC could no longer be interacted with. This has been fixed by also updating the shopkeeper's location in various other circumstances now.
 * Fixed: A related but more minor issue has been that Citizens NPCs can already be spawned while their chunk is still pending to be activated by the Shopkeepers plugin. During this short time period (roughly one second after chunk loads), the Citizens NPCs were not yet recognized as shopkeepers. This has been fixed by separating the registration of ticking (i.e. active) shopkeepers from the registration of spawned shop objects: Citizens shopkeepers now register their NPC entity already before the chunk is activated.
 * Fixed: Updating a shopkeeper's location also updates the shopkeeper's activation state now. Previously, it was possible for a shopkeeper's new chunk to not get activated until the chunk is reloaded.
+* Command: Added command "/shopkeeper setCurrency ['low'|'high']", which allows you to change the currency item(s) from in-game.
+* Permission: Added permission `shopkeeper.setcurrency` (default: `op`) which provides access to the new set-currency command.
 
 **Debugging changes:**
 * We still clear all shopkeeper registry collections during plugin shutdown, just in case something went wrong earlier and prevented elements from being properly removed. But we also log a warning in this case now.
@@ -76,6 +78,10 @@ Date format: (YYYY-MM-DD)
 * Added `mob-cannot-spawn-on-peaceful-difficulty`.
 * Added `restricted-area`.
 * Added `location-already-in-use`.
+* Added `must-hold-item-in-main-hand`.
+* Added `currency-item-set-to-main-hand-item`.
+* Added `high-currency-item-set-to-main-hand-item`.
+* Added `command-description-set-currency`.
 
 ## v2.14.0 (2021-12-17)
 ### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4

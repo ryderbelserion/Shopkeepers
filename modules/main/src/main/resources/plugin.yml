@@ -72,6 +72,9 @@ permissions:
     shopkeeper.givecurrency:
         description: Give currency items via command
         default: op
+    shopkeeper.setcurrency:
+        description: Set the currency items via command
+        default: op
     shopkeeper.convertitems.own:
         description: Convert your own items via command
         default: op

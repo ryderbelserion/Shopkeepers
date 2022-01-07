@@ -220,6 +220,9 @@ public class Messages extends Config {
 	public static Text highCurrencyItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a high currency item(s)!");
 	public static Text highCurrencyItemsReceived = Text.parse("&aYou have received &e{amount}&a high currency item(s)!");
 	public static Text highCurrencyDisabled = Text.parse("&cThe high currency is disabled!");
+	public static Text mustHoldItemInMainHand = Text.parse("&7You must hold an item in your main hand.");
+	public static Text currencyItemSetToMainHandItem = Text.parse("&aThe &ecurrency item&a has been set to the &eitem in your main hand&a!");
+	public static Text highCurrencyItemSetToMainHandItem = Text.parse("&aThe &ehigh currency item&a has been set to the &eitem in your main hand&a!");
 	public static Text itemsConverted = Text.parse("&aConverted &e{count}&a item stack(s)!");
 	public static String unknownBookAuthor = c("Unknown");
 
@@ -429,6 +432,7 @@ public class Messages extends Config {
 	public static Text commandDescriptionRemoveAll = Text.parse("Removes all shops of a specific player, all players, or all admin shops.");
 	public static Text commandDescriptionGive = Text.parse("Gives shop creation item(s) to the specified player.");
 	public static Text commandDescriptionGiveCurrency = Text.parse("Gives currency item(s) to the specified player.");
+	public static Text commandDescriptionSetCurrency = Text.parse("Changes the currency item to the item held in hand.");
 	public static Text commandDescriptionConvertItems = Text.parse("Converts the held (or all) items to conform to Spigot's data format.");
 	public static Text commandDescriptionRemote = Text.parse("Remotely opens a shop (Optionally: For another player).");
 	public static Text commandDescriptionRemoteEdit = Text.parse("Remotely edits a shop.");
