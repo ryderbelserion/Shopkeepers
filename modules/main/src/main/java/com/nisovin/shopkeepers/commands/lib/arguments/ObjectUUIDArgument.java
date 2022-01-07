@@ -2,9 +2,9 @@ package com.nisovin.shopkeepers.commands.lib.arguments;
 
 import java.util.UUID;
 
-import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
-import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 
 /**
  * Base class for arguments that accept a UUID as identifier for some type of objects.

@@ -60,6 +60,7 @@ Date format: (YYYY-MM-DD)
   * Internal API: Some calls to shopkeeper callback functions are better guarded against unexpected exceptions now. But this does not yet apply to all callback functions.
   * Internal API: Various other internal changes that might also affect the internal API of shopkeepers and shop objects.
 * Internal API: Added the ability to attach external 'components' to shopkeepers, which can provide additional state and/or functionality related to a particular shopkeeper.
+* Minor internal command library refactors.
 * Various other internal refactors and documentation changes.
 
 **Message changes:**  

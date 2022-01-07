@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.commands.lib;
+package com.nisovin.shopkeepers.commands.lib.argument;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -7,7 +7,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import com.nisovin.shopkeepers.commands.lib.Command;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -295,7 +299,7 @@ public abstract class CommandArgument<T> {
 	 * @return the exception
 	 * @see #getMissingArgumentErrorMsg()
 	 */
-	protected final MissingArgumentException missingArgumentError() {
+	public final MissingArgumentException missingArgumentError() {
 		return new MissingArgumentException(this, this.getMissingArgumentErrorMsg());
 	}
 
@@ -324,7 +328,7 @@ public abstract class CommandArgument<T> {
 	 * @return the exception
 	 * @see #getInvalidArgumentErrorMsg(String)
 	 */
-	protected final InvalidArgumentException invalidArgumentError(String argumentInput) {
+	public final InvalidArgumentException invalidArgumentError(String argumentInput) {
 		return new InvalidArgumentException(this, this.getInvalidArgumentErrorMsg(argumentInput));
 	}
 

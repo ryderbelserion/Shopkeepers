@@ -1,8 +1,9 @@
-package com.nisovin.shopkeepers.commands.lib;
+package com.nisovin.shopkeepers.commands.lib.argument;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**

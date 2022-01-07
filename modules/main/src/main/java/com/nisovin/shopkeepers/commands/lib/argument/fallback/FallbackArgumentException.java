@@ -1,6 +1,6 @@
-package com.nisovin.shopkeepers.commands.lib;
+package com.nisovin.shopkeepers.commands.lib.argument.fallback;
 
-import com.nisovin.shopkeepers.commands.lib.arguments.FallbackArgument;
+import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**

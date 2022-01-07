@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.Command;
-import com.nisovin.shopkeepers.commands.lib.HelpCommand;
+import com.nisovin.shopkeepers.commands.lib.commands.HelpCommand;
 import com.nisovin.shopkeepers.lang.Messages;
 
 class CommandHelp extends HelpCommand {

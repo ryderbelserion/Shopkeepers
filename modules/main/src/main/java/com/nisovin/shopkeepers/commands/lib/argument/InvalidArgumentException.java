@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.commands.lib;
+package com.nisovin.shopkeepers.commands.lib.argument;
 
 import com.nisovin.shopkeepers.text.Text;
 

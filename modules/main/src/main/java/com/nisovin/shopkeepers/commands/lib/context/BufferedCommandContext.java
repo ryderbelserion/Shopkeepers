@@ -1,4 +1,4 @@
-package com.nisovin.shopkeepers.commands.lib;
+package com.nisovin.shopkeepers.commands.lib.context;
 
 import java.util.Collections;
 import java.util.LinkedHashMap;

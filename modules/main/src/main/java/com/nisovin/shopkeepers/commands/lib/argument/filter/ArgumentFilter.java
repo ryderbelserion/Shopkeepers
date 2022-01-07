@@ -1,7 +1,8 @@
-package com.nisovin.shopkeepers.commands.lib;
+package com.nisovin.shopkeepers.commands.lib.argument.filter;
 
 import java.util.function.Predicate;
 
+import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.text.Text;
 
 public interface ArgumentFilter<T> extends Predicate<T> {

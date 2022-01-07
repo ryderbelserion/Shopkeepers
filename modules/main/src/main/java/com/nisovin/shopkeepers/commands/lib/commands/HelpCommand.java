@@ -1,7 +1,11 @@
-package com.nisovin.shopkeepers.commands.lib;
+package com.nisovin.shopkeepers.commands.lib.commands;
 
 import java.util.List;
 
+import com.nisovin.shopkeepers.commands.lib.Command;
+import com.nisovin.shopkeepers.commands.lib.CommandException;
+import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 /**

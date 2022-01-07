@@ -1,10 +1,12 @@
-package com.nisovin.shopkeepers.commands.lib;
+package com.nisovin.shopkeepers.commands.lib.commands;
 
 import java.util.List;
 
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.nisovin.shopkeepers.commands.lib.Command;
+import com.nisovin.shopkeepers.commands.lib.CommandSourceRejectedException;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.java.Validate;
 

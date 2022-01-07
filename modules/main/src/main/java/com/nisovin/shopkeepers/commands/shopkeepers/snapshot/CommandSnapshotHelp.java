@@ -3,7 +3,7 @@ package com.nisovin.shopkeepers.commands.shopkeepers.snapshot;
 import java.util.Arrays;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
-import com.nisovin.shopkeepers.commands.lib.HelpCommand;
+import com.nisovin.shopkeepers.commands.lib.commands.HelpCommand;
 
 public class CommandSnapshotHelp extends HelpCommand {
 

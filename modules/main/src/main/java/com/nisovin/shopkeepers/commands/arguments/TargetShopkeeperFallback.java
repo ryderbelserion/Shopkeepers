@@ -1,8 +1,8 @@
 package com.nisovin.shopkeepers.commands.arguments;
 
 import com.nisovin.shopkeepers.api.shopkeeper.Shopkeeper;
-import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.FallbackArgument;
+import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
+import com.nisovin.shopkeepers.commands.lib.argument.fallback.FallbackArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.TypedFallbackArgument;
 import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeeperFilter;
 import com.nisovin.shopkeepers.util.java.Validate;

@@ -1,8 +1,8 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
-import com.nisovin.shopkeepers.commands.lib.ArgumentFilter;
-import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 
 /**
  * Base class for arguments that accept a name as identifier for some type of objects.

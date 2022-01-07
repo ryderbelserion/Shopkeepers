@@ -5,14 +5,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 
-import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.ArgumentRejectedException;
-import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
-import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
-import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
+import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
+import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
+import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
+import com.nisovin.shopkeepers.commands.lib.argument.fallback.FallbackArgument;
+import com.nisovin.shopkeepers.commands.lib.argument.fallback.FallbackArgumentException;
+import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentRejectedException;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.java.Pair;
 import com.nisovin.shopkeepers.util.java.Validate;
 

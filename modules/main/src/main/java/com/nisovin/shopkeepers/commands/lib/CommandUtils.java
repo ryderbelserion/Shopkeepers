@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import com.nisovin.shopkeepers.util.java.Validate;
 
-public class CommandUtils {
+public final class CommandUtils {
 
 	private CommandUtils() {
 	}

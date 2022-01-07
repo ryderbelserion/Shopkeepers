@@ -1,9 +1,9 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
-import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
-import com.nisovin.shopkeepers.commands.lib.CommandContextView;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
+import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.util.java.Validate;
 
 public class BoundedIntegerArgument extends IntegerArgument {

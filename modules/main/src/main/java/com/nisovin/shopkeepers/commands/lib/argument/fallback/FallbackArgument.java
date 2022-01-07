@@ -1,11 +1,10 @@
-package com.nisovin.shopkeepers.commands.lib.arguments;
+package com.nisovin.shopkeepers.commands.lib.argument.fallback;
 
-import com.nisovin.shopkeepers.commands.lib.ArgumentParseException;
-import com.nisovin.shopkeepers.commands.lib.ArgumentsReader;
-import com.nisovin.shopkeepers.commands.lib.CommandArgument;
-import com.nisovin.shopkeepers.commands.lib.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.FallbackArgumentException;
+import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
+import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
+import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContext;
 
 /**
  * A {@link CommandArgument} that can provide a fallback if parsing fails.

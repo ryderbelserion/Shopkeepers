@@ -12,7 +12,15 @@ import java.util.function.Supplier;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 
-import com.nisovin.shopkeepers.commands.lib.arguments.FallbackArgument;
+import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
+import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
+import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
+import com.nisovin.shopkeepers.commands.lib.argument.fallback.FallbackArgument;
+import com.nisovin.shopkeepers.commands.lib.argument.fallback.FallbackArgumentException;
+import com.nisovin.shopkeepers.commands.lib.context.BufferedCommandContext;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContext;
+import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
+import com.nisovin.shopkeepers.commands.lib.context.SimpleCommandContext;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.text.Text;
@@ -257,12 +265,12 @@ public abstract class Command {
 		return true;
 	}
 
-	private static final Text MSG_COMMAND_SOURCE_DENIED = Text.of("You cannot execute this command here!");
+	private static final Text MSG_COMMAND_SOURCE_REJECTED = Text.of("You cannot execute this command here!");
 
 	/**
 	 * Checks whether the given type of {@link CommandSender} is accepted to execute this command.
 	 * <p>
-	 * If the {@link CommandSender} is not accepted the thrown {@link CommandSourceRejectedException} contains a
+	 * If the {@link CommandSender} is not accepted, the thrown {@link CommandSourceRejectedException} contains a
 	 * user-friendly rejection message.
 	 * 
 	 * @param sender
@@ -273,7 +281,7 @@ public abstract class Command {
 	public void checkCommandSource(CommandSender sender) throws CommandSourceRejectedException {
 		Validate.notNull(sender, "sender is null");
 		if (!this.isAccepted(sender)) {
-			throw new CommandSourceRejectedException(MSG_COMMAND_SOURCE_DENIED);
+			throw new CommandSourceRejectedException(MSG_COMMAND_SOURCE_REJECTED);
 		}
 	}
 

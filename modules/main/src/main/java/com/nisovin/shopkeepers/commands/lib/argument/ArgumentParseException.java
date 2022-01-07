@@ -1,5 +1,7 @@
-package com.nisovin.shopkeepers.commands.lib;
+package com.nisovin.shopkeepers.commands.lib.argument;
 
+import com.nisovin.shopkeepers.commands.lib.Command;
+import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.text.Text;
 
 /**
