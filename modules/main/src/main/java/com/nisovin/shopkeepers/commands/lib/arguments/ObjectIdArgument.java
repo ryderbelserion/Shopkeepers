@@ -67,7 +67,7 @@ public abstract class ObjectIdArgument<I> extends CommandArgument<I> {
 			int endIndex = argsReader.getCursor();
 			List<String> parsedArgs = argsReader.getArgs().subList(startIndex + 1, endIndex + 1);
 			String parsedArgsString = String.join(Command.ARGUMENTS_SEPARATOR, parsedArgs);
-			throw new ArgumentRejectedException(this, filter.getInvalidArgumentErrorMsg(this, parsedArgsString, id));
+			throw filter.rejectedArgumentException(this, parsedArgsString, id);
 		}
 		return id;
 	}

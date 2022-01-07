@@ -7,7 +7,6 @@ import com.nisovin.shopkeepers.commands.lib.argument.ArgumentParseException;
 import com.nisovin.shopkeepers.commands.lib.argument.ArgumentsReader;
 import com.nisovin.shopkeepers.commands.lib.argument.CommandArgument;
 import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentFilter;
-import com.nisovin.shopkeepers.commands.lib.argument.filter.ArgumentRejectedException;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.text.Text;
 
@@ -88,8 +87,8 @@ public abstract class ObjectByIdArgument<I, O> extends CommandArgument<O> {
 			throw this.invalidArgumentError(idArgument.toString(id));
 		}
 		if (!filter.test(object)) {
-			// Rejected by filter:
-			throw new ArgumentRejectedException(this, filter.getInvalidArgumentErrorMsg(this, idArgument.toString(id), object));
+			// Rejected by the filter:
+			throw filter.rejectedArgumentException(this, idArgument.toString(id), object);
 		}
 		return object;
 	}
