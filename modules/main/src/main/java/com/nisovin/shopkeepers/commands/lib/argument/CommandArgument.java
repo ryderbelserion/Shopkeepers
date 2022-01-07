@@ -285,7 +285,7 @@ public abstract class CommandArgument<T> {
 	 * <p>
 	 * When overriding this method, consider using {@link #getDefaultErrorMsgArgs()} for the common message arguments.
 	 * 
-	 * @return the error message
+	 * @return the error message, not <code>null</code>
 	 */
 	public Text getMissingArgumentErrorMsg() {
 		Text text = Messages.commandArgumentMissing;
@@ -296,7 +296,7 @@ public abstract class CommandArgument<T> {
 	/**
 	 * This creates a {@link MissingArgumentException} with the 'missing argument' error message.
 	 * 
-	 * @return the exception
+	 * @return the exception, not <code>null</code>
 	 * @see #getMissingArgumentErrorMsg()
 	 */
 	public final MissingArgumentException missingArgumentError() {
@@ -309,11 +309,11 @@ public abstract class CommandArgument<T> {
 	 * When overriding this method, consider using {@link #getDefaultErrorMsgArgs()} for the common message arguments.
 	 * 
 	 * @param argumentInput
-	 *            the argument input
-	 * @return the error message
+	 *            the argument input, not <code>null</code>
+	 * @return the error message, not <code>null</code>
 	 */
 	public Text getInvalidArgumentErrorMsg(String argumentInput) {
-		if (argumentInput == null) argumentInput = "";
+		Validate.notNull(argumentInput, "argumentInput is null");
 		Text text = Messages.commandArgumentInvalid;
 		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
 		text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
@@ -324,8 +324,8 @@ public abstract class CommandArgument<T> {
 	 * This creates an {@link InvalidArgumentException} with the 'invalid argument' error message.
 	 * 
 	 * @param argumentInput
-	 *            the invalid argument input
-	 * @return the exception
+	 *            the invalid argument input, not <code>null</code>
+	 * @return the exception, not <code>null</code>
 	 * @see #getInvalidArgumentErrorMsg(String)
 	 */
 	public final InvalidArgumentException invalidArgumentError(String argumentInput) {

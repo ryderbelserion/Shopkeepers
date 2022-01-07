@@ -43,7 +43,7 @@ public abstract class ArgumentFilter<T> implements Predicate<T> {
 	 * @param argument
 	 *            the argument using this filter, not <code>null</code>
 	 * @param argumentInput
-	 *            the argument input
+	 *            the argument input, not <code>null</code>
 	 * @param value
 	 *            the corresponding parsed but declined value, can be <code>null</code>
 	 * @return the error message
@@ -59,7 +59,7 @@ public abstract class ArgumentFilter<T> implements Predicate<T> {
 	 * @param argument
 	 *            the argument using this filter, not <code>null</code>
 	 * @param argumentInput
-	 *            the argument input
+	 *            the argument input, not <code>null</code>
 	 * @param value
 	 *            the corresponding parsed but declined value, can be <code>null</code>
 	 * @return the {@link ArgumentRejectedException}
