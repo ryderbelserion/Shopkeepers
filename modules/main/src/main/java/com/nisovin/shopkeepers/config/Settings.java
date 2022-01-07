@@ -578,6 +578,7 @@ public class Settings extends Config {
 
 		// Load config:
 		plugin.reloadConfig();
+		// This is a wrapper around the Bukkit config. Config comments are preserved by the underlying Bukkit config.
 		ConfigData configData = ConfigData.of(plugin.getConfig());
 
 		// Load settings from config:
@@ -591,7 +592,6 @@ public class Settings extends Config {
 
 		if (configChanged) {
 			// If the config was modified (migrations, adding missing settings, ..), save it:
-			// TODO Persist comments somehow.
 			plugin.saveConfig();
 		}
 		return null; // Config loaded successfully
