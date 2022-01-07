@@ -27,12 +27,12 @@ class CommandGiveCurrency extends Command {
 
 	private static final String ARGUMENT_PLAYER = "player";
 	private static final String ARGUMENT_CURRENCY_TYPE = "currency-type";
-	private static final String ARGUMENT_CURRENCY_LOW = "low";
-	private static final String ARGUMENT_CURRENCY_HIGH = "high";
+	private static final String ARGUMENT_CURRENCY_TYPE_LOW = "low";
+	private static final String ARGUMENT_CURRENCY_TYPE_HIGH = "high";
 	private static final String ARGUMENT_AMOUNT = "amount";
 
 	CommandGiveCurrency() {
-		super("givecurrency", Arrays.asList("currency"));
+		super("giveCurrency", Arrays.asList("currency"));
 
 		// Set permission:
 		this.setPermission(ShopkeepersPlugin.GIVE_CURRENCY_PERMISSION);
@@ -43,9 +43,9 @@ class CommandGiveCurrency extends Command {
 		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
 		this.addArgument(new DefaultValueFallback<>(new TypedFirstOfArgument<>(ARGUMENT_CURRENCY_TYPE, Arrays.asList(
-				new LiteralArgument(ARGUMENT_CURRENCY_LOW),
-				new LiteralArgument(ARGUMENT_CURRENCY_HIGH))),
-				ARGUMENT_CURRENCY_LOW));
+				new LiteralArgument(ARGUMENT_CURRENCY_TYPE_LOW),
+				new LiteralArgument(ARGUMENT_CURRENCY_TYPE_HIGH))),
+				ARGUMENT_CURRENCY_TYPE_LOW));
 		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_AMOUNT), 1));
 	}
 
@@ -59,10 +59,10 @@ class CommandGiveCurrency extends Command {
 
 		String currencyType = context.get(ARGUMENT_CURRENCY_TYPE);
 		boolean lowCurrency;
-		if (ARGUMENT_CURRENCY_LOW.equals(currencyType)) {
+		if (ARGUMENT_CURRENCY_TYPE_LOW.equals(currencyType)) {
 			lowCurrency = true;
 		} else {
-			assert ARGUMENT_CURRENCY_HIGH.equals(currencyType);
+			assert ARGUMENT_CURRENCY_TYPE_HIGH.equals(currencyType);
 			lowCurrency = false;
 			if (!Settings.isHighCurrencyEnabled()) {
 				TextUtils.sendMessage(sender, Messages.highCurrencyDisabled);

@@ -67,10 +67,10 @@ permissions:
         description: Allows turning trade notifications for you on or off by command
         default: true
     shopkeeper.give:
-        description: Give shop creation items per command
+        description: Give shop creation items via command
         default: op
     shopkeeper.givecurrency:
-        description: Give currency items per command
+        description: Give currency items via command
         default: op
     shopkeeper.convertitems.own:
         description: Convert your own items via command
