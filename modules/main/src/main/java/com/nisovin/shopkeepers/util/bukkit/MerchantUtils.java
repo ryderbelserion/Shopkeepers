@@ -96,16 +96,16 @@ public final class MerchantUtils {
 		if (recipe == null) return null;
 		Validate.isTrue(recipe.isValid(), "recipe is not valid");
 
-		// CraftBukkit always fills both ingredients, possibly with empty ItemStacks. We do the same in order to be able
-		// to more easily compare merchant recipes.
 		// The items are already copied on various occasions (addIngredient, getIngredients, when converting to a
 		// Minecraft recipe, etc.), so we do not need to copy them ourselves here. The only exception to this is the
 		// result item: The MerchantRecipe does not copy it during construction, nor during getResult. Copying the
 		// result item here ensures that we do not accidentally encounter unmodifiable merchant recipe result items in
 		// contexts in which we do not expect them.
 		ItemStack resultItem = recipe.getResultItem().copy();
-		ItemStack buyItem1 = recipe.getItem1().asItemStack();
-		ItemStack buyItem2 = ItemUtils.getOrEmpty(ItemUtils.asItemStackOrNull(recipe.getItem2()));
+		ItemStack buyItem1 = recipe.getRecipeItem1().asItemStack();
+		// CraftBukkit always fills both ingredients, possibly with empty ItemStacks. We do the same in order to be able
+		// to more easily compare merchant recipes.
+		ItemStack buyItem2 = ItemUtils.getOrEmpty(ItemUtils.asItemStackOrNull(recipe.getRecipeItem2()));
 		assert !ItemUtils.isEmpty(resultItem) && !ItemUtils.isEmpty(buyItem1);
 
 		MerchantRecipe merchantRecipe = new MerchantRecipe(resultItem, Integer.MAX_VALUE); // No max-uses limit

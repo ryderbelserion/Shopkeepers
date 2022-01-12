@@ -97,6 +97,16 @@ public class SKTradingRecipe extends TradingRecipeDraft implements TradingRecipe
 		this.outOfStock = outOfStock;
 	}
 
+	/**
+	 * Checks if this trading recipe has a {@link #getItem2() second item}.
+	 * 
+	 * @return <code>true</code> if the second item is not empty
+	 */
+	@Override
+	public final boolean hasItem2() {
+		return (item2 != null);
+	}
+
 	@Override
 	public final boolean isOutOfStock() {
 		return outOfStock;

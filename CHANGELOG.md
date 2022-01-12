@@ -26,6 +26,7 @@ Date format: (YYYY-MM-DD)
 * Fixed: Updating a shopkeeper's location also updates the shopkeeper's activation state now. Previously, it was possible for a shopkeeper's new chunk to not get activated until the chunk is reloaded.
 * Command: Added command "/shopkeeper setCurrency ['low'|'high']", which allows you to change the currency item(s) from in-game.
 * Permission: Added permission `shopkeeper.setcurrency` (default: `op`) which provides access to the new set-currency command.
+* Fixed: When setting the zero currency item to AIR, the selling and book shopkeepers were not able to derive the price of a trade from the editor when only the high currency price is specified.
 
 **Debugging changes:**
 * We still clear all shopkeeper registry collections during plugin shutdown, just in case something went wrong earlier and prevented elements from being properly removed. But we also log a warning in this case now.

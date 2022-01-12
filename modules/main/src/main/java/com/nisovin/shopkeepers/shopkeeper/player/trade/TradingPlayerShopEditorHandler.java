@@ -90,8 +90,8 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			assert recipe != null && recipe.isValid();
 			// We can reuse the trading recipe draft's items without copying them first.
 			UnmodifiableItemStack resultItem = recipe.getResultItem();
-			UnmodifiableItemStack item1 = recipe.getItem1();
-			UnmodifiableItemStack item2 = recipe.getItem2();
+			UnmodifiableItemStack item1 = recipe.getRecipeItem1();
+			UnmodifiableItemStack item2 = recipe.getRecipeItem2();
 
 			// Replace placeholder items, if any:
 			// Note: We also replace placeholder items in the buy items, because this allows the setup of trades before

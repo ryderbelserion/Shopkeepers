@@ -10,7 +10,8 @@ import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 /**
- * Similar to {@link TradingRecipe}, but each item can be empty.
+ * Similar to {@link TradingRecipe}, but each item can be empty, independently of the other items (e.g.
+ * {@link #getItem1() item1} can be empty even if {@link #getItem2() item2} is non-empty).
  * <p>
  * In order to avoid extensive item cloning, this class directly stores the item stacks that are given during
  * construction, without copying them first. This class exposes the item stacks always only as
@@ -50,8 +51,7 @@ public class TradingRecipeDraft {
 	/**
 	 * Creates a {@link TradingRecipeDraft}.
 	 * <p>
-	 * Empty items are normalized to <code>null</code>. If <code>item1</code> is empty, <code>item2</code> will take its
-	 * place.
+	 * Empty items are normalized to <code>null</code>.
 	 * <p>
 	 * In order to avoid extensive item cloning, this class stores the given item stacks directly, without copying them
 	 * first. This class exposes the item stacks always only as {@link UnmodifiableItemStack}s.
@@ -65,15 +65,8 @@ public class TradingRecipeDraft {
 	 */
 	public TradingRecipeDraft(UnmodifiableItemStack resultItem, UnmodifiableItemStack item1, UnmodifiableItemStack item2) {
 		this.resultItem = ItemUtils.getNullIfEmpty(resultItem);
-		item1 = ItemUtils.getNullIfEmpty(item1);
-		item2 = ItemUtils.getNullIfEmpty(item2);
-		// Swap items if item1 is empty:
-		if (item1 == null) {
-			item1 = item2;
-			item2 = null;
-		}
-		this.item1 = item1;
-		this.item2 = item2;
+		this.item1 = ItemUtils.getNullIfEmpty(item1);
+		this.item2 = ItemUtils.getNullIfEmpty(item2);
 	}
 
 	/**
@@ -104,12 +97,29 @@ public class TradingRecipeDraft {
 	}
 
 	/**
-	 * Checks whether this trading recipe draft has a {@link #getItem2() second item}.
+	 * Gets the first required item of a valid trading recipe based on this draft.
+	 * <p>
+	 * Unlike {@link #getItem1()}, this reorders the input items of this trading recipe draft and returns
+	 * {@link #getItem2() item2} if {@link #getItem1() item1} is empty.
 	 * 
-	 * @return <code>true</code> if the second item is not empty
+	 * @return an unmodifiable view on the first required item of a valid trading recipe based on this draft, not
+	 *         <code>null</code> if this draft is {@link #isValid() valid}
 	 */
-	public boolean hasItem2() {
-		return item2 != null;
+	public final UnmodifiableItemStack getRecipeItem1() {
+		return (item1 != null) ? item1 : item2;
+	}
+
+	/**
+	 * Gets the second required item of a valid trading recipe based on this draft.
+	 * <p>
+	 * Unlike {@link #getItem2()}, this reorders the input items of this trading recipe draft and returns
+	 * <code>null</code> if {@link #getItem1() item1} is empty.
+	 * 
+	 * @return an unmodifiable view on the second required item of a valid trading recipe based on this draft, can be
+	 *         <code>null</code>
+	 */
+	public final UnmodifiableItemStack getRecipeItem2() {
+		return (item1 != null) ? item2 : null;
 	}
 
 	/**
@@ -124,12 +134,12 @@ public class TradingRecipeDraft {
 	/**
 	 * Checks if this draft represents a valid trading recipe.
 	 * <p>
-	 * I.e. this checks if at least the result item and the first require item are not empty.
+	 * I.e. this checks if the result item and at least one of the input items are not empty.
 	 *
 	 * @return <code>true</code> if valid
 	 */
 	public final boolean isValid() {
-		return resultItem != null && item1 != null;
+		return resultItem != null && (item1 != null || item2 != null);
 	}
 
 	public final boolean areItemsEqual(@ReadOnly ItemStack resultItem, @ReadOnly ItemStack item1, @ReadOnly ItemStack item2) {

@@ -54,8 +54,8 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 			assert recipe != null && recipe.isValid();
 			// We can reuse the trading recipe draft's items without copying them first.
 			UnmodifiableItemStack resultItem = recipe.getResultItem();
-			UnmodifiableItemStack item1 = recipe.getItem1();
-			UnmodifiableItemStack item2 = recipe.getItem2();
+			UnmodifiableItemStack item1 = recipe.getRecipeItem1();
+			UnmodifiableItemStack item2 = recipe.getRecipeItem2();
 			return TradeOffer.create(resultItem, item1, item2);
 		}
 
