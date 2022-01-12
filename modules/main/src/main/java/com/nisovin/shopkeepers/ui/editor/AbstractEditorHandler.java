@@ -44,7 +44,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	protected static final int COLUMNS_PER_ROW = 9;
 	// 9 columns, column = [0,8]
-	protected static final int TRADES_COLUMNS = 9;
+	protected static final int TRADES_COLUMNS = COLUMNS_PER_ROW;
 
 	protected static final int TRADES_ROW_1_START = 0;
 	protected static final int TRADES_ROW_1_END = TRADES_ROW_1_START + TRADES_COLUMNS - 1;
@@ -121,6 +121,28 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		return this.isResultRow(rawSlot) || this.isItem1Row(rawSlot) || this.isItem2Row(rawSlot);
 	}
 
+	// First column has index 0.
+	// Only guaranteed to return valid results if the slot is within the trades area.
+	protected int getTradeColumn(int rawSlot) {
+		return rawSlot % 9;
+	}
+
+	protected boolean isTradeColumn(int column) {
+		return column >= 0 && column < TRADES_COLUMNS;
+	}
+
+	protected int getResultItemSlot(int column) {
+		return column + RESULT_ITEM_OFFSET;
+	}
+
+	protected int getItem1Slot(int column) {
+		return column + ITEM_1_OFFSET;
+	}
+
+	protected int getItem2Slot(int column) {
+		return column + ITEM_2_OFFSET;
+	}
+
 	protected boolean isTradesPageBar(int rawSlot) {
 		return rawSlot >= TRADES_PAGE_BAR_START && rawSlot <= TRADES_PAGE_BAR_END;
 	}
@@ -145,19 +167,49 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		return Settings.maxTradesPages;
 	}
 
+	// Returns null if the slot is empty.
+	protected final ItemStack getTradeResultItem(Inventory inventory, int column) {
+		assert inventory != null;
+		assert this.isTradeColumn(column);
+		ItemStack item = ItemUtils.getNullIfEmpty(inventory.getItem(this.getResultItemSlot(column)));
+		return item;
+	}
+
+	// Returns null if the slot is empty.
+	protected final ItemStack getTradeItem1(Inventory inventory, int column) {
+		assert inventory != null;
+		assert this.isTradeColumn(column);
+		ItemStack item = ItemUtils.getNullIfEmpty(inventory.getItem(this.getItem1Slot(column)));
+		return item;
+	}
+
+	// Returns null if the slot is empty.
+	protected final ItemStack getTradeItem2(Inventory inventory, int column) {
+		assert inventory != null;
+		assert this.isTradeColumn(column);
+		ItemStack item = ItemUtils.getNullIfEmpty(inventory.getItem(this.getItem2Slot(column)));
+		return item;
+	}
+
 	protected void setTradeColumn(Inventory inventory, int column, TradingRecipeDraft recipe) {
-		if (inventory == null) return;
+		assert inventory != null;
+		assert this.isTradeColumn(column);
+		assert recipe != null;
+
 		// The inventory implementations create NMS copies of the items, so we do not need to copy them ourselves here:
-		inventory.setItem(column + RESULT_ITEM_OFFSET, ItemUtils.asItemStackOrNull(recipe.getResultItem()));
-		inventory.setItem(column + ITEM_1_OFFSET, ItemUtils.asItemStackOrNull(recipe.getItem1()));
-		inventory.setItem(column + ITEM_2_OFFSET, ItemUtils.asItemStackOrNull(recipe.getItem2()));
+		inventory.setItem(this.getResultItemSlot(column), ItemUtils.asItemStackOrNull(recipe.getResultItem()));
+		inventory.setItem(this.getItem1Slot(column), ItemUtils.asItemStackOrNull(recipe.getItem1()));
+		inventory.setItem(this.getItem2Slot(column), ItemUtils.asItemStackOrNull(recipe.getItem2()));
 	}
 
 	// TODO Avoid creating new TradingRecipeDraft objects here and instead update the drafts of the session?
 	protected TradingRecipeDraft getTradingRecipe(Inventory inventory, int column) {
-		ItemStack resultItem = inventory.getItem(column + RESULT_ITEM_OFFSET);
-		ItemStack item1 = inventory.getItem(column + ITEM_1_OFFSET);
-		ItemStack item2 = inventory.getItem(column + ITEM_2_OFFSET);
+		assert inventory != null;
+		assert this.isTradeColumn(column);
+
+		ItemStack resultItem = this.getTradeResultItem(inventory, column);
+		ItemStack item1 = this.getTradeItem1(inventory, column);
+		ItemStack item2 = this.getTradeItem2(inventory, column);
 		return new TradingRecipeDraft(resultItem, item1, item2);
 	}
 
@@ -487,28 +539,21 @@ public abstract class AbstractEditorHandler extends UIHandler {
 
 	protected void setupTradeColumns(EditorSession editorSession) {
 		assert editorSession != null;
+		// Insert trades (this replaces all previous items inside the trades area):
 		Inventory inventory = editorSession.getInventory();
-
-		// clear trades area:
-		for (int i = TRADES_ROW_1_START; i <= TRADES_ROW_1_END; ++i) {
-			inventory.setItem(i, null);
-		}
-		for (int i = TRADES_ROW_2_START; i <= TRADES_ROW_2_END; ++i) {
-			inventory.setItem(i, null);
-		}
-		for (int i = TRADES_ROW_3_START; i <= TRADES_ROW_3_END; ++i) {
-			inventory.setItem(i, null);
-		}
-
-		// Insert trades:
 		int page = editorSession.getCurrentPage();
 		assert page >= 1;
 		List<TradingRecipeDraft> recipes = editorSession.getRecipes();
-		int recipesPerPage = COLUMNS_PER_ROW;
-		int startIndex = (page - 1) * recipesPerPage;
-		for (int column = 0, i = startIndex; column < COLUMNS_PER_ROW && i < recipes.size(); ++column, ++i) {
-			TradingRecipeDraft recipe = recipes.get(i);
-			this.setTradeColumn(inventory, column, recipe);
+		int recipeStartIndex = (page - 1) * TRADES_COLUMNS;
+		for (int column = 0; column < TRADES_COLUMNS; column++) {
+			int recipeIndex = recipeStartIndex + column;
+			if (recipeIndex < recipes.size()) {
+				// Insert trading recipe:
+				TradingRecipeDraft recipe = recipes.get(recipeIndex);
+				this.setTradeColumn(inventory, column, recipe);
+			} else {
+				this.setTradeColumn(inventory, column, TradingRecipeDraft.EMPTY);
+			}
 		}
 	}
 

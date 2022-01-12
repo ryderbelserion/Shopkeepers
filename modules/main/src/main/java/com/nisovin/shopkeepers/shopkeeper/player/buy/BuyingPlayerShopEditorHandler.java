@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
@@ -119,18 +120,17 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	@Override
 	protected void handleTradesClick(EditorSession editorSession, InventoryClickEvent event) {
 		assert this.isTradesArea(event.getRawSlot());
+		Inventory inventory = editorSession.getInventory();
 		int rawSlot = event.getRawSlot();
 		if (this.isResultRow(rawSlot)) {
-			// Modifying cost:
-			int column = rawSlot - RESULT_ITEM_OFFSET;
-			ItemStack tradedItem = event.getInventory().getItem(column + ITEM_1_OFFSET);
-			if (ItemUtils.isEmpty(tradedItem)) return;
+			// Modify the cost, if this column contains a trade:
+			ItemStack tradedItem = this.getTradeItem1(inventory, this.getTradeColumn(rawSlot));
+			if (tradedItem == null) return;
 			this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
 		} else if (this.isItem1Row(rawSlot)) {
-			// Modifying bought item quantity:
+			// Modify the bought item quantity, if this column contains a trade:
 			this.handleUpdateItemAmountOnClick(event, 1);
-		} else if (this.isItem2Row(rawSlot)) {
-			// Not used by the buying shopkeeper.
 		}
+		// Item2 row: Not used by the buying shop.
 	}
 }

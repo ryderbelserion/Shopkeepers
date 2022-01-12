@@ -121,25 +121,6 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		super.onInventoryClickEarly(uiSession, event);
 	}
 
-	@Override
-	protected void handleTradesClick(EditorSession editorSession, InventoryClickEvent event) {
-		super.handleTradesClick(editorSession, event);
-		int rawSlot = event.getRawSlot();
-		if (this.isItem1Row(rawSlot)) {
-			// Change low cost:
-			int column = rawSlot - ITEM_1_OFFSET;
-			ItemStack item = event.getInventory().getItem(column);
-			if (ItemUtils.isEmpty(item)) return;
-			this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
-		} else if (this.isItem2Row(rawSlot)) {
-			// Change high cost:
-			int column = rawSlot - ITEM_2_OFFSET;
-			ItemStack item = event.getInventory().getItem(column);
-			if (ItemUtils.isEmpty(item)) return;
-			this.handleUpdateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), Settings.createZeroHighCurrencyItem());
-		}
-	}
-
 	protected void handleUpdateItemAmountOnClick(InventoryClickEvent event, int minAmount) {
 		assert event.isCancelled();
 		// Ignore in certain situations:

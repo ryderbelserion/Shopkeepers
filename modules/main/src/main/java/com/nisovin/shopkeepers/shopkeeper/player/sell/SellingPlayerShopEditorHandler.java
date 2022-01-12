@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
@@ -110,12 +111,21 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	@Override
 	protected void handleTradesClick(EditorSession editorSession, InventoryClickEvent event) {
 		assert this.isTradesArea(event.getRawSlot());
+		Inventory inventory = editorSession.getInventory();
 		int rawSlot = event.getRawSlot();
 		if (this.isResultRow(rawSlot)) {
-			// Handle changing sell stack size:
+			// Change the stack size of the sold item, if this column contains a trade:
 			this.handleUpdateItemAmountOnClick(event, 1);
-		} else {
-			super.handleTradesClick(editorSession, event);
+		} else if (this.isItem1Row(rawSlot)) {
+			// Change the low cost, if this column contains a trade:
+			ItemStack resultItem = this.getTradeResultItem(inventory, this.getTradeColumn(rawSlot));
+			if (resultItem == null) return;
+			this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
+		} else if (this.isItem2Row(rawSlot)) {
+			// Change the high cost, if this column contains a trade:
+			ItemStack resultItem = this.getTradeResultItem(inventory, this.getTradeColumn(rawSlot));
+			if (resultItem == null) return;
+			this.handleUpdateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), Settings.creatHighZeroCurrencyItem());
 		}
 	}
 }

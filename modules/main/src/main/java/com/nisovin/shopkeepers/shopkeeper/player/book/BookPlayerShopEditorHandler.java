@@ -6,14 +6,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
+import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.ui.editor.DefaultTradingRecipesAdapter;
+import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.util.inventory.BookItems;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
@@ -106,5 +110,24 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	@Override
 	public SKBookPlayerShopkeeper getShopkeeper() {
 		return (SKBookPlayerShopkeeper) super.getShopkeeper();
+	}
+
+	@Override
+	protected void handleTradesClick(EditorSession editorSession, InventoryClickEvent event) {
+		assert this.isTradesArea(event.getRawSlot());
+		Inventory inventory = editorSession.getInventory();
+		int rawSlot = event.getRawSlot();
+		if (this.isItem1Row(rawSlot)) {
+			// Change the low cost, if this column contains a trade:
+			ItemStack resultItem = this.getTradeResultItem(inventory, this.getTradeColumn(rawSlot));
+			if (resultItem == null) return;
+			this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
+		} else if (this.isItem2Row(rawSlot)) {
+			// Change the high cost, if this column contains a trade:
+			ItemStack resultItem = this.getTradeResultItem(inventory, this.getTradeColumn(rawSlot));
+			if (resultItem == null) return;
+			this.handleUpdateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), Settings.createHighZeroCurrencyItem());
+		}
+		// Result item row: Result items (books) are not modifiable.
 	}
 }

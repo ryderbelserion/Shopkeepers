@@ -138,7 +138,6 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	protected void handleTradesClick(EditorSession editorSession, InventoryClickEvent event) {
 		int rawSlot = event.getRawSlot();
 		assert this.isTradesArea(rawSlot);
-		assert this.isResultRow(rawSlot) || this.isItem1Row(rawSlot) || this.isItem2Row(rawSlot);
 
 		ItemStack cursor = event.getCursor();
 		if (!ItemUtils.isEmpty(cursor)) {
