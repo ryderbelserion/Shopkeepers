@@ -220,10 +220,10 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		UnmodifiableItemStack lowCostItem = recipe.getItem1();
 		UnmodifiableItemStack highCostItem = recipe.getItem2();
 		int price = 0;
-		if (lowCostItem != null && lowCostItem.getType() == Settings.currencyItem.getType() && lowCostItem.getAmount() > 0) {
+		if (lowCostItem != null && lowCostItem.getType() == Settings.currencyItem.getType()) {
 			price += lowCostItem.getAmount();
 		}
-		if (Settings.isHighCurrencyEnabled() && highCostItem != null && highCostItem.getType() == Settings.highCurrencyItem.getType() && highCostItem.getAmount() > 0) {
+		if (highCostItem != null && Settings.isHighCurrencyEnabled() && highCostItem.getType() == Settings.highCurrencyItem.getType()) {
 			price += (highCostItem.getAmount() * Settings.highCurrencyValue);
 		}
 		return price;
