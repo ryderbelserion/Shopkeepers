@@ -52,7 +52,8 @@ public class Messages extends Config {
 			+ "&e  Left/Right-click to select the shop type.\n"
 			+ "&e  Sneak + left/right-click to select the object type.\n"
 			+ "&e  Right-click a container to select it.\n"
-			+ "&e  Then right-click a block to place the shopkeeper.");
+			+ "&e  Then right-click a block to place the shopkeeper."
+	);
 
 	public static String stateEnabled = c("&2Enabled");
 	public static String stateDisabled = c("&4Disabled");
@@ -67,94 +68,221 @@ public class Messages extends Config {
 	public static List<String> buttonCurrentPageLore = c(Arrays.asList());
 
 	public static String buttonName = c("&aSet shop name");
-	public static List<String> buttonNameLore = c(Arrays.asList("Lets you rename", "your shopkeeper"));
+	public static List<String> buttonNameLore = c(Arrays.asList(
+			"Lets you rename",
+			"your shopkeeper"
+	));
 	public static String buttonContainer = c("&aView shop inventory");
-	public static List<String> buttonContainerLore = c(Arrays.asList("Lets you view the inventory", "your shopkeeper is using"));
+	public static List<String> buttonContainerLore = c(Arrays.asList(
+			"Lets you view the inventory",
+			"your shopkeeper is using"
+	));
 	public static String buttonTradeNotifications = c("&aTrade Notifications");
-	public static List<String> buttonTradeNotificationsLore = c(Arrays.asList("Toggles trade notifications", "for this shopkeeper on/off.", "Currently: {state}"));
+	public static List<String> buttonTradeNotificationsLore = c(Arrays.asList(
+			"Toggles trade notifications",
+			"for this shopkeeper on/off.",
+			"Currently: {state}"
+	));
 	public static String buttonDelete = c("&4Delete");
-	public static List<String> buttonDeleteLore = c(Arrays.asList("Closes and removes", "this shopkeeper"));
+	public static List<String> buttonDeleteLore = c(Arrays.asList(
+			"Closes and removes",
+			"this shopkeeper"
+	));
 
 	public static String buttonSignVariant = c("&aChoose sign variant");
-	public static List<String> buttonSignVariantLore = c(Arrays.asList("Changes the sign's", "wood type"));
+	public static List<String> buttonSignVariantLore = c(Arrays.asList(
+			"Changes the sign's",
+			"wood type"
+	));
 	public static String buttonSignGlowingText = c("&aToggle glowing text");
-	public static List<String> buttonSignGlowingTextLore = c(Arrays.asList("Toggles glowing text", "on and off"));
+	public static List<String> buttonSignGlowingTextLore = c(Arrays.asList(
+			"Toggles glowing text",
+			"on and off"
+	));
 	public static String buttonBaby = c("&aToggle baby variant");
-	public static List<String> buttonBabyLore = c(Arrays.asList("Toggles between the mob's", "baby and adult variant"));
+	public static List<String> buttonBabyLore = c(Arrays.asList(
+			"Toggles between the mob's",
+			"baby and adult variant"
+	));
 	public static String buttonSitting = c("&aToggle sitting pose");
-	public static List<String> buttonSittingLore = c(Arrays.asList("Toggles the mob's", "sitting pose"));
+	public static List<String> buttonSittingLore = c(Arrays.asList(
+			"Toggles the mob's",
+			"sitting pose"
+	));
 	public static String buttonCatVariant = c("&aChoose cat variant");
-	public static List<String> buttonCatVariantLore = c(Arrays.asList("Changes the cat's look"));
+	public static List<String> buttonCatVariantLore = c(Arrays.asList(
+			"Changes the cat's look"
+	));
 	public static String buttonRabbitVariant = c("&aChoose rabbit variant");
-	public static List<String> buttonRabbitVariantLore = c(Arrays.asList("Changes the rabbit's look"));
+	public static List<String> buttonRabbitVariantLore = c(Arrays.asList(
+			"Changes the rabbit's look"
+	));
 	public static String buttonCollarColor = c("&aChoose collar color");
-	public static List<String> buttonCollarColorLore = c(Arrays.asList("Changes the mob's", "collar color"));
+	public static List<String> buttonCollarColorLore = c(Arrays.asList(
+			"Changes the mob's",
+			"collar color"
+	));
 	public static String buttonWolfAngry = c("&aToggle angry wolf");
-	public static List<String> buttonWolfAngryLore = c(Arrays.asList("Toggles the wolf's", "angry state"));
+	public static List<String> buttonWolfAngryLore = c(Arrays.asList(
+			"Toggles the wolf's",
+			"angry state"
+	));
 	public static String buttonCarryingChest = c("&aToggle carrying chest");
-	public static List<String> buttonCarryingChestLore = c(Arrays.asList("Toggles whether the mob", "is carrying a chest"));
+	public static List<String> buttonCarryingChestLore = c(Arrays.asList(
+			"Toggles whether the mob",
+			"is carrying a chest"
+	));
 	public static String buttonHorseColor = c("&aChoose horse color");
-	public static List<String> buttonHorseColorLore = c(Arrays.asList("Changes the color", "of the horse"));
+	public static List<String> buttonHorseColorLore = c(Arrays.asList(
+			"Changes the color",
+			"of the horse"
+	));
 	public static String buttonHorseStyle = c("&aChoose horse style");
-	public static List<String> buttonHorseStyleLore = c(Arrays.asList("Changes the coat pattern", "of the horse"));
+	public static List<String> buttonHorseStyleLore = c(Arrays.asList(
+			"Changes the coat pattern",
+			"of the horse"
+	));
 	public static String buttonHorseSaddle = c("&aToggle horse saddle");
-	public static List<String> buttonHorseSaddleLore = c(Arrays.asList("Toggles the saddle", "of the horse"));
+	public static List<String> buttonHorseSaddleLore = c(Arrays.asList(
+			"Toggles the saddle",
+			"of the horse"
+	));
 	public static String buttonHorseArmor = c("&aChoose horse armor");
-	public static List<String> buttonHorseArmorLore = c(Arrays.asList("Changes the armor", "of the horse"));
+	public static List<String> buttonHorseArmorLore = c(Arrays.asList(
+			"Changes the armor",
+			"of the horse"
+	));
 	public static String buttonLlamaVariant = c("&aChoose llama variant");
-	public static List<String> buttonLlamaVariantLore = c(Arrays.asList("Changes the llama's look"));
+	public static List<String> buttonLlamaVariantLore = c(Arrays.asList(
+			"Changes the llama's look"
+	));
 	public static String buttonLlamaCarpetColor = c("&aLlama carpet color");
-	public static List<String> buttonLlamaCarpetColorLore = c(Arrays.asList("Changes the llama's", "carpet color"));
+	public static List<String> buttonLlamaCarpetColorLore = c(Arrays.asList(
+			"Changes the llama's",
+			"carpet color"
+	));
 	public static String buttonCreeperCharged = c("&aToggle charged creeper");
-	public static List<String> buttonCreeperChargedLore = c(Arrays.asList("Toggles the creeper's", "charged state"));
+	public static List<String> buttonCreeperChargedLore = c(Arrays.asList(
+			"Toggles the creeper's",
+			"charged state"
+	));
 	public static String buttonFoxVariant = c("&aChoose fox variant");
-	public static List<String> buttonFoxVariantLore = c(Arrays.asList("Changes the fox's look"));
+	public static List<String> buttonFoxVariantLore = c(Arrays.asList(
+			"Changes the fox's look"
+	));
 	public static String buttonFoxCrouching = c("&aToggle crouching pose");
-	public static List<String> buttonFoxCrouchingLore = c(Arrays.asList("Toggles the fox's", "crouching pose"));
+	public static List<String> buttonFoxCrouchingLore = c(Arrays.asList(
+			"Toggles the fox's",
+			"crouching pose"
+	));
 	public static String buttonFoxSleeping = c("&aToggle sleeping pose");
-	public static List<String> buttonFoxSleepingLore = c(Arrays.asList("Toggles the fox's", "sleeping pose"));
+	public static List<String> buttonFoxSleepingLore = c(Arrays.asList(
+			"Toggles the fox's",
+			"sleeping pose"
+	));
 	public static String buttonMooshroomVariant = c("&aChoose mooshroom variant");
-	public static List<String> buttonMooshroomVariantLore = c(Arrays.asList("Changes the look", "of the mooshroom"));
+	public static List<String> buttonMooshroomVariantLore = c(Arrays.asList(
+			"Changes the look",
+			"of the mooshroom"
+	));
 	public static String buttonPandaVariant = c("&aChoose panda variant");
-	public static List<String> buttonPandaVariantLore = c(Arrays.asList("Changes the panda's look"));
+	public static List<String> buttonPandaVariantLore = c(Arrays.asList(
+			"Changes the panda's look"
+	));
 	public static String buttonParrotVariant = c("&aChoose parrot variant");
-	public static List<String> buttonParrotVariantLore = c(Arrays.asList("Changes the parrot's look"));
+	public static List<String> buttonParrotVariantLore = c(Arrays.asList(
+			"Changes the parrot's look"
+	));
 	public static String buttonPigSaddle = c("&aToggle pig saddle");
-	public static List<String> buttonPigSaddleLore = c(Arrays.asList("Toggles the pig's saddle"));
+	public static List<String> buttonPigSaddleLore = c(Arrays.asList(
+			"Toggles the pig's saddle"
+	));
 	public static String buttonSheepColor = c("&aChoose sheep color");
-	public static List<String> buttonSheepColorLore = c(Arrays.asList("Changes the sheep's", "wool color"));
+	public static List<String> buttonSheepColorLore = c(Arrays.asList(
+			"Changes the sheep's",
+			"wool color"
+	));
 	public static String buttonSheepSheared = c("&aToggle sheared sheep");
-	public static List<String> buttonSheepShearedLore = c(Arrays.asList("Toggles the sheep's", "sheared state"));
+	public static List<String> buttonSheepShearedLore = c(Arrays.asList(
+			"Toggles the sheep's",
+			"sheared state"
+	));
 	public static String buttonVillagerProfession = c("&aChoose villager profession");
-	public static List<String> buttonVillagerProfessionLore = c(Arrays.asList("Changes the profession", "of the villager"));
+	public static List<String> buttonVillagerProfessionLore = c(Arrays.asList(
+			"Changes the profession",
+			"of the villager"
+	));
 	public static String buttonVillagerVariant = c("&aChoose villager variant");
-	public static List<String> buttonVillagerVariantLore = c(Arrays.asList("Changes the look", "of the villager"));
+	public static List<String> buttonVillagerVariantLore = c(Arrays.asList(
+			"Changes the look",
+			"of the villager"
+	));
 	public static String buttonVillagerLevel = c("&aChoose villager badge color");
-	public static List<String> buttonVillagerLevelLore = c(Arrays.asList("Changes the badge color", "of the villager"));
+	public static List<String> buttonVillagerLevelLore = c(Arrays.asList(
+			"Changes the badge color",
+			"of the villager"
+	));
 	public static String buttonZombieVillagerProfession = c("&aChoose villager profession");
-	public static List<String> buttonZombieVillagerProfessionLore = c(Arrays.asList("Changes the profession", "of the zombie villager"));
+	public static List<String> buttonZombieVillagerProfessionLore = c(Arrays.asList(
+			"Changes the profession",
+			"of the zombie villager"
+	));
 	public static String buttonSlimeSize = c("&aChoose slime size");
-	public static List<String> buttonSlimeSizeLore = c(Arrays.asList("Cycles the slime's size.", "Current size: &e{size}"));
+	public static List<String> buttonSlimeSizeLore = c(Arrays.asList(
+			"Cycles the slime's size.",
+			"Current size: &e{size}"
+	));
 	public static String buttonMagmaCubeSize = c("&aChoose magma cube size");
-	public static List<String> buttonMagmaCubeSizeLore = c(Arrays.asList("Cycles the magma cube's size.", "Current size: &e{size}"));
+	public static List<String> buttonMagmaCubeSizeLore = c(Arrays.asList(
+			"Cycles the magma cube's size.",
+			"Current size: &e{size}"
+	));
 	public static String buttonSnowmanPumpkinHead = c("&aToggle pumpkin head");
-	public static List<String> buttonSnowmanPumpkinHeadLore = c(Arrays.asList("Toggles the snowman's", "pumpkin head"));
+	public static List<String> buttonSnowmanPumpkinHeadLore = c(Arrays.asList(
+			"Toggles the snowman's",
+			"pumpkin head"
+	));
 	public static String buttonShulkerColor = c("&aChoose shulker color");
-	public static List<String> buttonShulkerColorLore = c(Arrays.asList("Changes the color", "of the shulker"));
+	public static List<String> buttonShulkerColorLore = c(Arrays.asList(
+			"Changes the color",
+			"of the shulker"
+	));
 	public static String buttonAxolotlVariant = c("&aChoose axolotl variant");
-	public static List<String> buttonAxolotlVariantLore = c(Arrays.asList("Changes the axolotl's look"));
+	public static List<String> buttonAxolotlVariantLore = c(Arrays.asList(
+			"Changes the axolotl's look"
+	));
 	public static String buttonGlowSquidDark = c("&aToggle glow");
-	public static List<String> buttonGlowSquidDarkLore = c(Arrays.asList("Toggles the glow squid's", "glow on and off"));
+	public static List<String> buttonGlowSquidDarkLore = c(Arrays.asList(
+			"Toggles the glow squid's",
+			"glow on and off"
+	));
 	public static String buttonGoatScreaming = c("&aToggle screaming goat");
-	public static List<String> buttonGoatScreamingLore = c(Arrays.asList("Toggles between a normal", "and a screaming goat"));
+	public static List<String> buttonGoatScreamingLore = c(Arrays.asList(
+			"Toggles between a normal",
+			"and a screaming goat"
+	));
 	public static String buttonTropicalFishPattern = c("&aChoose variant");
-	public static List<String> buttonTropicalFishPatternLore = c(Arrays.asList("Changes the shape and pattern", "of the tropical fish.", "Currently: &e{pattern}"));
+	public static List<String> buttonTropicalFishPatternLore = c(Arrays.asList(
+			"Changes the shape and pattern",
+			"of the tropical fish.",
+			"Currently: &e{pattern}"
+	));
 	public static String buttonTropicalFishBodyColor = c("&aChoose body color");
-	public static List<String> buttonTropicalFishBodyColorLore = c(Arrays.asList("Changes the body color", "of the tropical fish"));
+	public static List<String> buttonTropicalFishBodyColorLore = c(Arrays.asList(
+			"Changes the body color",
+			"of the tropical fish"
+	));
 	public static String buttonTropicalFishPatternColor = c("&aChoose pattern color");
-	public static List<String> buttonTropicalFishPatternColorLore = c(Arrays.asList("Changes the pattern color", "of the tropical fish"));
+	public static List<String> buttonTropicalFishPatternColorLore = c(Arrays.asList(
+			"Changes the pattern color",
+			"of the tropical fish"
+	));
 	public static String buttonPufferFishPuffState = c("&aChoose puff state");
-	public static List<String> buttonPufferFishPuffStateLore = c(Arrays.asList("Changes the puff state", "of the puffer fish.", "Currently: &e{puffState}"));
+	public static List<String> buttonPufferFishPuffStateLore = c(Arrays.asList(
+			"Changes the puff state",
+			"of the puffer fish.",
+			"Currently: &e{puffState}"
+	));
 
 	public static String adminSignShopLine1 = c("&2[SHOP]");
 	public static String adminSignShopLine2 = c("&7{shopName}");
@@ -168,7 +296,9 @@ public class Messages extends Config {
 
 	public static String forHireTitle = c("For Hire");
 	public static String buttonHire = c("&aHire");
-	public static List<String> buttonHireLore = c(Arrays.asList("Buy this shopkeeper"));
+	public static List<String> buttonHireLore = c(Arrays.asList(
+			"Buy this shopkeeper"
+	));
 
 	public static String tradingTitlePrefix = c("&2");
 	public static String tradingTitleDefault = c("Shopkeeper");
@@ -299,11 +429,44 @@ public class Messages extends Config {
 	public static String shopSetupDescAdminRegular = c("&e  Right-click the shop while sneaking to modify trades.");
 
 	public static String tradeSetupDescHeader = c("&6{shopType}");
-	public static List<String> tradeSetupDescAdminRegular = c(Arrays.asList("Has unlimited stock.", "Insert items from your inventory.", "Top row: Result items", "Bottom rows: Cost items"));
-	public static List<String> tradeSetupDescSelling = c(Arrays.asList("Sells items to players.", "Insert items to sell into the container.", "Left/Right click to adjust amounts.", "Top row: Items being sold", "Bottom rows: Cost items"));
-	public static List<String> tradeSetupDescBuying = c(Arrays.asList("Buys items from players.", "Insert one of each item you want to", "buy and plenty of currency items", "into the container.", "Left/Right click to adjust amounts.", "Top row: Cost items", "Bottom row: Items being bought"));
-	public static List<String> tradeSetupDescTrading = c(Arrays.asList("Trades items with players.", "Pickup an item from your inventory", "and then click a slot to place it.", "Left/Right click to adjust amounts.", "Top row: Result items", "Bottom rows: Cost items"));
-	public static List<String> tradeSetupDescBook = c(Arrays.asList("Sells book copies.", "Insert written and blank books", "into the container.", "Left/Right click to adjust costs.", "Top row: Books being sold", "Bottom rows: Cost items"));
+	public static List<String> tradeSetupDescAdminRegular = c(Arrays.asList(
+			"Has unlimited stock.",
+			"Insert items from your inventory.",
+			"Top row: Result items",
+			"Bottom rows: Cost items"
+	));
+	public static List<String> tradeSetupDescSelling = c(Arrays.asList(
+			"Sells items to players.",
+			"Insert items to sell into the container.",
+			"Left/Right click to adjust amounts.",
+			"Top row: Items being sold",
+			"Bottom rows: Cost items"
+	));
+	public static List<String> tradeSetupDescBuying = c(Arrays.asList(
+			"Buys items from players.",
+			"Insert one of each item you want to",
+			"buy and plenty of currency items",
+			"into the container.",
+			"Left/Right click to adjust amounts.",
+			"Top row: Cost items",
+			"Bottom row: Items being bought"
+	));
+	public static List<String> tradeSetupDescTrading = c(Arrays.asList(
+			"Trades items with players.",
+			"Pickup an item from your inventory",
+			"and then click a slot to place it.",
+			"Left/Right click to adjust amounts.",
+			"Top row: Result items",
+			"Bottom rows: Cost items"
+	));
+	public static List<String> tradeSetupDescBook = c(Arrays.asList(
+			"Sells book copies.",
+			"Insert written and blank books",
+			"into the container.",
+			"Left/Right click to adjust costs.",
+			"Top row: Books being sold",
+			"Bottom rows: Cost items"
+	));
 
 	public static Text missingEditVillagersPerm = Text.parse("&7You do not have the permission to edit villagers.");
 	public static Text missingEditWanderingTradersPerm = Text.parse("&7You do not have the permission to edit wandering traders.");
@@ -322,18 +485,30 @@ public class Messages extends Config {
 	));
 
 	public static String buttonDeleteVillager = c("&4Delete");
-	public static List<String> buttonDeleteVillagerLore = c(Arrays.asList("Deletes the villager"));
+	public static List<String> buttonDeleteVillagerLore = c(Arrays.asList(
+			"Deletes the villager"
+	));
 	public static String buttonNameVillager = c("&aSet villager name");
-	public static List<String> buttonNameVillagerLore = c(Arrays.asList("Lets you rename", "the villager"));
+	public static List<String> buttonNameVillagerLore = c(Arrays.asList(
+			"Lets you rename",
+			"the villager"
+	));
 	public static String buttonVillagerInventory = c("&aView villager inventory");
 	public static List<String> buttonVillagerInventoryLore = c(Arrays.asList(
 			"Lets you view a copy of",
 			"the villager's inventory"
 	));
 	public static String buttonMobAi = c("&aToggle mob AI");
-	public static List<String> buttonMobAiLore = c(Arrays.asList("Toggles the mob's AI"));
+	public static List<String> buttonMobAiLore = c(Arrays.asList(
+			"Toggles the mob's AI"
+	));
 	public static String buttonInvulnerability = c("&aToggle invulnerability");
-	public static List<String> buttonInvulnerabilityLore = c(Arrays.asList("Toggles the mob's", "invulnerability.", "Players in creative mode", "can still damage the mob."));
+	public static List<String> buttonInvulnerabilityLore = c(Arrays.asList(
+			"Toggles the mob's",
+			"invulnerability.",
+			"Players in creative mode",
+			"can still damage the mob."
+	));
 
 	public static String villagerInventoryTitle = c("Villager inventory (copy)");
 	public static String setVillagerXp = c("&aSet the villager's XP to &e{xp}");
@@ -372,15 +547,24 @@ public class Messages extends Config {
 	public static Text nothingToConfirm = Text.parse("&cThere is nothing to confirm currently.");
 
 	public static String confirmationUiDeleteShopTitle = c("&cReally delete this shop?");
-	public static List<String> confirmationUiDeleteShopConfirmLore = c(Arrays.asList("This will irrevocably", "remove this shop!"));
+	public static List<String> confirmationUiDeleteShopConfirmLore = c(Arrays.asList(
+			"This will irrevocably",
+			"remove this shop!"
+	));
 
 	public static String confirmationUiDeleteVillagerTitle = c("&cReally delete this villager?");
-	public static List<String> confirmationUiDeleteVillagerConfirmLore = c(Arrays.asList("This will irrevocably", "remove this villager!"));
+	public static List<String> confirmationUiDeleteVillagerConfirmLore = c(Arrays.asList(
+			"This will irrevocably",
+			"remove this villager!"
+	));
 	public static Text villagerRemoved = Text.parse("&aThe villager has been removed.");
 
 	public static String confirmationUiConfirm = c("&2Confirm");
 	public static String confirmationUiCancel = c("&4Cancel");
-	public static List<String> confirmationUiCancelLore = c(Arrays.asList("This will abort the", "current action."));
+	public static List<String> confirmationUiCancelLore = c(Arrays.asList(
+			"This will abort the",
+			"current action."
+	));
 	public static Text confirmationUiAborted = Text.parse("&7Confirmation aborted.");
 
 	public static Text snapshotListHeader = Text.parse("&9Shop &e{shop_id} &9has &e{snapshotsCount} &9snapshots: &e(Page {page} of {maxPage})");
