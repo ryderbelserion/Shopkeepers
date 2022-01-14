@@ -180,6 +180,11 @@ public final class ItemUtils {
 		return new ItemStack(Material.AIR);
 	}
 
+	public static UnmodifiableItemStack getFallbackIfNull(UnmodifiableItemStack item, UnmodifiableItemStack fallback) {
+		if (item == null) return fallback;
+		return item;
+	}
+
 	public static ItemStack cloneOrNullIfEmpty(@ReadOnly ItemStack itemStack) {
 		return isEmpty(itemStack) ? null : itemStack.clone();
 	}

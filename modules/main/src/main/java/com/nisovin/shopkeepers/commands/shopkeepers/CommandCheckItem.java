@@ -42,8 +42,6 @@ class CommandCheckItem extends PlayerCommand {
 		player.sendMessage(ChatColor.YELLOW + "Item in main hand / off hand:");
 		player.sendMessage("- Is low currency: " + checkItems(mainHandItem, offHandItem, Settings::isCurrencyItem));
 		player.sendMessage("- Is high currency: " + checkItems(mainHandItem, offHandItem, Settings::isHighCurrencyItem));
-		player.sendMessage("- Is zero low currency: " + checkItems(mainHandItem, offHandItem, Settings::isZeroCurrencyItem));
-		player.sendMessage("- Is zero high currency: " + checkItems(mainHandItem, offHandItem, Settings::isZeroHighCurrencyItem));
 		player.sendMessage("- Is shop creation item: " + checkItems(mainHandItem, offHandItem, Settings::isShopCreationItem));
 		player.sendMessage("- Similar to off-hand item: " + toDisplayString(ItemUtils.isSimilar(mainHandItem, offHandItem)));
 		player.sendMessage("- Matching off-hand item: " + toDisplayString(ItemUtils.matchesData(mainHandItem, offHandItem)));

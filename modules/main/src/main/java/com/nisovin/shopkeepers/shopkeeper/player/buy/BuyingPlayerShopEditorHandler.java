@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
@@ -65,8 +66,7 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 
 				// Add new empty recipe:
 				containerItem = ItemUtils.copySingleItem(containerItem); // Ensures a stack size of 1
-				ItemStack currencyItem = Settings.createZeroCurrencyItem();
-				TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, containerItem, null);
+				TradingRecipeDraft recipe = new TradingRecipeDraft(null, containerItem, null);
 				recipes.add(recipe);
 				newRecipes.add(containerItem);
 			}
@@ -118,6 +118,16 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
+	protected TradingRecipeDraft getEmptyTrade() {
+		return DerivedSettings.buyingEmptyTrade;
+	}
+
+	@Override
+	protected TradingRecipeDraft getEmptyTradeSlotItems() {
+		return DerivedSettings.buyingEmptyTradeSlotItems;
+	}
+
+	@Override
 	protected void handleTradesClick(EditorSession editorSession, InventoryClickEvent event) {
 		assert this.isTradesArea(event.getRawSlot());
 		Inventory inventory = editorSession.getInventory();
@@ -126,10 +136,13 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			// Modify the cost, if this column contains a trade:
 			ItemStack tradedItem = this.getTradeItem1(inventory, this.getTradeColumn(rawSlot));
 			if (tradedItem == null) return;
-			this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
+
+			UnmodifiableItemStack emptySlotItem = this.getEmptyTradeSlotItems().getResultItem();
+			this.updateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), emptySlotItem);
 		} else if (this.isItem1Row(rawSlot)) {
 			// Modify the bought item quantity, if this column contains a trade:
-			this.handleUpdateItemAmountOnClick(event, 1);
+			UnmodifiableItemStack emptySlotItem = this.getEmptyTradeSlotItems().getItem1();
+			this.updateItemAmountOnClick(event, 1, emptySlotItem);
 		}
 		// Item2 row: Not used by the buying shop.
 	}

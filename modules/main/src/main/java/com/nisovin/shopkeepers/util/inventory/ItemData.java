@@ -247,6 +247,10 @@ public final class ItemData {
 		this.dataItem = ItemUtils.unmodifiableCopyWithAmount(dataItem.asItemStack(), 1);
 	}
 
+	public UnmodifiableItemStack asUnmodifiableItemStack() {
+		return dataItem;
+	}
+
 	public Material getType() {
 		return dataItem.getType();
 	}

@@ -21,12 +21,14 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ui.UISession;
+import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.AbstractUIType;
 import com.nisovin.shopkeepers.ui.UIHandler;
 import com.nisovin.shopkeepers.ui.villagerEditor.VillagerEditorHandler;
+import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.MathUtils;
@@ -167,50 +169,134 @@ public abstract class AbstractEditorHandler extends UIHandler {
 		return Settings.maxTradesPages;
 	}
 
-	// Returns null if the slot is empty.
+	/**
+	 * Gets the {@link TradingRecipeDraft} that is used for trade columns that don't contain any trade yet.
+	 * <p>
+	 * This is expected to always return the same placeholder items.
+	 * <p>
+	 * The placeholder items are expected to not match any items that players are able to set up trades with.
+	 * 
+	 * @return the {@link TradingRecipeDraft} to use for empty trade columns, not <code>null</code>
+	 */
+	protected TradingRecipeDraft getEmptyTrade() {
+		return TradingRecipeDraft.EMPTY;
+	}
+
+	/**
+	 * Gets the items that are used for empty slots of partially set up trades.
+	 * <p>
+	 * This is expected to always return the same placeholder items.
+	 * <p>
+	 * The placeholder items are expected to not match any items that players are able to set up trades with.
+	 * 
+	 * @return a {@link TradingRecipeDraft} with the items to use for empty slots of partially set up trades, not
+	 *         <code>null</code>
+	 */
+	protected TradingRecipeDraft getEmptyTradeSlotItems() {
+		return TradingRecipeDraft.EMPTY;
+	}
+
+	private boolean isEmptyResultItem(@ReadOnly ItemStack slotItem) {
+		ItemStack item = ItemUtils.getNullIfEmpty(slotItem);
+		if (item == null) return true;
+		if (ItemUtils.equals(this.getEmptyTrade().getResultItem(), item)) return true;
+		if (ItemUtils.equals(this.getEmptyTradeSlotItems().getResultItem(), item)) return true;
+		return false;
+	}
+
+	private boolean isEmptyItem1(@ReadOnly ItemStack slotItem) {
+		ItemStack item = ItemUtils.getNullIfEmpty(slotItem);
+		if (item == null) return true;
+		if (ItemUtils.equals(this.getEmptyTrade().getItem1(), item)) return true;
+		if (ItemUtils.equals(this.getEmptyTradeSlotItems().getItem1(), item)) return true;
+		return false;
+	}
+
+	private boolean isEmptyItem2(@ReadOnly ItemStack slotItem) {
+		ItemStack item = ItemUtils.getNullIfEmpty(slotItem);
+		if (item == null) return true;
+		if (ItemUtils.equals(this.getEmptyTrade().getItem2(), item)) return true;
+		if (ItemUtils.equals(this.getEmptyTradeSlotItems().getItem2(), item)) return true;
+		return false;
+	}
+
+	// Returns null if the slot is empty or if the item matches an empty slot placeholder item.
 	protected final ItemStack getTradeResultItem(Inventory inventory, int column) {
 		assert inventory != null;
 		assert this.isTradeColumn(column);
-		ItemStack item = ItemUtils.getNullIfEmpty(inventory.getItem(this.getResultItemSlot(column)));
+		ItemStack item = inventory.getItem(this.getResultItemSlot(column));
+		if (this.isEmptyResultItem(item)) return null;
 		return item;
 	}
 
-	// Returns null if the slot is empty.
+	// Returns null if the slot is empty or if the item matches an empty slot placeholder item.
 	protected final ItemStack getTradeItem1(Inventory inventory, int column) {
 		assert inventory != null;
 		assert this.isTradeColumn(column);
-		ItemStack item = ItemUtils.getNullIfEmpty(inventory.getItem(this.getItem1Slot(column)));
+		ItemStack item = inventory.getItem(this.getItem1Slot(column));
+		if (this.isEmptyItem1(item)) return null;
 		return item;
 	}
 
-	// Returns null if the slot is empty.
+	// Returns null if the slot is empty or if the item matches an empty slot placeholder item.
 	protected final ItemStack getTradeItem2(Inventory inventory, int column) {
 		assert inventory != null;
 		assert this.isTradeColumn(column);
-		ItemStack item = ItemUtils.getNullIfEmpty(inventory.getItem(this.getItem2Slot(column)));
+		ItemStack item = inventory.getItem(this.getItem2Slot(column));
+		if (this.isEmptyItem2(item)) return null;
 		return item;
 	}
 
+	// Use TradingRecipeDraft#EMPTY to insert an empty trade column.
 	protected void setTradeColumn(Inventory inventory, int column, TradingRecipeDraft recipe) {
 		assert inventory != null;
 		assert this.isTradeColumn(column);
 		assert recipe != null;
 
+		TradingRecipeDraft emptySlotItems;
+		if (recipe.isEmpty()) {
+			emptySlotItems = this.getEmptyTrade();
+		} else {
+			emptySlotItems = this.getEmptyTradeSlotItems();
+		}
+
+		// Insert placeholders for empty slots:
+		UnmodifiableItemStack resultItem = ItemUtils.getFallbackIfNull(recipe.getResultItem(), emptySlotItems.getResultItem());
+		UnmodifiableItemStack item1 = ItemUtils.getFallbackIfNull(recipe.getItem1(), emptySlotItems.getItem1());
+		UnmodifiableItemStack item2 = ItemUtils.getFallbackIfNull(recipe.getItem2(), emptySlotItems.getItem2());
+
 		// The inventory implementations create NMS copies of the items, so we do not need to copy them ourselves here:
-		inventory.setItem(this.getResultItemSlot(column), ItemUtils.asItemStackOrNull(recipe.getResultItem()));
-		inventory.setItem(this.getItem1Slot(column), ItemUtils.asItemStackOrNull(recipe.getItem1()));
-		inventory.setItem(this.getItem2Slot(column), ItemUtils.asItemStackOrNull(recipe.getItem2()));
+		inventory.setItem(this.getResultItemSlot(column), ItemUtils.asItemStackOrNull(resultItem));
+		inventory.setItem(this.getItem1Slot(column), ItemUtils.asItemStackOrNull(item1));
+		inventory.setItem(this.getItem2Slot(column), ItemUtils.asItemStackOrNull(item2));
 	}
 
 	// TODO Avoid creating new TradingRecipeDraft objects here and instead update the drafts of the session?
+	// This replaces items matching the empty slot placeholders with null items in the returned TradingRecipeDraft.
 	protected TradingRecipeDraft getTradingRecipe(Inventory inventory, int column) {
 		assert inventory != null;
 		assert this.isTradeColumn(column);
-
 		ItemStack resultItem = this.getTradeResultItem(inventory, column);
 		ItemStack item1 = this.getTradeItem1(inventory, column);
 		ItemStack item2 = this.getTradeItem2(inventory, column);
 		return new TradingRecipeDraft(resultItem, item1, item2);
+	}
+
+	protected final void updateTradeColumn(Inventory inventory, int column) {
+		TradingRecipeDraft recipe = this.getTradingRecipe(inventory, column);
+		this.setTradeColumn(inventory, column, recipe);
+	}
+
+	protected final boolean isEmptyTrade(Inventory inventory, int column) {
+		assert inventory != null;
+		assert this.isTradeColumn(column);
+		ItemStack resultItem = this.getTradeResultItem(inventory, column);
+		if (resultItem != null) return false;
+		ItemStack item1 = this.getTradeItem1(inventory, column);
+		if (item1 != null) return false;
+		ItemStack item2 = this.getTradeItem2(inventory, column);
+		if (item2 != null) return false;
+		return true;
 	}
 
 	// EDITOR BUTTONS
@@ -552,6 +638,7 @@ public abstract class AbstractEditorHandler extends UIHandler {
 				TradingRecipeDraft recipe = recipes.get(recipeIndex);
 				this.setTradeColumn(inventory, column, recipe);
 			} else {
+				// Insert empty slot placeholders:
 				this.setTradeColumn(inventory, column, TradingRecipeDraft.EMPTY);
 			}
 		}

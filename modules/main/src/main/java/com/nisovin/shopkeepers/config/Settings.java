@@ -33,6 +33,7 @@ import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.MaxShopsPermission;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
+import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
@@ -47,7 +48,7 @@ public class Settings extends Config {
 	/*
 	 * General Settings
 	 */
-	public static int configVersion = 4;
+	public static int configVersion = 5;
 	public static boolean debug = false;
 	// See DebugOptions for all available options.
 	public static List<String> debugOptions = new ArrayList<>(0);
@@ -217,6 +218,31 @@ public class Settings extends Config {
 	/*
 	 * Editor Menu
 	 */
+	public static ItemData sellingEmptyTradeResultItem = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData sellingEmptyTradeItem1 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData sellingEmptyTradeItem2 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData sellingEmptyItem1 = new ItemData(Material.BARRIER);
+	public static ItemData sellingEmptyItem2 = new ItemData(Material.BARRIER);
+
+	public static ItemData buyingEmptyTradeResultItem = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData buyingEmptyTradeItem1 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData buyingEmptyTradeItem2 = new ItemData(Material.AIR);
+	public static ItemData buyingEmptyResultItem = new ItemData(Material.BARRIER);
+	public static ItemData buyingEmptyItem2 = new ItemData(Material.AIR);
+
+	public static ItemData tradingEmptyTradeResultItem = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData tradingEmptyTradeItem1 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData tradingEmptyTradeItem2 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData tradingEmptyResultItem = new ItemData(Material.BARRIER);
+	public static ItemData tradingEmptyItem1 = new ItemData(Material.BARRIER);
+	public static ItemData tradingEmptyItem2 = new ItemData(Material.BARRIER);
+
+	public static ItemData bookEmptyTradeResultItem = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData bookEmptyTradeItem1 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData bookEmptyTradeItem2 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData bookEmptyItem1 = new ItemData(Material.BARRIER);
+	public static ItemData bookEmptyItem2 = new ItemData(Material.BARRIER);
+
 	public static int maxTradesPages = 5;
 
 	public static ItemData previousPageItem = new ItemData(Material.WRITABLE_BOOK);
@@ -299,9 +325,7 @@ public class Settings extends Config {
 	 * Currencies
 	 */
 	public static ItemData currencyItem = new ItemData(Material.EMERALD);
-	public static ItemData zeroCurrencyItem = new ItemData(Material.BARRIER);
 	public static ItemData highCurrencyItem = new ItemData(Material.EMERALD_BLOCK);
-	public static ItemData zeroHighCurrencyItem = new ItemData(Material.BARRIER);
 
 	// Note: This can in general be larger than 64!
 	public static int highCurrencyValue = 9;
@@ -315,6 +339,15 @@ public class Settings extends Config {
 		public static DateTimeFormatter dateTimeFormatter;
 
 		public static Charset fileCharset;
+
+		public static TradingRecipeDraft sellingEmptyTrade;
+		public static TradingRecipeDraft sellingEmptyTradeSlotItems;
+		public static TradingRecipeDraft buyingEmptyTrade;
+		public static TradingRecipeDraft buyingEmptyTradeSlotItems;
+		public static TradingRecipeDraft tradingEmptyTrade;
+		public static TradingRecipeDraft tradingEmptyTradeSlotItems;
+		public static TradingRecipeDraft bookEmptyTrade;
+		public static TradingRecipeDraft bookEmptyTradeSlotItems;
 
 		public static ItemData placeholderItemData;
 
@@ -365,6 +398,132 @@ public class Settings extends Config {
 				fileEncoding = "UTF-8";
 				fileCharset = StandardCharsets.UTF_8;
 			}
+
+			sellingEmptyTrade = new TradingRecipeDraft(
+					ItemUtils.setDisplayNameAndLore(
+							sellingEmptyTradeResultItem.createItemStack(),
+							Messages.sellingEmptyTradeResultItem,
+							Messages.sellingEmptyTradeResultItemLore
+					),
+					ItemUtils.setDisplayNameAndLore(
+							sellingEmptyTradeItem1.createItemStack(),
+							Messages.sellingEmptyTradeItem1,
+							Messages.sellingEmptyTradeItem1Lore
+					),
+					// The editor item can be configured, even if the high currency is disabled:
+					isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
+							sellingEmptyTradeItem2.createItemStack(),
+							Messages.sellingEmptyTradeItem2,
+							Messages.sellingEmptyTradeItem2Lore
+					) : sellingEmptyTradeItem2.createItemStack()
+			);
+			sellingEmptyTradeSlotItems = new TradingRecipeDraft(
+					// This item is never used, because the slot is never empty for a non-empty trade:
+					null,
+					ItemUtils.setDisplayNameAndLore(
+							sellingEmptyItem1.createItemStack(),
+							Messages.sellingEmptyItem1,
+							Messages.sellingEmptyItem1Lore
+					),
+					// The editor item can be configured, even if the high currency is disabled:
+					isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
+							sellingEmptyItem2.createItemStack(),
+							Messages.sellingEmptyItem2,
+							Messages.sellingEmptyItem2Lore
+					) : sellingEmptyItem2.createItemStack()
+			);
+			buyingEmptyTrade = new TradingRecipeDraft(
+					ItemUtils.setDisplayNameAndLore(
+							buyingEmptyTradeResultItem.createItemStack(),
+							Messages.buyingEmptyTradeResultItem,
+							Messages.buyingEmptyTradeResultItemLore
+					),
+					ItemUtils.setDisplayNameAndLore(
+							buyingEmptyTradeItem1.createItemStack(),
+							Messages.buyingEmptyTradeItem1,
+							Messages.buyingEmptyTradeItem1Lore
+					),
+					// The editor item can be configured, even though this slot is not used for anything:
+					buyingEmptyTradeItem2.createItemStack()
+			);
+			buyingEmptyTradeSlotItems = new TradingRecipeDraft(
+					ItemUtils.setDisplayNameAndLore(
+							buyingEmptyResultItem.createItemStack(),
+							Messages.buyingEmptyResultItem,
+							Messages.buyingEmptyResultItemLore
+					),
+					// This item is never used, because the slot is never empty for a non-empty trade:
+					null,
+					// The editor item can be configured, even though this slot is not used for anything:
+					buyingEmptyItem2.createItemStack()
+			);
+			tradingEmptyTrade = new TradingRecipeDraft(
+					ItemUtils.setDisplayNameAndLore(
+							tradingEmptyTradeResultItem.createItemStack(),
+							Messages.tradingEmptyTradeResultItem,
+							Messages.tradingEmptyTradeResultItemLore
+					),
+					ItemUtils.setDisplayNameAndLore(
+							tradingEmptyTradeItem1.createItemStack(),
+							Messages.tradingEmptyTradeItem1,
+							Messages.tradingEmptyTradeItem1Lore
+					),
+					ItemUtils.setDisplayNameAndLore(
+							tradingEmptyTradeItem2.createItemStack(),
+							Messages.tradingEmptyTradeItem2,
+							Messages.tradingEmptyTradeItem2Lore
+					)
+			);
+			tradingEmptyTradeSlotItems = new TradingRecipeDraft(
+					ItemUtils.setDisplayNameAndLore(
+							tradingEmptyResultItem.createItemStack(),
+							Messages.tradingEmptyResultItem,
+							Messages.tradingEmptyResultItemLore
+					),
+					ItemUtils.setDisplayNameAndLore(
+							tradingEmptyItem1.createItemStack(),
+							Messages.tradingEmptyItem1,
+							Messages.tradingEmptyItem1Lore
+					),
+					ItemUtils.setDisplayNameAndLore(
+							tradingEmptyItem2.createItemStack(),
+							Messages.tradingEmptyItem2,
+							Messages.tradingEmptyItem2Lore
+					)
+			);
+			bookEmptyTrade = new TradingRecipeDraft(
+					ItemUtils.setDisplayNameAndLore(
+							bookEmptyTradeResultItem.createItemStack(),
+							Messages.bookEmptyTradeResultItem,
+							Messages.bookEmptyTradeResultItemLore
+					),
+					ItemUtils.setDisplayNameAndLore(
+							bookEmptyTradeItem1.createItemStack(),
+							Messages.bookEmptyTradeItem1,
+							Messages.bookEmptyTradeItem1Lore
+					),
+					// The editor item can be configured, even if the high currency is disabled:
+					isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
+							bookEmptyTradeItem2.createItemStack(),
+							Messages.bookEmptyTradeItem2,
+							Messages.bookEmptyTradeItem2Lore
+					) : bookEmptyTradeItem2.createItemStack()
+			);
+			bookEmptyTradeSlotItems = new TradingRecipeDraft(
+					// This item is never used, because the slot is never empty for a non-empty trade:
+					null,
+					ItemUtils.setDisplayNameAndLore(
+							bookEmptyItem1.createItemStack(),
+							Messages.bookEmptyItem1,
+							Messages.bookEmptyItem1Lore
+					),
+					// The editor item can be configured, even if the high currency is disabled:
+					isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
+							bookEmptyItem2.createItemStack(),
+							Messages.bookEmptyItem2,
+							Messages.bookEmptyItem2Lore
+					) : bookEmptyItem2.createItemStack()
+			);
 
 			// Ignore (clear) the display name that is used to specify the substituted item type:
 			placeholderItemData = new ItemData(UnmodifiableItemStack.of(ItemUtils.setDisplayName(placeholderItem.createItemStack(), null)));
@@ -541,32 +700,6 @@ public class Settings extends Config {
 
 	public static boolean isHighCurrencyItem(UnmodifiableItemStack item) {
 		return isHighCurrencyItem(ItemUtils.asItemStackOrNull(item));
-	}
-
-	// Zero currency item:
-	public static ItemStack createZeroCurrencyItem() {
-		if (zeroCurrencyItem.getType() == Material.AIR) return null;
-		return zeroCurrencyItem.createItemStack();
-	}
-
-	public static boolean isZeroCurrencyItem(@ReadOnly ItemStack item) {
-		if (zeroCurrencyItem.getType() == Material.AIR) {
-			return ItemUtils.isEmpty(item);
-		}
-		return zeroCurrencyItem.matches(item);
-	}
-
-	// Zero high currency item:
-	public static ItemStack createZeroHighCurrencyItem() {
-		if (zeroHighCurrencyItem.getType() == Material.AIR) return null;
-		return zeroHighCurrencyItem.createItemStack();
-	}
-
-	public static boolean isZeroHighCurrencyItem(@ReadOnly ItemStack item) {
-		if (zeroHighCurrencyItem.getType() == Material.AIR) {
-			return ItemUtils.isEmpty(item);
-		}
-		return zeroHighCurrencyItem.matches(item);
 	}
 
 	///// PERSISTENCE

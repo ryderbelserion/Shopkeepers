@@ -15,6 +15,7 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.TradeOffer;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
+import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
@@ -114,6 +115,16 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
+	protected TradingRecipeDraft getEmptyTrade() {
+		return DerivedSettings.tradingEmptyTrade;
+	}
+
+	@Override
+	protected TradingRecipeDraft getEmptyTradeSlotItems() {
+		return DerivedSettings.tradingEmptyTradeSlotItems;
+	}
+
+	@Override
 	protected void handlePlayerInventoryClick(EditorSession editorSession, InventoryClickEvent event) {
 		// Assert: Event cancelled.
 		// Clicking in player inventory:
@@ -139,18 +150,41 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		int rawSlot = event.getRawSlot();
 		assert this.isTradesArea(rawSlot);
 
+		Inventory inventory = event.getInventory();
 		ItemStack cursor = event.getCursor();
 		if (!ItemUtils.isEmpty(cursor)) {
 			// Place item from cursor:
-			Inventory inventory = event.getInventory();
 			ItemStack cursorClone = ItemUtils.copySingleItem(cursor); // Copy with a stack size of 1
 			// Replace placeholder item, if this is one:
-			cursorClone = PlaceholderItems.replace(cursorClone);
-			InventoryUtils.setItemDelayed(inventory, rawSlot, cursorClone);
+			ItemStack cursorCloneFinal = PlaceholderItems.replace(cursorClone);
+			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+				inventory.setItem(rawSlot, cursorCloneFinal); // This copies the item internally
+
+				// Update the trade column (replaces empty slot placeholder items if necessary):
+				this.updateTradeColumn(inventory, this.getTradeColumn(rawSlot));
+			});
 		} else {
-			// Changing stack size of clicked item:
-			boolean resultRow = this.isResultRow(rawSlot);
-			this.handleUpdateItemAmountOnClick(event, resultRow ? 1 : 0);
+			// Change the stack size of the clicked item, if this column contains a trade:
+			int tradeColumn = this.getTradeColumn(rawSlot);
+			if (this.isEmptyTrade(inventory, tradeColumn)) return;
+
+			int minAmount = 0;
+			UnmodifiableItemStack emptySlotItem;
+			if (this.isResultRow(rawSlot)) {
+				minAmount = 1;
+				emptySlotItem = this.getEmptyTradeSlotItems().getResultItem();
+			} else if (this.isItem1Row(rawSlot)) {
+				emptySlotItem = this.getEmptyTradeSlotItems().getItem1();
+			} else {
+				assert this.isItem2Row(rawSlot);
+				emptySlotItem = this.getEmptyTradeSlotItems().getItem2();
+			}
+			ItemStack newItem = this.updateItemAmountOnClick(event, minAmount, emptySlotItem);
+
+			// If the trade column might now be completely empty, update it to insert the correct placeholder items:
+			if (newItem == null) {
+				this.updateTradeColumn(inventory, tradeColumn);
+			}
 		}
 	}
 
@@ -165,13 +199,18 @@ public class TradingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 		if (rawSlots.size() != 1) return;
 
 		int rawSlot = rawSlots.iterator().next();
-		if (this.isResultRow(rawSlot) || this.isItem1Row(rawSlot) || this.isItem2Row(rawSlot)) {
+		if (this.isTradesArea(rawSlot)) {
 			// Place item from cursor:
 			Inventory inventory = event.getInventory();
 			cursor.setAmount(1); // Cursor is already a copy
 			// Replace placeholder item, if this is one:
-			cursor = PlaceholderItems.replace(cursor);
-			InventoryUtils.setItemDelayed(inventory, rawSlot, cursor);
+			ItemStack cursorFinal = PlaceholderItems.replace(cursor);
+			Bukkit.getScheduler().runTask(ShopkeepersPlugin.getInstance(), () -> {
+				inventory.setItem(rawSlot, cursorFinal); // This copies the item internally
+
+				// Update the trade column (replaces empty slot placeholder items if necessary):
+				this.updateTradeColumn(inventory, this.getTradeColumn(rawSlot));
+			});
 		} else {
 			InventoryView view = event.getView();
 			if (this.isPlayerInventory(view, view.getSlotType(rawSlot), rawSlot)) {

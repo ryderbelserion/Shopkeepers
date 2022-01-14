@@ -393,6 +393,95 @@ trade-setup-desc-book:
 - 'Top row: Books being sold'
 - 'Bottom rows: Cost items'
 
+selling-empty-trade-result-item: "&dSell Item"
+selling-empty-trade-result-item-lore:
+- "The item you want to sell."
+- "Add items to the shop container."
+- "Left/Right click to adjust the amount."
+selling-empty-trade-item1: "&dBuy Item"
+selling-empty-trade-item1-lore:
+- "The item you want to buy."
+- "Left/Right click to adjust the amount."
+selling-empty-trade-item2: "&dBuy Item 2"
+selling-empty-trade-item2-lore:
+- "The second item you want to buy."
+- "Left/Right click to adjust the amount."
+selling-empty-item1: "&dBuy Item"
+selling-empty-item1-lore:
+- "The item you want to buy."
+- "Left/Right click to adjust the amount."
+selling-empty-item2: "&dBuy Item 2"
+selling-empty-item2-lore:
+- "The second item you want to buy."
+- "Left/Right click to adjust the amount."
+
+buying-empty-trade-result-item: "&dSell Item"
+buying-empty-trade-result-item-lore:
+- "The item you want to sell."
+- "Left/Right click to adjust the amount."
+buying-empty-trade-item1: "&dBuy Item"
+buying-empty-trade-item1-lore:
+- "The item you want to buy."
+- "Add items to the shop container."
+- "Left/Right click to adjust the amount."
+buying-empty-result-item: "&dSell Item"
+buying-empty-result-item-lore:
+- "The item you want to sell."
+- "Left/Right click to adjust the amount."
+
+trading-empty-trade-result-item: "&dSell Item"
+trading-empty-trade-result-item-lore:
+- "The item you want to sell."
+- "Add items to the shop container,"
+- "or place an item from your inventory."
+- "Left/Right click to adjust the amount."
+trading-empty-trade-item1: "&dBuy Item"
+trading-empty-trade-item1-lore:
+- "The item you want to buy."
+- "Place an item from your inventory."
+- "Left/Right click to adjust the amount."
+trading-empty-trade-item2: "&dBuy Item 2"
+trading-empty-trade-item2-lore:
+- "The second item you want to buy."
+- "Place an item from your inventory."
+- "Left/Right click to adjust the amount."
+trading-empty-result-item: "&dSell Item"
+trading-empty-result-item-lore:
+- "The item you want to sell."
+- "Place an item from your inventory."
+- "Left/Right click to adjust the amount."
+trading-empty-item1: "&dBuy Item"
+trading-empty-item1-lore:
+- "The item you want to buy."
+- "Place an item from your inventory."
+- "Left/Right click to adjust the amount."
+trading-empty-item2: "&dBuy Item 2"
+trading-empty-item2-lore:
+- "The second item you want to buy."
+- "Place an item from your inventory."
+- "Left/Right click to adjust the amount."
+
+book-empty-trade-result-item: "&dSell Item"
+book-empty-trade-result-item-lore:
+- "The item you want to sell."
+- "Add written books to the shop container."
+book-empty-trade-item1: "&dBuy Item"
+book-empty-trade-item1-lore:
+- "The item you want to buy."
+- "Left/Right click to adjust the amount."
+book-empty-trade-item2: "&dBuy Item 2"
+book-empty-trade-item2-lore:
+- "The second item you want to buy."
+- "Left/Right click to adjust the amount."
+book-empty-item1: "&dBuy Item"
+book-empty-item1-lore:
+- "The item you want to buy."
+- "Left/Right click to adjust the amount."
+book-empty-item2: "&dBuy Item 2"
+book-empty-item2-lore:
+- "The second item you want to buy."
+- "Left/Right click to adjust the amount."
+
 missing-edit-villagers-perm: "&7You do not have the permission to edit villagers."
 missing-edit-wandering-traders-perm: "&7You do not have the permission to edit wandering traders."
 must-target-entity: "&7You have to target an entity."

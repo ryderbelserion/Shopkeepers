@@ -121,11 +121,15 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		super.onInventoryClickEarly(uiSession, event);
 	}
 
-	protected void handleUpdateItemAmountOnClick(InventoryClickEvent event, int minAmount) {
+	// Returns the new item.
+	// Returns null if the new item is empty or matches the empty slot item.
+	protected ItemStack updateItemAmountOnClick(InventoryClickEvent event, int minAmount, UnmodifiableItemStack emptySlotItem) {
 		assert event.isCancelled();
 		// Ignore in certain situations:
 		ItemStack clickedItem = event.getCurrentItem();
-		if (ItemUtils.isEmpty(clickedItem)) return;
+		if (ItemUtils.isEmpty(clickedItem) || ItemUtils.equals(emptySlotItem, clickedItem)) {
+			return null;
+		}
 
 		// Get new item amount:
 		int currentItemAmount = clickedItem.getAmount();
@@ -136,16 +140,18 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 
 		// Update item in inventory:
 		if (newItemAmount == 0) {
-			// Empty item slot:
-			event.setCurrentItem(null);
+			// Place empty slot item:
+			event.setCurrentItem(ItemUtils.asItemStackOrNull(emptySlotItem));
+			return null;
 		} else {
 			clickedItem.setAmount(newItemAmount);
+			return clickedItem;
 		}
 	}
 
 	// TODO Calling this method always requires the creation of new currency items. Change it to only create new
 	// currency items when they are actually needed.
-	protected void handleUpdateTradeCostItemOnClick(InventoryClickEvent event, @ReadWrite ItemStack currencyItem, @ReadOnly ItemStack zeroCurrencyItem) {
+	protected void updateTradeCostItemOnClick(InventoryClickEvent event, @ReadWrite ItemStack currencyItem, UnmodifiableItemStack emptySlotItem) {
 		assert event.isCancelled();
 		// Ignore in certain situations:
 		if (ItemUtils.isEmpty(currencyItem)) return;
@@ -164,8 +170,8 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 
 		// Update item in inventory:
 		if (newItemAmount == 0) {
-			// Place zero-currency item:
-			event.setCurrentItem(zeroCurrencyItem);
+			// Place empty slot item:
+			event.setCurrentItem(ItemUtils.asItemStackOrNull(emptySlotItem));
 		} else {
 			if (isCurrencyItem) {
 				// Only update item amount of already existing currency item:
@@ -194,8 +200,6 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 			if (highCost > 0) {
 				remainingCost -= (highCost * Settings.highCurrencyValue);
 				highCostItem = Settings.createHighCurrencyItem(highCost);
-			} else {
-				highCostItem = Settings.createZeroHighCurrencyItem();
 			}
 		}
 		if (remainingCost > 0) {
@@ -203,13 +207,9 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 				lowCostItem = Settings.createCurrencyItem(remainingCost);
 			} else {
 				// Cost is too large to represent: Reset cost to zero.
-				lowCostItem = Settings.createZeroCurrencyItem();
-				if (Settings.isHighCurrencyEnabled()) {
-					highCostItem = Settings.createZeroHighCurrencyItem();
-				}
+				assert lowCostItem == null;
+				highCostItem = null;
 			}
-		} else {
-			lowCostItem = Settings.createZeroCurrencyItem();
 		}
 
 		return new TradingRecipeDraft(resultItem, lowCostItem, highCostItem);

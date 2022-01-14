@@ -468,6 +468,114 @@ public class Messages extends Config {
 			"Bottom rows: Cost items"
 	));
 
+	public static String sellingEmptyTradeResultItem = c("&dSell Item");
+	public static List<String> sellingEmptyTradeResultItemLore = c(Arrays.asList(
+			"The item you want to sell.",
+			"Add items to the shop container.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String sellingEmptyTradeItem1 = c("&dBuy Item");
+	public static List<String> sellingEmptyTradeItem1Lore = c(Arrays.asList(
+			"The item you want to buy.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String sellingEmptyTradeItem2 = c("&dBuy Item 2");
+	public static List<String> sellingEmptyTradeItem2Lore = c(Arrays.asList(
+			"The second item you want to buy.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String sellingEmptyItem1 = c("&dBuy Item");
+	public static List<String> sellingEmptyItem1Lore = c(Arrays.asList(
+			"The item you want to buy.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String sellingEmptyItem2 = c("&dBuy Item 2");
+	public static List<String> sellingEmptyItem2Lore = c(Arrays.asList(
+			"The second item you want to buy.",
+			"Left/Right click to adjust the amount."
+	));
+
+	public static String buyingEmptyTradeResultItem = c("&dSell Item");
+	public static List<String> buyingEmptyTradeResultItemLore = c(Arrays.asList(
+			"The item you want to sell.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String buyingEmptyTradeItem1 = c("&dBuy Item");
+	public static List<String> buyingEmptyTradeItem1Lore = c(Arrays.asList(
+			"The item you want to buy.",
+			"Add items to the shop container.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String buyingEmptyResultItem = c("&dSell Item");
+	public static List<String> buyingEmptyResultItemLore = c(Arrays.asList(
+			"The item you want to sell.",
+			"Left/Right click to adjust the amount."
+	));
+
+	public static String tradingEmptyTradeResultItem = c("&dSell Item");
+	public static List<String> tradingEmptyTradeResultItemLore = c(Arrays.asList(
+			"The item you want to sell.",
+			"Add items to the shop container,",
+			"or place an item from your inventory.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String tradingEmptyTradeItem1 = c("&dBuy Item");
+	public static List<String> tradingEmptyTradeItem1Lore = c(Arrays.asList(
+			"The item you want to buy.",
+			"Place an item from your inventory.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String tradingEmptyTradeItem2 = c("&dBuy Item 2");
+	public static List<String> tradingEmptyTradeItem2Lore = c(Arrays.asList(
+			"The second item you want to buy.",
+			"Place an item from your inventory.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String tradingEmptyResultItem = c("&dSell Item");
+	public static List<String> tradingEmptyResultItemLore = c(Arrays.asList(
+			"The item you want to sell.",
+			"Place an item from your inventory.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String tradingEmptyItem1 = c("&dBuy Item");
+	public static List<String> tradingEmptyItem1Lore = c(Arrays.asList(
+			"The item you want to buy.",
+			"Place an item from your inventory.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String tradingEmptyItem2 = c("&dBuy Item 2");
+	public static List<String> tradingEmptyItem2Lore = c(Arrays.asList(
+			"The second item you want to buy.",
+			"Place an item from your inventory.",
+			"Left/Right click to adjust the amount."
+	));
+
+	public static String bookEmptyTradeResultItem = c("&dSell Item");
+	public static List<String> bookEmptyTradeResultItemLore = c(Arrays.asList(
+			"The item you want to sell.",
+			"Add written books to the shop container."
+	));
+	public static String bookEmptyTradeItem1 = c("&dBuy Item");
+	public static List<String> bookEmptyTradeItem1Lore = c(Arrays.asList(
+			"The item you want to buy.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String bookEmptyTradeItem2 = c("&dBuy Item 2");
+	public static List<String> bookEmptyTradeItem2Lore = c(Arrays.asList(
+			"The second item you want to buy.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String bookEmptyItem1 = c("&dBuy Item");
+	public static List<String> bookEmptyItem1Lore = c(Arrays.asList(
+			"The item you want to buy.",
+			"Left/Right click to adjust the amount."
+	));
+	public static String bookEmptyItem2 = c("&dBuy Item 2");
+	public static List<String> bookEmptyItem2Lore = c(Arrays.asList(
+			"The second item you want to buy.",
+			"Left/Right click to adjust the amount."
+	));
+
 	public static Text missingEditVillagersPerm = Text.parse("&7You do not have the permission to edit villagers.");
 	public static Text missingEditWanderingTradersPerm = Text.parse("&7You do not have the permission to edit wandering traders.");
 	public static Text mustTargetEntity = Text.parse("&7You have to target an entity.");

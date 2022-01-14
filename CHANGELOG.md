@@ -27,6 +27,13 @@ Date format: (YYYY-MM-DD)
 * Command: Added command "/shopkeeper setCurrency ['low'|'high']", which allows you to change the currency item(s) from in-game.
 * Permission: Added permission `shopkeeper.setcurrency` (default: `op`) which provides access to the new set-currency command.
 * Fixed: When setting the zero currency item to AIR, the selling and book shopkeepers were not able to derive the price of a trade from the editor when only the high currency price is specified.
+* Added placeholder items for empty trade slots inside the editors of player shops.
+  * Config: Added various settings to specify the editor placeholder items for empty slots of partially set up trades (default: barriers, as it has been the case before), as well as for completely empty trade columns (default: light gray stained glass panes, since those are barely visible when using the default inventory textures).
+  * When you disable the high currency inside the config (by setting it to AIR), you will now need to manually adjust the corresponding empty placeholder items for the affected high currency slots (for example by setting them to AIR). This is a compromise that allows these slots to be set to arbitrary items, even if the high currency is disabled.
+  * Added display names and lore to these placeholder items that explain their purpose and usage inside the editor.
+  * Config: The settings for the zero currency items are no longer used (they have been replaced with new settings) and are automatically removed during a config migration.
+  * The "checkItem" command no longer compares the held items with the zero currency / editor placeholder items.
+* Config: Bumped the config version to 5.
 
 **Debugging changes:**
 * We still clear all shopkeeper registry collections during plugin shutdown, just in case something went wrong earlier and prevented elements from being properly removed. But we also log a warning in this case now.
@@ -83,6 +90,44 @@ Date format: (YYYY-MM-DD)
 * Added `currency-item-set-to-main-hand-item`.
 * Added `high-currency-item-set-to-main-hand-item`.
 * Added `command-description-set-currency`.
+* Added `selling-empty-trade-result-item`.
+* Added `selling-empty-trade-result-item-lore`.
+* Added `selling-empty-trade-item1`.
+* Added `selling-empty-trade-item1-lore`.
+* Added `selling-empty-trade-item2`.
+* Added `selling-empty-trade-item2-lore`.
+* Added `selling-empty-item1`.
+* Added `selling-empty-item1-lore`.
+* Added `selling-empty-item2`.
+* Added `selling-empty-item2-lore`.
+* Added `buying-empty-trade-result-item`.
+* Added `buying-empty-trade-result-item-lore`.
+* Added `buying-empty-trade-item1`.
+* Added `buying-empty-trade-item1-lore`.
+* Added `buying-empty-result-item`.
+* Added `buying-empty-result-item-lore`.
+* Added `trading-empty-trade-result-item`.
+* Added `trading-empty-trade-result-item-lore`.
+* Added `trading-empty-trade-item1`.
+* Added `trading-empty-trade-item1-lore`.
+* Added `trading-empty-trade-item2`.
+* Added `trading-empty-trade-item2-lore`.
+* Added `trading-empty-result-item`.
+* Added `trading-empty-result-item-lore`.
+* Added `trading-empty-item1`.
+* Added `trading-empty-item1-lore`.
+* Added `trading-empty-item2`.
+* Added `trading-empty-item2-lore`.
+* Added `book-empty-trade-result-item`.
+* Added `book-empty-trade-result-item-lore`.
+* Added `book-empty-trade-item1`.
+* Added `book-empty-trade-item1-lore`.
+* Added `book-empty-trade-item2`.
+* Added `book-empty-trade-item2-lore`.
+* Added `book-empty-item1`.
+* Added `book-empty-item1-lore`.
+* Added `book-empty-item2`.
+* Added `book-empty-item2-lore`.
 
 ## v2.14.0 (2021-12-17)
 ### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4

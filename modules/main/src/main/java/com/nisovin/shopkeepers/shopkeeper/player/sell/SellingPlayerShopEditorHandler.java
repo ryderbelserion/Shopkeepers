@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
@@ -109,23 +110,38 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 	}
 
 	@Override
+	protected TradingRecipeDraft getEmptyTrade() {
+		return DerivedSettings.sellingEmptyTrade;
+	}
+
+	@Override
+	protected TradingRecipeDraft getEmptyTradeSlotItems() {
+		return DerivedSettings.sellingEmptyTradeSlotItems;
+	}
+
+	@Override
 	protected void handleTradesClick(EditorSession editorSession, InventoryClickEvent event) {
 		assert this.isTradesArea(event.getRawSlot());
 		Inventory inventory = editorSession.getInventory();
 		int rawSlot = event.getRawSlot();
 		if (this.isResultRow(rawSlot)) {
 			// Change the stack size of the sold item, if this column contains a trade:
-			this.handleUpdateItemAmountOnClick(event, 1);
+			UnmodifiableItemStack emptySlotItem = this.getEmptyTrade().getResultItem();
+			this.updateItemAmountOnClick(event, 1, emptySlotItem);
 		} else if (this.isItem1Row(rawSlot)) {
 			// Change the low cost, if this column contains a trade:
 			ItemStack resultItem = this.getTradeResultItem(inventory, this.getTradeColumn(rawSlot));
 			if (resultItem == null) return;
-			this.handleUpdateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), Settings.createZeroCurrencyItem());
+
+			UnmodifiableItemStack emptySlotItem = this.getEmptyTradeSlotItems().getItem1();
+			this.updateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), emptySlotItem);
 		} else if (this.isItem2Row(rawSlot)) {
 			// Change the high cost, if this column contains a trade:
 			ItemStack resultItem = this.getTradeResultItem(inventory, this.getTradeColumn(rawSlot));
 			if (resultItem == null) return;
-			this.handleUpdateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), Settings.creatHighZeroCurrencyItem());
+
+			UnmodifiableItemStack emptySlotItem = this.getEmptyTradeSlotItems().getItem2();
+			this.updateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), emptySlotItem);
 		}
 	}
 }

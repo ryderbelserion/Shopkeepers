@@ -98,4 +98,16 @@ public class RegularAdminShopEditorHandler extends EditorHandler {
 		if (!super.canOpen(player, silent)) return false;
 		return this.getShopkeeper().getType().hasPermission(player);
 	}
+
+	// The admin shop editor does not restrict the interactions with the trade slots. If we were to insert non-empty
+	// placeholder items here, the editing player would be able to pick them up.
+	@Override
+	protected TradingRecipeDraft getEmptyTrade() {
+		return TradingRecipeDraft.EMPTY;
+	}
+
+	@Override
+	protected TradingRecipeDraft getEmptyTradeSlotItems() {
+		return TradingRecipeDraft.EMPTY;
+	}
 }
