@@ -218,28 +218,28 @@ public class Settings extends Config {
 	/*
 	 * Editor Menu
 	 */
-	public static ItemData sellingEmptyTradeResultItem = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-	public static ItemData sellingEmptyTradeItem1 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-	public static ItemData sellingEmptyTradeItem2 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData sellingEmptyTradeResultItem = new ItemData(Material.GRAY_STAINED_GLASS_PANE);
+	public static ItemData sellingEmptyTradeItem1 = new ItemData(Material.GRAY_STAINED_GLASS_PANE);
+	public static ItemData sellingEmptyTradeItem2 = new ItemData(Material.GRAY_STAINED_GLASS_PANE);
 	public static ItemData sellingEmptyItem1 = new ItemData(Material.BARRIER);
 	public static ItemData sellingEmptyItem2 = new ItemData(Material.BARRIER);
 
-	public static ItemData buyingEmptyTradeResultItem = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-	public static ItemData buyingEmptyTradeItem1 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData buyingEmptyTradeResultItem = new ItemData(Material.GRAY_STAINED_GLASS_PANE);
+	public static ItemData buyingEmptyTradeItem1 = new ItemData(Material.GRAY_STAINED_GLASS_PANE);
 	public static ItemData buyingEmptyTradeItem2 = new ItemData(Material.AIR);
 	public static ItemData buyingEmptyResultItem = new ItemData(Material.BARRIER);
 	public static ItemData buyingEmptyItem2 = new ItemData(Material.AIR);
 
-	public static ItemData tradingEmptyTradeResultItem = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-	public static ItemData tradingEmptyTradeItem1 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-	public static ItemData tradingEmptyTradeItem2 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData tradingEmptyTradeResultItem = new ItemData(Material.GRAY_STAINED_GLASS_PANE);
+	public static ItemData tradingEmptyTradeItem1 = new ItemData(Material.GRAY_STAINED_GLASS_PANE);
+	public static ItemData tradingEmptyTradeItem2 = new ItemData(Material.GRAY_STAINED_GLASS_PANE);
 	public static ItemData tradingEmptyResultItem = new ItemData(Material.BARRIER);
 	public static ItemData tradingEmptyItem1 = new ItemData(Material.BARRIER);
 	public static ItemData tradingEmptyItem2 = new ItemData(Material.BARRIER);
 
-	public static ItemData bookEmptyTradeResultItem = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-	public static ItemData bookEmptyTradeItem1 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-	public static ItemData bookEmptyTradeItem2 = new ItemData(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+	public static ItemData bookEmptyTradeResultItem = new ItemData(Material.GRAY_STAINED_GLASS_PANE);
+	public static ItemData bookEmptyTradeItem1 = new ItemData(Material.GRAY_STAINED_GLASS_PANE);
+	public static ItemData bookEmptyTradeItem2 = new ItemData(Material.GRAY_STAINED_GLASS_PANE);
 	public static ItemData bookEmptyItem1 = new ItemData(Material.BARRIER);
 	public static ItemData bookEmptyItem2 = new ItemData(Material.BARRIER);
 

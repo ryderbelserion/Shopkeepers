@@ -28,7 +28,7 @@ Date format: (YYYY-MM-DD)
 * Permission: Added permission `shopkeeper.setcurrency` (default: `op`) which provides access to the new set-currency command.
 * Fixed: When setting the zero currency item to AIR, the selling and book shopkeepers were not able to derive the price of a trade from the editor when only the high currency price is specified.
 * Added placeholder items for empty trade slots inside the editors of player shops.
-  * Config: Added various settings to specify the editor placeholder items for empty slots of partially set up trades (default: barriers, as it has been the case before), as well as for completely empty trade columns (default: light gray stained glass panes, since those are barely visible when using the default inventory textures).
+  * Config: Added various settings to specify the editor placeholder items for empty slots of partially set up trades (default: barriers, as it has been the case before), as well as for completely empty trade columns (default: gray stained glass panes).
   * When you disable the high currency inside the config (by setting it to AIR), you will now need to manually adjust the corresponding empty placeholder items for the affected high currency slots (for example by setting them to AIR). This is a compromise that allows these slots to be set to arbitrary items, even if the high currency is disabled.
   * Added display names and lore to these placeholder items that explain their purpose and usage inside the editor.
   * Config: The settings for the zero currency items are no longer used (they have been replaced with new settings) and are automatically removed during a config migration.

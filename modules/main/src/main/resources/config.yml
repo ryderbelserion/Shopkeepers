@@ -409,28 +409,28 @@ allow-renaming-of-player-npc-shops: false
 # file.
 # In combination with their display name and lore, these items must not match
 # any items that players are able to set up trades with.
-selling-empty-trade-result-item: LIGHT_GRAY_STAINED_GLASS_PANE
-selling-empty-trade-item1: LIGHT_GRAY_STAINED_GLASS_PANE
-selling-empty-trade-item2: LIGHT_GRAY_STAINED_GLASS_PANE
+selling-empty-trade-result-item: GRAY_STAINED_GLASS_PANE
+selling-empty-trade-item1: GRAY_STAINED_GLASS_PANE
+selling-empty-trade-item2: GRAY_STAINED_GLASS_PANE
 selling-empty-item1: BARRIER
 selling-empty-item2: BARRIER
 
-buying-empty-trade-result-item: LIGHT_GRAY_STAINED_GLASS_PANE
-buying-empty-trade-item1: LIGHT_GRAY_STAINED_GLASS_PANE
+buying-empty-trade-result-item: GRAY_STAINED_GLASS_PANE
+buying-empty-trade-item1: GRAY_STAINED_GLASS_PANE
 buying-empty-trade-item2: AIR
 buying-empty-result-item: BARRIER
 buying-empty-item2: AIR
 
-trading-empty-trade-result-item: LIGHT_GRAY_STAINED_GLASS_PANE
-trading-empty-trade-item1: LIGHT_GRAY_STAINED_GLASS_PANE
-trading-empty-trade-item2: LIGHT_GRAY_STAINED_GLASS_PANE
+trading-empty-trade-result-item: GRAY_STAINED_GLASS_PANE
+trading-empty-trade-item1: GRAY_STAINED_GLASS_PANE
+trading-empty-trade-item2: GRAY_STAINED_GLASS_PANE
 trading-empty-result-item: BARRIER
 trading-empty-item1: BARRIER
 trading-empty-item2: BARRIER
 
-book-empty-trade-result-item: LIGHT_GRAY_STAINED_GLASS_PANE
-book-empty-trade-item1: LIGHT_GRAY_STAINED_GLASS_PANE
-book-empty-trade-item2: LIGHT_GRAY_STAINED_GLASS_PANE
+book-empty-trade-result-item: GRAY_STAINED_GLASS_PANE
+book-empty-trade-item1: GRAY_STAINED_GLASS_PANE
+book-empty-trade-item2: GRAY_STAINED_GLASS_PANE
 book-empty-item1: BARRIER
 book-empty-item2: BARRIER
 
