@@ -11,10 +11,10 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.arguments.BoundedIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.TypedFirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
@@ -46,7 +46,8 @@ class CommandGiveCurrency extends Command {
 				new LiteralArgument(ARGUMENT_CURRENCY_TYPE_LOW),
 				new LiteralArgument(ARGUMENT_CURRENCY_TYPE_HIGH))),
 				ARGUMENT_CURRENCY_TYPE_LOW));
-		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_AMOUNT), 1));
+		// Upper limit to avoid accidental misuse:
+		this.addArgument(new DefaultValueFallback<>(new BoundedIntegerArgument(ARGUMENT_AMOUNT, 1, 1024), 1));
 	}
 
 	@Override
@@ -71,9 +72,7 @@ class CommandGiveCurrency extends Command {
 		}
 
 		int amount = context.get(ARGUMENT_AMOUNT);
-		assert amount >= 1;
-		// Upper limit to avoid accidental misuse: TODO Use BoundedIntegerArgument in the future?
-		if (amount > 1024) amount = 1024;
+		assert amount >= 1 && amount <= 1024;
 
 		ItemStack item;
 		if (lowCurrency) {

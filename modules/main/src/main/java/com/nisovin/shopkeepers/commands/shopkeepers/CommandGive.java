@@ -9,9 +9,9 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.arguments.BoundedIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.config.Settings;
@@ -35,7 +35,8 @@ class CommandGive extends Command {
 
 		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
-		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_AMOUNT), 1));
+		// Upper limit to avoid accidental misuse:
+		this.addArgument(new DefaultValueFallback<>(new BoundedIntegerArgument(ARGUMENT_AMOUNT, 1, 1024), 1));
 	}
 
 	@Override
@@ -47,9 +48,7 @@ class CommandGive extends Command {
 		boolean targetSelf = (sender.equals(targetPlayer));
 
 		int amount = context.get(ARGUMENT_AMOUNT);
-		assert amount >= 1;
-		// Upper limit to avoid accidental misuse: TODO Use BoundedIntegerArgument in the future?
-		if (amount > 1024) amount = 1024;
+		assert amount >= 1 && amount <= 1024;
 
 		ItemStack item = Settings.createShopCreationItem();
 		item.setAmount(amount);
