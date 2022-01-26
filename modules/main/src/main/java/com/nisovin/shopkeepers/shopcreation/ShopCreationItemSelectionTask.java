@@ -107,7 +107,7 @@ class ShopCreationItemSelectionTask implements Runnable {
 		cleanup(player);
 
 		if (!player.isOnline()) return; // No longer online
-		if (!Settings.isShopCreationItem(player.getEquipment().getItemInMainHand())) {
+		if (!Settings.shopCreationItem.matches(player.getEquipment().getItemInMainHand())) {
 			// No longer holding the shop creation item in hand:
 			return;
 		}

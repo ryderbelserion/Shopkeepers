@@ -11,6 +11,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
+import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
@@ -37,7 +38,7 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			List<TradingRecipeDraft> recipes = new ArrayList<>(offers.size() + 8); // Heuristic initial capacity
 			offers.forEach(offer -> {
 				UnmodifiableItemStack tradedItem = offer.getItem();
-				UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(Settings.createCurrencyItem(offer.getPrice()));
+				UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(Currencies.getBase().getItemData().createItemStack(offer.getPrice()));
 				TradingRecipeDraft recipe = new TradingRecipeDraft(currencyItem, tradedItem, null);
 				recipes.add(recipe);
 			});
@@ -52,7 +53,10 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 				// Replace placeholder item, if this is one:
 				containerItem = PlaceholderItems.replace(containerItem);
 
-				if (Settings.isAnyCurrencyItem(containerItem)) continue; // Ignore currency items
+				// Ignore currency items:
+				if (Currencies.matchesAny(containerItem)) {
+					continue;
+				}
 
 				if (shopkeeper.getOffer(containerItem) != null) {
 					// There is already a recipe for this item:
@@ -138,7 +142,7 @@ public class BuyingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			if (tradedItem == null) return;
 
 			UnmodifiableItemStack emptySlotItem = this.getEmptyTradeSlotItems().getResultItem();
-			this.updateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), emptySlotItem);
+			this.updateTradeCostItemOnClick(event, Currencies.getBase(), emptySlotItem);
 		} else if (this.isItem1Row(rawSlot)) {
 			// Modify the bought item quantity, if this column contains a trade:
 			UnmodifiableItemStack emptySlotItem = this.getEmptyTradeSlotItems().getItem1();

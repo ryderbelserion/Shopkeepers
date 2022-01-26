@@ -134,7 +134,7 @@ public class VillagerInteractionListener implements Listener {
 		// Hire him if holding his hiring item.
 		PlayerInventory playerInventory = player.getInventory();
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
-		if (!Settings.isHireItem(itemInMainHand)) {
+		if (!Settings.hireItem.matches(itemInMainHand)) {
 			// TODO Show hire item via hover event?
 			TextUtils.sendMessage(player, Messages.villagerForHire,
 					"costs", Settings.hireOtherVillagersCosts,
@@ -171,8 +171,8 @@ public class VillagerInteractionListener implements Listener {
 			}
 		}
 
-		// Give player the shop creation item
-		ItemStack shopCreationItem = Settings.createShopCreationItem();
+		// Give the player the shop creation item:
+		ItemStack shopCreationItem = Settings.shopCreationItem.createItemStack();
 		Map<Integer, ItemStack> remaining = playerInventory.addItem(shopCreationItem);
 		if (!remaining.isEmpty()) {
 			villager.getWorld().dropItem(villager.getLocation(), shopCreationItem);

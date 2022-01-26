@@ -345,14 +345,11 @@ public class Messages extends Config {
 	public static Text ownerSet = Text.parse("&aThe new owner is now &e{owner}");
 	public static Text shopCreationItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a shop creation item(s)!");
 	public static Text shopCreationItemsReceived = Text.parse("&aYou have received &e{amount}&a shop creation item(s)!");
-	public static Text currencyItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a currency item(s)!");
-	public static Text currencyItemsReceived = Text.parse("&aYou have received &e{amount}&a currency item(s)!");
-	public static Text highCurrencyItemsGiven = Text.parse("&aPlayer &e{player}&a has received &e{amount}&a high currency item(s)!");
-	public static Text highCurrencyItemsReceived = Text.parse("&aYou have received &e{amount}&a high currency item(s)!");
-	public static Text highCurrencyDisabled = Text.parse("&cThe high currency is disabled!");
+	public static Text unknownCurrency = Text.parse("&cUnknown currency: '&e{currency}&c'");
+	public static Text currencyItemsGiven = Text.parse("&aPlayer &e{player}&a has received &6{amount}x&a currency item '&e{currency}&a'!");
+	public static Text currencyItemsReceived = Text.parse("&aYou have received &6{amount}x&a currency item '&e{currency}&a'!");
 	public static Text mustHoldItemInMainHand = Text.parse("&7You must hold an item in your main hand.");
-	public static Text currencyItemSetToMainHandItem = Text.parse("&aThe &ecurrency item&a has been set to the &eitem in your main hand&a!");
-	public static Text highCurrencyItemSetToMainHandItem = Text.parse("&aThe &ehigh currency item&a has been set to the &eitem in your main hand&a!");
+	public static Text currencyItemSetToMainHandItem = Text.parse("&aThe currency item '&e{currencyId}&a' has been set to the &eitem in your main hand&a!");
 	public static Text itemsConverted = Text.parse("&aConverted &e{count}&a item stack(s)!");
 	public static String unknownBookAuthor = c("Unknown");
 

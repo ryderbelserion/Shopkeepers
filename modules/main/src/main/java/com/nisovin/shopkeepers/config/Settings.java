@@ -12,7 +12,6 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -20,7 +19,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import com.nisovin.shopkeepers.SKShopkeepersPlugin;
@@ -30,11 +28,11 @@ import com.nisovin.shopkeepers.config.lib.Config;
 import com.nisovin.shopkeepers.config.lib.ConfigData;
 import com.nisovin.shopkeepers.config.lib.ConfigLoadException;
 import com.nisovin.shopkeepers.config.migration.ConfigMigrations;
+import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.MaxShopsPermission;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
-import com.nisovin.shopkeepers.util.annotations.ReadOnly;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.SoundEffect;
 import com.nisovin.shopkeepers.util.inventory.ItemData;
@@ -411,7 +409,7 @@ public class Settings extends Config {
 							Messages.sellingEmptyTradeItem1Lore
 					),
 					// The editor item can be configured, even if the high currency is disabled:
-					isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
+					Currencies.isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
 							sellingEmptyTradeItem2.createItemStack(),
 							Messages.sellingEmptyTradeItem2,
 							Messages.sellingEmptyTradeItem2Lore
@@ -426,7 +424,7 @@ public class Settings extends Config {
 							Messages.sellingEmptyItem1Lore
 					),
 					// The editor item can be configured, even if the high currency is disabled:
-					isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
+					Currencies.isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
 							sellingEmptyItem2.createItemStack(),
 							Messages.sellingEmptyItem2,
 							Messages.sellingEmptyItem2Lore
@@ -503,7 +501,7 @@ public class Settings extends Config {
 							Messages.bookEmptyTradeItem1Lore
 					),
 					// The editor item can be configured, even if the high currency is disabled:
-					isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
+					Currencies.isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
 							bookEmptyTradeItem2.createItemStack(),
 							Messages.bookEmptyTradeItem2,
 							Messages.bookEmptyTradeItem2Lore
@@ -518,7 +516,7 @@ public class Settings extends Config {
 							Messages.bookEmptyItem1Lore
 					),
 					// The editor item can be configured, even if the high currency is disabled:
-					isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
+					Currencies.isHighCurrencyEnabled() ? ItemUtils.setDisplayNameAndLore(
 							bookEmptyItem2.createItemStack(),
 							Messages.bookEmptyItem2,
 							Messages.bookEmptyItem2Lore
@@ -609,97 +607,11 @@ public class Settings extends Config {
 	// Can also be called externally, when settings are changed externally.
 	public static void onSettingsChanged() {
 		// Update derived settings:
+		Currencies.load();
 		DerivedSettings.setup();
 
 		// Refresh async settings cache:
 		AsyncSettings.refresh();
-	}
-
-	// ITEMS
-
-	// Shop creation item:
-	public static ItemStack createShopCreationItem() {
-		return shopCreationItem.createItemStack();
-	}
-
-	public static boolean isShopCreationItem(ItemStack item) {
-		return shopCreationItem.matches(item);
-	}
-
-	// Naming item:
-	public static boolean isNamingItem(ItemStack item) {
-		return DerivedSettings.namingItemData.matches(item);
-	}
-
-	public static ItemStack createNameButtonItem() {
-		return DerivedSettings.nameButtonItem.createItemStack();
-	}
-
-	// Container button:
-	public static ItemStack createContainerButtonItem() {
-		return DerivedSettings.containerButtonItem.createItemStack();
-	}
-
-	// Delete button:
-	public static ItemStack createDeleteButtonItem() {
-		return DerivedSettings.deleteButtonItem.createItemStack();
-	}
-
-	// Hire item:
-	public static ItemStack createHireButtonItem() {
-		return DerivedSettings.hireButtonItem.createItemStack();
-	}
-
-	public static boolean isHireItem(ItemStack item) {
-		return hireItem.matches(item);
-	}
-
-	// CURRENCY
-
-	private static final Predicate<@ReadOnly ItemStack> ANY_CURRENCY_ITEMS = Settings::isAnyCurrencyItem;
-
-	public static Predicate<@ReadOnly ItemStack> anyCurrencyItems() {
-		return ANY_CURRENCY_ITEMS;
-	}
-
-	public static boolean isAnyCurrencyItem(@ReadOnly ItemStack itemStack) {
-		return isCurrencyItem(itemStack) || isHighCurrencyItem(itemStack);
-	}
-
-	public static boolean isAnyCurrencyItem(UnmodifiableItemStack itemStack) {
-		return isAnyCurrencyItem(ItemUtils.asItemStackOrNull(itemStack));
-	}
-
-	// Currency item:
-	public static ItemStack createCurrencyItem(int amount) {
-		return currencyItem.createItemStack(amount);
-	}
-
-	public static boolean isCurrencyItem(@ReadOnly ItemStack item) {
-		return currencyItem.matches(item);
-	}
-
-	public static boolean isCurrencyItem(UnmodifiableItemStack item) {
-		return isCurrencyItem(ItemUtils.asItemStackOrNull(item));
-	}
-
-	// High currency item:
-	public static boolean isHighCurrencyEnabled() {
-		return (highCurrencyValue > 0 && highCurrencyItem.getType() != Material.AIR);
-	}
-
-	public static ItemStack createHighCurrencyItem(int amount) {
-		if (!isHighCurrencyEnabled()) return null;
-		return highCurrencyItem.createItemStack(amount);
-	}
-
-	public static boolean isHighCurrencyItem(@ReadOnly ItemStack item) {
-		if (!isHighCurrencyEnabled()) return false;
-		return highCurrencyItem.matches(item);
-	}
-
-	public static boolean isHighCurrencyItem(UnmodifiableItemStack item) {
-		return isHighCurrencyItem(ItemUtils.asItemStackOrNull(item));
 	}
 
 	///// PERSISTENCE

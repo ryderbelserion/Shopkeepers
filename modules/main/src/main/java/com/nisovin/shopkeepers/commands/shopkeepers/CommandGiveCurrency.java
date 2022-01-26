@@ -13,22 +13,22 @@ import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.BoundedIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
-import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
-import com.nisovin.shopkeepers.commands.lib.arguments.TypedFirstOfArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
-import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.currency.Currencies;
+import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.InventoryUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
 
 class CommandGiveCurrency extends Command {
 
 	private static final String ARGUMENT_PLAYER = "player";
-	private static final String ARGUMENT_CURRENCY_TYPE = "currency-type";
-	private static final String ARGUMENT_CURRENCY_TYPE_LOW = "low";
-	private static final String ARGUMENT_CURRENCY_TYPE_HIGH = "high";
+	private static final String ARGUMENT_CURRENCY = "currency";
 	private static final String ARGUMENT_AMOUNT = "amount";
 
 	CommandGiveCurrency() {
@@ -42,10 +42,8 @@ class CommandGiveCurrency extends Command {
 
 		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
-		this.addArgument(new DefaultValueFallback<>(new TypedFirstOfArgument<>(ARGUMENT_CURRENCY_TYPE, Arrays.asList(
-				new LiteralArgument(ARGUMENT_CURRENCY_TYPE_LOW),
-				new LiteralArgument(ARGUMENT_CURRENCY_TYPE_HIGH))),
-				ARGUMENT_CURRENCY_TYPE_LOW));
+		// TODO Turn this into a proper argument with completions.
+		this.addArgument(new OptionalArgument<>(new StringArgument(ARGUMENT_CURRENCY)));
 		// Upper limit to avoid accidental misuse:
 		this.addArgument(new DefaultValueFallback<>(new BoundedIntegerArgument(ARGUMENT_AMOUNT, 1, 1024), 1));
 	}
@@ -58,28 +56,23 @@ class CommandGiveCurrency extends Command {
 		assert targetPlayer != null;
 		boolean targetSelf = (sender.equals(targetPlayer));
 
-		String currencyType = context.get(ARGUMENT_CURRENCY_TYPE);
-		boolean lowCurrency;
-		if (ARGUMENT_CURRENCY_TYPE_LOW.equals(currencyType)) {
-			lowCurrency = true;
-		} else {
-			assert ARGUMENT_CURRENCY_TYPE_HIGH.equals(currencyType);
-			lowCurrency = false;
-			if (!Settings.isHighCurrencyEnabled()) {
-				TextUtils.sendMessage(sender, Messages.highCurrencyDisabled);
+		Currency currency;
+		String currencyType = context.get(ARGUMENT_CURRENCY);
+		if (currencyType != null) {
+			currency = Currencies.getById(StringUtils.normalize(currencyType));
+			if (currency == null) {
+				TextUtils.sendMessage(sender, Messages.unknownCurrency, "currency", currencyType);
 				return;
 			}
+		} else {
+			currency = Currencies.getBase();
 		}
+		assert currency != null;
 
 		int amount = context.get(ARGUMENT_AMOUNT);
 		assert amount >= 1 && amount <= 1024;
 
-		ItemStack item;
-		if (lowCurrency) {
-			item = Settings.createCurrencyItem(amount);
-		} else {
-			item = Settings.createHighCurrencyItem(amount);
-		}
+		ItemStack item = currency.getItemData().createItemStack(amount);
 		assert item != null;
 
 		PlayerInventory inventory = targetPlayer.getInventory();
@@ -93,30 +86,20 @@ class CommandGiveCurrency extends Command {
 
 		// Success:
 		// TODO Show currency item via hover text?
-		if (lowCurrency) {
-			// Inform target player:
-			TextUtils.sendMessage(targetPlayer, Messages.currencyItemsReceived,
-					"amount", amount
+		// Inform target player:
+		TextUtils.sendMessage(targetPlayer, Messages.currencyItemsReceived,
+				"amount", amount,
+				"currency", currency.getDisplayName(),
+				"currencyId", currency.getId()
+		);
+		if (!targetSelf) {
+			// Inform command executor:
+			TextUtils.sendMessage(sender, Messages.currencyItemsGiven,
+					"player", TextUtils.getPlayerText(targetPlayer),
+					"amount", amount,
+					"currency", currency.getDisplayName(),
+					"currencyId", currency.getId()
 			);
-			if (!targetSelf) {
-				// Inform command executor:
-				TextUtils.sendMessage(sender, Messages.currencyItemsGiven,
-						"player", TextUtils.getPlayerText(targetPlayer),
-						"amount", amount
-				);
-			}
-		} else {
-			// Inform target player:
-			TextUtils.sendMessage(targetPlayer, Messages.highCurrencyItemsReceived,
-					"amount", amount
-			);
-			if (!targetSelf) {
-				// Inform command executor:
-				TextUtils.sendMessage(sender, Messages.highCurrencyItemsGiven,
-						"player", TextUtils.getPlayerText(targetPlayer),
-						"amount", amount
-				);
-			}
 		}
 	}
 }

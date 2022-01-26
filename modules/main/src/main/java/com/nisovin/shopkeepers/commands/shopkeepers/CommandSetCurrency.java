@@ -1,29 +1,27 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Arrays;
-
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
-import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.TypedFirstOfArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
+import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
 import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.currency.Currencies;
+import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemData;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
+import com.nisovin.shopkeepers.util.java.StringUtils;
 
 class CommandSetCurrency extends PlayerCommand {
 
-	private static final String ARGUMENT_CURRENCY_TYPE = "currency-type";
-	private static final String ARGUMENT_CURRENCY_TYPE_LOW = "low";
-	private static final String ARGUMENT_CURRENCY_TYPE_HIGH = "high";
+	private static final String ARGUMENT_CURRENCY = "currency";
 
 	CommandSetCurrency() {
 		super("setCurrency");
@@ -35,10 +33,8 @@ class CommandSetCurrency extends PlayerCommand {
 		this.setDescription(Messages.commandDescriptionSetCurrency);
 
 		// Arguments:
-		this.addArgument(new DefaultValueFallback<>(new TypedFirstOfArgument<>(ARGUMENT_CURRENCY_TYPE, Arrays.asList(
-				new LiteralArgument(ARGUMENT_CURRENCY_TYPE_LOW),
-				new LiteralArgument(ARGUMENT_CURRENCY_TYPE_HIGH))),
-				ARGUMENT_CURRENCY_TYPE_LOW));
+		// TODO Turn this into a proper argument with completions.
+		this.addArgument(new OptionalArgument<>(new StringArgument(ARGUMENT_CURRENCY)));
 	}
 
 	@Override
@@ -46,33 +42,40 @@ class CommandSetCurrency extends PlayerCommand {
 		assert input.getSender() instanceof Player;
 		Player player = (Player) input.getSender();
 
-		String currencyType = context.get(ARGUMENT_CURRENCY_TYPE);
-		boolean lowCurrency;
-		if (ARGUMENT_CURRENCY_TYPE_LOW.equals(currencyType)) {
-			lowCurrency = true;
+		Currency currency;
+		String currencyType = context.get(ARGUMENT_CURRENCY);
+		if (currencyType != null) {
+			currency = Currencies.getById(StringUtils.normalize(currencyType));
+			if (currency == null) {
+				TextUtils.sendMessage(player, Messages.unknownCurrency, "currency", currencyType);
+				return;
+			}
 		} else {
-			assert ARGUMENT_CURRENCY_TYPE_HIGH.equals(currencyType);
-			lowCurrency = false;
+			currency = Currencies.getBase();
 		}
+		assert currency != null;
+		boolean baseCurrency = (currency == Currencies.getBase());
 
 		ItemStack newCurrencyItem = ItemUtils.getOrEmpty(player.getInventory().getItemInMainHand());
 
 		// Note: The high currency item can be set to AIR to disable the high currency.
-		if (lowCurrency && ItemUtils.isEmpty(newCurrencyItem)) {
+		if (baseCurrency && ItemUtils.isEmpty(newCurrencyItem)) {
 			TextUtils.sendMessage(player, Messages.mustHoldItemInMainHand);
 			return;
 		}
 
-		if (lowCurrency) {
+		if (baseCurrency) {
 			Settings.currencyItem = new ItemData(newCurrencyItem);
 			Settings.onSettingsChanged();
 			Settings.saveConfig();
-			TextUtils.sendMessage(player, Messages.currencyItemSetToMainHandItem);
 		} else {
 			Settings.highCurrencyItem = new ItemData(newCurrencyItem);
 			Settings.onSettingsChanged();
 			Settings.saveConfig();
-			TextUtils.sendMessage(player, Messages.highCurrencyItemSetToMainHandItem);
 		}
+
+		TextUtils.sendMessage(player, Messages.currencyItemSetToMainHandItem,
+				"currency", currency.getDisplayName(),
+				"currencyId", currency.getId());
 	}
 }

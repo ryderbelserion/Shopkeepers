@@ -6,7 +6,8 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.currency.Currencies;
+import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.ui.trading.Trade;
@@ -92,10 +93,11 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
 		// First pass: Remove as much low currency as available from partial stacks.
 		// Second pass: Remove as much low currency as available from full stacks.
+		Currency baseCurrency = Currencies.getBase();
 		for (int k = 0; k < 2; k++) {
 			for (int slot = 0; slot < contents.length; slot++) {
 				ItemStack itemStack = contents[slot];
-				if (!Settings.isCurrencyItem(itemStack)) continue;
+				if (!baseCurrency.getItemData().matches(itemStack)) continue;
 
 				// Second pass, or the ItemStack is a partial one:
 				int itemAmount = itemStack.getAmount();
@@ -121,15 +123,16 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		}
 		if (remaining == 0) return 0;
 
-		if (!Settings.isHighCurrencyEnabled()) {
+		if (!Currencies.isHighCurrencyEnabled()) {
 			// We couldn't remove all currency:
 			return remaining;
 		}
 
-		int remainingHigh = (int) Math.ceil((double) remaining / Settings.highCurrencyValue);
+		Currency highCurrency = Currencies.getHigh();
+		int remainingHigh = (int) Math.ceil((double) remaining / highCurrency.getValue());
 		// We rounded the high currency up, so if this is negative now, it represents the remaining change which
 		// needs to be added back:
-		remaining -= (remainingHigh * Settings.highCurrencyValue);
+		remaining -= (remainingHigh * highCurrency.getValue());
 		assert remaining <= 0;
 
 		// First pass: Remove high currency from partial stacks.
@@ -137,7 +140,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 		for (int k = 0; k < 2; k++) {
 			for (int slot = 0; slot < contents.length; slot++) {
 				ItemStack itemStack = contents[slot];
-				if (!Settings.isHighCurrencyItem(itemStack)) continue;
+				if (!highCurrency.getItemData().matches(itemStack)) continue;
 
 				// Second pass, or the ItemStack is a partial one:
 				int itemAmount = itemStack.getAmount();
@@ -162,7 +165,7 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			if (remainingHigh == 0) break;
 		}
 
-		remaining += (remainingHigh * Settings.highCurrencyValue);
+		remaining += (remainingHigh * highCurrency.getValue());
 		if (remaining >= 0) {
 			return remaining;
 		}
@@ -171,13 +174,13 @@ public class BuyingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 
 		// Add the remaining change into empty slots (all partial slots have already been cleared above):
 		// TODO This could probably be replaced with Utils.addItems
-		int maxStackSize = Settings.currencyItem.getType().getMaxStackSize();
+		int maxStackSize = baseCurrency.getMaxStackSize();
 		for (int slot = 0; slot < contents.length; slot++) {
 			ItemStack itemStack = contents[slot];
 			if (!ItemUtils.isEmpty(itemStack)) continue;
 
 			int stackSize = Math.min(remaining, maxStackSize);
-			contents[slot] = Settings.createCurrencyItem(stackSize);
+			contents[slot] = baseCurrency.getItemData().createItemStack(stackSize);
 			remaining -= stackSize;
 			if (remaining == 0) break;
 		}

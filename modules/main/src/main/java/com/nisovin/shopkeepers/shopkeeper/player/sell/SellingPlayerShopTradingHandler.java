@@ -1,11 +1,14 @@
 package com.nisovin.shopkeepers.shopkeeper.player.sell;
 
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.currency.Currencies;
+import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopTradingHandler;
 import com.nisovin.shopkeepers.ui.trading.Trade;
@@ -65,15 +68,18 @@ public class SellingPlayerShopTradingHandler extends PlayerShopTradingHandler {
 			// TODO Always store the currency in the most compressed form possible, regardless of
 			// 'highCurrencyMinCost'?
 			int remaining = amountAfterTaxes;
-			if (Settings.isHighCurrencyEnabled() && remaining > Settings.highCurrencyMinCost) {
-				int highCurrencyAmount = (remaining / Settings.highCurrencyValue);
+			if (Currencies.isHighCurrencyEnabled() && remaining > Settings.highCurrencyMinCost) {
+				Currency highCurrency = Currencies.getHigh();
+				int highCurrencyAmount = (remaining / highCurrency.getValue());
 				if (highCurrencyAmount > 0) {
-					int remainingHighCurrency = InventoryUtils.addItems(newContainerContents, Settings.createHighCurrencyItem(highCurrencyAmount));
-					remaining -= ((highCurrencyAmount - remainingHighCurrency) * Settings.highCurrencyValue);
+					ItemStack currencyItems = highCurrency.getItemData().createItemStack(highCurrencyAmount);
+					int remainingHighCurrency = InventoryUtils.addItems(newContainerContents, currencyItems);
+					remaining -= ((highCurrencyAmount - remainingHighCurrency) * highCurrency.getValue());
 				}
 			}
 			if (remaining > 0) {
-				if (InventoryUtils.addItems(newContainerContents, Settings.createCurrencyItem(remaining)) != 0) {
+				ItemStack currencyItems = Currencies.getBase().getItemData().createItemStack(remaining);
+				if (InventoryUtils.addItems(newContainerContents, currencyItems) != 0) {
 					TextUtils.sendMessage(tradingPlayer, Messages.cannotTradeInsufficientStorageSpace);
 					this.debugPreventedTrade(tradingPlayer, "The shop's container cannot hold the traded items.");
 					return false;

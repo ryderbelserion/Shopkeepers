@@ -50,7 +50,7 @@ class CommandGive extends Command {
 		int amount = context.get(ARGUMENT_AMOUNT);
 		assert amount >= 1 && amount <= 1024;
 
-		ItemStack item = Settings.createShopCreationItem();
+		ItemStack item = Settings.shopCreationItem.createItemStack();
 		item.setAmount(amount);
 
 		PlayerInventory inventory = targetPlayer.getInventory();

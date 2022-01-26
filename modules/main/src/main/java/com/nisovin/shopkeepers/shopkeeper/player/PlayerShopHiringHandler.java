@@ -13,6 +13,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.playershops.PlayerShopsLimit;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
@@ -44,7 +45,7 @@ public class PlayerShopHiringHandler extends HiringHandler {
 		PlayerShopkeeper shopkeeper = this.getShopkeeper();
 		Inventory inventory = Bukkit.createInventory(player, 9, Messages.forHireTitle);
 
-		ItemStack hireItem = Settings.createHireButtonItem();
+		ItemStack hireItem = DerivedSettings.hireButtonItem.createItemStack();
 		inventory.setItem(BUTTON_HIRE_1, hireItem);
 		inventory.setItem(BUTTON_HIRE_2, hireItem);
 

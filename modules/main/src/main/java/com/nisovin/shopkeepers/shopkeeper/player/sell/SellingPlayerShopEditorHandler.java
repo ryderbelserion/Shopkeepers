@@ -9,8 +9,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.PriceOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
+import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlaceholderItems;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
@@ -51,7 +51,10 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 				// Replace placeholder item, if this is one:
 				containerItem = PlaceholderItems.replace(containerItem);
 
-				if (Settings.isAnyCurrencyItem(containerItem)) continue; // Ignore currency items
+				// Ignore currency items:
+				if (Currencies.matchesAny(containerItem)) {
+					continue;
+				}
 
 				if (shopkeeper.getOffer(containerItem) != null) {
 					// There is already a recipe for this item:
@@ -134,14 +137,14 @@ public class SellingPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			if (resultItem == null) return;
 
 			UnmodifiableItemStack emptySlotItem = this.getEmptyTradeSlotItems().getItem1();
-			this.updateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), emptySlotItem);
+			this.updateTradeCostItemOnClick(event, Currencies.getBase(), emptySlotItem);
 		} else if (this.isItem2Row(rawSlot)) {
 			// Change the high cost, if this column contains a trade:
 			ItemStack resultItem = this.getTradeResultItem(inventory, this.getTradeColumn(rawSlot));
 			if (resultItem == null) return;
 
 			UnmodifiableItemStack emptySlotItem = this.getEmptyTradeSlotItems().getItem2();
-			this.updateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), emptySlotItem);
+			this.updateTradeCostItemOnClick(event, Currencies.getHighOrNull(), emptySlotItem);
 		}
 	}
 }

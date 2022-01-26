@@ -12,6 +12,9 @@ import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.ui.UISession;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
+import com.nisovin.shopkeepers.currency.Currencies;
+import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.ui.SKDefaultUITypes;
@@ -22,7 +25,6 @@ import com.nisovin.shopkeepers.ui.editor.EditorSession;
 import com.nisovin.shopkeepers.ui.editor.ShopkeeperActionButton;
 import com.nisovin.shopkeepers.ui.editor.TradingRecipesAdapter;
 import com.nisovin.shopkeepers.util.annotations.ReadOnly;
-import com.nisovin.shopkeepers.util.annotations.ReadWrite;
 import com.nisovin.shopkeepers.util.bukkit.PermissionUtils;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 import com.nisovin.shopkeepers.util.java.StringUtils;
@@ -61,7 +63,7 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		return new ActionButton() {
 			@Override
 			public ItemStack getIcon(EditorSession editorSession) {
-				return Settings.createContainerButtonItem();
+				return DerivedSettings.containerButtonItem.createItemStack();
 			}
 
 			@Override
@@ -149,24 +151,23 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		}
 	}
 
-	// TODO Calling this method always requires the creation of new currency items. Change it to only create new
-	// currency items when they are actually needed.
-	protected void updateTradeCostItemOnClick(InventoryClickEvent event, @ReadWrite ItemStack currencyItem, UnmodifiableItemStack emptySlotItem) {
+	protected void updateTradeCostItemOnClick(InventoryClickEvent event, Currency currency, UnmodifiableItemStack emptySlotItem) {
+		assert event != null;
 		assert event.isCancelled();
 		// Ignore in certain situations:
-		if (ItemUtils.isEmpty(currencyItem)) return;
+		if (currency == null) return;
 
 		// Get new item amount:
 		ItemStack clickedItem = event.getCurrentItem(); // Can be null
 		int currentItemAmount = 0;
-		boolean isCurrencyItem = ItemUtils.isSimilar(currencyItem, clickedItem);
+		boolean isCurrencyItem = currency.getItemData().matches(clickedItem);
 		if (isCurrencyItem) {
 			assert clickedItem != null;
 			currentItemAmount = clickedItem.getAmount();
 		}
-		int newItemAmount = this.getNewAmountAfterEditorClick(event, currentItemAmount, 0, currencyItem.getMaxStackSize());
+		int newItemAmount = this.getNewAmountAfterEditorClick(event, currentItemAmount, 0, currency.getMaxStackSize());
 		assert newItemAmount >= 0;
-		assert newItemAmount <= currencyItem.getMaxStackSize();
+		assert newItemAmount <= currency.getMaxStackSize();
 
 		// Update item in inventory:
 		if (newItemAmount == 0) {
@@ -174,11 +175,11 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 			event.setCurrentItem(ItemUtils.asItemStackOrNull(emptySlotItem));
 		} else {
 			if (isCurrencyItem) {
-				// Only update item amount of already existing currency item:
+				// Only update the amount of the already existing currency item:
 				clickedItem.setAmount(newItemAmount);
 			} else {
-				// Place currency item with new amount:
-				currencyItem.setAmount(newItemAmount);
+				// Place a new currency item:
+				ItemStack currencyItem = currency.getItemData().createItemStack(newItemAmount);
 				event.setCurrentItem(currencyItem);
 			}
 		}
@@ -192,19 +193,21 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 		ItemStack lowCostItem = null;
 
 		int remainingCost = cost;
-		if (Settings.isHighCurrencyEnabled()) {
+		if (Currencies.isHighCurrencyEnabled()) {
+			Currency highCurrency = Currencies.getHigh();
 			int highCost = 0;
 			if (remainingCost > Settings.highCurrencyMinCost) {
-				highCost = Math.min((remainingCost / Settings.highCurrencyValue), Settings.highCurrencyItem.getType().getMaxStackSize());
+				highCost = Math.min((remainingCost / highCurrency.getValue()), highCurrency.getMaxStackSize());
 			}
 			if (highCost > 0) {
-				remainingCost -= (highCost * Settings.highCurrencyValue);
-				highCostItem = Settings.createHighCurrencyItem(highCost);
+				remainingCost -= (highCost * highCurrency.getValue());
+				highCostItem = Currencies.getHigh().getItemData().createItemStack(highCost);
 			}
 		}
 		if (remainingCost > 0) {
-			if (remainingCost <= Settings.currencyItem.getType().getMaxStackSize()) {
-				lowCostItem = Settings.createCurrencyItem(remainingCost);
+			Currency baseCurrency = Currencies.getBase();
+			if (remainingCost <= baseCurrency.getMaxStackSize()) {
+				lowCostItem = Currencies.getBase().getItemData().createItemStack(remainingCost);
 			} else {
 				// Cost is too large to represent: Reset cost to zero.
 				assert lowCostItem == null;
@@ -217,14 +220,18 @@ public abstract class PlayerShopEditorHandler extends EditorHandler {
 
 	protected static int getPrice(TradingRecipeDraft recipe) {
 		if (recipe == null) return 0;
-		UnmodifiableItemStack lowCostItem = recipe.getItem1();
-		UnmodifiableItemStack highCostItem = recipe.getItem2();
 		int price = 0;
-		if (lowCostItem != null && lowCostItem.getType() == Settings.currencyItem.getType()) {
-			price += lowCostItem.getAmount();
+
+		UnmodifiableItemStack item1 = recipe.getItem1();
+		Currency currency1 = Currencies.match(item1);
+		if (currency1 != null) {
+			price += (currency1.getValue() * item1.getAmount());
 		}
-		if (highCostItem != null && Settings.isHighCurrencyEnabled() && highCostItem.getType() == Settings.highCurrencyItem.getType()) {
-			price += (highCostItem.getAmount() * Settings.highCurrencyValue);
+
+		UnmodifiableItemStack item2 = recipe.getItem2();
+		Currency currency2 = Currencies.match(item2);
+		if (currency2 != null) {
+			price += (currency2.getValue() * item2.getAmount());
 		}
 		return price;
 	}

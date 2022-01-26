@@ -13,8 +13,8 @@ import org.bukkit.inventory.meta.BookMeta;
 
 import com.nisovin.shopkeepers.api.shopkeeper.offers.BookOffer;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
-import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
+import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.shopkeeper.TradingRecipeDraft;
 import com.nisovin.shopkeepers.shopkeeper.player.PlayerShopEditorHandler;
 import com.nisovin.shopkeepers.ui.editor.DefaultTradingRecipesAdapter;
@@ -134,14 +134,14 @@ public class BookPlayerShopEditorHandler extends PlayerShopEditorHandler {
 			if (resultItem == null) return;
 
 			UnmodifiableItemStack emptySlotItem = this.getEmptyTradeSlotItems().getItem1();
-			this.updateTradeCostItemOnClick(event, Settings.createCurrencyItem(1), emptySlotItem);
+			this.updateTradeCostItemOnClick(event, Currencies.getBase(), emptySlotItem);
 		} else if (this.isItem2Row(rawSlot)) {
 			// Change the high cost, if this column contains a trade:
 			ItemStack resultItem = this.getTradeResultItem(inventory, this.getTradeColumn(rawSlot));
 			if (resultItem == null) return;
 
 			UnmodifiableItemStack emptySlotItem = this.getEmptyTradeSlotItems().getItem2();
-			this.updateTradeCostItemOnClick(event, Settings.createHighCurrencyItem(1), emptySlotItem);
+			this.updateTradeCostItemOnClick(event, Currencies.getHighOrNull(), emptySlotItem);
 		}
 		// Result item row: Result items (books) are not modifiable.
 	}

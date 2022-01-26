@@ -14,6 +14,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.ShopType;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopType;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.event.ShopkeeperEventHelper;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -89,7 +90,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 		return new ActionButton(true) {
 			@Override
 			public ItemStack getIcon(EditorSession editorSession) {
-				return Settings.createDeleteButtonItem();
+				return DerivedSettings.deleteButtonItem.createItemStack();
 			}
 
 			@Override
@@ -156,7 +157,7 @@ public abstract class EditorHandler extends AbstractEditorHandler implements Sho
 		return new ActionButton() {
 			@Override
 			public ItemStack getIcon(EditorSession editorSession) {
-				return Settings.createNameButtonItem();
+				return DerivedSettings.nameButtonItem.createItemStack();
 			}
 
 			@Override

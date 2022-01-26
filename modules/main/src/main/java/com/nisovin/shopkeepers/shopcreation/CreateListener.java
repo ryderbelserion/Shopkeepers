@@ -103,7 +103,7 @@ class CreateListener implements Listener {
 
 		Player player = event.getPlayer();
 		ItemStack newItemInHand = player.getInventory().getItem(event.getNewSlot());
-		if (!Settings.isShopCreationItem(newItemInHand)) {
+		if (!Settings.shopCreationItem.matches(newItemInHand)) {
 			return;
 		}
 
@@ -140,7 +140,7 @@ class CreateListener implements Listener {
 
 		// Make sure that the used item is the shop creation item:
 		ItemStack itemInHand = event.getItem();
-		if (!Settings.isShopCreationItem(itemInHand)) {
+		if (!Settings.shopCreationItem.matches(itemInHand)) {
 			return;
 		}
 
@@ -292,7 +292,7 @@ class CreateListener implements Listener {
 
 	@EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
 	void onBlockDispense(BlockDispenseEvent event) {
-		if (Settings.preventShopCreationItemRegularUsage && Settings.isShopCreationItem(event.getItem())) {
+		if (Settings.preventShopCreationItemRegularUsage && Settings.shopCreationItem.matches(event.getItem())) {
 			Log.debug(() -> "Preventing dispensing of shop creation item at " + TextUtils.getLocationString(event.getBlock()));
 			event.setCancelled(true);
 			// TODO Drop item instead.
@@ -316,7 +316,7 @@ class CreateListener implements Listener {
 		// We check the permission first since this check is fast:
 		if (PermissionUtils.hasPermission(player, ShopkeepersPlugin.BYPASS_PERMISSION)) return;
 		ItemStack itemInHand = InventoryUtils.getItem(player.getInventory(), event.getHand());
-		if (!Settings.isShopCreationItem(itemInHand)) return;
+		if (!Settings.shopCreationItem.matches(itemInHand)) return;
 
 		// Prevent the entity interaction:
 		// TODO Only prevent the entity interaction if the item actually has a special entity interaction behavior.
@@ -346,7 +346,8 @@ class CreateListener implements Listener {
 		}
 
 		Inventory anvilInventory = event.getInventory();
-		if (!Settings.isShopCreationItem(anvilInventory.getItem(0)) && !Settings.isShopCreationItem(anvilInventory.getItem(1))) {
+		if (!Settings.shopCreationItem.matches(anvilInventory.getItem(0))
+				&& !Settings.shopCreationItem.matches(anvilInventory.getItem(1))) {
 			// No shop creation item involved.
 			// Note: We only prevent the renaming of the shop creation item, not its creation. I.e. we do not check the
 			// result item here. The shop creation item could intentionally be set up to be an item that can be created
@@ -359,7 +360,8 @@ class CreateListener implements Listener {
 			Player player = (Player) event.getView().getPlayer();
 			UUID playerUniqueId = player.getUniqueId();
 			long nowMillis = System.currentTimeMillis();
-			if (!playerUniqueId.equals(lastAnvilDebugMessagePlayer) || (nowMillis - lastAnvilDebugMessageMillis) > ANVIL_DEBUG_MESSAGE_THROTTLE_MILLIS) {
+			if (!playerUniqueId.equals(lastAnvilDebugMessagePlayer)
+					|| (nowMillis - lastAnvilDebugMessageMillis) > ANVIL_DEBUG_MESSAGE_THROTTLE_MILLIS) {
 				lastAnvilDebugMessagePlayer = playerUniqueId;
 				lastAnvilDebugMessageMillis = nowMillis;
 				Log.debug(() -> "Preventing renaming of shop creation item by " + player.getName() + " (debug output is throttled)");

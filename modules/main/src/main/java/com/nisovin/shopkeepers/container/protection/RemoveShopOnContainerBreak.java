@@ -47,7 +47,7 @@ public class RemoveShopOnContainerBreak {
 			if (!shopkeeper.isValid()) continue; // Skip if no longer valid
 			// Return the shop creation item for player shopkeepers:
 			if (Settings.deletingPlayerShopReturnsCreationItem) {
-				ItemStack shopCreationItem = Settings.createShopCreationItem();
+				ItemStack shopCreationItem = Settings.shopCreationItem.createItemStack();
 				block.getWorld().dropItemNaturally(block.getLocation(), shopCreationItem);
 			}
 			// Note: We do not pass the player responsible for breaking the container here, because we cannot determine

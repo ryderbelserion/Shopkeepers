@@ -13,6 +13,8 @@ import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.compat.NMSManager;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.currency.Currencies;
+import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
@@ -40,12 +42,14 @@ class CommandCheckItem extends PlayerCommand {
 		ItemStack offHandItem = player.getInventory().getItemInOffHand();
 
 		player.sendMessage(ChatColor.YELLOW + "Item in main hand / off hand:");
-		player.sendMessage("- Is low currency: " + checkItems(mainHandItem, offHandItem, Settings::isCurrencyItem));
-		player.sendMessage("- Is high currency: " + checkItems(mainHandItem, offHandItem, Settings::isHighCurrencyItem));
-		player.sendMessage("- Is shop creation item: " + checkItems(mainHandItem, offHandItem, Settings::isShopCreationItem));
 		player.sendMessage("- Similar to off-hand item: " + toDisplayString(ItemUtils.isSimilar(mainHandItem, offHandItem)));
 		player.sendMessage("- Matching off-hand item: " + toDisplayString(ItemUtils.matchesData(mainHandItem, offHandItem)));
 		player.sendMessage("- MC matching off-hand item: " + toDisplayString(NMSManager.getProvider().matches(mainHandItem, offHandItem)));
+		player.sendMessage("- Is shop creation item: " + checkItems(mainHandItem, offHandItem, Settings.shopCreationItem::matches));
+		for (Currency currency : Currencies.getAll()) {
+			player.sendMessage("- Is currency item '" + currency.getId() + "': "
+					+ checkItems(mainHandItem, offHandItem, currency.getItemData()::matches));
+		}
 	}
 
 	private static String checkItems(ItemStack mainHand, ItemStack offHand, Predicate<ItemStack> check) {

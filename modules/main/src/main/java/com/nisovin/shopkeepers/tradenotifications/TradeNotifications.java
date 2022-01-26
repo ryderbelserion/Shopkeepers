@@ -19,6 +19,7 @@ import com.nisovin.shopkeepers.api.shopkeeper.TradingRecipe;
 import com.nisovin.shopkeepers.api.shopkeeper.player.PlayerShopkeeper;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.currency.Currencies;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
 import com.nisovin.shopkeepers.text.ClickEventText.Action;
@@ -49,7 +50,7 @@ public class TradeNotifications implements Listener {
 			this.mergedTrades = mergedTrades;
 			shopMessageArguments = new Lazy<>(() -> ((AbstractShopkeeper) this.getShopkeeper()).getMessageArguments("shop_"));
 			tradeMessageArguments = new Lazy<>(() -> createTradeMessageArguments(this));
-			isResultItemCurrency = new Lazy<>(() -> Settings.isCurrencyItem(this.getResultItem()));
+			isResultItemCurrency = new Lazy<>(() -> Currencies.getBase().getItemData().matches(this.getResultItem()));
 		}
 
 		public Player getTradingPlayer() {

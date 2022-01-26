@@ -27,8 +27,11 @@ import com.nisovin.shopkeepers.api.ui.DefaultUITypes;
 import com.nisovin.shopkeepers.api.user.User;
 import com.nisovin.shopkeepers.api.util.UnmodifiableItemStack;
 import com.nisovin.shopkeepers.config.Settings;
+import com.nisovin.shopkeepers.config.Settings.DerivedSettings;
 import com.nisovin.shopkeepers.container.ShopContainers;
 import com.nisovin.shopkeepers.container.protection.ProtectedContainers;
+import com.nisovin.shopkeepers.currency.Currencies;
+import com.nisovin.shopkeepers.currency.Currency;
 import com.nisovin.shopkeepers.debug.DebugOptions;
 import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -148,7 +151,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 	public void delete(Player player) {
 		// Return the shop creation item:
 		if (Settings.deletingPlayerShopReturnsCreationItem && player != null && this.isOwner(player)) {
-			ItemStack shopCreationItem = Settings.createShopCreationItem();
+			ItemStack shopCreationItem = Settings.shopCreationItem.createItemStack();
 			Map<Integer, ItemStack> remaining = player.getInventory().addItem(shopCreationItem);
 			if (!remaining.isEmpty()) {
 				// Inventory is full, drop the item instead:
@@ -196,7 +199,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		// Naming via item:
 		PlayerInventory playerInventory = player.getInventory();
 		ItemStack itemInMainHand = playerInventory.getItemInMainHand();
-		if (Settings.namingOfPlayerShopsViaItem && Settings.isNamingItem(itemInMainHand)) {
+		if (Settings.namingOfPlayerShopsViaItem && DerivedSettings.namingItemData.matches(itemInMainHand)) {
 			// Check if player can edit this shopkeeper:
 			PlayerShopEditorHandler editorHandler = (PlayerShopEditorHandler) this.getUIHandler(DefaultUITypes.EDITOR());
 			if (editorHandler.canOpen(player, false)) {
@@ -575,10 +578,9 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		int totalCurrency = 0;
 		ItemStack[] contents = this.getContainerContents(); // Empty if the container is not found
 		for (ItemStack itemStack : contents) {
-			if (Settings.isCurrencyItem(itemStack)) {
-				totalCurrency += itemStack.getAmount();
-			} else if (Settings.isHighCurrencyItem(itemStack)) {
-				totalCurrency += (itemStack.getAmount() * Settings.highCurrencyValue);
+			Currency currency = Currencies.match(itemStack);
+			if (currency != null) {
+				totalCurrency += (itemStack.getAmount() * currency.getValue());
 			}
 		}
 		return totalCurrency;
@@ -591,17 +593,20 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 		UnmodifiableItemStack item1 = null;
 		UnmodifiableItemStack item2 = null;
 
-		if (Settings.isHighCurrencyEnabled() && price > Settings.highCurrencyMinCost) {
-			int highCurrencyAmount = Math.min(price / Settings.highCurrencyValue, Settings.highCurrencyItem.getType().getMaxStackSize());
+		if (Currencies.isHighCurrencyEnabled() && price > Settings.highCurrencyMinCost) {
+			Currency highCurrency = Currencies.getHigh();
+			int highCurrencyAmount = Math.min(price / highCurrency.getValue(), highCurrency.getMaxStackSize());
 			if (highCurrencyAmount > 0) {
-				remainingPrice -= (highCurrencyAmount * Settings.highCurrencyValue);
-				UnmodifiableItemStack highCurrencyItem = UnmodifiableItemStack.of(Settings.createHighCurrencyItem(highCurrencyAmount));
+				remainingPrice -= (highCurrencyAmount * highCurrency.getValue());
+				UnmodifiableItemStack highCurrencyItem = UnmodifiableItemStack.of(highCurrency.getItemData().createItemStack(highCurrencyAmount));
 				item1 = highCurrencyItem; // Using the first slot
 			}
 		}
 
 		if (remainingPrice > 0) {
-			if (remainingPrice > Settings.currencyItem.getType().getMaxStackSize()) {
+			Currency baseCurrency = Currencies.getBase();
+			int maxStackSize = baseCurrency.getMaxStackSize();
+			if (remainingPrice > maxStackSize) {
 				// Cannot represent this price with the used currency items:
 				// TODO Move this warning into the loading phase.
 				int maxPrice = getMaximumSellingPrice();
@@ -610,7 +615,7 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 				return null;
 			}
 
-			UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(Settings.createCurrencyItem(remainingPrice));
+			UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(baseCurrency.getItemData().createItemStack(remainingPrice));
 			if (item1 == null) {
 				item1 = currencyItem;
 			} else {
@@ -623,7 +628,8 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 
 	// Returns null (and logs a warning) if the price cannot be represented correctly by currency items.
 	protected final TradingRecipe createBuyingRecipe(UnmodifiableItemStack itemBeingBought, int price, boolean outOfStock) {
-		int maxPrice = Settings.currencyItem.getType().getMaxStackSize();
+		Currency currency = Currencies.getBase();
+		int maxPrice = currency.getStackValue();
 		if (price > maxPrice) {
 			// Cannot represent this price with the used currency items:
 			// TODO Move this warning into the loading phase.
@@ -631,14 +637,21 @@ public abstract class AbstractPlayerShopkeeper extends AbstractShopkeeper implem
 					+ maxPrice + ".");
 			return null;
 		}
-		UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(Settings.createCurrencyItem(price));
+		UnmodifiableItemStack currencyItem = UnmodifiableItemStack.of(currency.getItemData().createItemStack(price));
 		return new SKTradingRecipe(currencyItem, itemBeingBought, null, outOfStock);
 	}
 
 	private static int getMaximumSellingPrice() {
-		int maxPrice = Settings.currencyItem.getType().getMaxStackSize();
-		if (Settings.isHighCurrencyEnabled()) {
-			maxPrice += Settings.highCurrencyItem.getType().getMaxStackSize() * Settings.highCurrencyValue;
+		// Combined value of two stacks of the two highest valued currencies:
+		// TODO In the future: Two stacks of the single highest valued currency.
+		int maxPrice = 0;
+		int currenciesCount = Currencies.getAll().size();
+		Currency currency1 = Currencies.getAll().get(currenciesCount - 1);
+		maxPrice += currency1.getStackValue();
+
+		if (currenciesCount > 1) {
+			Currency currency2 = Currencies.getAll().get(currenciesCount - 2);
+			maxPrice += currency2.getStackValue();
 		}
 		return maxPrice;
 	}

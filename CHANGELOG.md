@@ -35,6 +35,7 @@ Date format: (YYYY-MM-DD)
   * The "checkItem" command no longer compares the held items with the zero currency / editor placeholder items.
 * Config: Bumped the config version to 5.
 * Command: The "give" and "giveCurrency" commands no longer allow item amounts greater than 1024. Previously, these commands silently truncated any amounts greater than 1024.
+* Command: The "giveCurrency" and "setCurrency" commands refer to the low currency as 'base' currency now.
 
 **Debugging changes:**
 * We still clear all shopkeeper registry collections during plugin shutdown, just in case something went wrong earlier and prevented elements from being properly removed. But we also log a warning in this case now.
@@ -72,12 +73,18 @@ Date format: (YYYY-MM-DD)
   * Internal API: Some calls to shopkeeper callback functions are better guarded against unexpected exceptions now. But this does not yet apply to all callback functions.
   * Internal API: Various other internal changes that might also affect the internal API of shopkeepers and shop objects.
 * Internal API: Added the ability to attach external 'components' to shopkeepers, which can provide additional state and/or functionality related to a particular shopkeeper.
+* Refactors and preparations to support more than two currency items.
 * Minor internal command library refactors.
 * Various other internal refactors and documentation changes.
 
 **Message changes:**  
 * Slightly changed the default `must-target-container` message.
+* Changed `currency-items-given`.
+* Changed `currency-items-received`.
 * Removed `shop-create-fail`.
+* Removed `high-currency-items-given`.
+* Removed `high-currency-items-received`.
+* Removed `high-currency-disabled`.
 * Added `button-horse-saddle`.
 * Added `button-horse-saddle-lore`.
 * Added `must-target-block`.
@@ -89,7 +96,6 @@ Date format: (YYYY-MM-DD)
 * Added `location-already-in-use`.
 * Added `must-hold-item-in-main-hand`.
 * Added `currency-item-set-to-main-hand-item`.
-* Added `high-currency-item-set-to-main-hand-item`.
 * Added `command-description-set-currency`.
 * Added `selling-empty-trade-result-item`.
 * Added `selling-empty-trade-result-item-lore`.
@@ -129,6 +135,7 @@ Date format: (YYYY-MM-DD)
 * Added `book-empty-item1-lore`.
 * Added `book-empty-item2`.
 * Added `book-empty-item2-lore`.
+* Added `unknown-currency`.
 
 ## v2.14.0 (2021-12-17)
 ### Supported MC versions: 1.18.1, 1.18, 1.17.1, 1.17, 1.16.5, 1.15.2, 1.14.4
