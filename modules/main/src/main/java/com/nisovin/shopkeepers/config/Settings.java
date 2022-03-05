@@ -752,11 +752,25 @@ public class Settings extends Config {
 		// effect. However, we do not print a warning in this case to allow tradeLogMergeDurationTicks to be easily
 		// adjusted inside the config without having to keep tradeLogNextMergeTimeoutTicks consistent.
 
-		// Temporary workaround for Mohist servers. See https://github.com/Shopkeepers/Shopkeepers/issues/738
-		// TODO This is supposed to be removed again once the underlying issue has been fixed by Mohist.
-		if (!disableInventoryVerification && Bukkit.getServer().getName().contains("Mohist")) {
-			Log.warning(this.getLogPrefix() + "Forcefully enabled 'disable-inventory-verification' to resolve a known incompatibility with Mohist servers.");
-			disableInventoryVerification = true;
+		// Temporary workaround for Mohist and Magma servers.
+		// See https://github.com/Shopkeepers/Shopkeepers/issues/738
+		// TODO This is supposed to be removed again once the underlying issue has been fixed by Mohist/Magma.
+		if (!disableInventoryVerification) {
+			String serverName = Bukkit.getServer().getName();
+			boolean forceDisableInventoryVerification = false;
+			String serverDisplayName = "";
+			if (serverName.contains("Mohist")) {
+				forceDisableInventoryVerification = true;
+				serverDisplayName = "Mohist";
+			} else if (serverName.contains("Magma")) {
+				forceDisableInventoryVerification = true;
+				serverDisplayName = "Magma";
+			}
+			if (forceDisableInventoryVerification) {
+				Log.warning(this.getLogPrefix() + "Forcefully enabled 'disable-inventory-verification'"
+						+ " to resolve a known incompatibility with " + serverDisplayName + " servers.");
+				disableInventoryVerification = true;
+			}
 		}
 	}
 }

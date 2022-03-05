@@ -7,6 +7,7 @@ Date format: (YYYY-MM-DD)
 * Config: The translations repository has been renamed and is now located at `https://github.com/Shopkeepers/Language-Files`.
 * Config: Added config option `placeholder-item` that allows changing the placeholder item (Thanks to oltdaniel, PR #762). It is also possible to disable placeholder items now by setting the item to AIR.
 * Config: Changed the default placeholder item type from `NAME_TAG`, which is difficult to obtain in vanilla Minecraft, to `PAPER`.
+* Config: Similar to Mohist servers, we also automatically enable the `disable-inventory-verification` setting now when we detect that we run on a Magma server.
 * Added an editor option to toggle the saddle of horse shopkeepers on and off.
 * Data: The shopkeeper data version has changed from `1` to `2`.
 * Reduced the range at which shopkeeper mobs look at players from 12 to 6 blocks.
