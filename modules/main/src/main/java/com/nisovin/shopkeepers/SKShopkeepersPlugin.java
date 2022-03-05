@@ -148,10 +148,9 @@ public class SKShopkeepersPlugin extends JavaPlugin implements InternalShopkeepe
 		}
 	}
 
-	// Returns false if no compatible NMS version, nor the fallback handler could be set up.
+	// Returns false if neither a compatible NMS version nor the fallback handler could be set up.
 	private boolean setupNMS() {
-		NMSManager.load(this);
-		return (NMSManager.getProvider() != null);
+		return NMSManager.load(this);
 	}
 
 	private void registerDefaults() {

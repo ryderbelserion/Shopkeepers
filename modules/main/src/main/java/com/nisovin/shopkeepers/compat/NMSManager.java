@@ -59,7 +59,8 @@ public final class NMSManager {
 		return NMSManager.provider;
 	}
 
-	public static void load(Plugin plugin) {
+	// Returns true if the NMS provider (or fallback handler) has been successfully set up.
+	public static boolean load(Plugin plugin) {
 		String mappingsVersion = ServerUtils.getMappingsVersion();
 		CompatVersion compatVersion = SUPPORTED_MAPPINGS_VERSIONS.get(mappingsVersion);
 		if (compatVersion != null) {
@@ -68,7 +69,7 @@ public final class NMSManager {
 				Class<?> clazz = Class.forName("com.nisovin.shopkeepers.compat.v" + compatVersionString + ".NMSHandler");
 				if (NMSCallProvider.class.isAssignableFrom(clazz)) {
 					NMSManager.provider = (NMSCallProvider) clazz.getConstructor().newInstance();
-					return; // Success
+					return true; // Success
 				} else {
 					// Unexpected: NMSHandler does not implement NMSCallProvider. Continue with fallback.
 				}
@@ -85,8 +86,10 @@ public final class NMSManager {
 
 		try {
 			NMSManager.provider = new FailedHandler();
+			return true; // Success
 		} catch (Exception e) {
 			Log.severe("Failed to enable 'compatibility mode'!", e);
 		}
+		return false;
 	}
 }
