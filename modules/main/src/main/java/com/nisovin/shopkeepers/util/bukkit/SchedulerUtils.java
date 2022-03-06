@@ -126,9 +126,9 @@ public final class SchedulerUtils {
 			final long waitStartNanos = System.nanoTime();
 			long waitDurationMillis = 0L;
 			do {
-				// Checking again every 5 milliseconds:
+				// Periodically check again:
 				try {
-					Thread.sleep(5L);
+					Thread.sleep(25L);
 				} catch (InterruptedException e) {
 					// Ignore, but reset interrupt flag:
 					Thread.currentThread().interrupt();

@@ -76,6 +76,7 @@ Date format: (YYYY-MM-DD)
 * Internal API: Added the ability to attach external 'components' to shopkeepers, which can provide additional state and/or functionality related to a particular shopkeeper.
 * Refactors and preparations to support more than two currency items.
 * Minor internal command library refactors.
+* Reduced the frequency with which we check for remaining async tasks during plugin shutdown.
 * Various other internal refactors and documentation changes.
 
 **Message changes:**  
