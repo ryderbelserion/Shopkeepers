@@ -82,6 +82,8 @@ Date format: (YYYY-MM-DD)
 
 **Message changes:**  
 * Slightly changed the default `must-target-container` message.
+* Changed `invalid-snapshot-id`.
+* Changed `invalid-snapshot-name`.
 * Changed `currency-items-given`.
 * Changed `currency-items-received`.
 * Removed `shop-create-fail`.

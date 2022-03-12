@@ -25,12 +25,8 @@ public class ShopObjectTypeArgument extends CommandArgument<ShopObjectType<?>> {
 	}
 
 	@Override
-	public Text getInvalidArgumentErrorMsg(String argumentInput) {
-		if (argumentInput == null) argumentInput = "";
-		Text text = Messages.commandShopObjectTypeArgumentInvalid;
-		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
-		text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
-		return text;
+	protected Text getInvalidArgumentErrorMsgText() {
+		return Messages.commandShopObjectTypeArgumentInvalid;
 	}
 
 	@Override

@@ -59,12 +59,8 @@ public class ShopkeeperSnapshotIndexByNameArgument extends ObjectByIdArgument<St
 	}
 
 	@Override
-	public Text getInvalidArgumentErrorMsg(String argumentInput) {
-		if (argumentInput == null) argumentInput = "";
-		Text text = Messages.invalidSnapshotName;
-		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
-		text.setPlaceholderArguments(Collections.singletonMap("name", argumentInput));
-		return text;
+	protected Text getInvalidArgumentErrorMsgText() {
+		return Messages.invalidSnapshotName;
 	}
 
 	@Override

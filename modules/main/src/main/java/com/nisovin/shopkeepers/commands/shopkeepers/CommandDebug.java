@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.commands.shopkeepers;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -35,10 +34,7 @@ class CommandDebug extends Command {
 		}
 
 		@Override
-		public Text getInvalidArgumentErrorMsg(String argumentInput) {
-			if (argumentInput == null) argumentInput = "";
-			invalidArgumentMsg.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
-			invalidArgumentMsg.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
+		protected Text getInvalidArgumentErrorMsgText() {
 			return invalidArgumentMsg;
 		}
 	}

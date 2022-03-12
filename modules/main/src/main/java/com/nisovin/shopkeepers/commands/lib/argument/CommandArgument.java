@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.commands.lib.argument;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -303,10 +302,15 @@ public abstract class CommandArgument<T> {
 		return new MissingArgumentException(this, this.getMissingArgumentErrorMsg());
 	}
 
+	protected Text getInvalidArgumentErrorMsgText() {
+		return Messages.commandArgumentInvalid;
+	}
+
 	/**
 	 * Gets the 'invalid argument' error message.
 	 * <p>
-	 * When overriding this method, consider using {@link #getDefaultErrorMsgArgs()} for the common message arguments.
+	 * When overriding this method, consider using {@link #getInvalidArgumentErrorMsgText()} for the text template, and
+	 * {@link #getDefaultErrorMsgArgs()} for the common message arguments.
 	 * 
 	 * @param argumentInput
 	 *            the argument input, not <code>null</code>
@@ -314,9 +318,9 @@ public abstract class CommandArgument<T> {
 	 */
 	public Text getInvalidArgumentErrorMsg(String argumentInput) {
 		Validate.notNull(argumentInput, "argumentInput is null");
-		Text text = Messages.commandArgumentInvalid;
+		Text text = this.getInvalidArgumentErrorMsgText();
 		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
-		text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
+		text.setPlaceholderArguments("argument", argumentInput);
 		return text;
 	}
 

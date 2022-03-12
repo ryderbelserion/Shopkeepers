@@ -67,12 +67,8 @@ public class ShopkeeperSnapshotIndexByIdArgument extends ObjectByIdArgument<Inte
 	}
 
 	@Override
-	public Text getInvalidArgumentErrorMsg(String argumentInput) {
-		if (argumentInput == null) argumentInput = "";
-		Text text = Messages.invalidSnapshotId;
-		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
-		text.setPlaceholderArguments(Collections.singletonMap("id", argumentInput));
-		return text;
+	protected Text getInvalidArgumentErrorMsgText() {
+		return Messages.invalidSnapshotId;
 	}
 
 	@Override

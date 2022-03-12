@@ -1,6 +1,5 @@
 package com.nisovin.shopkeepers.commands.lib.arguments;
 
-import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -42,12 +41,8 @@ public class PlayerByNameArgument extends ObjectByIdArgument<String, Player> {
 	}
 
 	@Override
-	public Text getInvalidArgumentErrorMsg(String argumentInput) {
-		if (argumentInput == null) argumentInput = "";
-		Text text = Messages.commandPlayerArgumentInvalid;
-		text.setPlaceholderArguments(this.getDefaultErrorMsgArgs());
-		text.setPlaceholderArguments(Collections.singletonMap("argument", argumentInput));
-		return text;
+	protected Text getInvalidArgumentErrorMsgText() {
+		return Messages.commandPlayerArgumentInvalid;
 	}
 
 	@Override
