@@ -38,6 +38,8 @@ Date format: (YYYY-MM-DD)
 * Config: Bumped the config version to 5.
 * Command: The "give" and "giveCurrency" commands no longer allow item amounts greater than 1024. Previously, these commands silently truncated any amounts greater than 1024.
 * Command: The "giveCurrency" and "setCurrency" commands refer to the low currency as 'base' currency now.
+* Command: Different types of command executors (e.g. command blocks and the console) no longer share their pending confirmation state.
+* Command: Confirmations account for proxied command senders now: Since the original caller of the command receives the command's feedback messages, we also require confirmation from the original caller.
 
 **Debugging changes:**
 * We still clear all shopkeeper registry collections during plugin shutdown, just in case something went wrong earlier and prevented elements from being properly removed. But we also log a warning in this case now.

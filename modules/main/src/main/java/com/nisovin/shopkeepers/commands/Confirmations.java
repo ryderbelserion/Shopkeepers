@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ProxiedCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -14,12 +15,12 @@ import com.nisovin.shopkeepers.util.java.Validate;
 
 public class Confirmations {
 
-	private static class ConfirmEntry {
+	private static class PendingConfirmation {
 
 		private final Runnable action;
 		private final int taskId;
 
-		public ConfirmEntry(Runnable action, int taskId) {
+		public PendingConfirmation(Runnable action, int taskId) {
 			this.taskId = taskId;
 			this.action = action;
 		}
@@ -36,9 +37,8 @@ public class Confirmations {
 	public static final int DEFAULT_CONFIRMATION_TICKS = 25 * 20; // 25 seconds
 
 	private final Plugin plugin;
-	// Player name -> confirmation data
-	// Null name is used for console confirmations.
-	private final Map<String, ConfirmEntry> confirming = new HashMap<>();
+	// The type of key that is used to track pending confirmations depends on the type of CommandSender.
+	private final Map<Object, PendingConfirmation> pendingConfirmations = new HashMap<>();
 
 	public Confirmations(Plugin plugin) {
 		this.plugin = plugin;
@@ -48,15 +48,24 @@ public class Confirmations {
 	}
 
 	public void onDisable() {
-		confirming.clear();
+		pendingConfirmations.clear();
 	}
 
-	private String getSenderKey(CommandSender sender) {
+	private Object getSenderKey(CommandSender sender) {
+		// Note: We cannot use the CommandSender instance itself as key, because for some types of
+		// command senders we might get a new instance for each invoked command.
 		if (sender instanceof Player) {
-			return sender.getName(); // Player's name
+			return ((Player) sender).getUniqueId();
+		} else if (sender instanceof ProxiedCommandSender) {
+			// Messages and permission checks use the caller, so we also use the caller for
+			// confirmations.
+			return this.getSenderKey(((ProxiedCommandSender) sender).getCaller());
 		} else {
-			// Any other command sender, such as console:
-			return null;
+			// Any other type of command sender (console, rcon, command blocks, etc.).
+			// Using the CommandSender's class as key allows us to track separate pending
+			// confirmations for different types of command senders (e.g. the console and command
+			// blocks don't share the same pending confirmation state).
+			return sender.getClass();
 		}
 	}
 
@@ -79,23 +88,26 @@ public class Confirmations {
 			TextUtils.sendMessage(sender, Messages.confirmationExpired);
 		}, timeoutTicks).getTaskId();
 
-		ConfirmEntry oldEntry = confirming.put(this.getSenderKey(sender), new ConfirmEntry(action, taskId));
-		if (oldEntry != null) {
-			// End old confirmation task:
-			Bukkit.getScheduler().cancelTask(oldEntry.getTaskId());
+		PendingConfirmation previousPendingConfirmation = pendingConfirmations.put(
+				this.getSenderKey(sender),
+				new PendingConfirmation(action, taskId)
+		);
+		if (previousPendingConfirmation != null) {
+			// Cancel the previous pending confirmation task:
+			Bukkit.getScheduler().cancelTask(previousPendingConfirmation.getTaskId());
 		}
 	}
 
-	// Returns the action that was awaiting confirmation
+	// Returns the action that was awaiting confirmation.
 	public Runnable endConfirmation(CommandSender sender) {
 		Validate.notNull(sender, "sender is null");
-		ConfirmEntry entry = confirming.remove(this.getSenderKey(sender));
-		if (entry != null) {
+		PendingConfirmation pendingConfirmation = pendingConfirmations.remove(this.getSenderKey(sender));
+		if (pendingConfirmation != null) {
 			// End confirmation task:
-			Bukkit.getScheduler().cancelTask(entry.getTaskId());
+			Bukkit.getScheduler().cancelTask(pendingConfirmation.getTaskId());
 
 			// Return action:
-			return entry.getAction();
+			return pendingConfirmation.getAction();
 		}
 		return null;
 	}
