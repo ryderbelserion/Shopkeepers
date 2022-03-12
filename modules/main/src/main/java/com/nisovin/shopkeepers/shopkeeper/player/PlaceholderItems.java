@@ -27,10 +27,13 @@ public final class PlaceholderItems {
 
 	/**
 	 * Creates a placeholder item.
+	 * <p>
+	 * If placeholder items are disabled (set to AIR), this returns an empty item stack that is not considered to be a
+	 * {@link #isPlaceholderItem(ItemStack) placeholder item}.
 	 * 
 	 * @param displayName
 	 *            the placeholder item's display name
-	 * @return the placeholder item
+	 * @return the placeholder item, not <code>null</code>
 	 */
 	public static ItemStack createPlaceholderItem(String displayName) {
 		ItemStack item = DerivedSettings.placeholderItemData.createItemStack();
@@ -39,17 +42,20 @@ public final class PlaceholderItems {
 	}
 
 	/**
-	 * Checks if the given {@link ItemStack} is a placeholder item (i.e. matches
+	 * Checks if the given {@link ItemStack} is a placeholder item (i.e. is not empty and matches
 	 * {@link DerivedSettings#placeholderItemData}).
 	 * <p>
 	 * This does not check if the given placeholder item specifies a {@link #isValidPlaceholderItem(ItemStack) valid
 	 * substituted item}.
+	 * <p>
+	 * Empty item stacks are never considered to be placeholder items.
 	 * 
 	 * @param itemStack
 	 *            the item stack
 	 * @return <code>true</code> if the item stack is a placeholder item
 	 */
 	public static boolean isPlaceholderItem(@ReadOnly ItemStack itemStack) {
+		if (ItemUtils.isEmpty(itemStack)) return false;
 		return DerivedSettings.placeholderItemData.matches(itemStack);
 	}
 
