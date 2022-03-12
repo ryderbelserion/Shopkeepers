@@ -14,6 +14,8 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.logging.Logger;
 
+import com.nisovin.shopkeepers.util.logging.NullLogger;
+
 /**
  * File related utilities.
  * <p>
@@ -211,13 +213,15 @@ public final class FileUtils {
 	 * @param target
 	 *            the path of the target file
 	 * @param logger
-	 *            the logger used to log warnings when atomic moving is not possible, or <code>null</code>
+	 *            the logger used to log warnings when atomic moving is not possible, can be {@link NullLogger} to not
+	 *            log anything
 	 * @throws IOException
 	 *             if the operation fails for some reason and we are not able to recover by applying some fallback
 	 */
 	public static void moveFile(Path source, Path target, Logger logger) throws IOException {
 		Validate.notNull(source, "source is null");
 		Validate.notNull(target, "target is null");
+		Validate.notNull(logger, "logger is null");
 
 		// Create the parent directories if necessary:
 		createParentDirectories(target);
@@ -228,24 +232,20 @@ public final class FileUtils {
 				Files.move(source, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
 			} catch (AtomicMoveNotSupportedException e) {
 				// Attempt non-atomic move:
-				if (logger != null) {
-					// TODO Turn this into a debug message? Might spam if this is logged repeatedly on a system that is
-					// known to not support atomic moves. Or maybe only print this once as warning, and then only in
-					// debug mode.
-					logger.warning("Could not atomically move file '" + source + "' to '" + target + "' ("
-							+ ThrowableUtils.getDescription(e) + ")! Attempting non-atomic move.");
-				}
+				// TODO Turn this into a debug message? Might spam if this is logged repeatedly on a system that is
+				// known to not support atomic moves. Or maybe only print this once as warning, and then only in debug
+				// mode.
+				logger.warning(() -> "Could not atomically move file '" + source + "' to '" + target
+						+ "' (" + ThrowableUtils.getDescription(e) + ")! Attempting non-atomic move.");
 				Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
 			}
 		} catch (IOException e) {
 			// Attempt File#renameTo(File):
 			if (!source.toFile().renameTo(target.toFile())) {
 				// Attempt copy and delete:
-				if (logger != null) {
-					// TODO Turn this into a debug message?
-					logger.warning("Could not move file '" + source + "' to '" + target + "' (" + ThrowableUtils.getDescription(e)
-							+ ")! Attempting copy and delete.");
-				}
+				// TODO Turn this into a debug message?
+				logger.warning(() -> "Could not move file '" + source + "' to '" + target + "' ("
+						+ ThrowableUtils.getDescription(e) + ")! Attempting copy and delete.");
 				try {
 					copyAndDelete(source, target);
 				} catch (IOException e2) {
