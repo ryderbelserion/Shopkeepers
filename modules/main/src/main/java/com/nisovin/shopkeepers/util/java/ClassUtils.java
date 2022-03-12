@@ -3,9 +3,11 @@ package com.nisovin.shopkeepers.util.java;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -139,6 +141,26 @@ public final class ClassUtils {
 			return false;
 		}
 		return true;
+	}
+
+	public static ClassLoader getClassLoader(Class<?> clazz) {
+		Validate.notNull(clazz, "clazz is null");
+		ClassLoader classLoader = clazz.getClassLoader();
+		Validate.notNull(classLoader, "The ClassLoader of clazz is null");
+		return classLoader;
+	}
+
+	public static InputStream getResource(Class<?> clazz, String resourcePath) {
+		ClassLoader classLoader = getClassLoader(clazz);
+		InputStream resource = classLoader.getResourceAsStream(resourcePath);
+		if (resource == null) {
+			throw new MissingResourceException(
+					"Missing resource: " + resourcePath,
+					clazz.getName(),
+					resourcePath
+			);
+		}
+		return resource;
 	}
 
 	private ClassUtils() {

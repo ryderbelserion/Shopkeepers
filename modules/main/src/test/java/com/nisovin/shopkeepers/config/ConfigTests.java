@@ -18,11 +18,12 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.util.bukkit.ConfigUtils;
 import com.nisovin.shopkeepers.util.data.container.DataContainer;
+import com.nisovin.shopkeepers.util.java.ClassUtils;
 
 public class ConfigTests extends AbstractBukkitTest {
 
 	private DataContainer loadConfigFromResource(String resourcePath) {
-		InputStream configResource = this.getClass().getClassLoader().getResourceAsStream(resourcePath);
+		InputStream configResource = ClassUtils.getResource(this.getClass(), resourcePath);
 		Configuration config = YamlConfiguration.loadConfiguration(new InputStreamReader(configResource));
 		// In order to be able to compare the contents of this loaded config with the data of an in-memory serialized
 		// config, we need to convert all config sections to Maps:

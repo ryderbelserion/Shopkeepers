@@ -5,6 +5,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Set;
@@ -17,6 +18,7 @@ import com.nisovin.shopkeepers.lang.Messages;
 import com.nisovin.shopkeepers.testutil.AbstractBukkitTest;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.java.ClassUtils;
 
 public class TextTest extends AbstractBukkitTest {
 
@@ -26,8 +28,8 @@ public class TextTest extends AbstractBukkitTest {
 		// Load default language file:
 		Configuration config;
 		String languageFilePath = Messages.getDefaultLanguageFilePath();
-		ClassLoader classLoader = this.getClass().getClassLoader();
-		try (Reader reader = new BufferedReader(new InputStreamReader(classLoader.getResourceAsStream(languageFilePath)))) {
+		InputStream languageFileResource = ClassUtils.getResource(this.getClass(), languageFilePath);
+		try (Reader reader = new BufferedReader(new InputStreamReader(languageFileResource))) {
 			config = YamlConfiguration.loadConfiguration(reader);
 		}
 
