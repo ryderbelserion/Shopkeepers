@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
+import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContext;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
@@ -413,4 +414,14 @@ public abstract class CommandArgument<T> {
 	}
 
 	// Note on hashCode and equals: CommandArguments are compared by identity.
+
+	// Factories for common derived argument types:
+
+	public final CommandArgument<T> optional() {
+		return new OptionalArgument<T>(this);
+	}
+
+	public final CommandArgument<T> orDefaultValue(T defaultValue) {
+		return new DefaultValueFallback<>(this, defaultValue);
+	}
 }

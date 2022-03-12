@@ -14,7 +14,6 @@ import com.nisovin.shopkeepers.api.util.ChunkCoords;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.BoundedIntegerArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.shopkeeper.AbstractShopkeeper;
@@ -46,7 +45,7 @@ class CommandTestSpawn extends PlayerCommand {
 		this.setHiddenInParentHelp(true);
 
 		// Arguments:
-		this.addArgument(new DefaultValueFallback<>(new BoundedIntegerArgument(ARGUMENT_REPETITIONS, 1, 1000), 10));
+		this.addArgument(new BoundedIntegerArgument(ARGUMENT_REPETITIONS, 1, 1000).orDefaultValue(10));
 	}
 
 	@Override

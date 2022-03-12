@@ -13,7 +13,6 @@ import com.nisovin.shopkeepers.api.shopkeeper.admin.AdminShopCreationData;
 import com.nisovin.shopkeepers.api.shopobjects.DefaultShopObjectTypes;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
@@ -39,7 +38,7 @@ class CommandDebugCreateShops extends PlayerCommand {
 		this.setHiddenInParentHelp(true);
 
 		// Arguments:
-		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_SHOP_COUNT), 10));
+		this.addArgument(new PositiveIntegerArgument(ARGUMENT_SHOP_COUNT).orDefaultValue(10));
 	}
 
 	@Override

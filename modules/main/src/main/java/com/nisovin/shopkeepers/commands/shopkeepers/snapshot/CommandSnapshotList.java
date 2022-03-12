@@ -12,7 +12,6 @@ import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.commands.util.ShopkeeperArgumentUtils.TargetShopkeeperFilter;
@@ -42,7 +41,7 @@ class CommandSnapshotList extends Command {
 				new ShopkeeperArgument(ARGUMENT_SHOPKEEPER),
 				TargetShopkeeperFilter.ANY
 		));
-		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_PAGE), 1));
+		this.addArgument(new PositiveIntegerArgument(ARGUMENT_PAGE).orDefaultValue(1));
 	}
 
 	@Override

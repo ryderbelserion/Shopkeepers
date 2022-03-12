@@ -25,7 +25,6 @@ import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.shopkeeper.activation.ShopkeeperChunkActivator;
@@ -64,10 +63,10 @@ class CommandCheck extends Command {
 		this.setHiddenInParentHelp(true);
 
 		// Arguments:
-		this.addArgument(new OptionalArgument<>(new FirstOfArgument("context", Arrays.asList(
+		this.addArgument(new FirstOfArgument("context", Arrays.asList(
 				new LiteralArgument(ARGUMENT_CHUNKS),
 				new LiteralArgument(ARGUMENT_ACTIVE)
-		), true))); // Join formats
+		), true).optional()); // Join formats
 	}
 
 	@Override

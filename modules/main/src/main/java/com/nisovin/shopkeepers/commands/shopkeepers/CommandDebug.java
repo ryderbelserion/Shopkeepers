@@ -11,7 +11,6 @@ import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.FixedValuesArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.config.Settings;
 import com.nisovin.shopkeepers.debug.DebugOptions;
@@ -51,7 +50,7 @@ class CommandDebug extends Command {
 		this.setDescription(Messages.commandDescriptionDebug);
 
 		// Arguments:
-		this.addArgument(new OptionalArgument<>(new DebugOptionArgument(ARGUMENT_DEBUG_OPTION)));
+		this.addArgument(new DebugOptionArgument(ARGUMENT_DEBUG_OPTION).optional());
 	}
 
 	@Override

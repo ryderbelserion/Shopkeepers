@@ -13,7 +13,6 @@ import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
@@ -40,7 +39,7 @@ class CommandConvertItems extends Command {
 
 		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
-		this.addArgument(new OptionalArgument<>(new LiteralArgument(ARGUMENT_ALL)));
+		this.addArgument(new LiteralArgument(ARGUMENT_ALL).optional());
 	}
 
 	@Override

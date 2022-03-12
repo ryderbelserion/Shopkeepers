@@ -10,13 +10,13 @@ import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.BoundedDoubleArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.PositiveIntegerArgument;
 import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.text.Text;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
+import com.nisovin.shopkeepers.util.bukkit.Ticks;
 
 /**
  * Produces lots of damage events (with a damage of <code>0</code>) in quick succession.
@@ -47,9 +47,9 @@ class CommandTestDamage extends PlayerCommand {
 		this.setHiddenInParentHelp(true);
 
 		// Arguments:
-		this.addArgument(new DefaultValueFallback<>(new BoundedDoubleArgument(ARGUMENT_DAMAGE, 0.0D, Double.MAX_VALUE), 0.0D));
-		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_TIMES_PER_TICK), 1));
-		this.addArgument(new DefaultValueFallback<>(new PositiveIntegerArgument(ARGUMENT_DURATION_TICKS), 20 * 10));
+		this.addArgument(new BoundedDoubleArgument(ARGUMENT_DAMAGE, 0.0D, Double.MAX_VALUE).orDefaultValue(0.0D));
+		this.addArgument(new PositiveIntegerArgument(ARGUMENT_TIMES_PER_TICK).orDefaultValue(1));
+		this.addArgument(new PositiveIntegerArgument(ARGUMENT_DURATION_TICKS).orDefaultValue((int) Ticks.fromSeconds(10)));
 	}
 
 	@Override

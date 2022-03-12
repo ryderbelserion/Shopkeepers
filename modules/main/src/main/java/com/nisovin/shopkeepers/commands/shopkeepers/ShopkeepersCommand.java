@@ -29,7 +29,6 @@ import com.nisovin.shopkeepers.commands.lib.BaseCommand;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.CommandRegistry;
-import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
 import com.nisovin.shopkeepers.commands.shopkeepers.snapshot.CommandSnapshot;
@@ -65,8 +64,8 @@ public class ShopkeepersCommand extends BaseCommand {
 		this.setHelpDescFormat(Messages.commandHelpDescriptionFormat);
 
 		// Arguments for shopkeeper creation:
-		this.addArgument(new OptionalArgument<>(new ShopTypeArgument(ARGUMENT_SHOP_TYPE)));
-		this.addArgument(new OptionalArgument<>(new ShopObjectTypeArgument(ARGUMENT_OBJECT_TYPE)));
+		this.addArgument(new ShopTypeArgument(ARGUMENT_SHOP_TYPE).optional());
+		this.addArgument(new ShopObjectTypeArgument(ARGUMENT_OBJECT_TYPE).optional());
 
 		// Register child commands:
 		CommandRegistry childCommands = this.getChildCommands();

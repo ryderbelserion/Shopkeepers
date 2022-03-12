@@ -13,7 +13,6 @@ import com.nisovin.shopkeepers.commands.arguments.TargetShopkeeperFallback;
 import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.FirstOfArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.LiteralArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
@@ -44,7 +43,7 @@ class CommandSetTradePerm extends Command {
 				TargetShopkeeperFilter.ADMIN
 		));
 		this.addArgument(new FirstOfArgument("permArg", Arrays.asList(
-				new DefaultValueFallback<>(new LiteralArgument(ARGUMENT_QUERY_PERMISSION), ARGUMENT_QUERY_PERMISSION),
+				new LiteralArgument(ARGUMENT_QUERY_PERMISSION).orDefaultValue(ARGUMENT_QUERY_PERMISSION),
 				new LiteralArgument(ARGUMENT_REMOVE_PERMISSION),
 				new StringArgument(ARGUMENT_NEW_PERMISSION)
 		), true, true));

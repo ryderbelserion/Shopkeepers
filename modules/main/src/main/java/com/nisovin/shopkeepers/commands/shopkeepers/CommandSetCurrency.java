@@ -6,7 +6,6 @@ import org.bukkit.inventory.ItemStack;
 import com.nisovin.shopkeepers.api.ShopkeepersPlugin;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
-import com.nisovin.shopkeepers.commands.lib.arguments.OptionalArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.StringArgument;
 import com.nisovin.shopkeepers.commands.lib.commands.PlayerCommand;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
@@ -34,7 +33,7 @@ class CommandSetCurrency extends PlayerCommand {
 
 		// Arguments:
 		// TODO Turn this into a proper argument with completions.
-		this.addArgument(new OptionalArgument<>(new StringArgument(ARGUMENT_CURRENCY)));
+		this.addArgument(new StringArgument(ARGUMENT_CURRENCY).optional());
 	}
 
 	@Override

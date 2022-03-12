@@ -10,7 +10,6 @@ import com.nisovin.shopkeepers.commands.lib.Command;
 import com.nisovin.shopkeepers.commands.lib.CommandException;
 import com.nisovin.shopkeepers.commands.lib.CommandInput;
 import com.nisovin.shopkeepers.commands.lib.arguments.BoundedIntegerArgument;
-import com.nisovin.shopkeepers.commands.lib.arguments.DefaultValueFallback;
 import com.nisovin.shopkeepers.commands.lib.arguments.PlayerArgument;
 import com.nisovin.shopkeepers.commands.lib.arguments.SenderPlayerFallback;
 import com.nisovin.shopkeepers.commands.lib.context.CommandContextView;
@@ -36,7 +35,7 @@ class CommandGive extends Command {
 		// Arguments:
 		this.addArgument(new SenderPlayerFallback(new PlayerArgument(ARGUMENT_PLAYER)));
 		// Upper limit to avoid accidental misuse:
-		this.addArgument(new DefaultValueFallback<>(new BoundedIntegerArgument(ARGUMENT_AMOUNT, 1, 1024), 1));
+		this.addArgument(new BoundedIntegerArgument(ARGUMENT_AMOUNT, 1, 1024).orDefaultValue(1));
 	}
 
 	@Override
