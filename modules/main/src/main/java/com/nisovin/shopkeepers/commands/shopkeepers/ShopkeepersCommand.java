@@ -7,7 +7,6 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.util.RayTraceResult;
 
@@ -40,14 +39,16 @@ import com.nisovin.shopkeepers.util.inventory.ItemUtils;
 
 public class ShopkeepersCommand extends BaseCommand {
 
+	private static final String COMMAND_NAME = "shopkeeper";
+
 	private static final String ARGUMENT_SHOP_TYPE = "shop-type";
 	private static final String ARGUMENT_OBJECT_TYPE = "object-type";
 
 	private final SKShopkeepersPlugin plugin;
 	private final ShopkeeperRegistry shopkeeperRegistry;
 
-	public ShopkeepersCommand(SKShopkeepersPlugin plugin, PluginCommand pluginCommand, Confirmations confirmations) {
-		super(pluginCommand);
+	public ShopkeepersCommand(SKShopkeepersPlugin plugin, Confirmations confirmations) {
+		super(plugin, COMMAND_NAME);
 		this.plugin = plugin;
 		this.shopkeeperRegistry = plugin.getShopkeeperRegistry();
 

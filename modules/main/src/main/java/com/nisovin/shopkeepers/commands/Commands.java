@@ -19,7 +19,7 @@ public class Commands {
 	public void onEnable() {
 		confirmations.onEnable();
 		// Register command executor:
-		shopkeepersCommand = new ShopkeepersCommand(plugin, plugin.getCommand("shopkeeper"), confirmations);
+		shopkeepersCommand = new ShopkeepersCommand(plugin, confirmations);
 	}
 
 	public void onDisable() {

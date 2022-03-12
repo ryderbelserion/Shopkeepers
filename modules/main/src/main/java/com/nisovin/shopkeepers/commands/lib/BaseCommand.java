@@ -6,26 +6,54 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nisovin.shopkeepers.text.Text;
+import com.nisovin.shopkeepers.util.java.Validate;
 
 /**
  * Implements the {@link CommandExecutor} and {@link TabCompleter} for a Bukkit {@link PluginCommand} by invoking our
  * command handling.
  */
-public abstract class BaseCommand extends Command implements org.bukkit.command.CommandExecutor, TabCompleter {
+public abstract class BaseCommand extends Command implements CommandExecutor, TabCompleter {
+
+	private static PluginCommand getPluginCommand(JavaPlugin plugin, String commandName) {
+		Validate.notNull(plugin, "plugin is null");
+		Validate.notEmpty(commandName, "commandName is null or empty");
+		PluginCommand bukkitCommand = plugin.getCommand(commandName);
+		return Validate.State.notNull(
+				bukkitCommand,
+				() -> "Could not find command: " + commandName
+		);
+	}
 
 	/**
-	 * Creates a new {@link BaseCommand} that configures itself for use by the given {@link PluginCommand}.
+	 * Creates a new {@link BaseCommand} that configures and binds itself to the specified {@link PluginCommand}.
+	 * 
+	 * @param plugin
+	 *            the plugin
+	 * @param commandName
+	 *            the command name
+	 * @see #BaseCommand(PluginCommand)
+	 */
+	public BaseCommand(JavaPlugin plugin, String commandName) {
+		this(getPluginCommand(plugin, commandName));
+	}
+
+	/**
+	 * Creates a new {@link BaseCommand} that configures and binds itself to the given {@link PluginCommand}.
 	 * <p>
-	 * This adopts the plugin command's name, aliases, description and permission and sets itself up as the plugin
-	 * command's {@link CommandExecutor} and {@link TabCompleter}.
+	 * This adopts the command's name, aliases, description, and permission, and assigns itself as the command's
+	 * {@link CommandExecutor} and {@link TabCompleter}.
 	 * 
 	 * @param bukkitCommand
-	 *            the corresponding bukkit command
+	 *            the corresponding Bukkit {@link PluginCommand}
 	 */
-	public BaseCommand(org.bukkit.command.PluginCommand bukkitCommand) {
-		super(bukkitCommand.getName(), bukkitCommand.getAliases());
+	public BaseCommand(PluginCommand bukkitCommand) {
+		super(
+				Validate.notNull(bukkitCommand, "bukkitCommand is null").getName(),
+				bukkitCommand.getAliases()
+		);
 		String desc = bukkitCommand.getDescription();
 		if (desc != null && !desc.isEmpty()) {
 			this.setDescription(Text.of(desc));
