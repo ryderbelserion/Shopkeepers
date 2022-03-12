@@ -348,18 +348,24 @@ public class SKCitizensShopObject extends AbstractEntityShopObject implements Ci
 		if (!Settings.snapshotsSaveCitizenNpcData) return;
 
 		// There is no need to try to get the current NPC data if we still store previously restored NPC data that we
-		// were not yet able to apply (because the NPC hasn't been loaded in the meantime).
+		// were not yet able to apply (because the NPC hasn't been loaded in the meantime). We then preserve the not yet
+		// applied NPC data, even if 'saveAll' is false.
 		DataContainer npcData = this.npcData;
 		if (saveAll && npcData == null) {
 			NPC npc = this.getNPC();
-			UUID npcUniqueId = this.getNPCUniqueId();
-			if (npc == null && npcUniqueId != null) {
-				Log.warning(shopkeeper.getLogPrefix()
-						+ "Citizens NPC not found! Is Citizens running? Could not save data of Citizens NPC with uuid "
-						+ npcUniqueId);
+			if (npc == null) {
+				UUID npcId = this.getNPCUniqueId();
+				if (npcId != null) {
+					Log.warning(shopkeeper.getLogPrefix()
+							+ "Could not save the data of the corresponding Citizens NPC! "
+							+ "Citizens NPC not found (uuid: " + npcId + ")! "
+							+ "Is the Citizens plugin enabled?");
+				}
+				// Else: The NPC has not yet been created, so there is no data to save, and no need to log a warning.
 				return;
+			} else {
+				npcData = CitizensUtils.Internal.saveNpc(npc);
 			}
-			npcData = CitizensUtils.Internal.saveNpc(npc);
 		}
 		shopObjectData.set(NPC_DATA, npcData);
 	}
