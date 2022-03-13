@@ -115,8 +115,11 @@ public class MutableChunkCoords extends ChunkCoords {
 	 *            the location, not <code>null</code>
 	 */
 	public void set(Location location) {
-		Validate.notNull(location, "location is null");
-		this.set(location.getWorld().getName(), fromBlock(location.getBlockX()), fromBlock(location.getBlockZ()));
+		this.set(
+				LocationUtils.getWorld(location).getName(),
+				fromBlock(location.getBlockX()),
+				fromBlock(location.getBlockZ())
+		);
 	}
 
 	/**

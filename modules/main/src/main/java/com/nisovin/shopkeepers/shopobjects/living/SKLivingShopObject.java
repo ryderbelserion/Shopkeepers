@@ -480,8 +480,8 @@ public class SKLivingShopObject<E extends LivingEntity> extends AbstractEntitySh
 			if (ChunkCoords.isSameChunk(shopkeeper.getLocation(), entityLocation)) {
 				// Check if the entity was removed due to the world's difficulty:
 				if (entity.isDead()
-						&& entityLocation.getWorld().getDifficulty() == Difficulty.PEACEFUL
-						&& EntityUtils.isRemovedOnPeacefulDifficulty(this.getEntityType())) {
+						&& EntityUtils.isRemovedOnPeacefulDifficulty(this.getEntityType())
+						&& LocationUtils.getWorld(entityLocation).getDifficulty() == Difficulty.PEACEFUL) {
 					skipRespawnAttemptsIfPeaceful = true;
 					// This is a warning in order to inform server admins about the issue right away.
 					// This is only logged once per affected shopkeeper and then skipped until the difficulty is

@@ -320,9 +320,7 @@ public final class SoundEffect {
 	 * @see World#playSound(Location, String, SoundCategory, float, float)
 	 */
 	public void play(Location location) {
-		Validate.notNull(location, "location is null");
-		World world = location.getWorld();
-		Validate.notNull(world, "World of location is null");
+		World world = LocationUtils.getWorld(location);
 		if (this.isDisabled()) return;
 
 		if (sound != null) {

@@ -1476,7 +1476,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 
 	private void spawnTickVisualizationParticle(Location location) {
 		assert location != null && location.isWorldLoaded() && location.getWorld() != null;
-		World world = location.getWorld();
+		World world = LocationUtils.getWorld(location);
 		world.spawnParticle(Particle.REDSTONE, location, 1, TICK_VISUALIZATION_DUSTS[tickingGroup]);
 	}
 

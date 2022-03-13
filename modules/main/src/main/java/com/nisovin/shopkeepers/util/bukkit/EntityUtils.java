@@ -138,8 +138,8 @@ public final class EntityUtils {
 
 	// filter of null: Accepts all found entities.
 	public static List<Entity> getNearbyEntities(Location location, double radius, boolean loadChunks, Predicate<Entity> filter) {
-		Validate.notNull(location, "location is null");
-		World world = location.getWorld(); // Throws an exception if the world is not loaded
+		// Throws an exception if the world is not available:
+		World world = LocationUtils.getWorld(location);
 		int centerChunkX = location.getBlockX() >> 4;
 		int centerChunkZ = location.getBlockZ() >> 4;
 		int chunkRadius = ((int) (radius / 16)) + 1;

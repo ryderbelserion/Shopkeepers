@@ -38,8 +38,9 @@ public final class MutableBlockLocation extends BlockLocation {
 	public static MutableBlockLocation of(Location location) {
 		Validate.notNull(location, "location is null");
 		// Note: We do not check Location#isWorldLoaded here, because if the location references a world that has been
-		// unloaded by now, this is likely an unexpected error that we want to inform about via an exception.
-		World world = location.getWorld(); // Throws an exception if the world has been unloaded
+		// unloaded by now, this is likely an error that we want to inform about via an exception.
+		// This throws an exception if the world has been unloaded:
+		World world = location.getWorld();
 		String worldName = (world != null) ? world.getName() : null;
 		return new MutableBlockLocation(worldName, location.getBlockX(), location.getBlockY(), location.getBlockZ());
 	}
@@ -153,8 +154,9 @@ public final class MutableBlockLocation extends BlockLocation {
 	public void set(Location location) {
 		Validate.notNull(location, "location is null");
 		// Note: We do not check Location#isWorldLoaded here, because if the location references a world that has been
-		// unloaded by now, this is likely an unexpected error that we want to inform about via an exception.
-		World world = location.getWorld(); // Throws an exception if the world has been unloaded
+		// unloaded by now, this is likely an error that we want to inform about via an exception.
+		// This throws an exception if the world has been unloaded:
+		World world = location.getWorld();
 		String worldName = (world != null) ? world.getName() : null;
 		this.set(worldName, location.getBlockX(), location.getBlockY(), location.getBlockZ());
 	}

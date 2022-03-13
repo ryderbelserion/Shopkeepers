@@ -562,9 +562,7 @@ public class SKShopkeeperRegistry implements ShopkeeperRegistry {
 
 	@Override
 	public Collection<? extends AbstractShopkeeper> getShopkeepersAtLocation(Location location) {
-		Validate.notNull(location, "location is null");
-		World world = location.getWorld();
-		Validate.notNull(world, "World of location is null");
+		World world = LocationUtils.getWorld(location);
 		String worldName = world.getName();
 		int x = location.getBlockX();
 		int y = location.getBlockY();

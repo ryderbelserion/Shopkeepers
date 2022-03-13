@@ -15,11 +15,14 @@ public class CreatureForceSpawnListener implements Listener {
 	private Location nextSpawnLocation = null;
 	private EntityType nextEntityType = null;
 
+	CreatureForceSpawnListener() {
+	}
+
 	// This listener tries to bypass other plugins which block the spawning of living shopkeeper entities.
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = false)
 	void onCreatureSpawn(CreatureSpawnEvent event) {
 		if (nextSpawnLocation == null) return;
-		if (event.getEntityType() == nextEntityType && LocationUtils.isEqualPosition(nextSpawnLocation, event.getLocation())) {
+		if (this.matchesForcedCreatureSpawn(event)) {
 			event.setCancelled(false);
 		} else {
 			// This shouldn't normally be reached..
@@ -31,7 +34,16 @@ public class CreatureForceSpawnListener implements Listener {
 		nextEntityType = null;
 	}
 
-	void forceCreatureSpawn(Location location, EntityType entityType) {
+	private boolean matchesForcedCreatureSpawn(CreatureSpawnEvent event) {
+		if (event.getEntityType() != nextEntityType) {
+			return false;
+		}
+		if (!LocationUtils.isEqualPosition(nextSpawnLocation, event.getLocation())) {
+			return false;
+		}
+		return true;
+	}
+
 		this.nextSpawnLocation = location;
 		this.nextEntityType = entityType;
 	}

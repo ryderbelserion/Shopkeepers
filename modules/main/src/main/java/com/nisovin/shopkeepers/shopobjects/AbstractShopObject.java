@@ -400,9 +400,7 @@ public abstract class AbstractShopObject implements ShopObject {
 		Location particleLocation = this.getTickVisualizationParticleLocation();
 		if (particleLocation == null) return;
 
-		assert particleLocation.isWorldLoaded();
-		World world = particleLocation.getWorld();
-		assert world != null;
+		World world = LocationUtils.getWorld(particleLocation);
 		world.spawnParticle(Particle.VILLAGER_ANGRY, particleLocation, 1);
 	}
 

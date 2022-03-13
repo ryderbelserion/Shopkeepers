@@ -55,8 +55,12 @@ public final class TextUtils {
 	private static final String UNKNOWN_PLAYER = "[unknown]";
 
 	public static String getLocationString(Location location) {
-		assert location != null && location.getWorld() != null; // Also: World is still loaded.
-		return getLocationString(location.getWorld().getName(), location.getX(), location.getY(), location.getZ());
+		return getLocationString(
+				LocationUtils.getWorld(location).getName(),
+				location.getX(),
+				location.getY(),
+				location.getZ()
+		);
 	}
 
 	public static String getLocationString(Block block) {

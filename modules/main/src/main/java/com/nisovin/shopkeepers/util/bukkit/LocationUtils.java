@@ -11,10 +11,27 @@ import com.nisovin.shopkeepers.util.java.Validate;
 public final class LocationUtils {
 
 	/**
+	 * Gets the {@link World} of the given {@link Location}.
+	 * 
+	 * @param location
+	 *            the location, not <code>null</code>
+	 * @return the world, not <code>null</code>
+	 * @throws IllegalArgumentException
+	 *             if the location has no world or the world has been unloaded
+	 */
+	public static World getWorld(Location location) {
+		Validate.notNull(location, "location is null");
+		// Throws an exception if the world is no longer loaded:
+		World world = location.getWorld();
+		return Validate.notNull(world, "location's world is null");
+	}
+
+	/**
 	 * Checks if the given locations represent the same position.
 	 * <p>
-	 * This compares the locations' worlds, which are allowed to be both <code>null</code>, as well as their precise
-	 * coordinates. This method ignores the pitch and yaw of the locations.
+	 * This compares the precise coordinates of the given locations, as well as their worlds. If both locations do not
+	 * store any world, or both their worlds are no longer loaded, their worlds are considered equal. The pitch and yaw
+	 * of the given locations are ignored.
 	 * <p>
 	 * If both locations are <code>null</code>, this returns <code>true</code>.
 	 * 
@@ -27,9 +44,6 @@ public final class LocationUtils {
 	public static boolean isEqualPosition(Location location1, Location location2) {
 		if (location1 == location2) return true; // Also handles both being null
 		if (location1 == null || location2 == null) return false;
-		if (!Objects.equals(location1.getWorld(), location2.getWorld())) {
-			return false;
-		}
 		if (Double.doubleToLongBits(location1.getX()) != Double.doubleToLongBits(location2.getX())) {
 			return false;
 		}
@@ -37,6 +51,14 @@ public final class LocationUtils {
 			return false;
 		}
 		if (Double.doubleToLongBits(location1.getZ()) != Double.doubleToLongBits(location2.getZ())) {
+			return false;
+		}
+		boolean world1Loaded = location1.isWorldLoaded();
+		boolean world2Loaded = location2.isWorldLoaded();
+		if (world1Loaded != world2Loaded) {
+			return false;
+		}
+		if (world1Loaded && !Objects.equals(location1.getWorld(), location2.getWorld())) {
 			return false;
 		}
 		return true;
@@ -57,6 +79,7 @@ public final class LocationUtils {
 	public static double getDistanceSquared(Location location1, Location location2) {
 		Validate.notNull(location1, "location1 is null");
 		Validate.notNull(location2, "location2 is null");
+		// These throw an exception if the worlds are no longer loaded:
 		World world1 = location1.getWorld();
 		World world2 = location2.getWorld();
 		Validate.notNull(world1, "World of location1 is null");
