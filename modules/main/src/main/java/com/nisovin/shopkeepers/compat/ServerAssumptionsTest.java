@@ -65,7 +65,7 @@ public class ServerAssumptionsTest {
 			// Tests passed:
 			result = true;
 			double durationMillis = TimeUtils.convert(System.nanoTime() - startTime, TimeUnit.NANOSECONDS, TimeUnit.MILLISECONDS);
-			Log.debug(() -> "Server assumption tests passed (" + TextUtils.DECIMAL_FORMAT.format(durationMillis) + " ms).");
+			Log.debug(() -> "Server assumption tests passed (" + TextUtils.format(durationMillis) + " ms).");
 		} catch (Exception e) {
 			result = false;
 			Log.severe("Server assumption test failed: " + e.getMessage());

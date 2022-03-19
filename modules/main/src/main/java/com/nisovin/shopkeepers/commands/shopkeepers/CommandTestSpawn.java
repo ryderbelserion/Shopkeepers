@@ -110,7 +110,8 @@ class CommandTestSpawn extends PlayerCommand {
 		player.sendMessage(ChatColor.GREEN + "Shopkeepers: " + ChatColor.YELLOW + activeShopkeepers.size()
 				+ (chunkShopkeepers.size() > activeShopkeepers.size() ? " / " + chunkShopkeepers.size() : "")
 				+ ChatColor.GREEN + "   Repetitions: " + ChatColor.YELLOW + repetitions
-				+ ChatColor.GREEN + "   Total duration: " + ChatColor.YELLOW + TextUtils.DECIMAL_FORMAT.format(totalDurationMillis) + " ms");
+				+ ChatColor.GREEN + "   Total duration: " + ChatColor.YELLOW
+				+ TextUtils.format(totalDurationMillis) + " ms");
 
 		if (failedToSpawn > 0) {
 			player.sendMessage(ChatColor.RED + "  Failed to respawn " + ChatColor.YELLOW + failedToSpawn
@@ -118,15 +119,21 @@ class CommandTestSpawn extends PlayerCommand {
 		}
 
 		player.sendMessage(ChatColor.GRAY + "  Despawn times (avg | avg per | max | max per): "
-				+ ChatColor.WHITE + TextUtils.DECIMAL_FORMAT.format(avgDespawnTimeMillis) + " ms"
-				+ ChatColor.GRAY + " | " + ChatColor.WHITE + TextUtils.DECIMAL_FORMAT_PRECISE.format(avgDespawnTimePerShopkeeperMillis) + " ms"
-				+ ChatColor.GRAY + " | " + ChatColor.WHITE + TextUtils.DECIMAL_FORMAT.format(maxDespawnTimeMillis) + " ms"
-				+ ChatColor.GRAY + " | " + ChatColor.WHITE + TextUtils.DECIMAL_FORMAT_PRECISE.format(maxDespawnTimePerShopkeeperMillis) + " ms");
+				+ ChatColor.WHITE + TextUtils.format(avgDespawnTimeMillis) + " ms"
+				+ ChatColor.GRAY + " | " + ChatColor.WHITE
+				+ TextUtils.formatPrecise(avgDespawnTimePerShopkeeperMillis) + " ms"
+				+ ChatColor.GRAY + " | " + ChatColor.WHITE
+				+ TextUtils.format(maxDespawnTimeMillis) + " ms"
+				+ ChatColor.GRAY + " | " + ChatColor.WHITE
+				+ TextUtils.formatPrecise(maxDespawnTimePerShopkeeperMillis) + " ms");
 		player.sendMessage(ChatColor.GRAY + "  Spawn times (avg | avg per | max | max per): "
-				+ ChatColor.WHITE + TextUtils.DECIMAL_FORMAT.format(avgSpawnTimeMillis) + " ms"
-				+ ChatColor.GRAY + " | " + ChatColor.WHITE + TextUtils.DECIMAL_FORMAT_PRECISE.format(avgSpawnTimePerShopkeeperMillis) + " ms"
-				+ ChatColor.GRAY + " | " + ChatColor.WHITE + TextUtils.DECIMAL_FORMAT.format(maxSpawnTimeMillis) + " ms"
-				+ ChatColor.GRAY + " | " + ChatColor.WHITE + TextUtils.DECIMAL_FORMAT_PRECISE.format(maxSpawnTimePerShopkeeperMillis) + " ms");
+				+ ChatColor.WHITE + TextUtils.format(avgSpawnTimeMillis) + " ms"
+				+ ChatColor.GRAY + " | " + ChatColor.WHITE
+				+ TextUtils.formatPrecise(avgSpawnTimePerShopkeeperMillis) + " ms"
+				+ ChatColor.GRAY + " | " + ChatColor.WHITE
+				+ TextUtils.format(maxSpawnTimeMillis) + " ms"
+				+ ChatColor.GRAY + " | " + ChatColor.WHITE
+				+ TextUtils.formatPrecise(maxSpawnTimePerShopkeeperMillis) + " ms");
 	}
 
 	private static class Result {

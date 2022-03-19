@@ -126,8 +126,8 @@ public class SKSignShopObject extends AbstractBlockShopObject implements SignSho
 					}
 
 					float yaw = BlockFaceUtils.getYaw(signFacing);
-					Log.warning(logPrefix + "Migrating sign facing '" + signFacing
-							+ "' to yaw " + TextUtils.DECIMAL_FORMAT.format(yaw));
+					Log.warning(logPrefix + "Migrating sign facing '" + signFacing + "' to yaw "
+							+ TextUtils.format(yaw));
 					shopkeeperData.set(AbstractShopkeeper.YAW, yaw);
 					migrated = true;
 				}

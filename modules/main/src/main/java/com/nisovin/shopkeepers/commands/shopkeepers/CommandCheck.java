@@ -107,34 +107,34 @@ class CommandCheck extends Command {
 		double avgChunkActivationTimings = chunkActivationTimings.getAverageTimeMillis();
 		double maxChunkActivationTimings = chunkActivationTimings.getMaxTimeMillis();
 		sender.sendMessage("  Chunk activation timings (avg | max | cnt): "
-				+ TextUtils.DECIMAL_FORMAT.format(avgChunkActivationTimings) + " ms" + " | "
-				+ TextUtils.DECIMAL_FORMAT.format(maxChunkActivationTimings) + " ms" + " | "
-				+ chunkActivationTimings.getCounter());
+				+ TextUtils.format(avgChunkActivationTimings) + " ms"
+				+ " | " + TextUtils.format(maxChunkActivationTimings) + " ms"
+				+ " | " + chunkActivationTimings.getCounter());
 
 		double avgTotalAITimings = livingEntityAI.getTotalTimings().getAverageTimeMillis();
 		double maxTotalAITiming = livingEntityAI.getTotalTimings().getMaxTimeMillis();
 		sender.sendMessage("  Total AI timings (per " + Settings.mobBehaviorTickPeriod + " ticks) (avg | max): "
-				+ TextUtils.DECIMAL_FORMAT.format(avgTotalAITimings) + " ms" + " | "
-				+ TextUtils.DECIMAL_FORMAT.format(maxTotalAITiming) + " ms");
+				+ TextUtils.format(avgTotalAITimings) + " ms"
+				+ " | " + TextUtils.format(maxTotalAITiming) + " ms");
 
 		// Note: These are per activation, which happens only every 20 ticks (not per tick).
 		double avgAIActivationTimings = livingEntityAI.getActivationTimings().getAverageTimeMillis();
 		double maxAIActivationTiming = livingEntityAI.getActivationTimings().getMaxTimeMillis();
 		sender.sendMessage("    AI activation timings (per " + LivingEntityAI.AI_ACTIVATION_TICK_RATE + " ticks) (avg | max): "
-				+ TextUtils.DECIMAL_FORMAT.format(avgAIActivationTimings) + " ms" + " | "
-				+ TextUtils.DECIMAL_FORMAT.format(maxAIActivationTiming) + " ms");
+				+ TextUtils.format(avgAIActivationTimings) + " ms"
+				+ " | " + TextUtils.format(maxAIActivationTiming) + " ms");
 
 		double avgGravityTimings = livingEntityAI.getGravityTimings().getAverageTimeMillis();
 		double maxGravityTiming = livingEntityAI.getGravityTimings().getMaxTimeMillis();
 		sender.sendMessage("    Gravity timings (per " + Settings.mobBehaviorTickPeriod + " ticks) (avg | max): "
-				+ TextUtils.DECIMAL_FORMAT.format(avgGravityTimings) + " ms" + " | "
-				+ TextUtils.DECIMAL_FORMAT.format(maxGravityTiming) + " ms");
+				+ TextUtils.format(avgGravityTimings) + " ms"
+				+ " | " + TextUtils.format(maxGravityTiming) + " ms");
 
 		double avgAITimings = livingEntityAI.getAITimings().getAverageTimeMillis();
 		double maxAITiming = livingEntityAI.getAITimings().getMaxTimeMillis();
 		sender.sendMessage("    AI timings (per " + Settings.mobBehaviorTickPeriod + " ticks) (avg | max): "
-				+ TextUtils.DECIMAL_FORMAT.format(avgAITimings) + " ms" + " | "
-				+ TextUtils.DECIMAL_FORMAT.format(maxAITiming) + " ms");
+				+ TextUtils.format(avgAITimings) + " ms"
+				+ " | " + TextUtils.format(maxAITiming) + " ms");
 
 		for (World world : Bukkit.getWorlds()) {
 			String worldName = world.getName();

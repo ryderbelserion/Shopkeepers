@@ -994,7 +994,7 @@ public abstract class AbstractShopkeeper implements Shopkeeper {
 		messageArguments.put("y", this::getY);
 		messageArguments.put("z", this::getZ);
 		// TODO The decimal format is not localized. Move it into the language file?
-		messageArguments.put("yaw", () -> TextUtils.DECIMAL_FORMAT.format(this.getYaw()));
+		messageArguments.put("yaw", () -> TextUtils.format(this.getYaw()));
 		// TODO Rename to 'position'?
 		messageArguments.put("location", this::getPositionString);
 		messageArguments.put("type", () -> this.getType().getIdentifier());

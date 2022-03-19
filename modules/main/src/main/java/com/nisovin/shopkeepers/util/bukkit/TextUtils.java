@@ -45,14 +45,22 @@ public final class TextUtils {
 
 	// FORMATTING AND CONVERSION
 
-	public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.US));
-	public static final DecimalFormat DECIMAL_FORMAT_PRECISE = new DecimalFormat("0.####", new DecimalFormatSymbols(Locale.US));
+	private static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.##", new DecimalFormatSymbols(Locale.US));
+	private static final DecimalFormat DECIMAL_FORMAT_PRECISE = new DecimalFormat("0.####", new DecimalFormatSymbols(Locale.US));
 	static {
 		DECIMAL_FORMAT.setGroupingUsed(false);
 		DECIMAL_FORMAT_PRECISE.setGroupingUsed(false);
 	}
 
 	private static final String UNKNOWN_PLAYER = "[unknown]";
+
+	public static String format(double number) {
+		return DECIMAL_FORMAT.format(number);
+	}
+
+	public static String formatPrecise(double number) {
+		return DECIMAL_FORMAT_PRECISE.format(number);
+	}
 
 	public static String getLocationString(Location location) {
 		return getLocationString(

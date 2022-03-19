@@ -69,9 +69,10 @@ class CommandTestDamage extends PlayerCommand {
 		}
 
 		// Start damage task:
-		player.sendMessage(TextUtils.colorize("&aStarting damage task: Target: &e" + target.getName() + "&a, Damage: &e"
-				+ TextUtils.DECIMAL_FORMAT.format(damage) + "&a, Per tick: &e" + timesPerTick + "&a, Duration &e"
-				+ durationTicks + " ticks &a..."));
+		player.sendMessage(TextUtils.colorize("&aStarting damage task: Target: &e"
+				+ target.getName() + "&a, Damage: &e" + TextUtils.format(damage)
+				+ "&a, Per tick: &e" + timesPerTick + "&a, Duration &e" + durationTicks
+				+ " ticks &a..."));
 
 		new BukkitRunnable() {
 
