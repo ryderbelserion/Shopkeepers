@@ -48,10 +48,12 @@ class TextParser {
 			char c = input.charAt(i);
 
 			// Color codes:
+			// TODO This does not account for hex colors. Bukkit's ChatColor is not able to
+			// represent hex colors. We will need to switch to Spigot's BungeeCord ChatColor to
+			// represent those.
 			ChatColor color = null;
-			if ((c == ChatColor.COLOR_CHAR || c == TextUtils.COLOR_CHAR_ALTERNATIVE) && i + 1 < length) {
-				char colorChar = Character.toLowerCase(input.charAt(i + 1));
-				color = ChatColor.getByChar(colorChar);
+			if (i + 1 < length) {
+				color = TextUtils.getChatColor(c, input.charAt(i + 1), true);
 			}
 			if (color != null) {
 				// Append formatting:

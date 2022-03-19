@@ -142,6 +142,23 @@ public final class TextUtils {
 	private static final Pattern STRIP_COLOR_ALTERNATIVE_PATTERN = Pattern.compile("(?i)" + COLOR_CHAR_ALTERNATIVE + "[0-9A-FK-ORX]");
 	private static final String COLOR_CODES = "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx";
 
+	public static boolean isAnyColorChar(char c) {
+		return c == ChatColor.COLOR_CHAR || c == COLOR_CHAR_ALTERNATIVE;
+	}
+
+	// TODO Does not support hex colors.
+	public static ChatColor getChatColor(char c1, char c2, boolean anyColorChar) {
+		if (anyColorChar ? isAnyColorChar(c1) : (c1 == ChatColor.COLOR_CHAR)) {
+			return getChatColorByChar(c2);
+		}
+		return null;
+	}
+
+	// TODO Does not support hex colors.
+	public static ChatColor getChatColorByChar(char c) {
+		return ChatColor.getByChar(Character.toLowerCase(c));
+	}
+
 	// Only checks for the Minecraft color code character, not the alternative color code character.
 	public static boolean containsColorChar(String text) {
 		return StringUtils.contains(text, ChatColor.COLOR_CHAR);
