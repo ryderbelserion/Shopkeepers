@@ -42,6 +42,7 @@ import com.nisovin.shopkeepers.shopobjects.AbstractShopObjectType;
 import com.nisovin.shopkeepers.shopobjects.block.BlockShopObjectIds;
 import com.nisovin.shopkeepers.shopobjects.entity.EntityShopObjectIds;
 import com.nisovin.shopkeepers.storage.SKShopkeeperStorage;
+import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;
 import com.nisovin.shopkeepers.util.java.StringUtils;

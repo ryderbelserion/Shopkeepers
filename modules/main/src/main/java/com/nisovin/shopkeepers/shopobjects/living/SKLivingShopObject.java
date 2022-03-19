@@ -35,6 +35,7 @@ import com.nisovin.shopkeepers.shopobjects.ShopObjectData;
 import com.nisovin.shopkeepers.shopobjects.ShopkeeperMetadata;
 import com.nisovin.shopkeepers.shopobjects.entity.AbstractEntityShopObject;
 import com.nisovin.shopkeepers.util.bukkit.EntityUtils;
+import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.bukkit.TextUtils;
 import com.nisovin.shopkeepers.util.bukkit.WorldUtils;
 import com.nisovin.shopkeepers.util.data.serialization.InvalidDataException;

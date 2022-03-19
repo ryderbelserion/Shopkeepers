@@ -23,6 +23,7 @@ import com.nisovin.shopkeepers.shopkeeper.registry.ShopObjectRegistry;
 import com.nisovin.shopkeepers.shopkeeper.spawning.ShopkeeperSpawnState;
 import com.nisovin.shopkeepers.ui.editor.Button;
 import com.nisovin.shopkeepers.ui.editor.EditorHandler;
+import com.nisovin.shopkeepers.util.bukkit.LocationUtils;
 import com.nisovin.shopkeepers.util.data.property.BasicProperty;
 import com.nisovin.shopkeepers.util.data.property.Property;
 import com.nisovin.shopkeepers.util.data.property.validation.java.StringValidators;
