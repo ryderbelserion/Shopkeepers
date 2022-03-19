@@ -40,6 +40,7 @@ Date format: (YYYY-MM-DD)
 * Command: The "giveCurrency" and "setCurrency" commands refer to the low currency as 'base' currency now.
 * Command: Different types of command executors (e.g. command blocks and the console) no longer share their pending confirmation state.
 * Command: Confirmations account for proxied command senders now: Since the original caller of the command receives the command's feedback messages, we also require confirmation from the original caller.
+* Fixed: When removing or translating color codes in text we also account for Bukkit's hex color code now (x).
 
 **Debugging changes:**
 * We still clear all shopkeeper registry collections during plugin shutdown, just in case something went wrong earlier and prevented elements from being properly removed. But we also log a warning in this case now.

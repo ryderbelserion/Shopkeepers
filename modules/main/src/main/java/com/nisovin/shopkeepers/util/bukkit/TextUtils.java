@@ -139,7 +139,8 @@ public final class TextUtils {
 	}
 
 	public static final char COLOR_CHAR_ALTERNATIVE = '&';
-	private static final Pattern STRIP_COLOR_ALTERNATIVE_PATTERN = Pattern.compile("(?i)" + COLOR_CHAR_ALTERNATIVE + "[0-9A-FK-OR]");
+	private static final Pattern STRIP_COLOR_ALTERNATIVE_PATTERN = Pattern.compile("(?i)" + COLOR_CHAR_ALTERNATIVE + "[0-9A-FK-ORX]");
+	private static final String COLOR_CODES = "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx";
 
 	// Only checks for the Minecraft color code character, not the alternative color code character.
 	public static boolean containsColorChar(String text) {
@@ -147,15 +148,16 @@ public final class TextUtils {
 	}
 
 	// Reverse of ChatColor#translateAlternateColorCodes:
-	public static String translateColorCodesToAlternative(char altColorChar, String textToTranslate) {
-		char[] b = textToTranslate.toCharArray();
-		for (int i = 0; i < b.length - 1; i++) {
-			if (b[i] == ChatColor.COLOR_CHAR && "0123456789AaBbCcDdEeFfKkLlMmNnOoRr".indexOf(b[i + 1]) > -1) {
-				b[i] = altColorChar;
-				b[i + 1] = Character.toLowerCase(b[i + 1]);
+	public static String translateColorCodesToAlternative(char altColorChar, String text) {
+		Validate.notNull(text, "text is null");
+		char[] c = text.toCharArray();
+		for (int i = 0; i < c.length - 1; i++) {
+			if (c[i] == ChatColor.COLOR_CHAR && COLOR_CODES.indexOf(c[i + 1]) > -1) {
+				c[i] = altColorChar;
+				c[i + 1] = Character.toLowerCase(c[i + 1]);
 			}
 		}
-		return new String(b);
+		return new String(c);
 	}
 
 	public static String stripColor(String colored) {
