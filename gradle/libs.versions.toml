@@ -10,7 +10,7 @@ craftbukkit = "1.14.4-R0.1-SNAPSHOT"
 checkerframework = "3.21.2"
 
 worldguard = "7.0.0"
-towny = "0.96.2.0"
+towny = "0.98.1.0"
 citizens = "2.0.29-SNAPSHOT"
 vault = "1.7"
 bstats = "1.5"
@@ -28,7 +28,8 @@ checkerframework-qual = { module = "org.checkerframework:checker-qual", version.
 checkerframework-checker = { module = "org.checkerframework:checker", version.ref = "checkerframework" }
 
 worldguard-bukkit = { module = "com.sk89q.worldguard:worldguard-bukkit", version.ref = "worldguard" }
-towny = { module = "com.github.TownyAdvanced:Towny", version.ref = "towny" }
+#towny = { module = "com.github.TownyAdvanced:Towny", version.ref = "towny" }
+towny = { module = "com.palmergames.bukkit.towny:towny", version.ref = "towny" }
 citizens-main = { module = "net.citizensnpcs:citizens-main", version.ref = "citizens" }
 vault-api = { module = "net.milkbowl.vault:VaultAPI", version.ref = "vault" }
 bstats-bukkit = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
